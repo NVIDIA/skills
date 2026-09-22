@@ -4,9 +4,10 @@ description: Run container-backed AutoML / hyperparameter optimization (HPO) for
   selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on any TAO SDK
   platform, result interpretation, and per-rec custom evaluation hooks. Use when the user mentions TAO AutoML, hyperparameter
   optimization, HPO, automl, automl_settings, AutoMLRunner, tao_automl, bayesian search, hyperband, ASHA, LLM-guided search,
-  autoresearch, or wants to tune train/distill/prune/quantize action parameters for any TAO network. Model actions use the model skill's
-  resolved container image by default; venv training requires an explicit user request. Platform-agnostic — runs on any SDK (Brev,
-  SLURM, Kubernetes, Docker).
+  autoresearch, or wants to tune train/evaluate/inference/distill/prune/quantize for a TAO network. Model actions use the resolved
+  image; venv training requires an explicit request. Platform-agnostic — runs on any SDK (Brev,
+  SLURM, Kubernetes, Docker). Do not use generic "keep improving" language alone to override a matching domain-specific
+  DEFT workflow; attribute-labelled CLIP / SigLIP image-retrieval loops belong to tao-run-deft-pas unless HPO is explicit.
 license: Apache-2.0
 compatibility: Requires docker + nvidia-container-toolkit. Workflows declare additional requirements.
 metadata:
@@ -24,7 +25,7 @@ tags:
 
 # TAO AutoML
 
-> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
+> **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run `tao-setup` first (host preflight, credentials, cross-skill discovery).
 
 Run automated hyperparameter optimization for a TAO model by combining:
 
@@ -44,12 +45,11 @@ final evaluation runs in the selected model action's resolved
 training-environment setup. A local checkpoint or Hugging Face model ID does not
 change this rule.
 
-Use venv-based **model action execution** only when the user explicitly asks for
-venv execution. Never infer venv mode from `local-docker`, local GPUs, an
-installed Python stack, or the presence of `pyproject.toml`. If the execution
-mode is absent, it is container-backed. A host/controller venv installed for
-`tao_automl`, TAO SDK, or a platform adapter is control-plane-only; state this
-clearly and keep all child model actions in the resolved container image.
+Use venv-based **model execution** only when explicitly requested. Never infer
+venv mode from `local-docker`, local GPUs, Python, or `pyproject.toml`. If
+absent, execution is container-backed. A host/controller venv for `tao_automl`,
+TAO SDK, or a platform adapter is
+control-plane-only; keep child model actions in the resolved container image.
 
 ## Reference Map
 
@@ -60,8 +60,9 @@ clearly and keep all child model actions in the resolved container image.
   sufficiency and future compression-search roadmap;
   `automl-runner-configuration.md` for runner/API/WandB details;
   `automl-advanced-monitoring.md` for hooks, resume, and pitfalls; and
-  `automl-examples.md` for conversation examples. `detailed-guide.md` is only
-  the map.
+  `automl-examples.md` for conversation examples; and
+  `automl-common-pitfalls.md` for recurring safety checks. `detailed-guide.md`
+  is only the map.
 - `skills/models/<network>/SKILL.md`: model-specific dataset requirements, metrics,
   HPO notes, checkpoint handoff, and known failures.
 - `skills/models/<network>/references/skill_info.yaml`: action contract,
@@ -82,11 +83,16 @@ clearly and keep all child model actions in the resolved container image.
 python -c "import tao_automl; from tao_automl.runner import AutoMLRunner; print('OK')"
 ```
 
+Then verify the selected platform's SDK constructs — importing `tao_automl` does
+not prove the platform backend is installed (e.g. `DockerSDK()` raises
+`CredentialError` without the `docker` package). See
+`automl-preflight-concepts.md`.
+
 If missing, show the exact install command from `versions.yaml` and ask before
 installing:
 
 ```bash
-SB="${TAO_SKILL_BANK_PATH:-~/tao-skills-external}"
+SB="${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}"
 pip install "$($SB/scripts/resolve_versions_key.py wheels.tao_automl_<platform>)"
 ```
 
@@ -116,11 +122,11 @@ Collect these before runner construction:
 
 | Input | Requirement |
 |---|---|
-| `model_skill` | Resolved model skill directory under `skills/models/`. Accept user aliases such as `network_arch` only after resolving them to the packaged skill directory. |
+| `model_skill` | Resolved model skill directory under `skills/models/`. Resolve user aliases such as `network_arch` to the packaged skill directory first. |
 | `network_arch` | Read from the resolved model skill metadata. |
-| `action` | Action to optimize, usually `train`, `distill`, `prune`, or `quantize`. |
+| `action` | Action to optimize — `train`, `evaluate`, `inference`, `distill`, `prune`, or `quantize` with a packaged schema/template. |
 | `platform` | One of the supported TAO platform skills. |
-| `train_dataset` / `eval_dataset` / action inputs | Use model-specific spec keys and dataset layout. Non-train actions often also require parent checkpoints, teacher checkpoints, calibration data, or pruned artifacts. |
+| `train_dataset` / `eval_dataset` / action inputs | Use model-specific spec keys and layout. Non-train actions may also need parent/teacher checkpoints, calibration data, or pruned artifacts. |
 | `results_root` | Local, Lustre, or S3 path appropriate for the platform. |
 | `gpu_count`, `num_nodes` | Respect model and platform limits. |
 | `container_image` | Resolve through model metadata and `versions.yaml`; show it to the user. |
@@ -171,22 +177,19 @@ spec/template, and the selected platform's normal job submission path. If the
 model skill recommends a smaller shape for evaluation than training, use that
 shape and call it out in the launch review.
 
-Share the eval metric number with the user in the launch review before asking
-for confirmation to launch recommendations. If the model has no packaged
-evaluate action, the eval dataset is missing, or the eval job fails, stop and
-report the blocker instead of silently falling back to a training-loss-only
-AutoML run. Continue without this baseline only when the user explicitly accepts
-that the run will optimize a proxy metric and will not have an impact baseline.
+Share the eval metric number in the launch review before asking for confirmation. If a
+starting checkpoint exists but the baseline cannot be
+produced — no packaged evaluate action, missing eval dataset, failed eval job —
+stop and report the blocker instead of silently falling back to a
+training-loss-only run.
 
-The AutoML runner owns final evaluation of the selected best checkpoint/model.
-When a runnable evaluate action and validation/eval data exist, pass a
-`final_eval_fn(best_rec, train_job_id)` callback to `AutoMLRunner.run`. The
-callback must evaluate the selected best checkpoint/model with the same metric,
-dataset, and direction used for the baseline, store a structured record under
-the workspace, and return the measured metric or a dict containing
-`metric_value` and metadata such as `record_path` and `job_id`. Do not run final
-evaluation as an agent-side step after `runner.run`; the returned result should
-contain `result["final_evaluation"]` with a concrete status and reason.
+For training from scratch, record the baseline as unavailable and proceed; do
+not evaluate an empty checkpoint.
+
+The runner owns final evaluation. When eval is runnable, pass
+`final_eval_fn(best_rec, train_job_id)` to `AutoMLRunner.run`; the result then
+carries `result["final_evaluation"]`. See `automl-preflight-concepts.md` for
+the callback, checkpoint, baseline, and from-scratch rules.
 
 ## Dependency And Data Preflight
 
@@ -196,8 +199,7 @@ before continuing. After user approval, rerun
 `scripts/check_tao_launch_preflight.py` with `--install-missing-tools` so it
 installs the smallest needed package and immediately retries path verification.
 For S3 paths, verify both credentials and path readability from the launch
-platform before creating runner artifacts. Do not wait for the first training
-container to discover a missing AWS CLI, S3 client, or unreadable URI.
+platform before creating runner artifacts.
 
 For models that read large media archives or directories during every training
 trial, stage or extract the dataset once to storage visible from the execution
@@ -226,10 +228,16 @@ adjustment in `result["history"][i]["adjustments"]`.
 | Algorithm | Good fit | Required knobs |
 |---|---|---|
 | `bayesian` | Default for small/medium budgets and few parameters. | `num_recommendations`, metric, direction |
-| `hyperband`, `asha` | Many configs with cheap early rungs; ASHA supports parallelism. | `max_epochs`, `reduction_factor`, optional `max_concurrent` |
+| `hyperband`, `asha` | Many configs, cheap early rungs; ASHA is parallel-friendly. | `max_epochs`, `reduction_factor`, optional `max_concurrent` |
 | `bohb`, `dehb` | Mixed Bayesian/evolutionary search with multi-fidelity budgets. | same rung budget fields as Hyperband |
 | `pbt` | Long training where schedules should mutate during training. | population and generation budget |
-| `llm`, `hybrid`, `autoresearch` | User explicitly wants LLM-guided search and has an endpoint configured. | LLM endpoint config plus budget |
+| `llm`, `hybrid`, `autoresearch` | User explicitly wants LLM-guided search with a configured endpoint. | LLM endpoint config plus budget |
+
+For `evaluate` or `inference`, default to Bayesian/BFBO-style search over the
+selected action's prompt, decoding, preprocessing, or runtime config knobs.
+Use a task metric from the action outputs/logs and set `direction` explicitly
+when the metric name is ambiguous. Do not use training-loss assumptions for
+actions that do not update weights.
 
 For `distill`, use the same train-like policy when the distill action performs
 epoch-based optimization and writes checkpoints. For single-shot `prune` and
@@ -278,9 +286,7 @@ metric. Use one of these:
 Do not map `kpi` to a metric unless the model skill explicitly defines that
 mapping.
 
-For every AutoML run with a runnable evaluate action and validation/eval data,
-run the automatic baseline eval job after preflight and before recommendations.
-The final report must compare that baseline metric, each recommendation's
+The final report must compare the baseline metric, each recommendation's
 metric, and the selected best metric so users can see the impact of tuning. For
 model skills that require an `eval_fn` to compute the real task metric, use
 that evaluator instead of optimizing a convenient training loss unless the user
@@ -291,35 +297,59 @@ explicitly accepts the proxy metric.
 Use the selected platform SDK only after its preflight passes. Construct SDKs
 without embedding credentials in code.
 
+`sdk` is the platform SDK object; containerless venv models use
+`VirtualEnvSDK(venv_path=..., work_dir=...)`. Always pass `work_dir` -- the
+default `~/.tao_sdk/virtualenv` fills the home directory with trial
+checkpoints. See `automl-runner-configuration.md`.
+
 ```python
+import sys
 from pathlib import Path
 from tao_automl.runner import AutoMLRunner
 
 skill_bank = Path("<absolute-tao-skill-bank>")
 model_skill = "<resolved-model-skill-directory>"
 skill_dir = skill_bank / "skills" / "models" / model_skill
+sys.path.insert(
+    0, str(skill_bank / "skills/applications/tao-run-automl/scripts")
+)
+from resolve_automl_session import validate_session_settings
 
 runner = AutoMLRunner(
+    sdk=sdk,
     skill_dir=str(skill_dir),
-    platform_sdk=sdk,
-    workspace_dir="<automl_workspace>",
+    action=action,                      # train, distill, prune, quantize, ...
 )
 
+workspace_path = Path("<automl_workspace>")
+resume = False
+# Mandatory fail-closed gate from this skill's bundled scripts directory.
+validate_session_settings(
+    automl_settings,
+    resume=resume,
+    workspace=workspace_path if resume else None,
+)
 result = runner.run(
-    automl_algorithm=algorithm,
-    automl_settings=automl_settings,
+    workspace_path=str(workspace_path),    # timestamp it to avoid collisions
+    automl_settings=automl_settings,       # must contain an explicit session_id
     spec_overrides=spec_overrides,
     automl_hyperparameters=automl_hyperparameters,
     custom_param_ranges=custom_param_ranges,
     metric_extractor=metric_extractor,  # optional
     eval_fn=eval_fn,                    # optional
     final_eval_fn=final_eval_fn,        # optional but required when final eval is runnable
+    resume=resume,
 )
 ```
 
-Only resume an existing workspace when the user explicitly asks to resume,
-continue, recover, or inspect an existing experiment. Treat a plain "run
-AutoML" request as a fresh run.
+Set `automl_settings["session_id"]` explicitly and call
+`validate_session_settings` before every run. Generate a fresh ID once with
+`scripts/resolve_automl_session.py new`. Resume only when explicitly requested;
+resolve its controller with
+`scripts/resolve_automl_session.py resolve --workspace <full-run-path>`.
+Missing or ambiguous state is a blocker. See the
+resume section of `references/automl-advanced-monitoring.md` for the complete
+fresh/resume pattern.
 
 ## Monitoring
 
@@ -372,19 +402,5 @@ At completion:
 
 ## Common Pitfalls
 
-- Do not expect `~/tao-core` at runtime. Schemas and templates must be packaged
-  inside the model skill.
-- Do not infer dataset URIs from previous runs.
-- Do not precompute SDK-managed output paths; non-URI output values are routed
-  by the SDK.
-- For SLURM, stage large datasets on Lustre rather than burning GPU allocation
-  time on large S3 downloads.
-- For gated HuggingFace models, verify `HF_TOKEN` is set without reading it.
-- If all recommendations fail, stop and summarize the shared root cause instead
-  of launching more trials.
-- Do not disable `automl_delete_intermediate_ckpt` by default. Keeping every
-  trial can consume one full distributed checkpoint set per recommendation.
-- Do not bypass a retention-preflight failure by disabling cleanup unless the
-  user has explicitly accepted external ownership and manual lifecycle
-  management for every trial artifact.
-
+See `references/automl-common-pitfalls.md` before launching or recovering an
+AutoML run.

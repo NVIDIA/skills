@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, and running inference on Visual ChangeNet models for binary image classification and change segmentation in PCB defect detection and AOI visual inspection workflows. <br>
+Developers and engineers training, evaluating, exporting, and running inference on Visual ChangeNet models for PCB defect detection and visual inspection, comparing image pairs for PASS/NO_PASS classification or producing change-segmentation masks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Optional] <br>
-**Credential Type(s):** [API key] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,12 +26,12 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [data-formats.md](references/data-formats.md) <br>
+- [dinov3-backbones.md](references/dinov3-backbones.md) <br>
 - [local-docker.md](references/local-docker.md) <br>
-- [parent-model-inference.md](references/parent-model-inference.md) <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
-- [tao-deploy-visual-changenet.md](references/tao-deploy-visual-changenet.md) <br>
-- [troubleshooting.md](references/troubleshooting.md) <br>
 - [tuning-parameters.md](references/tuning-parameters.md) <br>
+- [troubleshooting.md](references/troubleshooting.md) <br>
+- [tao-deploy-visual-changenet.md](references/tao-deploy-visual-changenet.md) <br>
+- [parent-model-inference.md](references/parent-model-inference.md) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
@@ -48,35 +48,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1, each attempt in an isolated sandbox pod. <br>
+1 evaluation task across 2 agents, each attempt isolated in its own sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks goal completion (goal_accuracy 50%) and expected workflow adherence (behavior_check 50%). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
+- Efficiency: Tool-call productivity and token efficiency (50% each). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 38% → 100% (+62 points) | 54% → 95% (+41 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 17% → 100% (+83 points) | 70% → 83% (+13 points) |
-| Efficiency | 25% → 100% (+75 points) | 0% → 100% (+100 points) |
+| Overall | 99.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 33.3% → 100.0% (+66.7 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 17.8% → 100.0% (+82.2 points) | 70.0% → 83.3% (+13.3 points) |
+| Efficiency | 96.8% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

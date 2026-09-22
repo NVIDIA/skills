@@ -35,8 +35,8 @@ Run `scripts/list_tao_capabilities.py` for general capability questions, or
 For a general capabilities answer, run the packaged helper:
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_capabilities.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --format text
+${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/list_tao_capabilities.py \
+  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} --format text
 ```
 
 Use the helper output as the source of truth for the answer instead of manually
@@ -44,7 +44,10 @@ enumerating capabilities from this skill or plugin metadata. Include:
 
 - Every top-level application workflow under `applications/` and what it can do.
 - Every top-level data workflow under `data/` and what it can do.
-- Supported execution platforms from `scripts/list_tao_platforms.py`.
+- Supported execution platforms, discovered from the installed platform skills
+  (tao-run-on-docker / -slurm / -kubernetes / -brev, plus any external one); on a
+  runtime that surfaces only the core router skills, read
+  `skills/platform/tao-run-on-*/SKILL.md` frontmatter.
 - The fine-tuning/deployment workflow coverage for models under `models/`: train,
   evaluate, inference, export, and TensorRT engine generation when those actions
   are present in the packaged schema manifest.
@@ -57,8 +60,8 @@ run, use the packaged model-list script instead of manually scanning model
 folders:
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_models.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --scope all --format text
+${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/list_tao_models.py \
+  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} --scope all --format text
 ```
 
 The model list comes from `skills/models/schemas.manifest.json`.
@@ -69,13 +72,13 @@ When the user asks what models are capable with AutoML, use the same model-list
 script in AutoML mode, or the compatibility wrapper:
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_models.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --scope automl --format text
+${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/list_tao_models.py \
+  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} --scope automl --format text
 ```
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_automl_support.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --format text
+${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/list_automl_support.py \
+  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} --format text
 ```
 
 Use `--action distill`, `--action prune`, or `--action quantize` when the user
@@ -85,4 +88,3 @@ AutoML support for an action requires
 `skills/models/<model_skill>/schemas/<action>.schema.json` to be packaged with the plugin
 and parse successfully as JSON. If that dataclass schema is missing or invalid,
 do not describe the model/action as AutoML-supported.
-

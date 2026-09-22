@@ -1,5 +1,5 @@
 ## Description: <br>
-DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection — a transformer-based detector with denoising training, multi-scale features, and optional distillation support for training, evaluating, exporting, distilling, quantizing, or running inference with TAO. <br>
+DINO (DETR with Improved DeNoising Anchor Boxes) for 2D object detection — a transformer-based detector with denoising training, multi-scale features, and optional distillation support. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, distilling, quantizing, or running inference for NVIDIA TAO DINO 2D object detectors using docker and nvidia-container-toolkit. <br>
+Developers and engineers training, evaluating, exporting, distilling, quantizing, or running inference for DINO-based 2D object detection models using NVIDIA TAO. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,13 +25,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DINO Data Specs](references/dino-data-specs.md) <br>
-- [DINO Actions and Error Patterns](references/dino-actions-errors.md) <br>
-- [DINO Tuning and Multi-GPU](references/dino-tuning-multigpu.md) <br>
-- [DINO AutoML and SDK](references/dino-automl-sdk.md) <br>
-- [TAO Deploy DINO](references/tao-deploy-dino.md) <br>
-- [Detailed Guide Map](references/detailed-guide.md) <br>
-- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [detailed-guide.md](references/detailed-guide.md) <br>
+- [dino-data-specs.md](references/dino-data-specs.md) <br>
+- [dino-actions-errors.md](references/dino-actions-errors.md) <br>
+- [dino-tuning-multigpu.md](references/dino-tuning-multigpu.md) <br>
+- [tao-deploy-dino.md](references/tao-deploy-dino.md) <br>
 
 
 ## Skill Output: <br>
@@ -47,35 +46,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), evaluated locally with evaluator version 1.3.2. Dataset digest: sha256:a0a4e58efb79. <br>
+1 evaluation task (1 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the skill produces correct answers against the reference answer. <br>
-- Discoverability: Whether the right skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helps complete the user's goal (goal completion and expected workflow adherence). <br>
-- Efficiency: Whether the skill avoids wasted tool or skill usage — routing quality and productive tool use. <br>
+- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was selected when needed and decoys were avoided. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (goal_accuracy 50% + behavior_check 50%). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (skill_efficiency 50% + token_efficiency 50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 48% → 96% (+48 points) | 52% → 95% (+44 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 32% → 95% (+63 points) | 58% → 83% (+25 points) |
-| Efficiency | 39% → 83% (+44 points) | 0% → 100% (+100 points) |
+| Overall | 94.4% | 94.3% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 11.1% → 100.0% (+88.9 points) | 70.0% → 78.3% (+8.3 points) |
+| Efficiency | 72.0% | 98.1% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

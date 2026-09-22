@@ -118,9 +118,9 @@ Required:
 Put secrets in `.env` at the project root:
 
 ```
-export HF_TOKEN=hf_xxx
-export WANDB_API_KEY=xxx
-export WANDB_PROJECT=<project>
+HF_TOKEN=hf_xxx
+WANDB_API_KEY=xxx
+WANDB_PROJECT=<project>
 ```
 
 ## Run
@@ -133,7 +133,7 @@ inside the container is safe and keeps outputs in `checkpoints/`, `logs/`,
 convention as `tao-finetune-huggingface-model/references/docker-runs.md`.
 
 ```bash
-source .env
+set -a; source .env; set +a
 
 # 1. Build image (once)
 docker build -t run-<model_short_name>:latest .
@@ -194,6 +194,8 @@ docker run --rm --gpus all --shm-size=16g --entrypoint /bin/bash \
 (LoRA only — insert between steps 5 and 6:)
 
 ```bash
+set -a; source .env; set +a
+
 docker run --rm --gpus all --entrypoint /bin/bash \
   --user $(id -u):$(id -g) \
   -e HF_TOKEN \

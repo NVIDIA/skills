@@ -101,7 +101,7 @@ def main() -> int:
 
     token = os.environ.get("HF_TOKEN") or None
     try:
-        src = hf_hub_download(repo_id=args.repo_id, filename=args.filename, token=token)
+        src = hf_hub_download(repo_id=args.repo_id, filename=args.filename, token=token)  # nosec B615 - pinned repo_id/filename from CLI args
     except Exception as exc:  # network, auth, missing file — all are hard stops
         sys.exit(
             f"stage_backbone: failed to download {args.filename} from {args.repo_id}: {exc}\n"

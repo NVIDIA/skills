@@ -34,7 +34,7 @@ Before writing any code, search the submodules for the closest existing model to
 
 ### 2.1 Determine the task type and find the closest existing TAO model
 
-The HF model's `pipeline_tag` (from Phase 1.4) determines which TAO reference model to follow. **Different task types have fundamentally different architectures, losses, dataset formats, and deploy pipelines** — see [references/task-type-guide.md](references/task-type-guide.md) for full details.
+The HF model's `pipeline_tag` (from Phase 1.4) determines which TAO reference model to follow. **Different task types have fundamentally different architectures, losses, dataset formats, and deploy pipelines** — see [references/task-type-guide.md](task-type-guide.md) for full details.
 
 ```bash
 # Identify a similar model by task type and architecture

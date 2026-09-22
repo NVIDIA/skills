@@ -7,16 +7,16 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers converting NVIDIA TAO DAFT datasets between supported formats for VLM training pipeline preparation. <br>
+Developers and engineers who need to convert NVIDIA TAO DAFT datasets between supported formats for VLM training and data processing pipelines. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -42,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) against skill-evaluator-dataset-snapshot. <br>
+1 evaluation task (1 positive), evaluated in isolated k8s-sandbox pods with 3 attempts per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed. <br>
-- Effectiveness: Checks goal completion and expected workflow adherence. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Verifies final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Measures goal completion and expected workflow adherence. <br>
+- Efficiency: Evaluates tool-call productivity and token usage efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+| Measure | Claude Code | Codex |
 |---|---:|---:|
-| Overall | 45% → 97% (+52 points) | 54% → 57% (+3 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 100% → 100% (±0 points) |
-| Discoverability | 44% → 100% (+56 points) | 0% → 0% (±0 points) |
-| Effectiveness | 32% → 100% (+68 points) | 70% → 85% (+15 points) |
-| Efficiency | 29% → 83% (+55 points) | 0% → 0% (±0 points) |
+| Overall | 99.6% | 70.7% |
+| Security | 100.0% | 100.0% |
+| Correctness | 100.0% | 80.0% |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 100.0% | 75.0% |
+| Efficiency | 97.8% | 98.6% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

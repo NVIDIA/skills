@@ -578,7 +578,7 @@
         },
         "concat_type": {
           "default": "linear",
-          "description": "concat type",
+          "description": "How lighting tensors are combined in input_map YAML key order. linear stacks along image height and ignores grid_map. grid places inputs row-major and requires an even num_input with grid_map.x * grid_map.y == num_input.",
           "enum": [
             "linear",
             "grid"
@@ -599,12 +599,12 @@
             "x": 2,
             "y": 2
           },
-          "description": "grid map",
+          "description": "Grid columns (x) and rows (y), used only when concat_type=grid. x*y must equal num_input. With the default 2x2 input_map order, LowAngle/Solder form the first row and Uniform/White the second.",
           "type": "collection"
         },
         "image_ext": {
           "default": ".jpg",
-          "description": "Image extension",
+          "description": "Extension appended after <object_name>_<input_map key> for every board and golden image; include the leading dot.",
           "type": "string"
         },
         "image_height": {
@@ -623,15 +623,16 @@
             "csv_path": "???",
             "images_dir": "???"
           },
+          "description": "Inference split in the four-column Optical Inspection CSV contract: input_path,golden_path,label,object_name.",
           "properties": {
             "csv_path": {
               "default": "???",
-              "description": "Path to csv file for dataset",
+              "description": "CSV with required string columns input_path, golden_path, label, object_name. Paths name directories relative to images_dir or absolute; object_name is a stem without lighting/extension; exact PASS is class 0 and any other non-empty defect name is class 1.",
               "type": "string"
             },
             "images_dir": {
               "default": "???",
-              "description": "Path to images directory for dataset",
+              "description": "Runtime image root. Relative CSV directories resolve below this root; it must directly contain golden/ and the referenced board directories.",
               "type": "string"
             }
           },
@@ -645,12 +646,12 @@
             "UniformLight": 2,
             "WhiteLight": 3
           },
-          "description": "input mapping",
+          "description": "Ordered mapping from exact filename lighting suffix to zero-based position. The loader iterates YAML key insertion order, so values must be contiguous 0..N-1 in that same order and the entry count must equal num_input.",
           "type": "collection"
         },
         "num_input": {
           "default": 4,
-          "description": "Number of input lighting conditions",
+          "description": "Number of lighting images loaded for each board side and its golden side. Must equal the number of input_map entries.",
           "maximum": Infinity,
           "minimum": 1,
           "type": "int"
@@ -661,15 +662,16 @@
             "csv_path": "???",
             "images_dir": "???"
           },
+          "description": "Evaluation/test split in the four-column Optical Inspection CSV contract: input_path,golden_path,label,object_name.",
           "properties": {
             "csv_path": {
               "default": "???",
-              "description": "Path to csv file for dataset",
+              "description": "CSV with required string columns input_path, golden_path, label, object_name. Paths name directories relative to images_dir or absolute; object_name is a stem without lighting/extension; exact PASS is class 0 and any other non-empty defect name is class 1.",
               "type": "string"
             },
             "images_dir": {
               "default": "???",
-              "description": "Path to images directory for dataset",
+              "description": "Runtime image root. Relative CSV directories resolve below this root; it must directly contain golden/ and the referenced board directories.",
               "type": "string"
             }
           },
@@ -681,15 +683,16 @@
             "csv_path": "???",
             "images_dir": "???"
           },
+          "description": "Training split in the four-column Optical Inspection CSV contract: input_path,golden_path,label,object_name.",
           "properties": {
             "csv_path": {
               "default": "???",
-              "description": "Path to csv file for dataset",
+              "description": "CSV with required string columns input_path, golden_path, label, object_name. Paths name directories relative to images_dir or absolute; object_name is a stem without lighting/extension; exact PASS is class 0 and any other non-empty defect name is class 1.",
               "type": "string"
             },
             "images_dir": {
               "default": "???",
-              "description": "Path to images directory for dataset",
+              "description": "Runtime image root. Relative CSV directories resolve below this root; it must directly contain golden/ and the referenced board directories.",
               "type": "string"
             }
           },
@@ -701,15 +704,16 @@
             "csv_path": "???",
             "images_dir": "???"
           },
+          "description": "Validation split in the four-column Optical Inspection CSV contract: input_path,golden_path,label,object_name.",
           "properties": {
             "csv_path": {
               "default": "???",
-              "description": "Path to csv file for dataset",
+              "description": "CSV with required string columns input_path, golden_path, label, object_name. Paths name directories relative to images_dir or absolute; object_name is a stem without lighting/extension; exact PASS is class 0 and any other non-empty defect name is class 1.",
               "type": "string"
             },
             "images_dir": {
               "default": "???",
-              "description": "Path to images directory for dataset",
+              "description": "Runtime image root. Relative CSV directories resolve below this root; it must directly contain golden/ and the referenced board directories.",
               "type": "string"
             }
           },
@@ -724,6 +728,7 @@
           "type": "int"
         }
       },
+      "description": "Optical Inspection paired-image dataset. For each CSV row and each input_map key, the loader opens <images_dir>/<input_path>/<object_name>_<light><image_ext> and <images_dir>/<golden_path>/<object_name>_<light><image_ext>. Validate with scripts/validate_dataset.py before launch.",
       "type": "collection"
     },
     "encryption_key": {

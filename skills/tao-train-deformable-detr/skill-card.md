@@ -1,5 +1,5 @@
 ## Description: <br>
-Deformable DETR for 2D object detection using deformable attention for efficient multi-scale feature processing, lighter than DINO with competitive accuracy; supports training, evaluating, exporting, quantizing, and inference for TAO Deformable-DETR models. <br>
+Deformable DETR for 2D object detection, using deformable attention for efficient multi-scale feature processing with competitive accuracy. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,7 +7,7 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
 Developers and engineers training, evaluating, exporting, quantizing, or running inference on Deformable DETR 2D object detection models using NVIDIA TAO Toolkit. <br>
 
@@ -25,8 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [tao-deploy-deformable-detr.md](references/tao-deploy-deformable-detr.md) <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
-- [TAO Deploy Deformable DETR](references/tao-deploy-deformable-detr.md) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
@@ -42,35 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1. <br>
+1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1, each attempt in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Checks whether the skill is safe to use. <br>
+- Correctness: Checks whether the answer produced is correct. <br>
+- Discoverability: Checks whether the right skill was loaded when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Checks whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 43% → 96% (+52 points) | 55% → 52% (-3 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 17% → 95% (+78 points) | 75% → 58% (-17 points) |
-| Efficiency | 29% → 83% (+54 points) | 0% → 0% (±0 points) |
+| Overall | 94.3% — baseline ran, but no comparable score was available; uplift unavailable | 95.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 13.3% → 100.0% (+86.7 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 5.0% → 100.0% (+95.0 points) | 70.0% → 83.3% (+13.3 points) |
+| Efficiency | 71.5% — baseline ran, but no comparable score was available; uplift unavailable | 97.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

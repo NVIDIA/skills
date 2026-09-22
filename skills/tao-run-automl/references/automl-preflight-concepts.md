@@ -28,6 +28,7 @@ The runner is **platform-agnostic** — it takes any object implementing the sta
 | `SlurmSDK` | Large sweeps on shared HPC clusters with queue/quota |
 | `KubernetesSDK` | Sweeps on EKS / GKE / AKS / on-prem clusters with the NVIDIA GPU Operator |
 | `DockerSDK` | Local debugging or single-host sweeps with a few recs |
+| `VirtualEnvSDK` | Containerless model skills (`container_image: null`, `execution.type: python_script`) that run trials as local Python processes. Takes constructor args, not credentials: `VirtualEnvSDK(venv_path=..., work_dir=...)` — see `automl-runner-configuration.md` § "VirtualEnvSDK (containerless venv runs)". |
 
 Multi-node per rec works on SLURM and K8s (each rec is an N-node distributed training job). Brev and local Docker are single-host per rec — multi-GPU within one host still works (`gpu_count > 1`), but you can't parallelize one rec across multiple hosts.
 
@@ -40,7 +41,7 @@ transitive dependency. Both packages are pinned in `versions.yaml` under
 
 ```bash
 python -c "import tao_automl" 2>/dev/null || {
-  SB="${TAO_SKILL_BANK_PATH:-~/tao-skills-external}"
+  SB="${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}"
   echo "MISSING: nvidia-tao-automl not installed. Pick the platform extra you need:"
   echo "  pip install \"$($SB/scripts/resolve_versions_key.py wheels.tao_automl_slurm)\"       # on-prem SLURM cluster"
   echo "  pip install \"$($SB/scripts/resolve_versions_key.py wheels.tao_automl_kubernetes)\"  # K8s (EKS / GKE / on-prem)"
@@ -61,14 +62,23 @@ If missing, the agent prompts the user to authorize the install via Bash, then r
 Before running AutoML:
 
 1. **Shared launch preflight**: Run the `tao-launch-workflow` intake pattern first. AutoML must not create runner files, workspaces, state files, logs, compatibility shims, or install dependencies until the selected platform's credentials, access check, dataset visibility, model credentials, container image confirmation, and compute shape are satisfied. This prevents wasting the AutoML budget on fake recommendation failures caused by SSH, storage, image, or credential setup.
-2. **SDK credentials**: env vars read from the session environment (export them in your shell before launching). Required env vars depend on which SDK you choose — see each platform's SKILL.md (`skills/platform/tao-run-on-brev`, `skills/platform/tao-run-on-slurm`, `skills/platform/tao-run-on-kubernetes`, `skills/platform/tao-run-on-local-docker`). Before asking for credentials, run:
+2. **SDK credentials**: env vars read from the session environment (export them in your shell before launching, or source a user-approved env file with `set -a; source /path/to/.env; set +a`). Required env vars depend on which SDK you choose — see each platform's SKILL.md (`skills/platform/tao-run-on-brev`, `skills/platform/tao-run-on-slurm`, `skills/platform/tao-run-on-kubernetes`, `skills/platform/tao-run-on-local-docker`). Before asking for credentials, read the chosen platform skill's `## Credentials` section and `references/skill_info.yaml` (required_credentials / credential_groups). Ask only for the credentials listed there. For example, SLURM needs SLURM credentials and not Brev or S3 credentials; Kubernetes and local Docker do not need SLURM or Brev credentials. Ask S3 credentials only when the selected platform and dataset/result URIs use `s3://`. For container pulls: `NGC_KEY`. The agent never reads values — only checks presence with `[ -n "$VAR_NAME" ]`. Construct the credential-reading SDKs with no arguments — e.g., `BrevSDK()`, `SlurmSDK()`, `KubernetesSDK()`, or `DockerSDK()`. `VirtualEnvSDK` is the exception: it reads no credentials but requires `venv_path=` and must be given an explicit `work_dir=`.
+
+   **Verify the SDK actually constructs before generating runner files.** A successful `import tao_automl` does not prove the selected AutoML platform extra is installed. Instantiate the SDK class for the chosen platform, for example:
+
    ```bash
-   ${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_platforms.py \
-     --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} \
-     --platform <platform> --format text
+   python -c "from tao_sdk.platforms.docker import DockerSDK; DockerSDK(); print('OK')"
    ```
-   Ask only for credentials from that output. For example, SLURM needs SLURM credentials and not Brev or S3 credentials; Kubernetes and local Docker do not need SLURM or Brev credentials. Ask S3 credentials only when the selected platform and dataset/result URIs use `s3://`. For container pulls: `NGC_KEY`. The agent never reads values — only checks presence with `[ -n "$VAR_NAME" ]`. Construct the SDK with no arguments — e.g., `BrevSDK()`, `SlurmSDK()`, `KubernetesSDK()`, or `DockerSDK()`.
-2. **Dataset**: Training data accessible from the compute backend. URI format depends on the SDK's platform:
+
+   Substitute the matching import for `brev`, `slurm`, or `kubernetes`. Catch a missing platform extra during preflight, before spending time on an image pull or recommendation. Local Docker launches with the host UID:GID when a writable results bind is present, so any model dataloader that writes through a spec path must point that path at a writable mount.
+
+   **Baseline eval when training from scratch.** The required baseline is scoped to runs that have a starting checkpoint. With no pretrained, parent, or resume checkpoint, there is no starting model to evaluate, so the baseline is inapplicable rather than failed:
+
+   - Record the baseline as unavailable with the reason and surface it in the launch review.
+   - Proceed to recommendations; only the impact-versus-starting-point delta is unavailable.
+   - Supply `baseline_fn` or `automl_settings["baseline_metric"]` only when a checkpoint exists. `final_eval_fn` still applies; a from-scratch smoke test may explicitly use `reuse_best_metric_for_final_evaluation=True`.
+
+3. **Dataset**: Training data accessible from the compute backend. URI format depends on the SDK's platform:
    - Brev / cloud: `s3://bucket/path` (S3-compatible; do not generate `aws://...`)
    - Slurm / internal shared storage: an absolute shared filesystem path visible to the Slurm job, e.g. `/lustre/fsw/tao_datasets/<model>/train` and `/lustre/fsw/tao_datasets/<model>/eval`
    - Azure: `azure://container/path`
@@ -79,10 +89,10 @@ Before running AutoML:
    `custom.train_dataset.media_path=/lustre/.../videos.tar.gz`; do not force
    both files to share one parent directory.
 3. **Skill bank available**: the runner takes an explicit `skill_dir` — the **absolute path to a model directory** inside the skill bank, e.g. `<bank-root>/skills/models/tao-train-dino`. No global env var; pass per run. The agent already knows the bank root (it loaded this SKILL.md from there) — use that same root. Resolve user model aliases to a packaged skill directory before constructing this path; do not assume `network_arch` equals the directory name. Common locations:
-   - cloned standalone: `~/tao-skills-external/` (or wherever the user cloned).
+   - cloned standalone: `~/tao-skill-bank/` (or wherever the user cloned).
    - Installed skill-bank cache: `<agent-cache>/tao-skill-bank/<version>/`.
    - Codex plugin: `~/.codex/plugins/cache/<marketplace>/tao-skill-bank/<version>/`.
-   - submodule inside a cloned SDK: `<sdk>/tao-skills-external/`.
+   - submodule inside a cloned SDK: `<sdk>/tao-skill-bank/`.
    ```python
    from pathlib import Path
    SKILL_BANK = Path("<bank-root>")        # substitute the actual path
@@ -90,7 +100,7 @@ Before running AutoML:
    ```
    The bank structure is:
    ```
-   tao-skills-external/
+   tao-skill-bank/
    └── skills/
        ├── applications/         # workflow configs (this skill)
        ├── models/               # per-network skill packages
@@ -111,7 +121,7 @@ Before running AutoML:
 4. **`nvidia-tao-automl` installed** with the platform extra you want. Resolve
    the pinned install command from `versions.yaml`:
    ```bash
-   SB="${TAO_SKILL_BANK_PATH:-~/tao-skills-external}"
+   SB="${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}"
    pip install "$($SB/scripts/resolve_versions_key.py wheels.tao_automl_brev)"   # or _slurm, _kubernetes, _docker, _all
    # With LLM/agentic algorithms, append ,llm to the resolved extra:
    pip install "$($SB/scripts/resolve_versions_key.py wheels.tao_automl_brev | sed 's/]/,llm]/')"
@@ -158,26 +168,26 @@ When the user asks what models/networks are supported for AutoML, run the
 packaged model-list helper in AutoML mode. AutoML enablement is **model-level**
 metadata (`skills/models/<network>/references/skill_info.yaml` has
 `automl_enabled: true`), not workflow-level metadata. The helper reads that
-model metadata, then validates whether the model also has a packaged,
-parseable train dataclass schema:
+model metadata, then validates whether the model also has packaged,
+parseable selected-action dataclass schemas:
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_tao_models.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --scope automl --format text
+${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/list_tao_models.py \
+  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} --scope automl --format text
 ```
 
 The compatibility wrapper below is also valid and delegates to the same logic:
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/scripts/list_automl_support.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skills-external} --format text
+${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/list_automl_support.py \
+  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} --format text
 ```
 
 Return both sections from that output: runnable AutoML model/actions and
 AutoML-enabled model/actions still blocked on schema packaging. The support
 rule is: AutoML is enabled at model level; runnable AutoML for an action also
 requires `skills/models/<model_skill>/schemas/<action>.schema.json` to be packaged and
-valid. Use `--action distill`, `--action prune`, or `--action quantize` for a
-focused compression-action query.
+valid. Use `--action evaluate`, `--action inference`, `--action distill`,
+`--action prune`, or `--action quantize` for a focused non-train action query.
 
 ---

@@ -17,6 +17,11 @@ The model needs two things from the dataset: a CSV file and an images directory.
 
 ## Classify CSV Format
 
+> The classify task shares its dataloader (`OIDataModule`) with the TAO
+> Optical Inspection network, so this CSV contract is identical to the one
+> documented in the `tao-train-optical-inspection` skill; keep the two in
+> sync when either changes.
+
 ```csv
 input_path,golden_path,label,object_name
 data/defect,data/golden,bridge,bridge_PCB+solder_00000

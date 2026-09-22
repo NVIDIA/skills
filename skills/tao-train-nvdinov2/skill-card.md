@@ -1,5 +1,5 @@
 ## Description: <br>
-NVDINOv2 for self-supervised visual representation learning, training vision transformers via self-distillation (teacher-student) without labels to produce general-purpose visual features. <br>
+NVDINOv2 for self-supervised visual representation learning — trains vision transformers via self-distillation (teacher-student) without labels and produces general-purpose visual features. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and machine learning engineers training self-supervised vision transformer backbones using NVIDIA TAO NVDINOv2 for general-purpose visual feature extraction. <br>
+Developers and engineers training, exporting, and running inference on NVDINOv2 self-supervised vision transformer backbones using the NVIDIA TAO toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,7 +26,8 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [TAO Deploy NVDINOv2](references/tao-deploy-nvdinov2.md) <br>
-- [Skill Info (model metadata)](references/skill_info.yaml) <br>
+- [Skill Info](references/skill_info.yaml) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
@@ -42,35 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) evaluated locally with evaluator v1.3.2. <br>
+1 evaluation task (1 positive), each attempt in an isolated sandbox pod. 3 attempts per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks whether the answer is correct against the reference answer. <br>
+- Discoverability: Checks whether the right skill was loaded when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Checks whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 37% → 92% (+56 points) | 51% → 59% (+8 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 0% → 100% (+100 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 17% → 78% (+62 points) | 53% → 95% (+42 points) |
-| Efficiency | 17% → 83% (+67 points) | 0% → 0% (±0 points) |
+| Overall | 99.5% — uplift unavailable | 66.4% — uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 6.7% → 100.0% (+93.3 points) | 100.0% → 80.0% (-20.0 points) |
+| Discoverability | 100.0% — uplift unavailable | 0.0% — uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 70.0% → 53.3% (-16.7 points) |
+| Efficiency | 97.4% — uplift unavailable | 99.5% → 98.4% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

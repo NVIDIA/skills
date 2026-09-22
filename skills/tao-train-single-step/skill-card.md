@@ -1,5 +1,5 @@
 ## Description: <br>
-Standard single-step train/eval/export workflow for any TAO model, used when training without iterative data augmentation, AutoML, or DEFT loops. <br>
+Standard single-step train/eval/export workflow for any TAO model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to perform standard supervised fine-tuning of NVIDIA TAO models on labeled datasets, with optional evaluation and export steps. <br>
+Developers and engineers who need to fine-tune NVIDIA TAO models on labeled datasets using a standard supervised training, evaluation, and export workflow. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -42,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task (1 positive) using skill-evaluator-dataset-snapshot; local environment, 1 attempt per task. <br>
+Evaluated against 1 task (1 positive), 3 attempts per task, in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
-- Correctness: Whether the answer produced is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was found and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (goal_accuracy 50% + behavior_check 50%). <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage (routing quality, workspace-aware reads, productive tool use). <br>
+- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the skill produces correct answers against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped the agent complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 51% → 86% (+34 points) | 58% → 57% (-1 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 100% (+60 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 32% → 45% (+13 points) | 90% → 85% (-5 points) |
-| Efficiency | 35% → 83% (+48 points) | 0% → 0% (±0 points) |
+| Overall | 94.6% | 71.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 0.0% → 100.0% (+100.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 5.6% → 100.0% (+94.4 points) | 16.7% → 58.3% (+41.6 points) |
+| Efficiency | 73.2% | 99.7% → 98.6% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

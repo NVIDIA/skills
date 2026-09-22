@@ -12,6 +12,7 @@ Load this file only when the compact `SKILL.md` points here for the current task
 - from tao_sdk.platforms.slurm      import SlurmSDK      # SLURM cluster
 - from tao_sdk.platforms.kubernetes import KubernetesSDK # K8s (EKS / GKE / on-prem)
 - from tao_sdk.platforms.docker     import DockerSDK     # local Docker daemon
+- VirtualEnvSDK (containerless venv runs)
 - Full Example (all options)
 - LLM-Powered Algorithm Example
 - Programmatic API (without runner)
@@ -54,7 +55,7 @@ sdk = BrevSDK()                                  # reads platform credentials fr
 runner = AutoMLRunner(
     sdk=sdk,
     skill_dir=SKILL_BANK / "skills" / "models" / model_skill, # resolved skill dir
-    action=action,                                            # train, distill, prune, quantize, ...
+    action=action,                                            # train, evaluate, inference, distill, prune, quantize, ...
 )
 result = runner.run(
     train_dataset_uri=train_dataset_uri,
@@ -62,6 +63,7 @@ result = runner.run(
         "algorithm": algorithm,
         "metric": metric,
         "automl_max_recommendations": max_recommendations,
+        "session_id": session_id,                     # explicit, generated once
     },
     workspace_path=f"./automl_workspace/{TIMESTAMP}",  # timestamped to avoid collisions
     # Platform-specific create_job kwargs go here as **platform_kwargs.
@@ -71,6 +73,78 @@ result = runner.run(
     gpu_type="H100",                             # Brev-specific
 )
 ```
+
+### VirtualEnvSDK (containerless venv runs)
+
+Model skills with `container_image: null` and `execution.type: python_script`
+(the NV-Tesseract Forecasting and AD Diffusion skills) run trials as local
+Python processes instead of containers. Their SDK is `VirtualEnvSDK`, and
+unlike the credential-reading platform SDKs it takes constructor arguments:
+
+```python
+from tao_sdk.platforms.virtualenv import VirtualEnvSDK
+from tao_automl.runner import AutoMLRunner
+
+sdk = VirtualEnvSDK(
+    venv_path="/abs/path/to/model-venv",   # must contain pyvenv.cfg + bin/python
+    work_dir="/scratch/automl-jobs",       # ALWAYS set this - see caution below
+)
+runner = AutoMLRunner(sdk=sdk, skill_dir=str(skill_dir), action="train")
+```
+
+Full signature: `VirtualEnvSDK(venv_path, work_dir=None, state_file=None)`.
+
+> **Caution - `work_dir` defaults into your home directory.** When `work_dir`
+> is omitted the SDK resolves it to `$TAO_SDK_STATE_DIR/virtualenv`, or
+> `~/.tao_sdk/virtualenv` when that env var is unset, and creates
+> `<work_dir>/jobs/` on construction. Every trial's checkpoints then land under
+> `$HOME` - roughly 1.4 GB per NV-Tesseract Forecasting trial. Always pass an
+> explicit `work_dir` on a filesystem with room for
+> `automl_max_recommendations` checkpoints. Setting `TAO_SDK_STATE_DIR`
+> relocates the default, but an explicit `work_dir` is the reviewable form and
+> is what the launch review must show.
+
+Job layout (this is where trial artifacts actually land):
+
+```text
+<work_dir>/jobs/<job-id>/spec/spec.<yaml|json|toml>
+<work_dir>/jobs/<job-id>/results/<declared_output_key_with_dots_as_underscores>/
+<work_dir>/jobs/<job-id>/logs/job.log
+```
+
+Declared outputs from `references/skill_info.yaml` are rewritten into that
+per-job results directory, so `train.output_dir` becomes
+`<work_dir>/jobs/<job-id>/results/train_output_dir`. Resolve it at runtime with
+`sdk.get_job_results_dir(job_id)`; do not precompute it.
+
+Do not pass `image=` for `python_script` execution - the venv is the runtime.
+Verify construction during preflight. Importing the class is not enough: the
+constructor is what validates `venv_path`, so an import-only check reports
+success against a venv that cannot run a single trial.
+
+```bash
+VENV_PATH=/abs/path/to/model-venv \
+WORK_DIR=/scratch/automl-jobs \
+python - <<'PY'
+import os
+from tao_sdk.platforms.virtualenv import VirtualEnvSDK
+
+VirtualEnvSDK(
+    venv_path=os.environ["VENV_PATH"],
+    work_dir=os.environ["WORK_DIR"],
+)
+print("OK")
+PY
+```
+
+Use the same `venv_path` and `work_dir` the runner will use. A missing or
+malformed venv exits non-zero with
+`ValueError: Virtual environment does not exist: <venv_path>`, so the check
+fails before any trial launches. Construction also creates `<work_dir>/jobs/`,
+which is the second reason to pass `work_dir` explicitly here.
+
+The `virtualenv` extra is not exposed as its own `versions.yaml` wheel key;
+`wheels.tao_automl_all` is currently the only key that includes it.
 
 ### Full Example (all options)
 
@@ -97,6 +171,7 @@ result = runner.run(
         "metric": metric,
         "direction": direction,                       # explicit when needed
         "automl_max_recommendations": max_recommendations,
+        "session_id": session_id,                     # explicit, generated/resolved once
     },
     automl_hyperparameters=automl_hyperparameters,    # from model skill / schema
     custom_param_ranges=custom_param_ranges,          # from model skill / user constraints
@@ -170,6 +245,7 @@ print("Best:", automl.get_best().specs)
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `algorithm` | str | **required** | `bayesian`, `hyperband`, `bohb`, `asha`, `bfbo`, `dehb`, `pbt`, `hyperband_es`, `llm`, `hybrid`, `autoresearch` |
+| `session_id` | str | **required by this skill** | Stable controller identity. Generate it once for a fresh run with `scripts/resolve_automl_session.py new`; on resume recover it from the full run workspace. Never rely on the wheel's random default. |
 | `metric` | str | `"loss"` | Metric name. The implicit rule for direction is "contains `'loss'` → minimize, else maximize". Override with `direction`. |
 | `direction` | `"minimize"` \| `"maximize"` | inferred | Explicit direction. Required only when it disagrees with the implicit rule. The runner transparently inverts reported values so callers always see their metric in its original scale. |
 | `automl_max_recommendations` | int | 20 | Max trials (bayesian, bfbo, llm) |
@@ -182,8 +258,18 @@ print("Best:", automl.get_best().specs)
 | `llm_model` | str | `gcp/google/gemini-3.1-pro-preview` | LLM model name (llm, hybrid, autoresearch) |
 | `llm_api_key` | str | from env | API key for the LLM endpoint |
 | `research_program` | str | None | Free-text research directives for the autoresearch agent |
+| `evolvable_text_parameters` | str \| list[str] | `[]` | Searchable text parameters that `autoresearch` may rewrite beyond schema seed enums. |
 | `automl_delete_intermediate_ckpt` | bool | True | Automatically delete cleanup-supported terminal artifacts once they are safe to prune. The active trial/current best, every non-dominated Pareto-front member in a multi-objective search, and Hyperband-family promotion/resume inputs are protected; Hybrid conservatively retains successful trials when full-fidelity provenance is ambiguous. Cleanup-aware SDKs reject remote Docker binds, named volumes, unsafe output ownership, and unbound S3 identities before the first trial because deletion cannot be verified. Set False only when all trial artifacts and their external cleanup lifecycle are intentionally owned. |
 | `override_automl_disabled_params` | bool | False | Include params whose schema `automl_enabled` is False. For advanced users who want to search over params the network author didn't flag for AutoML. |
+
+`AutoMLRunner.run(..., feedback_fn=...)` accepts a callback with signature
+`(recommendation, job_id) -> JSON-safe value`. For reflective searches, return
+compact training-split records containing the input/query, generated output,
+and a failure-mode comment that does not reveal the correct answer. Do not return
+gold/expected labels, item or media identifiers, or paths. The runner removes
+common ground-truth and identifier fields, persists the sanitized feedback, and
+supplies it to the next `autoresearch` proposal; it does not replace the numeric
+validation selection metric.
 
 ### `kpi` metric resolution
 

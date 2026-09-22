@@ -53,7 +53,7 @@ Write and run a Python script that:
    corruption. Set the "dark/corrupted" threshold relative to the PASS baseline
    (e.g., flag images below the 5th percentile of PASS golden intensities).
 4. Flag images below the adaptive threshold as potentially corrupted
-5. **Thumbnail generation**: For every image viewed during the investigation (golden audit, failure mode clustering, FP analysis, detectability assessment), copy and resize it to 128×128 px into an `rca_images/` folder next to the report. Name thumbnails descriptively (e.g., `golden_<sample_id>.jpg`, `test_<sample_id>.jpg`). These will be embedded in the final report using `![caption](rca_images/<name>.jpg)` syntax.
+5. **Thumbnail generation**: For every image viewed during the investigation (golden audit, failure mode clustering, FP analysis, detectability assessment), copy and resize it to 128×128 px into an `rca_images/` folder next to the report. Name thumbnails descriptively (e.g., `golden_<sample_id>.jpg`, `test_<sample_id>.jpg`). These will be embedded in the final report using `![caption] (rca_images/<filename>.jpg)` syntax.
 
 Then **view every flagged golden image** with the Read tool to confirm. For each:
 - Is it completely dark/black?

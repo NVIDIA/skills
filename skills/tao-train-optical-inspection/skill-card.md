@@ -1,5 +1,5 @@
 ## Description: <br>
-Optical Inspection for defect detection using Siamese networks, comparing image pairs to detect manufacturing defects, anomalies, or quality issues. <br>
+Optical inspection for defect detection using Siamese networks that compares image pairs to detect manufacturing defects, anomalies, or quality issues when training, evaluating, exporting, or running inference for a TAO Optical Inspection model on AOI / quality-control data. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference for TAO Optical Inspection models on AOI and quality-control data for manufacturing defect detection. <br>
+Developers and engineers training, evaluating, exporting, or running inference on NVIDIA TAO Optical Inspection Siamese models for automated optical inspection (AOI) and manufacturing quality-control defect detection. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,8 +26,8 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [TAO Deploy Optical Inspection](references/tao-deploy-optical-inspection.md) <br>
-- [Skill Info](references/skill_info.yaml) <br>
-- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [Skill Info (AutoML and model metadata)](references/skill_info.yaml) <br>
+- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
@@ -43,40 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) against skill-evaluator-dataset-snapshot. <br>
+1 evaluation task (tao-train-optical-inspection-basic) across 2 agents with 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer is correct, measured by final-answer accuracy against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed, including skill selection and decoy avoidance. <br>
+- Effectiveness: Whether the skill helped complete the user's goal, combining goal completion (50%) and expected workflow adherence (50%). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage, combining tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity for skill and tool usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 56% → 95% (+39 points) | 56% → 95% (+39 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 60% → 100% (+40 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 37% → 100% (+63 points) | 80% → 83% (+3 points) |
-| Efficiency | 33% → 75% (+42 points) | 0% → 100% (+100 points) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Overall | 99.4% | 76.9% |
+| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Correctness | 13.3% → 100.0% (+86.7 pts) | 100.0% → 70.0% (-30.0 pts) |
+| Discoverability | 100.0% | 47.5% |
+| Effectiveness | 10.0% → 100.0% (+90.0 pts) | 31.7% → 68.3% (+36.6 pts) |
+| Efficiency | 96.9% | 98.7% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

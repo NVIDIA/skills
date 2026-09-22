@@ -216,7 +216,8 @@ def main():
         help="Directory containing golden (OK) images",
     )
     parser.add_argument(
-        "--output", "-o", default="dataset.csv", help="Output CSV path",
+        "--output", "--output-csv", "-o", default="dataset.csv",
+        help="Output CSV path",
     )
     parser.add_argument(
         "--label", "-l", default=None,

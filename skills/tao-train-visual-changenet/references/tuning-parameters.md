@@ -24,6 +24,29 @@ with the single best checkpoint. When retention is disabled, periodic saving
 remains in effect. Checkpointer fields control artifact lifecycle and must not
 be included in the AutoML search space.
 
+### Retain the best FAR checkpoint
+
+`train.optim.monitor_name` is scheduler metadata; it does not configure
+checkpoint selection. `val_far` is FAR at 100% defect recall. If validation is
+missing either PASS or defect samples, it reports the explicit worst-case
+`100.0` sentinel; use a two-class validation split for meaningful retention.
+To retain the lowest validation false-alarm rate, set the checkpointer
+explicitly:
+
+```yaml
+train:
+  checkpointer:
+    enable_topk: true
+    monitor: val_far
+    mode: min
+    save_top_k: 1
+    replace_periodic: false
+```
+
+With `replace_periodic: false`, metric-best retention is additive to periodic
+checkpoints. Set it to `true` only when the single best-FAR checkpoint should
+replace periodic history and drive the latest symlink.
+
 ## Hardware
 
 - **Minimum**: 1 GPU with 16GB+ VRAM (V100 or A100). Single-GPU training works for small datasets (<10k images).

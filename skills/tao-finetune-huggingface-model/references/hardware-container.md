@@ -234,9 +234,8 @@ Optional for faster tokenizer:
 Most `nvcr.io/nvidia/pytorch` images are publicly accessible without authentication.
 If you get a 401 error:
 ```bash
-docker login nvcr.io
-# Username: $oauthtoken
-# Password: <your NGC API key from ngc.nvidia.com>
+set -a; source /path/to/.env; set +a   # omit if already exported
+echo "$NGC_KEY" | docker login nvcr.io -u '$oauthtoken' --password-stdin
 ```
 
 ---

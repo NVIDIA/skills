@@ -12,3 +12,8 @@
 - **No GPU available** — both steps need CUDA. Check `nvidia-smi` once at the top; the entrypoint's error is clear but it surfaces late in a long run.
 - **Image not pulled / wrong tag** — use the pinned `DS_IMAGE` (see Setup) and `docker pull "$DS_IMAGE"` before the run. The data-services tag declared there is required; the generic `:latest` tag does not contain the AOI-specific embedding/mining entrypoints.
 - **`topn` × N_targets ≫ source size** — the dedup pass will run out of unique source images and the mined parquet will be much smaller than `topn × N_targets`. This is expected, not a bug; report the actual mined count, not the requested one.
+- **History-aware output is empty or mostly duplicates** — the current weak
+  targets retrieved the same neighborhood as prior iterations. Inspect
+  `mining_history_summary.json`; increase `topn` above the default 5 or expand
+  the source pool. A wider `topn` cannot create variance when the
+  targets and available pool are effectively unchanged.

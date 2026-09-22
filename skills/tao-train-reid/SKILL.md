@@ -30,7 +30,7 @@ Docker/platform skill instead when it gives a stricter environment-specific
 command (non-root UID mapping, cache redirects, remote daemons).
 
 ```bash
-TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
 TAO_PYT_IMAGE="${TAO_PYT_IMAGE:-$TAO_PYT_IMAGE_DEFAULT}"
 RUN_ROOT="${RUN_ROOT:-$PWD}"
 DOCKER_COMMON=(
@@ -96,7 +96,8 @@ Do not advertise or synthesize `dataset_convert`, `deploy`, `prune`, `quantize`,
 
 - **Dataset type:** re_identification
 - **Formats:** default
-- **Monitoring metric:** cmc_rank_1, maximize
+- **AutoML training metric:** `cmc_rank_1` (maximize). Train status files emit this retrieval KPI for trial ranking.
+- **Standalone evaluation metric:** `mAP`. The evaluate action writes `mAP` to its status KPI and prints the CMC ranks in its console table; do not expect standalone evaluate status to contain `cmc_rank_1`.
 
 ### Per-Action Dataset Requirements
 

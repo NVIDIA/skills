@@ -21,7 +21,7 @@ tags:
   - nvidia-tao
   - computer-vision
   - training
-compatibility: Requires docker + nvidia-container-toolkit, NVIDIA GPU (driver ≥ 545, ≥ 24 GB VRAM for ≤3B models), ~40 GB free disk. Optional credentials (read from the session environment, exported before launching) — HF_TOKEN is read only when the model/dataset is gated or `push_to_hub` is on; WANDB_API_KEY and WANDB_PROJECT only when WandB logging is enabled.
+compatibility: Requires docker + nvidia-container-toolkit, NVIDIA GPU (driver ≥ 545, ≥ 24 GB VRAM for ≤3B models), ~40 GB free disk. Optional credentials (read from the session environment) — HF_TOKEN is read only when the model/dataset is gated or `push_to_hub` is on; WANDB_API_KEY and WANDB_PROJECT only when WandB logging is enabled.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -89,7 +89,7 @@ in `references/research-priorities.md`.
 **Required:**
 - `model_id` — HuggingFace model ID, e.g. `google/vit-base-patch16-224`
 
-**Conditional credentials (read from the session environment, exported before launching when present):**
+**Conditional credentials (read from the session environment — exported before launching or sourced from a user-approved env file):**
 - `HF_TOKEN` — only when the model/dataset is **gated** (read) or `push_to_hub` is on (write); public + public + `push_to_hub: false` needs none. Value never read — presence-only via `[ -n "$HF_TOKEN" ]`.
 - `WANDB_API_KEY`, `WANDB_PROJECT` — only when WandB is enabled; `WANDB_MODE=disabled` opts out.
 
@@ -128,15 +128,17 @@ a GPU host — read them first.
 | Concern | Authoritative skill |
 |---|---|
 | GPU host runtime (driver 580, CUDA Toolkit 13.0, NVIDIA Container Toolkit 1.19.0) | [`tao-skill-bank:tao-setup-nvidia-gpu-host`](../../platform/tao-setup-nvidia-gpu-host/SKILL.md) |
-| `docker run` flags, NGC auth, mounts, env passthrough | [`tao-skill-bank:tao-run-on-docker`](../../platform/tao-run-on-docker/SKILL.md) |
-| Local Docker job preflight (daemon, GPU smoke) | [`tao-skill-bank:tao-run-on-local-docker`](../../platform/tao-run-on-local-docker/SKILL.md) |
+| `docker run` flags, NGC auth, mounts, env passthrough, local/remote Docker job preflight (daemon, GPU smoke) | [`tao-skill-bank:tao-run-on-docker`](../../platform/tao-run-on-docker/SKILL.md) |
 
 **Default platform:** `local-docker` — build a one-off image (`run-<short>:latest`)
 and run it on the local Docker daemon. Ask only when the user explicitly needs a
 different backend (Brev remote GPU, SLURM/Kubernetes); then run that platform's
 Preflight first and route the Steps 4–5 `docker run` commands through it. The
 GPU-runtime and presence-only credential preflights (values never read), the
-canonical `docker run` flag set, the `list_tao_platforms.py` selection command, and
+canonical `docker run` flag set, discovery of the execution platforms from the
+installed platform skills (tao-run-on-docker / -slurm / -kubernetes / -brev, plus
+any external one; on a runtime that surfaces only the core router skills, read
+skills/platform/tao-run-on-*/SKILL.md frontmatter), and
 the workflow-specific flags (`--entrypoint /bin/bash -lc`, `PYTORCH_CUDA_ALLOC_CONF`,
 `--name hft_train`) are in `references/workflow-intake-preflight.md`.
 
@@ -241,9 +243,8 @@ hardware-dependent compat rules.
    then re-run with `--install --yes`.
 2. Free-disk soft-warn — override via `MIN_DISK_GB` (default 100 GB); recommend
    ≥ 100 GB for NGC base (~20 GB) + HF cache + checkpoints + data.
-3. Conditional credential presence (from the session environment, values never
-   read) — `HF_TOKEN` only when gated or `push_to_hub` is on; `WANDB_*` only when
-   WandB is on.
+3. Conditional credential presence (values never read) — `HF_TOKEN` only when
+   gated or `push_to_hub` is on; `WANDB_*` only when WandB is on.
 
 **Do not proceed to Step 4 on a hard-fail** — Step 4's `docker build` pulls a
 20+ GB NGC base, and a missing `nvidia-container-toolkit` only surfaces later as
@@ -401,10 +402,3 @@ fires twice across runs, lift it into `compat-workarounds.md` with a `detect` ru
 - Always include direct Hub and wandb URLs when referencing artifacts.
 - On error: state what went wrong, why, what you changed — no menus.
 - Never present "Option A/B/C" for a request with a clear answer. Act.
-
-## Example pipelines
-
-- [tao-rerun-convnext-cifar10](references/tao-rerun-convnext-cifar10.md)
-- [tao-rerun-detr-cppe5](references/tao-rerun-detr-cppe5.md)
-- [tao-rerun-segformer-foodseg103](references/tao-rerun-segformer-foodseg103.md)
-- [tao-rerun-smolvlm-vqav2](references/tao-rerun-smolvlm-vqav2.md)

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 """Normalize Sparse4D OVPKL depth H5 references after dataset conversion."""
 
 from __future__ import annotations
@@ -45,7 +48,7 @@ def _normalize_depth_path(value: object, data_root: Path) -> tuple[object, bool]
 
 def normalize_ann_file(path: Path, data_root: Path, dry_run: bool) -> int:
     with path.open("rb") as handle:
-        payload = pickle.load(handle)
+        payload = pickle.load(handle)  # nosec B301 - local dataset index written by this skill
 
     infos = payload.get("infos") if isinstance(payload, dict) else payload
     if not isinstance(infos, list):

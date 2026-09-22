@@ -45,7 +45,7 @@ Concrete patterns extracted from the TAO repos for running tests in containers, 
 
 > **Note:** For testing, we run directly inside the prepared TAO Toolkit containers (image tags built in Phase 0) — no Docker build is involved in the test loop. Release Docker images are optional and only for distribution validation. All work must be **local only** (`--load`, not `--push`). Do NOT push images to any registry.
 
-> **Authority for generic flags:** the `--gpus`, `--ipc=host` / `--shm-size`,
+> **Authority for generic flags:** the `--gpus`, `--shm-size=8g` / `--shm-size`,
 > `-v host:container`, `-e VAR` passthrough, container-name reuse, and
 > `docker inspect` / `docker logs` patterns are owned by
 > [`tao-skill-bank:tao-run-on-docker`](../../../platform/tao-run-on-docker/SKILL.md). The host GPU

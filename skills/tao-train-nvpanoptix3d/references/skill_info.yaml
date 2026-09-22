@@ -1,7 +1,7 @@
 name: tao-train-nvpanoptix3d
 network_arch: nvpanoptix3d
 automl_enabled: true
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
 data_format: front3d
 gpu_spec_key: train.num_gpus
 actions:

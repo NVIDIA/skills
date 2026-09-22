@@ -39,7 +39,10 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** ocrnet
 - **Formats:** default
-- **Monitoring metric:** val_acc_1
+- **AutoML training metric:** `val_acc`, with `direction=maximize`; TAO writes
+  this key to `status.json`
+- **Lightning progress alias:** `val_acc_1`
+- **Standalone evaluation metric:** `test_acc`, with `direction=maximize`
 
 ### Per-Action Dataset Requirements
 
@@ -284,4 +287,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-ocrnet](references/tao-deploy-ocrnet.md)
-

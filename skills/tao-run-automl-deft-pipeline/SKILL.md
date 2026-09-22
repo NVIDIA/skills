@@ -65,7 +65,7 @@ best HPs spec + ckpt ─────►      DEFT-augmented CSV ─────�
 
 The two handoffs are:
 
-- **Phase 1 → Phase 2**: a *spec file* AND the *winning checkpoint* — the bridge deep-merges Phase 1's HPs onto `specs/baseline_spec.yaml`, copies the checkpoint into `${RESULTS_DIR}/baseline/train/`, and pre-populates `deft_state.json` / `loop_log.jsonl` so DEFT skips its baseline train and resumes at baseline inference → evaluate → RCA → iter 1. DEFT stays plain-train (`automl_policy: off` preserved).
+- **Phase 1 → Phase 2**: a *spec file* AND the *winning checkpoint* — the bridge deep-merges Phase 1's HPs onto `specs/baseline_spec.yaml`, copies the checkpoint into `${RESULTS_DIR}/baseline/train/`, and pre-populates `deft_state.json` so DEFT skips its baseline train and resumes at baseline inference → evaluate → RCA → iter 1. DEFT stays plain-train (`automl_policy: off` preserved).
 - **Phase 2 → Phase 3**: a *training CSV* (`train_combined_iter${N_final}.csv`) AND the *iter winner's checkpoint* — the checkpoint is wired into each rec's `train.pretrained_model_path` so Phase 3 fine-tunes from Phase 2's winner. Phase 3's winning checkpoint is the deliverable; no separate retrain after Phase 3.
 
 See `references/phase-handoffs.md` for the exact steps, code, and DEFT-honors-this-handoff details of both handoffs.
@@ -118,7 +118,7 @@ After the sweep finishes, AutoML's `result["best"]["specs"]` is the winning hype
 
 Phase 1 hands over **two artifacts**: the winning *spec* and the winning *checkpoint*. Retraining the same HPs in DEFT's baseline step is wasted compute — instead, pre-seed DEFT's baseline state from Phase 1's outputs so DEFT starts at baseline inference → evaluate → RCA → iter 1. This is a four-step bridge (write merged spec → pre-seed `baseline/train/` → initialise `deft_state.json` with baseline already done → invoke DEFT), followed by a quality check of the winning checkpoint (per-class prediction counts; compare to zero-shot ChangeNet).
 
-See `references/phase-handoffs.md` for the verbatim Steps 1–4 (including the `cp` command, the `deft_state.json` patch code, and the `loop_log.jsonl` append) and the quality-check checklist.
+See `references/phase-handoffs.md` for the verbatim Steps 1–4 (including the `cp` command and the `deft_state.json` pre-seed code) and the quality-check checklist.
 
 ---
 
@@ -128,7 +128,7 @@ Invoke `tao-skill-bank:tao-run-deft-aoi` (read its `SKILL.md` for the full inter
 
 **The DEFT loop's baseline-train sub-step is skipped.** Phase 1 already produced a checkpoint trained at the winning HPs, and Phase 1's handoff (see `references/phase-handoffs.md`) pre-populated `${RESULTS_DIR}/baseline/train/` and `${RESULTS_DIR}/deft_state.json` so DEFT resumes at baseline inference → evaluate → RCA → iter 1. The rest of the DEFT loop runs unchanged. **Do not modify its `automl_policy: off` invariant.**
 
-The DEFT loop owns: its Pre-Flight Summary display step (**not** a fresh user gate — the Consolidated Pre-Flight above is the single gate; the DEFT summary still prints as an audit-trail display of the pre-seeded `baseline/train/` source and must not re-prompt); baseline inference → evaluate → RCA on the pre-seeded checkpoint; the full per-iteration RCA → routing → SDG → mining → assemble → train cycle; KPI gating and stop conditions; and the `${RESULTS_DIR}/` layout (`deft_state.json`, `loop_log.jsonl`, `DEFT_Loop_Report.html`).
+The DEFT loop owns: its Pre-Flight Summary display step (**not** a fresh user gate — the Consolidated Pre-Flight above is the single gate; the DEFT summary still records the pre-seeded `baseline/train/` source and must not re-prompt); baseline inference → evaluate → RCA on the pre-seeded checkpoint; the full per-iteration RCA → routing → SDG → mining → assemble → train cycle; KPI gating and stop conditions; and the `${RESULTS_DIR}/` layout (`deft_state.json`, `DEFT_Loop_Report.html`).
 
 After the loop exits (KPI met or `max_iterations` reached), capture two values from `deft_state.json`: `iterations.<best>.best_ckpt_path` (the loop's best plain-train checkpoint) and the final iteration label `N_final` (used to locate the augmented training CSV).
 
@@ -197,4 +197,3 @@ The handoff shape — Phase 1 emits a *spec + checkpoint* (the checkpoint pre-se
 - `references/phase-handoffs.md` — both handoffs, baseline pre-seed, and Phase 3 warm-start, verbatim
 - `references/pitfalls-and-quality-checks.md` — metric pitfalls, run-to-run noise, leakage, compute budget
 - `references/quick-start-example.md` — the customer-facing worked-example message
-

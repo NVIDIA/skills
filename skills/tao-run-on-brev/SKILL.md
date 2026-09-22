@@ -1,13 +1,11 @@
 ---
 name: tao-run-on-brev
-description: Brev managed GPU instances with Docker support. Use when running TAO training, evaluation, or inference on
-  Brev GPU instances, managing Brev deployments, or dispatching TAO jobs through the Brev CLI. Trigger phrases include
-  "run on Brev", "Brev GPU instance", "submit job to Brev", "Brev CLI deployment".
+description: Run a TAO training/evaluation/inference container on an NVIDIA Brev GPU instance. Instance provisioning (create/search/stop/delete/login) is delegated to the official brev-cli agent skill or the Brev MCP server; this skill covers only the TAO-specific part — running the container over `brev exec` via the four-verb docker contract. Trigger phrases include "run on Brev", "Brev GPU instance", "TAO on Brev", "submit job to Brev".
 license: Apache-2.0
-compatibility: Requires the brev CLI (https://github.com/brevdev/brev-cli) and an active brev login.
+compatibility: Requires the brev CLI (https://github.com/brevdev/brev-cli) and an active brev login. Instance provisioning is handled by the official brev-cli agent skill or the Brev MCP server.
 metadata:
   author: NVIDIA Corporation
-  version: "0.1.0"
+  version: "0.2.0"
 allowed-tools: Read Bash
 tags:
 - gpu
@@ -16,271 +14,139 @@ tags:
 - brev
 ---
 
-# Brev
+# Brev — TAO execution glue
 
 > **Standalone install?** If this session was not initialized by the TAO skill bank plugin, run the `tao-setup` skill first (host preflight, credentials, cross-skill discovery).
 
-NVIDIA Brev provides on-demand GPU instances across multiple cloud providers. Instances come pre-loaded with NVIDIA drivers, CUDA, Docker, and NVIDIA Container Toolkit.
+NVIDIA Brev provides on-demand GPU instances (pre-loaded with NVIDIA drivers,
+CUDA, Docker, and the NVIDIA Container Toolkit). Brev is **instance-based**: you
+provision an instance, run commands on it over `brev exec`, and delete it when
+done.
 
-Brev is instance-based (not job-based). You create an instance, run commands on it via `brev exec`, and delete it when done. The TAO SDK's BrevHandler wraps this into the standard job interface.
+This skill is deliberately thin. **Provisioning and managing instances — create,
+search by GPU/price, start/stop, delete, login — is owned by NVIDIA Brev's own
+agent skill, not duplicated here.** This skill covers only the TAO-specific part:
+running a TAO container on a reached instance through the **four-verb docker
+contract**, deferring the container-how to `tao-run-on-docker` over `brev exec`.
 
-## Preflight
+## Provisioning: use the official Brev skill or MCP
 
-This skill needs the `brev` CLI and an active login. Check before proceeding:
-
-```bash
-# 1. brev CLI installed
-command -v brev >/dev/null 2>&1 || {
-  echo "MISSING: brev CLI not installed. Install:"
-  echo "  https://docs.nvidia.com/brev/"
-  exit 1
-}
-
-# 2. brev command reference available.
-brev --help >/dev/null || {
-  echo "MISSING: brev CLI help unavailable; verify the brev installation."
-  exit 1
-}
-
-# 3. brev login active — always token-login first when running headless.
-#    Plain `brev ls` will hit an interactive auth prompt (read: EOF on stdin)
-#    even when BREV_API_TOKEN is set, so refresh the session up front.
-if [ -n "$BREV_API_TOKEN" ]; then
-  brev login --token "$BREV_API_TOKEN" >/dev/null 2>&1 || {
-    echo "MISSING: brev token login failed. Verify BREV_API_TOKEN."
-    exit 1
-  }
-fi
-# Retry once after a forced re-login: cached creds occasionally desync and the
-# first `brev ls` returns auth EOF until the session is rebuilt.
-brev ls >/dev/null 2>&1 || {
-  [ -n "$BREV_API_TOKEN" ] && brev login --token "$BREV_API_TOKEN" >/dev/null 2>&1
-  brev ls >/dev/null 2>&1 || {
-    echo "MISSING: not logged in to brev. Run:"
-    echo "  brev login                                    # interactive (opens browser)"
-    echo "  # or export BREV_API_TOKEN in your shell before launching (then 'brev login --token \$BREV_API_TOKEN')"
-    exit 1
-  }
-}
-```
-
-If any non-pip step fails, the agent prompts the user to authorize the fix via Bash, then re-runs the preflight before continuing. The TAO SDK is **not** required for Brev — `brev exec <instance> "docker run …"` is sufficient. Reach for the SDK only if you want Job handles, S3 I/O wrapping via `script_runner`, or state persistence; `nvidia-tao-sdk` is on public PyPI; install missing SDK requirements automatically from the pinned Brev extra: `python -m pip install "nvidia-tao-sdk[brev]==7.1.0rc42"` <!-- versions-key: wheels.tao_sdk_brev -->. **When going the SDK route, read `tao-skill-bank:tao-run-platform` for the `BrevSDK` kwarg reference, `build_entrypoint`, and `ActionWorkflow` patterns.**
-
-## Authentication
-
-Two options:
-
-1. **Automated (recommended)**: Get an API token from the Brev console settings page. Set `BREV_API_TOKEN` as an environment variable (e.g., `export BREV_API_TOKEN=...` in your shell). The handler auto-authenticates via `brev login --token` on first use.
-
-2. **Manual**: Run `brev login` (opens browser). Tokens expire hourly — the handler refreshes automatically.
-
-S3 credentials (ACCESS_KEY, SECRET_KEY) are needed separately for data transfer.
-
-### Headless / non-interactive
-
-In a CI shell, container, or agent session with no controlling TTY, **always
-run `brev login --token "$BREV_API_TOKEN"` before any other `brev` call** —
-even when the token is exported. Otherwise the CLI prompts on stdin and
-returns an `EOF` auth error on commands like `brev ls`, `brev create`, or
-`brev exec`. Re-run the token login if a call returns auth-EOF; a single
-refresh is usually enough.
-
-## Launch Preflight
-
-Before generating scripts or submitting jobs:
-
-1. Verify `BREV_API_TOKEN` is set.
-2. Verify the `brev` CLI is installed and can list instances, for example
-   `brev ls --json`. If needed, authenticate with `brev login --token`.
-3. For `s3://` datasets/results, verify `ACCESS_KEY` and `SECRET_KEY` are set
-   and the exact paths are readable with `aws s3 ls`.
-4. Do not accept local `/path` inputs for Brev unless the user has proven those
-   paths exist on the target Brev instance or are mounted into it.
-5. Verify model-specific credentials such as `HF_TOKEN` before launch.
-
-## Instance Lifecycle
-
-The agent controls instance lifecycle:
-
-- **Reuse**: Pass `instance_id` in `backend_details` to run multiple jobs on the same instance. Efficient for multi-step workflows.
-- **Ephemeral**: Omit `instance_id` — the handler creates a new instance per job. Clean but slower (instance boot ~2-5 min).
-
-### Creating an instance — placement info
-
-For accounts with more than one cloud credential or workspace group, plain
-`brev create` rejects the call with a placement error. Pass the account-specific
-IDs explicitly:
+NVIDIA Brev publishes an agent skill that manages instances in natural language
+("create an A100 instance", "search for GPUs under $3/hr", "stop all my
+instances"). Install it once — it self-registers into your agent's skills dir and
+is discovered at runtime:
 
 ```bash
-brev create my-instance \
-  --gpu L40S:1 \
-  --cloud-cred-id <cloudCredId> \
-  --workspace-group-id <workspaceGroupId>
+curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/main/scripts/install-agent-skill.sh | bash
+# installs to ~/.claude/skills/brev-cli/ , ~/.codex/skills/brev-cli/ , ~/.agents/skills/brev-cli/
 ```
 
-Discover the values once and export them in your shell before launching:
+Or connect the **Brev MCP server** (`https://docs.nvidia.com/brev/_mcp/server`).
+Either one owns login/auth quirks, placement IDs, GPU search, and teardown flags.
+It does **not** cover container execution on the instance — that is this skill.
+
+**Preflight for this skill:** the `brev` CLI is on `PATH` and logged in (headless:
+`brev login --token "$BREV_API_TOKEN"` before any other call), and you can reach a
+target instance — poll with a **two-word** command until it succeeds before
+issuing real work (a fresh instance reports `RUNNING` before sshd is up):
 
 ```bash
-brev ls --json | jq -r '.workspaces[0].workspaceGroupId'   # default group
-brev orgs --json | jq -r '.[0].cloudCredentials[].id'      # cloud credential
+for i in $(seq 1 60); do brev exec <instance> "echo ok" 2>/dev/null | grep -qx ok && break; sleep 5; done
+brev exec <instance> "echo ok" 2>/dev/null | grep -qx ok || { echo "instance not exec-ready"; exit 1; }
 ```
 
-When using the SDK, pass them through `backend_details`:
+The probe must be **two words, quoted as one argument**. A single-token probe
+(`brev exec <instance> -- true`) passes even when every real command is broken,
+because `brev exec [instance...] <command>` treats only the LAST positional as
+the command — so a lone `true` lands in the right slot by accident while
+`docker run ...` does not. See *`brev exec` argument form* below.
 
-```python
-BrevSDK().create_job(
-    ...,
-    backend_details={
-        "cloud_cred_id": "<cloudCredId>",
-        "workspace_group_id": "<workspaceGroupId>",
-    },
-)
+Allow **≥ 600 s** for the first `brev exec` on a new instance (SSH bring-up +
+first container pull); a 60–120 s wrapper timeout truncates startup and looks
+like a spurious `exec failed`.
+
+## Storage
+
+No shared NFS/Lustre — storage tier **B/C** via `tao-data-io`: stage inputs from
+S3 to the instance's local disk (or fetch in-container) and **upload results to S3
+before deleting the instance**. Instance-local `~/` persists across stop/start but
+**not** across delete/create, so the results upload must precede teardown.
+
+## Execution — the four verbs (a compound over Docker)
+
+Brev is a **compound consumer**: `submit` reaches an instance, then **defers the
+container-how to the four docker verbs** (`tao-run-on-docker`) run over
+`brev exec`. It is not a symmetric peer — teardown must additionally delete the
+instance to stop billing. `$BANK` = `${TAO_SKILL_BANK_PATH}`.
+
+- **submit** — reach an instance (provision/reuse via the official Brev skill or
+  MCP; reuse an existing instance by its `instance_id`; wait for readiness, above).
+  Lint the assembled command, open the record to mint `$JOB_ID` **before** launch,
+  then run the docker `submit` verb *inside* the instance and mark RUNNING:
+
+  ```bash
+  redact_secrets.py lint <<<"$REMOTE_CMD"     # no inline secrets; creds as -e VAR
+  JOB_ID=$("$BANK/scripts/tao_job_record.py" open \
+    --platform brev --image "$IMG" \
+    --network-arch "$ARCH" --action "$ACTION" \
+    --storage-tier "$TIER" --results-root "$RESULTS_ROOT")
+  brev exec <instance> "docker inspect '$JOB_ID' >/dev/null 2>&1 && { echo '$JOB_ID already submitted'; exit 0; }; docker run -d --name '$JOB_ID' --label 'tao-job=$JOB_ID' ..."
+  "$BANK/scripts/tao_job_record.py" mark "$JOB_ID" --state RUNNING \
+    --backend-ref "<instance>/$JOB_ID"       # instance is part of the ref: the
+                                             # container is unreachable without it
+  ```
+- **status / logs** — `brev exec <instance> "docker inspect $JOB_ID"` /
+  `brev exec <instance> "docker logs $JOB_ID"`, mapped to the vocab exactly as
+  the docker verbs do. Recover `<instance>` from the record's `backend-ref`.
+- **cancel / teardown** — remove the container, then for an ephemeral instance
+  delete it (stops billing), then mark the record. Never leave an ephemeral
+  instance running:
+
+  ```bash
+  brev exec <instance> "docker rm -f $JOB_ID"
+  brev delete <instance>                      # ephemeral instances only
+  "$BANK/scripts/tao_job_record.py" mark "$JOB_ID" --state CANCELED --source agent
+  ```
+
+### `brev exec` argument form
+
+The remote command is **one argument**. The CLI signature is
+`brev exec [instance...] <command>`: every positional except the last is an
+instance name, and `--` only ends flag parsing — it does not group the words
+after it. So `brev exec <inst> -- docker inspect "$JOB_ID"` is read as
+instances `<inst> docker inspect` plus command `"$JOB_ID"`, and fails with
+`could not look up instance "docker"` / `ssh: illegal option -- -` (exit 255) —
+an error that reads like an instance or SSH fault but is a syntax fault. Quote
+every remote command as a single string, exactly as `brev exec --help` shows.
+
+NGC auth once per instance — **never put `NGC_KEY` on argv** (it lands in the
+remote process table); pipe it to `--password-stdin`:
+
+```bash
+IMG=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+
+# NGC auth (one-time per instance) — value never on argv.
+# Single-quoted locally so $NGC_KEY expands in the instance's shell; export it
+# there first (or pipe it in from the local shell, if the instance has no copy).
+brev exec <instance> 'printf %s "$NGC_KEY" | docker login nvcr.io -u "$oauthtoken" --password-stdin'
+
+# Verify auth without reading ~/.docker/config.json. Failure before a successful
+# login = not authenticated; failure after = the key's org lacks entitlement.
+brev exec <instance> "docker manifest inspect $IMG >/dev/null && echo AUTH_OK || echo AUTH_FAIL"
+
+# Pull BEFORE the GPU run. `docker run` would pull implicitly, but the instance
+# bills from boot, so a multi-GB first-time TAO pull is billed GPU-idle time.
+# Pulling as its own step also separates a pull failure (auth/entitlement) from
+# a training failure in the logs.
+brev exec <instance> "docker image inspect $IMG >/dev/null 2>&1 || docker pull $IMG"
+
+# Run a TAO job (the docker `submit` verb, over brev exec)
+brev exec <instance> "docker inspect '$JOB_ID' >/dev/null 2>&1 && { echo '$JOB_ID already submitted'; exit 0; }; docker run -d --name '$JOB_ID' --label 'tao-job=$JOB_ID' --gpus all -v ~/data:/data -e NGC_KEY '$IMG' visual_changenet train -e /data/spec.yaml"
 ```
 
 ## Multi-GPU and multi-node
 
-**Multi-node is not supported on Brev.** Brev is instance-based — one job runs on one instance, with no cross-instance coordination.
-
-Multi-GPU **on a single instance** is supported (instances available with up to 8× H100 / A100 / L40S). `gpu_count` maps to the GPU count on the instance; `torchrun --nproc-per-node=N` or PyTorch DDP work within the instance.
-
-## GPU Types
-
-Available via `brev search`:
-- L40S, A100 80GB, H100 (availability varies by provider)
-- Use `--gpu-name` to filter, `--min-vram` for memory requirements
-
-## Storage
-
-No shared NFS/Lustre. All data flows through S3 via the script_runner's fsspec integration. Instance-local disk at `~/` persists across stop/start but not across delete/create.
-
-## Docker on Brev
-
-VM Mode instances have Docker pre-installed.
-
-### `brev exec` syntax — the remote command is ONE quoted string
-
-The CLI signature is `brev exec [instance...] <command>`: every positional
-except the last is treated as an instance name, and `--` only terminates flag
-parsing — it does **not** bundle the words after it into a single command.
-The multi-token form `brev exec <instance> -- docker run --gpus all …` <!-- lint-ok: brev-exec-form -->
-therefore makes the CLI treat `docker`, `run`, … as instance names and fails
-with `could not look up instance "docker"` / `illegal option -- -` (exit 255)
-— an error that reads like an SSH/instance fault but is a syntax fault. A
-single-token probe (`brev exec <instance> -- true`) <!-- lint-ok: brev-exec-form -->
-"works" only because the lone token is parsed as the command; never take it as
-proof that exec is healthy. Always pass the whole remote command as one quoted
-string:
-
-```bash
-brev exec <instance> "docker --version"
-```
-
-### NGC auth + running TAO containers
-
-```bash
-# NGC auth (one-time per instance). The key travels over stdin — never put it
-# in argv, where it lands in the instance process table, the SSH command
-# string brev forwards, and session transcripts.
-printf '%s' "$NGC_KEY" | brev exec <instance> "docker login nvcr.io -u '\$oauthtoken' --password-stdin"
-
-# Verify the login without reading credential files: manifest inspect succeeds
-# only when the login worked AND the key's org has entitlement for the image.
-TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
-brev exec <instance> "docker manifest inspect $TAO_PYT_IMAGE >/dev/null && echo AUTH_OK || echo AUTH_FAIL"
-
-# Run a TAO training job — the whole docker run is one quoted string.
-brev exec <instance> "docker run --gpus all --rm -v ~/data:/data $TAO_PYT_IMAGE visual_changenet train -e /data/spec.yaml"
-```
-
-### Wait for instance readiness before the first `brev exec`
-
-A freshly created instance reports `RUNNING` long before sshd, hostname
-resolution, and the user shell are ready. The first `brev exec` against an
-unsettled instance fails with `hostname not resolvable`,
-`Connection refused`, or a silent timeout. Always poll until a trivial exec
-succeeds before issuing real work. The probe must be a **multi-word quoted
-command**: it proves both SSH readiness and the single-string exec form that
-every real command depends on (a bare `true` probe passes even when every
-multi-token command would fail):
-
-```bash
-# Wait up to 5 minutes for shell readiness — covers the SSH bring-up window.
-for i in $(seq 1 60); do
-  [ "$(brev exec <instance> "echo ok" 2>/dev/null)" = "ok" ] && break
-  sleep 5
-done
-[ "$(brev exec <instance> "echo ok" 2>/dev/null)" = "ok" ] || {
-  echo "instance <instance> never became exec-ready"; exit 1;
-}
-```
-
-### `brev exec` timeout for cold-start workloads
-
-`brev exec` inherits no default timeout, but anything that wraps it (the SDK
-handler, CI step wrappers, `timeout` shell builtins) must allow time for both
-the SSH bring-up window and the container pull on a fresh instance. Use
-**≥ 600 s (10 min)** for the first exec on a new instance; the previous
-60–120 s default truncates remote startup and surfaces as a spurious
-`exec failed` even though the remote command is still progressing.
-
-## Cleanup
-
-```bash
-brev delete <instance>      # plain delete — no flags
-```
-
-The CLI does not accept `--yes` / `-y`; passing it errors with
-`unknown flag: --yes`. `brev delete <instance>` is already non-interactive on
-recent CLIs, so no confirmation flag is needed.
-
-## Error Patterns
-
-**brev CLI not found**: Install from https://docs.nvidia.com/brev/.
-
-**`brev ls` returns auth EOF even with `BREV_API_TOKEN` set**: Headless shell
-has no stdin for the interactive auth prompt. Run
-`brev login --token "$BREV_API_TOKEN"` first, then retry. If the failure
-persists across a single retry, the token itself is stale — mint a fresh one.
-
-**Token expired**: Handler auto-refreshes via `brev login --token`. If
-persistent, run `brev login` manually.
-
-**`brev create` rejected with placement error (`cloudCredId` /
-`workspaceGroupId` required)**: Multi-credential or multi-workspace accounts
-must pass `--cloud-cred-id` and/or `--workspace-group-id`. See
-*Creating an instance — placement info* above.
-
-**`brev exec` fails with `hostname not resolvable` or `Connection refused`
-right after create**: Instance reports `RUNNING` before sshd is up. Use the
-readiness-wait loop in *Wait for instance readiness before the first `brev
-exec`* before issuing the real command.
-
-**`could not look up instance "<word>"` / `ssh: illegal option -- -` / exit
-255 on a multi-word `brev exec`**: The remote command was passed as separate
-tokens (`brev exec <instance> -- docker run …`). <!-- lint-ok: brev-exec-form -->
-The CLI parses every positional except the last as an instance name, so
-`docker`, `run`, … are looked up as instances and stray `--flags` leak to ssh.
-Pass the whole remote command as ONE quoted string:
-`brev exec <instance> "docker run …"`. See *`brev exec` syntax* above.
-
-**SDK exec timeout / `exec failed` on a fresh instance**: The SDK's
-`brev exec` wrapper timed out before remote startup finished. Raise the
-timeout to ≥ 600 s for cold-start runs (see *`brev exec` timeout for
-cold-start workloads*).
-
-**`brev delete --yes`: `unknown flag: --yes`**: The CLI has no confirmation
-flag. Use plain `brev delete <instance>`.
-
-**Instance stuck in provisioning**: Some GPU types have limited availability. Try a different `--gpu-name` or provider.
-
-**Docker pull / `docker manifest inspect` fails on nvcr.io**: Two distinct
-causes — distinguish them by login state:
-
-- **No prior `Login Succeeded` on the instance**: not authenticated —
-  `NGC_KEY` unset, expired, or the login never ran. Re-run the stdin login
-  from *NGC auth + running TAO containers* with a valid key.
-- **Login succeeded but pull/inspect still returns `Access Denied` /
-  `unauthorized`**: the key authenticates but its NGC org lacks entitlement
-  for the image's org (e.g. a pre-release staging org). Request org access or select an
-  image from an org the key can read — re-running login will not help.
-
+**Multi-node is not supported on Brev** — instance-based, no cross-instance
+coordination. Multi-GPU **on a single instance** is supported (up to 8× H100 /
+A100 / L40S); `torchrun --nproc-per-node=N` or PyTorch DDP work within the
+instance.

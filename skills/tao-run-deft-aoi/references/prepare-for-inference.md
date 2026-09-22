@@ -8,11 +8,12 @@ downstream inference skills can consume the trained checkpoint without reading
 
 | File | Role |
 |---|---|
-| `best_model.json` | 6-field handoff metadata. The contract every consumer reads. |
+| `best_model.json` | Checkpoint plus customer metric contract/result and deployment metadata. |
 | `best_model_inference_spec.yaml` | Ready-to-run TAO inference spec. The executable artifact. |
 
-Both are written by `scripts/prepare_inference_spec.py`. Never hand-edit either
-file — keeping them in sync is the script's job.
+Both are written by `scripts/prepare_inference_spec.py`. At ordinary loop end,
+use `"$PYTHON" scripts/finalize_run.py`; it writes these first and refuses the terminal
+commit if either is absent. Never hand-edit either file.
 
 ### `best_model.json`
 
@@ -20,21 +21,40 @@ file — keeping them in sync is the script's job.
 {
   "checkpoint":     "/abs/path/to/best.pth",
   "threshold":      0.237481,
-  "far_pct":        43.747,
+  "metric_contract": {
+    "name": "weighted_escape_cost",
+    "display_name": "Weighted escape cost",
+    "operator": "<=",
+    "target": 0.02,
+    "unit": "cost/board"
+  },
+  "metric_result": {
+    "name": "weighted_escape_cost",
+    "value": 0.018,
+    "unit": "cost/board",
+    "passed": true
+  },
   "iteration":      "iter1",
   "backbone":       "/abs/path/to/c_radio_v2_b.ckpt",
-  "images_dir":     "/abs/path/to/kpi/images",
+  "backbone_container_path": "/data/pretrained_models/c_radio_v2_b.ckpt",
+  "backbone_type":  "c_radio_v2_vit_base_patch16_224",
+  "backbone_frozen": false,
+  "images_dir":     "/abs/path/to/workspace/images",
   "training_spec":  "/abs/path/to/baseline_spec.yaml"
 }
 ```
 
 | Field | Meaning |
 |---|---|
-| `checkpoint` | Best `.pth` (the iteration with lowest `far_pct`, including baseline) |
-| `threshold` | Decision threshold at recall=100% — **always use this, never the spec default** |
-| `far_pct` | FAR achieved at that threshold. Surface to operators alongside scores. |
+| `checkpoint` | Best `.pth`: prefer candidates satisfying all constraints, then select lowest for `<`/`<=` or highest for `>`/`>=` according to the primary metric contract |
+| `threshold` | Evaluator-selected operating threshold, or `null` when the customer metric intentionally uses the training spec's existing threshold |
+| `metric_contract` | Approved customer target, direction, unit, evaluator, and constraints |
+| `metric_result` | Best measured value, recomputed pass state, evidence, constraints, and optional diagnostics |
 | `iteration` | Which iteration won (`baseline`, `iter1`, …) |
 | `backbone` | Absolute path to the backbone `.ckpt` (mount this into the container) |
+| `backbone_container_path` | Exact container destination matching the generated inference spec |
+| `backbone_type` | Visual ChangeNet backbone type used by training |
+| `backbone_frozen` | Whether the backbone was frozen during task-level training |
 | `images_dir` | Path the model was evaluated against. Useful default for re-running on KPI data. |
 | `training_spec` | Path to the training YAML used. Read this if you need fields the JSON doesn't expose. |
 
@@ -46,9 +66,12 @@ spec, then:
 - Stripping `train_dataset`, `validation_dataset`, `test_dataset` from `dataset.classify`
 - Setting `dataset.classify.infer_dataset.{csv_path,images_dir}` to empty (CONSUMER fills in)
 - Setting `inference.checkpoint` to the best checkpoint
-- Setting `model.classify.eval_margin` to the KPI threshold (overrides default 0.3)
+- Setting `model.classify.eval_margin` to the evaluator-selected threshold when one exists; otherwise retaining the training spec value
 - Disabling augmentation (`augmentation_config.augment: false`)
-- Adding a stub `train.classify.loss` (TAO's `load_from_checkpoint` rebuilds the criterion and asserts on the loss/difference_module pairing)
+- Carrying only `train.classify.loss` as a compatibility stub for the pinned
+  TAO 7.1 image. It must match the checkpoint's training spec. TAO 7.2 images
+  containing NVIDIA-TAO/tao-pytorch#107 derive the non-training criterion from
+  the model architecture and no longer require this stub.
 
 The consumer sets four things and runs:
 
@@ -68,17 +91,30 @@ cp ${RESULTS_DIR}/best_model_inference_spec.yaml /tmp/my_inference.yaml
 # … set the four CONSUMER fields …
 
 # 3. Pinned TAO pyt image URI (stamped from the release manifest).
-TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
 
 # 4. Run inference. Mount paths from best_model.json into the container.
-docker run --rm --gpus all --shm-size=8g \
+HANDOFF="${RESULTS_DIR}/best_model.json"
+BACKBONE=$(jq -er '.backbone | strings | select(length > 0)' "$HANDOFF")
+BACKBONE_CONTAINER_PATH=$(jq -er '.backbone_container_path | strings | select(startswith("/"))' "$HANDOFF")
+HOST_RESULTS=<output_dir>
+mkdir -p "$HOST_RESULTS"
+probe="$HOST_RESULTS/.tao-write-probe.$$"
+(umask 077 && : >"$probe" && rm -f "$probe") || {
+    echo "FATAL: $HOST_RESULTS is not writable by uid $(id -u)" >&2
+    exit 2
+}
+
+docker run --pull=never --rm --gpus all --shm-size=8g \
     --user "$(id -u):$(id -g)" \
+    -e USER="$(id -un)" -e LOGNAME="$(id -un)" -e HOME=/tmp \
+    -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro \
     -v <your_csv_dir>:/data/infer \
-    -v $(jq -r .images_dir ${RESULTS_DIR}/best_model.json):/data/images \
-    -v $(jq -r .checkpoint ${RESULTS_DIR}/best_model.json):/model/best.pth \
-    -v $(jq -r .backbone ${RESULTS_DIR}/best_model.json):/data/pretrained_models/C-RADIOv2_B.pth \
+    -v "$(jq -er .images_dir "$HANDOFF"):/data/images:ro" \
+    -v "$(jq -er .checkpoint "$HANDOFF"):/model/best.pth:ro" \
+    -v "${BACKBONE}:${BACKBONE_CONTAINER_PATH}:ro" \
     -v /tmp/my_inference.yaml:/specs/inference.yaml \
-    -v <output_dir>:/results \
+    -v "$HOST_RESULTS:/results" \
     "$TAO_PYT_IMAGE" \
     visual_changenet inference -e /specs/inference.yaml
 ```
@@ -86,18 +122,22 @@ docker run --rm --gpus all --shm-size=8g \
 The `--shm-size=8g` is required — TAO dataloaders crash with bus errors on the
 default 64MB allocation.
 
+The output tree is owned by the submitting host user, so it can be updated or
+removed without sudo.
+
 ## Threshold Contract
 
-Use `threshold` from `best_model.json`, not the `eval_margin` default in the
-spec. The default is calibrated for a reference dataset and **does not generalize**.
+When `threshold` is numeric, use it rather than an unrelated default. It is the
+operating point selected by the approved evaluator and is already written to
+the generated YAML.
 
-The KPI threshold was chosen at recall=100% on the KPI test set — it is the
-operating point that catches every defect at the cost of the reported `far_pct`.
-A consumer that ignores it will see arbitrary results.
+When `threshold` is `null`, the customer metric did not select a new operating
+point; the generated YAML retains the exact training spec value. Do not invent
+one. If the selected evaluator requires a threshold, it must supply the
+operating point used by evaluation.
 
-The script sets `model.classify.eval_margin` in the generated YAML to the
-KPI-derived value, so consumers who run the YAML as-is get the right
-threshold automatically.
+Consumers who run the generated YAML as-is therefore get the same threshold
+semantics used by evaluation.
 
 ## Silent-Failure Modes (Avoid These)
 
@@ -119,19 +159,22 @@ config verbatim, but if you build an inference spec by hand, watch out:
    set to `.png`. Dataloader finds zero rows; predict loop runs over 0 batches;
    no error. Verify `image_ext` matches actual files on disk.
 
-4. **`loss` / `difference_module` pair (assertion).** Contrastive loss requires
-   `difference_module: euclidean`. CE loss works with either. The training spec
-   already paired them correctly — copy both fields together, never one without
-   the other.
+4. **`loss` / `difference_module` pair (assertion on the pinned TAO 7.1 image).**
+   Contrastive loss requires `difference_module: euclidean`; CE loss works with
+   either. Copy `train.classify.loss` from the training spec until the documented
+   image baseline includes NVIDIA-TAO/tao-pytorch#107. Do not copy other
+   training-only keys.
 
 ## When to Re-Run
 
 Re-run `prepare_inference_spec.py` whenever:
 
-- The loop finishes (handled automatically as the final step).
+- The loop is about to finish (`finalize_run.py` handles this before
+  `loop_stop`).
 - A new iteration completes and you want to evaluate against the latest best.
-  The script always picks lowest `far_pct` from `deft_state.json` — so calling
-  it mid-loop gives you the current best, not necessarily the final best.
+  The script applies the metric contract's comparison direction, so calling it
+  mid-loop gives the current customer-metric winner, not necessarily the final
+  best.
 
 Do **not** re-run after manually editing `deft_state.json`. Disk is canonical;
 if state is stale, the artifact is wrong.

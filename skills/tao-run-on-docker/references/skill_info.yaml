@@ -1,0 +1,24 @@
+type: platform
+# Local Docker daemon (or a remote box via DOCKER_HOST=ssh://). No credential is
+# required to run — hence required_credentials is empty and the launch preflight's
+# credential gate is a no-op for docker. NGC_KEY / HF_TOKEN / AWS_* are pulled in
+# only when the image or data actually needs them.
+required_credentials: []
+optional_credentials:
+- name: NGC_KEY
+  source: env_var
+  only_when: private nvcr.io image pulls require NGC auth
+- name: HF_TOKEN
+  source: env_var
+  only_when: selected model requires HuggingFace access
+- name: AWS_ACCESS_KEY_ID
+  source: env_var
+  only_when: dataset or result URIs use s3:// (tier C in-container fetch)
+- name: AWS_SECRET_ACCESS_KEY
+  source: env_var
+  only_when: dataset or result URIs use s3://
+resource_defaults: {}
+cloud_storage:
+  protocol: aws
+  uri_format: s3://{bucket_name}/{path}
+  metadata_key: aws

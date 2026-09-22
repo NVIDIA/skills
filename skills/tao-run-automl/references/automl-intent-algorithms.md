@@ -35,7 +35,7 @@ Extract these fields for a default run:
 | `model_skill` | Yes | `"tao-finetune-cosmos-reason"` | Resolve `requested_model` to a packaged directory under `skills/models/` by using model metadata. Do not assume `network_arch` is the directory name. |
 | `network_arch` | Yes | `"cosmos-rl"` | Read from `<skill_dir>/references/skill_info.yaml` after resolving `model_skill`. |
 | `action` | Yes | `"train"`, `"distill"`, `"prune"`, `"quantize"` | Default to `train` only for train-stage requests. For compression requests, use the named action. |
-| `platform` | Yes | `"brev"`, `"slurm"`, `"local-docker"`, `"kubernetes"` | After the user confirms they want AutoML, run `scripts/list_tao_platforms.py --format text` and ask them to choose from that output. |
+| `platform` | Yes | `"brev"`, `"slurm"`, `"local-docker"`, `"kubernetes"` | After the user confirms they want AutoML, discover the execution platforms from the installed platform skills (tao-run-on-docker / -slurm / -kubernetes / -brev, plus any external one); on a runtime that surfaces only the core router skills, read `skills/platform/tao-run-on-*/SKILL.md` frontmatter. Ask them to choose from those platforms. |
 | action dataset/checkpoint inputs | Yes | `"s3://bucket/data/subset"`, `"/lustre/fsw/tao_datasets/<model>/train"`, `prune.checkpoint=/...`, or `quantize.model_path=/...` | User provides a root URI/path, exact spec-key paths, parent job IDs, or the model skill declares a default profile for this exact network/action/use case. |
 | `eval_dataset_uri` or direct eval spec paths | Model-dependent | `"s3://bucket/data/eval"`, `"/lustre/fsw/tao_datasets/<model>/eval"`, or `custom.val_dataset.media_path=/...` | Ask only if the model skill's Per-Action Dataset Requirements require an eval/validation source and no default profile supplies it. |
 | `image` | Yes | `"nvcr.io/..."` | Resolve the default with `scripts/resolve_tao_image.py --model <requested_model> --action <action>`, show it to the user, and require confirmation or `image=<override>` before creating the AutoML runner. |
@@ -44,7 +44,7 @@ Extract these fields for a default run:
 | `skill_dir` | Yes | `"<bank-root>/skills/models/tao-train-dino"` | Absolute path to the resolved model skill directory in the skill bank. Passed explicitly to `AutoMLRunner(skill_dir=...)` — no env-var fallback. |
 | `long_running_enabled` | Yes | `true` | Ask during launch intake. If enabled, keep the agent attached and emit status until completion. Default: enabled. |
 | `status_interval_minutes` | Yes | `5` | Ask during launch intake. Default: 5 minutes. |
-| required credentials | Platform/model-dependent | `SLURM_USER`, `SLURM_HOSTNAME`, `SSH_KEY_PATH` or `SSH_AUTH_SOCK`, `HF_TOKEN` | First filter platform credentials with `scripts/list_tao_platforms.py --platform <platform>`, satisfy required credential groups, then add selected-model credentials. Do not ask for unrelated platform credentials. |
+| required credentials | Platform/model-dependent | `SLURM_USER`, `SLURM_HOSTNAME`, `SSH_KEY_PATH` or `SSH_AUTH_SOCK`, `HF_TOKEN` | First read the chosen platform skill's `## Credentials` section and `references/skill_info.yaml` (required_credentials / credential_groups), satisfy required credential groups, then add selected-model credentials. Do not ask for unrelated platform credentials. |
 | compute shape | Model-dependent | `num_gpus=4`, `num_nodes=1` | Ask only for model-required hardware fields that are not provided by the platform/default profile. |
 | `llm_endpoint` / `base_url` | **Yes** (for `llm`/`hybrid`/`autoresearch`) | `"https://inference-api.nvidia.com"` | Resolve from user input or `AUTOML_LLM_ENDPOINT`; pass explicitly in `automl_settings`. |
 | `llm_model` / `model` | **Yes** (for `llm`/`hybrid`/`autoresearch`) | `"gcp/google/gemini-3.1-pro-preview"` | Resolve from user input or `AUTOML_LLM_MODEL`; pass explicitly in `automl_settings`. |
@@ -117,6 +117,13 @@ evaluate action, validation data is missing, or the eval job fails, stop and
 surface the blocker. Proceed without this baseline only when the user
 explicitly accepts a proxy-metric run with no impact baseline.
 
+If the workflow starts from scratch and has no compatible checkpoint to
+evaluate, run a minimal default-configuration training job outside the AutoML
+recommendation budget, resolve its exact epoch/step checkpoint, and evaluate
+that checkpoint for the baseline. Then use the same evaluator task metric via
+`eval_fn` for every recommendation and `final_eval_fn` for the winner. An empty
+checkpoint value or container directory is not a valid baseline model.
+
 **Customization gate:** After the required quick-start fields are resolved, you may briefly offer customization. If the user declines or does not ask for it, proceed with the defaults above. If the user chooses customization, then present the additional options below.
 
 Customization-only fields:
@@ -135,8 +142,8 @@ Customization-only fields:
 
 For the selected model/action, read:
 
-- `${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/skills/models/<model_skill>/schemas/<action>.schema.json`
-- `${TAO_SKILL_BANK_PATH:-~/tao-skills-external}/skills/models/<model_skill>/schemas/manifest.json`
+- `${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/skills/models/<model_skill>/schemas/<action>.schema.json`
+- `${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/skills/models/<model_skill>/schemas/manifest.json`
 
 AutoML is enabled by the model skill, but it can run only when
 `schemas/<action>.schema.json` is packaged with the plugin and valid for the
@@ -165,6 +172,7 @@ result = runner.run(
         "algorithm": "bayesian",
         "metric": metric,
         "automl_max_recommendations": 10,
+        "session_id": session_id,
     },
     automl_hyperparameters=None,  # use schema params marked automl_enabled=true
     custom_param_ranges=None,     # use schema ranges/options/defaults

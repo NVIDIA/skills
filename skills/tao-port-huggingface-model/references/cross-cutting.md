@@ -71,8 +71,7 @@ containers; this skill only specifies *what* to run inside them.
 | Concern | Authoritative skill |
 |---|---|
 | GPU host runtime — NVIDIA driver 580, CUDA Toolkit 13.0, NVIDIA Container Toolkit 1.19.0 | [`tao-skill-bank:tao-setup-nvidia-gpu-host`](../../../platform/tao-setup-nvidia-gpu-host/SKILL.md) |
-| `docker run` flags, NGC auth, `--gpus`, mounts, env passthrough, `--ipc=host`/`--shm-size`, container inspection, common error modes | [`tao-skill-bank:tao-run-on-docker`](../../../platform/tao-run-on-docker/SKILL.md) |
-| Local Docker daemon preflight + per-job invocation | [`tao-skill-bank:tao-run-on-local-docker`](../../../platform/tao-run-on-local-docker/SKILL.md) |
+| `docker run` flags, NGC auth, `--gpus`, mounts, env passthrough, `--shm-size=8g`/`--shm-size`, container inspection, common error modes, local/remote (`DOCKER_HOST=ssh://`) daemon preflight + per-job invocation | [`tao-skill-bank:tao-run-on-docker`](../../../platform/tao-run-on-docker/SKILL.md) |
 
 **Default platform:** `local-docker`. This workflow requires bind-mounting
 your local clones of `tao-core`, `tao-pytorch`, `tao-deploy`, and

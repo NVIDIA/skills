@@ -51,7 +51,7 @@ vLLM supports many vision models; the pipelines just need an OpenAI-compatible c
 | Qwen3-VL-8B-Instruct | `Qwen/Qwen3-VL-8B-Instruct` | Newer Qwen3 family |
 | Qwen3-VL-235B-A22B-Instruct | `Qwen/Qwen3-VL-235B-A22B-Instruct` | MoE; requires serious hardware |
 
-If the chosen repo is gated, accept its license on the HuggingFace web UI first, then `export HF_TOKEN=<your_token>` before launching.
+If the chosen repo is gated, accept its license on the HuggingFace web UI first, then make `HF_TOKEN` available in your session before launching.
 
 ## 4. Launch the server
 
@@ -60,9 +60,10 @@ Use the launcher that matches the install path. Both commands listen on `0.0.0.0
 ### Option A — Docker (default, recommended)
 
 ```bash
+set -a; source /path/to/.env; set +a   # omit if already exported
 docker run --runtime nvidia --gpus all \
     -p 8000:8000 \
-    -e HF_TOKEN=<your_hf_token> \
+    -e HF_TOKEN \
     -v ~/.cache/huggingface:/root/.cache/huggingface \
     vllm/vllm-openai:latest \
     --model Qwen/Qwen3-VL-8B-Instruct \
@@ -75,7 +76,7 @@ docker run --runtime nvidia --gpus all \
 ### Option B — `pip` install (host launch, advanced)
 
 ```bash
-export HF_TOKEN=<your_hf_token>          # only required for gated models
+set -a; source /path/to/.env; set +a   # omit if already exported
 
 vllm serve Qwen/Qwen3-VL-8B-Instruct \
     --host 0.0.0.0 \

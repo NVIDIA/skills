@@ -1,5 +1,5 @@
 ## Description: <br>
-OneFormer for universal image segmentation. Unifies panoptic, instance, and semantic segmentation with a single architecture using task-conditioned queries. <br>
+OneFormer for universal image segmentation, unifying panoptic, instance, and semantic segmentation with a single architecture using task-conditioned queries. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference on OneFormer universal image segmentation models using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference on NVIDIA TAO OneFormer models for universal image segmentation tasks. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,9 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [tao-deploy-oneformer.md](references/tao-deploy-oneformer.md) <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [TAO Deploy OneFormer](references/tao-deploy-oneformer.md) <br>
+- [Skill metadata and AutoML configuration](references/skill_info.yaml) <br>
+- [Swin Transformer pretrained backbone](https://github.com/SwinTransformer/storage/releases/download/v1.0.8/swin_tiny_patch4_window7_224_22k.pth) <br>
 
 
 ## Skill Output: <br>
@@ -43,35 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1. <br>
+1 evaluation task (1 positive), 3 attempts per task, each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Checks whether the skill is safe to use — no unsafe operations, secret leakage, or unauthorized access. <br>
+- Correctness: Checks whether the answer is correct against the reference answer. <br>
+- Discoverability: Checks whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Checks whether the skill helped the agent complete the user's goal and expected workflow. <br>
+- Efficiency: Checks whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 58% → 92% (+34 points) | 55% → 52% (-3 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 60% → 100% (+40 points) | 100% → 100% (±0 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 0% (±0 points) |
-| Effectiveness | 42% → 78% (+37 points) | 75% → 58% (-17 points) |
-| Efficiency | 38% → 83% (+46 points) | 0% → 0% (±0 points) |
+| Overall | 94.3% | 78.7% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 5.6% → 100.0% (+94.4 points) | 36.7% → 95.0% (+58.3 points) |
+| Efficiency | 71.3% | 99.5% → 98.5% (-1.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -38,7 +38,13 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** centerpose
 - **Formats:** default
-- **Monitoring metric:** val_3DIoU
+- **Training monitoring metrics:** `val_3DIoU`, `val_2DMPE`
+- **Evaluate task metrics:** `test_3DIoU`, `test_2DMPE`
+- **AutoML metric contract:** use `test_3DIoU` with maximize direction for
+  the required evaluation-backed baseline, every recommendation through
+  `eval_fn`, best-model selection, and final evaluation. `val_3DIoU` is emitted
+  by training but not by the evaluate action, so it is only suitable for an
+  explicitly accepted training-proxy run without an impact baseline.
 
 ### Per-Action Dataset Requirements
 
@@ -100,7 +106,10 @@ CAL_IMAGE_DIRS = ["/path/to/extracted/train/<sequence_or_image_dir>"]
 ```
 ## Eval Dataset
 
-Optional. Val and test datasets are provided as separate tarballs.
+Optional. Val and test datasets are provided as separate tarballs. Training
+writes `val_3DIoU`/`val_2DMPE` KPIs, while evaluate writes
+`test_3DIoU`/`test_2DMPE`; do not configure an evaluate-backed AutoML callback
+to extract the training-prefixed names.
 
 ## Important Parameters
 
@@ -194,4 +203,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-centerpose](references/tao-deploy-centerpose.md)
-

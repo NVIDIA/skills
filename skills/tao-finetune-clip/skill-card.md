@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to fine-tune or train CLIP models, run zero-shot classification, compute image-text embeddings, or deploy CLIP to ONNX/TensorRT. <br>
+Developers and engineers use this skill to fine-tune, evaluate, export, and deploy NVIDIA TAO CLIP vision-language models for image-text retrieval, zero-shot classification, and embedding extraction. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,10 +25,10 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
+- [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [tao-deploy-clip.md](references/tao-deploy-clip.md) <br>
 - [error-patterns.md](references/error-patterns.md) <br>
 - [spec-param-inference.md](references/spec-param-inference.md) <br>
-- [tao-deploy-clip.md](references/tao-deploy-clip.md) <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -44,35 +44,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) against skill-evaluator-dataset-snapshot/1. <br>
+1 evaluation task (1 positive), 3 attempts per task, run in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Verifies final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the right skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (goal_accuracy 50% + behavior_check 50%). <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
+- Efficiency: Checks tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_execution`: Verifies expected skill selection and workflow execution. <br>
+- `skill_efficiency`: Measures tool-call productivity. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies expected workflow behavior was followed. <br>
+- `token_efficiency`: Measures actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 41% → 97% (+56 points) | 34% → 95% (+62 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 20% → 100% (+80 points) | 20% → 100% (+80 points) |
-| Discoverability | 50% → 100% (+50 points) | 0% → 94% (+94 points) |
-| Effectiveness | 17% → 100% (+83 points) | 48% → 83% (+35 points) |
-| Efficiency | 17% → 83% (+67 points) | 0% → 100% (+100 points) |
+| Overall | 96.2% | 95.3% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 16.7% → 83.3% (+66.6 points) | 33.3% → 83.3% (+50.0 points) |
+| Efficiency | 97.4% | 98.3% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -40,7 +40,9 @@ Non-train actions such as `evaluate`, `inference`, `export`, and deploy flows st
 
 - **Dataset type:** object_detection
 - **Formats:** coco, coco_raw
-- **Monitoring metric:** val_mAP50 for AP50; `val_mAP` for COCO/paper-style benchmark comparisons.
+- **AutoML metric contract:** for evaluation-backed selection, use `test_mAP50` with maximize direction. Use `val_mAP50` only for training-log-only AutoML workflows.
+- **Training monitoring metrics:** `val_mAP50` for AP50; `val_mAP` for COCO/paper-style benchmark comparisons.
+- **Evaluate action metrics:** `test_mAP50` for AP50; `test_mAP` for COCO/paper-style benchmark comparisons. AutoML trials compared through the evaluate action must use the corresponding `test_*` KPI rather than looking for a `val_*` KPI in evaluator output.
 
 ### Per-Action Dataset Requirements
 
@@ -211,7 +213,7 @@ Minimum 1 GPU(s), recommended 4 GPU(s). 16GB+ (V100 or A100) VRAM per GPU. Sligh
 
 **Dataset size smaller than total batch size**: Reduce batch_size or num_gpus.
 
-**AutoML metric extraction**: Deformable DETR emits detection metrics in structured training status and logs. For COCO/paper-style benchmark comparisons, optimize `val_mAP` with `direction: maximize`; for explicit AP50 workflows, optimize `val_mAP50`. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
+**AutoML metric extraction**: Deformable DETR emits `val_mAP` and `val_mAP50` in structured training status, while the standalone evaluate action emits `test_mAP` and `test_mAP50`. For COCO/paper-style training-only comparisons, optimize `val_mAP`; for explicit AP50 training-only workflows, optimize `val_mAP50`. When AutoML scores each recommendation with the evaluate action, use the corresponding `test_mAP` or `test_mAP50` KPI. Prefer `results_dir/train/status.json` or AutoML result state before parsing raw logs. Do not optimize `val_loss` for default detection model invocations.
 
 ## Spec Param / Parent Model Inference
 
@@ -247,4 +249,3 @@ For `parent_model` or `parent_model_folder`, pass the upstream train/export/Auto
 ## Deployment
 
 - [tao-deploy-deformable-detr](references/tao-deploy-deformable-detr.md)
-

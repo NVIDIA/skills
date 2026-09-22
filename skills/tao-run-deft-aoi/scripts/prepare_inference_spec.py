@@ -7,7 +7,7 @@ Produces two files under ``${RESULTS_DIR}/`` so downstream inference skills can
 consume the trained checkpoint without reading ``deft_state.json`` or the
 training spec directly:
 
-- ``best_model.json``                — handoff metadata (checkpoint, threshold, FAR)
+- ``best_model.json``                — checkpoint, operating threshold, and customer metric
 - ``best_model_inference_spec.yaml`` — a ready-to-run TAO inference spec built
                                        from the training spec used for the best
                                        iteration. Model / dataset config is
@@ -43,21 +43,36 @@ from typing import Any
 
 import yaml
 
+from metric_contract import contract_from_state, pick_best, result_from_iteration
 
-def _pick_best(state: dict[str, Any]) -> tuple[str, dict[str, Any]]:
-    """Return (iteration_label, iteration_dict) with the lowest far_pct."""
-    candidates: dict[str, dict[str, Any]] = {}
-    if "baseline" in state and "far_pct" in state["baseline"]:
-        candidates["baseline"] = state["baseline"]
+
+def _pick_best(
+    state: dict[str, Any]
+) -> tuple[str, dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Return the best completed iteration according to the metric direction."""
+    contract = contract_from_state(state)
+    candidates: list[tuple[str, dict[str, Any], dict[str, Any]]] = []
     for label, info in state.get("iterations", {}).items():
-        if "far_pct" in info:
-            candidates[label] = info
+        if not isinstance(info, dict) or info.get("status") != "complete":
+            continue
+        result = result_from_iteration(info, contract)
+        if result is not None:
+            candidates.append((label, info, result))
+    # Read-only compatibility for runs created before baseline was normalized
+    # under state["iterations"]. New writers must never create this shape.
+    if "baseline" in state and isinstance(state["baseline"], dict):
+        legacy_result = result_from_iteration(state["baseline"], contract)
+        if legacy_result is not None and not any(
+            label == "baseline" for label, _, _ in candidates
+        ):
+            candidates.append(("baseline", state["baseline"], legacy_result))
     if not candidates:
         raise RuntimeError(
-            "no iteration in deft_state.json has far_pct — "
-            "loop may have exited before evaluate ran"
+            "no completed iteration in deft_state.json has the configured metric — "
+            "finish an evaluate commit before preparing the handoff"
         )
-    return min(candidates.items(), key=lambda kv: kv[1]["far_pct"])
+    label, info, result = pick_best(candidates, contract)
+    return label, info, result, contract
 
 
 CHECKPOINT_MOUNT = "/model/best.pth"
@@ -65,16 +80,16 @@ CHECKPOINT_MOUNT = "/model/best.pth"
 
 def _build_inference_spec(
     train_spec: dict[str, Any],
-    threshold: float,
+    threshold: float | None,
 ) -> dict[str, Any]:
     """Transform a training spec into a minimal, runnable inference spec.
 
     Strips train/evaluate/export blocks. Keeps model + dataset architecture
     verbatim so backbone, lighting layout, image size, difference module, and
-    concat type all match the checkpoint. Adds a ``train.classify.loss`` stub
-    because TAO's PL classifier rebuilds its criterion on load and asserts the
-    loss/difference_module pairing — without this stub, load_from_checkpoint
-    raises before inference ever starts.
+    concat type all match the checkpoint. The currently pinned TAO 7.1 runtime
+    still rebuilds its criterion during non-training actions, so carry only the
+    matching ``train.classify.loss`` compatibility stub. TAO 7.2 runtimes that
+    include NVIDIA-TAO/tao-pytorch#107 no longer require it.
 
     The ``inference.checkpoint`` path is the in-container mount point, not the
     host path — consumers mount ``best_model.json["checkpoint"]`` (host) to
@@ -86,10 +101,15 @@ def _build_inference_spec(
         "encryption_key": train_spec.get("encryption_key", "tlt_encode"),
         "task": train_spec.get("task", "classify"),
         "results_dir": "",  # CONSUMER: override with your output dir
-        # Stub required by TAO's load_from_checkpoint criterion check.
+        # Required by the pinned TAO 7.1 runtime. Remove after the documented
+        # baseline includes NVIDIA-TAO/tao-pytorch#107.
         "train": {
             "classify": {
-                "loss": train_spec.get("train", {}).get("classify", {}).get("loss", "ce"),
+                "loss": (
+                    train_spec.get("train", {})
+                    .get("classify", {})
+                    .get("loss", "ce")
+                ),
             },
         },
         "model": deepcopy(train_spec["model"]),
@@ -101,9 +121,10 @@ def _build_inference_spec(
         },
     }
 
-    # Threshold from KPI analysis is the operating point — overrides the
-    # spec default which is calibrated for a different dataset.
-    spec["model"].setdefault("classify", {})["eval_margin"] = float(threshold)
+    # Use an evaluator-selected operating point when supplied. A custom metric
+    # may intentionally evaluate the training spec's existing threshold.
+    if threshold is not None:
+        spec["model"].setdefault("classify", {})["eval_margin"] = float(threshold)
 
     # Strip training/evaluation data sources; consumer only needs infer_dataset.
     cls = spec["dataset"]["classify"]
@@ -123,6 +144,67 @@ def _build_inference_spec(
     return spec
 
 
+def _resolve_backbone(
+    train_spec: dict[str, Any],
+    state: dict[str, Any],
+) -> tuple[str, str, str, bool]:
+    """Resolve the host backbone while preserving the legacy AOI mount."""
+    backbone_config = train_spec.get("model", {}).get("backbone", {})
+    container_path = backbone_config.get("pretrained_backbone_path")
+    backbone_type = str(backbone_config.get("type", ""))
+    backbone_frozen = bool(backbone_config.get("freeze_backbone", False))
+    if not isinstance(container_path, str) or not container_path.strip():
+        raise ValueError(
+            "training spec has no model.backbone.pretrained_backbone_path"
+        )
+
+    configured = pathlib.Path(container_path)
+    if configured.suffix not in {".ckpt", ".pth", ".safetensors"}:
+        raise ValueError(f"unsupported pretrained backbone file: {container_path}")
+
+    if configured.is_file():
+        host_path = configured
+    else:
+        backbone_dir = pathlib.Path(state["config"]["backbone_weight_dir"])
+        host_path = backbone_dir / configured.name
+
+        # Existing AOI mounts may rename the single staged C-RADIO file between
+        # host and container. Require the normalized alias; never substitute an
+        # unrelated sole checkpoint. DINO profiles must resolve exactly.
+        if not host_path.is_file() and "dinov3" not in backbone_type:
+            candidates = [
+                path
+                for suffix in (".ckpt", ".pth", ".safetensors")
+                for path in sorted(backbone_dir.glob(f"*{suffix}"))
+                if path.is_file() and path.stat().st_size > 0
+            ]
+            configured_stem = "".join(
+                char for char in configured.stem.casefold() if char.isalnum()
+            )
+            aliases = [
+                path
+                for path in candidates
+                if "".join(
+                    char for char in path.stem.casefold() if char.isalnum()
+                ) == configured_stem
+            ]
+            if len(aliases) == 1:
+                host_path = aliases[0]
+
+    if not host_path.is_file() or host_path.stat().st_size <= 0:
+        raise FileNotFoundError(
+            "the exact pretrained backbone referenced by the training spec is "
+            f"not staged: {host_path}"
+        )
+
+    return (
+        str(host_path.resolve()),
+        container_path,
+        backbone_type,
+        backbone_frozen,
+    )
+
+
 def prepare(results_dir: pathlib.Path) -> dict[str, pathlib.Path]:
     """Write best_model.json and best_model_inference_spec.yaml.
 
@@ -132,31 +214,43 @@ def prepare(results_dir: pathlib.Path) -> dict[str, pathlib.Path]:
     state_path = results_dir / "deft_state.json"
     state = json.loads(state_path.read_text())
 
-    iter_label, best = _pick_best(state)
+    iter_label, best, metric_result, metric_contract = _pick_best(state)
 
-    train_spec_path = pathlib.Path(state["config"]["specs_file"])
+    train_spec_path = pathlib.Path(
+        best.get("training_spec") or state["config"]["specs_file"]
+    )
     if not train_spec_path.exists():
         raise FileNotFoundError(f"training spec not found: {train_spec_path}")
     train_spec = yaml.safe_load(train_spec_path.read_text())
 
-    backbone_dir = pathlib.Path(state["config"]["backbone_weight_dir"])
-    backbone_files = sorted(backbone_dir.glob("*.ckpt")) + sorted(backbone_dir.glob("*.pth"))
-    backbone = str(backbone_files[0]) if backbone_files else str(backbone_dir)
+    backbone, backbone_container_path, backbone_type, backbone_frozen = (
+        _resolve_backbone(train_spec, state)
+    )
 
+    threshold = best.get("threshold")
     handoff = {
-        "checkpoint":    best["best_ckpt_path"],
-        "threshold":     best["threshold"],
-        "far_pct":       best["far_pct"],
-        "iteration":     iter_label,
-        "backbone":      backbone,
-        "images_dir":    state["config"]["images_dir"],
+        "checkpoint": best["best_ckpt_path"],
+        "threshold": threshold,
+        "metric_contract": metric_contract,
+        "metric_result": metric_result,
+        "iteration": iter_label,
+        "backbone": backbone,
+        "backbone_container_path": backbone_container_path,
+        "backbone_type": backbone_type,
+        "backbone_frozen": backbone_frozen,
+        "images_dir": state["config"]["images_dir"],
         "training_spec": str(train_spec_path),
     }
+    if metric_contract["name"] == "far_pct":
+        handoff["far_pct"] = metric_result["value"]
 
     inference_spec = _build_inference_spec(
         train_spec=train_spec,
-        threshold=best["threshold"],
+        threshold=threshold,
     )
+    inference_spec["model"]["backbone"][
+        "pretrained_backbone_path"
+    ] = backbone_container_path
 
     json_path = results_dir / "best_model.json"
     yaml_path = results_dir / "best_model_inference_spec.yaml"
