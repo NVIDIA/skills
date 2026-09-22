@@ -1,0 +1,38 @@
+network_arch: tao-mine-od-images
+type: data
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+gpu_spec_key: null
+required_credentials: []
+actions:
+  global:
+    command: tmm unique_neighbor_matching -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      source_path:
+        type: file
+      target_path:
+        type: file
+    outputs:
+      output_dir:
+        type: directory
+    upload_excludes:
+    - inputs/
+  class_stratified:
+    command: tmm unique_neighbor_matching -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      source_path:
+        type: file
+      target_path:
+        type: file
+      source_detection_file:
+        type: file
+      target_detection_file:
+        type: file
+    outputs:
+      output_dir:
+        type: directory
+    upload_excludes:
+    - inputs/

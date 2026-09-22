@@ -1,0 +1,95 @@
+name: video-clip-deploy
+type: model
+network_arch: video-clip
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-deploy  # versions-key: images.tao_toolkit.deploy
+data_format: vadr1_chunks
+actions:
+  gen_trt_engine:
+    command: video_clip gen_trt_engine -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      gen_trt_engine.onnx_file:
+        type: file
+      gen_trt_engine.trt_engine:
+        type: file
+    outputs:
+      results_dir:
+        type: folder
+      gen_trt_engine.trt_engine:
+        type: file
+    upload_excludes:
+    - inputs/
+  evaluate:
+    command: video_clip evaluate -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      evaluate.trt_engine:
+        type: file
+      dataset.val.gt_queries:
+        type: file
+      dataset.val.metadata:
+        type: file
+      dataset.val.video_root:
+        type: folder
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+  inference:
+    command: video_clip inference -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      inference.trt_engine:
+        type: file
+      inference.text_file:
+        type: file
+        optional: true
+      dataset.val.gt_queries:
+        type: file
+        optional: true
+      dataset.val.metadata:
+        type: file
+        optional: true
+      dataset.val.video_root:
+        type: folder
+        optional: true
+    outputs:
+      results_dir:
+        type: folder
+    upload_excludes:
+    - inputs/
+spec_params:
+  gen_trt_engine:
+    results_dir: output_dir
+    gen_trt_engine.onnx_file: parent_model
+    gen_trt_engine.trt_engine: create_engine_file
+  evaluate:
+    results_dir: output_dir
+    evaluate.trt_engine: parent_model
+  inference:
+    results_dir: output_dir
+    inference.trt_engine: parent_model
+spec_shorthand_keys:
+  trt_data_type: gen_trt_engine.tensorrt.data_type
+  trt_engine: gen_trt_engine.trt_engine
+  batch_size: dataset.val.batch_size
+  trt_min_batch_size: gen_trt_engine.tensorrt.min_batch_size
+  trt_opt_batch_size: gen_trt_engine.tensorrt.opt_batch_size
+  trt_max_batch_size: gen_trt_engine.tensorrt.max_batch_size
+description: Video-CLIP deploy workflow for TensorRT engine generation, retrieval
+  evaluation, and embedding inference using TAO Deploy.
+spec_templates:
+  gen_trt_engine: spec_template_gen_trt_engine.yaml
+  evaluate: spec_template_deploy_evaluate.yaml
+  inference: spec_template_deploy_inference.yaml
+notes:
+- Keep the exported *_config.yaml file and *_tokenizer/ directory beside the ONNX
+  model. Engine generation copies those sidecars beside the TensorRT engine.
+- Evaluate requires both dataset.val.gt_queries and dataset.val.metadata.
+- Inference requires inference.text_file and/or both dataset.val.gt_queries and
+  dataset.val.metadata.

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "tao-train-codetr-inference",
+    "question": "A user request: \"Run Co-DETR inference over a directory of images with TAO.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "expected_skill": "tao-train-codetr",
+    "expected_script": null,
+    "ground_truth": "Identify tao-train-codetr as the applicable skill and summarize its documented inference workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-train-codetr as the relevant skill",
+      "Names the command form: codetr inference -e <spec> with Hydra overrides",
+      "Lists the required inference inputs: checkpoint, infer_data_sources.image_dir, infer_data_sources.classmap",
+      "States that results_dir auto-appends the action name and output is KITTI labels under results_dir/inference/labels/",
+      "Mentions probing the image with `codetr --help` first, since Co-DETR may not ship in every TAO PyTorch build",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

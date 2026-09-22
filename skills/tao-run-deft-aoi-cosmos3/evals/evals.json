@@ -1,0 +1,47 @@
+[
+  {
+    "id": "tao-run-deft-aoi-cosmos3-basic",
+    "question": "Plan a Cosmos Reason 3 DEFT AOI loop over two-image ShareGPT records with bare OK/NG labels. Do not launch anything.",
+    "expected_skill": "tao-run-deft-aoi-cosmos3",
+    "expected_script": null,
+    "ground_truth": "Select tao-run-deft-aoi-cosmos3, ask the user to choose a platform, use nvidia/Cosmos3-Nano unless Edge or Super was explicitly requested, require only Proxy/Benchmark/Mining annotations, start with a zero-shot frozen Benchmark gate and run zero-shot Proxy only when that gate is unmet, both before any training, use Proxy only for RCCA/mining, create train_iter_<N>.json from selected Mining records and AnomalyGen synthetic NG pairs only after RCA, use frozen Benchmark only for stopping, show one preflight gate, and route every later GPU stage through submit/status/logs/cancel with a job-record.",
+    "expected_behavior": [
+      "Identifies tao-run-deft-aoi-cosmos3",
+      "Does not default to a platform",
+      "Follows the prompt's model choice, defaults to Nano when unspecified, and keeps hardware advice non-binding",
+      "Does not request an input Train annotation",
+      "Creates train_iter_<N>.json from selected Mining records only after Proxy RCA",
+      "Adds AnomalyGen synthetic NG pairs as a second training-data producer alongside real-image mining",
+      "Evaluates the frozen Benchmark gate before any Proxy work and skips Proxy once the gate stops the run",
+      "Keeps Proxy RCCA and frozen Benchmark stopping separate",
+      "Requires exact OK/NG training labels",
+      "Does not launch before confirmation"
+    ]
+  },
+  {
+    "id": "tao-run-deft-aoi-cosmos3-resume-state",
+    "question": "Resume the existing Cosmos3 DEFT AOI run at $RESULTS_DIR and determine the only safe next action without launching work.",
+    "expected_skill": "tao-run-deft-aoi-cosmos3",
+    "expected_script": null,
+    "ground_truth": "Read $RESULTS_DIR/deft_state.json as the single source of truth, use its status, current iteration, iteration status, completed stage, and latest event to identify the next stage, then read only that stage reference.",
+    "expected_behavior": [
+      "Reads $RESULTS_DIR/deft_state.json before any stage command",
+      "Uses state status, current_iteration, stage_completed, and the latest event to identify progress",
+      "Reads only the next stage's reference before later work",
+      "Does not mutate files or launch a job"
+    ]
+  },
+  {
+    "id": "tao-run-deft-aoi-cosmos3-bare-isolation",
+    "question": "Explain how the skill handles a mined record labeled 'Final answer: NG' and whether Benchmark false accepts may be used as mining targets.",
+    "expected_skill": "tao-run-deft-aoi-cosmos3",
+    "expected_script": "scripts/validate_sharegpt.py",
+    "ground_truth": "Reject the record as a training label because bare mode requires exactly NG, and forbid all Benchmark sample errors from routing/mining; only Proxy false accepts/rejects may drive those stages.",
+    "expected_behavior": [
+      "Rejects non-exact assistant labels in training data",
+      "Permits last-token normalization only for evaluator output",
+      "Forbids Benchmark errors from routing or mining",
+      "Uses Proxy errors as the only RCCA/mining source"
+    ]
+  }
+]

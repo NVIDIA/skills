@@ -1,0 +1,135 @@
+# EXAMPLE Cosmos3 AOI LoRA SFT config (cosmos-rl) — REFERENCE ONLY.
+#
+# This is the DEFT default adaptation: LoRA over bare OK/NG PCB image pairs.
+# You do NOT hand-write the staged spec. Build it from the model skill's
+# packaged template
+# (skills/models/tao-finetune-cosmos-reason/references/spec_template_train.yaml),
+# apply only the AOI overrides in `references/cosmos-reason.md`, and serialize
+# the nested dict to TOML. This copy is committed so the produced shape can be
+# reviewed without a run. Never write flat dotted keys into a spec.
+#
+# Shown at iteration N, i.e. AFTER zero-shot Proxy evaluate + Proxy RCA +
+# Mining selection have produced train_iter_<N>.json. The initial workspace
+# `specs/train_spec.toml` differs in exactly two places: `annotation_path`
+# points at `annotations/mining_pool.json` (the training-eligible source pool,
+# not a pre-zero-shot Train annotation) and `output_dir` is unbound. No Train
+# job runs before zero-shot Proxy.
+#
+# Run with:
+#   cosmos-rl --config <this>.toml /opt/cosmos_rl/tao_sft_example.py
+# with workflow argument `automl_policy: off` (a workflow argument, never a
+# spec key). Mount the workspace at /tao-workspace — NEVER over /workspace,
+# which is where cosmos-rl itself is installed.
+
+[custom]
+# The exact bare-label instruction. Must match the Proxy/Benchmark evaluate
+# `dataset.system_prompt` verbatim; the assistant turn is exactly OK or NG.
+system_prompt = "Return exactly OK or NG. Do not include reasoning or extra text."
+
+# tao_sft_example.py loads the annotation with json.load() — one JSON array,
+# not JSONL. Single `annotation_path`, not the video template's list of
+# per-task `annotation_files`.
+[custom.train_dataset]
+annotation_path = "/tao-workspace/results/run_<id>/iter<N>/assemble/train_iter_<N>.json"
+media_path = "/tao-workspace"
+media_root = "/tao-workspace"
+
+# No [custom.val_dataset], and validation stays disabled below: Proxy is scored
+# by a separate evaluate job and must never become Train validation data.
+
+# Parsed by cosmos_reason1_utils.VisionConfig. AOI records are two-image pairs
+# ([AOI, golden_reference]), so this is a pixel budget — not the video
+# template's fps / max_frames / nframes.
+[custom.vision]
+max_pixels = 401408
+min_pixels = 50176
+
+[train]
+resume = false                # each DEFT iteration binds a FRESH output_dir
+epoch = 5
+# Stage-bound results directory from the Train job-record. Keep it inside the
+# iteration result tree; a checkpoint outside that tree is a hard stop.
+output_dir = "/tao-workspace/results/run_<id>/iter<N>/train"
+epsilon = 1e-8
+optm_name = "AdamW"
+optm_lr = 1e-4                # LoRA tolerates a much higher lr than full SFT (1e-5)
+optm_decay_type = "cosine"
+optm_min_lr_factor = 0.01
+optm_impl = "foreach"
+optm_weight_decay = 0.01
+optm_betas = [0.9, 0.999]
+optm_warmup_epochs = 0        # schema exposes warmup EPOCHS, not a warmup ratio
+optm_grad_norm_clip = 1.0
+async_tp_enabled = false
+compile = false
+param_dtype = "bfloat16"
+fsdp_reduce_dtype = "float32"
+fsdp_offload = false
+fsdp_reshard_after_forward = "default"
+train_batch_per_replica = 4   # small mined pool on 1 GPU: ~n_samples/4 steps per epoch
+sync_weight_interval = 1
+
+[validation]
+enable = false                # DEFT contract: Proxy is a separate evaluate job
+freq_in_epoch = 1
+batch_size = 1
+dataloader_num_workers = 4
+dataloader_prefetch_factor = 4
+
+[policy]
+# Blank on purpose — filled at launch, same resolution as evaluate_spec.toml
+# `model.model_name`. Lineage is the selected Cosmos3 variant
+# (nvidia/Cosmos3-Nano by default; Edge/Super only on explicit request), which
+# is a native Omni checkpoint cosmos-rl cannot consume directly. The skill runs
+# prepare_cosmos3_vlm_checkpoint.py to produce a Qwen3-VL safetensors PTM and
+# writes that compute-frame path here. Do not hardcode a snapshot path.
+model_name_or_path = ""
+model_max_length = 40960      # contract floor: >= 40960
+model_gradient_checkpointing = true
+
+[policy.lora]
+r = 16
+lora_alpha = 32
+lora_dropout = 0.05
+use_rslora = false
+init_lora_weights = true
+modules_to_save = []
+# Language-side projections only — the vision tower keeps its pretrained
+# weights. The schema also accepts the string "all-linear", which additionally
+# adapts the vision linear layers; use it only when explicitly requested. Note
+# the schema forbids attn.qkv / attn.proj when modules_to_save contains "visual".
+target_modules = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+[logging]
+logger = ["console", "tao"]
+project_name = "cr3_deft_aoi"
+experiment_name = "<exp>_iter<N>_lora"
+
+[train.train_policy]
+type = "sft"
+enable_dataset_cache = false
+conversation_column_name = "conversations"
+dataloader_num_workers = 1
+dataloader_prefetch_factor = 1
+mini_batch = 1
+dataset.name = "<exp>_iter<N>_lora"
+dataset.test_size = 0
+
+[train.ckpt]
+enable_checkpoint = true
+save_freq_in_epoch = 1
+max_keep = 10                 # keep every epoch of a 5-epoch run; don't rotate out the best step
+save_mode = "async"
+# Exported adapter dir feeds the post-Train evaluate: set model.enable_lora=true,
+# model.model_name = that dir, model.base_model_path = the SAME prepared PTM
+# used above. Commit the concrete exported dir, never a broken `best` symlink.
+export_safetensors = true
+
+[policy.parallelism]
+n_init_replicas = 1
+tp_size = 1
+cp_size = 1
+dp_shard_size = 1             # single GPU; derive from the selected platform's shape
+pp_size = 1
+dp_replicate_size = 1
+cp_rotate_method = "allgather"

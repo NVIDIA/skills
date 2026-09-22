@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# `grounding_dino inference` — the settings that do not vary per run, applied over
+# the Hydra schema dump. The checkpoint, results_dir, num_gpus, image_dir,
+# captions and max_labels are run-specific and stay as --set.
+#
+# `captions` is never pinned here: it is the label map, since a detection takes
+# the class of the caption token it matched by position, so it belongs to the
+# run's class set rather than to the stage. See references/grounding-dino.md.
+
+inference.conf_threshold: 0.0  # Dropped at write time, so this bounds what
+                               # gap_analysis and KPI can score downstream. 0
+                               # keeps the full PR curve.
+
+dataset.batch_size: 8
+
+model.log_scale: auto          # Must not be null, and must match the checkpoint:
+model.class_embed_bias: true   # both fail as degraded predictions rather than an
+                               # error. NVIDIA's experiment.yaml ships alongside
+                               # the checkpoint and is the authority.
+
+model.backbone: swin_tiny_224_1k
+model.num_feature_levels: 4
+model.dec_layers: 6
+model.enc_layers: 6
+model.num_queries: 900
+model.dropout_ratio: 0.0
+model.dim_feedforward: 2048

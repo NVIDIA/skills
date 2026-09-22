@@ -1,0 +1,22 @@
+network_arch: tao-mine-nearest-neighbors
+type: data
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+gpu_spec_key: null
+required_credentials: []
+actions:
+  nearest_neighbors:
+    command: tmm nearest_neighbors -e {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      source_parquet:
+        type: file
+      target_parquet:
+        type: file
+    outputs:
+      output_parquet:
+        type: file
+      mining_summary:
+        type: file
+    upload_excludes:
+    - inputs/

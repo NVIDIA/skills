@@ -1,0 +1,33 @@
+num_gpus = 1
+results_dir = ""
+
+[task]
+type = "binary"
+
+[dataset]
+annotation_path = ""
+media_dir = ""
+system_prompt = "You are a helpful assistant."
+
+[model]
+model_name = ""
+tokenizer_model_name = "qwen2.5-vl-7b"  # gitleaks:allow (model name, not a credential)
+dtype = "bfloat16"
+tp_size = 8
+max_length = 32768
+enable_lora = false
+base_model_path = ""
+
+[evaluation]
+answer_type = "freeform"
+num_processes = 32
+skip_saved = false
+seed = 1
+
+[vision]
+nframes = 8
+
+[generation]
+max_retries = 3
+max_tokens = 10
+temperature = 0

@@ -1,0 +1,211 @@
+{
+  "automl_default_parameters": [
+    "hpo.alpha",
+    "hpo.k",
+    "hpo.temperature"
+  ],
+  "automl_disabled_parameters": [
+    "dataset.csv",
+    "dataset.context_csv",
+    "dataset.timestamp_col",
+    "dataset.target_cols",
+    "dataset.label_horizon",
+    "hpo.forecast_horizon",
+    "hpo.seq_len",
+    "hpo.ckpt",
+    "hpo.standardizer_pkl",
+    "hpo.use_cross_channel",
+    "hpo.context_stride",
+    "train.output_dir"
+  ],
+  "default": {
+    "dataset": {
+      "csv": "",
+      "context_csv": "",
+      "timestamp_col": "timestamp",
+      "target_cols": "",
+      "label_horizon": 72
+    },
+    "hpo": {
+      "alpha": 0.01,
+      "k": 64,
+      "temperature": 0.05,
+      "context_stride": 72,
+      "forecast_horizon": 72,
+      "seq_len": 512,
+      "ckpt": "",
+      "standardizer_pkl": "",
+      "use_cross_channel": false
+    },
+    "train": {
+      "output_dir": "artifacts/inference_hpo"
+    }
+  },
+  "properties": {
+    "dataset": {
+      "automl_enabled": false,
+      "description": "Dataset configuration for DARR inference HPO.",
+      "title": "dataset configuration",
+      "type": "collection",
+      "properties": {
+        "csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Eval CSV with ground truth (needs >= seq_len + forecast_horizon rows).",
+          "title": "eval CSV",
+          "type": "string"
+        },
+        "context_csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "DARR context library CSV (separate normal-behavior history).",
+          "title": "context CSV",
+          "type": "string"
+        },
+        "timestamp_col": {
+          "automl_enabled": false,
+          "default": "timestamp",
+          "description": "Name of the datetime column.",
+          "title": "timestamp column",
+          "type": "string"
+        },
+        "target_cols": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Comma-separated target columns. Empty = all numeric columns.",
+          "title": "target columns",
+          "type": "string"
+        },
+        "label_horizon": {
+          "automl_enabled": false,
+          "default": 72,
+          "description": "Number of rows held back from eval CSV as ground truth.",
+          "maximum": 512,
+          "minimum": 1,
+          "title": "label horizon",
+          "type": "int"
+        }
+      }
+    },
+    "hpo": {
+      "automl_default_parameters": [
+        "hpo.alpha",
+        "hpo.k",
+        "hpo.temperature"
+      ],
+      "automl_disabled_parameters": [
+        "hpo.forecast_horizon",
+        "hpo.seq_len",
+        "hpo.ckpt",
+        "hpo.standardizer_pkl",
+        "hpo.use_cross_channel",
+        "hpo.context_stride"
+      ],
+      "automl_enabled": false,
+      "description": "DARR inference hyperparameters.",
+      "title": "inference configuration",
+      "type": "collection",
+      "properties": {
+        "alpha": {
+          "automl_enabled": true,
+          "default": 0.01,
+          "description": "DARR blend weight: alpha * direct + (1 - alpha) * kNN. Lower values rely more on retrieval.",
+          "maximum": 0.5,
+          "minimum": 0.001,
+          "title": "blend weight",
+          "type": "float"
+        },
+        "k": {
+          "automl_enabled": true,
+          "default": 64,
+          "description": "Number of nearest neighbors in the context library for DARR retrieval.",
+          "maximum": 128,
+          "minimum": 8,
+          "title": "kNN count",
+          "type": "int"
+        },
+        "temperature": {
+          "automl_enabled": true,
+          "default": 0.05,
+          "description": "Softmax temperature for kNN similarity weights. Lower = sharper selection.",
+          "maximum": 0.5,
+          "minimum": 0.01,
+          "title": "kNN temperature",
+          "type": "float"
+        },
+        "forecast_horizon": {
+          "automl_enabled": false,
+          "default": 72,
+          "description": "Steps ahead to predict.",
+          "maximum": 512,
+          "minimum": 1,
+          "title": "forecast horizon",
+          "type": "int"
+        },
+        "seq_len": {
+          "automl_enabled": false,
+          "default": 512,
+          "description": "Input context window length in timesteps.",
+          "maximum": 512,
+          "minimum": 64,
+          "title": "sequence length",
+          "type": "int"
+        },
+        "ckpt": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Checkpoint path. Empty = auto-download from HuggingFace.",
+          "title": "checkpoint",
+          "type": "string"
+        },
+        "standardizer_pkl": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Standardizer path. Empty = auto-download from HuggingFace.",
+          "title": "standardizer",
+          "type": "string"
+        },
+        "use_cross_channel": {
+          "automl_enabled": false,
+          "default": false,
+          "description": "Use cross-channel attention model (run8_best_model_cr.pt).",
+          "title": "use cross channel",
+          "type": "bool"
+        },
+        "context_stride": {
+          "automl_enabled": false,
+          "default": 72,
+          "description": "Stride for context windowing.",
+          "maximum": 512,
+          "minimum": 1,
+          "title": "context stride",
+          "type": "int"
+        }
+      }
+    },
+    "train": {
+      "automl_enabled": false,
+      "description": "Output configuration.",
+      "title": "output configuration",
+      "type": "collection",
+      "properties": {
+        "output_dir": {
+          "automl_enabled": false,
+          "default": "artifacts/inference_hpo",
+          "description": "Output directory for trial metrics.",
+          "title": "output directory",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "x_tao_schema": {
+    "action": "inference_hpo",
+    "model": "tao-finetune-nv-tesseract-forecasting",
+    "network_arch": "nv_tesseract_forecasting",
+    "schema_action": "inference_hpo",
+    "schema_version": 1,
+    "source": "hand-authored for NV-Tesseract Forecasting DARR HPO"
+  }
+}

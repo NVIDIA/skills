@@ -1,0 +1,30 @@
+dataset:
+  csv: ""
+  train_csv: ""
+  val_csv: ""
+  timestamp_col: timestamp
+  target_cols: ""
+  val_ratio: 0.1
+  test_ratio: 0.0
+  stride: 1
+model:
+  seq_len: 512
+  forecast_horizon: 72
+  ckpt_init: auto
+  use_cross_channel: false
+  cross_channel_heads: 8
+  cross_channel_dropout: 0.1
+  unfreeze_encoder: false
+  unfreeze_embedder: false
+train:
+  epochs: 5
+  num_epochs: 5
+  checkpoint_interval: 5
+  checkpoint_interval_unit: epoch
+  batch_size: 8
+  lr: 1.0e-4
+  weight_decay: 0.0
+  head_dropout: 0.1
+  max_norm: 5.0
+  seed: 13
+  output_dir: artifacts/finetune

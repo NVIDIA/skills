@@ -1,0 +1,55 @@
+name: tao-finetune-nv-tesseract-forecasting
+network_arch: nv_tesseract_forecasting
+automl_enabled: true
+container_image: null
+actions:
+  train:
+    command: python examples/finetune_example.py --run-config {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.csv:
+        type: file
+        optional: true
+      dataset.train_csv:
+        type: file
+        optional: true
+      dataset.val_csv:
+        type: file
+        optional: true
+    outputs:
+      train.output_dir:
+        type: folder
+    upload_excludes: []
+    metric: val_mse
+    metric_direction: minimize
+    metric_file: metrics.json
+
+  inference_hpo:
+    command: python inference_hpo_trial.py --run-config {config_path}
+    config_format: yaml
+    mode: config
+    inputs:
+      dataset.csv:
+        type: file
+      dataset.context_csv:
+        type: file
+        optional: true
+    outputs:
+      train.output_dir:
+        type: folder
+    upload_excludes: []
+    metric: val_mse
+    metric_direction: minimize
+    metric_file: metrics.json
+
+spec_templates:
+  train: references/spec_template_train.yaml
+  inference_hpo: references/spec_template_inference_hpo.yaml
+
+description: >-
+  NV-Tesseract Forecasting fine-tuning and DARR inference HPO via VirtualEnvSDK.
+  No container required. Fine-tuning AutoML minimizes val_mse over lr, batch_size,
+  head_dropout, weight_decay, and max_norm. Inference HPO minimizes val_mse over
+  DARR parameters alpha, k, and temperature. Supply execution= to AutoMLRunner.run()
+  with absolute paths to your NV-Tesseract clone.

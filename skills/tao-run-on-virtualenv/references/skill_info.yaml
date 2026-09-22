@@ -1,0 +1,18 @@
+type: platform
+# Docker-free local Python execution in an existing venv. No credential is
+# required by the platform itself, so the launch preflight's credential gate is
+# a no-op; model-specific vars pass through by name via `submit -e VAR`.
+required_credentials: []
+optional_credentials:
+- name: HF_TOKEN
+  source: env_var
+  only_when: the script pulls gated HuggingFace assets
+- name: WANDB_API_KEY
+  source: env_var
+  only_when: the script logs to WandB
+resource_defaults: {}
+cloud_storage:
+  protocol: local
+  uri_format: /{absolute_path}
+  metadata_key: local
+features: [tracking, local, no-docker]
