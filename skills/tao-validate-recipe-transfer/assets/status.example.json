@@ -1,0 +1,37 @@
+{
+  "model": "DEIMv2-S",
+  "benchmark": "COCO val2017",
+  "dataset": "VOC_PCB",
+  "metric_name": "mAP@50-95",
+  "result_title": "Best result so far",
+
+  "gate": {
+    "note": "Only AP and params are published per variant. n/p = not published, so no delta exists to compute.",
+    "rows": [
+      {"metric": "AP 50-95", "measured": "50.9",  "paper": "50.9",  "delta": "0.00"},
+      {"metric": "Params",   "measured": "9.83M", "paper": "9.71M", "delta": "+1.2%"},
+      {"metric": "AP50",     "measured": "68.3",  "paper": null,    "delta": null},
+      {"metric": "AP75",     "measured": "55.1",  "paper": null,    "delta": null},
+      {"metric": "AP small", "measured": "31.4",  "paper": null,    "delta": null}
+    ]
+  },
+
+  "callout": "No paper number exists for VOC_PCB. Below is measured against the RT-DETR baseline, not against a published result.",
+
+  "cards": [
+    {"label": "Board-disjoint · primary", "value": "37.91", "sub": "vs 34.08 baseline · +3.83",
+     "progress": 0.53, "foot": "epoch 19 / 36 · still climbing", "tone": "success"},
+    {"label": "Shipped split · reference", "value": "56.06", "sub": "vs 72.68 baseline · −16.62",
+     "progress": 0.47, "foot": "epoch 17 / 36 · still climbing", "tone": "warning"}
+  ],
+
+  "bars": [
+    {"label": "DEIMv2-S disjoint", "value": 37.91, "tone": "primary"},
+    {"label": "RT-DETR disjoint",  "value": 34.08, "tone": "muted"},
+    {"label": "DEIMv2-S shipped",  "value": 56.06, "tone": "secondary"},
+    {"label": "TAO native",        "value": 71.73, "tone": "muted"},
+    {"label": "RT-DETR shipped",   "value": 72.68, "tone": "muted"}
+  ],
+
+  "footnote": "DEIMv2-S is 9.7M params, RT-DETR-R50 is 42M. Both DEIMv2 bars are mid-run, not final."
+}

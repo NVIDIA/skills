@@ -1,0 +1,14 @@
+[
+  {
+    "id": "tao-artifacts-schemas",
+    "question": "A user asks: \"What is the schema for a TAO job-record and spec-bundle?\" Identify which TAO skill applies and, reading only that skill's documentation, describe the typed artifacts it defines. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe from the docs only.",
+    "expected_skill": "tao-artifacts",
+    "expected_script": null,
+    "ground_truth": "Identify tao-artifacts as the skill defining the four typed artifacts (spec-bundle, job-record, results_dir, best_rec) and summarize their JSON schemas from the skill's references without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-artifacts as the relevant skill",
+      "Describes the spec-bundle / job-record / results_dir / best_rec artifacts from references/",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

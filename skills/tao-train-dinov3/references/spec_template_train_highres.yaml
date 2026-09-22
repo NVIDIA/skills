@@ -1,0 +1,122 @@
+# Optional DINOv3 high-resolution training example.
+# Mirrors tao-pytorch nvidia_tao_pytorch/ssl/dinov3/experiment_specs/train_dinov3_vitb_highres.yaml.
+encryption_key: ''
+results_dir: ''
+wandb:
+  enable: true
+  project: TAO Toolkit
+  entity: ''
+  group: ''
+  tags:
+  - tao-toolkit
+  - dinov3
+  - ssl
+  - highres
+  reinit: false
+  sync_tensorboard: true
+  save_code: false
+  name: TAO DINOv3 SSL highres
+  run_id: ''
+model:
+  distill:
+    enable: false
+    disable_masking: false
+    pretrained_non_distill_pl_model_path: ''
+  centering_method: sinkhorn
+  backbone:
+    teacher_type: vit_b
+    student_type: vit_b
+    num_register_tokens: 4
+    drop_path_rate: 0.4
+    patch_size: 16
+    # RoPE2D normalizes coords to [-1,1]; the 48x48 grid at 768 needs no interpolation.
+    img_size: 768
+    # Rotary frequency base. Changing it alters positional encoding.
+    rope_theta: 100.0
+  head:
+    num_layers: 3
+    hidden_dim: 2048
+    bottleneck_dim: 384
+  gram:
+    # Gram anchoring ON: protects dense (patch) feature geometry during high-res adaptation.
+    enable: true
+    w_gram: 2.0
+    start_step: 0
+    # 'ema' = early-EMA Gram teacher refreshed every refresh_interval steps;
+    # 'pretrained' = frozen snapshot of the loaded weights.
+    teacher_source: ema
+    refresh_interval: 10000
+    # Paper uses 2.0 (teacher at 2x student res) but at 768 that is 96x96=9216 tokens
+    # per crop — memory-heavy. Start at 1.0; raise only if memory allows.
+    teacher_scale: 1.0
+  lora:
+    enable: false
+dataset:
+  train_dataset:
+    images_dir: ''
+  # 768 is ~9x the 256 attention cost; keep the per-GPU batch small.
+  batch_size: 4
+  pin_memory: true
+  workers: 8
+  transform:
+    n_global_crops: 2
+    global_crops_scale:
+    - 0.32
+    - 1.0
+    global_crops_size: 768
+    n_local_crops: 8
+    local_crops_scale:
+    - 0.05
+    - 0.32
+    # 336 = 21 * 16 (multiple of patch size).
+    local_crops_size: 336
+train:
+  num_gpus: 1
+  gpu_ids:
+  - 0
+  num_nodes: 1
+  seed: 1234
+  cudnn:
+    benchmark: true
+    deterministic: false
+  # Adjust num_epochs and step-denominated fields for the corpus and global batch.
+  num_epochs: 2
+  # Adjust the checkpoint interval for the planned run length.
+  checkpoint_interval: 500
+  checkpoint_interval_unit: step
+  validation_interval: 1
+  resume_training_checkpoint_path: ''
+  results_dir: ''
+  # Seed from a compatible DINOv3 checkpoint.
+  pretrained_model_path: ''
+  layerwise_decay: 1.0
+  clip_grad_norm: 3.0
+  num_prototypes: 131072
+  precision: 16-mixed
+  use_custom_attention: true
+  # Use fsdp for large backbones / high res if DDP OOMs.
+  distributed_strategy: auto
+  schedulers:
+    # Adjust warm_up_steps and freeze_steps for the planned training length.
+    learning_rate:
+      val_base: "${eval: '5e-5 * (${dataset.batch_size} * ${train.num_gpus} * ${train.num_nodes} / 1024) ** (1/2)'}"
+      val_final: 1.0e-06
+      warm_up_steps: 2000
+    last_layer_learning_rate:
+      val_base: "${eval: '5e-5 * (${dataset.batch_size} * ${train.num_gpus} * ${train.num_nodes} / 1024) ** (1/2)'}"
+      val_final: 1.0e-06
+      warm_up_steps: 2000
+      freeze_steps: 500
+    weight_decay:
+      val_base: 0.04
+      val_final: 0.2
+    momentum:
+      val_base: 0.9999
+      val_final: 1.0
+    teacher_temperature:
+      val_base: 0.07
+      val_final: 0.07
+      val_start: 0.04
+      warm_up_steps: 7500
+  optim:
+    optim: adamw

@@ -1,0 +1,294 @@
+{
+  "automl_default_parameters": [
+    "train.lr",
+    "train.weight_decay",
+    "train.batch_size",
+    "train.grad_clip",
+    "dataset.mask_ratio",
+    "dataset.window_length"
+  ],
+  "automl_disabled_parameters": [
+    "dataset.csv",
+    "dataset.val_csv",
+    "dataset.val_ratio",
+    "dataset.timestamp_col",
+    "dataset.label_col",
+    "dataset.drop_cols",
+    "dataset.window_stride",
+    "dataset.split",
+    "train.pretrained_model",
+    "train.config",
+    "train.num_epochs",
+    "train.checkpoint_interval",
+    "train.checkpoint_interval_unit",
+    "train.output_dir",
+    "train.seed"
+  ],
+  "default": {
+    "dataset": {
+      "csv": "",
+      "val_csv": "",
+      "val_ratio": 0.3,
+      "timestamp_col": "timestamp",
+      "label_col": "",
+      "drop_cols": "",
+      "mask_ratio": 0.7,
+      "window_length": 100,
+      "window_stride": 1,
+      "split": 10
+    },
+    "train": {
+      "pretrained_model": "",
+      "config": "",
+      "epochs": 10,
+      "num_epochs": 10,
+      "checkpoint_interval": 10,
+      "checkpoint_interval_unit": "epoch",
+      "batch_size": 16,
+      "lr": 1e-5,
+      "weight_decay": 1e-6,
+      "grad_clip": 1.0,
+      "seed": 42,
+      "output_dir": "artifacts/finetune"
+    }
+  },
+  "properties": {
+    "dataset": {
+      "automl_default_parameters": [
+        "dataset.mask_ratio",
+        "dataset.window_length"
+      ],
+      "automl_disabled_parameters": [
+        "dataset.csv",
+        "dataset.val_csv",
+        "dataset.val_ratio",
+        "dataset.timestamp_col",
+        "dataset.label_col",
+        "dataset.drop_cols",
+        "dataset.window_stride",
+        "dataset.split"
+      ],
+      "automl_enabled": false,
+      "description": "Dataset and windowing configuration.",
+      "title": "dataset configuration",
+      "type": "collection",
+      "properties": {
+        "csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Path to the training CSV (normal-behavior windows only).",
+          "title": "training CSV",
+          "type": "string"
+        },
+        "val_csv": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Path to a separate validation CSV. When empty, val_ratio is used to split csv.",
+          "title": "validation CSV",
+          "type": "string"
+        },
+        "val_ratio": {
+          "automl_enabled": false,
+          "default": 0.3,
+          "description": "Fraction of csv reserved for validation when val_csv is not provided (temporal split).",
+          "maximum": 0.9,
+          "minimum": 0.05,
+          "title": "validation ratio",
+          "type": "float"
+        },
+        "timestamp_col": {
+          "automl_enabled": false,
+          "default": "timestamp",
+          "description": "Name of the datetime column to drop from features.",
+          "title": "timestamp column",
+          "type": "string"
+        },
+        "label_col": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Name of the label column to drop (if present in CSV).",
+          "title": "label column",
+          "type": "string"
+        },
+        "drop_cols": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Comma-separated list of extra columns to drop from features.",
+          "title": "drop columns",
+          "type": "string"
+        },
+        "mask_ratio": {
+          "automl_enabled": true,
+          "default": 0.7,
+          "description": "Fraction of each window masked during training. Higher values force stronger reconstruction; too high degrades signal.",
+          "maximum": 0.9,
+          "minimum": 0.3,
+          "title": "mask ratio",
+          "type": "float"
+        },
+        "window_length": {
+          "automl_enabled": true,
+          "default": 100,
+          "description": "Sliding window length in timesteps. Must be divisible by split (default 10). Must be ≤ val_rows (= total_rows × val_ratio). Controls the temporal context seen per training sample.",
+          "maximum": 140,
+          "minimum": 50,
+          "title": "window length",
+          "type": "int"
+        },
+        "window_stride": {
+          "automl_enabled": false,
+          "default": 1,
+          "description": "Step between consecutive windows. 1 = maximum overlap; increasing reduces dataset size.",
+          "maximum": 50,
+          "minimum": 1,
+          "title": "window stride",
+          "type": "int"
+        },
+        "split": {
+          "automl_enabled": false,
+          "default": 10,
+          "description": "Number of alternating mask segments per window. window_length must be divisible by split.",
+          "maximum": 20,
+          "minimum": 2,
+          "title": "mask segments",
+          "type": "int"
+        }
+      }
+    },
+    "train": {
+      "automl_default_parameters": [
+        "train.lr",
+        "train.weight_decay",
+        "train.batch_size",
+        "train.grad_clip"
+      ],
+      "automl_disabled_parameters": [
+        "train.pretrained_model",
+        "train.config",
+        "train.num_epochs",
+        "train.checkpoint_interval",
+        "train.checkpoint_interval_unit",
+        "train.output_dir",
+        "train.seed"
+      ],
+      "automl_enabled": false,
+      "description": "Training hyperparameters.",
+      "title": "training configuration",
+      "type": "collection",
+      "properties": {
+        "pretrained_model": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Path to the warm-start checkpoint. Empty = auto-download final_model.pth from HuggingFace.",
+          "title": "pretrained model path",
+          "type": "string"
+        },
+        "config": {
+          "automl_enabled": false,
+          "default": "",
+          "description": "Path to the model config YAML. Empty = auto-download curriculum_medium.yaml from HuggingFace.",
+          "title": "model config path",
+          "type": "string"
+        },
+        "epochs": {
+          "automl_enabled": false,
+          "default": 10,
+          "description": "Total training epochs. Increase for better convergence on domain data.",
+          "maximum": 200,
+          "minimum": 1,
+          "title": "epochs",
+          "type": "int"
+        },
+        "num_epochs": {
+          "automl_enabled": false,
+          "default": 10,
+          "description": "Compatibility epoch count consumed by AutoMLRunner checkpoint retention. Keep equal to train.epochs for NV-Tesseract scripts.",
+          "maximum": 200,
+          "minimum": 1,
+          "title": "AutoML runner epoch count",
+          "type": "int"
+        },
+        "checkpoint_interval": {
+          "automl_enabled": false,
+          "default": 10,
+          "description": "Compatibility checkpoint interval consumed by AutoMLRunner checkpoint retention.",
+          "minimum": 1,
+          "title": "checkpoint interval",
+          "type": "int"
+        },
+        "checkpoint_interval_unit": {
+          "automl_enabled": false,
+          "default": "epoch",
+          "description": "Compatibility checkpoint interval unit consumed by AutoMLRunner checkpoint retention.",
+          "enum": [
+            "epoch",
+            "step"
+          ],
+          "title": "checkpoint interval unit",
+          "type": "categorical"
+        },
+        "batch_size": {
+          "automl_enabled": true,
+          "default": 16,
+          "description": "Per-GPU batch size. Larger values stabilize gradients but require more VRAM. Cap at 32 for MPS (Apple Silicon) to avoid OOM.",
+          "maximum": 32,
+          "minimum": 4,
+          "title": "batch size",
+          "type": "int"
+        },
+        "lr": {
+          "automl_enabled": true,
+          "default": 1e-5,
+          "description": "AdamW learning rate. The pretrained diffusion backbone is sensitive; stay in [1e-7, 1e-3].",
+          "maximum": 1e-3,
+          "minimum": 1e-7,
+          "title": "learning rate",
+          "type": "float"
+        },
+        "weight_decay": {
+          "automl_enabled": true,
+          "default": 1e-6,
+          "description": "AdamW weight decay (L2 regularization). Helps prevent overfitting on small domain datasets.",
+          "maximum": 1e-3,
+          "minimum": 1e-9,
+          "title": "weight decay",
+          "type": "float"
+        },
+        "grad_clip": {
+          "automl_enabled": true,
+          "default": 1.0,
+          "description": "Gradient norm clipping threshold. Prevents gradient explosion during diffusion fine-tuning.",
+          "maximum": 10.0,
+          "minimum": 0.1,
+          "title": "gradient clip",
+          "type": "float"
+        },
+        "seed": {
+          "automl_enabled": false,
+          "default": 42,
+          "description": "Random seed for reproducibility.",
+          "maximum": 99999,
+          "minimum": 0,
+          "title": "random seed",
+          "type": "int"
+        },
+        "output_dir": {
+          "automl_enabled": false,
+          "default": "artifacts/finetune",
+          "description": "Output directory for checkpoints and metrics.",
+          "title": "output directory",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "x_tao_schema": {
+    "action": "train",
+    "model": "tao-finetune-nv-tesseract-ad-diffusion",
+    "network_arch": "nv_tesseract_ad_diffusion",
+    "schema_action": "train",
+    "schema_version": 1,
+    "source": "hand-authored for NV-Tesseract AD Diffusion finetune_example.py CLI"
+  }
+}

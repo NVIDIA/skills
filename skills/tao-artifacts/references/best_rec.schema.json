@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tao://artifacts/best_rec.schema.json",
+  "title": "TAO AutoML best_rec",
+  "description": "The read side of the AutoML -> downstream (e.g. DEFT warm-start) seam, emitted by tao-run-automl's best_rec adapter after AutoMLRunner (separate nvidia-tao-automl wheel) finishes. DEFT's own loop state stays in deft_state.json.",
+  "type": "object",
+  "required": ["schema_version", "experiment_id", "metric_name", "direction", "best", "all_recs"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "experiment_id": { "type": "string", "minLength": 1 },
+    "metric_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Explicit metric identity (e.g. far_at_100_recall, val_loss) — a bare number without name+direction is a contract violation."
+    },
+    "direction": { "enum": ["maximize", "minimize"] },
+    "best": {
+      "type": "object",
+      "required": ["rec_id", "score", "specs", "observed_budget", "checkpoint_uri"],
+      "additionalProperties": false,
+      "properties": {
+        "rec_id": { "type": "string", "minLength": 1 },
+        "score": { "type": "number" },
+        "specs": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[^.]+$" },
+          "description": "The winning HPs as a NESTED dict with budget keys (num_epochs etc.) STRIPPED — ASHA/hyperband mutate the budget per rung, and a rung budget deep-merged into a baseline spec silently overwrites the real epoch count."
+        },
+        "observed_budget": {
+          "type": "object",
+          "description": "The budget the winning trial actually ran at (e.g. {\"num_epochs\": 10}), kept SEPARATE from specs."
+        },
+        "checkpoint_uri": { "type": "string", "minLength": 1 },
+        "checkpoint_epoch": { "type": "integer", "minimum": 0 },
+        "checkpoint_step": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "all_recs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rec_id", "score"],
+        "additionalProperties": false,
+        "properties": {
+          "rec_id": { "type": "string", "minLength": 1 },
+          "score": { "type": ["number", "null"] },
+          "job_id": { "type": "string", "description": "Links to .tao/jobs/<id>.json via parent_job." }
+        }
+      }
+    }
+  }
+}

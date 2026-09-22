@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# `annotations convert` KITTI -> COCO — the settings that do not vary per run.
+# image_dir, label_dir, mapping and results_dir stay as --set.
+
+data.input_format: KITTI
+data.output_format: COCO
+
+kitti.project: coco            # Names the output `<project>.json`. The verify step
+                               # and the ODVG conversion both resolve coco.json.

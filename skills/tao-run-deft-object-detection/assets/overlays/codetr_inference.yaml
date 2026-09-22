@@ -1,0 +1,85 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# `codetr inference` — pool pseudo-labelling, the settings that do not vary per
+# run, applied over the Hydra schema dump. The checkpoint, classmap, image_dir,
+# results_dir, num_gpus and `inference.category_mapping` are run-specific and stay
+# as --set; the mapping is emitted by prepare_class_mappings_for_mining_data_prep.py.
+#
+# These values match the reference pipeline's Co-DETR spec
+# (`codino_infer_spec_conf_0.yaml`), except for `conf_threshold` and the class fold,
+# both noted at their field. The reference spec does not load on this image:
+# `dataset.contiguous_labels` and `dataset.augmentation.pad_size_divisor` are absent
+# from `DINODatasetConfig` and `DINOAugmentationConfig`. Neither affects the output.
+
+inference.conf_threshold: 0.3
+    # TAO: 0.5. Reference: 0.0. Applied at write time, so it is the quality control
+    # on the pseudo-labels — every box above it becomes training data. At 0.0 that is
+    # roughly 280 boxes per image. This is the one departure from the reference that
+    # changes which boxes ship.
+
+model.num_select: 1000
+    # TAO: 300. Decides whether rare classes survive into the pool.
+    # Caps how many of the 1500 decoder queries are kept as candidates, applied
+    # *before* the category fold and soft-NMS, so the abundant class crowds the rare
+    # ones out of the candidate set before the fold can separate them. Dropping to
+    # TAO's 300 takes bicycle from 55 boxes to 2 across the same 8 images. A DEFT loop
+    # exists to mine rare-class examples, so that cap defeats the pipeline while every
+    # stage still reports success.
+
+model.soft_nms_enabled: true
+    # TAO: false. `inference.category_mapping` folds classes and then runs
+    # per-output-category soft-NMS, but only when this is on. With it off the fold
+    # renames without merging, so one object detected as both car and truck yields two
+    # boxes of the same class, and those duplicates become training data.
+model.soft_nms_iou_threshold: 0.8
+model.soft_nms_method: linear
+
+inference.batch_size: 1        # TAO: -1
+dataset.batch_size: 1          # TAO: 4
+dataset.dataset_type: default  # TAO: serialized
+train.activation_checkpoint: false
+    # TAO: true. Trades compute for memory during training; nothing to recompute at
+    # inference.
+
+# --- Input sizing --------------------------------------------------------------
+# Sizes by resize-and-pad, leaving inference.input_width/input_height unset.
+dataset.augmentation.test_random_resize: 1280      # TAO: 800
+dataset.augmentation.random_resize_max_size: 2048  # TAO: 1333
+
+# --- Architecture. Must match the checkpoint; a mismatch fails silently. -------
+# These describe the ViT-Large COCO-80 detector this workflow pseudo-labels with
+# (zongzhuofan/co-detr-vit-large-coco). A mismatch here does not raise: the weights
+# fail to load into the layers, the detector stays randomly initialised, and the run
+# prints `Execution status: PASS`, exits 0, and writes one label file per image with
+# zero boxes. The only signal is a `Skipping size-mismatched key` line in the load
+# log. `verify_pseudo_labels.py` is the gate that catches it.
+#
+# A different checkpoint needs different values, so overriding these with --set
+# requires --allow-workflow-default-override. Read them off the checkpoint rather
+# than guessing: `patch_embed.proj.weight` of shape [D, 3, P, P] gives embed dim D
+# and patch size P (1024/16 here, so ViT-L/16 — the patch-14 DINOv2 backbone cannot
+# load into it); `query_embed` dimension 0 gives num_queries; `level_embeds`
+# dimension 0 gives num_feature_levels; and the DETR head's `cls_branches.0.bias`
+# gives num_classes — not `roi_head.0.bbox_head.fc_cls.bias`, which is one wider
+# because the auxiliary head carries a background class.
+model.backbone: vit_large_codetr   # TAO: swin_large_patch4_window7_224
+model.num_queries: 1500            # TAO: 900
+model.num_feature_levels: 5        # TAO: 4
+dataset.num_classes: 80            # TAO: 91. COCO-80, not COCO-91.
+model.two_stage_type: standard
+model.num_co_heads: 2              # TAO: 1
+model.co_head_num_convs: 1         # TAO: 4
+    # The collaborative heads are training-only; at inference the checkpoint reports
+    # them as missing keys. Pinned so one spec serves both paths.
+
+# These two are not free choices: with the settings above, TAO raises without them.
+model.return_interm_indices: [0, 1, 2, 3, 4]
+    # TAO: [1, 2, 3, 4]. Must hold exactly num_feature_levels entries, or the build
+    # fails with `num_feature_levels: 5 does not match the size of
+    # return_interm_indices`. Values index the stride map {0:4, 1:8, 2:16, 3:32,
+    # 4:64}, so this is strides 4 through 64.
+dataset.augmentation.fixed_random_crop: 1536
+    # TAO: null. Passed as the transformer's lsj_resolution. `vit_large_codetr`
+    # rejects a null: "requires dataset.augmentation.fixed_random_crop to be set".
+    # Unlike the fields above, this one fails loudly at startup.

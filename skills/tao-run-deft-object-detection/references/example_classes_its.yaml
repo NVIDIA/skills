@@ -1,0 +1,40 @@
+# Class mapping for scripts/prepare_class_mappings_for_mining_data_prep.py
+#
+# ITS mapping, based on the reference implementation
+# (video-tools/curate/codino_pl/its_mapping_codino.py) with one deliberate
+# change, noted below. Left = a class you train on. Right = the Co-DETR
+# (COCO-80) classes that fold into it. Anything not listed on the right is
+# dropped.
+classes:
+  bicycle:   [bicycle, motorcycle]
+  car:       [car, bus, truck]
+  person:    [person]
+  road_sign: [road_sign, traffic light, stop sign]
+
+# Notes on this mapping:
+#
+#   - `train` is DROPPED here, deviating from the reference implementation,
+#     which folded it into `car`. A train is not a car in any sense the metric
+#     should reward, and at an intersection it is either absent or a
+#     misdetection. Add it back to `car` only if your scene genuinely contains
+#     rail vehicles you want counted as cars.
+#   - `motorcycle` folds into `bicycle`, i.e. two-wheelers are grouped rather
+#     than split by motorisation.
+#   - `road_sign` has no single COCO equivalent; it is assembled from
+#     `traffic light` and `stop sign`.
+#
+# EVERY TARGET LISTS ITSELF AS A SOURCE. That makes the mapping idempotent:
+# applying it to already-remapped labels is a no-op instead of silently dropping
+# them. Without `road_sign` in its own source list, re-running the remap on
+# output that had already been mapped discarded every road_sign box — the other
+# three targets happened to be self-mapped and hid the asymmetry. Keep the self
+# entry when adding a class.
+#
+# The reference assigns fixed category ids (bicycle=1, car=2, person=3,
+# road_sign=4). This pipeline does not depend on those ids: the remap writes
+# class *names* into KITTI, and `annotations convert` assigns COCO ids from the
+# emitted classmap. Ordering here therefore sets the id order downstream.
+#
+# Drop any line you do not want to train on — e.g. remove `road_sign` for a
+# vehicles-and-people-only run. Run `--list-classes` against the pseudo-labels
+# to see what the detector actually found before changing the mapping.

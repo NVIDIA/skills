@@ -1,0 +1,16 @@
+[
+  {
+    "id": "tao-analyze-detection-kpi-basic",
+    "question": "A user request: \"Use the tao-analyze-detection-kpi skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-analyze-detection-kpi",
+    "expected_script": null,
+    "ground_truth": "Identify tao-analyze-detection-kpi as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-analyze-detection-kpi as the relevant skill",
+      "Explains that it runs TAO Data Services analytics kpi_analyze from a YAML spec",
+      "Mentions kpi_calc.csv with per-class TP/FP/FN/TN, Pr, Re, Acc, AP columns",
+      "Notes that input_format must be uppercase KITTI or COCO",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

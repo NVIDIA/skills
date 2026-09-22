@@ -1,0 +1,15 @@
+[
+  {
+    "id": "tao-mine-od-images-basic",
+    "question": "A user request: \"Use the tao-mine-od-images skill.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-mine-od-images",
+    "expected_script": null,
+    "ground_truth": "Identify tao-mine-od-images as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-mine-od-images as the relevant skill",
+      "Explains that it runs TAO Data Services TMM unique_neighbor_matching from a YAML spec",
+      "Mentions the output directory containing final_unique_files.parquet and summary.json",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]
