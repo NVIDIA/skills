@@ -1654,6 +1654,13 @@
       "last_modified": "2026-09-15"
     },
     {
+      "name": "nemotron-voice-agent-builder",
+      "path": "skills/nemotron-voice-agent-builder",
+      "content_digest": "sha256:8ad59efc61e90d1f9c8df6925f7e89edf142139cebd8142537f77afbd7a82c0f",
+      "last_commit": "6edc3fc88fe761649bd89393a290c1a3cfa62b6d",
+      "last_modified": "2026-09-23"
+    },
+    {
       "name": "nv-generate-ct-rflow",
       "path": "skills/nv-generate-ct-rflow",
       "content_digest": "sha256:a91579e7f4643eeb7fe6230d214a2d5d37c514687a3f1f9ca164a01be90305a5",
