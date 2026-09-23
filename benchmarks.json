@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 377,
-  "result_row_count": 3495,
+  "skill_count": 378,
+  "result_row_count": 3505,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5367,6 +5367,26 @@
       "component": "DeepStream",
       "has_results": true,
       "average_uplift_pct": 35.6
+    },
+    {
+      "skill": "rtx-remix-modding",
+      "evaluation_date": "2026-09-23",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:29a10a044caef4ddb28554a7c700cd5179001fc4eac72b52505b4f948df94241",
+      "validation_status": null,
+      "tasks": 10,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "has_results": true,
+      "average_uplift_pct": 27.87
     },
     {
       "skill": "skill-card-generator",
@@ -29936,6 +29956,96 @@
       "agent": "codex",
       "score_pct": 92.0,
       "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": -4.2
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 70.9,
+      "uplift_pct": 45.9
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.3,
+      "uplift_pct": 40.3
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.3,
+      "uplift_pct": 50.2
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "rtx-remix-modding",
+      "component": "RTX Remix",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "skill-card-generator",
