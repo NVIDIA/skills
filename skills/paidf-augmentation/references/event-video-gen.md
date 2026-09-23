@@ -112,8 +112,8 @@ the endpoint URL. Run host-local models in a container on the same bridge, or
 use a remote endpoint.
 
 > **Security:** Host networking is prohibited because it exposes host loopback
-> services, internal interfaces, and metadata endpoints such as
-> `169.254.169.254` to the container. Use only the isolated `paidf` bridge.
+> services and internal interfaces to the container. Use only the isolated
+> `paidf` bridge.
 
 The commands below assume `/workspace` as the working directory inside the container.
 

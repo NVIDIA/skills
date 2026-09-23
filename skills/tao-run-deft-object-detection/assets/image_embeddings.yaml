@@ -1,0 +1,17 @@
+# embedding image_embeddings — starting spec.
+#
+# TAO emits no default for this: the `image` module in `default_specs` is a
+# different thing entirely (data.image_dir / in_place), not embeddings.
+
+input_parquet: ???              # a `filepath` column; prepare_input_for_image_embeddings.py for the pool,
+                                # or gap analysis's weak_images.parquet directly for the queries
+output_parquet: ???
+
+model: SigLIP
+# MUST be identical to the encoder that produced the other side of the mining
+# pair. A mismatch does not raise — it returns confidently wrong neighbours — so
+# this is frozen in deft_state.json at init and read back, never re-resolved.
+model_path: ???
+model_config_path: ""           # only set when model_path is a TAO .pth/.ckpt
+
+batch_size: 64

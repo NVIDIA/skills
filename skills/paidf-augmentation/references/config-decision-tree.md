@@ -11,7 +11,8 @@ What is your input?
 │
 ├── Video file (.mp4, .avi, etc.)
 │   └── Do you want to change scene attributes (weather, lighting, colors, clothing)?
-│       ├── Yes → Cosmos Transfer 2.5 (video → augmented video)
+│       ├── Yes, with a precomputed WSM control → Cosmos 3 Super WSM Transfer
+│       ├── Yes, without WSM → Cosmos 3 Super Transfer
 │       └── No, I want to predict/continue/extend the video
 │           └── Cosmos Predict 2.5 (video + text → new video)
 │
@@ -29,11 +30,38 @@ What is your input?
 
 ## Step 2: Choose a Config
 
-### Cosmos Transfer 2.5 (video → video)
+### Cosmos 3 Super Transfer (video → video)
 
 ```text
-└── Scene-attribute transfer + hallucination/attribute verification → config_video_transfer_CT25_nim.yaml
+├── CT3 vLLM-OMNI transfer + external Cosmos Evaluator gate → config_video_transfer_CT3_omni.yaml
+└── CT3 RGB + uploaded WSM, focused SQA/reference            → config_video_transfer_CT3_wsm_omni.yaml
 ```
+
+The CT3 config uses shared-network Qwen VLM/LLM captioning and the
+`openai.video.sync` CT3 generation contract, then submits the generated S3 URI
+to an `evaluator`-role Arbitrator endpoint for gated
+`metropolis.hallucination` and `metropolis.attribute_verification`. Hallucination
+needs both sides of the comparison: `inputs.original_video_urls[stream_key]`
+is derived from `data[0].inputs.rgb`, so one input override updates both
+consumers. Replace its S3 paths, unique relative `output_storage_prefix`, and
+endpoint URLs for the deployment before running. Do not add the built-in
+Hallucination or Attribute Verification evaluators to that example: they would
+duplicate work and collide with the configured compatibility aliases.
+
+The focused WSM config uses a fixed prompt and no evaluator, so it needs only
+the Cosmos3 generation endpoint and storage access. It selects a
+`video_transfer` endpoint by its free-form id, uses `openai.video.async`, and
+sets the endpoint URL to the create route ending in `/v1/videos`. Supply the
+source at `data[].inputs.rgb` and the precomputed control at
+`data[].inputs.controls.wsm`. The client uploads both videos and sends
+`control_type=wsm`; keep tuning such as `extra_params.wsm.control_weight`, but
+do not set `control` or `control_path` there. Keep `num_frames`,
+`extra_params.max_frames`, and `extra_params.num_video_frames_per_chunk`
+aligned for the input/control pair.
+
+Those evaluator choices belong to these two cookbook examples. Selecting a
+Cosmos Transfer generation model does not itself require external Cosmos
+evaluation; other configs may use built-in evaluators or no evaluator.
 
 ### Cosmos Predict 2.5 (text/image/video → video)
 
@@ -77,7 +105,7 @@ What model are you using?
 │
 ├── Cosmos Transfer / Predict / image-to-video (video output)
 │   └── Default: VLM+LLM (VLM describes scene → LLM generates prompt with variables)
-│       Config: config_video_transfer_CT25_nim.yaml, config_image2video_cosmos3.yaml
+│       Config: config_video_transfer_CT3_omni.yaml, config_image2video_cosmos3.yaml
 │
 ├── image edit (image editing)
 │   └── Default: LLM-only (LLM generates editing instruction from variables)
@@ -103,11 +131,13 @@ All inference is remote — there is no `executor_type`. The generation model ne
 | image-edit | image_edit | nim | one `image_edit` endpoint (adapter `nim`, `openai.chat.completions`, or `openai.images.edits`) |
 | cosmos3-image2video | image2video | openai.video.sync | one `image2video` endpoint |
 | (Veo, any id) | image2video | — (set `openai.video.async`) | one `image2video` endpoint with `adapter: openai.video.async` + `api_key_env` |
+| (CT3 Omni, endpoint id) | video_transfer | — (set `openai.video.sync`) | one `video_transfer` endpoint selected by its id |
+| (CT3 WSM, endpoint id) | video_transfer | — (set `openai.video.async`) | one `video_transfer` endpoint selected by its id; URL is the `/v1/videos` create route |
 
 Additionally, captioning and verification need:
 - VLM captioning → a `vlm`-role endpoint
 - LLM captioning → an `llm`-role endpoint (except text/file captioners, which need none)
-- Attribute verification → a `vlm` endpoint (answering) + an `llm` endpoint (question generation)
+- Evaluation → the endpoints, media access, and authentication declared by the selected evaluator configuration
 
 If two endpoints share a role, disambiguate by giving them `id`s and pointing the consumer at one (`augmentation.model.name: <id>`, or `question_generation.endpoint_id` / `vlm_verification.endpoint_id`).
 
@@ -122,10 +152,11 @@ uv run modules/cli.py --config configs/cookbook/image-attribute-augmentation/con
   endpoints.0.url=http://localhost:8001/v1 \
   endpoints.0.adapter=openai.chat.completions
 
-# Re-target the video_transfer endpoint. In config_video_transfer_CT25_nim.yaml the
-# list order is vlm(0), llm(1), video_transfer(2) — so it is index 2, NOT 0.
-uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT25_nim.yaml \
-  endpoints.2.url=http://remote-server:8000
+# Re-target the video_transfer endpoint. In config_video_transfer_CT3_omni.yaml the
+# list order is vlm(0), llm(1), video_transfer(2), evaluator(3) — so the
+# generation endpoint is index 2, NOT 0.
+uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT3_omni.yaml \
+  endpoints.2.url=http://remote-server:8001/v1
 ```
 
 Index order is config-specific and fragile — **always confirm which entry holds the role you mean** (or just edit the YAML `endpoints:` list directly). Overriding the wrong index silently retargets a different service.
@@ -133,13 +164,13 @@ Index order is config-specific and fragile — **always confirm which entry hold
 ## Disabling Evaluators Inline
 
 ```bash
-# Disable hallucination check but keep attribute verification
-uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT25_nim.yaml \
-  evaluators.0.hallucination_check.enabled=false
+# Keep Hallucination results but make that check observe-only
+uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT3_omni.yaml \
+  evaluators.0.cosmos_evaluator.checks.0.gate=false
 
-# Disable all evaluators (quick generation test)
-uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT25_nim.yaml \
-  evaluators=null
+# Disable the CT3 external evaluator entirely (no preflight or submission)
+uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT3_omni.yaml \
+  evaluators.0.cosmos_evaluator.enabled=false
 ```
 
 ## Multi-Sample Batch Processing
@@ -173,6 +204,10 @@ The workflow config (`workflow_example.yaml`) specifies:
 - `variables` — independent probability distributions for sampled attributes
 - `conditional_variables` — dependent attribute distributions keyed by a parent variable value
 
+Any evaluator-specific media, path, or synchronization requirements come from
+`example_augmentation_config`; they do not apply to workflows using a different
+template.
+
 Use `conditional_variables` when attributes are not independent, for example:
 - `road_condition` depends on `weather`
 - `shoe_color` depends on `shoe_type`
@@ -187,6 +222,7 @@ Control modalities define structural guidance from input videos. Higher weights 
 | `depth` | Depth estimation map — preserves spatial layout | 0.3–0.4 (moderate) |
 | `seg` | Segmentation map — preserves object/semantic boundaries; pair with masks and `seg_control_prompt` | 0.2–0.4 (moderate); never use alone |
 | `vis` | Visualization/appearance — preserves visual style, supplements edge/seg | 0.05–0.6 (low); avoid very high values |
+| `wsm` | Precomputed world-scenario video — guides Cosmos3 geometry and motion | Put tuning under `extra_params.wsm`; a single positive weight normalizes to 1.0, so tune absolute strength with `control_guidance` |
 
 ### Weight Normalization Behavior
 
@@ -194,6 +230,12 @@ Control weights are **not** individually capped. The pipeline forwards each weig
 
 - **Sum ≤ 1.0**: Weights are applied **as-is** with no normalization. E.g., `{seg: 0.2, edge: 0.2}` stays unchanged.
 - **Sum > 1.0**: Weights are **normalized proportionally** so the total equals 1.0. E.g., `{seg: 4.0, edge: 1.0}` (sum 5.0) becomes `{seg: 0.8, edge: 0.2}`.
+
+Those `augmentation.modalities` rules describe the CT2.5 NIM controls. The
+Cosmos3 WSM upload path does not use `augmentation.modalities`: put its path in
+`data[].inputs.controls.wsm` and its options in `extra_params.wsm`. With WSM as
+the only active control, any positive `control_weight` normalizes to `1.0`;
+`extra_params.control_guidance` controls absolute strength.
 
 **Best practices** (see [Cosmos Cookbook — Control Modalities](https://nvidia-cosmos.github.io/cosmos-cookbook/core_concepts/control_modalities/overview.html)):
 - Use multi-control combinations (e.g., edge + seg) for best results.
@@ -226,6 +268,35 @@ augmentation:
 ```
 
 If `controls` are set to `null` (e.g., `edge: null`), the Cosmos model extracts control signals automatically from the RGB input.
+
+For the Cosmos3 WSM upload contract, use the dedicated config instead:
+
+```yaml
+data:
+  - inputs:
+      rgb: "/path/to/source.mp4"
+      controls:
+        wsm: "/path/to/precomputed_wsm.mp4"
+
+endpoints:
+  - id: cosmos3-transfer-wsm
+    role: video_transfer
+    url: "http://cosmos3-transfer:8001/v1/videos"
+    model: "nvidia/Cosmos3-Super"
+    adapter: openai.video.async
+
+augmentation:
+  model:
+    name: cosmos3-transfer-wsm   # exact endpoints[].id selector
+  parameters:
+    extra_params:
+      wsm:
+        control_weight: 1.0
+      control_guidance: 1.2
+```
+
+Do not put the WSM path under `extra_params`: the adapter uploads it from
+`controls.wsm` and the server injects a temporary path for that request.
 
 ## Post-Processing: Data-Processing Alignment (image edit only)
 

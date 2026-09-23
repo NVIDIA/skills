@@ -1,0 +1,24 @@
+dataset:
+  csv: ""
+  val_csv: ""
+  val_ratio: 0.3
+  timestamp_col: timestamp
+  label_col: ""
+  drop_cols: ""
+  mask_ratio: 0.7
+  window_length: 100
+  window_stride: 1
+  split: 10
+train:
+  pretrained_model: ""
+  config: ""
+  epochs: 10
+  num_epochs: 10
+  checkpoint_interval: 10
+  checkpoint_interval_unit: epoch
+  batch_size: 16
+  lr: 1.0e-5
+  weight_decay: 1.0e-6
+  grad_clip: 1.0
+  seed: 42
+  output_dir: artifacts/finetune

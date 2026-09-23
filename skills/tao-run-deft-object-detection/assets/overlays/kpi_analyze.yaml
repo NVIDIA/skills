@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# `analytics kpi_analyze` — the settings that do not vary per run, applied over
+# the spec `analytics default_specs` emits. Paths, `visualize.tag`,
+# `data.kpi_sources` and `kpi.conf_threshold` are run-specific and stay as --set.
+#
+# `kpi.conf_threshold` is deliberately absent: it is the run's scoring threshold,
+# frozen at init as config.kpi_conf_threshold, and pinning it here would override
+# the recorded value on every run and make the record meaningless.
+#
+# The comment on each line is what TAO emits by default, so the cost of removing
+# the line is visible without diffing against a container.
+
+data.input_format: KITTI       # TAO: KITTI. Uppercase here, lowercase in
+                               # `gap_analysis object_detection` in the same image.
+visualize.platform: local      # TAO: local. Pinned so a loop stage cannot acquire
+                               # a wandb credential dependency.
+
+kpi.iou_threshold: 0.5         # TAO: 0.5
+kpi.num_recall_points: 11      # TAO: 11. 11-point interpolated AP (VOC); 101
+                               # selects COCO-style and shifts every reported AP.
+kpi.ignore_sqwidth: 40         # TAO: 0. Excludes boxes below this square-width
+                               # from scoring; 0 scores small boxes the reference
+                               # set excludes.
+kpi.filter: false              # TAO: false
+kpi.is_internal: false         # TAO: false. True keeps only `person` and appends
+                               # a Summary row, changing what the report means
+                               # while still exiting 0.

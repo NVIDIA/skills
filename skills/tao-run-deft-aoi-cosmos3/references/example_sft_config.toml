@@ -1,0 +1,114 @@
+# EXAMPLE Cosmos3 AOI full-parameter SFT config (cosmos-rl) — REFERENCE ONLY.
+#
+# NOT the DEFT default. `references/cosmos-reason.md` requires LoRA unless the
+# user has EXPLICITLY approved full fine-tuning; see
+# `example_lora_config.toml` for the default. This copy exists so that approved
+# case has a reviewed shape to start from.
+#
+# Everything AOI-specific is identical to the LoRA example — bare OK/NG system
+# prompt, single `annotation_path`, image-pair pixel budget, no val_dataset.
+# Only four things change:
+#   1. no [policy.lora] block;
+#   2. lr drops 1e-4 -> 1e-5 (full SFT on a small mined pool forgets fast);
+#   3. flat LR (`optm_decay_type = "none"`) + fused optimizer;
+#   4. parallelism shards across GPUs — the LoRA example's single-GPU shape
+#      will OOM on a full-parameter update.
+# Prefer LoRA on small mined/synthetic pools: less overfitting and less
+# catastrophic forgetting of the base reasoner.
+#
+# Shown at iteration N, i.e. AFTER zero-shot Proxy evaluate + Proxy RCA +
+# Mining selection have produced train_iter_<N>.json.
+#
+# Run with:
+#   cosmos-rl --config <this>.toml /opt/cosmos_rl/tao_sft_example.py
+# with workflow argument `automl_policy: off`. Mount the workspace at
+# /tao-workspace — NEVER over /workspace, where cosmos-rl is installed.
+
+[custom]
+# Must match the Proxy/Benchmark evaluate `dataset.system_prompt` verbatim.
+system_prompt = "Return exactly OK or NG. Do not include reasoning or extra text."
+
+# One JSON array (json.load), not JSONL; single path, not a per-task list.
+[custom.train_dataset]
+annotation_path = "/tao-workspace/results/run_<id>/iter<N>/assemble/train_iter_<N>.json"
+media_path = "/tao-workspace"
+media_root = "/tao-workspace"
+
+# No [custom.val_dataset]: Proxy is a separate evaluate job, never Train val data.
+
+# Two-image AOI pairs ([AOI, golden_reference]) — a pixel budget, not video fps.
+[custom.vision]
+max_pixels = 401408
+min_pixels = 50176
+
+[train]
+resume = false                # each DEFT iteration binds a FRESH output_dir
+epoch = 5
+output_dir = "/tao-workspace/results/run_<id>/iter<N>/train"
+epsilon = 1e-8
+optm_name = "AdamW"
+optm_lr = 1e-5                # full-parameter SFT; 2e-6 if the pool is very small
+optm_decay_type = "none"
+optm_impl = "fused"
+optm_weight_decay = 0.01
+optm_betas = [0.9, 0.999]
+optm_warmup_epochs = 0        # schema exposes warmup EPOCHS, not a warmup ratio
+optm_grad_norm_clip = 1.0
+async_tp_enabled = false
+compile = false
+param_dtype = "bfloat16"
+fsdp_reduce_dtype = "float32"
+fsdp_offload = false          # first OOM lever, before dropping the batch
+fsdp_reshard_after_forward = "default"
+train_batch_per_replica = 2   # effective batch/step = train_batch_per_replica * dp_shard_size
+sync_weight_interval = 1
+
+[validation]
+enable = false
+freq_in_epoch = 1
+batch_size = 1
+dataloader_num_workers = 4
+dataloader_prefetch_factor = 4
+
+[policy]
+# Blank on purpose — the prepared Qwen3-VL safetensors PTM compute-frame path
+# is filled at launch (see example_lora_config.toml for the full rationale).
+# The selected Cosmos3 ID stays as source-model lineage, not as this path.
+model_name_or_path = ""
+model_max_length = 40960      # contract floor: >= 40960
+model_gradient_checkpointing = true
+
+# No [policy.lora] — that is what makes this run full-parameter.
+
+[logging]
+logger = ["console", "tao"]
+project_name = "cr3_deft_aoi"
+experiment_name = "<exp>_iter<N>_sft"
+
+[train.train_policy]
+type = "sft"
+enable_dataset_cache = false
+conversation_column_name = "conversations"
+dataloader_num_workers = 1
+dataloader_prefetch_factor = 1
+mini_batch = 1
+dataset.name = "<exp>_iter<N>_sft"
+dataset.test_size = 0
+
+[train.ckpt]
+enable_checkpoint = true
+save_freq_in_epoch = 1
+max_keep = 10                 # full weights are large; raise the disk budget accordingly
+save_mode = "async"
+# Full SFT exports merged weights, so the post-Train evaluate keeps
+# model.enable_lora = false and points model.model_name at this export.
+export_safetensors = true
+
+[policy.parallelism]
+n_init_replicas = 1
+tp_size = 1
+cp_size = 1
+dp_shard_size = 8             # FSDP shard degree; 1 GPU will OOM on full-parameter SFT
+pp_size = 1
+dp_replicate_size = 1
+cp_rotate_method = "allgather"

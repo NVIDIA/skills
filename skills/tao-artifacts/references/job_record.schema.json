@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tao://artifacts/job_record.schema.json",
+  "title": "TAO job-record",
+  "description": "One durable record per job at .tao/jobs/<id>.json, OUTSIDE any synced results tree. ONLY writer: scripts/tao_job_record.py (open/mark/redact-view). `open` binds results_dir at SUBMIT time and returns the id — the ONLY launch handle (atomic record-then-launch). Every write is redacted. 'What is running' is never read from records; poll the backend (docker ps / kubectl get / squeue) via backend_ref.",
+  "type": "object",
+  "required": ["schema_version", "id", "platform", "backend_ref", "image", "network_arch", "action", "results_dir", "storage_tier", "submitted_at", "transitions", "terminal_state", "redacted"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "platform": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,31}$", "description": "Open set — the platform skill's short name in canonical kebab-case (built-ins: docker, slurm, kubernetes, brev, virtualenv; external skills, e.g. kratos, use their own name). The writer normalizes input (trim/lowercase/space->hyphen) into this form; never an allowlist." },
+    "backend_ref": {
+      "type": ["string", "null"],
+      "description": "Platform-native handle: container id | namespace/job | slurm job id | brev instance+container | virtualenv pid:<pid>. Null between open (PENDING) and successful native launch."
+    },
+    "image": { "type": "string", "minLength": 1 },
+    "network_arch": { "type": "string", "minLength": 1 },
+    "action": { "type": "string", "minLength": 1 },
+    "results_dir": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Resolved at submit, written at open, never re-derived. Non-negotiable: K8s ttlSecondsAfterFinished and docker --rm make a missed write unrecoverable."
+    },
+    "storage_tier": {
+      "enum": ["A", "B", "C"],
+      "description": "Stamped by the tao-data-io consumer at stage time — never guessed by the producer."
+    },
+    "upload_excludes": { "type": "array", "items": { "type": "string" } },
+    "submitted_at": { "type": "string", "minLength": 1, "description": "ISO 8601 UTC" },
+    "transitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ts", "state", "message", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "ts": { "type": "string", "minLength": 1 },
+          "state": { "enum": ["PENDING", "RUNNING", "COMPLETE", "ERROR", "CANCELED", "UNKNOWN"] },
+          "message": {
+            "type": "string",
+            "description": "Platform-native sub-state rides here (ImagePullBackOff, PENDING-resources vs PENDING-priority, Insufficient-GPU) so stuck-Pending diagnosis is one call."
+          },
+          "source": { "enum": ["agent", "poller", "backend-hook"] }
+        }
+      },
+      "description": "Append-only. First transition is the PENDING written by open."
+    },
+    "terminal_state": { "enum": [null, "COMPLETE", "ERROR", "CANCELED"] },
+    "terminal_write_by": { "enum": [null, "agent", "poller", "backend-hook"] },
+    "err_class": {
+      "enum": [null, "ERR_INFRA", "ERR_PROGRAM"],
+      "description": "The agent's failure classification (see tao-launch-workflow's failure-analysis criteria). ERR_INFRA is retriable; ERR_PROGRAM never."
+    },
+    "retry_of": { "type": ["string", "null"], "description": "Job id this run retries (infra auto-retry chain)." },
+    "parent_job": { "type": ["string", "null"], "description": "Experiment/loop thread for AutoML/DEFT children. Workflow-level state stays in best_rec.json / deft_state.json." },
+    "redacted": { "const": true, "description": "Every write passes scripts/redact_secrets.py. A record with a raw credential is a bug." }
+  }
+}

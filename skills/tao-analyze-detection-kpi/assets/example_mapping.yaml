@@ -1,0 +1,27 @@
+# data.mapping — a YAML list of single-key dicts whose value is a LIST of aliases
+# that fold into that canonical class.
+#
+# A bare string (`- car: car`) is silently destructive: construct_category_map stores
+# the value verbatim, so a string is iterated character by character downstream, class
+# matching fails for every box, and the run exits 0 with TP=0 / FN=0 / mAP=0.0.
+# Always use a list, even for a single alias.
+- bicycle:
+    - bicycle
+    - Bicycle
+    - motorcycle
+    - Motorcycle
+    - twowheeler
+- car:
+    - car
+    - Automobile
+    - Vehicle
+    - heavy_truck
+    - Heavy Truck
+- person:
+    - person
+    - Person
+    - pedestrian
+- road_sign:
+    - road_sign
+    - traffic light
+    - stop sign

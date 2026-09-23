@@ -2,13 +2,18 @@
 
 ## Overview
 
-Evaluators run after generation to assess output quality. They are defined as an ordered list under `evaluators:` in the config. Two top-level evaluator types are available:
+Evaluators run after generation to assess output quality. They are defined as a list under `evaluators:` in the config. Three executable top-level evaluator types are available:
 
 1. **Hallucination Check** — optical-flow-based motion artifact detection
 2. **Attribute Verification** — LLM generates MCQ questions, VLM answers them
    (the VLM-side config lives in a nested `vlm_verification` block)
+3. **External Cosmos Evaluator** — checker-agnostic quality gates orchestrated
+   by a separately deployed Cosmos Evaluator Arbitrator
 
-The schema also accepts a standalone `vlm_verification` entry, but it is **not executed** — VLM verification only runs nested inside `attribute_verification`.
+`vlm_verification` is not a standalone evaluator: it has no independent
+question/expected-answer contract. A top-level entry is rejected during config
+validation. Nest it under `attribute_verification`, where the LLM-generated or
+fixed MCQs provide that contract.
 
 On failure, the pipeline retries with an incremented seed up to `pipeline.retry` times.
 
@@ -172,6 +177,157 @@ When `generate_natural_caption_on_pass: true`, after all attribute checks pass, 
 
 The `{attributes_text}` placeholder is replaced with the verified attribute values (e.g., "top outer color: blue; shoe type: boots"). The resulting caption is saved to `metadata.natural_caption`.
 
+## External Cosmos Evaluator
+
+This evaluator submits an externally readable generated candidate to a Cosmos
+Evaluator Arbitrator. Augmentation selects free-form checker names through
+configuration and interprets only their common top-level `passed: bool` gating
+contract; checker-specific scores and fields remain opaque.
+
+The endpoint must use the evaluator-only contract:
+
+```yaml
+endpoints:
+  - id: cosmos_evaluator
+    role: evaluator
+    url: "http://cosmos-evaluator-arbitrator:8000"
+    adapter: cosmos.evaluator.arbitrator
+    timeout: 1800
+```
+
+The hostname above assumes the augmentation container joins the same Docker
+bridge as Arbitrator. For a separate deployment, use its trusted URL. If that
+deployment requires authentication, add `api_key_env` with the name of the
+environment variable holding the key. The key is sent as
+`Authorization: Bearer <key>`; never put its value in YAML.
+
+```yaml
+evaluators:
+  - cosmos_evaluator:
+      enabled: true
+      endpoint_id: cosmos_evaluator
+      poll_interval_seconds: 5
+      stream_key: camera_front_wide_120fov
+      output_storage_prefix: "team/evaluations/run-42/"
+      merge_captioning_selections: true
+      checks:
+        - name: metropolis.attribute_verification
+          gate: true
+          metadata_key: attribute_verification
+      inputs: {}
+      config:
+        selected_variables:
+          weather: snowy
+          time_of_day: night
+        variable_options:
+          weather: [sunny, cloudy, rainy, snowy]
+          time_of_day: [morning, night]
+```
+
+### Discovery and request flow
+
+Before captioning or generation, augmentation calls Arbitrator's `/health`,
+`/checkers`, and `/dependency-graph` endpoints. Every selected checker must be
+both healthy and present in the graph. For each candidate, augmentation then:
+
+1. Deep-copies `inputs` and injects the generated URI at
+   `augmented_video_urls[stream_key]`.
+2. Deep-copies the one shared `config`; when
+   `merge_captioning_selections: true`, sampled captioning values/options are
+   merged by key and win over matching configured keys.
+3. Submits once to `POST /process/async`, then polls
+   `GET /executions/{request_id}` until terminal within the endpoint timeout.
+4. Reads each configured result either from
+   `checker_results[checker_name][stream_key]` or directly from
+   `checker_results[checker_name]`. The pinned service stores `response_json`
+   as a JSON string; the client also accepts an already-decoded object.
+
+`output_storage_prefix` is required for enabled evaluation and is a relative
+key prefix in storage configured for the checker services—not a storage URI.
+Use a concrete prefix unique to each run. See
+[configuration-schema.md](configuration-schema.md#external-cosmos-evaluator)
+for its exact validation rules and the deterministic fallback stream-key
+algorithm.
+
+`inputs` can carry current or future Arbitrator fields without checker-specific
+augmentation code. Common media fields are `original_video_urls` (for
+Hallucination), `world_model_video_urls`, and `rds_hq_url` (for Objects).
+Per-stream companion maps must contain the resolved stream key.
+
+### Gating and failures
+
+- `gate: true`: the selected result must contain a literal top-level boolean
+  `passed`. `false` is a quality failure and can use the existing generation
+  retry/seed re-roll.
+- `gate: false`: the result is retained as observation metadata but does not
+  reject the candidate; it need not expose `passed`.
+- A terminal parent execution status of `success` means checker jobs completed;
+  it is not itself a quality pass. Augmentation still inspects every gate.
+- Submission/polling/discovery failures, a failed execution, missing or skipped
+  results, and an invalid gating contract are service failures. Safe GETs are
+  retried, but an ambiguous POST is never resubmitted because Arbitrator has no
+  idempotency key. Service failures stop evaluation without generating a new
+  candidate. The provider block records a redacted `service_failure`; with the
+  defaults (`strict: true`, `retain_failures: true`) the generated candidate is
+  retained for inspection, the sample is not counted as successful, and the
+  run exits non-zero.
+
+The persisted `cosmos_evaluator` provider block is machine-readable. It always
+contains `request_id` (an integer after a valid acceptance response, otherwise
+`null`). `error_code: ambiguous_post` means the POST may have reached
+Arbitrator but no usable request ID reached the client; agents must enter the
+recovery flow below. Other clear operational failures use
+`error_code: service_failure` and must not be treated as ambiguous submissions.
+
+For an ambiguous POST (the request may have reached Arbitrator but no
+`request_id` reached the client), recovery is deliberately operator-driven:
+
+1. Do not blindly resubmit. Check Arbitrator logs and the checker storage area
+   identified by that run's unique `output_storage_prefix` to determine whether
+   the original execution exists or completed.
+2. If the original execution can be identified, inspect or finish handling that
+   execution without posting the candidate again.
+3. If its state cannot be established, preserve the retained candidate, choose
+   a new unique `output_storage_prefix`, and rerun it as a new evaluation. This
+   may leave an orphaned first execution, but avoids silently treating an
+   uncertain submission as a quality rejection.
+
+Automatic POST retry is unsafe until Arbitrator offers an idempotency key or a
+client-supplied request identifier that can be queried after a lost response.
+
+The generated video and every configured media input must be readable by the
+external checker containers, normally through shared object storage or HTTP.
+The pipeline does not upload local files solely for evaluation.
+Remote evaluation adds no GPU requirement to the augmentation container.
+
+### CT3 Omni external evaluator example
+
+`configs/cookbook/video-data-augmentation/config_video_transfer_CT3_omni.yaml`
+is the shipped external-evaluator VDA example. It has no built-in evaluator
+fallback: one Cosmos entry selects gated `metropolis.hallucination` and
+`metropolis.attribute_verification` and exposes their results through the
+compatibility aliases `hallucination_check` and `attribute_verification`.
+
+Hallucination requires both sides of the comparison. Augmentation injects the
+generated remote URI as `augmented_video_urls[stream_key]`; the config derives
+`inputs.original_video_urls[stream_key]` from `data[0].inputs.rgb`, so one input
+override updates both consumers. The stream key is `camera_front_wide_120fov`.
+The generated video is also remote, while `output_storage_prefix` remains a
+unique relative key.
+
+The shared flat `config` overrides the Hallucination threshold while relying on
+the checker's defaults for its motion-mask settings. It defines snow/night
+Attribute Verification selections and supplies checker-side LLM/VLM URL/model
+values. Those service names must resolve from the checker containers, not only
+from augmentation.
+
+The deployed external Attribute Verification checker examines the first video
+frame and does not generate `natural_caption`. Replace S3 and
+`output_storage_prefix` placeholders before running. Both checks are gates and
+`pipeline.evaluation.strict` is true, so either failure marks the sample
+unsuccessful. `pipeline.retry: 0` means it does not generate a replacement.
+Outputs are still retained (`retain_failures: true`).
+
 ## Evaluator Combinations
 
 ### No Evaluators (Generation Only)
@@ -223,18 +379,42 @@ evaluators:
         system_prompt: "..."
 ```
 
+### External Cosmos Gate (CT3 Omni)
+
+Use the `config_video_transfer_CT3_omni.yaml` example. It contains one
+external gate rather than duplicating the built-in attribute verifier:
+
+```yaml
+evaluators:
+  - cosmos_evaluator:
+      enabled: true
+      endpoint_id: cosmos_evaluator
+      output_storage_prefix: "<OUTPUT_PREFIX>/ct3-omni/<RUN_ID>/"
+      checks:
+        - name: metropolis.attribute_verification
+          gate: true
+          metadata_key: attribute_verification
+```
+
 ## Retry Behavior
 
-The retry mechanism works as follows:
+The retry mechanism is a bounded candidate loop:
 
 1. Generation runs with initial seed
-2. Evaluators run in order:
+2. Evaluators run in order for that candidate:
    - If **hallucination check fails** → skip attribute verification, retry immediately
    - If **attribute verification fails** → retry
-3. On retry: seed incremented by 1
+   - If an **external Cosmos gate returns `passed: false`** → retry
+3. A quality failure creates a replacement only when attempts remain. On that
+   retry, the seed is incremented by 1.
 4. If `pipeline.regenerate_caption_on_retry: true` and a captioner is configured, captioning reruns and overwrites the prompt (saved to `output.caption`)
 5. Generation reruns with the new seed (and possibly a new prompt)
-6. Max attempts = `pipeline.retry + 1`
+6. The loop ends after a pass or after exactly `pipeline.retry + 1` candidate
+   attempts. Exhaustion is an evaluation failure; there is no further cycle.
+
+External service/contract failures are not quality failures and do not spend a
+generation retry: they stop the loop on the current candidate and follow
+`strict`/`retain_failures`. Observe-only Cosmos checks never trigger a retry.
 
 **Seed progression**: If original seed is 12345, retries use 12346, 12347, etc.
 
@@ -276,4 +456,34 @@ After evaluation completes, results are written to `output.metadata`:
 }
 ```
 
-If `output.evaluation` is specified in the data section, a separate evaluation-only JSON is also written.
+An external run instead adds its sanitized provider block and any configured
+compatibility alias. It does not imply a built-in evaluator also ran:
+
+```json
+{
+  "cosmos_evaluator": {
+    "request_id": 814,
+    "status": "success",
+    "version": "1.1.0",
+    "commit_sha": "...",
+    "stream_key": "camera_front_wide_120fov",
+    "checks": {
+      "metropolis.attribute_verification": {
+        "camera_front_wide_120fov": {
+          "passed": true,
+          "result": {"passed": true}
+        }
+      }
+    }
+  },
+  "attribute_verification": {
+    "passed": true,
+    "result": {"passed": true}
+  }
+}
+```
+
+If a Cosmos check declares `metadata_key`, the same sanitized compatibility
+view is written at that root key when schema validation proves it cannot
+collide. If `output.evaluation` is specified in the data section, a separate
+evaluation-only JSON is also written.

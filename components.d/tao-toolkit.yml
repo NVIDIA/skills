@@ -16,19 +16,31 @@ skills:
     catalog_dir: tao-run-automl-deft-pipeline
   - path: skills/applications/tao-run-deft-aoi/
     catalog_dir: tao-run-deft-aoi
+  - path: skills/applications/tao-run-deft-aoi-cosmos3/
+    catalog_dir: tao-run-deft-aoi-cosmos3
+  - path: skills/applications/tao-run-deft-cr-its-mining/
+    catalog_dir: tao-run-deft-cr-its-mining
+  - path: skills/applications/tao-run-deft-object-detection/
+    catalog_dir: tao-run-deft-object-detection
   - path: skills/applications/tao-run-inference-service/
     catalog_dir: tao-run-inference-service
   - path: skills/applications/tao-train-single-step/
     catalog_dir: tao-train-single-step
+  - path: skills/applications/tao-validate-recipe-transfer/
+    catalog_dir: tao-validate-recipe-transfer
   # data
-  - path: skills/data/paidf-anomalygen/
-    catalog_dir: paidf-anomalygen
+  - path: skills/data/tao-analyze-detection-kpi/
+    catalog_dir: tao-analyze-detection-kpi
+  - path: skills/data/tao-analyze-gaps-od-map/
+    catalog_dir: tao-analyze-gaps-od-map
   - path: skills/data/tao-analyze-gaps-visual-changenet/
     catalog_dir: tao-analyze-gaps-visual-changenet
   - path: skills/data/tao-analyze-gaps-vlm-bcq/
     catalog_dir: tao-analyze-gaps-vlm-bcq
   - path: skills/data/tao-convert-dataset-format/
     catalog_dir: tao-convert-dataset-format
+  - path: skills/data/tao-generate-image-embeddings/
+    catalog_dir: tao-generate-image-embeddings
   - path: skills/data/tao-generate-image-grounding/
     catalog_dir: tao-generate-image-grounding
   - path: skills/data/tao-generate-referring-expressions/
@@ -37,6 +49,10 @@ skills:
     catalog_dir: tao-generate-video-reasoning-annotations
   - path: skills/data/tao-mine-aoi-images/
     catalog_dir: tao-mine-aoi-images
+  - path: skills/data/tao-mine-nearest-neighbors/
+    catalog_dir: tao-mine-nearest-neighbors
+  - path: skills/data/tao-mine-od-images/
+    catalog_dir: tao-mine-od-images
   - path: skills/data/tao-route-visual-changenet-samples/
     catalog_dir: tao-route-visual-changenet-samples
   - path: skills/data/tao-validate-dataset-format/
@@ -48,18 +64,28 @@ skills:
     catalog_dir: tao-finetune-cosmos-embed
   - path: skills/models/tao-finetune-cosmos-reason/
     catalog_dir: tao-finetune-cosmos-reason
+  - path: skills/models/tao-finetune-nv-tesseract-ad-diffusion/
+    catalog_dir: tao-finetune-nv-tesseract-ad-diffusion
+  - path: skills/models/tao-finetune-nv-tesseract-forecasting/
+    catalog_dir: tao-finetune-nv-tesseract-forecasting
+  - path: skills/models/tao-finetune-video-clip/
+    catalog_dir: tao-finetune-video-clip
   - path: skills/models/tao-train-action-recognition/
     catalog_dir: tao-train-action-recognition
   - path: skills/models/tao-train-bevfusion/
     catalog_dir: tao-train-bevfusion
   - path: skills/models/tao-train-centerpose/
     catalog_dir: tao-train-centerpose
+  - path: skills/models/tao-train-codetr/
+    catalog_dir: tao-train-codetr
   - path: skills/models/tao-train-deformable-detr/
     catalog_dir: tao-train-deformable-detr
   - path: skills/models/tao-train-depth-anything-v2/
     catalog_dir: tao-train-depth-anything-v2
   - path: skills/models/tao-train-dino/
     catalog_dir: tao-train-dino
+  - path: skills/models/tao-train-dinov3/
+    catalog_dir: tao-train-dinov3
   - path: skills/models/tao-train-fast-foundation-stereo/
     catalog_dir: tao-train-fast-foundation-stereo
   - path: skills/models/tao-train-foundation-stereo/
@@ -105,22 +131,26 @@ skills:
   - path: skills/models/tao-train-visual-changenet/
     catalog_dir: tao-train-visual-changenet
   # platform
+  - path: skills/platform/tao-data-io/
+    catalog_dir: tao-data-io
   - path: skills/platform/tao-run-on-brev/
     catalog_dir: tao-run-on-brev
   - path: skills/platform/tao-run-on-docker/
     catalog_dir: tao-run-on-docker
   - path: skills/platform/tao-run-on-kubernetes/
     catalog_dir: tao-run-on-kubernetes
-  - path: skills/platform/tao-run-on-local-docker/
-    catalog_dir: tao-run-on-local-docker
   - path: skills/platform/tao-run-on-slurm/
     catalog_dir: tao-run-on-slurm
-  - path: skills/platform/tao-run-platform/
-    catalog_dir: tao-run-platform
+  - path: skills/platform/tao-run-on-virtualenv/
+    catalog_dir: tao-run-on-virtualenv
   - path: skills/platform/tao-setup-nvidia-gpu-host/
     catalog_dir: tao-setup-nvidia-gpu-host
   # core
+  - path: skills/core/tao-artifacts/
+    catalog_dir: tao-artifacts
   - path: skills/core/tao-launch-workflow/
     catalog_dir: tao-launch-workflow
   - path: skills/core/tao-list-capabilities/
     catalog_dir: tao-list-capabilities
+  - path: skills/core/tao-setup/
+    catalog_dir: tao-setup

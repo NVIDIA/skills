@@ -1,0 +1,14 @@
+[
+  {
+    "id": "tao-data-io-staging",
+    "question": "A user request: \"Stage my S3 dataset for a TAO job.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the storage-tier and staging steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "expected_skill": "tao-data-io",
+    "expected_script": null,
+    "ground_truth": "Identify tao-data-io as the data-staging skill and summarize its storage tier A/B/C selection and S3 staging/upload workflow from SKILL.md without executing anything.",
+    "expected_behavior": [
+      "Identifies tao-data-io as the relevant skill",
+      "Explains the storage tier A/B/C choice and S3 staging from SKILL.md",
+      "Does not run commands, scripts, or web searches"
+    ]
+  }
+]

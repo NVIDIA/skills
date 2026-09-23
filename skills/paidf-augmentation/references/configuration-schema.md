@@ -25,6 +25,7 @@ data:
         depth: "/path/to/depth.mp4"
         seg: "/path/to/seg.mp4"
         vis: "/path/to/vis.mp4"
+        wsm: "/path/to/wsm.mp4"           # Cosmos3 world-scenario control
       prompt_attributes:                  # Required only for VLM+template captioning
         event_type: "person_falling"
         motion_level: "natural"
@@ -36,13 +37,22 @@ data:
       evaluation: "/path/to/eval.json"     # Optional: evaluation results
 ```
 
+For Cosmos3 WSM transfer, `data[].inputs.controls.wsm` is a client-readable
+video path. The `openai.video.sync` and `openai.video.async` adapters upload its
+bytes as `control_reference` and send `control_type=wsm`; the generation server
+creates the request-scoped `control_path`. Do not also set `control` or
+`control_path` under `augmentation.parameters.extra_params.wsm`. Other WSM
+options, such as `control_weight`, may remain in that object. The async adapter
+accepts one WSM control only on a `video_transfer` endpoint and rejects other
+control combinations.
+
 ## `endpoints` — API Endpoint Registry (a LIST)
 
 `endpoints:` is a **list** of endpoint entries (the BYOM registry). Each entry declares a `role` and, optionally, the API-contract `adapter`. The pipeline resolves the model and each captioning/evaluator consumer to an endpoint by role (and `id` when present).
 
 ```yaml
 endpoints:
-  - id: vlm_qwen                 # optional; only needed to disambiguate 2+ same-role endpoints
+  - id: vlm_qwen                 # optional exact selector; required to disambiguate 2+ same-role endpoints
     role: vlm
     url: "http://localhost:8000/v1"
     model: "Qwen/Qwen3.6-27B-FP8"
@@ -69,13 +79,13 @@ choose each long-poll window (default 300 seconds; larger values are capped at
 the NVCF gateway maximum of 300). This does not replace endpoint `timeout`,
 which remains the total invocation budget.
 
-**Roles → default adapter:** `vlm`→`openai.chat.completions`, `llm`→`openai.chat.completions`, `image_edit`→`nim`, `video_transfer`→`nim`, `video_predict`→`nim`, `image2video`→`openai.video.sync`.
+**Roles → default adapter:** `vlm`→`openai.chat.completions`, `llm`→`openai.chat.completions`, `image_edit`→`nim`, `video_transfer`→`nim`, `video_predict`→`nim`, `image2video`→`openai.video.sync`. The `evaluator` role has no default: an external Cosmos Evaluator endpoint must explicitly set `adapter: cosmos.evaluator.arbitrator`.
 
-**Adapters (API contracts):** `openai.chat.completions`, `openai.images.edits`, `openai.video.sync`, `openai.video.async`, `nim`, `passthrough`.
+**Adapters (API contracts):** generation/captioning uses `openai.chat.completions`, `openai.images.edits`, `openai.video.sync`, `openai.video.async`, `nim`, or `passthrough`. `cosmos.evaluator.arbitrator` is an evaluator-only contract and intentionally does not enter the generation adapter registry.
 
 **Model selection:** `augmentation.model.name` resolves to an endpoint by `id`, then by `role`, then by the model-name→role map (`image-edit`→`image_edit`, `cosmos-transfer2.5`→`video_transfer`, `cosmos-predict`→`video_predict`, `cosmos3-image2video`→`image2video`). If two endpoints share the matched role, disambiguate by setting `augmentation.model.name` to a specific endpoint `id`.
 
-Cross-section validation enforces: captioning with VLM requires a `vlm`-role endpoint; captioning with LLM requires an `llm`-role endpoint (unless using text/file captioner); VLM+template samples must select defined catalog IDs; the generation model name must resolve to exactly one endpoint, and that endpoint's effective adapter must be a known contract.
+Cross-section validation enforces: captioning with VLM requires a `vlm`-role endpoint; captioning with LLM requires an `llm`-role endpoint (unless using text/file captioner); VLM+template samples must select defined catalog IDs; the generation model name must resolve to exactly one endpoint, and that endpoint's effective adapter must be a known contract. An enabled external Cosmos evaluator must select an endpoint by `endpoint_id` whose role is `evaluator` and whose explicit adapter is `cosmos.evaluator.arbitrator`.
 
 ## `pipeline` — Pipeline Settings
 
@@ -241,6 +251,7 @@ augmentation:
 
 Per-model parameter highlights (all optional, pass-through):
 - **Cosmos Transfer 2.5:** `sigma`, `guidance`, `num_steps`, `inference_name`; control weights under `modalities`.
+- **Cosmos3 WSM transfer:** source video under `data[].inputs.rgb`, WSM video under `data[].inputs.controls.wsm`, and WSM tuning such as `extra_params.wsm.control_weight` plus `extra_params.control_guidance`. Use a `video_transfer` endpoint with `openai.video.sync` or `openai.video.async`; for async, the endpoint URL is the create route ending in `/v1/videos`.
 - **Cosmos Predict 2.5:** `inference_type` (`text2world`/`image2world`/`video2world`), `num_output_frames`, `enable_autoregressive`, `chunk_size`, `chunk_overlap`, `resolution`, `offload_tokenizer`, `offload_text_encoder`.
 - **image edit:** the `nim` `/v1/infer` contract uses its own native knob names — `steps` (5–100) and `cfg_scale` (>1.0, default 4.0), plus `negative_prompt`/`seed`; the `openai.chat.completions` and `openai.images.edits` contracts instead use `num_inference_steps`, `guidance_scale`, `negative_prompt` (often nested under an `extra_body:` envelope the server expects).
 - **image-to-video:** model-native knobs pass through verbatim (Cosmos3: `size`/`num_frames`/`fps`/`num_inference_steps`/`guidance_scale`/`flow_shift`/`extra_params`; Veo: `seconds`/`size`).
@@ -282,7 +293,7 @@ data_processing:
 
 ## `evaluators` — Quality Checks
 
-Evaluators run in order after generation. On failure, the pipeline retries with an incremented seed according to `pipeline.retry`. The schema accepts three entry shapes — `hallucination_check`, `attribute_verification`, or `vlm_verification` — but **two evaluators actually run today**: `hallucination_check` and `attribute_verification`. VLM verification only runs when nested inside an `attribute_verification` block; a standalone `vlm_verification` entry validates but is **not executed** (see the note below).
+Evaluators run after generation. On a quality failure, the pipeline retries with an incremented seed according to `pipeline.retry`. Three executable entry shapes are accepted: `hallucination_check`, `attribute_verification`, and `cosmos_evaluator`. The first two are built in; external Cosmos evaluation delegates checker execution to Arbitrator. VLM verification is the visual half of `attribute_verification` and therefore runs only as its nested `vlm_verification` block.
 
 ```yaml
 evaluators:
@@ -316,4 +327,105 @@ evaluators:
         parameters: {temperature: 0.0, max_tokens: 10}
 ```
 
-`question_generation.endpoint_id` / `vlm_verification.endpoint_id` pick a specific endpoint by `id` (otherwise the single endpoint of the matching role is used). `generate_options` lets the LLM write distractors instead of drawing from `verification_options`. `frames` controls how many evenly-spaced video frames the VLM verifier sees — use `>1` so a mid-video event is visible (the first frame of an image→video clip is the pre-event seed). A standalone `vlm_verification:` entry (one with no `attribute_verification`) is accepted by the schema but is **not executed** — the pipeline only performs VLM verification through an `attribute_verification` block (which pairs the LLM question generator with the VLM verifier). Put `vlm_verification` inside `attribute_verification`.
+`question_generation.endpoint_id` / `vlm_verification.endpoint_id` pick a specific endpoint by `id` (otherwise the single endpoint of the matching role is used). `generate_options` lets the LLM write distractors instead of drawing from `verification_options`. `frames` controls how many evenly-spaced video frames the VLM verifier sees — use `>1` so a mid-video event is visible (the first frame of an image→video clip is the pre-event seed). A top-level `vlm_verification:` entry is rejected during validation because it supplies no questions or expected answers; put it inside `attribute_verification`.
+
+### External Cosmos Evaluator
+
+External Cosmos evaluation is checker-agnostic. The endpoint is the Arbitrator,
+not an individual checker, and configured names are free-form strings validated
+at startup against both `GET /checkers` and `GET /dependency-graph`.
+
+```yaml
+endpoints:
+  - id: cosmos_evaluator
+    role: evaluator
+    url: "http://cosmos-evaluator-arbitrator:8000"
+    adapter: cosmos.evaluator.arbitrator      # explicit; not a generation adapter
+    timeout: 1800                             # total submit-and-poll budget
+
+evaluators:
+  - cosmos_evaluator:
+      enabled: true
+      endpoint_id: cosmos_evaluator
+      poll_interval_seconds: 5
+      stream_key: camera_front_wide_120fov   # optional; derived when omitted
+      output_storage_prefix: "team/run-42/"  # required relative object-key prefix
+      merge_captioning_selections: true
+      checks:
+        - name: metropolis.attribute_verification
+          gate: true
+          metadata_key: attribute_verification
+        - name: future.checker
+          gate: false                         # preserve result; do not reject output
+      inputs:
+        original_video_urls:                  # optional opaque Arbitrator input
+          camera_front_wide_120fov: s3://bucket/original.mp4
+      config:                                 # one shared dict sent to every check
+        selected_variables: {weather: snowy}
+        variable_options: {weather: [sunny, cloudy, rainy, snowy]}
+```
+
+Fields and behavior:
+
+- `enabled`: disabled entries make no network requests. At most one enabled
+  Cosmos entry is allowed.
+- `endpoint_id`: required and must select the explicit evaluator endpoint.
+- `checks`: non-empty, with unique, non-blank names. `gate: true` requires a
+  literal top-level boolean `passed` in that check's result. `gate: false`
+  preserves an opaque result without using it for candidate acceptance.
+- `metadata_key`: optional root-level compatibility alias. It cannot collide
+  with built-in evaluator metadata, the `cosmos_evaluator` provider block, or
+  another alias.
+- `inputs`: deep-copied pass-through input fields such as
+  `original_video_urls`, `world_model_video_urls`, and `rds_hq_url`.
+  `augmented_video_urls` is reserved because runtime binds it to the generated
+  candidate. Per-stream companion maps must contain the resolved stream key.
+- `config`: one shared opaque dictionary forwarded to every selected checker;
+  per-checker configuration maps are not part of the Arbitrator contract.
+- `merge_captioning_selections`: when true, runtime `selected_variables` and
+  `variable_options` are merged by key into the copied shared config. Runtime
+  values win for sampled keys; configured extra keys remain. The loaded YAML is
+  not mutated. When false, captioning selections are not merged.
+- `poll_interval_seconds`: positive delay between execution snapshots.
+- `output_storage_prefix`: required for enabled entries. It is a relative
+  object-storage **key prefix**, not an `s3://` URI. Surrounding whitespace is
+  stripped; a trailing slash is preserved. It must have no scheme, authority,
+  query, fragment, leading slash, backslash, ASCII control character, empty
+  path segment, `.` segment, or `..` segment. One final empty segment from an
+  optional trailing slash is allowed. Supply a concrete prefix unique to every
+  live run.
+
+When `stream_key` is present, surrounding whitespace is stripped and the
+remaining non-empty value is used unchanged. Otherwise runtime derives it from
+`data[].output.video` exactly once:
+
+1. Parse the URI and remove its query and fragment.
+2. Take the final non-empty POSIX path component, percent-decode it, and remove
+   only its final filename suffix.
+3. Normalize the stem with Unicode NFKC.
+4. Replace each maximal run outside `[A-Za-z0-9._-]` with `_`, then strip
+   leading/trailing `.`, `_`, and `-`.
+5. If nothing remains, use `stream-<digest>`, where `<digest>` is the first 12
+   lowercase hexadecimal characters of SHA-256 over the UTF-8, query-free and
+   fragment-free candidate URI.
+
+Examples: `s3://bucket/run/candidate.mp4` becomes `candidate`; and
+`https://host/run/My%20Clip.final.mp4?token=secret#frame` becomes
+`My_Clip.final`. The same resolved key is reused for request inputs, result
+lookup, and provider metadata.
+
+The generated candidate and configured media inputs must be remotely readable
+by the checker deployment (`s3://`, `msc://`, `gs://`, `az://`, or HTTP). Augmentation
+does not upload local files solely for evaluation. Results may be nested by
+stream under `checker_results[checker_name][stream_key]` or stored directly at
+`checker_results[checker_name]`; other checker-specific fields stay opaque.
+Quality failures may spend `pipeline.retry`; at most `pipeline.retry + 1`
+candidates are generated. HTTP, discovery, polling, execution,
+missing/skipped-result, or gating-contract failures are service failures and do
+not generate another candidate. An ambiguous POST is surfaced as a redacted
+service failure with `error_code: ambiguous_post` and a machine-readable
+`request_id` field (`null` when no usable ID was received). It is never
+automatically resubmitted; use the operator recovery procedure in the evaluator
+setup guide. Clear failures use `error_code: service_failure`.
+`pipeline.evaluation.strict`
+and `retain_failures` remain authoritative after evaluation.
