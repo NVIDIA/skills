@@ -3,13 +3,13 @@
     "id": "aug-model-select-video-weather-positive",
     "question": "I have a 10-second traffic video and want to re-render it as a rainy night while keeping the same vehicles, road layout, and camera viewpoint. Docker and the endpoints are NOT available in this environment — do not try to launch the container or run inference. Just tell me which augmentation model to use and the key config fields (augmentation.model.name, endpoints, captioning) I would set.",
     "expected_skill": "paidf-augmentation",
-    "ground_truth": "The response selects Cosmos Transfer 2.5 because the input is a video and the goal is to change scene attributes (weather/lighting) while preserving structure and motion. It sets augmentation.model.name to cosmos-transfer2.5, notes that this resolves to a video_transfer-role endpoint in the endpoints list (default adapter nim) — there is no executor_type and all inference is remote — and recommends VLM+LLM captioning (e.g. config_video_transfer_CT25_nim.yaml as a starting point). It does NOT claim to have run any inference or Docker command.",
+    "ground_truth": "The response selects Cosmos 3 Super transfer because the input is a video and the goal is to change scene attributes (weather/lighting) while preserving structure and motion. It sets augmentation.model.name to cosmos3-transfer-omni, notes that this resolves to a video_transfer-role endpoint (adapter openai.video.sync) — there is no executor_type and all inference is remote — and recommends VLM+LLM captioning (e.g. config_video_transfer_CT3_omni.yaml as a starting point). It does NOT claim to have run any inference or Docker command.",
     "expected_behavior": [
       "Reads skills/paidf-augmentation/SKILL.md and the relevant reference files.",
-      "Selects Cosmos Transfer 2.5 (NOT Cosmos Predict and NOT image-edit) for a video-to-video scene-attribute change.",
-      "Names the model augmentation.model.name=cosmos-transfer2.5 and notes it resolves to a video_transfer-role endpoint (adapter nim).",
+      "Selects Cosmos 3 Super transfer (NOT Cosmos Predict and NOT image-edit) for a video-to-video scene-attribute change.",
+      "Names the model augmentation.model.name=cosmos3-transfer-omni and notes it resolves to a video_transfer-role endpoint (adapter openai.video.sync).",
       "Does NOT mention executor_type (it no longer exists); describes inference as remote via the endpoints list.",
-      "Points to a VLM+LLM captioning config such as config_video_transfer_CT25_nim.yaml as the starting point.",
+      "Points to a VLM+LLM captioning config such as config_video_transfer_CT3_omni.yaml as the starting point.",
       "Does NOT claim it executed docker run or uv run; it produces a config/plan only."
     ]
   },
@@ -24,6 +24,20 @@
       "Explains the choice is text-only conditioning and that Cosmos Predict supports text-only, image+text, and video+text modes.",
       "Notes it resolves to a video_predict-role endpoint; distinguishes Cosmos Predict (generate new content) from Cosmos Transfer (transform an existing video).",
       "Does NOT claim it generated a video or ran any command."
+    ]
+  },
+  {
+    "id": "aug-cosmos3-wsm-upload-config-positive",
+    "question": "I have an RGB MP4 and a matching precomputed WSM MP4. I want a focused Cosmos3-Super config that uploads both to the async vLLM-Omni video API for SQA. There is no live endpoint here, so do not run inference; tell me which shipped config to use and the required data, endpoint, model-selection, and WSM parameter fields.",
+    "expected_skill": "paidf-augmentation",
+    "ground_truth": "The response selects configs/cookbook/video-data-augmentation/config_video_transfer_CT3_wsm_omni.yaml. It puts the source at data[].inputs.rgb and the WSM video at data[].inputs.controls.wsm. It configures a video_transfer endpoint whose free-form id matches augmentation.model.name, with model nvidia/Cosmos3-Super, adapter openai.video.async, and a create-route URL ending in /v1/videos. It explains that the client uploads the WSM as control_reference and sends control_type=wsm, so extra_params.wsm may contain control_weight but must not contain control or control_path. It keeps num_frames, extra_params.max_frames, and extra_params.num_video_frames_per_chunk aligned and does not claim to run inference.",
+    "expected_behavior": [
+      "Reads skills/paidf-augmentation/SKILL.md and references/config-decision-tree.md and/or references/configuration-schema.md.",
+      "Selects config_video_transfer_CT3_wsm_omni.yaml and uses data.inputs.rgb plus data.inputs.controls.wsm.",
+      "Uses a video_transfer endpoint with model nvidia/Cosmos3-Super, adapter openai.video.async, and a URL ending in /v1/videos.",
+      "Treats augmentation.model.name as a free-form endpoint-id selector that matches endpoints[].id; does not force a legacy enum value or mention executor_type.",
+      "Keeps optional WSM tuning such as extra_params.wsm.control_weight but does not place control or control_path in extra_params.wsm.",
+      "Keeps num_frames, max_frames, and num_video_frames_per_chunk aligned and does NOT claim it ran inference."
     ]
   },
   {
@@ -69,7 +83,7 @@
     "id": "aug-attribute-verification-setup-positive",
     "question": "I want to verify that my augmented outputs actually have the target attributes (e.g. weather=snowy). How do I wire up attribute verification — which config fields and endpoints do I need? No endpoints here; just the config.",
     "expected_skill": "paidf-augmentation",
-    "ground_truth": "The response explains attribute verification adds an evaluator that has the LLM generate MCQ questions from the variables and the VLM answer them against the output. It requires verification_options listing the candidate answer choices per attribute (or question_generation.generate_options: true to let the LLM invent distractors), and both an llm-role endpoint (question generation) and a vlm-role endpoint (answering). It mentions adding the attribute_verification evaluator to the evaluators list, that vlm_verification.frames controls how many video frames the VLM samples, and points to references/evaluator-setup-guide.md and config_video_transfer_CT25_nim.yaml / config_image_edit_attribute_chat_api.yaml.",
+    "ground_truth": "The response explains attribute verification adds an evaluator that has the LLM generate MCQ questions from the variables and the VLM answer them against the output. It requires verification_options listing the candidate answer choices per attribute (or question_generation.generate_options: true to let the LLM invent distractors), and both an llm-role endpoint (question generation) and a vlm-role endpoint (answering). It mentions adding the attribute_verification evaluator to the evaluators list, that vlm_verification.frames controls how many video frames the VLM samples, and points to references/evaluator-setup-guide.md and config_image_edit_attribute_chat_api.yaml.",
     "expected_behavior": [
       "Reads skills/paidf-augmentation/SKILL.md and references/evaluator-setup-guide.md.",
       "Explains that attribute verification uses the LLM to generate MCQ questions and the VLM to answer them against the output.",
@@ -106,15 +120,16 @@
   },
   {
     "id": "aug-docker-launch-recipe-positive",
-    "question": "How do I actually launch the augmentation container and run config_video_transfer_CT25_nim.yaml? Note: do NOT try to run it here. Just give me the exact docker run and uv run commands I would use.",
+    "question": "How do I actually launch the augmentation container and run config_video_transfer_CT3_omni.yaml? Note: do NOT try to run it here. Just give me the exact docker run and uv run commands I would use.",
     "expected_skill": "paidf-augmentation",
-    "ground_truth": "The response produces the launch recipe: verify that paidf-augmentation:1.1.0 resolves to the trusted expected sha256 image ID, create and use the paidf Docker bridge, then use that immutable image ID in docker run with only the required API-key names forwarded using -e VAR_NAME and the modules/, configs/, data/ volume mounts, followed by uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT25_nim.yaml inside the container. It publishes no ports because augmentation is an outbound client. For local endpoints it requires the model to run on the shared bridge and prohibits host networking. It notes the endpoint-only image is remote-API only, so no --runtime nvidia / NVIDIA_VISIBLE_DEVICES / HF_TOKEN is needed for remote inference (GPU is only needed for the data_processing.alignment post-processor). It does NOT claim the run succeeded or fabricate run output.",
+    "ground_truth": "The response produces the CT3 launch recipe: verify the checkout is clean and exactly at a release-owner-reviewed full commit, build paidf-augmentation:1.2.0, capture its sha256 image ID, create and use the paidf Docker bridge, then use that immutable image ID in docker run. It forwards only the storage credential names required by a read-only multistorage config, publishes no ports, and prohibits host networking. It requires externally readable input/output paths, notes that one data.0.inputs.rgb override updates the interpolation-backed Hallucination original_video_urls input, and requires Cosmos3-Super, Arbitrator, both checker services, and checker-side VLM/LLM reachability. The endpoint-only image needs no GPU solely for external evaluation. It includes validation-only and run commands inside the container and does NOT claim the run succeeded or fabricate output.",
     "expected_behavior": [
-      "Reads skills/paidf-augmentation/SKILL.md (Usage / Step 1: Launch the Docker Container and Step 2: Run the Pipeline (Inside the Container)).",
-      "Verifies paidf-augmentation:1.1.0 against a trusted expected sha256 image ID and uses that immutable ID in docker run with the modules/configs/data volume mounts and only required key names forwarded using -e VAR_NAME.",
-      "Uses the paidf Docker bridge, publishes no ports, and prohibits host networking.",
-      "Includes the in-container command uv run modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT25_nim.yaml.",
-      "Notes the endpoint-only image is remote-API only — no GPU runtime or HF_TOKEN needed for remote inference (GPU only for data_processing.alignment).",
+      "Reads skills/paidf-augmentation/SKILL.md (Canonical Workflow and Usage / Steps 1-2).",
+      "Verifies a clean checkout at a release-owner-reviewed full commit, builds paidf-augmentation:1.2.0, captures its sha256 image ID, and uses that immutable ID with protected, read-only storage configuration.",
+      "Uses the paidf Docker bridge for augmentation and local evaluator services, publishes no ports, and prohibits host networking.",
+      "Requires remote media, one interpolation-backed source override, Cosmos3-Super, Arbitrator, both checker services, and checker-side VLM/LLM reachability.",
+      "Includes in-container validation-only and run commands for configs/cookbook/video-data-augmentation/config_video_transfer_CT3_omni.yaml.",
+      "Notes no augmentation GPU is needed solely for external evaluation; GPU remains conditional for alignment, transcode, or built-in H.264 evaluation.",
       "Does NOT claim the docker run or uv run actually executed or succeeded, and does not fabricate inference output or timings."
     ]
   },
