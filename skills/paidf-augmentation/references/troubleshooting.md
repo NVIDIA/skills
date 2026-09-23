@@ -2,7 +2,7 @@
 
 > Configs live under `configs/cookbook/<use-case>/`. See the [cookbook index](../../../configs/cookbook/README.md) for the folder layout.
 
-Run inference and schema validation **inside the `paidf-augmentation:1.1.0` Docker container** (see SKILL.md → *Before You Start, Step 2*) for a consistent environment. All inference is remote (no local model weights), so most failures are config-resolution or endpoint/auth issues, not missing local dependencies.
+Run inference and schema validation **inside the `paidf-augmentation:1.2.0` Docker container** (see SKILL.md → *Before You Start, Step 2*) for a consistent environment. All inference is remote (no local model weights), so most failures are config-resolution or endpoint/auth issues, not missing local dependencies.
 
 ## Config Validation Errors
 
@@ -24,7 +24,7 @@ All configs are validated by the `PipelineConfig` Pydantic model. Common issues:
 |-------|-------|-----|
 | `401 Unauthorized` from an endpoint | Missing/wrong API key | Set the env var named by the endpoint's `api_key_env` (e.g. `VEO_API_KEY`) and forward only that name with `docker run -e VEO_API_KEY`. Local endpoints need no key. |
 | `404` on a chat/video route | Wrong adapter or `url` for the contract | Match the adapter to the server's route (`/v1/chat/completions` vs `/v1/images/edits` vs `/v1/videos/sync` vs NIM `/v1/infer`); a hosted async video model (Veo) needs `adapter: openai.video.async`. base_url should end at `/v1` for chat (the SDK appends `/chat/completions`). |
-| `Connection refused` | Endpoint not reachable from the container | With `--network host`, `curl <url>` from the host; for remote URLs use the default bridge network; on macOS/Windows use `host.docker.internal`. |
+| `Connection refused` | Endpoint not reachable from the container | From inside the augmentation container, `curl` the configured URL. For a local service, attach both containers to a user-defined bridge and replace host `localhost` in the endpoint URL with the service container's DNS name. For remote URLs, use the default bridge. On macOS/Windows, `host.docker.internal` can reach a host service without removing container network isolation. Do not use host networking on shared, multi-tenant, or production hosts. |
 | Request hangs for a long time | The endpoint is wedged/slow and the adapter timeout is high | Set a saner `timeout:` on the endpoint; verify the endpoint responds (`curl`). |
 | Hosted NVCF NIM returns `202` or times out at the gateway | Generation outlives the NVCF hold-open window | Use the `nim` adapter and set endpoint `timeout:` above queue plus generation latency. The adapter sends `NVCF-POLL-SECONDS` and polls `NVCF-REQID` automatically; `NVCF_POLL_SECONDS` configures each poll window (default/max 300). |
 | Verification fails repeatedly | Generated output doesn't match target attributes, or the VLM can't see a mid-video event | Increase `pipeline.retry`, adjust `augmentation.parameters.guidance`/`sigma`, or raise `vlm_verification.frames` so the VLM samples more frames |

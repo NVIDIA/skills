@@ -1,6 +1,6 @@
 # Captioning Strategy Guide
 
-> Configs live under `configs/cookbook/<use-case>/`. See the [cookbook index](../../../configs/cookbook/README.md) for the folder layout.
+> Configs live under `configs/cookbook/<use-case>/`; the folder layout is documented in `configs/cookbook/README.md`.
 
 ## Overview
 
@@ -320,7 +320,7 @@ The `vlm` captioner uses the single `vlm`-role endpoint in the `endpoints:` list
 
 ### Video Scene Augmentation (Cosmos Transfer)
 VLM+LLM captioning with weather/lighting/road variables + hallucination/attribute verification:
-→ `config_video_transfer_CT25_nim.yaml`
+→ `config_video_transfer_CT3_omni.yaml`
 
 ### Image-to-Video Event (Cosmos3 / Veo)
 VLM+LLM caption chain (Qwen3-VL describes the seed → Qwen2.5 writes the motion prompt) + attribute verification:

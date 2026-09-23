@@ -19,7 +19,7 @@ This is an image-to-image workflow. Use the `image-edit` model path only; do not
 Build the endpoint-only augmentation image from the repo root when the user asks for a fresh local image (use legacy BuildKit per the repo's build convention):
 
 ```bash
-DOCKER_BUILDKIT=0 docker build -t paidf-augmentation:1.1.0 -f docker/Dockerfile .
+DOCKER_BUILDKIT=0 docker build -t paidf-augmentation:1.2.0 -f docker/Dockerfile .
 ```
 
 Launch the container from the repo root with the dataset and output mounted to stable `/workspace/data` paths:
@@ -43,7 +43,7 @@ docker run -it --rm \
   -v "$HOST_OUT:/workspace/data/out" \
   -w /workspace \
   --entrypoint /bin/bash \
-  paidf-augmentation:1.1.0
+  paidf-augmentation:1.2.0
 ```
 
 > **Security & fallbacks.** Running as your own UID (`--user`) lets the container write `$HOST_OUT` without world-writable permissions, and the `:ro` mounts give read-only access to `modules/`/`configs/`, so no `chmod` is needed for them. The launch above uses the isolated `paidf` bridge. Attach local model containers to that bridge and address them by container name; host-network access is prohibited. If a non-default UID cannot use the image's prebuilt environment, drop `--user` and instead make `$HOST_OUT` writable by the container's non-root uid 10000 (e.g. `chown`), reserving world-writable permissions as a last resort on isolated single-user machines only. Prefer a secrets manager that injects the required environment variables; otherwise export only the required keys and forward their names with `-e VAR_NAME`. Never mount or load broad `.env`, SSH, cloud-credential, or token files.
@@ -115,7 +115,7 @@ Validate configs with `PipelineConfig` before launching a batch when the change 
 
 ## Running Image Edit
 
-Run image-edit augmentation inside `paidf-augmentation:1.1.0` (the endpoint-only image bundles the repo deps and reaches the model over a remote endpoint — no local weights). Run each generated config with `uv run modules/cli.py --config <cfg>` and log stdout/stderr per config. Do not pass API keys on the command line; export only the required keys and forward their names with Docker `-e VAR_NAME`.
+Run image-edit augmentation inside `paidf-augmentation:1.2.0` (the endpoint-only image bundles the repo deps and reaches the model over a remote endpoint — no local weights). Run each generated config with `uv run modules/cli.py --config <cfg>` and log stdout/stderr per config. Do not pass API keys on the command line; export only the required keys and forward their names with Docker `-e VAR_NAME`.
 
 Docker and UV notes:
 

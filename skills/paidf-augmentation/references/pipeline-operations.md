@@ -11,34 +11,66 @@ editing an existing config; `SKILL.md` keeps only the summary.
 ```text
 1. Load & validate config (Pydantic PipelineConfig)
 2. Initialize captioner (factory dispatch from config)
-3. Initialize evaluators (hallucination, attribute verification, vlm verification)
+3. Initialize the evaluators enabled by the config
 4. Resolve augmentation.model.name -> endpoint -> adapter -> BaseExecutor
 5. For each data sample:
    a. Run captioning -> produce prompt
    b. Run generation (with seed) via the endpoint's adapter -> produce output media
-   c. Run hallucination check (if configured)
-   d. Run attribute verification (if configured)
-      - LLM generates MCQ questions from variables
-      - VLM answers from frames sampled evenly across the output video
-   e. On failure: retry with incremented seed (up to `pipeline.retry`)
+   c. Run the configured evaluator sequence and apply its gating results
+   d. Branch on the evaluator outcome:
+      - gates passed -> accept the candidate and write outputs
+      - quality gate failed and attempts remain -> retry with incremented seed
+      - quality gate failed after `pipeline.retry + 1` total candidates -> fail
+        the evaluation and apply `strict` / `retain_failures`
+      - service/contract failure -> stop on the current candidate without
+        generating a replacement; surface the failure and apply
+        `strict` / `retain_failures`
       - If `pipeline.regenerate_caption_on_retry: true` and a captioner is
         configured, rerun captioning and overwrite output.caption before
         retrying generation
-   f. Write metadata JSON
+   e. Write metadata and the optional evaluation sidecar
 ```
 
-## Worked example: re-render a video as a rainy night
+This loop is finite: one initial candidate plus at most `pipeline.retry`
+replacement candidates; `pipeline.retry` defaults to `1`. For a replacement,
+increment the seed first, optionally regenerate the caption when configured,
+then run generation. Observe-only external checks do not affect the branch.
+For ambiguous external POST recovery, follow
+[evaluator-setup-guide.md](evaluator-setup-guide.md#gating-and-failures).
+
+Config authoring has a separate bound: validate inside the launched container,
+fix the concrete schema error, and retry at most 3 times total. If the third
+validation fails, stop before endpoint preflight or inference and report the
+remaining errors rather than repeating the edit loop.
+
+## External-evaluator example: re-render a video as a rainy night
+
+This example is specific to the CT3 Omni config that enables external Cosmos
+evaluation. Other configs use only the endpoints, media locations, and
+evaluators declared in their own YAML.
 
 1. **Model:** input is a video and the goal is a scene-attribute change → Cosmos
-   Transfer 2.5. Start from `config_video_transfer_CT25_nim.yaml`
-   (`augmentation.model.name: cosmos-transfer2.5`; role `video_transfer`, `nim` adapter).
-2. **Endpoint:** point the `video_transfer` endpoint's `url` at your CT2.5 NIM;
-   keep the `vlm`/`llm` endpoints for captioning + verification.
-3. **Inputs/outputs:** point `data.0.inputs.rgb` at the source video and set
-   `data.0.output.{video,caption,metadata}`.
-4. **Target attributes:** set `captioning.llm.variables.weather_condition: ["raining"]`
-   and `lighting_condition: ["night"]`.
-5. **Run** (inside the container): `uv run --no-sync modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT25_nim.yaml`.
+   3 Super. Start from `config_video_transfer_CT3_omni.yaml`
+   (`augmentation.model.name: cosmos3-transfer-omni`; role `video_transfer`,
+   `openai.video.sync` adapter).
+2. **Endpoints:** keep the four shared-network roles: VLM and LLM for captioning
+   and checker-side MCQs, `video_transfer` for Cosmos3-Super, and `evaluator` for
+   Arbitrator. Arbitrator's checker containers must also resolve the VLM/LLM
+   service names.
+3. **Inputs/outputs:** set one externally readable source URI at
+   `data.0.inputs.rgb`;
+   `cosmos_evaluator.inputs.original_video_urls.camera_front_wide_120fov`
+   references it automatically. The map key matches `stream_key`.
+   Set remote video/caption/metadata destinations and a unique relative
+   `output_storage_prefix`.
+4. **Target attributes:** set
+   `captioning.llm.variables.weather_condition: ["raining"]` and
+   `lighting_condition: ["night"]`; set the external normalized selections to
+   `weather: rainy` and `time_of_day: night`.
+5. **Credentials/preflight:** inject protected multistorage credentials, then
+   require Arbitrator health/discovery to report both external checks healthy
+   and scheduled.
+6. **Run** (inside the container): `uv run --no-sync modules/cli.py --config configs/cookbook/video-data-augmentation/config_video_transfer_CT3_omni.yaml`.
 
 ## Common Tasks
 
@@ -112,7 +144,8 @@ any credentials it holds out of version control.
 
 ## Security Notes
 
-This skill runs remote inference in Docker with credentials and host networking.
+This skill runs remote inference in Docker with credentials and outbound network
+access.
 Apply these practices, especially on shared or production hosts:
 
 - **Credentials via environment variables.** API keys are passed as env vars or
@@ -126,8 +159,9 @@ Apply these practices, especially on shared or production hosts:
   (`--user "$(id -u):$(id -g)"`) or matching the host directory's ownership.
   Making the directory world-writable is a last resort and must never be used on
   shared or production systems.
-- **Host networking.** Prefer Docker's default bridge network, which is sufficient
-  whenever your endpoints are remote URLs. Host networking mode removes network
-  isolation between the container and the host, so treat it as a last resort
-  reserved for the case where an endpoint genuinely listens on the host's own
-  `localhost`, and do not use it on shared or production hosts.
+- **Networking.** Prefer a user-defined bridge. Attach local service containers
+  to it and replace host `localhost` endpoint URLs with their container DNS
+  names. The default bridge is sufficient when every endpoint is remote. Never
+  use host networking on shared, multi-tenant, or production hosts. On an
+  isolated legacy host, use it only after an explicit user decision and a clear
+  warning that it removes network namespace isolation.
