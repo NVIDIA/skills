@@ -1810,9 +1810,9 @@
     {
       "name": "paidf-augmentation",
       "path": "skills/paidf-augmentation",
-      "content_digest": "sha256:6f08182ab0d6b948c0cd499812e3613ce4de1d5a7e3a40322d843dc1dca8f62e",
-      "last_commit": "e21ac3efa353355862d208d40240035c074a1302",
-      "last_modified": "2026-08-31"
+      "content_digest": "sha256:8a3e72da19f22eba091409b6f1748dbe7d2a4eb41965cd26db56fe9e71e829f8",
+      "last_commit": "bc6adc00d7c75447733d359b9d4ac75881bb9b3c",
+      "last_modified": "2026-09-22"
     },
     {
       "name": "paidf-auto-labeling",

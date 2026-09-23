@@ -3099,7 +3099,7 @@
     {
       "path": "skills/paidf-augmentation",
       "name": "paidf-augmentation",
-      "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer/Predict, image-edit, or image-to-video inference.",
+      "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer (including Cosmos3 WSM controls), Cosmos Predict, image-edit, or image-to-video inference.",
       "metadata": {
         "product.primary": "Cosmos",
         "classification.category.primary": "physical_ai",
