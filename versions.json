@@ -1808,13 +1808,6 @@
       "last_modified": "2026-08-24"
     },
     {
-      "name": "paidf-anomalygen",
-      "path": "skills/paidf-anomalygen",
-      "content_digest": "sha256:646a7187d47367802af818c0374d449eadaec8c27007c19fcdbeeecdecca25c9",
-      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
-      "last_modified": "2026-08-31"
-    },
-    {
       "name": "paidf-augmentation",
       "path": "skills/paidf-augmentation",
       "content_digest": "sha256:6f08182ab0d6b948c0cd499812e3613ce4de1d5a7e3a40322d843dc1dca8f62e",
@@ -1969,6 +1962,20 @@
       "last_modified": "2026-09-22"
     },
     {
+      "name": "tao-analyze-detection-kpi",
+      "path": "skills/tao-analyze-detection-kpi",
+      "content_digest": "sha256:0adf00c9011bbf87d8305c9269e6df538302aceeec6cddc8b49f8753726b52ed",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-analyze-gaps-od-map",
+      "path": "skills/tao-analyze-gaps-od-map",
+      "content_digest": "sha256:68b390e27514caf618792c73a34f24b16eeae8f7daf744d766b7df38c5a7ce65",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
       "name": "tao-analyze-gaps-visual-changenet",
       "path": "skills/tao-analyze-gaps-visual-changenet",
       "content_digest": "sha256:2cd0bb1456e354dfc67bcf73f36b79bdf79b6c457ebebb96a2bc39381865b08b",
@@ -1983,10 +1990,24 @@
       "last_modified": "2026-09-22"
     },
     {
+      "name": "tao-artifacts",
+      "path": "skills/tao-artifacts",
+      "content_digest": "sha256:8ff6b044e3020eb5c559bbb22859ee2fd28c3a62b41cf6065647b4b15e33c342",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
       "name": "tao-convert-dataset-format",
       "path": "skills/tao-convert-dataset-format",
       "content_digest": "sha256:0228c2d07e090e302e83906278390ed1bce64c1210a5cfd8d2b5de52db0e14fa",
       "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-data-io",
+      "path": "skills/tao-data-io",
+      "content_digest": "sha256:64cff0cd0d29b0ce54cd8ee344eb7631e9946ecda3abf3f789bfa2b7cb1c7ea3",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
       "last_modified": "2026-09-22"
     },
     {
@@ -2015,6 +2036,34 @@
       "path": "skills/tao-finetune-huggingface-model",
       "content_digest": "sha256:f8f8e5536ba3a4837b5b10a7cfaa95c5b2c74271ce980f4b55caf5a978361107",
       "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-nv-tesseract-ad-diffusion",
+      "path": "skills/tao-finetune-nv-tesseract-ad-diffusion",
+      "content_digest": "sha256:bbc8a67847b06e20763f63ba17e2610d4551b7be653c2d916f1c0cc2299c98ed",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-nv-tesseract-forecasting",
+      "path": "skills/tao-finetune-nv-tesseract-forecasting",
+      "content_digest": "sha256:1ddb0308a64e4e3d3eb3904aedf1287cb2825f7a924129dafba899b6cadffc76",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-finetune-video-clip",
+      "path": "skills/tao-finetune-video-clip",
+      "content_digest": "sha256:ee5af30995d0624c7c93027a20790275656fe974d787938d95e8cb0e74352197",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-generate-image-embeddings",
+      "path": "skills/tao-generate-image-embeddings",
+      "content_digest": "sha256:53dfd48f317a44f0c2cea9dd40da776774ac5726d762b2e2f82cf203717deb52",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
       "last_modified": "2026-09-22"
     },
     {
@@ -2060,6 +2109,20 @@
       "last_modified": "2026-09-22"
     },
     {
+      "name": "tao-mine-nearest-neighbors",
+      "path": "skills/tao-mine-nearest-neighbors",
+      "content_digest": "sha256:88028c49d3989800d009523cd264a5c7b5a2da6894966ea7013e378fa59f8db1",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-mine-od-images",
+      "path": "skills/tao-mine-od-images",
+      "content_digest": "sha256:36b02384438d3ee544bec23553679e1a6c16f587a20748acd01b44f457ca82a4",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
       "name": "tao-port-huggingface-model",
       "path": "skills/tao-port-huggingface-model",
       "content_digest": "sha256:a8a950f2eb6e4d1e92910eccf8f6baff183f9e0ab423f7e017d1f6ad87ce835f",
@@ -2095,6 +2158,27 @@
       "last_modified": "2026-09-22"
     },
     {
+      "name": "tao-run-deft-aoi-cosmos3",
+      "path": "skills/tao-run-deft-aoi-cosmos3",
+      "content_digest": "sha256:ab81b4b4215bcf91a40bc21937f883698ebbfb857a524e77e6529ffcb3ced7b4",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-cr-its-mining",
+      "path": "skills/tao-run-deft-cr-its-mining",
+      "content_digest": "sha256:3dc7cfddfdcb75fde82f3d5f49ae48a1c9fc94dd3ee1048a6a48c27a88b1c1ba",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-object-detection",
+      "path": "skills/tao-run-deft-object-detection",
+      "content_digest": "sha256:6c409089f01ac7908c99e12705eb806fa9c3855af8ab7c507e2f5bdb534ef927",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
       "name": "tao-run-inference-service",
       "path": "skills/tao-run-inference-service",
       "content_digest": "sha256:45bf9d277eb91ed9e50426a595e6fd6f133bc3986868a440256932f159807bcc",
@@ -2123,13 +2207,6 @@
       "last_modified": "2026-09-22"
     },
     {
-      "name": "tao-run-on-local-docker",
-      "path": "skills/tao-run-on-local-docker",
-      "content_digest": "sha256:a28ee7e8a52f1770d0093493c580c9366ed48720514daf8069e5fa9bdda683c3",
-      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
-      "last_modified": "2026-08-31"
-    },
-    {
       "name": "tao-run-on-slurm",
       "path": "skills/tao-run-on-slurm",
       "content_digest": "sha256:ea09d10330f7be7ef6495d2254f8418513f85ce3c91560eb6bf15044578a28e7",
@@ -2137,11 +2214,18 @@
       "last_modified": "2026-09-22"
     },
     {
-      "name": "tao-run-platform",
-      "path": "skills/tao-run-platform",
-      "content_digest": "sha256:120cf43b24072cb1dc3b4fc9c5084e82822fa6425abb113d920d8bfdc8b0d771",
-      "last_commit": "ccc489268146f6c4a56695b03a1a0d2da7c73845",
-      "last_modified": "2026-08-31"
+      "name": "tao-run-on-virtualenv",
+      "path": "skills/tao-run-on-virtualenv",
+      "content_digest": "sha256:bbcd22a5dd9d0d7b859dcbf656b03089d4ddbb90d9547da5ea83366604f31747",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-setup",
+      "path": "skills/tao-setup",
+      "content_digest": "sha256:3854983ff5091dc243d61226d47d85b561878e9e90282c3a677e6905ade785b7",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
     },
     {
       "name": "tao-setup-nvidia-gpu-host",
@@ -2172,6 +2256,13 @@
       "last_modified": "2026-09-22"
     },
     {
+      "name": "tao-train-codetr",
+      "path": "skills/tao-train-codetr",
+      "content_digest": "sha256:c22971693c2f1d9374a95f59f0e21fdac460e4053f785115ed587d8ad31b83bc",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
+      "last_modified": "2026-09-22"
+    },
+    {
       "name": "tao-train-deformable-detr",
       "path": "skills/tao-train-deformable-detr",
       "content_digest": "sha256:dba25a435f196ef96d7aa96f5200478dfb041e453a3977b090583a125460cd5b",
@@ -2190,6 +2281,13 @@
       "path": "skills/tao-train-dino",
       "content_digest": "sha256:6f549a037c2be606705520cb176f51ead94bb4a1f4c180fd6c04f386e36fa90b",
       "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-train-dinov3",
+      "path": "skills/tao-train-dinov3",
+      "content_digest": "sha256:69aa337637065506845e6d1a5962a7b70bb84eccb6d4af657ffb2b6454d03e73",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
       "last_modified": "2026-09-22"
     },
     {
@@ -2358,6 +2456,13 @@
       "path": "skills/tao-validate-dataset-format",
       "content_digest": "sha256:96b0fe6e29c366372596a72fa65bfbc56a203fb4fc1a52bcaf59da72ee5afee4",
       "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
+      "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-validate-recipe-transfer",
+      "path": "skills/tao-validate-recipe-transfer",
+      "content_digest": "sha256:95a2358064242fa93a29342823319e1bd1bb2334f65c684836a089be5df7cfd9",
+      "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
       "last_modified": "2026-09-22"
     },
     {
