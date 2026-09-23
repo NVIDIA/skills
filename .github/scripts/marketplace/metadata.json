@@ -193,6 +193,18 @@
       }
     },
     {
+      "path": "skills/bionemo-nvmolkit-usage",
+      "name": "nvmolkit-usage",
+      "description": "Use when writing or debugging nvMolKit Python code for GPU-accelerated RDKit fingerprints, similarity, conformers, clustering, and molecular searches.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "computational_biologist,application_developer,research_academic,data_scientist,developer",
+        "discovery.activity_tags": "debug,generate,optimize,integrate,troubleshoot"
+      }
+    },
+    {
       "path": "skills/bionemo-openfold2-nim",
       "name": "openfold2-nim",
       "description": "Use this skill for OpenFold2, NVIDIA's BioNeMo NIM microservice for monomer protein structure prediction. Invoke whenever the user mentions OpenFold2, AlphaFold2-like monomer folding, protein sequence-to-structure prediction, A3M MSAs, mmCIF templates, hosted NVIDIA API calls, or local Docker deployment.\n",

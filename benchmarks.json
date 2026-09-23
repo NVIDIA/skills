@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 381,
-  "result_row_count": 3530,
+  "skill_count": 382,
+  "result_row_count": 3540,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -344,6 +344,26 @@
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": 24.48
+    },
+    {
+      "skill": "nvmolkit-usage",
+      "evaluation_date": "2026-09-22",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:ce8098e0dd2fc0698933b7d4d303fe13bdd1d9be7e87d142bdfc44baae7a9f90",
+      "validation_status": null,
+      "tasks": 12,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 5.62
     },
     {
       "skill": "openfold2-nim",
@@ -8820,6 +8840,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 86.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.7,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.7,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.6,
+      "uplift_pct": 1.2
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.4,
+      "uplift_pct": 2.5
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-nvmolkit-usage",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.6,
       "uplift_pct": null
     },
     {
