@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 379,
-  "result_row_count": 3510,
+  "skill_count": 381,
+  "result_row_count": 3530,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -181,7 +181,7 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 30.63
     },
@@ -201,7 +201,7 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 29.17
     },
@@ -221,7 +221,7 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 21.43
     },
@@ -241,7 +241,7 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 29.8
     },
@@ -261,7 +261,7 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 25.2
     },
@@ -281,7 +281,7 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 34.45
     },
@@ -301,7 +301,7 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 26.6
     },
@@ -321,9 +321,49 @@
         "codex"
       ],
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 29.48
+    },
+    {
+      "skill": "msa-structure-prediction-pipeline",
+      "evaluation_date": "2026-09-19",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:69feec5f4715fb1d6f8488fa2a2b2948f573b98d6347fd0538cf9f6a9d65ac8b",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 24.48
+    },
+    {
+      "skill": "openfold2-nim",
+      "evaluation_date": "2026-09-19",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:b9e3d05d0d969ccfd88a32b5be08bf392d955c99747ffca3b9b9eb4e0e75d2e5",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 21.18
     },
     {
       "skill": "cudaq-guide",
@@ -7974,7 +8014,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -7983,7 +8023,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -7992,7 +8032,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8001,7 +8041,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8010,7 +8050,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8019,7 +8059,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8028,7 +8068,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8037,7 +8077,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8046,7 +8086,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8055,7 +8095,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -8064,7 +8104,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -8073,7 +8113,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -8082,7 +8122,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8091,7 +8131,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8100,7 +8140,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8109,7 +8149,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8118,7 +8158,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8127,7 +8167,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8136,7 +8176,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8145,7 +8185,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-continue-pretrain",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -8154,7 +8194,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -8163,7 +8203,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -8172,7 +8212,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8181,7 +8221,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8190,7 +8230,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8199,7 +8239,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8208,7 +8248,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8217,7 +8257,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8226,7 +8266,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8235,7 +8275,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-embed",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -8244,7 +8284,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -8253,7 +8293,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -8262,7 +8302,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8271,7 +8311,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8280,7 +8320,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8289,7 +8329,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8298,7 +8338,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8307,7 +8347,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8316,7 +8356,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8325,7 +8365,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-finetune",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -8334,7 +8374,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -8343,7 +8383,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -8352,7 +8392,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8361,7 +8401,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8370,7 +8410,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8379,7 +8419,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8388,7 +8428,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8397,7 +8437,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8406,7 +8446,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8415,7 +8455,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-infer",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -8424,7 +8464,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -8433,7 +8473,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -8442,7 +8482,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8451,7 +8491,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8460,7 +8500,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8469,7 +8509,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8478,7 +8518,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8487,7 +8527,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8496,7 +8536,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8505,7 +8545,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-monitor",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -8514,7 +8554,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -8523,7 +8563,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -8532,7 +8572,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8541,7 +8581,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8550,7 +8590,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8559,7 +8599,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8568,7 +8608,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8577,7 +8617,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8586,7 +8626,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8595,7 +8635,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -8604,7 +8644,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -8613,7 +8653,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -8622,7 +8662,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -8631,7 +8671,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -8640,7 +8680,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -8649,7 +8689,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -8658,7 +8698,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -8667,7 +8707,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -8676,7 +8716,7 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -8685,11 +8725,191 @@
     },
     {
       "catalog_dir": "bionemo-kermt-setup",
-      "component": "BioNeMo KERMT",
+      "component": "BioNeMo Open Models",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
       "score_pct": 82.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": -10.0
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 62.5
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": 49.3
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 26.1,
+      "uplift_pct": 14.5
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.3,
+      "uplift_pct": 18.1
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 12.1
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.7,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 73.1,
       "uplift_pct": null
     },
     {

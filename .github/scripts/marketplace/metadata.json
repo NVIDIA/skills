@@ -89,7 +89,7 @@
       "name": "kermt-add-cmim-pretrain",
       "description": "Convert a grover_base checkpoint (encoder-only or encoder + vocab heads) into a hybrid checkpoint by adding a randomly-initialized cMIM decoder + latent_dist, then continue pretraining on the user's corpus as hybrid (vocab + contrast). Effectively kermt-continue-pretrain with a one-time ckpt-conversion step prepended.",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "computational_biologist,research_academic,ml_engineer,research_non_academic,ai_engineer",
@@ -101,7 +101,7 @@
       "name": "kermt-continue-pretrain",
       "description": "Continue KERMT pretraining on a custom SMILES corpus with a grover_base, cmim, or hybrid checkpoint. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Run containerized training and write model bundles, prepared data, logs, and checkpoints to user-selected host directories.",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "computational_biologist,ml_engineer,research_academic,data_scientist,bioinformatician",
@@ -113,7 +113,7 @@
       "name": "kermt-embed",
       "description": "Extract per-molecule embeddings from any encoder-bearing KERMT checkpoint. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Run containerized embedding extraction and write model bundles, per-readout .npy embeddings, canonical SMILES, and validity arrays to user-selected host directories.",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "inference-ai",
         "audience": "computational_biologist,bioinformatician,research_academic,ml_engineer,data_scientist",
@@ -125,7 +125,7 @@
       "name": "kermt-finetune",
       "description": "Finetune a pretrained KERMT encoder on a labeled CSV. Validate the checkpoint and data, prepare features, and run containerized training. Use a local checkpoint or optionally download a pinned Hugging Face model bundle using HF_TOKEN if configured. Write model bundles, prepared data, logs, and trained models to user-selected host directories.",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "computational_biologist,ml_engineer,bioinformatician,data_scientist,research_academic",
@@ -137,7 +137,7 @@
       "name": "kermt-infer",
       "description": "Run predictions with a finetuned KERMT checkpoint on a SMILES-only CSV. The skill validates that the input ckpt has task FFN heads (refuses pretrain ckpts with a redirect to kermt-finetune), validates the CSV, prepares the data (clean + rdkit_2d features), then launches main.py predict inside the kermt container (blocking, minutes-scale).",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "inference-ai",
         "audience": "computational_biologist,research_academic,data_scientist,ml_engineer,application_developer",
@@ -149,7 +149,7 @@
       "name": "kermt-monitor",
       "description": "Check progress for a detached KERMT run (pretrain, finetune, or any kermt_run_detached invocation). Reads run.json, queries docker for container state, tails the pretrain/finetune log, and parses progress lines (epoch, step, val loss).",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,computational_biologist,bioinformatician,research_academic,devops_engineer",
@@ -161,7 +161,7 @@
       "name": "kermt-pretrain-scratch",
       "description": "Pretrain a fresh KERMT model from scratch on a user-provided corpus. Builds a new vocabulary from the corpus, instantiates the model architecture from defaults, and launches pretrain_ddp.py inside the kermt container (detached for long runs). Unlike kermt-continue-pretrain, no starting checkpoint is loaded — the model is randomly initialized.",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,computational_biologist,research_academic,data_scientist,ai_engineer",
@@ -173,11 +173,35 @@
       "name": "kermt-setup",
       "description": "Bootstrap the KERMT agent environment — verify host docker + nvidia-container-toolkit, build the kermt:latest image from the repo's Dockerfile if it doesn't yet exist, and run a GPU smoke test inside the container. Every other kermt-* skill depends on this; invoke it first.",
       "metadata": {
-        "product.primary": "BioNeMo",
+        "product.primary": "BioNeMo Open Models",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "application_developer,ml_engineer,computational_biologist,bioinformatician,devops_engineer",
         "discovery.activity_tags": "get_started,configure,validate,test,deploy"
+      }
+    },
+    {
+      "path": "skills/bionemo-msa-structure-prediction-pipeline",
+      "name": "msa-structure-prediction-pipeline",
+      "description": "NOTE: your protein sequence and the retrieved MSA alignment are transmitted to external NVIDIA-hosted APIs (health.api.nvidia.com) on every call. Use local NIM containers for confidential or proprietary sequences. Run a complete protein structure prediction pipeline using NVIDIA BioNeMo NIMs: search for MSA alignments with MSA-Search (ColabFold), then predict the structure with OpenFold3 using the retrieved alignments. Use this skill whenever the user wants to predict a protein structure with maximum accuracy using MSA context, run the full AlphaFold3-style pipeline, generate MSA-informed structure predictions, or improve structure prediction accuracy by providing evolutionary information. Triggers on: MSA structure prediction pipeline, structure prediction pipeline, MSA-informed prediction, OpenFold3, ColabFold MSA, AlphaFold3 pipeline, protein structure, homology search, a3m alignment, UniRef30, NIM microservice. This pipeline chains MSA-Search and OpenFold3.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,genomics_researcher,research_academic,application_developer",
+        "discovery.activity_tags": "inference,generate,orchestrate,integrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-openfold2-nim",
+      "name": "openfold2-nim",
+      "description": "Use this skill for OpenFold2, NVIDIA's BioNeMo NIM microservice for monomer protein structure prediction. Invoke whenever the user mentions OpenFold2, AlphaFold2-like monomer folding, protein sequence-to-structure prediction, A3M MSAs, mmCIF templates, hosted NVIDIA API calls, or local Docker deployment.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,genomics_researcher,research_academic,application_developer",
+        "discovery.activity_tags": "inference,generate,deploy,integrate,validate"
       }
     },
     {
