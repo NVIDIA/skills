@@ -26,6 +26,8 @@ skills:
     catalog_dir: nv-generate-mr-brain-finetune
   - path: skills/nv-generate-vae-finetune/
     catalog_dir: nv-generate-vae-finetune
+  - path: skills/nv-reason-ct/
+    catalog_dir: nv-reason-ct
   - path: skills/nv-reason-cxr/
     catalog_dir: nv-reason-cxr
   - path: skills/nv-segment-ct/
