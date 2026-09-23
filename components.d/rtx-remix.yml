@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: RTX Remix
+repo: NVIDIAGameWorks/toolkit-remix
+ref: main
+
+description: >-
+  Mod and remaster classic games with RTX Remix: manage projects and USD layers,
+  and replace textures and models through the Toolkit MCP server.
+skills:
+  - path: skills/rtx-remix-modding/
+    catalog_dir: rtx-remix-modding
+links:
+  contributing: docs/contributing/contributing-overview.md
+  discussions: false

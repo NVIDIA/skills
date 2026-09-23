@@ -2833,6 +2833,18 @@
       }
     },
     {
+      "path": "skills/nemotron-voice-agent-builder",
+      "name": "nemotron-voice-agent-builder",
+      "description": "Create, refine, or fix NVIDIA voice agents (Cascaded or Omni) with Pipecat or LiveKit. Use when building, scaffolding, or iterating on a real-time voice-agent pipeline, including speech (ASR/TTS) customization and cloud or local deployment. Not for offline/batch speech-to-text, text-only chat or RAG, or generic Docker or CUDA work unrelated to a voice agent.",
+      "metadata": {
+        "product.primary": "Nemotron",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "ai_engineer,application_developer,developer,ml_engineer,solutions_architect",
+        "discovery.activity_tags": "configure,deploy,troubleshoot,integrate,generate"
+      }
+    },
+    {
       "path": "skills/nv-generate-ct-rflow",
       "name": "nv-generate-ct-rflow",
       "description": "Used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct. Not for production training data without review.",
@@ -3097,21 +3109,9 @@
       }
     },
     {
-      "path": "skills/paidf-anomalygen",
-      "name": "paidf-anomalygen",
-      "description": "Full PAIDF AnomalyGen pipeline — fine-tune on a new anomaly dataset, generate synthetic anomaly images (SDG), evaluate quality (nn_score), and search per-sample (guidance, crop_ratio) parameters. Three modes: full (Phase 0→7: finetune then generate), finetune_only (Phase 0→1: train only), inference_only (Phase 0, 2→7: generate from an existing checkpoint). Use when the user asks to \"fine-tune AnomalyGen\", \"generate anomaly images\", \"run PAIDF SDG\", \"evaluate SDG output quality\", \"run per-sample search\", or run any part of the AnomalyGen pipeline, even if they only mention one phase.",
-      "metadata": {
-        "product.primary": "TAO Toolkit",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "vision-ai",
-        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
-        "discovery.activity_tags": "fine_tune,generate,evaluate,optimize,train"
-      }
-    },
-    {
       "path": "skills/paidf-augmentation",
       "name": "paidf-augmentation",
-      "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer/Predict, image-edit, or image-to-video inference.",
+      "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer (including Cosmos3 WSM controls), Cosmos Predict, image-edit, or image-to-video inference.",
       "metadata": {
         "product.primary": "Cosmos",
         "classification.category.primary": "physical_ai",
@@ -3349,6 +3349,18 @@
       }
     },
     {
+      "path": "skills/rtx-remix-modding",
+      "name": "rtx-remix-modding",
+      "description": "Mod or remaster a game with RTX Remix - open and edit projects, swap textures and models. Connect to the Remix Toolkit App via MCP. Not for non-Remix game interaction.",
+      "metadata": {
+        "product.primary": "RTX Remix",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gaming",
+        "audience": "developer,application_developer,hands_on_builder,designer",
+        "discovery.activity_tags": "transform,configure,integrate,inspect,operate"
+      }
+    },
+    {
       "path": "skills/skill-card-generator",
       "name": "skill-card-generator",
       "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",
@@ -3370,6 +3382,30 @@
         "catalog.subdomain": "vision-ai",
         "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
         "discovery.activity_tags": "troubleshoot,debug,evaluate,inspect,assess"
+      }
+    },
+    {
+      "path": "skills/tao-analyze-detection-kpi",
+      "name": "tao-analyze-detection-kpi",
+      "description": "Run TAO Data Services KPI analysis for object detection, comparing inference annotations against ground truth to compute per-class TP/FP/FN/TN, precision, recall, accuracy, and AP at a fixed IoU. Use when an object detection workflow needs per-class mAP reported after inference, or when the user asks to \"run KPI analyze\", \"compute detection mAP\", or \"score my OD predictions against ground truth\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "evaluate,measure,benchmark,validate,compare"
+      }
+    },
+    {
+      "path": "skills/tao-analyze-gaps-od-map",
+      "name": "tao-analyze-gaps-od-map",
+      "description": "Run TAO Data Services object-detection gap analysis from ground-truth and inference annotations. Use when an object detection workflow needs to identify weak images by comparing model predictions against ground truth using per-class recall, precision, and AP50 thresholds. Use when the user asks to \"analyze OD gaps\", \"find weak OD images\", or \"run mAP gap analysis\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,data_scientist,ai_engineer,developer",
+        "discovery.activity_tags": "evaluate,compare,assess,measure,validate"
       }
     },
     {
@@ -3397,6 +3433,18 @@
       }
     },
     {
+      "path": "skills/tao-artifacts",
+      "name": "tao-artifacts",
+      "description": "The contract home for TAO's SDK-free execution pipeline — authoritative JSON Schemas for the four typed artifacts (spec-bundle, job-record, results_dir layout, best_rec) plus the fixed job-status vocabulary and the nested-not-dotted spec rule. Use when authoring or validating a spec-bundle before submit, writing or reading a .tao/jobs job-record, resolving where results land, or consuming AutoML's best_rec.json. Trigger phrases include \"validate the spec bundle\", \"job record schema\", \"status vocabulary\", \"results_dir layout\", \"best_rec schema\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "validate,configure,integrate,inspect,test"
+      }
+    },
+    {
       "path": "skills/tao-convert-dataset-format",
       "name": "tao-convert-dataset-format",
       "description": "Run `tao-daft convert` to convert NVIDIA TAO DAFT datasets between supported formats. Do not use for non-DAFT data. Use when the user asks to convert a DAFT dataset, change DAFT format, change a TAO dataset format, or run `tao-daft convert`.",
@@ -3406,6 +3454,18 @@
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,ai_engineer,data_engineer,developer",
         "discovery.activity_tags": "convert,transform,configure"
+      }
+    },
+    {
+      "path": "skills/tao-data-io",
+      "name": "tao-data-io",
+      "description": "The data-mover for TAO jobs — decides the storage tier (A pre-positioned mount with zero fetch / B volume-from-S3 / C ephemeral in-compute fetch), stages inputs (bulk + annotation-selective + archive extract + HF/NGC PTM), maps credentials to env, routes outputs 3-way with upload-excludes, and runs the compute-frame verify gate. A support skill other platform skills (docker, kubernetes, slurm, brev, virtualenv) call to get data to and from the compute container without the TAO SDK. Trigger phrases include \"stage inputs\", \"mount the dataset\", \"upload TAO results\", \"download only referenced files\", \"resolve results_dir\", \"verify the container can read the data\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "ai-storage",
+        "audience": "platform_engineer,devops_engineer,ml_engineer,data_engineer,ai_engineer",
+        "discovery.activity_tags": "orchestrate,configure,integrate,deploy,validate"
       }
     },
     {
@@ -3454,6 +3514,54 @@
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,ai_engineer,developer,data_scientist",
         "discovery.activity_tags": "fine_tune,train,evaluate,inference,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-finetune-nv-tesseract-ad-diffusion",
+      "name": "tao-finetune-nv-tesseract-ad-diffusion",
+      "description": "NV-Tesseract AD Diffusion — diffusion-based anomaly detection and fine-tuning for multivariate time series. Use when the user asks to \"fine-tune NV-Tesseract\", \"run AD diffusion inference\", \"detect anomalies with diffusion\", \"time series anomaly detection\", \"finetune ad-diffusion\", \"use perform_anomaly_analysis_with_diffusion\", \"automl ad-diffusion\", \"hyperparameter search ad-diffusion\", \"hyperparameter optimization\" or mentions \"curriculum_medium.yaml\", \"final_model.pth\", \"nv-tesseract-ad-diffusion\", \"ad_diffusion\", or \"TSDiffuser_Generic\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer,developer",
+        "discovery.activity_tags": "fine_tune,inference,optimize,train,evaluate"
+      }
+    },
+    {
+      "path": "skills/tao-finetune-nv-tesseract-forecasting",
+      "name": "tao-finetune-nv-tesseract-forecasting",
+      "description": "NV-Tesseract Forecasting — transformer-based multivariate time series forecasting with DARR (context-enhanced kNN retrieval), interpretability, and fine-tuning. Use when the user asks to \"forecast with NV-Tesseract\", \"run forecasting inference\", \"use perform_forecasting\", \"DARR mode\", \"context-enhanced forecasting\", \"lag horizon attribution\", \"interpretability\", \"fine-tune forecasting\", \"fine-tune forecasting with automl\", \"hyper-parameter optimization with forecasting\", or or mentions \"nv-tesseract-forecasting\", \"moment_head_512_6hr\", or \"run8_best_model_cr\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,data_scientist,ai_engineer,developer",
+        "discovery.activity_tags": "fine_tune,inference,optimize,train,inspect"
+      }
+    },
+    {
+      "path": "skills/tao-finetune-video-clip",
+      "name": "tao-finetune-video-clip",
+      "description": "InternVideo2-CLIP L14 (TAO video_clip) for video-text retrieval, zero-shot classification, embedding extraction, LoRA fine-tuning, ONNX export, and TensorRT deployment. Use when the user asks to \"fine-tune IV2CLIP\", \"run video_clip train/evaluate/inference/export\", \"build a Video-CLIP TensorRT engine\", \"InternVideo2-CLIP on KPI chunks\", or \"TAO video_clip on vadr1_chunks JSON\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer,data_scientist",
+        "discovery.activity_tags": "fine_tune,train,evaluate,inference,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-generate-image-embeddings",
+      "name": "tao-generate-image-embeddings",
+      "description": "Run TAO Data Services image embedding to turn a parquet of image filepaths into an embedding parquet using CLIP, SigLIP, or a TAO checkpoint. Use when a workflow needs embeddings before nearest-neighbor or unique-neighbor mining, or when the user asks to \"embed images\", \"compute image embeddings\", or \"generate SigLIP embeddings\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,data_scientist,ai_engineer,data_engineer,developer",
+        "discovery.activity_tags": "generate,extract,transform,inference,operate"
       }
     },
     {
@@ -3529,6 +3637,30 @@
       }
     },
     {
+      "path": "skills/tao-mine-nearest-neighbors",
+      "name": "tao-mine-nearest-neighbors",
+      "description": "Run TAO Data Services TMM nearest-neighbor mining from embedding parquet files. Use when a workflow needs to mine source samples closest to target samples.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "ml_engineer,data_scientist,ai_engineer,data_engineer,developer",
+        "discovery.activity_tags": "select,compare,extract,transform"
+      }
+    },
+    {
+      "path": "skills/tao-mine-od-images",
+      "name": "tao-mine-od-images",
+      "description": "Run TAO Data Services TMM unique-neighbor matching mining from embedding parquet files for object detection workflows. Use when an object detection workflow needs to mine a bijectively-assigned set of unique source images closest to target samples. Use global allocation when mining without class constraints. Use class_stratified when rare classes are specified.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,data_scientist,data_engineer,ai_engineer,application_developer",
+        "discovery.activity_tags": "select,extract,configure,operate"
+      }
+    },
+    {
       "path": "skills/tao-port-huggingface-model",
       "name": "tao-port-huggingface-model",
       "description": "Integrate a HuggingFace Computer Vision model into the NVIDIA TAO Toolkit ecosystem (tao-core config, tao-pytorch trainer, tao-deploy TensorRT pipeline). Use when the user asks to \"integrate a HuggingFace model into TAO\", \"add an HF model to TAO Toolkit\", \"wire a HuggingFace ViT/DETR/ SegFormer into tao-pytorch\", \"build a TAO trainer + deploy pipeline for an HF CV model\", or pastes a HuggingFace model URL/ID and wants it turned into a TAO model. Covers the full 7-phase loop: prerequisites check, HuggingFace inspection and validation, codebase exploration, tao-core configuration and native trainer implementation, ONNX export plus TensorRT deploy integration, packaging and L0 testing, container-based end-to-end validation, and (conditional) accuracy/latency tuning. Supports classification, object detection, semantic / instance / panoptic segmentation, zero-shot detection, and depth estimation.\n",
@@ -3589,6 +3721,42 @@
       }
     },
     {
+      "path": "skills/tao-run-deft-aoi-cosmos3",
+      "name": "tao-run-deft-aoi-cosmos3",
+      "description": "Run the disk-backed DEFT AOI improvement loop for NVIDIA Cosmos Reason 3 / Cosmos3 models, using Nano by default and Edge or Super when explicitly requested: evaluate the base model on Proxy and frozen Benchmark splits, mine real image pairs from Proxy gaps, assemble a per-iteration Train JSON from selected Mining samples, train with cosmos-rl LoRA SFT, and repeat through the selected platform's submit/status/logs/cancel contract. This migration supports bare labels only: the assistant response must be exactly OK or NG. Use for \"run Cosmos3 DEFT AOI\", \"CR3 AOI loop\", or \"improve Cosmos3 PCB inspection with bare OK/NG\"; do not use for rich/reasoning annotation, one-off Cosmos training, or generic anomaly generation.\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,developer",
+        "discovery.activity_tags": "fine_tune,train,evaluate,optimize,orchestrate"
+      }
+    },
+    {
+      "path": "skills/tao-run-deft-cr-its-mining",
+      "name": "tao-run-deft-cr-its-mining",
+      "description": "Run the mining-based DEFT improvement workflow for ITS Cosmos-Reason binary video questions, focused on the non-reasoning classification/evaluation path. Use when the user asks for a DEFT CR ITS mining workflow, traffic-camera Cosmos Reason improvement loop, collision-identification workflow with data mining, or iterative Cosmos-RL refinement driven by gap analysis.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "fine_tune,evaluate,train,classify,optimize"
+      }
+    },
+    {
+      "path": "skills/tao-run-deft-object-detection",
+      "name": "tao-run-deft-object-detection",
+      "description": "Run the full DEFT smart-data-augmentation loop for NVIDIA TAO Grounding DINO object detection: zero-shot baseline inference, KPI analysis, per-class gap analysis, SigLIP embedding of weak images, unique-neighbor mining against a source pool, ODVG dataset staging, and retraining — repeated for a fixed number of iterations. Also prepares the source pool the loop mines from, as a separate run: Co-DETR pseudo-labeling, folding to the target classes, KITTI→COCO→ODVG conversion, and embedding. Use for prompts like \"run the DEFT OD loop\", \"run smart data augmentation for grounding dino\", \"mine and retrain my detection model\", \"improve OD mAP with gap analysis and mining\", \"prep the source pool\", or \"pseudo-label my unlabeled images for mining\"; do not use for standalone TAO training, one-off inference, or gap analysis alone.\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "train,fine_tune,optimize,evaluate,inference"
+      }
+    },
+    {
       "path": "skills/tao-run-inference-service",
       "name": "tao-run-inference-service",
       "description": "Start, query, and stop a network-specific TAO inference microservice ({network_arch}-inference-microservice) by delegating container execution to the appropriate platform skill. Handles container image resolution, job-payload JSON construction, and the service registry. Use when the user wants to run inference on a TAO model checkpoint using a microservice container, deploy a TAO inference endpoint, or stop a running inference container.\n",
@@ -3637,18 +3805,6 @@
       }
     },
     {
-      "path": "skills/tao-run-on-local-docker",
-      "name": "tao-run-on-local-docker",
-      "description": "Local or remote Docker execution for TAO SDK job containers using a Docker daemon with NVIDIA GPU runtime. Use when running TAO jobs on the current machine, a directly attached Docker host, or a remote GPU box exposed through DOCKER_HOST. Trigger phrases include \"run locally\", \"local Docker\", \"remote Docker\", \"use my GPU\", \"run on my machine\", \"host Docker daemon\".",
-      "metadata": {
-        "product.primary": "TAO Toolkit",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "training-ai",
-        "audience": "ml_engineer,ai_engineer,developer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "operate,configure,deploy,train,inference"
-      }
-    },
-    {
       "path": "skills/tao-run-on-slurm",
       "name": "tao-run-on-slurm",
       "description": "Remote SLURM GPU cluster execution over SSH with sbatch/srun, Pyxis/Enroot containers, and Lustre-backed results. Use when running TAO training/eval/inference jobs on an on-prem or DGX SLURM cluster. Trigger phrases include \"run on SLURM\", \"submit sbatch\", \"DGX SLURM cluster\", \"Pyxis/Enroot container\", \"Lustre dataset\".",
@@ -3661,15 +3817,27 @@
       }
     },
     {
-      "path": "skills/tao-run-platform",
-      "name": "tao-run-platform",
-      "description": "TAO Execution SDK for submitting and monitoring GPU training jobs on supported platforms (Brev, SLURM, local Docker, Kubernetes). Use when the user wants to run TAO jobs through the SDK, get job tracking, S3 I/O wrapping, multi-node distributed training, or platform-specific features that docker-run can't provide. Trigger phrases include \"use the TAO SDK\", \"call tao_sdk\", \"AutoMLRunner\", \"ActionWorkflow\", \"Job handles\", \"S3 I/O wrapping\", \"TAO platform run\".",
+      "path": "skills/tao-run-on-virtualenv",
+      "name": "tao-run-on-virtualenv",
+      "description": "Run a Python training/eval script directly in an existing local virtualenv — no docker, no container. Implements the four-verb consumer contract (submit/status/logs/cancel) over a vendored process-lifecycle runner with durable on-disk state, PID-reuse-safe identity, and process-group cleanup. Use for docker-free local execution, plain-Python model scripts, fast HPO/AutoML trial smokes, or hosts where containers are unavailable. Trigger phrases include \"run in my venv\", \"no docker\", \"virtualenv execution\", \"local python training\", \"run this training script directly\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "train,evaluate,operate,configure,test"
+      }
+    },
+    {
+      "path": "skills/tao-setup",
+      "name": "tao-setup",
+      "description": "One-time session setup and orchestration map for the TAO skill bank. Run this first when the TAO skills were installed individually (e.g. from a public skills catalog) so the session gets the cross-skill discovery flow, credential checks, and host preflight that the bundled plugin hook would otherwise inject automatically. Trigger phrases include \"set up TAO skills\", \"TAO session setup\", \"prepare TAO environment\", \"TAO getting started\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
-        "audience": "ml_engineer,ai_engineer,platform_engineer,devops_engineer,developer",
-        "discovery.activity_tags": "orchestrate,train,monitor,deploy,scale"
+        "audience": "ml_engineer,ai_engineer,developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,orchestrate,validate,integrate"
       }
     },
     {
@@ -3721,6 +3889,18 @@
       }
     },
     {
+      "path": "skills/tao-train-codetr",
+      "name": "tao-train-codetr",
+      "description": "Co-DETR (CoDINO) for object detection. A DETR-family detector with collaborative hybrid assignment — auxiliary one-to-many heads supervise the encoder during training, giving strong closed-set accuracy at high inference cost. Use when training, evaluating, or running inference for a TAO Co-DETR model. Trigger phrases include \"train Co-DETR\", \"run CoDINO\", \"codetr inference\", \"collaborative DETR\", \"autolabel detections with Co-DETR\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "train,inference,evaluate,configure"
+      }
+    },
+    {
       "path": "skills/tao-train-deformable-detr",
       "name": "tao-train-deformable-detr",
       "description": "Deformable DETR for 2D object detection. Uses deformable attention for efficient multi-scale feature processing, lighter than DINO with competitive accuracy. Use when training, evaluating, exporting, quantizing, or running inference for a TAO Deformable-DETR model. Trigger phrases include \"train deformable-detr\", \"Deformable DETR object detection\", \"lightweight DETR detector\".",
@@ -3754,6 +3934,18 @@
         "catalog.subdomain": "vision-ai",
         "audience": "ml_engineer,ai_engineer,application_developer,developer,data_scientist",
         "discovery.activity_tags": "train,evaluate,inference,optimize,deploy"
+      }
+    },
+    {
+      "path": "skills/tao-train-dinov3",
+      "name": "tao-train-dinov3",
+      "description": "DINOv3 continual self-supervised pre-training. Domain-adapts public DINOv3 ViT backbones on unlabeled images via teacher-student self-distillation (DINO + iBOT + KoLeo, optional Gram anchoring) and converts the EMA teacher into a timm-format backbone for downstream tasks. Trigger phrases include \"train DINOv3\", \"DINOv3 SSL\", \"domain-adapt a foundation backbone\", \"continual pretraining\", \"self-supervised finetune DINOv3\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "train,fine_tune,configure,convert"
       }
     },
     {
@@ -4042,6 +4234,18 @@
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,ai_engineer,data_scientist,developer,data_engineer",
         "discovery.activity_tags": "validate,inspect,troubleshoot,test"
+      }
+    },
+    {
+      "path": "skills/tao-validate-recipe-transfer",
+      "name": "tao-validate-recipe-transfer",
+      "description": "Port a published computer vision paper's official code and training recipe onto a customer's own dataset, or diagnose why such a transfer produced bad numbers. Use this whenever someone wants to reproduce a CV paper, run a paper's repo on their own images, fine-tune a published detection/segmentation/classification/keypoint model on customer data, adapt a training recipe to a new dataset, or figure out why a fine-tuned vision model scores well on validation but fails in production. Also use for post-mortems on any failed or disappointing CV training run, and whenever a user mentions mAP that looks too good, a model that \"worked in training but not in deployment\", or transferring hyperparameters from a paper to their own data. Trigger even if the user only says \"train a model on my dataset\" and a published architecture or repo is involved.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,developer,data_scientist,research_academic",
+        "discovery.activity_tags": "validate,fine_tune,train,troubleshoot,evaluate"
       }
     },
     {
