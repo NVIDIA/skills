@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: BioNeMo NIMs
+repo: NVIDIA-BioNeMo/bionemo-agent-toolkit
+ref: main
+description: >-
+  OpenFold2 predicts single-chain protein structures.
+  The MSA pipeline uses MSA-Search alignments to guide OpenFold3 structure prediction.
+links:
+  contributing: CONTRIBUTING.md
+  discussions: false
+  security: true
+skills:
+  - path: skills/bionemo-agent-toolkit/skills/msa-structure-prediction-pipeline/
+    catalog_dir: bionemo-msa-structure-prediction-pipeline
+  - path: skills/bionemo-agent-toolkit/skills/openfold2-nim/
+    catalog_dir: bionemo-openfold2-nim
