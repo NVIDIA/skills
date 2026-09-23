@@ -1,0 +1,35 @@
+{
+  "skill_name": "nvmolkit-usage",
+  "trigger_evals": [
+    {
+      "id": "nvmolkit-usage-trigger-001",
+      "prompt": "Can you port my RDKit Morgan fingerprint and Tanimoto screen to run on GPUs with nvMolKit?",
+      "expected": "trigger"
+    },
+    {
+      "id": "nvmolkit-usage-trigger-002",
+      "prompt": "Why is my nvmolkit GetFingerprints loop slower than RDKit on 100 molecules?",
+      "expected": "trigger"
+    },
+    {
+      "id": "nvmolkit-usage-trigger-003",
+      "prompt": "How do I install nvMolKit in a fresh uv environment and verify CUDA works?",
+      "expected": "trigger"
+    },
+    {
+      "id": "nvmolkit-usage-trigger-004",
+      "prompt": "Use nvMolKit to find maximum common substructures for a batch of explicit molecule pairs.",
+      "expected": "trigger"
+    },
+    {
+      "id": "nvmolkit-usage-trigger-005",
+      "prompt": "Write a pandas data cleaning script for a CSV of customers.",
+      "expected": "no_trigger"
+    },
+    {
+      "id": "nvmolkit-usage-trigger-006",
+      "prompt": "Use RDKit to calculate one descriptor for a single molecule; I do not have a GPU.",
+      "expected": "no_trigger"
+    }
+  ]
+}
