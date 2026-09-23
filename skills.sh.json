@@ -480,6 +480,13 @@
       "skills": [
         "doca-argus"
       ]
+    },
+    {
+      "title": "Gaming",
+      "description": "Build, optimize, and test game development workflows, game technologies, rendering pipelines, and player-facing interactive experiences.",
+      "skills": [
+        "rtx-remix-modding"
+      ]
     }
   ]
 }

@@ -1948,6 +1948,13 @@
       "last_modified": "2026-08-12"
     },
     {
+      "name": "rtx-remix-modding",
+      "path": "skills/rtx-remix-modding",
+      "content_digest": "sha256:8e8edfeda9cf72834ad05ad77139fff873f967ae7bb148bbdfd60211517c460f",
+      "last_commit": "00b4ec809609c81d5991210b8e2b53c10c1b1a78",
+      "last_modified": "2026-09-23"
+    },
+    {
       "name": "skill-card-generator",
       "path": "skills/skill-card-generator",
       "content_digest": "sha256:975d38ea360319d933276ad84e66e898b47472e16e70e9643741866e2a8e5860",

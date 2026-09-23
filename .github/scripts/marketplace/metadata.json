@@ -3337,6 +3337,18 @@
       }
     },
     {
+      "path": "skills/rtx-remix-modding",
+      "name": "rtx-remix-modding",
+      "description": "Mod or remaster a game with RTX Remix - open and edit projects, swap textures and models. Connect to the Remix Toolkit App via MCP. Not for non-Remix game interaction.",
+      "metadata": {
+        "product.primary": "RTX Remix",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gaming",
+        "audience": "developer,application_developer,hands_on_builder,designer",
+        "discovery.activity_tags": "transform,configure,integrate,inspect,operate"
+      }
+    },
+    {
       "path": "skills/skill-card-generator",
       "name": "skill-card-generator",
       "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",
