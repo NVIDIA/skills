@@ -361,6 +361,7 @@
         "jetson-video-pipeline",
         "jetson-video-recipe",
         "jetson-video-setup",
+        "nvmolkit-usage",
         "tao-run-on-docker",
         "tilegym-adding-cutile-kernel",
         "tilegym-converting-cutile-to-julia",
