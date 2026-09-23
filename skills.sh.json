@@ -211,7 +211,8 @@
         "digital-health-clinical-asr-finetune",
         "digital-health-clinical-asr-setup",
         "nemotron-asr-finetune",
-        "nemotron-speech"
+        "nemotron-speech",
+        "nemotron-voice-agent-builder"
       ]
     },
     {

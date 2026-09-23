@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 378,
-  "result_row_count": 3505,
+  "skill_count": 379,
+  "result_row_count": 3510,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4542,6 +4542,26 @@
       "component": "Nemotron Speech",
       "has_results": true,
       "average_uplift_pct": 18.87
+    },
+    {
+      "skill": "nemotron-voice-agent-builder",
+      "evaluation_date": "2026-09-23",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:820305d412563ab26a2312566e2cd07ced079c651a147528990951cee89bcebc",
+      "validation_status": null,
+      "tasks": 5,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "has_results": true,
+      "average_uplift_pct": 47.73
     },
     {
       "skill": "nv-generate-ct-rflow",
@@ -26940,6 +26960,51 @@
       "num": null,
       "agent": "codex",
       "score_pct": 58.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": 43.6
+    },
+    {
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 45.4
+    },
+    {
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.5,
+      "uplift_pct": 54.2
+    },
+    {
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.9,
       "uplift_pct": null
     },
     {

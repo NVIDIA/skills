@@ -2833,6 +2833,18 @@
       }
     },
     {
+      "path": "skills/nemotron-voice-agent-builder",
+      "name": "nemotron-voice-agent-builder",
+      "description": "Create, refine, or fix NVIDIA voice agents (Cascaded or Omni) with Pipecat or LiveKit. Use when building, scaffolding, or iterating on a real-time voice-agent pipeline, including speech (ASR/TTS) customization and cloud or local deployment. Not for offline/batch speech-to-text, text-only chat or RAG, or generic Docker or CUDA work unrelated to a voice agent.",
+      "metadata": {
+        "product.primary": "Nemotron",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "ai_engineer,application_developer,developer,ml_engineer,solutions_architect",
+        "discovery.activity_tags": "configure,deploy,troubleshoot,integrate,generate"
+      }
+    },
+    {
       "path": "skills/nv-generate-ct-rflow",
       "name": "nv-generate-ct-rflow",
       "description": "Used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct. Not for production training data without review.",
