@@ -1,244 +1,170 @@
-# Setup and readiness workflow
+# Setup workflow
 
-## Contents
+Use these checks directly on the Jetson. Adapt paths to the installed release,
+show mutations before running them, and retain the command output needed to
+explain the result.
 
-- [Select scope](#select-scope)
-- [Classify intent](#classify-intent)
-- [Probe](#1-probe)
-- [Plan and validate](#2-plan-and-validate)
-- [Execute the reviewed plan](#3-execute-the-reviewed-plan)
-- [Verify native](#4-verify-native)
-- [Verify PyNvVideoCodec](#5-verify-pynvvideocodec)
-- [Report](#6-report)
+## 1. Confirm the target
 
-Use this workflow on the Jetson target. The skill does not open SSH sessions,
-copy itself, or treat a GPU-name inference as live evidence.
-
-## Select scope
-
-Before target inspection or the first probe, resolve the requested surface.
-Named native and Python products select only their own surface. A bare “video
-SDK” setup, install, operation, readiness, or report-only request is ambiguous:
-ask whether the user wants native Video Codec SDK, PyNvVideoCodec, or both,
-then stop before probing or acting. “Video Codec SDK” is the native product
-name, not the bare ambiguous phrase. Report-only intent alone does not select a
-surface or authorize broadening to both.
-
-Map the choice to commands as follows:
-
-| User scope | Probe runtime | Plan component |
-|---|---|---|
-| Native Video Codec SDK | `native` | `native-sdk` |
-| PyNvVideoCodec/PySDK/Python | `pynvc` | `pynvc` |
-| Explicitly both | `both` | Repeat both component flags |
-
-Use `--runtime both` only when the request explicitly selects both surfaces,
-or when a consumer's `auto` gate invokes this read-only probe solely to
-authenticate both candidates. That internal candidate probe does not authorize
-installing, verifying, executing, or reporting both surfaces.
-
-Evaluate the two surfaces independently. Native Video Codec SDK 13.0.x and
-PyNvVideoCodec 2.1.0 are separate products; PyNvVideoCodec does not require the
-native developer package.
-
-## Classify intent
-
-- **Report-only/readiness audit:** after the surface is selected, run only its
-  read-only probe and reauthentication. Do not build, install, create a venv,
-  or launch codec operations. A bare “video SDK” request remains ambiguous:
-  ask which surface to inspect and stop before probing.
-- **Verify usability:** run the applicable non-installing official-sample
-  verifier only when the user authorizes its build/work/output writes.
-- **Plan-only:** emit and validate a plan, then stop. The plan marks protected
-  commands as requiring confirmation and cannot authorize a transaction.
-- **Setup/install:** use `--request-intent setup-install`. The explicit request
-  authorizes only the unchanged batches in the reviewed plan.
-- **Fresh setup:** additionally use `--fresh-setup`. For Python, require an
-  explicit unique, absent `--venv` at an absolute durable path such as
-  `/home/ubuntu/.venvs/nvcodec-fresh`, never in the working directory or a
-  transient run/evidence tree; the registry outlives that directory. Write the
-  `--output` reports somewhere equally durable. Preserve working base packages.
-
-## 1. Probe
-
-Run the selected live probe into a fresh, persistent attempt directory:
+Read the target identity before claiming readiness:
 
 ```bash
-python3 -I scripts/setup/probe_nvcodec.py \
-  --runtime native \
-  --gpu 0 \
-  --output nvcodec-environment-before.json
+test -r /etc/nv_tegra_release
+sed -n '1p' /etc/nv_tegra_release
+sed -n '1,12p' /etc/os-release
 ```
 
-Use `pynvc` or `both` for the corresponding explicitly selected scope. The
-probe reads local target, APT, CUDA, Python, package, tool, and import state.
-It does not refresh APT, contact a package index, install, build, or launch a
-codec. It returns an inventory even when a requested surface is not installed.
+Record the requested GPU ordinal. If these checks are not running on a Jetson,
+provide instructions only.
 
-Reauthenticate a saved environment with the same public CLI:
+## 2. Inspect the selected product
+
+### Native Video Codec SDK
+
+Use package-manager ownership as the source of truth:
 
 ```bash
-python3 -I scripts/setup/probe_nvcodec.py \
-  --reauthenticate nvcodec-environment-before.json
+/usr/bin/dpkg-query -W -f='${Status}\t${Version}\n' nvidia-video-codec-sdk
+/usr/bin/dpkg-query -L nvidia-video-codec-sdk
+/usr/bin/dpkg --verify nvidia-video-codec-sdk
+command -v cmake
+command -v g++
+command -v pkg-config
+command -v ninja
+command -v make
+command -v nvcc
+ls -1 /usr/local/cuda*/bin/nvcc 2>/dev/null
 ```
 
-This emits `nvcodec-environment-validation`. Do not use a separate validator.
-A valid result proves the recorded structure and file identities still match;
-it does not prove an encode or decode operation.
-
-### Exact PyNvVideoCodec interpreter
-
-The normal `pynvc` probe resolves the fixed registry at
-`$HOME/.local/state/jetson-videosdk/current-pynvc.json` and delegates only to
-its authenticated lexical interpreter. It never scans common venv locations
-or falls back to system Python.
-
-If the registry is absent or stale and the user says PyNvVideoCodec already
-exists, require the exact interpreter or venv path. Probe that lexical
-interpreter explicitly as the setup candidate:
+Require one installed package, a silent successful `dpkg --verify`, and exactly
+one complete package-owned Samples root. The SDK 13 package uses a versioned
+root such as `/opt/nvidia/video-codec-sdk/13.0.37/Samples`; derive the actual
+path from `dpkg-query -L`. Select the active `nvcc` from `PATH` or a single
+versioned `/usr/local/cuda-*/bin/nvcc`, then derive `CUDA_ROOT` from its parent.
+Check the AppDec build dependencies directly:
 
 ```bash
-<exact-venv-python> -I scripts/setup/probe_nvcodec.py \
-  --runtime pynvc \
-  --gpu 0 \
-  --setup-candidate \
-  --output nvcodec-environment-candidate.json
+pkg-config --exists libavcodec libavformat libavutil libswresample
 ```
 
-Then run `--reauthenticate` through that same interpreter. Reuse it if valid.
-If no path is supplied, ask for one; do not scan, guess, or immediately create
-a replacement. Use `--setup-candidate` only for this exact supplied
-interpreter or the interpreter created by an authorized setup plan.
+Missing tools or dependencies mean `installed`, not `ready`. Do not search for
+an unpacked SDK or use an unowned sample tree as a replacement.
 
-## 2. Plan and validate
+### PyNvVideoCodec
 
-Generate a plan for only the selected component:
+Set `PYTHON` to the exact interpreter selected by the precedence in `SKILL.md`.
+Run:
 
 ```bash
-python3 -I scripts/setup/plan_install.py \
-  nvcodec-environment-before.json \
-  --component native-sdk \
-  --request-intent setup-install \
-  --output nvcodec-install-plan.json
-
-python3 -I scripts/setup/plan_install.py \
-  validate nvcodec-install-plan.json
+"$PYTHON" -I -c 'import importlib.metadata as m; d=m.distribution("PyNvVideoCodec"); print(d.version); print(d.locate_file(""))'
+"$PYTHON" -I -c 'import PyNvVideoCodec as n; print(n.__file__)'
+"$PYTHON" -I -m pip check
+"$PYTHON" -I -m pip show -f PyNvVideoCodec
 ```
 
-For PyNvVideoCodec, use `--component pynvc`. For explicit `both`, repeat
-`--component` in native-then-Python order. Use `--request-intent plan-only`
-when no mutation is authorized.
+Require a successful import from that venv, one installed distribution, and a
+clean `pip check`. The sample paths used below must appear in the installed
+distribution's file list and stay under its package root. Do not set
+`PYTHONPATH`, use system-site packages, or switch interpreters after inspection.
 
-The `validate` action checks the plan kind/schema, digest, component states,
-and authorization fields without mutation. Before an APT transaction,
-`plan_install.py` additionally reloads the reviewed sibling
-`nvcodec-install-plan.json`, reauthenticates its bound inputs, regenerates the
-canonical plan, and requires the same digest. Never execute serialized or
-hand-edited caller argv.
+For read-only consumer preflight, these direct checks are sufficient. Return
+the package/Samples root or exact interpreter, package version, and loaded
+module path. The consuming operation provides its own runtime proof.
 
-If an authorized metadata refresh is required, execute only the plan's emitted
-`plan_install.py refresh` command. Discard the old plan, create a fresh probe,
-and regenerate it with the exact successful refresh receipt. A refresh can
-change all APT candidates, so re-plan every selected package surface.
+## 3. Verify the native product
 
-## 3. Execute the reviewed plan
-
-Read [setup-install.md](setup-install.md), inspect every exact argv, and execute
-the plan's batches sequentially. The public owners are:
-
-- `plan_install.py refresh|preview|apply` for APT transactions;
-- `lock_pip_reports.py create-venv|materialize-apply` for the isolated Python
-  environment and locked pip application;
-- `verify_pynvc_sample.py --register-current` for the operation proof and
-  registry publication.
-
-Do not reconstruct commands from prose. Preserve the reviewed plan's working
-directory and artifact names. Stop on command, candidate, origin, dependency,
-hash, setup-mode, or scope drift.
-
-APT packages are eligible only from an already configured, normally
-signature-verified source at
-`https://repo.download.nvidia.com/jetson/common` or `/som`, exact
-`rNN.N/main`, with no trust bypass. Never add, replace, or repair a repository
-or signing key.
-
-A blocked component carries no executable command. Continue a separately
-actionable selected peer unless a shared APT refresh invalidates both plans.
-
-## 4. Verify native
-
-After native installation or validated reuse, create a fresh native-only
-environment and reauthenticate it, then run:
+Create a new user-owned build directory outside the package tree. Resolve each
+tool with `command -v`; use `Ninja` when available and otherwise use the
+matching installed CMake generator. Configure and build only the two official
+samples:
 
 ```bash
-python3 -I scripts/setup/verify_native.py \
-  --environment nvcodec-environment-after-native.json \
-  --sdk-root /opt/nvidia/video-codec-sdk \
-  --build-dir ./nvcodec-native-build \
-  --work-dir ./nvcodec-native-smoke \
-  --build --run-encode --run-decode \
-  --gpu 0 \
-  --output nvcodec-native-verification.json
+"$CMAKE" -S "$SDK_ROOT/Samples" -B "$BUILD_ROOT" \
+  -G "$GENERATOR_NAME" \
+  "-DCMAKE_MAKE_PROGRAM=$GENERATOR" \
+  -DCMAKE_BUILD_TYPE=Release \
+  "-DCMAKE_CXX_COMPILER=$CXX" \
+  "-DCUDAToolkit_ROOT=$CUDA_ROOT" \
+  "-DCUDAToolkit_NVCC_EXECUTABLE=$NVCC" \
+  "-DCMAKE_CUDA_COMPILER=$NVCC" \
+  "-DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG"
+"$CMAKE" --build "$BUILD_ROOT" --target AppEncCuda --parallel 2
+"$CMAKE" --build "$BUILD_ROOT" --target AppDec --parallel 2
 ```
 
-The verifier reauthenticates package ownership, `dpkg --verify`, required
-tools, AppDec prerequisites, and real CUDA/NVENC/NVDEC linkage. It builds only
-package-owned `AppEncCuda` and `AppDec`. It launches `AppDec` only after the
-current `AppEncCuda` run proves exactly one encoded frame, its exact output
-marker, and a fresh nonempty H.264 bitstream.
+The expected binaries are:
 
-Native readiness requires one decoded frame and an exact 345,600-byte
-640×360 NV12 output. H.264 is lossy, so source and decoded pixel hashes need
-not match.
+- `$BUILD_ROOT/AppEncode/AppEncCuda/AppEncCuda`
+- `$BUILD_ROOT/AppDecode/AppDec/AppDec`
 
-## 5. Verify PyNvVideoCodec
+Use `ldd` to require real `libcuda.so.1` and `libnvidia-encode.so.1` for the
+encoder, and real `libcuda.so.1` and `libnvcuvid.so.1` for the decoder. Reject
+missing libraries and CUDA stub paths.
 
-For a new environment, execute the plan's exact clean-venv, resolver, and
-locked-apply commands. For a valid existing environment, skip all installation
-steps and verify only.
-
-Run the final probe and verifier through the exact selected lexical
-interpreter:
+Create a fresh 345,600-byte NV12 fixture in a new output directory, then run:
 
 ```bash
-<exact-venv-python> -I scripts/setup/probe_nvcodec.py \
-  --runtime pynvc --gpu 0 --setup-candidate \
-  --output nvcodec-environment-after-python.json
-
-<exact-venv-python> -I scripts/setup/verify_pynvc_sample.py \
-  --environment nvcodec-environment-after-python.json \
-  --work-dir ./nvcodec-pynvc-smoke \
-  --gpu 0 \
-  --register-current \
-  --output nvcodec-pynvc-verification.json
+dd if=/dev/zero of="$RAW" bs=345600 count=1 status=none
+"$APPENC" -i "$RAW" -s 640x360 -if nv12 -gpu 0 -codec h264 -o "$BITSTREAM"
+"$APPDEC" -i "$BITSTREAM" -o "$DECODED" -gpu 0
 ```
 
-The verifier authenticates the imported module, loaded extension, and every
-executed official sample/helper/config file against the installed wheel. It
-runs wheel-owned encode before independent decode. Readiness always requires the
-exact one-frame encode marker and a fresh nonempty H.264 bitstream. Under
-`--profile full-samples` it also requires `advanced/decode.py`'s exact
-345,600-byte decoded NV12 output; under the default `pynvc-smoke` it requires
-`advanced/decode_perf.py`'s two anchored markers, each exactly once, with no
-worker error, warning, or traceback, and produces no decoded output file.
+Accept native readiness only when all of these hold:
 
-`verify_pynvc_sample.py --register-current` is the only publisher. It first
-writes the complete verification result, then publishes the registry only
-when that result has `ready=true` and `status=operation_verified`. A failed
-proof or publication preserves the previous registry.
+- the raw input is exactly 345,600 bytes;
+- the encoder exits zero and prints exactly one `Total frames encoded: 1`;
+- the bitstream is newly created, regular, and nonempty;
+- the decoder consumes that same path, exits zero, and prints exactly one
+  `Total frame decoded: 1`;
+- the decoded NV12 output is newly created and exactly 345,600 bytes; and
+- neither command reports an explicit CUDA, NVENC, NVDEC, fatal, or failure
+  message.
 
-## 6. Report
+## 4. Verify PyNvVideoCodec
 
-Report:
+Use only wheel-owned files listed by
+`"$PYTHON" -I -m pip show -f PyNvVideoCodec`. Locate these members under the
+installed distribution root:
 
-- target and Jetson Linux release;
-- selected surface(s);
-- installed/candidate native package and PyNvVideoCodec versions;
-- exact Python interpreter for the Python surface;
-- independent native and Python inventory and operation verdicts;
-- every blocker without suppressing an actionable peer;
-- paths, sizes, and SHA-256 values for retained artifacts.
+- `samples/basic/encode.py`
+- `samples/advanced/decode_perf.py`
+- `samples/advanced/decode.py` for `full-samples`
+- the wheel's `encode_config.json`
 
-Use `operation_verified` only for a completed official encode→decode proof.
-Do not derive codec support from setup inventory. Route capability questions
-to `jetson-video-capability`.
+Create the same fresh one-frame NV12 input and run the wheel-owned encoder:
+
+```bash
+"$PYTHON" -I "$BASIC_ENCODE" \
+  -i "$RAW" -o "$BITSTREAM" -s 640x360 \
+  -m cpu -if NV12 -f 1 -g 0 -c h264 -json "$CONFIG"
+```
+
+For the default smoke profile, independently consume it with:
+
+```bash
+"$PYTHON" -I "$DECODE_PERF" \
+  -i "$BITSTREAM" -d 1 -f 1 -n 1 -m thread -g 0
+```
+
+For a separately provisioned `full-samples` environment, use:
+
+```bash
+"$PYTHON" -I "$ADVANCED_DECODE" \
+  -i "$BITSTREAM" -o "$DECODED" -d 1 -g 0 -f 1
+```
+
+Require one `Completed encoding 1 frames using CPU buffers` marker and a fresh
+nonempty bitstream. The smoke decoder must print exactly one
+`Successfully decoded requested 1 frames` and one `Total frames decoded: 1` as
+literal substring occurrences. The threaded sample prefixes the first marker
+with its worker name, so do not require that marker to occupy the whole line.
+Require no smoke-decoder worker warning, error, or traceback. The full decoder
+must report one requested decoded frame and produce exactly 345,600 bytes. Exit
+zero alone is not sufficient because a worker failure may otherwise be hidden.
+
+## 5. Report
+
+Return the concise result defined in
+[setup-output-contract.md](setup-output-contract.md). Include actual commands
+and logs only to the extent needed to reproduce or diagnose the setup. Create
+a checksum package when the user requests one.

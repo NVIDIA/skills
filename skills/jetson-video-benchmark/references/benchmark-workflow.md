@@ -1,155 +1,208 @@
 # Benchmark workflow
 
-Run compact, authenticated Video Codec SDK performance measurements on
-user-supplied representative content. This workflow owns live FPS, multi-stream
-concurrency, and P4/P5 comparisons. It also owns a separate
-documentation-derived planning answer when content is unavailable. It never
-substitutes an external codec, and it does not provide PSNR/SSIM quality
-measurement. For a quality-only request, apply the terminal scope rule in
-`SKILL.md` and stop.
+Live measurements invoke authenticated released samples directly. The
+documentation-only estimate remains a separate calculation path in
+[documented-performance-estimates.md](documented-performance-estimates.md).
 
-## Two answer paths
+## Live preflight
 
-- **Live measurement:** requires one exact user-selected path or URL, no
-  catalog or synthetic substitution, and preserved provenance and identity.
-  When setup is installed, apply its shared
-  [video content policy](../../jetson-video-setup/references/video-content.md).
-  The setup skill is not otherwise required for this media rule. An explicit
-  run, measure, or real-benchmark request remains media-gated.
-- **Documented estimate:** applies only to a no-media planning, expected,
-  indicative, achievable-FPS, or theoretical codec-stream-capacity question at
-  any positive resolution. Follow
-  [documented-performance-estimates.md](documented-performance-estimates.md).
-  Non-1080p results add a disclosed pixel-area heuristic to the documented row
-  and clock scaling. This is a calculation-only answer path, not a controller
-  route or benchmark result.
+1. Canonicalize the input and preserve URL or `null`, license, attribution,
+   bytes, SHA-256, codec, format, width, height, FPS, and frame count. For a URL,
+   disable redirects; bound connection time, total time, and accepted bytes
+   using an explicit user ceiling or trusted local metadata. Resolve the host
+   first and accept only HTTP(S) addresses outside loopback, private,
+   link-local, multicast, and reserved ranges. Recheck the connected peer
+   address on every connection and preserve hostname-based TLS validation.
+2. Carry the surface-selection result from `SKILL.md` and obtain a fresh
+   read-only readiness result from setup for every selected branch.
+3. Native uses the installed package and allowlisted samples. Python uses the
+   exact interpreter, loaded extension, wheel `RECORD`, and wheel-owned sample.
+   Decode performance may use `pynvc-smoke`; Python encode or comparison needs
+   a separate `full-samples` environment.
+4. Encode, compare, and encode-capacity require a validated schema-2 recipe;
+   decode routes do not. Hold every non-preset fact equal for P4/P5.
 
-## Owner and exact CLI
+Return `dependency_required` for an ineligible selected branch before a
+measurement launch. An independently eligible peer may continue, producing a
+`partial` aggregate.
 
-One controller owns live measurements in this domain:
-**`jetson-video-benchmark/scripts/benchmark_controller.py`**. Launch it
-directly:
+## Exact benchmark allowlist
+
+Native paths are relative to the authenticated SDK build/source roots.
+
+| Sample | Executable | Source | CMake file | Required runtime libraries |
+|---|---|---|---|---|
+| `AppEncPerf` | `AppEncode/AppEncPerf/AppEncPerf` | `Samples/AppEncode/AppEncPerf/AppEncPerf.cpp` | `Samples/AppEncode/AppEncPerf/CMakeLists.txt` | `libcuda.so.1`, `libnvidia-encode.so.1` |
+| `AppDecPerf` | `AppDecode/AppDecPerf/AppDecPerf` | `Samples/AppDecode/AppDecPerf/AppDecPerf.cpp` | `Samples/AppDecode/AppDecPerf/CMakeLists.txt` | `libcuda.so.1`, `libnvcuvid.so.1` |
+
+PyNvVideoCodec wheel members:
+
+| Sample | Additional required `RECORD` members |
+|---|---|
+| `samples/advanced/encode_perf.py` | `samples/utils/__init__.py`, `samples/utils/Utils.py`, `samples/utils/encode_parser.py`, `samples/utils/frame_utils.py`, `samples/utils/encode_parallel_utils.py` |
+| `samples/advanced/decode_perf.py` | `samples/utils/__init__.py`, `samples/utils/decode_parser.py` |
+
+The reference owns this allowlist. The fresh setup readiness result supplies
+the package root or exact interpreter and package location. Resolve required
+tools directly, and authenticate the selected entries immediately before use.
+The allowlist does not prove readiness, support, or operation success.
+
+## Build native benchmark samples
+
+Build the selected target directly. Authenticate one installed public
+`nvidia-video-codec-sdk` 13.0.x package and one package-owned, unmodified,
+non-symlinked Samples tree with
+`/usr/bin/dpkg-query -W`, `/usr/bin/dpkg-query -L`, and silent successful
+`/usr/bin/dpkg --verify`. Resolve `cmake`, the C++ compiler, `nvcc`,
+`pkg-config`, and the selected generator with standard system commands; record
+their canonical paths and versions. Create a fresh mode-0700 `BUILD_ROOT`
+outside the SDK. With `TARGET` restricted to `AppEncPerf` or `AppDecPerf`,
+invoke:
+
+If the exact package is absent or its 13.0.x ownership resolves to zero or
+multiple complete Samples roots, return `dependency_required` and route repair
+to setup; never infer another package name or choose one root by path order.
+A nonzero configure, build, or native option-validation exit fails that branch:
+return `failed` with the exact command and captured output, and never launch or
+substitute another binary.
+
+```bash
+"$CMAKE" -S "$SDK_ROOT/Samples" -B "$BUILD_ROOT" \
+  -G "$GENERATOR_NAME" \
+  "-DCMAKE_MAKE_PROGRAM=$GENERATOR" \
+  -DCMAKE_BUILD_TYPE=Release \
+  "-DCMAKE_CXX_COMPILER=$CXX" \
+  "-DCUDAToolkit_ROOT=$CUDA_ROOT" \
+  "-DCUDAToolkit_NVCC_EXECUTABLE=$NVCC" \
+  "-DCMAKE_CUDA_COMPILER=$NVCC" \
+  "-DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG"
+"$CMAKE" --build "$BUILD_ROOT" --target "$TARGET" --parallel 2
+```
+
+The only accepted outputs under `BUILD_ROOT` are
+`AppEncode/AppEncPerf/AppEncPerf` and `AppDecode/AppDecPerf/AppDecPerf`.
+Require confinement to the fresh build root, hash the binary, and prove its
+table-row libraries resolve with `ldd` to real non-stub files. Recheck package,
+source, tools, binary, and libraries after every warmup/measurement series.
+
+## Direct argument arrays
+
+Build one list of arguments and retain it verbatim with every warmup and
+measurement. Never pass `-loop`.
 
 ```text
-python3 -I scripts/benchmark_controller.py \
-  --request nvcodec-benchmark-request.json \
-  --workspace fresh-workspace-dir \
-  --output nvcodec-benchmark-result.json
+native decode:
+  APPDECPERF -i INPUT -gpu GPU -thread WORKERS [-single] [-host]
+
+native encode:
+  APPENCPERF -i INPUT -s WIDTHxHEIGHT -if NATIVE_FORMAT -gpu GPU
+    -frame FRAMES -thread WORKERS -codec CODEC [RECIPE_CONTROLS...]
+
+Python decode:
+  PYTHON -I DECODE_PERF -i INPUT -n WORKERS -m PROCESS_MODEL
+    -g GPU -f FRAMES
+
+Python encode:
+  PYTHON -I ENCODE_PERF -m PROCESS_MODEL -i INPUT -s WIDTHxHEIGHT
+    -if FORMAT -n WORKERS -f FRAMES -g GPU -c CODEC -json CONFIG
 ```
 
-All three flags are required (`--help` supported). Exit `0` on success, `2` on any
-request or contract failure.
+Native format mapping is exact: `NV12→nv12`, `YUV420→iyuv`, `P010→p010`,
+`NV16→nv16`, `P210→p210`, `YUV444→yuv444`,
+`YUV444_16BIT→yuv444p16`, `ARGB→bgra`, and `ABGR→abgr`.
 
-## Benchmark request schema
+Native encode recipe controls are the exact native projection excluding the
+base options `-s`, `-if`, `-gpu`, and `-codec`; these are supplied once from
+the evidenced workload. Python `CONFIG` is the canonical JSON projection for
+that recipe and the sole `-json` operand.
 
-`--request` is a `schema_version: "1.0"`, `kind: "nvcodec-benchmark-request"` object.
-`mode` is exactly `dry_run` (plan only) or `execute` (default `execute`). `route` is
-exactly one of:
+## Native option validation
 
-| `route` | Purpose |
-|---|---|
-| `encode` | Encode throughput / achievable encode FPS |
-| `decode` | Decode throughput / achievable decode FPS |
-| `compare` | P4 vs P5 performance, holding every non-preset control identical |
-| `camera_capacity` | Multi-stream codec-worker concurrency capacity |
+Run both authenticated `AppEncPerf -h` and `AppEncPerf -A`; both must exit zero.
+Collect their complete combined stdout/stderr as the advertised-option set.
 
-`environment` is optional. Setup emits the raw schema-1.2
-`nvcodec-environment` JSON; the benchmark request carries its exact portable
-identity, not the embedded JSON or a private workspace object:
+Before launching, check the planned argument list against this checklist. Any
+failure blocks the launch; report the failing item verbatim.
 
-```json
-{
-  "schema_version": "1.2",
-  "kind": "nvcodec-environment",
-  "path": "/canonical/absolute/fresh-environment.json",
-  "size_bytes": 1234,
-  "sha256": "64-lowercase-hex-digest"
-}
-```
+- The launcher path and every argument are nonempty strings containing no NUL.
+- Every emitted option (each argument beginning with `-`, excluding a bare `-`)
+  appears in the advertised-option set from the two help texts. Report the full
+  sorted list of options that are not advertised.
+- `-loop` is never emitted; it is forbidden regardless of advertisement.
 
-Derive `path`, `size_bytes`, and `sha256` from the fresh file after the probe
-finishes. The controller verifies the current bytes and never falls back if
-that supplied identity is malformed, stale, or unsuitable.
+Launch exactly the checked list with `shell=False`. Do not reconstruct, edit, or
+append to the argument list after checking it -- the checked list and the
+launched list must be identical. This is a deterministic procedure the agent
+performs, not an automatically enforced runtime hook.
 
-After the media gate, an agent that needs `pynvc` or `both` and has no supplied
-environment or exact interpreter first checks the installed skill catalog. If
-`jetson-video-setup` is present, invoke its public `probe_nvcodec.py` with a
-fresh output path, `--runtime pynvc` for Python-only or `--runtime both` for
-`both`/`auto`, and no `--setup-candidate`. This is an artifact handoff, not a
-consumer import: setup alone resolves and reauthenticates its fixed registry.
-Inspect the emitted JSON before constructing the identity above. It is usable
-for Py only when `mode=live`, the requested GPU matches,
-`pynvc.installed=true`, and `pynvc.identity.status=verified`; the benchmark
-controller then independently validates it again. Ask for an exact interpreter
-for explicit `pynvc`/`both` only when setup is unavailable or returns any
-absent, stale, unreadable, invalid-binding, or launch-failure result. For
-`auto`, record Py as `not_evaluated` and continue only an eligible native
-surface. Never pass a blocked probe as authority, scan for a venv, or trust an
-older artifact.
+## Frame accounting
 
-When `environment` is omitted, the controller performs bounded read-only local
-authentication. An explicit `native` route inspects only the fixed APT package
-`nvidia-video-codec-sdk`, verifies its public 13.0.x version and unmodified
-package-owned official sample tree, binds the existing build toolchain, and
-later verifies non-stub codec linkage. An explicit `pynvc` route requires
-`pynvc_interpreter` as one exact absolute path and authenticates the isolated
-import, exact loaded extension, wheel RECORD, and wheel-owned sample. It never
-searches for a venv. Explicit single-surface routes do not inspect their peer.
-An explicit `pynvc` or `both` request without `pynvc_interpreter` returns
-`input_required`. For local `auto`, an absent selector is reported as Python
-`not_evaluated`, not silently omitted, and an eligible native branch may continue.
-The controller's local binding is derived in-process and may be emitted as
-evidence, but is never accepted as a request input or as a substitute setup
-artifact.
+The PyNvVideoCodec 2.1 `encode_perf.py` helper caps each worker at 1,000 frames.
 
-For encode, pass `recipe` as the exact portable absolute identity of a schema-2
-`nvcodec-recipe`; embedded recipe objects are invalid. Its codec, width, height,
-format, FPS, optional frame count, and GPU must exactly match the input/request
-workload before the documented PyNvVideoCodec frame cap is applied. Decode does
-not consume a recipe. If the sibling recipe validator is absent, encode returns
-structured `dependency_required` with the dependency, reason, and exact
-install-and-retry action rather than a generic controller error.
+- If Python encode participates, use `min(source_frames, 1000)` per worker for
+  every compared surface, including native, so the same leading frames run.
+- Native-only encode retains all requested frames. Decode is never capped.
+- Expected aggregate frames are `effective_frames_per_worker * workers`.
+- Preserve the original input identity and source frame count; do not trim or
+  rewrite the input or recipe.
+- `require_source_frames` is true only when the user explicitly requires exact
+  source-frame fidelity; it is false otherwise.
+- If `require_source_frames` is true and the cap would apply, stop before any
+  launch and require native-only or an input at/below the cap.
 
-If bounded local authentication proves that a selected SDK surface needs
-installation or repair, preserve any healthy peer and return a structured
-`jetson-video-setup` dependency with its installed state and retry action. A
-missing exact Python interpreter selector is still `input_required` (or
-`not_evaluated` for local `auto`), never inferred to be a broken installation.
+For each surface, report source and effective frames per worker, worker count,
+expected aggregate frames, whether the cap was applied, and its authenticated
+PyNvVideoCodec 2.1 sample authority. A fixed object schema is not required.
 
-`input` (encode) or `encoded_artifact` (decode) carries the verified artifact
-identity, exact width/height/frames/FPS/codec/format metadata, and preserved
-`source_url` (null for local input), `license`, and `attribution`.
-Encode request metadata accepts H.264, HEVC, or AV1; decode additionally accepts
-VP9. An accepted request codec is not itself a target-support claim.
+## Measured lifecycle
 
-`compare` requires two encode recipes that differ only by preset. Only released
-sample routes that carry an authenticated FPS value (see the shared contract)
-are eligible for throughput; runner process duration is never relabeled as
-sample-reported throughput.
+For each variant/surface independently:
 
-## Workflow
+1. Authenticate the sample and helper identities and recheck input, recipe, and
+   config identities.
+2. Run one whole-process warmup. Retain its exact argv and outcome but exclude
+   it from statistics.
+3. Run at least three new whole processes sequentially. Number repetitions from
+   one and label each `measure`.
+4. Parse the official terminal markers below, require the expected aggregate
+   frame count, and reject non-finite/non-positive or contradictory values.
+5. Compute MP/s only with sample-bound dimensions, then apply the concise
+   acceptance checklist in the output contract before accepting the result.
 
-1. Classify the request into exactly one route above.
-2. Apply the shared video-content input, resolution, provenance, and synthetic-
-   fixture rules. If input is absent for an explicit live measurement, return
-   its `input_required` result and pause before probing, retrieval, dry run, or
-   execution. Request only the missing media at that gate; interpreter,
-   environment, recipe, and surface-authority resolution happen afterward. A
-   no-media planning question follows the separate documented-estimate path
-   above.
-3. For preset comparisons, produce recipes with the recipes workflow that hold everything but the
-   compared control constant, and bind every variant to the same user-selected content and frame
-   range.
-4. Run the benchmark controller in `dry_run` first to review the planned invocation,
-   then `execute` with a fresh output path and a bounded timeout (300 s per repetition).
-5. Report the measured target and exact workload only — not a portable product ceiling.
-   Resolve camera data direction before choosing the controller operation.
-   Measured concurrency without matching capture/transport/latency evidence is
-   an encode- or decode-stage capacity bound, not a verified camera count. A
-   no-media capacity calculation is weaker still: label it a theoretical
-   codec-stream bound and follow the estimate reference's shared-budget formula.
+Official markers:
 
-See [benchmark-output-contract.md](benchmark-output-contract.md) for the result JSON
-contract. The controller authenticates the required official performance
-sample from either the exact setup-produced live environment identity or the
-bounded local authority described above.
+- AppEncPerf: `nTotal=N, time=S seconds, FPS=F`; repeated occurrences must
+  agree and `N/S` must be consistent with displayed precision.
+- AppDecPerf: `Total Frames Decoded=N FPS = F`; also require one matching
+  codec, frame-rate, coded-size, display-area, chroma, and bit-depth report per
+  worker before deriving dimensions/MP/s.
+- Python encode: `^Total frames processed: N$`, `^Duration: S seconds$`, and
+  `^Total FPS: F$`, with rate consistency within displayed precision.
+- Python decode: `^Total frames decoded: N$`, `^Total FPS: F$`, and
+  `^Total wall time: Ss$`. Omit MP/s because this sample does not report
+  dimensions.
+
+In every route, reject explicit error/fatal/failed/failure/CUDA/NVENC/FFmpeg
+failure lines even when the exit code is zero.
+
+Retry a failed branch once at most, after the input,
+sample/package/interpreter, environment, or unavailable resource has
+demonstrably changed. Retain both attempts.
+
+## Comparisons and capacity
+
+- P4/P5 comparison accepts exactly two recipes. Reopen and rehash both, compare
+  their `encoder_intent` objects after removing only `preset`, and require the
+  remaining objects to be identical; the removed values must be exactly `p4`
+  and `p5`. Keep surface results separate and disclose projection differences.
+  Throughput never proves quality ordering.
+- A capacity sweep uses strictly increasing worker counts beginning at one.
+  Compute `safety_margin = 1 - margin_fraction`,
+  `usable_fps = measured_min_fps * safety_margin`,
+  `required_fps = workers * nominal_stream_fps`, and
+  `headroom_fps = usable_fps - required_fps`; a 10% margin therefore means
+  `safety_margin = 0.9`. Record every point with these values and the maximum
+  passing tested count. It is a codec-stage bound, not a camera or end-to-end
+  result.
+- Explicit `both` runs independent branches and returns `partial` when only one
+  passes. `auto` never benchmarks two surfaces to choose between them.

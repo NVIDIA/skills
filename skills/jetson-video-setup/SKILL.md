@@ -2,13 +2,15 @@
 name: jetson-video-setup
 license: "Apache-2.0"
 description: >-
-  Use when installing, repairing, probing, or verifying native NVIDIA Video
-  Codec SDK or PyNvVideoCodec on Jetson with official encode-to-decode samples,
-  including registered-environment recovery.
+  Use when installing, repairing, reusing, inspecting, or verifying readiness of
+  the native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson, including the
+  one-frame encode/decode smoke test with official samples, and when
+  interpreting what those readiness results, including CPU-buffer and
+  device-memory sample modes, do and do not establish.
 metadata:
   author: "Vinit Bansal <vinitkumarb@nvidia.com>"
   tags: [jetson, video-codec-sdk, pynvvideocodec, setup, nvenc, nvdec]
-  languages: [python]
+  languages: [markdown]
   data-classification: public
 ---
 
@@ -16,166 +18,164 @@ metadata:
 
 ## Purpose
 
-Probe, install, and independently verify the native NVIDIA Video Codec SDK and
-PyNvVideoCodec surfaces on a live Jetson. Setup owns installation readiness,
-not codec-support verdicts, recipes, benchmarks, or application pipelines.
+Inspect, install, and verify the native NVIDIA Video Codec SDK and
+PyNvVideoCodec on a live Jetson. Setup owns product installation and readiness.
+Use the sibling video skills for codec support, encoder configuration,
+performance measurement, and application pipelines.
+
+Use the standard package manager, Python environment tools, and installed
+NVIDIA samples directly, then return a concise readiness result.
 
 ## Read before acting
 
-- Read [setup-workflow.md](references/setup-workflow.md) for surface selection
-  and the probe → plan → apply → verify order.
-- Read [setup-install.md](references/setup-install.md) before any APT, venv, or
-  pip mutation.
-- Read [setup-output-contract.md](references/setup-output-contract.md) before
-  consuming or reporting an artifact.
+- Read [setup-workflow.md](references/setup-workflow.md) for inspection and
+  readiness checks.
+- Read [setup-install.md](references/setup-install.md) completely once before
+  an APT, venv, or pip change.
+- Read [setup-output-contract.md](references/setup-output-contract.md) for the
+  concise human-readable result to return.
+- Read [video-content.md](references/video-content.md) only when a request also
+  supplies or asks to retrieve media.
 
-## Select the surface
+## Select the product
 
-Before step 1 or any probe, resolve the requested surface. "Video Codec SDK",
-"VC SDK", "native SDK", or `nvidia-video-codec-sdk` selects native;
-"PyNvVideoCodec", "PyNv", "PySDK", or Python selects PyNvVideoCodec. Match a
-named product before considering the bare phrase: "Video Codec SDK" is the
-native product name even though it contains the words "video SDK". A genuinely
-bare "video SDK" setup, install, operation, readiness, or report-only request
-is ambiguous: ask only whether the user wants native Video Codec SDK,
-PyNvVideoCodec, or both, then stop before probing, acting, or describing future
-probes, checks, installation steps, or report contents. Report-only intent
-alone does not select a surface or authorize broadening to both.
+Resolve the requested product before touching the target:
 
-Select both only when explicitly requested, and reuse the selection for the
-rest of the request. One narrow exception applies to a consumer skill's
-`auto` selection gate: that consumer may invoke setup's read-only probe with
-`--runtime both` solely to evaluate both candidates. This does not select both
-for installation, verification, execution, or the final report.
+- “Video Codec SDK”, “VC SDK”, “native SDK”, or
+  `nvidia-video-codec-sdk` selects the native product.
+- “PyNvVideoCodec”, “PyNv”, “PySDK”, “Python SDK”, or an explicitly Python
+  interface selects PyNvVideoCodec.
+- Select both only when the user asks for both.
 
-Keep the selected surfaces independent. A native failure must not suppress an
-actionable Python surface, and a Python failure must not suppress native.
-Report aggregate `both` readiness only after both verification chains pass.
+A genuinely bare “video SDK” setup or readiness request is ambiguous. Ask
+whether the user wants native Video Codec SDK, PyNvVideoCodec, or both, then
+stop. The word “report” does not resolve that ambiguity.
 
-## Compose requested sibling stages
-
-Setup's probe, plan, install, and verification workflow requires no sibling
-skill. When a complex request also asks for product capability, recipe,
-performance, or pipeline work, add only the corresponding
-`jetson-video-capability`, `jetson-video-recipe`, `jetson-video-benchmark`, or
-`jetson-video-pipeline` stage. Check the agent's installed skill catalog first.
-If the sibling is present, read its `SKILL.md` and invoke its documented public
-entry point; pass artifacts as data and never import sibling code. If it is
-absent, preserve completed setup results and say, using the actual names: `I
-can run <stage>, but it requires <skill>, which is not installed. Install
-<skill> and retry this stage.` Never acquire a sibling for an unrequested
-stage.
+Keep native and Python work independent. A failure on one surface must not
+erase a successful result from the other.
 
 ## Workflow
 
-1. Confirm execution is on the Jetson. On a non-Jetson host, produce guidance
-   only and make no live readiness claim.
-2. Probe the selected surface with `probe_nvcodec.py --runtime
-   native|pynvc|both --output ...`. Use `both` only when the request explicitly
-   selects both surfaces or for the narrow read-only consumer `auto` candidate
-   check above. The probe is read-only. Reauthenticate a saved artifact with
-   the same CLI's `--reauthenticate` action.
-3. For PyNvVideoCodec, use the fixed validated-venv registry or an exact
-   user-supplied interpreter. Never scan for or guess a venv. If the user says
-   PyNvVideoCodec is already installed but supplies no exact path and the
-   registry is not ready, ask for the path before provisioning anything. A
-   missing registered interpreter makes that registry not ready; a registered
-   interpreter that cannot be launched blocks the selected Py surface. Never
-   scan or fall back to another environment.
-4. Generate an install plan with `plan_install.py`, then run
-   `plan_install.py validate PLAN`. A report-only request stops after the
-   probe; `plan-only` never authorizes mutation. Use `setup-install` intent only
-   for an explicit install/setup request; that request authorizes only the
-   complete unchanged batches in the reviewed plan.
-5. Execute only literal commands from the reviewed `setup-install` plan.
-   Invoke every published `argv` verbatim as the current user, including steps marked `privilege: "root"`; never prefix `sudo`, because `plan_install.py` owns the authorized internal `sudo -n` escalation for APT operations.
-   `plan_install.py` owns APT refresh, preview, and apply actions;
-   `lock_pip_reports.py` owns clean-venv creation and the locked pip apply.
-   APT execution regenerates the canonical plan and rechecks live candidate,
-   origin, source, and simulation evidence before mutation.
-6. Re-probe the completed surface. Run `verify_native.py` for native or
-   `verify_pynvc_sample.py` for Python. Each setup proof uses the installed
-   release's official samples to encode one 640×360 NV12 frame to H.264, then
-   independently decode that fresh bitstream. Native, and Python under
-   `--profile full-samples`, decode to exactly 345,600 bytes. The default
-   Python profile `pynvc-smoke` decodes one bounded frame with
-   `advanced/decode_perf.py`, which writes no raw output, so it proves frame
-   production only. A consumer that genuinely needs Torch — Python
-   encode-benchmark, pipeline, or the full raw-decode proof — is blocked under
-   `pynvc-smoke`; say so and name the remedy: provision a `full-samples` venv
-   explicitly with `plan_install.py --profile full-samples`. Exit zero alone is
-   never proof: require the profile's exact positive markers and counts. Only a
-   passing verifier may promote the selected surface from probe `partial` to a
-   final ready verdict.
-7. After a ready Python verification, publish the fixed registry only with
-   `verify_pynvc_sample.py --register-current --output READY_REPORT`.
-8. Report the detected Jetson Linux release, product versions, independent
-   surface verdicts, blockers, and artifact identities.
+1. Confirm commands would run on a Jetson. Inspect `/etc/nv_tegra_release`,
+   `/etc/os-release`, and the requested GPU ordinal. On another host, provide
+   guidance only and make no readiness claim.
+2. Inspect only the selected product with the direct commands in
+   [setup-workflow.md](references/setup-workflow.md). For native, identify the
+   installed package, package-owned Samples tree, CUDA toolkit, and build
+   tools. For Python, use the exact interpreter supplied by the user or
+   created during this request and inspect its installed distribution and
+   loaded module. Never scan the filesystem for virtual environments.
+3. If inspection is all the user requested, report what is installed and stop.
+   Package or import presence is `installed`, not `ready`.
+4. If the selected product is missing and the user asked to install or repair
+   it, follow that install reference. Show the exact
+   package or pip commands before mutation. Install and verify system
+   prerequisites before creating a final Python environment path. Change only
+   the selected product and its missing prerequisites.
+5. After installation, repeat the direct inspection. Then run the installed
+   release's official one-frame encode followed by independent decode as
+   described in [setup-workflow.md](references/setup-workflow.md).
+6. Report each selected product separately. Use `ready` only after its official
+   encode and independent decode pass all observable checks. Otherwise report
+   `installed`, `blocked`, or `failed`, name the failing command or missing
+   prerequisite, and give one concrete next action.
 
-Use `--fresh-setup` only when the user explicitly requests a new setup or
-reinstall. It never authorizes removing working base packages. A fresh Python
-setup also requires a unique, previously absent `--venv`. That `--venv` must be
-an absolute path under a durable location, for example
-`/home/ubuntu/.venvs/nvcodec-fresh`; never place it in the current working
-directory or any transient run, session, or evidence tree, because the registry
-you publish outlives that directory. Relative `--output` names resolve against
-the working directory, so write setup reports somewhere equally durable.
+When another video skill asks only for readiness, perform steps 1 and 2 and
+return the exact package/Samples root or Python interpreter/package path. Do
+not run the setup smoke test if that consumer will immediately run its own
+authenticated operation.
 
-## Direct setup scripts
+## PyNvVideoCodec environment selection
 
-Run every public CLI under `python3 -I` and inspect its `--help` before building
-arguments.
+Use this interpreter precedence: an explicit user path, an exact path already
+established in the current conversation, then the conventional profile path.
+The conventional smoke interpreter is `$HOME/.venvs/nvcodec/bin/python`; the
+`full-samples` interpreter is `$HOME/.venvs/nvcodec-full/bin/python`. Checking
+one of these exact paths is not a filesystem scan. Never select a venv by
+directory order or fall back to system Python.
 
-| File | Public responsibility |
+For a new environment, use the applicable conventional path when it is absent,
+or an explicit new absolute path in a durable user-owned location. If the
+conventional path exists, inspect it first. Reuse it when valid; otherwise
+report its exact defect, leave it untouched, and ask for a different new path.
+Return the selected interpreter path so downstream skills can use it directly.
+
+Use `pynvc-smoke` for the setup smoke proof, decode-performance work, and a
+conventional interface-availability check. That availability check inspects
+only the exact smoke path and reports `not_ready` when it is absent or invalid.
+Any consumer encode operation, including a capability availability proof, and
+work using advanced raw decode, segmentation, or encode-performance samples
+selects the separate `full-samples` environment and dependencies described in
+the install guide. A media-free capability inventory may use either
+conventional profile: inspect smoke first, then `full-samples` when smoke is
+absent, and report the exact interpreter that answered.
+Apply that either-profile allowance only when the entire request is a
+media-free inventory. When a request also seeks an operation or a capability
+availability proof, use the profile that request binds; if that profile is not
+ready, report `not_ready` and do not query the other conventional profile. The
+interface-availability check above remains bound to the smoke path.
+
+## Readiness proof
+
+Both products use one generated 640×360 8-bit NV12 frame (345,600 bytes), H.264
+encode, and an independent decode of the fresh bitstream.
+
+| Product | Required evidence |
 |---|---|
-| `scripts/setup/probe_nvcodec.py` | Emit or reauthenticate the read-only live `nvcodec-environment` schema 1.2 artifact. |
-| `scripts/setup/plan_install.py` | Plan and validate selected components; execute only its own reviewed APT refresh/preview/apply actions. |
-| `scripts/setup/lock_pip_reports.py` | Create a new venv and materialize/apply the authenticated pip lock. |
-| `scripts/setup/verify_native.py` | Build package-owned `AppEncCuda`/`AppDec` and verify the fixed native encode→decode smoke. |
-| `scripts/setup/verify_pynvc_sample.py` | Authenticate and run wheel-owned Python encode/decode samples, emit the readiness artifact, and authenticate the validated-venv registry chain. |
-| `scripts/setup/setup_contract.py` | Private common mechanics for these setup CLIs: strict JSON, bounded commands, and public-APT binding; never invoke it as a CLI. |
+| Native | Package-owned `AppEncCuda` reports one encoded frame; package-owned `AppDec` consumes that exact nonempty bitstream, reports one decoded frame, and writes a 345,600-byte NV12 output. |
+| PyNv `full-samples` | Wheel-owned `basic/encode.py` reports one encoded CPU-buffer frame; wheel-owned `advanced/decode.py` consumes the exact bitstream, reports one frame, and writes a 345,600-byte output. |
+| PyNv `pynvc-smoke` | The same encoder proof; wheel-owned `advanced/decode_perf.py` reports one requested decoded frame and a total of one, with no worker error, warning, or traceback. It does not claim a raw decoded file. |
 
-There is no setup dispatcher. Invoke these five public CLIs directly. Setup
-must not import Python code from another skill, and another skill must not
-import setup's private implementation.
+Exit zero or file creation alone is insufficient. Require the expected marker
+and count, a newly created nonempty bitstream, and the independent consumer.
+Do not require decoded bytes to equal the input because H.264 is lossy.
 
-## Readiness and scope
+CPU-buffer and device-memory sample modes establish only the exact readiness
+operation. They do not establish external buffer sharing, zero copy, or a
+synchronization primitive for another process or pipeline stage. For a request
+to confirm an in-process or cross-stage buffer contract, invoke
+`jetson-video-pipeline`; require an authenticated operation of the actual
+downstream stage that proves the sharing handle, format and layout, ownership
+and lifetime, signal and wait behavior, and safe buffer reuse. Do not answer
+that request from setup evidence alone.
 
-- Inventory or import presence is not operational proof.
-- `operation_verified` requires both official operations, their positive
-  markers, and a fresh nonempty bitstream. Native and Python `full-samples`
-  additionally require the exact decoded frame count and raw-output size;
-  Python `pynvc-smoke` instead requires its two exact one-frame production
-  markers and claims no raw decoded artifact.
-- Exit zero or output-file creation alone is insufficient.
-- Setup emits only bounded baseline Py API-query observations and raw native
-  sample summaries as supporting readiness evidence. It does not emit the
-  complete decoder tuple matrix or a product-support verdict; use
-  `jetson-video-capability` for those questions.
-- Use `jetson-video-recipe`, `jetson-video-benchmark`, and
-  `jetson-video-pipeline` for configuration, measurement, and handoff work.
-- A local probe proves only the detected stack and minimum release gate; it
-  does not prove release currency or the newest release compatible with this
-  target. Call a release `latest` or `newest compatible` only when successfully
-  retrieved current official NVIDIA documentation, recorded with URL and
-  retrieval date, establishes both release currency and compatibility with the
-  authenticated target identity. Otherwise report newest-compatible as
-  `unknown` and point to the official compatibility documentation; local APT
-  state, a failed source, or either fact alone is insufficient.
-- For a quality-only request such as PSNR or SSIM, state that setup does not
-  provide it and that a separately authorized quality workflow is required,
-  then stop; do not install, invoke, name, recommend, or offer to set
-  up an external quality tool.
+## Compose requested sibling work
+
+For a request that also asks about support, encoder configuration, throughput,
+or an application workflow, invoke only the matching public skill:
+
+- `jetson-video-capability`
+- `jetson-video-recipe`
+- `jetson-video-benchmark`
+- `jetson-video-pipeline`
+
+Pass the selected product and exact local paths as data. Do not read or import
+a sibling skill's private files. If a required sibling is unavailable,
+preserve completed setup results and name the missing skill.
 
 ## Safety
 
-- Accept native SDK/CUDA packages only from the configured,
-  signature-authenticated stock public NVIDIA Jetson source
-  (`repo.download.nvidia.com/jetson/common` or `/som`, exact `rNN.N/main`).
-  Base prerequisites may use another already configured,
-  signature-authenticated APT origin. Bind every candidate to its exact source
-  record and never add or change a source or key.
-- Keep credentials out of argv, logs, artifacts, stdout, and stderr.
-- Preserve exact plan, package, interpreter, artifact, and source identities.
-- Use fresh output/work/build paths. Never overwrite evidence or reuse it after
-  a reflash, driver/package change, or venv replacement.
+- For a report-only request, perform direct read-only inspection only; never
+  build samples, create a workspace or venv, launch a codec operation, or
+  mutate packages or an existing Python environment.
+- Use only already configured, signature-authenticated package repositories.
+  NVIDIA SDK and CUDA packages must come from the public Jetson repository for
+  the installed release. Never add or edit a source, key, or trust bypass.
+- Before APT installation, inspect the candidate and origin, run the exact
+  `apt-get -s` simulation, and reject removals, downgrades, or unexpected
+  packages. Apply the reviewed command with noninteractive `sudo -n`; if that
+  authorization is unavailable, stop rather than using a password prompt,
+  `su`, or another escalation path.
+- Run `dpkg --audit` after an APT mutation and stop if it is nonempty or fails.
+- Keep native and Python acquisition separate. A Python-only request must not
+  install `nvidia-video-codec-sdk`; a native-only request must not create a
+  venv.
+- Keep credentials out of commands, logs, and reports. Reject symlinked or
+  unexpected install targets and use fresh build/output paths.
+- Local installation and smoke results do not establish product support or
+  that the release is the newest compatible release. Use current official
+  NVIDIA documentation for those claims.
+
+For PSNR, SSIM, DRM playback, capture, inference, or display work, state that
+setup does not own that workflow and route only an explicitly requested video
+codec portion.

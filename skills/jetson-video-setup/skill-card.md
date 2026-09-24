@@ -1,5 +1,5 @@
 ## Description: <br>
-Use when installing, repairing, probing, or verifying native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson with official encode-to-decode samples, including registered-environment recovery. <br>
+Use when installing, repairing, reusing, inspecting, or verifying readiness of the native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson, including the one-frame encode/decode smoke test with official samples, and when interpreting what those readiness results, including CPU-buffer and device-memory sample modes, do and do not establish. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+CC-BY-4.0 AND Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers installing, verifying, or repairing NVIDIA Video Codec SDK and PyNvVideoCodec surfaces on Jetson devices. <br>
+Developers and engineers use this skill to install, inspect, verify readiness, and repair the native NVIDIA Video Codec SDK and PyNvVideoCodec on Jetson devices. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -44,38 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (4 positive) in isolated k8s-sandbox pods. <br>
+5 evaluation tasks (5 positive) with 3 attempts per task in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the skill produces correct answers against the reference. <br>
-- Discoverability: Whether the right skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed: skill selection, decoy avoidance, and workflow execution. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
+- Efficiency: Whether wasted tool calls and token usage were avoided (50% tool-call productivity, 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 36% → 81% (+45 points) | 24% → 83% (+58 points) |
-| Security | 50% → 100% (+50 points) | 0% → 100% (+100 points) |
-| Correctness | 35% → 75% (+40 points) | 50% → 95% (+45 points) |
-| Discoverability | 38% → 98% (+61 points) | 33% → 84% (+52 points) |
-| Effectiveness | 24% → 46% (+22 points) | 13% → 46% (+32 points) |
-| Efficiency | 32% → 85% (+53 points) | 26% → 90% (+63 points) |
+| Overall | 83.0% | 83.4% |
+| Security | 72.2% → 100.0% (+27.8 points) | 56.7% → 100.0% (+43.3 points) |
+| Correctness | 35.6% → 80.0% (+44.4 points) | 50.7% → 88.0% (+37.3 points) |
+| Discoverability | 100.0% | 87.0% |
+| Effectiveness | 33.8% → 55.2% (+21.4 points) | 23.6% → 61.2% (+37.6 points) |
+| Efficiency | 79.9% | 80.8% |
 
 ## Skill Version(s): <br>
-e61c045 (source: git SHA, committed 2026-08-10) <br>
+74bce4d (source: git SHA, committed 2026-09-16) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
