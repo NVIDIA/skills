@@ -1,0 +1,21 @@
+name: BioNeMo Proteina-Complexa
+repo: NVIDIA-BioNeMo/Proteina-Complexa
+ref: dev
+description: >-
+  Proteina-Complexa skills for environment setup, target preparation, protein
+  and ligand binder design, PDB evaluation, and parameter sweeps.
+links:
+  contributing: README.md
+  discussions: false
+  security: false
+skills:
+  - path: skills/complexa-design/
+    catalog_dir: bionemo-complexa-design
+  - path: skills/complexa-evaluate-pdbs/
+    catalog_dir: bionemo-complexa-evaluate-pdbs
+  - path: skills/complexa-setup/
+    catalog_dir: bionemo-complexa-setup
+  - path: skills/complexa-sweep/
+    catalog_dir: bionemo-complexa-sweep
+  - path: skills/complexa-target/
+    catalog_dir: bionemo-complexa-target
