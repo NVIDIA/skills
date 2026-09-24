@@ -103,10 +103,10 @@ validation, live capability, operation, and emitted-bitstream proof separate.
 
 ## Latency and quality controls
 
-- `bf`: gate against exact `num_max_bframes`. The resolver enforces `bf=0` for
+- `bf`: gate against exact `num_max_bframes`. The recipe contract enforces `bf=0` for
   `ultra_low_latency`; use `low_latency` when B-frames are required.
 - `lookahead`: gate on `support_lookahead` and enforce the API range
-  `0..(31 - bf)`. The resolver enforces zero for `ultra_low_latency`.
+  `0..(31 - bf)`. The recipe contract enforces zero for `ultra_low_latency`.
 - `multipass`: `disabled`, quarter-resolution, or full-resolution choices must be throughput-tested. Do not infer support from `support_multiple_ref_frames`; they are different concepts.
 - `aq`: spatial AQ strength is 1–15 when enabled. `temporalaq` is a distinct option and is gated on `support_temporal_aq`.
 - `temporalaq` is enabled by key presence in the supplied parser. Emit `1`/`true` to enable it;
@@ -126,6 +126,11 @@ validation, live capability, operation, and emitted-bitstream proof separate.
 
 ## Surface gates
 
+Pixel format and memory interoperability are separate contracts. A recipe's
+format names pixel layout; it does not select a memory domain, sharing handle,
+allocation owner, copy policy, or synchronization primitive. Bind those facts
+to authenticated pipeline evidence before claiming an in-process edge.
+
 - `YUV420`, `ARGB`, and `ABGR` are recipe/standalone encoder-input surfaces, not current
   independent-decode pipeline target formats. Native `YUV420` pipeline output would require an
   explicit `AppDec -outplanar` route that is not implemented, public-2.1 PyNvVideoCodec
@@ -135,7 +140,7 @@ validation, live capability, operation, and emitted-bitstream proof separate.
 - `profile` is native-AppEnc-only because public PyNvVideoCodec 2.1 does not parse it. Native
   profiles are codec-specific: H.264 `baseline|main|high|high444`; HEVC
   `main|main10|frext`; AV1 `main`. H.264 Baseline requires resolved `bf=0`; reject a positive
-  caller or catalog/default B-frame value instead of silently rewriting it. Lookahead remains
+  caller or selected-default B-frame value instead of silently rewriting it. Lookahead remains
   independently gated. Use [Profile selection](#profile-selection) for format, depth, lossless,
   omitted-profile, and downstream guidance.
 - CPU-buffer sample readiness requires NumPy plus exact `pycuda==2026.1`; GPU-buffer mode also

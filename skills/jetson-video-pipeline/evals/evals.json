@@ -2,25 +2,58 @@
   "skill_name": "jetson-video-pipeline",
   "evals": [
     {
-      "id": "pipeline-dual-surface-encode-decode",
-      "prompt": "Plan equivalent native Video Codec SDK and PyNvVideoCodec H.264 encode-to-decode pipelines with exact artifact handoffs. Do not run them.",
-      "expected_output": "An input-required response asking only for one exact media path or URL before either pipeline is planned.",
+      "id": "pipeline-native-transcode-plan",
+      "prompt": "How would you transcode an H.264 video to HEVC on this Jetson and confirm that the result is usable?",
+      "expected_output": "A concise native transcode architecture followed by independent decode validation, with media-dependent details left for execution.",
       "assertions": [
-        "Returns input_required and asks only for one exact target-local path or user-supplied HTTP(S) URL",
-        "Stops before probing, authentication, dry-run planning, or operation launch",
-        "Does not choose catalog or synthetic media and makes no execution or pipeline-completion claim"
+        "Answers with the native AppTrans to AppDec route without requiring a media path before describing the architecture",
+        "Requires AppDec to consume the exact produced HEVC artifact and requires the transcode and decode frame counts to match",
+        "Identifies exact media and runtime readiness as execution prerequisites instead of silently choosing media",
+        "Makes no claim that execution, output validation, or product-wide HEVC support has already been established"
       ],
       "expected_skill": "jetson-video-pipeline",
       "expected_workflow": "pipeline"
     },
     {
-      "id": "pipeline-native-transcode",
-      "prompt": "Plan a native H.264-to-HEVC transcode with an independent decode check. Do not run it.",
-      "expected_output": "An input-required response asking only for one exact H.264 media path or URL before planning the transcode.",
+      "id": "pipeline-native-encode-decode-dry-run",
+      "prompt": "Show me the commands to encode /data/clip.yuv, which contains 300 NV12 frames at 1920x1080, as a 60 fps, 6 Mbps CBR low-latency H.264 stream with the native SDK and decode the result. Do not run anything.",
+      "expected_output": "A planned native encode-to-decode command flow based on the supplied identity and raw-media metadata, without inspecting or launching anything.",
       "assertions": [
-        "Returns input_required and asks only for one exact target-local H.264 path or user-supplied HTTP(S) URL",
-        "Stops before probing, authentication, dry-run planning, AppTrans, or AppDec",
-        "Does not choose catalog or synthetic media and makes no transcode or verification claim"
+        "Returns planned rather than input_required and preserves the native surface and supplied media metadata",
+        "Obtains encoder options through jetson-video-recipe and shows the AppEncCuda output being consumed by AppDec with both operations expected to report 300 frames",
+        "Carries the supplied 1920x1080 NV12 layout into the planned encoder arguments",
+        "Derives 933120000 bytes for both the 300-frame NV12 input and decoded output",
+        "Does not inspect or hash the media, probe the target, authenticate launchers, create a workspace, or claim verified execution"
+      ],
+      "expected_skill_sequence": [
+        "jetson-video-pipeline",
+        "jetson-video-recipe"
+      ],
+      "expected_workflow": "pipeline"
+    },
+    {
+      "id": "pipeline-execution-media-required",
+      "prompt": "Encode a video to H.264 on this Jetson and decode the result to make sure it is usable.",
+      "expected_output": "An input-required execution response that briefly identifies the encode-to-independent-decode route and requests the user's exact media.",
+      "assertions": [
+        "Returns input_required, briefly identifies the intended encode-to-independent-decode route, and asks for one exact target-local path or user-supplied HTTP(S) URL",
+        "Stops before target inspection, retrieval, authentication, recipe dispatch, or workspace creation",
+        "Does not choose catalog, synthetic, or setup-smoke media and makes no execution or usability claim"
+      ],
+      "expected_skill": "jetson-video-pipeline",
+      "expected_workflow": "pipeline"
+    },
+    {
+      "id": "pipeline-in-process-cuvid-nvenc-contract",
+      "prompt": "Using the installed native SDK, plan an in-process H.264 decode to CUDA processing to H.264 encode pipeline for /data/input.264. Use bounded queues and four reusable encoder surfaces. Do not run it.",
+      "expected_output": "A planned in-process graph that distinguishes decoder input, retained mapped output, CUDA-event-to-NVENC ordering, ownership, backpressure, and exact cleanup without claiming general zero copy or authenticating the target.",
+      "assertions": [
+        "States that cuvidDecodePicture has no CUDA stream or event input dependency and preserves compressed-input lifetime",
+        "Uses CUVIDPROCPARAMS output_stream for mapped-output ordering and defers cuvidUnmapVideoFrame until downstream completion",
+        "Derives decoder mapping capacity from simultaneous ownership and bounded backpressure rather than a fixed surface formula",
+        "Uses persistent CUDA-device-pointer registration, an event-before-NVENC-stream wait, and calls NvEncSetIOCudaStreams after successful encoder initialization and before picture submission using pointers to live CUstream variables",
+        "Uses NV_ENC_INPUT_IMAGE, the mapped buffer format, and NV_ENC_PIC_STRUCT_FRAME for CUDA-pointer image registration and submission",
+        "Emits the canonical filesystem io_contract directly while keeping separately authenticated in-process edge evidence distinct"
       ],
       "expected_skill": "jetson-video-pipeline",
       "expected_workflow": "pipeline"

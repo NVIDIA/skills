@@ -30,7 +30,7 @@
       "prompt": "Which hardware video codecs can this Jetson decode?",
       "expected_output": "A supported-decoder summary that separates documentation, live API results, and operation evidence.",
       "assertions": [
-        "Covers MPEG-1, MPEG-2, MPEG-4, VC-1, H.264, HEVC, VP8, VP9, AV1, and JPEG",
+        "Names MPEG-1, MPEG-2, MPEG-4, VC-1, H.264, HEVC, VP8, VP9, AV1, and JPEG and assigns each an evidence-qualified status; documented-supported, documented-unsupported, API-only, and documentation-unknown are all acceptable classifications",
         "Distinguishes documented support from API-only or documentation-unknown results",
         "Does not present a capability query as a successful decode operation"
       ],
@@ -45,6 +45,18 @@
         "States that the skill covers hardware encode/decode of user-supplied non-DRM bitstreams, not DRM-protected streaming-service playback",
         "Does not claim whether Netflix works or describe Jetson content-DRM certification",
         "Does not recommend a browser, Widevine installation, playback tool, workaround, or DRM bypass and does not probe the target"
+      ],
+      "expected_skill": "jetson-video-capability",
+      "expected_workflow": "setup"
+    },
+    {
+      "id": "capability-codec-not-buffer-sharing",
+      "prompt": "NVDEC and NVENC are reported available. Does that prove I can pass decoded frames to the encoder through DMA-BUF or NvSciBuf without copying?",
+      "expected_output": "A capability boundary that leaves buffer sharing and synchronization unestablished.",
+      "assertions": [
+        "Does not infer DMA-BUF, NvSciBuf, zero copy, or cross-stage synchronization from codec availability",
+        "Separates codec/API capability from an authenticated producer-to-consumer operation",
+        "Uses not established rather than unsupported for missing interoperability evidence"
       ],
       "expected_skill": "jetson-video-capability",
       "expected_workflow": "setup"

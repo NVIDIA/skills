@@ -1,224 +1,158 @@
 # Pipeline workflow
 
-## Contents
+Use direct, authenticated NVIDIA samples for codec work. The agent owns
+planning, execution, artifact handoffs, and the final report.
 
-- [Owner and exact CLI](#owner-and-exact-cli)
-- [Pipeline request schema](#pipeline-request-schema)
-- [Workflow](#workflow)
-- [Acceptance content evidence](#acceptance-content-evidence)
+## Before planning
 
-Run compact, authenticated multi-stage Video SDK routes and verify every
-producer-to-consumer handoff. This workflow owns encode/decode chains, native
-transcode, PyNvVideoCodec segmentation, container decode triage, AV1 verification,
-and the customer acceptance package. Each stage uses only released samples; libavformat
-embedded in released NVIDIA samples is allowed only for container demux.
+1. Apply the scope and request-classification gates in `SKILL.md`. Architecture
+   questions end with a direct route answer and stated assumptions. Dry runs
+   use only user-supplied identity and metadata. The target and media steps
+   below apply to execution; recipe-bearing dry runs still use step 4.
+2. Preserve an explicit `native`, `pynvc`, or `both`; otherwise use `auto`.
+   Obtain fresh direct readiness from setup for the selected local runtime.
+   With `auto`, run the only eligible surface, block with zero, or return
+   `selection_required` offering `native`, `pynvc`, and `both` when both are
+   eligible.
+3. Require `full-samples` for Python encode, advanced decode, segmentation, or
+   encode-performance. The smaller `pynvc-smoke` profile is sufficient only
+   for its documented setup smoke and Python decode-performance route.
+4. For encode or transcode dry runs and execution, obtain a validated schema-2
+   recipe. Decode-only, segmentation, and container triage do not require one.
+5. Canonicalize and hash the exact user media. Preserve URL or `null`, license,
+   attribution, path, byte count, SHA-256, and media metadata established by the
+   user or a media parser/sample. Never infer metadata from the filename or
+   replace the input with setup's synthetic fixture. For a URL, disable
+   redirects; bound connection time, total time, and accepted bytes using an
+   explicit user ceiling or trusted local metadata. Resolve the host first and
+   accept only HTTP(S) addresses outside loopback, private, link-local,
+   multicast, and reserved ranges. Recheck the connected peer address on every
+   connection and preserve hostname-based TLS validation.
 
-## Owner and exact CLI
+## Plan, then execute
 
-One controller owns this domain:
-**`jetson-video-pipeline/scripts/pipeline_controller.py`**. Launch it directly
-in isolated mode:
+For a dry run, emit a readable `planned` result using the user-supplied media
+identity and metadata. Show the intended argument arrays, inputs, outputs,
+expected markers, frame counts, producer-to-consumer handoffs, and applicable
+`io_contract` from
+[buffer-sharing-and-synchronization.md](buffer-sharing-and-synchronization.md).
+Do not open the media, inspect the target, authenticate launchers, or claim the
+commands were verified.
 
-```text
-python3 -I scripts/pipeline_controller.py \
-  --request nvcodec-pipeline-request.json \
-  --workspace fresh-workspace-dir \
-  --output nvcodec-pipeline-result.json
-```
+For execution:
 
-All three flags are required (`--help` supported). Exit `0` when `status` is `complete`
-or `planned`, `2` on a safe block or stage failure, `3` on malformed input or an
-internal error.
+When a native binary still needs compilation, return `dependency_required`
+with the exact build command and source/tool identities.
 
-## Pipeline request schema
+1. Create a new mode-0700 workspace. Require every output path to be absent.
+2. Authenticate the selected sample and every required helper as specified in
+   [official-sample-contract.md](official-sample-contract.md). Record canonical
+   path, size, and SHA-256. Recheck them immediately before launch.
+3. Launch the exact argument array directly, without a shell or `eval`, under
+   the selected interpreter when Python is used. Retain unedited stdout/stderr
+   in separate stage logs and capture exit code, elapsed monotonic time, timeout
+   state, and working directory. Use a
+   finite per-process timeout: 300 seconds unless the user supplies a different
+   finite bound. Record the bound and terminate the launched process group on
+   expiry before returning `failed`.
+4. Require exit zero, the allowed positive marker set with every expected
+   cardinality, count, and path, no explicit failure line, and a fresh nonempty
+   output. A timeout, launch error, stale output, contradictory marker, or
+   exit-zero unusable file fails that operation.
+5. Immediately before a handoff, reopen the original producer output and
+   verify its path, size, and SHA-256. The independent consumer must open that
+   same path. Rehash it again after the consumer completes. Preserve the
+   canonical `io_contract` on successful and failed boundaries and in the
+   final result.
+6. Apply the reference's byte/layout table to the actual raw source and decoded
+   file. Do not infer usability from a marker or byte count alone.
+7. Retain a successful branch when another selected surface or segment fails;
+   label the aggregate `partial`. Retry once at most, with fresh paths, and only
+   after the input, executable/package/interpreter, readiness, or unavailable
+   resource has demonstrably changed. Retain both attempts and stop after the
+   retry.
 
-`--request` is a `schema_version: "1.0"`, `kind: "nvcodec-pipeline-request"` object.
-`mode` is exactly `dry_run` (plan only) or `execute` (default `execute`). `route` is
-exactly one of:
+## Routes
 
-| `route` | Purpose |
-|---|---|
-| `encode_decode` | Encode then independently decode/verify the same artifact (native, or the same request through native and Python for a dual-surface comparison) |
-| `native_transcode` | Native H.264 → HEVC transcode with usable-output proof |
-| `pynvc_segments` | Split a clip into independently usable PyNvVideoCodec segments and validate each |
-| `container_triage` | Demux a user-supplied local container, or retrieve the exact user-supplied HTTP(S) URL, then decode and report hardware-decode support (`surface` must be `native` or `pynvc`) |
-| `av1_verify` | Verify AV1 encode from an AV1 recipe with an exact native projection and positive `frame_count` |
-| `acceptance` | Aggregate setup, capabilities, P4/P5 encode/decode, and throughput into one acceptance package |
+### Encode and independently decode
 
-`container_triage` also requires `target_eligibility` with exactly `eligible`
-(boolean) and `reasons` (a list of nonempty strings). Use
-`{"eligible": true, "reasons": []}` only after identifying the current target
-as an eligible released Jetson route; otherwise set `eligible` false and record
-the observed reasons. This gate is request planning context, not an SDK setup
-artifact or a codec-support verdict.
+- Native: validated recipe → `AppEncCuda` → fresh elementary stream → `AppDec`.
+- Python: validated recipe/config → wheel-owned `basic/encode.py` → fresh
+  elementary stream → wheel-owned `advanced/decode.py`.
+- Require producer and decoder counts to equal the requested frame count.
+- Require exact raw-input and decoded-output byte sizes from the format,
+  geometry, and frame count. Record the independently decoded layout.
+- For `both`, keep each surface's identities, commands, and result separate.
 
-For `encode_decode`, the controller consumes one authenticated encode-request artifact
-and calls the landed recipe/encode owner. Other routes authenticate their exact sample
-set directly. A completed `container_triage` result retains its workspace-relative
-decoded-frame evidence and also returns `decode.raw_video` as the exact portable absolute
-identity that the encode controller accepts directly. `av1_verify` owns the complete IVF
-frame walk and independent AppDec proof;
-setup capability queries remain separate context and are never treated as that proof.
+### Native H.264-to-HEVC transcode
 
-`environment` is an optional portable identity for a fresh schema-1.2 setup
-artifact. Setup emits raw JSON; the request carries an exact identity with only
-`schema_version`, `kind`, canonical absolute `path`, `size_bytes`, and lowercase
-`sha256`. When supplied it is authoritative and must validate. When omitted,
-the controller authenticates the selected installed surface locally;
-PyNvVideoCodec routes additionally require the exact absolute
-`pynvc_interpreter`. A controller-produced local binding is private evidence
-and is never accepted as a request member.
+Require an H.264 input and an exact native HEVC recipe projection. Do not infer
+the input frame count from its filename. Run
+`AppTrans` with recipe options except raw-only `-s`, `-if`, and `-gpu`; supply
+the selected GPU once. Accept exactly one legacy or current transcode count
+marker, never both. Rehash the HEVC output and independently decode it with
+`AppDec` for the same positive frame count. If the input frame count was known
+before launch, both counts must also equal it; otherwise the two authenticated
+sample counts establish the tested frame count.
 
-After the media gate, an agent that needs `pynvc` or `both` and has neither a
-supplied environment nor exact interpreter first checks the installed skill
-catalog. If `jetson-video-setup` is present, invoke its public
-`probe_nvcodec.py` with a fresh output, `--runtime pynvc` for Python-only or
-`--runtime both` for `both`/`auto`, and no `--setup-candidate`. Setup alone
-resolves and reauthenticates its registry. Inspect the fresh JSON before
-constructing the identity: require `mode=live`, the requested GPU,
-`pynvc.installed=true`, and `pynvc.identity.status=verified`. Derive the
-identity's path, size, and SHA-256 from that exact file and let this controller
-authenticate it again. For explicit `pynvc`/`both`, ask for an exact interpreter
-only when setup is unavailable or returns any absent, stale, unreadable,
-invalid-binding, or launch-failure result. For `auto`, keep Py `not_evaluated`
-and continue only an eligible native surface. Never pass a blocked probe as
-authority.
+### PyNvVideoCodec segments
 
-## Workflow
+Authenticate the wheel-owned segment sample, `segments.txt`,
+`transcode_config.json`, and advanced decoder. Validate every schedule row as
+finite `0 <= start < end`. The created-file markers must exactly match the
+declared output set and the summary must equal its size. Each segment must be
+fresh, nonempty, rehashed, and independently decoded. Report failed segments
+without discarding verified peers.
 
-1. Apply the media gate before classifying the request into exactly one route
-   above. Require its media input to originate from an absolute target-local
-   path or one exact user-supplied HTTP(S) URL; never substitute catalog or
-   synthetic media, and preserve provenance and identity. When setup is installed, also apply its
-   shared [video content policy](../../jetson-video-setup/references/video-content.md).
-   A route may consume a prior artifact only when that artifact remains bound
-   to the same user-selected source. If no input is supplied, return
-   `input_required`, ask for one, and pause before probing, retrieval,
-   conversion, authority selection, dry run, or pipeline execution. Ask only
-   for media at that gate; never select catalog media or use the synthetic
-   setup fixture.
-2. Honor an explicit `native`/`pynvc`/`both` surface. Map “whichever”, “best
-   available”, “choose for me”, and any other unspecified-surface wording to
-   `auto`; never broaden it to `both`. Only an explicit dual-surface request
-   selects `both`.
-3. After the input gate and surface classification, use a supplied setup
-   environment identity, obtain a fresh one through setup's public probe as
-   described above, or use local selected-surface authentication. Supplied
-   evidence must validate and never falls back. Without it, native derives raw
-   dpkg/package-source/toolchain facts; Python derives raw wheel/import facts
-   from the exact `pynvc_interpreter`. The consumer stages those facts as
-   private evidence, derives its normalized surface view internally, and
-   revalidates the binding before launch. It never accepts a serialized local
-   binding from the caller and never scans for a Python environment. A missing
-   or invalid SDK routes only that surface to `jetson-video-setup`.
-4. Apply the `auto` gate using only that authority: zero
-   eligible surfaces block, one runs, and two
-   return `selection_required` before searching prior results, dry run, or
-   codec launch. Eligibility authentication happens first. This gate is
-   unconditional when two surfaces are
-   eligible: ask for exactly `native`, `pynvc`, or `both`. For `both`, preserve
-   every eligible branch and each blocked peer. One surface never authorizes or
-   blocks the other. If local `auto` has no exact `pynvc_interpreter`, disclose
-   PyNvVideoCodec as `not_evaluated` with the retry action and continue only an
-   eligible native branch; explicit `pynvc` and `both` still require setup
-   evidence or the exact interpreter. A prompt's claim that a surface is ready
-   is never authority. Eligibility is decided at planning time: each surface is
-   structurally validated against its own required subset of the schema-1.2
-   environment — native `installed`/`package`/`sdk_root`/`cuda`/`tools` versions,
-   pynvc `installed`/`version`/`interpreter`/`interpreter_identity`/`sys_prefix`/
-   `extension`/`module` — ignoring additive keys. A malformed surface is blocked
-   during planning, never deferred to execute-time authentication, so a broken
-   surface never consumes a run slot or couples the peer through late failure.
-5. Run `dry_run` to review the planned stages and handoffs, then `execute` with a fresh
-   output path and bounded per-stage timeouts.
-6. Bind each handoff to its original canonical path, size, and SHA-256; reopen and
-   rehash the original artifact — never trust copied status prose. A stage is complete
-   only when its exact positive marker, count, and fresh nonempty output are proven.
+### Container triage
 
-For `acceptance`, the controller writes exactly nine compact pre-seal files and reports
-`seal_pending: true`; it intentionally does not create its own checksum manifest or an
-inventory. Its `references` object must name `readiness`, `capabilities`, `content`,
-`p4_recipe`, `p5_recipe`, `p4_encode_decode`, `p5_encode_decode`, `p4_benchmark`,
-`p5_benchmark`, `handoffs`, `commands`, `task_results`,
-and `timing`. The task-results JSONL contains exactly one
-`{task_id, status: "complete", evidence}` row for each of the ten stage names;
-`evidence` is a nonempty list of names from `references`. Recipes must validate as P4/P5,
-each encode/decode stage must consume its accepted recipe and the same exact raw input,
-and each benchmark variant must retain that exact recipe identity and input identity.
-Encode/decode artifacts must be complete, benchmarks must retain a warmup and at least
-three measurements; the handoff list must be nonempty and every entry must be verified.
-Each accepted benchmark branch retains the successful `warmup` command and
-sequential measured repetitions whose command phase is `measure`; every command argv must
-equal the authenticated launcher plus `benchmark_arguments`, exit zero, and not time out.
-FPS and megapixels/second must be positive finite values, and their repetition count, mean,
-minimum, and maximum must agree with the retained measurements.
+First establish an eligible released Jetson route. Decode the exact local or
+retrieved container through `AppDec`'s intrinsic libavformat demux or the
+wheel-owned advanced decoder. Record the same content provenance and require a
+fresh usable decoded output. This route reports the tested operation only; it
+does not generalize hardware support.
 
-The acceptance assembler copies the six verified media metadata fields from the `content`
-evidence into `evidence/summary.json.representative_content`: exactly
-`source_url`, `license`, `attribution`, `path`, `size_bytes`, and `sha256`.
-`source_url` is the exact user-supplied HTTP(S) URL for retrieved media and JSON
-`null` for target-local media. `license` and `attribution` are nonempty honest
-strings; either may be the literal `unknown`. It writes the corresponding exact
-direct source record—not a generic reference table—to
-`evidence/representative-content.json` with exactly `kind`, those six metadata
-fields, `expected_size_bytes`, `expected_sha256`, and `verified`. Require
-matching expected size/SHA-256 and `verified: true`. Both files therefore
-satisfy the six-field compact metadata contract in
-[setup's shared video content policy](../../jetson-video-setup/references/video-content.md)
-and can be passed directly to the `content-summary` controller while the
-external media remains at its bound canonical path. Retrieval-command or local
-user-selection evidence supports acquisition claims separately and is not part
-of this six-field validator contract.
+### AV1 verification
 
-### Acceptance content evidence
+Require an AV1 recipe with an exact native projection and positive frame count.
+Run both requested host-output and video-memory modes independently. For every
+fresh IVF output, rehash it and have `AppDec` consume that exact path. Require
+the expected positive decoded frame count; do not claim a separate container-
+structure verdict from header bytes alone.
 
-Keep the source record and fresh validation result in the compact package and
-bind both in its manifest. Exclude the media itself from the package, retaining
-its canonical path, size, and SHA-256 in the summary. Run
-`scripts/validate_representative_content_summary.py` directly before cleaning
-up excluded media:
+## Concise acceptance report
 
-```bash
-python3 -I scripts/validate_representative_content_summary.py \
-  --summary /absolute/path/to/evidence/summary.json \
-  --source-artifact /absolute/path/to/evidence/representative-content.json \
-  --output /absolute/path/to/evidence/representative-content-summary-validation.json
-```
+Acceptance is a human-readable reproducibility report. Include only requested
+stages, with one row per stage and one of
+`complete`, `partial`, `blocked`, `failed`, `not_evaluated`, or `deferred`.
+Retain:
 
-The validator reads the two JSON files directly, requires strict shapes and
-values, and freshly rehashes the current content file without modifying it. It
-proves current byte identity and exact cross-record metadata equality only. It
-does not prove URL origin, publisher-supplied expectations, license,
-attribution, representativeness, or nonuniformity. Preserve a retrieval command
-record for URL media or user-selection evidence for local media when making an
-acquisition claim; these are separate from the six-field metadata consistency
-check and need not be copied into the compact package. Claim content
-characteristics only when separate observed evidence supports them.
+- readiness result and selected target/runtime;
+- raw API capability facts separately from documentation and operations;
+- P4/P5 recipe identities and the exact input identity they share;
+- every encode/decode producer/consumer command, marker, frame count, output
+  identity, decoded layout, and byte-size validation;
+- every benchmark warmup, measured repetition, timing scope, and recomputed
+  statistics as required by `jetson-video-benchmark`;
+- limitations, failed/retained branches, and exact retry actions.
 
-Exit `0` means this limited consistency check is verified, exit `2` means
-invalid or unauthenticated input, and exit `3` means validator or fresh-output
-failure. The compact package cannot rerun the check after excluded media is
-removed unless that external media is restored at its bound path. Do not pipe a
-log or stdout record into this check, and do not use command substitution in
-place of either file.
+One report, a command log, and compact JSON evidence are sufficient when they
+contain those facts. Write a checksum manifest last if packaging is requested.
+Keep media, raw frames, bitstreams, SDK trees, builds, venvs, and caches outside
+the small evidence package; bind them by canonical path, bytes, and SHA-256.
 
-Set `validation_result_filename` to one fresh plain JSON filename and pass the matching
-workspace-relative path to the CLI, for example
-`--output evidence/customer-validation.json`. The controller writes the other eight files;
-the mandatory `--output` is the ninth validation-result file. It does not contain its own
-artifact identity. After the result is complete and every JSON/JSONL file parses, seal the
-final small package from its root:
+## Status meaning
 
-```bash
-(
-  cd "$PACKAGE_ROOT"
-  find . -type f ! -path './evidence/manifest-sha256.txt' -print0 |
-    LC_ALL=C sort -z | xargs -0 sha256sum
-) > "$PACKAGE_ROOT/evidence/manifest-sha256.txt"
-```
-
-Do not place media, raw frames, streams, SDK trees, build directories, virtual
-environments, or caches in the package; record their external path, size, and SHA-256.
-
-The allowed operation routes are defined by
-[official-sample-contract.md](official-sample-contract.md).
+- `planned`: an architecture plan with conceptual steps or a dry run with
+  concrete commands was provided; nothing was launched. State unresolved
+  assumptions.
+- `complete`: every requested branch passed operation and handoff validation.
+- `partial`: at least one independent requested branch passed and another did
+  not.
+- `blocked`: no requested branch could safely run.
+- `failed`: launch or observable validation failed.
+- `input_required`, `dependency_required`, and `selection_required`: the named
+  terminal gate stopped work before launch.
+- `operation_verified`: only the exact tested route worked.
+- `unsupported`: reserve for directly applicable product documentation; never
+  derive it from an API field or failed operation.

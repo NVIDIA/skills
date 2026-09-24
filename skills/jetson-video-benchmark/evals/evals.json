@@ -4,10 +4,10 @@
     {
       "id": "benchmark-no-content",
       "prompt": "Can you measure real 1080p H.264 encode and decode FPS without a test video?",
-      "expected_output": "A request for exact representative input before any real benchmark.",
+      "expected_output": "A request for the missing representative raw encode input and compressed decode input before any real benchmark.",
       "assertions": [
         "Says real performance cannot be measured without representative input",
-        "Asks for an exact target-local path or user-supplied HTTP(S) URL",
+        "Asks for exact target-local paths or user-supplied HTTP(S) URLs for raw encode input and compressed decode input",
         "Does not choose content or claim measured FPS"
       ],
       "expected_skill": "jetson-video-benchmark",
