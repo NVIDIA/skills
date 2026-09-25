@@ -41,9 +41,10 @@ A qualitative encode control that is not an exact table value, including
 "medium quality", must not be mapped to one preset, rate-control mode, or
 tuning. Preserve the encode direction, enumerate a compact set of exact
 documented encode candidates without calling any candidate "medium", and ask
-for the exact controls. Never switch to a decode row merely because decode has
-fewer required controls. Use decode only for already-compressed camera input;
-use separate encode and decode budgets when both stages are requested.
+for the exact controls and direction. Never switch to a decode row merely
+because decode has fewer required controls. State decode only as the
+conditional interpretation for cameras that already emit the compressed
+codec; use separate encode and decode budgets when both stages are requested.
 
 Encode rows apply exactly to 1920x1080, YUV 4:2:0, 8-bit input:
 
@@ -82,9 +83,10 @@ Decode rows apply exactly to 1920x1080 YUV 4:2:0:
 
 Do not scale a row across chroma, bit depth, codec, preset, rate control, or
 tuning. Scale resolution only with the separately labeled pixel-area heuristic
-below. Do not multiply by an encoder or decoder engine count by default. The
-table does not measure native-versus-PyNvVideoCodec wrapper overhead or prove
-simultaneous-stream capacity.
+below. Keep the published rows per engine; the aggregate-planning rule below
+governs any all-engines total. The table does not measure
+native-versus-PyNvVideoCodec wrapper overhead or prove simultaneous-stream
+capacity.
 
 ## Select the target clock
 
@@ -96,7 +98,10 @@ Use a positive configured maximum video clock, not an instantaneous idle clock:
    CI-supplied configured maximum clock and label it `user_supplied`, or use
    `nvpmodel -q --verbose` only when its current power-mode output explicitly
    labels `PARAM VIDEO`, its `MAX_FREQ` path, and the configured value. Record
-   the command, power mode, path, value, and Hz-to-MHz conversion.
+   the command, power mode, path, value, and Hz-to-MHz conversion. Run that
+   exact read-only query as a standalone command; do not embed `nvpmodel` in a
+   command substitution or a compound device-summary command, and never pass a
+   non-query option.
 3. If no configured maximum is available, report only the unscaled documented
    row and formula with `target_clock_unavailable`. Do not guess.
 
@@ -213,11 +218,14 @@ overcommitting each resolution.
 Use `evidence_class: documented_theoretical_capacity_estimate`, retain the
 underlying FPS evidence class, and set `measurement_performed: false` and
 `capacity_verified: false`. Call it codec-stream capacity, not physical camera
-connectivity or end-to-end pipeline capacity. Published rows are per engine.
-Multiply by an engine count only when the exact target count is independently
-authenticated, the user explicitly requests multi-session aggregate planning,
-and the result is labeled `theoretical_multi_session_engine_budget`; a single
-session never receives that multiplication.
+connectivity or end-to-end pipeline capacity. Report capacity per engine,
+including generic stream or camera questions about how many a device can
+connect or handle. Multiply across engines only when the user explicitly asks
+for an all-engines or whole-device total; take that count from a live target
+interface that enumerates the engines themselves, and label it
+`theoretical_multi_session_engine_budget`. A SKU-matched documented
+specification supplies device identity evidence; keep its capacity row per
+engine.
 
 Every clock-scaled FPS basis must include:
 
@@ -237,9 +245,11 @@ Every clock-scaled FPS basis must include:
   benchmark workflow for a measured result.
 
 A non-1080p or theoretical-capacity answer must additionally include every
-field and caveat required by the two sections above. Always end by requesting
+field and caveat required by the two sections above. Every estimate answer must
+end by requesting
 representative user content for a real benchmark; for capacity, also request
-the intended per-stream FPS and stream mix if either was defaulted or omitted.
+the intended codec direction, per-stream FPS, and stream mix if any was
+defaulted or omitted.
 
 When the exact row exists but no configured maximum clock is available, return
 only `evidence_class: documented_reference_value` with

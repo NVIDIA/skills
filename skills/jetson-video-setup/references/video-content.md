@@ -11,7 +11,7 @@ smoke fixture; benchmark and pipeline workflows own normal media execution.
 | Setup/readiness verification | A deterministic synthetic raw fixture is allowed; user media is not required. |
 | Capability API query | Media-free. A minimal capability-operation smoke test may use setup's deterministic fixture. |
 | Recipe planning, validation, or live compatibility check | Media-free. Stop before media work. |
-| Documentation-only benchmark estimate | Media-free. Do not launch a controller or claim a measurement. |
+| Documentation-only benchmark estimate | Media-free. Do not execute a benchmark operation or claim a measurement. |
 | Live benchmark `encode`, `decode`, `compare`, or `camera_capacity` | Require exact user-selected media under the input gate below. |
 | Pipeline `encode_decode`, `native_transcode`, `pynvc_segments`, `container_triage`, `av1_verify`, or `acceptance` | Require exact user-selected media under the input gate below. |
 | Direct recipe-bound encode/decode execution | Require exact user-selected media, except for the capability-smoke fixture above. |
@@ -33,12 +33,12 @@ run or execution, require the user to supply exactly one of:
 
 If neither is present, return `input_required` with
 `next_action: provide_media_path_or_url`, ask the user for one, and pause before probing,
-retrieving, converting, constructing a controller request, or launching an operation. Never browse
+retrieving, converting, preparing an operation invocation, or launching an operation. Never browse
 for, select, recommend, or retrieve media from a bundled catalog or an alternate source.
-The controller's `synthetic_input_allowed: false` field is an agent-routing rule, not a byte-content
-classifier: an artifact identity alone does not prove who selected the file or how its frames were
-created. Bind request construction to the user's supplied path or URL and never turn the setup
-fixture into an execution input.
+The synthetic-content prohibition is an agent-routing rule, not a byte-content classifier: an
+artifact identity alone does not prove who selected the file or how its frames were created. Bind
+the operation to the user's supplied path or URL and never turn the setup fixture into an execution
+input.
 
 Treat user selection as operation input, not as proof of copyright or license rights. Preserve
 license and attribution exactly when evidenced or supplied. Use the literal string `unknown` when
@@ -68,11 +68,11 @@ either is unknown; never infer or invent it.
 - If the selected NVIDIA sample does not accept the user-selected source, ask for another local
   path or URL, or report the route blocked. Do not choose fallback media or use FFmpeg to replace
   codec work.
-- Use the same user-selected content and frame range across comparisons. The controllers validate
-  byte identity, frame alignment, metadata, and official-sample evidence; they do not infer scene
-  complexity, representativeness, ownership, or nonuniformity. Never promote the setup fixture into
-  a performance input. Report results only for the exact user-selected workload and do not
-  generalize it into a complete workload suite.
+- Use the same user-selected content and frame range across comparisons. In each owning workflow,
+  the agent validates byte identity, frame alignment, metadata, and official-sample evidence; it
+  does not infer scene complexity, representativeness, ownership, or nonuniformity. Never promote
+  the setup fixture into a performance input. Report results only for the exact user-selected
+  workload and do not generalize it into a complete workload suite.
 
 ## Evidence
 

@@ -4,10 +4,11 @@
     {
       "id": "recipe-live-streaming-both",
       "prompt": "Give me one H.264 1080p60, 6 Mbps CBR low-latency live-streaming recipe for native Video Codec SDK and PyNvVideoCodec. Do not run it.",
-      "expected_output": "One validated live-streaming recipe projected to both SDKs with explicit defaults.",
+      "expected_output": "One validated live-streaming recipe written as fresh canonical JSON and projected to both SDKs with explicit defaults, with its absolute path, byte count, and SHA-256 reported.",
       "assertions": [
         "Preserves H.264, 1920x1080, 60 fps, CBR, and 6000000 bps in one canonical intent",
         "Resolves to P4, low-latency tuning, GOP 60, one B-frame, zero lookahead, full-resolution multipass, and a 3000000-bit VBV buffer",
+        "Writes the recipe as fresh canonical JSON and reports its absolute path, byte count, and SHA-256 even though execution was not requested",
         "Projects the same intent to native and PyNvVideoCodec without claiming execution, measured quality, or performance"
       ],
       "expected_skill": "jetson-video-recipe",
@@ -16,10 +17,11 @@
     {
       "id": "recipe-high-profile-projection-loss",
       "prompt": "Prepare an H.264 1080p archival recipe for native Video Codec SDK and PyNvVideoCodec. High profile is required. Do not run it.",
-      "expected_output": "One archival recipe that preserves High profile natively and exposes the PyNvVideoCodec projection loss.",
+      "expected_output": "One archival recipe written as fresh canonical JSON that preserves High profile natively, exposes the PyNvVideoCodec projection loss, and reports its absolute path, byte count, and SHA-256.",
       "assertions": [
         "Preserves H.264 High profile as an explicit canonical control and expresses it in the native projection",
         "Reports the released PyNvVideoCodec sample projection as unrepresentable because it cannot express a named profile",
+        "Writes the recipe as fresh canonical JSON and reports its absolute path, byte count, and SHA-256 even though execution was not requested",
         "Does not drop or downgrade High profile, claim both projections are exact, or claim execution or performance"
       ],
       "expected_skill": "jetson-video-recipe",
@@ -33,6 +35,19 @@
         "Explains that CQ is a target-quality VBR control and conflicts with an average bitrate in the shared recipe contract",
         "Does not silently discard CQ, reinterpret the bitrate as a cap, or produce a validated native or PyNvVideoCodec projection",
         "Launches no media, codec, or benchmark operation and asks only for information needed after the conflict is resolved"
+      ],
+      "expected_skill": "jetson-video-recipe",
+      "expected_workflow": "recipes"
+    },
+    {
+      "id": "recipe-format-not-memory-domain",
+      "prompt": "Plan, but do not run, a 1920x1080 60 fps NV12 H.264 encoder recipe for live streaming, and mark NV12 as a zero-copy CUDA shared-buffer type.",
+      "expected_output": "An encoder recipe that preserves NV12 as pixel layout but refuses to infer memory sharing or synchronization.",
+      "assertions": [
+        "Produces a plan-only H.264 live-streaming recipe for 1920x1080 at 60 fps with NV12 preserved as the pixel format",
+        "Distinguishes pixel format from memory domain, handle type, ownership, copy policy, and synchronization",
+        "Does not describe NV12 itself as CUDA-shareable or zero copy",
+        "Leaves interoperability to authenticated pipeline evidence"
       ],
       "expected_skill": "jetson-video-recipe",
       "expected_workflow": "recipes"

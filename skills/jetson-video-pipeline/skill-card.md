@@ -1,5 +1,5 @@
 ## Description: <br>
-Execute and verify Jetson Video Codec SDK or PyNvVideoCodec encode/decode, transcode, segmentation, container decode, AV1, or acceptance workflows with exact artifact handoffs. <br>
+Use when planning, executing, and independently validating Jetson Video Codec SDK or PyNvVideoCodec encode/decode, transcode, segmentation, container decode, AV1, or concise acceptance workflows. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to execute official-sample codec stages on NVIDIA Jetson devices and prove that every consumer used the exact artifact produced by the preceding stage, including encode-then-decode verification, native transcode, PyNvVideoCodec segments, container decode triage, AV1 operation verification, and customer acceptance packages. <br>
+Developers and engineers use this skill to plan, execute, and validate Jetson Video Codec SDK and PyNvVideoCodec codec workflows including encode/decode, transcode, segmentation, container decode, and AV1 verification on NVIDIA Jetson devices. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,17 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Pipeline workflow](references/pipeline-workflow.md) <br>
-- [Official sample contract](references/official-sample-contract.md) <br>
-- [Agent Skills](https://agentskills.io/) <br>
+- [Pipeline Workflow](references/pipeline-workflow.md) <br>
+- [Official Sample Contract](references/official-sample-contract.md) <br>
+- [Buffer Sharing and Synchronization](references/buffer-sharing-and-synchronization.md) <br>
+- [In-Process Codec Boundaries](references/in-process-codec-boundaries.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, JSON results, Artifact verification] <br>
-**Output Format:** [JSON with structured pipeline result and workspace artifacts] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline JSON evidence blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces provenance-tracked workspace with hashed artifacts and structured result JSON] <br>
+**Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -43,38 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive) from skill-evaluator-dataset-snapshot/1, each run in an isolated k8s-sandbox pod. <br>
+Evaluated against 4 internal evaluation tasks (4 positive) with 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
+- Efficiency: Checks tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `skill_execution`: Verifies expected skill selection, decoy avoidance, and workflow execution. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Measures tool-call productivity. <br>
+- `token_efficiency`: Measures actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 50% → 100% (+50 points) | 35% → 71% (+36 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 40% → 100% (+60 points) | 40% → 30% (-10 points) |
-| Discoverability | 50% → 100% (+50 points) | 22% → 94% (+72 points) |
-| Effectiveness | 30% → 100% (+70 points) | 0% → 30% (+30 points) |
-| Efficiency | 31% → 100% (+69 points) | 11% → 100% (+89 points) |
+| Overall | 88.7% — uplift unavailable | 93.2% — uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
+| Correctness | 100.0% → 85.0% (-15.0 points) | 66.7% → 100.0% (+33.3 points) |
+| Discoverability | 95.0% — uplift unavailable | 93.8% — uplift unavailable |
+| Effectiveness | 55.4% → 67.5% (+12.1 points) | 34.2% → 88.8% (+54.6 points) |
+| Efficiency | 96.0% — uplift unavailable | 83.4% — uplift unavailable |
 
 ## Skill Version(s): <br>
-e61c045 (source: git SHA, committed 2026-08-10) <br>
+74bce4d (source: git SHA, committed 2026-09-16) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
