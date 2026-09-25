@@ -1,0 +1,7 @@
+{
+  "case_id": "example-input",
+  "volume_path": "REPLACE_WITH_AUTHORIZED_CT.nii.gz",
+  "prompt": "write a structured chest CT report",
+  "anatomy_region": "chest",
+  "enable_thinking": true
+}

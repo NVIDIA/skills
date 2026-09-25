@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Structured output from skills/nv-reason-ct/scripts/run_nv_reason_ct.py.",
+  "type": "object",
+  "required": [
+    "skill",
+    "input",
+    "output",
+    "runtime",
+    "environment",
+    "limitations"
+  ],
+  "properties": {
+    "skill": {"const": "nv_reason_ct"},
+    "input": {
+      "type": "object",
+      "required": [
+        "case_id",
+        "prompt",
+        "anatomy_region",
+        "enable_thinking",
+        "volume"
+      ],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "prompt": {"type": "string", "minLength": 1},
+        "anatomy_region": {"enum": ["chest", "abdomen", "none"]},
+        "enable_thinking": {"type": "boolean"},
+        "volume": {
+          "type": "object",
+          "required": [
+            "path",
+            "source",
+            "format",
+            "ndim",
+            "shape",
+            "spacing_mm",
+            "dtype",
+            "sha256"
+          ],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "source": {
+              "enum": ["file", "fixture_file"]
+            },
+            "format": {"const": "nifti"},
+            "ndim": {"const": 3},
+            "shape": {
+              "type": "array",
+              "items": {"type": "integer", "minimum": 1},
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "spacing_mm": {
+              "type": "array",
+              "items": {"type": "number", "exclusiveMinimum": 0},
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "dtype": {"type": "string", "minLength": 1},
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "output": {
+      "type": "object",
+      "required": ["response_text", "text_chars"],
+      "properties": {
+        "response_text": {"type": "string", "minLength": 1},
+        "text_chars": {"type": "integer", "minimum": 1},
+        "partial_json_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Present only after successfully saving partial JSON. If saving fails, retain stdout; this field is absent even for truncated output."
+        }
+      },
+      "additionalProperties": false
+    },
+    "runtime": {
+      "type": "object",
+      "required": [
+        "model",
+        "model_source",
+        "revision",
+        "resolved_revision",
+        "mode",
+        "mock",
+        "device",
+        "torch_dtype",
+        "attention_implementation",
+        "trust_remote_code",
+        "deterministic_generation",
+        "max_new_tokens",
+        "inference_seconds",
+        "local_files_only",
+        "generated_tokens",
+        "truncated_by_max_new_tokens"
+      ],
+      "properties": {
+        "model": {"type": "string", "minLength": 1},
+        "model_source": {"enum": ["hub", "local"]},
+        "revision": {"type": ["string", "null"], "minLength": 1},
+        "resolved_revision": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "mode": {"const": "hf_transformers"},
+        "mock": {"const": false},
+        "device": {"type": "string", "minLength": 1},
+        "torch_dtype": {"type": "string", "minLength": 1},
+        "attention_implementation": {"const": "sdpa"},
+        "trust_remote_code": {"const": true},
+        "deterministic_generation": {"const": true},
+        "max_new_tokens": {"type": "integer", "minimum": 1},
+        "inference_seconds": {"type": "number", "minimum": 0},
+        "local_files_only": {"type": "boolean"},
+        "transformers_version": {"type": ["string", "null"]},
+        "torch_version": {"type": ["string", "null"]},
+        "generated_tokens": {"type": "integer", "minimum": 0},
+        "truncated_by_max_new_tokens": {"type": "boolean"}
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {"properties": {"model_source": {"const": "hub"}}},
+          "then": {"properties": {
+            "revision": {"type": "string"},
+            "resolved_revision": {"type": "string"}
+          }},
+          "else": {"properties": {
+            "revision": {"const": null},
+            "resolved_revision": {"const": null},
+            "local_files_only": {"const": true}
+          }}
+        }
+      ]
+    },
+    "environment": {
+      "type": "object",
+      "required": ["packages"],
+      "properties": {
+        "packages": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        }
+      },
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}

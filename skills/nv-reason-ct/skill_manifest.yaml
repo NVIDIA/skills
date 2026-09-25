@@ -1,0 +1,233 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+id: medagent.nv_reason_ct
+version: 0.3.1
+license: Apache-2.0
+upstream_refs:
+  - kind: huggingface_repo
+    name: nvidia/NV-Reason-CT
+    repo_id: nvidia/NV-Reason-CT
+    revision: main
+    notes: Replace the moving branch with the reviewed immutable public release revision before publication.
+  - kind: git_repo
+    name: NVIDIA-Medtech/NV-Reason-CT inference examples
+    repo_url: https://github.com/NVIDIA-Medtech/NV-Reason-CT
+    revision: main
+    notes: README.md, inference.py, and requirements.txt define the upstream single-turn contract. The public examples/ directory provides three Git LFS CT volumes; example_1 supports the documented chest and abdomen end-to-end checks. Record the inspected Git commit and LFS content hashes with run evidence.
+license_restrictions:
+  wrapper: Apache-2.0
+  upstream_model_and_code: OpenMDW-1.1
+  redistribution: retain_license_and_applicable_notices
+intended_use:
+  summary: >
+    Engineering-time wrapper around nvidia/NV-Reason-CT inference for a
+    user-provided 3D NIfTI CT volume and text prompt. Invokes the documented
+    Hugging Face Transformers custom-code path and emits structured JSON with
+    input metadata, crop selection, response text, runtime identity, and
+    limitations.
+  scope: development
+  not_for:
+    - clinical deployment
+    - clinical interpretation
+    - autonomous diagnosis
+    - treatment decisions
+    - triage
+    - patient-facing report generation
+    - regulatory submission
+
+inputs:
+  - name: ct_request_or_fixture
+    type: file_path
+    formats:
+      - json
+    description: >
+      JSON request pointing to a caller-owned or separately downloaded
+      upstream example CT volume. Populate the request template with an
+      existing authorized volume path before inference.
+  - name: ct_volume
+    type: file_path
+    formats:
+      - nifti
+    optional: true
+    description: >
+      Direct wrapper use accepts one 3D .nii or .nii.gz CT volume in
+      Hounsfield units instead of a JSON request.
+
+outputs:
+  - name: result_json
+    type: json
+    schema: validators/output_schema.json
+    description: >
+      JSON on stdout. On token-limit truncation, the wrapper also retains a
+      unique partial_result_*.json under --out-dir and exits 3; partial output
+      must not be treated as completed generation.
+
+runtime:
+  language: python
+  python: ">=3.11"
+  entrypoint: scripts/run_nv_reason_ct.py
+  args:
+    - "${python}"
+    - "${script}"
+    - "${fixture}"
+    - "--out-dir"
+    - "${out}/artifacts"
+  # Inventory only. Upstream owns installation requirements and compatibility.
+  dependencies:
+    transformers: "*"
+    torch: "*"
+    monai: "*"
+    nibabel: "*"
+    dynamic-network-architectures: "*"
+    scipy: "*"
+    numpy: "*"
+    Pillow: "*"
+    timm: "*"
+    einops: "*"
+    safetensors: "*"
+    huggingface_hub: "*"
+  env_optional:
+    - NV_REASON_CT_MODEL
+    - NV_REASON_CT_REVISION
+    - HF_HOME
+    - HF_HUB_CACHE
+    - HF_MODULES_CACHE
+    - XDG_CACHE_HOME
+    - TORCH_HOME
+    - HF_TOKEN
+    - TRANSFORMERS_OFFLINE
+    - HF_HUB_OFFLINE
+    - CUDA_VISIBLE_DEVICES
+  external_assets:
+    - kind: huggingface_repo
+      repo_id: nvidia/NV-Reason-CT
+      installation_url: https://github.com/NVIDIA-Medtech/NV-Reason-CT#installation
+  side_effects:
+    pip_packages:
+      - transformers
+      - torch
+      - monai
+      - nibabel
+      - dynamic-network-architectures
+      - scipy
+      - numpy
+      - Pillow
+      - timm
+      - einops
+      - safetensors
+      - huggingface_hub
+    local_writes:
+      - {path: "<caller-provided --out-dir>", approx_mb_max: 5}
+    home_writes:
+      - {path: ~/.cache/huggingface/, approx_mb_max: 16000}
+    network_endpoints:
+      - https://huggingface.co
+    requires_docker: false
+    requires_gpu: cuda
+    gpu_fallback: none
+    environment:
+      clean_environment_required: false
+      clean_environment_recommended: true
+      modifies_active_python_environment: false
+      user_environment_modification_ok: false
+      recommended_isolation: fresh venv or container for live inference and evidence runs
+      notes: >
+        Follow the upstream repository's installation instructions and dependency
+        requirements. This skill records installed versions without maintaining
+        package constraints or installing packages. Use a caller-selected isolated
+        environment and capture --check-setup output for evidence.
+
+limitations:
+  - >
+    This is a thin wrapper. NIfTI preprocessing, anatomy-aware cropping, model
+    inference, and decoding are delegated to the nvidia/NV-Reason-CT custom
+    Transformers code loaded with trust_remote_code=True.
+  - >
+    Live inference requires explicit --trust-model-code acknowledgement for
+    the selected Hub revision or local export. The wrapper warns before loading
+    custom Python code; the flag is not a sandbox or authenticity check. The
+    default runtime.args template deliberately does not supply this consent;
+    invoke the wrapper CLI with explicit authorization for live inference.
+    Read-only --check-setup does not require the flag or grant that authorization.
+  - >
+    Output is not a diagnosis, clinical report, treatment recommendation, or
+    triage decision. It is engineering evidence and requires qualified review
+    before any medical use.
+  - >
+    The wrapper validates readable 3D NIfTI structure and finite affine and
+    spacing metadata, but does not verify de-identification, Hounsfield-unit
+    calibration, crop quality, anatomy coverage, or clinical correctness.
+  - >
+    The request template must be populated with an existing authorized volume
+    path before inference. No CT scans or model weights are bundled.
+  - >
+    Automatic reproducibility verification is preflight-only because the
+    request template contains no CT volume. Live repeatability requires staged
+    upstream examples, reviewed model assets, and a compatible GPU; use the
+    opt-in upstream-parity tests in tests/test_upstream_examples.py rather
+    than treating preflight success as completed model inference.
+  - >
+    Real-data integration and live end-to-end checks use the separately
+    downloaded upstream Git LFS examples, not bundled CT images. Download the
+    actual volumes from the public source repository. example_1 is used for both chest
+    and abdomen; no clinical ground truth or quality score is inferred from
+    agreement with the upstream CLI.
+  - >
+    Dependency requirements and compatibility are maintained upstream. Setup
+    checks imports, CUDA/bfloat16, and asset presence, not package-version
+    compatibility or vulnerabilities. Retain the installed-version report and
+    review the actual environment separately. SKILL.md's historical baseline
+    has a known Transformers security advisory, not a remediated live result.
+  - >
+    The manifest currently follows the moving model revision main. Replace it
+    with a reviewed immutable public release revision before publication.
+  - >
+    Each wrapper invocation is a single-turn inference request. It does not
+    implement upstream's model-reuse or multi-turn history examples. Upstream
+    training JSONL records are not inference fixtures and do not include CT volumes.
+  - >
+    --model also accepts a complete local model-and-processor export from
+    upstream SFT/GRPO training, not an adapter-only checkpoint. Local exports
+    have no Hub revision; output records their absolute path and null revisions.
+    Retain separate content hashes for reproducibility. Local loading uses
+    local_files_only=True but is not a sandbox for custom Python code.
+
+validation:
+  expected_runtime_seconds:
+    min: 0.0
+    max: 3600.0
+    inference_path: runtime.inference_seconds
+  sanity_checks:
+    - {path: skill, eq: nv_reason_ct}
+    - {path: input.volume.format, eq: nifti}
+    - {path: input.volume.ndim, eq: 3}
+    - {path: input.volume.shape, length_eq: 3}
+    - {path: input.volume.spacing_mm, length_eq: 3}
+    - {path: input.volume.sha256, matches: "^[0-9a-f]{64}$"}
+    - {path: input.anatomy_region, matches: "^(chest|abdomen|none)$"}
+    - {path: output.response_text, length_gte: 1}
+    - {path: runtime.model, length_gte: 1}
+    - {path: runtime.model_source, matches: "^(hub|local)$"}
+    - {path: runtime.mode, eq: hf_transformers}
+    - {path: runtime.mock, eq: false}
+    - {path: runtime.attention_implementation, eq: sdpa}
+    - {path: runtime.trust_remote_code, eq: true}
+    - {path: runtime.deterministic_generation, eq: true}
+    - {path: runtime.truncated_by_max_new_tokens, eq: false}
+  expected_cost:
+    wall_seconds: {max: 3600}
+    cpu_seconds: {max: 7200}
+    rss_mb_peak: {max: 64000}
+    gpu_seconds: {max: 3600}
+    gpu_memory_mb_peak: {max: 96000}
+  reproducibility:
+    mode: preflight
+    fixture: fixtures/example_request.json
+    runs: 2
+    reason: >
+      Live repeats require a separately staged authorized CT volume, reviewed
+      model assets, and a CUDA GPU. The committed request is a path template,
+      not executable demo data; only request/environment preflight is audited
+      automatically. tests/test_upstream_examples.py provides opt-in live
+      parity checks; EXAMPLES.md documents inference on the upstream volumes.
