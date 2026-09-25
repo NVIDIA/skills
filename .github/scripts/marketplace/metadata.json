@@ -2151,7 +2151,7 @@
     {
       "path": "skills/jetson-video-benchmark",
       "name": "jetson-video-benchmark",
-      "description": "Use when measuring Jetson Video Codec SDK or PyNvVideoCodec encode/decode throughput, comparing presets or surfaces, testing codec-worker capacity with authenticated samples and user media, or producing a documented clock-scaled or clock-and-resolution-scaled planning estimate when representative content is unavailable. Also use for Jetson video requests asking only for PSNR or SSIM results, to apply this performance skill's scope-only response.",
+      "description": "Use when measuring Jetson Video Codec SDK or PyNvVideoCodec encode/decode throughput, comparing presets or surfaces, testing codec-worker capacity with authenticated samples and user media, or producing a clearly labeled documentation-derived planning estimate when representative media is absent. Also use for a video request limited to PSNR or SSIM, to apply the terminal scope response.",
       "metadata": {
         "product.primary": "Jetson",
         "classification.category.primary": "graphics_and_media",
@@ -2163,7 +2163,7 @@
     {
       "path": "skills/jetson-video-capability",
       "name": "jetson-video-capability",
-      "description": "Use when Jetson codec, profile, chroma, bit-depth, dimension, engine-count, or operational support must be reconciled using live SDK APIs, authenticated NVIDIA samples, and NVIDIA documentation. Also use for Jetson questions about Netflix, Widevine, or other DRM-protected streaming-service playback to apply the codec-scope boundary.",
+      "description": "Use when Jetson codec, profile, chroma, bit-depth, dimension, engine-count, or operational support must be reconciled from live APIs, authenticated NVIDIA samples, and NVIDIA documentation; also applies the content-DRM scope.",
       "metadata": {
         "product.primary": "Jetson",
         "classification.category.primary": "physical_ai",
@@ -2175,19 +2175,19 @@
     {
       "path": "skills/jetson-video-pipeline",
       "name": "jetson-video-pipeline",
-      "description": "Use when executing and verifying Jetson Video Codec SDK or PyNvVideoCodec encode/decode, transcode, segmentation, container decode, AV1, or acceptance workflows with exact artifact handoffs.",
+      "description": "Use when planning, executing, and independently validating Jetson Video Codec SDK or PyNvVideoCodec encode/decode, transcode, segmentation, container decode, AV1, or concise acceptance workflows.",
       "metadata": {
         "product.primary": "Video Codec",
         "classification.category.primary": "graphics_and_media",
         "catalog.subdomain": "gpu-development",
         "audience": "application_developer,developer,platform_engineer",
-        "discovery.activity_tags": "validate,test,convert,debug,package"
+        "discovery.activity_tags": "validate,convert,test,debug,configure"
       }
     },
     {
       "path": "skills/jetson-video-recipe",
       "name": "jetson-video-recipe",
-      "description": "Use when turning a Jetson encoder use case into one validated surface-neutral recipe with native and PyNvVideoCodec projections for codec, preset, rate control, bitrate, latency, format, and profile.",
+      "description": "Use when turning a Jetson encoder use case into one surface-neutral recipe with native Video Codec SDK and PyNvVideoCodec projections.",
       "metadata": {
         "product.primary": "Jetson",
         "classification.category.primary": "graphics_and_media",
@@ -2199,7 +2199,7 @@
     {
       "path": "skills/jetson-video-setup",
       "name": "jetson-video-setup",
-      "description": "Use when installing, repairing, probing, or verifying native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson with official encode-to-decode samples, including registered-environment recovery.",
+      "description": "Use when installing, repairing, reusing, inspecting, or verifying readiness of the native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson, including the one-frame encode/decode smoke test with official samples, and when interpreting what those readiness results, including CPU-buffer and device-memory sample modes, do and do not establish.",
       "metadata": {
         "product.primary": "Video Codec",
         "classification.category.primary": "graphics_and_media",
