@@ -1257,37 +1257,37 @@
     {
       "name": "jetson-video-benchmark",
       "path": "skills/jetson-video-benchmark",
-      "content_digest": "sha256:e17f48d3f0196591e0c26eee655ac33a49a98c987dcdc8e8c4731e6fbc9e076d",
-      "last_commit": "d36ff704a11655e4abb0e30ad69c6bfa1b63c1b3",
-      "last_modified": "2026-08-17"
+      "content_digest": "sha256:5a5270ffce1b7369c07be80080ca66ed70fe9d9a9ae9aee162b9780215aa5f9c",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
     },
     {
       "name": "jetson-video-capability",
       "path": "skills/jetson-video-capability",
-      "content_digest": "sha256:49bd05d757615f3eb85a893da02e1aff7186c598e330d43094c0652a3688b967",
-      "last_commit": "d36ff704a11655e4abb0e30ad69c6bfa1b63c1b3",
-      "last_modified": "2026-08-17"
+      "content_digest": "sha256:f791b6d7a3bd57b26028f2af014a5c296f331e3bd22417a19645167f90ea6fa8",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
     },
     {
       "name": "jetson-video-pipeline",
       "path": "skills/jetson-video-pipeline",
-      "content_digest": "sha256:e41e847cd4e5762ad663f51d6a9cd5419691a985a5d58c985649d0a1b86cec37",
-      "last_commit": "d36ff704a11655e4abb0e30ad69c6bfa1b63c1b3",
-      "last_modified": "2026-08-17"
+      "content_digest": "sha256:bac015476b19abf19ca112ede93d1003b9c98feaa4d282d3889b621720027370",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
     },
     {
       "name": "jetson-video-recipe",
       "path": "skills/jetson-video-recipe",
-      "content_digest": "sha256:8054e6968da126f76ac4c38eb13b2d4804979f2ca1b571783e52c43302ba2d30",
-      "last_commit": "d36ff704a11655e4abb0e30ad69c6bfa1b63c1b3",
-      "last_modified": "2026-08-17"
+      "content_digest": "sha256:98bce4f1cd9ed5fcbd4f896a811c85a151f0b37e3b16d985073a5db264beb51b",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
     },
     {
       "name": "jetson-video-setup",
       "path": "skills/jetson-video-setup",
-      "content_digest": "sha256:77f9099b8a501edfcd79a78633b18fee914aa030863ebc3c96bec4bc4293745b",
-      "last_commit": "d36ff704a11655e4abb0e30ad69c6bfa1b63c1b3",
-      "last_modified": "2026-08-17"
+      "content_digest": "sha256:9101525e38c2591f5ef7a63a47d39d7c4150bfd6f3e62e4941299ae34b9d0c25",
+      "last_commit": "9bb5a397cbddae039ca59c84a2fc2382c1c8c502",
+      "last_modified": "2026-09-24"
     },
     {
       "name": "launch-nemo-rl",
