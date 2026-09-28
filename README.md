@@ -115,7 +115,6 @@ For non-interactive installs, global installs, agent-specific installs, updates,
 <!-- skills-table-start -->
 | Product | Description | Skills |
 |---------|-------------|--------|
-| **AIQ** | NVIDIA AI-Q Blueprint - deploy local AI-Q services and run shallow or deep research workflows as agent skills. | [`aiq-research`](skills/aiq-research), [`aiq-deploy`](skills/aiq-deploy) |
 | **BioNeMo Libraries** | GPU-accelerated cheminformatics with nvMolKit for molecular fingerprints, similarity search, conformer generation, and optimization. | [`bionemo-nvmolkit-usage`](skills/bionemo-nvmolkit-usage) |
 | **BioNeMo NIMs** | OpenFold2 predicts single-chain protein structures. The MSA pipeline uses MSA-Search alignments to guide OpenFold3 structure prediction. | [`bionemo-msa-structure-prediction-pipeline`](skills/bionemo-msa-structure-prediction-pipeline), [`bionemo-openfold2-nim`](skills/bionemo-openfold2-nim) |
 | **BioNeMo Open Models** | KERMT skills for container setup, molecular model pretraining and finetuning, inference, embedding extraction, and run monitoring. | [`bionemo-kermt-add-cmim-pretrain`](skills/bionemo-kermt-add-cmim-pretrain), [`bionemo-kermt-continue-pretrain`](skills/bionemo-kermt-continue-pretrain), [`bionemo-kermt-embed`](skills/bionemo-kermt-embed), [`bionemo-kermt-finetune`](skills/bionemo-kermt-finetune), [`bionemo-kermt-infer`](skills/bionemo-kermt-infer), [`bionemo-kermt-monitor`](skills/bionemo-kermt-monitor), [`bionemo-kermt-pretrain-scratch`](skills/bionemo-kermt-pretrain-scratch), [`bionemo-kermt-setup`](skills/bionemo-kermt-setup) |
@@ -181,7 +180,6 @@ Per-product source repo links:
 <!-- help-table-start -->
 | Product | Issues | Discussions | Contributing | Security |
 |---------|--------|-------------|--------------|----------|
-| **AIQ** | [Issues](https://github.com/NVIDIA-AI-Blueprints/aiq/issues) | [Discussions](https://github.com/NVIDIA-AI-Blueprints/aiq/discussions) | [Contributing](https://github.com/NVIDIA-AI-Blueprints/aiq/blob/develop/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA-AI-Blueprints/aiq/blob/develop/SECURITY.md) |
 | **BioNeMo Libraries** | [Issues](https://github.com/NVIDIA-BioNeMo/nvMolKit/issues) | — | [Contributing](https://github.com/NVIDIA-BioNeMo/nvMolKit/blob/main/CONTRIBUTING.md) | — |
 | **BioNeMo NIMs** | [Issues](https://github.com/NVIDIA-BioNeMo/bionemo-agent-toolkit/issues) | — | [Contributing](https://github.com/NVIDIA-BioNeMo/bionemo-agent-toolkit/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA-BioNeMo/bionemo-agent-toolkit/blob/main/SECURITY.md) |
 | **BioNeMo Open Models** | [Issues](https://github.com/NVIDIA-BioNeMo/KERMT/issues) | — | [Contributing](https://github.com/NVIDIA-BioNeMo/KERMT/blob/main/CONTRIBUTING.md) | — |
@@ -283,7 +281,7 @@ NVIDIA/skills/
 │   │                              synced from upstream product repos
 │   ├── README.md                 # Browser-facing install guidance
 │   ├── <product-prefix>-*/       # Flat layout — one dir per skill, product-prefixed
-│   │                               # e.g. aiq-*, cuopt-*, cupynumeric-*,
+│   │                               # e.g. cuopt-*, cupynumeric-*,
 │   │                               # dali-*, deepstream-*, dicom-*, digital-health-*,
 │   │                               # dynamo-*, earth2studio-*, holoscan-*, hsb-*,
 │   │                               # jetson-*, launch-nemo-rl, mcore-*,

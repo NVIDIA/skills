@@ -6,8 +6,6 @@
       "title": "Agentic AI",
       "description": "Build and operate agentic systems, including RAG workflows, evaluation harnesses, tool use, policy, sandboxing, agent configuration, and agent workflow automation.",
       "skills": [
-        "aiq-deploy",
-        "aiq-research",
         "nemo-fabric-build-adapter",
         "nemo-fabric-integrate",
         "nemo-relay-debug-runtime-integration",
