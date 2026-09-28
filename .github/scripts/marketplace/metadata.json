@@ -13,30 +13,6 @@
       }
     },
     {
-      "path": "skills/aiq-deploy",
-      "name": "aiq-deploy",
-      "description": "Use when asked to install, deploy, run, validate, troubleshoot, or stop NVIDIA AI-Q Blueprint infrastructure.\n",
-      "metadata": {
-        "product.primary": "NeMo Agent Toolkit",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,devops_engineer,platform_engineer",
-        "discovery.activity_tags": "deploy,configure,validate,troubleshoot,operate"
-      }
-    },
-    {
-      "path": "skills/aiq-research",
-      "name": "aiq-research",
-      "description": "Use when asked to run deep research or AI-Q research through a reachable NVIDIA AI-Q Blueprint backend.\n",
-      "metadata": {
-        "product.primary": "NeMo Agent Toolkit",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "agentic-ai",
-        "audience": "developer,ai_engineer",
-        "discovery.activity_tags": "generate,summarize,validate"
-      }
-    },
-    {
       "path": "skills/amc-run-rtsp-calibration",
       "name": "amc-run-rtsp-calibration",
       "description": "Calibrate a new dataset from live RTSP camera streams via the AutoMagicCalib REST API. Use when the user provides RTSP URLs or asks to calibrate live cameras; VIOS records clips, AMC ingests them, then runs calibration.",

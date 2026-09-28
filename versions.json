@@ -9,20 +9,6 @@
       "last_modified": "2026-09-15"
     },
     {
-      "name": "aiq-deploy",
-      "path": "skills/aiq-deploy",
-      "content_digest": "sha256:fdc8e5fe9dec3ff05fc7a55d70d611f14191617b77aa89a09249af1705284289",
-      "last_commit": "416539cb3ce46f17706072b1571369c11bd1a49e",
-      "last_modified": "2026-05-29"
-    },
-    {
-      "name": "aiq-research",
-      "path": "skills/aiq-research",
-      "content_digest": "sha256:a977c6f29549d268398b38b7bdd5a9869c8c410e2e76dcab9f61ad1314a9a6cd",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
-    },
-    {
       "name": "amc-run-rtsp-calibration",
       "path": "skills/amc-run-rtsp-calibration",
       "content_digest": "sha256:7b48e2a0fe6ac9ac1dec34cd24482f3b5980cdbb0e597bed0622b809504603da",
