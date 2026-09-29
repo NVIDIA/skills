@@ -85,6 +85,18 @@
       }
     },
     {
+      "path": "skills/bionemo-diffdock-nim",
+      "name": "diffdock-nim",
+      "description": "Run DiffDock molecular docking via NVIDIA NIM to predict small-molecule binding poses against protein targets. Use for DiffDock, molecular docking, ligand docking, blind docking, SMILES or SDF ligands, ranked poses, confidence scores, hosted NVIDIA API, or local Docker deployment.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,application_developer,data_scientist",
+        "discovery.activity_tags": "inference,generate,evaluate,deploy,integrate"
+      }
+    },
+    {
       "path": "skills/bionemo-kermt-add-cmim-pretrain",
       "name": "kermt-add-cmim-pretrain",
       "description": "Convert a grover_base checkpoint (encoder-only or encoder + vocab heads) into a hybrid checkpoint by adding a randomly-initialized cMIM decoder + latent_dist, then continue pretraining on the user's corpus as hybrid (vocab + contrast). Effectively kermt-continue-pretrain with a one-time ckpt-conversion step prepended.",
@@ -178,6 +190,18 @@
         "catalog.subdomain": "training-ai",
         "audience": "application_developer,ml_engineer,computational_biologist,bioinformatician,devops_engineer",
         "discovery.activity_tags": "get_started,configure,validate,test,deploy"
+      }
+    },
+    {
+      "path": "skills/bionemo-molmim-nim",
+      "name": "molmim-nim",
+      "description": "Use this skill for MolMIM, NVIDIA's BioNeMo NIM microservice for small-molecule latent-space generation and optimization. Invoke for MolMIM, molecular embeddings, hidden states, latent decoding, sampling around a seed SMILES, CMA-ES guided molecule generation, QED or plogP optimization, hosted NVIDIA API calls, or local Docker deployment.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,data_scientist,application_developer",
+        "discovery.activity_tags": "generate,optimize,inference,deploy,integrate"
       }
     },
     {

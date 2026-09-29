@@ -321,6 +321,7 @@
       "title": "Inference AI",
       "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration.",
       "skills": [
+        "diffdock-nim",
         "dynamo-interconnect-check",
         "dynamo-recipe-runner",
         "dynamo-router-starter",
@@ -332,6 +333,7 @@
         "kermt-embed",
         "kermt-infer",
         "medtech-model-evidence-export",
+        "molmim-nim",
         "msa-structure-prediction-pipeline",
         "nv-reason-ct",
         "openfold2-nim",

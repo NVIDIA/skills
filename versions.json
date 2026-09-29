@@ -51,6 +51,13 @@
       "last_modified": "2026-07-14"
     },
     {
+      "name": "bionemo-diffdock-nim",
+      "path": "skills/bionemo-diffdock-nim",
+      "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",
+      "last_commit": "65585a7a715e75167b9fa38d439cdd058eeee840",
+      "last_modified": "2026-09-29"
+    },
+    {
       "name": "bionemo-kermt-add-cmim-pretrain",
       "path": "skills/bionemo-kermt-add-cmim-pretrain",
       "content_digest": "sha256:cb2294cee2287ea6647c5253a5a3dd5e5ed2defbd11e89388d8e326b74e65da4",
@@ -105,6 +112,13 @@
       "content_digest": "sha256:53ce1b9f89fa19fb0e08472b7109d2604622f625f3743c2ed3e4297dc035f779",
       "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
       "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-molmim-nim",
+      "path": "skills/bionemo-molmim-nim",
+      "content_digest": "sha256:c66c7b1f123008539aa5ab9d88babeae3cd8ff7365cacabf5af199f2c7527da2",
+      "last_commit": "65585a7a715e75167b9fa38d439cdd058eeee840",
+      "last_modified": "2026-09-29"
     },
     {
       "name": "bionemo-msa-structure-prediction-pipeline",
