@@ -5,10 +5,8 @@ name: BioNeMo NIMs
 repo: NVIDIA-BioNeMo/bionemo-agent-toolkit
 ref: main
 description: >-
-  OpenFold2 predicts single-chain protein structures.
-  The MSA pipeline uses MSA-Search alignments to guide OpenFold3 structure prediction.
-  MolMIM generates and optimizes small molecules.
-  DiffDock predicts protein-ligand binding poses.
+  Run and combine BioNeMo NIM microservices for biomolecular research and
+  drug discovery through hosted APIs or local deployments.
 links:
   contributing: CONTRIBUTING.md
   discussions: false
