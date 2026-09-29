@@ -111,7 +111,10 @@ Swap is a fallback for scarce RAM, not a floor. A host whose available memory
 already meets the requirement passes with zero swap. When available memory is
 short and swap covers the gap, preflight warns that paging is likely. Only when
 available memory plus swap is below the requirement does preflight fail. Swap is
-never created, enabled, resized, or removed without explicit authorization.
+never created, enabled, resized, or removed without the user's explicit
+approval of the specific operation, device or file path, and size. See
+[Host swap safety](../SKILL.md#host-swap-safety); a general request to make
+preflight pass does not authorize a swap change.
 
 ## ROS 2 bridge executables
 
