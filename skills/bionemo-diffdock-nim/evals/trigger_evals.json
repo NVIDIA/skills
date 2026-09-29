@@ -1,0 +1,22 @@
+[
+  {"query": "Dock aspirin to the COX-2 enzyme using DiffDock and show me the top binding poses", "should_trigger": true},
+  {"query": "I want to run DiffDock NIM to predict how my ligand binds to a protein target", "should_trigger": true},
+  {"query": "Use the DiffDock microservice to do blind molecular docking for this SMILES ligand", "should_trigger": true},
+  {"query": "How do I use DiffDock with the hosted NVIDIA API for virtual screening?", "should_trigger": true},
+  {"query": "Run DiffDock on this PDB file and SMILES string to get binding pose confidence scores", "should_trigger": true},
+  {"query": "I have a drug candidate and a protein target — can DiffDock predict the binding pose?", "should_trigger": true},
+  {"query": "Submit a docking job to DiffDock NIM and save the top 5 SDF poses", "should_trigger": true},
+  {"query": "Use DiffDock to screen multiple ligand SMILESes against a protein receptor", "should_trigger": true},
+  {"query": "I want to rank docking poses by confidence using DiffDock", "should_trigger": true},
+  {"query": "Run the DiffDock Docker container locally to dock a ligand", "should_trigger": true},
+  {"query": "Perform blind docking without specifying a binding site using the NVIDIA DiffDock NIM", "should_trigger": true},
+  {"query": "I want to run molecular docking with DiffDock and save SDF files of the binding poses", "should_trigger": true},
+  {"query": "Predict protein structure from sequence using a structure prediction NIM", "should_trigger": false},
+  {"query": "Generate novel drug-like molecules starting from a scaffold SMILES", "should_trigger": false},
+  {"query": "Search for protein sequence homologs in UniRef30 database", "should_trigger": false},
+  {"query": "Design a protein sequence that will fold into a given backbone structure", "should_trigger": false},
+  {"query": "I want to run RFDiffusion to design a protein binder for EGFR", "should_trigger": false},
+  {"query": "Predict binding affinity using Boltz2 for a protein-ligand pair", "should_trigger": false},
+  {"query": "How do I calculate RMSD between two protein structures in Python?", "should_trigger": false},
+  {"query": "Run ProteinMPNN to redesign sequences for my protein backbone", "should_trigger": false}
+]

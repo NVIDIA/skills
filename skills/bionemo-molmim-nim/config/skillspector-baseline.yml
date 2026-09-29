@@ -1,0 +1,18 @@
+# SkillSpector suppression baseline — molmim-nim
+#
+# Audited false-positive suppression, auto-applied by the NVSkills Tier 1
+# runner via config/skillspector-baseline.yml. Suppressed findings remain in
+# the report JSON marked `suppressed: true` with the reason below.
+version: 1
+
+rules:
+  - id: "PE3"
+    path: "*references/api.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, omosafi@nvidia.com, 2026-08-12).
+      PE3 fires on the literal `.env` token in this NIM skill's documented
+      NGC_API_KEY loading snippet (`[ -f .env ] && . ./.env`), which reads the
+      user's own repo-root dotenv to obtain their NGC API key for
+      `docker login nvcr.io`. This is first-party, user-facing setup guidance for
+      the user's own credential file — not credential theft. No SSH keys, cloud
+      credential stores, or third-party secret files are accessed.
