@@ -346,7 +346,10 @@ def memory_policy(mem_total, mem_available, swap_free, min_available, min_total)
         "status": "fail",
         "effective_bytes": effective,
         "detail": (
-            "available memory plus swap is below the requirement; free memory or "
-            "authorize adding swap before running the showcase"
+            "available memory plus swap is below the requirement; free memory "
+            "or use a larger host. Any host swap change requires the user's "
+            "explicit approval of the operation, device or file path, and "
+            "size under SKILL.md Host swap safety; preflight failure alone "
+            "does not authorize it"
         ),
     }
