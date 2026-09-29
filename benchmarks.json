@@ -2780,10 +2780,10 @@
     },
     {
       "skill": "isaac-mission-control-showcase",
-      "evaluation_date": "2026-09-18",
+      "evaluation_date": "2026-09-29",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:53df5054895d6c1cfa04e19d9145af4857e6310543c98498d2c49226247b9259",
+      "dataset_digest": "sha256:d2c173a3311d897cb3c7826dc32cf64d1af3996ab9598cf758d620afbb47d077",
       "validation_status": null,
       "tasks": 4,
       "attempts_per_task": 3,
@@ -2796,7 +2796,7 @@
       "catalog_dir": "isaac-mission-control-showcase",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 40.32
+      "average_uplift_pct": 46.77
     },
     {
       "skill": "jetson-build-source",
@@ -19664,7 +19664,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19672,8 +19672,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.5,
-      "uplift_pct": 43.7
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19681,53 +19681,53 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 62.5
+      "score_pct": 85.0,
+      "uplift_pct": 57.5
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
       "component": "Physical AI",
       "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 63.0
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 78.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.5,
+      "uplift_pct": 54.1
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
       "score_pct": 80.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "isaac-mission-control-showcase",
-      "component": "Physical AI",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 99.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "isaac-mission-control-showcase",
-      "component": "Physical AI",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 86.7,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "isaac-mission-control-showcase",
-      "component": "Physical AI",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 91.9,
-      "uplift_pct": 59.4
-    },
-    {
-      "catalog_dir": "isaac-mission-control-showcase",
-      "component": "Physical AI",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 76.9,
-      "uplift_pct": 36.3
+      "uplift_pct": 51.0
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -19735,7 +19735,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.0,
+      "score_pct": 83.4,
       "uplift_pct": null
     },
     {
@@ -19744,7 +19744,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.7,
+      "score_pct": 81.7,
       "uplift_pct": null
     },
     {
