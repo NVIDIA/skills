@@ -333,6 +333,7 @@
         "kermt-infer",
         "medtech-model-evidence-export",
         "msa-structure-prediction-pipeline",
+        "nv-reason-ct",
         "openfold2-nim",
         "tao-run-inference-service"
       ]
