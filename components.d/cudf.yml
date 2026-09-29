@@ -6,3 +6,5 @@ description: Official NVIDIA-authored guidance for NVIDIA cuDF GPU DataFrames, p
 skills:
   - path: skills/accelerated-computing-cudf
     catalog_dir: accelerated-computing-cudf
+  - path: skills/cudf-query-engine-builder
+    catalog_dir: cudf-query-engine-builder
