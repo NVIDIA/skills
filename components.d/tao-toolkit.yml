@@ -22,6 +22,8 @@ skills:
     catalog_dir: tao-run-deft-cr-its-mining
   - path: skills/applications/tao-run-deft-object-detection/
     catalog_dir: tao-run-deft-object-detection
+  - path: skills/applications/tao-run-deft-pas/
+    catalog_dir: tao-run-deft-pas
   - path: skills/applications/tao-run-inference-service/
     catalog_dir: tao-run-inference-service
   - path: skills/applications/tao-train-single-step/
@@ -29,6 +31,8 @@ skills:
   - path: skills/applications/tao-validate-recipe-transfer/
     catalog_dir: tao-validate-recipe-transfer
   # data
+  - path: skills/data/paidf-cosmos-predict/
+    catalog_dir: paidf-cosmos-predict
   - path: skills/data/tao-analyze-detection-kpi/
     catalog_dir: tao-analyze-detection-kpi
   - path: skills/data/tao-analyze-gaps-od-map/
@@ -39,6 +43,8 @@ skills:
     catalog_dir: tao-analyze-gaps-vlm-bcq
   - path: skills/data/tao-convert-dataset-format/
     catalog_dir: tao-convert-dataset-format
+  - path: skills/data/tao-generate-anomalies/
+    catalog_dir: tao-generate-anomalies
   - path: skills/data/tao-generate-image-embeddings/
     catalog_dir: tao-generate-image-embeddings
   - path: skills/data/tao-generate-image-grounding/
