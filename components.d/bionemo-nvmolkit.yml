@@ -5,8 +5,8 @@ name: BioNeMo Libraries
 repo: NVIDIA-BioNeMo/nvMolKit
 ref: main
 description: >-
-  GPU-accelerated cheminformatics with nvMolKit for molecular fingerprints,
-  similarity search, conformer generation, and optimization.
+  Accelerate cheminformatics, genomic analysis, and equivariant model
+  development with NVIDIA GPU libraries and tools.
 links:
   contributing: CONTRIBUTING.md
   discussions: false

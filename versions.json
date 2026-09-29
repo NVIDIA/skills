@@ -1703,6 +1703,13 @@
       "last_modified": "2026-07-08"
     },
     {
+      "name": "nv-reason-ct",
+      "path": "skills/nv-reason-ct",
+      "content_digest": "sha256:e89cd4d3a7c600ee2cc8108b578c7c9cd915d7b0f99f14904417c5df52d9f1e2",
+      "last_commit": "74d4e064fc56ed6a5271fda7d184a1e6e0ded0b6",
+      "last_modified": "2026-09-29"
+    },
+    {
       "name": "nv-reason-cxr",
       "path": "skills/nv-reason-cxr",
       "content_digest": "sha256:27ddb44fe12a516fd9bc6eff284e143dbc206be870dca0f45c98f2a6c37c2914",

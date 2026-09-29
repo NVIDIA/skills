@@ -5,8 +5,8 @@ name: BioNeMo Open Models
 repo: NVIDIA-BioNeMo/KERMT
 ref: main
 description: >-
-  KERMT skills for container setup, molecular model pretraining and finetuning,
-  inference, embedding extraction, and run monitoring.
+  Apply BioNeMo open models to molecular property prediction and generative
+  protein design.
 links:
   contributing: CONTRIBUTING.md
   discussions: false

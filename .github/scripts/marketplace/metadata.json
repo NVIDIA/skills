@@ -2917,6 +2917,18 @@
       }
     },
     {
+      "path": "skills/nv-reason-ct",
+      "name": "nv-reason-ct",
+      "description": "Run NV-Reason-CT inference on user-provided 3D NIfTI chest or abdominal CT volumes for engineering and research workflows. Not for diagnosis, treatment, or clinical reporting.",
+      "metadata": {
+        "product.primary": "NIM for Healthcare",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,research_academic,research_non_academic",
+        "discovery.activity_tags": "inference,evaluate,benchmark,validate"
+      }
+    },
+    {
       "path": "skills/nv-reason-cxr",
       "name": "nv-reason-cxr",
       "description": "Used for command-shape or live NV-Reason-CXR chest X-ray reasoning smoke tests. Not for diagnosis or clinical reporting.",
