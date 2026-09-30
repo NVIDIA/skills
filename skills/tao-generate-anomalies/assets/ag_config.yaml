@@ -1,0 +1,50 @@
+# DDP config template (default, use with predict2_anomaly_gen_ddp_{2b,14b}).
+# Placeholders in <angle-brackets> are filled by scripts/utilities/generate_config.py.
+# Keep sections minimal — the experiment provides defaults for everything else.
+job:
+  project: anomaly_gen
+  group: <NAME>
+  name: <NAME>_training_FP32_lr<LR>_bs=<BATCH_SIZE>_<MODEL_SIZE>_<IMAGE_SIZE>x<IMAGE_SIZE>
+optimizer:
+  lr: <LR>
+checkpoint:
+  save_iter: <SAVE_ITER>
+trainer:
+  max_iter: <MAX_ITER>
+  logging_iter: 10
+  validation_iter: <VALIDATION_ITER>
+  run_validation: True
+  early_stop:
+    enabled: <EARLY_STOP_ENABLED>
+    metric: nn
+    patience: <EARLY_STOP_PATIENCE>
+    min_delta: 0
+    min_delta_mode: rel
+dataloader_train:
+  batch_size: <BATCH_SIZE>
+  dataset:
+    dataset_dir: <DATASET_DIR>
+    image_size:
+      - <IMAGE_SIZE>
+      - <IMAGE_SIZE>
+    anomaly_types: <ANOMALY_TYPES>
+    seed: 1
+    data_augprob: 0.5
+    aug_type: <AUG_TYPE>
+    ratio_range: <RATIO_RANGE>
+dataloader_val:
+  batch_size: 32
+  dataset:
+    input_data_path: <VALIDATION_JSONL>
+model:
+  config:
+    ag_config:
+      ad_precision: float32
+      t5_model_name: checkpoints/google-t5/t5-large
+      anomaly_embedding:
+        anomaly_types: <ANOMALY_TYPES>
+        freeze: False
+      mask_encoder:
+        encoder_config:
+          init_cfg:
+            checkpoint: checkpoints/NVDINOV2/nv_dinov2_classification_model.ckpt

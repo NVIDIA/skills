@@ -20,3 +20,5 @@ skills:
     catalog_dir: bionemo-molmim-nim
   - path: skills/bionemo-agent-toolkit/skills/diffdock-nim/
     catalog_dir: bionemo-diffdock-nim
+  - path: skills/bionemo-agent-toolkit/skills/genmol-nim/
+    catalog_dir: bionemo-genmol-nim

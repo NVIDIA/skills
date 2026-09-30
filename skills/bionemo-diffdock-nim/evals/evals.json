@@ -1,0 +1,67 @@
+{
+  "skill_name": "diffdock-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to dock aspirin (SMILES: CC(=O)OC1=CC=CC=C1C(=O)O) to a protein target using the staged receptor at /workspace/input/protein.pdb. Generate 10 docking poses and show me the confidence scores using the hosted NVIDIA DiffDock API. Create and execute the request now using NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted DiffDock request that reads the staged protein.pdb, filters it to a non-empty ATOM-only receptor, uses Bearer auth, ligand_file_type='txt', and num_poses=10, then saves returned poses and reports actual ranked confidence scores.",
+      "files": [
+        "evals/files/protein.pdb"
+      ],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived pose scores and saved artifact paths",
+        "[hosted-endpoint-url] Uses the correct hosted DiffDock endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/mit/diffdock'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from NGC_API_KEY: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[atom-records-only] Protein input contains only ATOM records (strips non-ATOM lines): Script filters protein.pdb to ATOM lines only before sending (e.g., using grep, startswith('ATOM'), or similar)",
+        "[smiles-file-type] ligand_file_type is set to 'txt' for SMILES input (not 'smiles'): Script contains 'ligand_file_type' set to 'txt'",
+        "[num-poses-10] num_poses is set to 10: Script contains 'num_poses' and '10'",
+        "[confidence-scores-printed] Prints position_confidence scores for each pose: Script accesses 'position_confidence' from response and prints or reports scores"
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "I have an SDF file of a drug candidate (ligand.sdf) and want to dock it to my protein (receptor.pdb). Use the DiffDock hosted API to generate 20 poses and save each pose as a separate SDF file named by its rank and confidence score.",
+      "expected_output": "A Python script that reads receptor.pdb (ATOM records only) and ligand.sdf, calls the hosted endpoint with ligand_file_type='sdf' and num_poses=20, then saves each SDF pose to a file named with rank and confidence.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/mit/diffdock'",
+        "[sdf-file-type] ligand_file_type is set to 'sdf': Script contains 'ligand_file_type' and 'sdf'",
+        "[num-poses-20] num_poses is set to 20: Script contains 'num_poses' and '20'",
+        "[atom-records-protein] Protein input is filtered to ATOM records: Script filters receptor.pdb to ATOM lines before sending",
+        "[saves-ranked-pose-files] Saves each pose to a separate SDF file with rank and confidence in name: Script iterates over ligand_positions and saves each pose to a .sdf file with rank or confidence in the filename",
+        "[parallel-confidence-scores] position_confidence list is used parallel to ligand_positions: Script accesses 'position_confidence' and 'ligand_positions' together (e.g., zip or enumerate)"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "3",
+      "prompt": "Help me set up DiffDock locally with Docker on my GPU. I have an A100 and NGC_API_KEY is set. After setup, dock a small molecule (SMILES: c1ccccc1) to my protein (protein.pdb).",
+      "expected_output": "Docker setup commands using shell env first and optional repo-root .env overrides, requiring NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, with the exact pinned image tag :2.2.0, NVIDIA_VISIBLE_DEVICES=0 env var, --shm-size=2G and --ulimit flags, health check, then a local no-auth docking script using localhost:8000 without /v1/ prefix.",
+      "files": [],
+      "assertions": [
+        "[docker-image-tag] References the correct DiffDock image with pinned :2.2.0 tag: Output contains 'nvcr.io/nim/mit/diffdock:2.2.0'",
+        "[nvidia-visible-devices] Uses NVIDIA_VISIBLE_DEVICES=0 for single GPU (not --gpus all): Output contains 'NVIDIA_VISIBLE_DEVICES' and '0'",
+        "[env-contract-and-cache] Local setup uses the repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE to /opt/nim/.cache",
+        "[ulimit-flags] Includes --ulimit memlock and --ulimit stack flags: Output contains '--ulimit memlock' and '--ulimit stack'",
+        "[health-check] Includes health check before docking request: Output contains health check against localhost:8000/v1/health/ready",
+        "[local-endpoint-no-v1] Local inference URL has no /v1/ prefix and uses /molecular-docking/ route: Script contains 'localhost:8000/molecular-docking/diffdock/generate'"
+      ]
+    },
+    {
+      "id": "4",
+      "prompt": "I want to do a quick docking study with DiffDock using the hosted API. Use these parameters: protein structure in target.pdb, ligand SMILES: CC1=CC=C(C=C1)NC(=O)C, generate 5 poses with save_trajectory set to false. Show me which pose has the highest confidence.",
+      "expected_output": "A Python script with ATOM-filtered protein, the provided SMILES as txt ligand, num_poses=5, save_trajectory=False, calling the hosted endpoint and identifying/reporting the highest confidence pose.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/mit/diffdock'",
+        "[correct-smiles] The specified ligand SMILES is included in the payload: Script contains 'CC1=CC=C(C=C1)NC(=O)C'",
+        "[txt-file-type-for-smiles] Uses ligand_file_type='txt' for SMILES input: Script contains 'ligand_file_type' set to 'txt'",
+        "[num-poses-5] num_poses is set to 5: Script contains 'num_poses' and '5'",
+        "[save-trajectory-false] save_trajectory is set to False: Script contains 'save_trajectory' and 'False' or 'false'",
+        "[best-pose-identified] Reports the highest confidence pose (position_confidence[0] is rank 1): Script identifies and reports the best pose using position_confidence scores"
+      ]
+    }
+  ]
+}

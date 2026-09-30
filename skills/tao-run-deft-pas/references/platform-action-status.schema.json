@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.nvidia.com/tao/schemas/pas-platform-action-status-v2.json",
+  "title": "PAS DEFT terminal platform action status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "workflow", "kind", "name", "attempt", "platform",
+    "job_id", "backend_ref", "storage_tier", "backend_state",
+    "backend_exit_code", "image_kind", "image", "command", "command_sha256",
+    "passed_hf_token", "request_path", "request_sha256",
+    "job_binding_sha256", "results_scope", "staging_receipt_sha256",
+    "started_at", "started_ns", "finished_at", "status", "exit_code",
+    "log_path", "fresh_outputs", "freshness_contract", "artifact_error"
+  ],
+  "properties": {
+    "schema_version": {"const": "2"},
+    "workflow": {"const": "tao-run-deft-pas"},
+    "kind": {"const": "platform_action"},
+    "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]*$"},
+    "attempt": {"type": "integer", "minimum": 1, "maximum": 2},
+    "platform": {"enum": ["docker", "slurm", "kubernetes", "brev", "virtualenv"]},
+    "job_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+    "backend_ref": {"type": "string", "minLength": 1},
+    "storage_tier": {"enum": ["A", "B", "C"]},
+    "backend_state": {"enum": ["COMPLETE", "ERROR", "CANCELED"]},
+    "backend_exit_code": {"type": ["integer", "null"]},
+    "image_kind": {"enum": ["pyt", "ds"]},
+    "image": {"type": "string", "minLength": 1},
+    "command": {
+      "type": "array", "minItems": 1,
+      "items": {"type": "string"}
+    },
+    "command_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "passed_hf_token": {"type": "boolean"},
+    "request_path": {"type": "string", "pattern": "^/"},
+    "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "job_binding_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "results_scope": {"type": "string", "minLength": 2},
+    "staging_receipt_sha256": {
+      "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"
+    },
+    "started_at": {"type": "string", "minLength": 1},
+    "started_ns": {"type": "integer", "minimum": 1},
+    "finished_at": {"type": "string", "minLength": 1},
+    "status": {"enum": ["ok", "error"]},
+    "exit_code": {"type": "integer"},
+    "log_path": {"type": "string", "pattern": "^/"},
+    "fresh_outputs": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^/"}
+    },
+    "freshness_contract": {
+      "enum": ["local-mtime-after-prepare", "remote-mirror-with-delete-before-submit"]
+    },
+    "artifact_error": {"type": ["string", "null"]}
+  }
+}

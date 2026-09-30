@@ -61,6 +61,30 @@
       }
     },
     {
+      "path": "skills/bionemo-diffdock-nim",
+      "name": "diffdock-nim",
+      "description": "Run DiffDock molecular docking via NVIDIA NIM to predict small-molecule binding poses against protein targets. Use for DiffDock, molecular docking, ligand docking, blind docking, SMILES or SDF ligands, ranked poses, confidence scores, hosted NVIDIA API, or local Docker deployment.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,application_developer,data_scientist",
+        "discovery.activity_tags": "inference,generate,evaluate,deploy,integrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-genmol-nim",
+      "name": "genmol-nim",
+      "description": "Generate novel drug-like molecules using the GenMol NIM microservice. Use for de novo generation, scaffold decoration, motif extension, lead optimization, SAFE notation, QED or LogP ranking, hosted NVIDIA API calls, or local Docker deployment. GenMol takes SAFE notation in the smiles field, not ordinary SMILES.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,application_developer,research_academic,research_non_academic,bioinformatician",
+        "discovery.activity_tags": "generate,inference,optimize,deploy,integrate"
+      }
+    },
+    {
       "path": "skills/bionemo-kermt-add-cmim-pretrain",
       "name": "kermt-add-cmim-pretrain",
       "description": "Convert a grover_base checkpoint (encoder-only or encoder + vocab heads) into a hybrid checkpoint by adding a randomly-initialized cMIM decoder + latent_dist, then continue pretraining on the user's corpus as hybrid (vocab + contrast). Effectively kermt-continue-pretrain with a one-time ckpt-conversion step prepended.",
@@ -154,6 +178,18 @@
         "catalog.subdomain": "training-ai",
         "audience": "application_developer,ml_engineer,computational_biologist,bioinformatician,devops_engineer",
         "discovery.activity_tags": "get_started,configure,validate,test,deploy"
+      }
+    },
+    {
+      "path": "skills/bionemo-molmim-nim",
+      "name": "molmim-nim",
+      "description": "Use this skill for MolMIM, NVIDIA's BioNeMo NIM microservice for small-molecule latent-space generation and optimization. Invoke for MolMIM, molecular embeddings, hidden states, latent decoding, sampling around a seed SMILES, CMA-ES guided molecule generation, QED or plogP optimization, hosted NVIDIA API calls, or local Docker deployment.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,data_scientist,application_developer",
+        "discovery.activity_tags": "generate,optimize,inference,deploy,integrate"
       }
     },
     {
@@ -3157,6 +3193,18 @@
       }
     },
     {
+      "path": "skills/paidf-cosmos-predict",
+      "name": "paidf-cosmos-predict",
+      "description": "Prepare and run PAIDF Cosmos Predict video generation for DEFT media samples.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,data_scientist,developer",
+        "discovery.activity_tags": "generate,configure,inference,synthesize,transform"
+      }
+    },
+    {
       "path": "skills/paidf-curation-and-retrieval",
       "name": "paidf-curation-and-retrieval",
       "description": "Use when operating PAIDF Curation and Retrieval or NVIDIA Cosmos Curator pipelines (split, filter, caption, embed, dedup, shard, image annotate) or PAIDF Data Mining nearest-neighbor matching on Curator embeddings. Activate for Make or CLI pipeline config, GPU run preflight, FFmpeg sidecar, SAM3 keys, or Curator-to-TAO handoff. Do not use for generic ETL, vector-database RAG, model training, orchestration, or embeddings outside Cosmos Curator and PAIDF Data Mining.",
@@ -3577,6 +3625,18 @@
       }
     },
     {
+      "path": "skills/tao-generate-anomalies",
+      "name": "tao-generate-anomalies",
+      "description": "Full PAIDF AnomalyGen pipeline — fine-tune on a new anomaly dataset, generate synthetic anomaly images (SDG), evaluate quality (nn_score), and search per-sample (guidance, crop_ratio) parameters. Three modes: full (Phase 0→7: finetune then generate), finetune_only (Phase 0→1: train only), inference_only (Phase 0, 2→7: generate from an existing checkpoint). Use when the user asks to \"fine-tune AnomalyGen\", \"generate anomaly images\", \"run PAIDF SDG\", \"evaluate SDG output quality\", \"run per-sample search\", or run any part of the AnomalyGen pipeline, even if they only mention one phase.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
+        "discovery.activity_tags": "fine_tune,generate,evaluate,optimize,train"
+      }
+    },
+    {
       "path": "skills/tao-generate-image-embeddings",
       "name": "tao-generate-image-embeddings",
       "description": "Run TAO Data Services image embedding to turn a parquet of image filepaths into an embedding parquet using CLIP, SigLIP, or a TAO checkpoint. Use when a workflow needs embeddings before nearest-neighbor or unique-neighbor mining, or when the user asks to \"embed images\", \"compute image embeddings\", or \"generate SigLIP embeddings\".",
@@ -3778,6 +3838,18 @@
         "catalog.subdomain": "vision-ai",
         "audience": "ml_engineer,ai_engineer,data_scientist,developer",
         "discovery.activity_tags": "train,fine_tune,optimize,evaluate,inference"
+      }
+    },
+    {
+      "path": "skills/tao-run-deft-pas",
+      "name": "tao-run-deft-pas",
+      "description": "Run iterative improvement for NVIDIA TAO CLIP / SigLIP image-text retrieval on attribute-labelled data. Use when a request combines retrieval evaluation, weak-attribute or caption-pair mining, repeated retraining, and a stopping condition based on a retrieval KPI, validation plateau, or iteration budget; the customer need not know the DEFT or People Attribute Search (PAS) names. The self-contained workflow performs dataset preparation, zero-shot evaluation, attribute gap analysis, caption-space k-NN mining, history-aware selection, retraining, and re-evaluation. Treat `tao-deft-pas` as shorthand for this canonical `tao-run-deft-pas` workflow. Do not use for standalone CLIP training, one-off evaluation or embedding, generic k-NN mining, or AOI/ChangeNet DEFT workflows.\n",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
+        "discovery.activity_tags": "orchestrate,fine_tune,evaluate,train,optimize"
       }
     },
     {

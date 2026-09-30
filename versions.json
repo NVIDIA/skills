@@ -37,6 +37,20 @@
       "last_modified": "2026-07-14"
     },
     {
+      "name": "bionemo-diffdock-nim",
+      "path": "skills/bionemo-diffdock-nim",
+      "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",
+      "last_commit": "65585a7a715e75167b9fa38d439cdd058eeee840",
+      "last_modified": "2026-09-29"
+    },
+    {
+      "name": "bionemo-genmol-nim",
+      "path": "skills/bionemo-genmol-nim",
+      "content_digest": "sha256:aa02a9d487adeba68a48f142675e0d15581facf20d3e7c424bf875f0bc08a27e",
+      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
+      "last_modified": "2026-09-29"
+    },
+    {
       "name": "bionemo-kermt-add-cmim-pretrain",
       "path": "skills/bionemo-kermt-add-cmim-pretrain",
       "content_digest": "sha256:cb2294cee2287ea6647c5253a5a3dd5e5ed2defbd11e89388d8e326b74e65da4",
@@ -91,6 +105,13 @@
       "content_digest": "sha256:53ce1b9f89fa19fb0e08472b7109d2604622f625f3743c2ed3e4297dc035f779",
       "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
       "last_modified": "2026-09-15"
+    },
+    {
+      "name": "bionemo-molmim-nim",
+      "path": "skills/bionemo-molmim-nim",
+      "content_digest": "sha256:c66c7b1f123008539aa5ab9d88babeae3cd8ff7365cacabf5af199f2c7527da2",
+      "last_commit": "65585a7a715e75167b9fa38d439cdd058eeee840",
+      "last_modified": "2026-09-29"
     },
     {
       "name": "bionemo-msa-structure-prediction-pipeline",
@@ -1005,9 +1026,9 @@
     {
       "name": "isaac-mission-control-showcase",
       "path": "skills/isaac-mission-control-showcase",
-      "content_digest": "sha256:300ecb89f33ceaa2003c66042a7295afa6aa13d4e1404efe36c0d13141465651",
-      "last_commit": "a1d53919418ebc63fc7ab9d59f168caac6bca3e5",
-      "last_modified": "2026-09-18"
+      "content_digest": "sha256:add44a74fb5f559ace399da795a8cc5e5d73dccf671d567d90dd5af5980ebaa4",
+      "last_commit": "e37f30b0e4095ae323223ad16b180eb6c39e0bd0",
+      "last_modified": "2026-09-29"
     },
     {
       "name": "jetson-build-source",
@@ -1843,6 +1864,13 @@
       "last_modified": "2026-09-16"
     },
     {
+      "name": "paidf-cosmos-predict",
+      "path": "skills/paidf-cosmos-predict",
+      "content_digest": "sha256:695ce48a8e997ef8dad9a8b66171f77456cd4a5e08b2564a51513ba24628311b",
+      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
+      "last_modified": "2026-09-29"
+    },
+    {
       "name": "paidf-curation-and-retrieval",
       "path": "skills/paidf-curation-and-retrieval",
       "content_digest": "sha256:b6895349b8b8a9a676cabb9c3ce8a843af55ce5294b427c0435bf5c2624a1e2b",
@@ -2088,6 +2116,13 @@
       "last_modified": "2026-09-22"
     },
     {
+      "name": "tao-generate-anomalies",
+      "path": "skills/tao-generate-anomalies",
+      "content_digest": "sha256:4c09bc2187f9e5eb53eb4fd69a7419b14027323db57aab462dd048f4c34a1bd9",
+      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
+      "last_modified": "2026-09-29"
+    },
+    {
       "name": "tao-generate-image-embeddings",
       "path": "skills/tao-generate-image-embeddings",
       "content_digest": "sha256:53dfd48f317a44f0c2cea9dd40da776774ac5726d762b2e2f82cf203717deb52",
@@ -2205,6 +2240,13 @@
       "content_digest": "sha256:6c409089f01ac7908c99e12705eb806fa9c3855af8ab7c507e2f5bdb534ef927",
       "last_commit": "3fc0fa1daa32f6a87bfb2dbd99c47b540602dfea",
       "last_modified": "2026-09-22"
+    },
+    {
+      "name": "tao-run-deft-pas",
+      "path": "skills/tao-run-deft-pas",
+      "content_digest": "sha256:8f3cf53d813742417a88c0081b146628071eee4976fdd931b6bfb3f370bd279f",
+      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
+      "last_modified": "2026-09-29"
     },
     {
       "name": "tao-run-inference-service",

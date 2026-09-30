@@ -1,0 +1,45 @@
+# Template shape for PAIDF Cosmos Predict media generation.
+#
+# The helper script writes a concrete config.yaml with one data entry per unique
+# absolute media path. Default values come from assets/default_generation_settings.json.
+
+data:
+  -
+    inputs:
+      rgb: "/absolute/input/media.mp4"
+    output:
+      video: "/absolute/output_dir/generated/videos/<sha256_16>.mp4"
+      caption: "/absolute/output_dir/captions/<sha256_16>.txt"
+      metadata: "/absolute/output_dir/generated/metadata/<sha256_16>.json"
+
+endpoints:
+  vlm:
+    url: "<--vlm-captioning-endpoint>"
+    model: "<vlm_captioning.model>"
+
+captioning:
+  vlm:
+    parser: "instruct"
+    user_prompt: "<contents of --caption-prompt-file>"
+    parameters:
+      max_tokens: "<vlm_captioning.parameters.max_tokens>"
+      temperature: "<vlm_captioning.parameters.temperature>"
+      top_p: "<vlm_captioning.parameters.top_p>"
+      stream: "<vlm_captioning.parameters.stream>"
+
+augmentation:
+  model:
+    name: "<paidf.augmentation.model.name>"
+    version: "<paidf.augmentation.model.version>"
+    executor_type: "<paidf.augmentation.model.executor_type>"
+  parameters:
+    inference_type: "<paidf.augmentation.parameters.inference_type>"
+    num_output_frames: "<paidf.augmentation.parameters.num_output_frames>"
+    num_steps: "<paidf.augmentation.parameters.num_steps>"
+    enable_autoregressive: "<paidf.augmentation.parameters.enable_autoregressive>"
+    guidance: "<paidf.augmentation.parameters.guidance>"
+    resolution: "<paidf.augmentation.parameters.resolution>"
+    inference_name: "<paidf.augmentation.parameters.inference_name>"
+  local_parameters:
+    num_processes: "<paidf.augmentation.local_parameters.num_processes>"
+    master_port: "<paidf.augmentation.local_parameters.master_port>"
