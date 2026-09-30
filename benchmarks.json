@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 385,
-  "result_row_count": 3565,
+  "skill_count": 389,
+  "result_row_count": 3605,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -184,6 +184,26 @@
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": 15.47
+    },
+    {
+      "skill": "genmol-nim",
+      "evaluation_date": "2026-09-29",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:863cc2afe0b8980fd5388973f2820de36adb4becfd34ff4b63cc0649e353ce68",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 16.55
     },
     {
       "skill": "kermt-add-cmim-pretrain",
@@ -5161,6 +5181,26 @@
       "average_uplift_pct": 47.65
     },
     {
+      "skill": "paidf-cosmos-predict",
+      "evaluation_date": "2026-09-22",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:40b5dc92b593baba3717f804cdabbcbd1c29d8f4f27b1e820ea8703e520f9729",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 35.97
+    },
+    {
       "skill": "paidf-curation-and-retrieval",
       "evaluation_date": "2026-09-14",
       "environment": "k8s-sandbox",
@@ -5849,6 +5889,26 @@
       "average_uplift_pct": 47.0
     },
     {
+      "skill": "tao-generate-anomalies",
+      "evaluation_date": "2026-09-22",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:f16074998b03223a85c3a4a806ad96050ff9fba4c9d9125dd3ab7b9e54d2c850",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 39.1
+    },
+    {
       "skill": "tao-generate-image-embeddings",
       "evaluation_date": "2026-09-17",
       "environment": "k8s-sandbox",
@@ -6187,6 +6247,26 @@
       "component": "TAO Toolkit",
       "has_results": true,
       "average_uplift_pct": 53.58
+    },
+    {
+      "skill": "tao-run-deft-pas",
+      "evaluation_date": "2026-09-22",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:40d7b333cefc143c30dd17c4ffbefe571c121a4003d1bf967029bf231d1321d9",
+      "validation_status": null,
+      "tasks": 14,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 26.33
     },
     {
       "skill": "tao-run-inference-service",
@@ -8180,6 +8260,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 88.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 65.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 49.3
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.1,
       "uplift_pct": null
     },
     {
@@ -29423,6 +29593,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 47.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 83.3
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 65.8,
+      "uplift_pct": 22.5
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "paidf-cosmos-predict",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.4,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "paidf-curation-and-retrieval",
       "component": "Physical AI Curation and Retrieval",
       "dimension": "Security",
@@ -32168,6 +32428,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 83.3
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 51.7
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-generate-anomalies",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.4,
+      "uplift_pct": -1.3
+    },
+    {
       "catalog_dir": "tao-generate-image-embeddings",
       "component": "TAO Toolkit",
       "dimension": "Security",
@@ -33696,6 +34046,96 @@
       "agent": "codex",
       "score_pct": 94.2,
       "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 74.7
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.8,
+      "uplift_pct": 34.5
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 54.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.2,
+      "uplift_pct": 55.1
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 45.4,
+      "uplift_pct": 20.4
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 99.2,
+      "uplift_pct": -0.4
     },
     {
       "catalog_dir": "tao-run-inference-service",
