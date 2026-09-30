@@ -5,6 +5,7 @@ license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
   version: "0.8.0"
+  verification-request: "2026-09-15"
   tags:
     - isaac-for-healthcare
     - i4h

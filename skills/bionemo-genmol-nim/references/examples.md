@@ -1,6 +1,7 @@
 # GenMol Examples
 
-Use these compact patterns when the activated skill needs a little more detail.
+Use these patterns for GenMol de novo generation, scaffold decoration, lead
+optimization, and saving score-ranked molecules from a successful API response.
 
 ## Hosted De Novo Generation
 
@@ -8,8 +9,8 @@ Use these compact patterns when the activated skill needs a little more detail.
 payload = {
     "smiles": "[*{20-30}]",
     "num_molecules": 30,
-    "temperature": "1.0",
-    "noise": "1.0",
+    "temperature": "1",
+    "noise": "1",
     "step_size": 1,
     "scoring": "QED",
     "unique": False,
@@ -41,8 +42,8 @@ safe_input = safe_hit.rsplit(".", 1)[0] + ".[*{5-12}]"
 payload = {
     "smiles": safe_input,
     "num_molecules": 30,
-    "temperature": "1.0",
-    "noise": "1.0",
+    "temperature": "1",
+    "noise": "1",
     "scoring": "LogP",
     "unique": True,
 }
@@ -50,12 +51,15 @@ payload = {
 
 ## Save Ranked Results
 
+This example creates `generated_molecules.smi` in the working directory and
+refuses to overwrite an existing file. Choose another output path if it exists.
+
 ```python
 if result["status"] != "success":
     raise RuntimeError(result.get("error", "GenMol failed"))
 
 molecules = sorted(result["molecules"], key=lambda mol: mol["score"], reverse=True)
-with open("generated_molecules.smi", "w", encoding="utf-8") as handle:
+with open("generated_molecules.smi", "x", encoding="utf-8") as handle:
     handle.write("smiles\tscore\n")
     for molecule in molecules:
         handle.write(f"{molecule['smiles']}\t{molecule['score']:.4f}\n")

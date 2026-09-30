@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to set up the Isaac for Healthcare workflow runtime, check host prerequisites, and verify dependency-light workflow discovery. <br>
+Developers and engineers who need to prepare the Isaac for Healthcare workflow runtime, verify host prerequisites, and confirm dependency-light workflow discovery. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -41,35 +41,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive), 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks goal completion and expected workflow adherence (equal-weight mean of goal_accuracy and behavior_check). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer produced is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal accuracy + 50% behavior check). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity; routing is scored under Discoverability. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 75% → 86% (+11 points) | 65% → 75% (+10 points) |
-| Security | 50% → 100% (+50 points) | 0% → 50% (+50 points) |
-| Correctness | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Discoverability | 75% → 81% (+6 points) | 69% → 69% (±0 points) |
-| Effectiveness | 74% → 71% (-3 points) | 81% → 86% (+5 points) |
-| Efficiency | 77% → 77% (-0 points) | 77% → 71% (-6 points) |
+| Overall | 88.8% | 65.7% |
+| Security | 100.0% → 100.0% (±0.0 points) | 0.0% → 0.0% (±0.0 points) |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 95.0% | 75.0% |
+| Effectiveness | 39.3% → 71.1% (+31.8 points) | 85.7% → 95.0% (+9.3 points) |
+| Efficiency | 77.9% | 58.7% |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

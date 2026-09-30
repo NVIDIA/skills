@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to replay HDF5-recorded workflow episodes through their original Isaac Sim Scene for visual trajectory and recording verification. <br>
+Developers and engineers who need to replay and visually verify recorded HDF5 workflow episodes through their original Isaac for Healthcare simulation Scenes. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -41,35 +41,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive), each run in an isolated sandbox pod with 1 attempt per task. <br>
+2 evaluation tasks (2 positive), each with 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Security: Checks unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Checks tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 40% → 84% (+43 points) | 21% → 67% (+46 points) |
-| Security | 100% → 100% (±0 points) | 50% → 0% (-50 points) |
-| Correctness | 0% → 100% (+100 points) | 10% → 90% (+80 points) |
-| Discoverability | 50% → 94% (+44 points) | 19% → 89% (+71 points) |
-| Effectiveness | 6% → 29% (+22 points) | 6% → 70% (+64 points) |
-| Efficiency | 46% → 96% (+50 points) | 20% → 84% (+65 points) |
+| Overall | 86.2% | 74.2% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 75.0% (-25.0 points) |
+| Correctness | 25.0% → 100.0% (+75.0 points) | 13.3% → 90.0% (+76.7 points) |
+| Discoverability | 92.5% | 91.5% |
+| Effectiveness | 3.1% → 50.0% (+46.9 points) | 6.3% → 37.5% (+31.2 points) |
+| Efficiency | 88.5% | 77.1% |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

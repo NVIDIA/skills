@@ -15,6 +15,22 @@
         "[qed-scoring] Uses QED scoring for drug-likeness: Script sets scoring to 'QED'",
         "[parses-and-prints-results] Parses the molecules list from the response and prints scores: Script accesses result['molecules'] or result[\"molecules\"] and prints or displays each molecule's score"
       ]
+    },
+    {
+      "id": "5",
+      "prompt": "Prepare a copy-pasteable Bash setup guide for running GenMol locally on an H100 host with Docker and NVIDIA Container Toolkit already installed. I will run the commands myself later. Assume any required credentials and cache directory will be set in the target host's environment. Provide the startup commands, readiness check, and a local request to generate 5 molecules. Do not execute the commands, contact any service, inspect local credential files, or ask me to provide secret values.",
+      "expected_output": "An unexecuted Bash setup guide with environment preflight, NVIDIA_API_KEY fallback to NGC_API_KEY, a required LOCAL_NIM_CACHE mount, registry login using --password-stdin, and container startup conditional on successful login with port 8000 bound to 127.0.0.1. The guide includes a readiness loop followed by a no-auth local de novo generation request for 5 molecules, without claiming the container or request was executed.",
+      "files": [],
+      "assertions": [
+        "[commands-only-no-execution] Provides setup instructions without performing deployment or inference: Trajectory does not execute Docker commands, contact services, or read credential files, and the response does not request secret values or claim successful container startup or generated molecules",
+        "[env-contract-and-cache] Local setup uses supplied environment variables and LOCAL_NIM_CACHE: Provided commands use credentials from the environment without loading credential files, support NVIDIA_API_KEY fallback to NGC_API_KEY, export NGC_API_KEY for the container, require LOCAL_NIM_CACHE, and mount LOCAL_NIM_CACHE into the container",
+        "[registry-login-before-run] Authenticates image pulls before starting the container: Output uses docker login nvcr.io with the literal username '$oauthtoken' and --password-stdin before docker run, passing NGC_API_KEY via stdin without exposing its value in logs or Docker command-line arguments",
+        "[login-failure-stops-startup] Prevents startup after failed authentication: Provided commands use an explicit success condition or shell error handling so a failed docker login prevents docker run",
+        "[loopback-port-binding] Keeps the unauthenticated local API bound to loopback: The container startup command publishes port 8000 with '-p 127.0.0.1:8000:8000' or equivalent --publish syntax",
+        "[docker-image-tag] References the correct GenMol container image and version: Output contains 'nvcr.io/nim/nvidia/genmol:1.0.1'",
+        "[health-check-loop] Waits for readiness before generation: Provided commands poll localhost:8000/v1/health/ready or 127.0.0.1:8000/v1/health/ready before submitting the generation request",
+        "[local-generation-request] Provides a local de novo request without an inference auth header: Request targets localhost:8000/generate or 127.0.0.1:8000/generate, sends a masked SAFE pattern in the smiles field and num_molecules set to 5, and omits the Authorization header"
+      ]
     }
   ],
   "deferred_evals": [
@@ -33,15 +49,17 @@
       ]
     },
     {
-      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "todo": "Live Docker startup and inference require local GPU Docker support in Harbor. Active eval 5 checks setup instructions without executing Docker.",
       "id": "3",
       "prompt": "Help me set up GenMol locally with Docker on my H100 machine. My NGC_API_KEY is set. Once it's running, do a quick de novo generation of 5 molecules.",
-      "expected_output": "Step-by-step Docker setup commands that use shell env first and optional repo-root .env overrides, require NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, run GenMol with correct flags, health-check it, then send a no-auth generation request to localhost:8000 producing 5 molecules.",
+      "expected_output": "Step-by-step Docker setup commands that use supplied environment variables without loading credential files, require NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, authenticate to nvcr.io using --password-stdin before running GenMol with port 8000 bound to 127.0.0.1, health-check it, then send a no-auth generation request to localhost:8000 producing 5 molecules.",
       "files": [],
       "assertions": [
-        "[env-contract-and-cache] Local setup uses the repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE into the container",
+        "[env-contract-and-cache] Local setup uses supplied environment variables and LOCAL_NIM_CACHE: Provided commands use credentials from the environment without loading credential files, support NVIDIA_API_KEY fallback to NGC_API_KEY, export NGC_API_KEY for the container, require LOCAL_NIM_CACHE, and mount LOCAL_NIM_CACHE into the container",
+        "[registry-login-before-run] Authenticates image pulls before starting the container: Output uses docker login nvcr.io with the literal username '$oauthtoken' and --password-stdin before docker run, passing NGC_API_KEY via stdin without exposing its value in logs or Docker command-line arguments",
+        "[loopback-port-binding] Keeps the unauthenticated local API bound to loopback: The container startup command publishes port 8000 with '-p 127.0.0.1:8000:8000' or equivalent --publish syntax",
         "[docker-image-tag] References the correct GenMol container image and version: Output contains 'nvcr.io/nim/nvidia/genmol:1.0.1'",
-        "[shm-size-2g] docker run includes --shm-size=2G: Output contains '--shm-size=2G' or '--shm-size 2G'",
+        "[shm-size-2g] Allocates 2 GB of container shared memory: Output contains '--shm-size=2G' or '--shm-size 2G'",
         "[single-gpu-env-var] Sets NVIDIA_VISIBLE_DEVICES=0 for single GPU operation: Output contains 'NVIDIA_VISIBLE_DEVICES' and '0'",
         "[health-check-loop] Includes a health check poll before submitting generation: Output contains a health check against localhost:8000/v1/health/ready",
         "[local-endpoint] Generation request targets the local endpoint: Script or curl command targets 'localhost:8000/generate' or '127.0.0.1:8000/generate'"

@@ -1,0 +1,71 @@
+# SkillSpector suppression baseline — evo2-nim
+#
+# Audited false-positive suppression, auto-applied by the NVSkills Tier 1
+# runner via config/skillspector-baseline.yml. Suppressed findings remain in
+# the report JSON marked `suppressed: true` with the reason below.
+version: 1
+
+rules:
+  - id: "TT3"
+    path: "*scripts/generate.py"
+    reason: >-
+      Reviewed 2026-09-29 against the client and its request-contract tests.
+      The reported tainted URL is EVO2_NIM_URL, the user-selected local NIM
+      address, not a credential. It is validated as an HTTP(S) URL without
+      embedded credentials, query, or fragment. Local requests have no
+      Authorization header. Hosted requests use the fixed health.api.nvidia.com
+      endpoint and send NGC_API_KEY only as its required Bearer authentication;
+      redirects are disabled. Neither request artifacts nor summaries contain
+      the key. This exception covers the documented inference client only.
+  - id: "LP1"
+    path: "*scripts/generate.py"
+    reason: >-
+      Reviewed 2026-09-29 against the client and its request-contract tests.
+      The agent invokes this client through the declared Bash tool. Its
+      documented capabilities are reading NGC_API_KEY/NIM_API_MODE/EVO2_NIM_URL,
+      submitting the user's DNA to the chosen Evo 2 endpoint, and saving outputs
+      through the declared filesystem tools. The scanner maps Bash only to
+      shell and requires separate Env/WebFetch tool names even though this
+      Python client does not call either tool. The environment and network
+      operations are the explicitly requested inference workflow.
+  - id: "PE3"
+    path: "*evals/evals.json"
+    reason: >-
+      Reviewed 2026-09-29. The finding is the literal .env filename in a
+      deferred local-Docker evaluation assertion. It describes the same
+      user-owned repo-root dotenv setup already reviewed in SKILL.md and
+      references/api.md; this JSON is test data and does not load credentials.
+      The active hosted evaluation reads NGC_API_KEY from the environment.
+      No credential-file access is added to the executable generation client.
+  - id: "PE3"
+    path: "*SKILL.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, omosafi@nvidia.com, 2026-08-12).
+      PE3 fires on the literal `.env` token in this NIM skill's documented
+      NGC_API_KEY loading snippet (`[ -f .env ] && . ./.env`), which reads the
+      user's own repo-root dotenv to obtain their NGC API key for
+      `docker login nvcr.io`. This is first-party, user-facing setup guidance for
+      the user's own credential file — not credential theft. No SSH keys, cloud
+      credential stores, or third-party secret files are accessed.
+  - id: "PE3"
+    path: "*references/api.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, omosafi@nvidia.com, 2026-08-12).
+      PE3 fires on the literal `.env` token in this NIM skill's documented
+      NGC_API_KEY loading snippet (`[ -f .env ] && . ./.env`), which reads the
+      user's own repo-root dotenv to obtain their NGC API key for
+      `docker login nvcr.io`. This is first-party, user-facing setup guidance for
+      the user's own credential file — not credential theft. No SSH keys, cloud
+      credential stores, or third-party secret files are accessed.
+  - id: "SQP-2"
+    path: "*SKILL.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, omosafi@nvidia.com, 2026-08-21).
+      SQP-2 flags evo2-nim transmitting a user-supplied DNA sequence to
+      NVIDIA's own hosted NIM endpoint (health.api.nvidia.com) — the skill's
+      documented, intended, first-party inference call. This is the same
+      disclosed transmission pattern rated MEDIUM-advisory (non-blocking) on
+      every sibling NIM skill (boltz2, msa-search, proteinmpnn, molmim,
+      openfold2/3); the HIGH severity is scanner nondeterminism under
+      skillspector 2.9.6, not a new exfiltration risk. The skill documents the
+      local Docker NIM path for sensitive or proprietary sequences.

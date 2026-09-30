@@ -1,5 +1,5 @@
 ## Description: <br>
-Grade or filter workflow HDF5 episodes with an OpenAI-compatible vision model. Use for visual success labels; do not use for replay, policy evaluation, or recordings without frames. <br>
+Grade or filter workflow HDF5 episodes with an OpenAI-compatible vision model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to grade or filter workflow HDF5 episode recordings using an OpenAI-compatible vision-language model, producing visual success labels for dataset annotation. <br>
+Developers and engineers use this skill to grade or filter HDF5-recorded workflow episodes against visual success criteria using a vision-language model. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,11 +26,10 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Isaac for Healthcare Workflows](https://github.com/isaac-for-healthcare/i4h-workflows) <br>
-- [Agent Skills Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Analysis] <br>
+**Output Type(s):** [Analysis, Shell commands] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -42,35 +41,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive) run in isolated k8s-sandbox pods, with 1 attempt per task. <br>
+2 evaluation tasks (2 positive), each with 3 attempts per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether the skill is safe to use: no unsafe operations, secret leakage, or unauthorized access. <br>
-- Correctness: Checks whether the final answer is correct against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal (goal completion and expected workflow adherence, equally weighted). <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed: skill selection, decoy avoidance, and workflow execution. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies whether the expected skill was found and executed. <br>
-- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Measures routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 47% → 85% (+38 points) | 17% → 63% (+46 points) |
-| Security | 100% → 100% (±0 points) | 0% → 0% (±0 points) |
-| Correctness | 30% → 100% (+70 points) | 10% → 100% (+90 points) |
-| Discoverability | 50% → 94% (+44 points) | 28% → 81% (+53 points) |
-| Effectiveness | 6% → 42% (+36 points) | 6% → 50% (+44 points) |
-| Efficiency | 47% → 88% (+41 points) | 41% → 85% (+44 points) |
+| Overall | 87.7% | 54.3% |
+| Security | 100.0% → 100.0% (±0.0 points) | 66.7% → 0.0% (-66.7 points) |
+| Correctness | 10.0% → 100.0% (+90.0 points) | 16.7% → 80.0% (+63.3 points) |
+| Discoverability | 92.5% | 90.0% |
+| Effectiveness | 6.3% → 52.5% (+46.2 points) | 6.3% → 26.3% (+20.0 points) |
+| Efficiency | 93.3% | 75.3% |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

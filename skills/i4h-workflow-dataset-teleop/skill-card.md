@@ -1,5 +1,5 @@
 ## Description: <br>
-Record demonstrations through a workflow's teleop Task into workflow HDF5 for keyboard, leader, VR, or bus input. <br>
+Record demonstrations through a workflow's teleop Task into workflow HDF5. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to record human teleop demonstrations through Isaac for Healthcare workflow tasks into HDF5 datasets for training data collection. <br>
+Developers and engineers who need to record human-operated teleop demonstrations through Isaac for Healthcare workflows into HDF5 datasets for downstream training. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,10 +26,11 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Isaac for Healthcare Workflows](https://github.com/isaac-for-healthcare/i4h-workflows) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Shell commands, Analysis, Files] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -41,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (3 positive), each run in an isolated sandbox pod. <br>
+3 evaluation tasks (3 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether the skill is safe to use: unsafe operations, secret leakage, and unauthorized access. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks whether the final answer is correct against the reference answer. <br>
-- Discoverability: Checks whether the right skill was loaded and executed when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow (goal completion and behavior adherence, equally weighted). <br>
-- Efficiency: Checks whether the skill avoided wasted tool or skill usage through routing quality and productive tool use. <br>
+- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
+- Efficiency: Checks for tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 43% → 75% (+32 points) | 42% → 69% (+26 points) |
-| Security | 100% → 67% (-33 points) | 0% → 50% (+50 points) |
-| Correctness | 7% → 100% (+93 points) | 67% → 100% (+33 points) |
-| Discoverability | 48% → 83% (+35 points) | 54% → 73% (+19 points) |
-| Effectiveness | 20% → 40% (+20 points) | 24% → 36% (+12 points) |
-| Efficiency | 38% → 84% (+46 points) | 67% → 83% (+17 points) |
+| Overall | 66.0% | 71.8% |
+| Security | 88.9% → 66.7% (-22.2 pp) | 71.4% → 83.3% (+11.9 pp) |
+| Correctness | 4.4% → 66.7% (+62.3 pp) | 31.4% → 93.3% (+61.9 pp) |
+| Discoverability | 91.7% | 75.0% |
+| Effectiveness | 3.3% → 21.7% (+18.4 pp) | 10.9% → 36.3% (+25.4 pp) |
+| Efficiency | 83.3% | 71.2% |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

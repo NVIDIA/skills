@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers running the full Isaac for Healthcare data-to-policy pipeline end-to-end, from recording through checkpoint validation, for robotics policy workflows. <br>
+Developers and engineers running the Isaac for Healthcare end-to-end data-to-policy workflow, from recording through training and checkpoint validation. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -41,35 +41,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive) executed in isolated sandbox pods. <br>
+Evaluated against 2 evaluation tasks (2 positive) in isolated k8s-sandbox pods with 3 attempts per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed the expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage. <br>
+- Discoverability: Whether the expected skill was selected and the workflow executed when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal accuracy + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 41% → 83% (+42 points) | 39% → 57% (+18 points) |
-| Security | 100% → 100% (±0 points) | 100% → 0% (-100 points) |
-| Correctness | 10% → 100% (+90 points) | 0% → 100% (+100 points) |
-| Discoverability | 48% → 94% (+46 points) | 41% → 69% (+28 points) |
-| Effectiveness | 6% → 34% (+28 points) | 6% → 27% (+21 points) |
-| Efficiency | 40% → 85% (+46 points) | 50% → 89% (+39 points) |
+| Overall | 62.8% — baseline ran, but no comparable score was available; uplift unavailable | 57.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 83.3% → 33.3% (-50.0 points) | 75.0% → 0.0% (-75.0 points) |
+| Correctness | 6.7% → 100.0% (+93.3 points) | 25.0% → 100.0% (+75.0 points) |
+| Discoverability | 85.0% — baseline ran, but no comparable score was available; uplift unavailable | 75.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 6.3% → 20.2% (+13.9 points) | 22.1% → 52.9% (+30.8 points) |
+| Efficiency | 75.3% — baseline ran, but no comparable score was available; uplift unavailable | 58.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

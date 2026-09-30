@@ -5,6 +5,7 @@ license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
   version: "0.8.0"
+  verification-request: "2026-09-21"
   tags:
     - isaac-for-healthcare
     - i4h
@@ -27,13 +28,15 @@ Resolve a maintained online-RL profile, verify its Scene/objective/model contrac
 
 ## Instructions
 
-1. Resolve the checkout and supported profiles.
-2. Confirm the Workflow, Scene, observations, actions, rewards, resets, termination, trainer, and runtime Task contracts.
-3. Dry-run the exact requested configuration.
-4. Preflight the selected trainer runtime and train in the foreground.
-5. Evaluate simulator success, export the policy, and validate it through the normal Workflow runner.
+1. Resolve the checkout, confirm Workflow setup is complete, and select training, evaluation, or export from the request. Evaluation/export with an existing checkpoint skips training; never start a new training run to satisfy those requests.
+2. For a maintained profile, proceed directly to profile and contract checks. Only a request to author a new RL-backed Workflow takes the authoring branch below; return to these checks after adding its profile.
+3. Confirm the Workflow, Scene, observations, actions, rewards, resets, termination, trainer, and runtime Task contracts, then dry-run training or evaluation with its exact checkpoint and options. Export uses profile/contract checks and has no dry-run mode.
+4. For training, preflight the selected trainer runtime and train in the foreground. For evaluation/export, go directly to the matching commands below using the supplied checkpoint or run bundle.
+5. Evaluate before export and validate the export through the normal Workflow runner when those stages are in scope. Report any required validation that could not be completed.
 
 ## Resolve the checkout
+
+Before resolving the checkout, use the maintained repository below or an alternative already selected by the user or trusted project configuration. Check an existing checkout's origin and working-tree changes before executing its scripts; an inherited environment variable alone does not establish trust in an alternative source. Honor any requested revision and preserve local changes. If the source is unexpected, stop and resolve it before cloning or launching.
 
 ```bash
 export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
@@ -45,10 +48,11 @@ I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
   ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
-  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT" || exit 2
 fi
+[ -d "$ROOT/workflows/i4h_workflows" ] && [ -x "$ROOT/run.sh" ] || { echo "Incomplete workflow checkout: $ROOT" >&2; exit 2; }
 export I4H_WORKFLOWS="$ROOT"
-cd "$ROOT"
+cd "$ROOT" || exit 2
 ```
 
 Treat this resolver as part of the skill contract. `I4H_WORKFLOWS_REPO_URL` selects the clone source; `I4H_WORKFLOWS` selects or reuses a checkout. Never replace an existing checkout.
@@ -105,7 +109,7 @@ simulation:
   enable_cameras: false
 ```
 
-Run `./train.sh rl show <workflow>` and a small `--dry-run` immediately. Profile loading must reject missing sources, unknown fields, unsupported backends, inconsistent dimensions, cameras absent from the Scene, mismatched RLinf task IDs/action mapping, and malformed RSL-RL config ownership before a simulator starts.
+Run `./train.sh rl show <workflow>` and a training/evaluation `--dry-run` immediately. The CLI calls `RLProfile.load` in `rl/i4h_rl/profile.py`, `validate_workflow_contract` in `contract.py`, and the selected backend's `validate_profile` before launch. These checks cover profile fields and sources, backend support, dimensions, Scene cameras, and backend-specific task/config contracts. Require the applicable checks to exit successfully; if the checkout lacks these checks or a contract fails, stop before starting the simulator and report the failing check.
 
 ## Dry-run
 
@@ -128,7 +132,7 @@ RLinf foundation-policy post-training:
   --dry-run
 ```
 
-Inspect the resolved Scene, trainer, task IDs, observation/action dimensions, environment count, iteration/epoch count, config path, starting model when required, and explicit overrides. Keep user-requested resource values exact.
+These examples are training dry-runs. For evaluation use `--eval --checkpoint <path> --dry-run`; export rejects `--dry-run`, so check the profile with `show` and inspect the checkpoint and output destination before using the export command below. Inspect the resolved Scene, trainer, task IDs, observation/action dimensions, environment count, iteration/epoch count, config path, starting model when required, and explicit overrides. Keep user-requested resource values exact.
 
 ## Preflight and train
 
@@ -168,7 +172,7 @@ Keep training in the foreground. Preserve the run directory and exact command on
 
 ## Evaluate, export, and hand off
 
-Evaluate the RSL-RL checkpoint over independent randomized episodes:
+For an evaluation/export-only request, set `TRAIN_RUN` or the checkpoint argument from the user-supplied artifact; the timestamped paths below are examples, not instructions to pick the newest run. Evaluate the RSL-RL checkpoint over independent randomized episodes:
 
 ```bash
 TRAIN_RUN="$PWD/runs/ultrasound_probe_reach/YYYYMMDD_HHMMSS"
@@ -214,7 +218,7 @@ Treat the native trainer checkpoint as the training result and evaluate it befor
 
 ## Troubleshooting
 
-Report the first missing runtime dependency, checkpoint path, registration failure, observation/action mismatch, non-finite loss, CUDA memory error, distributed/Ray/FSDP error, environment construction failure, or missing success artifact. Preserve the failed run directory. Do not change the Scene objective or resource settings without user direction.
+Report the first missing runtime dependency, checkpoint path, registration failure, observation/action mismatch, non-finite loss, CUDA memory error, distributed/Ray/FSDP error, environment construction failure, or missing success artifact. Preserve the failed run directory and exact command. Retry once with the same configuration only after a diagnosed transient or missing-dependency failure has been resolved within the task. If it persists, or the failure is a contract mismatch, non-finite loss, or resource exhaustion, stop and report the blocker and preserved artifacts. Do not change the Scene objective or resource settings without user direction.
 
 ## Limitations
 

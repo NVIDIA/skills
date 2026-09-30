@@ -10,7 +10,7 @@
 | List models (local) | GET | `http://localhost:8000/v1/models` |
 
 Auth for hosted: `Authorization: Bearer $NGC_API_KEY` header on every request.
-Auth for local: none on inference requests after readiness; supported container startup passes `NGC_API_KEY` as `-e NGC_API_KEY` for registry login, entitlement/resource checks, and first-run model downloads.
+Auth for local: none on inference requests after readiness. Authenticate image pulls with `docker login nvcr.io` on the host; pass `-e NGC_API_KEY` to the container for entitlement/resource checks and first-run model downloads.
 
 ---
 
@@ -116,23 +116,32 @@ On failure:
 
 ---
 
-## Docker run reference
+## Local container startup
+
+Passing `-e NGC_API_KEY` to the container does not authenticate the image pull.
+The commands below log in to NGC using the key on stdin, then start the container
+only if login succeeds. The unauthenticated API is bound to `127.0.0.1`.
+Provide the key and cache path through the environment before running this
+example; it does not load credential files. Keep shell tracing disabled.
+Registry login authenticates to `nvcr.io` using the key; the container also uses
+it for entitlement checks and model downloads, which need about 20 GB of cache.
 
 ```bash
-set -a
-[ -f .env ] && . ./.env
-set +a
+set +x
 
 if [ -z "${NGC_API_KEY:-}" ] && [ -n "${NVIDIA_API_KEY:-}" ]; then
-  export NGC_API_KEY="$NVIDIA_API_KEY"
+  NGC_API_KEY="$NVIDIA_API_KEY"
 fi
-: "${NGC_API_KEY:?Set NGC_API_KEY or NVIDIA_API_KEY in the environment or repo-root .env}"
+: "${NGC_API_KEY:?Set NGC_API_KEY or NVIDIA_API_KEY in the environment}"
+export NGC_API_KEY
 
-: "${LOCAL_NIM_CACHE:?Set LOCAL_NIM_CACHE in the environment or repo-root .env}"
+: "${LOCAL_NIM_CACHE:?Set LOCAL_NIM_CACHE in the environment}"
 export NIM_TEST_GPU="${NIM_TEST_GPU:-0}"
 mkdir -p "${LOCAL_NIM_CACHE}"
 chmod 755 "${LOCAL_NIM_CACHE}"
 
+printf '%s\n' "$NGC_API_KEY" | \
+  docker login nvcr.io --username '$oauthtoken' --password-stdin && \
 docker run --rm -it --name genmol-nim \
   --runtime=nvidia \
   --gpus=all \
@@ -142,7 +151,7 @@ docker run --rm -it --name genmol-nim \
   --ulimit stack=67108864 \
   -e NGC_API_KEY \
   -v "${LOCAL_NIM_CACHE}:/opt/nim/.cache" \
-  -p 8000:8000 \
+  -p 127.0.0.1:8000:8000 \
   nvcr.io/nim/nvidia/genmol:1.0.1
 ```
 
@@ -156,14 +165,14 @@ docker run --rm -it --name genmol-nim \
 | `--ulimit stack` | `67108864` | 64 MB stack |
 | `-e NGC_API_KEY` | — | Passed through for model weight download on first run |
 | `-v ... :/opt/nim/.cache` | local path | Cache dir for downloaded model weights (~20 GB) |
-| `-p 8000:8000` | — | Expose HTTP API on localhost:8000 |
+| `-p 127.0.0.1:8000:8000` | — | Bind the HTTP API to the host's loopback address |
 
 ### Environment variables
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `NIM_TEST_GPU` | 0 | GPU index used to set `NVIDIA_VISIBLE_DEVICES` |
-| `NGC_API_KEY` | — | Required for model download |
+| `NGC_API_KEY` | — | Required for registry login and model download |
 | `NVIDIA_API_KEY` | — | Optional fallback source if `NGC_API_KEY` is absent |
 | `LOCAL_NIM_CACHE` | — | Required host cache path for downloaded model weights |
 | `NIM_LOG_LEVEL` | INFO | Verbosity: DEBUG, INFO, WARNING, ERROR, CRITICAL |
