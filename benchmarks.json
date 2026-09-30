@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 387,
-  "result_row_count": 3585,
+  "skill_count": 388,
+  "result_row_count": 3600,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -146,13 +146,33 @@
       "average_uplift_pct": 15.47
     },
     {
-      "skill": "genmol-nim",
-      "evaluation_date": "2026-09-29",
+      "skill": "evo2-nim",
+      "evaluation_date": "2026-09-30",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:863cc2afe0b8980fd5388973f2820de36adb4becfd34ff4b63cc0649e353ce68",
+      "dataset_digest": "sha256:f6c50c0077eda60ee7fc9ab49ca7a1dcb84f3deeee873c4837c89c794f3ea9f6",
       "validation_status": null,
       "tasks": 1,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 18.93
+    },
+    {
+      "skill": "genmol-nim",
+      "evaluation_date": "2026-09-30",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:be25e4ba35214b8bd487e1a4add647999bc9a855bd07fee2993d7927cdba1b00",
+      "validation_status": null,
+      "tasks": 2,
       "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -163,7 +183,7 @@
       "catalog_dir": "bionemo-genmol-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
-      "average_uplift_pct": 16.55
+      "average_uplift_pct": 15.1
     },
     {
       "skill": "kermt-add-cmim-pretrain",
@@ -2480,13 +2500,13 @@
     },
     {
       "skill": "i4h-lerobot-viz",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:93ad31732f601b7ae680a17624f8f898357d09fcbc3494f057ea035e226ab28c",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2496,17 +2516,17 @@
       "catalog_dir": "i4h-lerobot-viz",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 33.6
+      "average_uplift_pct": 19.58
     },
     {
       "skill": "i4h-workflow",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:00d6d45e6392054493752474bd5ee6e1196f7ad41810fa6da95eb645ed1ac583",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2516,17 +2536,17 @@
       "catalog_dir": "i4h-workflow",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 4.5
+      "average_uplift_pct": 4.75
     },
     {
       "skill": "i4h-workflow-create",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:5cc46d1f852070edff4a32347f96e7887fbdf3302ea6f9adbee8c105bd2f2e8a",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 5,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2536,17 +2556,17 @@
       "catalog_dir": "i4h-workflow-create",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 29.4
+      "average_uplift_pct": 22.6
     },
     {
       "skill": "i4h-workflow-dataset-annotate",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:b1d50c74acaec1cdd719c0e683f299d8e8a0538cbe903efc0c052cbb9318fb9e",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2556,17 +2576,17 @@
       "catalog_dir": "i4h-workflow-dataset-annotate",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 42.2
+      "average_uplift_pct": 25.47
     },
     {
       "skill": "i4h-workflow-dataset-convert",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:c419f87fbbf11d2b03666ba2d679b84bd034853994f033900031bf092b0ce801",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2576,17 +2596,17 @@
       "catalog_dir": "i4h-workflow-dataset-convert",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 27.9
+      "average_uplift_pct": 25.77
     },
     {
       "skill": "i4h-workflow-dataset-mimic",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-15",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:26e64d6309ea0d85ebda82fbe5e6c44c2789e399a1a2bbf4ffc90b73dd488c46",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2596,17 +2616,17 @@
       "catalog_dir": "i4h-workflow-dataset-mimic",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 31.1
+      "average_uplift_pct": 35.18
     },
     {
       "skill": "i4h-workflow-dataset-replay",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:bb1ca36274d90171e49695a74ff3163120054f3fe62cc2897af88e299c50455b",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2616,17 +2636,17 @@
       "catalog_dir": "i4h-workflow-dataset-replay",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 44.6
+      "average_uplift_pct": 34.13
     },
     {
       "skill": "i4h-workflow-dataset-teleop",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:7e5d819eae66b55ccd3c97e712d134cb73d73d8e5a746f5c03faf7907c3d98c9",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2636,17 +2656,17 @@
       "catalog_dir": "i4h-workflow-dataset-teleop",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 29.2
+      "average_uplift_pct": 26.28
     },
     {
       "skill": "i4h-workflow-e2e",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:df688f31b369fdc7f19cf4212dec493696ea1df04dd7347724dcfc0dea93a4dc",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2656,17 +2676,17 @@
       "catalog_dir": "i4h-workflow-e2e",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 29.8
+      "average_uplift_pct": 14.67
     },
     {
       "skill": "i4h-workflow-finetune",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:b170a81b7e415375da232ea323fc52b67bb8b05c5682e964f08a4882fc8d6964",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2676,7 +2696,7 @@
       "catalog_dir": "i4h-workflow-finetune",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 23.3
+      "average_uplift_pct": 22.58
     },
     {
       "skill": "i4h-workflow-scene-edit",
@@ -2700,13 +2720,13 @@
     },
     {
       "skill": "i4h-workflow-setup",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-15",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:ade31484d3ac5633cdb8008746e2b20803e31832a7c5b577d8bff9bb02a55354",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2716,17 +2736,17 @@
       "catalog_dir": "i4h-workflow-setup",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 10.2
+      "average_uplift_pct": 10.18
     },
     {
       "skill": "i4h-workflow-train-rl",
-      "evaluation_date": "2026-09-03",
+      "evaluation_date": "2026-09-21",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:eaab434eabd6b5ea5e26065aef290992f9fb29cbadea578299cbb70d56828b94",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 9,
-      "attempts_per_task": 1,
+      "attempts_per_task": 3,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -2736,7 +2756,7 @@
       "catalog_dir": "i4h-workflow-train-rl",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
-      "average_uplift_pct": 22.6
+      "average_uplift_pct": 11.77
     },
     {
       "skill": "i4h-workflow-validate",
@@ -8043,7 +8063,7 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "bionemo-genmol-nim",
+      "catalog_dir": "bionemo-evo2-nim",
       "component": "BioNeMo NIMs",
       "dimension": "Security",
       "num": null,
@@ -8052,15 +8072,105 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "bionemo-genmol-nim",
+      "catalog_dir": "bionemo-evo2-nim",
       "component": "BioNeMo NIMs",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
+      "score_pct": 100.0,
       "uplift_pct": 50.0
     },
     {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 63.6
+    },
+    {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-evo2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-genmol-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
       "catalog_dir": "bionemo-genmol-nim",
       "component": "BioNeMo NIMs",
       "dimension": "Correctness",
@@ -8084,7 +8194,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.0,
+      "score_pct": 100.0,
       "uplift_pct": null
     },
     {
@@ -8093,7 +8203,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
+      "score_pct": 93.0,
       "uplift_pct": null
     },
     {
@@ -8102,8 +8212,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 65.0,
-      "uplift_pct": 0.0
+      "score_pct": 78.8,
+      "uplift_pct": 34.7
     },
     {
       "catalog_dir": "bionemo-genmol-nim",
@@ -8112,7 +8222,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 49.3
+      "uplift_pct": 55.9
     },
     {
       "catalog_dir": "bionemo-genmol-nim",
@@ -8120,7 +8230,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 74.1,
+      "score_pct": 84.2,
       "uplift_pct": null
     },
     {
@@ -8129,7 +8239,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.1,
+      "score_pct": 86.3,
       "uplift_pct": null
     },
     {
@@ -18539,11 +18649,29 @@
     {
       "catalog_dir": "i4h-lerobot-viz",
       "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.7,
+      "uplift_pct": -33.3
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 55.0
     },
     {
       "catalog_dir": "i4h-lerobot-viz",
@@ -18551,8 +18679,17 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 45.0
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-lerobot-viz",
@@ -18560,8 +18697,17 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 34.0,
-      "uplift_pct": 29.0
+      "score_pct": 16.3,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 23.3,
+      "uplift_pct": 20.8
     },
     {
       "catalog_dir": "i4h-lerobot-viz",
@@ -18569,8 +18715,17 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 54.0
+      "score_pct": 97.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-lerobot-viz",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18578,8 +18733,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 0.0
+      "score_pct": 87.5,
+      "uplift_pct": -12.5
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18587,8 +18742,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": -50.0
+      "score_pct": 87.5,
+      "uplift_pct": -12.5
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18596,26 +18751,26 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
+      "score_pct": 25.0,
+      "uplift_pct": 18.3
+    },
+    {
+      "catalog_dir": "i4h-workflow",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
       "score_pct": 50.0,
       "uplift_pct": 0.0
     },
     {
       "catalog_dir": "i4h-workflow",
       "component": "Isaac for Healthcare Workflows",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": -20.0
-    },
-    {
-      "catalog_dir": "i4h-workflow",
-      "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": 25.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18623,8 +18778,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 22.0
+      "score_pct": 90.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18632,8 +18787,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 41.0,
-      "uplift_pct": 3.0
+      "score_pct": 30.6,
+      "uplift_pct": 19.8
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18641,8 +18796,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 43.0,
-      "uplift_pct": 5.0
+      "score_pct": 41.7,
+      "uplift_pct": 15.4
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18650,8 +18805,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 31.0
+      "score_pct": 99.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow",
@@ -18659,8 +18814,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 29.0
+      "score_pct": 91.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18669,7 +18824,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 20.8
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18687,7 +18842,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 80.0,
-      "uplift_pct": 52.0
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18696,7 +18851,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 72.0,
-      "uplift_pct": 12.0
+      "uplift_pct": 37.4
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18704,8 +18859,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 99.0,
-      "uplift_pct": 52.0
+      "score_pct": 98.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18713,8 +18868,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 45.0
+      "score_pct": 93.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18723,7 +18878,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 37.0,
-      "uplift_pct": 24.0
+      "uplift_pct": 23.2
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18731,8 +18886,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 32.0,
-      "uplift_pct": -16.0
+      "score_pct": 34.0,
+      "uplift_pct": 9.2
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18740,8 +18895,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 62.0
+      "score_pct": 89.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-create",
@@ -18749,8 +18904,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 43.0
+      "score_pct": 97.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-annotate",
@@ -18768,7 +18923,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 0.0,
-      "uplift_pct": 0.0
+      "uplift_pct": -66.7
     },
     {
       "catalog_dir": "i4h-workflow-dataset-annotate",
@@ -18776,107 +18931,107 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 70.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-annotate",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 90.0
     },
     {
       "catalog_dir": "i4h-workflow-dataset-annotate",
       "component": "Isaac for Healthcare Workflows",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 44.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-annotate",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 53.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-annotate",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 42.0,
-      "uplift_pct": 36.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-annotate",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 44.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-annotate",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 41.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-annotate",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 44.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-convert",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-convert",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 67.0,
-      "uplift_pct": -33.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-convert",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 80.0,
-      "uplift_pct": 27.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-convert",
-      "component": "Isaac for Healthcare Workflows",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
       "score_pct": 80.0,
-      "uplift_pct": 27.0
+      "uplift_pct": 63.3
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 52.5,
+      "uplift_pct": 46.2
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 26.3,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-annotate",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.5,
+      "uplift_pct": -12.5
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 7.1
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 37.9
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-convert",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 62.9
     },
     {
       "catalog_dir": "i4h-workflow-dataset-convert",
@@ -18884,8 +19039,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 48.0
+      "score_pct": 96.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-convert",
@@ -18893,8 +19048,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 50.0
+      "score_pct": 90.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-convert",
@@ -18902,8 +19057,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 42.0,
-      "uplift_pct": 27.0
+      "score_pct": 34.2,
+      "uplift_pct": 22.1
     },
     {
       "catalog_dir": "i4h-workflow-dataset-convert",
@@ -18911,8 +19066,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 42.0,
-      "uplift_pct": 39.0
+      "score_pct": 45.0,
+      "uplift_pct": 37.1
     },
     {
       "catalog_dir": "i4h-workflow-dataset-convert",
@@ -18920,8 +19075,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 91.0,
-      "uplift_pct": 50.0
+      "score_pct": 82.9,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-convert",
@@ -18929,8 +19084,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 44.0
+      "score_pct": 88.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -18948,7 +19103,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 50.0,
-      "uplift_pct": -50.0
+      "uplift_pct": -33.3
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -18957,7 +19112,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 80.0
+      "uplift_pct": 92.0
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -18965,8 +19120,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "score_pct": 90.0,
+      "uplift_pct": 76.7
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -18974,8 +19129,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 46.0
+      "score_pct": 97.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -18983,8 +19138,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 51.0
+      "score_pct": 89.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -18992,8 +19147,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 32.0,
-      "uplift_pct": 15.0
+      "score_pct": 57.5,
+      "uplift_pct": 46.5
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -19001,8 +19156,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 38.0,
-      "uplift_pct": 32.0
+      "score_pct": 35.0,
+      "uplift_pct": 29.2
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -19010,8 +19165,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 78.0,
-      "uplift_pct": 46.0
+      "score_pct": 85.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-mimic",
@@ -19019,8 +19174,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 51.0
+      "score_pct": 87.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-replay",
@@ -19037,8 +19192,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": -50.0
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
     },
     {
       "catalog_dir": "i4h-workflow-dataset-replay",
@@ -19047,7 +19202,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "i4h-workflow-dataset-replay",
@@ -19056,7 +19211,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.0,
-      "uplift_pct": 80.0
+      "uplift_pct": 76.7
     },
     {
       "catalog_dir": "i4h-workflow-dataset-replay",
@@ -19064,8 +19219,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 44.0
+      "score_pct": 92.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-replay",
@@ -19073,8 +19228,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 71.0
+      "score_pct": 91.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-replay",
@@ -19082,53 +19237,53 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 29.0,
-      "uplift_pct": 22.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-replay",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 64.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-replay",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-replay",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 65.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-teleop",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 67.0,
-      "uplift_pct": -33.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-dataset-teleop",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
       "score_pct": 50.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 46.9
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 37.5,
+      "uplift_pct": 31.2
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-replay",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.7,
+      "uplift_pct": -22.2
+    },
+    {
+      "catalog_dir": "i4h-workflow-dataset-teleop",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 11.9
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19136,8 +19291,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 93.0
+      "score_pct": 66.7,
+      "uplift_pct": 62.3
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19145,8 +19300,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 33.0
+      "score_pct": 93.3,
+      "uplift_pct": 61.9
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19154,8 +19309,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.0,
-      "uplift_pct": 35.0
+      "score_pct": 91.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19163,8 +19318,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 73.0,
-      "uplift_pct": 19.0
+      "score_pct": 75.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19172,8 +19327,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 40.0,
-      "uplift_pct": 20.0
+      "score_pct": 21.7,
+      "uplift_pct": 18.4
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19181,8 +19336,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 36.0,
-      "uplift_pct": 12.0
+      "score_pct": 36.3,
+      "uplift_pct": 25.4
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19190,8 +19345,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 84.0,
-      "uplift_pct": 46.0
+      "score_pct": 83.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-dataset-teleop",
@@ -19199,8 +19354,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.0,
-      "uplift_pct": 17.0
+      "score_pct": 71.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-e2e",
@@ -19208,8 +19363,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 33.3,
+      "uplift_pct": -50.0
     },
     {
       "catalog_dir": "i4h-workflow-e2e",
@@ -19218,7 +19373,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 0.0,
-      "uplift_pct": -100.0
+      "uplift_pct": -75.0
     },
     {
       "catalog_dir": "i4h-workflow-e2e",
@@ -19227,7 +19382,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 90.0
+      "uplift_pct": 93.3
     },
     {
       "catalog_dir": "i4h-workflow-e2e",
@@ -19236,52 +19391,52 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "i4h-workflow-e2e",
       "component": "Isaac for Healthcare Workflows",
       "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 46.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-e2e",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 28.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-e2e",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 34.0,
-      "uplift_pct": 28.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-e2e",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 27.0,
-      "uplift_pct": 21.0
-    },
-    {
-      "catalog_dir": "i4h-workflow-e2e",
-      "component": "Isaac for Healthcare Workflows",
-      "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
       "score_pct": 85.0,
-      "uplift_pct": 46.0
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 20.2,
+      "uplift_pct": 13.9
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 52.9,
+      "uplift_pct": 30.8
+    },
+    {
+      "catalog_dir": "i4h-workflow-e2e",
+      "component": "Isaac for Healthcare Workflows",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-e2e",
@@ -19289,8 +19444,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 39.0
+      "score_pct": 58.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19307,8 +19462,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": -50.0
+      "score_pct": 25.0,
+      "uplift_pct": -75.0
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19316,8 +19471,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "score_pct": 70.0,
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19326,7 +19481,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 96.7
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19334,8 +19489,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 47.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19343,8 +19498,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": 25.0
+      "score_pct": 81.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19352,8 +19507,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 12.0,
-      "uplift_pct": 8.0
+      "score_pct": 35.0,
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19361,8 +19516,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 28.0,
-      "uplift_pct": 5.0
+      "score_pct": 28.8,
+      "uplift_pct": 23.8
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19370,8 +19525,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.0,
-      "uplift_pct": 41.0
+      "score_pct": 76.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-finetune",
@@ -19379,8 +19534,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.0,
-      "uplift_pct": 17.0
+      "score_pct": 69.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-scene-edit",
@@ -19434,7 +19589,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19442,8 +19597,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 50.0
+      "score_pct": 0.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19452,7 +19607,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19469,8 +19624,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.0,
-      "uplift_pct": 6.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19478,8 +19633,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 0.0
+      "score_pct": 75.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19487,8 +19642,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 71.0,
-      "uplift_pct": -3.0
+      "score_pct": 71.1,
+      "uplift_pct": 31.8
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19496,8 +19651,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 5.0
+      "score_pct": 95.0,
+      "uplift_pct": 9.3
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19505,8 +19660,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 77.0,
-      "uplift_pct": -0.0
+      "score_pct": 77.9,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-setup",
@@ -19514,8 +19669,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.0,
-      "uplift_pct": -6.0
+      "score_pct": 58.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-train-rl",
@@ -19523,8 +19678,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 22.0,
-      "uplift_pct": 0.0
+      "score_pct": 37.5,
+      "uplift_pct": -41.7
     },
     {
       "catalog_dir": "i4h-workflow-train-rl",
@@ -19532,8 +19687,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 33.0
+      "score_pct": 81.7,
+      "uplift_pct": 54.2
     },
     {
       "catalog_dir": "i4h-workflow-train-rl",
@@ -19541,8 +19696,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 27.0
+      "score_pct": 77.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-train-rl",
@@ -19550,8 +19705,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 35.0,
-      "uplift_pct": 16.0
+      "score_pct": 33.4,
+      "uplift_pct": 22.8
     },
     {
       "catalog_dir": "i4h-workflow-train-rl",
@@ -19559,8 +19714,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 37.0
+      "score_pct": 71.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "i4h-workflow-validate",

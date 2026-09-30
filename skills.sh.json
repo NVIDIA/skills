@@ -327,6 +327,7 @@
         "dynamo-recipe-runner",
         "dynamo-router-starter",
         "dynamo-troubleshoot",
+        "evo2-nim",
         "genmol-nim",
         "jetson-inference-mem-tune",
         "jetson-llm-benchmark",

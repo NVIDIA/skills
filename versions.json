@@ -44,11 +44,18 @@
       "last_modified": "2026-09-29"
     },
     {
+      "name": "bionemo-evo2-nim",
+      "path": "skills/bionemo-evo2-nim",
+      "content_digest": "sha256:a900004a09a497c37327a501ee3db57240df4edde97c18fb854f29723ff85c9c",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
+    },
+    {
       "name": "bionemo-genmol-nim",
       "path": "skills/bionemo-genmol-nim",
-      "content_digest": "sha256:aa02a9d487adeba68a48f142675e0d15581facf20d3e7c424bf875f0bc08a27e",
-      "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
-      "last_modified": "2026-09-29"
+      "content_digest": "sha256:a27ed94b0d4658911e9fafcd682b84d5d712cdc9cad1b4aed55292676299e609",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "bionemo-kermt-add-cmim-pretrain",
@@ -928,72 +935,72 @@
     {
       "name": "i4h-lerobot-viz",
       "path": "skills/i4h-lerobot-viz",
-      "content_digest": "sha256:1d666e935707985610461675b57c46ddc9e4101fc0798919d6e62addc48c46fe",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:5403d1a0f6dbc354676700506df1ff2a7a623b31e9feb81ce980c1b521b1cd49",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow",
       "path": "skills/i4h-workflow",
-      "content_digest": "sha256:7989cfe8ec4d4610162353f1e5c1e2a639692b729b3de06c6cd6b8f7553caeab",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:4100ab9100d9417caf93c61b3bb70aef33b2b5099757ef1c147a9edfb42842c0",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-create",
       "path": "skills/i4h-workflow-create",
-      "content_digest": "sha256:66531af4230c1e64f50c2cf425c38991e7b40c31aad45dcda5cf7db0ef5143c5",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:1172e04c046f7d1f6bfe31830f0d24fd9d6c55de75583fe2012accf3709b1310",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-dataset-annotate",
       "path": "skills/i4h-workflow-dataset-annotate",
-      "content_digest": "sha256:5328a4819ad94ccf2b7219cb39dbad8d5ddfb7484d108f3ecf1201b9dead281c",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:67f638ddf672f4670eef3c4f9a24346f7bcd1ed21eb95044babcd3426096c2ce",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-dataset-convert",
       "path": "skills/i4h-workflow-dataset-convert",
-      "content_digest": "sha256:78df74e7e64ca4b6f89775ff524fe11885b91fa7da594de938ea22fbd3f0973b",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:717dfe50901515651a1fc94fd08c938ce029d9196ad5a254f3c840068a75f32b",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-dataset-mimic",
       "path": "skills/i4h-workflow-dataset-mimic",
-      "content_digest": "sha256:2be9818b2b8bff4494831f00ddaf4fba0e94c241ffd95daa440268dea42e3e89",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:5252646bac6770069736cbe80a432e01832e40ca35e8d8599855af0558167a9e",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-dataset-replay",
       "path": "skills/i4h-workflow-dataset-replay",
-      "content_digest": "sha256:30b5e4507ea90da8c5acf64b30284ea6c4b5edbdb562fb3b8c41d5add0ea58cb",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:66c1469160ceb282d5038fdc01ae0e0e29996a0a62573f693c87fb0aa0bbfeee",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-dataset-teleop",
       "path": "skills/i4h-workflow-dataset-teleop",
-      "content_digest": "sha256:6a216984bf45ffa18f11822b4a56c60203266818c483c2d7254a5edeca14f587",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:a32ba3481b83093a4d015f5bf6db73b9c4617dea8620c7165eb5ea5c997d4b41",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-e2e",
       "path": "skills/i4h-workflow-e2e",
-      "content_digest": "sha256:3a65e8fbaf624dc2b28276e11c09bf3e307971eabb2951c4722b4a26d28110f1",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:0e28b303c4e50b553e573e1ab128be1ea7aa4d71419e2564f3469a9f22ba6e25",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-finetune",
       "path": "skills/i4h-workflow-finetune",
-      "content_digest": "sha256:84057e23240a9c2d62b677d4acdac8aa48e88385042d47834132ee014fc712a0",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:673c1053ceff69767ec39e36f904ba3a99af9508a6717b54173b9d72fa016dc6",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-scene-edit",
@@ -1005,16 +1012,16 @@
     {
       "name": "i4h-workflow-setup",
       "path": "skills/i4h-workflow-setup",
-      "content_digest": "sha256:4342d46adbc2da7cdc0ca75e573bea139c2f7ec45fc55fe506f5316e1e44191d",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:f9dd21dd6a24364ea3c13e84d67075f76848faa11c9d17c64fe538f262be41b3",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-train-rl",
       "path": "skills/i4h-workflow-train-rl",
-      "content_digest": "sha256:d6491c583557845525a7346d2e20c98eb25518f843da28af2f4fe6644df08b42",
-      "last_commit": "0b26974a4e6b0e914e24566dbb3288b1f26cf2f4",
-      "last_modified": "2026-09-08"
+      "content_digest": "sha256:84d22047348647013a8a21eae979934bd28a3f6b1ade87ce47bb2b56bc9b1802",
+      "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
+      "last_modified": "2026-09-30"
     },
     {
       "name": "i4h-workflow-validate",

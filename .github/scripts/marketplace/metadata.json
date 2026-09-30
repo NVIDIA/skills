@@ -73,6 +73,18 @@
       }
     },
     {
+      "path": "skills/bionemo-evo2-nim",
+      "name": "evo2-nim",
+      "description": "Generate and analyze DNA sequences using NVIDIA's Evo 2 BioNeMo NIM microservice. Use for Evo2/Evo 2, DNA generation, genomic sequence generation, hosted generation, local Docker deployment, local forward passes, layer outputs, logits, sampled probabilities, and BioNeMo NIM workflows.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "genomics_researcher,bioinformatician,computational_biologist,application_developer,ml_engineer",
+        "discovery.activity_tags": "generate,inference,deploy,integrate,inspect"
+      }
+    },
+    {
       "path": "skills/bionemo-genmol-nim",
       "name": "genmol-nim",
       "description": "Generate novel drug-like molecules using the GenMol NIM microservice. Use for de novo generation, scaffold decoration, motif extension, lead optimization, SAFE notation, QED or LogP ranking, hosted NVIDIA API calls, or local Docker deployment. GenMol takes SAFE notation in the smiles field, not ordinary SMILES.\n",
