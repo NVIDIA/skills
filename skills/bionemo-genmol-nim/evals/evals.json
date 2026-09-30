@@ -1,0 +1,65 @@
+{
+  "skill_name": "genmol-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to generate 20 drug-like molecules from scratch using GenMol. No scaffold — just generate novel molecules and rank them by drug-likeness. Use the hosted NVIDIA API. My NGC_API_KEY is already set in my environment. Create and execute the request now, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted GenMol request with a masked SAFE input for de novo generation and QED scoring, plus at least 20 actual returned molecules saved and reported in score-ranked order.",
+      "files": [],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived molecules, scores, and saved artifact paths",
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/nvidia/genmol/generate'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from NGC_API_KEY environment variable: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[de-novo-safe-input] Uses a masked SAFE input pattern for de novo generation (no scaffold): Script payload smiles field contains a masked fragment pattern like [*{n-m}] with no scaffold prefix",
+        "[num-molecules-20] Requests at least 20 molecules (may request more to compensate for GenMol's post-generation filtering): Script sets num_molecules to 20 or higher (e.g. 30) to ensure at least 20 valid molecules are returned",
+        "[qed-scoring] Uses QED scoring for drug-likeness: Script sets scoring to 'QED'",
+        "[parses-and-prints-results] Parses the molecules list from the response and prints scores: Script accesses result['molecules'] or result[\"molecules\"] and prints or displays each molecule's score"
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "I have a pyrrolidinone scaffold (SMILES: C1CC(=O)NC1) that I want to decorate with new fragments to generate drug-like analogs. Generate 10 molecules using GenMol with QED scoring. Use the hosted API.",
+      "expected_output": "A Python script that converts the scaffold SMILES to SAFE notation using safe-mol, handles SAFEFragmentationError fallback for simple ring scaffolds, appends a masked fragment token, notes the motif extension two-sided mask pattern, calls the hosted GenMol endpoint, and displays generated molecules sorted by QED score.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/nvidia/genmol/generate'",
+        "[safe-mol-or-safe-notation] Uses safe-mol package to encode the scaffold or explicitly uses SAFE notation: Script uses safe.encode or sf.encode, handles SAFEFragmentationError by falling back or explaining the limitation, and includes a SAFE-formatted string containing the scaffold",
+        "[masked-fragment-appended] Appends a masked fragment token to the scaffold: Script payload smiles field contains [*{ and }] masking pattern combined with scaffold content",
+        "[num-molecules-10] Requests at least 10 molecules (may request more to compensate for filtering, but output shows top 10): Script sets num_molecules to 10 or higher, and output or comments indicate showing/taking 10 results",
+        "[temperature-noise-as-strings] temperature and noise parameters are passed as strings, not floats: Script passes temperature and noise as quoted string values (e.g. '1.0' or \"1.0\"), not as bare floats",
+        "[output-sorted-by-score] Results are sorted by score before display: Script sorts the molecules list by score field before printing or saving"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "3",
+      "prompt": "Help me set up GenMol locally with Docker on my H100 machine. My NGC_API_KEY is set. Once it's running, do a quick de novo generation of 5 molecules.",
+      "expected_output": "Step-by-step Docker setup commands that use shell env first and optional repo-root .env overrides, require NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, run GenMol with correct flags, health-check it, then send a no-auth generation request to localhost:8000 producing 5 molecules.",
+      "files": [],
+      "assertions": [
+        "[env-contract-and-cache] Local setup uses the repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE into the container",
+        "[docker-image-tag] References the correct GenMol container image and version: Output contains 'nvcr.io/nim/nvidia/genmol:1.0.1'",
+        "[shm-size-2g] docker run includes --shm-size=2G: Output contains '--shm-size=2G' or '--shm-size 2G'",
+        "[single-gpu-env-var] Sets NVIDIA_VISIBLE_DEVICES=0 for single GPU operation: Output contains 'NVIDIA_VISIBLE_DEVICES' and '0'",
+        "[health-check-loop] Includes a health check poll before submitting generation: Output contains a health check against localhost:8000/v1/health/ready",
+        "[local-endpoint] Generation request targets the local endpoint: Script or curl command targets 'localhost:8000/generate' or '127.0.0.1:8000/generate'"
+      ]
+    },
+    {
+      "id": "4",
+      "prompt": "I have a hit molecule I want to optimize for lipophilicity (LogP). The SMILES is CC1=CC=C(C=C1)NC(=O)C. Generate 30 unique analogs ranked by LogP using GenMol. Use the hosted API.",
+      "expected_output": "A Python script that encodes the hit molecule as a SAFE input with a masked fragment for optimization, calls the hosted GenMol endpoint with LogP scoring and unique=True, requests 30 molecules, and displays results sorted by score.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/nvidia/genmol/generate'",
+        "[logp-scoring] Uses LogP scoring: Script sets scoring to 'LogP'",
+        "[unique-true] Requests unique molecules only: Script sets unique to True or true",
+        "[num-molecules-30] Requests 30 molecules: Script sets num_molecules to 30",
+        "[safe-input-for-optimization] Constructs a SAFE input from the hit molecule (not raw SMILES): Script uses safe.encode or sf.encode on the hit SMILES, or includes the hit molecule encoded in SAFE notation with a masked fragment",
+        "[results-ranked-descending] Output molecules are ranked by score in descending order: Script sorts molecules by score in descending order (highest score first)"
+      ]
+    }
+  ]
+}
