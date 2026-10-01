@@ -1,0 +1,6 @@
+# No findings are suppressed. Keep an explicit per-skill baseline so NVSkills
+# does not fall back to the repository-wide baseline for unrelated skills.
+# Credential-file loading was removed from the instructions and evaluations.
+version: 2
+rules: []
+fingerprints: []

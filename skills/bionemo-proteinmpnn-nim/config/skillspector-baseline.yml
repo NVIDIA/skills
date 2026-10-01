@@ -1,0 +1,30 @@
+# SkillSpector suppression baseline — proteinmpnn-nim
+#
+# Audited false-positive suppression, auto-applied by the NVSkills Tier 1
+# runner via config/skillspector-baseline.yml. Suppressed findings remain in
+# the report JSON marked `suppressed: true` with the reason below.
+version: 2
+
+rules:
+  - id: "PE3"
+    path: "*references/api.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, omosafi@nvidia.com, 2026-08-12).
+      PE3 fires on the literal `.env` token in this NIM skill's documented
+      NGC_API_KEY loading snippet (`[ -f .env ] && . ./.env`), which reads the
+      user's own repo-root dotenv to obtain their NGC API key for
+      `docker login nvcr.io`. This is first-party, user-facing setup guidance for
+      the user's own credential file — not credential theft. No SSH keys, cloud
+      credential stores, or third-party secret files are accessed.
+  - id: "PE3"
+    path: "evals/evals.json"
+    # Match only the literal dotenv token, including PE3's trailing space.
+    message: ".env "
+    reason: >-
+      Reviewed 2026-09-30. The two matches are in deferred Docker evaluation
+      3's expected output and setup assertion. They describe optional loading
+      of the user's own repo-root dotenv file for NGC authentication, the same
+      setup documented in references/api.md. This JSON is evaluation text and
+      does not read or transmit credentials. The active hosted evaluation and
+      design client read NGC_API_KEY from the environment. This exception is
+      limited to the literal dotenv matches in this evaluation file.

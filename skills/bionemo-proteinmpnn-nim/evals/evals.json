@@ -1,0 +1,67 @@
+{
+  "skill_name": "proteinmpnn-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "Use the staged protein backbone at /workspace/input/1R42.pdb to design 10 protein sequences that will fold into it using the hosted NVIDIA ProteinMPNN API. Create and execute the request now using NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted ProteinMPNN request that reads the staged 1R42.pdb, uses Bearer auth and num_seq_per_target=10, plus the actual returned designed sequences and scores saved as a multi-FASTA artifact.",
+      "files": [
+        "evals/files/1R42.pdb"
+      ],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived designed sequences, scores, and the saved FASTA path",
+        "[hosted-endpoint-url] Uses the correct hosted ProteinMPNN endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/ipd/proteinmpnn/predict'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from NGC_API_KEY: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[input-pdb-field] Sends PDB file content as 'input_pdb' field (inline string, not file path): Script reads 1R42.pdb and passes its content to 'input_pdb' field in the payload",
+        "[num-seq-per-target] num_seq_per_target is set to 10: Script contains 'num_seq_per_target' and '10'",
+        "[saves-mfasta-output] Saves the mfasta string from the response to a .fa file: Script accesses 'mfasta' from response and writes it to a file with .fa or .fasta extension",
+        "[scores-reported] Reports scores only for designed sequences: Script accounts for the native/WT FASTA row when present and pairs scores with designed sequences, not the WT row"
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "I want to redesign chain A of my protein structure (structure.pdb) while keeping chain B fixed. Generate 5 sequences at sampling temperature 0.2, excluding cysteines. Use the hosted ProteinMPNN API.",
+      "expected_output": "A Python script targeting the hosted endpoint with input_pdb_chains=['A'], num_seq_per_target=5, sampling_temp=[0.2], and omit_AAs=['C'], reading structure.pdb and saving the designed sequences.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/ipd/proteinmpnn/predict'",
+        "[input-pdb-chains] Uses input_pdb_chains to limit design to chain A: Script contains 'input_pdb_chains' and 'A'",
+        "[sampling-temp-array] sampling_temp is passed as an array (even for a single value): Script contains 'sampling_temp' with value [0.2] or as a list containing 0.2",
+        "[omit-cysteines] omit_AAs excludes cysteine ('C'): Script contains 'omit_AAs' and 'C'",
+        "[num-seq-5] num_seq_per_target is set to 5: Script contains 'num_seq_per_target' and '5'",
+        "[saves-output] Saves designed sequences to a FASTA file: Script writes the mfasta response to a file"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "3",
+      "prompt": "Help me set up ProteinMPNN locally with Docker and design sequences for my structure file backbone.pdb. I have an RTX A6000 GPU. My NGC_API_KEY is set.",
+      "expected_output": "Docker setup commands using shell env first and optional repo-root .env overrides, requiring NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, using the correct image tag, single GPU flag, and the unique cache mount path /home/nvs/.cache/nim (not /opt/nim/.cache), then a health check and no-auth request script to localhost:8000.",
+      "files": [],
+      "assertions": [
+        "[docker-image-tag] References the correct ProteinMPNN container image: Output contains 'nvcr.io/nim/ipd/proteinmpnn'",
+        "[env-contract-and-cache] Local setup uses the repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE to /home/nvs/.cache/nim",
+        "[cache-mount-path] Volume mount uses /home/nvs/.cache/nim (not /opt/nim/.cache): Output contains '/home/nvs/.cache/nim' as the container-side cache path in the -v mount",
+        "[health-check] Includes health check before sending request: Output contains health check against localhost:8000/v1/health/ready",
+        "[local-endpoint-no-v1] Local request uses path without /v1/ prefix: Script contains 'localhost:8000/biology/ipd/proteinmpnn/predict'",
+        "[input-pdb-inline] PDB content is sent inline in input_pdb field, not as a file path: Script reads backbone.pdb file content and passes the string content to input_pdb"
+      ]
+    },
+    {
+      "id": "4",
+      "prompt": "I want to design diverse protein sequences for my scaffold (protein.pdb) to explore sequence space. Use the soluble protein model, generate sequences at three different temperatures (0.1, 0.3, 0.5) to get diverse candidates, and exclude methionine. Use the hosted API.",
+      "expected_output": "A Python script with use_soluble_model=True, sampling_temp=[0.1, 0.3, 0.5], and omit_AAs=['M'], calling the hosted endpoint and saving the multi-FASTA output.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/ipd/proteinmpnn/predict'",
+        "[soluble-model] use_soluble_model is set to True: Script contains 'use_soluble_model' and 'True'",
+        "[multiple-temperatures] sampling_temp contains multiple temperature values: Script contains 'sampling_temp' with a list containing 0.1, 0.3, and 0.5 (or similar multiple values)",
+        "[omit-methionine] omit_AAs excludes methionine ('M'): Script contains 'omit_AAs' and 'M'",
+        "[saves-mfasta] Saves multi-FASTA output to a file: Script writes mfasta from response to a .fa or .fasta file",
+        "[pdb-read-inline] Reads PDB file and passes content inline (not path): Script reads protein.pdb and passes its text content as input_pdb string"
+      ]
+    }
+  ]
+}
