@@ -241,6 +241,30 @@
       }
     },
     {
+      "path": "skills/bionemo-openfold3-nim",
+      "name": "openfold3-nim",
+      "description": "Use this skill for OpenFold3, NVIDIA's BioNeMo NIM microservice for biomolecular structure prediction. Invoke whenever the user mentions OpenFold3 or needs protein, protein-ligand, protein-DNA/RNA, or multi-chain complex prediction with the hosted NVIDIA API or local Docker NIM. Covers endpoint choice, auth, request payloads, output artifacts, confidence scores, and local container setup.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,genomics_researcher,research_academic,application_developer",
+        "discovery.activity_tags": "inference,generate,deploy,configure,validate"
+      }
+    },
+    {
+      "path": "skills/bionemo-proteinmpnn-nim",
+      "name": "proteinmpnn-nim",
+      "description": "Run ProteinMPNN inverse folding via NVIDIA NIM to design protein sequences for a target backbone. Sends user-provided PDB files and design parameters to NVIDIA's hosted API, authenticated with an environment API key, or to a user-selected local NIM. Use for sequence design, backbone redesign, fixed chains and residues, omit_AAs, sampling temperature, soluble model, local Docker, and multi-FASTA output.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,application_developer",
+        "discovery.activity_tags": "inference,generate,configure,deploy,integrate"
+      }
+    },
+    {
       "path": "skills/bionemo-rfdiffusion-nim",
       "name": "rfdiffusion-nim",
       "description": "Run RFDiffusion protein backbone design via NVIDIA NIM. Use for de novo protein backbones, motif scaffolding, binder design, hotspot residues, contigs syntax, diffusion steps, hosted NVIDIA API calls, local Docker deployment, and PDB backbone outputs for ProteinMPNN sequence design.\n",
@@ -3147,7 +3171,7 @@
     {
       "path": "skills/nvidia-skill-finder",
       "name": "nvidia-skill-finder",
-      "description": "Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.",
+      "description": "Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, Isaac, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.",
       "metadata": {
         "product.primary": "Learning",
         "classification.category.primary": "developer_tools",

@@ -340,6 +340,8 @@
         "msa-structure-prediction-pipeline",
         "nv-reason-ct",
         "openfold2-nim",
+        "openfold3-nim",
+        "proteinmpnn-nim",
         "rfdiffusion-nim",
         "tao-run-inference-service"
       ]

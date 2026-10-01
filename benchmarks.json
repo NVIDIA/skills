@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 389,
-  "result_row_count": 3610,
+  "skill_count": 391,
+  "result_row_count": 3635,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -421,6 +421,46 @@
         "codex"
       ],
       "catalog_dir": "bionemo-openfold2-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 21.18
+    },
+    {
+      "skill": "openfold3-nim",
+      "evaluation_date": "2026-09-30",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:405d82d91432042dcd7576e872a7acae051a4a4fef41962393f6e84e901b1513",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 22.28
+    },
+    {
+      "skill": "proteinmpnn-nim",
+      "evaluation_date": "2026-09-30",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:52236518d474794d5676f553c4879b1270b621cbf3f0a5dcf19ee85143e8cc9c",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-proteinmpnn-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": 21.18
@@ -5065,20 +5105,23 @@
     },
     {
       "skill": "nvidia-skill-finder",
-      "evaluation_date": "2026-07-24",
-      "environment": "local",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-10-01",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:df412e229dfed3687e1112c8f5bc439a6f3695291f3d357f049002621e90845f",
       "validation_status": null,
-      "tasks": 17,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "tasks": 18,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
-      "agents": [],
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "has_results": true,
-      "average_uplift_pct": 32.8
+      "average_uplift_pct": 26.97
     },
     {
       "skill": "omniverse-cad-to-simready",
@@ -9340,6 +9383,186 @@
       "num": null,
       "agent": "codex",
       "score_pct": 73.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.5,
+      "uplift_pct": 37.5
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 3.0
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.4,
+      "uplift_pct": 17.4
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": 15.8
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-openfold3-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 42.1
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-proteinmpnn-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.4,
       "uplift_pct": null
     },
     {
@@ -29191,46 +29414,91 @@
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Security",
-      "num": 17,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 97.2,
+      "uplift_pct": -1.0
+    },
+    {
+      "catalog_dir": "nvidia-skill-finder",
+      "component": "NVIDIA Skills",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.4,
+      "uplift_pct": 5.9
     },
     {
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Correctness",
-      "num": 17,
+      "num": null,
       "agent": "claude-code",
+      "score_pct": 96.7,
+      "uplift_pct": 27.1
+    },
+    {
+      "catalog_dir": "nvidia-skill-finder",
+      "component": "NVIDIA Skills",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 24.0
+      "uplift_pct": 29.2
     },
     {
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Discoverability",
-      "num": 17,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-skill-finder",
+      "component": "NVIDIA Skills",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Effectiveness",
-      "num": 17,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 99.0,
-      "uplift_pct": 52.0
+      "score_pct": 87.9,
+      "uplift_pct": 51.8
+    },
+    {
+      "catalog_dir": "nvidia-skill-finder",
+      "component": "NVIDIA Skills",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.7,
+      "uplift_pct": 48.8
     },
     {
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "dimension": "Efficiency",
-      "num": 17,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": 38.0
+      "score_pct": 78.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-skill-finder",
+      "component": "NVIDIA Skills",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "omniverse-cad-to-simready",

@@ -142,6 +142,20 @@
       "last_modified": "2026-09-23"
     },
     {
+      "name": "bionemo-openfold3-nim",
+      "path": "skills/bionemo-openfold3-nim",
+      "content_digest": "sha256:ec7a398c3798f8faa91790ee19b522f3517255e4ac337388fcbe13dc70d0873f",
+      "last_commit": "2390ad987ab2e89691a89124cd191d7f9dee408a",
+      "last_modified": "2026-10-01"
+    },
+    {
+      "name": "bionemo-proteinmpnn-nim",
+      "path": "skills/bionemo-proteinmpnn-nim",
+      "content_digest": "sha256:111a0f188e28ac54da1dc00ae7b61725d14d948c26acd2eaee25babcf0d94812",
+      "last_commit": "2390ad987ab2e89691a89124cd191d7f9dee408a",
+      "last_modified": "2026-10-01"
+    },
+    {
       "name": "bionemo-rfdiffusion-nim",
       "path": "skills/bionemo-rfdiffusion-nim",
       "content_digest": "sha256:f36888eb4b17db75a8a7f79031a04c27c22fa6ff9f0af80ff9566eeb197c9cb7",
@@ -1838,9 +1852,9 @@
     {
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
-      "content_digest": "sha256:7b680337b798b61256500d08095717541a89e4a523a0530867c49f98263ceb95",
-      "last_commit": "8c5983f4003d63ec2aa40bb1bd4a757a212b0119",
-      "last_modified": "2026-07-24"
+      "content_digest": "sha256:da43951c0c8c69da5622f5299055228c70bc6345273e7869f3c59acb92af8310",
+      "last_commit": "13a0ce1d97a350e2a7c6d0ca82fea37d293af625",
+      "last_modified": "2026-10-01"
     },
     {
       "name": "omniverse-cad-to-simready",
