@@ -1,0 +1,39 @@
+# SkillSpector suppression baseline — msa-search-nim
+#
+# Audited false-positive suppression, auto-applied by the NVSkills Tier 1
+# runner via config/skillspector-baseline.yml. Suppressed findings remain in
+# the report JSON marked `suppressed: true` with the reason below.
+version: 1
+
+rules:
+  - id: "PE3"
+    path: "evals/evals.json"
+    message: ".env "
+    reason: >-
+      Reviewed JSON-only false positive (2026-09-16). The two matches are
+      expected-output/assertion text in deferred local-setup case 3. They
+      describe the same optional repo-root dotenv setup documented in this
+      skill; the JSON does not read files or execute that setup. This rule
+      matches only the literal .env finding in this eval file. Credential
+      access in executable scripts and references to other secret stores
+      remain subject to scanning.
+  - id: "PE3"
+    path: "*SKILL.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, omosafi@nvidia.com, 2026-08-12).
+      PE3 fires on the literal `.env` token in this NIM skill's documented
+      NGC_API_KEY loading snippet (`[ -f .env ] && . ./.env`), which reads the
+      user's own repo-root dotenv to obtain their NGC API key for
+      `docker login nvcr.io`. This is first-party, user-facing setup guidance for
+      the user's own credential file — not credential theft. No SSH keys, cloud
+      credential stores, or third-party secret files are accessed.
+  - id: "PE3"
+    path: "*references/api.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, omosafi@nvidia.com, 2026-08-12).
+      PE3 fires on the literal `.env` token in this NIM skill's documented
+      NGC_API_KEY loading snippet (`[ -f .env ] && . ./.env`), which reads the
+      user's own repo-root dotenv to obtain their NGC API key for
+      `docker login nvcr.io`. This is first-party, user-facing setup guidance for
+      the user's own credential file — not credential theft. No SSH keys, cloud
+      credential stores, or third-party secret files are accessed.
