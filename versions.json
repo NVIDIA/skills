@@ -151,8 +151,8 @@
     {
       "name": "bionemo-proteinmpnn-nim",
       "path": "skills/bionemo-proteinmpnn-nim",
-      "content_digest": "sha256:111a0f188e28ac54da1dc00ae7b61725d14d948c26acd2eaee25babcf0d94812",
-      "last_commit": "2390ad987ab2e89691a89124cd191d7f9dee408a",
+      "content_digest": "sha256:201722da7ea14df60542473d9ec621de924404af5a49f0dc646065108f956fd1",
+      "last_commit": "d9ccb63e891cb4817516d9dc8c829e1ed09981f7",
       "last_modified": "2026-10-01"
     },
     {
@@ -840,6 +840,13 @@
       "content_digest": "sha256:f7543a9a31a9ba851720cca7664d59917140a20d77b5e73226fac0377971bed5",
       "last_commit": "a5a01eb1c6d8dc515a38060b019f7e19f9b0ef8f",
       "last_modified": "2026-09-16"
+    },
+    {
+      "name": "g-assist-mcp-skill",
+      "path": "skills/g-assist-mcp-skill",
+      "content_digest": "sha256:2401c7be149918ecbef7f3f2f6360db0b5366ed295f0367dc8114346add76962",
+      "last_commit": "d9ccb63e891cb4817516d9dc8c829e1ed09981f7",
+      "last_modified": "2026-10-01"
     },
     {
       "name": "holohub-app-lifecycle",
