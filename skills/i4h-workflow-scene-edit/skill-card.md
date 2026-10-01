@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers editing existing Isaac for Healthcare workflow Scenes — modifying assets, layout, cameras, randomization, task text, or success rules in a live simulator session. <br>
+Developers and engineers iterating on existing Isaac for Healthcare workflow Scenes — modifying assets, layout, cameras, randomization, task text, or success rules through a live simulator session. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,13 +25,14 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Existing Scene Assets](references/existing-scene-assets.md) <br>
-- [G1 Reach and Contact](references/g1-reach-and-contact.md) <br>
-- [Isaac Sim Skill Routing](references/isaacsim-skill-routing.md) <br>
+- [existing-scene-assets.md](references/existing-scene-assets.md) <br>
+- [g1-reach-and-contact.md](references/g1-reach-and-contact.md) <br>
+- [isaacsim-skill-routing.md](references/isaacsim-skill-routing.md) <br>
+- [agentskills.io specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Code, Configuration instructions] <br>
+**Output Type(s):** [Shell commands, Code, Files, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -43,35 +44,35 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-12 evaluation tasks (12 positive), each run in an isolated sandbox pod. <br>
+12 evaluation tasks (12 positive) run in isolated sandbox pods with dataset digest sha256:2eb07663. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Checks routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved (50%) and expected workflow behavior was followed (50%). <br>
+- Efficiency: Checks tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 39% → 66% (+27 points) |
-| Security | Not available | 33% → 54% (+21 points) |
-| Correctness | Not available | 38% → 82% (+43 points) |
-| Discoverability | Not available | 47% → 69% (+22 points) |
-| Effectiveness | Not available | 21% → 40% (+18 points) |
-| Efficiency | Not available | 57% → 87% (+30 points) |
+| Overall | Not available | 62.7% — uplift unavailable |
+| Security | Not available | 33.3% → 45.8% (+12.5 points) |
+| Correctness | Not available | 38.3% → 76.7% (+38.4 points) |
+| Discoverability | Not available | 76.3% — uplift unavailable |
+| Effectiveness | Not available | 15.4% → 39.1% (+23.7 points) |
+| Efficiency | Not available | 75.6% — uplift unavailable |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>
