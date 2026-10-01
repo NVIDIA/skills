@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 391,
-  "result_row_count": 3640,
+  "skill_count": 392,
+  "result_row_count": 3650,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -447,7 +447,7 @@
     },
     {
       "skill": "proteinmpnn-nim",
-      "evaluation_date": "2026-09-30",
+      "evaluation_date": "2026-10-01",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:52236518d474794d5676f553c4879b1270b621cbf3f0a5dcf19ee85143e8cc9c",
@@ -463,7 +463,7 @@
       "catalog_dir": "bionemo-proteinmpnn-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
-      "average_uplift_pct": 21.18
+      "average_uplift_pct": 10.35
     },
     {
       "skill": "rfdiffusion-nim",
@@ -2237,6 +2237,26 @@
       "component": "FoundationPose Perception Pipeline",
       "has_results": true,
       "average_uplift_pct": 14.03
+    },
+    {
+      "skill": "g-assist-mcp-skill",
+      "evaluation_date": "2026-09-30",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:005ae43f3adb9fe981b27b5096c41379327675753c3c913e0df8734f6d3159f2",
+      "validation_status": null,
+      "tasks": 16,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "has_results": true,
+      "average_uplift_pct": 21.48
     },
     {
       "skill": "holohub-app-lifecycle",
@@ -9536,7 +9556,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 35.0
+      "uplift_pct": 12.1
     },
     {
       "catalog_dir": "bionemo-proteinmpnn-nim",
@@ -9545,7 +9565,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 42.1
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "bionemo-proteinmpnn-nim",
@@ -9553,7 +9573,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
+      "score_pct": 76.3,
       "uplift_pct": null
     },
     {
@@ -9562,7 +9582,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.4,
+      "score_pct": 58.6,
       "uplift_pct": null
     },
     {
@@ -17528,6 +17548,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.5,
+      "uplift_pct": 22.8
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 38.1
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "g-assist-mcp-skill",
+      "component": "G-Assist",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.5,
       "uplift_pct": null
     },
     {

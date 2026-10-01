@@ -1441,6 +1441,18 @@
       }
     },
     {
+      "path": "skills/g-assist-mcp-skill",
+      "name": "g-assist-mcp-skill",
+      "description": "Use this skill to check or change this machine's NVIDIA display and GPU settings, such as resolution, refresh rate, V-Sync, G-SYNC, brightness, color, and GPU performance.",
+      "metadata": {
+        "product.primary": "Settings",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gaming",
+        "audience": "developer,hands_on_builder,it_operations,other",
+        "discovery.activity_tags": "configure,inspect,optimize,troubleshoot,operate"
+      }
+    },
+    {
       "path": "skills/holohub-app-lifecycle",
       "name": "holohub-app-lifecycle",
       "description": "Use for non-failing HoloHub app work with ./holohub: scaffold, build, run, test, visual evidence, lint, and flow benchmarking.",

@@ -498,6 +498,7 @@
       "title": "Gaming",
       "description": "Build, optimize, and test game development workflows, game technologies, rendering pipelines, and player-facing interactive experiences.",
       "skills": [
+        "g-assist-mcp-skill",
         "rtx-remix-modding"
       ]
     }
