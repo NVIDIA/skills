@@ -30,3 +30,5 @@ skills:
     catalog_dir: bionemo-openfold3-nim
   - path: skills/bionemo-agent-toolkit/skills/proteinmpnn-nim/
     catalog_dir: bionemo-proteinmpnn-nim
+  - path: skills/bionemo-agent-toolkit/skills/msa-search-nim/
+    catalog_dir: bionemo-msa-search-nim
