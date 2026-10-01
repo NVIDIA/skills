@@ -32,3 +32,5 @@ skills:
     catalog_dir: bionemo-proteinmpnn-nim
   - path: skills/bionemo-agent-toolkit/skills/msa-search-nim/
     catalog_dir: bionemo-msa-search-nim
+  - path: skills/bionemo-agent-toolkit/skills/boltz2-nim/
+    catalog_dir: bionemo-boltz2-nim
