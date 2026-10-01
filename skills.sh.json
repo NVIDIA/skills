@@ -337,6 +337,7 @@
         "kermt-infer",
         "medtech-model-evidence-export",
         "molmim-nim",
+        "msa-search-nim",
         "msa-structure-prediction-pipeline",
         "nv-reason-ct",
         "openfold2-nim",

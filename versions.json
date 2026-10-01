@@ -121,6 +121,13 @@
       "last_modified": "2026-09-29"
     },
     {
+      "name": "bionemo-msa-search-nim",
+      "path": "skills/bionemo-msa-search-nim",
+      "content_digest": "sha256:c154b07f99a11cd144fa976a15b105ed1bec2b7b953520ca1d35444e890e904f",
+      "last_commit": "b78d9ad16855ce930a196f907a3f863064935b8e",
+      "last_modified": "2026-10-01"
+    },
+    {
       "name": "bionemo-msa-structure-prediction-pipeline",
       "path": "skills/bionemo-msa-structure-prediction-pipeline",
       "content_digest": "sha256:d672fd6bd6e18694f4ef34c5e5722f78b2791be41104d7f0f81a452cb545e2ac",
