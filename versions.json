@@ -1026,9 +1026,9 @@
     {
       "name": "i4h-workflow-scene-edit",
       "path": "skills/i4h-workflow-scene-edit",
-      "content_digest": "sha256:efd5edb2b51aa89bc42e96dcf5beb775a1357592c98fe6875c39705fbcc30c88",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:b2e347ac121c5d7be01b6ef7c5ad8b0513070b1dbe91a2797cb2e9146452321c",
+      "last_commit": "4aa3fd218f072597f804184967a7f1e4ed950042",
+      "last_modified": "2026-10-01"
     },
     {
       "name": "i4h-workflow-setup",
@@ -1047,9 +1047,9 @@
     {
       "name": "i4h-workflow-validate",
       "path": "skills/i4h-workflow-validate",
-      "content_digest": "sha256:5d1b1b3b292002e91c42bbca2c9e05f21a3ecd428184e9c0ca526711985431e1",
-      "last_commit": "eb936784ab65e64b450c6eeaba084505e1e7d059",
-      "last_modified": "2026-09-04"
+      "content_digest": "sha256:6f5d7cfdc21939358ab17ca4ee6a35b1a3cc26e4f808a1af9ac62d3fd4a71ada",
+      "last_commit": "4aa3fd218f072597f804184967a7f1e4ed950042",
+      "last_modified": "2026-10-01"
     },
     {
       "name": "isaac-mission-control-showcase",
