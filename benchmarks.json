@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 388,
-  "result_row_count": 3600,
+  "skill_count": 389,
+  "result_row_count": 3610,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -424,6 +424,26 @@
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": 21.18
+    },
+    {
+      "skill": "rfdiffusion-nim",
+      "evaluation_date": "2026-09-30",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:cb7cf77853b13d6d9cb5a92314eb44d57660bb922f2f5d331ebf98b4dc9459f5",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 1.32
     },
     {
       "skill": "cudaq-guide",
@@ -9320,6 +9340,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 73.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 0.0,
+      "uplift_pct": -100.0
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 65.0,
+      "uplift_pct": -35.0
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.9,
+      "uplift_pct": -7.1
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 73.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfdiffusion-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 65.4,
       "uplift_pct": null
     },
     {
