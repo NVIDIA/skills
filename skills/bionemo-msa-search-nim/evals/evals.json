@@ -1,0 +1,66 @@
+{
+  "skill_name": "msa-search-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to generate a multiple sequence alignment for my protein sequence using the MSA-Search NIM. My sequence is SGSMKTAISLPDETFDRVSRRASELGMSRSEFFTKAAQR. Search against UniRef30 and ColabFold environmental databases and return the alignment in A3M format using the hosted NVIDIA API. Create and execute the request now using NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted MSA-Search request with Bearer auth, case-correct database names, and A3M output format, plus the actual returned alignment saved to a file and summarized from the response.",
+      "files": [],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived alignment information and the saved A3M path",
+        "[hosted-endpoint-url] Uses the correct hosted MSA-Search endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/colabfold/msa-search/predict'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from NGC_API_KEY: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[sequence-field] Request uses 'sequence' (singular) field with the provided sequence: Script contains 'sequence' field and 'SGSMKTAISLPDETFDRVSRRASELGMSRSEFFTKAAQR'",
+        "[databases-field] databases field specifies case-correct hosted database names, not the lowercase or unversioned aliases: Script contains 'databases' and 'Uniref30_2302' and 'colabfold_envdb_202108'",
+        "[a3m-output-format] Requests A3M alignment output format: Script contains 'output_alignment_formats' and 'a3m'",
+        "[saves-alignment-output] Saves the returned alignment to a file: Script writes alignment content from 'alignments' in the response to a file"
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "I have a protein complex with two chains and I need paired MSA alignments for it. Chain 1 (hemoglobin alpha): VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVA. Chain 2 (hemoglobin beta): MHLTPEEKSAVTALWGKVNVDEVGGEALGRLLVVYPYTQRFFESFGDLSTPDAVMGNPKVKAHGKKVLGAF. Use the hosted API.",
+      "expected_output": "A Python script that calls the hosted /paired/predict endpoint with a 'sequences' list containing both chains, extracts per-chain alignments from alignments_by_chain, and saves each chain's alignment to a separate file.",
+      "files": [],
+      "assertions": [
+        "[paired-endpoint-url] Uses the correct hosted paired MSA endpoint URL: Script contains 'msa-search/paired/predict'",
+        "[sequences-plural-field] Uses 'sequences' (plural, list) field — not 'sequence' (singular): Script payload contains 'sequences' as a list/array, not 'sequence'",
+        "[both-chains-present] Both protein sequences are included in the request: Script contains 'VLSPADKTNVKAAWGKVGAHAG' and 'MHLTPEEKSAVTALWGKVNVD'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[parses-alignments-by-chain] Response parsed by 'alignments_by_chain' (not 'alignments'): Script references 'alignments_by_chain' from the response",
+        "[saves-per-chain-alignments] Saves alignment for each chain to separate files: Script saves at least two alignment files, one per chain"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "3",
+      "prompt": "Help me set up the MSA-Search NIM locally with Docker and then search for MSA for my protein sequence: MTEYKLVVVGACGVGKSALTIQLIQNHFVDE. I have an A100 GPU. My NGC_API_KEY is set.",
+      "expected_output": "Docker setup instructions using shell env first and optional repo-root .env overrides, requiring NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, warning about the 1.4 TB database cache, health-checking the service, then sending a no-auth request to localhost:8000 without a /v1/ prefix.",
+      "files": [],
+      "assertions": [
+        "[docker-image-tag] References the correct MSA-Search container image with :2 tag: Output contains 'nvcr.io/nim/colabfold/msa-search' and ':2'",
+        "[env-contract-and-cache] Local setup uses the repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE to /opt/nim/.cache",
+        "[storage-warning] Mentions the large storage requirement for databases: Output mentions at least 1 TB or 1.4 TB or 1660 GB of storage needed for databases",
+        "[nim-cache-mount] Mounts cache directory to /opt/nim/.cache: Output contains '/opt/nim/.cache' in the volume mount",
+        "[health-check] Includes health check before submitting request: Output contains health check against localhost:8000/v1/health/ready",
+        "[local-endpoint-no-v1] Local prediction request uses path without /v1/ prefix: Script contains 'localhost:8000/biology/colabfold/msa-search/predict'"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "4",
+      "prompt": "I need structural templates for my protein sequence to use as input to a structure prediction model. Can you search for structural templates using a local MSA-Search NIM? Sequence: VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVA. Return up to 20 structures.",
+      "expected_output": "A Python script targeting the local /biology/colabfold/msa-search/structure-templates/predict endpoint because the hosted health.api template path returned HTTP 404 in validation, with structural_template_databases=['pdb70_220313'], the sequence, max_structures=20, max_msa_sequences=500 to match NIM_GLOBAL_MAX_MSA_DEPTH, no Authorization header for localhost inference, and parsing/saving both returned mmCIF template structures and search_hits M8 tables.",
+      "files": [],
+      "assertions": [
+        "[structure-templates-endpoint] Uses the structure-templates endpoint, not the standard predict endpoint: Script contains 'structure-templates/predict'",
+        "[sequence-field] Request uses 'sequence' (singular) field: Script contains 'sequence' field with the provided sequence",
+        "[max-structures-param] max_structures is set to 20 and max_msa_sequences matches the default GPU server depth: Script contains 'max_structures' and '20', plus 'max_msa_sequences' and '500' or explains it must match NIM_GLOBAL_MAX_MSA_DEPTH",
+        "[pdb70-canonical-database] Uses the canonical pdb70_220313 template database name: Script sets structural_template_databases to include 'pdb70_220313'",
+        "[local-no-auth] Uses no Authorization header for local template inference: Script does not send Authorization/Bearer headers to localhost",
+        "[parses-structures-and-search-hits] Parses template structures and search_hits M8 output: Script references both 'structures' for mmCIF content and 'search_hits'/'m8' for the hit table"
+      ]
+    }
+  ]
+}
