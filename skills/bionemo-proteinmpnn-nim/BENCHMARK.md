@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `proteinmpnn-nim`
-- Evaluation date: 2026-09-30
+- Evaluation date: 2026-10-01
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.3% — baseline ran, but no comparable score was available; uplift unavailable | 88.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 50.0% → 100.0% (+50.0 points) |
 | Correctness | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Discoverability | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 65.0% → 100.0% (+35.0 points) | 57.9% → 100.0% (+42.1 points) |
-| Efficiency | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 79.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 87.9% → 100.0% (+12.1 points) | 100.0% → 100.0% (±0.0 points) |
+| Efficiency | 76.3% — baseline ran, but no comparable score was available; uplift unavailable | 58.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -52,11 +52,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 273,504 | 721,343 | -447,839 | -62.08% | skill 1/1; base 1/1 |
-| claude-code | 1 | 273,504 | 721,343 | -447,839 | -62.08% | skill 1/1; base 1/1 |
-| codex | All cases | 122,990 | 281,801 | -158,811 | -56.36% | skill 1/1; base 1/1 |
-| codex | 1 | 122,990 | 281,801 | -158,811 | -56.36% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 396,494 | 1,003,144 | -606,650 | -60.47% | skill 2/2; base 2/2 |
+| claude-code | All cases | 461,349 | 920,758 | -459,409 | -49.89% | skill 1/1; base 1/1 |
+| claude-code | 1 | 461,349 | 920,758 | -459,409 | -49.89% | skill 1/1; base 1/1 |
+| codex | All cases | 219,696 | 527,654 | -307,958 | -58.36% | skill 1/1; base 1/1 |
+| codex | 1 | 219,696 | 527,654 | -307,958 | -58.36% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 681,045 | 1,448,412 | -767,367 | -52.98% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 

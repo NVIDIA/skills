@@ -101,6 +101,11 @@ MKTVRQERLKSIVQGPKRAKELMSIQRQAPQTTQNLDIWLQAAEDL
 
 ## Docker Reference
 
+The default setup binds port 8000 to the host's loopback address because local
+inference is unauthenticated. See [Docker's port publishing guidance](https://docs.docker.com/engine/network/port-publishing/).
+Registry login uses `--password-stdin`; the `&&` starts the container only after
+login succeeds.
+
 ```bash
 set -a
 [ -f .env ] && . ./.env
@@ -116,18 +121,20 @@ export NIM_TEST_GPU="${NIM_TEST_GPU:-0}"
 mkdir -p "${LOCAL_NIM_CACHE}"
 chmod 755 "${LOCAL_NIM_CACHE}"
 
+printf '%s\n' "${NGC_API_KEY}" | docker login nvcr.io --username '$oauthtoken' --password-stdin && \
 docker run -it \
   --runtime=nvidia \
   --gpus "device=${NIM_TEST_GPU}" \
   -e NGC_API_KEY \
   -v "${LOCAL_NIM_CACHE}:/home/nvs/.cache/nim" \
-  -p 8000:8000 \
+  -p 127.0.0.1:8000:8000 \
   nvcr.io/nim/ipd/proteinmpnn:latest
 ```
 
 | Flag | Value | Notes |
 |---|---|---|
 | `--gpus` | `device=${NIM_TEST_GPU}` | Single GPU only |
+| Port binding | `127.0.0.1:8000:8000` | Host loopback for unauthenticated local inference |
 | Cache mount | `/home/nvs/.cache/nim` | **Different from other NIMs** — NOT `/opt/nim/.cache` |
 | Image | `nvcr.io/nim/ipd/proteinmpnn:latest` | v1.1.0 as of 2025 |
 | No `--shm-size` | — | Not required for this NIM |
