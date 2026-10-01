@@ -12,6 +12,8 @@ links:
   discussions: false
   security: true
 skills:
+  - path: skills/bionemo-agent-toolkit/skills/drug-discovery-pipeline/
+    catalog_dir: bionemo-drug-discovery-pipeline
   - path: skills/bionemo-agent-toolkit/skills/msa-structure-prediction-pipeline/
     catalog_dir: bionemo-msa-structure-prediction-pipeline
   - path: skills/bionemo-agent-toolkit/skills/openfold2-nim/
