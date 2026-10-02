@@ -1,0 +1,25 @@
+custom_healthcare_tool:
+  type: function
+  function:
+    name: custom_healthcare_tool
+    description: >-
+      Save or process the completed custom ambient healthcare workflow request.
+      The assistant must call this before saying the request was saved or giving
+      a request ID. Replace the properties and required fields with the
+      developer-defined healthcare workflow inputs.
+    parameters:
+      type: object
+      properties:
+        required_field_one:
+          type: string
+          description: Replace with the first required field.
+        required_field_two:
+          type: string
+          description: Replace with the second required field.
+        required_field_three:
+          type: string
+          description: Replace with the third required field.
+      required:
+        - required_field_one
+        - required_field_two
+        - required_field_three

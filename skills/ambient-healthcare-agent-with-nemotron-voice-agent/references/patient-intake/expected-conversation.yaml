@@ -1,0 +1,259 @@
+scenario: patient-intake
+prompt_key: patient_intake_healthcare
+tool_names:
+  - review_patient_intake
+  - record_patient_intake
+expected_final_status: saved
+expected_result_id_field: record_id
+test_conversations:
+  - name: exact_patient_intake_welcome
+    history:
+      - role: user
+        content: "Please introduce yourself to the user."
+    expected_next_message_content: >-
+      Say exactly: Hello and welcome to the patient intake agent. I'm here to
+      help you get checked in for your appointment and will be asking you a few
+      questions in order to get ready for your visit with the doctor. First,
+      could you please tell me your full name? Do not call a tool or add any
+      other text.
+    expected_tool_call: false
+
+  - name: ask_for_date_of_birth_without_repeating_welcome
+    history:
+      - role: assistant
+        content: >-
+          Hello and welcome to the patient intake agent. I'm here to help you
+          get checked in for your appointment and will be asking you a few
+          questions in order to get ready for your visit with the doctor.
+          First, could you please tell me your full name?
+      - role: user
+        content: "My name is Maya Chen."
+    expected_next_message_content: >-
+      Ask only for the patient's date of birth. Do not repeat or restart the
+      welcome, ask for the name again, mention Maya Chen, summarize collected
+      information, or call a tool.
+    expected_tool_call: false
+
+  - name: ask_for_current_medications
+    history:
+      - role: user
+        content: "Hi, I need to complete my intake."
+      - role: assistant
+        content: "I can help with intake. What is your full name?"
+      - role: user
+        content: "My name is Maya Chen."
+      - role: assistant
+        content: "What is your date of birth and what symptoms or visit reason should I record?"
+      - role: user
+        content: "I was born on 1988-04-12 and I have had a sore throat for two days."
+    expected_next_message_content: >-
+      Ask only what current medications the patient takes because medications
+      are the next missing required intake field. Do not summarize, recap,
+      repeat, restate, confirm, or list the name, date of birth, or symptoms.
+      Do not ask for the pharmacy yet, and do not say the intake was saved or
+      recorded.
+    expected_tool_call: false
+
+  - name: ask_for_symptoms_without_summarizing_name_or_date_of_birth
+    history:
+      - role: assistant
+        content: "Could you please tell me your full name?"
+      - role: user
+        content: "My name is Maya Chen."
+      - role: assistant
+        content: "What is your date of birth?"
+      - role: user
+        content: "I was born on 1988-04-12."
+    expected_next_message_content: >-
+      Ask only what symptoms the patient is experiencing or the reason for the
+      visit. Do not summarize, recap, repeat, restate, confirm, or mention Maya
+      Chen or the date of birth. Do not ask for medications or pharmacy yet,
+      and do not call a tool.
+    expected_tool_call: false
+
+  - name: ask_for_pharmacy_without_partial_summary_after_sequential_collection
+    history:
+      - role: user
+        content: "Please help me complete my intake."
+      - role: assistant
+        content: "What is your full name?"
+      - role: user
+        content: "My full name is Maya Chen."
+      - role: assistant
+        content: "What is your date of birth?"
+      - role: user
+        content: "April twelfth nineteen eighty eight."
+      - role: assistant
+        content: "What symptoms are you experiencing, or what is the reason for your visit?"
+      - role: user
+        content: "I need a follow-up flu shot."
+      - role: assistant
+        content: "What medications are you currently taking?"
+      - role: user
+        content: "I take loratadine daily."
+    expected_next_message_content: >-
+      Ask only for the current or preferred pharmacy. Do not summarize, recap,
+      repeat, restate, confirm, or list Maya Chen's name, date of birth, visit
+      reason, or current medication. Do not claim all five fields are known and
+      do not call a tool because the pharmacy is still missing.
+    expected_tool_call: false
+
+  - name: review_completed_patient_intake
+    history:
+      - role: user
+        content: "Hi, I need to complete my intake."
+      - role: assistant
+        content: "I can help with intake. What is your full name?"
+      - role: user
+        content: "My name is Maya Chen."
+      - role: assistant
+        content: "What is your date of birth and what symptoms or visit reason should I record?"
+      - role: user
+        content: "I was born on 1988-04-12 and I have had a sore throat for two days."
+      - role: assistant
+        content: "What medications are you currently taking?"
+      - role: user
+        content: "I take loratadine daily."
+      - role: assistant
+        content: "What is your current or preferred pharmacy?"
+      - role: user
+        content: "My pharmacy is Green Valley Pharmacy."
+    expected_next_message_content: >-
+      Naturally review Maya Chen's intake by narrating her date of birth as
+      April 12th 1988, her sore throat for two days, her current loratadine
+      medication, and the Green Valley Pharmacy, then ask whether all
+      information is correct. Do not say the intake was saved and do not call
+      the save tool. Use only natural speech: no bullets, raw field names,
+      underscores, equals signs, key-value formatting, or narration about
+      calling a tool.
+    expected_tool_call: true
+    expected_tool_name: review_patient_intake
+    expected_final_status: review_required
+    expected_result_id_field:
+    expected_tool_arguments:
+      patient_name: "Maya Chen"
+      date_of_birth: "1988-04-12"
+      symptoms: "sore throat for two days"
+      current_medications: "loratadine daily"
+      current_pharmacy: "Green Valley Pharmacy"
+
+  - name: save_explicitly_confirmed_patient_intake
+    history:
+      - role: user
+        content: "Hi, I need to complete my intake."
+      - role: assistant
+        content: "I can help with intake. What is your full name?"
+      - role: user
+        content: "My name is Maya Chen."
+      - role: assistant
+        content: "What is your date of birth and what symptoms or visit reason should I record?"
+      - role: user
+        content: "I was born on 1988-04-12 and I have had a sore throat for two days."
+      - role: assistant
+        content: "What medications are you currently taking?"
+      - role: user
+        content: "I take loratadine daily."
+      - role: assistant
+        content: "What is your current or preferred pharmacy?"
+      - role: user
+        content: "My pharmacy is Green Valley Pharmacy."
+      - role: assistant
+        content: >-
+          Thank you. I have all the information I need. Your name is Maya Chen,
+          your date of birth is April 12th 1988, you're currently experiencing
+          a sore throat for two days, your current medications are loratadine
+          daily, and your current pharmacy is Green Valley Pharmacy. Is this
+          all correct?
+      - role: user
+        content: "Yes, that is all correct."
+    expected_next_message_content: >-
+      After the save tool returns saved, begin with Thank you, say that the
+      information was saved, and give the returned confirmation number. Do not
+      repeat the intake fields or narrate the tool call.
+    expected_tool_call: true
+    expected_tool_name: record_patient_intake
+    expected_final_status: saved
+    expected_tool_arguments:
+      patient_name: "Maya Chen"
+      date_of_birth: "1988-04-12"
+      symptoms: "sore throat for two days"
+      current_medications: "loratadine daily"
+      current_pharmacy: "Green Valley Pharmacy"
+      patient_confirmed: true
+
+  - name: review_correction_before_saving
+    history:
+      - role: user
+        content: "My name is Maya Chen, I was born on 1988-04-12, I have a sore throat, I take loratadine daily, and I use Green Valley Pharmacy."
+      - role: assistant
+        content: >-
+          Thank you. I have all the information I need. Your name is Maya Chen,
+          your date of birth is April 12th 1988, you're currently experiencing
+          a sore throat, your current medications are loratadine daily, and your
+          current pharmacy is Green Valley Pharmacy. Is this all correct?
+      - role: user
+        content: "Actually, please change my pharmacy to Sunset Pharmacy."
+    expected_next_message_content: >-
+      Review all five fields again with Sunset Pharmacy and ask whether the
+      updated information is correct. Do not save the intake yet.
+    expected_tool_call: true
+    expected_tool_name: review_patient_intake
+    expected_final_status: review_required
+    expected_result_id_field:
+    expected_tool_arguments:
+      patient_name: "Maya Chen"
+      date_of_birth: "1988-04-12"
+      symptoms: "sore throat"
+      current_medications: "loratadine daily"
+      current_pharmacy: "Sunset Pharmacy"
+
+  - name: review_question_shaped_final_pharmacy_answer
+    history:
+      - role: user
+        content: "My name is Jane Johnson."
+      - role: assistant
+        content: "What is your date of birth?"
+      - role: user
+        content: "October first nineteen sixty four."
+      - role: assistant
+        content: "What symptoms are you experiencing, or what is the reason for your visit?"
+      - role: user
+        content: "I need the second dose of my vaccination."
+      - role: assistant
+        content: "What medications are you currently taking?"
+      - role: user
+        content: "I take metformin twice daily."
+      - role: assistant
+        content: "What is your current or preferred pharmacy?"
+      - role: user
+        content: "Is the Walgreens pharmacy in Santa Clara?"
+    expected_next_message_content: >-
+      Treat Walgreens pharmacy in Santa Clara as the final pharmacy answer and
+      call the review tool silently. Do not answer yes, introduce a review,
+      write a Review heading, use colon-labeled fields, or save the intake.
+    expected_tool_call: true
+    expected_tool_name: review_patient_intake
+    expected_final_status: review_required
+    expected_result_id_field:
+    expected_tool_arguments:
+      patient_name: "Jane Johnson"
+      date_of_birth: "1964-10-01"
+    expected_tool_argument_substrings:
+      symptoms:
+        - "second dose"
+        - "vaccination"
+      current_medications:
+        - "metformin"
+        - "twice daily"
+      current_pharmacy:
+        - "Walgreens"
+        - "Santa Clara"
+handoff_note: >-
+  The assistant should collect intake fields from existing conversation
+  history and ask for missing fields without summarizing, recapping, or
+  confirming partial intake data. Only after all five fields are known should
+  review_patient_intake present them in natural speech and request explicit
+  confirmation. Corrections must be reviewed again. The assistant may call
+  record_patient_intake only after the user confirms the latest review; the
+  saved confirmation is emitted directly from the tool's speech-formatted
+  response_text.

@@ -1,0 +1,18 @@
+schema_version: 1
+
+harbor:
+  task_source: evals_json
+  n_attempts: 1
+  pass_threshold: 0.50
+  n_concurrent: 2
+  max_agents: 2
+  timeout_multiplier: 2.0
+  agent_runtime_preflight: true
+
+skill_workspace:
+  mode: isolated
+
+grading:
+  mode: default_plus_custom
+  custom_metrics:
+    - nva_workflow_contract
