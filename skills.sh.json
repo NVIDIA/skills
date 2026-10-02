@@ -136,6 +136,7 @@
         "nv-segment-ct",
         "nv-segment-ct-finetune",
         "nv-segment-ctmr",
+        "nvidia-broadcast",
         "rtvi-cv-customize-model",
         "rtvi-cv-scaffold-vss-service",
         "rtvi-vlm-customize-model",

@@ -1885,6 +1885,13 @@
       "last_modified": "2026-10-02"
     },
     {
+      "name": "nvidia-broadcast",
+      "path": "skills/nvidia-broadcast",
+      "content_digest": "sha256:1dcc05b987f877909c0a2b2a01ea024e7730f11e6537de8bd0af24d41584811e",
+      "last_commit": "a58506c6426092e02cd5a399b1d11cc235cfe172",
+      "last_modified": "2026-10-02"
+    },
+    {
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
       "content_digest": "sha256:da43951c0c8c69da5622f5299055228c70bc6345273e7869f3c59acb92af8310",

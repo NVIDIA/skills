@@ -3229,6 +3229,18 @@
       }
     },
     {
+      "path": "skills/nvidia-broadcast",
+      "name": "nvidia-broadcast",
+      "description": "Use when controlling NVIDIA Broadcast through MCP to apply effects, process local media, select devices, or change camera resolution, or when Broadcast is missing or too old to expose the gateway and the user wants it installed; not for Broadcast app settings outside the MCP gateway.",
+      "metadata": {
+        "product.primary": "Maxine",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,developer,ai_engineer,hands_on_builder",
+        "discovery.activity_tags": "configure,operate,transform,integrate,troubleshoot"
+      }
+    },
+    {
       "path": "skills/nvidia-skill-finder",
       "name": "nvidia-skill-finder",
       "description": "Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, Isaac, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.",
