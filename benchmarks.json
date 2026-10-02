@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 396,
-  "result_row_count": 3690,
+  "skill_count": 397,
+  "result_row_count": 3700,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5202,6 +5202,26 @@
       "component": "NVIDIA App",
       "has_results": true,
       "average_uplift_pct": 15.08
+    },
+    {
+      "skill": "nvidia-broadcast",
+      "evaluation_date": "2026-10-02",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:e64ad6bef7a96002e979cd95f36177197892f9a1fc780874e2ca376e1faecd9b",
+      "validation_status": null,
+      "tasks": 22,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "has_results": true,
+      "average_uplift_pct": 10.78
     },
     {
       "skill": "nvidia-skill-finder",
@@ -30003,6 +30023,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 93.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 4.5
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 53.6,
+      "uplift_pct": 24.5
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 49.1,
+      "uplift_pct": 19.1
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 49.1,
+      "uplift_pct": 9.9
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 45.6,
+      "uplift_pct": 6.7
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-broadcast",
+      "component": "NVIDIA Broadcast",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.5,
       "uplift_pct": null
     },
     {
