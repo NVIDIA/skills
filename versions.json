@@ -37,11 +37,25 @@
       "last_modified": "2026-07-14"
     },
     {
+      "name": "bionemo-boltz2-nim",
+      "path": "skills/bionemo-boltz2-nim",
+      "content_digest": "sha256:b12e1701bd327d2b911444d81645a0009681336f77d13307dfe4920090bbc9b7",
+      "last_commit": "85ad8571bd181d61fe8ba0102ea83ddfe31c20c9",
+      "last_modified": "2026-10-02"
+    },
+    {
       "name": "bionemo-diffdock-nim",
       "path": "skills/bionemo-diffdock-nim",
       "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",
       "last_commit": "65585a7a715e75167b9fa38d439cdd058eeee840",
       "last_modified": "2026-09-29"
+    },
+    {
+      "name": "bionemo-drug-discovery-pipeline",
+      "path": "skills/bionemo-drug-discovery-pipeline",
+      "content_digest": "sha256:a6f2e8dc53e84877a469807d743e99928768d6b7414b2eeed630e34e2cb8aae3",
+      "last_commit": "85ad8571bd181d61fe8ba0102ea83ddfe31c20c9",
+      "last_modified": "2026-10-02"
     },
     {
       "name": "bionemo-evo2-nim",
@@ -1862,6 +1876,13 @@
       "content_digest": "sha256:ea8b3b84962cda04f54ec362139076c68dc585d7156440ad2c176ba38cb531b4",
       "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
       "last_modified": "2026-09-13"
+    },
+    {
+      "name": "nvidia-app",
+      "path": "skills/nvidia-app",
+      "content_digest": "sha256:16617cd658188b4554e9dbcc9a56eac85d6c09d374e970750e3940a614b6a019",
+      "last_commit": "85ad8571bd181d61fe8ba0102ea83ddfe31c20c9",
+      "last_modified": "2026-10-02"
     },
     {
       "name": "nvidia-skill-finder",

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 393,
-  "result_row_count": 3660,
+  "skill_count": 396,
+  "result_row_count": 3690,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -126,6 +126,26 @@
       "average_uplift_pct": 23.3
     },
     {
+      "skill": "boltz2-nim",
+      "evaluation_date": "2026-10-01",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:7a71e1e15678ee63624aa6e4b07bb0b91196ed11d2a208b9847bed88be328ec8",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": -0.35
+    },
+    {
       "skill": "diffdock-nim",
       "evaluation_date": "2026-09-23",
       "environment": "k8s-sandbox",
@@ -144,6 +164,26 @@
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": 15.47
+    },
+    {
+      "skill": "drug-discovery-pipeline",
+      "evaluation_date": "2026-10-01",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:d8fc2008cd7f9229e6c9085ee8f16a3c6097c1d350dce96be6615c539716e557",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 13.42
     },
     {
       "skill": "evo2-nim",
@@ -5144,6 +5184,26 @@
       "average_uplift_pct": 10.87
     },
     {
+      "skill": "nvidia-app",
+      "evaluation_date": "2026-10-01",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:24a80b6a8c68db3347169c24fd3020997f52e4a2b1d6de22376feab66226e32f",
+      "validation_status": null,
+      "tasks": 32,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "has_results": true,
+      "average_uplift_pct": 15.08
+    },
+    {
       "skill": "nvidia-skill-finder",
       "evaluation_date": "2026-10-01",
       "environment": "k8s-sandbox",
@@ -8076,6 +8136,96 @@
       "uplift_pct": 25.0
     },
     {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 55.0,
+      "uplift_pct": -45.0
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.9,
+      "uplift_pct": -7.1
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-boltz2-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 72.4,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "bionemo-diffdock-nim",
       "component": "BioNeMo NIMs",
       "dimension": "Security",
@@ -8163,6 +8313,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 88.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.9,
+      "uplift_pct": 51.5
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 57.2,
+      "uplift_pct": -21.0
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-drug-discovery-pipeline",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.0,
       "uplift_pct": null
     },
     {
@@ -29673,6 +29913,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 78.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.8,
+      "uplift_pct": -28.1
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.6,
+      "uplift_pct": -9.3
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 74.4
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 61.3,
+      "uplift_pct": 40.7
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 37.0,
+      "uplift_pct": 7.3
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 35.7,
+      "uplift_pct": 5.5
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-app",
+      "component": "NVIDIA App",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.9,
       "uplift_pct": null
     },
     {

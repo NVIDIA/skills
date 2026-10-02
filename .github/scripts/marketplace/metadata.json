@@ -61,6 +61,18 @@
       }
     },
     {
+      "path": "skills/bionemo-boltz2-nim",
+      "name": "boltz2-nim",
+      "description": "Use Boltz2 NIM for biomolecular structure prediction and binding affinity. Invoke for Boltz2, protein structures, protein-ligand/DNA/RNA complexes, SMILES or CCD ligands, pIC50/IC50 affinity scoring, mmCIF output, hosted NVIDIA API calls, or local Docker deployment.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,research_non_academic,application_developer",
+        "discovery.activity_tags": "inference,generate,integrate,deploy,evaluate"
+      }
+    },
+    {
       "path": "skills/bionemo-diffdock-nim",
       "name": "diffdock-nim",
       "description": "Run DiffDock molecular docking via NVIDIA NIM to predict small-molecule binding poses against protein targets. Use for DiffDock, molecular docking, ligand docking, blind docking, SMILES or SDF ligands, ranked poses, confidence scores, hosted NVIDIA API, or local Docker deployment.\n",
@@ -70,6 +82,18 @@
         "catalog.subdomain": "inference-ai",
         "audience": "computational_biologist,bioinformatician,research_academic,application_developer,data_scientist",
         "discovery.activity_tags": "inference,generate,evaluate,deploy,integrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-drug-discovery-pipeline",
+      "name": "drug-discovery-pipeline",
+      "description": "NOTE: molecule and target inputs and your NGC_API_KEY are transmitted to external NVIDIA-hosted API endpoints on every call. Use local NIM containers for confidential or proprietary data. Run a complete computational drug discovery pipeline using NVIDIA BioNeMo NIMs: generate drug-like molecules with GenMol, dock them to a protein target with DiffDock, then predict binding affinity with Boltz2. Use this skill whenever the user wants to generate and screen small molecule drug candidates, perform hit discovery, optimize leads against a protein target, or do virtual screening combining molecule generation, docking, and affinity prediction. Triggers on: drug discovery pipeline, hit discovery, lead optimization, virtual screening, molecule generation, molecular docking, binding affinity, GenMol, DiffDock, Boltz2, SMILES, SAFE notation, NIM microservice. This is a multi-step pipeline composing three BioNeMo NIMs.\n",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,research_non_academic,data_scientist",
+        "discovery.activity_tags": "generate,inference,evaluate,optimize,orchestrate"
       }
     },
     {
@@ -3190,6 +3214,18 @@
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,ai_engineer,developer,application_developer",
         "discovery.activity_tags": "convert,configure,validate,integrate"
+      }
+    },
+    {
+      "path": "skills/nvidia-app",
+      "name": "nvidia-app",
+      "description": "NVIDIA App MCP: drivers, games, laptops, overlay. Check drivers, manage and optimize games, configure laptop features.\n",
+      "metadata": {
+        "product.primary": "Client",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "gaming",
+        "audience": "developer,it_operations,hands_on_builder",
+        "discovery.activity_tags": "operate,configure,optimize,monitor,troubleshoot"
       }
     },
     {

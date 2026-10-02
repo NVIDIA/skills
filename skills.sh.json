@@ -322,7 +322,9 @@
       "title": "Inference AI",
       "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration.",
       "skills": [
+        "boltz2-nim",
         "diffdock-nim",
+        "drug-discovery-pipeline",
         "dynamo-interconnect-check",
         "dynamo-recipe-runner",
         "dynamo-router-starter",
@@ -500,6 +502,7 @@
       "description": "Build, optimize, and test game development workflows, game technologies, rendering pipelines, and player-facing interactive experiences.",
       "skills": [
         "g-assist-mcp-skill",
+        "nvidia-app",
         "rtx-remix-modding"
       ]
     }
