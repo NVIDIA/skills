@@ -13,6 +13,18 @@
       }
     },
     {
+      "path": "skills/ambient-healthcare-agent-with-nemotron-voice-agent",
+      "name": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "description": "Customize NVIDIA Nemotron Voice Agent's Generic Pipecat example for healthcare appointment, five-field patient intake, or custom tool-calling workflows without a separate backend.",
+      "metadata": {
+        "product.primary": "Nemotron for Digital Health",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "conversational-ai",
+        "audience": "application_developer,ai_engineer,developer,solutions_architect",
+        "discovery.activity_tags": "configure,extend,integrate,deploy,get_started"
+      }
+    },
+    {
       "path": "skills/amc-run-rtsp-calibration",
       "name": "amc-run-rtsp-calibration",
       "description": "Calibrate a new dataset from live RTSP camera streams via the AutoMagicCalib REST API. Use when the user provides RTSP URLs or asks to calibrate live cameras; VIOS records clips, AMC ingests them, then runs calibration.",

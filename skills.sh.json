@@ -208,6 +208,7 @@
       "title": "Conversational AI",
       "description": "Build and deploy speech, voice, dialogue, and multimodal conversational AI workflows, including real-time assistant and voice-agent experiences.",
       "skills": [
+        "ambient-healthcare-agent-with-nemotron-voice-agent",
         "digital-health-clinical-asr-build",
         "digital-health-clinical-asr-eval",
         "digital-health-clinical-asr-finetune",

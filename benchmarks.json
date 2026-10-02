@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 397,
-  "result_row_count": 3700,
+  "skill_count": 398,
+  "result_row_count": 3710,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -44,6 +44,26 @@
       "component": "cuDF",
       "has_results": true,
       "average_uplift_pct": -3.73
+    },
+    {
+      "skill": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "evaluation_date": "2026-09-24",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:d8ae4021cef430b548b0c29cac10d8517b49a7c5910f714f06a474939295ff30",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "has_results": true,
+      "average_uplift_pct": 36.55
     },
     {
       "skill": "amc-run-rtsp-calibration",
@@ -7793,6 +7813,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 82.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 70.7
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 61.7
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 61.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.9,
+      "uplift_pct": 32.9
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": 54.0
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "component": "Digital Health",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.7,
       "uplift_pct": null
     },
     {

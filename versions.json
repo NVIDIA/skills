@@ -9,6 +9,13 @@
       "last_modified": "2026-09-15"
     },
     {
+      "name": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "path": "skills/ambient-healthcare-agent-with-nemotron-voice-agent",
+      "content_digest": "sha256:24537301b005d7016223c050b8a444c888764eedad76d96958ec6b52d483415d",
+      "last_commit": "5e8d7e4bdb3314b5e1a1c6beff2e933680f73026",
+      "last_modified": "2026-10-02"
+    },
+    {
       "name": "amc-run-rtsp-calibration",
       "path": "skills/amc-run-rtsp-calibration",
       "content_digest": "sha256:7b48e2a0fe6ac9ac1dec34cd24482f3b5980cdbb0e597bed0622b809504603da",
