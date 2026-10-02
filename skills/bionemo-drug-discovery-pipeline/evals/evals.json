@@ -1,0 +1,66 @@
+{
+  "skill_name": "drug-discovery-pipeline",
+  "evals": [
+    {
+      "id": "eval-1-de-novo-hit-discovery",
+      "prompt": "I want to discover new drug-like molecules that could inhibit the EGFR kinase using the staged receptor at /workspace/input/egfr.pdb. Run the hosted pipeline now: generate novel molecules, dock them to EGFR, and score the top hits for binding affinity. Start from scratch with no known scaffold. For this smoke test, request 10 molecules from GenMol, dock the top 2 candidates with 1 pose each, and run Boltz2 affinity prediction for the best docked hit. Use NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual responses; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted GenMol to DiffDock to Boltz2 pipeline using the staged EGFR receptor and a bounded 10-to-2-to-1 smoke-test fan-out, correct SAFE/typing and ligand handoffs, plus saved artifacts and actual generated molecules, docking scores, and affinity results from all three services.",
+      "files": [
+        "evals/files/egfr.pdb"
+      ],
+      "assertions": [
+        "[hosted-pipeline-executed] Executes all hosted pipeline stages instead of only writing code: Trajectory shows successful GenMol, DiffDock, and Boltz2 requests, and the final response reports actual response-derived molecules, docking scores, affinity values, and saved artifact paths",
+        "[a1-genmol-safe-notation] GenMol smiles field uses SAFE notation, not raw SMILES: The script or instructions pass SAFE notation (a scaffold encoded in SAFE format) to the GenMol `smiles` field, and either explicitly state that this field accepts SAFE notation (not raw SMILES) or the value provided is clearly a SAFE-encoded string.",
+        "[a2-genmol-string-temperature] GenMol temperature and noise are typed as strings: The GenMol payload sets `temperature` and `noise` as quoted string values (e.g. \"1.0\", not 1.0 as a bare float). The output should show these fields as strings in the JSON payload.",
+        "[a3-diffdock-ligand-file-type-txt] DiffDock ligand_file_type is set to 'txt' for SMILES input: The DiffDock request payload includes `ligand_file_type` set to \"txt\" (not \"sdf\" or any other value), since SMILES strings from GenMol are passed as plain text.",
+        "[a4-diffdock-atom-only-protein] DiffDock protein input strips HETATM lines, keeping only ATOM records: The output mentions stripping HETATM lines from the PDB file before sending to DiffDock, or the code filters the PDB content to include only lines starting with ATOM when constructing the `protein` field.",
+        "[a5-boltz2-polymers-field] Boltz2 uses 'polymers' field, not 'sequences': The Boltz2 payload uses the field name `polymers` (not `sequences`) to provide the protein input. Each polymer entry includes `id`, `molecule_type`, and `sequence` fields.",
+        "[a6-pipeline-handoff-smiles] GenMol output SMILES are passed directly into DiffDock ligand field: The pipeline correctly reads the `smiles` field from each GenMol response molecule and passes that value as the `ligand` field in the DiffDock request, establishing the handoff between Step 1 and Step 2."
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "eval-2-lead-optimization-scaffold",
+      "prompt": "I have a known lead compound with SMILES 'CC1=CC=C(C=C1)NC(=O)C2=CC=CC=C2' that partially inhibits CDK2. I want to generate analogs around this scaffold, dock them to CDK2, and get binding affinity predictions. My CDK2 PDB is ready. Can you help me set up this pipeline?",
+      "expected_output": "A pipeline that encodes the known SMILES into SAFE notation before calling GenMol, uses the GenMol-generated SMILES in DiffDock with ATOM-only PDB protein input, and passes top hits to Boltz2 for pIC50 affinity prediction.",
+      "files": [],
+      "assertions": [
+        "[a1-safe-encoding-before-genmol] Known SMILES scaffold is converted to SAFE notation before being sent to GenMol: The output explicitly encodes the user-provided SMILES into SAFE notation (e.g. using the safe-mol library or equivalent) before passing it to the GenMol `smiles` field, since GenMol accepts SAFE notation not raw SMILES.",
+        "[a2-genmol-hosted-endpoint] GenMol hosted endpoint URL is correct: The GenMol API call targets `https://health.api.nvidia.com/v1/biology/nvidia/genmol/generate` (exact path including `/v1/biology/nvidia/genmol/generate`).",
+        "[a3-diffdock-protein-atom-only] PDB file is filtered to ATOM lines only before DiffDock: The code or instructions filter the CDK2 PDB file to remove HETATM lines, passing only ATOM records in the `protein` field of the DiffDock request.",
+        "[a4-diffdock-hosted-endpoint] DiffDock hosted endpoint uses the correct /v1/biology/mit/diffdock path: The DiffDock API call targets `https://health.api.nvidia.com/v1/biology/mit/diffdock` — not the old `/v1/molecular-docking/diffdock/generate` path, which returns 404.",
+        "[a5-boltz2-ligand-predict-affinity] Boltz2 ligand entries include predict_affinity flag: Each ligand entry in the Boltz2 `ligands` list includes `\"predict_affinity\": true` (or True), so that pIC50 affinity values are returned in the response.",
+        "[a6-boltz2-affinity-pic50-extraction] Boltz2 response affinity_pic50 is extracted from the response: The output shows how to extract `affinity_pic50` from the Boltz2 response (e.g. `response['affinities']['L1']['affinity_pic50'][0]`), and the pipeline uses this value to rank or report top binding candidates."
+      ]
+    },
+    {
+      "id": "eval-3-docking-affinity-scoring",
+      "prompt": "I already have a list of SMILES strings I want to test against a protein target. I want to dock them with DiffDock and then use Boltz2 to predict which ones have the highest binding affinity. The protein is in a PDB file. What does the code look like for the docking and affinity prediction steps?",
+      "expected_output": "Code that sends each SMILES to DiffDock with ligand_file_type 'txt', selects top poses by treating position_confidence as higher-is-better despite negative values, then sends those poses to Boltz2 using the polymers field and extracts affinity_pic50.",
+      "files": [],
+      "assertions": [
+        "[a1-diffdock-position-confidence-negative] DiffDock position_confidence scores are correctly treated as negative (higher/less negative = better): The output explicitly notes that DiffDock `position_confidence` values are negative floats and that a higher (less negative) value indicates better confidence — the code sorts or selects poses accordingly (e.g. using max() or sorting in descending order).",
+        "[a2-diffdock-ligand-smiles-txt] DiffDock receives SMILES as ligand with ligand_file_type txt: The DiffDock payload uses the SMILES string as the `ligand` field and sets `ligand_file_type` to \"txt\".",
+        "[a3-diffdock-local-endpoint] DiffDock local endpoint path is correct when using local Docker: If local Docker mode is used, the DiffDock endpoint is `http://localhost:8000/molecular-docking/diffdock/generate` (not `/biology/mit/diffdock`, which is the hosted path).",
+        "[a4-boltz2-polymers-not-sequences] Boltz2 protein input uses 'polymers' field, not 'sequences': The Boltz2 request body uses the key `polymers` (not `sequences`) for the protein input. Using `sequences` is incorrect and will fail.",
+        "[a5-boltz2-affinity-probability-binary] Boltz2 response includes affinity_probability_binary for binary binding classification: The output references or extracts `affinity_probability_binary` from the Boltz2 response in addition to (or as an alternative to) `affinity_pic50`, using it to identify strong binders.",
+        "[a6-bearer-auth-hosted] Hosted API calls include Bearer token authentication: Requests to hosted endpoints include an Authorization header with a Bearer token sourced from the NGC_API_KEY environment variable (e.g. `Authorization: Bearer $NGC_API_KEY`)."
+      ]
+    },
+    {
+      "id": "eval-4-full-hosted-pipeline",
+      "prompt": "Can you write a complete Python script that runs the full drug discovery pipeline — molecule generation, docking, and binding affinity prediction — all using the NVIDIA hosted APIs? I want to generate 10 molecules from a fragment, dock the best 3 to my target protein, and predict their binding affinities.",
+      "expected_output": "A complete Python script hitting all three hosted NVIDIA API endpoints in sequence: GenMol at /v1/biology/nvidia/genmol/generate, DiffDock at /v1/biology/mit/diffdock, and Boltz2 at /v1/biology/mit/boltz2/predict, with Bearer auth on all requests.",
+      "files": [],
+      "assertions": [
+        "[a1-genmol-correct-hosted-url] GenMol hosted endpoint URL is exactly correct: The script calls `https://health.api.nvidia.com/v1/biology/nvidia/genmol/generate` for the GenMol step — the full URL must include `/v1/biology/nvidia/genmol/generate`.",
+        "[a2-diffdock-correct-hosted-url] DiffDock hosted endpoint is /v1/biology/mit/diffdock, not the old molecular-docking path: The script calls `https://health.api.nvidia.com/v1/biology/mit/diffdock` for the DiffDock step. The old URL `/v1/molecular-docking/diffdock/generate` returns 404 and must NOT appear in the output.",
+        "[a3-boltz2-correct-hosted-url] Boltz2 hosted endpoint URL is exactly correct: The script calls `https://health.api.nvidia.com/v1/biology/mit/boltz2/predict` for the Boltz2 step — the full URL must include `/v1/biology/mit/boltz2/predict`.",
+        "[a4-all-requests-bearer-auth] All three NIM requests include Bearer token from NGC_API_KEY: Every API call in the script (GenMol, DiffDock, and Boltz2) sets an Authorization header with `Bearer` and the NGC_API_KEY environment variable. No request is sent without authentication.",
+        "[a5-genmol-num-molecules-and-string-params] GenMol num_molecules is set to 10 and temperature/noise are strings: The GenMol payload sets `num_molecules` to 10 (or a value consistent with generating enough candidates to select 3 top hits), and `temperature` and `noise` are quoted string values not bare floats.",
+        "[a6-top-hits-selection-and-boltz2-polymers] Top 3 docking hits are selected and Boltz2 uses polymers field: The script selects the top 3 poses from DiffDock (using position_confidence, treating higher/less-negative as better) and submits them to Boltz2 using the `polymers` field (not `sequences`) for the protein and the `ligands` field for the docked molecules."
+      ]
+    }
+  ]
+}
