@@ -82,6 +82,14 @@ Say so, and offer the nearest thing you can do:
 - **Asset references** — add one to a prim, or replace one already there. There is no removal.
 - **Textures** — read what a material binds, and replace it.
 
+Unsupported prim deletion belongs in the Remix Toolkit GUI; that refusal and route ARE the
+closing sentence, even if you select the prim for the user. Hiding it, moving it off-world,
+blanking/removing its reference, or replacing it with an empty/invisible asset makes the same
+geometry disappear from the game — the same unsupported deletion, not a supported alternative.
+Hand-edited `.usda` files, raw USD/`pxr` scripts and filesystem edits bypass the Toolkit's command
+layer, so nothing validates those edits or can undo them. Deleting, muting or reverting a layer
+to remove one prim takes every other edit in that layer with it.
+
 Nothing saves itself in this release. A write lands in memory and the running game keeps rendering the old asset until the layer is on disk, so a turn that ends on a successful edit has changed nothing the user can see. Call `remix_save_layer` once the edit is in, then read back to confirm it landed. This is the same silent success as above, and the easier one to report as a win.
 
 Ask instead of guessing scope. "Swap all the broken ones", "fix everything in this layer" — ask how many, and which, before acting.

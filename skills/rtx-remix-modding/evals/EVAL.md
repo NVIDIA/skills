@@ -1,6 +1,6 @@
 # Evaluating `rtx-remix-modding`
 
-`evals.json` holds 10 cases: **7 that must activate the skill** and **3 that must not**.
+`evals.json` holds 11 cases: **8 that must activate the skill** and **3 that must not**.
 
 Every case is derived from text this skill ships today, and each tests what the agent *says and
 routes to* rather than whether a USD write landed. Nothing here needs a GPU, a running Remix or
@@ -21,8 +21,9 @@ to produce.
 | 5 | What a capture does not contain cannot be reached | Dropping to raw `pxr` traversal to look again — same stage, same nothing |
 | 6 | Relay a tool's refusal with its remedy, and invent no cause | Reporting "impossible" when the tool said "do X and this works", or guessing at the user's setup |
 | 7 | Missing `remix_*` tools are a gap to name, not to work around | Hand-editing `.usda`, which lands in a layer the runtime ignores — looks like success, renders nothing |
+| 11 | Unsupported prim deletion routes to the Toolkit GUI, including after selection | Omitting the refusal, or substituting raw USD/filesystem edits, hide/off-world/empty-reference tricks, or whole-layer removal — same disappearing geometry, bypassed validation/undo, or collateral edits |
 
-These seven are not a sample of the skill; they are the rules that cost real debugging to get
+These eight are not a sample of the skill; they are the rules that cost real debugging to get
 right. `.agents/rules/agent-skill-rules.md` records why the wording of each
 one is load-bearing, and four of these cases sit directly on top of it: case 5 because three
 prohibition-shaped phrasings were walked past before a factual one held, case 4 because the
