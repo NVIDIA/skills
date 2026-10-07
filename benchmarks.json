@@ -3885,13 +3885,13 @@
     },
     {
       "skill": "nemo-automodel-model-onboarding",
-      "evaluation_date": "2026-09-11",
+      "evaluation_date": "2026-10-05",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:814bfc7c94da8ea6fd1a065d7f3f0c4fcda9ef918f1da7eb46630700f241fc25",
       "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -3901,7 +3901,7 @@
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "has_results": true,
-      "average_uplift_pct": 23.57
+      "average_uplift_pct": 27.5
     },
     {
       "skill": "nemo-automodel-recipe-development",
@@ -5733,13 +5733,13 @@
     },
     {
       "skill": "rtx-remix-modding",
-      "evaluation_date": "2026-09-23",
+      "evaluation_date": "2026-10-06",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:29a10a044caef4ddb28554a7c700cd5179001fc4eac72b52505b4f948df94241",
+      "dataset_digest": "sha256:7a32fc881c330ecfeaa36d0afd37f0d220e5dc84fac8aefef0c1bcb3db46b52b",
       "validation_status": null,
-      "tasks": 10,
-      "attempts_per_task": 3,
+      "tasks": 11,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -5749,7 +5749,7 @@
       "catalog_dir": "rtx-remix-modding",
       "component": "RTX Remix",
       "has_results": true,
-      "average_uplift_pct": 27.87
+      "average_uplift_pct": 24.32
     },
     {
       "skill": "skill-card-generator",
@@ -24562,7 +24562,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 33.3
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
@@ -24571,7 +24571,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
@@ -24589,7 +24589,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 10.0
+      "uplift_pct": 13.3
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
@@ -24615,8 +24615,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.5,
-      "uplift_pct": 46.1
+      "score_pct": 92.6,
+      "uplift_pct": 52.8
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
@@ -24624,8 +24624,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.2,
-      "uplift_pct": 27.0
+      "score_pct": 97.2,
+      "uplift_pct": 32.3
     },
     {
       "catalog_dir": "nemo-automodel-model-onboarding",
@@ -24633,7 +24633,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.2,
+      "score_pct": 100.0,
       "uplift_pct": null
     },
     {
@@ -24642,7 +24642,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.2,
+      "score_pct": 100.0,
       "uplift_pct": null
     },
     {
@@ -32040,8 +32040,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": -4.2
+      "score_pct": 90.9,
+      "uplift_pct": -4.6
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -32049,8 +32049,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 70.9,
-      "uplift_pct": 45.9
+      "score_pct": 65.5,
+      "uplift_pct": 36.4
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -32058,8 +32058,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 58.3,
-      "uplift_pct": 40.3
+      "score_pct": 72.7,
+      "uplift_pct": 56.3
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -32067,7 +32067,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 92.5,
       "uplift_pct": null
     },
     {
@@ -32085,8 +32085,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.3,
-      "uplift_pct": 50.2
+      "score_pct": 75.9,
+      "uplift_pct": 22.0
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -32094,8 +32094,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 35.0
+      "score_pct": 79.1,
+      "uplift_pct": 35.8
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -32103,7 +32103,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.7,
+      "score_pct": 97.2,
       "uplift_pct": null
     },
     {
@@ -32112,7 +32112,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.1,
+      "score_pct": 97.4,
       "uplift_pct": null
     },
     {
