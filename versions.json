@@ -1425,9 +1425,9 @@
     {
       "name": "nemo-automodel-model-onboarding",
       "path": "skills/nemo-automodel-model-onboarding",
-      "content_digest": "sha256:0a0c795b9fe470caf654d54cd40fed64524baffffe986e862c9b071777e75533",
-      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
-      "last_modified": "2026-09-11"
+      "content_digest": "sha256:d2db2b4564432ff850b0247dc695ddd12adf35603fc9cf692168dc7d9d197286",
+      "last_commit": "2c188f5bb27cb9c48baa7e57ab73e2434f15e38e",
+      "last_modified": "2026-10-07"
     },
     {
       "name": "nemo-automodel-recipe-development",
@@ -2076,9 +2076,9 @@
     {
       "name": "rtx-remix-modding",
       "path": "skills/rtx-remix-modding",
-      "content_digest": "sha256:8e8edfeda9cf72834ad05ad77139fff873f967ae7bb148bbdfd60211517c460f",
-      "last_commit": "00b4ec809609c81d5991210b8e2b53c10c1b1a78",
-      "last_modified": "2026-09-23"
+      "content_digest": "sha256:510e8f62aa3ba0103471025b92afedc16f2abdb7b56e286780385adb96f527ab",
+      "last_commit": "2c188f5bb27cb9c48baa7e57ab73e2434f15e38e",
+      "last_modified": "2026-10-07"
     },
     {
       "name": "skill-card-generator",
