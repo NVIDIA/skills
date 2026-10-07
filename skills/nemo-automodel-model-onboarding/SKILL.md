@@ -244,6 +244,9 @@ the adapter must explicitly map:
 
 Add tests that assert expected key mappings and run numerical equivalence with tiny configs before trying full checkpoints.
 
+For MoE PEFT, preserve pretrained router correction biases and verify adapter
+save/reload/resume using the [router-bias checks](./moe-patterns.md#preserve-router-state-during-lora).
+
 Do not use these shortcuts:
 
 - Do not validate the adapter only by calling `from_pretrained()`.
@@ -472,6 +475,7 @@ that only surface in a full parity comparison.
 - [ ] Created example YAML config
 - [ ] Verified model loads via `NeMoAutoModelForCausalLM.from_pretrained()`
 - [ ] Created unit tests (forward shape, state_dict round-trip)
+- [ ] Verified MoE PEFT router freezing and adapter save/reload/resume per [LoRA for MoE](./moe-patterns.md#preserve-router-state-during-lora)
 - [ ] Declared `_keep_in_fp32_modules_strict` for every intrinsically-fp32 param (SSM `A_log`/`dt_bias`, Mamba `D` when reference-fp32, MoE gate bias, attention-sink bias, `scale`, …) — see §2.8
 - [ ] Created layer equivalence tests for every rewritten layer (matching model dtype)
 - [ ] Created functional tests (training loss decreases)

@@ -93,6 +93,16 @@
       "expected_skill": null,
       "expected_output": "This skill should not activate. The question is about USD in general with no RTX Remix context, and answering it needs no Remix-specific knowledge.",
       "assertions": ["The rtx-remix-modding skill does not activate"]
+    },
+    {
+      "id": 11,
+      "prompt": "Delete the prim at /RootNode/meshes/mesh_9858949B5B49CCDC from my RTX Remix project.",
+      "expected_skill": "rtx-remix-modding",
+      "expected_output": "Deleting a prim is unsupported by the Remix tools; do it in the Remix Toolkit GUI. That refusal and route are the closing sentence, even after selecting the prim. Hiding it, moving it off-world, blanking/removing its reference, or using an empty/invisible replacement makes the same geometry disappear, so these are not supported alternatives. Hand-edited .usda files, raw USD/pxr scripts and filesystem edits bypass command-layer validation and undo; deleting, muting or reverting a layer also removes its other edits.",
+      "assertions": [
+        "The answer states that deleting a prim is unsupported by these tools and names the Remix Toolkit GUI as where to do it, even if the agent selects the prim first",
+        "The answer does not propose or perform hand-editing .usda, raw USD/pxr or filesystem edits, hiding the prim, moving it off-world, removing or blanking its reference, substituting an empty/invisible asset, or deleting, muting or reverting a layer to make it disappear"
+      ]
     }
   ]
 }
