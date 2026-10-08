@@ -8,8 +8,9 @@
 # *present* and *genuine* does NOT prove the files still match it — a skill can
 # carry a real signature while its content has drifted (e.g. a team signs an
 # early commit, keeps editing, and the sync picks up later content with the
-# stale signature). This check recomputes each signed file's hash and compares
-# it to the manifest, failing on any mismatch or missing file.
+# stale signature). This check recomputes each signed file's hash, compares it
+# to the manifest, and fails on any missing, modified, or unsigned extra file
+# not explicitly ignored by the signature metadata.
 #
 # On a pull request it checks only the skills changed in the PR (so it catches
 # drift being introduced without blocking on unrelated pre-existing state). On
