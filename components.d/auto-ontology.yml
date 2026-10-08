@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Auto Ontology
+repo: NVIDIA/auto-ontology
+description: Set up Auto Ontology, model and publish its semantic layer, and run validated text-to-SQL queries through it.
+skills:
+  - path: skills/nvidia-ontology-setup/
+    catalog_dir: nvidia-ontology-setup
+  - path: skills/nvidia-ontology-management/
+    catalog_dir: nvidia-ontology-management
+  - path: skills/nvidia-ontology-query/
+    catalog_dir: nvidia-ontology-query
+links:
+  discussions: false
