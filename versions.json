@@ -1845,37 +1845,37 @@
     {
       "name": "nvflare-convert-lightning",
       "path": "skills/nvflare-convert-lightning",
-      "content_digest": "sha256:80b642eddbf89d493b21f50017562a3a01d477498f5ef804086b2a3b6f45dba8",
-      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
-      "last_modified": "2026-09-13"
+      "content_digest": "sha256:04a4bfd52598443eeec9afafce038bafd455c4d4fad1e97f3affb47d412f5f98",
+      "last_commit": "cf5224d142509fe6dd435c0581fee216758c21f3",
+      "last_modified": "2026-10-08"
     },
     {
       "name": "nvflare-convert-pytorch",
       "path": "skills/nvflare-convert-pytorch",
-      "content_digest": "sha256:a39624c4438324f62f80b32e731843d0e25885e26ca8ea948da488f0f0cfaa55",
-      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
-      "last_modified": "2026-09-13"
+      "content_digest": "sha256:bbc9438f9798662f8b5f8a77aeef9d2d245beca5887aa652f303414ce83b2a36",
+      "last_commit": "cf5224d142509fe6dd435c0581fee216758c21f3",
+      "last_modified": "2026-10-08"
     },
     {
       "name": "nvflare-diagnose-job",
       "path": "skills/nvflare-diagnose-job",
-      "content_digest": "sha256:5c40476d6e3f3b6e9fe4b1e3b5a996ceb71f76e499b4e286a70123decaa54785",
-      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
-      "last_modified": "2026-09-13"
+      "content_digest": "sha256:2711cb29df211e442e5326fdbdeed9172129ed030b069d15a426caa3c02ff784",
+      "last_commit": "cf5224d142509fe6dd435c0581fee216758c21f3",
+      "last_modified": "2026-10-08"
     },
     {
       "name": "nvflare-fed-stats",
       "path": "skills/nvflare-fed-stats",
-      "content_digest": "sha256:26dcb728e5b0fb6f31572ad1de0c33c2fda19747e0992b1e21aba542a3de7dba",
-      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
-      "last_modified": "2026-09-13"
+      "content_digest": "sha256:0edb1f2c5f680b70cba4e3168f6dca9148ea98c7b0a2e766b16d40e22e2fc354",
+      "last_commit": "cf5224d142509fe6dd435c0581fee216758c21f3",
+      "last_modified": "2026-10-08"
     },
     {
       "name": "nvflare-orient",
       "path": "skills/nvflare-orient",
-      "content_digest": "sha256:853ba8a64c84cf27694fd5ea2ed39cfd6262539c8c8c88e952e5b92f016644ba",
-      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
-      "last_modified": "2026-09-13"
+      "content_digest": "sha256:084f772605d5bd56cbb065f79a6e584deab51636a5cea022ef9602f43754e2aa",
+      "last_commit": "cf5224d142509fe6dd435c0581fee216758c21f3",
+      "last_modified": "2026-10-08"
     },
     {
       "name": "nvflare-shared",
