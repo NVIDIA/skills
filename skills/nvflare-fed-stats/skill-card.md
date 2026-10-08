@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML engineers computing federated statistics across distributed NVFLARE sites for tabular and image data without writing custom aggregation code. <br>
+Developers and engineers computing federated statistics (counts, means, histograms, quantiles) across distributed NVFLARE sites for tabular or image datasets, enabling privacy-preserving data summaries without exposing raw data. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,18 +25,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Image Statistics Reference](references/image-statistics.md) <br>
-- [Statistics Mapping Reference](references/statistics-mapping.md) <br>
-- [Stats Job Validation Reference](references/stats-job-validation.md) <br>
+- [image-statistics.md](references/image-statistics.md) <br>
+- [statistics-mapping.md](references/statistics-mapping.md) <br>
+- [stats-job-validation.md](references/stats-job-validation.md) <br>
 - [NVIDIA FLARE Documentation](https://nvflare.readthedocs.io/en/main) <br>
 - [NVIDIA FLARE Paper](https://arxiv.org/abs/2210.13291) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Analysis, Shell commands] <br>
-**Output Format:** [Python source files (client.py, job.py) and JSON statistics output] <br>
+**Output Type(s):** [Analysis, Code, Shell commands] <br>
+**Output Format:** [JSON statistics output with generated Python files (client.py, job.py)] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Privacy filters applied by default; aggregates only, never raw data] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -45,35 +45,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 17 positive evaluation tasks, each running in an isolated sandbox pod. Tier 3 live agent evaluation. <br>
+17 evaluation tasks (17 positive) executed in isolated k8s-sandbox pods, 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helps complete the user's goal and follows expected workflow. <br>
-- Efficiency: Whether the skill avoids wasted tool or skill usage. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Goal completion (50%) and expected workflow adherence (50%). <br>
+- Efficiency: Tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Codex (Baseline → Skill Uplift) |
-|---|---:|
-| Overall | 54% → 69% (+15 points) |
-| Security | 88% → 47% (-41 points) |
-| Correctness | 64% → 86% (+22 points) |
-| Discoverability | 39% → 68% (+28 points) |
-| Effectiveness | 41% → 71% (+30 points) |
-| Efficiency | 38% → 72% (+34 points) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | Not available | 70.6% |
+| Security | Not available | 76.5% → 47.1% (-29.4 points) |
+| Correctness | Not available | 67.1% → 85.9% (+18.8 points) |
+| Discoverability | Not available | 72.7% |
+| Effectiveness | Not available | 50.5% → 69.8% (+19.3 points) |
+| Efficiency | Not available | 77.7% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

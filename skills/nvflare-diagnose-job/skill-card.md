@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers diagnosing NVFLARE federated learning job failures across simulation, POC, and production environments by collecting bounded evidence and mapping failure patterns to actionable recovery steps. <br>
+Developers and engineers diagnosing NVFLARE federated learning job failures across simulation, POC, and production deployments. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -30,8 +30,8 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Diagnosis report] <br>
-**Output Format:** [Structured Markdown with runtime mode, matched failure pattern, recovery category, evidence summary, and next action] <br>
+**Output Type(s):** [Analysis] <br>
+**Output Format:** [Markdown] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -42,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 10 internal diagnosis tasks (10 positive) in isolated sandbox pods. <br>
+Evaluated against 10 tasks (10 positive) with 3 attempts each in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the diagnosis answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (goal completion and expected workflow adherence). <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage, checking routing quality and productive tool use. <br>
+- Correctness: Whether the final diagnosis answer is correct against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal (50% goal accuracy + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 68% → 82% (+15 points) |
-| Security | Not available | 70% → 85% (+15 points) |
-| Correctness | Not available | 94% → 96% (+2 points) |
-| Discoverability | Not available | 41% → 69% (+28 points) |
-| Effectiveness | Not available | 95% → 90% (-6 points) |
-| Efficiency | Not available | 38% → 73% (+35 points) |
+| Overall | Not available | 83.5% |
+| Security | Not available | 75.0% → 85.0% (+10.0 points) |
+| Correctness | Not available | 66.7% → 94.0% (+27.3 points) |
+| Discoverability | Not available | 66.0% |
+| Effectiveness | Not available | 79.7% → 89.3% (+9.6 points) |
+| Efficiency | Not available | 83.0% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

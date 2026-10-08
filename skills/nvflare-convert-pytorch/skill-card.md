@@ -1,5 +1,5 @@
 ## Description: <br>
-Convert existing plain or manual PyTorch training code into an NVFLARE federated job using Client API model exchange, local validation, and job export. <br>
+Convert existing plain or manual PyTorch training code into an NVFLARE federated job using Client API model exchange, local validation, and job export; use when the user names plain PyTorch or preliminary source inspection identifies one plain-PyTorch owner, and not for Lightning, other frameworks, deployment, POC/production lifecycle, or experiment workflows. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers converting plain PyTorch training scripts into NVFLARE federated learning jobs with horizontal FL, Client API model exchange, validation, and export. <br>
+Developers and ML engineers converting existing plain PyTorch training scripts into NVFLARE federated learning jobs with Client API model exchange, local validation, and job export. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,14 +25,14 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [PyTorch Client API Conversion](references/pytorch-client-api-conversion.md) <br>
-- [Recipe Selection](references/recipe-selection.md) <br>
-- [Job Validation](references/job-validation.md) <br>
+- [pytorch-client-api-conversion.md](references/pytorch-client-api-conversion.md) <br>
+- [recipe-selection.md](references/recipe-selection.md) <br>
+- [job-validation.md](references/job-validation.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline Python and bash code blocks] <br>
+**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
+**Output Format:** [Python files with inline shell commands for validation] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -43,35 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-17 evaluation tasks (17 positive), each in an isolated sandbox pod. <br>
+17 evaluation tasks (17 positive), each in an isolated sandbox pod. Evaluator version: 1.5.6. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the conversion answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed the expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage during the conversion. <br>
+- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Final-answer correctness against the reference answer. <br>
+- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 54% → 68% (+14 points) |
-| Security | Not available | 62% → 35% (-26 points) |
-| Correctness | Not available | 81% → 92% (+11 points) |
-| Discoverability | Not available | 29% → 68% (+39 points) |
-| Effectiveness | Not available | 64% → 70% (+6 points) |
-| Efficiency | Not available | 33% → 76% (+43 points) |
+| Overall | 77.5% | 64.6% |
+| Security | 58.8% → 47.1% (-11.7 points) | 29.4% → 23.5% (-5.9 points) |
+| Correctness | 91.8% → 95.3% (+3.5 points) | 81.2% → 90.6% (+9.4 points) |
+| Discoverability | 89.9% | 71.5% |
+| Effectiveness | 75.3% → 82.3% (+7.0 points) | 70.6% → 66.5% (-4.1 points) |
+| Efficiency | 73.2% | 71.0% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>
