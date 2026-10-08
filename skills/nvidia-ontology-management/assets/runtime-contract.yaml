@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES.
+# All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+schema_version: 1
+skill: nvidia-ontology-management
+role: specialist
+workflows:
+  inspect:
+    input: OntologyInspectionRequest
+    output: SemanticInspectionReceipt
+  model:
+    input: OntologyModelingRequest
+    output: SemanticModelSpec
+  manage:
+    input: ReviewedOntologyChange
+    output: OntologyChangeReceipt
+  publish:
+    input: ReviewedPublicationRequest
+    output: PublicationReceipt
+input_artifacts:
+  - QuestionSpec
+  - PhysicalSchemaCatalog
+  - SourceEvidence
+  - CurrentModelExport
+  - PermissionReceipt
+  - ExternalResultReceipt
+output_artifacts:
+  - SemanticInspectionReceipt
+  - SemanticModelSpec
+  - ModelGapReport
+  - OntologyChangeReceipt
+  - ExactReadbackReceipt
+  - PublicationReceipt
+  - RollbackReceipt
+required_fields:
+  SemanticModelSpec:
+    - model_identity
+    - source_bindings
+    - concept_identities
+    - relationship_contracts
+    - measure_contracts
+    - validation_cases
+    - unresolved_gaps
+  OntologyChangeReceipt:
+    - requested_scope
+    - caller_permission
+    - before_artifact_hash
+    - proposed_change_hash
+    - persisted_diff
+    - status
+  PublicationReceipt:
+    - publication_mode
+    - writer_class
+    - destination_identity
+    - source_and_model_identity
+    - payload_or_artifact_hash
+    - exact_readback
+    - rollback_target
+    - status
+statuses:
+  - proposed
+  - validated
+  - published
+  - receipt_only
+  - blocked
+  - quarantined
+  - rolled_back
+gates:
+  - every concept has grounded identity and source binding
+  - relationships have direction cardinality and join evidence
+  - measures declare expression unit grain additivity denominator and population
+  - writes use the caller's approved interface and permission
+  - model imports pass exact scoped re-export comparison
+  - publication preserves evidence class validity and supersession
+  - failed promotion leaves prior accepted state active where rollback is supported
+fail_closed_when:
+  - required identity or source binding is missing
+  - requested operation is absent from the installed public API
+  - exact readback differs from the reviewed change
+  - no approved writer exists for durable result rows
+handoffs:
+  - nvidia-ontology-setup for deployment connection ingestion or readiness gaps
+  - nvidia-ontology-query for positive and negative query readback

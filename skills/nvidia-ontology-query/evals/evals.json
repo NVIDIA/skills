@@ -1,0 +1,161 @@
+{
+  "skill_name": "nvidia-ontology-query",
+  "evals": [
+    {
+      "id": "query-eval-001-mcp-first",
+      "prompt": "How should my coding agent ask Auto Ontology how many open orders we have?",
+      "expected_output": "If MCP is connected, use the handshake tools in order: check_readiness, search_terms, check_answerable, ask_question. Do not jump straight to ask_question. Do not copy a frozen tool table if the handshake list differs.",
+      "assertions": [
+        "Prefers MCP when available",
+        "Sequences check_readiness before ask_question",
+        "Does not dump the full OpenAPI surface"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-002-no-fastapi-public",
+      "prompt": "I'll POST questions to http://localhost:3001/api/chat/completions with a conversation_id from our partner app.",
+      "expected_output": "Do not expose or call FastAPI :3001 from a partner app. Public clients use the Next.js gateway on the web origin (:3000). FastAPI trusts x-auto-ontology-user-id and does not independently verify it. conversation_id on a direct FastAPI call requires that internal header.",
+      "assertions": [
+        "Directs the caller to the Next.js gateway, not FastAPI :3001",
+        "Explains that FastAPI is a trusted internal boundary",
+        "Does not endorse public :3001 access"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-003-conversation-409",
+      "prompt": "As an authenticated user with chat:use and conversation:write, I send two overlapping POSTs to /api/chat/completions with the same conversation_id. What happens?",
+      "expected_output": "The second request returns 409 Conversation in progress. Wait for [DONE] on the SSE stream before sending the next turn. conversation_id is scoped to the authenticated Auto Ontology user.",
+      "assertions": [
+        "Names 409 Conversation in progress",
+        "Requires waiting for [DONE] before the next turn",
+        "Does not recommend parallel turns on one conversation_id"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-004-sso-vs-api-token",
+      "prompt": "AI-Q already has the user's NVIDIA SSO JWT. Should it also mint an Auto Ontology API token to call chat?",
+      "expected_output": "No extra Auto Ontology token is required. Auto Ontology accepts the SSO id token as Authorization: Bearer, verifies issuer/signature/expiry, and does not check audience (aud is AI-Q's client id). The token must map to an existing Auto Ontology user (email, then SSO subject). An Auto Ontology API token is for scripts that cannot present SSO.",
+      "assertions": [
+        "Uses the SSO bearer as the AI-Q credential",
+        "Does not require minting an Auto Ontology API token for AI-Q",
+        "Notes audience is not checked and an Auto Ontology user must already exist"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-005-no-raw-schema-tools",
+      "prompt": "Which MCP tool lists every schema and column in the warehouse so I can write SQL myself?",
+      "expected_output": "There is none, on purpose. Consumers reach data through the semantic layer. describe_table is the table view (terms and SQL attributes). Use search_terms / ask_question rather than information_schema.",
+      "assertions": [
+        "States there is no MCP catalog-browser for raw schemas",
+        "Points at describe_table / search_terms / ask_question",
+        "Does not recommend listing information_schema via Auto Ontology MCP"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-006-cuopt-not-in-repo",
+      "prompt": "Wire Auto Ontology to cuOpt so chat answers become a vehicle routing job.",
+      "expected_output": "This repository has no cuOpt bridge. Auto Ontology returns answers, SQL, and rows; a partner agent may feed numbers into cuOpt using cuopt-* skills. Do not claim Auto Ontology solves routing or LPs.",
+      "assertions": [
+        "States there is no in-repo cuOpt integration",
+        "Allows a partner-wired hop from Auto Ontology rows to cuOpt",
+        "Does not invent an Auto Ontology routing API"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-007-readiness-before-retry",
+      "prompt": "ask_question came back with an empty answer, no SQL, and no error. I'll rephrase the question.",
+      "expected_output": "Call check_readiness first. Empty answers are often a missing connection or uncompiled layer, not a phrasing problem. Rephrase only after readiness is clean, then search_terms.",
+      "assertions": [
+        "Calls check_readiness (or compilation status) before rephrasing",
+        "Does not immediately retry a rephrased ask_question as the first step"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-008-quantity-not-ratio",
+      "prompt": "The question asks for unmet weekly demand in units. Generated SQL returns (1 - service_level) under the alias unmet_weekly_demand. Use that answer.",
+      "expected_output": "Reject the result as a material measure and unit substitution. One minus service level is a dimensionless share, not a quantity in units. Resolve the approved unmet-demand measure and source expression, regenerate or report the gap, and do not repair the error by relabeling the ratio.",
+      "assertions": [
+        "Rejects the ratio-for-quantity substitution",
+        "Checks the approved measure expression and unit",
+        "Does not present the aliased ratio as demand units"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-009-run-metric-fanout",
+      "prompt": "Use the nvidia-ontology-query skill to audit this query result before summarizing it. A query joins one row per run to 19 selected-job rows and reports SUM(risk_mwh). The source value is 7738.2 MWh and the result is 147025.8 MWh.",
+      "expected_output": "Do not summarize the multiplied value. The one-to-many join fanned out an already run-grain metric by 19. Require direct run-grain projection or isolation of the unique run row and preserve 7738.2 MWh.",
+      "assertions": [
+        "Loads nvidia-ontology-query before auditing the result",
+        "Identifies one-to-many metric fanout",
+        "Rejects 147025.8 MWh as the run total",
+        "Requires a run-grain query before answering"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-010-scenario-lineage",
+      "prompt": "I asked for children of primary_material_shortage. The rows also include selective_prebuild_intervention whose parent is base. SQL executed successfully.",
+      "expected_output": "Execution success is insufficient. Reject the extra base-child row because the SQL omitted or substituted the requested parent/scenario predicate. Require explicit parent lineage, scenario, status, validity, and supersession filters before answering.",
+      "assertions": [
+        "Rejects the wrong-parent population",
+        "Checks explicit lineage and validity predicates",
+        "Does not trim the extra row only in prose"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-011-prose-versus-rows",
+      "prompt": "The SQL rows contain the requested values, but the answer only says that the query would compare the two runs. Is that a complete answer?",
+      "expected_output": "No. Validate the rows, then state the returned findings with values, units, scope, and status. Keep SQL/result correctness separate from answer-prose correctness; a query description is not a decision-ready answer.",
+      "assertions": [
+        "Treats rows and answer prose as separate checks",
+        "Requires the prose to state actual findings",
+        "Preserves values, units, scope, and status"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-012-source-role",
+      "prompt": "The question requests forecast_runs.planning_artifact_sha256, but SQL selected a snapshot artifact-index hash with the same shape. Return it as the planning artifact.",
+      "expected_output": "Reject the substitution. Similar-looking hashes have different source roles. Require the requested table and column or report that the planning artifact is unavailable; do not relabel the snapshot index hash.",
+      "assertions": [
+        "Checks the requested source role and column",
+        "Rejects the snapshot hash substitution",
+        "Does not repair provenance by changing the label"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-013-truncated-result",
+      "prompt": "ask_question returned 100 rows with row_count 340 and truncated true. List all 340 customers in rank order from this response.",
+      "expected_output": "The response cannot prove the complete list or ranking because 240 rows were withheld. Do not extrapolate or label the first 100 as complete. Narrow the request or obtain a bounded aggregate or complete authorized result before making the claim.",
+      "assertions": [
+        "Treats truncated true as incomplete evidence",
+        "Does not claim a complete 340-row ranking",
+        "Narrows the request or asks for a complete supported result"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    }
+  ]
+}

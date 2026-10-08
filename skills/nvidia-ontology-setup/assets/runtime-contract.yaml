@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES.
+# All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+schema_version: 1
+skill: nvidia-ontology-setup
+role: specialist
+workflows:
+  plan_setup:
+    input: DeploymentRequest
+    output: DeploymentPlan
+  install_or_connect:
+    input: ApprovedDeploymentPlan
+    output: ConnectionReceipt
+  ingest_and_compile:
+    input: SourceConnectionReceipt
+    output: ReadinessReceipt
+input_artifacts:
+  - DeploymentRequest
+  - EnvironmentInventory
+  - SourceConnectionSpec
+  - CredentialAvailabilityReceipt
+output_artifacts:
+  - DeploymentPlan
+  - InstallReceipt
+  - ConnectionReceipt
+  - IngestionReceipt
+  - CompilationReceipt
+  - ReadinessReceipt
+  - SetupGapReport
+required_fields:
+  DeploymentPlan:
+    - target_mode
+    - repository_revision
+    - required_credentials
+    - source_connection_mode
+    - host_port_plan
+    - destructive_actions
+  ConnectionReceipt:
+    - public_web_origin
+    - source_identity
+    - authentication_mode
+    - connection_test_status
+    - secret_storage_status
+  ReadinessReceipt:
+    - deployment_status
+    - source_connection_status
+    - ingestion_status
+    - compilation_status
+    - mcp_oauth_discovery_status
+    - checked_at
+    - status
+statuses:
+  - proposed
+  - installed
+  - connected
+  - ready
+  - incomplete
+  - blocked
+gates:
+  - target mode and destructive actions are approved before commands run
+  - the published Helm chart is the default install; setup_env.sh is for developer workflows only
+  - the public web origin is used for REST and MCP discovery
+  - source connection succeeds before ingestion is treated as complete
+  - ingest and query use the same embedding endpoint and model
+  - compilation and live source readiness pass before query handoff
+fail_closed_when:
+  - required model credentials are absent
+  - authentication secrets would be printed or committed
+  - partial Vault configuration is being treated as protected storage
+  - connection ingestion or compilation evidence is missing
+handoffs:
+  - nvidia-ontology-management for inspection modeling mutation or publication
+  - nvidia-ontology-query after deployment source and compilation readiness pass

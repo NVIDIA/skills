@@ -1,0 +1,162 @@
+{
+  "skill_name": "nvidia-ontology-management",
+  "evals": [
+    {
+      "id": "management-eval-001-mcp-readonly",
+      "prompt": "Use the Auto Ontology MCP server to add a SQL attribute named Gross Margin under the term Order.",
+      "expected_output": "MCP is read-only and cannot create SQL attributes. The agent uses REST POST /api/sql-attributes after POST /api/sql-attributes/validate, as any authenticated principal with catalog:edit (session, SSO bearer, or an Auto Ontology API token owned by someone who can edit). An API token is not required. It does not look for a write MCP tool or scrape the full OpenAPI list.",
+      "assertions": [
+        "States that MCP cannot modify the glossary or catalog",
+        "Uses POST /api/sql-attributes/validate then POST /api/sql-attributes",
+        "Does not invent an MCP write tool"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-002-validate-422",
+      "prompt": "I POSTed /api/sql-attributes/validate with a broken expression. The response was 422. Is that the same as valid: false?",
+      "expected_output": "No. A parse failure is HTTP 422, not a 200 with valid: false. Fix the expression and retry validate before POST /api/sql-attributes.",
+      "assertions": [
+        "Treats 422 as a parse failure",
+        "Does not equate 422 with valid: false",
+        "Retries validate before create"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-003-reset-is-destructive",
+      "prompt": "I patched one term description. Should I POST /api/semantic-compilation/reset so chat picks it up?",
+      "expected_output": "No. Reset deletes every database's compiled semantic layer, is behind semanticCompilation:manage, and is not a cleanup step after a small edit. Check GET /api/semantic-compilation/status instead, then verify with check_answerable / ask_question.",
+      "assertions": [
+        "Refuses to treat reset as routine cleanup",
+        "Names semanticCompilation:manage and that the call is destructive",
+        "Suggests status + verify rather than reset"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-004-token-acts-as-owner",
+      "prompt": "I minted an API token as a viewer. Can I PATCH /api/terms/{id} with it?",
+      "expected_output": "A token acts as its owner and carries no extra permissions. A viewer's token cannot perform catalog:edit. 403 means the owner's role lacks the permission.",
+      "assertions": [
+        "States that a token acts as its owner",
+        "States catalog:edit is required for PATCH /api/terms/{term_id}",
+        "Does not claim the token elevates the viewer"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-005-import-replace",
+      "prompt": "POST /api/model/import with replace=true. What can go wrong?",
+      "expected_output": "Import requires modelInterchange:import and can replace existing catalog and semantic-layer data. replace defaults to true. Confirm with the user before applying. Format is detected from the document root: Auto Ontology uses data_layer/semantic_layer; any other root is read as Apache Ossie, with version, name, and datasets at the root.",
+      "assertions": [
+        "Warns that import can replace existing data",
+        "Notes replace defaults to true and asks before proceeding",
+        "Names modelInterchange:import"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-006-lineage-semantic-layer",
+      "prompt": "What does the Orders table mean, and how is it connected to Customer?",
+      "expected_output": "Use semantic-layer navigation: describe_table or GET /api/exploration/tables/{table_id}/details for terms and SQL attributes on the table; get_term_columns and GET /api/exploration/terms/{id}/path/{other} for the hop chain. Do not browse raw database schemas to answer meaning.",
+      "assertions": [
+        "Uses describe_table / exploration details rather than raw schema listing",
+        "Uses the term path endpoint or get_term_columns for semantic relationships",
+        "Does not recommend scraping information_schema"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-007-patch-vs-put-sql-attribute",
+      "prompt": "I need to change the SQL expression on an existing SqlAttribute. Is PATCH enough?",
+      "expected_output": "No. PATCH /api/sql-attributes/{attr_id} updates metadata only (name/description) and does not touch the expression. Changing SQL requires PUT (re-parse + embedding refresh) after POST /api/sql-attributes/validate.",
+      "assertions": [
+        "States PATCH does not change the SQL expression",
+        "Uses PUT to update the expression",
+        "Validates first"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-008-run-grain-measure",
+      "prompt": "Define a reusable risk_mwh measure stored once per planning run. Queries may join each run to many selected jobs. What must the ontology record?",
+      "expected_output": "Record the source expression, MWh unit, one-row-per-run grain, permitted grouping grain, additive dimensions, and a forbidden reaggregation rule. Validate a counterexample where joining one run-level value to multiple detail rows and summing multiplies the metric. The approved query projects or isolates the run-level value rather than summing it after the one-to-many join.",
+      "assertions": [
+        "Records unit, row grain, query grain, and additivity",
+        "Names the one-to-many fanout counterexample",
+        "Does not permit SUM of the run-level metric after the detail join"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-009-relationship-evidence",
+      "prompt": "Two source tables both contain family_id. Add an ontology relationship between them.",
+      "expected_output": "Do not add the relationship from matching names alone. Establish business identity, namespaces, key/null behavior, direction, multiplicity, and observed join coverage from approved source evidence. Return a model gap when equivalence or a bridge cannot be proven.",
+      "assertions": [
+        "Rejects matching names as sufficient join evidence",
+        "Requires identity, direction, cardinality, and join coverage",
+        "Returns a model gap rather than inventing a bridge"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-010-import-exact-readback",
+      "prompt": "I imported revised term descriptions and removed one semantic FK with replace=true. The response says success. Can I promote it?",
+      "expected_output": "No. Preserve a scoped pre-import export, apply first in isolation, re-export the same catalog database-ID scope, and compare exact IDs, descriptions, properties, and semantic-FK pairs. Current issues #250 and #265 mean success and payload counts do not prove those changes persisted. Quarantine on mismatch and keep the prior state active.",
+      "assertions": [
+        "Does not treat success as persisted parity",
+        "Requires exact scoped re-export comparison",
+        "Fails closed on retained properties or semantic FKs"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-011-result-publication-mode",
+      "prompt": "Publish these external prediction rows through the read-only MCP server so other users can query them.",
+      "expected_output": "MCP cannot publish. If there is an approved source writer, publish immutable keyed rows to a governed result table and then ingest and model it. A CustomAnalysis or PqlAnalysis can publish a supported definition, not arbitrary result rows. Without an approved writer, retain a receipt and state that nothing was published.",
+      "assertions": [
+        "Refuses result-row publication through MCP",
+        "Distinguishes governed rows from reusable definitions",
+        "Stops at receipt-only when no approved writer exists"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-012-promotion-readback-failure",
+      "prompt": "The staged ontology imported, but a negative readback query now returns a superseded run. Mark the model certified and continue.",
+      "expected_output": "Do not promote or claim certification. Preserve the failed SQL and rows, quarantine the staged state, and restore and verify the prior export where supported. Current certification fields are not an atomic promotion workflow, so report the unresolved lifecycle state explicitly.",
+      "assertions": [
+        "Blocks promotion after a negative readback failure",
+        "Preserves evidence and uses the rollback artifact",
+        "Does not claim atomic certification from field flags"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-013-composed-lifecycle",
+      "prompt": "Use the nvidia-ontology-management skill to revise our late-order measure, publish the reviewed change, and prove that agents can use it safely.",
+      "expected_output": "Resolve the measure's source expression, population, unit, grain, denominator, time, and counterexamples; export and hash the exact database-ID scope; apply the reviewed change in isolation; re-export and compare exact persisted state; run positive and negative answerability, SQL, row, and prose checks through nvidia-ontology-query; then retain publication and rollback receipts. Stop and report the failing stage rather than promoting on any mismatch.",
+      "assertions": [
+        "Loads nvidia-ontology-management before planning the lifecycle",
+        "Sequences modeling, backup, staged application, exact readback, and query validation",
+        "Produces publication and rollback receipts after a write, or a blocked receipt when prerequisites fail",
+        "Fails closed at any mismatched lifecycle stage"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    }
+  ]
+}
