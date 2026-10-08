@@ -4,9 +4,9 @@
     {
       "name": "accelerated-computing-cudf",
       "path": "skills/accelerated-computing-cudf",
-      "content_digest": "sha256:df67c51363357414ba634b62489f5a88c36d95d14d6e74fa82f1ad8a6b540ad7",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:cdaa92e74ff6424acbabb2a2ced68160a5434320ea2f90859ce6b272dce45eff",
+      "last_commit": "de8fe184e89e6f84e525d8b347b7c4298d255e11",
+      "last_modified": "2026-10-08"
     },
     {
       "name": "ambient-healthcare-agent-with-nemotron-voice-agent",
