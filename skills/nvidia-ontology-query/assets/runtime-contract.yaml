@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES.
+# All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+schema_version: 1
+skill: nvidia-ontology-query
+role: specialist
+workflows:
+  inspect_readiness:
+    input: ReadinessRequest
+    output: ReadinessReceipt
+  resolve_question:
+    input: QuestionSpec
+    output: GroundedQuestion
+  ask_and_validate:
+    input: GroundedQuestion
+    output: ValidatedAnswer
+input_artifacts:
+  - QuestionSpec
+  - ConversationContext
+  - ReadinessReceipt
+  - AnswerabilityReceipt
+  - SemanticDefinitionEvidence
+output_artifacts:
+  - GroundedQuestion
+  - QueryExecutionReceipt
+  - QueryGapReport
+  - ValidatedAnswer
+required_fields:
+  GroundedQuestion:
+    - question_identity
+    - population
+    - measure_and_unit
+    - result_grain
+    - grouping_and_time
+    - required_lineage_and_status
+    - required_source_roles
+  QueryExecutionReceipt:
+    - question_identity
+    - source_and_ontology_identity
+    - sql
+    - rows
+    - row_count
+    - truncated
+    - attempts
+    - validation_gaps
+  ValidatedAnswer:
+    - findings
+    - values_and_units
+    - population_and_time_scope
+    - evidence_state
+    - query_receipt_identity
+    - status
+statuses:
+  - validated
+  - incomplete
+  - ambiguous
+  - blocked
+gates:
+  - deployment and live source are ready or the request stops
+  - exact question is answerable or semantic gaps are explicit
+  - SQL preserves every material question constraint
+  - rows match population grain unit time lineage status and source role
+  - truncation does not support complete-list ranking or total claims
+  - answer prose states findings and agrees with validated rows
+fail_closed_when:
+  - a material measure population lineage or source role is substituted
+  - one-to-many fanout multiplies an already aggregate-grain measure
+  - empty or null output is being treated as zero without definition
+  - a result is incomplete or invalid but the requested claim requires completeness
+handoffs:
+  - nvidia-ontology-management for missing definitions model corrections or publication
+  - nvidia-ontology-setup for deployment connection or compilation gaps
