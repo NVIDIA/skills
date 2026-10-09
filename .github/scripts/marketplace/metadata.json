@@ -85,6 +85,54 @@
       }
     },
     {
+      "path": "skills/bionemo-codonfm-embed",
+      "name": "codonfm-embed",
+      "description": "Validate coding-sequence CSVs, extract public CodonFM/Encodon embeddings, and choose checkpoints for downstream property modeling.",
+      "metadata": {
+        "product.primary": "BioNeMo Open Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,genomics_researcher,ml_engineer,data_scientist",
+        "discovery.activity_tags": "validate,extract,select,inference"
+      }
+    },
+    {
+      "path": "skills/bionemo-codonfm-finetune",
+      "name": "codonfm-finetune",
+      "description": "Fine-tune public CodonFM Encodon checkpoints on labeled coding-sequence or coding-variant data using LoRA, head-only, or full fine-tuning. Use when a user explicitly asks to fine-tune CodonFM or Encodon for regression or classification. Support generic public-v1 Encodon workflows only; reject Decodon, MissenseDataset, missense_synom_agg, and generation workflows.",
+      "metadata": {
+        "product.primary": "BioNeMo Open Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "computational_biologist,bioinformatician,genomics_researcher,ml_engineer,research_academic",
+        "discovery.activity_tags": "fine_tune,train,classify,configure,evaluate"
+      }
+    },
+    {
+      "path": "skills/bionemo-codonfm-score",
+      "name": "codonfm-score",
+      "description": "Validate, prepare, or run public CodonFM Encodon masked-codon variant scoring and review compatibility of its scoring workflows. Use only when the user explicitly requests CodonFM or Encodon, or that context is already established in the conversation. Do not select this skill for a generic variant-scoring request without that context; ask for the variant and intended analysis first.",
+      "metadata": {
+        "product.primary": "BioNeMo Open Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,genomics_researcher,ml_engineer",
+        "discovery.activity_tags": "validate,inference,evaluate,configure"
+      }
+    },
+    {
+      "path": "skills/bionemo-codonfm-setup",
+      "name": "codonfm-setup",
+      "description": "Set up the public CodonFM v1 repository and download public Encodon checkpoints. Use for requests to build or launch the CodonFM development container, configure local data/checkpoint mounts, verify GPU access, or download public Encodon 80M, 600M, 1B, or Cdwt-1B weights. Do not use for Decodon, Encodon 5B/10B, missense-aggregation, or codon-optimization setup because those implementations are not in the public repository.",
+      "metadata": {
+        "product.primary": "BioNeMo Open Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "computational_biologist,bioinformatician,genomics_researcher,ml_engineer,developer",
+        "discovery.activity_tags": "get_started,configure,validate,deploy,integrate"
+      }
+    },
+    {
       "path": "skills/bionemo-diffdock-nim",
       "name": "diffdock-nim",
       "description": "Run DiffDock molecular docking via NVIDIA NIM to predict small-molecule binding poses against protein targets. Use for DiffDock, molecular docking, ligand docking, blind docking, SMILES or SDF ligands, ranked poses, confidence scores, hosted NVIDIA API, or local Docker deployment.\n",

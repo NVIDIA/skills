@@ -239,6 +239,7 @@
       "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
       "skills": [
         "accelerated-computing-cudf",
+        "codonfm-setup",
         "nvflare-fed-stats",
         "nvidia-ontology-management",
         "tao-mine-nearest-neighbors"
@@ -248,6 +249,7 @@
       "title": "Training AI",
       "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
       "skills": [
+        "codonfm-finetune",
         "dali-dynamic-mode",
         "data-designer",
         "kermt-add-cmim-pretrain",
@@ -327,6 +329,8 @@
       "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration.",
       "skills": [
         "boltz2-nim",
+        "codonfm-embed",
+        "codonfm-score",
         "diffdock-nim",
         "drug-discovery-pipeline",
         "dynamo-interconnect-check",
