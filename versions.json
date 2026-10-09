@@ -51,6 +51,34 @@
       "last_modified": "2026-10-02"
     },
     {
+      "name": "bionemo-codonfm-embed",
+      "path": "skills/bionemo-codonfm-embed",
+      "content_digest": "sha256:2301dee54caee5554bb80f31a49e562c0a45e0ba13f25b1d9497e16e92c6a4fd",
+      "last_commit": "329cfc63d21bcd6294fa2c4d6ed8b73bbab98df7",
+      "last_modified": "2026-10-09"
+    },
+    {
+      "name": "bionemo-codonfm-finetune",
+      "path": "skills/bionemo-codonfm-finetune",
+      "content_digest": "sha256:03a97b819d57c2fac91be9bc34be7663dcdb551b189400f265ca5c9c31c724fe",
+      "last_commit": "329cfc63d21bcd6294fa2c4d6ed8b73bbab98df7",
+      "last_modified": "2026-10-09"
+    },
+    {
+      "name": "bionemo-codonfm-score",
+      "path": "skills/bionemo-codonfm-score",
+      "content_digest": "sha256:6eb8fe5aaa521fe47a9c16dc9af70a3c988a293f55e3e3c8a7df42cec076a132",
+      "last_commit": "329cfc63d21bcd6294fa2c4d6ed8b73bbab98df7",
+      "last_modified": "2026-10-09"
+    },
+    {
+      "name": "bionemo-codonfm-setup",
+      "path": "skills/bionemo-codonfm-setup",
+      "content_digest": "sha256:05122800c36e1b900278488b0eb3e37a2fb5677e2fd2034730c011dd7b1a12d1",
+      "last_commit": "329cfc63d21bcd6294fa2c4d6ed8b73bbab98df7",
+      "last_modified": "2026-10-09"
+    },
+    {
       "name": "bionemo-diffdock-nim",
       "path": "skills/bionemo-diffdock-nim",
       "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",
@@ -1439,16 +1467,16 @@
     {
       "name": "nemo-fabric-build-adapter",
       "path": "skills/nemo-fabric-build-adapter",
-      "content_digest": "sha256:860482c2ef24890c89be004ca7017a73a4a0d111f110c0f5c71731e91fdd9e1e",
-      "last_commit": "353cfd90352f66e8d1bb4bb4844a717667d19c26",
-      "last_modified": "2026-09-02"
+      "content_digest": "sha256:3d97095821a7ad57da73a9ca63bc2739b5441a4b16da01a7a3d6c6406524a68b",
+      "last_commit": "329cfc63d21bcd6294fa2c4d6ed8b73bbab98df7",
+      "last_modified": "2026-10-09"
     },
     {
       "name": "nemo-fabric-integrate",
       "path": "skills/nemo-fabric-integrate",
-      "content_digest": "sha256:69f1546d965340eb35e1df5f018100d911a383688f5253d1e86797195462e5e8",
-      "last_commit": "353cfd90352f66e8d1bb4bb4844a717667d19c26",
-      "last_modified": "2026-09-02"
+      "content_digest": "sha256:a679ae443bf1c53f55f7c6d774a7c76f3f13449d4af2292a12f425c21360a392",
+      "last_commit": "329cfc63d21bcd6294fa2c4d6ed8b73bbab98df7",
+      "last_modified": "2026-10-09"
     },
     {
       "name": "nemo-mbridge-mlm-bridge-training",

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 401,
-  "result_row_count": 3755,
+  "skill_count": 405,
+  "result_row_count": 3795,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -164,6 +164,86 @@
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": -0.35
+    },
+    {
+      "skill": "codonfm-embed",
+      "evaluation_date": "2026-10-07",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:8ef619d6a9074d8b7fdc6224f220bb79aad6e37e2222f3290580290b7a6afbeb",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "has_results": true,
+      "average_uplift_pct": 8.33
+    },
+    {
+      "skill": "codonfm-finetune",
+      "evaluation_date": "2026-10-07",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:81d6d44379cdd6e73149247223022a3b07d3b00517da29ff30435ddc7aedc045",
+      "validation_status": null,
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "has_results": true,
+      "average_uplift_pct": -1.1
+    },
+    {
+      "skill": "codonfm-score",
+      "evaluation_date": "2026-10-07",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:5473a6b7ef522b019ec4b46023830ce8ac22da3576b0c97bf10acb2ac28e9d79",
+      "validation_status": null,
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "has_results": true,
+      "average_uplift_pct": 7.23
+    },
+    {
+      "skill": "codonfm-setup",
+      "evaluation_date": "2026-10-07",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:da7c67cf041d32b7e9920ac29786e8d039bfe948533853dbb0bbf38c553dc8d9",
+      "validation_status": null,
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "has_results": true,
+      "average_uplift_pct": 15.57
     },
     {
       "skill": "diffdock-nim",
@@ -3925,12 +4005,12 @@
     },
     {
       "skill": "nemo-fabric-build-adapter",
-      "evaluation_date": "2026-09-02",
+      "evaluation_date": "2026-10-08",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
-      "dataset_digest": "sha256:49facda261222af714c5569b39110fce320007210df2f7f14811eedf63b80611",
-      "validation_status": "passed",
-      "tasks": 6,
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:b0644fe48c189bd6fcbf458a022b58e155d5b001adaf4b153c9ea36fd4cae5f7",
+      "validation_status": null,
+      "tasks": 7,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -3941,15 +4021,15 @@
       "catalog_dir": "nemo-fabric-build-adapter",
       "component": "NeMo Fabric",
       "has_results": true,
-      "average_uplift_pct": 27.2
+      "average_uplift_pct": 19.4
     },
     {
       "skill": "nemo-fabric-integrate",
-      "evaluation_date": "2026-09-02",
+      "evaluation_date": "2026-10-08",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.3.2",
+      "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:4e12e11bb429ad195c00ceab9cd53bbf6351f32173f03b0ae827531ba2441a9e",
-      "validation_status": "passed",
+      "validation_status": null,
       "tasks": 6,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
@@ -3961,7 +4041,7 @@
       "catalog_dir": "nemo-fabric-integrate",
       "component": "NeMo Fabric",
       "has_results": true,
-      "average_uplift_pct": 27.1
+      "average_uplift_pct": 21.85
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -8458,6 +8538,366 @@
       "num": null,
       "agent": "codex",
       "score_pct": 72.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.6,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.8,
+      "uplift_pct": -5.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-embed",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.7,
+      "uplift_pct": -33.3
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.7,
+      "uplift_pct": 33.4
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": -6.7
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-finetune",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.7,
+      "uplift_pct": 33.4
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": 3.3
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.7,
+      "uplift_pct": 6.7
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-score",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": -12.5
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.7,
+      "uplift_pct": 5.9
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-codonfm-setup",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.0,
       "uplift_pct": null
     },
     {
@@ -24846,8 +25286,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": -33.0
+      "score_pct": 85.7,
+      "uplift_pct": 28.6
     },
     {
       "catalog_dir": "nemo-fabric-build-adapter",
@@ -24855,8 +25295,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 57.0
+      "score_pct": 82.9,
+      "uplift_pct": 11.5
     },
     {
       "catalog_dir": "nemo-fabric-build-adapter",
@@ -24864,8 +25304,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 28.0
+      "score_pct": 82.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-fabric-build-adapter",
@@ -24873,8 +25313,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 54.0
+      "score_pct": 70.2,
+      "uplift_pct": 18.1
     },
     {
       "catalog_dir": "nemo-fabric-build-adapter",
@@ -24882,8 +25322,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 30.0
+      "score_pct": 70.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24891,8 +25331,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 67.0,
-      "uplift_pct": -33.0
+      "score_pct": 83.3,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24900,8 +25340,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 58.0,
-      "uplift_pct": -25.0
+      "score_pct": 58.3,
+      "uplift_pct": -8.4
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24909,8 +25349,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.0,
-      "uplift_pct": 77.0
+      "score_pct": 93.3,
+      "uplift_pct": 46.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24918,8 +25358,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 53.0
+      "score_pct": 80.0,
+      "uplift_pct": 43.3
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24927,8 +25367,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 27.0
+      "score_pct": 85.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24936,8 +25376,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 27.0
+      "score_pct": 77.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24945,8 +25385,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 70.0,
-      "uplift_pct": 48.0
+      "score_pct": 60.1,
+      "uplift_pct": 25.4
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24954,8 +25394,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 73.0,
-      "uplift_pct": 40.0
+      "score_pct": 61.3,
+      "uplift_pct": 24.2
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24963,8 +25403,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 78.0,
-      "uplift_pct": 21.0
+      "score_pct": 63.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -24972,8 +25412,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 36.0
+      "score_pct": 85.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
