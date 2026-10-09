@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: NVSHMEM
+repo: NVIDIA/nvshmem
+ref: devel
+description: >-
+  Install, build, run, tune, and debug the NVSHMEM library and applications.
+links:
+  contributing: CONTRIBUTING.md
+  security: false
+skills:
+  - path: skills/nvshmem-install/
+    catalog_dir: nvshmem-install
+  - path: skills/nvshmem-get-started/
+    catalog_dir: nvshmem-get-started
+  - path: skills/nvshmem-docs/
+    catalog_dir: nvshmem-docs
+  - path: skills/nvshmem-troubleshoot-and-report-bugs/
+    catalog_dir: nvshmem-troubleshoot-and-report-bugs
+  - path: skills/nvshmem-tune-performance/
+    catalog_dir: nvshmem-tune-performance
+  - path: skills/nvshmem-enable-tma/
+    catalog_dir: nvshmem-enable-tma
+  - path: skills/nvshmem-configure-nic-pe-mapping/
+    catalog_dir: nvshmem-configure-nic-pe-mapping
+  - path: skills/nvshmem-select-remote-transport/
+    catalog_dir: nvshmem-select-remote-transport
+  - path: skills/nvshmem-collect-performance-data/
+    catalog_dir: nvshmem-collect-performance-data
