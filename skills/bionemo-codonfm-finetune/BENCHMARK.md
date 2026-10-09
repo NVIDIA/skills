@@ -1,4 +1,4 @@
-# Skill Benchmark: nemo-fabric-integrate
+# Skill Benchmark: codonfm-finetune
 
 > ✅ **Overall verdict: PASS — Recommended for publication**
 
@@ -8,12 +8,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 ## Evaluation Metadata
 
-- Skill: `nemo-fabric-integrate`
-- Evaluation date: 2026-10-08
+- Skill: `codonfm-finetune`
+- Evaluation date: 2026-10-07
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
-- Tasks: 6 evaluation tasks (4 positive, 2 negative)
-- Dataset digest: `sha256:4e12e11bb429ad195c00ceab9cd53bbf6351f32173f03b0ae827531ba2441a9e` (skill-evaluator-dataset-snapshot/1)
+- Tasks: 3 evaluation tasks (3 positive)
+- Dataset digest: `sha256:81d6d44379cdd6e73149247223022a3b07d3b00517da29ff30435ddc7aedc045` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
@@ -35,18 +35,16 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 77.1% — baseline ran, but no comparable score was available; uplift unavailable | 72.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 83.3% → 83.3% (±0.0 points) | 66.7% → 58.3% (-8.4 points) |
-| Correctness | 46.7% → 93.3% (+46.6 points) | 36.7% → 80.0% (+43.3 points) |
-| Discoverability | 85.0% — baseline ran, but no comparable score was available; uplift unavailable | 77.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 34.7% → 60.1% (+25.4 points) | 37.1% → 61.3% (+24.2 points) |
-| Efficiency | 63.7% — baseline ran, but no comparable score was available; uplift unavailable | 85.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 85.0% — baseline ran, but no comparable score was available; uplift unavailable | 82.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 66.7% (-33.3 points) | 33.3% → 66.7% (+33.4 points) |
+| Correctness | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 76.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 86.7% → 86.7% (±0.0 points) | 96.7% → 90.0% (-6.7 points) |
+| Efficiency | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 80.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
-
-A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
 ## Token Usage
 
@@ -54,21 +52,15 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 10,600,942 | 14,732,230 | -4,131,288 | -28.04% | skill 6/6; base 6/6 |
-| claude-code | nemo-fabric-integrate-001-python-service | 784,956 | 7,448,869 | -6,663,913 | -89.46% | skill 1/1; base 1/1 |
-| claude-code | nemo-fabric-integrate-002-evaluation-platform | 4,431,805 | 287,995 | +4,143,810 | +1438.85% | skill 1/1; base 1/1 |
-| claude-code | nemo-fabric-integrate-003-adapter-contribution-negative | 452,804 | 278,069 | +174,735 | +62.84% | skill 1/1; base 1/1 |
-| claude-code | nemo-fabric-integrate-004-overview-negative | 68,421 | 30,000 | +38,421 | +128.07% | skill 1/1; base 1/1 |
-| claude-code | nemo-fabric-integrate-005-streaming-boundary | 4,169,583 | 2,561,457 | +1,608,126 | +62.78% | skill 1/1; base 1/1 |
-| claude-code | nemo-fabric-integrate-006-system-instruction-modes | 693,373 | 4,125,840 | -3,432,467 | -83.19% | skill 1/1; base 1/1 |
-| codex | All cases | 5,954,906 | 3,664,192 | +2,290,714 | +62.52% | skill 6/6; base 6/6 |
-| codex | nemo-fabric-integrate-001-python-service | 98,533 | 148,007 | -49,474 | -33.43% | skill 1/1; base 1/1 |
-| codex | nemo-fabric-integrate-002-evaluation-platform | 612,823 | 733,541 | -120,718 | -16.46% | skill 1/1; base 1/1 |
-| codex | nemo-fabric-integrate-003-adapter-contribution-negative | 4,508,195 | 2,551,188 | +1,957,007 | +76.71% | skill 1/1; base 1/1 |
-| codex | nemo-fabric-integrate-004-overview-negative | 18,169 | 17,947 | +222 | +1.24% | skill 1/1; base 1/1 |
-| codex | nemo-fabric-integrate-005-streaming-boundary | 106,206 | 84,751 | +21,455 | +25.32% | skill 1/1; base 1/1 |
-| codex | nemo-fabric-integrate-006-system-instruction-modes | 610,980 | 128,758 | +482,222 | +374.52% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 16,555,848 | 18,396,422 | -1,840,574 | -10.01% | skill 12/12; base 12/12 |
+| claude-code | All cases | 2,259,711 | 5,318,079 | -3,058,368 | -57.51% | skill 3/3; base 3/3 |
+| claude-code | codonfm-finetune-001 | 975,823 | 2,626,474 | -1,650,651 | -62.85% | skill 1/1; base 1/1 |
+| claude-code | codonfm-finetune-002 | 728,893 | 1,887,306 | -1,158,413 | -61.38% | skill 1/1; base 1/1 |
+| claude-code | codonfm-finetune-003 | 554,995 | 804,299 | -249,304 | -31.00% | skill 1/1; base 1/1 |
+| codex | All cases | 1,217,895 | 1,719,144 | -501,249 | -29.16% | skill 3/3; base 3/3 |
+| codex | codonfm-finetune-001 | 536,353 | 1,008,386 | -472,033 | -46.81% | skill 1/1; base 1/1 |
+| codex | codonfm-finetune-002 | 435,825 | 405,824 | +30,001 | +7.39% | skill 1/1; base 1/1 |
+| codex | codonfm-finetune-003 | 245,717 | 304,934 | -59,217 | -19.42% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 3,477,606 | 7,037,223 | -3,559,617 | -50.58% | skill 6/6; base 6/6 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -76,21 +68,21 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 6 task(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
 ## Findings and Observations
 
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/nemo-fabric-integrate/SKILL.md`)
-- **MEDIUM** QUALITY/quality_reliability: MCP skill lacks connection/error guidance (`skills/nemo-fabric-integrate/SKILL.md`)
-- **MEDIUM** QUALITY/quality_efficiency: Large skill (5805 tokens, recommended max <5000). Per agentskills.io, SKILL.md should be concise (~500 lines) — large skill bodies increase token cost after invocation; long or unfocused top-level descriptions can degrade agent routing accuracy (`skills/nemo-fabric-integrate/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemo-fabric-integrate/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemo-fabric-integrate/SKILL.md`)
-- 7 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** QUALITY/quality_correctness: No documented scripts in table format (`skills/codonfm-finetune/SKILL.md`)
+- **MEDIUM** QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/codonfm-finetune/SKILL.md`)
+- **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/codonfm-finetune/SKILL.md`)
+- **MEDIUM** SECURITY/Unknown (LP3): MCP Least Privilege: The skill declares no explicit tool scope (no 'permissions' or 'allowed-tools' field in metadata), yet the skill content (`SKILL.md:1`)
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`SKILL.md:162`)
+- 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

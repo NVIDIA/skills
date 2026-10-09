@@ -16,7 +16,7 @@ Every invocation that reaches the adapter boundary returns a normalized
 | `status` | Terminal invocation status: `succeeded`, `failed`, or `cancelled`. Branch on this. |
 | `error` | Structured failure metadata when available. Branch on `status`, not on this field. |
 | `output` | Harness output normalized to the configured output schema. |
-| `usage` | Optional `RunUsage` with input, output, and total token counts, estimated cost in USD, and provider metadata. |
+| `usage` | Optional `RunUsage` with invocation-local input, cached-input, output, and total token counts, reported cost in USD, and provider metadata. |
 | `artifacts` | Output files, logs, patches, and other materialized references. |
 | `telemetry` | References to NVIDIA NeMo Relay or other telemetry streams from the run. |
 | `events` | Ordered normalized lifecycle and invocation events. |
@@ -37,12 +37,14 @@ Read usage only when the target reports it:
 ```python
 if result.usage is not None:
     record_usage(
-        input_tokens=result.usage.input_tokens,
-        output_tokens=result.usage.output_tokens,
-        total_tokens=result.usage.total_tokens,
-        cost_usd=result.usage.cost_usd,
+        input_tokens=result.usage.get("input_tokens"),
+        output_tokens=result.usage.get("output_tokens"),
+        total_tokens=result.usage.get("total_tokens"),
+        cost_usd=result.usage.get("cost_usd"),
     )
 ```
+
+Treat missing counters and cost as unknown, not zero. `cached_input_tokens` reports cached prompt tokens; `input_tokens_include_cache` declares whether `input_tokens` includes them (`True`), excludes them (`False`), or has unknown semantics (absent). Do not add cache to an inclusive input count. Keep estimated costs separate in provider metadata; `cost_usd` is reported cost, not an estimate.
 
 ## Correlation IDs
 
@@ -69,6 +71,15 @@ Refer to the [errors reference](https://github.com/NVIDIA/NeMo-Fabric/blob/main/
 | `FabricNativeUnavailableError` | Native extension is not installed or importable. |
 
 ## Cleanup And Resilience
+
+Core host-operation deadlines (`host_timeout`) become Python `TimeoutError`, then
+`FabricRuntimeError` with `code="timeout"` and the failed lifecycle stage.
+If invocation succeeds in `Fabric.run()` but stop reaches this deadline,
+it returns a failed `RunResult` with `error.stage == "stop"` and
+`error.code == "timeout"`. Check the returned result as well as raised errors.
+Adapters can report execution deadlines in normalized results with
+`result.error.code == "timeout"`. Other adapter-specific timeout codes are not
+automatically reclassified. Do not classify deadlines from error text.
 
 - Prefer `run(...)` and `async with` runtimes: both attempt cleanup
   automatically. Shutdown is attempted, not guaranteed — `stop()`, including the

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodonFM Fine-tuning"
+  short_description: "Fine-tune public Encodon models on labeled data"
+  default_prompt: "Use $codonfm-finetune to prepare and validate an Encodon fine-tuning run on my labeled data."

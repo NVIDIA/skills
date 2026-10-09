@@ -35,10 +35,18 @@ indexes the public config models. The generated pages omit constructor fields an
 defaults, so read the installed `nemo_fabric` models (they ship `py.typed`) for
 exact field names and defaults.
 
-Claude and Codex validate every model role against their descriptor-owned
-`model_schema`. Provider identifiers outside their native `anthropic` and
-`openai` paths require both `ModelConfig.base_url` and
-`ModelConfig.api_key_env`; undeclared `ModelConfig.settings` also fail planning.
+All bundled adapters except Hermes validate every model role against their
+descriptor-owned `model_schema`. Provider identifiers outside the native Claude
+and Codex `anthropic` and `openai` paths require both `ModelConfig.base_url` and
+`ModelConfig.api_key_env`. Deep Agents keeps dynamic LangChain provider
+selection. Undeclared `ModelConfig.settings` fail planning for each of these
+adapters. `models.<role>.top_p` and `models.<role>.max_tokens` are normalized
+fields. Deep Agents, Hermes, mini-SWE-agent, and Remote Agent declare native
+mappings; other adapters fail planning when either field is configured.
+Legacy adapter descriptors that instead accept either name through
+`extension_schemas.model` receive it in `AgentModelConfig.extensions`. A
+descriptor-advertised normalized mapping takes precedence over this compatibility
+route.
 
 Omit `instructions.system` to preserve the harness's native system instruction.
 When present, `InstructionConfig.mode` defaults to `replace`; set it to
@@ -119,9 +127,10 @@ def with_relay(base: FabricConfig) -> FabricConfig:
 Use this function-and-copy pattern for every variant; keep all variation in
 ordinary Python.
 
-For ATOF, author the NeMo Relay 0.7 schema-v3 file and stream sink model
-directly. Put `RelayAtofFileSinkConfig` and `RelayAtofStreamSinkConfig`
-instances in `RelayAtofConfig.sinks`, and set `RelayAtofConfig.enabled=True`.
+For ATOF, use the current configuration and stream sink format in the
+[Python SDK guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/sdk/python.mdx).
+Put `RelayAtofFileSinkConfig` and `RelayAtofStreamSinkConfig` instances in
+`RelayAtofConfig.sinks`, and set `RelayAtofConfig.enabled=True`.
 
 ## Relative Paths
 
@@ -135,7 +144,11 @@ package or job layout, so nothing depends on the process working directory.
 - Use normalized fields for portable behavior: models, instructions, turn
   limit, runtime, environment, tools, skills, MCP, and telemetry.
 - Supply request context through `RunRequest.context` for each invocation;
-  request context is not part of `FabricConfig`.
+  request context is not part of `FabricConfig`. To group invocations into one
+  NeMo Relay session, set `RunRequest.relay_session_root` to the
+  same UUID string on each. Adapters that own an in-process Relay Agent scope
+  root propagation at it. An unusable value falls back to per-request sessions
+  without an error.
 - Use `harness.settings` for adapter-owned configuration declared by the
   selected descriptor. Each bundled adapter declares a closed settings schema.
   Executable paths, state directories, and Relay command discovery are runtime
