@@ -40,19 +40,19 @@ that stay hidden behind this boundary.
 The consumer or its execution environment owns installation; NeMo Fabric validates
 runtime assumptions but never installs harnesses or credentials at run time.
 
-- NeMo Fabric supports Python 3.11 through 3.14. Use Python 3.11 through 3.13
-  for Hermes Agent; the Harbor integration requires Python 3.12 or later.
-- Install the runtime with `uv pip install nemo-fabric` (add the `harbor` extra
-  for the Harbor integration). Refer to the
+- Choose supported Python interpreters for the runtime, Harbor, and adapter
+  environments from the
   [installation guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/getting-started/install.mdx).
+- Install the runtime with `uv pip install nemo-fabric` (add the `harbor` extra
+  for the Harbor integration).
 - Select the harness adapter through `HarnessConfig.adapter_id`. To install the
   NeMo Fabric runtime, adapter, and supported harness in one environment, use
   `nemo-fabric[claude]`, `nemo-fabric[codex]`,
   or `nemo-fabric[deepagents]`.
-- Hermes Agent 0.20 and later is no longer installable from PyPI. Follow the
-  [Hermes Agent installation guide](https://hermes-agent.nousresearch.com/docs/installation),
-  then install the `nemo-fabric[hermes-agent]` package
-  into the Python environment that runs Hermes Agent. These packages do not
+- Install Hermes Agent separately from the Fabric adapter. Follow the
+  [Hermes integration guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/integrations/harness/hermes.mdx)
+  for the current compatible interpreter, source checkout, Relay dependencies,
+  and adapter installation. The `nemo-fabric[hermes-agent]` extra does not
   install Hermes Agent.
 - In a separate adapter environment, install
   `nemo-fabric-adapters-<adapter>[harness]`. This installs the adapter and
@@ -65,15 +65,15 @@ runtime assumptions but never installs harnesses or credentials at run time.
 - If the adapter environment already manages a compatible harness, install the
   bare `nemo-fabric-adapters-<adapter>` distribution. Bare adapter
   distributions contain only adapter-owned runtime dependencies.
-- LangChain Deep Agents and Hermes Agent adapter packages provide `relay` and
-  include the NeMo Relay Python package in `full`. The Hermes Agent extras do
-  not install Hermes Agent. Claude and Codex do not provide `relay`; their
-  `harness` and `full` extras install the supported `nemo-relay` CLI alongside
-  the harness SDK.
+- LangChain Deep Agents and Hermes adapter packages provide `relay` and include
+  the NeMo Relay Python package in `full`. Claude and Codex do not provide
+  `relay`; their `harness` and `full` extras install the supported `nemo-relay`
+  CLI alongside the harness SDK.
 - Provide model credentials through environment variables named by the config
   (`ModelConfig.api_key_env`), never as literals in code.
 - Confirm the native extension is importable; SDK calls raise
   `FabricNativeUnavailableError` when it is missing.
+- For descriptor inspection without harness SDKs, install the separate `nemo-fabric-adapter-catalog` package and call `nemo_fabric_adapter_catalog.get_adapter_descriptor(adapter_id)` or `get_target_descriptor(target_id)`. Refer to the [catalog guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/sdk/python/nemo-fabric-adapter-catalog/README.md). Catalog resources do not register execution runners; unknown IDs raise `KeyError`. Validate against the task environment's descriptor before relying on a snapshot claim. Catalog source versions and fingerprints are not runtime-observed provenance.
 
 ## Build The Typed Config From Consumer Config
 
@@ -171,6 +171,8 @@ construction.
 
 ## Choose A Lifecycle
 
+For Deep Agents, mini-SWE-agent, and the LangGraph custom-agent example, pass the same UUID string through `RunRequest.relay_session_root` on each conversation turn to group Relay trajectories under one session. Core forwards the typed field as `AgentRunRequest.relay_session_root`; context keys do not control Relay propagation. An unusable UUID preserves per-request behavior. The remaining adapters do not consume this field.
+
 Pick the smallest lifecycle the consumer needs:
 
 - **Single invocation** — one input, no retained state after the call.
@@ -195,7 +197,9 @@ Pick the smallest lifecycle the consumer needs:
   target invocation. This path does not require NeMo Relay or
   `streaming=True`.
 - **NVIDIA NeMo Relay stream** — live, raw ATOF records plus a terminal normalized
-  result. Enable NeMo Relay, pass `streaming=True` to `start_runtime(...)`, call
+  result. Install `nemo-fabric[streaming]` to include the matching collector for
+  the default embedded streaming path. Enable NeMo Relay, pass `streaming=True`
+  to `start_runtime(...)`, call
   `runtime.invoke_stream(...)`, iterate the returned `InvokeStream`, and then
   await `stream.result()`. Iteration ending does not indicate invocation
   success; invocation exceptions raise from `result()`, while harness-reported
@@ -203,25 +207,19 @@ Pick the smallest lifecycle the consumer needs:
   call `await stream.aclose()` before starting another turn. `aclose()` waits
   for the turn to finish; it does not cancel the harness invocation. The SDK
   intentionally exposes only ATOF records generated by NeMo Relay. This path is
-  independent of native OpenAI streaming. The listener
-  limits each record to 1 MiB and its queue to 1,024 records or 16 MiB of
-  encoded data. It correlates records through the NeMo Fabric request ID for
-  in-process harnesses. For gateway harnesses, it uses the NeMo Relay turn-scope
-  role and 1-based turn index. It yields only the matched scope tree. Delayed
-  prior-turn records therefore do not enter the next stream. If gateway and
-  NeMo Fabric turn sequences do not align, the SDK discards the uncorrelated records
-  and emits a `RuntimeWarning` after natural stream exhaustion. The listener
-  binds to `NEMO_FABRIC_STREAMING_HOST`, which defaults to `127.0.0.1`.
-  Override it when the gateway must reach the SDK through another network
-  interface, and restrict access to that interface. If async iteration reaches
-  its post-turn drain timeout without a NeMo Relay connection, or receives data
-  without a matching turn root, the SDK emits one `RuntimeWarning` for that
-  failure mode; callers that only await `stream.result()` do not run that
-  warning check. The SDK also warns when a NeMo Relay upload terminates before
-  completing its chunked request body because yielded records can be incomplete.
-  The `streaming=True` flag does not enable NeMo Relay by itself. Without
-  `streaming=True`, startup leaves the NeMo Relay configuration unchanged and
-  does not inject the SDK-owned ATOF stream sink.
+  independent of native OpenAI streaming. The collector registers the request
+  before the agent is invoked, then routes the matching ATOF root scope and its
+  descendants by request ID and UUID ancestry. By default, streaming starts an
+  embedded collector. Set `launch_collector=False` to use an externally managed
+  collector; configure its base URL as the `nemo-fabric-stream` sink with
+  `transport="ndjson"`. The runtime directs Relay to `<base-url>/v1/atof` and
+  uses the collector control and stream endpoints. The bundled Pi adapter requires
+  the embedded collector. Do not set `launch_collector=False` for Pi streaming.
+  The embedded collector waits up to `completion_wait_timeout` seconds (1.0 by
+  default) for a late `agent_settled` marker. The collector limits each record to
+  1 MiB and each request queue to 1,024 records or 16 MiB of encoded
+  data. The `streaming=True` flag does not enable NeMo Relay by itself. Without
+  `streaming=True`, startup leaves the NeMo Relay configuration unchanged.
 
 The selected adapter owns the execution topology. The bundled Claude, Codex,
 Deep Agents, and Hermes Agent adapters retain their native client, graph/checkpointer,
@@ -315,6 +313,15 @@ print(plan.adapter.adapter_id, report.status)
   misspelled adapter settings fail before diagnostics or runtime startup. A
   resolved descriptor without a settings schema accepts only an empty settings
   map.
+- For a separate admission host, call public `inspect_adapter(config, descriptor)`
+  with matching catalog or canonical external metadata. The immutable
+  `AdapterCapabilityProfile` has `adapter_id`, `descriptor_sha256`, `skills`,
+  `mcp`, and `atif` fields. It does not import harness SDKs or read task-local
+  discovery paths. Missing metadata makes conservative claims and rejects
+  requested optional features. Pass `expected_descriptor_sha256=profile.descriptor_sha256`
+  to task-side `run()` or `start_runtime()` to reject descriptor drift before
+  startup. This standalone profile does not qualify workflow targets or attached
+  services. Declared support is not runtime provenance or proof of an artifact.
 
 ## Consume Results And Handle Errors
 

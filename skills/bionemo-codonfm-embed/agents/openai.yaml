@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodonFM Embeddings"
+  short_description: "Extract public Encodon sequence embeddings"
+  default_prompt: "Use $codonfm-embed to extract Encodon embeddings from my coding-sequence CSV."
