@@ -11,7 +11,7 @@ permissions:
 jobs:
   require-nvskills-ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 65
+    timeout-minutes: 245
     permissions:
       contents: read
       pull-requests: read
@@ -33,7 +33,7 @@ jobs:
           SIGNATURE_SERVICE_ACCOUNT_LOGIN: ${{ vars.NVSKILLS_FORK_SERVICE_ACCOUNT_LOGIN || vars.NVSKILLS_SIGNATURE_COMMIT_LOGIN || 'svc-nvskills-signing' }}
           STATUS_POLL_SECONDS: ${{ vars.NVSKILLS_STATUS_POLL_SECONDS || '30' }}
           MISSING_STATUS_GRACE_SECONDS: ${{ vars.NVSKILLS_MISSING_STATUS_GRACE_SECONDS || '120' }}
-          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '3300' }}
+          MAX_STATUS_WAIT_SECONDS: ${{ vars.NVSKILLS_MAX_STATUS_WAIT_SECONDS || '14400' }}
         run: |
           set -euo pipefail
 
@@ -92,7 +92,7 @@ jobs:
             # Linux caps a single argument at 128 KiB (MAX_ARG_STRLEN); the
             # commit payload exceeds that long before the page-30 guard below
             # can fire, so --argjson died with "Argument list too long" instead
-            # of returning a verdict. See PR #471 (96 files, 865 KiB).
+            # of returning a verdict. See NVIDIA/skills#471 (96 files, 865 KiB).
             local scratch_dir all_files_file page_files_file
             if ! scratch_dir="$(mktemp -d)" || [ -z "${scratch_dir}" ]; then
               echo "Unable to create a scratch directory for commit ${commit_sha}." >&2
@@ -107,12 +107,8 @@ jobs:
               if [ "${page}" -eq 1 ]; then
                 first_response="${response}"
               fi
-              # Keep only what the classifiers below read: .filename and
-              # .previous_filename. The API returns each file's full patch,
-              # which is ~98% of the payload and never inspected. Dropping
-              # .previous_filename here would let a rename INTO a signature
-              # artifact name pass is_generated_signature_artifact_commit,
-              # so both fields are required.
+              # Discard unused patches; keep both paths to detect renames
+              # into generated artifacts and out of watched directories.
               printf '%s' "${response}" \
                 | jq -c '[.files[]? | {filename, previous_filename}]' > "${page_files_file}"
               page_count="$(jq 'length' < "${page_files_file}")"
@@ -324,7 +320,7 @@ jobs:
 
           poll_seconds="$(bounded_positive_integer "${STATUS_POLL_SECONDS}" 30 300)"
           missing_grace_seconds="$(bounded_positive_integer "${MISSING_STATUS_GRACE_SECONDS}" 120 600)"
-          max_wait_seconds="$(bounded_positive_integer "${MAX_STATUS_WAIT_SECONDS}" 3300 3300)"
+          max_wait_seconds="$(bounded_positive_integer "${MAX_STATUS_WAIT_SECONDS}" 14400 14400)"
           elapsed_seconds=0
           status_sha=""
           status_state="missing"
