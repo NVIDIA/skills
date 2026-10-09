@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 398,
-  "result_row_count": 3725,
+  "skill_count": 401,
+  "result_row_count": 3755,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5242,6 +5242,66 @@
       "component": "NVIDIA Broadcast",
       "has_results": true,
       "average_uplift_pct": 10.78
+    },
+    {
+      "skill": "nvidia-ontology-management",
+      "evaluation_date": "2026-10-08",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:4c8455d88fc45fd16ded90344c740ea7149fe29edbca7f112b346c21177d23fa",
+      "validation_status": null,
+      "tasks": 13,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "has_results": true,
+      "average_uplift_pct": 33.12
+    },
+    {
+      "skill": "nvidia-ontology-query",
+      "evaluation_date": "2026-10-08",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:314823168b2eada85a48a450189c9d2cc1d374eed343c106147bd2b63080bf72",
+      "validation_status": null,
+      "tasks": 13,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "has_results": true,
+      "average_uplift_pct": 23.37
+    },
+    {
+      "skill": "nvidia-ontology-setup",
+      "evaluation_date": "2026-10-08",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:dcbcf0848aefb19cd5b010e9a0d69ed8920e61dc3fdba560ca0f88cd48a8da96",
+      "validation_status": null,
+      "tasks": 10,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "has_results": true,
+      "average_uplift_pct": 36.28
     },
     {
       "skill": "nvidia-skill-finder",
@@ -30358,6 +30418,276 @@
       "num": null,
       "agent": "codex",
       "score_pct": 89.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.9,
+      "uplift_pct": -7.7
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 70.8
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.2,
+      "uplift_pct": 41.5
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.3,
+      "uplift_pct": 46.9
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.1,
+      "uplift_pct": 47.2
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-management",
+      "component": "Auto Ontology",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.3,
+      "uplift_pct": 7.7
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 52.3
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.8,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": 40.5
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.5,
+      "uplift_pct": 19.7
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-query",
+      "component": "Auto Ontology",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 64.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.5,
+      "uplift_pct": 52.7
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.5,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.2,
       "uplift_pct": null
     },
     {

@@ -3253,6 +3253,42 @@
       }
     },
     {
+      "path": "skills/nvidia-ontology-management",
+      "name": "nvidia-ontology-management",
+      "description": "Model and publish semantic definitions in Auto Ontology. Use for terms, relationships, measures, imports, and governed results—not deployment or querying.",
+      "metadata": {
+        "product.primary": "Auto Ontology",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "data-science",
+        "audience": "data_engineer,developer,application_developer,solutions_architect",
+        "discovery.activity_tags": "configure,integrate,inspect,validate,generate"
+      }
+    },
+    {
+      "path": "skills/nvidia-ontology-query",
+      "name": "nvidia-ontology-query",
+      "description": "Query Auto Ontology and validate generated SQL, rows, and answers. Use for MCP or REST access, readiness, authentication, conversations, and grounded questions.",
+      "metadata": {
+        "product.primary": "Auto Ontology",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,application_developer,ai_engineer,solutions_architect",
+        "discovery.activity_tags": "validate,integrate,inspect,troubleshoot,test"
+      }
+    },
+    {
+      "path": "skills/nvidia-ontology-setup",
+      "name": "nvidia-ontology-setup",
+      "description": "Set up or troubleshoot the Auto Ontology runtime. Use for Helm (the official install), Docker Compose, developer setup, and MCP connection to an existing deployment.",
+      "metadata": {
+        "product.primary": "Auto Ontology",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "infrastructure",
+        "audience": "platform_engineer,devops_engineer,application_developer,developer",
+        "discovery.activity_tags": "deploy,configure,troubleshoot,integrate,validate"
+      }
+    },
+    {
       "path": "skills/nvidia-skill-finder",
       "name": "nvidia-skill-finder",
       "description": "Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, Isaac, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.",

@@ -1899,6 +1899,27 @@
       "last_modified": "2026-10-02"
     },
     {
+      "name": "nvidia-ontology-management",
+      "path": "skills/nvidia-ontology-management",
+      "content_digest": "sha256:f72fb89aae5fc5e9d789c56f07fe3537410ce6a6007db26decab77198704b9b9",
+      "last_commit": "dfdd0805a7a2e217742aa17cc941d8d7d5f8f728",
+      "last_modified": "2026-10-08"
+    },
+    {
+      "name": "nvidia-ontology-query",
+      "path": "skills/nvidia-ontology-query",
+      "content_digest": "sha256:1554ccfdd765cd19638239b0d105c21b9d03c2a20d2c04230777095ce359915a",
+      "last_commit": "dfdd0805a7a2e217742aa17cc941d8d7d5f8f728",
+      "last_modified": "2026-10-08"
+    },
+    {
+      "name": "nvidia-ontology-setup",
+      "path": "skills/nvidia-ontology-setup",
+      "content_digest": "sha256:7478d5b358e9832ccbcb04c3226aae6d561428d62c49fdb30d291e8e77cfe35f",
+      "last_commit": "dfdd0805a7a2e217742aa17cc941d8d7d5f8f728",
+      "last_modified": "2026-10-08"
+    },
+    {
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
       "content_digest": "sha256:da43951c0c8c69da5622f5299055228c70bc6345273e7869f3c59acb92af8310",
