@@ -22,6 +22,7 @@
         "nemo-retriever-mcp",
         "nemoclaw-user-guide",
         "nemotron-policy-generator",
+        "nvidia-ontology-query",
         "nvidia-skill-finder",
         "rag-blueprint",
         "rag-eval",
@@ -239,6 +240,7 @@
       "skills": [
         "accelerated-computing-cudf",
         "nvflare-fed-stats",
+        "nvidia-ontology-management",
         "tao-mine-nearest-neighbors"
       ]
     },
@@ -413,6 +415,7 @@
         "jetson-headless-mode",
         "jetson-optimize-memory",
         "jetson-promote-image",
+        "nvidia-ontology-setup",
         "tao-run-on-brev",
         "tao-run-on-kubernetes",
         "tao-run-on-slurm",
