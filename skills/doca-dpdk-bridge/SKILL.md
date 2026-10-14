@@ -6,38 +6,56 @@ description: >
   adding DOCA capabilities in-place — most commonly DOCA Flow hardware
   steering — without rewriting the data-plane in DOCA-native form:
   binding a DPDK port id to a `doca_dev` (`doca_dpdk_port_probe` /
-  `doca_dpdk_port_as_dev`), converting `rte_mbuf` ↔ `doca_buf`,
-  querying `doca_dpdk_cap_is_rep_port_supported`, or debugging
-  `DOCA_ERROR_*` from a bridge call. Trigger even without "DOCA DPDK
-  Bridge": "how do I add DOCA Flow to my DPDK app", "make a DPDK port
-  visible to DOCA", "the bridge loads but every operation returns
-  errors", "pkg-config --exists doca-dpdk-bridge fails", or
-  "DOCA_ERROR_NOT_FOUND on port registration". Route elsewhere for
-  fresh DOCA-native packet I/O (doca-eth), flow-rule programming
-  (doca-flow), DOCA or DPDK install (doca-setup), or RDMA data
-  movement (doca-rdma).
+  `doca_dpdk_port_as_dev`), converting `rte_mbuf` ↔ `doca_buf`, querying
+  `doca_dpdk_cap_is_rep_port_supported`, or debugging `DOCA_ERROR_*`
+  from a bridge call. Trigger even without "DOCA DPDK Bridge": "how do I
+  add DOCA Flow to my DPDK app", "make a DPDK port visible to DOCA",
+  "the bridge loads but every operation returns errors", "pkg-config
+  --exists doca-dpdk-bridge fails", or "DOCA_ERROR_NOT_FOUND on port
+  registration". Route elsewhere for fresh DOCA-native packet I/O
+  (doca-eth), flow-rule programming (doca-flow), DOCA or DPDK install
+  (doca-setup), or RDMA data movement (doca-rdma).
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - dpdk
+    - bridge
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on Linux
-  (Ubuntu 22.04/24.04 or RHEL/SLES) with a BlueField DPU or
-  ConnectX NIC attached, plus a separate DPDK install whose
-  version falls within the bridge's matched-pair window. Reads
-  the user's local install via `pkg-config doca-dpdk-bridge` and
-  `pkg-config libdpdk`, and inspects
-  /opt/mellanox/doca/{lib,include,samples,applications}.
+  Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
+  22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC
+  attached, plus a separate DPDK install whose version falls within the
+  bridge's matched-pair window. Reads the user's local install via
+  `pkg-config doca-dpdk-bridge` and `pkg-config libdpdk`, and inspects
+  /opt/mellanox/doca/{lib,include,samples,applications}. The validation
+  steps require a live DOCA install.
 ---
 
 # DOCA DPDK Bridge
+
+## Examples
+
+- **"How do I add DOCA Flow to my DPDK app?"** — this is in
+  scope. Bind the DPDK port with `doca_dpdk_port_probe`; do not
+  rewrite the data-plane as native `doca-eth`.
+- **"DOCA_ERROR_NOT_FOUND on port registration."** — check the
+  DPDK/DOCA matched-pair window before changing the probe call.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+probe / debug. Open the capabilities companion for port binding
+and mbuf conversion. Do not open every companion file.
 
 **Where to start:** This skill assumes DOCA is already installed,
 DPDK is already installed, the user has an **existing DPDK
 application**, and they want to **add DOCA capabilities to it
 in-place** (most commonly DOCA Flow for hardware steering)
 without migrating the data-plane to DOCA-native APIs. Open
-[`TASKS.md`](TASKS.md) if the user wants to *do* something
+the tasks companion if the user wants to *do* something
 (configure / build / modify / run / test / debug); open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
+the capabilities companion when the question is *what
 the bridge can express* on this version. If the user has not
 installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
@@ -45,6 +63,13 @@ installed DOCA yet, route to
 packet I/O against DOCA, route to
 [`doca-eth`](../doca-eth/SKILL.md) instead — the bridge exists
 for the interop case, not the start-fresh case.
+
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
 
 ## Example questions this skill answers well
 
@@ -59,45 +84,45 @@ single instance.
   ports; I want to install DOCA Flow steering rules on those
   ports for HW offload"*. Answered by the bridge-vs-native
   selection rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the port-handover workflow in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 3.
+  ## configure step 3.
 - **"How do I make a DPDK port visible to DOCA?"** — worked
   example: *"I have a DPDK port id from `rte_eth_dev_*`; how does
   DOCA see it"*. Answered by the DPDK-port-id ↔ `doca_dev`
   mapping (`doca_dpdk_port_probe` / `doca_dpdk_port_as_dev`) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   bridge-objects table + the binding workflow in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 4.
+  ## configure step 4.
 - **"How do I move packets between DPDK mbufs and DOCA bufs?"** —
   worked example: *"DPDK delivers an `rte_mbuf` to my fastpath; I
   want a DOCA library to operate on the payload"*. Answered by
   the mbuf ↔ DOCA-buf conversion shape in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the conversion-step workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **"Is the bridge even installed and is its DPDK compatible
   with my DOCA?"** — worked example: *"`pkg-config --exists
   doca-dpdk-bridge` returns failure on a host that has DPDK
   separately installed"*. Answered by the version-coupling rule
   in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  ## Version compatibility
   + the cap-check workflow in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 1.
+  ## configure step 1.
 - **"Should I be using `doca-dpdk-bridge` or `doca-eth`?"** —
   worked example: *"new project; I have not committed to DPDK
   yet"*. Answered by the path-selection table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   bridge-vs-native row + the deferred-verbs note in
-  [`TASKS.md ## Deferred task verbs`](TASKS.md#deferred-task-verbs).
+  ## Deferred task verbs.
 - **"What does this `DOCA_ERROR_*` from a bridge call mean and
   which layer caused it?"** — worked example: *"`DOCA_ERROR_NOT_FOUND`
   on a port-registration call after the DPDK port came up
   cleanly"*. Answered by the bridge overlay on the cross-library
   taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
+  ## debug that escalates to
   [`doca-debug`](../../doca-debug/SKILL.md).
 
 ## Audience
@@ -119,7 +144,7 @@ confirm the spelling against the user's install via
 `pkg-config --exists doca-dpdk-bridge`; some DOCA releases use a
 slightly different module name and the agent must not guess).
 The shipped samples are written in C. C and C++ consumers are
-the canonical case; the worked examples in `TASKS.md` assume
+the canonical case; the worked examples in the tasks companion assume
 that path. Other-language consumers (Rust, Go, Python, …)
 typically do not use this bridge — DPDK itself is C-shaped, and
 a non-C DPDK app is rare; if the user is in that minority, the
@@ -167,7 +192,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive bridge-
 specific material lives in two companion files:
 
-- `CAPABILITIES.md` — what the DOCA DPDK Bridge can express on
+- the capabilities companion — what the DOCA DPDK Bridge can express on
   this version: the bridge-vs-native selection rule (when to
   use `doca-dpdk-bridge` vs native `doca-eth`), the
   bridge-object surface (DPDK-port-id ↔ `doca_dev` mapping, the
@@ -179,7 +204,7 @@ specific material lives in two companion files:
   events), and the safety policy that gates the matched-pair
   DPDK ↔ DOCA version coupling, the EAL-must-be-up
   precondition, and DPDK-side privileges.
-- `TASKS.md` — step-by-step workflows for the six in-scope
+- the tasks companion — step-by-step workflows for the six in-scope
   bridge verbs: `configure`, `build`, `modify`, `run`, `test`,
   `debug`. Plus a `Deferred task verbs` block that points
   out-of-scope questions at the right next skill, and a
@@ -217,7 +242,7 @@ contain — and pull requests should not add:
   workflow in
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
   layered with the bridge-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Standalone build manifests** (`meson.build`,
   `CMakeLists.txt`, `Cargo.toml`, …) parked inside the skill.
   The agent constructs the build manifest *in the user's project
@@ -231,14 +256,14 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope (existing DPDK app + wants DOCA on top — not fresh).
 2. **For the bridge capability matrix, the bridge-vs-native
    selection rule, port-handover surface, capability-query rules,
    error taxonomy, observability, and safety policy, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical
@@ -276,7 +301,7 @@ guidance".
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the

@@ -3,12 +3,12 @@
   "evals": [
     {
       "id": "doca-pcc-ztr-rttcc-algo.explicit-positive.v1",
-      "prompt": "Use the doca-pcc-ztr-rttcc-algo skill to help me. I'm deploying and tuning the DOCA-shipped Zero-Touch RoCE RTT-based Congestion Control (ZTR RTTCC) reference algorithm on a BlueField-3 DPA — wiring doca_pcc_dev_ztr_rttcc_algo into the shipped PCC sample, picking a variant at DPACC build time, and tuning host-set parameters.",
+      "prompt": "Use the doca-pcc-ztr-rttcc-algo skill for this task: I'm running into this: \"my RoCE-v2 flows aren't being throttled and the PCC sample isn't dispatching to my algo\". Can you walk me through it?",
       "expected_skill": "doca-pcc-ztr-rttcc-algo",
       "expected_output": "The agent loads doca-pcc-ztr-rttcc-algo and answers from the documented workflow — wiring doca_pcc_dev_ztr_rttcc_algo into the shipped DOCA PCC sample, picking a variant (vanilla / PM / RX-rate / multipath / window-probeless) at DPACC build time, tuning host-set parameters, and diagnosing DOCA_PCC_DEV_STATUS_FAIL — quoting only real symbols.",
       "assertions": [
         "The doca-pcc-ztr-rttcc-algo skill is selected and its SKILL.md/TASKS.md drive the answer.",
-        "The reference algorithm wiring, variant selection, and parameter tuning are used correctly.",
+        "The answer first discriminates whether CC events are reaching the algorithm at all -- covering wrong algo slot, doca_pcc attached to the wrong port, or no RoCE-v2 traffic on the port -- instead of opening with parameter tuning or a variant rebuild.",
         "Every symbol named is traceable to the bundle (no invented tokens)."
       ]
     },
@@ -18,8 +18,9 @@
       "expected_skill": "doca-pcc-ztr-rttcc-algo",
       "expected_output": "The agent recognizes this as a doca-pcc-ztr-rttcc-algo task even though the skill is not named, loads it, and walks the sample-dispatch / algorithm-wiring path grounded in the bundle.",
       "assertions": [
-        "The doca-pcc-ztr-rttcc-algo skill is triggered from the implicit phrasing without the user naming it.",
-        "The answer ties the no-throttle symptom to sample dispatch and algorithm wiring."
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer first discriminates whether CC events are reaching the algorithm at all -- covering wrong algo slot, doca_pcc attached to the wrong port, or no RoCE-v2 traffic on the port -- instead of opening with parameter tuning or a variant rebuild.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
       ]
     },
     {
@@ -28,18 +29,20 @@
       "expected_skill": "doca-pcc-ztr-rttcc-algo",
       "expected_output": "The agent loads doca-pcc-ztr-rttcc-algo and diagnoses the set-params failure and flat-counters path (host-set parameters and DOCA_PCC_DEV_STATUS_FAIL) from the bundle, grounded in real symbols.",
       "assertions": [
-        "The doca-pcc-ztr-rttcc-algo skill is triggered from the implicit phrasing without the user naming it.",
-        "The answer explains host-set parameter tuning and the DOCA_PCC_DEV_STATUS_FAIL path."
+        "The answer engages the request directly rather than deflecting it.",
+        "The set-params failure is handled through doca_pcc_dev_set_ztr_rttcc_params and the DOCA_PCC_DEV_STATUS_FAIL path, with out-of-range values not retried.",
+        "The flat counters are treated as a separate question from the set-params failure, and are discriminated by whether CC events are landing at all before parameters are blamed.",
+        "Every symbol named is traceable to the bundle (no invented tokens)."
       ]
     },
     {
       "id": "doca-pcc-ztr-rttcc-algo.negative.v1",
-      "prompt": "I actually need to write a custom PCC algorithm from scratch, do read-only PCC counter inspection, and manage the host-side doca-pcc lifecycle. Which skill should handle this and why is it not doca-pcc-ztr-rttcc-algo?",
+      "prompt": "I actually need to write a custom PCC algorithm from scratch, do read-only PCC counter inspection, and manage the host-side doca-pcc lifecycle. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-pcc-ztr-rttcc-algo; it routes custom-algorithm authoring, read-only counter inspection, the host-side doca-pcc lifecycle, and firmware-only pre-Programmable PCC out to their proper skills.",
+      "expected_output": "The agent does not apply doca-pcc-ztr-rttcc-algo's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-pcc-ztr-rttcc-algo as the answer.",
       "assertions": [
-        "doca-pcc-ztr-rttcc-algo is not used as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s): doca-pcc and others rather than forcing this reference-algo skill."
+        "The answer does not apply doca-pcc-ztr-rttcc-algo's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

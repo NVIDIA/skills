@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 capabilities (install, configure, build, modify, run, test, debug,
 use) see [TASKS.md](TASKS.md). For where the underlying public
 documentation and installed package paths live, defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) — do
+`doca-public-knowledge-map/SKILL.md` — do
 not duplicate URLs or install paths in this file.
 
 ## Pattern overview
@@ -48,7 +48,7 @@ Two cross-cutting rules that apply to *every* pattern above:
   `doca_gpi_get_dpa` *"can be called only if gpi not started"*.
   The agent walks the user through configuration (and, where the
   application drives the GPU datapath, the
-  [`doca-gpunetio`](../doca-gpunetio/SKILL.md) setup) *before*
+  `doca-gpunetio/SKILL.md` setup) *before*
   `doca_gpi_start()`, not after.
 
 ## Capabilities and modes
@@ -67,7 +67,7 @@ pick one before writing any code:
 
 | Library | Surface shape | When to pick |
 | --- | --- | --- |
-| [`doca-gpunetio`](../doca-gpunetio/SKILL.md) | Higher-level Send/Receive-shaped Ethernet I/O for CUDA kernels; richer per-packet API; the canonical surface for GPU-side packet processing | The CUDA kernel sends or receives Ethernet packets through a queue and the application is happy with the Send/Receive abstraction |
+| `doca-gpunetio/SKILL.md` | Higher-level Send/Receive-shaped Ethernet I/O for CUDA kernels; richer per-packet API; the canonical surface for GPU-side packet processing | The CUDA kernel sends or receives Ethernet packets through a queue and the application is happy with the Send/Receive abstraction |
 | `doca-gpi` (this skill) | Lower-level channel surface; the CUDA kernel drives RDMA work *directly* via the GPU-side channel handle; channel endpoints are connected to remote peers via `doca_gpi_channel_ep_connect` | The CUDA kernel needs to initiate RDMA operations and the application wants direct control over the per-channel work submission rather than the Send/Receive abstraction |
 
 **Decision rule for the agent.** If the user's intent is *"my
@@ -117,7 +117,7 @@ below is `DOCA_EXPERIMENTAL`. Verified channel surface:
 | `doca_gpi_channel_attr_set_sq_wqe_num`, `_set_srq_wqe_num`, `_set_gpu_wqe_num`, `_set_num_counters`, `_set_num_signals`, `_set_low_latency`, `_set_pending_credits_writeback_shift`, `_set_srq_repost_mask` | Size the send / shared-receive / GPU work-queue depth, counters, signals, and behavior flags | All `uint16_t` WQE counts; set on the attr before `doca_gpi_channel_create` |
 | `doca_gpi_channel_create(gpu_dev, domain, attr, &channel)` | Create the channel on a `doca_gpu` device and the supplied domain | Takes the GPU device as its first argument |
 | `doca_gpi_channel_destroy(channel)` | Release a channel created with `doca_gpi_channel_create` | |
-| `doca_gpi_gpu_channel_get(channel, &gpu_channel)` | Retrieve the GPU-side handle the CUDA kernel uses; type is `struct doca_gpu_gpi_channel*` | This is the only host→device handoff; the type is defined by [`doca-gpunetio`](../doca-gpunetio/SKILL.md) |
+| `doca_gpi_gpu_channel_get(channel, &gpu_channel)` | Retrieve the GPU-side handle the CUDA kernel uses; type is `struct doca_gpu_gpi_channel*` | This is the only host→device handoff; the type is defined by `doca-gpunetio/SKILL.md` |
 | `doca_gpi_channel_ep_conn_info_create(channel, ep_idx, &conn_info_size, &conn_info)` | Build the connection-info blob for an endpoint, to exchange out of band | Pair with `doca_gpi_channel_ep_conn_info_destroy(conn_info)` once the peer's blob has been consumed |
 | `doca_gpi_channel_ep_connect(channel, ep_idx, conn_info, conn_info_size)` | Connect the endpoint using the peer's connection-info blob | After this call the GPU side can issue work on the endpoint |
 | `doca_gpi_channel_get_error_state(channel)` | Check the channel error state | Returns `DOCA_SUCCESS` if no error, `DOCA_ERROR_DRIVER` on error |
@@ -131,7 +131,7 @@ compiled with `nvcc` against the DOCA GPU NetIO device-side
 header set. The CUDA-side programming model (kernel launch, GPU
 memory mapping, the device-side API surface that *uses* the
 GPI channel) is owned by
-[`doca-gpunetio`](../doca-gpunetio/SKILL.md) — the
+`doca-gpunetio/SKILL.md` — the
 `doca_gpu_gpi_channel` type and its device-side `.cuh` API are
 defined there; this skill does not duplicate it. Two rules that
 DO belong here because they are GPI-specific:
@@ -154,7 +154,7 @@ DO belong here because they are GPI-specific:
 
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-docs
-rule, see [`doca-version`](../../doca-version/SKILL.md). The body
+rule, see `doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The GPI-specific overlay** is:
@@ -174,13 +174,13 @@ lives there; this skill does not duplicate it.
   installed CUDA Toolkit version is a second axis. The
   authoritative DOCA ↔ CUDA pairing for a given DOCA release
   lives in the release notes; route through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the release-notes URL pattern rather than quoting a CUDA
   version pin from agent memory.
 - **`doca-gpi.pc` plus `doca-gpunetio.pc` plus `doca-dpa.pc`
   plus `doca-verbs.pc` must all match `doca_caps --version`** at
   the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   `dependencies/meson.build` lists `doca-dpa`, `doca-gpunetio`,
   and `doca-verbs` (plus the `libmlx5` / `libibverbs` externals)
   as GPI's DOCA dependencies; a partial install where one of
@@ -188,8 +188,8 @@ lives there; this skill does not duplicate it.
   common partial-install pattern for GPI users.
   On disagreement, stop before building or running GPI, identify
   every divergent `.pc` or install-version source, and use
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
-  plus [`doca-setup`](../../doca-setup/SKILL.md) to look up and
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
+  plus `doca-setup/SKILL.md` to look up and
   repair the platform-specific package set. Re-run the complete
   match after repair; do not proceed with a mismatched stack.
 - **The closest public docs surface for the GPU-side handoff is
@@ -203,7 +203,7 @@ lives there; this skill does not duplicate it.
   [DOCA SDK index](https://docs.nvidia.com/doca/sdk/) is the
   authoritative starting point for whether a *GPI*-specific
   page now exists; route through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the up-to-date URL pattern rather than quoting a URL
   literal from agent memory.
 
@@ -211,7 +211,7 @@ lives there; this skill does not duplicate it.
 
 The cross-library `DOCA_ERROR_*` taxonomy (what each family
 means and which debug layer it routes to) lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 The GPI-specific overlay names the families the agent will see
 most often from `doca_gpi_*` calls and what they specifically
 indicate:
@@ -223,12 +223,12 @@ indicate:
 | `DOCA_ERROR_NO_MEMORY` | `doca_gpi_create` failed to allocate internal state | Inspect the system's available memory; this is rarely an application bug, usually a host-side resource issue |
 | `DOCA_ERROR_INITIALIZATION` | `doca_gpi_create` failed to initialize internal state | Same as above — inspect host resources |
 | `DOCA_ERROR_IN_USE` | `doca_gpi_destroy` ran while domains or channels are still alive | Destroy every channel (`doca_gpi_channel_destroy`) and domain (`doca_gpi_domain_destroy`), and detach mmaps (`doca_gpi_domain_detach_mmap`), before destroying the GPI instance |
-| `DOCA_ERROR_NOT_SUPPORTED` | The installed DOCA version does not export the requested `doca_gpi_*` symbol, or the device does not support the GPU datapath this code requires | Confirm the symbol exists in the installed headers per [`## Version compatibility`](#version-compatibility); confirm GPU-datapath support on the device via `doca_caps` ([`doca-caps`](../../tools/doca-caps/SKILL.md)) |
-| `DOCA_ERROR_DRIVER` | The layer below DOCA (mlx5 driver, firmware, the verbs / RDMA stack GPI depends on) reported a failure | Stop. This is not a GPI-spec problem. Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) layer 7 |
+| `DOCA_ERROR_NOT_SUPPORTED` | The installed DOCA version does not export the requested `doca_gpi_*` symbol, or the device does not support the GPU datapath this code requires | Confirm the symbol exists in the installed headers per [`## Version compatibility`](#version-compatibility); confirm GPU-datapath support on the device via `doca_caps` (`doca-caps/SKILL.md`) |
+| `DOCA_ERROR_DRIVER` | The layer below DOCA (mlx5 driver, firmware, the verbs / RDMA stack GPI depends on) reported a failure | Stop. This is not a GPI-spec problem. Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) layer 7 |
 
 Quote `doca_error_get_descr()` verbatim — do not paraphrase. The
 cross-cutting debug ladder
-([`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug))
+(`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`))
 is the canonical layered diagnosis path that the agent escalates
 to once the GPI-specific cause has been narrowed.
 
@@ -251,7 +251,7 @@ problem.
    The CUDA kernel that holds the `doca_gpu_gpi_channel*`
    handle reads completions, posts work, and observes per-channel
    state through the device-side API surface owned by
-   [`doca-gpunetio`](../doca-gpunetio/SKILL.md). The host side
+   `doca-gpunetio/SKILL.md`. The host side
    is blind to those completions; the only signal the host gets
    that work happened is application-level (counters the CUDA
    kernel updates in shared memory, host-side timing, observable
@@ -276,14 +276,14 @@ problem.
 For cross-cutting observability primitives (`--sdk-log-level`,
 the `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env
 var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 GPI's safety surface is **GPU-side initiator**: a CUDA kernel
 that has been handed a `doca_gpu_gpi_channel*` can issue RDMA
@@ -318,7 +318,7 @@ follow from that:
    RDMA descriptor: over a secure channel, only to authenticated
    peers, with the *"production environments need a secure
    channel"* discipline the public DOCA RDMA guide names (see
-   [`doca-rdma CAPABILITIES.md ## Safety policy`](../doca-rdma/CAPABILITIES.md#safety-policy)).
+   `doca-rdma CAPABILITIES.md ## Safety policy` (`doca-rdma/CAPABILITIES.md#safety-policy`)).
    The GPI overlay does not relax that rule.
 
 For changes that touch hardware state below the GPI library
@@ -326,7 +326,7 @@ itself — `mlxconfig`-class writes, firmware burns, BlueField BFB
 reflash, host kernel boot parameters (IOMMU mode is particularly
 load-bearing for GPUDirect-style memory mapping) — the
 cross-cutting meta-policy in
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+`doca-hardware-safety/SKILL.md`
 applies without modification. GPI does not redefine those rules;
 the agent walks the hardware-safety ladder first whenever the
 symptom involves device state, then the GPI overlay above for
@@ -342,25 +342,25 @@ topics the agent will get asked but should route elsewhere:
   upstream CUDA documentation is the right answer; this skill
   assumes the user already builds and launches CUDA kernels.
 - **The DOCA GPU NetIO Send/Receive surface** — owned by
-  [`doca-gpunetio`](../doca-gpunetio/SKILL.md). GPI is the
+  `doca-gpunetio/SKILL.md`. GPI is the
   lower-level channel/queue surface; GPU NetIO is the higher-
   level Send/Receive surface. The selection table at the top
   of [`## Capabilities and modes`](#capabilities-and-modes)
   routes the agent there.
 - **The doca-rdma queue lifecycle and permission matrix** —
-  owned by [`doca-rdma`](../doca-rdma/SKILL.md). GPI does not
+  owned by `doca-rdma/SKILL.md`. GPI does not
   create or bind a `doca-rdma` queue — its transport layer is
-  `doca-verbs` ([`doca-verbs`](../doca-verbs/SKILL.md)). The
+  `doca-verbs` (`doca-verbs/SKILL.md`). The
   host-CPU-initiated RDMA queue object, its transport type, and
   its permission matrix are not GPI's concern.
 - **DPA-resident accelerator initiation** — owned by
-  [`doca-rdmi`](../doca-rdmi/SKILL.md). GPI is the GPU case;
+  `doca-rdmi/SKILL.md`. GPI is the GPU case;
   RDMI is the DPA case. The CLASS of "accelerator-initiated
   one-sided RDMA" applies to both.
 - **Cross-library `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the GPI overlay, not the taxonomy itself.
 - **Cross-library capability-snapshot tooling** — owned by
-  [`doca-caps`](../../tools/doca-caps/SKILL.md). This skill
+  `doca-caps/SKILL.md`. This skill
   references the tool; it does not redefine its invocation
   patterns.

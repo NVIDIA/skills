@@ -2,36 +2,52 @@
 license: Apache-2.0
 name: doca-flow-grpc-server
 description: >
-  PLAINTEXT-ONLY: the shipped `doca_flow_grpc` server uses
-  `grpc::InsecureServerCredentials()` with NO TLS / mTLS / token-auth
-  knob on the binary — transport security must come from external
+  Remote control of DOCA Flow over gRPC with the shipped `doca_flow_grpc`
+  server: program Flow pipes and entries from Python, Go, Rust or Java, or
+  from another host, instead of linking `libdoca_flow.so`. PLAINTEXT-ONLY:
+  the server uses `grpc::InsecureServerCredentials()` with NO TLS / mTLS /
+  token-auth knob; transport security must come from external
   infrastructure (e.g. an mTLS proxy / sidecar) on a trusted segment.
-  Use this skill when bringing up, configuring, hardening, or
-  debugging `doca_flow_grpc` — the DOCA-shipped gRPC remote-control
-  surface in front of `doca-flow` that lets non-C++ clients (Python,
-  Go, Rust, Java) program Flow pipes and entries over RPC instead of
-  linking `libdoca_flow.so` directly. Trigger even when the user
-  doesn't say 'doca-flow-grpc-server' or 'gRPC' — e.g. 'program Flow
-  rules from Python on another host', 'remotely configure pipes on the
-  BlueField', 'client times out connecting to the Flow server', 'where
-  is the .proto for Flow', 'UNAUTHENTICATED / FAILED_PRECONDITION on a
-  Flow RPC'. Route elsewhere for the underlying doca-flow API, generic
-  gRPC tooling (protoc, language bindings), or DOCA install / BFB
-  bring-up.
+  Trigger even without "gRPC": "program Flow rules from Python on another
+  host", "remotely configure pipes on the BlueField", "client times out
+  connecting to the Flow server", "where is the .proto for Flow",
+  "UNAUTHENTICATED / FAILED_PRECONDITION on a Flow RPC". Covers bringing
+  up, configuring, hardening and debugging the server. Route elsewhere for
+  the underlying doca-flow C API, generic gRPC tooling (protoc, language
+  bindings), or DOCA install / BFB bring-up.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - flow
+    - grpc
 compatibility: >
   Requires DOCA on Linux (Ubuntu 22.04/24.04 or RHEL/SLES) with a
   BlueField DPU or ConnectX NIC. The `doca_flow_grpc` binary is a build
-  artifact (install: false in tools/flow_grpc_server/meson.build, gated by
-  flag_enable_grpc_support + flag_enable_grpc_flow_library) — NOT
-  installed under a default DOCA path; build it from the DOCA source tree
-  with gRPC enabled. Its `.proto` lives under libs/doca_flow/grpc/.
-  Confirm Flow via `pkg-config doca-flow`.
-
+  artifact (install: false in tools/flow_grpc_server/meson.build, gated
+  by flag_enable_grpc_support + flag_enable_grpc_flow_library) — NOT
+  installed under a default DOCA path; build it from the DOCA source
+  tree with gRPC enabled. Its `.proto` lives under libs/doca_flow/grpc/.
+  Confirm Flow via `pkg-config doca-flow`. The validation steps require
+  a live DOCA install.
 ---
 
 # DOCA Flow gRPC Server (`doca_flow_grpc`)
+
+## Examples
+
+- **"Do I actually need a remote control plane for Flow?"** —
+  this is in scope. Prefer a direct `libdoca_flow.so` link when
+  the client can live on the same host.
+- **"Where is the gRPC contract on my install?"** — the `.proto`
+  is the source of truth; do not invent RPCs from memory.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+run / debug. Open the capabilities companion for when-to-use-gRPC
+and endpoint posture. Do not open every companion file.
 
 > **CRITICAL transport-security correction (Run-12 + R13).** The
 > shipped `doca_flow_grpc` / `doca_flow_grpc_client`
@@ -49,8 +65,8 @@ compatibility: >
 > that is the **client-side** API name and a Grep-against-source
 > verification will fail. There
 > is **no TLS, no mTLS, and no token-auth** knob on the shipped
-> control plane today. Any prose below (or in `CAPABILITIES.md`
-> / `TASKS.md`) that frames "mTLS / token auth / TLS posture"
+> control plane today. Any prose below (or in the capabilities companion
+> / the tasks companion) that frames "mTLS / token auth / TLS posture"
 > as a configurable knob on **this** server is the bundle's
 > previous aspirational framing and is wrong against the shipped
 > source. Treat the server as **plaintext-on-a-trusted-segment
@@ -65,14 +81,14 @@ compatibility: >
 
 **Where to start:** This is a tool skill for standing up and
 operating `doca_flow_grpc`, the DOCA-shipped gRPC remote-
-control surface for `doca-flow`. Open [`TASKS.md`](TASKS.md) and
-start at [`## configure`](TASKS.md#configure) to decide whether a
+control surface for `doca-flow`. Open the tasks companion and
+start at `## configure` to decide whether a
 remote control plane is the right answer at all (vs talking to
-`libdoca_flow.so` directly), then [`## run`](TASKS.md#run) for
+`libdoca_flow.so` directly), then `## run` for
 the start → bind → one-client-smoke sequence, then
-[`## test`](TASKS.md#test) for the smoke-before-bulk loop that
+`## test` for the smoke-before-bulk loop that
 gates any RPC that mutates Flow / dataplane state. Open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
+the capabilities companion when the question is *what
 the gRPC contract surface looks like* (the `.proto` files shipped
 under the tool's source tree on the user's install), *which
 external proxy / sidecar / VPN protects the plaintext server*, *which language bindings
@@ -85,6 +101,13 @@ not stood up `doca-flow` yet, route to
 server is a remote control plane on top of the Flow library, not
 a replacement for it.
 
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
+
 ## Example questions this skill answers well
 
 The CLASSES of `doca_flow_grpc` questions this skill is
@@ -96,7 +119,7 @@ load-bearing piece; the worked example is one instance.
   directly?"** — worked example: *"my client is a Python
   service on a different host; can it program Flow rules
   remotely?"*. Answered by the *when-to-use-gRPC* decision in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the routing into
   [`doca-flow`](../../libs/doca-flow/SKILL.md) when a direct
   library link is the better answer.
@@ -104,7 +127,7 @@ load-bearing piece; the worked example is one instance.
   install?"** — worked example: *"I want to generate a Python
   client; where do I get the `.proto` file?"*. Answered by the
   *the-`.proto`-file-is-the-source-of-truth* rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the language-bindings discussion of standard gRPC tooling
   (`protoc` + the language-specific gRPC plugin per the
   [official gRPC docs](https://grpc.io/docs/) on `grpc.io`).
@@ -112,30 +135,30 @@ load-bearing piece; the worked example is one instance.
   door into my dataplane?"** — worked example: *"the server is
   bound on `0.0.0.0`; what should I do before exposing it?"*.
   Answered by the *admin attack surface* posture in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the external protection / network-segment decision in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"How do I smoke ONE client end-to-end before opening the
   server to the fleet?"** — worked example: *"my Python client
   can dial the endpoint; what is the first RPC I run to prove
   it talks to the live Flow application?"*. Answered by the
   smoke-before-bulk loop in
-  [`TASKS.md ## test`](TASKS.md#test) +
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the tasks companion +
+  the capabilities companion
   smoke-before-bulk rule.
 - **"My client cannot reach the server — is the server down,
   the wrong endpoint, an external-proxy mismatch, or a version
   mismatch?"** — worked example: *"the client times out
   connecting"*. Answered by the layered error taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 - **"Is my non-C++ client (Python / Go / Rust) actually the
   right shape for the gRPC contract, or is there a cleaner
   path?"** — worked example: *"I want a Rust client; what
   does the `.proto`-generated API look like?"*. Answered by the
   language-bindings discussion in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the routing through standard gRPC tooling.
 
 ## Audience
@@ -171,7 +194,7 @@ contract files under `libs/doca_flow/grpc/`; per the tool's
 source tree (`server/`, `dpa_device/`, `packet_buffering/`) the
 tool can also be paired with a packet-buffering / DPA-side
 helper on configurations that need them. The skill uses the
-same `kind: tool` three-file shape (`SKILL.md` + `CAPABILITIES.md` + `TASKS.md`) the rest of the bundle's tool slot uses — front matter at the top of this file already says `kind: tool`. (Prior bundle revisions said "library three-file shape" here; that wording was internally inconsistent with the front matter and is corrected.)
+same `kind: tool` three-file shape (this skill + the capabilities companion + the tasks companion) the rest of the bundle's tool slot uses — front matter at the top of this file already says `kind: tool`. (Prior bundle revisions said "library three-file shape" here; that wording was internally inconsistent with the front matter and is corrected.)
 
 ## Language scope
 
@@ -222,7 +245,7 @@ Do **not** load this skill for general DOCA orientation,
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what `doca_flow_grpc` exposes:
+- the capabilities companion — what `doca_flow_grpc` exposes:
   the gRPC remote-control surface in front of `doca-flow`,
   the `.proto`-files-as-authoritative-contract rule (the
   shipped `.proto` files under the tool's source on the
@@ -240,7 +263,7 @@ companion files:
   server's own logs + the live Flow application's logs +
   the RPC client's status codes), and the safety policy
   that treats the endpoint as an admin attack surface.
-- `TASKS.md` — step-by-step workflows for the in-scope task
+- the tasks companion — step-by-step workflows for the in-scope task
   verbs: `install` (route to setup; binary is built from
   source with gRPC support enabled),
   `configure` (decide remote-vs-direct, pick the external
@@ -290,7 +313,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question
+1. Read this skill first to confirm the user's question
    is in scope (the user actually wants a remote gRPC control
    plane on top of `doca-flow`, not a direct library link or
    a different DOCA library).
@@ -298,11 +321,11 @@ contain — and pull requests should not add:
    rule, the language-bindings story, the external proxy /
    sidecar / VPN and network-segment decision, version availability, the
    layered error surface, observability, and safety posture,
-   see [CAPABILITIES.md](CAPABILITIES.md).**
+   see the capabilities companion.**
 3. **For the documented start sequence and the
    smoke-before-bulk workflow — `install`, `configure`,
    `build`, `modify`, `run`, `test`, `debug`, `use` — see
-   [TASKS.md](TASKS.md).**
+   the tasks companion.**
 
 ## Related skills
 
@@ -322,7 +345,7 @@ contain — and pull requests should not add:
   documentation set.
 - [`doca-version`](../../doca-version/SKILL.md) — canonical
   version-handling rules. The
-  [`## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  `## Version compatibility`
   section in this skill is a thin overlay on top.
 - [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
   debug ladder. gRPC server failures route into the ladder at

@@ -19,7 +19,7 @@ H2 anchor; the patterns are CLASSES, not use cases.
 
 | Pattern | When it applies (class shape)                              | Where it lives                                          |
 |---------|------------------------------------------------------------|---------------------------------------------------------|
-| 1. Reach an install | User has no DOCA reachable from where they are now | [TASKS.md ## no-install](TASKS.md#no-install) (NGC Path 0) |
+| 1. Reach an install | User has no DOCA reachable from where they are now | [TASKS.md ## no-install](references/no-install.md) (NGC Path 0) |
 | 2. Detect an install | User has *something* installed and must figure out what | [`## Version compatibility`](#version-compatibility) + [TASKS.md ## test](TASKS.md#test) |
 | 3. Wire the build to the install | Headers / `*.pc` / `LD_LIBRARY_PATH` / build flavor | [`## Capabilities and modes`](#capabilities-and-modes) + [TASKS.md ## configure](TASKS.md#configure) |
 | 4. Wire the runtime to the device | Hugepages / representors / devlink / kernel modules | [`## Observability`](#observability) + [TASKS.md ## configure](TASKS.md#configure) |
@@ -33,8 +33,8 @@ Two principles cut across all five patterns:
   failure mode the env-debug ladder catches.
 - **Env-class only.** The instant the answer becomes "rewrite the
   program", hand off to
-  [`doca-programming-guide`](../doca-programming-guide/SKILL.md). The
-  patterns above never tell the user to change their code.
+  [`doca-programming-guide`](../doca-programming-guide/SKILL.md). Env answers stay on install, runtime, and observability;
+  source edits belong in that programming skill.
 
 ## Capabilities and modes
 
@@ -44,7 +44,7 @@ DOCA install is layered into three orthogonal env axes. Pick the right combinati
 
 | Profile | What it pulls in | When to use |
 | --- | --- | --- |
-| `doca-all` | Full superset: SDK + samples + applications + tools + `doca-ofed` + `doca-networking`. | Default for any developer host, BlueField, or CI machine. Recommended for first-time setup. The public NGC DOCA container ([TASKS.md ## no-install](TASKS.md#no-install) Path 0) ships this profile. |
+| `doca-all` | Full superset: SDK + samples + applications + tools + `doca-ofed` + `doca-networking`. | Default for any developer host, BlueField, or CI machine. Recommended for first-time setup. The public NGC DOCA container ([TASKS.md ## no-install](references/no-install.md) Path 0) ships this profile. |
 | `doca-ofed` | OFED userspace + kernel modules only (RDMA stack). | Constrained host that only needs the underlying RDMA stack, no DOCA libraries. Rare in a development context. |
 | `doca-networking` | The DOCA networking subset (Flow, telemetry, etc.) on top of `doca-ofed`. | Constrained images that ship only the networking libraries. Most agent users will instead want `doca-all`. |
 
@@ -77,7 +77,7 @@ For the canonical DOCA version-detection chain (`pkg-config --modversion doca-co
 
 - `PKG_CONFIG_PATH` must include `/opt/mellanox/doca/infrastructure/lib/pkgconfig` so that `pkg-config --modversion doca-<library>` resolves at all. The env-setup procedure in [`TASKS.md ## configure`](TASKS.md#configure) verifies this; partial-install diagnosis lives in [`doca-version TASKS.md ## debug`](../doca-version/TASKS.md#debug) layer 2.
 - The on-disk paths the detection chain reads (`/opt/mellanox/doca/applications/VERSION`, `$(pkg-config --variable=includedir doca-common)/doca_version.h`, the `*.pc` directory) are env-side artifacts — see [`## Capabilities and modes`](#capabilities-and-modes) for the install-tree layout that places them where the chain expects.
-- On the *no-install* path (NGC container, per [`TASKS.md ## no-install`](TASKS.md#no-install) Path 0), the env-side overlay is that the four-way match is *of the container tag* the user pulled; the container's headers, `*.so`, samples, and `doca_caps` are guaranteed consistent by construction. The agent must still report which path was used so the user knows which install they verified.
+- On the *no-install* path (NGC container, per [`TASKS.md ## no-install`](references/no-install.md) Path 0), the env-side overlay is that the four-way match is *of the container tag* the user pulled; the container's headers, `*.so`, samples, and `doca_caps` are guaranteed consistent by construction. The agent must still report which path was used so the user knows which install they verified.
 
 ## Error taxonomy
 
@@ -85,14 +85,14 @@ Env-class errors that the agent should recognize and disambiguate before falling
 
 | Error surface | Typical message | Most-likely cause | Next step |
 | --- | --- | --- | --- |
-| `pkg-config` | `Package 'doca-flow' was not found` | Wrong install profile (`doca-flow.pc` is missing) **or** `PKG_CONFIG_PATH` does not include `/opt/mellanox/doca/infrastructure/lib/pkgconfig`. | Run `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/`. If `doca-flow.pc` exists, fix `PKG_CONFIG_PATH` (see [`TASKS.md ## configure`](TASKS.md#configure)). If it doesn't, reinstall with `doca-all` — or, if no install is reachable, the user should reach one via [`TASKS.md ## no-install`](TASKS.md#no-install). |
-| First-app workflow | `/opt/mellanox/doca/samples/` is empty, missing, or `ls` returns `No such file or directory` on a host where `pkg-config --modversion doca-common` succeeds | Partial install: the `doca-samples` package was not installed alongside `doca-common`. The bundle's canonical first-app workflow ([AGENTS.md `## Ground rules` rule 5](../../AGENTS.md#ground-rules-every-agent-must-follow)) requires *modify-from-shipped-sample*; with no `samples/` tree the workflow cannot apply on this host. | The agent MUST say so explicitly to the user, MUST NOT scaffold `main.c` / `Makefile` / `Dockerfile` from API memory, and MUST route to one of: (a) targeted `apt install doca-samples` (or platform equivalent), (b) pivot to the NGC DOCA container via [`TASKS.md ## no-install`](TASKS.md#no-install) Path 0, where samples are guaranteed present at the container tag, or (c) point the user at the [DOCA samples in the public archive on `docs.nvidia.com`](https://docs.nvidia.com/doca/sdk/) and have them install the `doca-samples` package before continuing. |
+| `pkg-config` | `Package 'doca-flow' was not found` | Wrong install profile (`doca-flow.pc` is missing) **or** `PKG_CONFIG_PATH` does not include `/opt/mellanox/doca/infrastructure/lib/pkgconfig`. | Run `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/`. If `doca-flow.pc` exists, fix `PKG_CONFIG_PATH` (see [`TASKS.md ## configure`](TASKS.md#configure)). If it doesn't, reinstall with `doca-all` — or, if no install is reachable, the user should reach one via [`TASKS.md ## no-install`](references/no-install.md). |
+| First-app workflow | `/opt/mellanox/doca/samples/` is empty, missing, or `ls` returns `No such file or directory` on a host where `pkg-config --modversion doca-common` succeeds | Partial install: the `doca-samples` package was not installed alongside `doca-common`. The bundle's canonical first-app workflow ([AGENTS.md `## Ground rules` rule 5](../../AGENTS.md#ground-rules-every-agent-must-follow)) requires *modify-from-shipped-sample*; with no `samples/` tree the workflow cannot apply on this host. | The agent MUST say so explicitly to the user, MUST NOT scaffold `main.c` / `Makefile` / `Dockerfile` from API memory, and MUST route to one of: (a) targeted `apt install doca-samples` (or platform equivalent), (b) pivot to the NGC DOCA container via [`TASKS.md ## no-install`](references/no-install.md) Path 0, where samples are guaranteed present at the container tag, or (c) point the user at the [DOCA samples in the public archive on `docs.nvidia.com`](https://docs.nvidia.com/doca/sdk/) and have them install the `doca-samples` package before continuing. |
 | `meson` configure | `Dependency doca-flow found: NO` | Same as above (meson uses `pkg-config` under the hood). | Same as above. |
 | `meson` configure | `compiler not found` / `meson not found` | Build toolchain missing on this host (common on minimal BlueField images). | Install the appropriate `build-essential` / `meson` / `ninja-build` packages for the OS. The NGC DOCA container ships these by default. |
 | Compile time | `error: unknown type name 'doca_flow_pipe_cfg'` | The header path is not on the include search path, or the headers are from an older DOCA than the library you intend to link against. | `pkg-config --cflags doca-flow` to obtain the canonical include flags; cross-check the version ([`TASKS.md ## test`](TASKS.md#test)). |
 | Link time | `undefined reference to 'doca_flow_pipe_create'` | The library is not on the link line (`-ldoca_flow` missing), or the library found at link time is older than the headers. | `pkg-config --libs doca-flow`; verify `--modversion` of the package matches the headers' release. |
 | Runtime | `EAL: No free 2048 kB hugepages reported` | Hugepages not mounted or insufficient. | Mount and reserve hugepages ([`TASKS.md ## configure`](TASKS.md#configure)). |
-| Runtime | `Cannot find any working PCI driver` | Kernel modules for the device not loaded, or the BlueField is not in the expected mode (host vs. DPU vs. switch). | `lsmod | grep mlx5`; verify mode via `mlxconfig`. Inside an NGC container with no real NIC, this is *expected* and the right move is to graduate the user to a hardware path (Path A or Path C in [`TASKS.md ## no-install`](TASKS.md#no-install)). |
+| Runtime | `Cannot find any working PCI driver` | Kernel modules for the device not loaded, or the BlueField is not in the expected mode (host vs. DPU vs. switch). | `lsmod | grep mlx5`; verify mode via `mlxconfig`. Inside an NGC container with no real NIC, this is *expected* and the right move is to graduate the user to a hardware path (Path A or Path C in [`TASKS.md ## no-install`](references/no-install.md)). |
 | Runtime | `representor X not found` | Representors not enabled on the PF (`devlink dev eswitch set ... mode switchdev`), or the application is asking for a representor index that doesn't exist on this hardware. | `devlink dev show`; cross-check requested index against `cat /sys/class/net/*/phys_port_name`. |
 | Runtime | Application starts, exits cleanly, no traffic effect | Often a silent steering-mode mismatch (HWS expected, SWS active) or a switch-mode app run in non-switch mode. | Re-run `doca_caps`; cross-check the steering mode the application requested via library init args. |
 
@@ -137,7 +137,7 @@ env-class report is exactly **install → capability → runtime**, in that
 order — never start at the application layer when these have not been
 verified.
 
-Inside the NGC DOCA container, the install and capability layers above will respond normally; the runtime layer will partially or fully report no real hardware (no hugepages mounted by default, no `devlink` devices visible, no representors). That is the expected state for the build / read / learn loop the container is for; for runtime against real hardware, the user has to graduate to a hardware path (see [`TASKS.md ## no-install`](TASKS.md#no-install) Paths A and C).
+Inside the NGC DOCA container, the install and capability layers above will respond normally; the runtime layer will partially or fully report no real hardware (no hugepages mounted by default, no `devlink` devices visible, no representors). That is the expected state for the build / read / learn loop the container is for; for runtime against real hardware, the user has to graduate to a hardware path (see [`TASKS.md ## no-install`](references/no-install.md) Paths A and C).
 
 ## Safety policy
 
@@ -149,7 +149,7 @@ DOCA install and runtime preparation are **shared system state**. Several env ac
 
 3. **Never auto-`reboot` or auto-power-cycle.** `mlxconfig` and BFB updates require a host reset to take effect. The agent should produce the *commands* and explain the requirement, but must not chain them with an unattended reboot — let the user confirm their environment can absorb the reboot.
 
-4. **The NGC container is build / read / learn only — not a runtime substitute.** The public NGC DOCA container at `nvcr.io/nvidia/doca/doca` is the canonical Stage-1 path for any user on macOS, Windows, or Linux without DOCA, but it is *not* a substitute for running against real hardware. DPDK / DOCA calls that require a real NIC, real DPU, real hugepages on the host kernel, or real driver presence will fail inside the container — and that failure is correct. The agent must not work around this boundary by granting the container unrestricted host privileges or exposing host devices; when the user needs runtime, graduate them from Path 0 to Path A or Path C in [`TASKS.md ## no-install`](TASKS.md#no-install).
+4. **The NGC container is build / read / learn only — not a runtime substitute.** The public NGC DOCA container from the catalog Tags page is the canonical Stage-1 path for any user on macOS, Windows, or Linux without DOCA, but it is *not* a substitute for running against real hardware. DPDK / DOCA calls that require a real NIC, real DPU, real hugepages on the host kernel, or real driver presence will fail inside the container — and that failure is correct. The agent must not work around this boundary by granting the container unrestricted host privileges or exposing host devices; when the user needs runtime, graduate them from Path 0 to Path A or Path C in [`TASKS.md ## no-install`](references/no-install.md).
 
 5. **Be explicit about what changes when the user installs DOCA.** Installing the host package modifies kernel modules (`mlx5_core`, OFED), adds udev rules, and (for `doca-all`) installs services that may auto-start. Surface this before recommending an install on a host that has other workloads.
 
@@ -194,21 +194,15 @@ The bridge converts a verification-only answer into a verification + iteration a
 
 ## Hardware binding-layer command stanza
 
-Any answer that touches hardware state — recognizing the system shape, configuring representors, pinning workloads to NUMA / IRQ / queues, debugging a *"does nothing on the wire"* runtime symptom, applying a `doca-hardware-safety` overlay — MUST instantiate the **binding-layer command stanza** below. The stanza is the bundle-wide hardware-enumeration shape; per-artifact skills (doca-bare-metal-deployment, doca-flow, libs/doca-rdma, …) layer their library-specific binding details on top.
+The full read-only enumeration stanza (commands, healthy-output, when-mandatory)
+lives in [references/hardware-binding.md](references/hardware-binding.md).
+Load that companion for any hardware-touching answer. Mutating commands are
+not in that file. The six spine rows every hardware-touching answer must
+instantiate are:
 
-The agent's failure mode the stanza replaces: mentioning hardware ("you'll want to pin this to the right NUMA node") without naming the specific commands that produce the enumeration. Pointing at *"check the binding"* without running the commands is the same failure mode the debug-loop contract replaces for symptoms — hand-waving instead of evidence.
-
-| Stanza row | Read-only command | What it tells the agent | When the row is mandatory |
-| --- | --- | --- | --- |
-| **PCIe presence** | `lspci -d 15b3:` (Mellanox vendor ID 15b3); for a specific device, `lspci -s <bdf> -vvv`. | Confirms the BlueField NIC / DPU is visible to the host kernel and enumerates its function structure (PF / VF / SF). Empty output = the device is not bound, the kernel module is not loaded, or the device is in the wrong eswitch mode. | Every hardware-touching answer; this is the lowest-cost confirmation of hardware reachability. |
-| **Driver / device state** | `devlink dev show`; for representors, `devlink port show`; for SR-IOV, `cat /sys/class/net/<pf>/device/sriov_numvfs` and `ls /sys/class/net/<pf>/device/virtfn*/net/`. | Confirms the driver has bound the device, lists ports the kernel sees, and reports SR-IOV state. A `devlink dev show` that lists the device with `flavour: physical` but no representors means SR-IOV has not been enabled or the eswitch is in `legacy` mode. | Any deployment-shape answer (recognize / configure), any answer that references representors, any *"interface X is missing"* runtime debug. |
-| **NUMA topology** | `cat /sys/class/net/<iface>/device/numa_node` (the NUMA node the NIC is attached to); `numactl -H` (the host topology); `lscpu \| grep -i numa` (CPU NUMA enumeration). | Tells the agent which NUMA node the workload must be pinned to for line-rate. A NIC on node 0 with a worker on node 1 will eat ~30–60% of throughput to cross-socket traffic. | Any bare-metal performance answer; any `doca-bare-metal-deployment ## run` invocation with isolation; any *"my throughput is low"* runtime debug. |
-| **IRQ affinity** | `cat /proc/interrupts \| grep <iface>` (current IRQ-to-CPU mapping); `ls /sys/class/net/<iface>/device/msi_irqs/`; for inspection of one IRQ, `cat /proc/irq/<n>/smp_affinity_list`. | Confirms which CPU cores the NIC's MSI-X interrupts land on. Default kernel placement is rarely optimal for DOCA workloads; the agent must check before recommending or before debugging interrupt-storm symptoms. | Any answer that recommends CPU pinning, IRQ steering, or polling-mode tuning. |
-| **Firmware / configuration snapshot** | `mlxconfig -d <bdf> q` (current firmware NV config — read-only, side-effect-free); for a single key, `mlxconfig -d <bdf> q \| grep -i <key>`. | Reports the firmware-level configuration (eswitch mode, SR-IOV count, port-type, IB vs ETH, etc.). The four-way coherence rule from [`doca-version CAPABILITIES.md ## Version compatibility`](../doca-version/CAPABILITIES.md#version-compatibility) explicitly includes firmware; ignoring this row means missing the case where the host install is consistent but the firmware is on a different rev. | Any answer that touches `mlxconfig`-class settings (the trigger that loads `doca-hardware-safety`); any version-coherence answer where firmware is in scope; any *"the feature is supposed to be supported but isn't"* runtime debug. |
-| **Kernel module state** | `lsmod \| grep -E 'mlx5_core\|mlx5_ib\|mlx_compat'`; `modinfo mlx5_core \| head -20` for version detail. | Confirms the kernel modules backing the device are loaded and at the expected version. A missing `mlx5_core` produces every higher-layer symptom as a cascade; a mismatched module version against the OFED stack produces the "looks fine but nothing works" class. | Any *"no devices visible"* runtime symptom; any cross-kernel-upgrade debug. |
-
-**The stanza is read-only.** Every row is a side-effect-free enumeration. Mutating commands (`mlxconfig -d <bdf> set ...`, `devlink dev eswitch set ... mode switchdev`, kernel-module reload, BFB reflash) are NOT part of the stanza — they belong in the per-artifact `## modify` anchor and require the [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) overlay. Running the stanza is always safe; acting on what it reveals is what requires the safety overlay.
-
-**Stacking rule.** When a per-artifact skill is loaded (e.g. [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md), [`doca-flow`](../libs/doca-flow/SKILL.md)), the per-artifact `## configure` / `## run` anchors layer library-specific binding details on top — for Flow, the steering-mode capability query (`doca_caps`) and the representor-to-`port_id` mapping; for bare-metal, the cgroup-v2 + namespace + `taskset` instantiation. The cross-cutting stanza is the spine; the per-artifact overlay names the artifact-specific calls.
-
-**Cross-cutting layering.** When the [`## recognize`](TASKS.md#recognize) front-door routing decision fires, the auto-detect block at step 1 of that anchor is a *subset* of this stanza (PCIe presence + DOCA install presence). The full stanza is what `## recognize` hands off to the routed skill so the downstream answer has the binding-layer picture in hand. When the universal verification contract fires, step 1 (Preconditions) MUST include the relevant rows of this stanza for any hardware-touching change.
+| **PCIe presence** | `lspci -d 15b3:` | Device visible to the host kernel? |
+| **Driver / device state** | `devlink dev show` | Driver bound; representors / SR-IOV visible? |
+| **NUMA topology** | `cat /sys/class/net/<iface>/device/numa_node` | NIC NUMA node vs worker placement |
+| **IRQ affinity** | `cat /proc/interrupts \| grep <iface>` | MSI-X IRQ-to-CPU mapping |
+| **Firmware / configuration snapshot** | `mlxconfig -d <bdf> q` | Firmware NV config (read-only) |
+| **Kernel module state** | `lsmod \| grep -E 'mlx5_core\|mlx5_ib\|mlx_compat'` | `mlx5_core` loaded at the expected version |

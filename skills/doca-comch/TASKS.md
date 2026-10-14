@@ -21,6 +21,23 @@ copy-paste recipe. The agent's job is to walk the user through the
 steps in order, verifying preconditions before recommending the
 next call.
 
+## DOCA 3.5 field notes
+
+Observed on DOCA 3.5 (developer review); check them before debugging
+further:
+
+- **`doca_ctx_start()` returns `DOCA_ERROR_IN_PROGRESS`** for the
+  Comch client and consumer. That is an asynchronous start, not a
+  failure: keep calling `doca_pe_progress()` until the context state
+  callback reports `DOCA_CTX_STATE_RUNNING`. Code that treats the
+  return value as an error exits too early.
+- **Start the BlueField server first.** A client with no server
+  fails with a firmware code instead of a reason (`Failed to create
+  devx object with syndrome=0xe5300 ... Client registration failed`).
+- **Run the BlueField side as root.** Without it, opening the
+  representor fails with the misleading `representor devices are
+  available only on DPU, do not run on Host`, even on the DPU.
+
 ## configure
 
 Goal: stand up a Comch channel between a host process and a DPU

@@ -17,9 +17,9 @@ policy that these workflows assume, see
 [CAPABILITIES.md](CAPABILITIES.md). For the universal
 modify-a-shipped-sample workflow and the cross-library
 `DOCA_ERROR_*` taxonomy these workflows rest on, see
-[`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 For the cross-cutting debug ladder that the Common debug verb feeds
-into, see [`doca-debug`](../../doca-debug/SKILL.md).
+into, see `doca-debug/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through the
@@ -30,9 +30,9 @@ next call.
 
 DOCA Common is part of every DOCA install — installing doca-common
 in isolation is not a thing. The install verb routes to
-[`doca-setup`](../../doca-setup/SKILL.md) for the env / install
+`doca-setup/SKILL.md` for the env / install
 chain, and to
-[`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package)
+`doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`)
 for the on-disk layout the rest of this file assumes.
 
 The agent's checks before declaring the install ready for any
@@ -41,20 +41,20 @@ foundation work:
 1. **`pkg-config --modversion doca-common` returns a semver
    string** — this is the universal anchor every doca-common
    workflow assumes. If the query fails, the install is broken;
-   route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)
+   route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`)
    layer 1 (install).
 2. **`doca_caps --version` agrees** with the `pkg-config` result
    per the four-way match rule in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 3. **The Common headers are resolvable** under
    $(pkg-config --variable=includedir doca-common) (`doca_buf.h`,
    `doca_ctx.h`, `doca_dev.h`, `doca_pe.h`, `doca_log.h`,
    `doca_mmap.h`, …) per the headers-win-over-docs rule in
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 If any of the three checks fails, **stop** — this skill's
 workflows assume the install is healthy, and a partial install is a
-[`doca-setup`](../../doca-setup/SKILL.md) concern.
+`doca-setup/SKILL.md` concern.
 
 ## configure
 
@@ -65,11 +65,11 @@ Rmax, …) is going to consume.
 Steps the agent should walk the user through:
 
 1. **Confirm the installed DOCA version.** Use the procedure in
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
    Quote the version observed (`pkg-config --modversion
    doca-common`, then `doca_caps --version`); do not assume
    "latest". The four-way match rule lives in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 2. **Enumerate devices and pick one.** Call
    `doca_devinfo_create_list(&devinfos, &num)`; iterate; pick the
    `doca_devinfo` whose `doca_devinfo_get_pci_addr_str` /
@@ -127,16 +127,16 @@ flags.
 
 The build pattern for any DOCA C/C++ consumer is fully documented
 in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the doca-common-specific overlay:
 
 | Slot | Value for doca-common | Why it matters |
 | --- | --- | --- |
-| `pkg-config` module name | `doca-common` (always present on any healthy install; the universal anchor) | The Common surface is the foundation every higher-level library depends on. The agent's probe rule is `pkg-config --exists doca-common` first; if it fails, the install is broken (route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) layer 1) |
+| `pkg-config` module name | `doca-common` (always present on any healthy install; the universal anchor) | The Common surface is the foundation every higher-level library depends on. The agent's probe rule is `pkg-config --exists doca-common` first; if it fails, the install is broken (route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layer 1) |
 | Required runtime libs | `libdoca_common` (returned by `pkg-config --libs doca-common`) | Any DOCA app links this transitively through its primary library's `.pc`, but a Common-only consumer (e.g. a device-discovery tool) links it directly |
 | Include flags | `pkg-config --cflags doca-common` resolves to includes under $(pkg-config --variable=includedir doca-common) (`doca_buf.h`, `doca_ctx.h`, `doca_dev.h`, `doca_pe.h`, `doca_log.h`, `doca_mmap.h`, `doca_error.h`, `doca_types.h`, …) | Hand-typed `-I` lines drift between releases; only `pkg-config` survives a DOCA upgrade |
 | Link flags | `pkg-config --libs doca-common` returns the canonical `-l` list | Hand-typed `-l` lines are the failure mode; the order matters for static-linking and `pkg-config` knows the right shape |
-| Minimum required DOCA version | Query with `pkg-config --modversion doca-common`; never hardcode in build files | The four-way match rule in [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility) requires the build-time version to be reachable; hardcoding it breaks the chain |
+| Minimum required DOCA version | Query with `pkg-config --modversion doca-common`; never hardcode in build files | The four-way match rule in `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`) requires the build-time version to be reachable; hardcoding it breaks the chain |
 | Companion library probes (optional) | If the release exposes a standalone `doca-log.pc` (release-dependent), probe it with `pkg-config --exists doca-log` and use it for the log subsystem; otherwise the log surface ships through `doca-common` | Per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility), the agent must verify on the user's install — never quote one shape from memory |
 
 For non-C consumers (Rust, Go, Python), the wrapper consumes the
@@ -146,7 +146,7 @@ through the language's own FFI generator (e.g. `bindgen` against
 `doca_log.h`). The lifecycle, the cap-query rule, the PE drive
 loop, and the two-tier log model still apply — the wrapper consumes
 a `*.so` that has its own runtime version per
-[`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+`doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 
 ## modify
 
@@ -157,7 +157,7 @@ and apply a **minimum diff** to add or change the foundation wiring
 without rewriting from scratch.
 
 The universal modify-a-shipped-sample workflow is in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify);
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`);
 this skill provides the doca-common-specific slot fill.
 
 | Slot | Value | Source |
@@ -187,7 +187,7 @@ Steps the agent should walk the user through:
    agree. A mismatch means the binary is loading a different
    `libdoca_common.so` than the one its build-time `pkg-config`
    saw — debug via
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    before assuming a Common bug.
 2. **Set the SDK log tier explicitly on first run.** Pass
    `--sdk-log-level WARNING` (most shipped samples / reference apps
@@ -225,7 +225,7 @@ Steps the agent should walk the user through:
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
 underlie *"the program built but does nothing"*, see
-[`doca-version TASKS.md ## run`](../../doca-version/TASKS.md#run).
+`doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
 
@@ -271,7 +271,7 @@ Steps:
    library exposes that cap publicly). The result must match the
    configure-time baseline; if it does not, the device or firmware
    state changed (mode flip, firmware burn — see
-   [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md))
+   `doca-hardware-safety/SKILL.md`)
    and the user is operating on a different surface than they
    thought.
 3. **Lifecycle smoke.** With the user's smallest possible
@@ -291,7 +291,7 @@ evidence-backed mutation followed by one complete rerun. Stop when
 that second sweep finishes, even if another mutation appears useful.
 If all four steps are not green without mutating a prior step,
 escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured log + baseline + version state as evidence.
 
 ## debug
@@ -308,7 +308,7 @@ before recommending any code change.
 > `--sdk-log-level`, `DOCA_LOG_LEVEL`, the `doca-<lib>-trace` build
 > flavor, container-vs-native debug, core dumps, Developer Forum
 > escalation), see
-> [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug). The
+> `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). The
 > agent should walk the cross-cutting ladder first whenever the
 > symptom layer is not yet known; this Common overlay layers on top
 > once the symptom is confirmed to be inside the foundation surface.
@@ -341,11 +341,11 @@ Walk in this order — do not skip steps:
    `DOCA_ERROR_NOT_PERMITTED`, this is a host-side env issue
    (kernel module loads, user group, ulimits, IOMMU mode, missing
    capabilities) — route to
-   [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`).
 6. **Version sanity.** If a previously working spec now fails or
    behaves differently, confirm the installed DOCA version did not
    change via the four-source coherence check in
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2. A library upgrade between sessions is a common and
    easy-to-miss cause.
 7. **Escalation criteria.** If the lifecycle is correct, the
@@ -353,9 +353,9 @@ Walk in this order — do not skip steps:
    the version is unchanged AND the symptom persists — the bug is
    below the Common API surface (driver or firmware). Stop
    attempting Common-spec changes; capture state per
-   [`doca-debug ## test`](../../doca-debug/TASKS.md#test) (the
+   `doca-debug ## test` (`doca-debug/TASKS.md#test`) (the
    read-only triple) and escalate via
-   [`doca-debug ## debug` *Where to ask for help*](../../doca-debug/TASKS.md#debug)
+   `doca-debug ## debug` *Where to ask for help* (`doca-debug/TASKS.md#debug`)
    to the public DOCA Developer Forum.
 
 ## use
@@ -510,9 +510,9 @@ the agent does not invent guidance:
 - **deploy.** Deploying DOCA apps at scale, routing log output to
   centralized aggregation systems, K8s sidecars — out of scope for
   this skill; partial guidance in
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for DOCA Log Service and DOCA Telemetry Service routing, and
-  [`doca-container-deployment`](../../doca-container-deployment/SKILL.md)
+  `doca-container-deployment/SKILL.md`
   for the container path.
 - **rollback.** Coordinated rollback across multiple hosts /
   DPUs — out of scope for this skill. For single-host config
@@ -542,7 +542,7 @@ unprivileged user unless noted.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env
@@ -556,10 +556,10 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the row.
    Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
@@ -579,7 +579,7 @@ For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL` / `DOCA_LOG_LEVEL_SDK`) the cross-library overlay
 is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the doca-common-specific rows on top.
 
 Three cross-cutting rules for this appendix:
@@ -590,10 +590,10 @@ Three cross-cutting rules for this appendix:
   and the installed `doca_*.h` headers are the only safe sources.
 - **Never paraphrase a Common `DOCA_ERROR_*`.** Quote
   `doca_error_get_descr()` verbatim — the layer-classifier in
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) layer 5
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) layer 5
   needs the exact text.
 - **Cross-link instead of duplicate.** Cross-cutting commands (the
   read-only triple, `dmesg`, `lspci`, `mlxconfig -d <pcie> q`) live
   in
-  [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+  `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
   this appendix names only the doca-common-specific ones.

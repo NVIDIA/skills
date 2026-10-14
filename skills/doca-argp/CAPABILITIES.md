@@ -12,7 +12,7 @@ Read this file when the loader sent you here from
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers an Arg-Parser
 overlay on top of, see
-[`doca-version`](../../doca-version/SKILL.md).
+`doca-version/SKILL.md`.
 
 ## Pattern overview
 
@@ -121,7 +121,7 @@ before recommending the Arg Parser path.
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body lives
+`doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The Arg-Parser-specific overlay** is:
@@ -132,19 +132,19 @@ there; this skill does not duplicate it.
   every package profile. Use `pkg-config --exists doca-argp`
   for the presence check FIRST, then `pkg-config --modversion
   doca-argp` for the version. Per the cross-cutting rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the build-time `pkg-config` value is the authority for *"is
   this library available for me to link against?"*.
 - **`doca-argp.pc` and `doca-common.pc` must both match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   A common partial-install pattern after a DOCA upgrade is
   that `doca-argp.pc` lingers from the previous release; route
-  to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any Arg-Parser-layer diagnosis.
 - **Headers in $(pkg-config --variable=includedir doca-common)
   win over public docs.** Per the headers-win-over-docs rule
-  in [`doca-version`](../../doca-version/SKILL.md), if a
+  in `doca-version/SKILL.md`, if a
   public Arg Parser doc page mentions a `doca_argp_*` symbol
   that is not in the installed `doca_argp.h`, the headers
   describe what *this* install can call; the docs describe
@@ -156,7 +156,7 @@ there; this skill does not duplicate it.
 Arg-Parser-specific overlays on the cross-library
 `DOCA_ERROR_*` taxonomy. The cross-library taxonomy itself
 lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *Arg Parser surface* meaning that the
 agent must disambiguate before falling back to the
 cross-library response.
@@ -203,18 +203,18 @@ Three primary signals the agent should reach for:
    cross-cutting observability primitives
    (`DOCA_LOG_LEVEL=trace`, `--sdk-log-level`, the trace build
    flavor) in
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability),
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`),
    the Arg Parser routes its own messages through DOCA Log; a
    trace-level run shows the per-param parse calls and the
    JSON-config file read.
 
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The Arg Parser's safety surface is **lower-stakes than most DOCA
 libraries** for string, integer, boolean, and double parameters: that
@@ -276,21 +276,21 @@ elsewhere:
   layered on top if a feature is genuinely required.
 - **DOCA Core context, progress engine, and `doca_mmap`
   internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   Arg Parser is upstream of the Core context (it parses the
   CLI that selects which device the Core context will open);
   it does not redefine the Core context.
 - **DOCA Log internals** (registry names, per-source level
   filters) — owned by the public DOCA Log guide reachable
   through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
   Arg Parser registers `--sdk-log-level` as a default flag but
   does not own the log layer it configures.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the Arg Parser overlay, not the taxonomy
   itself.
 - **Cross-cutting debug ladder** (install / version / build /
   link / runtime / program / driver) — owned by
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug).
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`).
   This skill's `## debug` overlays the program layer.

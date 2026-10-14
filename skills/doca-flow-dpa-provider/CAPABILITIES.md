@@ -15,11 +15,11 @@ pattern (the verbs `install / configure / build / modify /
 run / test / debug / use`), jump to [TASKS.md](TASKS.md).
 For the canonical DOCA version-handling rules that this
 skill layers a provider overlay on top of, see
-[`doca-version`](../../doca-version/SKILL.md). For the
+`doca-version/SKILL.md`. For the
 host-side Flow surface this library exports, see
-[`doca-flow`](../doca-flow/SKILL.md). For the host-side DPA
+`doca-flow/SKILL.md`. For the host-side DPA
 lifecycle and the two-side-program rule this library
-inherits, see [`doca-dpa`](../doca-dpa/SKILL.md).
+inherits, see `doca-dpa/SKILL.md`.
 
 ## Pattern overview
 
@@ -80,14 +80,14 @@ into the relevant capability surface.
 
 | Side | What runs there | Toolchain | What this skill covers |
 | --- | --- | --- | --- |
-| Host (Flow) | C / C++ (or any language that can FFI a C library) using `doca-flow` to bring up the port and construct the pipe spec | Host system compiler + `pkg-config doca-flow` | This skill *consumes* the result; the build-up of the pipe is owned by [`doca-flow`](../doca-flow/SKILL.md). The agent surfaces that the pipe is the same pipe in both libraries — the provider does NOT create its own pipe object |
+| Host (Flow) | C / C++ (or any language that can FFI a C library) using `doca-flow` to bring up the port and construct the pipe spec | Host system compiler + `pkg-config doca-flow` | This skill *consumes* the result; the build-up of the pipe is owned by `doca-flow/SKILL.md`. The agent surfaces that the pipe is the same pipe in both libraries — the provider does NOT create its own pipe object |
 | Host (DPA / DPACC) | C / C++ using `doca-flow-dpa-provider` (this skill) + the host-side DPA execution surface (`doca-dpa` and the underlying FlexIO process) to allocate queues, run the export handshake, and hand the device address to the DPA kernel | Host system compiler + `pkg-config doca-flow-dpa-provider` + the DPACC compiler for the DPA-side translation unit | All of `## Capabilities and modes` / `## Error taxonomy` / `## Observability` / `## Safety policy` below |
-| DPA side | The kernel function body that runs on the DPA processor; consumes the `doca_flow_dpa_addr` device pointer and calls the DPA-side device API (`doca_flow_pipe_hash_*`, `doca_flow_external_resource_*`, `doca_flow_queue_poll_completion`) | DPACC (DPA-side compiler) plus the device-side library that is linked when the kernel includes `doca_flow_dpa_provider_dev.h` | This skill names the DPA-side surface and routes via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) to the public DOCA DPA / DPACC guides for the kernel-writing mechanics; it does not redefine those surfaces |
+| DPA side | The kernel function body that runs on the DPA processor; consumes the `doca_flow_dpa_addr` device pointer and calls the DPA-side device API (`doca_flow_pipe_hash_*`, `doca_flow_external_resource_*`, `doca_flow_queue_poll_completion`) | DPACC (DPA-side compiler) plus the device-side library that is linked when the kernel includes `doca_flow_dpa_provider_dev.h` | This skill names the DPA-side surface and routes via `doca-public-knowledge-map/SKILL.md` to the public DOCA DPA / DPACC guides for the kernel-writing mechanics; it does not redefine those surfaces |
 
 The agent's rule: when the user asks *"how do I write the DPA
 kernel itself"*, that is the DPA-side question — route to
 the public DPA / DPACC guide via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 When the user asks *"how do I export my host-side Flow pipe
 so a DPA kernel can read its counters and modify its
 entries"*, that is this skill's scope.
@@ -127,7 +127,7 @@ skill exists to teach.**
 
 | Step | Call | Why it has to happen at this position |
 | --- | --- | --- |
-| 1. Build the pipe on the host | `doca_flow_pipe_create` (owned by [`doca-flow`](../doca-flow/SKILL.md)) — the pipe object that will be exported | The provider does NOT define its own pipe; it bridges an existing `doca-flow` pipe. If the pipe spec is wrong, fix that in `doca-flow` BEFORE coming here |
+| 1. Build the pipe on the host | `doca_flow_pipe_create` (owned by `doca-flow/SKILL.md`) — the pipe object that will be exported | The provider does NOT define its own pipe; it bridges an existing `doca-flow` pipe. If the pipe spec is wrong, fix that in `doca-flow` BEFORE coming here |
 | 2. Mark the pipe as a candidate for export | `doca_flow_dpa_pipe_export_prepare(ctx, pipe, nr_entries, &dpa_pipe)` — must be done BEFORE any entry is added to the pipe (per the installed header), otherwise those entries will not be exported | The provider must register the pipe's planned entry budget BEFORE the host adds entries; doing it after the entries are added silently produces an exported pipe with no entries the DPA kernel can see |
 | 3. Add entries on the host | `doca_flow_pipe_add_entry` (owned by `doca-flow`), called AFTER step 2 | The host still owns the entry-add surface; the provider just made the pipe DPA-aware in step 2 |
 | 4. Commit the export | `doca_flow_dpa_pipe_export(ctx, dpa_pipe)` — actually copies the pipe's state into DPA address space | Until this call, the device address is not usable from the DPA kernel even though `dpa_pipe` exists on the host side. Re-exporting an already-exported pipe returns `DOCA_ERROR_BAD_STATE` per the installed header |
@@ -143,7 +143,7 @@ surface.**
 
 | Step | Call | Why it has to happen at this position |
 | --- | --- | --- |
-| 1. Build the external resource on the host | The matching `doca-flow` external-resource API (an index-selector resource or a memory resource) — owned by [`doca-flow`](../doca-flow/SKILL.md) | Same separation of concerns as the pipe — the provider does not define its own external resource |
+| 1. Build the external resource on the host | The matching `doca-flow` external-resource API (an index-selector resource or a memory resource) — owned by `doca-flow/SKILL.md` | Same separation of concerns as the pipe — the provider does not define its own external resource |
 | 2. Export to the DPA | `doca_flow_dpa_external_resource_export(ctx, resource_type, resource_ctx, &dpa_resource)` | Creates the DPA-side handle. Returns `DOCA_ERROR_BAD_STATE` if the queues required for the resource type were not yet created (see queue-config above) |
 | 3. Get the device address | `doca_flow_dpa_external_resource_get_device_addr(ctx, dpa_resource, &dev_addr)` | The DPA-side device pointer the kernel consumes. The DPA kernel calls `doca_flow_external_resource_*` against this address |
 
@@ -180,9 +180,9 @@ underlying DOCA DPA capability set. The agent must surface
 that there is no separate `doca_flow_dpa_provider_cap_*`
 family — capability discovery for this skill is the *join*
 of
-[`doca-flow CAPABILITIES.md ## Capabilities and modes`](../doca-flow/CAPABILITIES.md#capabilities-and-modes)
+`doca-flow CAPABILITIES.md ## Capabilities and modes` (`doca-flow/CAPABILITIES.md#capabilities-and-modes`)
 ("is the pipe shape supported on this device") and
-[`doca-dpa CAPABILITIES.md ## Capabilities and modes`](../doca-dpa/CAPABILITIES.md#capabilities-and-modes)
+`doca-dpa CAPABILITIES.md ## Capabilities and modes` (`doca-dpa/CAPABILITIES.md#capabilities-and-modes`)
 ("does this BlueField expose a DPA processor"). A pipe shape
 that fails to construct in `doca-flow` cannot be exported by
 this skill; a BlueField that fails the DPA cap query cannot
@@ -210,7 +210,7 @@ that ride on top of the queue-type rule.
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body lives
+`doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The provider-specific overlay** is:
@@ -230,7 +230,7 @@ there; this skill does not duplicate it.
   cross-check them against the DOCA Compatibility Policy at
   <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>,
   and route any disagreement to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   before any provider-layer diagnosis.
 - **Use the current `doca_flow_dpa_queues_create` API.** The
   installed v3.5 public header (`doca_flow_dpa_provider.h`)
@@ -243,7 +243,7 @@ there; this skill does not duplicate it.
   older pipe-queues surface only when the user explicitly asks
   about an older installed sample that still references it.
 - **The cross-cutting cap-query rule still applies.** Per
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the `doca_flow_*_cap_*` queries in `doca-flow` and the
   `doca_dpa_cap_*` queries in `doca-dpa` are the runtime
   authority for *"is this combined surface supported on
@@ -255,7 +255,7 @@ there; this skill does not duplicate it.
   <https://docs.nvidia.com/doca/sdk/doca-flow/index.html> and
   <https://docs.nvidia.com/doca/sdk/doca-dpa/index.html>
   since the library sits between the two. Route to
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the canonical URL list rather than quoting a specific
   URL from memory.
 
@@ -264,7 +264,7 @@ there; this skill does not duplicate it.
 Provider-specific overlays on the cross-library
 `DOCA_ERROR_*` taxonomy. The cross-library taxonomy itself
 lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *provider surface* meaning the agent
 must disambiguate before falling back to the cross-library
 response. Every row reflects an error code documented in the
@@ -277,7 +277,7 @@ installed headers `doca_flow_dpa_provider.h` and
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_flow_dpa_init` (device-side uses features the BlueField does not support); `_queues_create` (failed to match requested queue config to device capabilities); `_pipe_export_prepare` / `_pipe_export` (the pipe shape does not support an export — for example, a non-hash pipe being asked to expose hash-entry control to the DPA); `_external_resource_*` (the external resource type is not exportable) | The pipe spec OR the queue config OR the BlueField generation is asking for something the underlying capability set does not advertise. Re-run capability discovery in `doca-flow` (for the pipe shape) and `doca-dpa` (for the BlueField generation); do NOT retry the same export against the same device |
 | `DOCA_ERROR_NO_MEMORY` | `doca_flow_dpa_init`; `_queues_create`; `_pipe_export_prepare`; `_external_resource_export` | Allocation failure for the provider's internal bookkeeping (DPA context, queue arena, export context). Inspect host memory state; do not silently retry |
 | `DOCA_ERROR_BAD_STATE` | `_queues_create` (queues were already created for this port); `_pipe_export_prepare` (queues were not yet created); `_pipe_export` (preparation step failed or the pipe was already exported); `_external_resource_export` (queues not yet created or wrong queue-type set for this resource type) | Lifecycle violation. Walk the export lifecycle in [`## Safety policy`](#safety-policy); the most common shape is calling `_pipe_export_prepare` before `_queues_create`, or calling `_pipe_export` twice on the same pipe |
-| `DOCA_ERROR_DRIVER` | `doca_flow_dpa_init` (lower-level DPA-related layer failure); `_queues_create`; `_pipe_export` (error in DPA copy operations); on the DPA side, `doca_flow_queue_poll_completion` and `doca_flow_queue_flush` use `_DRIVER` for lower-layer failures | The DPA driver layer (or the joint DOCA + DPACC version skew) reported failure. Most common cause is a DOCA-Flow + DOCA-DPA + DPACC version mismatch per the DOCA Compatibility Policy; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) layer 5 (driver) AND to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) for the version-skew side |
+| `DOCA_ERROR_DRIVER` | `doca_flow_dpa_init` (lower-level DPA-related layer failure); `_queues_create`; `_pipe_export` (error in DPA copy operations); on the DPA side, `doca_flow_queue_poll_completion` and `doca_flow_queue_flush` use `_DRIVER` for lower-layer failures | The DPA driver layer (or the joint DOCA + DPACC version skew) reported failure. Most common cause is a DOCA-Flow + DOCA-DPA + DPACC version mismatch per the DOCA Compatibility Policy; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layer 5 (driver) AND to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) for the version-skew side |
 | `DOCA_ERROR_AGAIN` *(DPA-side)* | Every DPA-side post call (`doca_flow_pipe_hash_*`, `doca_flow_external_resource_*`) returns this when the matching work queue is full and the request could not be submitted | The DPA-side kernel is producing requests faster than the host (or the kernel itself) is polling the matching completion queue. Drain via `doca_flow_queue_poll_completion(queue_type)` on the right queue type, then retry. Same as the cross-library *"would-block, retry after progress"* pattern; this is NOT a queue-resize event |
 | `DOCA_ERROR_IO_FAILED` *(DPA-side)* | DPA-side `doca_flow_pipe_hash_*` and `doca_flow_external_resource_*` post paths | The submission itself was rejected by the lower DPA layer. This is rarer than `_AGAIN` and typically points at queue state corruption (e.g. queue destroyed while in-flight requests existed) rather than backpressure |
 | `DOCA_ERROR_NOT_SUPPORTED` *(DPA-side)* | `doca_flow_queue_poll_completion`, `doca_flow_queue_flush` (given queue type not supported); `doca_flow_pipe_hash_disable_index` (disable isn't supported for the given hash pipe); `doca_flow_external_resource_memory_read*` (read not supported in this configuration) | The DPA-side call asks for an operation the underlying pipe / resource / queue type does not expose. Re-read the pipe and resource construction in `doca-flow`; the fix is on the host side (build a pipe / resource that supports the operation), not on the DPA side |
@@ -299,7 +299,7 @@ observability surfaces) AND a DPA-side observability surface
 (the `doca_flow_dpa_completion_stats` populated by
 `doca_flow_queue_poll_completion`, plus the cross-library DPA
 developer tools the agent inherits from
-[`doca-dpa CAPABILITIES.md ## Observability`](../doca-dpa/CAPABILITIES.md#observability)).
+`doca-dpa CAPABILITIES.md ## Observability` (`doca-dpa/CAPABILITIES.md#observability`)).
 The agent must reach for both, not just one — a DPA-side
 request that is silently dropped because the matching
 completion queue is full will not show up on the host's
@@ -330,13 +330,13 @@ Four primary signals the agent should reach for:
    ground truth for whether traffic is matching the
    exported pipe. The provider does not bypass them; reach
    for them per
-   [`doca-flow CAPABILITIES.md ## Observability`](../doca-flow/CAPABILITIES.md#observability).
+   `doca-flow CAPABILITIES.md ## Observability` (`doca-flow/CAPABILITIES.md#observability`).
 4. **The underlying DPA observability surface.** The DPA
    developer tools named in
-   [`doca-dpa CAPABILITIES.md ## Observability`](../doca-dpa/CAPABILITIES.md#observability)
+   `doca-dpa CAPABILITIES.md ## Observability` (`doca-dpa/CAPABILITIES.md#observability`)
    (the DPA debugger, the DPA process-state inspector, the
    DPA statistics tool — all routed via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md))
+   `doca-public-knowledge-map/SKILL.md`)
    are the right surface when the DPA-side kernel is
    running but not making forward progress on the exported
    handles. Stuck-DPA cases are inherited from `doca-dpa`,
@@ -345,14 +345,14 @@ Four primary signals the agent should reach for:
 For cross-cutting observability primitives
 (`--sdk-log-level`, the `DOCA_LOG_LEVEL` env var, the trace
 build flavor) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout, sample tree) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The provider's safety surface is **export-lifecycle-driven
 AND three-program-driven**. Misusing the export handshake
@@ -394,7 +394,7 @@ provider setup:
    exported pipe whose entries the DPA cannot see.
 4. **Add entries to the pipe via `doca-flow` after step 3,
    not before.** Re-validate the spec before each add per
-   [`doca-flow CAPABILITIES.md ## Safety policy`](../doca-flow/CAPABILITIES.md#safety-policy).
+   `doca-flow CAPABILITIES.md ## Safety policy` (`doca-flow/CAPABILITIES.md#safety-policy`).
 5. **`doca_flow_dpa_pipe_export(ctx, dpa_pipe)`.** Calling
    it twice on the same `dpa_pipe` returns
    `DOCA_ERROR_BAD_STATE` per the installed header.
@@ -410,7 +410,7 @@ provider setup:
    the host-side teardown sequence appears to succeed.
 
 **Do not partial-rebuild one side.** Inherited from
-[`doca-dpa CAPABILITIES.md ## Safety policy`](../doca-dpa/CAPABILITIES.md#safety-policy):
+`doca-dpa CAPABILITIES.md ## Safety policy` (`doca-dpa/CAPABILITIES.md#safety-policy`):
 a host-side rebuild against a new DOCA install with the
 DPA-side image still built by an old `dpacc`, or the inverse,
 fails the export handshake in non-obvious ways (the host
@@ -420,7 +420,7 @@ DPACC versions per the DOCA Compatibility Policy.
 
 **Validate the host-side pipe before exporting it.**
 Inherited from
-[`doca-flow CAPABILITIES.md ## Safety policy`](../doca-flow/CAPABILITIES.md#safety-policy):
+`doca-flow CAPABILITIES.md ## Safety policy` (`doca-flow/CAPABILITIES.md#safety-policy`):
 the host-side `doca-flow` pipe specification MUST be
 validated (via the Flow pipe-validate API or the dry-run
 sample) BEFORE step 3 of the export lifecycle. A pipe that
@@ -438,5 +438,5 @@ non-production representor first, run a single hash-replace
 or memory-update against a known-safe entry, poll the
 completion queue to confirm `num_failed == 0`, then widen.
 The replica-first rule from
-[`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+`doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
 applies.

@@ -236,12 +236,17 @@ ultimately failed.
 
 Documented observability surfaces:
 
-- **Service logs.** DMS logs are split across documented components
-  and locations. The public guide also includes a documented example
-  log-rotation configuration. The agent's role on logging questions
-  is to identify the documented log component the user is reading,
-  quote the documented format expectation if it exists, and route to
-  the documented log-rotation example for retention setup.
+- **Service logs.** DMS logs split by component, and the answer to
+  "where do I look" is the component, not the guide. The frontend
+  daemon logs under its own unit — `journalctl -u dmsd` when it runs
+  under SystemD — and the `dmspe` backend logs separately, to the
+  destination its launch flags set. Name the one that matches the
+  layer being debugged: transport and auth failures surface on the
+  frontend, tool-execution failures on the backend. A logging answer
+  that says "check the documented log location" without naming
+  `dmsd` or `dmspe` has told the operator nothing they can act on.
+  For retention setup specifically, route to the public guide's
+  log-rotation example rather than inventing a policy.
 - **gNMI `Get` against State paths** — the documented way to read
   observed device state, separated from desired-Configuration state by
   the OpenConfig convention.

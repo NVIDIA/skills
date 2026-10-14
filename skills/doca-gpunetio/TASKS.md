@@ -24,6 +24,22 @@ copy-paste recipe. The agent's job is to walk the user through
 the steps in order, verifying preconditions before recommending
 the next call.
 
+## DOCA 3.5 field notes
+
+**GPU memory registration: dmabuf first, `nvidia-peermem` only as a
+fallback** (DOCA 3.5 GPUNetIO installation and setup page). dmabuf is
+the default and preferred method; it needs Linux kernel 6.2 or later,
+`libibverbs` 1.14.44 or later, and the open NVIDIA kernel driver
+(`nvidia-open`; CUDA 12.5 or older must be installed with
+`-m=kernel-open`). Get the descriptor with `doca_gpu_dmabuf_fd()`; on
+success use `doca_mmap_set_dmabuf_memrange()`, otherwise
+`doca_mmap_set_memrange()`. Without dmabuf, `doca_mmap_start()` falls
+back to legacy registration through `nvidia-peermem`
+(`sudo modprobe nvidia-peermem`) and logs `Registration using dmabuf
+is not supported, falling back to legacy registration`, which is
+harmless if peermem is acceptable. A missing `nvidia-peermem` module is
+therefore only a problem when dmabuf is unavailable.
+
 ## configure
 
 Goal: stand up a `doca_gpu` context on a target CUDA device,

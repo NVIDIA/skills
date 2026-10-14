@@ -2,24 +2,28 @@
 license: Apache-2.0
 name: doca-bare-metal-deployment
 description: >
-  Use this skill for launching, supervising, debugging, OR
-  platform lifecycle on a BlueField — BFB install, RShim/TMFIFO,
-  host PF rebind, post-BFB recovery — taking a DOCA-linked binary
-  to a healthy run directly on hardware (host x86 + BlueField NIC
-  over PCIe, or BlueField Arm bare-metal). No container, no
-  kubelet. Covers launch mode (direct, tmux, systemd), PCI/NUMA/
-  CPU/IRQ binding, co-tenant isolation (cgroup-v2/netns/numactl),
-  a seven-layer error taxonomy, and a six-state BlueField
-  lifecycle classifier. Trigger even when user does not say
-  "bare-metal" — implicit phrasings include "binary exits 1 right
-  after launch", "systemd keeps restarting it", "no matching
-  device on the BF", "bfb-install exited 0 but DPU is dead",
-  "ping 192.168.100.2 works but ssh fails", "host PFs aren't
-  showing netdevs". Destructive firmware burn / mlxconfig set
-  requires explicit confirmation via doca-hardware-safety;
-  containers, library APIs, env prep, and build use other skills.
+  Running a DOCA-linked binary directly on the hardware, with no container
+  or kubelet: on host x86 with a BlueField NIC over PCIe, or bare-metal on
+  BlueField Arm. Use for launching and supervising it (direct, tmux,
+  systemd), and when it "exits 1 right after launch", "systemd keeps
+  restarting it", reports "no matching device on the BF", or the BlueField
+  itself is unhealthy: "bfb-install exited 0 but DPU is dead", "ping
+  192.168.100.2 works but ssh fails", "host PFs aren't showing netdevs".
+  Service containers under kubelet belong to doca-container-deployment.
+  Covers PCI/NUMA/CPU/IRQ binding, co-tenant isolation
+  (cgroup-v2/netns/numactl), a seven-layer error taxonomy, platform
+  lifecycle (BFB install, RShim/TMFIFO, host PF rebind, post-BFB recovery)
+  and a six-state BlueField lifecycle classifier. Destructive firmware
+  burn / mlxconfig set requires explicit confirmation via
+  doca-hardware-safety; library APIs, env prep, and build use other
+  skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - deployment
+    - bare-metal
 compatibility: >
   No DOCA install required to read this skill (it is an overlay
   loaded against any DOCA artifact skill); the validation steps
@@ -28,6 +32,21 @@ compatibility: >
 ---
 
 # DOCA bare-metal deployment
+
+## Examples
+
+- **"The binary exits 1 right after launch."** — this is in scope.
+  Treat it as a launch / device-bind / isolation failure before
+  rewriting application code.
+- **"systemd keeps restarting my DOCA app."** — a restart loop on
+  hardware is high-stakes. Debug the first exit before enabling
+  Restart=always.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for launch /
+supervise / recover, and the capabilities companion for the runtime
+contract. Do not open every companion file.
 
 **Where to start:** This skill is the bundle's home for *operating*
 a DOCA-linked application binary **directly on hardware** — no
@@ -38,10 +57,10 @@ they built (per the canonical workflow in
 [`doca-programming-guide`](../doca-programming-guide/SKILL.md))
 and they want to know *how to actually run it on the host or on
 the BlueField Arm cores correctly*, open
-[`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure). If the question is *what
+the tasks companion and start at
+`## configure`. If the question is *what
 shape does the bare-metal runtime even have and what is the
-deployment contract*, start at [`CAPABILITIES.md`](CAPABILITIES.md).
+deployment contract*, start at the capabilities companion.
 If the user is not yet sure whether their target system shape is
 the container path or the bare-metal path, route the recognition
 step to [`doca-setup`](../doca-setup/SKILL.md) first; only return
@@ -54,7 +73,7 @@ have a DOCA-linked application binary they built and want to run
 it directly on hardware** — i.e., people who already have:
 
 - a DOCA-linked application binary they built per
-  [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build),
+  `doca-programming-guide ## build`,
 - a real BlueField NIC and a host that talks to it (the **host
   x86** path — DOCA host install on the host talks to the
   BlueField NIC over PCIe), OR a BlueField with a console or SSH
@@ -76,11 +95,11 @@ It is **not** for:
   for the single-host kubelet-standalone shape; **fleet/production-scale
   deployment is fleet-orchestration scope** — route to the orchestration
   entry-point in
-  [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/map.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing)
+  `doca-public-knowledge-map ## Deploying DOCA services at scale`
   (DPF / Network Operator / Launch Kit), not hand-rolled static-pod loops),
 - fresh-laptop-no-hardware users with no DOCA install yet — those
   belong on
-  [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+  `doca-setup ## no-install`.
 
 The skill teaches the agent the bare-metal-deployment *procedure*
 and the rules for quoting documented commands from the public DOCA
@@ -148,7 +167,7 @@ questions (use
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — the bare-metal deployment runtime contract
+- the capabilities companion — the bare-metal deployment runtime contract
   for a DOCA-linked binary: the two host modes (host x86 vs
   BlueField Arm bare-metal), the three launch modes (direct,
   tmux/screen, systemd-supervised), the hardware-resource-binding
@@ -172,7 +191,7 @@ companion files:
   representor names, devlink paths, or systemd `Restart=` mode
   names; confirm tenant-isolation primitives BEFORE the workload
   starts).
-- `TASKS.md` — step-by-step workflows for the in-scope bare-metal
+- the tasks companion — step-by-step workflows for the in-scope bare-metal
   verbs: `configure`, `build`, `modify`, `run` (with an explicit
   `### isolation` sub-anchor covering cgroup-v2 / namespaces /
   numactl per-tenant primitives), `test`, `debug`,
@@ -193,9 +212,9 @@ companion files:
 The skill assumes a host or BlueField target where:
 
 - DOCA is already installed and healthy (per
-  [`doca-setup ## test`](../doca-setup/TASKS.md#test)),
+  `doca-setup ## test`),
 - the user has a DOCA-linked application binary they built (per
-  [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build)),
+  `doca-programming-guide ## build`),
 - the user has the host-OS permissions to enumerate devices,
   reserve hugepages, write systemd units (if they choose that
   launch mode), and bind processes to NUMA nodes.
@@ -207,7 +226,7 @@ building the binary — that path goes through
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope (bare-metal launch of a DOCA-linked binary on host
    x86 or BlueField Arm; NOT the container path, NOT a full
    cluster, NOT a library-API question).
@@ -215,20 +234,17 @@ building the binary — that path goes through
    modes, hardware-binding surface, per-tenant isolation, version
    overlay, seven-layer error taxonomy, observability surface,
    bare-metal safety overlay), see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — `configure`, `build` (routing
    stub), `modify` (routing stub), `run` (with `### isolation`
    sub-anchor), `test`, `debug`, `bluefield-lifecycle` (BFB
    install + RShim/TMFIFO + post-BFB recovery + the six-state
    `bluefield-state-classifier`), plus the `Command appendix` and
-   the `Deferred task verbs` block — see [TASKS.md](TASKS.md).**
+   the `Deferred task verbs` block — see the tasks companion.**
 
 ## Example questions this skill answers well
 
-See [`references/details.md`](references/details.md#example-questions-this-skill-answers-well).
 ## What this skill deliberately does not ship
 
-See [`references/details.md`](references/details.md#what-this-skill-deliberately-does-not-ship).
 ## Related skills
 
-See [`references/details.md`](references/details.md#related-skills).

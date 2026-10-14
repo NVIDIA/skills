@@ -2,31 +2,53 @@
 license: Apache-2.0
 name: doca-urom
 description: >
-  Use this skill when the user is doing hands-on DOCA UROM library work
-  from the host side — wiring doca-urom under an HPC / UCX / MPI stack
-  to OFFLOAD remote memory operations (puts, gets, atomics, collectives)
-  onto a BlueField DPU, creating a UROM Service context
-  (doca_urom_service_*) and Worker contexts (doca_urom_worker_*) that
-  run plugins on the DPU, discovering plugins via
-  doca_urom_service_get_plugins_list, progressing completions, or
-  debugging DOCA_ERROR_* from a doca_urom_* call. Trigger even without
-  "DOCA UROM": "MPI all-reduce burning host CPU", "push UCX traffic
-  onto the BlueField", "first doca_urom call returns NOT_PERMITTED", or
-  "host library and DPU service look out of sync". Route elsewhere for
-  UROM Service deployment on the DPU side, MPI / UCX collective
-  algorithm design, and RDMA / RoCE / IB substrate bring-up.
+  Host-side DOCA UROM library (doca_urom_*): offload an HPC / UCX / MPI
+  application's remote memory operations (puts, gets, atomics,
+  collectives) from the host CPU onto a BlueField DPU. Trigger on "MPI
+  all-reduce burning host CPU", "push UCX traffic onto the BlueField",
+  "first doca_urom call returns NOT_PERMITTED", or "host library and DPU
+  service look out of sync", even without naming DOCA UROM. An offload
+  needs both halves: this host library and the UROM Service on the DPU
+  (doca-urom-svc), which owns deploying that container. Covers creating
+  UROM Service contexts (doca_urom_service_*) and Worker contexts
+  (doca_urom_worker_*) that run plugins on the DPU, discovering plugins
+  via doca_urom_service_get_plugins_list, progressing completions, and
+  DOCA_ERROR_* from doca_urom_* calls. Route elsewhere for UROM Service
+  deployment on the DPU side, MPI / UCX collective algorithm design, and
+  RDMA / RoCE / IB substrate bring-up.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - urom
+    - hpc
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) on a host paired with a BlueField DPU
   running the DOCA UROM Service at a compatible version. Reads the
   user's local install via `pkg-config doca-urom` and inspects
-  /opt/mellanox/doca/{lib,include,samples,applications}; underlying
-  RDMA fabric between host and BlueField must be healthy.
+  /opt/mellanox/doca/{lib,include,samples,applications}; underlying RDMA
+  fabric between host and BlueField must be healthy. The validation
+  steps require a live DOCA install.
 ---
 
 # DOCA UROM
+
+## Examples
+
+- **"Push UCX traffic onto the BlueField."** — this is in
+  scope. Stay on host-side `doca-urom`; do not deploy the
+  DPU-side UROM Service here.
+- **"First doca_urom call returns NOT_PERMITTED."** — check
+  host/service version alignment and the RDMA substrate
+  before changing the offload call.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+offload / debug. Open the capabilities companion for service vs
+worker contexts. Do not open every companion file.
 
 **Where to start:** This skill assumes DOCA is already installed on
 both the host and the BlueField, the DOCA UROM Service is
@@ -35,9 +57,9 @@ deployed and running on the BlueField side, and the user is doing
 `doca-urom` from an HPC / UCX / MPI stack on the host to enqueue
 remote memory operations (puts, gets, atomics, active messages,
 collective primitives) that the BlueField DPU will execute on the
-host's behalf. Open [`TASKS.md`](TASKS.md) if the user wants to
+host's behalf. Open the tasks companion if the user wants to
 *do* something (configure / build / modify / run / test /
-debug); open [`CAPABILITIES.md`](CAPABILITIES.md) when the
+debug); open the capabilities companion when the
 question is *what can the host-side UROM API express* on this
 version + this BlueField + this UROM Service version. If the
 user has not installed DOCA yet, route to
@@ -49,6 +71,13 @@ DIFFERENT artifact — route via
 to the public *DOCA UROM Service* guide. This skill is the
 **host-side library**; the UROM Service is the **DPU-side
 executor**, and they are a paired contract.
+
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
 
 ## Example questions this skill answers well
 
@@ -63,17 +92,17 @@ instance.
   compute — how do I push that work onto the BlueField via
   UROM?"*. Answered by the host-library-plus-DPU-service
   paired-contract model in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the host-side bring-up workflow in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"Is the DOCA UROM Service even running on my BlueField, and
   why does that matter before I write any `doca_urom_*` code?"** —
   worked example: *"my first `doca_urom_*` call returns
   `DOCA_ERROR_NOT_PERMITTED` on a host where DOCA is otherwise
   healthy"*. Answered by the env-precondition matrix in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the service-deployed-and-running check in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 1, which
+  the tasks companion step 1, which
   routes service-side env questions to
   [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
 - **"Is this UROM operation type / atomic / collective supported
@@ -84,15 +113,15 @@ instance.
   on a started Service — UROM operations are plugin-defined
   Command tasks, so the supported-plugins list is the
   capability surface) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the discovery step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"How does `doca-urom` relate to `doca-rdma` — am I replacing
   it, layering on top, or something else?"** — worked example:
   *"I already have raw `doca-rdma` working; should I rewrite to
   use UROM, or is that the wrong tool?"*. Answered by the
   path-selection rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   (UROM uses the RDMA transport substrate underneath but adds
   the DPU-offload contract on top, and is the right tool only
   when host CPU is the bottleneck due to communication
@@ -101,7 +130,7 @@ instance.
 - **"Is this UROM API on my installed DOCA version?"** — worked
   example: *"is the collective-ops plugin discoverable via
   `doca_urom_service_get_plugins_list` on DOCA 3.x"*. Answered by the version-compatibility overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  the capabilities companion,
   which cross-links the canonical detection chain in
   [`doca-version`](../../doca-version/SKILL.md) and adds the
   UROM-specific *host library and DPU service versions must
@@ -111,9 +140,9 @@ instance.
   *"`DOCA_ERROR_NOT_PERMITTED` on the first
   `doca_urom_*` enqueue after `doca_ctx_start()` succeeded"*.
   Answered by the UROM overlay on the cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
+  the tasks companion that escalates to
   [`doca-debug`](../../doca-debug/SKILL.md).
 
 ## Audience
@@ -136,7 +165,7 @@ with `pkg-config` module name `doca-urom`. The shipped samples
 under `/opt/mellanox/doca/samples/doca_urom/` are written in C
 (NVIDIA's choice). C and C++ consumers — including UCX-based
 stacks that wrap the library — are the canonical case and the
-worked examples in `TASKS.md` assume that path. Other-language
+worked examples in the tasks companion assume that path. Other-language
 consumers (Rust, Go, Python, …) consume the same `*.so` through
 FFI or language-specific bindings; the skill's contribution in
 that case is to keep the lifecycle, capability-discovery,
@@ -195,7 +224,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive
 UROM-specific material lives in two companion files:
 
-- `CAPABILITIES.md` — what the host-side UROM API can express on
+- the capabilities companion — what the host-side UROM API can express on
   this version + this BlueField + this UROM Service version: the
   paired-contract model (host library enqueues; DPU service
   executes); the two host-side context types — the
@@ -213,7 +242,7 @@ UROM-specific material lives in two companion files:
   preconditions (DOCA UROM Service deployed and running on the
   DPU side; host library and DPU service versions agreeing; an
   RDMA-capable BlueField + DOCA install).
-- `TASKS.md` — step-by-step workflows for the six in-scope UROM
+- the tasks companion — step-by-step workflows for the six in-scope UROM
   verbs: `configure`, `build`, `modify`, `run`, `test`,
   `debug`. Plus a `Deferred task verbs` block that points
   out-of-scope questions at the right next skill.
@@ -245,7 +274,7 @@ contain — and pull requests should not add:
   modify-a-sample workflow in
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
   layered with the UROM-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  the tasks companion.
 - **An MPI / UCX algorithm or collective implementation.** This
   library *offloads* remote memory operations; the algorithm
   selecting which puts / gets / atomics / collectives to issue
@@ -274,7 +303,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope (host-side library work; not DPU-side service
    deployment, and not MPI / UCX algorithm design).
 2. **For the UROM capability matrix, the paired-contract model
@@ -282,9 +311,9 @@ contain — and pull requests should not add:
    model, the enqueue-side operation surface, the
    plugin-discovery rule, the env-precondition policy, the
    error taxonomy, the observability surface, and the safety
-   policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   policy, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify,
-   run, test, debug — see [TASKS.md](TASKS.md).**
+   run, test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical
@@ -331,7 +360,7 @@ host-side-specific guidance".
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect /
   prefer / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the

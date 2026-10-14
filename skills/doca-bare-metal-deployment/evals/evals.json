@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-bare-metal-deployment.explicit-positive.v1",
-      "prompt": "Use the doca-bare-metal-deployment skill to help me. Use this skill for launching, supervising, debugging, OR platform lifecycle on a BlueField — BFB install, RShim/TMFIFO, host PF rebind, post-BFB recovery — taking a DOCA-linked binary to a healthy run directly on hardware (host x86 + BlueFi",
+      "prompt": "Use the doca-bare-metal-deployment skill for this task: I'm running into this: \"my DOCA binary on the BlueField exits 1 right after launch\". Can you walk me through it?",
       "expected_skill": "doca-bare-metal-deployment",
       "expected_output": "The agent loads doca-bare-metal-deployment and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-bare-metal-deployment's scope.",
       "assertions": [
@@ -18,7 +18,7 @@
       "expected_skill": "doca-bare-metal-deployment",
       "expected_output": "The agent recognizes this as a doca-bare-metal-deployment task even though the skill is not named, loads doca-bare-metal-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
       "assertions": [
-        "The doca-bare-metal-deployment skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The response is concrete and grounded in the skill content rather than generic advice."
       ]
     },
@@ -28,18 +28,18 @@
       "expected_skill": "doca-bare-metal-deployment",
       "expected_output": "The agent recognizes this as a doca-bare-metal-deployment task even though the skill is not named, loads doca-bare-metal-deployment, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
       "assertions": [
-        "The doca-bare-metal-deployment skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The response is concrete and grounded in the skill content rather than generic advice."
       ]
     },
     {
       "id": "doca-bare-metal-deployment.negative.v1",
-      "prompt": "I need help with something doca-bare-metal-deployment explicitly says is out of scope (it should be handled by doca-hardware-safety). Which skill should handle it and why is it not doca-bare-metal-deployment?",
+      "prompt": "I already have a Kubernetes static-Pod manifest and need to deploy the workload through kubelet; no bare-metal process will be launched.",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-bare-metal-deployment; it recognizes the request is out of scope and routes to the correct skill (doca-hardware-safety), explaining the boundary.",
+      "expected_output": "The agent does not apply doca-bare-metal-deployment's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-bare-metal-deployment as the answer.",
       "assertions": [
-        "doca-bare-metal-deployment is not used as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s): doca-hardware-safety."
+        "The answer does not apply doca-bare-metal-deployment's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

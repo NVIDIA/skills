@@ -2,34 +2,52 @@
 license: Apache-2.0
 name: doca-comm-channel-admin
 description: >
-  Use this skill to enumerate host↔DPU DOCA comch (formerly
-  Comm Channel) servers and connections via the shipped
-  doca_comm_channel_admin binary — listing comch-capable
-  devices and decoding the per-device server / connection
-  table (server name, PID, in-use / max, PCIe address). The
-  shipped binary is a SINGLE-SHOT SCAN-AND-PRINT tool with no
-  registered arguments — NO list / inspect / drain / restart
-  subcommands; one inventory pass over every comch-capable
-  doca_dev on this side. Channel reset / drain / restart go to
-  doca-comch (program side), doca-setup / doca-hardware-safety
-  (driver reload), or BFB / RShim — NOT to this binary.
-  Trigger on phrasings like "list comch servers", "which
-  channels are active on this BlueField", or "verify admin
-  tool sees same channel as program." Refuse and route
-  elsewhere for the comch programming API, library install,
-  protocol design, channel reset, or general orientation.
+  Use this skill to enumerate host↔DPU DOCA comch (formerly Comm
+  Channel) servers and connections via the shipped
+  doca_comm_channel_admin binary — listing comch-capable devices and
+  decoding the per-device server / connection table (server name, PID,
+  in-use / max, PCIe address). The shipped binary is a SINGLE-SHOT
+  SCAN-AND-PRINT tool with no registered arguments — NO list / inspect /
+  drain / restart subcommands; one inventory pass over every
+  comch-capable doca_dev on this side. Channel reset / drain / restart
+  go to doca-comch (program side), doca-setup / doca-hardware-safety
+  (driver reload), or BFB / RShim — NOT to this binary. Trigger on
+  phrasings like "list comch servers", "which channels are active on
+  this BlueField", or "verify admin tool sees same channel as program."
+  Refuse and route elsewhere for the comch programming API, library
+  install, protocol design, channel reset, or general orientation.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - comch
+    - tools
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on Linux
-  (Ubuntu 22.04/24.04 or RHEL/SLES) with the Comm Channel tooling
-  subpackage so the CLI is present under
-  /opt/mellanox/doca/tools/. Runs from either the x86/Arm host or
-  the BlueField Arm side; a live host↔DPU comch channel created
-  via the doca-comch library is needed for non-empty tables.
+  Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
+  22.04/24.04 or RHEL/SLES) with the Comm Channel tooling subpackage so
+  the CLI is present under /opt/mellanox/doca/tools/. Runs from either
+  the x86/Arm host or the BlueField Arm side; a live host↔DPU comch
+  channel created via the doca-comch library is needed for non-empty
+  tables. The validation steps require a live DOCA install.
 ---
 
 # DOCA Comm Channel Admin Tool
+
+## Examples
+
+- **"Which comch servers and connections are currently visible?"** —
+  this is in scope. Stay on the admin CLI; do not open a new
+  comch channel from this skill.
+- **"The program reports CONNECTED but the admin tool lists zero
+  channels."** — cross-check representor binding before rewriting
+  the comch app.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for run /
+debug. Open the capabilities companion for table columns and
+error layers. Do not open every companion file.
 
 > **Actual binary contract.** `doca_comm_channel_admin` is one
 > zero-application-argument, read-only scan-and-print operation.
@@ -50,11 +68,11 @@ to comch-capable devices, shells out to `resourcedump` (MFT) on
 each, and prints two ASCII tables (SERVERS and CONNECTIONS).
 There is no `list` subcommand, no `inspect` subcommand, no
 `drain` flag, and no `restart` flag — those are not part of the
-tool's surface. Open [`TASKS.md`](TASKS.md) and start at
-[`## run`](TASKS.md#run) for the single-shot invocation, or
-[`## debug`](TASKS.md#debug) when the user reports the tool sees
+tool's surface. Open the tasks companion and start at
+`## run` for the single-shot invocation, or
+`## debug` when the user reports the tool sees
 a different channel set than the program. Open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
+the capabilities companion when the question is *what
 the printed tables actually mean* and *what is not in this
 tool's scope*. If the user has not installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first; if the user
@@ -62,7 +80,7 @@ needs MFT (`resourcedump` on `PATH` with the privilege documented
 for the installed release), `doca-setup` + `doca-public-knowledge-map`
 cover that. If the user is holding pre-2.5 docs that mention
 "Comm Channel", route to
-[`doca-comch CAPABILITIES.md ## Version compatibility`](../../libs/doca-comch/CAPABILITIES.md#version-compatibility)
+[`doca-comch`](../../libs/doca-comch/SKILL.md)
 for the rename rule. If the user wants to *change* channel
 state, route to the program-side
 reconnect lifecycle in [`doca-comch`](../../libs/doca-comch/SKILL.md)
@@ -80,25 +98,25 @@ the worked example is one instance.
 - **"Which comch servers and connections are currently visible?"** —
   worked example: *"print every server and connection row visible
   on this side"*. Answered by the scan-and-print surface in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the single invocation in
-  [`TASKS.md ## run`](TASKS.md#run).
+  the tasks companion.
 - **"What does the tool report for this server or connection?"** —
   locate the matching row in the SERVERS or CONNECTIONS table;
   there is no second per-channel query. Answered by
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + [`TASKS.md ## run`](TASKS.md#run).
+  the capabilities companion
+  + the tasks companion.
 - **"How do I know the admin tool's view matches what my Comch
   program sees?"** — worked example: *"the program reports
   CONNECTED but the admin tool lists zero channels"*. Answered by
   the cross-checking pattern in
-  [`TASKS.md ## test`](TASKS.md#test) and the representor-binding
+  the tasks companion and the representor-binding
   layer in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+  the capabilities companion.
 - **"Is this admin tool on my installed DOCA version, and does it
   match the comch library version?"** — worked example: *"is the
   tool available on DOCA 2.4"*. Answered by the overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  the capabilities companion,
   which redirects to the canonical
   [`doca-version`](../../doca-version/SKILL.md) rules and adds the
   Comm Channel Admin Tool specifics.
@@ -106,8 +124,8 @@ the worked example is one instance.
   genuinely no channel?"** — worked example: *"`list` returned an
   empty result on a host with a known-good Comch client"*.
   Answered by the empty-output interpretation rules in
-  [`TASKS.md ## debug`](TASKS.md#debug) +
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+  the tasks companion +
+  the capabilities companion.
 
 ## Audience
 
@@ -166,7 +184,7 @@ those, route to
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what the Comm Channel Admin Tool reports:
+- the capabilities companion — what the Comm Channel Admin Tool reports:
   the two read-only tables, the version-availability overlay
   that redirects to [`doca-version`](../../doca-version/SKILL.md),
   the layered error taxonomy (tool-not-installed / device-binding
@@ -174,7 +192,7 @@ companion files:
   version / cross-cutting), the tool's role as an observability
   primitive for [`doca-comch`](../../libs/doca-comch/SKILL.md)
   debug sessions, and the read-only safety policy.
-- `TASKS.md` — step-by-step workflows for the in-scope task verbs:
+- the tasks companion — step-by-step workflows for the in-scope task verbs:
   `configure` (route to install), `build` (route to install),
   `modify` (refuse), `run` (one scan-and-print), `test`
   (cross-check the printed rows), `debug` (the layered
@@ -213,16 +231,16 @@ pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope (the user wants to inventory a comch
    channel from the outside, not learn the comch API).
 2. **For what the tool reports, version availability, the layered error surface,
    observability, and safety posture, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For the single invocation and cross-check
    workflow — `configure`, `build`, `modify`, `run`, `test`,
    `debug`, plus the `Command appendix` — see
-   [TASKS.md](TASKS.md).**
+   the tasks companion.**
 
 ## Related skills
 
@@ -236,12 +254,12 @@ pull requests should not add:
   the rest of the public DOCA documentation set.
 - [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
   version-handling rules. The `## Version compatibility` section
-  in [`CAPABILITIES.md`](CAPABILITIES.md) is a concise overlay
+  in the capabilities companion is a concise overlay
   that redirects here for the body.
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
   — the bundle's detect → prefer → fall back → report contract for
   structured helper tools. The Command appendix in
-  [`TASKS.md`](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
   install verification, representor visibility checks, and the
   *I have no install yet* path with the public NGC DOCA

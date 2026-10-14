@@ -3,45 +3,63 @@ license: Apache-2.0
 name: doca-flow-dpa-perf
 description: >
   Use this skill when the user is invoking doca_flow_dpa_perf on
-  DPA-capable hardware (ConnectX-7 minimum supported,
-  ConnectX-8 recommended, or BlueField-3) to measure rule
-  update / disable rates on the DPA-offloaded DOCA Flow path —
-  picking the active / passive device split, choosing workload-shape
-  axes (burst, queue, completion threshold, workers, hash pipe algo,
-  PSL tables), or reading Kops/sec iteration stats and the optional
-  self-test. Trigger even when the user does not explicitly mention
-  "doca_flow_dpa_perf" or "DPA Provider" — typical implicit phrasings
-  include "how fast can the DPA program path-selector entries",
-  "baseline rule-update rate on ConnectX-8", "tool reports zero ops
-  on my BlueField", "self-test sentinel never shows on tcpdump", or
-  "is my BlueField-2 DPA-capable". Refuse and route elsewhere for the
-  host / DPU-CPU Flow path (doca-flow-perf), Flow pipeline tuning
-  (doca-flow-tune), writing doca-flow / doca-dpa applications, or
-  DOCA install — those belong to other skills.
+  DPA-capable hardware (ConnectX-7 minimum supported, ConnectX-8
+  recommended, or BlueField-3) to measure rule update / disable rates on
+  the DPA-offloaded DOCA Flow path — picking the active / passive device
+  split, choosing workload-shape axes (burst, queue, completion
+  threshold, workers, hash pipe algo, PSL tables), or reading Kops/sec
+  iteration stats and the optional self-test. Trigger even when the user
+  does not explicitly mention "doca_flow_dpa_perf" or "DPA Provider" —
+  typical implicit phrasings include "how fast can the DPA program
+  path-selector entries", "baseline rule-update rate on ConnectX-8",
+  "tool reports zero ops on my BlueField", "self-test sentinel never
+  shows on tcpdump", or "is my BlueField-2 DPA-capable". Refuse and
+  route elsewhere for the host / DPU-CPU Flow path (doca-flow-perf),
+  Flow pipeline tuning (doca-flow-tune), writing doca-flow / doca-dpa
+  applications, or DOCA install — those belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - flow
+    - dpa
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a DPA-capable device attached —
-  ConnectX-7 as the minimum supported ConnectX generation,
-  ConnectX-8 recommended, or BlueField-3 (BlueField-2 and earlier
-  ConnectX are unsupported). VNF Flow mode required; PF or VF only (SFs are not
-  supported on the DPA path). Reads `pkg-config doca-flow` and the
-  shipped `doca_flow_dpa_perf` binary plus its README on the user's
-  install.
+  ConnectX-7 minimum, ConnectX-8 recommended, or BlueField-3
+  (BlueField-2 and earlier ConnectX unsupported). VNF Flow mode
+  required; PF or VF only (SFs unsupported on the DPA path). Reads
+  `pkg-config doca-flow` and the shipped `doca_flow_dpa_perf` binary.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA Flow DPA Perf (`doca_flow_dpa_perf`)
 
+## Examples
+
+- **"How fast can the DPA program path-selector entries?"** —
+  this is in scope on DPA-capable hardware. Do not use this
+  for the host / DPU-CPU Flow path.
+- **"Tool reports zero ops on my BlueField."** — confirm
+  BlueField-3 + VNF mode + PF/VF before changing burst or
+  queue axes.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+run / debug. Open the capabilities companion for device split and
+workload axes. Do not open every companion file.
+
 **Where to start:** This is a tool skill for invoking
 `doca_flow_dpa_perf`, the DPA-accelerated Flow performance tool.
-Open [`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure) to confirm DPA-capable
+Open the tasks companion and start at
+`## configure` to confirm DPA-capable
 hardware + VNF Flow mode + the active / passive device split, then
-[`## run`](TASKS.md#run) for the smoke-before-bulk flow with a
+`## run` for the smoke-before-bulk flow with a
 small operation count before any sweep, then
-[`## test`](TASKS.md#test) for the eval-loop overlay that gates
-defensible Kops/sec numbers. Open [`CAPABILITIES.md`](CAPABILITIES.md)
+`## test` for the eval-loop overlay that gates
+defensible Kops/sec numbers. Open the capabilities companion
 when the question is *what `doca_flow_dpa_perf` can measure*,
 *what the DPA preconditions are*, *which devices it runs on*,
 or *how to interpret update / disable / self-test output without
@@ -63,18 +81,18 @@ load-bearing piece; the worked example is one instance.
   DOCA Flow; do I baseline with `doca_flow_dpa_perf` or with
   `doca_flow_perf`?"*. Answered by the *DPA-vs-host* boundary
   in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   and the device-preconditions table.
 - **"What does the DPA-offload actually accelerate, and what
   doesn't it change?"** — worked example: *"if I move my Flow
   rule update path to the DPA, what changes in the data plane
   for the packets themselves?"*. Answered by the DPA-Provider
   scope in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  the capabilities companion.
 - **"What hardware do I need to use this tool at all?"** —
   worked example: *"is my BlueField-2 DPA-capable?"*. Answered
   by the device-preconditions table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   (BlueField-3 yes, BlueField-2 no; ConnectX-7 minimum
   supported, ConnectX-8 recommended, and later generations
   supported per the public guide and the
@@ -85,22 +103,22 @@ load-bearing piece; the worked example is one instance.
   iteration time and standard deviation, not a single noisy
   first-iteration spike"*. Answered by the eval-loop overlay
   in
-  [`TASKS.md ## test`](TASKS.md#test) and the iteration-stats
+  the tasks companion and the iteration-stats
   rule in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability).
+  the capabilities companion.
 - **"My tool reports zero ops / hangs / fails the self-test —
   what does that mean?"** — worked example: *"the tool runs but
   the self-test step fails"*. Answered by the layered error
   taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   + the debug ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 - **"How do I quote a DPA-perf number alongside a host-side
   Flow-perf number for the same workload, in a way the next
   engineer can actually compare?"** — worked example: *"two
   Kops/sec numbers for what is supposedly the same workload"*.
   Answered by the four-tuple capture rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the per-tool-name rule (the host tool and the DPA tool are
   different surfaces; their numbers are not interchangeable
   without naming which tool produced which).
@@ -196,7 +214,7 @@ the host / DPU-CPU Flow path — that audience belongs in
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what `doca_flow_dpa_perf` measures
+- the capabilities companion — what `doca_flow_dpa_perf` measures
   (the DPA-Provider-on-DPA-device update / disable path
   specifically), the DPA-vs-host-path boundary, the
   device-preconditions table (ConnectX-7+ / BlueField-3+),
@@ -216,7 +234,7 @@ companion files:
   tcpdump-side traffic verification), and the safety posture
   (smoke-before-bulk, four-tuple capture, name the tool that
   produced the number).
-- `TASKS.md` — step-by-step workflows for the in-scope task
+- the tasks companion — step-by-step workflows for the in-scope task
   verbs: `install` (route to setup; the binary is shipped),
   `configure` (DPA-preconditions + active / passive device +
   workload-shape decision), `build` (route to install — the
@@ -266,7 +284,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question
+1. Read this skill first to confirm the user's question
    is in scope (the user actually wants to invoke
    `doca_flow_dpa_perf` on DPA-capable hardware, not measure
    the host / DPU-CPU Flow path).
@@ -274,10 +292,10 @@ contain — and pull requests should not add:
    boundary, the device-preconditions table, the workload-
    shape axes, the version overlay, the error taxonomy, the
    observability surface, and the safety posture, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For the documented invocations and the smoke-before-bulk
    workflow — `install`, `configure`, `build`, `modify`,
-   `run`, `test`, `debug`, `use` — see [TASKS.md](TASKS.md).**
+   `run`, `test`, `debug`, `use` — see the tasks companion.**
 
 ## Related skills
 
@@ -294,7 +312,7 @@ contain — and pull requests should not add:
 - [`doca-flow-perf`](../doca-flow-perf/SKILL.md) — the
   host / DPU-CPU Flow performance tool. The cross-tool
   comparison rule lives in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
+  the capabilities companion:
   name which tool produced which number.
 - [`doca-flow-tune`](../doca-flow-tune/SKILL.md) — the Flow
   tuning tool. A DPA-perf number is the kind of baseline
@@ -306,7 +324,7 @@ contain — and pull requests should not add:
   documentation set.
 - [`doca-version`](../../doca-version/SKILL.md) — canonical
   DOCA version-handling rules. The
-  [`## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  `## Version compatibility`
   section in this skill is a thin overlay on top.
 - [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
   install verification, hugepages, NUMA awareness, and the

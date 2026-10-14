@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill for launching, supervising, debugging, or platform lifecycle on a BlueField — BFB install, RShim/TMFIFO, host PF rebind, post-BFB recovery — taking a DOCA-linked binary to a healthy run directly on hardware (host x86 + BlueField NIC over PCIe, or BlueField Arm bare-metal). <br>
+Guides launching, supervising, and troubleshooting a DOCA-linked application binary directly on hardware — on a host x86 with a BlueField NIC over PCIe or bare-metal on BlueField Arm — covering PCI/NUMA/CPU/IRQ binding, co-tenant isolation, a seven-layer error taxonomy, and BlueField platform lifecycle. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and operators who have a DOCA-linked application binary and want to run it directly on hardware — launching, binding to PCI/NUMA/CPU/IRQ resources, configuring co-tenant isolation, diagnosing bare-metal failures, and managing BlueField lifecycle operations. <br>
+Developers and operators who have a DOCA-linked application binary and want to run it directly on hardware (host x86 or BlueField Arm bare-metal), including choosing launch modes, binding to PCIe functions and NUMA nodes, setting up per-tenant isolation, diagnosing bare-metal launch failures, and recovering BlueField platform state. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,9 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [details.md](references/details.md) <br>
+- [Deployment details reference](references/details.md) <br>
 - [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Samples and Applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 
 
@@ -44,37 +44,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
+Evaluated against 4 evaluation tasks (3 positive, 1 negative) in isolated k8s-sandbox pods with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
+- Efficiency: Checks tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `skill_execution`: Verifies the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Verifies tool-call productivity. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+35%) | 75% (+10%) |
-| Discoverability | 4 | 100% (+50%) | 95% (+45%) |
-| Effectiveness | 4 | 92% (+58%) | 100% (+57%) |
-| Efficiency | 4 | 94% (+56%) | 100% (+75%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 91.7% | 98.0% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 70.0% → 95.0% (+25.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 60.4% → 89.4% (+29.0 points) | 58.3% → 100.0% (+41.7 points) |
+| Efficiency | 69.3% | 100.0% |
 
 ## Skill Version(s): <br>
-ffe362c (source: git SHA, committed 2026-07-25) <br>
+7e143d8 (source: git SHA, committed 2026-10-12) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

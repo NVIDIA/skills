@@ -2,24 +2,28 @@
 license: Apache-2.0
 name: doca-container-deployment
 description: >
-  Use this skill when the user is hands-on deploying an in-bundle DOCA
-  service container (Argus, DMS, Firefly, or UROM service) on a
-  BlueField — kubelet standalone watching a
-  static-pod manifests directory, YAML pod-spec drop, kubelet status /
-  ENTRYPOINT logs / per-service liveness, smoke-before-bulk, and the
-  layered error taxonomy (pod-spec, scheduling, image pull, runtime,
-  mount, network, version, host). Trigger even when the user does not
-  say "container deployment" — typical implicit phrasings include "how
-  do I run my built service on the BlueField?", "where do I drop the
-  pod-spec YAML?", "pod stuck in Pending / ImagePullBackOff /
-  CrashLoopBackOff", "container Running but service isn't ready", "pod
-  restart-loops after edit", or "DMS and Firefly together". Refuse and
-  route elsewhere for per-service config schemas, DOCA install,
-  library-API questions, external NVIDIA services (BlueMan, HBN, SNAP,
-  Virtio-net), or full Kubernetes-cluster ops — those belong to other
-  skills.
+  Running an in-bundle DOCA service as a container on a BlueField (Argus,
+  DMS, Firefly, or UROM service): kubelet standalone watching a static-pod
+  manifests directory, YAML pod-spec drop, kubelet status / ENTRYPOINT
+  logs / per-service liveness. Trigger on "how do I run my built service
+  on the BlueField?", "where do I drop the pod-spec YAML?", "pod stuck in
+  Pending / ImagePullBackOff / CrashLoopBackOff", "container Running but
+  service isn't ready", "pod restart-loops after edit", or "DMS and
+  Firefly together", even without naming container deployment. A
+  DOCA-linked binary launched directly on the host or Arm belongs to
+  doca-bare-metal-deployment. Covers smoke-before-bulk and the layered
+  error taxonomy (pod-spec, scheduling, image pull, runtime, mount,
+  network, version, host). Refuse and route elsewhere for per-service
+  config schemas, DOCA install, library-API questions, external NVIDIA
+  services (BlueMan, HBN, SNAP, Virtio-net), or full Kubernetes-cluster
+  ops.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - container
+    - deployment
 compatibility: >
   No DOCA install required to read this skill (it is an overlay loaded
   against any DOCA artifact skill); the validation steps within DO
@@ -27,6 +31,22 @@ compatibility: >
 ---
 
 # DOCA container deployment
+
+## Examples
+
+- **"How do I run a DOCA service container on BlueField?"** —
+  this is in scope after the setup recognize front door. Drop
+  a documented pod spec; do not invent YAML or image tags.
+- **"The pod spec is in the directory but the pod never
+  starts."** — walk the eight-layer taxonomy before letting
+  kubelet restart-loop the pod.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for
+configure / run / debug. Open the capabilities companion for
+the kubelet-standalone contract. Do not open every companion
+file.
 
 **Where to start:** This skill is for *operating* the cross-cutting
 DOCA container-deployment runtime — the shared pattern every DOCA
@@ -38,7 +58,7 @@ the pod and runs the container).
 **If the developer has NOT yet decided container vs. bare-metal**
 (*"I just got a BlueField, what now?"*, *"my code is built, how do I
 run it?"*, *"how do I deploy this?"*), route them BACK to
-[`doca-setup ## recognize`](../doca-setup/TASKS.md#recognize) first.
+[`doca-setup`](../doca-setup/SKILL.md) first.
 That is the front-door routing decision. The wrong failure mode is
 to silently push every developer onto the container path because the
 agent loaded this skill first. `## recognize` detects the system
@@ -50,10 +70,10 @@ drop on a BlueField) or the bare-metal-path sibling
 launches directly).
 
 **If the developer is already on the container path**, open
-[`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure). If the question is *what shape
+the tasks companion and start at
+`## configure`. If the question is *what shape
 of runtime is this and what does the deployment contract look like*,
-start at [`CAPABILITIES.md`](CAPABILITIES.md). For per-service
+start at the capabilities companion. For per-service
 overlays, follow the per-service skill under `skills/services/` that
 layers on top of this one — the supported overlays are Argus, DMS,
 Firefly, and UROM service. Flow-Inspector and OS-Inspector are
@@ -137,7 +157,7 @@ mode on the BlueField, not a full Kubernetes control plane).
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — the cross-cutting DOCA container-deployment
+- the capabilities companion — the cross-cutting DOCA container-deployment
   runtime contract on the BlueField (kubelet standalone agent on
   BlueField Arm watching a documented static-pod manifests
   directory; YAML pod-spec drop is the unit of operator input; the
@@ -154,7 +174,7 @@ companion files:
   clear the root cause before letting kubelet restart-loop the
   pod; do NOT invent pod-spec field names / kubelet flags / image
   tags from memory).
-- `TASKS.md` — step-by-step workflows for the in-scope deployment
+- the tasks companion — step-by-step workflows for the in-scope deployment
   verbs: `configure`, `build`, `modify`, `run`, `test`, `debug`,
   plus a `Deferred task verbs` block routing per-service config
   questions, host-firmware-slot work, paired-workload work, and
@@ -172,23 +192,39 @@ concern of each DOCA service's public guide reached through
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope (cross-cutting deployment runtime, NOT a per-service
    config-schema question).
 2. **For the kubelet-standalone-mode runtime shape, the static-pod
    manifests directory rule, the host-OS / BFB / firmware-slot /
    image-pull preconditions, the eight-layer error taxonomy, the
    observability surface, and the safety / smoke-before-bulk
-   policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   policy, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
-## Example questions this skill answers well
-
-See [`references/details.md`](references/details.md#example-questions-this-skill-answers-well).
-## What this skill deliberately does not ship
-
-See [`references/details.md`](references/details.md#what-this-skill-deliberately-does-not-ship).
 ## Related skills
 
-See [`references/details.md`](references/details.md#related-skills).
+- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+  — public Container Deployment Guide, per-service guides, and
+  NGC. Quote documented paths and tags from there; do not invent
+  them.
+- [`doca-setup`](../doca-setup/SKILL.md) — env and install on the
+  BlueField target, including the recognize front door that
+  chooses this skill vs bare-metal.
+- [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)
+  — the sibling binary-launch path.
+- [`doca-debug`](../doca-debug/SKILL.md) — cross-cutting debug
+  ladder this runtime's pod / image / ENTRYPOINT layers sit on.
+- [`doca-version`](../doca-version/SKILL.md) — four-way match and
+  container-tag overlay.
+- [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md)
+  — prefer structured status when present.
+- Per-service overlays:
+  [`doca-argus`](../services/doca-argus/SKILL.md),
+  [`doca-dms`](../services/doca-dms/SKILL.md),
+  [`doca-firefly`](../services/doca-firefly/SKILL.md),
+  [`doca-urom-svc`](../services/doca-urom-svc/SKILL.md).
+- [`doca-programming-guide`](../doca-programming-guide/SKILL.md)
+  — program-side discipline when a service surfaces a library
+  error.

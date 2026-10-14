@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when bringing up, configuring, hardening, or debugging doca_flow_grpc — the DOCA-shipped gRPC remote-control surface in front of doca-flow that lets non-C++ clients (Python, Go, Rust, Java) program Flow pipes and entries over RPC instead of linking libdoca_flow.so directly. <br>
+Remote control of DOCA Flow over gRPC with the shipped doca_flow_grpc server: program Flow pipes and entries from Python, Go, Rust or Java, or from another host, instead of linking libdoca_flow.so, with transport security supplied by external infrastructure because the server is plaintext-only. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and control-plane engineers who need to program a running DOCA Flow pipeline from a non-C++ process across a network boundary, including standing up the gRPC server, locating .proto contracts, hardening the plaintext endpoint with an external proxy, and diagnosing connectivity or RPC failures. <br>
+Developers, control-plane engineers, platform operators, and AI agents who need to remotely program DOCA Flow pipes and entries over gRPC from a non-C++ process or another host, covering server bring-up, configuration, endpoint hardening behind an external proxy, smoke testing, and debugging. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,9 +26,11 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [gRPC Official Documentation](https://grpc.io/docs/) <br>
+- [gRPC Documentation](https://grpc.io/docs/) <br>
 - [gRPC Language Support](https://grpc.io/docs/languages/) <br>
-- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
@@ -44,42 +46,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 internal skill evaluation tasks (3 positive activation, 1 negative activation). <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Measures final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed? Checks whether the expected skill was selected and decoys were avoided. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% tool-call productivity and 50% token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity; routing is scored under Discoverability. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+65%) | 100% (+35%) |
-| Discoverability | 4 | 100% (+38%) | 95% (+45%) |
-| Effectiveness | 4 | 87% (+53%) | 100% (+50%) |
-| Efficiency | 4 | 91% (+34%) | 91% (+62%) |
-
-## Testing Completed: <br>
-**[x] Agent Red-Teaming** <br>
-**[ ] Network Security** <br>
-**[ ] Product Security** <br>
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 93.1% | 97.0% |
+| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Correctness | 50.0% → 100.0% (+50.0 pts) | 75.0% → 100.0% (+25.0 pts) |
+| Discoverability | 100.0% | 86.7% |
+| Effectiveness | 37.5% → 93.8% (+56.3 pts) | 61.3% → 98.1% (+36.8 pts) |
+| Efficiency | 71.7% | 100.0% |
 
 ## Skill Version(s): <br>
-2790d51 (source: git SHA, committed 2026-07-26) <br>
+4e18025 (source: git SHA, committed 2026-10-11) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

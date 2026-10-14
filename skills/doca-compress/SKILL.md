@@ -2,47 +2,65 @@
 license: Apache-2.0
 name: doca-compress
 description: >
-  Use this skill for hands-on DOCA Compress programming on a
-  BlueField DPU, ConnectX NIC, or host with DOCA — enabling
-  compress-deflate, decompress-deflate, decompress-lz4-stream,
-  or decompress-lz4-block tasks on a doca_compress context
-  (the hardware supports DEFLATE both directions plus LZ4
-  decompress; LZ4 encode is NOT supported), sizing source /
-  destination doca_buf against the per-task cap query, setting
-  mmap permissions, deciding offload vs CPU zlib / zstd,
-  validating with a round-trip smoke, or debugging
-  DOCA_ERROR_* from a Compress call. Trigger on phrasings
-  like "offload this gzip", "decompress incoming network
-  data", "compress task returns INVALID_VALUE on alloc_init",
-  "submitted a task but no completion arrives", or "decompress
-  LZ4 on the BlueField." Refuse and route elsewhere for
-  non-DEFLATE / non-LZ4 algorithms (zstd / Snappy / brotli),
-  LZ4 encode (route to a CPU LZ4 library), pure mmap-to-mmap
-  copies (doca-dma), or DOCA Core lifecycle internals.
+  Hardware compression offload with DOCA Compress on a BlueField DPU,
+  ConnectX NIC, or host: DEFLATE compress and decompress, plus LZ4
+  decompress (stream and block; LZ4 encode is NOT supported), instead of
+  CPU zlib / zstd. Trigger on "offload this gzip", "decompress incoming
+  network data on the NIC", "compress task returns INVALID_VALUE on
+  alloc_init", "submitted a task but no completion arrives", or
+  "decompress LZ4 on the BlueField", even without naming DOCA Compress.
+  Covers enabling compress-deflate, decompress-deflate,
+  decompress-lz4-stream and decompress-lz4-block tasks on a doca_compress
+  context, sizing source / destination doca_buf against the per-task cap
+  query, mmap permissions, offload vs CPU decisions, a round-trip smoke,
+  and DOCA_ERROR_* from Compress calls. Refuse and route elsewhere for
+  zstd / Snappy / brotli, LZ4 encode (a CPU LZ4 library), pure
+  mmap-to-mmap copies (doca-dma), or DOCA Core lifecycle internals.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - compress
+    - deflate
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux
   (Ubuntu 22.04/24.04 or RHEL/SLES) with a BlueField DPU or
   ConnectX NIC attached. Reads the user's local install via
   `pkg-config doca-compress` and inspects
   /opt/mellanox/doca/{lib,include,samples,applications}.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA Compress
 
+## Examples
+
+- **"Offload this gzip on the BlueField."** — this is in scope if
+  the codec is DEFLATE (or LZ4 decompress). Do not invent LZ4
+  encode or zstd offload.
+- **"Compress task returns INVALID_VALUE on alloc_init."** — size
+  the `doca_buf` against the per-task cap query before changing
+  the algorithm.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+test / debug. Open the capabilities companion for codec support
+and buffer-size policy. Do not open every companion file.
+
 **Where to start:** This skill assumes DOCA is already installed and
 the user is doing **hands-on Compress work** (bulk DEFLATE
 compression or decompression) on a BlueField / ConnectX / host
-with DOCA. Open [`TASKS.md`](TASKS.md) if the user wants to *do*
+with DOCA. Open the tasks companion if the user wants to *do*
 something (configure / build / modify / run / test / debug); open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what can
+the capabilities companion when the question is *what can
 DOCA Compress express* on this version. If the user has not
 installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
+`doca-setup/SKILL.md` first. If the user is
 asking *"should I even offload this compression to the
 accelerator?"*, the size-threshold path-selection rule in
-[`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+## Capabilities and modes
 is the first stop — bulk compress is the canonical fit, tiny
 one-shot is not.
 
@@ -58,9 +76,9 @@ instance.
   4 MiB log buffer before writing it to storage; is doca-compress
   worth the setup vs zlib on the CPU?"*. Answered by the
   size-threshold path-selection rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the *"when NOT to use doca-compress"* bullets in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
+  ## Safety policy.
 - **"Does my device support the compress (or decompress) task I
   want, and how big a buffer can it move per submission?"** —
   worked example: *"is `doca_compress_task_compress_deflate` on
@@ -69,41 +87,41 @@ instance.
   (`doca_compress_cap_task_compress_deflate_is_supported`,
   `_decompress_deflate_is_supported`, the matching
   `_get_max_buf_size` queries) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the discovery step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  ## configure.
 - **"I just need to decompress incoming network data — is that a
   valid standalone use of doca-compress?"** — worked example:
   *"my client receives DEFLATE-compressed payloads and never
   produces any compressed output of its own"*. Answered by the
   *"decompression-only"* note in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   task-type table + the per-task configuration matrix in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 5.
+  ## configure step 5.
 - **"What permissions does the source / destination mmap need?"** —
   worked example: *"my `doca_compress_task_compress_deflate`
   returns `DOCA_ERROR_NOT_PERMITTED`"*. Answered by the permission
   matrix in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  ## Safety policy
   + the mmap-set-permissions checklist in
-  [`TASKS.md ## test`](TASKS.md#test).
+  ## test.
 - **"Is this DOCA Compress API available on my installed DOCA
   version?"** — worked example: *"is
   `doca_compress_task_decompress_deflate` in the DOCA I have
   installed?"*. Answered by the version-compatibility overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  ## Version compatibility,
   which cross-links the canonical detection chain in
-  [`doca-version`](../../doca-version/SKILL.md) and adds the
+  `doca-version/SKILL.md` and adds the
   Compress-specific *"discover per-task support, do not assume"*
   bullets.
 - **"What does this `DOCA_ERROR_*` from a Compress call mean and
   which layer caused it?"** — worked example: *"`DOCA_ERROR_INVALID_VALUE`
   on `doca_compress_task_compress_deflate_alloc_init`"*. Answered
   by the Compress overlay on the cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  ## debug that escalates to
+  `doca-debug/SKILL.md`.
 
 ## Audience
 
@@ -117,7 +135,7 @@ decompression onto a BlueField DPU or ConnectX accelerator. It is
 **Language scope.** DOCA Compress ships as a C library with
 `pkg-config` module name `doca-compress`. The shipped samples are
 written in C. C and C++ consumers are the canonical case and the
-worked examples in `TASKS.md` assume that path. Other-language
+worked examples in the tasks companion assume that path. Other-language
 consumers (Rust, Go, Python, …) consume the same `*.so` through
 FFI or language-specific bindings; the skill's contribution in
 that case is to keep the lifecycle, capability-discovery,
@@ -155,7 +173,7 @@ work, in any language. Concretely:
   decompress → compare against a known DEFLATE-encoded fixture)
   before pushing bulk input through the accelerator.
 - Deciding *whether to offload at all* — the size-threshold rule
-  in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  in ## Capabilities and modes
   says doca-compress is the right answer only for bulk inputs
   (rule of thumb: ≥ a few KiB); below that, CPU compression beats
   the DMA-to-accelerator round-trip.
@@ -171,7 +189,7 @@ work, in any language. Concretely:
 Do **not** load this skill for general DOCA orientation, install
 of DOCA itself, non-DEFLATE compression libraries on CPU (use
 zlib / zstd / similar), or other DOCA libraries. For those, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## What this skill provides
 
@@ -179,7 +197,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive
 Compress-specific material lives in two companion files:
 
-- `CAPABILITIES.md` — what DOCA Compress can express on this
+- the capabilities companion — what DOCA Compress can express on this
   version: the four task types (compress-deflate,
   decompress-deflate, decompress-lz4-stream, and
   decompress-lz4-block, each independently capability-gated), the
@@ -191,7 +209,7 @@ Compress-specific material lives in two companion files:
   destination mmap permission decisions, and the size-threshold
   path-selection rule (when to use doca-compress versus CPU
   compression or `doca-dma` for the no-compression copy case).
-- `TASKS.md` — step-by-step workflows for the six in-scope
+- the tasks companion — step-by-step workflows for the six in-scope
   Compress verbs: `configure`, `build`, `modify`, `run`, `test`,
   `debug`. Plus a `## rollback` overlay (Compress-specific
   five-step teardown that drains in-flight tasks before
@@ -205,7 +223,7 @@ The skill assumes a host or BlueField where DOCA is already
 installed at the standard location and the user has the
 privileges their public install profile expects. It does not
 cover installing DOCA — that path goes through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -220,9 +238,9 @@ contain — and pull requests should not add:
   public DOCA Compress guide. The agent's job is to route the
   user to those files and prescribe a minimum-diff modification
   on them via the universal modify-a-sample workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the Compress-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Pre-encoded DEFLATE fixtures for arbitrary inputs.** The
   skill tells the agent to use a *round-trip* validation
   (compress → decompress and compare to the original, or
@@ -241,59 +259,59 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope.
 2. **For the Compress capability matrix, the compress / decompress
    task split (including decompression-only as a standalone
    shape), per-task capability-query rules, permission matrix,
    error taxonomy, observability, and safety / path-selection
-   policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   policy, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 version-handling rules, and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public docs or
 the installed package layout" rather than "Compress-specific
 guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation source
   and the on-disk layout of an installed DOCA package. The DOCA
   Compress page lives at
   `docs.nvidia.com/doca/sdk/DOCA-Compress/`; the File Compression
   reference application is the canonical worked example.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, and the *I have no install yet* path
   with the public NGC DOCA container. This skill assumes its
   preconditions are satisfied.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+- `doca-version/SKILL.md` — canonical DOCA
   version-handling rules. This skill's
-  [`## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  `## Version compatibility`
   cross-links the four-way match rule and adds only the
   Compress-specific *"discover per-task support + per-task max
   buffer size via cap query"* overlay.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+  the tasks companion honors this contract.
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal
   modify-a-shipped-sample first-app workflow, the universal
   lifecycle, the cross-library `DOCA_ERROR_*` taxonomy, and the
   program-side debug order. This skill layers Compress specifics
   on top.
-- [`doca-dma`](../doca-dma/SKILL.md) — the right library when
+- `doca-dma/SKILL.md` — the right library when
   the data flow is a pure mmap-to-mmap copy with no compression
   required. This skill's path-selection rule routes to DMA when
   Compress is *not* the answer (e.g. the user only wants to move
   bytes, not encode them).
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). Compress-specific debug (task-not-supported,
   source-buffer-too-large, destination-buffer-too-small) overlays

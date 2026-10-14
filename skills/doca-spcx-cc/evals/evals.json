@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-spcx-cc.explicit-positive.v1",
-      "prompt": "Use the doca-spcx-cc skill to help me. I'm working on: invoking `doca_spcx_cc` (the host-side CLI under /opt/mellanox/doca/tools/) to load, parameterize, start, observe, or stop a Programmable Congestion Control (SPCX) algorithm on a BlueField with a DPA processor against a live RDMA / RoCE fabric, or picking SPCX vs the established `doca-pcc` surface.",
+      "prompt": "Use the doca-spcx-cc skill for this task: I need to evaluate a programmable congestion-control algorithm on a test fabric, capture a baseline, and roll back if the traffic signal worsens.",
       "expected_skill": "doca-spcx-cc",
       "expected_output": "The agent selects the doca-spcx-cc skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -13,32 +13,34 @@
     },
     {
       "id": "doca-spcx-cc.implicit-positive.v1",
-      "prompt": "I'm running into this: \"I want to write a custom RTT-based CC algorithm for my RoCE fabric\". Can you walk me through it?",
+      "prompt": "I need to evaluate a programmable congestion-control algorithm on a test fabric, capture a baseline, and roll back if the traffic signal worsens.",
       "expected_skill": "doca-spcx-cc",
       "expected_output": "The agent recognizes this as a doca-spcx-cc issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-spcx-cc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-spcx-cc.implicit-positive.v2",
-      "prompt": "I'm running into this: \"my SPCX session loaded but throughput / latency didn't change\". Can you walk me through it?",
+      "prompt": "I need to evaluate a programmable congestion-control algorithm on a test fabric, capture a baseline, and roll back if the traffic signal worsens.",
       "expected_skill": "doca-spcx-cc",
-      "expected_output": "The agent recognizes this as a doca-spcx-cc issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "expected_output": "The agent loads doca-spcx-cc and applies the contention rule: Active plus an unchanged traffic curve is not evidence the algorithm failed to take over, because a CC algorithm has no observable behaviour without actual contention on the fabric. An idle-link or contention-absent run is uninformative by construction, so the agent establishes whether the run generated contention before drawing any conclusion, and refuses to declare the algorithm broken or safe on that basis. Only real symbols and commands are quoted.",
       "assertions": [
-        "The doca-spcx-cc skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer establishes whether the run actually generated contention on the fabric before concluding anything about the algorithm.",
+        "The answer does not accept an idle-link or contention-absent run as evidence that factory CC is still in charge, or that the algorithm is broken.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-spcx-cc.negative.v1",
-      "prompt": "I actually need help with DPA-side algorithm authoring detail. Which skill should handle this, and why is it not doca-spcx-cc?",
+      "prompt": "I'm writing the device-side algorithm code itself and need help with that programming model, not with a host command line that loads a prebuilt one. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-spcx-cc; it explains that DPA-side algorithm authoring detail is out of doca-spcx-cc's scope and routes to the appropriate skill instead.",
+      "expected_output": "The agent does not apply doca-spcx-cc's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-spcx-cc as the answer.",
       "assertions": [
-        "doca-spcx-cc is not selected as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) instead."
+        "The answer does not apply doca-spcx-cc's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

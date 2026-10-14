@@ -2,36 +2,54 @@
 license: Apache-2.0
 name: doca-flow-tune
 description: >
-  Use this skill when the user is tuning a live or captured
-  `doca-flow` pipeline with `doca_flow_tune` — snapshotting
-  pipe / counter / KPI state, picking a tuning axis (rule
-  placement, resource hints / table sizing, HW-offload mode)
-  and a matching measurement (rule-install rate, lookup latency,
-  hardware-counter delta), running offline or online (read-only
-  or state-changing) modes, reading the dumper CSV / analyze
-  JSON / visualize mermaid, or applying a recommendation back
-  into the Flow program. Trigger even when the user does
-  not explicitly mention "doca_flow_tune" — typical implicit
-  phrasings include "Flow rule-install rate is low on
-  BlueField", "table sizing looks wrong for this pipe", "tune
-  visualize step is empty", "before/after
-  counters don't move", or "which doca-flow knob does this
-  recommendation hit". Refuse and route elsewhere for measuring
-  baseline numbers (doca-flow-perf, doca-flow-dpa-perf), writing
-  the doca-flow application, DOCA install, or streaming Flow
-  telemetry — those belong to other skills.
+  Use this skill when the user is tuning a live or captured `doca-flow`
+  pipeline with `doca_flow_tune` — snapshotting pipe / counter / KPI
+  state, picking a tuning axis (rule placement, resource hints / table
+  sizing, HW-offload mode) and a matching measurement (rule-install
+  rate, lookup latency, hardware-counter delta), running offline or
+  online (read-only or state-changing) modes, reading the dumper CSV /
+  analyze JSON / visualize mermaid, or applying a recommendation back
+  into the Flow program. Trigger even when the user does not explicitly
+  mention "doca_flow_tune" — typical implicit phrasings include "Flow
+  rule-install rate is low on BlueField", "table sizing looks wrong for
+  this pipe", "tune visualize step is empty", "before/after counters
+  don't move", or "which doca-flow knob does this recommendation hit".
+  Refuse and route elsewhere for measuring baseline numbers
+  (doca-flow-perf, doca-flow-dpa-perf), writing the doca-flow
+  application, DOCA install, or streaming Flow telemetry — those belong
+  to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - flow
+    - tune
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on Linux
-  (Ubuntu 22.04/24.04 or RHEL/SLES) with a BlueField DPU or
-  ConnectX NIC attached, plus a running or captured `doca-flow`
-  application to observe. Reads the user's local install via
-  `pkg-config doca-flow` and the shipped `flow_tune_cfg*.json`
-  templates and `scripts/` directory under /opt/mellanox/doca.
+  Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
+  22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC
+  attached, plus a running or captured `doca-flow` application to
+  observe. Reads the user's local install via `pkg-config doca-flow` and
+  the shipped `flow_tune_cfg*.json` templates and `scripts/` directory
+  under /opt/mellanox/doca. The validation steps require a live DOCA
+  install.
 ---
 
 # DOCA Flow Tune (`doca_flow_tune`)
+
+## Examples
+
+- **"Flow rule-install rate is low on BlueField."** — this is
+  in scope. Snapshot then pick a tuning axis; do not replace
+  this with a flow-perf baseline run.
+- **"Tune visualize step is empty."** — check dumper CSV /
+  analyze JSON before changing the Flow program.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+tune / debug. Open the capabilities companion for online vs
+offline modes. Do not open every companion file.
 
 > **Subcommand surface correction (Run-12, verified Run-13
 > against doca/tools/flow_tune/src/tune/common/tune_config.cpp).**
@@ -51,7 +69,7 @@ compatibility: >
 > subcommands run in **offline / captured-snapshot mode** against
 > JSON / CSV files the online modes previously dropped into the
 > configured `outputs_directory`. The rest of this skill (and
-> [`CAPABILITIES.md`](CAPABILITIES.md) / [`TASKS.md`](TASKS.md))
+> the capabilities companion / the tasks companion)
 > uses the legacy *"server role / online mode / offline mode"*
 > framing — that framing is internally consistent with the
 > subcommand surface here: *server role* = a server-attached
@@ -62,15 +80,15 @@ compatibility: >
 > downstream behavioral consequence of the subcommand pick.
 
 **Where to start:** This is a tool skill for invoking `doca_flow_tune`,
-the unified DOCA Flow tuning tool. Open [`TASKS.md`](TASKS.md) and
-start at [`## configure`](TASKS.md#configure) to commit to the
+the unified DOCA Flow tuning tool. Open the tasks companion and
+start at `## configure` to commit to the
 three-axis decision (target Flow pipeline × tuning axis ×
 measurement) and pick offline vs online vs server-attach mode, then
-[`## run`](TASKS.md#run) for the snapshot → analyze → visualize
-loop, then [`## test`](TASKS.md#test) for the smoke-before-bulk
+`## run` for the snapshot → analyze → visualize
+loop, then `## test` for the smoke-before-bulk
 overlay that gates any state-changing application of a tuning
 recommendation back into the Flow application's code. Open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
+the capabilities companion when the question is *what
 state `doca_flow_tune` can observe and recommend on*, *how its
 server / client roles fit inside the single artifact*, *which DOCA
 version the tool ships in*, or *how to interpret the dumper / monitor
@@ -93,7 +111,7 @@ piece; the worked example is one instance.
   on a BlueField-3 and I think the rule-install rate is below what
   the device can sustain; do I measure first or tune first?"*.
   Answered by the *tune vs perf* boundary in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   and the routing into
   [`doca-flow-perf`](../doca-flow-perf/SKILL.md) for baselines vs
   this skill for optimization on top of a measured baseline.
@@ -102,40 +120,40 @@ piece; the worked example is one instance.
   example: *"I want a side-effect-free dumper / monitor run against
   the running Flow ports for an operations-rate profile"*. Answered
   by the snapshot flow in
-  [`TASKS.md ## run`](TASKS.md#run) plus the read-only-by-default
+  the tasks companion plus the read-only-by-default
   posture in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
+  the capabilities companion.
 - **"Pick the right tuning axis — rule placement, resource hints,
   or hardware-offload mode — for the question I actually have."**
   — worked example: *"my Flow pipe's rule-install rate is low; is
   this a placement question or a table-sizing question?"*. Answered
   by the three-axis configuration in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the configure walk in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"How do `doca_flow_tune`'s server role and client / consumer
   role fit together inside the single artifact?"** — worked
   example: *"I keep reading about a Flow Tune server and a Flow
   Tune client; which binary am I running?"*. Answered by the
   *one binary, two roles* breakdown in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   and the corresponding routing in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"How do I take a recommended parameter change from flow-tune
   back into my doca-flow application without breaking the
   dataplane?"** — worked example: *"the analyze step suggests a
   different table sizing for my pipe; how do I apply it?"*.
   Answered by the *recommendation → minimum-diff modification of
   the Flow program* loop in
-  [`TASKS.md ## modify`](TASKS.md#modify) and the
+  the tasks companion and the
   smoke-before-bulk rule in
-  [`TASKS.md ## test`](TASKS.md#test).
+  the tasks companion.
 - **"`doca_flow_tune` reports nothing / disagrees with the Flow
   app / cannot attach — what does that mean?"** — worked example:
   *"the tool runs but the visualize step produces an empty
   mermaid diagram"*. Answered by the layered error taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-  + [`TASKS.md ## debug`](TASKS.md#debug).
+  the capabilities companion
+  + the tasks companion.
 
 ## Audience
 
@@ -188,7 +206,7 @@ tool is *configure JSON, run, read the outputs, propose minimum-
 diff changes to the surrounding `doca-flow` program in the
 program's own language*. For the `doca-flow` API the
 recommendations route back into, see
-[`doca-flow CAPABILITIES.md`](../../libs/doca-flow/CAPABILITIES.md);
+[`doca-flow`](../../libs/doca-flow/SKILL.md);
 for cross-language application patterns, see
 [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
 
@@ -235,7 +253,7 @@ For those, route to
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what `doca_flow_tune` observes and
+- the capabilities companion — what `doca_flow_tune` observes and
   recommends on: the unified-artifact decomposition (server role
   + client / consumer role inside one binary), the three-axis
   configuration model (tuning axis × measurement × scope: which
@@ -253,7 +271,7 @@ companion files:
   observability primitive for the Flow pipeline), and the safety
   policy that makes any mutating application of a recommendation
   high-stakes because the recommendation lands in live Flow state.
-- `TASKS.md` — step-by-step workflows for the in-scope task verbs:
+- the tasks companion — step-by-step workflows for the in-scope task verbs:
   `install` (route to setup; the binary is shipped),
   `configure` (the three-axis decision + JSON config + mode pick),
   `build` (route to install; the binary is shipped), `modify`
@@ -309,18 +327,18 @@ and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope (the user actually wants to invoke `doca_flow_tune`
    against a `doca-flow` pipeline, not measure baseline perf or
    learn the Flow API).
 2. **For what `doca_flow_tune` observes, the one-binary / two-role
    decomposition, the three-axis model, the version overlay, the
    error taxonomy, observability surface, and safety posture,
-   see [CAPABILITIES.md](CAPABILITIES.md).**
+   see the capabilities companion.**
 3. **For the documented invocations and the snapshot → analyze →
    visualize → propose → smoke workflow — `install`, `configure`,
    `build`, `modify`, `run`, `test`, `debug`, `use` — see
-   [TASKS.md](TASKS.md).**
+   the tasks companion.**
 
 ## Related skills
 
@@ -351,7 +369,7 @@ and pull requests should not add:
 - [`doca-version`](../../doca-version/SKILL.md) — the canonical
   version-detection chain, four-way match, NGC semantics, and
   headers-win-over-docs rule. The
-  [`## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  `## Version compatibility`
   overlay in this skill is a thin extension on top.
 - [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
   debug ladder. Flow-tune surfaces *its own* error taxonomy; when
@@ -359,7 +377,7 @@ and pull requests should not add:
   the tune taxonomy hands off to `doca-debug`.
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
   — the bundle's detect → prefer → fall back → report contract.
-  The Command appendix in [`TASKS.md`](TASKS.md) honors it.
+  The Command appendix in the tasks companion honors it.
 - [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
   install verification, hugepages, NUMA, and the *I have no
   install yet* path with the public NGC DOCA container.

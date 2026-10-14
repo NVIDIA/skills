@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-bench-extension.explicit-positive.v1",
-      "prompt": "Use the doca-bench-extension skill to help me. I'm working on: the operator is authoring, building, loading, or debugging a custom doca-bench plug-in \u2014 a versioned shared library with DOCA_EXPERIMENTAL-marked C entry points that doca-bench loads to measure a workload class its built-in modes do not cover, with doca_bench_cuda as the shipped reference exemplar.",
+      "prompt": "Use the doca-bench-extension skill for this task: I'm running into this: \"no built-in doca-bench mode fits my workload\". Can you walk me through it?",
       "expected_skill": "doca-bench-extension",
       "expected_output": "The agent selects the doca-bench-extension skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -17,7 +17,7 @@
       "expected_skill": "doca-bench-extension",
       "expected_output": "The agent recognizes this as a doca-bench-extension issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-bench-extension skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,18 +27,18 @@
       "expected_skill": "doca-bench-extension",
       "expected_output": "The agent recognizes this as a doca-bench-extension issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-bench-extension skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-bench-extension.negative.v1",
-      "prompt": "I actually need help with questions about which built-in doca-bench mode to pick. Which skill should handle this, and why is it not doca-bench-extension?",
+      "prompt": "I only need to choose among the benchmark modes that already ship. I am not writing any new plug-in code. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-bench-extension; it explains that questions about which built-in doca-bench mode to pick is out of doca-bench-extension's scope and routes to the appropriate skill instead.",
+      "expected_output": "The agent does not apply doca-bench-extension's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-bench-extension as the answer.",
       "assertions": [
-        "doca-bench-extension is not selected as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) instead."
+        "The answer does not apply doca-bench-extension's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

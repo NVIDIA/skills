@@ -2,24 +2,28 @@
 license: Apache-2.0
 name: doca-bf4-deployment
 description: >
-  WARNING: guides potentially IRREVERSIBLE BlueField-4 hardware
-  operations (PLDM firmware burns, ISO reflashes, power cycles, BMC
-  factory resets) that can brick firmware, corrupt boot media, or
-  cause outages — a maintenance window and rollback plan are required,
-  and every mutating step is governed by doca-hardware-safety, loaded
-  alongside. Use this skill for BlueField-4 (BF4) day-1 platform
-  bring-up from the BMC: installing the BlueField/DOCA bundle
-  ISO onto the DPU (Grace, the Arm complex) over UEFI HTTP
-  Boot, PXE, or Redfish Virtual Media; the PLDM firmware-update flow
-  (BMC, NIC firmware, SBIOS, ERoT) via the Redfish UpdateService and
-  pldmtool; and a Grace Ubuntu image with optional cloud-init. Trigger
-  on BlueField-4/BF4 bring-up phrasings even without "BF4": {bring up
-  my new BlueField-4}, {the BlueField ISO will not boot over HTTP from
-  the BMC}, {attach BF4 virtual media via Redfish}, {BF4 firmware Task
-  stuck at Running}. BF3 bring-up, application launch, and library APIs
-  belong to other skills.
+  WARNING: guides IRREVERSIBLE BlueField-4 hardware operations (PLDM
+  firmware burns, ISO reflashes, power cycles, BMC factory resets); every
+  mutating step is governed by doca-hardware-safety (window, rollback).
+  BlueField-4 only: BlueField-3 bring-up is doca-bf3-deployment. Use this
+  skill for BlueField-4 (BF4) day-1 platform
+  bring-up from the BMC: installing the BlueField/DOCA bundle ISO onto
+  the DPU (Grace, the Arm complex) over UEFI HTTP Boot, PXE, or Redfish
+  Virtual Media; the PLDM firmware-update flow (BMC, NIC firmware,
+  SBIOS, ERoT) via the Redfish UpdateService and pldmtool; and a Grace
+  Ubuntu image with optional cloud-init. Trigger on BlueField-4/BF4
+  bring-up phrasings even without "BF4": {bring up my new BlueField-4},
+  {the BlueField ISO will not boot over HTTP from the BMC}, {attach BF4
+  virtual media via Redfish}, {BF4 firmware Task stuck at Running}, {prepare a BlueField-4 host: platform
+  support, version alignment, safest first smoke test}. Application
+  launch and library APIs belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - bluefield-4
+    - deployment
 compatibility: >
   No DOCA install is required to read this skill; it teaches the
   documented BlueField-4 BMC-driven bring-up flows (UEFI HTTP Boot,
@@ -27,9 +31,44 @@ compatibility: >
   steps requires a BlueField-4 with an out-of-band-reachable BMC, a
   host or HTTP/HTTPS server to host the bundle ISO, and the target
   versions from the public BlueField/DOCA release notes.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA BlueField-4 (BF4) deployment
+
+## Examples
+
+- **"I have a BlueField-4 and a BMC — how do I bring Grace up?"** —
+  BMC-driven day-1, not the BF3 RShim/BFB path. Do not invent
+  credentials or skip media detach.
+- **"PLDM update finished but the NIC firmware did not move."** —
+  treat it as a firmware-Task / activation failure, not a second
+  burn by default.
+
+**BlueField-3 or any other generation is not this skill.** Name
+`doca-bf3-deployment` and stop; do not read further or run commands.
+
+## Preparing a BlueField-4 host (answer from here)
+
+1. **Platform:** confirm it is BlueField-4 and that the BMC is reachable
+   out of band; compare
+   the Redfish firmware inventory with the release notes' targets.
+2. **Version alignment:** run the `doca-version` four-source chain on the
+   host. Fixing any mismatch changes hardware state and follows
+   `doca-hardware-safety`.
+3. **Safest first smoke test:** read-only `doca_caps --list-devs`, then one
+   shipped sample per `doca-bare-metal-deployment`. No firmware, mode or
+   reset change before that is green.
+4. **Say it in the answer:** every mutating step (PLDM firmware burn, ISO
+   reflash, power cycle, BMC reset) is routed through
+   `doca-hardware-safety`: pre-flight inventory, out-of-band access,
+   maintenance window, rollback, then apply and verify.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for BMC bring-up
+and recover. Open the capabilities companion for the three install
+methods and the BF4 safety overlay. Do not open every companion file.
 
 > ⚠️ **WARNING — irreversible hardware operations.** This skill guides
 > operators through potentially destructive, irreversible BlueField-4
@@ -58,10 +97,17 @@ and
 [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)):
 those skills assume a working BlueField; this skill is how the
 BlueField-4 GETS to working. If the user has a fresh BF4 and wants to
-install the OS or update firmware, open [`TASKS.md`](TASKS.md) and
-start at [`## configure`](TASKS.md#configure). If the question is
+install the OS or update firmware, open the tasks companion and
+start at `## configure`. If the question is
 *what bring-up methods even exist and what is the contract for each*,
-start at [`CAPABILITIES.md`](CAPABILITIES.md).
+start at the capabilities companion.
+
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
 
 > **Scope note — BF4 day-1 is in scope by directive.** The bundle's
 > [`AGENTS.md ## Non-goals`](../../AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely)
@@ -76,45 +122,6 @@ start at [`CAPABILITIES.md`](CAPABILITIES.md).
 > change-application meta-policy. It does NOT redefine that
 > meta-policy, and it does NOT cover BF3 (route to
 > `doca-bf3-deployment`), application launch, or library APIs.
-
-## Audience
-
-This skill serves **external operators standing up a new
-BlueField-4** who already have:
-
-- a BlueField-4 with its BMC reachable out-of-band (BMC SSH plus the
-  documented Redfish endpoint), so the DPU can be driven without
-  physical access,
-- the BlueField/DOCA bundle ISO (and, for the Grace-Ubuntu path, a
-  Grace Ubuntu image) downloaded from the public NVIDIA download
-  surface, hosted at {iso-uri} on the operator's own HTTP/HTTPS
-  server, and
-- the target firmware and OS versions read from the **public
-  BlueField/DOCA release notes** (this skill never quotes a specific
-  pre-release firmware version).
-
-It is **not** for:
-
-- BlueField-3 (BF3) bring-up — route to `doca-bf3-deployment`,
-- developers who want to RUN a DOCA service container or a DOCA-linked
-  binary on an already-working BlueField — route to
-  [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
-  or
-  [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md),
-- the cross-cutting hardware-change meta-policy itself (preflight, OOB
-  console discipline, maintenance window, rollback) — that is owned by
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) and this
-  skill cross-links it, never duplicates it,
-- fleet-scale / orchestrated DPU provisioning — that is DOCA Platform
-  Framework territory, routed via
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
-
-The skill teaches the agent the documented bring-up *procedure* and
-the rules for quoting Redfish / PLDM / UEFI standard operations and
-public BlueField/DOCA documentation via
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md);
-it does not invent BMC credentials, ISO URIs, firmware version
-strings, EIDs, Redfish task IDs, or device names from memory.
 
 ## When to load this skill
 
@@ -165,7 +172,7 @@ fleet-scale orchestrated provisioning (route via
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — the BF4 day-1 bring-up contract: the three OS
+- the capabilities companion — the BF4 day-1 bring-up contract: the three OS
   install methods (UEFI HTTP Boot, PXE Boot, Redfish Virtual Media)
   and the Grace-Ubuntu-plus-cloud-init Virtual Media path; the PLDM
   firmware-update surface across BMC / NIC firmware / SBIOS / ERoT;
@@ -183,7 +190,7 @@ companion files:
   MUTATING hardware op; never print a real password; always detach
   virtual media to avoid boot loops; only public hosts for any
   NVIDIA URL).
-- `TASKS.md` — step-by-step workflows for the in-scope bring-up verbs:
+- the tasks companion — step-by-step workflows for the in-scope bring-up verbs:
   `configure`, `build` (routing stub), `modify` (routing stub), `run`
   (the three install methods plus the PLDM firmware-update flow plus
   the Grace-Ubuntu cloud-init path, as `###` sub-anchors), `test`
@@ -210,7 +217,7 @@ application-deployment skills.
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope (BF4 day-1 bring-up via the BMC; NOT BF3, NOT application
    launch, NOT a library-API question, NOT the hardware-change
    meta-policy itself).
@@ -218,23 +225,23 @@ application-deployment skills.
    Grace-Ubuntu cloud-init path, the PLDM firmware-update surface, the
    version overlay, the bring-up error taxonomy, the observability
    surface, and the BF4 safety overlay), see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — `configure`, `build` (routing
    stub), `modify` (routing stub), `run` (with the three install
    methods, the PLDM flow, and the Grace-Ubuntu cloud-init path as
    `###` sub-anchors), `test`, `debug`, plus the `Deferred task verbs`
-   block — see [TASKS.md](TASKS.md).**
+   block — see the tasks companion.**
 4. **Load
    [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
    ALONGSIDE** whenever the question reaches a mutating step (PLDM
    firmware burn, ISO reflash, power cycle, BMC factory reset).
 
-## Example questions this skill answers well
-
-See [`references/details.md`](references/details.md#example-questions-this-skill-answers-well).
-## What this skill deliberately does not ship
-
-See [`references/details.md`](references/details.md#what-this-skill-deliberately-does-not-ship).
 ## Related skills
 
-See [`references/details.md`](references/details.md#related-skills).
+- [`doca-bf3-deployment`](../doca-bf3-deployment/SKILL.md) — BF3 RShim/BFB day-1.
+- [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) — PLDM, reflash, power cycle.
+- [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) — launch after Grace is up.
+- [`doca-container-deployment`](../doca-container-deployment/SKILL.md) — service container after Grace is up.
+- [`doca-setup`](../doca-setup/SKILL.md) — env prep on the installed Grace OS.
+- [`doca-version`](../doca-version/SKILL.md) — four-way version match.
+- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) — public docs and release notes.

@@ -18,11 +18,11 @@ policy, see [CAPABILITIES.md](CAPABILITIES.md). For the
 cross-library DOCA patterns layered under everything below (the
 universal Core lifecycle, the cross-library `DOCA_ERROR_*`
 taxonomy, the modify-a-shipped-sample workflow), see
-[`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 For the RDMA substrate that NVMe-over-RDMA transport lands on,
-see [`doca-rdma`](../doca-rdma/SKILL.md). For the steering
+see `doca-rdma/SKILL.md`. For the steering
 side that decides which NVMe-oF packets reach STA-managed
-queues, see [`doca-flow`](../doca-flow/SKILL.md).
+queues, see `doca-flow/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through
@@ -48,18 +48,18 @@ Steps the agent should walk the user through:
    installed and consistent — `pkg-config --modversion doca-sta`
    resolves and matches `doca_caps --version` per the four-way
    match rule owned by
-   [`doca-version`](../../doca-version/SKILL.md); (b) for the
+   `doca-version/SKILL.md`; (b) for the
    RDMA transport (STA's only transport),
    `pkg-config --modversion doca-rdma`
    resolves AND `doca_rdma_cap_*` on the chosen device reports a
    non-empty surface per
-   [`doca-rdma CAPABILITIES.md ## Capabilities and modes`](../doca-rdma/CAPABILITIES.md#capabilities-and-modes);
+   `doca-rdma CAPABILITIES.md ## Capabilities and modes` (`doca-rdma/CAPABILITIES.md#capabilities-and-modes`);
    (c) the user has a plan for how NVMe-oF traffic will reach
    the STA-managed queue — either a DOCA Flow rule programmed
-   per [`doca-flow TASKS.md ## configure`](../doca-flow/TASKS.md#configure),
+   per `doca-flow TASKS.md ## configure` (`doca-flow/TASKS.md#configure`),
    or the env-side equivalent on the user's setup. If any of
    the three is missing, route to the owning skill (the env
-   side to [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure))
+   side to `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`))
    first and do NOT propose a `doca_sta_*` workaround.
 2. **Confirm the device supports STA.** Per the cap-check rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
@@ -96,7 +96,7 @@ Steps the agent should walk the user through:
 5. **Create and configure the `doca_sta` context.** This is a
    standard DOCA Core context create — the universal lifecycle
    from
-   [`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure)
+   `doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`)
    applies. Mandatory before `doca_ctx_start()`: the underlying
    `doca_dev` opened against a device that passes
    `doca_sta_cap_is_supported`; the devices added with
@@ -134,7 +134,7 @@ transport is RDMA, so `doca-rdma` is always required.
 
 The build pattern for any DOCA C/C++ consumer is fully
 documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the STA-specific overlay:
 
 | Slot | Value for STA | Why it matters |
@@ -142,7 +142,7 @@ This skill carries only the STA-specific overlay:
 | `pkg-config` module name | `doca-sta` for the STA surface itself; AND `doca-rdma` for the RDMA substrate (always required — STA's transport is RDMA) | Linking only `doca-sta` without `doca-rdma` produces `undefined reference` errors for the substrate symbols — surface the substrate-link requirement up front per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) |
 | Include flags | `pkg-config --cflags doca-sta doca-rdma` | Resolves DOCA headers under whichever include directory `pkg-config --cflags` reports on this install (do not hardcode the include path — it can move across DOCA install profiles) for the STA surface and the RDMA substrate surface in one pass |
 | Link flags | `pkg-config --libs doca-sta doca-rdma` | Pulls in whatever `pkg-config --libs` resolves on this install (do not predict the `-l<name>` form by hand — `.so` basenames use underscores, `.pc` names use hyphens, and `pkg-config` is the only correct translator), plus whatever the `doca-rdma` `.pc` adds (resolved by `pkg-config`, do not hand-craft); ordering is handled by `pkg-config`, do not hand-craft the `-l` list |
-| Version anchors | `pkg-config --modversion doca-sta` MUST agree with `doca_caps --version`; `pkg-config --modversion doca-rdma` MUST also agree with the same line | Per the substrate-library version-match rule in [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility), a STA install that compiles against one DOCA RDMA major and runs against another is a partial-install hazard; route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 |
+| Version anchors | `pkg-config --modversion doca-sta` MUST agree with `doca_caps --version`; `pkg-config --modversion doca-rdma` MUST also agree with the same line | Per the substrate-library version-match rule in [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility), a STA install that compiles against one DOCA RDMA major and runs against another is a partial-install hazard; route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 |
 | Companion DOCA libs | `doca-argp` for argument parsing (if the consumer uses the standard DOCA arg style); the cross-library `doca-common` is pulled in transitively | Adding unnecessary companion libs bloats the link line and obscures real partial-install issues |
 | Initiator/host NVMe stack glue | NOT shipped by this skill | Per [`SKILL.md`](SKILL.md), the initiator / host NVMe stacks (SPDK `bdev_nvme`, kernel `nvme` host) are upstream projects out of scope; doca-sta is target-side acceleration, not an initiator transport provider |
 
@@ -153,7 +153,7 @@ language's own FFI generator (e.g. `bindgen` against the
 doca-sta headers, which assume the RDMA substrate headers). The
 substrate rule, lifecycle
 rule, and capability-discovery rules still apply per
-[`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility),
+`doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`),
 and the wrapper must surface the version-pair to the user.
 
 ## modify
@@ -167,7 +167,7 @@ assembles the smallest correct program from the `doca_sta_*` API
 and the public DOCA STA guide.
 
 The universal modify-a-shipped-sample workflow in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify)
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`)
 does NOT apply here (there is no sample to start from); instead
 the agent walks these slots to scope the from-scratch minimal
 target:
@@ -202,7 +202,7 @@ Steps the agent should walk the user through:
    initiator (the NVMe-oF host) connecting in, no Connect
    handshake arrives and the target idles. For NVMe-over-RDMA —
    STA's only transport — both ends must route IB / RoCE to each
-   other per [`doca-rdma TASKS.md ## run`](../doca-rdma/TASKS.md#run).
+   other per `doca-rdma TASKS.md ## run` (`doca-rdma/TASKS.md#run`).
    This is a fabric / env precondition, NOT a code problem.
 2. **Confirm the steering side is in place.** Per the
    precondition matrix in
@@ -213,7 +213,7 @@ Steps the agent should walk the user through:
    that the Connect handshake never completes and the program
    blocks indefinitely — do NOT recommend retrying the
    `doca_ctx_start()` until the Flow rule is confirmed per
-   [`doca-flow TASKS.md ## run`](../doca-flow/TASKS.md#run).
+   `doca-flow TASKS.md ## run` (`doca-flow/TASKS.md#run`).
 3. **Start the target before the initiator connects.** Bring
    the STA target up (subsystems / namespaces / backends defined,
    `doca_ctx_start()` returned success) before the remote
@@ -229,7 +229,7 @@ Steps the agent should walk the user through:
    the initiator is pointed at the target's NQN.
 5. **Capture the structured log on the first run.** Set
    `DOCA_LOG_LEVEL=trace` for the first run (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)).
    This is the cheapest way to make the per-queue lifecycle
    transitions, the Connect handshake outcome, and the
    per-IO completion events visible on first failure — and
@@ -239,7 +239,7 @@ Steps the agent should walk the user through:
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
 underlie *"the program built but does nothing"*, see
-[`doca-version TASKS.md ## run`](../../doca-version/TASKS.md#run).
+`doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
 
@@ -333,15 +333,15 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | --- | --- | --- |
 | Connect handshake never completes | `doca_ctx_start()` returns success but the per-queue state never transitions past CREATED, OR the remote initiator reports the NVMe-oF Connect timed out | Re-walk the substrate + steering precondition matrix in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) BEFORE re-checking STA code — this is almost never a STA bug |
 | `DOCA_ERROR_NOT_SUPPORTED` at start | The chosen device does not pass `doca_sta_cap_is_supported`, or a sizing value exceeds the reported `doca_sta_get_max_*` bound | Re-run `doca_sta_cap_is_supported` and the matching `doca_sta_get_max_*` query against the active `doca_devinfo`; pick a supported device OR lower the sizing value below the reported maximum |
-| Single I/O fails with `DOCA_ERROR_IO_FAILED` after admin command succeeded | The admin queue worked but the I/O queue path is broken — transport-layer error, peer-side controller reset, or the substrate (e.g. RDMA queue-pair) hit a fault | Capture `dmesg | tail` per [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug) and the matching substrate-skill error taxonomy in [`doca-rdma CAPABILITIES.md ## Error taxonomy`](../doca-rdma/CAPABILITIES.md#error-taxonomy); do NOT retry blindly |
+| Single I/O fails with `DOCA_ERROR_IO_FAILED` after admin command succeeded | The admin queue worked but the I/O queue path is broken — transport-layer error, peer-side controller reset, or the substrate (e.g. RDMA queue-pair) hit a fault | Capture `dmesg | tail` per `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) and the matching substrate-skill error taxonomy in `doca-rdma CAPABILITIES.md ## Error taxonomy` (`doca-rdma/CAPABILITIES.md#error-taxonomy`); do NOT retry blindly |
 | `DOCA_ERROR_AGAIN` on submit during the sustained-run loop | The per-queue in-flight budget is full | This is the cross-library *"would-block, retry after progress"* pattern — drain completions via `doca_pe_progress()` before re-submitting, or raise the queue depth / in-flight budget within the device cap per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) |
-| Same code passes on host A, fails on host B | Different DOCA version, different substrate version, or different device cap surface | Re-run the version chain per [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) four-way match on host B; re-run the STA cap queries on host B against the active `doca_devinfo`; re-walk the substrate-library version-match rule in [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
+| Same code passes on host A, fails on host B | Different DOCA version, different substrate version, or different device cap surface | Re-run the version chain per `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) four-way match on host B; re-run the STA cap queries on host B against the active `doca_devinfo`; re-walk the substrate-library version-match rule in [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
 
 Loop termination: stop iterating once two consecutive
 iterations of the same kind do not change the picture — that
 means the cause is below STA (substrate, steering, fabric,
 NVMe stack on top, driver / firmware). Escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured STA-layer trace, the cap-query baseline,
 and the substrate-side trace as evidence.
 
@@ -353,7 +353,7 @@ or does not behave as expected, narrow the cause to a single
 layer before recommending any code change.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending STA-specific
 fixes. This skill's overlay names the STA-specific
@@ -367,7 +367,7 @@ manifestation at layers 5 (runtime), 6 (program), and 7
   queue-pair state machine: an I/O was submitted before the
   queue-pair transitioned to CONNECTED, or the context was
   reconfigured after start. Walk the universal lifecycle in
-  [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)
+  `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`)
   AND the per-queue state-transition note in
   [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
   before recommending any code change.
@@ -384,7 +384,7 @@ manifestation at layers 5 (runtime), 6 (program), and 7
   device access, steering rule in place) BEFORE any code
   change. The most common cause is a missing or wrong DOCA
   Flow rule for the NVMe-oF 5-tuple, owned by
-  [`doca-flow TASKS.md ## debug`](../doca-flow/TASKS.md#debug).
+  `doca-flow TASKS.md ## debug` (`doca-flow/TASKS.md#debug`).
 
 **Layer 6 (program) — STA overlay.**
 
@@ -418,10 +418,10 @@ manifestation at layers 5 (runtime), 6 (program), and 7
   transport-layer error: link drop, RDMA peer disconnect,
   firmware fault, or peer-side controller reset.
   Capture `dmesg | tail` and `mlxconfig -d <pcie> q` per
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5 (driver); for the NVMe-over-RDMA path overlay the
   substrate-side error taxonomy in
-  [`doca-rdma CAPABILITIES.md ## Error taxonomy`](../doca-rdma/CAPABILITIES.md#error-taxonomy).
+  `doca-rdma CAPABILITIES.md ## Error taxonomy` (`doca-rdma/CAPABILITIES.md#error-taxonomy`).
   Do NOT retry blindly in the STA code.
 - `DOCA_ERROR_DRIVER` from any STA call is the layer below
   DOCA reporting failure. Capture
@@ -430,7 +430,7 @@ manifestation at layers 5 (runtime), 6 (program), and 7
   `doca_caps --version`; cross-check the version triple per
   [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility);
   route to
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5 (driver). A version-skew between STA and the
   substrate is the canonical partial-install hazard here.
 - `DOCA_ERROR_NOT_PERMITTED` on the `doca_dev` open or the
@@ -438,21 +438,21 @@ manifestation at layers 5 (runtime), 6 (program), and 7
   Confirm sudo or the appropriate group membership per
   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy);
   the fix lives in
-  [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure),
+  `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`),
   not in a `doca_sta_*` call.
 
 Once the layer is identified, route to the matching debug
 verb on the matching skill: install / build / link / driver
-to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug);
-version to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug);
+to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`);
+version to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug);
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`);
 substrate (RDMA) to
-[`doca-rdma TASKS.md ## debug`](../doca-rdma/TASKS.md#debug);
+`doca-rdma TASKS.md ## debug` (`doca-rdma/TASKS.md#debug`);
 steering to
-[`doca-flow TASKS.md ## debug`](../doca-flow/TASKS.md#debug).
+`doca-flow TASKS.md ## debug` (`doca-flow/TASKS.md#debug`).
 
 ## Deferred task verbs
 
@@ -462,9 +462,9 @@ so the agent does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [`doca-setup`](../../doca-setup/SKILL.md) and to the install-tree
+  `doca-setup/SKILL.md` and to the install-tree
   layout in
-  [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying NVMe-oF-using applications at scale
   across many hosts / DPUs, multi-tenant subsystem fan-out,
@@ -481,7 +481,7 @@ so the agent does not invent guidance:
   and this skill does not ship initiator glue.
   Route the user to the upstream project's own integration
   documentation reachable via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **Initiator-side NVMe host semantics.** Host-side controller
   configuration, host block-layer semantics, and host multipath
   policy are owned by the remote initiator's NVMe stack, not by
@@ -496,7 +496,7 @@ so the agent does not invent guidance:
   `mlxconfig` / `mlxfwreset` / re-imaging the BFB, all of
   which belong to the env-side skill rather than this one.
   Route to
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5.
 
 ## Command appendix
@@ -510,7 +510,7 @@ need elevated privileges call that out explicitly.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -524,29 +524,29 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-sta` | [`## configure`](#configure) step 1; [`## build`](#build) version-anchor slot | What is the build-time DOCA STA version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
+| `pkg-config --modversion doca-sta` | [`## configure`](#configure) step 1; [`## build`](#build) version-anchor slot | What is the build-time DOCA STA version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
 | `pkg-config --modversion doca-rdma` | [`## configure`](#configure) step 1 (NVMe-over-RDMA path); [`## build`](#build) version-anchor slot | What is the build-time DOCA RDMA substrate version, and does it agree with `doca-sta`? | A semver string matching `pkg-config --modversion doca-sta` and `doca_caps --version`. Disagreement = substrate-vs-STA partial-install hazard per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
 | `pkg-config --cflags --libs doca-sta doca-rdma` | [`## build`](#build) | What include + link flags does the linker need for the STA surface plus the RDMA substrate? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `ls /opt/mellanox/doca/samples/doca_sta/ 2>/dev/null` | [`## modify`](#modify) slot 1 | Does this install ship STA samples? | Expect **no such directory** — DOCA STA ships no public samples and is absent from the sample profiles. Build from the public headers (next row) instead; do NOT fabricate a sample path |
 | `doca_caps --list-devs` | [`## configure`](#configure) step 2 | Which devices on this host can be used as a `doca_dev` for STA, and what do they advertise? | One row per visible device with PCIe address and capability flags; cross-check against `doca_sta_cap_is_supported` for the per-device STA support |
 | `ls "$(pkg-config --variable=includedir doca-common)/doca_sta*.h"` | [`## configure`](#configure) step 2; [`## modify`](#modify) slot 1 | Which `doca_sta_*` cap-check, sizing, and setter symbols does this install actually expose? | One or more header files; grep inside for the `doca_sta_cap_is_supported`, `doca_sta_get_max_*`, and `doca_sta_set_*` declarations rather than quoting symbols from memory per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | [`## run`](#run) step 5 | What did the structured DOCA logger emit for the first failing STA call? | Trace-level lines on every STA-layer lifecycle transition, the Connect handshake outcome, every per-IO completion. Silence after `doca_ctx_start()` on the `doca_sta` = either PE not progressed OR the steering rule is missing — reach for the substrate / steering trace next |
-| `dmesg \| tail -n 40` (sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver log around the last STA / substrate call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug). Repeated NVMe-oF reset / disconnect lines → peer-side fault, NOT a doca-sta bug |
+| `dmesg \| tail -n 40` (sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver log around the last STA / substrate call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`). Repeated NVMe-oF reset / disconnect lines → peer-side fault, NOT a doca-sta bug |
 | `ibv_devinfo` (sudo, NVMe-over-RDMA path only) | [`## configure`](#configure) step 1; [`## debug`](#debug) layer 7 | What does the underlying `libibverbs` see for this device on the RDMA substrate side? | One device row with `state: PORT_ACTIVE` and a sane MTU; absence indicates the RDMA substrate is not actually up regardless of what doca-sta reports |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the STA-specific rows on top. The substrate-
 library commands (RDMA-side cap queries, `ibv_devinfo`,
 RDMA-side trace) live in
-[`doca-rdma TASKS.md ## Command appendix`](../doca-rdma/TASKS.md#command-appendix)
+`doca-rdma TASKS.md ## Command appendix` (`doca-rdma/TASKS.md#command-appendix`)
 and are referenced from there, not duplicated here.

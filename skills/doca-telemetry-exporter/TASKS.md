@@ -15,7 +15,7 @@ events / opaque events / metrics / OTLP logs) plus the NetFlow
 sibling API, the error taxonomy, observability, and safety policy,
 see [CAPABILITIES.md](CAPABILITIES.md). For where to find docs, the
 installed DOCA layout, or release notes, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through the
@@ -44,7 +44,7 @@ Steps the agent should walk the user through:
    to publish; the aggregating / receiving side is the DOCA
    Telemetry Service (DTS), a separate DOCA service with its own
    public guide reachable via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+   `doca-public-knowledge-map/SKILL.md`.
    State the role first.
 2. **Pick the publish surface.** Walk the publish-surface table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
@@ -57,7 +57,7 @@ Steps the agent should walk the user through:
    `_schema_set_opaque_events_enabled` before `schema_start`;
    metrics/OTLP contexts are created only AFTER `source_start`.
 3. **Confirm the installed DOCA version.** Use the procedure in
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
    Quote the version observed (`pkg-config --modversion
    doca-telemetry-exporter`, then `doca_caps --version`); do not
    assume "latest". Note: there is NO per-device capability query
@@ -119,7 +119,7 @@ cross-library build pattern.
 The build pattern for any DOCA C/C++ consumer is **identical**
 across libraries — `pkg-config` for include + link flags, meson or
 CMake as the build system — and is fully documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the exporter-specific overlay:
 
 | Slot | Value for Telemetry Exporter | Why it matters |
@@ -128,7 +128,7 @@ This skill carries only the exporter-specific overlay:
 | Include flags | `pkg-config --cflags doca-telemetry-exporter` | Resolves to the exporter headers (`doca_telemetry_exporter.h`, `doca_telemetry_exporter_netflow.h`) on this install |
 | Link flags | `pkg-config --libs doca-telemetry-exporter` | Pulls in whatever `pkg-config --libs` resolves on this install (do not predict the `-l<name>` form by hand — `.so` basenames use underscores, `.pc` names use hyphens, and `pkg-config` is the only correct translator) plus the transitive set the resolver computes |
 | Experimental-API flag | `-DDOCA_ALLOW_EXPERIMENTAL_API` when using `_source_report`, the Metrics API, the OTLP-logs API, or `_schema_set_indexes` / `_get_indexes` | Those symbols are `DOCA_EXPERIMENTAL` (per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)); without the flag they will not compile. The `DOCA_STABLE` surface — schema/type/field registration, schema → source lifecycle, opaque events, NetFlow (`doca_telemetry_exporter_netflow.h`), `source_flush`, `check_ipc_status`, `get_timestamp`, and the `schema_set_*` / `schema_get_*` config family — does not need it. Shipped samples still set the flag blanket-style; a NetFlow-only or opaque-only app does not require it on current headers |
-| Header check | the artifact's public headers resolvable under whichever include directory `pkg-config --cflags` reports (do not hardcode the include path) | If `pkg-config --cflags doca-telemetry-exporter` resolves but the include is missing, the install is partial — route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 |
+| Header check | the artifact's public headers resolvable under whichever include directory `pkg-config --cflags` reports (do not hardcode the include path) | If `pkg-config --cflags doca-telemetry-exporter` resolves but the include is missing, the install is partial — route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 |
 | Minimum required DOCA version | Query with `pkg-config --modversion doca-telemetry-exporter`; never hardcode in build files | Cross-version build/runtime mixing breaks per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
 
 For non-C consumers (Rust, Go, Python), the link surface is the
@@ -143,7 +143,7 @@ starting point and apply a **minimum-diff modification** to express
 the user's intent.
 
 The universal modify-a-shipped-sample workflow lives in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify).
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`).
 Use it as-is. The exporter-specific overlay starts with picking the
 RIGHT sample — four ship under
 `/opt/mellanox/doca/samples/doca_telemetry_exporter/`, one per
@@ -209,7 +209,7 @@ Steps the agent should walk the user through:
    IPC was never enabled on the schema.
 5. **Capture the structured log.** Set `DOCA_LOG_LEVEL=trace` for
    the first run (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)).
    This makes the schema/source lifecycle transitions and each
    report visible on first failure.
 6. **Flush before exit.** Ensure the app calls `_source_flush`
@@ -274,7 +274,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 Loop termination: stop iterating once two consecutive iterations of
 the same kind don't change anything — that means the cause is below
 the exporter (transport, receiver). Escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) with
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) with
 the captured evidence and the receiver-side log state.
 
 ## debug
@@ -284,7 +284,7 @@ Goal: when a DOCA Telemetry Exporter call returns a `DOCA_ERROR_*`
 a specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk it in order — install → version → build → link → runtime →
 program → driver — *before* recommending exporter-specific fixes.
 This skill's overlay names the exporter-specific manifestation at
@@ -295,7 +295,7 @@ layers 5 (runtime) and 6 (program):
 - Walk the role rule: did the user actually want the exporter
   (publisher) and not the receiving DOCA Telemetry Service? If they
   are reading the DTS guide, route to it via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
+  `doca-public-knowledge-map/SKILL.md`,
   not deeper into the exporter.
 - Walk destination staging: for IPC, is the DTS up and does
   `check_ipc_status` return `CONNECTED`? A passing build + a missing
@@ -330,12 +330,12 @@ layers 5 (runtime) and 6 (program):
 
 Once the layer is identified, route to the matching debug verb on
 the matching skill: install / build / link / driver to
-[`doca-setup ## debug`](../../doca-setup/TASKS.md#debug); version
-to [`doca-version ## debug`](../../doca-version/TASKS.md#debug);
+`doca-setup ## debug` (`doca-setup/TASKS.md#debug`); version
+to `doca-version ## debug` (`doca-version/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 ## Deferred task verbs
 
@@ -345,17 +345,17 @@ the agent does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [`doca-setup`](../../doca-setup/SKILL.md) and to the install-tree
+  `doca-setup/SKILL.md` and to the install-tree
   layout in
-  [doca-public-knowledge-map ## Layout of an installed DOCA package](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed.
 - **receiver / collector / aggregating service.** Setting up the
   DOCA Telemetry Service (DTS), an OpenTelemetry Collector, or a
   NetFlow collector — out of scope. Route to the receiver's own
   public guide via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
+  `doca-public-knowledge-map/SKILL.md`,
   and to
-  [`doca-collectx-deployment`](../../doca-collectx-deployment/SKILL.md)
+  `doca-collectx-deployment/SKILL.md`
   for the CollectX collection path. This skill is publisher-side
   only.
 - **deploy.** Deploying telemetry-emitting applications at scale
@@ -364,7 +364,7 @@ the agent does not invent guidance:
 - **firmware burn / reset.** The exporter does not depend on
   firmware-layer state; telemetry publishing changes no hardware or
   fabric state. If the debug ladder lands on a driver-layer issue,
-  route via [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug).
+  route via `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 
 ## Command appendix
 
@@ -376,7 +376,7 @@ is the application's normal unprivileged user unless noted.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -387,11 +387,11 @@ the agent should:
    report *"falling back to manual chain"*.
 4. The version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-telemetry-exporter` | `## configure` step 3; `## build` | What is the build-time DOCA Telemetry Exporter version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
+| `pkg-config --modversion doca-telemetry-exporter` | `## configure` step 3; `## build` | What is the build-time DOCA Telemetry Exporter version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
 | `pkg-config --cflags --libs doca-telemetry-exporter` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode the `-I` include path or the `-l<name>` form — both drift between DOCA profiles/majors; `.so` basenames use underscores, `.pc` names use hyphens, and `pkg-config` is the only correct translator |
 | `ls /opt/mellanox/doca/samples/doca_telemetry_exporter/` | `## modify` slot 1 | Which exporter samples ship in this install, and which is the closest starting point? | The four sample dirs `telemetry_export`, `telemetry_export_metrics`, `telemetry_export_otlp_logs`, `telemetry_export_netflow` (subset possible per install profile) |
 | `doca_caps --version` | `## configure` step 3; `## test` | What is the *runtime* DOCA version? | A semver string matching `pkg-config --modversion doca-telemetry-exporter`. Note: `doca_caps` has NO per-device data for this library — its telemetry-exporter dump is a stub |
@@ -402,5 +402,5 @@ the agent should:
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the exporter-specific rows on top.

@@ -2,23 +2,26 @@
 license: Apache-2.0
 name: doca-verbs
 description: >
-  Use this skill when the user is dropping below the higher-level DOCA
-  libraries (doca-rdma / doca-eth / doca-rmax) into the raw-verbs escape
-  hatch — managing QP / CQ / PD / MR / SRQ / AH / CC-group / Ethernet-SQ-RQ
-  primitives inside DOCA Core, porting libibverbs code into the DOCA Core
-  model, capability-querying a specific verb / opcode / WR flag / QP
-  attribute via doca_verbs_query_device, or debugging DOCA_ERROR_* from
-  doca_verbs_* calls. Trigger even when the user does not say "doca-verbs"
-  — implicit phrasings include "raw QP attribute the task API doesn't
-  expose", "keep my ibv_* code next to doca_* on the same QP", "IO_FAILED
-  on WR submit", "QP state transition rejected", "attach a congestion-
-  control group", or "porting my libibverbs code". The skill's first job
-  is to route MOST users back UP to the higher-level library. Refuse and
-  route elsewhere for general doca-rdma / doca-eth / doca-rmax workloads,
-  DOCA install, Core internals, and general libibverbs theory — those
-  belong to other skills.
+  Raw verbs inside DOCA Core (doca-verbs): direct control of QP, CQ, PD,
+  SRQ and address-handle objects through doca_verbs_context,
+  doca_verbs_qp_create / doca_verbs_qp_modify and doca_verbs_cq_create,
+  porting libibverbs code into DOCA Core, or a QP attribute, opcode or WR
+  flag the doca-rdma task API does not expose. Trigger on "raw QP
+  attribute the task API does not expose", "porting libibverbs code", "IO_FAILED on WR submit",
+  "QP state transition rejected", or "attach a congestion-control group",
+  even without naming doca-verbs. Its first job is to route MOST users
+  back up to doca-rdma, doca-eth or doca-rmax. Covers CC-group and
+  Ethernet SQ/RQ primitives, capability queries via
+  doca_verbs_query_device, and DOCA_ERROR_* from doca_verbs_* calls.
+  Refuse and route elsewhere for ordinary doca-rdma / doca-eth / doca-rmax
+  workloads, DOCA install, Core internals, and general libibverbs theory.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - verbs
+    - rdma
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC attached.
@@ -31,15 +34,32 @@ compatibility: >
 
 # DOCA Verbs
 
+## Examples
+
+- **"Should I use doca-verbs or doca-rdma?"** — if the work is ordinary
+  RDMA data movement and the user did not name a raw QP / CQ / WR / SRQ /
+  Address-Handle attribute the higher-level API cannot express, this
+  skill is out of scope. Route to [`doca-rdma`](../doca-rdma/SKILL.md).
+- **"I need a raw QP attribute the task API does not expose."** — stay
+  here. Use only the public `doca_verbs.h` surface. Do not quote
+  restricted headers.
+
+## Instructions
+
+Follow [`## Loading order`](#loading-order). Open only the companion
+that matches the question. Do not load every `references/` file.
+
 ## STOP — most RDMA tasks do NOT belong here
 
 If the task is general RDMA **data movement** (send / receive / read /
 write / atomic between endpoints) and the user did **not** name a
-specific raw QP / CQ / work-request / SRQ / Address-Handle attribute
+raw QP / CQ / work-request / SRQ / Address-Handle attribute
 that the higher-level API genuinely cannot express, this skill is
-**out of scope**. Route to [`doca-rdma`](../doca-rdma/SKILL.md) and
-follow its non-negotiable: the deliverable **links `libdoca_rdma` and
-calls `doca_rdma_*`**.
+**out of scope**. Route to [`doca-rdma`](../doca-rdma/SKILL.md). For a
+routing-only request, stop after explaining that conceptual boundary.
+Unless the `doca-rdma` guidance is also loaded, do not infer or list its
+implementation APIs. Conceptual terms such as QP, CQ, connection, send,
+and receive are not implementation API names.
 
 Loading this raw-verbs skill is **never** a license to hand-roll
 `libibverbs` / `librdmacm`. "Raw verbs is fewer lines" or "the high-level
@@ -64,6 +84,31 @@ configure / build / modify / run / test / debug workflow for them.
 If the user has not installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first.
 
+## Non-negotiable answer checklist
+
+For every in-scope porting, lifecycle, or debugging answer, do not declare the
+answer complete until it explicitly states all applicable items below:
+
+1. `doca_verbs_context` is the DOCA Core context that owns the verbs surface;
+   it wraps the selected `doca_dev`, integrates with the progress engine, and
+   owns the per-object PD / MR / CQ / QP lifecycle described in
+   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+2. A submit-time success followed by `DOCA_ERROR_IO_FAILED` is diagnosed from
+   the completion-queue entry's error field—not from the submit return—before
+   recommending retries or code changes.
+3. The answer selects exactly one documented completion path: progress engine,
+   manual CQ polling, or completion-channel delivery.
+4. Both version axes are stated before any symbol or feature is promised.
+   First, `pkg-config --modversion doca-verbs` agrees with `doca_caps --version`
+   and `pkg-config --modversion doca-common`. Second, the whole `doca_verbs_*`
+   ABI ships in the EXPERIMENTAL tier, so symbols may rename, reshape, or
+   graduate between releases and the installed headers outrank any
+   documentation ([`doca-version`](../../doca-version/SKILL.md)). Whether the
+   device supports a verb is a separate question, answered by the `doca_devinfo`
+   capability query rather than by either version.
+5. Existing `ibv_*` handles are replaced rather than mixed with
+   `doca_verbs_*` handles on the same hardware objects.
+
 ## The decision this skill exists to gate
 
 The single load-bearing decision every conversation that loads this
@@ -79,7 +124,7 @@ skill must make, FIRST, before any code-level discussion:
    timing-precise media / data-over-IP streaming. The most common
    baseline-agent failure for raw verbs is recommending them
    *unnecessarily* because the user said the word "verbs" or "QP"
-   without checking whether the higher-level surface already covers
+   without confirming that the higher-level surface already covers
    their case.
 2. **Is the semantic the user needs a specific verb / opcode /
    work-request flag / QP attribute / SRQ option that the matching
@@ -105,60 +150,6 @@ If none of (1)-(3) apply, the answer to *"should I use
 higher-level DOCA library. This is by design: a correctly-loaded
 raw-verbs skill that talks the user *out* of raw verbs is doing its
 job.
-
-## Example questions this skill answers well
-
-The CLASSES of raw-verbs questions this skill is built to answer,
-each with one worked example. The agent should treat the *class* as
-the load-bearing piece — the worked example is a single instance.
-
-- **"Should I drop to `doca-verbs` for this?"** — worked example:
-  *"I want to set a specific raw work-request flag and the
-  `doca_rdma_task_*` abstraction does not expose it"*. Answered by
-  the path-selection rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  higher-level-vs-doca-verbs table + the *climb back up* step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
-- **"How is `doca-verbs` different from `libibverbs`?"** — worked
-  example: *"I have existing `ibv_*` code; can I just keep using
-  it and call `doca_*` next to it?"*. Answered by the
-  libibverbs-vs-doca-verbs boundary rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  + the porting workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify).
-- **"Is this raw verb / opcode / QP option / SRQ feature
-  supported on my device + DOCA version?"** — worked example:
-  *"does this device advertise the QP feature my raw WR needs"*.
-  Answered by the capability-query rule
-  (`doca_verbs_query_device` + the
-  `doca_verbs_device_attr_get_*` family) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the discovery step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
-- **"I'm porting libibverbs code into the DOCA Core model — what
-  does the agent walk me through?"** — worked example: *"I have a
-  small libibverbs sender/receiver that uses `IBV_SEND_INLINE` on
-  a custom QP attribute, and I want it to live inside a DOCA Core
-  context"*. Answered by the porting overlay in
-  [`TASKS.md ## modify`](TASKS.md#modify) +
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  no-mixing rule.
-- **"What does this `DOCA_ERROR_*` from a raw-verbs call mean?"** —
-  worked example: *"`DOCA_ERROR_IO_FAILED` from a WR submission —
-  what do I look at?"*. Answered by the verbs overlay on the
-  cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-  (which sends the agent to inspect the completion-queue entry,
-  not the submit return value) + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
-- **"When do I climb back up from `doca-verbs` to the matching
-  higher-level library?"** — worked example: *"my raw-verbs
-  prototype works; do I keep it or refactor onto `doca-rdma`?"*.
-  Answered by the climb-back rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  (raw verbs is a *targeted* surface, not a default; once the
-  specific need is covered, the higher-level surface is the
-  long-term home).
 
 ## Audience
 
@@ -251,7 +242,7 @@ material lives in two companion files:
   `configure`, `build`, `modify`, `run`, `test`, `debug`. Plus a
   `Deferred task verbs` block that points out-of-scope questions
   at the right next skill. Every workflow assumes the drop-down
-  decision in this `SKILL.md` has already been made; the
+  decision in the drop-down section above has already been made; the
   `## configure` step always begins by re-confirming it.
 
 The skill assumes a host or BlueField where DOCA is already
@@ -293,8 +284,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
-   scope — i.e., to walk the drop-down decision above.
+1. Confirm the question is in scope by walking the drop-down decision above.
 2. **For the higher-level-library-vs-doca-verbs split, the
    libibverbs-vs-doca-verbs boundary, the verbs object model,
    capability discovery, error taxonomy, observability, and

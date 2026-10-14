@@ -182,6 +182,14 @@ there; this skill does not duplicate it.
   tag the operator is using. A mismatch between the docs version
   and the container tag is the canonical *"my config doesn't work
   even though it matches the docs"* failure mode.
+- **Take the YAML from the NGC Firefly resource.** The shared
+  `doca_container_configs` bundle from the Container Deployment Guide
+  has carried a stale Firefly YAML (image `1.5.0-doca2.9.0`); the NGC
+  Firefly resource carries the YAML for the current release. Check the
+  `image:` tag before deploying. PTP also depends on firmware
+  24.34.1002 or higher, `REAL_TIME_CLOCK_ENABLE`, OVS hardware offload
+  with TX timestamping, and NTP disabled on the BlueField — see
+  [TASKS.md ## configure](TASKS.md#configure) step 2.
 
 ## Error taxonomy
 

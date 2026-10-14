@@ -6,20 +6,24 @@ description: >
   change that touches DPU / NIC hardware state on a live system —
   mlxconfig firmware-parameter write, NIC firmware burn, BFB reflash,
   NIC ↔ DPU mode flip, SR-IOV or device-emulation slot enable, kernel
-  boot-parameter change (IOMMU, hugepages, VFIO), PCIe rebind /
-  rescan / link-state flip, or BlueField cold reboot. Wraps the
-  change in pre-flight inventory, OOB reachability, a maintenance
-  window, the mlxconfig cold-power-cycle rule, replica rehearsal, and
-  rollback. Trigger even when the user does not say "hardware safety"
-  — implicit phrasings: "flip BlueField mode over SSH", "enable
-  SR-IOV and reboot", "burned firmware but mlxconfig shows old
-  value", "reflashed BFB and lost representors", "reflash during
-  business hours", "vendor says this is one-way". Refuse for general
-  DOCA orientation (doca-public-knowledge-map), install or env debug
+  boot-parameter change (IOMMU, hugepages, VFIO), PCIe rebind / rescan /
+  link-state flip, BlueField cold reboot, or remediation of a BlueField
+  thermal shutdown. Wrap the change in
+  pre-flight inventory, OOB reachability, a maintenance window, replica
+  rehearsal, and rollback. Trigger on implicit phrasing: "flip BlueField
+  mode over SSH", "enable SR-IOV and reboot", "burned firmware but
+  mlxconfig shows old value", "BlueField thermal shutdown". Not for
+  read-only inventory or version queries (doca-version, doca-caps). Refuse
+  orientation (doca-public-knowledge-map), install or env debug
   (doca-setup), and program-side debug (doca-debug,
-  doca-programming-guide) — those belong to other skills.
+  doca-programming-guide).
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - hardware
+    - safety
 compatibility: >
   No DOCA install required to read this skill (it is an overlay
   loaded against any DOCA artifact skill); the validation steps
@@ -31,13 +35,46 @@ compatibility: >
 
 # DOCA hardware safety
 
+## Examples
+
+- **"Enable SR-IOV and reboot."** — this is in scope. Inventory first,
+  require out-of-band reachability, a maintenance window, replica
+  rehearsal, then apply.
+- **"Flip BlueField mode over SSH."** — refuse if the host has no
+  out-of-band path. A link-breaking change without BMC / RShim /
+  console is a hard stop.
+
+## Quick answers (answer from this file)
+
+- **Thermal shutdown or hardware safety limits.** Treat it as a hardware
+  event: capture read-only evidence first (BMC/Redfish chassis thermal
+  sensors and event log, the out-of-band console, `dmesg | grep -i mlx5`,
+  and `mget_temp -d <mst device>` from MFT). Never disable or raise thermal
+  protection; airflow and cooling are facility fixes. Any remediation that is
+  a firmware update, an `mlxconfig` write or a cold power cycle goes through
+  the contract below; with no root cause or no rollback, refuse and escalate
+  to NVIDIA support.
+- **Read-only inventory or version questions** do not need this skill: name
+  `doca-version` (four-source chain) or `doca-caps` (`doca_caps --list-devs`)
+  and answer there.
+- Name sibling skills (`doca-version`, `doca-setup`,
+  `doca-structured-tools-contract`) when they apply; do not open them to
+  answer a safety question.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion before applying
+a hardware-touching change. Open the capabilities companion for the
+in-scope change class and refuse-and-escalate rules. Do not open every
+companion file.
+
 **Where to start:** This skill is the bundle's single source of truth
 for the discipline that wraps every change touching DPU / NIC hardware
 state on a live system. Open
-[`TASKS.md`](TASKS.md) when the operator is about to *apply* a
+the tasks companion when the operator is about to *apply* a
 hardware-touching change and needs the change-application discipline
 (pre-flight inventory → out-of-band path → window → apply → verify
-→ rollback). Open [`CAPABILITIES.md`](CAPABILITIES.md) when the
+→ rollback). Open the capabilities companion when the
 question is *what does hardware-safety even cover* (the class of
 changes in scope, the failure modes the policy prevents, the
 observability surface that gates a change, and the meta-policy that
@@ -50,58 +87,53 @@ anchors do NOT redefine the cross-cutting discipline — they layer the
 artifact's own concerns on top of it. This skill is the layer they all
 build on.
 
-## Example questions this skill answers well
+## Mandatory answer contract for an `mlxconfig`-class production change
 
-The CLASSES of hardware-safety questions this skill is built to
-answer, each with one worked example. The agent should treat the
-*class* as load-bearing — the worked example is a single instance.
+An answer about applying an `mlxconfig`-class write on production MUST
+state every gate below explicitly; links to companion files do not
+substitute for walking the gates:
 
-- **"I'm about to apply a hardware-touching change. What do I have to
-  capture *before* I touch anything?"** — worked example: *"the
-  per-artifact skill told me to flip a firmware-level emulation slot;
-  what do I capture first?"*. Answered by the pre-flight inventory
-  in [`TASKS.md ## configure`](TASKS.md#configure) plus the
-  inventory taxonomy in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
-- **"This change might drop the link I'm using to manage the
-  BlueField. Is that safe?"** — worked example: *"I'm about to flip
-  the BlueField between NIC and DPU mode over the same management
-  link"*. Answered by the out-of-band access rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  plus the OOB-precondition gate in
-  [`TASKS.md ## configure`](TASKS.md#configure).
-- **"The per-artifact skill said to write an `mlxconfig` parameter,
-  then reboot. Is that the right sequence?"** — worked example:
-  *"the storage-emulation skill told me to enable a firmware slot
-  via `mlxconfig` and then warm-reboot to apply it"*. Answered by
-  the `mlxconfig`-class rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  plus the apply-with-cold-power-cycle workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify).
-- **"My deployment plan reflashes the BlueField BFB during business
-  hours. Is that OK?"** — worked example: *"I have a one-hour
-  window during the day; can I reflash now?"*. Answered by the
-  maintenance-window discipline in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  plus the firmware-burn workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify).
-- **"How do I prove the change works *before* I touch production?"**
-  — worked example: *"the change is small; can I skip the lab
-  replica"*. Answered by the replica-first rule in
-  [`TASKS.md ## test`](TASKS.md#test) plus the
-  pre-hardware-validation pattern in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
-- **"How do I roll back if this change goes wrong?"** — worked
-  example: *"I just reflashed the BFB and the host can't see the
-  representors anymore"*. Answered by the rollback ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) plus the
-  rollback-must-be-documented rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
-- **"This change doesn't have a documented rollback. Should I still
-  apply it?"** — worked example: *"the vendor says this firmware
-  rev is one-way"*. Answered by the refuse-and-escalate rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  plus the escalation path in [`TASKS.md ## debug`](TASKS.md#debug).
+1. Name the change class before any apply step and state that its
+   firmware-stored value commits at the next **cold power cycle**, not
+   a warm reboot.
+2. Require a pre-flight capture of PCIe topology, link state, firmware
+   level, BFB level, the current `mlxconfig` configuration, and the
+   host kernel/modules/environment.
+3. Treat the change as potentially link-breaking and refuse to issue
+   it until a deployment-specific OOB console class is named and
+   proven reachable. Never describe an `mlxconfig`-class production
+   write as inherently non-link-breaking.
+4. Require a time-boxed maintenance window with stakeholders,
+   rollback decision point, rollback plan, and verification gate
+   documented before application.
+5. Rehearse both the forward change and the rollback on a matching
+   non-production replica before production.
+6. Keep production workload gated until the four-way version match,
+   per-artifact health metric, and end-to-end observability path all
+   pass.
+7. Name the rollback ladder: compare with the captured baseline →
+   restore the captured values → cold-power-cycle → repeat inventory
+   and four-way checks → route residual software symptoms to
+   `doca-debug`.
+8. Include an explicit refusal and escalation statement in the answer:
+   if no documented rollback exists, the captured baseline cannot be
+   restored, or OOB access is unavailable for a potentially
+   link-breaking change, **stop and refuse to proceed**. Escalate to
+   the operator's change-control process, vendor support, or the public
+   DOCA Developer Forum; never guess at recovery. Merely naming a
+   "refuse-and-escalate rule" without stating this action and route does
+   not satisfy the contract. Never invent a parameter, address,
+   version, endpoint, or recovery value.
+
+The replica gate is **required**, never merely recommended: say that
+production is blocked until both the forward change and its rollback
+have succeeded on the representative replica. Wording such as
+*"recommended"*, *"highly recommended"*, or *"if available"* violates
+this contract even when a replica is mentioned elsewhere in the answer.
+
+The same framing applies to firmware burn, BFB reflash, and host
+boot-parameter changes; only their documented commit action,
+class-specific preconditions, and rollback mechanism differ.
 
 ## When to load this skill
 
@@ -123,17 +155,17 @@ has the activation rule at hand.
 | Host kernel state | host kernel boot parameter change (IOMMU mode `iommu=pt` / `intel_iommu=on`, `default_hugepagesz`, `hugepagesz`, `nr_hugepages`, `pci=resource_alignment`, `vfio-pci.ids`); requires host reboot |
 | Hugepages | hugepage *reservation* change (`/sys/kernel/mm/hugepages/*/nr_hugepages`, `sysctl vm.nr_hugepages`); hugepage *mount* change (`mount -t hugetlbfs`); this is global state shared with every DOCA / DPDK process on the host |
 | PCIe state | PCIe rebind / `echo > /sys/bus/pci/.../{bind,unbind,remove,rescan}`; representor enable/disable; eswitch mode change (`devlink dev eswitch set ... mode {switchdev,legacy}`); link down/up on a port currently carrying traffic |
-| BlueField reboot class | BlueField cold reboot, BlueField warm reboot to apply `mlxconfig`; any change whose blast radius is *"every hosted service on this DPU restarts"* |
+| BlueField reboot class | BlueField cold reboot, BlueField warm reboot to apply `mlxconfig`; opening any RShim node other than `misc` (even `cat /dev/rshimN/boot` starts a boot cycle and resets the BlueField; read only `/dev/rshimN/misc`); any change whose blast radius is *"every hosted service on this DPU restarts"* |
 | Per-artifact cross-link | any per-artifact skill's `## Safety policy` cross-links here for the cross-cutting rule body |
 
 When any cell above fires, the agent MUST load this skill **before**
 composing the first sentence of the answer. For production it MUST
 walk the change-application discipline in this order:
-[`TASKS.md ## configure`](TASKS.md#configure) (plan) →
-[`## test`](TASKS.md#test) (representative replica change + rollback
-rehearsal) → [`## modify`](TASKS.md#modify) (production apply) →
-[`## run`](TASKS.md#run) (production verification) →
-[`## debug`](TASKS.md#debug) (debug / rollback). It MUST cite the
+## configure (plan) →
+`## test` (representative replica change + rollback
+rehearsal) → `## modify` (production apply) →
+`## run` (production verification) →
+`## debug` (debug / rollback). It MUST cite the
 activation explicitly in the answer (e.g. *"because this touches
 `mlxconfig`, the answer follows the `doca-hardware-safety`
 discipline …"*) so the user can audit the reasoning.
@@ -144,11 +176,11 @@ The activation is **mandatory, not advisory.** The most common failure mode this
 
 If any of the following is true, the agent MUST stop and refuse to recommend the change — not soften the warning, not proceed with a *"this is risky but here's how"* answer, not defer the rollback question to *"you should think about that"*:
 
-1. The change has no documented rollback path AND the user cannot provide one. (Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) *rollback-must-be-documented* rule.)
-2. The change is link-breaking AND the host has no out-of-band access path. (Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) *out-of-band-precondition* rule.)
+1. The change has no documented rollback path AND the user cannot provide one. (Per ## Safety policy *rollback-must-be-documented* rule.)
+2. The change is link-breaking AND the host has no out-of-band access path. (Per ## Safety policy *out-of-band-precondition* rule.)
 3. The change touches hardware state AND the user has not confirmed an
    explicit, time-boxed maintenance window. (Per
-   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+   ## Safety policy
    *maintenance-window* rule.)
 4. Production application is contemplated before the change and its
    rollback have passed on a representative non-prod replica. This
@@ -158,7 +190,7 @@ If any of the following is true, the agent MUST stop and refuse to recommend the
    mismatched on the required hardware, firmware, kernel, module, or
    function-topology axes does not satisfy the gate; obtain a
    representative replica or refuse and escalate. (Per
-   [`TASKS.md ## test`](TASKS.md#test) *replica-first* rule.)
+   ## test *replica-first* rule.)
 
 In each of these cases the correct answer shape is *"this change requires X (here is why); the bundle refuses to recommend it without X; here is the route to obtain X"* — not silence and not improvisation. The refuse-and-escalate rule is what makes the bundle's hardware-safety guidance trustworthy to production operators.
 
@@ -176,7 +208,7 @@ This is a **thin loader**. The body keeps only the orientation needed
 to pick the right next file. The substantive content lives in two
 companion files:
 
-- `CAPABILITIES.md` — the meta-policy surface: the class of changes
+- the capabilities companion — the meta-policy surface: the class of changes
   in scope (the pre-flight inventory taxonomy, the
   `mlxconfig`-class / firmware-burn / kernel-boot-parameter
   groupings), the cross-cutting safety policy that every per-artifact
@@ -185,7 +217,7 @@ companion files:
   the observability gate the operator must satisfy before any
   workload moves, and the thin version-compatibility overlay that
   redirects to [`doca-version`](../doca-version/SKILL.md).
-- `TASKS.md` — the change-application workflows: `## configure` (the
+- the tasks companion — the change-application workflows: `## configure` (the
   pre-flight inventory + out-of-band + maintenance-window plan),
   `## build` (routing stub — hardware-touching changes do not produce
   build artifacts), `## modify` (the apply-the-change discipline,
@@ -197,15 +229,15 @@ companion files:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope (the agent is about to recommend a change that touches
    hardware state on a live system).
 2. **For the class of changes in scope, the meta-safety policy, the
    failure-mode taxonomy, the observability gate, and the
-   version-overlay redirect, see [CAPABILITIES.md](CAPABILITIES.md).**
+   version-overlay redirect, see the capabilities companion.**
 3. **For the apply-a-change workflow — pre-flight inventory →
    out-of-band → maintenance window → apply → verify → rollback —
-   see [TASKS.md](TASKS.md).**
+   see the tasks companion.**
 4. The per-artifact specifics (which exact firmware slot to flip,
    which exact kernel parameter the operator needs, which exact
    container tag the operator must roll back to) live in the matching
@@ -267,7 +299,7 @@ companion files:
   this meta-policy with artifact-specific safety. The cross-link is
   intentionally bidirectional: per-artifact skills link here for
   the meta-policy; this skill enumerates the in-bundle overlays in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  ## Safety policy
   as "skills that overlay this meta-policy". The externally-
   productized analogs (`doca-virtio-net`, `doca-snap`, `doca-hbn`,
   BlueMan, DPF) are NOT in-bundle skills — their safety policies

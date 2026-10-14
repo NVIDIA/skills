@@ -172,6 +172,9 @@ it on the user's actual hardware.
 
 ## Version compatibility
 
+Device gate: the SHA engine exists only on BlueField-2; BlueField-3 has no
+SHA acceleration engine, so the offload engine cannot accelerate there.
+
 For the canonical DOCA version-detection chain, the
 four-way match rule, NGC container semantics, and the
 headers-win-over-docs rule, see

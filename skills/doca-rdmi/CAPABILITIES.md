@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 capabilities (install, configure, build, modify, run, test, debug,
 use) see [TASKS.md](TASKS.md). For where the underlying public
 documentation and installed package paths live, defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) — do
+`doca-public-knowledge-map/SKILL.md` — do
 not duplicate URLs or install paths in this file.
 
 ## Pattern overview
@@ -61,8 +61,8 @@ interchangeable; pick one before writing any code:
 
 | Library | When to pick | Initiator | Direction |
 | --- | --- | --- | --- |
-| [`doca-rdma`](../doca-rdma/SKILL.md) | General-purpose RDMA from the host CPU or the BlueField CPU; supports the full eleven-task set (send / receive / read / write / atomic / sync-event variants); both two-sided and one-sided | Host or BlueField CPU | Two-sided or one-sided |
-| `doca-rdmi` (this skill) | One-sided RDMA initiated from an accelerator datapath (DPA today; GPU via `doca-gpi`); focused connection + poster object pair; the accelerator kernel drives the queues directly | DPA kernel (this skill) or GPU kernel ([`doca-gpi`](../doca-gpi/SKILL.md)) | Initiator-side only |
+| `doca-rdma/SKILL.md` | General-purpose RDMA from the host CPU or the BlueField CPU; supports the full eleven-task set (send / receive / read / write / atomic / sync-event variants); both two-sided and one-sided | Host or BlueField CPU | Two-sided or one-sided |
+| `doca-rdmi` (this skill) | One-sided RDMA initiated from an accelerator datapath (DPA today; GPU via `doca-gpi`); focused connection + poster object pair; the accelerator kernel drives the queues directly | DPA kernel (this skill) or GPU kernel (`doca-gpi/SKILL.md`) | Initiator-side only |
 | `doca-verbs` | The low-level verbs surface; RDMI builds on a `doca_verbs_context` for the underlying QP / CQ / PD primitives; rarely the right surface for application code — prefer the higher-level library above | Host or BlueField CPU | Either |
 
 **Decision rule for the agent.** If the user's intent is *"my
@@ -71,7 +71,7 @@ remote responder, and I do not want the host CPU on the data
 path"*, RDMI is the right surface. Anything else — two-sided
 flows, host-CPU-initiated traffic, the rich completion / mmap
 permission matrix — routes to
-[`doca-rdma`](../doca-rdma/SKILL.md). When the user is unsure,
+`doca-rdma/SKILL.md`. When the user is unsure,
 walk the table above before recommending any `doca_rdmi_*` call.
 
 ### The connection object
@@ -111,7 +111,7 @@ The DPA-side headers — `doca_rdmi_dev_connection.h`,
 `doca_rdmi_dev_poster.h`, `doca_rdmi_dev_cqe.h` — are the
 device-side counterpart consumed by the DPA kernel. They are
 compiled with the DOCA DPA toolchain owned by
-[`doca-dpa`](../doca-dpa/SKILL.md); this skill names the handoff
+`doca-dpa/SKILL.md`; this skill names the handoff
 (the handle type, the *valid only after start* rule) but does not
 duplicate the DPA programming model. Two rules that DO belong
 here because they are RDMI-specific:
@@ -148,7 +148,7 @@ recommend it.
 
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-docs
-rule, see [`doca-version`](../../doca-version/SKILL.md). The body
+rule, see `doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The RDMI-specific overlay** is:
@@ -165,24 +165,24 @@ lives there; this skill does not duplicate it.
   API support"). Build the user's expectations around that.
 - **The runtime authority is the installed headers, not the
   public docs.** Per the cross-cutting rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the agent confirms a symbol exists by checking the installed
   header (look up the install-path pattern in
-  [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package))
+  `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`))
   before recommending it. A *"function not found"* link error on
   a `doca_rdmi_*` symbol is most commonly a wrong-version
   mismatch — confirm the version per
-  [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure)
+  `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)
   before any RDMI-layer diagnosis.
 - **`doca-rdmi.pc` plus `doca-common.pc` plus `doca-verbs.pc`
   plus `doca-dpa.pc` must all match `doca_caps --version`** at
   the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   RDMI sits on top of the verbs surface and (for the DPA
   datapath) the DPA surface — a partial install where one of
   these `.pc` files reports a different version is the most
   common partial-install pattern for RDMI users. Route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any RDMI-layer diagnosis.
 - **The closest public docs surface is the DOCA RDMA programming
   guide.** Until a dedicated *DOCA RDMA Initiator* page is
@@ -193,7 +193,7 @@ lives there; this skill does not duplicate it.
   [DOCA SDK index](https://docs.nvidia.com/doca/sdk/) is the
   authoritative starting point for whether an *RDMI*-specific
   page now exists; route through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the up-to-date URL pattern rather than quoting a URL
   literal from agent memory.
 
@@ -201,7 +201,7 @@ lives there; this skill does not duplicate it.
 
 The cross-library `DOCA_ERROR_*` taxonomy (what each family means
 and which debug layer it routes to) lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 The RDMI-specific overlay names the families the agent will see
 most often from `doca_rdmi_*` calls and what they specifically
 indicate:
@@ -210,13 +210,13 @@ indicate:
 | --- | --- | --- |
 | `DOCA_ERROR_BAD_STATE` | A configuration call (`_init_receive`, `_dpa_completion_attach`, `_cq_attach`, `_set_input`) ran *after* `doca_ctx_start()`; or a DPA-side call ran on a context that was not set on the DPA datapath via `doca_ctx_set_datapath_on_dpa()` | Walk the lifecycle in [`## Capabilities and modes`](#capabilities-and-modes); confirm every attach/configure call landed before `doca_ctx_start()` and that the datapath was set before start |
 | `DOCA_ERROR_INVALID_VALUE` | An object handle is NULL, a buffer size is zero, or a verbs context / PD argument is mismatched between connection and poster | Re-walk the create/configure step in [`## Capabilities and modes`](#capabilities-and-modes); the verbs PD must be consistent across the connection, poster, and any sibling verbs objects in the same application |
-| `DOCA_ERROR_NOT_SUPPORTED` | The installed DOCA version does not export the requested `doca_rdmi_*` symbol, or the device does not support the DPA datapath this code requires | Confirm the symbol exists in the installed headers per [`## Version compatibility`](#version-compatibility); confirm DPA support on the device via `doca_caps` ([`doca-caps`](../../tools/doca-caps/SKILL.md)) |
-| `DOCA_ERROR_NO_MEMORY` | The library could not allocate internal bookkeeping (queues, descriptors) — typically a budget exceeded on the verbs surface below RDMI | Inspect verbs-side resource limits; route to the verbs-layer / driver-layer ladder in [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) |
-| `DOCA_ERROR_DRIVER` | The layer below DOCA (mlx5 driver, firmware, the verbs QP transitions) reported a failure | Stop. This is not an RDMI-spec problem. Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) layer 7 |
+| `DOCA_ERROR_NOT_SUPPORTED` | The installed DOCA version does not export the requested `doca_rdmi_*` symbol, or the device does not support the DPA datapath this code requires | Confirm the symbol exists in the installed headers per [`## Version compatibility`](#version-compatibility); confirm DPA support on the device via `doca_caps` (`doca-caps/SKILL.md`) |
+| `DOCA_ERROR_NO_MEMORY` | The library could not allocate internal bookkeeping (queues, descriptors) — typically a budget exceeded on the verbs surface below RDMI | Inspect verbs-side resource limits; route to the verbs-layer / driver-layer ladder in `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) |
+| `DOCA_ERROR_DRIVER` | The layer below DOCA (mlx5 driver, firmware, the verbs QP transitions) reported a failure | Stop. This is not an RDMI-spec problem. Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) layer 7 |
 
 Quote `doca_error_get_descr()` verbatim — do not paraphrase. The
 cross-cutting debug ladder
-([`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug))
+(`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`))
 is the canonical layered diagnosis path that the agent escalates
 to once the RDMI-specific cause has been narrowed.
 
@@ -242,7 +242,7 @@ problem.
    (`doca_rdmi_connection_dpa_completion_attach`,
    `doca_rdmi_poster_dpa_completion_attach`), the DPA kernel
    polls the completion through the
-   [`doca-dpa`](../doca-dpa/SKILL.md) device-side surface. The
+   `doca-dpa/SKILL.md` device-side surface. The
    host side is blind to those completions; the only host-side
    signal that work was consumed is the matching ack
    (`doca_rdmi_connection_recv_ack`) and the eventual stop/
@@ -261,14 +261,14 @@ problem.
 For cross-cutting observability primitives (`--sdk-log-level`,
 the `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env
 var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 RDMI's safety surface is **initiator-side**: an accelerator kernel
 that has been handed a DPA handle can post sends, writes, and reads
@@ -310,7 +310,7 @@ For changes that touch hardware state below the RDMI library
 itself — `mlxconfig`-class writes, firmware burns, BlueField BFB
 reflash, host kernel boot parameters that affect the DPA — the
 cross-cutting meta-policy in
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+`doca-hardware-safety/SKILL.md`
 applies without modification. RDMI does not redefine those rules;
 the agent walks the hardware-safety ladder first whenever the
 symptom involves device state, then the RDMI overlay above for
@@ -328,24 +328,24 @@ elsewhere:
   skill assumes the user already understands the underlying
   abstractions.
 - **Two-sided RDMA, host-CPU-initiated RDMA, the full eleven-task
-  matrix** — owned by [`doca-rdma`](../doca-rdma/SKILL.md). The
+  matrix** — owned by `doca-rdma/SKILL.md`. The
   selection table at the top of [`##
   Capabilities and modes`](#capabilities-and-modes) routes the
   agent there.
 - **The DPA programming model** (DPA toolchain, kernel build,
   device-side memory model) — owned by
-  [`doca-dpa`](../doca-dpa/SKILL.md). RDMI returns DPA handles
+  `doca-dpa/SKILL.md`. RDMI returns DPA handles
   and names the device-side header set, but does not author DPA
   kernels.
 - **GPU-side packet / RDMA initiation** — owned by
-  [`doca-gpi`](../doca-gpi/SKILL.md) and
-  [`doca-gpunetio`](../doca-gpunetio/SKILL.md). RDMI is the
+  `doca-gpi/SKILL.md` and
+  `doca-gpunetio/SKILL.md`. RDMI is the
   DPA-side counterpart; GPI/GPUNetIO is the GPU-side
   counterpart.
 - **Cross-library `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the RDMI overlay, not the taxonomy itself.
 - **Cross-library capability-snapshot tooling** — owned by
-  [`doca-caps`](../../tools/doca-caps/SKILL.md). This skill
+  `doca-caps/SKILL.md`. This skill
   references the tool; it does not redefine its invocation
   patterns.

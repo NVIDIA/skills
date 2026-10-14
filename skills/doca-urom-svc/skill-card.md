@@ -1,5 +1,5 @@
 ## Description: <br>
-Operate the DOCA UROM Service container on BlueField Arm for remote memory operations (puts, gets, atomics, collectives) enqueued by a paired host using doca-urom: pull the NGC image, choose the UCX component, size queues, configure Comch pairing, and align host and service versions. <br>
+Operate the DOCA UROM Service container on BlueField Arm for remote memory operations (puts, gets, atomics, collectives) enqueued by a paired host using `doca-urom`: pull the NGC image, choose the UCX component, size queues, configure Comch pairing, and align host and service versions, with least-privilege pairing and memory exposure verified before start. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External operators and platform teams who deploy and operate the DOCA UROM Service container on BlueField to receive and execute the remote memory operations that HPC, UCX, and MPI workloads on the host enqueue through doca-urom. <br>
+External operators and platform teams who deploy and operate the DOCA UROM Service container on BlueField Arm to execute remote memory operations that HPC, UCX, or MPI workloads on paired hosts enqueue through `doca-urom`, including configuration of UCX components, queue depths, Comch pairing, host-library/service version alignment, and debugging of NOT_PERMITTED errors, missing completions, or slow offloaded collectives. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,18 +25,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
+- [DOCA UROM Service Capabilities (companion)](CAPABILITIES.md) <br>
+- [DOCA UROM Service Tasks (companion)](TASKS.md) <br>
 - [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) <br>
 - [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Does not ship pre-baked service configurations or container image tags; operators derive flags, env, and image from the public DOCA UROM Service Guide, and Comch pairing plus RDMA permissions must be verified before the service starts.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -45,37 +45,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive activation, 1 negative activation). <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated sandbox pod and compared against a no-skill baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is it safe to use? <br>
+- Correctness: Is the answer correct? <br>
+- Discoverability: Was the right skill loaded when needed? <br>
+- Effectiveness: Did the skill help complete the task? <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+50%) | 100% (+30%) |
-| Discoverability | 4 | 100% (+25%) | 95% (+34%) |
-| Effectiveness | 4 | 88% (+59%) | 94% (+59%) |
-| Efficiency | 4 | 94% (+43%) | 83% (+55%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 98.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 70.0% → 100.0% (+30.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 60.0% → 100.0% (+40.0 points) | 48.8% → 100.0% (+51.2 points) |
+| Efficiency | 86.7% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-56cf891 (source: git SHA, committed 2026-07-26) <br>
+7e143d8 (source: git SHA, committed 2026-10-12) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

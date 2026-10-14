@@ -2,24 +2,29 @@
 license: Apache-2.0
 name: doca-bf3-deployment
 description: >
-  Use this skill for BlueField-3 (BF3) day-1 platform bring-up via
-  the classic RShim/BFB path: pushing a BlueField bundle (BFB) to
-  the DPU over RShim with bfb-install from the host, the host-to-DPU
-  TMFIFO management channel (tmfifo_net0, the 192.168.100.x
-  convention), RShim daemon state and console-over-rshim, DPU mode
-  selection (DPU/embedded-function vs separated-host/NIC mode) via
-  mlxconfig, post-BFB recovery, a six-state BlueField-state
-  classifier, and verifying the install (cat /etc/mlnx-release plus
-  version checks). Trigger even when the user does not say "BF3" —
-  typical phrasings include {push a BFB to my BlueField-3},
-  {bfb-install exited 0 but the DPU never came back}, {ping
-  192.168.100.2 works but ssh fails}, or {is DOCA on the host or
-  the Arm side?}. BFB reflash, mlxconfig set, mode changes, and
-  firmware burns are destructive: require explicit target-bound
-  confirmation and load doca-hardware-safety. App launch, container
-  deploy, env install, and the BF4 BMC-Redfish path route elsewhere.
+  Use this skill for BlueField-3 (BF3) day-1 platform bring-up via the
+  classic RShim/BFB path: pushing a BlueField bundle (BFB) to the DPU
+  over RShim with bfb-install from the host, the host-to-DPU TMFIFO
+  management channel (tmfifo_net0, the 192.168.100.x convention), RShim
+  daemon state and console-over-rshim, DPU mode selection
+  (DPU/embedded-function vs separated-host/NIC mode) via mlxconfig,
+  post-BFB recovery, a six-state BlueField-state classifier, and
+  verifying the install (cat /etc/mlnx-release plus version checks).
+  Trigger even when the user does not say "BF3" — typical phrasings
+  include {push a BFB to my BlueField-3}, {bfb-install exited 0 but the
+  DPU never came back}, {ping 192.168.100.2 works but ssh fails}, or {is
+  DOCA on the host or the Arm side?}. BFB reflash, mlxconfig set, mode
+  changes, and firmware burns are destructive: require explicit
+  target-bound confirmation and load doca-hardware-safety. App launch,
+  container deploy, env install, and the BF4 BMC-Redfish path route
+  elsewhere.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - bluefield-3
+    - deployment
 compatibility: >
   No DOCA install required to read this skill (it is a
   platform-lifecycle overlay loaded against BF3 hardware); the
@@ -27,9 +32,24 @@ compatibility: >
   BlueField-3, host-side RShim access (PCIe or USB), the matching
   DOCA-Host install, and a BlueField bundle (BFB) image downloaded
   from the public DOCA Downloads page.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA BlueField-3 (BF3) deployment
+
+## Examples
+
+- **"I have a BlueField-3 and a BFB — how do I push it?"** — RShim
+  plus bfb-install from the host. Exit 0 is not success until the
+  DPU is ready.
+- **"bfb-install exited 0 but the DPU never came back."** — start
+  at the six-state classifier, not a second burn.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for BFB push
+and recover. Open the capabilities companion for the RShim/BFB
+contract and safety overlay. Do not open every companion file.
 
 **Where to start:** This skill is the bundle's home for **BlueField-3
 day-1 platform bring-up** — taking a BF3 from "powered card in the
@@ -41,10 +61,10 @@ is the sibling skill
 [`doca-bf4-deployment`](../doca-bf4-deployment/SKILL.md) (the BF4
 equivalent). If the user has a BF3 and needs to push a BFB, recover
 a DPU that did not come back, or verify the install, open
-[`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure). If the question is *what shape
+the tasks companion and start at
+`## configure`. If the question is *what shape
 does the BF3 platform-bring-up surface even have*, start at
-[`CAPABILITIES.md`](CAPABILITIES.md). Once the BF3 is healthy, this
+the capabilities companion. Once the BF3 is healthy, this
 skill routes **onward** to the deployment skills — running a binary
 goes to
 [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md);
@@ -88,7 +108,7 @@ It is **not** for:
   or *deploy a service container* (route to
   [`doca-container-deployment`](../doca-container-deployment/SKILL.md)),
 - fresh-no-hardware users with no DOCA install — route to
-  [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+  `doca-setup ## no-install`.
 
 The skill teaches the agent the BF3 bring-up *procedure* and the
 rules for quoting documented commands from the public BlueField
@@ -99,7 +119,7 @@ it does **not** invent `bfb-install` flag sets, BFB image filenames,
 RShim character-device paths, `bf.cfg` schema keys, `mlxconfig`
 parameter names, or TMFIFO subnets from memory. Where a fact is
 already vetted in
-[`doca-bare-metal-deployment ## bluefield-lifecycle`](../doca-bare-metal-deployment/TASKS.md#bluefield-lifecycle),
+`doca-bare-metal-deployment ## bluefield-lifecycle`,
 this skill reuses that exact fact rather than restating a new one.
 
 ## When to load this skill
@@ -157,7 +177,7 @@ ALONGSIDE this skill.
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — the BF3 platform-bring-up contract: the
+- the capabilities companion — the BF3 platform-bring-up contract: the
   RShim/BFB transport surface (the userspace RShim daemon, the
   `/dev/rshim*` tree, console-over-rshim, the BFB image as the unit
   of input), the TMFIFO management-channel surface (`tmfifo_net0` /
@@ -172,7 +192,7 @@ companion files:
   taxonomy, the observability surface, and the safety policy
   (overlay on
   [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)).
-- `TASKS.md` — step-by-step workflows for the in-scope BF3
+- the tasks companion — step-by-step workflows for the in-scope BF3
   lifecycle verbs: `configure`, `build` (routing stub), `modify`,
   `run` (the BFB-install + RShim/TMFIFO bring-up sequence), `test`
   (the post-BFB readiness smoke), `debug` (the six-state
@@ -198,25 +218,22 @@ goes through [`doca-setup`](../doca-setup/SKILL.md)), and it does
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope (BF3 platform bring-up over the RShim/BFB path; NOT BF4,
    NOT app-launch, NOT a library-API question).
 2. **For the bring-up contract (RShim/BFB transport, TMFIFO
    channel, DPU-mode surface, host-vs-Arm install distinction,
    BF3-version overlay, error taxonomy, observability surface, BF3
-   safety overlay), see [CAPABILITIES.md](CAPABILITIES.md).**
+   safety overlay), see the capabilities companion.**
 3. **For step-by-step workflows — `configure`, `build` (routing
    stub), `modify`, `run` (BFB install + RShim/TMFIFO bring-up),
    `test` (post-BFB readiness smoke), `debug` (the six-state
    `bluefield-state-classifier`), plus the `Deferred task verbs`
-   block — see [TASKS.md](TASKS.md).**
+   block — see the tasks companion.**
 
 ## Example questions this skill answers well
 
-See [`references/details.md`](references/details.md#example-questions-this-skill-answers-well).
 ## What this skill deliberately does not ship
 
-See [`references/details.md`](references/details.md#what-this-skill-deliberately-does-not-ship).
 ## Related skills
 
-See [`references/details.md`](references/details.md#related-skills).

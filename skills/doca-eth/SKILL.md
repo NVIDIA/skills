@@ -2,45 +2,67 @@
 license: Apache-2.0
 name: doca-eth
 description: >
-  Use this skill for hands-on DOCA Ethernet packet-queue work
-  on a BlueField DPU or ConnectX NIC — bringing up a
-  `doca_eth_rxq` or `doca_eth_txq` on a port / representor /
-  SF, picking among the four `enum doca_eth_rxq_type` values
-  (`_REGULAR` / `_CYCLIC` / `_MANAGED_MEMPOOL` /
-  `_SHARED_MEMPOOL`), sizing burst or scatter-gather length
-  against the `_cap_*` queries, submitting
-  `doca_eth_txq_task_send` / `_lso_send` (carrying packet
-  `doca_buf`s — no `doca_eth_frame` struct exists), or
-  debugging DOCA_ERROR_* from an Ethernet call. Trigger on
-  implicit phrasings: "my RX queue is up but no packets
-  arrive", "send-task returns AGAIN at line rate", "which
-  queue type for fixed-MTU ingress", "device open fails
-  without sudo", or "is L3 checksum offload available here".
-  Refuse and route elsewhere for installing DOCA,
-  flow-rule / steering programming, host↔DPU control
+  Use this skill for hands-on DOCA Ethernet packet-queue work on a
+  BlueField DPU or ConnectX NIC — bringing up a `doca_eth_rxq` or
+  `doca_eth_txq` on a port / representor / SF, picking among the four
+  `enum doca_eth_rxq_type` values (`_REGULAR` / `_CYCLIC` /
+  `_MANAGED_MEMPOOL` / `_SHARED_MEMPOOL`), sizing burst or
+  scatter-gather length against the `_cap_*` queries, submitting
+  `doca_eth_txq_task_send` / `_lso_send` (carrying packet `doca_buf`s —
+  no `doca_eth_frame` struct exists), or debugging DOCA_ERROR_* from an
+  Ethernet call. `doca_eth_rxq` and `doca_eth_txq` are two Core
+  contexts; one `doca_ctx_start()` does not cover both. Trigger on
+  implicit phrasings: "my RX queue is up but no packets arrive",
+  "send-task returns AGAIN at line rate", "which queue type for
+  fixed-MTU ingress", "device open fails without sudo", or "is L3
+  checksum offload available here". Refuse and route elsewhere for
+  installing DOCA, flow-rule / steering programming, host↔DPU control
   messaging, or RDMA data movement.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - ethernet
+    - queues
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux
   (Ubuntu 22.04/24.04 or RHEL/SLES) with a BlueField DPU or
   ConnectX NIC attached. Reads the user's local install via
   `pkg-config doca-eth` and inspects
   /opt/mellanox/doca/{lib,include,samples,applications}.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA Ethernet
 
+## Examples
+
+- **"My RX queue is up but no packets arrive."** — RX and TX are two
+  Core contexts; one `doca_ctx_start()` does not cover both.
+- **"Send-task returns AGAIN at line rate."** — size burst against
+  the `_cap_*` queries before changing queue type.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+build / run. Open the capabilities companion for the RX-type taxonomy
+and send surface. Do not open every companion file.
+
 **Where to start:** This skill assumes DOCA is already installed and
 the user is doing **hands-on packet-queue work** on a host or
-BlueField with DOCA. Open [`TASKS.md`](TASKS.md) if the user wants
+BlueField with DOCA. Open the tasks companion if the user wants
 to *do* something (configure / build / modify / run / test /
-debug); open [`CAPABILITIES.md`](CAPABILITIES.md) when the question
+debug); open the capabilities companion when the question
 is *what can a DOCA Ethernet queue express* on this version. If
 the user has not installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
+`doca-setup/SKILL.md` first. **RX and TX are
+independent Core contexts.** A `doca_eth_rxq` and a `doca_eth_txq`
+each get their own `doca_ctx_create` / `_start` / `_stop` /
+`_destroy`; one `doca_ctx_start()` does **not** start both sides.
+Do not walk a single lifecycle for "the queue pair". If the user is
 asking *"how do I get packets to land on my RX queue at all"*, the
-answer lives in [`doca-flow`](../doca-flow/SKILL.md) — DOCA
+answer lives in `doca-flow/SKILL.md` — DOCA
 Ethernet is the *queue* surface; DOCA Flow is the *steering*
 surface, and they are independent libraries.
 
@@ -54,52 +76,62 @@ instance.
 - **"How do I bring up an RX and TX queue on a representor or
   physical port?"** — worked example: *"set up a `doca_eth_rxq`
   plus a `doca_eth_txq` on a single BlueField representor for
-  first-run testing"*. Answered by the queue-pair lifecycle in
-  [`TASKS.md ## configure`](TASKS.md#configure) +
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  first-run testing"*. Answered by two independent Core
+  contexts (each with its own start) in
+  ## configure +
+  ## Capabilities and modes
   RX / TX object table.
 - **"Which RX type fits my data shape — regular, cyclic, or
   managed-recv?"** — worked example: *"line-rate ingress with
   fixed-size frames into a pre-allocated buffer ring"*. Answered
   by the RX-type taxonomy in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the capability-query rule (`doca_eth_rxq_cap_is_type_supported`
   against a `doca_devinfo`) in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  ## configure.
 - **"How do I send a packet from user code through `doca_eth_txq`?"**
   — worked example: *"allocate a packet `doca_buf`, attach the
   payload, submit one send-task, wait for the completion event"*.
   Answered by the TX submission shape in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the property-set workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **"My queue is up but no packets arrive — why?"** — worked
   example: *"`doca_eth_rxq` started cleanly but the recv callback
   never fires"*. Answered by the steering-dependency rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  ## Safety policy
   + the env-prep checklist in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 1, which
+  ## configure step 1, which
   routes the steering side to
-  [`doca-flow`](../doca-flow/SKILL.md) and the
+  `doca-flow/SKILL.md` and the
   promiscuous-mode side to
-  [`doca-setup`](../../doca-setup/SKILL.md).
+  `doca-setup/SKILL.md`.
 - **"Is this Ethernet capability available on my device + my
   installed DOCA?"** — worked example: *"does this device
   advertise L3 checksum offload"*. Answered by the
   capability-query rule (`doca_eth_txq_cap_is_l3_chksum_offload_supported`
   against a `doca_devinfo`) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the version-and-device overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
+  ## Version compatibility.
 - **"What does this `DOCA_ERROR_*` from an Ethernet call mean and
   which layer caused it?"** — worked example: *"`DOCA_ERROR_AGAIN`
   on `doca_task_submit` for an `eth_txq` send-task at high rate"*.
   Answered by the Ethernet overlay on the cross-library taxonomy
   in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  ## debug that escalates to
+  `doca-debug/SKILL.md`.
+
+**Picking the root-cause layer when several could explain a symptom.**
+Walk the layers bottom-up (install → version → build → link → runtime →
+program → driver) with the read-only check each layer names in `TASKS.md`
+`## debug`. The lowest layer whose check fails is the root cause: fix it,
+change one variable at a time, and re-run the same check before moving up.
+For a silent RX queue, rule out the three runtime preconditions (device
+access, port up, traffic steered to the queue) before any program or driver
+cause.
 
 ## Audience
 
@@ -114,7 +146,7 @@ Ethernet itself.
 **Language scope.** DOCA Ethernet ships as a C library with
 `pkg-config` module name `doca-eth`. The shipped samples are
 written in C. C and C++ consumers are the canonical case; the
-worked examples in `TASKS.md` assume that path. Other-language
+worked examples in the tasks companion assume that path. Other-language
 consumers (Rust, Go, Python, …) consume the same `*.so` through
 FFI or language-specific bindings; the skill's contribution in
 that case is to keep the queue-object split, lifecycle,
@@ -158,11 +190,11 @@ work, in any language. Concretely:
 
 Do **not** load this skill for general DOCA orientation, install
 of DOCA itself, flow-rule programming (use
-[`doca-flow`](../doca-flow/SKILL.md)), host ↔ DPU control
-messaging (use [`doca-comch`](../doca-comch/SKILL.md)), or
-RDMA data movement (use [`doca-rdma`](../doca-rdma/SKILL.md)).
+`doca-flow/SKILL.md`), host ↔ DPU control
+messaging (use `doca-comch/SKILL.md`), or
+RDMA data movement (use `doca-rdma/SKILL.md`).
 For DOCA documentation orientation, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## What this skill provides
 
@@ -170,7 +202,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive Ethernet-
 specific material lives in two companion files:
 
-- `CAPABILITIES.md` — what a DOCA Ethernet queue can express on
+- the capabilities companion — what a DOCA Ethernet queue can express on
   this version: the RX / TX object split, the RX-type taxonomy
   (regular / cyclic / managed-recv), the send-task / frame
   submission surface, the capability-query surface
@@ -179,7 +211,7 @@ specific material lives in two companion files:
   set), the observability surface (per-queue progress engine
   events, capability snapshots), and the safety policy that
   gates the steering / permission / port-state preconditions.
-- `TASKS.md` — step-by-step workflows for the six in-scope
+- the tasks companion — step-by-step workflows for the six in-scope
   Ethernet verbs: `configure`, `build`, `modify`, `run`,
   `test`, `debug`. Plus a `Deferred task verbs` block that
   points out-of-scope questions at the right next skill, and a
@@ -191,7 +223,7 @@ installed at the standard location and the user has the
 privileges their public install profile expects (typically sudo
 or `mlnx`-group membership to open a `doca_dev` against a port).
 It does not cover installing DOCA — that path goes through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -205,9 +237,9 @@ contain — and pull requests should not add:
   agent's job is to route the user to those files and prescribe
   a minimum-diff modification on them via the universal
   modify-a-sample workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the Ethernet-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Standalone build manifests** (`meson.build`,
   `CMakeLists.txt`, `Cargo.toml`, …) parked inside the skill.
   The agent constructs the build manifest *in the user's project
@@ -220,58 +252,58 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope.
 2. **For the Ethernet capability matrix, RX-type taxonomy, send
    surface, capability-query rules, error taxonomy,
    observability, and safety policy, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 version-handling rules,
-[`doca-flow`](../doca-flow/SKILL.md) for the steering side
+`doca-flow/SKILL.md` for the steering side
 that the RX queue depends on, and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public docs or
 the installed package layout" rather than "Ethernet-specific
 guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation source
   and the on-disk layout of an installed DOCA package. The
   Ethernet URL slug is `DOCA-Ethernet`.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, port-state checks (`devlink dev show`,
   `ip link`), permission and group-membership requirements for
   opening a `doca_dev`. This skill assumes its preconditions
   are satisfied.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. This skill's `## Version
   compatibility` cross-links the four-way match rule and adds
   only the Ethernet-specific overlay (RX-type availability
   windows, checksum-offload device-conditional support).
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+  the tasks companion honors this contract.
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the
   universal modify-a-shipped-sample first-app workflow, the
   universal lifecycle, the cross-library `DOCA_ERROR_*`
   taxonomy, and the program-side debug order. This skill layers
   Ethernet specifics on top.
-- [`doca-flow`](../doca-flow/SKILL.md) — the steering surface
+- `doca-flow/SKILL.md` — the steering surface
   that decides which packets land on which `doca_eth_rxq`. DOCA
   Ethernet does *not* program steering itself; an empty RX queue
   almost always means a missing or wrong Flow rule, not an
   Ethernet bug.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). Ethernet-specific debug (RX-type
   mismatches, send-queue-full retries, steering-empty-queue

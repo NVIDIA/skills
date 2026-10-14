@@ -5,41 +5,58 @@ description: >
   Use this skill when the user is doing hands-on DOCA GPUNetIO
   programming — wiring a CUDA kernel on an NVIDIA GPU to a doca-eth
   queue via doca_gpu_eth_rxq / doca_gpu_eth_txq, standing up the
-  per-CUDA-device doca_gpu context, designing the persistent CUDA
-  kernel that drains the GPU-visible queue, running the dual
-  capability check (DOCA cap-query plus cudaGetDeviceProperties),
-  registering cudaMalloc pools via doca_buf_arr_create_*, or
-  debugging DOCA_ERROR_* returns from the GPUNetIO API. Trigger
-  even when the user does not explicitly mention "DOCA GPUNetIO"
-  or "persistent kernel" — typical implicit phrasings include
-  "CUDA kernel reading packets directly from the NIC",
+  per-CUDA-device doca_gpu context, designing the persistent CUDA kernel
+  that drains the GPU-visible queue, running the dual capability check
+  (DOCA cap-query plus cudaGetDeviceProperties), registering cudaMalloc
+  pools via doca_buf_arr_create_*, or debugging DOCA_ERROR_* returns
+  from the GPUNetIO API. Trigger even when the user does not explicitly
+  mention "DOCA GPUNetIO" or "persistent kernel" — typical implicit
+  phrasings include "CUDA kernel reading packets directly from the NIC",
   "GPU-initiated networking on BlueField", "DOCA_ERROR_DRIVER on
-  doca_gpu_create", "nvidia_peermem not loaded",
-  "kernel-per-packet is too slow", or "which GPU supports GPU-side
-  packet I/O". Refuse and route elsewhere for general CUDA
-  programming, DOCA Ethernet queue bring-up, DOCA DPA, or
-  DOCA install — those belong to other skills.
+  doca_gpu_create", "nvidia_peermem not loaded", "kernel-per-packet is
+  too slow", or "which GPU supports GPU-side packet I/O". Refuse and
+  route elsewhere for general CUDA programming, DOCA Ethernet queue
+  bring-up, DOCA DPA, or DOCA install — those belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - gpunetio
+    - cuda
 compatibility: >
-  Requires DOCA SDK at /opt/mellanox/doca on Linux (Ubuntu 22.04/24.04 or
-  RHEL/SLES) with a BlueField DPU or ConnectX NIC. Reads the local install
-  via `pkg-config doca-gpunetio`. Requires an NVIDIA GPU with CUDA toolkit
-  (matched to DOCA per the DOCA Compatibility Policy) and the
-  nvidia_peermem kernel module loaded for GPUDirect RDMA; some samples
-  need an InfiniBand-capable RNIC.
-
+  Requires DOCA SDK at /opt/mellanox/doca on Linux (Ubuntu 22.04/24.04
+  or RHEL/SLES) with a BlueField DPU or ConnectX NIC. Reads the local
+  install via `pkg-config doca-gpunetio`. Requires an NVIDIA GPU with
+  CUDA toolkit (matched to DOCA per the DOCA Compatibility Policy) and
+  GPU memory registered via dmabuf (or the legacy nvidia-peermem fallback) for GPUDirect RDMA; some
+  samples need an InfiniBand-capable RNIC. The validation steps require
+  a live DOCA install.
 ---
 
 # DOCA GPUNetIO
+
+## Examples
+
+- **"CUDA kernel reading packets directly from the NIC."** — this is
+  in scope. Stay on `doca_gpu_eth_rxq` / `_txq` and the persistent
+  kernel; do not rewrite it as host-CPU Ethernet.
+- **"DOCA_ERROR_DRIVER on doca_gpu_create."** — check CUDA device
+  match and dmabuf / `nvidia-peermem` registration before changing queue type.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+build / run. Open the capabilities companion for GPU vs host path
+selection. Do not open every companion file.
 
 **Where to start:** This skill assumes DOCA is already installed,
 the CUDA toolkit is installed and matched to the DOCA install, and
 the user is doing **hands-on GPUNetIO work** — i.e. wiring a DOCA
 network queue into a CUDA kernel on an NVIDIA GPU. Open
-[`TASKS.md`](TASKS.md) if the user wants to *do* something
+the tasks companion if the user wants to *do* something
 (configure / build / modify / run / test / debug); open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
+the capabilities companion when the question is *what
 can GPUNetIO express* on this version + this GPU. If the user has
 not installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first; if the user has
@@ -59,37 +76,37 @@ instance.
   reads packets from a `doca_gpu_eth_rxq` built on top of a
   representor `doca_eth_rxq` and counts them per-flow"*. Answered
   by the persistent-kernel pattern in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the GPU-side bring-up workflow in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  ## configure.
 - **"Can I run GPUNetIO on this GPU?"** — worked example: *"my
   host has one Ampere card and one Turing card; which one
   supports GPU-initiated networking?"*. Answered by the dual
   capability-discovery rule (DOCA cap-query AND
   `cudaGetDeviceProperties` against the CUDA device ordinal) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the device-enumeration step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  ## configure.
 - **"Why does my GPUNetIO setup fail with
   `DOCA_ERROR_NOT_SUPPORTED` even though doca-eth came up
   fine?"** — worked example: *"`nvidia_peermem` is not loaded so
   GPUDirect RDMA is unavailable"*. Answered by the env preconditions
-  in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  in ## Safety policy
   + the env checklist in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 1.
+  ## configure step 1.
 - **"How do I move data between CUDA-allocated buffers and a DOCA
   queue?"** — worked example: *"use `cudaMalloc` for the receive
   buffer pool and register it with DOCA via `doca_buf_arr_create_*`
   before starting the context"*. Answered by the CUDA-allocator
   + DOCA-registration overlay in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  ## Safety policy
   + the buffer-prep step in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 4.
+  ## configure step 4.
 - **"Is the GPUNetIO API I'm reading about on my installed DOCA +
   CUDA combination?"** — worked example: *"is the persistent-kernel
   helper available with the CUDA toolkit version I have?"*.
   Answered by the version-compatibility overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  ## Version compatibility
   which cross-links the canonical detection chain in
   [`doca-version`](../../doca-version/SKILL.md) and adds the
   GPUNetIO-specific *DOCA must match CUDA* overlay.
@@ -98,9 +115,9 @@ instance.
   on `doca_gpu_*_create` — is it DOCA, CUDA, or the underlying
   doca-eth queue?"*. Answered by the GPUNetIO overlay on the
   cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
+  ## debug that escalates to
   [`doca-debug`](../../doca-debug/SKILL.md).
 
 ## Audience
@@ -170,7 +187,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive
 GPUNetIO-specific material lives in two companion files:
 
-- `CAPABILITIES.md` — what GPUNetIO can express on this version
+- the capabilities companion — what GPUNetIO can express on this version
   + this GPU: the `doca_gpu` per-device context, the GPU-visible
   RX / TX queue handles layered on doca-eth, the persistent
   CUDA-kernel pattern as the default usage shape, the
@@ -182,8 +199,8 @@ GPUNetIO-specific material lives in two companion files:
   `DOCA_ERROR_*` set, the observability surface (CUDA-side
   counters + DOCA-side per-task completion), and the safety
   policy that gates env preconditions (CUDA + DOCA version
-  match, `nvidia_peermem`, CUDA buffer registration).
-- `TASKS.md` — step-by-step workflows for the six in-scope
+  match, dmabuf or `nvidia-peermem` registration).
+- the tasks companion — step-by-step workflows for the six in-scope
   GPUNetIO verbs: `configure`, `build`, `modify`, `run`, `test`,
   `debug`. Plus a `## rollback` overlay (GPUNetIO-specific
   five-step teardown that signals the persistent kernel to
@@ -218,7 +235,7 @@ contain — and pull requests should not add:
   workflow in
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
   layered with the GPUNetIO-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Standalone build manifests** (`meson.build`,
   `CMakeLists.txt`, …) parked inside the skill. The agent
   constructs the build manifest *in the user's project
@@ -233,15 +250,15 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope.
 2. **For the GPUNetIO capability matrix, the `doca_gpu` per-device
    context, the persistent-kernel pattern, the dual capability
    query, the env-precondition policy, the error taxonomy, the
    observability surface, and the safety policy, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical
@@ -276,7 +293,7 @@ docs, or the on-disk install layout" rather than
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the

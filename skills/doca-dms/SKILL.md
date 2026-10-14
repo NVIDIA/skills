@@ -2,30 +2,54 @@
 license: Apache-2.0
 name: doca-dms
 description: >
-  Operate NVIDIA DOCA Management Service (`dmsd` + `dmspe`) on a
-  BlueField, Arm/x86 host, or Kubernetes pod: choose deployment and
+  Operate NVIDIA DOCA Management Service on a BlueField, Arm/x86 host,
+  or Kubernetes pod: from DOCA 3.5 the local `dms-cli` (one command per
+  YANG path, no server), and the `dmsd` + `dmspe` service: choose deployment and
   authentication, configure `-allowed_users` and `dmsgroup`, use gNMI
   Get/Set/Subscribe, run supported gNOI workflows, and debug
   frontend/backend failures. Trigger even without "DMS" for "manage a
   remote BlueField over gRPC", "gNOI reboot from orchestrator", or
-  fleet-management requests.
-  SAFETY: reboot, OS install, factory-reset, and managed-file deletion
-  are destructive and require target-bound explicit confirmation;
-  never invoke them speculatively. Route installation and library/API
-  build questions elsewhere, and route turnkey aggregation to the
-  externally-productized DOCA Telemetry Service.
+  fleet-management requests. SAFETY: reboot, OS install, factory-reset,
+  and managed-file deletion are destructive and require target-bound
+  explicit confirmation; never invoke them speculatively. Route
+  installation and library/API build questions elsewhere, and route
+  turnkey aggregation to the externally-productized DOCA Telemetry
+  Service.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: service
+  tags:
+    - doca
+    - dms
+    - gnmi
 compatibility: >
-  DOCA service shipped with the DOCA install at /opt/mellanox/doca
-  on the management endpoint (x86 host (non-DPU), BlueField Arm, or
-  Kubernetes pod) on Linux (Ubuntu 22.04/24.04 or RHEL/SLES); `dmsd`
-  + `dmspe` run there, and DMS is also pulled as an NGC container
-  image. Verify the public DMS guide version matches the installed
-  DOCA release before quoting flags or YANG paths.
+  DOCA service shipped with the DOCA install at /opt/mellanox/doca on
+  the management endpoint (x86 host (non-DPU), BlueField Arm, or
+  Kubernetes pod) on Linux (Ubuntu 22.04/24.04 or RHEL/SLES); `dmsd` +
+  `dmspe` run there, and DMS is also pulled as an NGC container image.
+  Verify the public DMS guide version matches the installed DOCA release
+  before quoting flags or YANG paths. The validation steps require a
+  live DOCA install.
 ---
 
 # DOCA Management Service (DMS)
+
+## Examples
+
+- **"Read or change a BlueField setting locally."** — use
+  `dms-cli` (DOCA 3.5+); explore the path with `--tree` first.
+- **"Manage a remote BlueField over gRPC."** — this is in
+  scope. Use `dmsd` + `dmspe` with the chosen auth; do not
+  drop to ad-hoc SSH for the management plane.
+- **"gNOI reboot from orchestrator."** — treat reboot / OS
+  install / factory-reset as destructive: require target-bound
+  explicit confirmation first.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+gNMI / debug. Open the capabilities companion for auth and gNOI
+scope. Do not open every companion file.
 
 > **⚠️ Destructive operations.** The gNOI `reboot`, `OS install`,
 > `factory-reset`, and managed-file deletion operations are
@@ -42,14 +66,43 @@ compatibility: >
 
 **Where to start:** This skill is for *operating* DMS, not for
 *linking against* a library. If the user wants to *deploy* or *run*
-the daemon, open [`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure). If the question is *what shape
+the daemon, open the tasks companion and start at
+`## configure`. If the question is *what shape
 of service is DMS and what protocols does it speak*, start at
-[`CAPABILITIES.md`](CAPABILITIES.md). If DOCA is not installed on the
+the capabilities companion. If DOCA is not installed on the
 management endpoint yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first.
 
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
+
+**DOCA 3.5 and later: start with `dms-cli`.** The DMS guide now centres on
+`/opt/mellanox/doca/services/dms/dms-cli`, run directly on the host or
+BlueField Arm with no server or daemon. One syntax per YANG path:
+`dms-cli -t pci/<BDF> /nvidia/mode/operating-mode` reads a value, the same
+path plus a value sets it, and action paths run operations. Explore before
+writing: `--tree /nvidia`, `--describe <path>` and `list-xpaths <path>`;
+script with `--json`; validate with `--dry-run`. VFs and SFs take
+`-t pci/<BDF>,pf<N>vf<M>` or `pf<N>sf<M>`. Observed on DOCA 3.5: as a normal
+user it fails with `backend fork/exec .../dmspe: permission denied` — run it
+with `sudo` or add the user to `dmsgroup`; some example paths do not exist on
+every device (for example congestion-control slots are under
+`/nvidia/cc/algo/slot` there), so confirm every path with `--tree` /
+`list-xpaths` before using it. Firmware or BFB installs
+(`/nvidia/provisioning/install`), resets and mode changes are
+hardware-state changes: follow `doca-hardware-safety`. The `dmsd` + `dmspe`
+gRPC (gNMI / gNOI) service below remains for remote and fleet management.
+
 ## Example questions this skill answers well
+
+> **Never invent the image tag.** It comes from the NGC catalog's DOCA
+> org or the DMS page on `docs.nvidia.com`, not from memory — a
+> plausible tag reads as authoritative and mismatches the installed
+> DOCA. Cite where it came from, or send the user to look it up.
 
 The CLASSES of DMS questions this skill is built to answer, each with
 one worked example. The class is the load-bearing piece; the worked
@@ -58,37 +111,37 @@ example is one instance.
 - **"Where should DMS run for my target topology?"** — worked example:
   *"I have a host without a DPU; can I still manage a remote
   ConnectX?"*. Answered by the deployment-shape decision in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + [`TASKS.md ## configure`](TASKS.md#configure).
+  the capabilities companion
+  + the tasks companion.
 - **"Which authentication mode should I pick for my security
   posture?"** — worked example: *"a multi-tenant production env vs a
   single-tenant lab"*. Answered by the auth-mode trade-off table in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the auth-wiring step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"How do I issue a gNMI `Get` / `Set` against a modeled path?"** —
   worked example: *"set `/interfaces/interface/config/mtu` on a remote
   interface"*. Answered by the gNMI/gNOI surface in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the request-shape workflow in
-  [`TASKS.md ## run`](TASKS.md#run).
+  the tasks companion.
 - **"How do I run a gNOI operation (reboot, OS install, file
   transfer)?"** — worked example: *"trigger a clean reboot of the
   target via gNOI"*. Answered by the gNOI catalog in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the run workflow in [`TASKS.md ## run`](TASKS.md#run).
+  the capabilities companion
+  + the run workflow in the tasks companion.
 - **"My DMS request returned an error — was it the frontend or the
   backend?"** — worked example: *"`mlxconfig` failed under DMS but
   works on the shell"*. Answered by the frontend-vs-backend split in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 - **"Where do I read DMS logs and how do I rotate them?"** — worked
   example: *"persistent log directory + journald + log-rotation
   policy"*. Answered by the logging surface in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
+  the capabilities companion
   + the log-rotation step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 
 ## Audience
 
@@ -147,12 +200,12 @@ DOCA itself, or library-API questions. For those, route via
 This is a **thin loader**. Substantive material lives in two companion
 files:
 
-- `CAPABILITIES.md` — DMS architecture (frontend `dmsd` / privileged
+- the capabilities companion — DMS architecture (frontend `dmsd` / privileged
   backend `dmspe`), management protocols (gNMI, gNOI), the YANG-based
   unified configuration dictionary, deployment shapes, authentication
   modes with their security trade-offs, the configuration-persistency
   model, the logging surface, and DMS's documented security posture.
-- `TASKS.md` — step-by-step workflows for the in-scope DMS verbs:
+- the tasks companion — step-by-step workflows for the in-scope DMS verbs:
   `configure`, `build`, `modify`, `run`, `test`, `debug`, plus a
   `Deferred task verbs` block routing out-of-scope questions.
 
@@ -189,12 +242,12 @@ and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in scope.
+1. Read this skill first to confirm the user's question is in scope.
 2. **For the DMS architecture, deployment shapes, auth modes,
    protocol/path inventory, persistency, logging, and security
-   posture, see [CAPABILITIES.md](CAPABILITIES.md).**
+   posture, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run, test,
-   debug — see [TASKS.md](TASKS.md).**
+   debug — see the tasks companion.**
 4. **Apply the destructive-operation gate in every phase.** Before any
    gNOI OS install, reboot, factory reset, or managed-file deletion —
    including a test or debug action — verify the exact target and obtain explicit

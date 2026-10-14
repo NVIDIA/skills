@@ -8,39 +8,64 @@ description: >
   backend, running the single-iteration smoke then the iterative eval
   loop, interpreting per-iteration CPU cycles and num_pushed /
   num_failed, or capturing the four-tuple (DOCA version,
-  BlueField/firmware, JSON policy, worker/queue/burst config) that
-  makes a Kops/sec number defensible. Trigger even when the user does
-  not explicitly mention "doca-flow-perf" — typical implicit phrasings
-  include "how many rules per second can my BlueField insert",
-  "5-tuple hairpin rule rate", "Kops/sec for steering", "flow-perf
-  number does not match release notes", "DPDK vs DOCA benchmark", or
-  "rule-install variance too high". Refuse and route elsewhere for
-  optimizing a live Flow app (doca-flow-tune), the DPA-offloaded path
+  BlueField/firmware, JSON policy, worker/queue/burst config) that makes
+  a Kops/sec number defensible. Trigger even when the user does not
+  explicitly mention "doca-flow-perf" — typical implicit phrasings
+  include "how many rules per second can my BlueField insert", "5-tuple
+  hairpin rule rate", "Kops/sec for steering", "flow-perf number does
+  not match release notes", "DPDK vs DOCA benchmark", or "rule-install
+  variance too high". Refuse and route elsewhere for optimizing a live
+  Flow app (doca-flow-tune), the DPA-offloaded path
   (doca-flow-dpa-perf), dataplane throughput or latency, or
   library-internal pipe semantics — those belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - flow
+    - perf
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC
   attached. The doca_flow_perf binary plus its configs/ JSON exemplars
   must be present (the DOCA Flow Perf install component), with the
-  underlying doca-flow library healthy. Reads `pkg-config doca-flow`
-  and inspects /opt/mellanox/doca/{lib,include,samples,applications}.
+  underlying doca-flow library healthy. Reads `pkg-config doca-flow` and
+  inspects /opt/mellanox/doca/{lib,include,samples,applications}. The
+  validation steps require a live DOCA install.
 ---
 
 # DOCA Flow Perf (`doca_flow_perf`)
 
+## Examples
+
+- **"How many rules per second can my BlueField insert?"** —
+  this is in scope. Stay on `doca_flow_perf`; do not retune
+  a live Flow app here.
+- **"DPDK vs DOCA benchmark."** — pick the JSON policy and
+  backend; capture the four-tuple that makes Kops/sec
+  defensible.
+- **"My production pipeline is losing hardware offload."** — out of
+  scope: that is diagnosing a live Flow application, owned by
+  `doca-flow-tune`. Name it and stop; do not run a `doca_flow_perf`
+  benchmark for it.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+run / debug. Open the capabilities companion for backends and
+policy files. Do not open every companion file.
+
 **Where to start:** This is a tool skill for invoking
 `doca_flow_perf`, the host-side / DPU-CPU-side DOCA Flow
-performance measurement tool. Open [`TASKS.md`](TASKS.md) and
-start at [`## configure`](TASKS.md#configure) to commit to
+performance measurement tool. Open the tasks companion and
+start at `## configure` to commit to
 the three-axis decision (target Flow pipeline shape × traffic
 class × measurement axis) and pick the JSON policy file that
-expresses the workload, then [`## run`](TASKS.md#run) for the
-single-iteration smoke, then [`## test`](TASKS.md#test) for
+expresses the workload, then `## run` for the
+single-iteration smoke, then `## test` for
 the iterative eval loop that produces a defensible
-Kops/sec-class number. Open [`CAPABILITIES.md`](CAPABILITIES.md)
+Kops/sec-class number. Open the capabilities companion
 when the question is *what `doca_flow_perf` measures and what
 it deliberately does not measure*, *how its DPDK and DOCA
 backends differ behind the same JSON contract*, *how to
@@ -56,6 +81,13 @@ pipeline rather than measure a synthetic one, route to
 [`doca-flow-tune`](../doca-flow-tune/SKILL.md) — `flow-perf`
 is a synthetic-driver microbenchmark, not a tuner of a live
 Flow application.
+
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
 
 ## Example questions this skill answers well
 
@@ -192,16 +224,16 @@ the DPA-offloaded path (route to
 Three companion files in this directory, each owning a
 different question shape:
 
-- [`SKILL.md`](SKILL.md) — this file. Audience, scope,
+- this skill — this file. Audience, scope,
   loading order, related skills. Routes everything else.
-- [`CAPABILITIES.md`](CAPABILITIES.md) — *what
+- the capabilities companion — *what
   `doca_flow_perf` is*, what it measures, what it
   deliberately doesn't measure, the DPDK-vs-DOCA backend
   duality, the JSON contract surface, the per-iteration
   output interpretation, version compatibility (versioned
   with `doca-flow` and `doca-version`), the layered error
   taxonomy, observability, and the safety policy overlay.
-- [`TASKS.md`](TASKS.md) — the procedural verbs (`configure`,
+- the tasks companion — the procedural verbs (`configure`,
   `run`, `test`, `debug`, etc.) plus a `doca_flow_perf`-
   specific command appendix and the agent-side `use`
   workflow that consumes the captured per-iteration output.
@@ -263,17 +295,17 @@ When a `doca_flow_perf` question arrives:
    [`doca-setup`](../../doca-setup/SKILL.md);
 2. Confirm the underlying `doca-flow` library is healthy on
    the device — if not, route to
-   [`doca-flow TASKS.md ## test`](../../libs/doca-flow/TASKS.md#test);
+   [`doca-flow`](../../libs/doca-flow/SKILL.md);
 3. Confirm the user wants to *measure*, not *optimize* —
    if optimize, route to
    [`doca-flow-tune`](../doca-flow-tune/SKILL.md);
 4. Confirm the target path is host / DPU-CPU, not DPA — if
    DPA, route to
    [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md);
-5. Read [`CAPABILITIES.md`](CAPABILITIES.md) to commit to
+5. Read the capabilities companion to commit to
    the three-axis decision (pipeline shape × traffic class ×
    measurement axis);
-6. Read [`TASKS.md`](TASKS.md) and walk
+6. Read the tasks companion and walk
    `## configure → ## run → ## test → ## debug` in that
    order; do NOT start with `## run` without the
    `## configure` precondition step.
@@ -323,7 +355,7 @@ contract from `tools/<X>/`:
   flow-perf preconditions rely on.
 - [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
   — the canonical hardware-safety meta-policy that
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   overlays.
 
 This skill assumes the surrounding doca-flow application is

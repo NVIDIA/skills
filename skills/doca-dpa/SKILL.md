@@ -2,14 +2,14 @@
 license: Apache-2.0
 name: doca-dpa
 description: >
-  Use this skill when the user is doing hands-on DOCA DPA host-side
-  work on a BlueField — creating the `doca_dpa` Core context, loading
-  a DPACC-compiled DPA app image (`doca_dpa_app`), creating DPA
-  threads, launching kernels via `doca_dpa_kernel_launch_update_*`,
-  draining `doca_dpa_completion`, running `doca_dpa_cap_*` discovery,
-  choosing between the DPA comm component (inter-DPA messaging) and the
-  DPA verbs component (in-kernel RDMA), or debugging `DOCA_ERROR_*`
-  from `doca_dpa_*`. Trigger even without "DOCA DPA" or "Data-Path
+  Use this skill when the user is doing hands-on DOCA DPA host-side work
+  on a BlueField — creating the `doca_dpa` Core context, loading a
+  DPACC-compiled DPA app image (`doca_dpa_app`), creating DPA threads,
+  launching kernels via `doca_dpa_kernel_launch_update_*`, draining
+  `doca_dpa_completion`, running `doca_dpa_cap_*` discovery, choosing
+  between the DPA comm component (inter-DPA messaging) and the DPA verbs
+  component (in-kernel RDMA), or debugging `DOCA_ERROR_*` from
+  `doca_dpa_*`. Trigger even without "DOCA DPA" or "Data-Path
   Accelerator": "run compute on the DPA from my host", "DPA kernel
   hangs, no completion", "DOCA_ERROR_DRIVER on launch", "DOCA/DPACC
   version skew", or "does this BlueField expose a DPA". Route elsewhere
@@ -17,27 +17,48 @@ description: >
   host↔DPU messaging (doca-comch), host-side RDMA (doca-rdma), and
   GPU-initiated networking (doca-gpunetio).
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - dpa
+    - accelerator
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on Linux
-  (Ubuntu 22.04/24.04 or RHEL/SLES) with a BlueField DPU whose
-  generation exposes the DPA processor to the host, plus the
-  matching DPACC compiler at a version listed compatible by
-  the DOCA Compatibility Policy. Reads `pkg-config --modversion
-  doca-dpa` and the installed `dpacc` version, and inspects
-  /opt/mellanox/doca/{lib,include,samples/doca_dpa,applications}.
+  Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
+  22.04/24.04 or RHEL/SLES) with a BlueField DPU whose generation
+  exposes the DPA processor to the host, plus the matching DPACC
+  compiler at a version listed compatible by the DOCA Compatibility
+  Policy. Reads `pkg-config --modversion doca-dpa` and the installed
+  `dpacc` version, and inspects
+  /opt/mellanox/doca/{lib,include,samples/doca_dpa,applications}. The
+  validation steps require a live DOCA install.
 ---
 
 # DOCA DPA
+
+## Examples
+
+- **"Run compute on the DPA from my host."** — this is in scope.
+  Stay on `doca_dpa` + a DPACC-built image; do not rewrite it as
+  host-CPU or GPUNetIO.
+- **"DPA kernel hangs, no completion."** — drain
+  `doca_dpa_completion` and check DOCA/DPACC version skew before
+  changing the kernel.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+launch / debug. Open the capabilities companion for threads vs
+kernels and the DPA cap query. Do not open every companion file.
 
 **Where to start:** This skill assumes DOCA is already installed,
 the user's BlueField has a DPA processor and the host can see it
 through DOCA, and the user is doing **hands-on DPA work from the
 host side** — i.e. using `doca-dpa` to load a DPA application
 image, launch DPA kernels, and exchange data with the DPA
-processor. Open [`TASKS.md`](TASKS.md) if the user wants to *do*
+processor. Open the tasks companion if the user wants to *do*
 something (configure / build / modify / run / test / debug); open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
+the capabilities companion when the question is *what
 can the host-side DPA API express* on this version + this
 BlueField generation. If the user has not installed DOCA yet,
 route to [`doca-setup`](../../doca-setup/SKILL.md) first; if the
@@ -47,90 +68,6 @@ is a different scope — route via
 [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
 to the public DOCA DPA / DPACC / DPA-Comms / DPA-Verbs guides
 (this skill does not redefine those DPA-side surfaces).
-
-## Example questions this skill answers well
-
-The CLASSES of DPA questions this skill is built to answer, each
-with one worked example. The agent should treat the *class* as
-the load-bearing piece — the worked example is a single
-instance.
-
-- **"How do I run a piece of compute on the DPA processor from
-  my host program?"** — worked example: *"load a DPA kernel that
-  counts events in a loop and reports the count back to the
-  host"*. Answered by the two-side-program model + the
-  host-side launch workflow in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the bring-up steps in
-  [`TASKS.md ## configure`](TASKS.md#configure).
-- **"Does this BlueField even have a DPA, and which DPA features
-  does my DOCA install expose?"** — worked example: *"my host
-  has a BlueField; can I use the DPA on it for a programmable
-  control workload?"*. Answered by the dual-axis capability rule
-  (BlueField-generation axis via `doca_dpa_cap_*` against the
-  active `doca_devinfo` plus the DOCA-install axis via
-  `pkg-config --modversion doca-dpa`) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the device-enumeration step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
-- **"Why does my host-side DPA setup fail with
-  `DOCA_ERROR_NOT_SUPPORTED` even though DOCA Core looks
-  healthy?"** — worked example: *"the BlueField generation in
-  this host predates the DPA feature my code uses"*. Answered by
-  the env-precondition matrix in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  + the env checklist in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 1.
-- **"How do I get arguments and results between my host program
-  and my DPA kernel?"** — worked example: *"pass a buffer pointer
-  and a length into the DPA kernel as launch arguments; read a
-  completion back when the kernel finishes"*. Answered by the
-  launch-argument + completion overlay in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the launch + drain steps in
-  [`TASKS.md ## run`](TASKS.md#run).
-- **"Is the DPA host-side API I'm reading about on my installed
-  DOCA?"** — worked example: *"is the host-side launch helper I
-  see in the docs available against the DOCA + DPACC versions on
-  this host?"*. Answered by the version-compatibility overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)
-  which cross-links the canonical detection chain in
-  [`doca-version`](../../doca-version/SKILL.md) and adds the
-  DPA-specific *DOCA must match DPACC* overlay.
-- **"What does this `DOCA_ERROR_*` from a `doca_dpa_*` call mean
-  and which layer caused it?"** — worked example: *"`DOCA_ERROR_DRIVER`
-  on a host-side launch call — is it DOCA, the DPACC-produced
-  image, or the DPA processor itself?"*. Answered by the DPA
-  overlay on the cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-  + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
-- **"How does my DPA kernel send a small message to another
-  DPA thread on the same DPA processor?"** — worked example:
-  *"two DPA threads in the same loaded `doca_dpa_app`; thread A
-  sends a counter value to thread B over a DPA-side comms
-  endpoint and thread B signals the host through
-  `doca_dpa_completion`"*. Answered by the DPA-Comms routing
-  rule, primitive families, host-side capability-budget rule,
-  and DPA-Comms error overlay in
-  [`CAPABILITIES.md ## comms`](CAPABILITIES.md#comms) plus the
-  configure / build / modify / run / test / debug overlay in
-  [`TASKS.md ## comms`](TASKS.md#comms). Disambiguates the DPA
-  device-side comm component from host-side `doca-comch` and
-  host-side `doca-rdma`.
-- **"How do I do RDMA directly from inside my DPA kernel to a
-  remote peer, without round-tripping to the host?"** — worked
-  example: *"my DPA kernel needs to fetch the next 4 KiB input
-  buffer from a remote node via RDMA read before continuing
-  compute; the host round-trip is the measured bottleneck"*.
-  Answered by the 4-way RDMA matrix, the host-configures-QP /
-  DPA-uses-QP coupling rule, the host-side cap-query rule for
-  the specific verb, and the DPA-Verbs error overlay in
-  [`CAPABILITIES.md ## verbs`](CAPABILITIES.md#verbs) plus the
-  workflow overlay in [`TASKS.md ## verbs`](TASKS.md#verbs).
-  Includes the climb-back rule for when the latency-tuning
-  premise stops holding.
 
 ## Audience
 
@@ -194,6 +131,19 @@ translation unit built by `dpacc`. Concretely:
   a DPA application image they built separately with `dpacc` —
   the env-precondition and capability-discovery rules in this
   skill still apply.
+
+> **"My DPA kernel hangs and I never get a completion" is a
+> host-side question first.** Launch calls are asynchronous, so a
+> successful return means *submitted*, not *finished*. Before
+> reading a line of kernel code, establish that the host is
+> actually in a position to observe completion: a
+> `doca_dpa_completion` is attached, and the host is driving
+> `doca_pe_progress` in parallel with the outstanding launches. A
+> host that submits and then blocks without progressing the PE sees
+> no completions and concludes *"the DPA is hung"* incorrectly —
+> the kernel may have finished already. Only once that is excluded
+> is a non-terminating kernel body the suspect. Both steps and the
+> ordering are in ## run steps 2-3.
 - Writing DPA-side kernel code that calls the DPA device-side
   comm component **`libdoca_dpa_dev_comm.a`** (header
   `doca_dpa_dev_comch_msgq.h`) — for inter-DPA-thread
@@ -206,8 +156,8 @@ translation unit built by `dpacc`. Concretely:
   overlay (`_AGAIN` → kernel must yield; `_BAD_STATE`
   disambiguation from the parent's host-side `_BAD_STATE`), and
   the configure / build / modify / run / test / debug overlay
-  live in [`CAPABILITIES.md ## comms`](CAPABILITIES.md#comms) and
-  [`TASKS.md ## comms`](TASKS.md#comms) under this same skill.
+  live in ## comms and
+  ## comms under this same skill.
 - Writing DPA-side kernel code that calls the DPA device-side
   verbs component **`libdoca_dpa_dev_verbs.a`** (header
   `doca_dpa_dev_verbs.h`) — for RDMA from inside
@@ -219,8 +169,8 @@ translation unit built by `dpacc`. Concretely:
   DOCA/DPACC install, read from `doca_dpa_dev_verbs.h` and the
   shipped sample), the IO_FAILED → CQE-inspection
   overlay, and the climb-back rule live in
-  [`CAPABILITIES.md ## verbs`](CAPABILITIES.md#verbs) and
-  [`TASKS.md ## verbs`](TASKS.md#verbs) under this same skill.
+  ## verbs and
+  ## verbs under this same skill.
 
 Do **not** load this skill for general DOCA orientation,
 install of DOCA or the DPACC compiler, the DPA-side
@@ -238,7 +188,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive
 DPA-specific material lives in two companion files:
 
-- `CAPABILITIES.md` — what the host-side DPA API can express on
+- the capabilities companion — what the host-side DPA API can express on
   this version + this BlueField generation: the per-DPA-instance
   `doca_dpa` context, the loaded `doca_dpa_app` image produced
   by `dpacc`, the `doca_dpa_thread` execution context, the
@@ -252,7 +202,7 @@ DPA-specific material lives in two companion files:
   policy that gates env preconditions (DPA-capable BlueField,
   matched DOCA + DPACC versions, DPA-side image and host-side
   expected entry points agree).
-- `TASKS.md` — step-by-step workflows for the six in-scope DPA
+- the tasks companion — step-by-step workflows for the six in-scope DPA
   verbs: `configure`, `build`, `modify`, `run`, `test`,
   `debug`. Plus a `Deferred task verbs` block that points
   out-of-scope questions at the right next skill.
@@ -282,7 +232,7 @@ contain — and pull requests should not add:
   workflow in
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
   layered with the DPA-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Standalone build manifests** (`meson.build`,
   `CMakeLists.txt`, …) parked inside the skill. The agent
   constructs the build manifest *in the user's project
@@ -305,7 +255,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope (host-side DPA work, not DPA-side kernel-writing).
 2. **For the DPA capability matrix, the `doca_dpa` per-instance
    context, the loaded `doca_dpa_app` image, the
@@ -313,9 +263,9 @@ contain — and pull requests should not add:
    completion model, the dual capability query, the
    env-precondition policy, the error taxonomy, the
    observability surface, and the safety policy, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify,
-   run, test, debug — see [TASKS.md](TASKS.md).**
+   run, test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical
@@ -352,7 +302,7 @@ install layout" rather than "DPA host-side-specific guidance".
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect /
   prefer / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the

@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill for hands-on DOCA Compress programming on a BlueField DPU, ConnectX NIC, or host with DOCA — enabling compress-deflate, decompress-deflate, decompress-lz4-stream, or decompress-lz4-block tasks on a doca_compress context. <br>
+Hardware compression offload with DOCA Compress on a BlueField DPU, ConnectX NIC, or host: DEFLATE compress and decompress, plus LZ4 decompress (stream and block; LZ4 encode is NOT supported), instead of CPU zlib / zstd. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building applications that consume the DOCA Compress library to offload bulk DEFLATE compression or decompression onto a BlueField DPU or ConnectX accelerator. <br>
+Developers and engineers building applications that consume the DOCA Compress library to offload bulk DEFLATE compression or decompression (and LZ4 decompression) onto a BlueField DPU or ConnectX accelerator, including capability queries, buffer sizing, mmap permissions, offload-vs-CPU decisions, and DOCA_ERROR_* debugging. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,14 +26,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Compress Guide](https://docs.nvidia.com/doca/sdk/DOCA-Compress/) <br>
 - [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
-- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Configuration instructions, Shell commands, Analysis] <br>
-**Output Format:** [Markdown with inline C code blocks and shell commands] <br>
+**Output Type(s):** [Analysis, Code, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,37 +45,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 internal skill evaluation tasks (3 positive activation, 1 negative activation). <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is it safe to use? Scored from the `security` signal. <br>
+- Correctness: Is the answer correct? Scored from the `accuracy` signal. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` and `behavior_check`. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% `skill_efficiency` (tool-call productivity) + 50% `token_efficiency`. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 95% (+0%) | 100% (+15%) |
-| Discoverability | 4 | 100% (+25%) | 95% (+34%) |
-| Effectiveness | 4 | 98% (+58%) | 94% (+61%) |
-| Efficiency | 4 | 100% (+25%) | 93% (+44%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 93.2% | 98.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 75.0% → 100.0% (+25.0 points) | 95.0% → 100.0% (+5.0 points) |
+| Discoverability | 100.0% | 93.3% |
+| Effectiveness | 58.8% → 92.5% (+33.7 points) | 73.1% → 98.8% (+25.7 points) |
+| Efficiency | 73.3% | 100.0% |
 
 ## Skill Version(s): <br>
-d33a8af (source: git SHA, committed 2026-07-26) <br>
+7e143d8 (source: git SHA, committed 2026-10-12) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

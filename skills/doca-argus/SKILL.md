@@ -8,26 +8,47 @@ description: >
   integrity violations, and operational anomalies, and forwards findings
   to a SIEM (Splunk / ELK / Sentinel / syslog). Covers the four-axis
   config (detection policy, forwarding, sampling, host coverage),
-  running the NGC container on BlueField Arm, and wiring the
-  forwarder. Trigger even without "DOCA Argus" by
-  name — typical implicit phrasings: "container green but no findings
-  arrive", "false-positive flood in Splunk", or "runtime security on a
-  fleet of BlueField-3s". Refuse and route elsewhere for installing
-  DOCA, SIEM-side ingest stanzas, pre-baked detection-rule packs, and
-  metrics observability (DOCA Telemetry). Argus is NVIDIA's currently-
-  promoted runtime-security framework, superseding the older App Shield
-  library; name it first for new runtime-security work.
+  running the NGC container on BlueField Arm, and wiring the forwarder.
+  Trigger even without "DOCA Argus" by name — typical implicit
+  phrasings: "container green but no findings arrive", "false-positive
+  flood in Splunk", or "runtime security on a fleet of BlueField-3s".
+  Refuse and route elsewhere for installing DOCA, SIEM-side ingest
+  stanzas, pre-baked detection-rule packs, and metrics observability
+  (DOCA Telemetry). Argus is NVIDIA's currently- promoted
+  runtime-security framework, superseding the older App Shield library;
+  name it first for new runtime-security work.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: service
+  tags:
+    - doca
+    - argus
+    - security
 compatibility: >
   BlueField-Arm-only DOCA service container; pulled from NVIDIA NGC and
   started under the BlueField OS container runtime per the public DOCA
   Container Deployment Guide. Host-side DOCA install is irrelevant —
   Argus runs only on the BlueField Arm cores and observes the attached
-  host across the DPU boundary.
+  host across the DPU boundary. The validation steps require a live DOCA
+  install.
 ---
 
 # DOCA Argus Service
+
+## Examples
+
+- **"Container green but no findings arrive."** — this is in
+  scope. Stay on Argus config / forwarder; do not rewrite
+  SIEM ingest stanzas here.
+- **"Runtime security on a fleet of BlueField-3s."** — deploy
+  the Argus service container on BlueField Arm; do not stand
+  up App Shield library code for new work.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+forward / debug. Open the capabilities companion for the four-axis
+config. Do not open every companion file.
 
 > **Currently-promoted successor.** DOCA Argus is NVIDIA's primary,
 > currently-promoted framework for runtime threat detection and host
@@ -54,10 +75,10 @@ Shield library (the *lower-level* introspection library a developer
 would use to BUILD custom security tooling — Argus is what most
 operators want INSTEAD; the App Shield library is not covered by
 this bundle). If the user wants to *deploy* the Argus container, open
-[`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure). If the question is *what
+the tasks companion and start at
+`## configure`. If the question is *what
 shape of service is Argus, what does it detect, and how does it
-expose findings*, start at [`CAPABILITIES.md`](CAPABILITIES.md).
+expose findings*, start at the capabilities companion.
 If DOCA is not installed on the BlueField yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first. If the user's real
 question is *"I want to write a custom security tool against host
@@ -66,6 +87,13 @@ kernel state from the BlueField side"*, the right answer is
 not covered by this bundle; route the user to the public docs via
 [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
 instead.
+
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
 
 ## Example questions this skill answers well
 
@@ -79,45 +107,45 @@ worked example is one instance.
   example: *"I want runtime security on a fleet of BlueField-3s
   protecting a production database tier; what should I reach for
   first?"*. Answered by the Argus-vs-App-Shield path-selection rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the path-selection step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"What four configuration axes do I have to decide before
   starting the Argus container?"** — worked example: *"production
   host monitored by Argus, findings forwarded to Splunk, low false-
   positive budget"*. Answered by the four-axis configuration table
   in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the four-axis step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"Argus's container is running but I see no findings — what did
   I miss?"** — worked example: *"container green, no findings have
   arrived in 24h"*. Answered by the detection-policy and sampling
   rows in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 - **"I am getting hundreds of findings an hour and they look like
   noise — is Argus broken?"** — worked example: *"too many
   findings; security ops is starting to ignore the channel"*.
   Answered by the calibration-period and detection-policy rules in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 - **"How do I pair Argus with my existing SIEM (Splunk / ELK /
   …)?"** — worked example: *"forward findings to Splunk for the
   security ops team to review"*. Answered by the forwarding-axis
   row in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the forwarding step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"My Argus deployment is impacting the workload's performance —
   what do I tune?"** — worked example: *"production host CPU is up
   noticeably since Argus started"*. Answered by the sampling-axis
   row in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the sampling-tuning row in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 
 ## Audience
 
@@ -212,7 +240,7 @@ security tooling, since App Shield is not covered by this bundle).
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — Argus's architecture (long-running
+- the capabilities companion — Argus's architecture (long-running
   container that owns the runtime-security observation surface on
   the BlueField), the four configuration axes (detection policy /
   forwarding / sampling / host coverage), the deployment shape
@@ -224,7 +252,7 @@ companion files:
   sampling-performance / host-coverage), and the safety policy
   (Argus-vs-App-Shield path selection, never silently disable findings,
   expect a calibration period, smoke-before-bulk).
-- `TASKS.md` — step-by-step workflows for the in-scope Argus
+- the tasks companion — step-by-step workflows for the in-scope Argus
   verbs: `configure`, `build`, `modify`, `run`, `test`, `debug`,
   plus a `Deferred task verbs` block routing out-of-scope
   questions and a `Command appendix` of recurring commands.
@@ -286,7 +314,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope **and** that Argus is the right answer at all (vs.
    building on the DOCA App Shield library — not covered by this
    bundle, vs. deploying nothing, vs. deploying observability
@@ -295,9 +323,9 @@ contain — and pull requests should not add:
    the SIEM pairing surface, the error taxonomy, the
    observability surface, and the safety policy (including the
    calibration-period rule and the never-silently-disable rule),
-   see [CAPABILITIES.md](CAPABILITIES.md).**
+   see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 ## Related skills
 
@@ -319,7 +347,7 @@ contain — and pull requests should not add:
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
   — general DOCA patterns. Argus is service-shaped not library-
   shaped, so the build / modify / first-app pattern there does
@@ -335,7 +363,7 @@ contain — and pull requests should not add:
   security product, route to the public docs via
   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
   The path-selection rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   routes the user to Argus first for production security.
 - [`doca-dms`](../doca-dms/SKILL.md) and
   [`doca-firefly`](../doca-firefly/SKILL.md) — sibling service

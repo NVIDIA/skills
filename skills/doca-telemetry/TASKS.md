@@ -11,7 +11,7 @@ publisher to configure. Each domain is read directly off an
 already-open `doca_dev` via cap-query → `_create` → per-domain
 setters → `_start` → per-domain read → `_stop` → `_destroy`. The
 publishing / export side is the sibling
-[`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
+`doca-telemetry-exporter/SKILL.md`
 library — a separate skill.
 
 **Where to start:** The verbs run `configure → build → modify →
@@ -31,7 +31,7 @@ rule and the `AGAIN`-means-snapshot-not-ready rule),
 observability, and safety policy, see
 [CAPABILITIES.md](CAPABILITIES.md). For where to find docs, the
 installed DOCA layout, or release notes, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through
@@ -53,7 +53,7 @@ Steps the agent should walk the user through:
    `doca-telemetry` is what the user's application links to
    **read** hardware counters off a `doca_dev`; the publishing /
    export side is
-   [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md),
+   `doca-telemetry-exporter/SKILL.md`,
    a separate sibling library. An agent that walks the user
    toward the exporter skill when they wanted to read counters
    is wrong; an agent that recommends linking this reader when
@@ -73,7 +73,7 @@ Steps the agent should walk the user through:
    application.
 3. **Confirm the installed DOCA version and cap-query the
    domain.** Use the procedure in
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
    Quote the version observed (`pkg-config --modversion
    doca-telemetry`, then `doca_caps --version`); do not assume
    "latest". Then call the matching per-domain capability query
@@ -151,12 +151,12 @@ build pattern.
 The build pattern for any DOCA C/C++ consumer is **identical**
 across libraries — `pkg-config` for include + link flags, meson
 or CMake as the build system — and is fully documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the reader-specific overlay:
 
 | Slot | Value for the reader | Why it matters |
 | --- | --- | --- |
-| `pkg-config` module name | `doca-telemetry` | The reader's `.pc` file installed by the DOCA host packages. **Wrong module name = wrong direction** — `doca-telemetry-exporter` is the SIBLING publisher library, with its own `.pc` and its own skill at [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md). Picking `doca-telemetry-exporter` when the user wanted to read counters (or `doca-telemetry` when the user wanted to publish) is the load-bearing first-app failure, NOT a typo — re-check the role per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) |
+| `pkg-config` module name | `doca-telemetry` | The reader's `.pc` file installed by the DOCA host packages. **Wrong module name = wrong direction** — `doca-telemetry-exporter` is the SIBLING publisher library, with its own `.pc` and its own skill at `doca-telemetry-exporter/SKILL.md`. Picking `doca-telemetry-exporter` when the user wanted to read counters (or `doca-telemetry` when the user wanted to publish) is the load-bearing first-app failure, NOT a typo — re-check the role per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) |
 | Header to `#include` | The per-domain header for the chosen domain: `doca_telemetry_pcc.h` / `_dpa.h` / `_diag.h` / `_adp_retx.h` / `_phy.h` / `_pci.h` | Each domain is a separate header. Including the wrong domain's header gets the wrong symbol family. Resolve under `$(pkg-config --variable=includedir doca-common)` |
 | Include flags | `pkg-config --cflags doca-telemetry` | Resolves to the telemetry headers on this install |
 | Link flags | `pkg-config --libs doca-telemetry` | Pulls in whatever `pkg-config --libs` resolves on this install (do not predict the `-l<name>` form by hand — `.so` basenames use underscores, `.pc` names use hyphens, and `pkg-config` is the only correct translator) plus the transitive set the resolver computes |
@@ -174,7 +174,7 @@ verified starting point and apply a **minimum-diff
 modification** to express the user's intent.
 
 The universal modify-a-shipped-sample workflow lives in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify).
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`).
 Use it as-is. The reader-specific overlay is the *modify-from-
 sample contract fill* — the slots the agent must elicit from the
 user before recommending any code-level edit:
@@ -193,7 +193,7 @@ walks the unified diff line-by-line against the sample source
 read on disk and has the user paste back the result for
 validation. A future modify-from-sample renderer may automate
 this workflow; it is not currently available (per
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify)).
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`)).
 
 ## run
 
@@ -233,7 +233,7 @@ Steps the agent should walk the user through:
    step 5; otherwise leave clear-on-read disabled.
 4. **Capture the structured log.** Set `DOCA_LOG_LEVEL=trace`
    for the first run (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)).
    This is the cheapest way to make the per-domain lifecycle
    transitions and the first failing read visible.
 5. **Handle `DOCA_ERROR_AGAIN` with sample-window-aware
@@ -329,7 +329,7 @@ result / error / populated outcome. Matching evidence across both
 iterations requires escalation, never success; it means the cause
 is below the reader (device / driver / firmware feature gating).
 Escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured cap-query + per-read evidence and the device /
 version state.
 
@@ -340,7 +340,7 @@ Goal: when a DOCA Telemetry per-domain read returns a
 to a specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending reader-
 specific fixes. This skill's overlay names the reader-specific
@@ -351,7 +351,7 @@ manifestation at layers 5 (runtime) and 6 (program):
 - Walk the role rule: did the user actually want the reader and
   not the exporter? If the user is reading guides about emitting
   / publishing values, route them to
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
+  `doca-telemetry-exporter/SKILL.md`
   via the role-split table in
   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
   not to debug the reader further.
@@ -391,14 +391,14 @@ manifestation at layers 5 (runtime) and 6 (program):
 
 Once the layer is identified, route to the matching debug verb
 on the matching skill: install / build / link / driver to
-[`doca-setup ## debug`](../../doca-setup/TASKS.md#debug);
-version to [`doca-version ## debug`](../../doca-version/TASKS.md#debug);
+`doca-setup ## debug` (`doca-setup/TASKS.md#debug`);
+version to `doca-version ## debug` (`doca-version/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer Core patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug);
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`);
 publishing-side concerns to
-[`doca-telemetry-exporter ## debug`](../doca-telemetry-exporter/TASKS.md#debug).
+`doca-telemetry-exporter ## debug` (`doca-telemetry-exporter/TASKS.md#debug`).
 
 ## Deferred task verbs
 
@@ -408,28 +408,25 @@ so the agent does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [`doca-setup`](../../doca-setup/SKILL.md) and to the
+  `doca-setup/SKILL.md` and to the
   install-tree layout in
-  [doca-public-knowledge-map ## Layout of an installed DOCA package](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed and a `doca_dev`
   is open.
 - **publish / export telemetry.** Wiring up the application-side
   publishing of labeled metrics / OTLP logs — out of scope for
   this skill. Route to
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
+  `doca-telemetry-exporter/SKILL.md`
   for the sibling publisher library. This skill is reader-side
   only.
-- **operate the DOCA Telemetry Service (DTS) itself.** DTS is a
-  separate, externally-productized DOCA service with its own
-  public guide and is out of scope for this bundle; reach it via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
-  non-goals.
+- **operate the DOCA Telemetry Service (DTS) itself.** That is
+  `doca-dts`.
 - **stand up a NetFlow / IPFIX / socket collector.** The
   per-domain reader libraries do not expose a collector /
   schema-transport surface. Route to a generic collector outside
   the DOCA family, to
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
-  for publishing, or to DTS (out of scope) for productized
+  `doca-telemetry-exporter/SKILL.md`
+  for publishing, or to `doca-dts` for productized
   aggregation.
 - **deploy.** Deploying counter-reading applications at scale
   across many hosts, Kubernetes operator workflows — out of
@@ -439,9 +436,9 @@ so the agent does not invent guidance:
   driver / firmware-feature-gating issue
   (`DOCA_ERROR_IO_FAILED` or persistent `NOT_SUPPORTED`), the
   fix is via the env-side skill:
-  [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) layer
+  `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layer
   5, then upstream documentation reachable through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 
 ## Command appendix
 
@@ -456,7 +453,7 @@ counter domains that require elevated device access, per
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST
@@ -471,24 +468,24 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-telemetry` | `## configure` step 3; `## build` slot | What is the build-time DOCA Telemetry (reader) version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). If the command returns *"Package 'doca-telemetry' was not found"* and the user actually wanted the publisher, route to [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md) — wrong direction is the load-bearing first-app failure, not a typo |
+| `pkg-config --modversion doca-telemetry` | `## configure` step 3; `## build` slot | What is the build-time DOCA Telemetry (reader) version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). If the command returns *"Package 'doca-telemetry' was not found"* and the user actually wanted the publisher, route to `doca-telemetry-exporter/SKILL.md` — wrong direction is the load-bearing first-app failure, not a typo |
 | `pkg-config --cflags --libs doca-telemetry` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly |
 | `ls /opt/mellanox/doca/samples/doca_telemetry/` | `## modify` slot 1 | Which reader samples ship in this install, and which is the closest starting point? | A list of sample directories named after the per-domain reader they demonstrate |
 | `doca_caps --version` | `## configure` step 3; `## test` step 2 | What is the *runtime* DOCA version? | A semver string matching `pkg-config --modversion doca-telemetry` |
 | `id` | `## run` step 2 | Does the running user have the privilege the counter domain requires? | The user's id has the device-access privilege the domain needs. Mismatch = `DOCA_ERROR_NOT_PERMITTED` on create / start / read — grant the specific privilege on the env side, not blanket sudo |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 3; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
-| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last reader call? | Empty or recent benign messages. Repeated mlx5 / firmware / device errors → driver / env-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
+| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last reader call? | Empty or recent benign messages. Repeated mlx5 / firmware / device errors → driver / env-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 4 | What did the structured DOCA logger emit for the first failing read? | A trace-level line on every per-domain lifecycle transition and every read. Per-read `AGAIN` traces = snapshot not ready — apply a sample-window-aware retry, not a blind spin |
 
 For commands shared across libraries (`pkg-config
 --modversion`, `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the per-domain reader rows on top.

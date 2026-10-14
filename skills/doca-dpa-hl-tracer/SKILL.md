@@ -2,50 +2,65 @@
 license: Apache-2.0
 name: doca-dpa-hl-tracer
 description: >
-  Use this skill when the user runs doca_dpa_hl_tracer to
-  capture/decode DPA-side traces at the programming-events
-  layer (kernel entry/exit, sync points, comm primitive
-  calls, RDMA WR submission, completion drain) — picking
-  TRACE vs CRIT, tuning the JSON config (file-size limits
-  + file_size_limit_policy, thread priorities/cores),
-  decoding against the matching DPA-side ELF, or
-  diagnosing empty/noisy captures. Trigger even when the
-  user does not explicitly mention "DOCA DPA tracer" or
-  "high-level tracer" — typical implicit phrasings include
-  "DPA kernel returns wrong result but host completions
-  look clean", "kernel-entry to first-comm latency is
-  huge", "RDMA WR to drain gap on the DPA", "trace file
-  truncated mid-run", "TRACE doubled my DPA latency", or
-  "tracer wrote a file but parser shows zero events".
+  Use this skill when the user runs doca_dpa_hl_tracer to capture/decode
+  DPA-side traces at the programming-events layer (kernel entry/exit,
+  sync points, comm primitive calls, RDMA WR submission, completion
+  drain) — picking TRACE vs CRIT, tuning the JSON config (file-size
+  limits + file_size_limit_policy, thread priorities/cores), decoding
+  against the matching DPA-side ELF, or diagnosing empty/noisy captures.
+  Trigger even when the user does not explicitly mention "DOCA DPA
+  tracer" or "high-level tracer" — typical implicit phrasings include
+  "DPA kernel returns wrong result but host completions look clean",
+  "kernel-entry to first-comm latency is huge", "RDMA WR to drain gap on
+  the DPA", "trace file truncated mid-run", "TRACE doubled my DPA
+  latency", or "tracer wrote a file but parser shows zero events".
   Refuse and route elsewhere for writing DPA kernels,
-  DPA-Comms/DPA-Verbs programming, raw per-cycle DPA
-  profiling, host-side doca-dpa debugging, or production
-  DPA telemetry — those belong to other skills.
+  DPA-Comms/DPA-Verbs programming, raw per-cycle DPA profiling,
+  host-side doca-dpa debugging, or production DPA telemetry — those
+  belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - dpa
+    - tracer
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on
-  Linux (Ubuntu 22.04/24.04 or RHEL/SLES) with a BlueField
-  device whose DPA processor is exposed to the host, plus
-  the DOCA DPA Tools optional component (binary at
-  /opt/mellanox/doca/tools/doca_dpa_hl_tracer). Requires a
-  DPACC-built DPA-side ELF and a live doca-dpa-launched
-  workload for events to fire.
+  Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
+  22.04/24.04 or RHEL/SLES) with a BlueField device whose DPA processor
+  is exposed to the host, plus the DOCA DPA Tools optional component
+  (binary at /opt/mellanox/doca/tools/doca_dpa_hl_tracer). Requires a
+  DPACC-built DPA-side ELF and a live doca-dpa-launched workload for
+  events to fire. The validation steps require a live DOCA install.
 ---
 
 # DOCA DPA High-Level Tracer
+
+## Examples
+
+- **"My DPA kernel is doing the wrong thing — where do I look?"** —
+  this is in scope when there is no host-side `DOCA_ERROR_*`.
+  Capture then decode; do not start with cycle-only profiles.
+- **"TRACE mode buried the DPA in observation overhead."** — switch
+  capture window and `TRACE` vs `CRIT` before changing the kernel.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+run / debug. Open the capabilities companion for event taxonomy.
+Do not open every companion file.
 
 **Where to start:** This is a tool skill for invoking
 `doca_dpa_hl_tracer` — the documented host-side CLI that
 captures DPA-side execution traces in higher-level terms
 (DPA programming events: kernel entry / exit, sync points,
 comm primitive calls, RDMA WR submission, completions) rather
-than raw cycle counts. Open [`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure) for the
+than raw cycle counts. Open the tasks companion and start at
+`## configure` for the
 mode-vs-overhead decision and the JSON config layout, then
-[`## run`](TASKS.md#run) for the
+`## run` for the
 capture → decode → render pipeline. Open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is
+the capabilities companion when the question is
 *what does this tool actually trace*, *which DPA programming
 events does it expose*, *what is the trace-overhead vs
 fidelity tradeoff*, or *how does it slot into a DPA debug
@@ -54,7 +69,7 @@ and [`doca-debug`](../../doca-debug/SKILL.md)*. If DPA is not
 the right surface for the user's question (e.g. the bug is
 host-side, the bug is in the DPACC-produced image, the user
 wants raw cycle counts), the path-selection rule in
-[`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+the capabilities companion
 routes the agent before any capture is attempted.
 
 ## Example questions this skill answers well
@@ -69,21 +84,21 @@ the load-bearing piece; the worked example is one instance.
   kernel's reported result is wrong; no host-side
   `DOCA_ERROR_*`"*. Answered by the *when DPA-side
   high-level tracing is the right surface* gate in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the
   capture → decode → render flow in
-  [`TASKS.md ## run`](TASKS.md#run) + the
+  the tasks companion + the
   *which DPA programming events to focus on* rule in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 - **"My DPA kernel is slow at a granularity that doesn't
   show up in cycle profiles — how do I see kernel-entry to
   first-comm-call latency?"** — worked example: *"my DPA
   kernel runs but the time between launch and the first
   RDMA WR submission is bigger than I expected"*. Answered
   by the event-taxonomy table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the iterative loop in
-  [`TASKS.md ## test`](TASKS.md#test) which treats trace
+  the tasks companion which treats trace
   overhead, mode (`TRACE` vs `CRIT`), and capture window
   as axes to tune.
 - **"How do I capture a trace without burying the DPA in
@@ -91,9 +106,9 @@ the load-bearing piece; the worked example is one instance.
   is producing too much data and my measured DPA latency
   went up by 2x compared to without the tracer"*. Answered
   by the mode-vs-overhead tradeoff in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the `CRIT`-first guidance in
-  [`TASKS.md ## configure`](TASKS.md#configure) (start
+  the tasks companion (start
   with critical-events-only; widen to `TRACE` only when the
   bug demands per-event detail).
 - **"My trace file got truncated mid-run — how should I
@@ -102,15 +117,15 @@ the load-bearing piece; the worked example is one instance.
   Answered by the `log_file_max_size_in_bytes` /
   `bin_file_max_size_in_bytes` / `file_size_limit_policy`
   triple in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the JSON config layout in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"Is the tracer on my install, and is it paired with the
   matching `doca-dpa` library and DPACC compiler
   version?"** — worked example: *"is the tracer ABI on my
   install compatible with the DPA image my DPACC just
   produced?"*. Answered by the version-overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  the capabilities companion,
   which redirects to the canonical
   [`doca-version`](../../doca-version/SKILL.md) chain and
   adds the *tracer ↔ `doca-dpa` library ↔ DPACC compiler*
@@ -120,11 +135,11 @@ the load-bearing piece; the worked example is one instance.
   wrong thing?"** — worked example: *"`doca_dpa_hl_tracer`
   ran, wrote a file, but the parser shows zero events"*.
   Answered by the layered error taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   (install / device-binding / DPA-image-instrumented /
   capture-window / decode-vs-elf / overhead-saturated /
   version / cross-cutting) + the layered walk in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 
 ## Audience
 
@@ -147,7 +162,7 @@ counters. Concretely:
   DPA side without instrumenting the application.
 - An AI agent producing a *DPA-side trace report* as
   evidence for the host-side
-  [`doca-dpa TASKS.md ## debug`](../../libs/doca-dpa/TASKS.md#debug)
+  [`doca-dpa`](../../libs/doca-dpa/SKILL.md)
   ladder when the host side reports clean completions but
   the DPA-side behaviour is wrong.
 
@@ -209,7 +224,7 @@ already brought a DPA workload up at least once. Concretely:
   DPA-side ELF to render the human-readable event stream.
 - Capturing a side-effect-bounded trace as prerequisite
   evidence for a host-side
-  [`doca-dpa TASKS.md ## debug`](../../libs/doca-dpa/TASKS.md#debug)
+  [`doca-dpa`](../../libs/doca-dpa/SKILL.md)
   ladder step.
 
 Do **not** load this skill for general DOCA orientation,
@@ -224,7 +239,7 @@ or DOCA / DPACC install. For those, route to
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what `doca_dpa_hl_tracer` captures: the
+- the capabilities companion — what `doca_dpa_hl_tracer` captures: the
   DPA programming event taxonomy (kernel entry / exit, sync
   points, comm primitive calls, RDMA WR submission and
   completion drain), the two documented capture modes
@@ -244,7 +259,7 @@ companion files:
   file + log file + tool's own stderr), and the safety
   policy (capture is bounded; tracing is not a production
   observability surface).
-- `TASKS.md` — step-by-step workflows for the in-scope
+- the tasks companion — step-by-step workflows for the in-scope
   task verbs: `install` (route to host-side DOCA install +
   DPA prerequisites), `configure` (mode + JSON config
   layout + capture window), `build` (route to install —
@@ -302,17 +317,17 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question
+1. Read this skill first to confirm the user's question
    is in scope (DPA-side high-level tracing, not DPA-side
    programming and not raw cycle profiling).
 2. **For the event taxonomy, capture modes, overhead
    tradeoff, JSON config layout, version overlay, error
    taxonomy, observability, and safety policy, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For the documented invocations and the
    capture → decode → render workflow — `install`,
    `configure`, `build`, `modify`, `run`, `test`, `debug`,
-   `use` — see [TASKS.md](TASKS.md).**
+   `use` — see the tasks companion.**
 
 ## Related skills
 
@@ -333,7 +348,7 @@ contain — and pull requests should not add:
   documentation set.
 - [`doca-version`](../../doca-version/SKILL.md) — canonical
   DOCA version-handling rules. The `## Version
-  compatibility` section in [`CAPABILITIES.md`](CAPABILITIES.md)
+  compatibility` section in the capabilities companion
   is a concise overlay that redirects here for the body
   and adds the *tracer ↔ `doca-dpa` library ↔ DPACC
   compiler* matching rule.
@@ -346,7 +361,7 @@ contain — and pull requests should not add:
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
   — the bundle's detect → prefer → fall back → report
   contract for structured helper tools. The command
-  appendix in [`TASKS.md`](TASKS.md) honors this contract.
+  appendix in the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
   — general DOCA programming patterns shared by every
   library / tool surface, including the cross-library

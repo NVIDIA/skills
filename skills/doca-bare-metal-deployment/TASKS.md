@@ -598,35 +598,20 @@ public BlueField Platform Software Manual.
       [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points))
       — pushing a corrupted BFB is the load-bearing first-run
       failure for the entire flow.
-2. **Author `bf.cfg` from the documented schema.** The BFB-install
-   path takes an installer configuration file (`bf.cfg`) that
-   controls post-install state on the Arm side — root/ubuntu
-   password, hostname, and `bfb_modify_os()` shell-script hooks
-   that run during the install to seed any state the documented
-   `bf.cfg` parameters do NOT cover directly. **Two
-   operator-relevant rules**:
-   (a) If the operator wants passwordless SSH to survive the
-   install, the `bf.cfg` MUST set the documented `ubuntu_PASSWORD`
-   parameter (or equivalent per the schema, e.g. `ROOT_PASSWORD`)
-   AND seed the SSH public key via a `bfb_modify_os()` hook that
-   writes `/mnt/home/ubuntu/.ssh/authorized_keys` on the
-   to-be-installed rootfs (the rootfs is mounted under `/mnt`
-   during install per the BSP manual). The default BFB install
-   rewrites `/home/ubuntu/.ssh/`, so any pre-existing key on the
-   previous image is GONE unless reseeded by this hook. Do NOT
-   invent an `authorized_keys` top-level `bf.cfg` parameter — the
-   schema does not have one; the mechanism is the
-   `bfb_modify_os()` hook.
-   (b) For separated-host / bump-in-the-wire / scalable-function
-   deployments where the BlueField must boot in a specific
-   internal-CPU / port-owner / SF mode (e.g. `SEPARATED_HOST(0)`,
-   `EMBEDDED_CPU(1)`), the required `mlxconfig set` invocations
-   are run from a `bfb_modify_os()` hook in `bf.cfg` at
-   BFB-install time; reconfiguring the same modes after the
-   install typically requires another BFB push (per the BSP
-   manual). The agent quotes the `bf.cfg` parameter keys from the
-   public schema (and references the `bfb_modify_os()` script
-   pattern) and does NOT invent key names from memory.
+2. **Route BFB identity and first-boot provisioning to its owner.**
+   BlueField BSP / BFB lifecycle and installer customization are
+   outside this DOCA SDK bundle. Do not provide credential-file paths,
+   installer password fields, first-boot hooks, or commands that seed
+   login state. Route the operator through the
+   [`BlueField Platform Software`](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
+   entry in `doca-public-knowledge-map` to the current public BSP
+   manual. Require the operator to use its documented identity-
+   provisioning workflow and approved secret-management process,
+   verify OOB access before closing the maintenance window, and never
+   assume credentials from the previous image survive a reimage.
+   BlueField mode selection is routed to the same owner; this skill
+   does not synthesize installer configuration fields or mode-changing
+   commands.
 3. **Push the BFB.** Run the host-side `bfb-install` invocation
    per its `--help` and the BSP manual. The push streams the BFB
    to the BlueField over RShim/PCIe; the Arm side reboots through
@@ -858,14 +843,13 @@ console output reach the same triage step.
    passes (and `ip route get` confirms the route is going to the
    BlueField, not local loopback), BUT SSH to the documented
    Arm-side management endpoint refuses or hangs. Root cause
-   class: Arm-side sshd not yet listening (still in init), OR
-   the operator's authorized_keys / `ubuntu_PASSWORD` was NOT in
-   the `bf.cfg` per [`### bfb-install lifecycle`](#bfb-install-lifecycle)
-   step 2. Recovery sequencing: wait the documented sshd-ready
-   bound from the BSP manual; if still down, fall through to the
-   RShim console (`/dev/rshim<N>/console`) for a userspace
-   prompt and re-seed credentials there; on the next BFB push,
-   put the `authorized_keys` IN the `bf.cfg`.
+   class: Arm-side sshd not yet listening (still in init), or the
+   deployment's documented identity-provisioning workflow did not
+   complete. Recovery sequencing: wait the documented sshd-ready
+   bound from the BSP manual; if still down, use the established OOB
+   path and route credential recovery to the operator's approved BSP
+   provisioning and secret-management process. This skill does not
+   prescribe credential files, installer fields, or recovery commands.
 5. **`arm-ok-host-pfs-unbound`.** Evidence: Arm-side SSH alive,
    Arm OS reports healthy (uptime > a few seconds, `dmesg` clean),
    BUT host-side enumeration is broken — `lspci -d 15b3:` shows

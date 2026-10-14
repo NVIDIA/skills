@@ -4,42 +4,71 @@ name: doca-sha
 description: >
   Use this skill when the user is doing hands-on DOCA SHA programming —
   offloading SHA-1, SHA-256, or SHA-512 hashing onto a BlueField DPU or
-  ConnectX accelerator, picking between one-shot `doca_sha_task_hash` and
-  incremental `doca_sha_task_partial_hash`, querying `doca_sha_cap_*`
-  for algorithm support and min destination / max source buffer sizes, setting
-  source / destination `doca_mmap` permissions, or decoding DOCA_ERROR_*
-  returns from the SHA API. Trigger even when the user does not explicitly
-  mention "DOCA SHA" or "doca_sha_task" — typical implicit phrasings
-  include "hash a multi-GiB file on the DPU", "offload SHA-256 to the
-  BlueField", "streaming hash over chunks", "partial hash returns
-  BAD_STATE", "destination buffer too small for digest", or "is SHA-512
-  available on this card". Refuse and route elsewhere for general
-  cryptographic-hash theory (collision resistance, SHA-3 selection), other
-  DOCA crypto libraries (AES-GCM, Compress, DMA), or DOCA install / BFB
-  bring-up — those belong to other skills.
+  ConnectX accelerator, picking between one-shot `doca_sha_task_hash`
+  and incremental `doca_sha_task_partial_hash`, querying
+  `doca_sha_cap_*` for algorithm support and min destination / max
+  source buffer sizes, setting source / destination `doca_mmap`
+  permissions, or decoding DOCA_ERROR_* returns from the SHA API.
+  Trigger even when the user does not explicitly mention "DOCA SHA" or
+  "doca_sha_task" — typical implicit phrasings include "hash a multi-GiB
+  file on the DPU", "offload SHA-256 to the BlueField", "streaming hash
+  over chunks", "partial hash returns BAD_STATE", "destination buffer
+  too small for digest", or "is SHA-512 available on this card". Refuse
+  and route elsewhere for general cryptographic-hash theory (collision
+  resistance, SHA-3 selection), other DOCA crypto libraries (AES-GCM,
+  Compress, DMA), or DOCA install / BFB bring-up — those belong to other
+  skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - sha
+    - hash
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC attached.
   Reads the user's local install via `pkg-config doca-sha` and inspects
   /opt/mellanox/doca/{lib,include,samples,applications}.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA SHA
 
+## Examples
+
+- **"Offload SHA-256 to the BlueField."** — this is in scope. Use the
+  shipped SHA sample and `doca_sha_cap_*` before picking SHA-1 /
+  SHA-256 / SHA-512.
+- **"Partial hash returns BAD_STATE."** — stay on the incremental
+  `doca_sha_task_partial_hash` lifecycle; do not switch to a CPU
+  hash library mid-stream.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+build / run. Open the capabilities companion for one-shot vs
+partial hash and algorithm support. Do not open every companion file.
+
 **Where to start:** This skill assumes DOCA is already installed and
 the user is doing **hands-on SHA-acceleration work** on a BlueField
-/ ConnectX / host with DOCA. Open [`TASKS.md`](TASKS.md) if the user
+/ ConnectX / host with DOCA. Open the tasks companion if the user
 wants to *do* something (configure / build / modify / run / test /
-debug); open [`CAPABILITIES.md`](CAPABILITIES.md) when the question
+debug); open the capabilities companion when the question
 is *what can DOCA SHA express* on this version. If the user has not
 installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
 asking *"should I even use the accelerator for this hash?"*, the
 path-selection rule in
-[`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+## Capabilities and modes
 is the first stop.
+
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
 
 ## Example questions this skill answers well
 
@@ -51,9 +80,9 @@ the load-bearing piece — the worked example is a single instance.
   the CPU?"** — worked example: *"I am verifying file integrity on
   a 4 GiB image; is doca-sha worth the setup vs OpenSSL on the
   CPU?"*. Answered by the path-selection table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the *"when NOT to use doca-sha"* bullets in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
+  ## Safety policy.
 - **"Does my device support the SHA algorithm I want?"** — worked
   example: *"is SHA-256 in the accelerator on this BlueField, and
   what is the minimum destination buffer size for it?"*. Answered
@@ -62,27 +91,27 @@ the load-bearing piece — the worked example is a single instance.
   for the one-shot path; `_task_partial_hash_get_supported(devinfo, algorithm)`
   for the partial-hash path; `doca_sha_cap_get_min_dst_buf_size`,
   `doca_sha_cap_get_max_src_buf_size`) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the discovery step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  ## configure.
 - **"How do I pick between the one-shot and the partial / incremental
   hash task?"** — worked example: *"my input is 1 GiB and the device
   cap says max source buffer is 64 MiB"*. Answered by the
   one-shot-vs-partial table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the task-config workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **"What permissions does the source / destination mmap need?"** —
   worked example: *"my `doca_sha_task_hash` returns
   `DOCA_ERROR_NOT_PERMITTED`"*. Answered by the permission matrix
-  in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  in ## Safety policy
   + the mmap-set-permissions checklist in
-  [`TASKS.md ## test`](TASKS.md#test).
+  ## test.
 - **"Is this DOCA SHA API available on my installed DOCA version?"**
   — worked example: *"is `doca_sha_task_partial_hash` in the DOCA
   I have installed?"*. Answered by the version-compatibility
   overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  ## Version compatibility,
   which cross-links the canonical detection chain in
   [`doca-version`](../../doca-version/SKILL.md) and adds the
   SHA-specific *"discover, do not assume"* bullets.
@@ -90,9 +119,9 @@ the load-bearing piece — the worked example is a single instance.
   layer caused it?"** — worked example: *"`DOCA_ERROR_INVALID_VALUE`
   on `doca_sha_task_hash_alloc_init`"*. Answered by the SHA overlay
   on the cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
+  ## debug that escalates to
   [`doca-debug`](../../doca-debug/SKILL.md).
 
 ## Audience
@@ -107,7 +136,7 @@ to DOCA SHA itself.
 **Language scope.** DOCA SHA ships as a C library with `pkg-config`
 module name `doca-sha`. The shipped samples are written in C. C and
 C++ consumers are the canonical case and the worked examples in
-`TASKS.md` assume that path. Other-language consumers (Rust, Go,
+the tasks companion assume that path. Other-language consumers (Rust, Go,
 Python, …) consume the same `*.so` through FFI or language-specific
 bindings; the skill's contribution in that case is to keep the
 lifecycle, capability-discovery, permission, error-taxonomy, and
@@ -162,7 +191,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive SHA-specific
 material lives in two companion files:
 
-- `CAPABILITIES.md` — what DOCA SHA can express on this version:
+- the capabilities companion — what DOCA SHA can express on this version:
   the two task types (one-shot hash and partial / incremental
   hash), the three algorithm enums, the capability-query surface
   (`doca_sha_cap_*` for algorithm support and buffer sizing), the
@@ -172,7 +201,7 @@ material lives in two companion files:
   destination mmap permission decisions, and the path-selection
   rule (when to use doca-sha versus a CPU hash or a different
   DOCA crypto library).
-- `TASKS.md` — step-by-step workflows for the six in-scope SHA
+- the tasks companion — step-by-step workflows for the six in-scope SHA
   verbs: `configure`, `build`, `modify`, `run`, `test`, `debug`.
   Plus a `Deferred task verbs` block that points out-of-scope
   questions at the right next skill.
@@ -198,7 +227,7 @@ contain — and pull requests should not add:
   modify-a-sample workflow in
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
   layered with the SHA-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Pre-computed digest tables for arbitrary inputs.** The skill
   tells the agent to use a *published* test vector (e.g. the NIST
   SHA test vectors for the empty string, "abc", and the
@@ -216,14 +245,14 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope.
 2. **For the SHA capability matrix, algorithm enums, one-shot vs
    partial task split, capability-query rules, permission matrix,
    error taxonomy, observability, and safety / path-selection
-   policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   policy, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical
@@ -245,13 +274,13 @@ installed package layout" rather than "SHA-specific guidance".
   preconditions are satisfied.
 - [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
   version-handling rules. This skill's
-  [`## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  `## Version compatibility`
   cross-links the four-way match rule and adds only the SHA-specific
   *"discover algorithms + buffer sizes via cap query"* overlay.
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal

@@ -2,34 +2,54 @@
 license: Apache-2.0
 name: doca-gpunetio-ib-write-bw
 description: >
-  Use this skill when the user is building, running, or interpreting
-  the doca/tools/gpunetio_ib_write_bw client+server benchmark — a CUDA
+  Use this skill when the user is building, running, or interpreting the
+  doca/tools/gpunetio_ib_write_bw client+server benchmark — a CUDA
   kernel on the client posts RDMA WRITE work requests through the
   doca-gpunetio device-side surface to measure sustained GPU-driven
   WRITE bandwidth on a GPU+IB-device pair. Trigger even when the user
-  does not explicitly mention "doca-gpunetio-ib-write-bw" or
-  "GPUNetIO" — typical implicit phrasings include "measure WRITE BW
-  when the GPU posts the WRs", "BW swings between runs on the same
-  flags", "is the NIC saturated or am I CPU-bound on the CUDA
-  kernel", "meson compile fails for the GPUNetIO bw tool",
-  "nvidia_peermem isn't picking up my GPU buffer", or "GPU-initiated
-  WRITE throughput vs CPU-initiated perftest". Refuse and route
-  elsewhere for general doca-gpunetio library work, DOCA install, the
-  GPU-initiated WRITE latency analog, the CPU-initiated upstream
-  perftest, or application-level end-to-end throughput — those belong
-  to other skills.
+  does not explicitly mention "doca-gpunetio-ib-write-bw" or "GPUNetIO"
+  — typical implicit phrasings include "measure WRITE BW when the GPU
+  posts the WRs", "BW swings between runs on the same flags", "is the
+  NIC saturated or am I CPU-bound on the CUDA kernel", "meson compile
+  fails for the GPUNetIO bw tool", "nvidia_peermem isn't picking up my
+  GPU buffer", or "GPU-initiated WRITE throughput vs CPU-initiated
+  perftest". Refuse and route elsewhere for general doca-gpunetio
+  library work, DOCA install, the GPU-initiated WRITE latency analog,
+  the CPU-initiated upstream perftest, or application-level end-to-end
+  throughput — those belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - gpunetio
+    - bandwidth
 compatibility: >
   Requires DOCA SDK on Linux with a BlueField DPU or ConnectX NIC,
   NVIDIA GPU, CUDA toolkit and nvcc, loaded `nvidia_peermem`, and an
   InfiniBand RNIC paired with the GPU. Uses `pkg-config` for
   doca-gpunetio, doca-rdma, and doca-common, plus the installed
   gpunetio_ib_write_bw sources. Run only on a trusted, non-shared IB
-  fabric during the benchmark window.
+  fabric during the benchmark window. The validation steps require a
+  live DOCA install.
 ---
 
 # DOCA GPUNetIO ib_write_bw
+
+## Examples
+
+- **"What sustained RDMA-WRITE bandwidth can GPUNetIO deliver on
+  this GPU-NIC pair?"** — this is in scope. Stay on
+  `gpunetio_ib_write_bw`; do not retune a live GPI app here.
+- **"Where is the bottleneck — GPU occupancy, NIC issue rate, or
+  link saturation?"** — decompose throughput before changing
+  the CUDA kernel.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+run / debug. Open the capabilities companion for GPU-NIC pairing
+and observability. Do not open every companion file.
 
 **Where to start:** This is a tool skill for the GPUNetIO-
 flavored `ib_write_bw` benchmark shipped under
@@ -38,11 +58,11 @@ built from source against the installed DOCA via `meson`).
 It measures sustained RDMA WRITE bandwidth when the WRs are
 posted **from a CUDA kernel through the doca-gpunetio
 device-side surface**, with the GPU on the data path. Open
-[`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure) for the GPU-NIC
+the tasks companion and start at
+`## configure` for the GPU-NIC
 pairing precondition and the build pattern; jump to
-[`## run`](TASKS.md#run) for the smoke-before-bulk flow.
-Open [`CAPABILITIES.md`](CAPABILITIES.md) when the question
+`## run` for the smoke-before-bulk flow.
+Open the capabilities companion when the question
 is *what this tool actually measures*, *how the result
 decomposes (GPU occupancy vs NIC issue rate vs link
 saturation)*, or *how the result reads against the GPI
@@ -51,9 +71,9 @@ sister tool and the upstream CPU-initiated `perftest`
 [`doca-setup`](../../doca-setup/SKILL.md) first; if the
 user is still deciding between the GPI and GPUNetIO
 programming surfaces, the picture in
-[`../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes`](../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes)
+[`doca-gpunetio`](../../libs/doca-gpunetio/SKILL.md)
 and
-[`../../libs/doca-gpi/CAPABILITIES.md#capabilities-and-modes`](../../libs/doca-gpi/CAPABILITIES.md#capabilities-and-modes)
+[`doca-gpi`](../../libs/doca-gpi/SKILL.md)
 is the first stop.
 
 ## Example questions this skill answers well
@@ -68,10 +88,10 @@ instance.
   *"measure sustained WRITE BW between two hosts with an
   H100 + ConnectX-7 on each side"*. Answered by the
   GPU-NIC pairing precondition in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the bring-up flow in
-  [`TASKS.md ## configure`](TASKS.md#configure) +
-  [`TASKS.md ## run`](TASKS.md#run). The same shape
+  the tasks companion +
+  the tasks companion. The same shape
   answers *"measure GPUNetIO-driven WRITE BW between a
   host GPU and a BlueField DPU"*.
 - **"Where is the bottleneck — GPU compute occupancy, NIC
@@ -80,9 +100,9 @@ instance.
   saturated, am I CPU-bound on the client, or is the CUDA
   kernel not driving enough WRs in flight?"*. Answered by
   the throughput-decomposition rules in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
+  the capabilities companion
   + the eval-loop overlay in
-  [`TASKS.md ## test`](TASKS.md#test).
+  the tasks companion.
 - **"How does the result differ from the classic CPU-
   initiated `perftest` `ib_write_bw`?"** — worked example:
   *"my team has a CPU-initiated WRITE BW number on this
@@ -90,29 +110,29 @@ instance.
   or be different?"*. Answered by the *"GPU-initiated
   path adds (or removes) overhead vs the CPU-initiated
   path"* rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  the capabilities companion.
 - **"Is the doca-gpunetio path the right surface for my
   sustained-throughput workload class?"** — worked example:
   *"my application streams sensor data from GPU memory at
   line rate to a remote consumer"*. Answered by the
   *"when GPUNetIO is the right surface vs GPI vs CPU-
   initiated"* rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + the use-side decision in [`TASKS.md ## use`](TASKS.md#use).
+  the capabilities companion
+  + the use-side decision in the tasks companion.
 - **"My BW number swings between runs. What do I check
   before quoting it?"** — worked example: *"three runs at
   the same flags gave 145, 187, and 160 Gbit/s; is the
   benchmark noisy or is my platform inconsistent?"*.
   Answered by the measurement-soundness rules in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   layer 5 + the steady-state guidance in
-  [`TASKS.md ## test`](TASKS.md#test).
+  the tasks companion.
 - **"What version of DOCA + CUDA Toolkit do I need for this
   binary to build and run?"** — worked example: *"my
   install has DOCA at one semver and CUDA at another; will
   the ToT-shipped `gpunetio_ib_write_bw` even link?"*.
   Answered by the version overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  the capabilities companion
   which cross-links the canonical detection chain in
   [`doca-version`](../../doca-version/SKILL.md).
 
@@ -202,7 +222,7 @@ GPUNetIO, not the user's full pipeline.
 This is a **thin loader**. Substantive material lives in
 two companion files:
 
-- `CAPABILITIES.md` — what the tool measures (the
+- the capabilities companion — what the tool measures (the
   sustained-WRITE-BW primitive driven by a client-side
   CUDA kernel through doca-gpunetio), the
   runtime-surface selection rule (GPUNetIO vs GPI vs
@@ -218,7 +238,7 @@ two companion files:
   *"GPU-side handle is a credential"* rule from
   doca-gpunetio; the cross-cutting hardware-safety
   meta-policy).
-- `TASKS.md` — step-by-step workflows for the in-scope
+- the tasks companion — step-by-step workflows for the in-scope
   task verbs: `install` (preconditions — DOCA install,
   CUDA Toolkit, GPU + NIC pair, OOB connectivity),
   `configure` (build-tree under
@@ -268,7 +288,7 @@ not contain — and pull requests should not add:
 - **Wrappers, parsers, or scripts** in any language that
   consume the tool's stdout. The output format is small
   and documented in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability);
+  the capabilities companion;
   if the user wants to script against it, the right
   answer is *"read the live source, write the parser
   against your installed binary"*.
@@ -279,7 +299,7 @@ not contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's
+1. Read this skill first to confirm the user's
    question is in scope (the user actually wants to
    measure sustained kernel-initiated WRITE BW through
    GPUNetIO, not learn GPUNetIO as a library or do a
@@ -289,10 +309,10 @@ not contain — and pull requests should not add:
    `perftest`, the throughput-decomposition guide, the
    version overlay, the error taxonomy, the observability
    surface, and the safety overlay, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — `install`, `configure`,
    `build`, `modify`, `run`, `test`, `debug`, `use` — see
-   [TASKS.md](TASKS.md).**
+   the tasks companion.**
 
 ## Related skills
 
@@ -328,7 +348,7 @@ not contain — and pull requests should not add:
   `ib_write_bw` benchmark binary, so the GPI comparison is
   against the library surface, not a sibling tool. The
   selection rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   is the decision aid.
 - [`doca-version`](../../doca-version/SKILL.md) — the
   canonical version-detection chain, four-way match rule,

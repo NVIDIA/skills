@@ -1,40 +1,104 @@
 ---
-name: doca-flow
 license: Apache-2.0
+name: doca-flow
 description: >
-  Build and debug DOCA Flow applications on supported NVIDIA NICs/DPUs:
-  define match/action pipes, initialize ports and representors, choose
-  forwarding targets, validate pipes before hardware programming, read
-  counters, match the Flow version to the installed DOCA release, and
-  diagnose Flow API errors. Trigger on DOCA packet steering, classifier,
-  representor, rule-matching, hairpin, or 5-tuple-to-queue questions even
-  when "DOCA Flow" is not named. Route plain DPDK `rte_flow`, kernel TC,
-  OVS, BFB bring-up, and DPU OS installation elsewhere. DPU OS
-  installation is destructive and always requires explicit confirmation.
+  DOCA Flow packet steering on NVIDIA NICs/DPUs, linked into a C
+  application: match/action pipes, ports, representors, forwarding,
+  hairpin, counters. Trigger on packet steering, classifier,
+  rule-matching, representor, hairpin or 5-tuple-to-queue questions even
+  when "DOCA Flow" is not named. Remote or non-C++ control over gRPC
+  belongs to doca-flow-grpc-server. Also covers pipe validation before
+  hardware programming, Flow/DOCA version match, and Flow API errors.
+  First app: follow the local bundle (doca-setup, doca-programming-guide,
+  doca-flow, doca-public-knowledge-map). Stage 1 pull
+  nvcr.io/nvidia/doca/doca (NGC catalog tag, never invent); Stage 2 needs
+  a real NIC. Then ls samples inside the container; never emit main.c, a
+  Dockerfile, or hand-typed -l flags. Route software-only host pipelines,
+  plain DPDK `rte_flow`, kernel TC, OVS, BFB bring-up, and DPU OS
+  installation elsewhere. DPU OS installation is destructive and always
+  requires explicit confirmation.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - flow
+    - steering
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a supported NVIDIA NIC/DPU attached.
   Reads the user's local install via `pkg-config doca-flow` and inspects
   /opt/mellanox/doca/{lib,include,samples,applications}.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA Flow
 
+## Examples
+
+- **"How do I bring up a Flow port on a representor?"** — this is in
+  scope. Use the installed header and a shipped sample; do not author
+  a first-app `main.c`.
+- **"Match 5-tuple and send to a queue."** — express it as a Flow
+  pipe. Do not fall back to kernel tc or iptables.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+modify / debug. Open the capabilities companion for the pipe-spec
+schema and safety policy. Do not open every companion file.
+For connection tracking, read the tasks companion's `flow-ct` section
+before starting ports: CT initialization is process-global and must precede
+port start. Adding CT to running ports requires an approved interruption
+and reconstruction from a captured configuration, not a per-port
+`doca_ctx_start` call or reuse of invalidated pipe handles.
+
+## Non-negotiable: first app is NGC pull + a shipped sample, not authored C
+
+When the user is new to DOCA, has docker, has no host DOCA, or asks
+for a first Flow app, do this **before host `pkg-config` and before
+any source listing**:
+
+1. **Bundle first.** This answer follows the local doca-skills
+   bundle: [`doca-setup`](../../doca-setup/SKILL.md) (Stage 1 vs
+   Stage 2), [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+   (modify a shipped sample), this `doca-flow` skill, and
+   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+   Name those skills. Do not invent other skill names.
+2. **Stage 1 vs Stage 2 before any command.** Stage 1 = NGC container
+   on a laptop (compile / learn; no real packets). Stage 2 = a real
+   BlueField or ConnectX for pipe runtime. Docker compiles only; do
+   not say the app works entirely inside docker.
+3. **Path 0 (Stage 1).** Copy a tag from
+   https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags
+   using *How to pick an NGC tag without guessing* — never invent one.
+   Then `docker pull nvcr.io/nvidia/doca/doca:<tag>` and
+   `docker run -it --rm -v $HOME/dev:/work nvcr.io/nvidia/doca/doca:<tag> bash`.
+   Do not invent a `Dockerfile`. Do not build DOCA from source.
+4. **Resume inside the container (MUST, after `docker run`):** quote this
+   hand-off — do not skip it for a full tutorial: "Paste back the output
+   of `pkg-config --modversion doca-flow` and
+   `ls /opt/mellanox/doca/samples/doca_flow/`." Then: "I resume from
+   doca-programming-guide ## modify step 1 with the real install in
+   hand." Name a directory that listing shows; copy it. If `ls` is
+   empty, stop — do not scaffold. Use `doca-flow` on that `pkg-config`
+   line, not `doca-common`.
+5. **Never** emit a new `main.c`, `Makefile`, `Dockerfile`, or
+   hand-typed `-l` / `-L` flags. Paste `pkg-config --libs doca-flow`.
+
 ## Non-negotiable: the deliverable uses DOCA Flow, not kernel tc/iptables
 
-When this skill is in scope, the user is asking for **DOCA Flow**. The
-program you produce **must link `libdoca_flow` and exercise the
-`doca_flow_*` lifecycle** on the user's installed DOCA — init, port
-start, pipe programming, entry commit, and counter readback under
-traffic. Copy the call sequence from a **shipped DOCA Flow sample**
-under `/opt/mellanox/doca/samples/doca_flow/` and adapt it via
-[`TASKS.md ## configure`](TASKS.md#configure) /
-[`TASKS.md ## modify`](TASKS.md#modify). Verify every symbol against
+When this skill is in scope, the user is asking for **DOCA Flow**. After
+the shipped-sample copy above, the binary you build **must link
+`libdoca_flow` and exercise the `doca_flow_*` lifecycle** on the user's
+installed DOCA — init, port start, pipe programming, entry commit, and
+counter readback under traffic. Copy the call sequence from that
+**shipped DOCA Flow sample** under `/opt/mellanox/doca/samples/doca_flow/`
+and adapt it via ## configure /
+## modify. Verify every symbol against
 the installed header ([Ground rule](#ground-rule-verify-every-api-name-against-the-installed-header)
 below) and the add-entry table in
-[`CAPABILITIES.md ## API surface and name guards`](CAPABILITIES.md#api-surface-and-name-guards).
+## API surface and name guards.
 Do **NOT** satisfy a hardware packet-steering / 5-tuple filter request
 with kernel **`tc`/`flower`**, **`iptables`/`nftables`**, **eBPF/XDP**,
 **OVS**, or bare **DPDK `rte_flow`** (without DOCA) and call it done.
@@ -55,11 +119,20 @@ A tool whose `ldd` shows no `libdoca_flow` is a failed DOCA Flow task,
 regardless of whether a rule landed in the NIC. Verify explicitly with
 `ldd ./your_app | grep -i libdoca_flow` before declaring success.
 
-**Where to start:** Open [`TASKS.md`](TASKS.md) to *do* something
+**Never invent a link line.** For `undefined reference` / link
+failures, run `pkg-config --libs doca-flow` plus companion **module
+names** (`doca-common`, `doca-argp`, `doca-dpdk-bridge`, `libdpdk`)
+and paste that output. Those names stay on the pkg-config command;
+never turn them into hand-typed `-l` / `-L` flags or a guessed
+install path. The shipped sample's `meson.build` `dependency()` list
+is the module set; `pkg-config` is the only translator into linker
+flags.
+
+**Where to start:** Open the tasks companion to *do* something
 (configure / build / modify / run / test / debug); open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what can
+the capabilities companion when the question is *what can
 Flow express* on this version. **You MUST open
-[`TASKS.md ## configure`](TASKS.md#configure) before writing or running
+## configure before writing or running
 any port code** — its bring-up gate decides whether the binary launches
 at all, so reading this loader alone is never enough. If DOCA is not
 installed yet, route to [`doca-setup`](../../doca-setup/SKILL.md) first.
@@ -82,10 +155,10 @@ DOCA Flow ships no backward-compat alias header, so a
 "reasonable-looking" name that is not in the header simply does not
 link. Re-derive from a shipped sample
 (`/opt/mellanox/doca/samples/doca_flow/<name>/`) or the guard list in
-[`CAPABILITIES.md ## API surface and name guards`](CAPABILITIES.md#api-surface-and-name-guards),
+## API surface and name guards,
 never from prose.
 
-## Port bring-up: the gate lives in TASKS.md
+## Port bring-up: the gate lives in the tasks companion
 
 A port that compiles clean and aborts the instant
 `doca_flow_port_start()` runs is the canonical bring-up failure. The
@@ -95,7 +168,7 @@ VNF mode or the installed switch sample's `doca_dev_rep` path — device
 taken from launch args not hard-coded, and the binary returning a
 non-zero exit from `main()` if the bridge cannot arm and forward) is
 enforced step-by-step in
-[`TASKS.md ## configure`](TASKS.md#configure) step 6 — open it before
+## configure step 6 — open it before
 writing or running port code; do not reconstruct the gate from this
 summary.
 
@@ -110,7 +183,7 @@ not silently emit half-correct code — when:**
    (*match → actions → fwd*); answer with the correct pipe-graph shape
    instead of code — typically a classifier pipe → a per-flow encap pipe
    → a per-flow forward pipe (see
-   [`CAPABILITIES.md ## Pipe decomposition`](CAPABILITIES.md#pipe-decomposition-one-logic-step-per-pipe)).
+   ## Pipe decomposition).
 2. **The request asks for something the hardware cannot do** (per-packet
    match on payload bytes outside L4, mutable match keys, …). Name the
    closest legal shape and stop.
@@ -142,28 +215,28 @@ The CLASSES of Flow questions this skill answers (the *class* is the
 load-bearing piece; the example is one instance):
 
 - **"How do I bring up a Flow port on a representor?"** →
-  [`TASKS.md ## configure`](TASKS.md#configure) +
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  ## configure +
+  ## Capabilities and modes.
 - **"How do I express *<match X, do Y>* as a pipe?"** →
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + [`TASKS.md ## modify`](TASKS.md#modify).
+  ## Capabilities and modes
+  + ## modify.
 - **"Will this pipe spec program the HW, or will commit fail?"** →
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
-  + [`TASKS.md ## test`](TASKS.md#test).
+  ## Safety policy
+  + ## test.
 - **"How do I read Flow counters to investigate observed traffic?"** →
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
-  + [`TASKS.md ## debug`](TASKS.md#debug).
+  ## Observability
+  + ## debug.
 - **"My Flow port won't start — `Failed to get hws cap` / `dest action
   ROOT … err -121`."** → device-placement signature (not a pipe bug);
   the steering plane belongs to the DPU Arm on a `SEPARATED_HOST` /
   NIC-mode BlueField. See the device-placement bullet in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + [`TASKS.md ## configure`](TASKS.md#configure) step 2 + Step 0 of
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  ## Capabilities and modes
+  + ## configure step 2 + Step 0 of
+  ## debug.
 - **"How do I add hardware-accelerated stateful 5-tuple connection
   tracking (aging, NAT) on top of my existing doca-flow setup?"** →
-  [`CAPABILITIES.md ## flow-ct`](CAPABILITIES.md#flow-ct) +
-  [`TASKS.md ## flow-ct`](TASKS.md#flow-ct).
+  ## flow-ct +
+  ## flow-ct.
 
 ## Audience
 
@@ -172,7 +245,7 @@ library — code that calls `doca_flow_*` (in C/C++, or via FFI from another
 language) to program packet steering on a supported NVIDIA NIC/DPU with DOCA
 installed at `/opt/mellanox/doca`. Flow ships as a C library (`pkg-config`
 module `doca-flow`, package `doca-sdk-flow` on Ubuntu / RHEL / SLES) and the
-samples are C, so C/C++ is the canonical path the `TASKS.md` examples assume;
+samples are C, so C/C++ is the canonical path the the tasks companion examples assume;
 other-language consumers reach the same `*.so` through FFI, and the skill
 keeps its API-surface, lifecycle, capability-discovery, error-taxonomy, and
 safety guidance language-neutral.
@@ -193,7 +266,7 @@ any language:
   missing prerequisite vs unsupported on this hardware / install).
 - Designing non-C bindings (Rust, Go, Python, …) over the Flow C ABI.
 - Adding stateful CT (`doca_flow_ct.h`) on top of an existing port
-  (see [`TASKS.md ## flow-ct`](TASKS.md#flow-ct)).
+  (see ## flow-ct).
 
 Do **not** load for general DOCA orientation, "where do I find docs",
 install-layout, or non-Flow library questions — use
@@ -204,13 +277,13 @@ install-layout, or non-Flow library questions — use
 This is a **thin loader**; substantive material lives in two companion
 files:
 
-- [`CAPABILITIES.md`](CAPABILITIES.md) — what Flow can express on this
+- the capabilities companion — what Flow can express on this
   version: supported match and action kinds, pipe-decomposition rules,
   the API surface + commonly-invented-name guard list, the Flow
   `DOCA_ERROR_*` overlay, the per-entry / per-pipe observability
   surface, version notes, the safety policy, and the CT companion
   surface.
-- [`TASKS.md`](TASKS.md) — workflows for the six in-scope verbs
+- the tasks companion — workflows for the six in-scope verbs
   (`configure`, `build`, `modify`, `run`, `test`, `debug`), plus
   `## flow-ct` (stateful-CT overlay), `## shared-resources` (shared
   encap / decap / counter / meter / RSS / IPsec-SA / PSP overlay),
@@ -221,7 +294,7 @@ The skill assumes DOCA is installed at `/opt/mellanox/doca` and the user can
 open a `doca_dev`. Installing DOCA, hugepages setup, and the EAL `dv_flow_en`
 devargs prep go through [`doca-setup`](../../doca-setup/SKILL.md); the
 hugepages / devargs runtime prerequisites a binary needs *before* a Flow port
-starts are pinned in [`TASKS.md ## configure`](TASKS.md#configure) step 5.
+starts are pinned in ## configure step 5.
 
 ## What this skill deliberately does not ship
 
@@ -233,17 +306,17 @@ source is the shipped C sample at
 user there and prescribes a minimum-diff edit via the modify-a-sample
 workflow in
 [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) plus
-the Flow overrides in [`TASKS.md ## build`](TASKS.md#build), and builds
+the Flow overrides in ## build, and builds
 any manifest *in the user's project* against the user's install, where
 `pkg-config --modversion doca-flow` is the source of truth.
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the question is in scope.
+1. Read this skill first to confirm the question is in scope.
 2. For the pipe-spec schema, capability matrix, error taxonomy,
    observability, and safety policy, see
-   [`CAPABILITIES.md`](CAPABILITIES.md).
-3. For step-by-step workflows, see [`TASKS.md`](TASKS.md).
+   the capabilities companion.
+3. For step-by-step workflows, see the tasks companion.
 
 ## Related skills
 
