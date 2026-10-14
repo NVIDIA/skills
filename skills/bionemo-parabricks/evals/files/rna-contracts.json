@@ -1,0 +1,122 @@
+{
+  "parabricks_version": "4.7.1",
+  "reference_assets": "The FASTA and STAR library use the same reference sequences and annotation; the library was built by STAR 2.7.2a. Input data paths are deployment paths, not local files to probe.",
+  "jobs": [
+    {
+      "id": "per_alignment",
+      "cpu_star_argv": [
+        "STAR",
+        "--genomeDir",
+        "/ref/GRCh38_STAR_2.7.2a",
+        "--readFilesIn",
+        "/reads/P_R1.fastq.gz",
+        "/reads/P_R2.fastq.gz",
+        "--outSAMattrRGline",
+        "ID:P",
+        "SM:P",
+        "PU:P.1",
+        "--outSAMtype",
+        "BAM",
+        "Unsorted",
+        "--outSAMunmapped",
+        "Within",
+        "KeepPairs",
+        "--outFilterMultimapNmax",
+        "10"
+      ],
+      "target": {
+        "reference": "/ref/GRCh38.fa",
+        "output_directory": "/results/per_alignment/star",
+        "bam": "/results/per_alignment/per_alignment.bam",
+        "mark_duplicates": false
+      },
+      "required_behavior": "The CPU STAR unsorted BAM is sorted later. A consumer requires one unmapped-mate record for every reported alignment of the mapped mate, including multi-mappers. Keep that record multiplicity in the final sorted BAM; ordinary unmapped-read inclusion is insufficient."
+    },
+    {
+      "id": "ordinary",
+      "cpu_star_argv": [
+        "STAR",
+        "--genomeDir",
+        "/ref/GRCh38_STAR_2.7.2a",
+        "--readFilesIn",
+        "/reads/O_R1.fastq.gz",
+        "/reads/O_R2.fastq.gz",
+        "--outSAMattrRGline",
+        "ID:O",
+        "SM:O",
+        "PU:O.1",
+        "--outSAMtype",
+        "BAM",
+        "SortedByCoordinate",
+        "--outSAMunmapped",
+        "Within",
+        "KeepPairs",
+        "--runThreadN",
+        "16"
+      ],
+      "target": {
+        "reference": "/ref/GRCh38.fa",
+        "output_directory": "/results/ordinary/star",
+        "bam": "/results/ordinary/ordinary.bam",
+        "mark_duplicates": false
+      },
+      "required_behavior": "Coordinate-sorted BAM with ordinary unmapped-read inclusion. No adjacency or extra unmapped-mate copies for multi-mapping alignments are required. No duplicate marking."
+    },
+    {
+      "id": "primary_ties",
+      "cpu_star_argv": [
+        "STAR",
+        "--genomeDir",
+        "/ref/GRCh38_STAR_2.7.2a",
+        "--readFilesIn",
+        "/reads/T_R1.fastq.gz",
+        "/reads/T_R2.fastq.gz",
+        "--outSAMattrRGline",
+        "ID:T",
+        "SM:T",
+        "PU:T.1",
+        "--outSAMtype",
+        "BAM",
+        "SortedByCoordinate",
+        "--outSAMprimaryFlag",
+        "AllBestScore"
+      ],
+      "target": {
+        "reference": "/ref/GRCh38.fa",
+        "output_directory": "/results/primary_ties/star",
+        "bam": "/results/primary_ties/primary_ties.bam",
+        "mark_duplicates": false
+      },
+      "required_behavior": "Preserve the AllBestScore policy: all alignments tied for best score must retain primary status. Do not substitute a single-primary policy."
+    },
+    {
+      "id": "unmatched_lanes",
+      "cpu_star_argv": [
+        "STAR",
+        "--genomeDir",
+        "/ref/GRCh38_STAR_2.7.2a",
+        "--readFilesIn",
+        "/reads/U_L1_R1.fastq.gz,/reads/U_L2_R1.fastq.gz",
+        "/reads/U_L1_R2.fastq.gz",
+        "--outSAMattrRGline",
+        "ID:U1",
+        "SM:U",
+        "PU:U.1",
+        ",",
+        "ID:U2",
+        "SM:U",
+        "PU:U.2",
+        "--outSAMtype",
+        "BAM",
+        "SortedByCoordinate"
+      ],
+      "target": {
+        "reference": "/ref/GRCh38.fa",
+        "output_directory": "/results/unmatched_lanes/star",
+        "bam": "/results/unmatched_lanes/unmatched_lanes.bam",
+        "mark_duplicates": false
+      },
+      "required_behavior": "Keep both paired-end lanes. A mate file may be missing; do not guess names, concatenate lanes, or change pairing."
+    }
+  ]
+}
