@@ -77,17 +77,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 77.1% — baseline ran, but no comparable score was available; uplift unavailable | 72.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 83.3% → 83.3% (±0.0 points) | 66.7% → 58.3% (-8.4 points) |
-| Correctness | 46.7% → 93.3% (+46.6 points) | 36.7% → 80.0% (+43.3 points) |
-| Discoverability | 85.0% — baseline ran, but no comparable score was available; uplift unavailable | 77.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 34.7% → 60.1% (+25.4 points) | 37.1% → 61.3% (+24.2 points) |
-| Efficiency | 63.7% — baseline ran, but no comparable score was available; uplift unavailable | 85.1% — baseline ran, but no comparable score was available; uplift unavailable |
-
-Overall verdict: PASS — Recommended for publication (Tier 1 passed with observations, Tier 2 passed, Tier 3 passed).
+| Overall | 70.8% — baseline ran, but no comparable score was available; uplift unavailable | 83.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 58.3% (-41.7 points) | 83.3% → 83.3% (±0.0 points) |
+| Correctness | 30.0% → 86.7% (+56.7 points) | 33.3% → 93.3% (+60.0 points) |
+| Discoverability | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 27.9% → 67.1% (+39.2 points) | 30.6% → 71.6% (+41.0 points) |
+| Efficiency | 62.1% — baseline ran, but no comparable score was available; uplift unavailable | 83.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-ac263cc (source: git SHA, committed 2026-10-08) <br>
+5a4d563 (source: git SHA, committed 2026-10-13) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
