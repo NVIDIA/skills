@@ -14,3 +14,5 @@ links:
 skills:
   - path: skills/bionemo-agent-toolkit/skills/parabricks/
     catalog_dir: bionemo-parabricks
+  - path: skills/bionemo-agent-toolkit/skills/genomics-workflow-acceleration/
+    catalog_dir: bionemo-genomics-workflow-acceleration
