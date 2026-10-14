@@ -23,5 +23,3 @@ Everything here except `assets/` (the logo, and a 2:1 `banner.png` for the Herme
 - `skills/` — copied from the canonical `skills/` catalog
 - `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, `.cursor-plugin/plugin.json` — per-agent manifests
 - `plugin.json` — portable [Agent Plugins 1.0.0](https://agent-plugins.org/schemas/1.0.0/plugin.schema.json) manifest, read by Agent Plugins compatible clients such as Hermes
-
-The plugin is listed in all three self-hosted marketplaces, each named `nvidia-official`. To change what it bundles, edit `plugins.d/nvidia-skills.yml` and re-run the build script.
