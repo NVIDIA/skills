@@ -205,6 +205,13 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "bionemo-parabricks",
+      "path": "skills/bionemo-parabricks",
+      "content_digest": "sha256:8477f2bddc7ebdb0a831e82b7d778a01463a768bcb76a0b5903437b542f670b9",
+      "last_commit": "ab9edfd1ef0f2932b3018aef8efeddb8624205ca",
+      "last_modified": "2026-10-14"
+    },
+    {
       "name": "bionemo-proteinmpnn-nim",
       "path": "skills/bionemo-proteinmpnn-nim",
       "content_digest": "sha256:201722da7ea14df60542473d9ec621de924404af5a49f0dc646065108f956fd1",

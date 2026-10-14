@@ -349,6 +349,18 @@
       }
     },
     {
+      "path": "skills/bionemo-parabricks",
+      "name": "parabricks",
+      "description": "Plan NVIDIA Parabricks pbrun commands, translate CPU options and check runtime readiness. Use for individual tools, including planning-only questions.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "data-science",
+        "audience": "bioinformatician,genomics_researcher,computational_biologist,application_developer,developer",
+        "discovery.activity_tags": "generate,configure,convert,validate,assess"
+      }
+    },
+    {
       "path": "skills/bionemo-proteinmpnn-nim",
       "name": "proteinmpnn-nim",
       "description": "Run ProteinMPNN inverse folding via NVIDIA NIM to design protein sequences for a target backbone. Sends user-provided PDB files and design parameters to NVIDIA's hosted API, authenticated with an environment API key, or to a user-selected local NIM. Use for sequence design, backbone redesign, fixed chains and residues, omit_AAs, sampling temperature, soluble model, local Docker, and multi-FASTA output.\n",

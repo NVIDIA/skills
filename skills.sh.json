@@ -242,6 +242,7 @@
         "codonfm-setup",
         "nvflare-fed-stats",
         "nvidia-ontology-management",
+        "parabricks",
         "tao-mine-nearest-neighbors"
       ]
     },
