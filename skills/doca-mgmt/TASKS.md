@@ -217,8 +217,10 @@ Apply-with-rollback workflow (every modify pattern):
    or the re-query still differs, fail closed: stop all further
    writes, preserve the target identity plus pre-state, intended
    forward diff, post-write state, rollback call/result, and
-   post-rollback state, then escalate to the operator's
-   change-control / hardware-recovery path.
+   post-rollback state, then hand that bundle to the operator for
+   hardware recovery (out-of-band console or BMC per
+   `doca-hardware-safety`, then NVIDIA support with the bundle). Do not
+   retry the write.
 9. **Hold the rollback path ready for the duration of the
    change window.** The user does not declare the change "done"
    until either (a) the workload has resumed and the device's
@@ -324,9 +326,10 @@ Iteration shape:
    capture the exact target, sub-domain, parameters, capability
    result, return value, and post-operation `_get` / `_query`
    state; restore the captured pre-state using the prepared
-   rollback; re-query; and escalate the unexpected
-   firmware/library behavior. Do not continue negative testing or
-   promote the operation.
+   rollback; re-query; and report the unexpected firmware/library
+   behavior to the user with that capture, as a defect for NVIDIA support
+   (DOCA version, firmware version, opcode, parameters). Do not continue
+   negative testing or promote the operation.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
 

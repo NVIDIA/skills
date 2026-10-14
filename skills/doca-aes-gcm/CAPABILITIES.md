@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 verbs `configure / build / modify / run / test / debug`), jump to
 [TASKS.md](TASKS.md). For the canonical DOCA version-handling rules
 that this skill layers an AES-GCM overlay on top of, see
-[`doca-version`](../../doca-version/SKILL.md).
+`doca-version/SKILL.md`.
 
 ## Pattern overview
 
@@ -55,7 +55,7 @@ Three cross-cutting rules that apply to *every* pattern above:
 DOCA AES-GCM is a **DOCA Core Context**. Every AES-GCM instance
 follows the universal `cfg-create → cfg-set-* → init → start → use
 → stop → destroy` lifecycle (see
-[`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)).
+`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`)).
 On top of that lifecycle, DOCA AES-GCM layers its own task model and
 key-size-selection surface.
 
@@ -97,7 +97,7 @@ rule:
   CPU + AES-NI is faster); when the user needs a non-GCM AES mode
   (CBC, CTR, XTS — use CPU + OpenSSL, not this library); or when
   the user needs *only* a keyed hash for authentication without
-  encryption (use [`doca-sha`](../doca-sha/SKILL.md) for hashing,
+  encryption (use `doca-sha/SKILL.md` for hashing,
   or a CPU HMAC).
 
 **AES-GCM key sizes — only 128 and 256.** AES-GCM is defined in
@@ -150,7 +150,7 @@ own program needs them.
 
 For the canonical DOCA version-detection chain, the four-way match
 rule, NGC container semantics, and the headers-win-over-docs rule,
-see [`doca-version`](../../doca-version/SKILL.md). The body lives
+see `doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The AES-GCM-specific overlay** is:
@@ -165,7 +165,7 @@ there; this skill does not duplicate it.
   `doca_aes_gcm_cap_task_encrypt_is_key_type_supported(devinfo, key_type)`
   / `_decrypt_is_key_type_supported(devinfo, key_type)` against
   the active device. Per the cross-cutting cap-query rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the cap query is the runtime authority — never quote a key
   type as available from agent memory.
 - **Per-device task presence is independent of the library install.**
@@ -176,35 +176,35 @@ there; this skill does not duplicate it.
   `_task_decrypt_is_supported(devinfo)` per the cross-cutting
   cap-query rule above; if one returns false on a device the user
   expected to support it, route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   before invoking the missing codepath.
 - **`doca-aes-gcm.pc` plus `doca-common.pc` must both match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   A common partial-install pattern on hosts where the AES-GCM
   package was installed separately from the rest of DOCA is that
   `doca-aes-gcm.pc` reports release *X* while `doca-common.pc`
   reports release *Y*; route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any AES-GCM-layer diagnosis.
 
 ## Error taxonomy
 
 AES-GCM-specific overlays on the cross-library `DOCA_ERROR_*`
 taxonomy. The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *AES-GCM surface* meaning that the agent must
 disambiguate before falling back to the cross-library response.
 
 | Error | AES-GCM context where it shows up | AES-GCM-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; task submit before the matching `_set_conf` ran | Lifecycle violation. Walk the call sequence against the lifecycle in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes); confirm the task type the user is submitting was enabled via `doca_aes_gcm_task_*_set_conf` before `doca_ctx_start()`. |
+| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; task submit before the matching `_set_conf` ran | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); confirm the task type the user is submitting was enabled via `doca_aes_gcm_task_*_set_conf` before `doca_ctx_start()`. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_aes_gcm_task_*_alloc_init`; submit time | The configured key size is not in the supported set, OR the plaintext exceeds `doca_aes_gcm_cap_task_encrypt_get_max_buf_size(devinfo)`, OR the auth tag length the user passed does not match the AES-GCM spec. Re-run the matching cap query, then resize or correct the tag length. |
 | `DOCA_ERROR_NOT_SUPPORTED` | `_task_*_set_conf`; submit with an unsupported key type | The task type is not in this device's accelerator, OR the configured key type is not in this device's supported set. Re-run `doca_aes_gcm_cap_task_*_is_supported` / `_is_key_type_supported` against the active `doca_devinfo`; if false, that is the answer — fall back to CPU or change the key type. |
 | `DOCA_ERROR_NOT_PERMITTED` | First task submission | The source mmap does not have `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY` (or a stronger flag that supersedes it), OR the destination mmap is missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`, OR the program lacks the access the user's key-handling layer requires. Re-check the matrix in [`## Safety policy`](#safety-policy). |
 | `DOCA_ERROR_AGAIN` | `doca_task_submit` on either AES-GCM task type | The task queue is full. This is *not* a hardware error; the program must drain completions via `doca_pe_progress()` before re-submitting. Same as the cross-library *"would-block, retry after progress"* pattern. |
 | `DOCA_ERROR_IO_FAILED` (or equivalent device-reported error on the decrypt completion) | `doca_aes_gcm_task_decrypt` completion | **Auth tag verification FAILED on decrypt.** This is the security-relevant outcome: the ciphertext was tampered with or corrupted in transit / at rest. The plaintext output of this task is *poisoned* — do not consume it. Treat the input ciphertext as untrusted, log a security event, and route to the user's application-layer policy for tampered input. Do NOT silently retry. |
-| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure. Capture state and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the AES-GCM program. |
+| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure. Capture state and route to env-class debug (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the AES-GCM program. |
 
 The agent's rule: **never recommend a retry loop on `DOCA_ERROR_*`
 without first identifying which of the rows above is the cause**.
@@ -256,14 +256,14 @@ Four primary signals the agent should reach for:
 
 For cross-cutting observability primitives (`--sdk-log-level`, the
 `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package layout)
 defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 DOCA AES-GCM's safety surface is **buffer-permission discipline plus
 AEAD discipline plus key-handling discipline plus path-selection
@@ -340,7 +340,7 @@ operational rules:
 - **Authentication without encryption.** If the user needs only a
   keyed hash for integrity (e.g. an HMAC over a plaintext payload),
   AES-GCM is the wrong tool. Route to
-  [`doca-sha`](../doca-sha/SKILL.md) for hardware-accelerated SHA
+  `doca-sha/SKILL.md` for hardware-accelerated SHA
   hashing, or to CPU HMAC.
 
 **The mmap must stay valid until the AES-GCM context is destroyed.**
@@ -373,11 +373,11 @@ topics the agent will get asked but should route elsewhere:
   is the operational key-handling discipline in
   [`## Safety policy`](#safety-policy).
 - **DOCA Core context and progress engine internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   This skill *uses* the Core context lifecycle; it does not
   redefine it.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the AES-GCM overlay, not the taxonomy itself.
 - **Other DOCA crypto-acceleration libraries (DOCA SHA, DOCA
   Compress, DOCA DMA)** — separate libraries with their own skills

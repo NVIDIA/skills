@@ -15,7 +15,7 @@ header. Each domain ships its own small `doca_telemetry_<domain>_*`
 C API: a capability query on a `doca_devinfo`, a context created
 on a `doca_dev`, a per-domain `_start`, per-domain read / sample
 calls, then `_stop` / `_destroy`. The publishing / export side is
-the sibling [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
+the sibling `doca-telemetry-exporter/SKILL.md`
 library — a separate skill.
 
 Read this file when the loader sent you here from
@@ -23,7 +23,7 @@ Read this file when the loader sent you here from
 (the verbs `configure / build / modify / run / test / debug`),
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers a per-domain
-overlay on top of, see [`doca-version`](../../doca-version/SKILL.md).
+overlay on top of, see `doca-version/SKILL.md`.
 
 ## Pattern overview
 
@@ -47,7 +47,7 @@ Two cross-cutting rules that apply to *every* pattern above:
   is the library the user's application links to *read* hardware
   counters off a `doca_dev`. The application-side publishing of
   labeled metrics / OTLP logs is
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md),
+  `doca-telemetry-exporter/SKILL.md`,
   a sibling library with its own skill. Wiring the exporter's
   API into a reader application (or this library's API into a
   publishing application) is the load-bearing first-app failure
@@ -77,7 +77,7 @@ confusion between them is the #1 first-app failure.
 | Side | What it does | What it does NOT do | Where it lives |
 | --- | --- | --- | --- |
 | Reader (this library, `doca-telemetry`) | Reads **hardware counters** off a `doca_dev` through one of the six per-domain contexts: PCC / DPA / DIAG / ADP-RETX / PHY / PCI counter snapshots | Publish / export counter values to a monitoring pipeline; define a schema; bind a socket / port; consume events from another process | Linked INTO the user's application; reads the local device through the per-domain C API |
-| Exporter (sibling library, `doca-telemetry-exporter`) | Application-side **publishing** of labeled metrics / structured telemetry / OTLP logs | Read hardware counters off a device | A separate library with its own skill at [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md). Wiring its API into a reader application is the load-bearing first-app failure this skill exists to prevent |
+| Exporter (sibling library, `doca-telemetry-exporter`) | Application-side **publishing** of labeled metrics / structured telemetry / OTLP logs | Read hardware counters off a device | A separate library with its own skill at `doca-telemetry-exporter/SKILL.md`. Wiring its API into a reader application is the load-bearing first-app failure this skill exists to prevent |
 
 **Per-domain sub-libraries.** The public surface is exactly
 these six. The agent must not invent a seventh, and must not
@@ -85,7 +85,7 @@ invent a generic "telemetry collector" context. Exact symbol
 names are install-bound — confirm against the user's installed
 headers under `$(pkg-config --variable=includedir doca-common)`
 per the headers-win-over-docs rule in
-[`doca-version`](../../doca-version/SKILL.md).
+`doca-version/SKILL.md`.
 
 | Header | Domain | Counter family it reads | Per-domain cap query |
 | --- | --- | --- | --- |
@@ -114,7 +114,7 @@ domain (or, for `phy` / `pci`, a sub-area / feature) is on this
 install + this device, call the matching
 `doca_telemetry_<domain>_cap_is_supported(devinfo)` query (per
 the cross-cutting cap-query rule in
-[`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability)).
+`doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`)).
 The query is the runtime authority. Asserting *"this device
 supports PHY FEC histograms"* from memory without the cap query
 is the silent-fail case — when the device does not expose it,
@@ -131,22 +131,22 @@ recommending reader setup.
 
 | Use DOCA Telemetry (this skill) when … | Use a different primitive when … |
 | --- | --- |
-| The user is reading hardware counters (PCC / DPA / DIAG / ADP-RETX / PHY / PCI) off a `doca_dev` from inside their own application | The user wants to **PUBLISH / EXPORT** counter values to a monitoring pipeline (OTLP / Prometheus / labeled metrics) — that is [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md), the sibling publisher library |
+| The user is reading hardware counters (PCC / DPA / DIAG / ADP-RETX / PHY / PCI) off a `doca_dev` from inside their own application | The user wants to **PUBLISH / EXPORT** counter values to a monitoring pipeline (OTLP / Prometheus / labeled metrics) — that is `doca-telemetry-exporter/SKILL.md`, the sibling publisher library |
 | The user needs the structured per-domain counter snapshot the device exposes through the public per-domain C API | The user wants plain structured stdout / per-line logging from their own program — use `doca-log`; the per-domain cap-query discipline is overhead they do not need |
-| The user is consuming the device's own hardware counters | The user wants a turnkey, deployed aggregation service across a fleet — that is the externally-productized DOCA Telemetry Service (DTS), **out of scope** for this bundle (see [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) non-goals); or a generic NetFlow / IPFIX / Prometheus collector outside the DOCA family |
+| The user is consuming the device's own hardware counters | The user wants a turnkey, deployed aggregation service across a fleet — that is the DOCA Telemetry Service (DTS), owned by `doca-dts` (see `doca-public-knowledge-map/SKILL.md` non-goals); or a generic NetFlow / IPFIX / Prometheus collector outside the DOCA family |
 
 ## Version compatibility
 
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-docs
-rule, see [`doca-version`](../../doca-version/SKILL.md). The body
+rule, see `doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The per-domain reader overlay** is:
 
 - **Use `pkg-config --modversion doca-telemetry` as the
   build-time anchor.** Per
-  [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure),
+  `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`),
   this MUST match the other version sources in the four-way
   match. The set of domains — and the per-counter / per-sub-area
   surface each domain exposes — is bound to BOTH the DOCA
@@ -157,7 +157,7 @@ lives there; this skill does not duplicate it.
   release.** When the user reports *"I'm reading guides about
   doca-telemetry-exporter — is that this library?"*, the answer
   is no: that is the publishing side, with its own skill at
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md).
+  `doca-telemetry-exporter/SKILL.md`.
   The two `.pc` files coexist on a normal install; using the
   wrong one for the user's intent is the load-bearing first-app
   failure and the agent must walk the role split (per
@@ -165,11 +165,11 @@ lives there; this skill does not duplicate it.
   picking a `pkg-config` module.
 - **`doca-telemetry.pc` plus `doca-common.pc` must both match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   A common partial-install pattern after a DOCA upgrade is that
   `doca-telemetry.pc` lingers from the previous release while
   `doca-common.pc` was refreshed; route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   ladder step 2 before any reader-layer diagnosis.
 - **New per-domain counters / sub-areas appear across
   releases.** A counter family or PHY sub-area present on a newer
@@ -182,7 +182,7 @@ lives there; this skill does not duplicate it.
 
 Per-domain-reader overlays on the cross-library `DOCA_ERROR_*`
 taxonomy. The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *reader surface* meaning the agent must
 disambiguate before falling back to the cross-library response.
 
@@ -193,7 +193,7 @@ disambiguate before falling back to the cross-library response.
 | `DOCA_ERROR_AGAIN` | A per-domain read / sample call (notably `diag` and the sampled domains) | The hardware-counter snapshot / sample cycle is **not ready yet**. The correct response is to retry after the documented sample window (for diag, after the previous sampling cycle completes — see the explicit note on `doca_telemetry_diag_query_counters`), NOT to spin in a tight loop. See [`## Safety policy`](#safety-policy) sample-window rule |
 | `DOCA_ERROR_INVALID_VALUE` | A read into an undersized output buffer; a setter passed an out-of-range value (e.g. `diag` log-num-samples beyond the cap, `adp_retx` bin count beyond `_cap_get_hist_max_bins`) | A size / range mismatch against the install's caps. Re-read the relevant `_cap_get_*` sizing query and size the buffer / value to it; do not widen blindly |
 | `DOCA_ERROR_NOT_PERMITTED` | Context create / start; a privileged counter read | The running user lacks the privilege the device requires for this counter domain (some diagnostic / PHY counters require elevated access). Walk the [`## Safety policy`](#safety-policy) permission row; this is endpoint/privilege-specific, not a blanket "add sudo" |
-| `DOCA_ERROR_IO_FAILED` | Context create; read | The device / driver layer below DOCA reported failure (firmware query failed, device went away). Capture state and route to env-class debug ([`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the reader program |
+| `DOCA_ERROR_IO_FAILED` | Context create; read | The device / driver layer below DOCA reported failure (firmware query failed, device went away). Capture state and route to env-class debug (`doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the reader program |
 
 The agent's rule: **never recommend a retry loop on
 `DOCA_ERROR_*` without first identifying which row above is the
@@ -232,14 +232,14 @@ Two primary signals the agent should reach for:
 For the cross-cutting observability primitives
 (`--sdk-log-level`, the `doca-<lib>-trace` build flavor, the
 `DOCA_LOG_LEVEL` env var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The reader's safety surface is **cap-query-before-read +
 sample-window discipline + privilege for the specific counter
@@ -250,7 +250,7 @@ agent must prevent.
 | --- | --- | --- | --- |
 | Domain (and sub-area) cap-queried before read | `doca_telemetry_<domain>_cap_is_supported(devinfo)` (or the `pci` per-feature caps) returned `DOCA_SUCCESS` for the domain / sub-area the app will read | Code review at modify time; the read does not return `DOCA_ERROR_NOT_SUPPORTED` | Add the cap-query before the read. A read that assumes a domain the device does not expose is the canonical *"NOT_SUPPORTED out of nowhere"* failure |
 | Sample-window discipline on reads | The read loop retries on `DOCA_ERROR_AGAIN` only after the documented sample window; for `diag`, the next `_query_counters` waits for the previous sampling cycle to finish | Structured log shows spaced retries, not a tight spin; the diag read is not called mid-cycle | Space the retry to the sample period (`doca_telemetry_diag_set_sample_period` for diag); a tight `AGAIN` spin wastes CPU and never converges faster than the hardware sample window |
-| Running user has privilege for the counter domain | Some diagnostic / PHY / PCI counters require elevated device access; the running user has it | `id`; the create / start / read does not return `DOCA_ERROR_NOT_PERMITTED` | This is privilege for the *specific* counter domain, not a blanket sudo. Fix via the env-side privilege grant (route to [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure)) rather than running the whole app as root reflexively |
+| Running user has privilege for the counter domain | Some diagnostic / PHY / PCI counters require elevated device access; the running user has it | `id`; the create / start / read does not return `DOCA_ERROR_NOT_PERMITTED` | This is privilege for the *specific* counter domain, not a blanket sudo. Fix via the env-side privilege grant (route to `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`)) rather than running the whole app as root reflexively |
 
 - **The reader is read-only.** Do not invent a `_publish()` /
   `_emit()` / `_register_schema()` shape on any per-domain
@@ -258,7 +258,7 @@ agent must prevent.
   nothing more. If the user wants their app to ALSO publish the
   values it read to a monitoring pipeline, that requires a
   SEPARATE
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
+  `doca-telemetry-exporter/SKILL.md`
   context inside the same application — not a method on the
   reader context.
 - **Cap-query before every domain you read.** Each of the six
@@ -279,26 +279,21 @@ hardware-counter reader libraries. Adjacent topics the agent
 will get asked but should route elsewhere:
 
 - **The publishing / export side** —
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
+  `doca-telemetry-exporter/SKILL.md`
   is the sibling skill for the application-side publisher
   library. This skill is reader-side only; any "how do I
   emit / publish a counter value" question routes there.
 - **The DOCA Telemetry Service (DTS) — operating / deploying
-  the service itself** — DTS is an externally-productized NVIDIA
-  service that is NOT in `doca/services/` at the bundle-aligned
-  DOCA release; it is **out of scope** for this bundle. Reach its
-  docs via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
-  non-goals.
+  the service itself** — owned by `doca-dts`.
 - **NetFlow / IPFIX / local-socket collector frameworks** — the
   per-domain reader libraries do NOT expose a collector /
   schema-transport surface. Route any such question to a generic
   collector outside the DOCA family, to
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md)
-  for publishing, or to DTS (out of scope) for productized
+  `doca-telemetry-exporter/SKILL.md`
+  for publishing, or to `doca-dts` for productized
   aggregation.
 - **DOCA Core context internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   Note the per-domain reader does NOT use the generic
   `doca_ctx_*` / progress-engine surface; it uses per-domain
   `_create` / `_start` / `_stop` / `_destroy` directly.
@@ -306,12 +301,12 @@ will get asked but should route elsewhere:
   use `doca-log`; the per-domain cap-query discipline is
   overhead the user does not need for plain logs.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the reader overlay (the
   `NOT_SUPPORTED`-means-domain-not-exposed rule and the
   `AGAIN`-means-snapshot-not-ready rule), not the taxonomy
   itself.
 - **Cross-cutting debug ladder** (install / version / build /
   link / runtime / program / driver) — owned by
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug).
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`).
   This skill's `## debug` overlays the runtime + program layers.

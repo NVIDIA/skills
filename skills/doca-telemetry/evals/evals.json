@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-telemetry.explicit-positive.v1",
-      "prompt": "Use the doca-telemetry skill to help me. I'm working on: reading **DOCA hardware-counter events** from a `doca_dev` via the per-domain DOCA Telemetry reader libraries \u2014 `doca_telemetry_pcc`, `_dpa`, `_diag`, `_adp_retx`, `_phy`, `_pci`. This is the **counter-READER** surface \u2014 there is no NetFlow / IPFIX / local-socket collector framework here; the bundle previously framed it that way and that framing is wrong. Each domain ships its own `doca_telemetry_{domain}_*` API: cap-query `_cap_is_supported(devinfo)`, `_create()` on a `doca_dev`, `_start()`, then per-domain read / sample.",
+      "prompt": "Use the doca-telemetry skill for this task: I'm running into this: \"read PCC counters from my BlueField app\". Can you walk me through it?",
       "expected_skill": "doca-telemetry",
       "expected_output": "The agent selects the doca-telemetry skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -17,7 +17,7 @@
       "expected_skill": "doca-telemetry",
       "expected_output": "The agent recognizes this as a doca-telemetry issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-telemetry skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,18 +27,18 @@
       "expected_skill": "doca-telemetry",
       "expected_output": "The agent recognizes this as a doca-telemetry issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-telemetry skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-telemetry.negative.v1",
-      "prompt": "I actually need help with the publishing / export side. Which skill should handle this, and why is it not doca-telemetry?",
+      "prompt": "I need to define my own event schema and publish my application's metrics out to a collector. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-telemetry; it explains that the publishing / export side is out of doca-telemetry's scope and routes to the appropriate skill instead.",
+      "expected_output": "The agent does not apply doca-telemetry's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-telemetry as the answer.",
       "assertions": [
-        "doca-telemetry is not selected as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) instead."
+        "The answer does not apply doca-telemetry's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

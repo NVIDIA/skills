@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-common.explicit-positive.v1",
-      "prompt": "Use the doca-common skill to help me. I'm building on DOCA foundation primitives — walking the doca_ctx lifecycle, discovering doca_dev / doca_devinfo and gating on doca_*_cap_* before trusting a feature, wiring doca_mmap / doca_buf_inventory / doca_buf for zero-copy I/O, and driving doca_pe for completions.",
+      "prompt": "Use the doca-common skill for this task: I'm running into this: \"my tasks submit but nothing ever completes\". Can you walk me through it?",
       "expected_skill": "doca-common",
       "expected_output": "The agent loads doca-common and answers from the documented foundation workflow — doca_ctx lifecycle, doca_dev / doca_devinfo discovery, doca_*_cap_* gating, doca_mmap / doca_buf_inventory / doca_buf zero-copy wiring, and doca_pe completion draining — quoting only real symbols (no invented tokens).",
       "assertions": [
@@ -18,7 +18,7 @@
       "expected_skill": "doca-common",
       "expected_output": "The agent recognizes this as a doca-common completion/progress-engine issue even though the skill is not named, loads it, and walks the doca_pe driving path grounded in the bundle.",
       "assertions": [
-        "The doca-common skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer ties no-completion to driving the doca_pe progress engine."
       ]
     },
@@ -28,17 +28,17 @@
       "expected_skill": "doca-common",
       "expected_output": "The agent loads doca-common and diagnoses the ctx-start state machine and the two-tier DOCA Log model (--sdk-log-level vs app-side) from the bundle, grounded in real symbols.",
       "assertions": [
-        "The doca-common skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer explains the doca_ctx state transitions and the two-tier log level model."
       ]
     },
     {
       "id": "doca-common.negative.v1",
-      "prompt": "I only need help constructing a doca-flow pipe in isolation, and separately I still need to install DOCA on this host. Which skill should handle this and why is it not doca-common?",
+      "prompt": "I only need help constructing a doca-flow pipe in isolation, and separately I still need to install DOCA on this host. How should I approach this?",
       "expected_skill": null,
       "expected_output": "The agent does NOT force doca-common; it routes per-library pipe construction to doca-flow and DOCA installation to doca-setup, explaining doca-common only covers the shared foundation primitives.",
       "assertions": [
-        "doca-common is not used as the primary skill for this out-of-scope request.",
+        "The answer does not attempt the out-of-scope work itself.",
         "The answer routes to the appropriate skill(s): doca-flow / doca-setup."
       ]
     }

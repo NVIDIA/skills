@@ -2,26 +2,24 @@
 license: Apache-2.0
 name: doca-programming-guide
 description: >
-  Use this skill when the user is writing their first DOCA app or
-  asking a library-agnostic programming question — picking a
-  shipped sample to copy and modify, wiring the canonical
-  pkg-config doca-{library} + meson build (or FFI from Rust / Go
-  / Python against the public C ABI), walking the cfg-create →
-  init → start → use → stop → destroy lifecycle, validating a
-  spec before commit, or decoding a DOCA_ERROR_* return with
-  doca_error_get_descr(). Trigger even when the user does not say
-  "DOCA programming guide" — implicit phrasings: "write my
-  first DOCA program", "meson line for doca_rdma_*", "got
-  DOCA_ERROR_BAD_STATE on my first call", "call DOCA from Rust
-  without writing C", "built clean but nothing on the wire",
-  "what order do doca_*_pipe calls go in". Refuse and route for
-  install / hugepages / pkg-config not resolving doca-{library}
-  (doca-setup), docs or version lookup
-  (doca-public-knowledge-map), and library-internal API
-  construction like Flow pipe topology or RDMA QP setup (matching
-  library skill).
+  Use this skill when the user is writing their first DOCA app or asking
+  a library-agnostic programming question — picking a shipped sample to
+  copy and modify, wiring pkg-config + meson (or FFI from Rust / Go /
+  Python against the public C ABI), walking the Core lifecycle (create →
+  configure → start → connect → use → stop → destroy), or decoding a
+  DOCA_ERROR_*. Trigger on implicit phrasing: "write my first DOCA
+  program", "meson line for doca_rdma_*", "DOCA_ERROR_BAD_STATE on first
+  call", "call DOCA from Rust", "built clean but nothing on the wire".
+  Refuse install / hugepages / pkg-config (doca-setup), docs or version
+  lookup (doca-public-knowledge-map), and library-internal API work
+  (matching library skill).
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - programming
+    - first-app
 compatibility: >
   No DOCA install required to read this skill (it is an overlay
   loaded against any DOCA artifact skill); the validation steps
@@ -30,11 +28,31 @@ compatibility: >
 
 # DOCA programming guide
 
+## Examples
+
+- **"How do I write my first DOCA program?"** — copy a shipped sample
+  and follow the modify workflow, then the canonical pkg-config + meson
+  build. Docker / NGC can compile and link; runtime needs a real
+  BlueField or ConnectX.
+- **"What's the lifecycle every DOCA object follows?"** — create →
+  configure → start → connect → use → stop → destroy. Configuration
+  finishes before start.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for how-to and
+the capabilities companion for coverage. Do not open every companion
+file.
+
 **Where to start:** Read [`## Audience`](#audience) to confirm the user
 is *consuming* DOCA, not *contributing* to it. Then jump to the H2
 that matches the verb (`## modify` for first-app derivation,
 `## build` for the canonical build pattern, `## test` for the test
-loop, `## debug` for the program-class debug ladder).
+loop, `## debug` for the program-class debug ladder). **Docker / NGC
+is the build half, not the runtime half.** The NGC container can
+compile and link. Flow pipe creation, RDMA QP ops, and any call
+that needs a `doca_dev` on a port need a real BlueField or
+ConnectX. Do not promise the app will work entirely inside docker.
 
 ## Example questions this skill answers well
 
@@ -44,44 +62,46 @@ to answer, each with one worked example. Library-specific overlays
 skill answers the library-agnostic shape.
 
 - **"How do I write my first DOCA program for &lt;any library&gt;?"** —
-  worked example: *"I want to write my first DOCA Flow application."*
-  Answered by the modify-a-shipped-sample workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify) plus the canonical build
-  pattern in [`TASKS.md ## build`](TASKS.md#build).
+  worked example: *"I have docker; help me build my first DOCA Flow
+  app."* Answered by the modify-a-shipped-sample workflow in
+  ## modify plus the canonical build
+  pattern in ## build. Say that docker
+  / NGC builds and links, but runtime needs a real NIC or DPU.
 - **"What's the right build line for any DOCA library?"** — worked
   example: *"How do I compile a program that calls `doca_rdma_*`?"*
   Answered by the `pkg-config doca-<library>` pattern in
-  [`TASKS.md ## build`](TASKS.md#build) (C/C++ Track 1) and the
+  ## build (C/C++ Track 1) and the
   FFI/bindings pattern in Track 2.
 - **"What's the lifecycle every DOCA object follows?"** — worked
   example: *"What's the right order of `doca_flow_pipe_*` calls in my
-  program?"* Answered by the cfg-create / init / start / use / stop /
-  destroy template in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  program?"* Answered by the Core order create → configure → start →
+  connect → use → stop → destroy in ## Capabilities and modes
+  (`cfg-create` / `init` implement configure and finish before start).
 - **"`DOCA_ERROR_*` came back — what does it mean and what do I do?"**
   — worked example: *"My code got `DOCA_ERROR_BAD_STATE`."* Answered
   by the cross-library `doca_error_get_descr()` rule in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the program-class debug order in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  ## debug.
 - **"My program built and started, but does nothing on the wire."** —
   worked example: *"My Flow program runs cleanly but no traffic is
   matched."* Answered by the validate-before-commit rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  ## Safety policy
   and the layered program-class debug ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  ## debug.
 - **"What does &lt;language&gt; consumer of DOCA look like (FFI /
   bindings)?"** — worked example: *"How do I call DOCA Comch from Rust
   without writing C?"* Answered by Track 2 of
-  [`TASKS.md ## build`](TASKS.md#build) (FFI against the public C
+  ## build (FFI against the public C
   ABI) and the language-neutral lifecycle in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  ## Capabilities and modes.
 - **"How should I classify and build all the shipped DOCA samples and
   applications? What's the difference between a sample and an
   application?"** — worked example: *"I tried to build all DOCA apps
   and 20/159 failed — which ones are real regressions vs missing
   optional stacks?"* Answered by the sample-vs-application model and
   the category / dependency / skip-vs-fail taxonomy in
-  [`TASKS.md ## sample-and-app-categorization`](TASKS.md#sample-and-app-categorization),
+  ## sample-and-app-categorization,
   which separates *"the SDK is broken"* from *"the optional GPU /
   RMAX / MPI stack is not on this BlueField"*.
 
@@ -141,8 +161,11 @@ actually program against DOCA** in a library-agnostic way:
   sample* workflow that every library skill extends with
   library-specific overrides — moved here from `doca-setup` because it
   is a programming verb, not an env verb.
-- The universal DOCA lifecycle (`cfg-create → init → start → use →
-  stop → destroy`) and how it manifests across libraries.
+- The universal DOCA Core lifecycle (`create → configure (including
+  permissions and task `set_conf`) → start → connect → use → stop →
+  destroy`) and how it manifests across libraries. Configuration MUST
+  finish before `doca_ctx_start()`. Connect is its own step after
+  start; do not write `connect/use` as one token.
 - The general `DOCA_ERROR_*` pattern, `doca_error_t`, and
   `doca_error_get_descr()` — the cross-library shape, not Flow- or
   RDMA-specific overlays.
@@ -176,7 +199,7 @@ This is a **thin loader**. The body keeps only the orientation needed
 to pick the right next file. The substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what every DOCA program looks like in the
+- the capabilities companion — what every DOCA program looks like in the
   abstract: the shape of DOCA (host / DPU / switch, libraries / apps /
   services / tools, build flavor selection rationale), the universal
   program lifecycle, the unified version-compat rule that applies to
@@ -184,7 +207,7 @@ companion files:
   the program-side observability surface (DOCA logging, capability
   snapshots), and the program-side safety policy that every library
   skill inherits.
-- `TASKS.md` — step-by-step workflows for the six in-scope programming
+- the tasks companion — step-by-step workflows for the six in-scope programming
   verbs: `configure`, `build`, `modify`, `run`, `test`, `debug`. The
   `## modify` verb owns the universal *derive a custom first app from
   a sample* pattern that every DOCA library skill extends with
@@ -212,9 +235,9 @@ It deliberately does not contain — and pull requests should not add:
   application source code is the shipped C samples on the user's
   installed system; the agent's job is to route the user to that file
   and prescribe a minimum-diff modification on it
-  ([`TASKS.md ## modify`](TASKS.md#modify)) — for C/C++ users — or to
+  (## modify) — for C/C++ users — or to
   route non-C users to the public C ABI surface that their bindings
-  will call ([`TASKS.md ## build`](TASKS.md#build) Track 2), *not* to
+  will call (## build Track 2), *not* to
   author the wrapper.
 - **Standalone build manifests** (`meson.build`, `CMakeLists.txt`,
   `Cargo.toml`, `setup.py`, `go.mod`, …) parked inside the skill. The
@@ -228,17 +251,17 @@ It deliberately does not contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is a
+1. Read this skill first to confirm the user's question is a
    programming-class question (not env, not routing, not library-API).
 2. **For the DOCA shape, the universal lifecycle, the cross-library
    error taxonomy, the program-side observability surface, and the
    safety policy that every library skill inherits, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step programming workflows — `configure`, `build`,
-   `modify`, `run`, `test`, `debug` — see [TASKS.md](TASKS.md).**
+   `modify`, `run`, `test`, `debug` — see the tasks companion.**
 
 If the user is asking for a *first app* in a specific library, walk
-through [`TASKS.md ## modify`](TASKS.md#modify) for the universal
+through ## modify for the universal
 copy-and-edit pattern, then hand off to the library skill (e.g.
 [`doca-flow`](../libs/doca-flow/SKILL.md)) for the library-specific values
 to swap.
@@ -259,3 +282,7 @@ to swap.
 - [`doca-flow`](../libs/doca-flow/SKILL.md) — DOCA Flow on BlueField.
   Extends this skill's `## modify` (universal first-app derivation)
   with the Flow-specific list of fields to swap.
+- [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+  — shipping an application that already builds: container manifests,
+  rollout, and service-readiness verification. This skill ends once the
+  program compiles and runs locally; it does not cover deploying it.

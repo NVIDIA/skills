@@ -13,7 +13,7 @@ compatibility, error taxonomy, observability surface, and safety
 policy that these workflows assume, see
 [CAPABILITIES.md](CAPABILITIES.md). For where to find docs, the
 installed DOCA layout, or release notes, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through
@@ -27,7 +27,7 @@ plus a compatible CUDA Toolkit before any GPI-specific work
 begins.
 
 This skill does **not** own DOCA installation; that path lives in
-[`doca-setup`](../../doca-setup/SKILL.md). The GPI-specific
+`doca-setup/SKILL.md`. The GPI-specific
 preconditions the agent verifies after a DOCA install:
 
 1. **`doca-gpi` `.pc` file is present.** `pkg-config
@@ -36,13 +36,13 @@ preconditions the agent verifies after a DOCA install:
    DOCA package set does not include GPI; the user needs to
    install the matching package (the exact package name is
    platform-specific and looked up via
-   [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package)).
+   `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`)).
 2. **Supporting `.pc` files are present.** GPI's DOCA
    dependencies (`dependencies/meson.build`) are `doca-dpa`,
    `doca-gpunetio`, and `doca-verbs`. All of their `pkg-config
    --modversion` results must agree with `doca-gpi` on the same
    DOCA semver per the four-way match in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 3. **Installed header exposes the symbols.** Check
    `doca_gpi.h` resolves under the installed DOCA infrastructure
    include tree. If the `.pc` resolves but the header is missing,
@@ -52,7 +52,7 @@ preconditions the agent verifies after a DOCA install:
    handle is consumed by `nvcc`-compiled kernels; the user must
    have a CUDA Toolkit version paired with the installed DOCA
    release per the release notes (looked up via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
+   `doca-public-knowledge-map/SKILL.md`).
    The agent does NOT quote a specific CUDA version from agent
    memory; the user reads the pairing from the DOCA release
    notes that match `doca_caps --version`.
@@ -62,11 +62,11 @@ preconditions the agent verifies after a DOCA install:
    DOCA side installs. Verify via `nvidia-smi` (or the
    user's equivalent GPU-side probe). The agent does not
    prescribe specific GPU drivers; routing for those goes
-   through [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+   through `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
    layer 5 (driver).
 
 If any precondition fails, **stop and route to
-[`doca-setup`](../../doca-setup/SKILL.md)**; a GPI-layer
+`doca-setup/SKILL.md`**; a GPI-layer
 diagnosis against a half-installed DOCA or a missing CUDA Toolkit
 wastes the user's time.
 
@@ -80,13 +80,13 @@ Steps the agent should walk the user through:
 
 1. **Confirm the installed DOCA version + CUDA version.** Use
    the procedure in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
    Quote the DOCA version (`pkg-config --modversion doca-gpi`,
    `doca_caps --version`) and the CUDA version (`nvidia-smi`
    for the driver-reported toolkit, `nvcc --version` for the
    build-time toolkit); do not assume "latest".
 2. **Identify GPU-datapath-capable devices.** Run `doca_caps
-   --list-devs` ([`doca-caps`](../../tools/doca-caps/SKILL.md))
+   --list-devs` (`doca-caps/SKILL.md`)
    to see which devices have the GPU-datapath capability. Note
    that `doca_gpi.h` exposes **no** `doca_gpi_cap_*` devinfo
    query — GPI has no runtime capability API — so the agent does
@@ -109,7 +109,7 @@ Steps the agent should walk the user through:
    **before** `doca_gpi_start` — the header states start "must be
    called after setting all the GPI attributes". Where the
    application drives the GPU datapath, do the
-   [`doca-gpunetio`](../doca-gpunetio/SKILL.md) setup here too.
+   `doca-gpunetio/SKILL.md` setup here too.
 5. **Start, then create the domain and attach memory.** Call
    `doca_gpi_start(gpi)`. Build a domain with
    `doca_gpi_domain_attr_create` + the sizing setters above +
@@ -158,15 +158,15 @@ canonical cross-library build pattern.
 The build pattern for any DOCA C/C++ consumer is **identical**
 across libraries — `pkg-config` for include + link flags, meson
 or CMake as the build system — and is fully documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the GPI-specific overlay:
 
 | Slot | Value for GPI | Why it matters |
 | --- | --- | --- |
 | `pkg-config` module name (host side) | `doca-gpi` | The library's `.pc` file installed by the DOCA host packages |
 | Co-required modules | `doca-gpunetio`, `doca-dpa`, `doca-verbs` | GPI's DOCA dependencies per `dependencies/meson.build`; the GPU-side handle type lives in `doca-gpunetio` and the transport layer is `doca-verbs`, so all must be reachable through `pkg-config` |
-| Header check | `doca_gpi.h` resolvable under the installed DOCA infrastructure include tree (path via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)) | If `pkg-config --cflags doca-gpi` resolves but the include is missing, the install is partial |
-| CUDA-side compilation | The CUDA kernel that consumes `struct doca_gpu_gpi_channel*` is compiled with `nvcc`, against the DOCA GPU NetIO device-side header set — routed to [`doca-gpunetio`](../doca-gpunetio/SKILL.md) for the device-side surface | Mixing host and CUDA toolchains on the same translation unit is the canonical reason a CUDA-side build "fails for no reason"; routed to GPU NetIO for the device-side details |
+| Header check | `doca_gpi.h` resolvable under the installed DOCA infrastructure include tree (path via `doca-public-knowledge-map/SKILL.md`) | If `pkg-config --cflags doca-gpi` resolves but the include is missing, the install is partial |
+| CUDA-side compilation | The CUDA kernel that consumes `struct doca_gpu_gpi_channel*` is compiled with `nvcc`, against the DOCA GPU NetIO device-side header set — routed to `doca-gpunetio/SKILL.md` for the device-side surface | Mixing host and CUDA toolchains on the same translation unit is the canonical reason a CUDA-side build "fails for no reason"; routed to GPU NetIO for the device-side details |
 | Minimum required DOCA version | Query with `pkg-config --modversion doca-gpi`; never hardcode in build files | Every `doca_gpi_*` symbol is `DOCA_EXPERIMENTAL`, so a version pin from agent memory is wrong by construction — the whole surface can shift between releases |
 | CUDA Toolkit pairing | The DOCA release notes for the installed version name the compatible CUDA Toolkit range | The pairing is a release-notes lookup, not an agent-memory recall |
 
@@ -184,14 +184,14 @@ set) as the starting point and apply a minimum-diff modification
 to express the new intent.
 
 The universal modify-a-shipped-sample workflow lives in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify).
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`).
 Use it as-is. The GPI-specific overlay is the *five-slot fill*
 the agent must elicit from the user before recommending any
 code-level edit:
 
 | Slot | What the agent asks the user | GPI-specific consideration |
 | --- | --- | --- |
-| 1. Starting code | Which GPI-using file or sample is the baseline? | If the user has no working baseline, use only a live, verified GPI baseline from the installed version. If none is available, route through [`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify) preconditions and [`doca-setup TASKS.md ## no-install`](../../doca-setup/TASKS.md#no-install) to obtain a real installed sample surface. Do not author GPI from prose and do not substitute an unverified GPUNetIO sample |
+| 1. Starting code | Which GPI-using file or sample is the baseline? | If the user has no working baseline, use only a live, verified GPI baseline from the installed version. If none is available, route through `doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`) preconditions and `doca-setup TASKS.md ## no-install` (`doca-setup/TASKS.md#no-install`) to obtain a real installed sample surface. Do not author GPI from prose and do not substitute an unverified GPUNetIO sample |
 | 2. Sizing change | Change domain channel count or per-channel work-queue depths? | Channel count is set on `doca_gpi_domain_attr` (`_set_num_channels`); WQE depths on `doca_gpi_channel_attr` (`_set_sq_wqe_num` / `_set_srq_wqe_num` / `_set_gpu_wqe_num`). There is no `doca_gpi_cap_*` query, so an out-of-range value fails at create time, not at a cap check; do not carry a number over from a different device |
 | 3. Memory binding | Add or remove a `doca_gpi_domain_attach_local_mmap` / `doca_gpi_domain_attach_remote_mmap` region? | Each attach needs an application-created `doca_mmap`; a remote attach requires the peer's `doca_mmap` exchanged out of band and is not safe to re-export without re-doing that exchange |
 | 4. Endpoint connection | Change how endpoint connection info is exchanged with the remote peer? | This is a re-architecture, not a tweak. The conn-info blob from `doca_gpi_channel_ep_conn_info_create` crosses an application-owned out-of-band channel (TCP, file, MPI, …); do not invent a built-in exchange |
@@ -215,17 +215,17 @@ Steps the agent should walk the user through:
    work; running the binary on one side alone produces a
    misleading hang. The peer must be running an RDMA stack
    (commonly an application using
-   [`doca-rdma`](../doca-rdma/SKILL.md) or the upstream verbs
+   `doca-rdma/SKILL.md` or the upstream verbs
    surface) reachable over IB / RoCE on the chosen GID.
 2. **Launch the CUDA kernel.** Load the CUDA binary, allocate
    GPU memory, and launch the kernel that consumes the
    GPU-side channel handle. The kernel launch incantation is
    not GPI's concern; the CUDA programming model is owned by
-   [`doca-gpunetio`](../doca-gpunetio/SKILL.md) and the upstream
+   `doca-gpunetio/SKILL.md` and the upstream
    CUDA documentation.
 3. **Capture the structured log on the host side.** Set
    `DOCA_LOG_LEVEL=trace` for the first run (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)).
    This is the cheapest way to make the host-side lifecycle
    visible on first failure. Treat the trace as sensitive because
    it can contain endpoint, descriptor, or connection metadata:
@@ -241,7 +241,7 @@ Steps the agent should walk the user through:
    kernel did not launch, (b) the descriptor exchange landed
    wrong, or (c) the remote peer silently disconnected. Route
    kernel-launch verification to
-   [`doca-gpunetio TASKS.md ## debug`](../doca-gpunetio/TASKS.md#debug);
+   `doca-gpunetio TASKS.md ## debug` (`doca-gpunetio/TASKS.md#debug`);
    route peer reachability back to [`## run`](#run) step 1 and the
    peer's RDMA stack. Check descriptor bytes between those two
    boundaries before diving into GPI internals.
@@ -317,7 +317,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | `DOCA_ERROR_*` from `doca_gpi_gpu_channel_get` | The channel was not yet created on a configured, started GPI instance | Re-walk steps 4-7 of [`## configure`](#configure); confirm `doca_gpi_start` and `doca_gpi_channel_create` ran before the handle was requested |
 | `DOCA_ERROR_*` from a create call | A domain / channel attribute value is out of range | GPI exposes no cap query, so re-derive a candidate from installed-version evidence and release notes, then use one corrected create attempt on the active device as the acceptance check |
 | Endpoint connect silently fails | Both sides ran `doca_gpi_channel_ep_connect` without error; no traffic flows | The conn-info blob or remote `doca_mmap` transported wrong, or the GID indexes don't agree; diff the bytes and re-confirm the GID selection |
-| CUDA kernel never observes a completion | The host side is fine; the kernel polls forever | Route kernel-launch verification to [`doca-gpunetio TASKS.md ## debug`](../doca-gpunetio/TASKS.md#debug); route peer reachability to [`## run`](#run) step 1 and the peer's RDMA stack; verify descriptor exchange between them |
+| CUDA kernel never observes a completion | The host side is fine; the kernel polls forever | Route kernel-launch verification to `doca-gpunetio TASKS.md ## debug` (`doca-gpunetio/TASKS.md#debug`); route peer reachability to [`## run`](#run) step 1 and the peer's RDMA stack; verify descriptor exchange between them |
 | `DOCA_ERROR_IN_USE` from `doca_gpi_destroy` | Domains or channels are still alive | Destroy every channel and domain and detach mmaps before destroy; the destroy does not auto-clean |
 
 Loop termination: allow at most two corrective iterations total
@@ -327,7 +327,7 @@ changes. Stop earlier when an iteration produces no new evidence
 observations). Treat either limit as an inconclusive plateau:
 capture the evidence, re-check the applicable GPI gate once, and
 escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured layer-1-through-5 evidence. Do not claim the
 cause is below GPI unless the captured evidence establishes that
 boundary.
@@ -339,7 +339,7 @@ program doesn't make forward progress), narrow the cause to a
 specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending GPI-specific
 fixes. This skill's overlay names the GPI-specific manifestation
@@ -355,7 +355,7 @@ at layers 5 (runtime) and 6 (program):
 - Confirm the CUDA kernel actually launched and is consuming
   the GPU-side handle. *No observable completions* is almost
   always a launch / handoff bug, not a GPI-spec bug; route to
-  [`doca-gpunetio`](../doca-gpunetio/SKILL.md) for the
+  `doca-gpunetio/SKILL.md` for the
   CUDA-side launch verification.
 - Confirm the descriptor exchange landed intact on both sides.
   This is application-owned and a common source of silent
@@ -382,13 +382,13 @@ at layers 5 (runtime) and 6 (program):
 
 Once the layer is identified, route to the matching debug verb
 on the matching skill: install / build / link / driver to
-[`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug);
+`doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`);
 CUDA-side debug to
-[`doca-gpunetio TASKS.md ## debug`](../doca-gpunetio/TASKS.md#debug);
+`doca-gpunetio TASKS.md ## debug` (`doca-gpunetio/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 ## use
 
@@ -422,7 +422,7 @@ The integration shape this skill teaches:
    consumes which channel so handles don't get crossed.
 4. **Operational handoff.** Production deployment uses the
    bundle's hardware-safety meta-policy
-   ([`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md))
+   (`doca-hardware-safety/SKILL.md`)
    for any change that touches the BlueField BFB, firmware,
    IOMMU mode, or host kernel parameters that affect
    GPUDirect-style memory mapping. GPI itself does not modify
@@ -445,9 +445,9 @@ so the agent does not invent guidance:
 
 - **install (of DOCA itself).** Installing DOCA, choosing
   packages, post-install verification, `pkg-config` wiring —
-  defer to [`doca-setup`](../../doca-setup/SKILL.md) and to the
+  defer to `doca-setup/SKILL.md` and to the
   install-tree layout in
-  [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill's `## install` verb assumes DOCA is already
   installed and only checks the GPI-specific preconditions.
 - **deploy.** Deploying GPI-using applications at scale across
@@ -465,7 +465,7 @@ so the agent does not invent guidance:
   stream ordering, and GPU memory model belong to the upstream
   CUDA documentation; the DOCA-side wiring for the CUDA-
   consumed surface belongs to
-  [`doca-gpunetio`](../doca-gpunetio/SKILL.md). This skill
+  `doca-gpunetio/SKILL.md`. This skill
   describes the GPI-side handoff (the GPU-side handle, the
   channel-connect call) but does not author CUDA kernels.
 - **Kernel-level driver install / firmware burn / IOMMU
@@ -473,9 +473,9 @@ so the agent does not invent guidance:
   burning new ConnectX firmware, modifying `mlxconfig`
   parameters, switching IOMMU mode at host boot — out of
   scope. Route to
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5 and to
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+  `doca-hardware-safety/SKILL.md`
   for the change-application discipline.
 
 ## Command appendix
@@ -487,7 +487,7 @@ worked example is a single instance.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent probes for the matching structured helper FIRST
 (`doca-env --json` for version + devices + libraries + drivers
 in one shot; `doca-capability-snapshot` for per-device
@@ -498,7 +498,7 @@ manual command in the row.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-gpi` | [`## install`](#install) step 1; [`## configure`](#configure) step 1 | What is the build-time DOCA GPI version? | A semver matching `doca_caps --version`. Disagreement = partial install; route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 |
+| `pkg-config --modversion doca-gpi` | [`## install`](#install) step 1; [`## configure`](#configure) step 1 | What is the build-time DOCA GPI version? | A semver matching `doca_caps --version`. Disagreement = partial install; route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 |
 | `pkg-config --modversion doca-gpi doca-gpunetio doca-dpa doca-verbs` | [`## install`](#install) step 2 | Do `doca-gpi` and its dependencies agree on the same DOCA semver? | A single semver repeated across all four. Any disagreement is the partial-install pattern |
 | `pkg-config --cflags --libs doca-gpi` | [`## build`](#build) | What include + link flags does the linker need? | Includes resolve under whichever include directory `pkg-config --cflags` reports on this install (do not hardcode the path); libs include `-ldoca_gpi` alongside its dependencies (`-ldoca_gpunetio`, `-ldoca_dpa`, `-ldoca_verbs`) |
 | `doca_caps --list-devs` | [`## install`](#install) step 5; [`## configure`](#configure) step 2 | Which devices on this host can be used as a `doca_dev` with GPU-datapath capability? | One row per visible device with PCIe address and capability flags; the GPU-datapath capability flag is the gate for GPI |
@@ -506,10 +506,10 @@ manual command in the row.
 | `nvcc --version` | [`## install`](#install) step 4; [`## build`](#build) | What CUDA Toolkit version will compile the GPU-side code? | A version that pairs with the installed DOCA per the release notes |
 | `cat /opt/mellanox/doca/applications/VERSION` | [`## install`](#install) step 1; [`## debug`](#debug) layer 1 | What does the install tree itself claim its version is? | A semver matching the other version sources |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | [`## run`](#run) step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition. Silence after `doca_gpi_start()` = the CUDA kernel was never launched or the host is no longer the right side to observe |
-| `dmesg | tail -n 40` (sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver log around the last GPI call? | Empty or recent benign messages. Repeated mlx5 / GPU-driver errors → driver-layer bug; route to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug) |
+| `dmesg | tail -n 40` (sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver log around the last GPI call? | Empty or recent benign messages. Repeated mlx5 / GPU-driver errors → driver-layer bug; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the GPI-specific rows on top.

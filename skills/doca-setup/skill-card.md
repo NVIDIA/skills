@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through verifying a DOCA install is healthy, preparing the build and runtime environment, debugging env-class failures, deciding container-vs-bare-metal deployment shape, and reaching a DOCA install from a host that does not have one via the NGC DOCA container fallback. <br>
+Use this skill when the user is dealing with the DOCA environment around their workload — verifying an install is healthy, preparing the build environment (pkg-config, headers, LD_LIBRARY_PATH, hugepages, devlink, representors), debugging env-class failures, deciding container-vs-bare-metal deployment shape, or reaching a DOCA install from a host that doesn't have one yet via the NGC DOCA container Stage-1 fallback. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA DOCA on BlueField DPUs who need to install, verify, configure, or troubleshoot the DOCA environment before running workloads. <br>
+Developers and engineers working with NVIDIA DOCA on BlueField DPUs who need to verify installations, prepare build and runtime environments, debug environment-class failures, or route deployment decisions between container and bare-metal paths. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,10 +25,13 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
-- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/) <br>
+- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [command-appendix.md](references/command-appendix.md) <br>
+- [hardware-binding.md](references/hardware-binding.md) <br>
+- [no-install.md](references/no-install.md) <br>
+- [recognize.md](references/recognize.md) <br>
 
 
 ## Skill Output: <br>
@@ -44,37 +47,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative) in the k8s-sandbox environment with the external Skill Evaluator profile. <br>
+4 evaluation tasks (3 positive, 1 negative) executed in isolated sandbox pods, each with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the right skill was loaded when needed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal and expected workflow. <br>
+- Efficiency: Checks for wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+45%) | 95% (+10%) |
-| Discoverability | 4 | 100% (+39%) | 83% (+22%) |
-| Effectiveness | 4 | 100% (+68%) | 91% (+42%) |
-| Efficiency | 4 | 77% (+22%) | 90% (+54%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 96.4% | 96.3% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 65.0% → 100.0% (+35.0 points) | 65.0% → 100.0% (+35.0 points) |
+| Discoverability | 98.3% | 91.7% |
+| Effectiveness | 62.1% → 98.8% (+36.7 points) | 65.8% → 98.1% (+32.3 points) |
+| Efficiency | 84.7% | 91.6% |
 
 ## Skill Version(s): <br>
-a62f6e2 (source: git SHA, committed 2026-07-22) <br>
+00a43cf (source: git SHA, committed 2026-10-11) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

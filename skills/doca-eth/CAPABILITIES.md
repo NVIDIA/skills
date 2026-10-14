@@ -11,9 +11,9 @@ Read this file when the loader sent you here from
 (the verbs `configure / build / modify / run / test / debug`),
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers an Ethernet overlay
-on top of, see [`doca-version`](../../doca-version/SKILL.md). For
+on top of, see `doca-version/SKILL.md`. For
 the steering side (which Flow rule sends which packet to which
-RX queue), defer to [`doca-flow`](../doca-flow/SKILL.md);
+RX queue), defer to `doca-flow/SKILL.md`;
 DOCA Ethernet is the *queue* surface, not the *steering*
 surface.
 
@@ -110,7 +110,7 @@ matching `_cap_*` query and use the matching `_set_*` setter.
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body lives
+`doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The Ethernet-specific overlay** is:
@@ -118,7 +118,7 @@ there; this skill does not duplicate it.
 - **RX-type availability and `doca_eth_*_cap_*` are the runtime
   authority, not the public docs.** Per the cross-cutting
   cap-query rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the agent must call `doca_eth_rxq_cap_is_type_supported(devinfo, type)`
   before promising the user that managed-recv or cyclic is on
   this device + DOCA version; checksum offload likewise gates on
@@ -127,30 +127,30 @@ there; this skill does not duplicate it.
   hallucination failure mode for this library.
 - **`doca-eth.pc` and `doca-common.pc` must both match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   Use `pkg-config --modversion doca-eth` as the build-time
   anchor; disagreement with `doca_caps --version` is a
   partial-install hazard and must be routed to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any Ethernet-layer diagnosis.
 
 ## Error taxonomy
 
 Ethernet-specific overlays on the cross-library `DOCA_ERROR_*`
 taxonomy. The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *Ethernet surface* meaning that the
 agent must disambiguate before falling back to the cross-library
 response.
 
 | Error | DOCA Ethernet context where it shows up | Ethernet-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; submitting a send-task on a `doca_eth_txq` that is not STARTED; posting a recv buffer on a `doca_eth_rxq` of the wrong type | Lifecycle violation. Walk the queue's own state against the universal lifecycle in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes); the most common case is treating RX and TX as one context. |
+| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; submitting a send-task on a `doca_eth_txq` that is not STARTED; posting a recv buffer on a `doca_eth_rxq` of the wrong type | Lifecycle violation. Walk the queue's own state against the universal lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is treating RX and TX as one context. |
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_eth_rxq_set_type` with a type the device does not advertise; `doca_eth_txq_set_*` for L3 checksum offload on a device that does not support it; oversized burst | Re-run the matching `doca_eth_<side>_cap_*` query against the active `doca_devinfo`; if the cap query says false, that is the answer — the user's device or DOCA version does not support the request. |
 | `DOCA_ERROR_NOT_PERMITTED` | `doca_dev_open` for a port or representor that the user has no access to; queue create after a permission downgrade | The device was not opened with the required access. Confirm sudo or `mlnx`-group membership per [`## Safety policy`](#safety-policy); do not modify the program. |
 | `DOCA_ERROR_AGAIN` | `doca_task_submit` for a TX send-task when the queue is full | The send queue is full. This is *not* a hardware error; drain completions via `doca_pe_progress()` before re-submitting. Same as the cross-library *"would-block, retry after progress"* pattern. |
 | `DOCA_ERROR_NO_MEMORY` | RX recv-task allocator or managed-recv internal buffer pool; large TX scatter-gather attempts | The descriptor or buffer pool is exhausted. The fix is to raise queue / pool sizing (within the cap) or to drain inbound completions faster, not to retry the allocation in a tight loop. |
-| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure. Capture state (`dmesg | tail`, `mlxconfig -d <pcie> q`) and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the program. |
+| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure. Capture state (`dmesg | tail`, `mlxconfig -d <pcie> q`) and route to env-class debug (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the program. |
 
 The agent's rule: **never recommend a retry loop on
 `DOCA_ERROR_*` without first identifying which of the rows
@@ -158,9 +158,9 @@ above is the cause**. `_AGAIN` is the only one that wants a
 retry (after `doca_pe_progress()`); the others want
 investigation, not retry. And *"no packets arriving"* is
 **never** a `DOCA_ERROR_*` — it is the steering side; route to
-[`doca-flow`](../doca-flow/SKILL.md) or to the
+`doca-flow/SKILL.md` or to the
 promiscuous-mode workaround in
-[`doca-setup`](../../doca-setup/SKILL.md), not to the Ethernet
+`doca-setup/SKILL.md`, not to the Ethernet
 error taxonomy.
 
 ## Observability
@@ -196,17 +196,17 @@ Three primary signals the agent should reach for:
    driver layer at all. A linkdown port is a silent ingress
    queue; the agent must check it before any Ethernet-layer
    diagnosis. Defer to
-   [`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability)
+   `doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`)
    for the env-side observability primitives.
 
 For the cross-library debug-time observability
 (`DOCA_LOG_LEVEL=trace`, `--sdk-log-level`, the trace build
 flavor) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 DOCA Ethernet's safety surface is **access, port state, and
 steering**. The single most common first-app failure is *"my
@@ -220,9 +220,9 @@ DOCA Ethernet setup:
 
 | Precondition | What must be true before `doca_ctx_start()` | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
-| Device access | The `doca_dev` was opened against a port / representor / SF the user has permission to use (typically requires sudo or `mlnx`-group membership) | `id` for group membership; the open call failing with `DOCA_ERROR_NOT_PERMITTED` is the runtime symptom | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side; do not modify the program |
-| Port up | The underlying port reports linkup at the driver layer (`devlink dev show` reports `state: PORT_ACTIVE`; `ip link` shows the device `UP,LOWER_UP`) | `devlink dev show`; `ip -j link show <dev>`; `ethtool <dev>` | [`doca-setup CAPABILITIES.md ## Capabilities and modes`](../../doca-setup/CAPABILITIES.md#capabilities-and-modes) port-bring-up; do not modify the program |
-| Traffic actually reaches the RX queue | Either a DOCA Flow rule steers matching packets to this `doca_eth_rxq`, OR the underlying interface is in promiscuous mode at the kernel layer so every packet on the wire reaches the queue | Inspect the flow rule programmed for this queue (or the absence of one); `ip link show <dev>` reports the `PROMISC` flag if promiscuous mode is on | [`doca-flow`](../doca-flow/SKILL.md) for the steering side (canonical); [`doca-setup`](../../doca-setup/SKILL.md) for the promiscuous-mode workaround (expedient first-run path only) |
+| Device access | The `doca_dev` was opened against a port / representor / SF the user has permission to use (typically requires sudo or `mlnx`-group membership) | `id` for group membership; the open call failing with `DOCA_ERROR_NOT_PERMITTED` is the runtime symptom | `doca-setup/SKILL.md` for the env-side; do not modify the program |
+| Port up | The underlying port reports linkup at the driver layer (`devlink dev show` reports `state: PORT_ACTIVE`; `ip link` shows the device `UP,LOWER_UP`) | `devlink dev show`; `ip -j link show <dev>`; `ethtool <dev>` | `doca-setup CAPABILITIES.md ## Capabilities and modes` (`doca-setup/CAPABILITIES.md#capabilities-and-modes`) port-bring-up; do not modify the program |
+| Traffic actually reaches the RX queue | Either a DOCA Flow rule steers matching packets to this `doca_eth_rxq`, OR the underlying interface is in promiscuous mode at the kernel layer so every packet on the wire reaches the queue | Inspect the flow rule programmed for this queue (or the absence of one); `ip link show <dev>` reports the `PROMISC` flag if promiscuous mode is on | `doca-flow/SKILL.md` for the steering side (canonical); `doca-setup/SKILL.md` for the promiscuous-mode workaround (expedient first-run path only) |
 
 **RX and TX queues are independent — do not share lifecycles.**
 A `doca_eth_rxq` and a `doca_eth_txq` each have their own

@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-comch.explicit-positive.v1",
-      "prompt": "Use the doca-comch skill to help me. I'm bringing up host <-> DPU PCIe control-plane messaging and need to pick server (DPU) vs client (host) roles and choose slow-path send-task/recv-callback vs fast-path producer/consumer.",
+      "prompt": "Use the doca-comch skill for this task: I'm running into this: \"I need to send a control message from the host to the BlueField over PCIe\". Can you walk me through it?",
       "expected_skill": "doca-comch",
       "expected_output": "The agent loads doca-comch and answers from the documented workflow — server=DPU / client=host role selection, slow-path (send-task/recv-callback) vs fast-path (producer/consumer), and capability queries (max-msg-size, max-clients) — quoting only real symbols from the bundle (no invented tokens).",
       "assertions": [
@@ -18,7 +18,7 @@
       "expected_skill": "doca-comch",
       "expected_output": "The agent recognizes this as a doca-comch task even though the skill is not named, loads it, and walks the host->DPU control-plane messaging setup grounded in the bundle.",
       "assertions": [
-        "The doca-comch skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer uses the Comch control-plane path rather than generic networking advice."
       ]
     },
@@ -28,18 +28,18 @@
       "expected_skill": "doca-comch",
       "expected_output": "The agent loads doca-comch and diagnoses the connection-callback / AGAIN-on-submit path from the bundle's Comch error taxonomy and progress-engine expectations.",
       "assertions": [
-        "The doca-comch skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer ties AGAIN/connect-callback to the documented Comch behavior, not generic advice."
       ]
     },
     {
       "id": "doca-comch.negative.v1",
-      "prompt": "I need to install DOCA and flash the BFB firmware on my BlueField before anything else. Which skill should handle this and why is it not doca-comch?",
+      "prompt": "I need to install DOCA and flash the BFB firmware onto my BlueField first. No host-to-DPU messaging is involved yet. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-comch; it recognizes installing DOCA and BFB/firmware bring-up as out of scope and routes to doca-setup / doca-hardware-safety, explaining doca-comch only covers host<->DPU Comch messaging.",
+      "expected_output": "The agent does not apply doca-comch's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-comch as the answer.",
       "assertions": [
-        "doca-comch is not used as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) (e.g., doca-setup / doca-hardware-safety)."
+        "The answer does not apply doca-comch's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

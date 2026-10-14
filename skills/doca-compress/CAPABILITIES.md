@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 (the verbs `configure / build / modify / run / test / debug`),
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers a Compress overlay
-on top of, see [`doca-version`](../../doca-version/SKILL.md).
+on top of, see `doca-version/SKILL.md`.
 
 ## Pattern overview
 
@@ -49,7 +49,7 @@ Two cross-cutting rules that apply to *every* pattern above:
 DOCA Compress is a **DOCA Core Context**. Every `doca_compress`
 instance follows the universal `cfg-create → cfg-set-* → init →
 start → use → stop → destroy` lifecycle (see
-[`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)).
+`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`)).
 On top of that lifecycle, DOCA Compress layers its own task model:
 DEFLATE encode and DEFLATE / LZ4 decode modes, each independently
 capability-gated.
@@ -107,7 +107,7 @@ agent's rule:
   rule of thumb is: DEFLATE both directions; LZ4 decompress
   only; everything else (zstd / Snappy / brotli / …) → CPU.
   When the user only wants to move bytes without encoding them,
-  use [`doca-dma`](../doca-dma/SKILL.md) — pure mmap-to-mmap copy
+  use `doca-dma/SKILL.md` — pure mmap-to-mmap copy
   is DMA's job, not Compress's.
 
 **The size-threshold the cap query does NOT report.** The
@@ -150,7 +150,7 @@ coming from the library; query the active capability values via
 
 For the canonical DOCA version-detection chain, the four-way match
 rule, NGC container semantics, and the headers-win-over-docs rule,
-see [`doca-version`](../../doca-version/SKILL.md). The body lives
+see `doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The Compress-specific overlay** is:
@@ -162,42 +162,42 @@ there; this skill does not duplicate it.
   `doca_compress_cap_task_compress_deflate_is_supported(devinfo)`
   and `_decompress_deflate_is_supported(devinfo)` against the
   active device. Per the cross-cutting cap-query rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the cap query is the runtime authority — never quote either
   task as available from agent memory.
 - **`doca-compress.pc` plus `doca-common.pc` must both match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   A common partial-install pattern on hosts where the Compress
   package was installed separately from the rest of DOCA is that
   `doca-compress.pc` reports release *X* while `doca-common.pc`
   reports release *Y*; route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any Compress-layer diagnosis.
 - **Per-task max buffer size is device-bound, not version-bound.**
   The `_get_max_buf_size` queries are the runtime authority; the
   matching `version-matrix.json` row records the *promise*. If
   the two disagree, the cap-query value wins, per the
   headers-win-over-docs rule in
-  [`doca-version`](../../doca-version/SKILL.md).
+  `doca-version/SKILL.md`.
 
 ## Error taxonomy
 
 Compress-specific overlays on the cross-library `DOCA_ERROR_*`
 taxonomy. The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *Compress surface* meaning that the agent
 must disambiguate before falling back to the cross-library
 response.
 
 | Error | Compress context where it shows up | Compress-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; destroying the source or destination `doca_mmap` before `doca_ctx_destroy()` | Lifecycle violation. Walk the call sequence against the lifecycle in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes); the most common case is releasing a source / destination mmap underneath a still-running context. |
+| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; destroying the source or destination `doca_mmap` before `doca_ctx_destroy()` | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing a source / destination mmap underneath a still-running context. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_compress_task_compress_deflate_alloc_init`; `doca_compress_task_decompress_deflate_alloc_init`; submit time | The source buffer is larger than the matching `_get_max_buf_size` for the task type, OR the destination buffer is too small for the worst-case output (compress: input that does not compress well can produce slightly more bytes than the input; decompress: output can be substantially larger than the compressed input). Re-run the matching cap query, then resize. |
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_compress_task_*_set_conf`; first submit | The requested task type is not available on this device's accelerator. Re-run the matching `doca_compress_cap_task_*_is_supported(devinfo)` query; if false, that is the answer — the user's device cannot offload this task type. Fall back to CPU compression or pick a different device. |
 | `DOCA_ERROR_NOT_PERMITTED` | First task submission | The source mmap does not have `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY` (or a stronger flag that supersedes it), OR the destination mmap is missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`. Re-check the matrix in [`## Safety policy`](#safety-policy). |
 | `DOCA_ERROR_AGAIN` | `doca_task_submit` on either Compress task type | The task queue is full. This is *not* a hardware error; the program must drain completions via `doca_pe_progress()` before re-submitting. Same as the cross-library *"would-block, retry after progress"* pattern. |
-| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure (driver / firmware / accelerator). Capture state and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the Compress program. |
+| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure (driver / firmware / accelerator). Capture state and route to env-class debug (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the Compress program. |
 
 The agent's rule: **never recommend a retry loop on `DOCA_ERROR_*`
 without first identifying which of the rows above is the cause**.
@@ -240,14 +240,14 @@ Three primary signals the agent should reach for:
 For cross-cutting observability primitives (`--sdk-log-level`,
 the `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env
 var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 DOCA Compress's safety surface is **buffer-permission discipline
 plus path-selection discipline**. The library reads from a source
@@ -288,7 +288,7 @@ important:
   library that implements it, not to invent a DOCA workaround.
 - **Pure copy, no compression.** If the user only wants to move
   bytes between two `doca_mmap` regions without encoding them,
-  [`doca-dma`](../doca-dma/SKILL.md) is the right library — its
+  `doca-dma/SKILL.md` is the right library — its
   memcpy task is purpose-built for that pattern. Layering
   doca-compress on top wastes accelerator cycles on encoding
   output the user does not want.
@@ -318,14 +318,14 @@ topics the agent will get asked but should route elsewhere:
   skill assumes the user already knows they want DEFLATE and is
   asking *how to express it through the DOCA Compress API*.
 - **DOCA Core context and progress engine internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   This skill *uses* the Core context lifecycle; it does not
   redefine it.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the Compress overlay, not the taxonomy itself.
 - **Pure mmap-to-mmap copies** — owned by
-  [`doca-dma`](../doca-dma/SKILL.md). When the user wants bytes
+  `doca-dma/SKILL.md`. When the user wants bytes
   moved without encoding, DMA is the answer; Compress is not.
 - **Other DOCA accelerator libraries (DOCA SHA, DOCA AES-GCM,
   DOCA Erasure Coding, …)** — separate libraries with their own
@@ -334,7 +334,7 @@ topics the agent will get asked but should route elsewhere:
   them; the deep per-library substance lives in the matching
   skill.
 - **Cross-library `doca_caps` invocation patterns** — owned by
-  the cross-library [`doca-caps`](../../tools/doca-caps/SKILL.md)
+  the cross-library `doca-caps/SKILL.md`
   tool skill. This skill references the *Compress capability
   query family* (`doca_compress_cap_*`), which is per-library;
   the *cross-library capability snapshot tool* (`doca_caps

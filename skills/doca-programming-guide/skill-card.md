@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through library-agnostic DOCA programming tasks including first-app derivation from shipped samples, the canonical pkg-config build pattern, the universal DOCA object lifecycle, cross-library error decoding, and program-class debugging. <br>
+Guides developers through library-agnostic DOCA programming tasks including writing a first app from a shipped sample, the canonical pkg-config + meson build pattern, the Core object lifecycle, DOCA_ERROR decoding, and FFI/bindings for non-C consumers. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building applications that consume DOCA libraries, in C/C++ directly or via FFI/bindings from Rust, Go, or Python against the public C ABI. <br>
+Developers and engineers building applications that consume DOCA libraries use this skill to follow library-agnostic programming patterns — from deriving a first app from shipped samples, through build configuration and the Core lifecycle, to error decoding and program-class debugging. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -29,12 +29,13 @@ Mitigation: Review and scan skill before deployment. <br>
 - [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 - [NGC Catalog](https://catalog.ngc.nvidia.com/) <br>
-- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Code, Configuration instructions, Shell commands] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -45,37 +46,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
+Evaluated against 4 tasks (3 positive, 1 negative) in isolated sandbox pods; dataset digest sha256:2e27fd34. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed (goal_accuracy 50% + behavior_check 50%). <br>
+- Efficiency: Checks tool-call productivity and token efficiency (skill_efficiency 50% + token_efficiency 50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Verifies whether the expected skill was selected and decoys were avoided. <br>
+- `accuracy`: Evaluates final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Assesses whether the user's goal was achieved. <br>
+- `behavior_check`: Assesses whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Measures tool-call productivity. <br>
+- `token_efficiency`: Measures token usage efficiency. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+35%) | 100% (+20%) |
-| Discoverability | 4 | 100% (+25%) | 91% (+28%) |
-| Effectiveness | 4 | 100% (+82%) | 92% (+39%) |
-| Efficiency | 4 | 100% (+34%) | 100% (+62%) |
+| Measure | Claude Code (Baseline → Skill) | Codex (Baseline → Skill) |
+|---|---:|---:|
+| Overall | 90.6% | 93.5% |
+| Security | 100.0% → 100.0% (±0.0) | 100.0% → 100.0% (±0.0) |
+| Correctness | 60.0% → 100.0% (+40.0) | 80.0% → 95.0% (+15.0) |
+| Discoverability | 100.0% | 93.3% |
+| Effectiveness | 41.7% → 84.2% (+42.5) | 59.6% → 87.5% (+27.9) |
+| Efficiency | 68.9% | 91.7% |
 
 ## Skill Version(s): <br>
-d33a8af (source: git SHA, committed 2026-07-26) <br>
+6e4ede9 (source: git SHA, committed 2026-10-05) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

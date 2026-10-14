@@ -24,39 +24,7 @@ This skill scopes itself to **env work and the front-door routing decision**. Th
 
 ## recognize
 
-Goal: detect the user's **system shape and deployment target** before any other env work begins, so the agent can route the user to the correct downstream skill instead of guessing. This is the **front door**. The agent MUST walk this before answering any deployment-shaped question (*"how do I deploy"*, *"how do I run my DOCA app"*, *"how do I get my DOCA service up"*, *"I just got a BlueField, what now"*, *"my code is built, what next"*).
-
-**Why this exists.** The bundle today supports four distinct system shapes — host x86 + remote BlueField NIC, BlueField Arm bare-metal, DPU-only / converged-accelerator, and fresh-laptop-with-no-hardware — and **two parallel deployment paths** on top: containers (kubelet-standalone with a YAML pod-spec drop, owned by [`doca-container-deployment`](../doca-container-deployment/SKILL.md)) and bare-metal binaries (direct/tmux/systemd launch, owned by [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)). The wrong failure mode is to silently push every developer onto the container path because the agent loaded that skill first. The right behavior is to recognize the system, confirm with the developer, and route. This is what `## recognize` enforces.
-
-**Step 0 — scale gate (run this BEFORE the five-leaf walk).** First decide *persona and scale*, because the five leaves below are the **developer / PoC / small-dev** path (a single host or a handful of DPUs). If the user's intent is **production / fleet-scale** — provisioning racks of DPUs, declarative lifecycle, coordinated BFB/firmware rollouts across many BlueFields (signals: *"across N DPUs"*, *"in production"*, *"at fleet/cluster scale"*, *"Kubernetes operator"*, *"declaratively manage"*) — ask one closed question to confirm production-fleet intent. Route to orchestration only after that confirmation; absent a fleet signal, use the developer/PoC path. Once confirmed, do **not** walk the single-host leaves and do **not** hand-roll per-host `bfb-install` loops or static-pod drops. Route to the orchestration entry-point in [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/map.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing), which points at DOCA Platform Framework (DPF), NVIDIA Network Operator, and the Kubernetes Launch Kit (externally owned, routed-not-owned).
-
-**The decision tree the agent walks.** The agent asks the **minimum** number of questions needed to land on one of the five leaves below. Do not ask all of them; stop as soon as the leaf is unambiguous. The system-shape × deployment-shape matrix the bundle covers lives in [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes); this anchor is the *interactive* walk of that matrix.
-
-1. **Detect first; ask only the residual.** Before any question, the agent attempts a non-destructive auto-detect against what is already on the wire:
-   - `uname -m` (x86_64 vs aarch64 — the BlueField Arm side is aarch64).
-   - `lspci -d 15b3:` (BlueField NIC PCIe visibility — non-empty output proves a BlueField is reachable from this host).
-   - `pkg-config --modversion doca-common` (DOCA install presence + version; honor [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md) — prefer the structured output and fall back to the manual command). If the install is absent, this leg lands on `## no-install`.
-   - `cat /etc/nvidia/bf-release` *if it exists* (BlueField OS image marker — present only on BlueField Arm bare-metal).
-   - `cat /proc/cpuinfo | grep -m1 'model name'` (host CPU model — distinguishes a developer laptop / x86 workstation from a server with a BlueField installed).
-   The agent **quotes the observed output back to the user** and uses it as the prior; it does NOT infer the system shape from the user's phrasing alone.
-
-2. **Ask up to three residual questions, in this priority order.** Each question is *closed-form* — multiple choice or yes/no — so the developer can answer in one word and the agent can route without ambiguity.
-   - **Q1 (target):** *"Where will the DOCA workload run — on the host CPU talking to a BlueField NIC over PCIe, on the BlueField Arm cores directly, on a DPU-only / converged-accelerator card (e.g. SuperNIC-class), or you are not sure yet?"* The four answers map 1:1 to leaves 2-5 below. Skip if `uname -m` + `lspci -d 15b3:` already pinned this.
-   - **Q2 (packaging):** *"Will the workload be deployed as a kubelet-standalone container (YAML pod-spec drop on the BlueField), as a bare-metal binary you launch directly (CLI / tmux / systemd), or you do not know yet?"* Two answers route to the two deployment paths; the *"do not know"* answer triggers the brief explainer in step 3 below. Skip if the developer has already produced a binary or a pod-spec YAML.
-   - **Q3 (workload kind):** *"Is the workload a DOCA-linked **application** you wrote (or are about to write), or a packaged DOCA **service** from NVIDIA (Argus / DMS / Firefly / Flow-Inspector / OS-Inspector / UROM-svc)?"* Application + bare-metal is the most common mismatch the question catches; service + container is the canonical NVIDIA-packaged path. Skip if the matching artifact already exists on disk.
-
-3. **If the developer answers "do not know" to Q2, give them the one-paragraph decision rule, then re-ask Q2 once.** The rule: *"Containers are the canonical way to deploy a packaged NVIDIA DOCA service (the BlueField OS image already ships kubelet-standalone + the runtime); the operator drops a YAML pod-spec into a documented directory and the pod starts. Bare-metal is the canonical way to run a DOCA-linked application you wrote yourself; you launch the binary directly and you own the lifecycle (CPU pinning, hugepages, systemd unit). The two paths are equally supported; the right answer depends on the workload, not on which path is 'better'."* If Q2 remains unknown after that explanation, or no reply is available in unattended execution, stop with `confirmation_required` and explain both paths rather than re-asking again.
-
-4. **Route to the matching leaf** (the agent states the routing explicitly: *"Based on what you said and what I detected, the right next skill is …"*). The five leaves:
-   - **Leaf A — fresh laptop / no DOCA install / no BlueField reachable from this host:** route to [`## no-install`](#no-install). The NGC DOCA container is the universal Stage-1.
-   - **Leaf B — host x86 with a reachable BlueField, application workload, bare-metal launch:** route to [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) for the launch contract, after completing [`## configure`](#configure) for the env prep on this host.
-   - **Leaf C — host x86 (or BlueField Arm bare-metal) with a reachable BlueField, service workload, container launch:** route to [`doca-container-deployment`](../doca-container-deployment/SKILL.md) for the pod-spec drop, after completing [`## configure`](#configure) for the env prep.
-   - **Leaf D — BlueField Arm bare-metal (DPU-side), application workload, bare-metal launch:** route to [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md). Cross-link the BlueField-Arm-specific overlay there.
-   - **Leaf E — DPU-only / converged-accelerator card (e.g. SuperNIC-class) with no host CPU available for DOCA:** today this is a constrained subset of Leaf D — route to [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) with the explicit caveat that some host-side env steps in [`## configure`](#configure) do not apply (e.g. the host-side `LD_LIBRARY_PATH`). The agent should ALSO load [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) early on this leaf because device-only systems are higher-stakes (no escape hatch on a host CPU).
-
-5. **Stop and confirm before proceeding.** Before handing off to the routed skill, the agent restates the routing decision in one line — *"You are on a `<system shape>`, deploying a `<workload kind>` via the `<deployment path>` path; I'll continue with `<routed skill>`. Speak up now if any of that is wrong."* In an interactive session, wait for acknowledgment. In unattended execution, emit the proposed route and stop with `confirmation_required`; never treat silence as approval.
-
-**What this verb deliberately does NOT do.** It does not install DOCA (that's `## configure` after `## no-install` for the install-absent leaf). It does not bind hardware resources (that's [`doca-bare-metal-deployment ## run`](../doca-bare-metal-deployment/TASKS.md#run) or, for containers, the pod-spec mount in [`doca-container-deployment ## modify`](../doca-container-deployment/TASKS.md#modify)). It does not pick a DOCA version (that's [`doca-version`](../doca-version/SKILL.md)). It does not author the workload (that's [`doca-programming-guide`](../doca-programming-guide/SKILL.md)). It does not change device state (that's a [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) meta-policy concern). The verb is **exactly** *"detect, ask the minimum, route, confirm"* — nothing more.
+The front-door system-shape walk lives in [references/recognize.md](references/recognize.md). Load that file next; do not improvise the leaf table.
 
 ## configure
 
@@ -116,18 +84,20 @@ Steps the agent should walk the user through:
    application owner rather than guessing. Confirm the resulting
    reservation fits the operator-approved memory budget, show its
    impact, and obtain explicit approval. Never default to a fixed page
-   count. Only then apply the approved value:
+   count. This skill does not run a privileged write and does not
+   pipe a value into `tee`. After approval, the operator applies the
+   count through the site privilege process. On BlueField Ubuntu 22.04,
+   prefer `doca-hugepages config` then `doca-hugepages reload` (the
+   helper owns allocation; `config` alone does not apply). Do not mix
+   `doca-hugepages` with raw sysfs writes. If the workload requires a
+   hugetlbfs mount, the operator creates it through the same site
+   process; this skill does not mount filesystems.
 
-   ```bash
-   echo '<approved-page-count>' | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-   sudo mkdir -p /mnt/huge
-   sudo mount -t hugetlbfs -o pagesize=2M nodev /mnt/huge
-   ```
-
-   Verify with `mount | grep huge` and `cat /proc/meminfo | grep -i huge`.
-   Rollback restores the recorded previous count and unmounts
-   `/mnt/huge` only if this workflow mounted it and no workload is
-   using it.
+   Verify with `grep -i huge /proc/meminfo` and, if a mount was
+   requested, `findmnt -t hugetlbfs`. Rollback restores the recorded
+   previous count through the same site process that applied it, and
+   unmounts `/mnt/huge` only if this workflow caused that mount and
+   no workload is using it.
 
 8. **Confirm device and representor visibility.** `devlink dev show` lists the network devices the kernel sees; `cat /sys/class/net/*/phys_port_name` shows the names of any active representors. If representors are expected but absent, first verify the target BDF, driver binding, SR-IOV/VF state, and current eswitch mode. Recommend `switchdev` only when that evidence and the version-matched deployment guide identify legacy eswitch mode as the cause; the change still requires explicit consent because it disrupts existing flows.
 
@@ -193,59 +163,37 @@ route to [`doca-programming-guide ## run`](../doca-programming-guide/TASKS.md#ru
 
 ## no-install
 
-Goal: behave correctly when the user wants to do *anything* program-side (build a sample, derive a first app, run a program) but the env-class preconditions aren't met — i.e., the user is on a fresh laptop, a CI runner, a remote machine, or any host without DOCA installed. This applies regardless of the user's chosen language: Python, Rust, Go, and Node consumers all need the DOCA `*.so` to bind against, and a fresh host with no install can't provide that any more than it can provide the C samples.
-
-The wrong behavior — and the failure mode this section exists to prevent — is for the agent to author DOCA application source code from documentation prose (in *any* language: C, C++, Rust, Go, Python wrapper, etc.), mark unknowns with placeholder comments, and present it as a *first app*. That output looks complete to the user, won't compile or link against any real DOCA install, and breaks the user's trust in every other answer the skill produces. Don't.
+The Stage-1 / Stage-2 NGC path lives in [references/no-install.md](references/no-install.md). Load that file next. Do not invent an NGC tag or author application source on a host with no install.
 
 ### Stage 1 vs Stage 2 — open every "I am new to DOCA" answer with the staged roadmap
 
-When the user opens with *"I am new to DOCA, guide me to my first app"* (or any equivalent beginner orientation prompt), the agent's first move is **not** a command. The agent leads with the staged roadmap below and only *then* drops into the per-path details under [What the agent does instead](#what-the-agent-does-instead). This prevents the *command-first overwhelm* failure mode that a reviewer flagged ("the response was correct but too command-heavy for a beginner"). The table is also surfaced verbatim in [`README.md`](../../README.md) so a human reading the bundle without an agent sees the same roadmap; runtime agents MUST quote (or paraphrase faithfully) the same two stages here.
-
-| Stage | What the user is doing | Where they are | Bundle path |
-| --- | --- | --- | --- |
-| **Stage 1 — container learning** | Read the API surface, build / modify a shipped C sample, smoke the build, learn the `pkg-config doca-<library>` + meson pattern. **No real packets cross hardware.** This is the universal entry point for any user on macOS, Windows, or Linux without DOCA. | The public **NGC DOCA container** `nvcr.io/nvidia/doca/doca:<tag>`, pulled with Docker and run with `-it --rm`. `/opt/mellanox/doca` is populated inside the container by construction. | [`## no-install`](#no-install) **Path 0** below, then [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify), then the matching library skill (e.g. [`doca-flow`](../libs/doca-flow/SKILL.md)). |
-| **Stage 2 — hardware runtime** | Run the app you built in Stage 1 against real traffic on a real NIC / DPU. Programmed flows, real packets, counters move. | Either a **Linux host with a ConnectX / BlueField NIC** (Path C), or remote-into a **lab box that already has DOCA + hardware** (Path A). | [`## no-install`](#no-install) **Paths A / C** below, then [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) or [`doca-container-deployment`](../doca-container-deployment/SKILL.md) depending on how the user wants to ship the app. |
-
-**The resume point inside the container is part of the answer.** Tell the user: *"Once you're inside the Stage-1 container, paste back the output of `pkg-config --modversion doca-<library>`, `pkg-config --cflags --libs doca-<library>`, and `ls /opt/mellanox/doca/samples/<library>/<sample_name>/`. I resume from [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) step 1 with the real install in hand."* The resumption promise is what makes Stage 1 actionable rather than a dead end.
-
-### What the agent does instead
-
-1. **State the limitation explicitly, once.** Tailor the wording to the user's language but keep the substance the same: *"DOCA needs a Linux environment with the DOCA install tree, a `pkg-config doca-<library>` that resolves, and (for any language other than C/C++) the `*.so` libraries available for FFI / bindings to load. I can't write your first app from this environment because the verified pieces — the shipped C samples in the C/C++ track, or the `*.so` and headers your bindings will link against in any other language — live in an environment I can't reach yet. The good news is there's a public Stage-1 fallback that works on any OS with Docker — the NGC DOCA container — and three other paths depending on what you actually need. Here's the menu, and what I can do once you reach any of them."*
-
-2. **Hand the user the procedure they will execute on the install host.** Library- and language-aware, with the substance owned by [`doca-programming-guide`](../doca-programming-guide/SKILL.md):
-   - **C / C++ track** — the procedure is [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) (the *modify-a-shipped-sample* workflow), with library-specific overrides from the matching library skill (e.g. [`doca-flow ## build`](../libs/doca-flow/TASKS.md#build) for Flow).
-   - **Other-language track** — the procedure is [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build) Track 2 (FFI / bindings against the public C ABI), then library-specific guidance from the matching library skill.
-
-   In both cases, *no* application source code is written in this conversation — the procedure is what the user runs against the real install once they reach it.
-
-3. **Walk the user through reaching an install environment.** Four honest paths, named in order of *cost to start trying* (Path 0 is the universal default for any non-Linux user; the others are situational).
-
-   | Path | When it fits | What the agent walks the user through |
-   | --- | --- | --- |
-   | **0. NGC DOCA container** (`nvcr.io/nvidia/doca/doca`) — **canonical first option for any user on macOS, Windows, or Linux without DOCA.** | The user wants to build samples, modify a sample, read the API surface, generate FFI bindings, learn — *anything except real-traffic runtime against a real NIC*. Works on any OS that runs Docker. Free; no NVIDIA hardware required. | (1) Install Docker (Docker Desktop on macOS / Windows; native Docker on Linux). (2) **Pick a tag using the deterministic rule below — never invent one.** (3) `docker pull nvcr.io/nvidia/doca/doca:<tag-copied-verbatim-from-the-catalog>`. The public DOCA images are anonymously pullable at the time of writing; if a particular tag asks for auth, sign up for a free NGC account at <https://ngc.nvidia.com>, generate an API key, read it into a local `NGC_API_KEY` variable without sharing or logging it, and run `printf '%s' "$NGC_API_KEY" \| docker login nvcr.io -u '$oauthtoken' --password-stdin`; never request, repeat, or place the key directly on a command line. (4) `docker run -it --rm -v $HOME/dev:/work nvcr.io/nvidia/doca/doca:<tag> bash`; inside the container the user has a real `/opt/mellanox/doca` install — `pkg-config --modversion doca-<library>` works, `ls /opt/mellanox/doca/samples/` works, and the workflows in [`## configure`](#configure), [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build), and [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) all work. **Limitations to surface upfront:** no real NIC inside the container, so DPDK / DOCA calls that need real hardware will fail at runtime — that is *expected* and the right move at that point is to graduate the user to Path A or Path C below. |
-   | **A. Existing Linux + DOCA host** (lab box, dev server, BlueField over `rshim`) | The user already has a DOCA-installed host — most common case at NVIDIA, less common for external users. | SSH or Cursor-remote into it; rerun the [`## configure`](#configure) workflow there, then hand off to [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify). |
-   | **B. Fresh Linux instance, no NIC** (laptop running Ubuntu, cloud VM, etc.) | The user wants a *persistent, native* install (not container-scoped) but doesn't have NVIDIA hardware. | Pick any Linux distro listed under the [DOCA Host Supported OS table](https://docs.nvidia.com/doca/sdk/NVIDIA+DOCA+Installation+Guide+for+Linux). Install via the Installation Guide; the **build-only** parts of [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build) and [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) work; the actual runtime needs hardware (Path C). For most users, **Path 0 is faster and lighter** unless the user explicitly wants a non-container install. |
-   | **C. Linux + ConnectX or BlueField hardware** | The user wants the real end-to-end runtime, including programmed flows and real packet behavior. | Either user-owned hardware, an internal lab allocation, or the [DOCA Downloads page](https://developer.nvidia.com/doca-downloads) for the BFB image to bring up a BlueField. The agent does *not* recommend specific cloud SKUs by name unless they are listed in the public Supported OS table; cloud GPU/ARM SKUs do not generically include DOCA-eligible NICs and the agent must not pretend otherwise. |
+Lead with the two-row Stage 1 (container learning, no real packets) vs
+Stage 2 (hardware runtime) table in
+[references/no-install.md](references/no-install.md#stage-1-vs-stage-2--open-every-i-am-new-to-doca-answer-with-the-staged-roadmap)
+before any command. **Resume point inside the container:** once the user
+is inside Stage 1, they paste back `pkg-config --modversion doca-<library>`,
+`pkg-config --cflags --libs doca-<library>`, and
+`ls /opt/mellanox/doca/samples/<library>/<sample_name>/`; this skill then
+resumes from [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify).
 
 ### How to pick an NGC tag without guessing
 
-Image tags are version-dated and platform-shaped; **never guess one** — that violates [AGENTS.md ground rule 3](../../AGENTS.md#ground-rules-every-agent-must-follow) (never invent symbols, URLs, paths, or package names). The deterministic rule:
+For first-app and CI-pinning questions, name and apply **How to pick an
+NGC tag without guessing**, not just a generic Docker pull recommendation:
 
-1. Open the catalog **Tags** page directly: <https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags>. That is the *only* authoritative list of tags that actually exist for `nvcr.io/nvidia/doca/doca`. Do not fall back to memory.
-2. Detect the user's host axes from a brief question or from output the user has already pasted:
-   - **Architecture** — `uname -m`: `x86_64` ⇒ pick a tag containing `linux-amd64`; `aarch64` / Apple Silicon ⇒ pick one containing `linux-arm64`.
-   - **OS family** — match the OS family fragment in the tag string (`ubuntu22.04`, `rhel9.4`, etc.) to what the user runs on the *outer* host. For a Mac on Docker Desktop, any Linux flavor is fine because the container is its own world; default to Ubuntu LTS.
-   - **CUDA?** — default **no** for first-app work; CUDA-enabled variants are larger and only relevant if the user is also using CUDA (e.g. GPUNetIO / GPI / GPUDirect work).
-   - **Host vs DPU flavor** — default **host flavor**. Pick a DPU flavor *only* when the user is targeting the BlueField Arm OS (a less common first-app axis).
-3. From the *visible* tags list, pick the **highest-numbered** tag that matches all four axes. The tag string is treated as opaque text from the catalog — the agent does NOT assemble a tag from version + arch fragments out of memory.
-4. `docker pull nvcr.io/nvidia/doca/doca:<tag-copied-verbatim-from-the-catalog>`.
-5. **If the agent cannot reach the catalog page from this session, say so explicitly and ask the user to paste the candidate tag from the catalog.** The agent does NOT fabricate a tag string. This is the same *never invent symbols, URLs, paths, or package names* discipline as [AGENTS.md ground rule 3](../../AGENTS.md#ground-rules-every-agent-must-follow); fabricating a tag here is a release-blocker.
-
-The same rule is documented for human readers in [`README.md ## Beginner roadmap`](../../README.md#beginner-roadmap--stage-1-container-learning--stage-2-hardware-runtime); the two surfaces stay in sync.
-
-4. **Do not scaffold a project on the un-installed host.** Do not produce `meson.build`, `CMakeLists.txt`, `Cargo.toml`, `setup.py`, `go.mod`, an application source file in any language, project directories, or any artifact that would mislead the user into thinking a build is one command away. The agent's *only* artifacts in this state are: (a) the install / path procedure for the user to run in the chosen environment, and (b) the menu above. The skill's claim is *"I'll be useful the moment you reach a real install — including the NGC container, which is one `docker pull` away"*; making artifacts now would dilute that claim with files that are not buildable in this environment.
-
-5. **Promise the resumption.** Tell the user: *"When you're inside the NGC container, the lab host, the cloud Linux VM, or the hardware host, paste me the output of `pkg-config --modversion doca-<library>` and `pkg-config --cflags --libs doca-<library>`, plus (C/C++ track) `ls /opt/mellanox/doca/samples/<library>/<sample_name>/` or (other-language track) the `*.so` filename your bindings will load. I'll resume from [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) step 1 (C/C++) or from the matching library skill's bindings guidance via [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build) Track 2 (other languages) with the real install in hand."*
+1. Open the [NGC DOCA Tags page](https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags).
+   Match the requested release and platform using the full rule in
+   [references/no-install.md](references/no-install.md#how-to-pick-an-ngc-tag-without-guessing).
+2. Copy the exact visible tag for `nvcr.io/nvidia/doca/doca`; never assemble
+   an example tag from version/architecture fragments. `:latest` is not a
+   reproducible CI pin. If the catalog is unreachable, ask for a pasted
+   candidate tag and stop short of claiming it was verified.
+3. After pulling that image, run `pkg-config --modversion doca-common`
+   **inside the selected container**, not on the outer host. Compare the
+   output with the intended DOCA release using
+   [doca-version](../doca-version/TASKS.md#configure). Record the exact image
+   reference and observed version. A successful pull alone is not version
+   verification; missing or mismatched output blocks the build handoff.
 
 ## test
 
@@ -309,41 +257,12 @@ Investigation order — **always**:
 
 If the agent finds itself recommending a code change before completing (1)–(4), it is jumping layers — back up.
 
-## Command appendix
-
-The commands the verbs above expect the agent to issue or have the user
-issue, grouped by class so the agent reaches for the right family
-without searching prose. Each command appears with the verb it belongs
-to and the H2 anchor in this file or in
-[CAPABILITIES.md](CAPABILITIES.md) that explains the expected output.
-
-| Class | Command | Owning verb / anchor | Reads as healthy when … |
-| --- | --- | --- | --- |
-| Detect install | `pkg-config --modversion doca-common` | [`## test`](#test) step 1 / [CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility) | Returns a single version string. Empty / "not found" ⇒ install or `PKG_CONFIG_PATH` is wrong. |
-| Detect install | `pkg-config --list-all \| grep -i doca` | [`## configure`](#configure) step 2 | Lists at least one `doca-*` module. Empty ⇒ install profile probably wrong. |
-| Detect install | `doca_caps --version` | [`## test`](#test) step 2 | Matches `pkg-config --modversion doca-common`. Mismatch ⇒ partial upgrade. |
-| Detect install | `cat /opt/mellanox/doca/applications/VERSION` | [CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility) | Fallback when `pkg-config` is broken. Returns the same string. |
-| Wire build | `pkg-config --cflags doca-<library>` | [`## configure`](#configure) step 2 | Returns `-I/opt/mellanox/doca/infrastructure/include` (or trace-flavor equivalent). |
-| Wire build | `pkg-config --libs doca-<library>` | [`## configure`](#configure) step 2 / [`## run`](#run) checklist | Returns `-L/opt/mellanox/doca/lib/<arch>-linux-gnu -ldoca_<library>` plus deps. |
-| Wire runtime | `mount \| grep huge` | [`## configure`](#configure) step 7 / [CAPABILITIES.md ## Observability](CAPABILITIES.md#observability) | Shows a `hugetlbfs` mount. Empty ⇒ no hugepages reserved. |
-| Wire runtime | `cat /proc/meminfo \| grep -i huge` | [`## configure`](#configure) step 7 | Shows `HugePages_Total` > 0 and `HugePages_Free` > 0. |
-| Wire runtime | `devlink dev show` | [`## configure`](#configure) step 8 | Lists the expected BlueField / ConnectX PCIe BDF. |
-| Wire runtime | `cat /sys/class/net/*/phys_port_name` | [`## configure`](#configure) step 8 | Shows the representor port names for the device. |
-| Wire runtime | `lsmod \| grep mlx5` | [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy) | Shows `mlx5_core`, `mlx5_ib` loaded. |
-| Detect mode | `mlxconfig -d <pcie> q INTERNAL_CPU_MODEL` | [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes) | Matches the mode the program expects (`EMBEDDED_CPU(1)` for switch mode). |
-| Reach an install | `docker pull nvcr.io/nvidia/doca/doca:<tag>` | [`## no-install`](#no-install) Path 0 | Pull succeeds; tag exists on NGC. |
-| Reach an install | `docker run -it --rm -v $HOME/dev:/work nvcr.io/nvidia/doca/doca:<tag> bash` | [`## no-install`](#no-install) Path 0 | Shell starts; `/opt/mellanox/doca` is populated inside. |
-
-The appendix lists the *families* of commands; the verbs above describe
-the *when* and *why*. New commands must come from a public NVIDIA source
-(documented in [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes)
-or [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md));
-agent-invented flags fail the bundle's anti-hallucination contract
-declared in [AGENTS.md `## Ground rules`](../../AGENTS.md#ground-rules-every-agent-must-follow).
-
 ## Deferred task verbs
 
-- **`install`.** Installing DOCA itself on a fresh host or BlueField is a knowledge-map question — the canonical Installation Guide and the package profile choice are documented there. Defer to [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package) and the Installation Guide URL it routes to. The fastest way to reach an install on a non-Linux host (or any host without DOCA) is [`## no-install`](#no-install) Path 0 (NGC container).
-- **Build / first-app derivation / running a program.** These are *programming verbs*, not env verbs, and live in [`doca-programming-guide`](../doca-programming-guide/SKILL.md). After this skill's `## configure` and `## test` have produced a known-good environment, hand off there.
-- **Library API specifics.** Constructing a Flow pipe, RDMA queue setup, etc. — outside the scope of this skill. After this skill's verbs have produced a known-good environment, hand off to [`doca-programming-guide`](../doca-programming-guide/SKILL.md) for the cross-library patterns and then to the matching library skill (e.g. [`doca-flow`](../libs/doca-flow/SKILL.md)) for API-level guidance.
-- **`deploy` / `rollback` at fleet scale.** Provisioning multiple BlueFields, coordinated firmware/BFB updates across a fleet, or staged rollback is **fleet-orchestration scope**, externally owned and out of this bundle's SDK scope. Do **not** hand-roll per-host `bfb-install` loops or static-pod rollouts at that scale. Route to the orchestration entry-point in [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/map.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing), which points at DOCA Platform Framework (DPF), NVIDIA Network Operator, and the Kubernetes Launch Kit with authoritative links. Single-host / handful-of-DPUs PoC deployment stays in-bundle ([`doca-container-deployment`](../doca-container-deployment/SKILL.md) / [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)).
+- **`install`.** Installing DOCA itself is a knowledge-map question. Defer to [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package) and [`## no-install`](#no-install) Path 0 for a host without DOCA.
+- **Build / first-app derivation / running a program.** These are programming verbs. After `## configure` and `## test` are green, hand off to [`doca-programming-guide`](../doca-programming-guide/SKILL.md).
+- **Library API specifics.** After the env is known-good, hand off to the matching library skill (for example [`doca-flow`](../libs/doca-flow/SKILL.md)).
+
+## Command appendix
+
+See [references/command-appendix.md](references/command-appendix.md).

@@ -2,21 +2,25 @@
 license: Apache-2.0
 name: doca-pcc-counters
 description: >
-  Use this skill when the user is invoking the DOCA PCC Counters tool
-  — the `pcc_counters.sh` bash script under the DOCA tools directory —
-  to arm and read the fixed firmware/hardware PCC (Programmable
-  Congestion Control) diagnostic counters (CNP, RTT, WRED-drop, etc.)
-  on a ConnectX / BlueField device via mst + the mlx5 debugfs
-  `diag_cnt` interface. The script takes two positional args —
-  `set | query` and an mst device path — with no `--help` or
-  subcommands. Trigger even without "pcc_counters.sh" or "PCC
-  counters": "how do I read the CNP / RTT / WRED-drop counters",
-  "PCC counter stuck at zero", "the script says Bad Device", or "is
-  congestion control dropping packets on this port?". Route elsewhere
-  for writing a custom PCC algorithm (doca-pcc), factory firmware PCC
-  config, DOCA install, or fleet-wide CC tuning.
+  Use this skill when the user is invoking the DOCA PCC Counters tool —
+  the `pcc_counters.sh` bash script under the DOCA tools directory — to
+  arm and read the fixed firmware/hardware PCC (Programmable Congestion
+  Control) diagnostic counters (CNP, RTT, WRED-drop, etc.) on a ConnectX
+  / BlueField device via mst + the mlx5 debugfs `diag_cnt` interface.
+  The script takes two positional args — `set | query` and an mst device
+  path — with no `--help` or subcommands. Trigger even without
+  "pcc_counters.sh" or "PCC counters": "how do I read the CNP / RTT /
+  WRED-drop counters", "PCC counter stuck at zero", "the script says Bad
+  Device", or "is congestion control dropping packets on this port?".
+  Route elsewhere for writing a custom PCC algorithm (doca-pcc), factory
+  firmware PCC config, DOCA install, or fleet-wide CC tuning.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - pcc
+    - counters
 compatibility: >
   Requires DOCA/MFT on Linux with a ConnectX-6 or newer or BlueField
   device, mst tools, mounted debugfs, and root access to the mlx5
@@ -24,22 +28,35 @@ compatibility: >
   diagnostics independently of custom PCC code. Its set operation
   changes which counters are collected, not congestion-control or
   forwarding behavior; treat later fleet tuning as a separate
-  high-stakes action.
-
+  high-stakes action. The validation steps require a live DOCA install.
 ---
 
 # DOCA PCC Counters (`pcc_counters.sh`)
+
+## Examples
+
+- **"How do I read the PCC diagnostic counters on this device?"** —
+  this is in scope. Arm then query; do not treat this as PCC
+  algorithm tuning.
+- **"The script printed ERROR: Bad Device."** — resolve the mst
+  path before assuming firmware is broken.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for run /
+debug. Open the capabilities companion for the fixed counter set.
+Do not open every companion file.
 
 **Where to start:** This is a tool skill for invoking
 `pcc_counters.sh` — a small bash script that arms and reads the
 device's fixed set of firmware / hardware **PCC diagnostic
 counters** (CNP count, RTT-perf, WRED-drop, RTT-gen, handled
 events) through the mlx5 debugfs `diag_cnt` interface. Open
-[`TASKS.md`](TASKS.md) and start at [`## run`](TASKS.md#run) for
+the tasks companion and start at `## run` for
 the canonical `set`-then-`query` sequence, or
-[`## debug`](TASKS.md#debug) when the user reports
+`## debug` when the user reports
 *"`ERROR: Bad Device`"*, *"counter stuck at zero"*, or *"the
-dump is empty"*. Open [`CAPABILITIES.md`](CAPABILITIES.md) when
+dump is empty"*. Open the capabilities companion when
 the question is *which counters the script reports and how it
 reaches them*. If the user has not installed DOCA / MFT yet,
 route to [`doca-setup`](../../doca-setup/SKILL.md) first.
@@ -66,29 +83,29 @@ load-bearing piece; the worked example is one instance.
   device?"** — worked example: *"arm and dump the CNP / RTT /
   WRED-drop counters for `/dev/mst/mt41692_pciconf0`"*.
   Answered by the fixed counter set in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the `set`-then-`query` invocation in
-  [`TASKS.md ## run`](TASKS.md#run).
+  the tasks companion.
 - **"What is the smallest legal invocation?"** — worked
   example: *"what exactly do I type?"*. Answered by the
   two-positional-argument contract
   (`set | query` + an mst device path) in
-  [`TASKS.md ## run`](TASKS.md#run).
+  the tasks companion.
 - **"The script printed `ERROR: Bad Device` — what's wrong?"**
   — worked example: *"my device path is not matching"*.
   Answered by the device-resolution layer in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
-  + [`TASKS.md ## debug`](TASKS.md#debug).
+  the capabilities companion
+  + the tasks companion.
 - **"A counter is stuck at zero — is the device idle, the
   counters not armed, or genuinely no events?"** — worked
   example: *"`PCC_CNP_COUNT` reads 0 after `query`"*. Answered
   by the arm-before-read rule and the layered diagnosis in
-  [`TASKS.md ## debug`](TASKS.md#debug) +
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+  the tasks companion +
+  the capabilities companion.
 - **"Is this script on my install, and where?"** — worked
   example: *"is `pcc_counters.sh` present and where does the
   install put it"*. Answered by the install overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  the capabilities companion,
   which redirects to the canonical
   [`doca-version`](../../doca-version/SKILL.md) rules.
 
@@ -122,8 +139,8 @@ algorithm (route via
 installed under the DOCA tools directory (per `install_data` in
 `tools/pcc_counters/meson.build`), not a compiled binary and
 not a library you link against. The skill uses the bundle's
-`kind: tool` three-file shape (`SKILL.md` + `CAPABILITIES.md`
-+ `TASKS.md`) so the agent's task-verb contract
+`kind: tool` three-file shape (this skill + the capabilities companion
++ the tasks companion) so the agent's task-verb contract
 (`configure / build / modify / run / test / debug`) is uniform
 across the bundle.
 
@@ -154,7 +171,7 @@ For those, route to
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what `pcc_counters.sh` does: the exact
+- the capabilities companion — what `pcc_counters.sh` does: the exact
   two-operation surface (`set` arms the device's diagnostic
   counters by writing counter IDs + params to debugfs;
   `query` reads the `diag_cnt/dump` and prints the named
@@ -172,7 +189,7 @@ companion files:
   policy that flags `set` as a privileged debugfs write and
   any CC tuning decision derived from a reading as
   high-stakes.
-- `TASKS.md` — step-by-step workflows for the in-scope task
+- the tasks companion — step-by-step workflows for the in-scope task
   verbs: `configure` (route to install + confirm mst /
   debugfs / sudo), `build` (route to install; nothing to
   compile — it is a script), `modify` (refuse — do not patch
@@ -213,16 +230,16 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question
+1. Read this skill first to confirm the user's question
    is in scope (reading the device's firmware PCC diagnostic
    counters; not designing or loading a custom algorithm).
 2. **For what the script does, the fixed counter set, the
    debugfs mechanism, the install-availability overlay, the
    layered error surface, and the safety posture, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For the documented invocations — `configure`, `build`,
    `modify`, `run`, `test`, `debug`, plus the `Command
-   appendix` — see [TASKS.md](TASKS.md).**
+   appendix` — see the tasks companion.**
 
 ## Related skills
 
@@ -241,7 +258,7 @@ contain — and pull requests should not add:
   including the firmware PCC algorithm configuration.
 - [`doca-version`](../../doca-version/SKILL.md) — canonical
   DOCA version-handling rules. The `## Version compatibility`
-  section in [`CAPABILITIES.md`](CAPABILITIES.md) is a concise
+  section in the capabilities companion is a concise
   overlay that redirects here.
 - [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
   install verification, mst tools, debugfs, and the

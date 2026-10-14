@@ -47,8 +47,11 @@ Two cross-cutting rules that apply to *every* pattern above:
 ## Capabilities and modes
 
 DOCA RDMA is a **DOCA Core Context**. Every RDMA instance follows
-the universal `cfg-create → cfg-set-* → init → start → use → stop →
-destroy` lifecycle (see
+create → configure (tasks, permissions, properties) → start →
+connect → use → stop → destroy. Configuration MUST finish before
+`doca_ctx_start()`. The cfg-object phases underneath that
+(`cfg-create → cfg-set-* → init`) are how configure is implemented;
+they do not replace connect as a distinct step after start (see
 [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)).
 On top of that lifecycle, RDMA layers its own connection
 state-machine and task model.

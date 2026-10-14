@@ -20,7 +20,7 @@ substance.
 | Pattern | Class shape | Where it lives |
 | --- | --- | --- |
 | 1. Plug into the right slot | Host / DPU / Switch; library / app / service / tool — orient the program | [`## Capabilities and modes`](#capabilities-and-modes) |
-| 2. Follow the universal lifecycle | cfg → create → init → start → use → stop → destroy for every DOCA object | [`## Capabilities and modes`](#capabilities-and-modes) lifecycle subsection |
+| 2. Follow the universal lifecycle | create → configure → start → connect → use → stop → destroy for every DOCA Core context (`cfg-create` / `init` implement configure) | [`## Capabilities and modes`](#capabilities-and-modes) lifecycle subsection |
 | 3. Build / link the program | `pkg-config doca-<library>` (C/C++ direct) OR FFI/bindings against the public C ABI | [TASKS.md ## build](TASKS.md#build) |
 | 4. Handle `DOCA_ERROR_*` correctly | `doca_error_get_descr()` first; never paper over | [`## Error taxonomy`](#error-taxonomy) |
 | 5. Validate before commit, observe before "fixing" | Pre-commit validation, log levels, sample-counter discipline | [`## Safety policy`](#safety-policy) + [`## Observability`](#observability) |
@@ -69,18 +69,24 @@ The agent's rule: when the user says *"first app"*, the answer always starts fro
 | `doca-<library>` (e.g. `doca-flow`) | Release. Optimized, no extra sanitation. | Production and benchmarking. |
 | `doca-<library>-trace` (e.g. `doca-flow-trace`) | Trace build. Enables additional input sanitation, slower, much louder logs. | **First-app development.** First-time-user errors are caught earlier and surfaced with explicit reasons; switch to release only after the staged run succeeds and you're moving to a performance reading. |
 
-**The universal lifecycle.** Every DOCA library object the user creates follows the same six-phase lifecycle. Library skills name which specific API calls correspond to each phase.
+**The universal lifecycle.** Every DOCA Core context follows
+create → configure → start → connect → use → stop → destroy.
+The cfg-object calls (`cfg-create` → `cfg-set-*` → `init`) are how
+configure is implemented and MUST finish before `doca_ctx_start()`.
+Connect is its own step after start; do not mash it into use.
+Library skills name which specific API calls correspond to each phase.
 
 | Phase | What it means | What goes wrong if you skip it |
 | --- | --- | --- |
-| `cfg-create` | Allocate a configuration object (`doca_<library>_cfg_*`). | NULL deref on the cfg pointer. |
-| `cfg-set-*` | Populate the configuration with the user's settings (mode, capabilities, callbacks). | The library defaults what you didn't set — usually not what you meant. |
-| `init` / `create` | Materialize the actual library object from the populated cfg. | Calls that need the object return `DOCA_ERROR_BAD_STATE`. |
-| `start` | Move the object into a state where it can be used. | `use`-phase calls return `DOCA_ERROR_BAD_STATE`. |
+| `cfg-create` | Allocate a configuration object (`doca_<library>_cfg_*`). Part of configure. | NULL deref on the cfg pointer. |
+| `cfg-set-*` | Populate the configuration with the user's settings (mode, capabilities, callbacks). Part of configure. | The library defaults what you didn't set — usually not what you meant. |
+| `init` / `create` | Materialize the actual library object from the populated cfg. Completes configure. | Calls that need the object return `DOCA_ERROR_BAD_STATE`. |
+| `start` | Move the object into a started state. | `connect` / `use`-phase calls return `DOCA_ERROR_BAD_STATE`. |
+| `connect` | For Core contexts with a peer: establish the connection after start, before use. | `use`-phase tasks fail; answers that write `connect/use` as one token skip this step. |
 | `use` | The library-specific work — pipe entries, queue ops, channel sends, etc. | Library-specific symptoms (no traffic, dropped packets, hung sends). |
 | `stop` + `destroy` | Reverse-order tear-down; release in the inverse order of acquisition. | Resource leaks; on next run, capability discovery may report exhausted budgets. |
 
-The agent's rule: never recommend a `use`-phase call before confirming the object is in `started` state, and never recommend re-creating an object that hasn't been `destroyed`.
+The agent's rule: never recommend a `use`-phase call before confirming the object is in `started` state, and never recommend re-creating an object that hasn't been `destroyed`. For a DOCA Core context the named order is create → configure → start → connect → use → stop → destroy. Task configuration and permission setting belong in configure (`cfg-set-*`) and MUST complete before `doca_ctx_start()`. Libraries with a peer add connect after start and before use — name it as its own step.
 
 ## Version compatibility
 

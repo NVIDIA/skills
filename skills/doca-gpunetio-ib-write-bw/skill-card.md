@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through building, running, and interpreting the doca/tools/gpunetio_ib_write_bw client+server benchmark that measures sustained GPU-driven RDMA WRITE bandwidth via the doca-gpunetio device-side surface on a GPU+IB-device pair. <br>
+Guides operators through building, running, and interpreting the gpunetio_ib_write_bw client+server benchmark that measures sustained RDMA WRITE bandwidth when work requests are posted from a CUDA kernel through doca-gpunetio on a GPU+IB-device pair. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers and performance engineers who need a reproducible measurement of sustained RDMA WRITE bandwidth when the work requests are posted from a CUDA kernel through doca-gpunetio, on the user's actual install and GPU-NIC pair. <br>
+Developers and performance engineers measuring sustained GPU-initiated RDMA WRITE bandwidth through the doca-gpunetio surface, comparing GPUNetIO against GPI or CPU-initiated perftest paths, and capturing reproducible benchmark baselines on their GPU+NIC topology. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -44,37 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 evaluation tasks (3 positive skill-activation, 1 negative). <br>
+4 evaluation tasks (3 positive, 1 negative) executed with 3 attempts per task in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Checks tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+65%) | 100% (+40%) |
-| Discoverability | 4 | 97% (+34%) | 95% (+50%) |
-| Effectiveness | 4 | 81% (+60%) | 88% (+62%) |
-| Efficiency | 4 | 94% (+44%) | 100% (+58%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 95.3% | 96.8% |
+| Security | 100.0% → 100.0% (±0.0 pp) | 100.0% → 100.0% (±0.0 pp) |
+| Correctness | 30.0% → 100.0% (+70.0 pp) | 63.3% → 100.0% (+36.7 pp) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 31.7% → 87.5% (+55.8 pp) | 30.8% → 93.8% (+63.0 pp) |
+| Efficiency | 89.1% | 95.0% |
 
 ## Skill Version(s): <br>
-2790d51 (source: git SHA, committed 2026-07-26) <br>
+be5fb89 (source: git SHA, committed 2026-09-14) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

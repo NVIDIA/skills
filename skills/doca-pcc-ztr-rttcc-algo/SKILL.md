@@ -2,34 +2,53 @@
 license: Apache-2.0
 name: doca-pcc-ztr-rttcc-algo
 description: >
-  Use this skill when the user is doing hands-on deployment, tuning,
-  or evaluation of the DOCA-shipped Zero-Touch RoCE RTT-based
-  Congestion Control (ZTR RTTCC) reference algorithm on a BlueField-3
-  DPA — wiring `doca_pcc_dev_ztr_rttcc_algo` into the shipped DOCA
-  PCC sample, picking a variant (vanilla / PM / RX-rate / multipath /
-  window-probeless) at DPACC build time, tuning host-set parameters,
-  or diagnosing `DOCA_PCC_DEV_STATUS_FAIL` from the algorithm.
-  Trigger even when the user does not say 'DOCA PCC' or 'ZTR RTTCC' —
-  typical implicit phrasings: 'my RoCE-v2 flows aren't being
-  throttled', 'PCC sample isn't dispatching to my algo', 'how do I
-  pick the multipath PCC variant', 'set-params returns fail',
-  'algorithm loaded but counters are flat', or 'do I need a custom
-  CC algorithm on BF3'. Refuse and route elsewhere for writing a
-  custom PCC algorithm from scratch, read-only PCC counter
-  inspection, the host-side `doca-pcc` lifecycle, or firmware-only
-  pre-Programmable PCC — those belong to other skills.
+  DOCA-shipped Zero-Touch RoCE RTT congestion control (ZTR RTTCC)
+  reference algorithm on a BlueField-3 DPA: deploy, tune and evaluate
+  doca_pcc_dev_ztr_rttcc_algo through the shipped DOCA PCC sample. Trigger
+  on "my RoCE-v2 flows aren't being throttled", "PCC sample isn't
+  dispatching to my algo", "set-params returns fail", "algorithm loaded
+  but counters are flat", "how do I pick the multipath PCC variant", or
+  "do I need a custom CC algorithm on BF3", even without naming ZTR RTTCC.
+  Your own algorithm through the host library belongs to doca-pcc; the
+  doca_spcx_cc command line to doca-spcx-cc. Covers picking a variant
+  (vanilla / PM / RX-rate / multipath / window-probeless) at DPACC build
+  time, tuning host-set parameters, and DOCA_PCC_DEV_STATUS_FAIL from the
+  algorithm. Refuse and route elsewhere for writing a custom PCC algorithm
+  from scratch, read-only PCC counter inspection, or firmware-only
+  pre-Programmable PCC.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - pcc
+    - ztr-rttcc
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a BlueField-3 DPU exposing the DPA
   processor, the firmware custom-PCC slot enabled, a matched-version
-  DPACC compiler, and live RoCE-v2 traffic on the attached port.
-  Reads `pkg-config doca-pcc-ztr-rttcc-algo` and inspects
-  /opt/mellanox/doca/{lib,include,applications/pcc}.
+  DPACC compiler, and live RoCE-v2 traffic on the attached port. Reads
+  `pkg-config doca-pcc-ztr-rttcc-algo` and inspects
+  /opt/mellanox/doca/{lib,include,applications/pcc}. The validation
+  steps require a live DOCA install.
 ---
 
 # DOCA PCC ZTR RTTCC Algorithm
+
+## Examples
+
+- **"How do I pick the multipath PCC variant?"** — this is in
+  scope. Pick the ZTR RTTCC variant at DPACC build time; do not
+  invent a custom algorithm.
+- **"Algorithm loaded but counters are flat."** — confirm live
+  RoCE-v2 traffic and host-set params before rewriting the
+  sample.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+tune / debug. Open the capabilities companion for variants and
+the FAIL status. Do not open every companion file.
 
 **Where to start:** This skill assumes DOCA is already
 installed, the user's BlueField has a DPA processor that
@@ -42,10 +61,10 @@ RTTCC reference algorithm** on a BlueField port that
 already carries RoCE-v2 traffic — i.e. either deploying it
 as the no-config-required baseline, tuning its documented
 parameters, or evaluating it against a custom algorithm the
-user intends to write. Open [`TASKS.md`](TASKS.md) if the
+user intends to write. Open the tasks companion if the
 user wants to *do* something (install / configure / build /
 modify / run / test / debug / use); open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is
+the capabilities companion when the question is
 *what does the algorithm express, what are its variants and
 parameters, what does it ship vs not ship*. If the user has
 not installed DOCA yet, route to
@@ -75,10 +94,10 @@ example is a single instance.
   carrying production RoCE-v2 traffic from a GPU cluster;
   is the shipped algorithm a fine default or do I need
   custom logic?"*. Answered by the decision rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   ("when to use the reference vs custom") + the env
   preconditions in
-  [`TASKS.md ## install`](TASKS.md#install).
+  ## install.
 - **"How do I wire the shipped algorithm into the DOCA
   PCC application that's already running on my host?"** —
   worked example: *"`/opt/mellanox/doca/applications/pcc`
@@ -86,9 +105,9 @@ example is a single instance.
   change so the user algo callback dispatches to
   `doca_pcc_dev_ztr_rttcc_algo` under a chosen algo
   slot?"*. Answered by the integration sequence in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the in-place edits in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **"Which variant of the algorithm am I getting — vanilla
   RTT-CC, path-migration mode, RX-rate mode, multipath,
   multipath with credits, window-probeless?"** — worked
@@ -97,35 +116,53 @@ example is a single instance.
   side source ships several variants; how do I know
   which one I get and how do I pick another?"*.
   Answered by the variants table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  ## Capabilities and modes.
 - **"How do I confirm the algorithm is actually
   modulating my RDMA / RoCE traffic, and not just
   loading?"** — worked example: *"I followed the
   integration steps; the application starts; how do I
   know the algorithm is shaping flows under load?"*.
   Answered by the observability surface in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
+  ## Observability
   + the counter-watch loop in
-  [`TASKS.md ## test`](TASKS.md#test) which routes to
+  ## test which routes to
   [`doca-pcc-counters`](../../tools/doca-pcc-counters/SKILL.md).
+
+> **"Flows aren't being throttled" / "counters are flat" is first an
+> observability question, not a tuning one.** This is a debug
+> question, so do not answer it by walking the launch checklist in
+> ## run — that sequence is for bringing a
+> new build up, not for a system already running. Go to the
+> discrimination in ## debug step 6 and
+> start there: are CC events reaching the algorithm at all? If
+> none are, the cause is the wrong algo slot, a `doca_pcc` attached to
+> the wrong port, or — the documented common trap — no RoCE-v2 traffic
+> on that port to modulate, in which case the algorithm is loaded but
+> idle and the run proves nothing. Only once events are landing and
+> the AI / decrement counters are still flat do parameters or the
+> compiled variant come into question. Jumping to parameter tuning or
+> a variant rebuild first is the mistake
+> ## Safety policy
+> calls out by name; the discrimination recipe is
+> ## debug step 6.
 - **"Which tunables does the algorithm expose, and how
   do I change them from the host without rebuilding the
   DPA-side image?"** — worked example: *"my workload is
   more latency-sensitive than the default profile assumes
   — which parameter knob do I adjust?"*. Answered by
   the parameter surface in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the `doca_pcc_dev_set_ztr_rttcc_params` workflow in
-  [`TASKS.md ## use`](TASKS.md#use).
+  ## use.
 - **"What does this `DOCA_PCC_DEV_STATUS_FAIL` or
   `DOCA_ERROR_*` from a `doca_pcc_dev_ztr_rttcc_*` call
   mean and which layer caused it?"** — worked example:
   *"my init callback returns `DOCA_PCC_DEV_STATUS_FAIL`
   on first launch"*. Answered by the algorithm overlay
   on the host-side PCC taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates
+  ## debug that escalates
   through
   [`doca-pcc`](../doca-pcc/SKILL.md) and
   [`doca-debug`](../../doca-debug/SKILL.md).
@@ -220,7 +257,7 @@ orientation needed to pick the right next file. The
 substantive algorithm-specific material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what the shipped ZTR RTTCC
+- the capabilities companion — what the shipped ZTR RTTCC
   algorithm expresses on this version + this BlueField
   generation + this firmware: the public DPA-side API
   surface (`doca_pcc_dev_ztr_rttcc_init`,
@@ -240,7 +277,7 @@ companion files:
   per-feature parameter blocks), the error taxonomy in
   `DOCA_PCC_DEV_STATUS_OK` / `_FAIL`, and the safety
   policy.
-- `TASKS.md` — step-by-step workflows for the in-scope
+- the tasks companion — step-by-step workflows for the in-scope
   algorithm verbs: `install`, `configure`, `build`,
   `modify`, `run`, `test`, `debug`, `use`. Plus a
   `Deferred task verbs` block that points out-of-scope
@@ -252,7 +289,7 @@ already installed; the BlueField is a generation that
 exposes the DPA processor (the algorithm runs on the DPA);
 the BlueField firmware has the custom-PCC slot enabled
 (inherited from
-[`doca-pcc CAPABILITIES.md ## Safety policy`](../doca-pcc/CAPABILITIES.md#safety-policy));
+`doca-pcc ## Safety policy`);
 and the BlueField port the algorithm will modulate has
 RoCE-v2 traffic actually flowing on it (the algorithm
 modulates *existing* RDMA / RoCE traffic — without traffic,
@@ -301,7 +338,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's
+1. Read this skill first to confirm the user's
    question is in scope (deployment / tuning / evaluation
    of the shipped reference algorithm, not algorithm
    design from scratch and not read-only counter
@@ -312,91 +349,59 @@ contain — and pull requests should not add:
    framework relationship, the
    `doca-pcc-counters` inspection-side relationship, the
    error taxonomy, the observability surface, and the
-   safety policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   safety policy, see the capabilities companion.**
 3. **For step-by-step workflows — install, configure,
    build, modify, run, test, debug, use — see
-   [TASKS.md](TASKS.md).**
+   the tasks companion.**
 
-Both companion files cross-link to each other,
-[`doca-pcc`](../doca-pcc/SKILL.md) for the host-side PCC
-lifecycle that loads this algorithm,
-[`doca-pcc-counters`](../../tools/doca-pcc-counters/SKILL.md)
-for the read-only counter-inspection side of validating that
-the algorithm is modulating traffic,
-[`doca-dpa`](../doca-dpa/SKILL.md) for the DPA-side
-two-side-program model and the DPACC compiler discipline,
-[`doca-version`](../../doca-version/SKILL.md) for the
-canonical DOCA version-handling rules (with the DPACC
-overlay inherited from
-[`doca-dpa`](../doca-dpa/SKILL.md) and
-[`doca-pcc`](../doca-pcc/SKILL.md)), and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
-whenever the right answer is "look it up in the public DOCA
-PCC programming guide or the on-disk install layout".
+Both companion files cross-link to each other and to the skills
+listed under **Related skills** below.
 
 ## Related skills
 
-- [`doca-pcc`](../doca-pcc/SKILL.md) — the host-side PCC
-  control library. This algorithm is loaded INTO a
-  `doca_pcc` context that `doca-pcc` stands up; the
-  host-side lifecycle (`doca_pcc` create / configure /
-  start / stop / destroy, the algorithm image
-  `doca_pcc_app`, the attach-to-port semantics) is owned
-  by `doca-pcc`. This skill prescribes only the DPA-side
+- [`doca-pcc`](../doca-pcc/SKILL.md) — the host-side PCC control
+  library. This algorithm is loaded INTO a `doca_pcc` context that
+  `doca-pcc` stands up, and owns the host-side lifecycle (create /
+  configure / start / stop / destroy, the `doca_pcc_app` image, the
+  attach-to-port semantics). This skill prescribes only the DPA-side
   algorithm integration on top.
 - [`doca-pcc-counters`](../../tools/doca-pcc-counters/SKILL.md) —
-  the read-only diagnostic CLI for PCC counters at the
-  port. The canonical *"is the algorithm actually
-  modulating traffic"* check goes through the counter
-  tool; this skill names what counters the algorithm
-  emits (CNP / NACK / AI / HAI / decrement / RTT-band
-  counters per the public header) and routes the
-  inspection workflow to the tool skill.
-- [`doca-dpa`](../doca-dpa/SKILL.md) — the host-side
-  DPA control library. The algorithm runs on the DPA,
-  compiled by DPACC; the two-side-program rule and the
-  DOCA-and-DPACC version-match overlay inherited from
-  here apply.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
-  the routing table for every public DOCA documentation
-  source (the DOCA PCC programming guide at
-  <https://docs.nvidia.com/doca/sdk/doca-pcc/index.html>;
-  the DOCA PCC application guide; the DOCA Compatibility
-  Policy) and the on-disk layout of an installed DOCA
-  package.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env
-  preparation, install verification, DPACC compiler
-  install / verification, BlueField firmware
-  configuration (including the custom-PCC slot enable),
-  and the *I have no install yet* path with the public
-  NGC DOCA container. This skill assumes its
-  preconditions are satisfied AND that DPACC is installed
-  at a version that matches DOCA AND that the firmware-
-  level custom-PCC slot is enabled.
-- [`doca-version`](../../doca-version/SKILL.md) —
-  canonical DOCA version-handling rules. This skill's
-  `## Version compatibility` cross-links the four-way
-  match rule plus the DOCA-and-DPACC overlay inherited
-  from [`doca-pcc`](../doca-pcc/SKILL.md).
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
-  the bundle's structured-tools precedence rule (detect /
-  prefer / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
-  general DOCA programming patterns. This skill layers
-  algorithm-specific overlays on top of the universal
-  build, modify-a-shipped-sample, and Core lifecycle
-  patterns.
-- [`doca-debug`](../../doca-debug/SKILL.md) — cross-cutting
-  debug ladder. Algorithm-specific debug (the algorithm
-  loaded but counters do not move; the algorithm fails to
-  initialize; the algorithm modulates traffic too
-  aggressively / too gently for the workload) overlays on
-  top of that ladder.
+  the read-only CLI for port PCC counters, and the canonical *"is
+  the algorithm actually modulating traffic"* check. This skill
+  names the counters the algorithm emits (CNP / NACK / AI / HAI /
+  decrement / RTT-band) and routes the inspection there.
+- [`doca-dpa`](../doca-dpa/SKILL.md) — the host-side DPA control
+  library. The algorithm runs on the DPA, compiled by DPACC; the
+  two-side-program rule and the DOCA-and-DPACC version-match
+  overlay apply.
+- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  — routing to the public DOCA PCC programming guide
+  (<https://docs.nvidia.com/doca/sdk/doca-pcc/index.html>), the PCC
+  application guide, the Compatibility Policy, and the on-disk
+  layout of an installed DOCA package.
+- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+  install and DPACC compiler verification, BlueField firmware
+  configuration (including the custom-PCC slot enable), and the *no
+  install yet* path via the public NGC DOCA container. This skill
+  assumes those preconditions hold, DPACC matches DOCA, and the
+  custom-PCC slot is enabled.
+- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+  version handling. `## Version compatibility` cross-links the
+  four-way match rule and the DOCA-and-DPACC overlay inherited from
+  [`doca-pcc`](../doca-pcc/SKILL.md).
+- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+  — the detect / prefer / fall back / report precedence rule the
+  Command appendix in the tasks companion honors.
+- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+  — general DOCA programming patterns; this skill layers
+  algorithm-specific overlays on the universal build,
+  modify-a-shipped-sample, and Core lifecycle patterns.
+- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+  debug ladder. Algorithm-specific debug (loaded but counters do
+  not move; fails to initialize; modulates too aggressively or too
+  gently) overlays on top of it.
 - [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) —
-  cross-cutting hardware-safety meta-policy. Because the
-  algorithm modulates production RoCE-v2 flows on a
-  BlueField port, the meta-policy's pre-flight inventory,
-  replica-first, and rollback rules apply via this
-  skill's `## Safety policy` overlay.
-
+  cross-cutting hardware-safety meta-policy. Because the algorithm
+  modulates production RoCE-v2 flows on a BlueField port, its
+  pre-flight inventory, replica-first, and rollback rules apply via
+  this skill's `## Safety policy` overlay.

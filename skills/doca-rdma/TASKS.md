@@ -25,6 +25,11 @@ call.
 Goal: bring up a DOCA RDMA context on a host or BlueField and confirm
 both sides are in a state where data-movement tasks are meaningful.
 
+Core order, named in full every time: create → configure → start →
+connect → use → stop → destroy. Task configuration and permission
+setting belong in configure and MUST finish before `doca_ctx_start()`.
+Connect is its own step after start; do not fold it into use.
+
 Steps the agent should walk the user through:
 
 1. **Confirm the installed DOCA version.** Use the procedure in
@@ -58,7 +63,9 @@ Steps the agent should walk the user through:
    matrix in [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy).
    Optional but commonly needed: `doca_rdma_set_transport_type()`,
    `doca_rdma_set_max_num_connections()`, `doca_rdma_set_*` queue
-   sizes.
+   sizes. Then `doca_ctx_start()`, then connect with the method from
+   step 3, then use. Never connect or submit before start; tear-down
+   is stop then destroy.
 5. **Sanity check before any task submission.** Confirm with the
    user: which side is requesting work (Read/Write originator), which
    side is exporting memory (`doca_mmap_export_rdma()`), which
@@ -110,11 +117,43 @@ module on the target before writing any build file:
 > resolution above (and escalate via the error taxonomy) instead of
 > bypassing DOCA.
 
+**Concrete path — build the shipped DOCA RDMA sample pair first.**
+Before writing any new code, start from the samples the DOCA RDMA
+guide ships under `/opt/mellanox/doca/samples/doca_rdma/`. Each
+sample directory holds `<name>_sample.c`, `<name>_main.c`, and
+`meson.build`. The pairs are:
+
+| Pair (run both) | Pattern | When to pick it |
+| --- | --- | --- |
+| `rdma_receive` + `rdma_send` | Two-sided send/receive | The first pair to build; it is also the `## test` smoke |
+| `rdma_write_responder` + `rdma_write_requester` | One-sided write | Data must land in the peer's memory without a posted receive |
+| `rdma_read_responder` + `rdma_read_requester` | One-sided read | The requester pulls data from the peer's exported memory |
+| `*_immediate` variants | Same, plus a 32-bit immediate value | Only when the user needs the immediate value |
+
+1. `ls /opt/mellanox/doca/samples/doca_rdma/` — quote the pairs this
+   install actually ships before naming one.
+2. `pkg-config --modversion doca-rdma` (or the module Step 0
+   resolved) — record the version next to the build.
+3. Build each side out of tree with meson + ninja, as the guide
+   documents: `cd /opt/mellanox/doca/samples/doca_rdma/rdma_receive`,
+   `meson /tmp/build-rdma-receive`, `ninja -C /tmp/build-rdma-receive`;
+   repeat for `rdma_send` into its own build directory. The binary is
+   `doca_<sample_name>` in that build directory. Never edit files
+   under `/opt/mellanox/doca/samples/` or leave build directories
+   there — when the user's intent needs a code change, copy the whole
+   samples tree to a workspace first so the shared helper files still
+   resolve, and edit and build the copy.
+4. Prove the routing on the exact binary you will run, as its own
+   unfiltered command: `ldd /tmp/build-rdma-send/doca_rdma_send`, and
+   read the `libdoca_rdma.so => …` line in the full output. No such
+   line means this is not a DOCA RDMA build — fix the build; do not
+   switch to another tool.
+
 This skill carries only the RDMA-specific overlay:
 
 | Slot | Value for RDMA | Why it matters |
 | --- | --- | --- |
-| `pkg-config` module name | `doca` (umbrella; verify per Step 0 — there is normally no `doca-rdma.pc`) | The `.pc` that resolves the RDMA cflags/libs on current DOCA host packages |
+| `pkg-config` module name | `doca-rdma` when `pkg-config --exists doca-rdma` succeeds, otherwise the umbrella `doca` (verify per Step 0) | The `.pc` that resolves the RDMA cflags/libs on current DOCA host packages |
 | Required runtime libs | whatever `pkg-config --libs doca` reports — it pulls in `libdoca_common`, `libdoca_rdma`, and the device-side providers | RDMA depends on Core + the rdma transport providers shipped with DOCA |
 | Header check | `doca_rdma.h` resolvable under the include directory `pkg-config --cflags doca` reports (do not hardcode the include path — the install layout can move) | If `--cflags` resolves but `doca_rdma.h` is missing, the install is partial |
 | Minimum required DOCA version | Query with `pkg-config --modversion doca`; never hardcode in build files | Cross-version build/runtime mixing breaks per [CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility) |
@@ -194,26 +233,38 @@ Steps the agent should walk the user through:
    `doca_pe_progress()` call. Confirm the progress engine is being
    driven on both sides.
 
-**Single-host loopback (only one BlueField / NIC available).** A peer
-does *not* have to be a second host. Both endpoints can run as two
-local processes bound to the same `doca_dev`; the device loops the
-traffic internally. The two sides still exchange connection state out
-of band, so the shipped send/receive (and read/write) samples
-implement a **file-based descriptor handshake**: each side writes its
-own `doca_rdma_export()` descriptor (and, for one-sided tasks, its
-`doca_mmap_export_rdma()` descriptor) to a local file and reads the
-peer's file, then each presses enter to advance from
-*connection-listening* to *connected*. On a single box, point the two
-processes at a shared filesystem (the requester's `local` path is the
-responder's `remote` path and vice-versa), start both, then release
-the handshake once both descriptor files exist. Two caveats that bite
-agents: (a) the **write/atomic** samples expect a *second* enter on
-the responder after the requester reports its task done — a single
-enter looks like a hang; (b) **loopback traffic stays internal to the
-device, so physical-port and `vport_*` RDMA hw_counters do not
-move** — prove success from the completion event and the received
-payload (e.g. the responder logging the bytes the requester sent), not
-from port counters.
+**Two peers on one box (only one BlueField / NIC available).** A
+peer does *not* have to be a second host. Run the responder /
+receiver and the requester / sender as **two separate processes**
+on the same active port (`-d <ibdev>`), or across two ports, or
+host ↔ BlueField. Two processes on one port still move the bytes
+through the NIC. What does **not** count is a same-process,
+same-buffer loopback, or a client / server pointed at `127.0.0.1` /
+`localhost`. Exchange connection details with the samples' own
+arguments (DOCA 3.5 RDMA guide, common sample arguments):
+
+- **Out-of-band descriptor files (default).** `-ld` /
+  `--local-descriptor-path` is where a side writes its own
+  descriptor; `-re` / `--remote-descriptor-path` is where it reads
+  the peer's; the one-sided read/write samples also take `-m` /
+  `--mmap-descriptor-path` for the peer's exported mmap. On one box
+  the receiver's local path is the sender's remote path and vice
+  versa. Start the responder / receiver first, then the requester /
+  sender.
+- **RDMA CM.** `-cm` / `--use-rdma-cm` on both sides; the listener
+  takes `-lp` / `--listen-port`, the connector takes `-sa` /
+  `--server-addr` with `-sat` / `--server-addr-type` (IPv4, IPv6, or
+  GID). Use the port's own IP or GID, never a loopback address.
+
+Two caveats that bite agents: (a) the descriptor handshake waits for
+Enter on each side once both descriptor files exist, and the
+**write/atomic** samples expect a *second* Enter on the responder
+after the requester reports its task done — a single Enter looks
+like a hang; drive these prompts from the same foreground command
+and wait for both processes, do not leave them in the background;
+(b) prove the transfer with the independent evidence in `## test`
+(receiver-side data check plus the receiving port's RDMA byte
+counters sampled before and after), not from the sample's log alone.
 
 ## test
 
@@ -228,6 +279,33 @@ data-movement pattern flows end-to-end with the expected completions,
 or (b) the agent has narrowed the failure cause to a layer outside
 RDMA itself (driver / firmware / network) and escalated to the
 matching skill.
+
+**What proves a DOCA RDMA transfer — and what does not.** Declare the
+data path working only when one run captures all four:
+
+1. **Routing.** Plain `ldd` on the executed requester and responder
+   binaries (built from the shipped sample per `## build`) shows
+   `libdoca_rdma.so`.
+2. **Two peers.** Responder / receiver and requester / sender are
+   separate processes with different PIDs (two hosts, host ↔
+   BlueField, two ports, or one active port). The responder starts
+   first, the command waits for both, and both exit 0.
+3. **Data check.** The receiver validates the payload it actually
+   received against what the sender sent — for example the SHA-256 of
+   the sent and received buffers. Use synthetic test bytes, never user
+   data.
+4. **NIC evidence.** Sample the receiving port's RDMA byte counters
+   before and after the run — map the device to its netdev with
+   `ibdev2netdev`, then read `ethtool -S <netdev>` (the mlx5
+   `rx_vport_rdma_unicast_bytes` / `tx_vport_rdma_unicast_bytes`
+   counters). The receive-side delta should be at least the payload
+   size.
+
+`ib_write_bw`, `ib_send_bw`, `rping`, `ibv_rc_pingpong`, and other
+rdma-core / perftest tools exercise only the verbs layer and the
+fabric: they can be a fabric pre-check, but they **do not validate
+the DOCA RDMA path** and are never the deliverable. Neither is a
+loopback shortcut (same process / same buffer, or `127.0.0.1`).
 
 Iteration shape:
 
@@ -315,8 +393,8 @@ at layers 5 (runtime) and 6 (program):
   `DOCA_ERROR_NOT_PERMITTED`. Walk the matrix in
   [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy)
   against the user's configured permissions.
-- Lifecycle order: configure → start → connect → use → stop →
-  destroy. Out-of-order returns `DOCA_ERROR_BAD_STATE`. The most
+- Lifecycle order: create → configure → start → connect → use →
+  stop → destroy. Out-of-order returns `DOCA_ERROR_BAD_STATE`. The most
   common case is destroying an mmap before `doca_ctx_destroy()`.
 - Bulk-submit sizing: `DOCA_ERROR_FULL` on bulk submit is a
   sizing-vs-drain mismatch, not a hardware failure.
@@ -391,7 +469,7 @@ the agent should:
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). Note: there is normally no `doca-rdma.pc`; use the umbrella `doca` module (verify with `pkg-config --list-all | grep -i doca`) |
+| `pkg-config --modversion doca` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). Use `pkg-config --modversion doca-rdma` when that module resolves; otherwise the umbrella `doca` module (verify with `pkg-config --list-all | grep -i doca`) |
 | `pkg-config --cflags --libs doca` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs doca` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores (`libdoca_rdma.so`), and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. If this probe fails, fix the module name / `PKG_CONFIG_PATH` per `## build` Step 0 — do NOT fall back to raw libibverbs. |
 | `grep -RHn 'DOCA_VERSION_' $(pkg-config --variable=includedir doca)/doca_version.h` | `## configure` step 1 | What macros does this DOCA install expose for compile-time version checks? | A `DOCA_VERSION_MAJOR`, `MINOR`, `PATCH` triple matching the runtime version |
 | `doca_caps --list-devs` | `## configure` step 2 | Which devices on this host can be used as a `doca_dev`? | One row per visible device with PCIe address and capability flags |
@@ -402,6 +480,9 @@ the agent should:
 | `mlxconfig -d <pcie> q | head -n 40` (sudo) | `## debug` layer 7 | What firmware config does the underlying NIC report? | Stable firmware config; transient values indicate a partial reset |
 | `ibv_devinfo` (sudo) | `## configure` step 2; `## debug` layer 7 | What does the underlying `libibverbs` see for this device? | One device row with `state: PORT_ACTIVE` and a sane MTU |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed |
+| `ldd <build-dir>/doca_rdma_send` (unfiltered, own command) | `## build` step 4; `## test` evidence 1 | Does the binary I am about to run actually use DOCA RDMA? | A `libdoca_rdma.so => …` line. Missing = not a DOCA RDMA build |
+| `ibdev2netdev`, then `ethtool -S <netdev>` before and after | `## test` evidence 4 | Did RDMA bytes really cross the receiving port? | `rx_vport_rdma_unicast_bytes` delta ≥ payload bytes |
+| `ib_write_bw` / `rping` / `ibv_rc_pingpong` | fabric pre-check only | Does the verbs layer / fabric work at all? | Passing says nothing about DOCA RDMA; never report it as the DOCA RDMA proof |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, the install-prefix `applications/VERSION`,

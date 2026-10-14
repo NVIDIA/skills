@@ -3,33 +3,52 @@ license: Apache-2.0
 name: doca-firefly
 description: >
   Use this skill when the user is operating the DOCA Firefly Service
-  container on BlueField — picking the four PTP configuration axes
-  (role / profile / domain / interface), wiring the BlueField PHC +
-  host follower + consumer workload pairing, deciding whether
-  PTP-grade time is even needed (vs. chrony / NTP), or debugging a
-  Firefly deployment where PTP isn't syncing or the host clock isn't
-  following. Trigger even when the user does not explicitly mention
-  "DOCA Firefly" or "PTP" — typical implicit phrasings include
-  "container green but PTP never advances past LISTENING", "Firefly
-  says synced but the host clock still drifts", "sync acquired but
-  offset is tens of microseconds", "my Rivermax SMPTE workload needs
-  PTP", or "is chrony good enough". Refuse and route elsewhere for
-  installing DOCA, host-side chrony / ptp4l config bodies, PTP
-  topology / boundary-clock design, building DOCA apps that read the
-  disciplined PHC, or other DOCA services (DMS, Flow-Inspector, HBN)
-  — those belong to other skills.
+  container on BlueField — picking the four PTP configuration axes (role
+  / profile / domain / interface), wiring the BlueField PHC + host
+  follower + consumer workload pairing, deciding whether PTP-grade time
+  is even needed (vs. chrony / NTP), or debugging a Firefly deployment
+  where PTP isn't syncing or the host clock isn't following. Trigger
+  even when the user does not explicitly mention "DOCA Firefly" or "PTP"
+  — typical implicit phrasings include "container green but PTP never
+  advances past LISTENING", "Firefly says synced but the host clock
+  still drifts", "sync acquired but offset is tens of microseconds", "my
+  Rivermax SMPTE workload needs PTP", or "is chrony good enough". Refuse
+  and route elsewhere for installing DOCA, host-side chrony / ptp4l
+  config bodies, PTP topology / boundary-clock design, building DOCA
+  apps that read the disciplined PHC, or other DOCA services (DMS,
+  Flow-Inspector, HBN) — those belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: service
+  tags:
+    - doca
+    - firefly
+    - ptp
 compatibility: >
-  BlueField-Arm-only DOCA service container; pulled from NVIDIA NGC
-  and started under the BlueField OS container runtime. Host-side
-  install is irrelevant. Requires a reachable PTP master (or runs as
-  the master itself) and a PTP-aware network path; the host-side
-  time follower (chrony / ptp4l / phc2sys reading the BlueField PHC)
-  is also operator-owned.
+  BlueField-Arm-only DOCA service container; pulled from NVIDIA NGC and
+  started under the BlueField OS container runtime. Host-side install is
+  irrelevant. Requires a reachable PTP master (or runs as the master
+  itself) and a PTP-aware network path; the host-side time follower
+  (chrony / ptp4l / phc2sys reading the BlueField PHC) is also
+  operator-owned. The validation steps require a live DOCA install.
 ---
 
 # DOCA Firefly Service
+
+## Examples
+
+- **"Container green but PTP never advances past LISTENING."**
+  — this is in scope. Check role / profile / domain /
+  interface before changing host chrony.
+- **"Firefly says synced but the host clock still drifts."** —
+  wire the BlueField PHC follower; Firefly does not replace
+  host-side chrony / ptp4l bodies.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+sync / debug. Open the capabilities companion for PTP axes.
+Do not open every companion file.
 
 > **Subsystem inventory (Run-12 correction, verified Run-13).**
 > DOCA Firefly is NOT just "a PTP daemon." The shipped
@@ -88,10 +107,10 @@ the **PTP / PHC2SYS / PPS / SyncE / Servo / Monitor** stack that
 drives and observes the BlueField PTP Hardware Clock (PHC); it is
 *not* the host-side time follower, *not* the consumer workload, and
 *not* a programming surface. If the user wants to *deploy* the
-container, open [`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure). If the question is *what shape
+container, open the tasks companion and start at
+`## configure`. If the question is *what shape
 of service is Firefly and what PTP roles / profiles does it speak*,
-start at [`CAPABILITIES.md`](CAPABILITIES.md). If DOCA is not installed
+start at the capabilities companion. If DOCA is not installed
 on the BlueField yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first. If the user's
 real question is *"I have a Rivermax SMPTE workload and the docs say I
@@ -109,36 +128,36 @@ worked example is one instance.
   worked example: *"my distributed app is fine on chrony today; is
   there a reason to add PTP?"*. Answered by the PTP-vs-NTP path-
   selection rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the env-prep checklist in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"What four PTP configuration axes do I have to decide before
   starting the container?"** — worked example: *"a SMPTE ST 2110
   broadcast plant that wants Firefly in slave role on the wire-side
   port"*. Answered by the four-axis configuration table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the PTP-config step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"Firefly's container is running but the host's time isn't
   following — what did I miss?"** — worked example: *"`ptp4l` /
   Firefly says it's locked but `chronyc tracking` on the host shows
   drift"*. Answered by the END-TO-END time-sync discipline in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the host-follower step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  the tasks companion.
 - **"PTP locks but the offset / jitter is way past spec — what's
   wrong with the path?"** — worked example: *"sync acquired but offset
   is in the tens of microseconds"*. Answered by the PTP-aware-path
   rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  the capabilities companion
   + the layered debug ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 - **"How does Firefly pair with a Rivermax SMPTE workload?"** —
   worked example: *"SMPTE ST 2110 video sender that needs to be PTP-
   locked"*. Answered by the Rivermax-pairing rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the pairing step in
-  [`TASKS.md ## configure`](TASKS.md#configure), which routes the
+  the tasks companion, which routes the
   Rivermax side to
   [`doca-rmax`](../../libs/doca-rmax/SKILL.md) and refuses to
   collapse the two services into one.
@@ -147,9 +166,9 @@ worked example is one instance.
   interface?"** — worked example: *"container green but the
   ports-state output never advances past `LISTENING`"*. Answered by
   the four-axis-mismatch rule in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  the capabilities companion
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug).
+  the tasks companion.
 
 ## Audience
 
@@ -232,7 +251,7 @@ those, route via
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — Firefly's architecture (container that drives
+- the capabilities companion — Firefly's architecture (container that drives
   the BlueField PHC and speaks PTP on the wire), the four PTP
   configuration axes (role / profile / domain / interface, with
   transport as a fifth knob), the deployment shape (container on
@@ -242,7 +261,7 @@ companion files:
   the error taxonomy (four-axis-mismatch / host-follower / PTP-aware-
   path / container-runtime), and the safety policy (PTP-vs-NTP path
   selection, END-TO-END discipline, smoke-before-scale).
-- `TASKS.md` — step-by-step workflows for the in-scope Firefly
+- the tasks companion — step-by-step workflows for the in-scope Firefly
   verbs: `configure`, `build`, `modify`, `run`, `test`, `debug`,
   plus a `Deferred task verbs` block routing out-of-scope questions
   and a `Command appendix` of recurring commands.
@@ -288,15 +307,15 @@ and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope **and** that Firefly is the right answer at all (vs. keeping
    NTP / chrony on the host).
 2. **For Firefly's deployment shape, the four PTP configuration
    axes, the Rivermax + host-follower pairing surface, the error
    taxonomy, the observability surface, and the END-TO-END safety
-   policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   policy, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 ## Related skills
 
@@ -316,7 +335,7 @@ and pull requests should not add:
   match rule and adds the container-tag-lags-host-package overlay.
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect / prefer /
-  fall back / report). The Command appendix in [TASKS.md](TASKS.md)
+  fall back / report). The Command appendix in the tasks companion
   honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
   — general DOCA patterns. Firefly is service-shaped not library-

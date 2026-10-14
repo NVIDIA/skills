@@ -344,6 +344,15 @@ Debug is layered: most failures are NOT in the algorithm —
 they are in the host-side framework precondition chain or
 in the build. Walk the ladder; do not jump.
 
+Triage by symptom first. If the algorithm loaded (or the
+sample runs) but RoCE-v2 flows are not throttled or the
+sample does not seem to dispatch to the algorithm, start at
+rung 6: discriminate whether CC events reach the algorithm
+at all (wrong algo slot, `doca_pcc` attached to the wrong
+port, or no RoCE-v2 traffic on the port) before tuning
+parameters or rebuilding a variant. Errors at startup or
+load start at rung 1.
+
 1. **`DOCA_ERROR_NOT_PERMITTED` / `DOCA_ERROR_DRIVER` /
    `DOCA_ERROR_INVALID_VALUE` from `doca_pcc` host-side
    calls at startup.** Algorithm wiring has not even

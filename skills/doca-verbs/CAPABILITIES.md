@@ -21,33 +21,7 @@ do not duplicate URLs or install paths in this file.
 
 ## Pattern overview
 
-Every raw-verbs question this skill teaches resolves into one of
-SIX patterns. The patterns are CLASSES — they apply across every
-raw-verbs use case, not just the worked example shown.
-
-| Raw-verbs pattern | Class shape | Where the substance lives |
-| --- | --- | --- |
-| 1. Decide drop-down vs stay-up | The agent first re-checks whether the matching higher-level DOCA library ([`doca-rdma`](../doca-rdma/SKILL.md) / [`doca-eth`](../doca-eth/SKILL.md) / [`doca-rmax`](../doca-rmax/SKILL.md)) covers the case; only if it explicitly does not does the conversation continue here | [`## Capabilities and modes`](#capabilities-and-modes) higher-level-vs-doca-verbs table + [TASKS.md ## configure](TASKS.md#configure) step 1 |
-| 2. Place the surface against libibverbs | The agent teaches that `doca-verbs` is *not* a synonym for libibverbs even though the object names rhyme; mixing handles across the boundary is unsupported | [`## Safety policy`](#safety-policy) no-mixing rule + [TASKS.md ## modify](TASKS.md#modify) porting block |
-| 3. Bring the verbs context up inside DOCA Core | The agent walks `doca_dev` + `doca_pe` + `doca_verbs_context_create` + per-object PD / QP / CQ / SRQ / AH creation in DOCA Core terms (not in libibverbs poll-CQ terms) | [`## Capabilities and modes`](#capabilities-and-modes) object-model section + [TASKS.md ## configure](TASKS.md#configure) |
-| 4. Capability-query the specific verb / opcode / QP feature | The user wanted raw verbs because some specific thing was missing upstairs — the agent must confirm that *specific* thing is supported here on the device, via `doca_verbs_query_device` + the matching `doca_verbs_device_attr_get_*` against the active `doca_devinfo` | [`## Capabilities and modes`](#capabilities-and-modes) cap-query rule + [TASKS.md ## configure](TASKS.md#configure) |
-| 5. Observe what the HW actually did | Three valid surfaces: the DOCA progress engine (preferred default, integrates with the rest of DOCA Core), manual completion-queue handling via `doca_verbs_bridge_poll_cq`, or completion-channel event delivery via `doca_verbs_comp_channel_create` + `doca_verbs_get_cq_event` — the agent picks one explicitly | [`## Observability`](#observability) + [TASKS.md ## debug](TASKS.md#debug) |
-| 6. Interpret a `DOCA_ERROR_*` from a raw-verbs call | Map the error to a layer (lifecycle / cap / permission / completion-status); the IO_FAILED case has its own overlay because the answer lives on the CQE, not on the submit return | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
-
-Two cross-cutting rules that apply to *every* pattern above:
-
-- **Smoke-before-scale.** Always start with one QP + one WR + one
-  completion before adding any second QP, second connection, or
-  second WR opcode. Raw verbs amplifies the cost of a hidden
-  configuration bug; a single-shot smoke isolates the cause
-  cleanly. The full eval-loop overlay is in
-  [TASKS.md ## test](TASKS.md#test).
-- **Discover the version-installed surface, do not assume.** Every
-  pattern above gates on `pkg-config --modversion doca-verbs` and
-  on the `doca_verbs_query_device` + `doca_verbs_device_attr_get_*`
-  capability queries against the active `doca_devinfo`. Quoting a
-  verb / opcode / QP option / SRQ feature without checking is the
-  most common hallucination failure mode for raw verbs.
+See [references/pattern-overview.md](references/pattern-overview.md).
 
 ## Capabilities and modes
 
@@ -293,7 +267,7 @@ Five primary signals the agent should reach for:
    `_set_current_state` / `_set_next_state` pair; misordered
    transitions return `DOCA_ERROR_BAD_STATE`. The current state is
    queryable via `doca_verbs_qp_query`. A debugging session
-   without confirmation of the QP's current state is blind to
+   until `doca_verbs_qp_query` has reported the QP's current state is blind to
    half the lifecycle.
 3. **Capability snapshot at configure time.** The output of
    `doca_verbs_query_device` + the iterated
@@ -309,15 +283,10 @@ Five primary signals the agent should reach for:
    changes, fatal errors). Wire the handle into the user's poll
    loop the same way as the comp-channel handle when those events
    are operationally relevant.
-5. **Commands in flight (RESTRICTED / trap-tier — NOT public).**
-   `doca_verbs_command_get_state`, `_get_op_type`,
-   `_get_user_data` give visibility into command-in-flight
-   state, but they are **not part of the public verbs surface**:
-   they are declared only in the restricted trap header
-   `include/restricted/multi_path/doca_verbs_trap.h`, not in
-   `include/public/doca_verbs.h`. Do not present them as
-   generally available observability for public verbs consumers;
-   they require the restricted multi-path/trap tier.
+5. **Public-header boundary.** Only recommend observability APIs declared by
+   the installed public `doca_verbs.h`. If a local installation exposes
+   additional non-public headers or symbols, treat them as out of scope and do
+   not quote, route to, or infer behavior from them.
 
 For cross-cutting observability primitives (`--sdk-log-level`, the
 `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env var) see
@@ -391,42 +360,4 @@ Additional rules:
 
 ## Deferred topic boundaries
 
-This skill scopes itself to the raw-verbs surface inside DOCA
-Core. Adjacent topics the agent will get asked but should route
-elsewhere:
-
-- **General DOCA RDMA work (Send / Receive / Read / Write / Atomic
-  task patterns).** Owned by
-  [`doca-rdma`](../doca-rdma/SKILL.md). This skill exists *only*
-  for cases the higher-level library does not cover.
-- **General DOCA Ethernet queue work.** Owned by
-  [`doca-eth`](../doca-eth/SKILL.md). This skill's
-  `doca_verbs_eth_sq_*` / `doca_verbs_eth_rq_*` surface exists
-  *only* for the cases doca-eth does not expose.
-- **Timing-precise media / data-over-IP streaming.** Owned by
-  [`doca-rmax`](../doca-rmax/SKILL.md). Most Rivermax cases stay
-  there.
-- **General libibverbs programming** (raw ibverbs lifecycle, queue
-  pair theory, memory-region semantics outside DOCA Core) —
-  outside this skill. Route to the upstream RDMA / IB
-  documentation; this skill assumes the user already understands
-  the abstractions and is asking *how to express them inside the
-  DOCA Core model*.
-- **DOCA Core context and progress engine internals** — owned by
-  [`doca-common`](../doca-common/SKILL.md). This skill *uses* the
-  Core context lifecycle and the PE drive loop; it does not
-  redefine them.
-- **Cross-library `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
-  This skill adds the raw-verbs overlay, not the taxonomy itself.
-- **Cross-cutting debug ladder** (install / version / build / link
-  / runtime / program / driver) — owned by
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug). This
-  skill's `## debug` redirects there for layers 1-4 and layer 7;
-  layers 5-6 carry the raw-verbs-specific overlay.
-- **Cross-library `doca_caps` invocation patterns** — owned by
-  [`doca-caps`](../../tools/doca-caps/SKILL.md). This skill
-  references the *raw-verbs capability query family*
-  (`doca_verbs_query_device` + `doca_verbs_device_attr_get_*`),
-  which is per-library; the *cross-library capability snapshot
-  tool* is a separate surface routed there.
+See [references/deferred-topics.md](references/deferred-topics.md).

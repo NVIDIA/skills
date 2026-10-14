@@ -5,10 +5,10 @@ description: >
   Use this skill when the user is measuring GPU-kernel-initiated RDMA
   WRITE latency through doca-gpunetio — building and running the
   `gpunetio_ib_write_lat` client + server pair under
-  `doca/tools/gpunetio_ib_write_lat/`, checking GPU-NIC pairing,
-  reading the half-iter / full-iter / CUDA-side usec columns,
-  characterizing median / p99 / jitter for a real-time control loop,
-  picking GPUNetIO vs GPI vs CPU-initiated `perftest`, or weighing the
+  `doca/tools/gpunetio_ib_write_lat/`, checking GPU-NIC pairing, reading
+  the half-iter / full-iter / CUDA-side usec columns, characterizing
+  median / p99 / jitter for a real-time control loop, picking GPUNetIO
+  vs GPI vs CPU-initiated `perftest`, or weighing the
   latency-vs-batching trade-off. Trigger even without 'GPUNetIO' or
   'ib_write_lat': 'GPU kernel RDMA latency benchmark', 'how fast can a
   CUDA kernel post a WRITE', 'p99 RDMA latency on H100 + ConnectX',
@@ -17,19 +17,38 @@ description: >
   (doca-gpunetio-ib-write-bw), the GPI surface (doca-gpi), library
   debugging (doca-gpunetio), or DOCA install.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: tool
+  tags:
+    - doca
+    - gpunetio
+    - latency
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on Linux
-  (Ubuntu 22.04/24.04 or RHEL/SLES) with an InfiniBand-capable
-  ConnectX or BlueField RNIC. Requires NVIDIA GPU with CUDA
-  Toolkit and `nvidia_peermem` loaded; client and server hosts
-  each need a GPU-NIC pair on a common PCIe / NVLink fabric.
-  Reads pkg-config doca-gpunetio / doca-rdma / doca-common and
-  builds from the source tree at
-  /opt/mellanox/doca/tools/gpunetio_ib_write_lat against the installed DOCA.
+  Requires DOCA SDK at /opt/mellanox/doca on Linux (Ubuntu 22.04/24.04
+  or RHEL/SLES) with an InfiniBand-capable ConnectX or BlueField RNIC,
+  NVIDIA GPU, CUDA toolkit, and loaded `nvidia_peermem`. Client and
+  server each need a GPU-NIC pair. Reads pkg-config doca-gpunetio /
+  doca-rdma / doca-common and builds
+  `/opt/mellanox/doca/tools/gpunetio_ib_write_lat` against the installed
+  DOCA. The validation steps require a live DOCA install.
 ---
 
 # DOCA GPUNetIO ib_write_lat
+
+## Examples
+
+- **"What GPU-init RDMA-WRITE latency can GPUNetIO deliver?"** —
+  this is in scope. Capture median and p99; do not treat GPI as
+  a shipped latency binary.
+- **"GPUNetIO vs GPI — which latency number should I trust?"** —
+  same physical operation, different runtime; route GPI semantics
+  to the GPI skill.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+run / debug. Open the capabilities companion for pairing and
+observability. Do not open every companion file.
 
 **Where to start:** This is a tool skill for the GPUNetIO-
 flavored `ib_write_lat` benchmark shipped under
@@ -38,11 +57,11 @@ built from source against the installed DOCA via `meson`).
 It measures the latency of an RDMA WRITE work request when
 the WR is posted **from a CUDA kernel through the
 doca-gpunetio device-side surface**, in a ping-pong cadence.
-Open [`TASKS.md`](TASKS.md) and start at
-[`## configure`](TASKS.md#configure) for the GPU-NIC pairing
+Open the tasks companion and start at
+`## configure` for the GPU-NIC pairing
 precondition and the build pattern; jump to
-[`## run`](TASKS.md#run) for the single-iteration smoke
-flow. Open [`CAPABILITIES.md`](CAPABILITIES.md) when the
+`## run` for the single-iteration smoke
+flow. Open the capabilities companion when the
 question is *what this tool actually measures*, *how it
 differs from the GPI sister tool on the same physical
 operation*, or *how to interpret the half-iter / full-iter
@@ -51,9 +70,9 @@ characterization*. If DOCA is not installed yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first; if the
 user is still deciding between GPUNetIO and GPI as a
 programming surface, the picture in
-[`../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes`](../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes)
+[`doca-gpunetio`](../../libs/doca-gpunetio/SKILL.md)
 and
-[`../../libs/doca-gpi/CAPABILITIES.md#capabilities-and-modes`](../../libs/doca-gpi/CAPABILITIES.md#capabilities-and-modes)
+[`doca-gpi`](../../libs/doca-gpi/SKILL.md)
 is the first stop.
 
 ## Example questions this skill answers well
@@ -70,19 +89,19 @@ instance.
   ConnectX-7 on each side, target the median and the p99
   separately"*. Answered by the GPU-NIC pairing
   precondition in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the bring-up flow in
-  [`TASKS.md ## configure`](TASKS.md#configure) +
-  [`TASKS.md ## run`](TASKS.md#run).
+  the tasks companion +
+  the tasks companion.
 - **"This is the GPUNetIO tool — how does the latency
   number differ from the GPI programming surface?"** —
   worked example: *"the team is using GPI; should I expect
   GPUNetIO to beat / tie / lose vs GPI?"*. Answered by the
   *"same physical operation, different runtime framework"*
   rule in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the cross-link to the GPI library skill
-  [`../../libs/doca-gpi/CAPABILITIES.md`](../../libs/doca-gpi/CAPABILITIES.md)
+  [`doca-gpi`](../../libs/doca-gpi/SKILL.md)
   (note: `doca/tools/` ships no GPI `ib_write_lat`
   benchmark binary — GPI is a programming surface, not a
   shipped benchmark tool).
@@ -92,29 +111,29 @@ instance.
   is well under the budget but p99 spikes; do I quote
   the median or the p99?"*. Answered by the
   median-vs-p99-vs-jitter rule in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
+  the capabilities companion
   + the eval-loop overlay in
-  [`TASKS.md ## test`](TASKS.md#test).
+  the tasks companion.
 - **"What is the latency-vs-batching trade-off specific
   to GPU-init RDMA?"** — worked example: *"my CUDA kernel
   could batch multiple WRs to amortize the GPU-side
   overhead; what does that buy me on latency vs what does
   it cost me?"*. Answered by the
   latency-vs-batching trade-off in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+  the capabilities companion.
 - **"What version of DOCA + CUDA Toolkit do I need for
   this binary to build and run?"** — worked example: *"my
   install has DOCA at one semver and CUDA at another;
   will the ToT-shipped `gpunetio_ib_write_lat` even
   link?"*. Answered by the version overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
+  the capabilities companion.
 - **"How do I read the half-iter / full-iter / CUDA-side
   usec columns?"** — worked example: *"the binary printed
   half-iter, full-iter, and a CUDA-side number — what is
   the right column to quote for one-way latency vs
   round-trip vs cross-check?"*. Answered by the column-
   semantics rule in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability).
+  the capabilities companion.
 
 ## Audience
 
@@ -204,7 +223,7 @@ not the user's full pipeline.
 This is a **thin loader**. Substantive material lives in
 two companion files:
 
-- `CAPABILITIES.md` — what the tool measures (the
+- the capabilities companion — what the tool measures (the
   ping-pong WRITE latency primitive driven by both sides'
   CUDA kernels through doca-gpunetio), the
   runtime-surface selection rule (GPUNetIO vs GPI vs
@@ -216,7 +235,7 @@ two companion files:
   (stdout report including the timeout knob the
   `gpunetio_rdma_write_lat_*` kernel functions surface
   per the verified `common.h`), and the safety overlay.
-- `TASKS.md` — step-by-step workflows for the in-scope
+- the tasks companion — step-by-step workflows for the in-scope
   task verbs: `install`, `configure`, `build`, `modify`,
   `run` (smoke-before-bulk; single-iteration verification;
   reading the report columns), `test` (the eval loop —
@@ -250,13 +269,13 @@ pull requests should not add:
 - **Wrappers, parsers, or scripts** in any language that
   consume the tool's stdout. The output format is small
   and documented in
-  [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability).
+  the capabilities companion.
 - **A `samples/`, `bindings/`, or `reference/` subtree.**
   This is a thin loader for a shipped tool tree.
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's
+1. Read this skill first to confirm the user's
    question is in scope (the user actually wants to
    measure kernel-initiated WRITE latency through
    GPUNetIO, not the GPI variant, not the CPU-initiated
@@ -267,10 +286,10 @@ pull requests should not add:
    median / p99 / jitter reporting taxonomy, the version
    overlay, the error taxonomy, the observability
    surface, and the safety overlay, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For step-by-step workflows — `install`,
    `configure`, `build`, `modify`, `run`, `test`,
-   `debug`, `use` — see [TASKS.md](TASKS.md).**
+   `debug`, `use` — see the tasks companion.**
 
 ## Related skills
 
@@ -304,7 +323,7 @@ pull requests should not add:
   benchmark binary, so the GPI comparison is against the
   library surface, not a sibling tool. The selection rule
   in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   is the decision aid; the agent's job is to teach when
   to pick which.
 - [`doca-version`](../../doca-version/SKILL.md) — the

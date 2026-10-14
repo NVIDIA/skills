@@ -2,7 +2,7 @@
 license: Apache-2.0 AND CC-BY-4.0
 name: doca-structured-tools-contract
 description: >
-  Use this skill whenever another DOCA skill says "prefer the
+  Not for writing library code (name that library skill). Use this skill whenever another DOCA skill says "prefer the
   structured tool per doca-structured-tools-contract", or when the
   user wants a one-shot answer that consolidates info multiple
   manual commands would produce — DOCA env / version / devices /
@@ -19,6 +19,7 @@ description: >
   guidance — those belong to the per-library skill,
   doca-public-knowledge-map, or doca-setup.
 metadata:
+  author: NVIDIA
   kind: knowledge
 compatibility: >
   No DOCA install required to read this skill (it is an overlay
@@ -39,11 +40,31 @@ section. **Always report which path was taken** so the user can fix
 the gap (or so a future bundle update can detect that the structured
 path was never tried).
 
+**Scope boundary.** Writing library code ("write packet-steering code with
+the DOCA Flow API") is not a structured-tools question: name the library
+skill and stop. Checking a spec before commit ("is my DOCA Flow pipe spec
+valid before I commit it?") IS in scope: apply the validate-before-commit
+schema below.
+
 ## Example questions this skill answers well
 
 See [`references/examples.md`](references/examples.md) for the five
 worked routing examples. Keep this loader focused on detection,
 fallback behavior, and the authoritative schemas below.
+
+## Quick answer: "is my DOCA Flow pipe spec valid before I commit it?"
+
+Apply the validate-before-commit schema:
+1. Probe for a dedicated read-only validator: `command -v doca-validate`.
+   None ships today, so report "validation: skip (no read-only validator
+   installed)".
+2. DOCA Flow has no `doca_flow_pipe_validate` call; do not invent one.
+   DOCA Flow validates at constructor time: a failing
+   `doca_flow_pipe_create` (`DOCA_ERROR_INVALID_VALUE` /
+   `DOCA_ERROR_NOT_SUPPORTED`) is the validation signal.
+3. Because that call is mutating, run it only in `doca-flow` TASKS.md
+   `## test` on a test setup after its snapshot and safety preconditions,
+   never as a read-only probe from this contract.
 
 ## When to load this skill
 
@@ -107,7 +128,11 @@ either directly by the agent or through commands the user runs.
    executables that satisfy these contracts are deferred to a
    subsequent PR on the maintainer roadmap. This skill exists so
    every other skill in the bundle can be *infra-aware* before the
-   executables ship.
+   executables ship. So **no helper named here is installed
+   anywhere today.** Never present one as available, document its
+   flags, or send the user to install it or read its docs; none
+   exist. Probe, report it absent in one line, then answer from the
+   manual fallback.
 7. **Privilege is never implicit.** A manual fallback command that
    requires `sudo` is emitted for the user to run or executed only
    through an already approved privileged channel. Never silently
@@ -153,8 +178,8 @@ Command appendix references this contract:
      failed: `<reason>`)."* — when the probe failed. Include the
      actual probe command and failure reason; for `command -v`, note
      that failure means the helper was not found on `PATH`, not that
-     it is definitively absent. Plus a one-line note pointing the
-     user at how to install the helpers when they become available.
+     it is definitively absent. Do not suggest installing the helper
+     (ground rule 6: none ships today).
    - *"Falling back to manual chain (`<tool>` output failed schema
      validation: `<reason>`)."* — when the helper exists but its
      output is malformed, missing required fields, or has invalid
@@ -213,7 +238,6 @@ synthesize the same answer):
 ### version-matrix.json schema
 
 **Detection probe:** `test -f /opt/mellanox/doca/share/version-matrix.json`.
-If absent, use the manual fallback; do not guess another install path.
 
 **Top-level shape (JSON object):**
 
@@ -267,22 +291,18 @@ structured tool, if installed, lives at the same `$PATH` location as
 **Manual fallback chain:**
 
 1. `doca_caps --list-devs` → device enumeration
-2. For each device + each library of interest: invoke the
-   library-specific `doca_<lib>_cap_*` query family from a small
-   test program by following the library's own `## test` workflow
-   and modifying its named shipped sample. Do not invent test code.
+2. Per-device detail: `doca_caps --pci-addr <bdf>` (side-effect
+   free; see `doca-caps`). Only if a capability that tool does not
+   print is required, use the library's own `## test` workflow from
+   its shipped sample; never write new test code for a snapshot.
 
 ### validate-before-commit schema
 
-**Detection probe:** `command -v doca-validate`. If that command is
-absent, the structured helper is absent and the agent uses the manual
-fallback below. A library-specific constructor-time validation
-surface is not a detection probe and may mutate state. For example,
-the public Flow header at this release does not ship a separate
-`doca_flow_pipe_validate` symbol: never invent one and never use
-`doca_flow_pipe_create` as a read-only probe. The structured tool
-wraps only library-specific validation calls that are safe for its
-contract and returns a uniform JSON result.
+**Detection probe:** `command -v doca-validate`. A library-specific
+constructor-time validation surface is not a detection probe and may
+mutate state. For example, the public Flow header at this release
+ships no separate `doca_flow_pipe_validate` symbol: never invent one,
+and never use `doca_flow_pipe_create` to test for the helper.
 
 **Top-level shape (JSON object):**
 
@@ -303,8 +323,10 @@ contract and returns a uniform JSON result.
    after that skill's snapshot/safety preconditions; do not invoke it
    as a pre-commit probe. If the caller requires read-only validation
    and the installed API exposes no dedicated validator, report
-   `result: skip` and route to the per-library `## test` workflow.
-2. Invoke it before any commit / create / submit call.
+   `result: skip`, route to the per-library `## test` workflow, and
+   stop here (skip steps 2 and 3).
+2. Invoke that dedicated read-only validator (never a mutating
+   `_create`) before any commit / create / submit call.
 3. Map validation outcomes deliberately: `DOCA_ERROR_INVALID_VALUE`
    and `DOCA_ERROR_NOT_SUPPORTED` are `result: fail`. Permission,
    transport, unavailable-device, and other operational errors are
@@ -352,29 +374,5 @@ trivially when diagnosing host ↔ BlueField mismatches.
 
 ## Relationship to PR2 executables
 
-The schemas above describe **contracts**. The implementations that
-satisfy each contract are deferred to a subsequent PR on the
-maintainer roadmap.
-
-This skill ships first so other skills can reference the contract
-without later retrofit when PR2 executables land.
-
-Concrete consequence for contributors writing a new library skill:
-when you build the Command appendix, do not duplicate the manual
-fallback chain — link to this skill's matching schema section and
-add only the *per-library overlay*. For Flow, the public header at
-this release has no separate `doca_flow_pipe_validate` symbol: do not
-invent one or use `doca_flow_pipe_create` as this contract's read-only
-pre-commit probe. Report `result: skip` and route to `doca-flow
-TASKS.md ## test`, where constructor-time checks may run only after
-that workflow's snapshot and safety preconditions. The fallback chain
-itself lives here.
-
-## URL audit
-
-This skill references the following external URLs. All MUST be
-public and MUST resolve. The lint runs the URL check in CI.
-
-| URL | Owner | Last verified | DOCA version | Notes |
-| --- | --- | --- | --- | --- |
-| (none — this skill is a contract, the substantive URLs are owned by `doca-public-knowledge-map` and the per-library skills) | n/a | 2026-05-17 | 3.3.0 | The agent reaches public docs via `doca-public-knowledge-map`; this skill stays vendor-neutral on URLs |
+No helper named in this contract ships yet (ground rule 6); when one lands it
+satisfies the schema above unchanged, so no other skill needs a retrofit.

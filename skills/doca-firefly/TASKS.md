@@ -38,6 +38,35 @@ end-to-end discipline before the container starts.
    If the user has no install yet, route to
    [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
    for the public NGC DOCA container path.
+   Then check the BlueField PTP prerequisites the DOCA 3.5 Firefly
+   Service Guide lists. Query first; change nothing yet:
+    - **Firmware and BSP.** Firmware must be 24.34.1002 or higher and
+      the BlueField image 3.9.0 or higher. Read the running firmware
+      (e.g. `fw_ver` in `ibv_devinfo`) and compare.
+    - **Real-time clock.** `sudo mlxconfig -d <pcie> q | grep
+      REAL_TIME_CLOCK_ENABLE` must show `True(1)`. Turning it on
+      (`mlxconfig ... set REAL_TIME_CLOCK_ENABLE=1`) is a firmware
+      setting that only takes effect after a graceful shutdown and
+      power cycle of the BlueField. That is a hardware-state change:
+      follow `doca-hardware-safety` (inventory, out-of-band access,
+      maintenance window, rollback) and get the operator's approval
+      before applying it — never as a side step of a container deploy.
+    - **OVS offload and TX timestamping.** Firefly gets TX timestamps
+      for outgoing PTP messages only when that traffic is offloaded to
+      hardware; otherwise it loops in a fault waiting for them.
+      Confirm `sudo ovs-vsctl get Open_vSwitch . other_config` shows
+      `hw-offload="true"` (the BFB default). TX port timestamping is
+      enabled with `ethtool --set-priv-flags <iface> tx_port_ts on` —
+      on the SF, not the representor, in DPU mode; on `p0` in
+      separated mode. In DPU mode the guide also adds OVS
+      multicast-snooping settings and OpenFlow rules that pass PTP
+      (UDP 319/320) between the SF and `p0`; copy them from the
+      version-matched guide. Changing OVS on a port that carries
+      traffic goes through the same `doca-hardware-safety` discipline.
+    - **NTP off on the BlueField.** `phc2sys` can only discipline the
+      BlueField OS clock if no other time service fights it. The guide's
+      Ubuntu example is `systemctl stop systemd-timesyncd`; also stop
+      chrony / ntpd if they run on the BlueField.
 3. **Decide the four PTP configuration axes.** Per the four-axis
    table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
@@ -178,6 +207,13 @@ not, stop and hand off to the BlueField container-runtime owner.
    invent the tag. If that version-matched guide/tag source is
    inaccessible, stop and ask the operator to provide the tag from
    the guide; do not infer one from the host package version.
+   **Take the YAML from the NGC Firefly resource, not the shared
+   bundle.** The shared `doca_container_configs` bundle linked from
+   the Container Deployment Guide has shipped an old Firefly YAML
+   (image `1.5.0-doca2.9.0`). The NGC Firefly resource carries the
+   current `doca_firefly.yaml` for the release. Before copying the
+   YAML into `/etc/kubelet.d`, open it and check that its `image:` tag
+   matches the operator's DOCA release.
 2. **Start the container per the public Container Deployment Guide
    pattern.** Mount the Firefly config file at the path the public
    Firefly Service Guide names. The runtime command shape (e.g.
@@ -315,6 +351,10 @@ without clearing the layer above. The five layers match
    traffic on the configured interface is the cheapest confirmation
    of which axis is wrong; defer to upstream Linux PTP / `tcpdump`
    docs for the exact filter.
+   If the logs show Firefly stuck in a fault loop waiting for TX
+   timestamps, check OVS `hw-offload`, `tx_port_ts`, and the PTP
+   OpenFlow rules from `## configure` step 2 before touching the four
+   axes.
 3. **Host-follower layer.** PTP locks (Firefly says synced; PHC
    offset is tight); host OS clock drifts. Resolution: the
    host-side chrony / `ptp4l` / `phc2sys` is not configured to
@@ -323,6 +363,9 @@ without clearing the layer above. The five layers match
    `chronyc sources`, and (if `ptp4l` is the follower) `pmc`
    against the host's PTP daemon. This layer is owned by upstream
    Linux PTP / chrony, not by Firefly — Firefly is correct.
+   If it is the BlueField OS clock that jumps while the PHC is locked,
+   check that NTP (`systemd-timesyncd`, chrony, ntpd) is stopped on the
+   BlueField — it fights `phc2sys` (see `## configure` step 2).
 4. **PTP-aware-path layer.** PTP locks; sync acquired; offset and
    jitter wildly past the profile's spec. Resolution: a non-PTP-
    aware switch in the path is silently adding variable latency

@@ -25,6 +25,24 @@ copy-paste recipe. The agent's job is to walk the user through
 the steps in order, verifying preconditions before recommending
 the next call.
 
+## Loads fine but no on-wire change
+
+A load that returned success has already cleared the
+install, version, build, link and custom-PCC-slot layers, so do
+not open with the install → driver walk or with the algorithm
+body. Check the host side in this order:
+
+1. **`doca_pcc_start()` never called.** The algorithm is loaded
+   but inert; a load without a start produces exactly this symptom.
+2. **Wrong `doca_dev`.** The `doca_dev` the `doca_pcc` was created
+   against is not the port carrying the user's RoCE traffic.
+3. **No RDMA / RoCE traffic on that port** to modulate (route to
+   `doca-rdma`).
+
+Reports firing does not distinguish these: the body runs in all
+three. The DPA-side algorithm body is a later, conditional cause
+owned by `doca-dpa` and must not lead. Layer 5 below has the detail.
+
 ## configure
 
 Goal: stand up a `doca_pcc` context against a BlueField port
@@ -341,7 +359,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | `DOCA_ERROR_NOT_PERMITTED` on a BlueField the agent expected to work | `doca_dev` access is fine on other libraries but PCC create / load fails | Firmware-side custom-PCC slot is the most likely culprit; re-run the firmware-side check; the BlueField may need a reset after the slot is flipped before the new state takes effect. Do NOT diagnose this as a host-OS permission problem first |
 | `DOCA_ERROR_NOT_SUPPORTED` on a BlueField the agent expected to work | DOCA cap-query failed against the active `doca_devinfo` | The BlueField generation axis was missed (older BlueField may not expose the DPA at all); re-run the env-side BlueField check; if the BlueField truly does not expose the DPA, the answer is the hardware, not a code or DOCA upgrade |
 | `DOCA_ERROR_DRIVER` on first algorithm load | DOCA + DPACC versions are skewed OR the algorithm image was built against a different DOCA install than the host runtime OR the firmware custom-PCC slot is enabled but in a transitional state | Re-run the version chain per [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test); rebuild BOTH sides via `dpacc` + the host build against the matched versions; cross-check against the DOCA Compatibility Policy; if all that is clean, reset the BlueField to settle the firmware state |
-| Smoke loaded and reports fire; counter tool shows no on-wire change | The algorithm body has no effect path on the actual rate-update events, OR there is no RDMA / RoCE traffic on the attached port to modulate | Walk the algorithm-body effect path with the user; confirm RDMA / RoCE traffic is actually flowing on the attached port (route to [`doca-rdma`](../doca-rdma/SKILL.md) if not) |
+| Smoke loaded and reports fire; counter tool shows no on-wire change | `doca_pcc_start()` was never called, so the algorithm is loaded but inert, OR the `doca_dev` it was created against is not the traffic-carrying port, OR there is no RDMA / RoCE traffic on that port to modulate. Reports firing does not distinguish these — the body runs either way | Confirm `doca_pcc_start()` ran and returned success; re-verify the `doca_dev` selected at configure time is the port under test; confirm RDMA / RoCE traffic is actually flowing on it (route to [`doca-rdma`](../doca-rdma/SKILL.md) if not). Only when all three are established does the algorithm-body effect path come into question, and that is [`doca-dpa`](../doca-dpa/SKILL.md)'s surface — route it rather than auditing the body here |
 | Host observed N reports; report stream then stops mid-run | The host is not draining the report queue fast enough OR the DPA-side algorithm has hung in its main loop | Restructure the host loop to drain reports per batch; consult the DPA-side tooling named in [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability) for stuck-DPA cases |
 | `doca_pcc_stop` blocks on teardown | The algorithm body has an unbounded loop with no termination signal | The agent must surface that custom PCC algorithms, like generic DPA kernels, need a termination signal — see the [`doca-dpa TASKS.md ## modify`](../doca-dpa/TASKS.md#modify) DPA-kernel termination rule; the host cannot force-kill the DPA-side algorithm from the `doca-pcc` API |
 
@@ -382,15 +400,30 @@ and 7 (driver):
   per [`## configure`](#configure) step 1 and the host-side
   progress per [`## run`](#run) step 3 before assuming the
   PCC algorithm itself is broken.
-- A loaded custom PCC algorithm whose reports fire but whose
-  RDMA / RoCE traffic shows no on-wire change is most often
-  *"no traffic on the attached port"* (route to
-  [`doca-rdma`](../doca-rdma/SKILL.md)) OR the algorithm
-  body computes correctly but takes no rate-update action.
+- A loaded custom PCC algorithm that shows no on-wire change
+  has three candidate causes, and the agent must rule them out
+  **in this order** — the first two are host-side and cheap to
+  check, the third means auditing DPA code:
+  1. **The algorithm is loaded but inert.** A successful load
+     is not a live algorithm: `doca_pcc_start()` is the moment
+     it becomes live on the port, per the attach-to-port table
+     in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
+     A load that succeeded without a start produces exactly
+     this symptom and reports nothing wrong.
+  2. **No traffic on the attached port.** PCC only modulates
+     existing RDMA / RoCE traffic; the `doca_dev` the
+     `doca_pcc` was created against is the port that matters.
+     If RDMA / RoCE is not stood up there, route to
+     [`doca-rdma`](../doca-rdma/SKILL.md).
+  3. **The algorithm body takes no rate-update action.** Only
+     once 1 and 2 are excluded is the DPA-side body the
+     suspect.
+
   Use the `pcc_counters` CLI (route via
   [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools))
   to inspect the port-level counters and confirm which case
-  applies.
+  applies. Do not open the algorithm body first: reports firing
+  proves the body runs, not that it is bound and live.
 - A *"DPA-side PCC algorithm hung; cannot stop the program"*
   pattern is almost always a missing termination signal in
   the DPA-side algorithm body, per the

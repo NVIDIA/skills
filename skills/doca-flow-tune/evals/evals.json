@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-flow-tune.explicit-positive.v1",
-      "prompt": "Use the doca-flow-tune skill to help me. I'm working on: tuning a live or captured `doca-flow` pipeline with `doca_flow_tune` \u2014 snapshotting pipe / counter / KPI state, picking a tuning axis (rule placement, resource hints / table sizing, HW-offload mode) and a matching measurement (rule-install rate, lookup latency, hardware-counter delta), running offline or online (read-only or state-changing) modes, reading the dumper CSV / analyze JSON / visualize mermaid, or applying a recommendation back into the Flow program.",
+      "prompt": "Use the doca-flow-tune skill for this task: I'm running into this: \"Flow rule-install rate is low on BlueField\". Can you walk me through it?",
       "expected_skill": "doca-flow-tune",
       "expected_output": "The agent selects the doca-flow-tune skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -17,7 +17,7 @@
       "expected_skill": "doca-flow-tune",
       "expected_output": "The agent recognizes this as a doca-flow-tune issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-flow-tune skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,18 +27,18 @@
       "expected_skill": "doca-flow-tune",
       "expected_output": "The agent recognizes this as a doca-flow-tune issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-flow-tune skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-flow-tune.negative.v1",
-      "prompt": "I actually need help with measuring baseline numbers. Which skill should handle this, and why is it not doca-flow-tune?",
+      "prompt": "I need to benchmark how many rules per second my pipeline can insert before I change anything about how it is built. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-flow-tune; it explains that measuring baseline numbers is out of doca-flow-tune's scope and routes to the appropriate skill instead.",
+      "expected_output": "The agent does not apply doca-flow-tune's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-flow-tune as the answer.",
       "assertions": [
-        "doca-flow-tune is not selected as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) instead."
+        "The answer does not apply doca-flow-tune's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

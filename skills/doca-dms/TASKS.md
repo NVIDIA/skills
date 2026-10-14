@@ -123,9 +123,15 @@ Bringing up `dmsd` and exercising it.
    Method / Security flag families. Quote flags from the live guide;
    do not infer flags from generic gRPC knowledge.
 3. **Verify the daemon is reachable.** Use a documented gNMI `Get`
-   against a known-supported State path as a connectivity probe.
-   "Documented" matters: a `Get` against an unsupported path returns
-   an error from `dmsd` regardless of whether the daemon is healthy.
+   against a known-supported State path as a connectivity probe, and
+   give the operator that command. "Documented" matters: a `Get`
+   against an unsupported path returns an error from `dmsd`
+   regardless of whether the daemon is healthy.
+
+   When the probe fails, name where to look rather than closing with
+   "check the logs": report the gRPC status code it returned, then
+   `journalctl -u dmsd` for frontend transport and auth failures, or
+   the `dmspe` backend log for tool-execution failures.
 4. **Verify authorization works as expected.** Confirm a user in the
    `-allowed_users` list can issue gRPC commands and a user outside it
    cannot. If the test fails, the failure is at the authorization
@@ -287,7 +293,7 @@ SystemD unit file, not prose recall.
 | Daemon lifecycle (SystemD) | `systemctl status dmsd` / `start` / `stop` / `restart` | [`## run`](#run) | `active (running)` with no recent restart loops. |
 | Daemon launch (manual) | `dmsd --help` first, then the documented flag set | [`## run`](#run) | Daemon binds the documented listener and emits the expected startup banner. |
 | Daemon logs (frontend) | `journalctl -u dmsd --since "5 min ago"` or the documented log file | [`## debug`](#debug) layer Transport/Auth | Lines present for the request window; no auth-rejection storm. |
-| Daemon logs (backend) | The documented `dmspe` log destination | [`## debug`](#debug) layer Backend | Backend execution lines present; tool stderr captured. |
+| Daemon logs (backend) | `journalctl -u dmspe --since "5 min ago"`, or the `dmspe` log file the launch flags set | [`## debug`](#debug) layer Backend | Backend execution lines present; tool stderr captured. |
 | Sanity gNMI Get | A gNMI `Get` on a path copied verbatim from the installed/public DMS guide for this release; do not substitute a generic OpenConfig example | [`## test`](#test) step 1 | Returns the expected typed value. |
 | Sanity gNMI Set | A gNMI `Set` on a documented, reversible path selected by the operator on a test-only interface/instance; snapshot first, then restore and verify as in test step 3 | [`## test`](#test) step 3 | Returns success; subsequent `Get` reflects the test value, then the restored snapshot. |
 | gNOI sanity (read-only) | A gNOI `System.Time` (or equivalent read-only op the guide lists) | [`## test`](#test) step 1 | Returns the expected time / status. |

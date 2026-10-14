@@ -107,7 +107,12 @@ Steps the agent should walk the user through, in order:
    / how many iterations? Is the device dedicated to this
    measurement (no production `doca-flow` application
    running)? OOB access available? If any answer is
-   unclear, stop and ask.
+   unclear, stop and ask. If the user confirms there is
+   **no out-of-band access**, or the device is **shared with a
+   production `doca-flow` application**, do not run
+   `doca_flow_perf` at all: report which precondition is
+   missing and that the measurement needs a dedicated device
+   with OOB access, and stop.
 
 Do not invent CLI flag spellings, JSON schema keys, or
 default numeric workload sizes. The public DOCA Flow Perf

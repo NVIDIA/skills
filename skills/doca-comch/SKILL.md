@@ -2,25 +2,28 @@
 license: Apache-2.0
 name: doca-comch
 description: >
-  Use this skill when the user is doing hands-on DOCA Comch work
-  on a host + BlueField pair — bringing up host ↔ DPU PCIe
-  control-plane messaging, picking server (DPU) vs client (host)
-  roles, choosing slow-path send-task / recv-callback vs
-  fast-path producer / consumer, querying max-msg-size or
-  max-clients capabilities, registering connection callbacks, or
-  debugging DOCA_ERROR_* returns from the Comch API. Trigger
-  even when the user does not explicitly mention "DOCA Comch" or
-  "Comm Channel" (renamed in DOCA 2.5) — typical implicit
-  phrasings include "send a control message from host to
-  BlueField over PCIe", "DPU can't see the host representor",
-  "DOCA_ERROR_NOT_PERMITTED on server_create", "DOCA_ERROR_AGAIN
-  on task_send submit", "connect callback never fires", or
-  "stream bulk data from a host driver to a DPU agent". Refuse
-  and route elsewhere for installing DOCA itself, BFB / firmware
-  bring-up, non-Comch DOCA libraries, or deploying Comch apps at
-  scale — those belong to other skills.
+  Use this skill when the user is doing hands-on DOCA Comch work on a
+  host + BlueField pair — bringing up host ↔ DPU PCIe control-plane
+  messaging, picking server (DPU) vs client (host) roles, choosing
+  slow-path send-task / recv-callback vs fast-path producer / consumer,
+  querying max-msg-size or max-clients capabilities, registering
+  connection callbacks, or debugging DOCA_ERROR_* returns from the Comch
+  API. Trigger even when the user does not explicitly mention "DOCA
+  Comch" or "Comm Channel" (renamed in DOCA 2.5) — typical implicit
+  phrasings include "send a control message from host to BlueField over
+  PCIe", "DPU can't see the host representor", "DOCA_ERROR_NOT_PERMITTED
+  on server_create", "DOCA_ERROR_AGAIN on task_send submit", "connect
+  callback never fires", or "stream bulk data from a host driver to a
+  DPU agent". Refuse and route elsewhere for installing DOCA itself, BFB
+  / firmware bring-up, non-Comch DOCA libraries, or deploying Comch apps
+  at scale — those belong to other skills.
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - comch
+    - comm-channel
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux
   (Ubuntu 22.04/24.04 or RHEL/SLES) on a host + BlueField pair
@@ -29,21 +32,37 @@ compatibility: >
   local install via `pkg-config doca-comch` (legacy
   `doca-comm-channel` on installs <2.5) and inspects
   /opt/mellanox/doca/{lib,include,samples,applications}.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA Comch
 
+## Examples
+
+- **"Send a control message from host to BlueField over PCIe."** —
+  this is in scope. Pick server (DPU) vs client (host) and stay
+  on the Comch send/recv path; do not fall back to TCP.
+- **"Connect callback never fires."** — check role, representor
+  visibility, and the 2.5 rename overlay before rewriting the
+  app as raw verbs.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+modify / debug. Open the capabilities companion for slow-path vs
+fast-path and the 2.5 rename. Do not open every companion file.
+
 **Where to start:** This skill assumes DOCA is already installed and
 the user is doing **hands-on Comch work** on a BlueField + host
-pair with DOCA. Open [`TASKS.md`](TASKS.md) if the user wants to
+pair with DOCA. Open the tasks companion if the user wants to
 *do* something (configure / build / modify / run / test / debug);
-open [`CAPABILITIES.md`](CAPABILITIES.md) when the question is
+open the capabilities companion when the question is
 *what can Comch express* on this version. If the user has not
 installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
 asking *"is Comch even on this DOCA"* because the docs they read
 mention `doca-comm-channel`, route to
-[`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility)
+## Version compatibility
 for the 2.5 rename.
 
 ## Example questions this skill answers well
@@ -56,38 +75,38 @@ load-bearing piece — the worked example is a single instance.
   worked example: *"server side on the DPU, client side on the
   host, exchange a first control message"*. Answered by the
   role-selection + lifecycle workflow in
-  [`TASKS.md ## configure`](TASKS.md#configure) +
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## configure +
+  ## Capabilities and modes
   server-vs-client table.
 - **"How do I move bulk data over Comch with low CPU?"** — worked
   example: *"stream a 64 KiB chunk every 100 µs from the host
   driver to a DPU agent"*. Answered by the producer / consumer
   fast-path described in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the channel-setup workflow in
-  [`TASKS.md ## configure`](TASKS.md#configure)
+  ## configure
   step 4, with the *"slow-path vs fast-path"* selection rule.
 - **"What is the maximum message size I can send?"** — worked
   example: *"can I send a 4 MiB control message in one shot?"*.
   Answered by the capability-query rule
   (`doca_comch_cap_get_max_msg_size`) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the property-set workflow in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **"Why doesn't the DPU side see the representor?"** — worked
   example: *"`doca_comch_server_create` returns
   `DOCA_ERROR_NOT_PERMITTED` on a freshly imaged BlueField"*.
   Answered by the representor + permission overlay in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  ## Safety policy
   + the env-prep checklist in
-  [`TASKS.md ## configure`](TASKS.md#configure) step 1, which
+  ## configure step 1, which
   routes representor-side env questions to
   [`doca-setup`](../../doca-setup/SKILL.md).
 - **"Is this Comch capability on my installed DOCA version?"** —
   worked example: *"is `doca_comch_producer` in DOCA 2.6.0, or do
   I still need the old slow-path API?"*. Answered by the
   version-compatibility overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  ## Version compatibility,
   which cross-links the canonical detection chain in
   [`doca-version`](../../doca-version/SKILL.md) and adds the
   Comch-specific 2.5 rename rule.
@@ -95,9 +114,9 @@ load-bearing piece — the worked example is a single instance.
   which layer caused it?"** — worked example: *"`DOCA_ERROR_AGAIN`
   on submitting a `doca_comch_task_send` via `doca_task_submit`"*. Answered by the Comch
   overlay on the cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
+  ## debug that escalates to
   [`doca-debug`](../../doca-debug/SKILL.md).
 
 ## Audience
@@ -112,7 +131,7 @@ NVIDIA developers contributing to DOCA Comch itself.
 **Language scope.** DOCA Comch ships as a C library with
 `pkg-config` module name `doca-comch`. The shipped samples are
 written in C. C and C++ consumers are the canonical case; the
-worked examples in `TASKS.md` assume that path. Other-language
+worked examples in the tasks companion assume that path. Other-language
 consumers (Rust, Go, Python, …) consume the same `*.so` through
 FFI or language-specific bindings; the skill's contribution in
 that case is to keep the role-split, lifecycle,
@@ -158,7 +177,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive Comch-specific
 material lives in two companion files:
 
-- `CAPABILITIES.md` — what Comch can express on this version: the
+- the capabilities companion — what Comch can express on this version: the
   server vs client role split, the slow-path send-task /
   recv-callback surface, the producer / consumer fast-path
   surface, the capability-query surface
@@ -167,7 +186,7 @@ material lives in two companion files:
   (connection state callbacks, task completion callbacks), and
   the safety policy that gates representor and permission
   decisions.
-- `TASKS.md` — step-by-step workflows for the six in-scope Comch
+- the tasks companion — step-by-step workflows for the six in-scope Comch
   verbs: `configure`, `build`, `modify`, `run`, `test`, `debug`.
   Plus a `Deferred task verbs` block that points out-of-scope
   questions at the right next skill.
@@ -193,7 +212,7 @@ contain — and pull requests should not add:
   modify-a-sample workflow in
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
   layered with the Comch-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Standalone build manifests** (`meson.build`, `CMakeLists.txt`,
   `Cargo.toml`, …) parked inside the skill. The agent constructs
   the build manifest *in the user's project directory* against
@@ -206,13 +225,13 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is
+1. Read this skill first to confirm the user's question is
    in scope.
 2. **For the Comch capability matrix, role split, slow-path /
    fast-path surfaces, permission policy, error taxonomy,
-   observability, and safety policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   observability, and safety policy, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical
@@ -239,7 +258,7 @@ guidance".
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal

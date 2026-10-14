@@ -14,7 +14,7 @@ compatibility, error taxonomy, observability surface, and safety
 policy that these workflows assume, see
 [CAPABILITIES.md](CAPABILITIES.md). For where to find docs, the
 installed DOCA layout, or release notes, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through the
@@ -60,8 +60,8 @@ install — never hardcode versions or paths.
    not exist on the user's version). Use the discovered sample as the
    modify-target via the five-slot fill in [`## modify`](#modify).
    If the directory is absent or empty, stop and route to
-   [`doca-setup`](../../doca-setup/SKILL.md) for install repair and
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+   `doca-setup/SKILL.md` for install repair and
+   `doca-public-knowledge-map/SKILL.md`
    for the current sample-layout source; do not invent a sample name.
    Because every `doca_rdmi_*` symbol is EXPERIMENTAL, authoring RDMI
    source from documentation is forbidden.
@@ -96,7 +96,7 @@ Goal: confirm the user's installed DOCA actually ships `doca-rdmi`
 and the supporting libraries before any RDMI-specific work begins.
 
 This skill does **not** own DOCA installation; that path lives in
-[`doca-setup`](../../doca-setup/SKILL.md). The RDMI-specific
+`doca-setup/SKILL.md`. The RDMI-specific
 preconditions the agent verifies after a DOCA install:
 
 1. **`doca-rdmi` `.pc` file is present.** `pkg-config
@@ -105,12 +105,12 @@ preconditions the agent verifies after a DOCA install:
    installed DOCA package set does not include RDMI; the user
    needs to install the matching package (the exact package name
    is platform-specific and looked up via
-   [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package)).
+   `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`)).
 2. **Supporting `.pc` files are present.** RDMI builds on
    `doca-common`, `doca-verbs`, and (for the DPA datapath)
    `doca-dpa`. All four `pkg-config --modversion` results must
    agree on the same DOCA semver per the four-way match in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 3. **Installed headers expose the symbols.** Check the public
    header set (`doca_rdmi_connection.h`, `doca_rdmi_poster.h`,
    `doca_rdmi_dev_connection.h`, `doca_rdmi_dev_poster.h`,
@@ -121,11 +121,11 @@ preconditions the agent verifies after a DOCA install:
 4. **The DPA toolchain is available** if the user intends to use
    the DPA datapath. The DOCA DPACC compiler ships as a separate
    tool; the agent routes to
-   [`doca-dpa`](../doca-dpa/SKILL.md) for the DPA toolchain
+   `doca-dpa/SKILL.md` for the DPA toolchain
    preconditions rather than duplicating them here.
 
 If any precondition fails, **stop and route to
-[`doca-setup`](../../doca-setup/SKILL.md)**; an RDMI-layer
+`doca-setup/SKILL.md`**; an RDMI-layer
 diagnosis against a half-installed DOCA wastes the user's time.
 
 ## configure
@@ -137,7 +137,7 @@ handle is valid.
 Steps the agent should walk the user through:
 
 1. **Confirm the installed DOCA version.** Use the procedure in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
    Quote the version observed (`pkg-config --modversion
    doca-rdmi`, then `doca_caps --version`); do not assume
    "latest". Surface that every `doca_rdmi_*` symbol the agent
@@ -148,7 +148,7 @@ Steps the agent should walk the user through:
    `doca_verbs_context` and a `doca_verbs_pd` before any
    `doca_rdmi_*_create` call. The verbs surface is a precondition;
    route the user to the public DOCA verbs guide via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+   `doca-public-knowledge-map/SKILL.md`
    if they do not yet have a working verbs setup.
 3. **Pick the datapath.** If the application runs the data path
    on the DPA, the user must call `doca_ctx_set_datapath_on_dpa()`
@@ -175,7 +175,7 @@ Steps the agent should walk the user through:
 7. **Retrieve the DPA handle.** After start (and only after
    start), call `doca_rdmi_*_get_dpa_handle` to obtain the
    accelerator-side handle. Hand that handle to the DPA kernel
-   per the [`doca-dpa`](../doca-dpa/SKILL.md) programming model;
+   per the `doca-dpa/SKILL.md` programming model;
    do not invent a different handoff.
 
 If any step fails with a `DOCA_ERROR_*`, route through the error
@@ -192,15 +192,15 @@ using the canonical cross-library build pattern.
 The build pattern for any DOCA C/C++ consumer is **identical**
 across libraries — `pkg-config` for include + link flags, meson
 or CMake as the build system — and is fully documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the RDMI-specific overlay:
 
 | Slot | Value for RDMI | Why it matters |
 | --- | --- | --- |
 | `pkg-config` module name (host side) | `doca-rdmi` | The library's `.pc` file installed by the DOCA host packages |
 | Co-required modules | `doca-common`, `doca-verbs`, plus `doca-dpa` when the DPA datapath is in use | RDMI builds on verbs; the DPA datapath additionally requires the `doca-dpa` host-side library plus the DPA toolchain |
-| Header check | `doca_rdmi_connection.h`, `doca_rdmi_poster.h` resolvable under the installed DOCA infrastructure include tree (path via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)) | If `pkg-config --cflags doca-rdmi` resolves but the include is missing, the install is partial |
-| DPA-side compilation | `doca_rdmi_dev_*.h` headers are compiled with the DOCA DPA toolchain into the DPA kernel — *not* with the host compiler | Mixing host and DPA toolchains on the same translation unit is the canonical reason a DPA-side build "fails for no reason"; routed to [`doca-dpa`](../doca-dpa/SKILL.md) for the toolchain details |
+| Header check | `doca_rdmi_connection.h`, `doca_rdmi_poster.h` resolvable under the installed DOCA infrastructure include tree (path via `doca-public-knowledge-map/SKILL.md`) | If `pkg-config --cflags doca-rdmi` resolves but the include is missing, the install is partial |
+| DPA-side compilation | `doca_rdmi_dev_*.h` headers are compiled with the DOCA DPA toolchain into the DPA kernel — *not* with the host compiler | Mixing host and DPA toolchains on the same translation unit is the canonical reason a DPA-side build "fails for no reason"; routed to `doca-dpa/SKILL.md` for the toolchain details |
 | Minimum required DOCA version | Query with `pkg-config --modversion doca-rdmi`; never hardcode in build files | The EXPERIMENTAL tag means a version pin from agent memory is wrong by construction |
 
 For non-C consumers (Rust, Go, Python), the host-side link surface
@@ -216,7 +216,7 @@ set) as the starting point and apply a minimum-diff modification
 to express the new intent.
 
 The universal modify-a-shipped-sample workflow lives in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify).
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`).
 Use it as-is. The RDMI-specific overlay is the *five-slot fill*
 the agent must elicit from the user before recommending any
 code-level edit:
@@ -246,16 +246,16 @@ Steps the agent should walk the user through:
    initiator; running the binary on one side alone produces a
    misleading hang. The responder's RDMA stack must be running
    (commonly an application using
-   [`doca-rdma`](../doca-rdma/SKILL.md) or the upstream verbs
+   `doca-rdma/SKILL.md` or the upstream verbs
    surface) and reachable over IB / RoCE.
 2. **Drive the DPA kernel.** Load the DPA binary onto the
-   accelerator per [`doca-dpa`](../doca-dpa/SKILL.md); hand it
+   accelerator per `doca-dpa/SKILL.md`; hand it
    the DPA handle obtained from `doca_rdmi_*_get_dpa_handle`.
    The agent does *not* author the DPA-side launch
    incantation; the launch model is owned by `doca-dpa`.
 3. **Capture the structured log on the host side.** Set
    `DOCA_LOG_LEVEL=trace` for the first run (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)).
    This is the cheapest way to make the host-side lifecycle
    visible on first failure.
 4. **Drive the host-side ack loop.** After the DPA consumes
@@ -301,7 +301,7 @@ Iteration shape:
    installed `libdoca_rdmi.so` (and matched in the installed
    headers). A `function not found` at link time is almost
    always a partial install or a wrong-version pairing per
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2.
 2. **Lifecycle-order check.** Walk the configure sequence in
    [`## configure`](#configure) against the user's code: every
@@ -343,7 +343,7 @@ Loop termination: stop when two consecutive phase-4 comparisons
 produce identical triple-capture diffs for the same hypothesis
 (verbs context state, RDMI connection state, and DOCA log lines).
 That means the cause is below RDMI. Escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured layer-1-through-5 evidence.
 
 ## debug
@@ -353,7 +353,7 @@ program doesn't make forward progress), narrow the cause to a
 specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending RDMI-specific
 fixes. This skill's overlay names the RDMI-specific manifestation
@@ -368,7 +368,7 @@ at layers 5 (runtime) and 6 (program):
 - Confirm the DPA kernel was actually launched and is consuming
   completions. *No observable completions* with a DPA attach is
   almost always a launch / handoff bug, not an RDMI-spec bug;
-  route to [`doca-dpa`](../doca-dpa/SKILL.md) for the
+  route to `doca-dpa/SKILL.md` for the
   accelerator-side launch verification.
 - Confirm the host-side ack loop is firing. A stalled receive
   window looks like a hung initiator; the diagnostic is to
@@ -392,17 +392,17 @@ at layers 5 (runtime) and 6 (program):
 
 Once the layer is identified, route to the matching debug verb on
 the matching skill: install / build / link / driver to
-[`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug);
+`doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`);
 DPA-side debug to
-[`doca-dpa TASKS.md ## debug`](../doca-dpa/TASKS.md#debug);
+`doca-dpa TASKS.md ## debug` (`doca-dpa/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 **5-phase universal debug-loop instantiation (RDMI).** Layer
 identification above is phase 1 of the
-[universal debug-loop contract](../../doca-debug/CAPABILITIES.md#universal-debug-loop-contract).
+universal debug-loop contract (`doca-debug/CAPABILITIES.md#universal-debug-loop-contract`).
 The agent MUST walk the remaining four phases on every RDMI
 debug answer before declaring done:
 
@@ -413,7 +413,7 @@ debug answer before declaring done:
    on the underlying device, (b) RDMI connection state via
    `doca_rdmi_connection_get_app_rq_info` (host side) AND the
    DPA-side completion counter from
-   [`doca-dpa`](../doca-dpa/TASKS.md#debug), (c) DOCA log lines
+   `doca-dpa/TASKS.md#debug`, (c) DOCA log lines
    at `DOCA_LOG_LEVEL=DEBUG` for the offending post / poll. The
    triple is the rollback target — do NOT mutate before
    capturing all three.
@@ -439,7 +439,7 @@ RDMI contexts are stateful (verbs context + connection / poster +
 optional DPA attach + remote responder peer) and the agent's
 failure mode is to leave a half-connected QP / a stale DPA
 handle / a registered MR pointing at freed host memory. The
-[universal verification contract](../../doca-setup/CAPABILITIES.md#universal-verification-contract)
+universal verification contract (`doca-setup/CAPABILITIES.md#universal-verification-contract`)
 step 1 (preconditions) requires *"the rollback path is
 documented"* on every change-recommending answer; this is the
 RDMI instantiation.
@@ -456,13 +456,13 @@ is unfalsifiable without it.
 1. **Quiesce the data path FIRST.** Stop posting new WRs from
    both initiator and responder. For DPA-initiated paths, signal
    the DPA kernel to drain via the termination mechanism established
-   by [`doca-dpa`](../doca-dpa/SKILL.md), then wait for the host/DPA
+   by `doca-dpa/SKILL.md`, then wait for the host/DPA
    completion mechanism defined by
-   [`doca-dpa`](../doca-dpa/SKILL.md) to report that the kernel
+   `doca-dpa/SKILL.md` to report that the kernel
    returned. Do not substitute a CUDA synchronization API for DPA
    completion. If it does not return within the bounded debug-loop
    window, that is the
-   [deploy-loop bridge](../../doca-setup/CAPABILITIES.md#deploy-loop-bridge--step-5-not-green-is-the-debug-loop-trigger)
+   deploy-loop bridge (`doca-setup/CAPABILITIES.md#deploy-loop-bridge--step-5-not-green-is-the-debug-loop-trigger`)
    trigger; fire the debug-loop on the hung-kernel symptom
    before continuing the rollback.
 2. **Tear down RDMI objects in reverse-create order.** (a)
@@ -483,12 +483,12 @@ is unfalsifiable without it.
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
 4. **Tear down the verbs context LAST.** `doca_verbs_context`
    may be shared with non-RDMI clients (e.g., the verbs CQ from
-   [`doca-verbs`](../doca-verbs/SKILL.md)); only destroy it
+   `doca-verbs/SKILL.md`); only destroy it
    if RDMI was the sole client. If shared, leave the verbs
    context up and route the rollback's verbs leg via
-   [`doca-verbs TASKS.md`](../doca-verbs/TASKS.md).
+   `doca-verbs/TASKS.md`.
 5. **Re-verify the verbs parent is intact.** Re-run the
-   one-WR smoke from [`doca-verbs TASKS.md ## test`](../doca-verbs/TASKS.md#test)
+   one-WR smoke from `doca-verbs TASKS.md ## test` (`doca-verbs/TASKS.md#test`)
    to confirm the parent verbs context still completes a single
    WR at the pre-RDMI shape. If not, the RDMI rollback
    corrupted the parent — surface as a residual gap, do NOT
@@ -535,7 +535,7 @@ The integration shape this skill teaches:
    architecture comes up.
 4. **Operational handoff.** Production deployment uses the
    bundle's hardware-safety meta-policy
-   ([`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md))
+   (`doca-hardware-safety/SKILL.md`)
    for any change that touches the BlueField BFB, firmware, or
    DPA toolchain. RDMI itself does not modify hardware state,
    but every RDMI-using component lives downstream of those
@@ -555,9 +555,9 @@ so the agent does not invent guidance:
 
 - **install (of DOCA itself).** Installing DOCA, choosing
   packages, post-install verification, `pkg-config` wiring —
-  defer to [`doca-setup`](../../doca-setup/SKILL.md) and to the
+  defer to `doca-setup/SKILL.md` and to the
   install-tree layout in
-  [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill's `## install` verb assumes DOCA is already
   installed and only checks the RDMI-specific preconditions.
 - **deploy.** Deploying RDMI-using applications at scale across
@@ -572,15 +572,15 @@ so the agent does not invent guidance:
   do not replace that documented workflow with an invented shortcut.
 - **DPA programming.** The DPA toolchain, kernel build, memory
   model, and execution semantics belong to
-  [`doca-dpa`](../doca-dpa/SKILL.md). This skill describes the
+  `doca-dpa/SKILL.md`. This skill describes the
   RDMI-side handoff (the handle, the device-side header set)
   but does not author DPA kernels.
 - **Kernel-level driver install / firmware burn.** Installing
   the `mlx5_core` driver, burning new ConnectX firmware, or
   modifying `mlxconfig` parameters — out of scope. Route to
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5 and to
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+  `doca-hardware-safety/SKILL.md`
   for the change-application discipline.
 
 ## Command appendix
@@ -592,7 +592,7 @@ worked example is a single instance.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent probes for the matching structured helper FIRST
 (`doca-env --json` for version + devices + libraries + drivers;
 `doca-capability-snapshot` for per-device capability flags;
@@ -603,18 +603,18 @@ the row.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-rdmi` | [`## install`](#install) step 1; [`## configure`](#configure) step 1 | What is the build-time DOCA RDMI version? | A semver matching `doca_caps --version`. Disagreement = partial install; route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 |
+| `pkg-config --modversion doca-rdmi` | [`## install`](#install) step 1; [`## configure`](#configure) step 1 | What is the build-time DOCA RDMI version? | A semver matching `doca_caps --version`. Disagreement = partial install; route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 |
 | `pkg-config --modversion doca-common doca-verbs doca-dpa doca-rdmi` | [`## install`](#install) step 2 | Do all four `.pc` files agree on the same DOCA semver? | A single semver repeated four times. Any disagreement is the partial-install pattern |
 | `pkg-config --cflags --libs doca-rdmi` | [`## build`](#build) | What include + link flags does the linker need? | Includes resolve under whichever include directory `pkg-config --cflags` reports on this install (do not hardcode the path); libs include `-ldoca_rdmi -ldoca_common -ldoca_verbs` (plus `-ldoca_dpa` when the DPA datapath is in use) |
 | `doca_caps --list-devs` | [`## configure`](#configure) step 2; [`## test`](#test) step 4 | Which devices on this host can be used as a `doca_dev` with DPA capability? | One row per visible device with PCIe address and capability flags; the DPA capability flag is the gate for RDMI-on-DPA |
 | `doca_caps --version` | [`## install`](#install) step 1 | What is the *runtime* DOCA version on this host? | A semver matching `pkg-config --modversion doca-rdmi` |
 | `cat /opt/mellanox/doca/applications/VERSION` | [`## install`](#install) step 1; [`## debug`](#debug) layer 1 | What does the install tree itself claim its version is? | A semver matching the other version sources |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | [`## run`](#run) step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition. Silence after `doca_ctx_start()` = the DPA kernel was never launched or the host stopped progressing the PE |
-| `dmesg | tail -n 40` (sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver log around the last RDMI call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug) |
-| `mlxconfig -d <pcie> q | head -n 40` (sudo) | [`## debug`](#debug) layer 7 | What firmware config does the underlying NIC / DPU report? | Stable firmware config; mismatched values indicate a hardware-state change that must go through [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) |
+| `dmesg | tail -n 40` (sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver log around the last RDMI call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
+| `mlxconfig -d <pcie> q | head -n 40` (sudo) | [`## debug`](#debug) layer 7 | What firmware config does the underlying NIC / DPU report? | Stable firmware config; mismatched values indicate a hardware-state change that must go through `doca-hardware-safety/SKILL.md` |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the RDMI-specific rows on top.

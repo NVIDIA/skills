@@ -62,7 +62,7 @@ DOCA does not ship official bindings in non-C languages inside this repository. 
 
 ## modify
 
-Goal: take a working shipped sample and **derive a custom first application** for the user, by editing a verbatim copy of the sample on the user's own DOCA-installed Linux host (bare-metal, VM, *or NGC container*). The substance of the modified file is NVIDIA's BSD-3 sample (verified, compiled, shipped) with a small, named set of user-domain values swapped. The agent does **not** author DOCA library source code from scratch.
+Goal: take a working shipped sample and **derive a custom first application** for the user, by editing a verbatim copy of the sample on the user's own DOCA-installed Linux host (bare-metal, VM, *or NGC container*). The NGC / docker path is **build-and-link only**; runtime (Flow pipes, RDMA QPs, `doca_dev` on a port) needs a real BlueField or ConnectX — do not claim the app runs entirely inside the container. The substance of the modified file is NVIDIA's BSD-3 sample (verified, compiled, shipped) with a small, named set of user-domain values swapped. The agent does **not** author DOCA library source code from scratch.
 
 **Language scope of this verb.** The shipped DOCA samples are written in C; this is the only application source code NVIDIA ships in this repository. The modify-a-sample workflow below is therefore the C / C++ first-app track. For consumers writing their first DOCA application in another language (Rust, Go, Python, …), this verb is *not* the right path — those users should still build a shipped sample (Track 1 of [`## build`](#build)) to verify their install is healthy, and then use Track 2 of [`## build`](#build) plus the matching library skill's bindings / FFI guidance for the wrapper-side work the user does in their own toolchain. The agent must not pretend the modify-a-sample workflow produces a Rust crate, a Go module, or a Python package; the workflow's output is a modified copy of NVIDIA's C sample.
 
@@ -264,7 +264,7 @@ Investigation order — **always**:
 
 2. **Version layer (program-side).** `pkg-config --modversion doca-<library>` against the runtime `doca_caps --version`. Mismatch ⇒ partial upgrade or stale build env; reinstall consistently before code changes ([CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility)).
 
-3. **Lifecycle order layer.** Did the program call the library's APIs in the universal order *cfg-create → init → start → use → stop → destroy*? Out-of-order calls produce `DOCA_ERROR_BAD_STATE`. The library skill names which specific calls map to which lifecycle phase.
+3. **Lifecycle order layer.** Did the program call the library's APIs in the Core order *create → configure → start → connect → use → stop → destroy* (`cfg-create` / `init` implement configure and finish before start)? Out-of-order calls produce `DOCA_ERROR_BAD_STATE`. The library skill names which specific calls map to which lifecycle phase.
 
 4. **Capability layer.** Did the program ask for a feature the active mode does not support? Re-run capability discovery from [`## configure`](#configure) step 4 and cross-check; an unsupported feature returns `DOCA_ERROR_NOT_SUPPORTED`. Code-side workarounds for `NOT_SUPPORTED` are almost always wrong — change intent, switch hardware/mode, or escalate.
 
@@ -327,13 +327,12 @@ makes the distinction *before* it picks a sweep strategy.
   it. An application build *fail* therefore has many more
   legitimate causes than a sample fail; classify before declaring.
 
-The agent never tells a user *"build all apps"* without first
-clarifying which subset: *all samples* (cheap, library-level),
-*all top-level applications* (heavier, integration-level), *all
-optional-stack apps* (per-category), or *build-only vs runnable on
-this target* (whether the sweep is just a compile check or an
-end-to-end run). The clarification is one sentence to the user,
-not a guess.
+Do not recommend *"build all apps"* until the subset is explicit:
+*all samples* (cheap, library-level), *all top-level applications*
+(heavier, integration-level), *all optional-stack apps*
+(per-category), or *build-only vs runnable on this target* (whether
+the sweep is just a compile check or an end-to-end run). The
+clarification is one sentence to the user, not a guess.
 
 ### Category taxonomy
 
@@ -503,4 +502,4 @@ Two cross-cutting rules:
 - **`install`.** Installing DOCA on a fresh host, or reaching an install from a no-install host (NGC container fallback at `nvcr.io/nvidia/doca/doca` for macOS / Windows / Linux without DOCA, lab box, cloud Linux without NIC, hardware path) — env scope. Defer to [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) and the Installation Guide via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
 - **Env preparation.** `PKG_CONFIG_PATH`, hugepages, devlink, representor enumeration — env scope. Defer to [`doca-setup ## configure`](../doca-setup/TASKS.md#configure).
 - **Library API specifics.** Constructing a Flow pipe, RDMA queue setup, Comch channel construction, etc. — library scope. After this skill's verbs have produced a buildable, runnable program shape, hand off to the matching library skill (e.g. [`doca-flow`](../libs/doca-flow/SKILL.md)) for API-level guidance.
-- **`deploy` / `rollback` at fleet scale.** Provisioning multiple BlueFields, coordinated firmware / BFB updates across a fleet, or staged rollback is **fleet-orchestration scope**, externally owned and out of this bundle's SDK scope. Do **not** hand-roll per-host deployment logic at that scale. Route to the orchestration entry-point in [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/map.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing) (DOCA Platform Framework / NVIDIA Network Operator / Kubernetes Launch Kit, with authoritative links). Single-host / handful-of-DPUs PoC deployment stays in-bundle via [`doca-setup ## recognize`](../doca-setup/TASKS.md#recognize).
+- **`deploy` / `rollback` at fleet scale.** Provisioning multiple BlueFields, coordinated firmware / BFB updates across a fleet, or staged rollback is **fleet-orchestration scope**, externally owned and out of this bundle's SDK scope. Do **not** hand-roll per-host deployment logic at that scale. Route to the orchestration entry-point in [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/services.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing) (DOCA Platform Framework / NVIDIA Network Operator / Kubernetes Launch Kit, with authoritative links). Single-host / handful-of-DPUs PoC deployment stays in-bundle via [`doca-setup ## recognize`](../doca-setup/TASKS.md#recognize).

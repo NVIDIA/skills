@@ -218,9 +218,9 @@ this verb is the recovery ladder.
      [`doca-version ## apt-source consistency`](../doca-version/TASKS.md#apt-source-consistency),
      then re-converge.
    - **Aborted transaction / `dpkg` interrupted** → recover the
-     package database via the documented `dpkg`/`apt` repair path
-     before retrying the move. The agent quotes the documented repair
-     step, not an invented one.
+     package database first: `sudo dpkg --configure -a`, then
+     `sudo apt-get -f install` (Debian/Ubuntu); do not re-run the upgrade
+     as the first action, and re-detect via `doca-version` afterwards.
    - **Partial upgrade** → converge the package set on one release
      via the install path in
      [`doca-setup ## debug`](../doca-setup/TASKS.md#debug).

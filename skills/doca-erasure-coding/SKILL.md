@@ -2,49 +2,85 @@
 license: Apache-2.0
 name: doca-erasure-coding
 description: >
-  Use this skill when the user is doing hands-on DOCA Erasure Coding
-  programming on a BlueField DPU, ConnectX NIC, or host — bringing
-  up a doca_ec context, picking among the create / recover / update
-  tasks, choosing matrix type / N / K / block size, querying
-  doca_ec_cap_* before sizing, setting doca_mmap src/dst
-  permissions, or debugging DOCA_ERROR_* returns from
-  doca_ec_task_*. Trigger even when the user does not name "DOCA
-  Erasure Coding" or "Reed-Solomon" — typical implicit phrasings
-  include "one data block changed, how do I refresh parity without
-  re-encoding", "a disk failed and 2 parity blocks are gone, can I
-  rebuild", "RAID-6 resilience across 12 disks", "my
-  doca_ec_task_create returns NOT_PERMITTED", or "is this N+K layout
-  still recoverable". Refuse and route elsewhere for non-Reed-Solomon
-  codes (fountain / LDPC / raptor), pure-replication designs,
-  network FEC, or other DOCA accelerator libraries (SHA / Compress /
-  AES-GCM / DMA) — those belong to other skills.
+  Hardware-offloaded erasure coding with DOCA Erasure Coding
+  (Reed-Solomon, doca_ec) on a BlueField DPU, ConnectX NIC, or host:
+  generating parity for data blocks, rebuilding lost blocks from the
+  survivors, and refreshing parity after a change. Trigger on "one data
+  block changed, how do I refresh parity without re-encoding", "a disk
+  failed and 2 parity blocks are gone, can I rebuild", "RAID-6 resilience
+  across 12 disks", "my doca_ec_task_create returns NOT_PERMITTED", or "is
+  this N+K layout still recoverable", even without naming DOCA Erasure
+  Coding. Covers bringing up a doca_ec context, the create / recover /
+  update tasks, matrix type / N / K / block size, doca_ec_cap_* queries
+  before sizing, doca_mmap src/dst permissions, and DOCA_ERROR_* from
+  doca_ec_task_*. Refuse and route elsewhere for non-Reed-Solomon codes
+  (fountain / LDPC / raptor), pure-replication designs, network FEC, or
+  other DOCA accelerator libraries (SHA / Compress / AES-GCM / DMA).
 metadata:
+  author: NVIDIA <doca@nvidia.com>
   kind: library
+  tags:
+    - doca
+    - erasure-coding
+    - reed-solomon
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC
   attached. Reads the user's local install via `pkg-config
   doca-erasure-coding` and inspects
   /opt/mellanox/doca/{lib,include,samples,applications}.
+  The validation steps require a live DOCA install.
 ---
 
 # DOCA Erasure Coding
 
+## Examples
+
+- **"A disk failed; can I rebuild from parity?"** — this is in
+  scope if the layout is Reed-Solomon N+K. Query `doca_ec_cap_*`
+  before sizing recover.
+- **"One data block changed; refresh parity without re-encoding."**
+  — use the update task. Do not route this to replication or
+  network FEC.
+
+## Quick answer: capability check and sample choice
+
+Before writing code, query the device: `doca_ec_cap_task_create_is_supported`,
+`doca_ec_cap_task_update_is_supported` or `doca_ec_cap_task_recover_is_supported`
+for the task you need, then `doca_ec_cap_get_max_block_size` and
+`doca_ec_cap_get_max_buf_list_len` to size blocks. Start from the shipped sample
+for that task under `/opt/mellanox/doca/samples/doca_erasure_coding/` (copy it;
+never edit the installed one). Use the update task to refresh parity for a
+changed block instead of re-encoding everything.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for configure /
+recover / debug. Open the capabilities companion for create /
+recover / update and matrix policy. Do not open every companion file.
+
 **Where to start:** This skill assumes DOCA is already installed and
 the user is doing **hands-on erasure-coding work** on a BlueField /
-ConnectX / host with DOCA. Open [`TASKS.md`](TASKS.md) if the user
+ConnectX / host with DOCA. Open the tasks companion if the user
 wants to *do* something (configure / build / modify / run / test /
-debug); open [`CAPABILITIES.md`](CAPABILITIES.md) when the question
+debug); open the capabilities companion when the question
 is *what can DOCA Erasure Coding express* on this version. If the
 user has not installed DOCA yet, route to
 [`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
 asking *"should I even use erasure coding here, or just replicate
 the data?"*, the path-selection rule in
-[`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+## Capabilities and modes
 is the first stop — erasure coding is a **storage-resilience**
 primitive (RAID-6 / distributed file system parity / object-storage
 erasure-coded buckets), not a network primitive and not a
 replication substitute.
+
+**How to use this skill.** Read this file, then search the companion file
+for the `## <name>` heading the question needs and read that whole section.
+Answer completely from it, quoting only its symbols and commands. Do not
+browse docs; use the entry points in `doca-public-knowledge-map`. Give
+environment checks as commands for the user's DOCA host. For out-of-scope
+requests, name the skill that owns them and stop.
 
 ## Example questions this skill answers well
 
@@ -59,9 +95,9 @@ single instance.
   resilience across 12 disks; is doca-erasure-coding the right
   primitive, or should I just keep three copies?"*. Answered by
   the path-selection table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the *"when NOT to use doca-erasure-coding"* bullets in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
+  ## Safety policy.
 - **"Does my device support the EC task type, block size, N+K
   layout, and matrix type I want?"** — worked example: *"is
   `doca_ec_task_create` on this BlueField, what is the maximum
@@ -75,40 +111,40 @@ single instance.
   `doca_ec_cap_get_max_buf_list_len`, and per-variant
   `doca_ec_matrix_create()` constructor success — the public
   header does NOT ship a `doca_ec_cap_get_matrix_*` family) in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the discovery step in
-  [`TASKS.md ## configure`](TASKS.md#configure).
+  ## configure.
 - **"One source block changed — do I have to recompute all the
   parity from scratch?"** — worked example: *"I have 8 data + 4
   parity blocks on disk; one data block was just rewritten. How
   do I express the parity update without re-running the full
   encode?"*. Answered by the `doca_ec_task_update` row in the
   task-type table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the update-vs-re-encode rule in
-  [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  ## Safety policy
   + the modify-from-sample slot for switching between create and
   update tasks in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **"K of my N+K blocks went missing — how do I reconstruct
   them?"** — worked example: *"a disk failed; the 8 data blocks
   are intact but 2 of the 4 parity blocks are gone; can DOCA
   recover them?"*. Answered by the
   `doca_ec_task_recover` row in the task-type table in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  ## Capabilities and modes
   + the recover smoke (encode → drop a block → recover → bit-compare)
-  in [`TASKS.md ## test`](TASKS.md#test).
+  in ## test.
 - **"What permissions does the source / destination mmap need?"** —
   worked example: *"my `doca_ec_task_create` returns
   `DOCA_ERROR_NOT_PERMITTED`"*. Answered by the permission matrix
-  in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+  in ## Safety policy
   + the mmap-set-permissions checklist in
-  [`TASKS.md ## test`](TASKS.md#test).
+  ## test.
 - **"Is this DOCA Erasure Coding API available on my installed
   DOCA version?"** — worked example: *"is `doca_ec_task_update` in
   the DOCA I have installed, or do I have to recompute parity from
   scratch?"*. Answered by the version-compatibility overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  ## Version compatibility,
   which cross-links the canonical detection chain in
   [`doca-version`](../../doca-version/SKILL.md) and adds the
   EC-specific *"discover per-task support + matrix type via cap
@@ -117,9 +153,9 @@ single instance.
   layer caused it?"** — worked example: *"`DOCA_ERROR_INVALID_VALUE`
   on `doca_ec_task_create_allocate_init` with block_size = 4 MiB"*.
   Answered by the EC overlay on the cross-library taxonomy in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
+  ## Error taxonomy
   + the layered ladder in
-  [`TASKS.md ## debug`](TASKS.md#debug) that escalates to
+  ## debug that escalates to
   [`doca-debug`](../../doca-debug/SKILL.md).
 
 ## Audience
@@ -144,7 +180,7 @@ the N=k, K=2 case); confusing them produces wrong recommendations.
 **Language scope.** DOCA Erasure Coding ships as a C library with
 `pkg-config` module name `doca-erasure-coding`. The shipped samples
 are written in C. C and C++ consumers are the canonical case and
-the worked examples in `TASKS.md` assume that path. Other-language
+the worked examples in the tasks companion assume that path. Other-language
 consumers (Rust, Go, Python, …) consume the same `*.so` through
 FFI or language-specific bindings; the skill's contribution in
 that case is to keep the lifecycle, capability-discovery,
@@ -218,7 +254,7 @@ This is a **thin loader**. The body keeps only the orientation
 needed to pick the right next file. The substantive
 EC-specific material lives in two companion files:
 
-- `CAPABILITIES.md` — what DOCA Erasure Coding can express on
+- the capabilities companion — what DOCA Erasure Coding can express on
   this version: the three task types (create / recover / update,
   each independently capability-gated), the matrix-type + N + K +
   block-size configuration surface, the capability-query family
@@ -230,7 +266,7 @@ EC-specific material lives in two companion files:
   permission decisions, and the path-selection rule (when to use
   doca-erasure-coding versus a CPU EC library versus pure
   replication versus RAID-6 on disk).
-- `TASKS.md` — step-by-step workflows for the six in-scope EC
+- the tasks companion — step-by-step workflows for the six in-scope EC
   verbs: `configure`, `build`, `modify`, `run`, `test`, `debug`.
   Plus a `Deferred task verbs` block that points out-of-scope
   questions at the right next skill.
@@ -255,7 +291,7 @@ contain — and pull requests should not add:
   modify-a-sample workflow in
   [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
   layered with the EC-specific overrides in
-  [`TASKS.md ## modify`](TASKS.md#modify).
+  ## modify.
 - **Pre-computed parity tables for arbitrary N + K layouts.**
   The skill tells the agent to use a *known-vector* smoke
   (encode a tiny N + K layout from a fixed input, simulate
@@ -275,7 +311,7 @@ contain — and pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope (storage-domain resilience — N data + K redundancy
    blocks — and not a network or replication question
    misclassified as erasure coding).
@@ -283,9 +319,9 @@ contain — and pull requests should not add:
    (create / recover / update), the matrix-type + N + K +
    block-size configuration surface, the capability-query rules,
    permission matrix, error taxonomy, observability, and safety /
-   path-selection policy, see [CAPABILITIES.md](CAPABILITIES.md).**
+   path-selection policy, see the capabilities companion.**
 3. **For step-by-step workflows — configure, build, modify, run,
-   test, debug — see [TASKS.md](TASKS.md).**
+   test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
 [`doca-version`](../../doca-version/SKILL.md) for the canonical
@@ -309,14 +345,14 @@ the installed package layout" rather than "EC-specific guidance".
   preconditions are satisfied.
 - [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
   version-handling rules. This skill's
-  [`## Version compatibility`](CAPABILITIES.md#version-compatibility)
+  `## Version compatibility`
   cross-links the four-way match rule and adds only the
   EC-specific *"discover per-task support + supported matrix
   types + max block size + max N+K via cap query"* overlay.
 - [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
-  [TASKS.md](TASKS.md) honors this contract.
+  the tasks companion honors this contract.
 - [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal

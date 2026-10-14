@@ -1,5 +1,23 @@
 # DOCA Flow workflows
 
+**First docker / first-app request (MUST):** follow the local
+doca-skills bundle (`doca-setup`, `doca-programming-guide`,
+`doca-flow`, `doca-public-knowledge-map`). Open with Stage 1 (NGC
+container, compile only) vs Stage 2 (real BlueField / ConnectX)
+before any command. Do not start with host `pkg-config`. Path 0:
+copy a tag from
+https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags
+(*How to pick an NGC tag without guessing*; never invent), then
+`docker pull nvcr.io/nvidia/doca/doca:<tag>` and
+`docker run -it --rm -v $HOME/dev:/work nvcr.io/nvidia/doca/doca:<tag> bash`.
+After `docker run`, MUST say: paste back the output of
+`pkg-config --modversion doca-flow` and
+`ls /opt/mellanox/doca/samples/doca_flow/`. Then: I resume from
+`doca-programming-guide` ## modify step 1 with the real install in
+hand. Copy a listed directory. Never emit `main.c` / `Makefile` /
+`Dockerfile` or hand-typed `-l` / `-L` (paste
+`pkg-config --libs doca-flow`). Then `configure → build → modify`.
+
 **Where to start:** The verbs run `configure → build → modify → test →
 run → debug`; skip ahead only when the user is already past a verb.
 `## test` is an iterative loop (validate → cross-check → counter wiring →
@@ -75,14 +93,12 @@ the environment is ready for pipe construction.
    present.
 5. **Runtime prerequisites — hugepages + HWS devargs, before any Flow
    program runs.** A DOCA Flow program needs hugepages allocated and
-   mounted first, and hardware steering (HWS) must be requested through
-   DPDK devargs:
-
-```bash
-echo '1024' | sudo tee -a /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-sudo mkdir -p /mnt/huge
-sudo mount -t hugetlbfs -o pagesize=2M nodev /mnt/huge
-```
+   mounted first. Hugepage reservation and any hugetlbfs mount are
+   env-class: follow [`doca-setup`](../../doca-setup/SKILL.md). Record
+   the current `nr_hugepages` first. Do not pipe a value into `tee`.
+   Do not default to a fixed page count. Do not mix `doca-hugepages`
+   with raw sysfs writes. Hardware steering (HWS) must be requested
+   through DPDK devargs:
 
    - **HWS** is enabled via DPDK devarg `dv_flow_en=2` AND a `mode_args`
      value containing `hws` (e.g. `"vnf,hws"` or `"switch,hws"`). Without
@@ -374,7 +390,7 @@ fwd_miss.target = kernel_target;          /* unmatched traffic ALSO continues to
   source rep whose own per-entry `fwd` is `DOCA_FLOW_FWD_PORT` to the
   destination representor's `port_id`, each carrying
   `monitor.counter_type = DOCA_FLOW_RESOURCE_TYPE_NON_SHARED` for the
-  per-VF counter. "Drop any other VF" is the pipe's `fwd_miss`
+  per-VF counter. Dropping every other VF is the pipe's `fwd_miss`
   (`DOCA_FLOW_FWD_DROP`), not an extra pipe — leaving the entry match
   empty steers nothing (the classic switch-app bug). Insert the entries
   as a batch (`DOCA_FLOW_ENTRY_FLAGS_WAIT_FOR_BATCH`, last one
@@ -384,15 +400,16 @@ fwd_miss.target = kernel_target;          /* unmatched traffic ALSO continues to
   [`## test`](#test); swap only the literals (port ids, pipe name via
   `doca_flow_pipe_cfg_set_name()`).
 - **Build — link more than `doca-flow`.** `pkg-config --libs doca-flow`
-  omits the companion modules, so linking it alone fails with `undefined
-  reference` (e.g. `doca_error_get_descr`, `doca_dpdk_port_as_dev`) +
-  `DSO missing from command line`. Mirror the shipped sample's dependency
-  set: `doca-common` + `doca-argp` + the library (`samples/meson.build`),
-  plus `doca-dpdk-bridge` (provides `doca_dpdk_port_*`) + `libdpdk` for any
-  DPDK-backed app. Outside the meson tree, build a manifest *in the user's
-  project* with a `dependency()` per module called (meson canonical;
-  cmake/autotools work the same; discover names via `pkg-config --list-all
-  | grep doca`) — don't copy a template out of this skill. Compile with
+  alone often fails with `undefined reference` (e.g. `doca_error_get_descr`,
+  `doca_dpdk_port_as_dev`) + `DSO missing from command line` because
+  companion **modules** live in other `.pc` files. Mirror the shipped
+  sample's `dependency()` set (`doca-common`, `doca-argp`, `doca-flow`,
+  plus `doca-dpdk-bridge` and `libdpdk` for DPDK-backed apps) by putting
+  those names on the `pkg-config --libs` command and pasting its output.
+  They are pkg-config arguments, never linker tokens — do not type a
+  `-l` or `-L` flag by hand. Outside the meson tree, discover
+  names with `pkg-config --list-all | grep doca` — don't copy a template
+  out of this skill. Compile with
   `-D DOCA_ALLOW_EXPERIMENTAL_API` by default: most of `doca_flow.h` is
   experimental-tagged, so omitting it is a common first-build failure; it's
   a compile-time switch, not runtime code.
@@ -640,14 +657,24 @@ Walk in this order — do not skip steps:
 
 ## flow-ct
 
-The DOCA-Flow-CT-specific overlay on the parent verbs. Use AFTER
-the parent's [`## configure`](#configure) → [`## debug`](#debug)
-sequence has been walked for the stateless doca-flow port; this
-section adds only what CT changes on top. For the capability
-surface, layering rule, the single `doca_flow_ct_cap_is_dev_supported`
-device-support query, CT-specific error overlay, and safety
-policy, see
+The DOCA-Flow-CT-specific overlay on the parent verbs. Read this section
+**before the port-start step** in [`## configure`](#configure), even when
+the requested change is described as adding CT to existing stateless pipes.
+For device support, sizing, and safety, read
 [`CAPABILITIES.md ## flow-ct`](CAPABILITIES.md#flow-ct).
+
+**Lifecycle to explain before applying the change:** `doca_flow_init` →
+`doca_flow_ct_cfg_create` and the verified `doca_flow_ct_cfg_set_*` setters →
+`doca_flow_ct_init(cfg)` once per process → port start → CT-aware pipes →
+entries. CT is not a per-port `doca_ctx`; do not call `doca_ctx_start` for CT.
+If ports are already running, this is not an in-place attachment: capture
+pipe definitions and counter baselines, obtain approval for the traffic
+interruption, stop the affected ports, initialize CT before restarting,
+and recreate the intended stateless/CT-aware configuration from the
+snapshot and shipped sample. Do not assume old pipe handles survive.
+On shutdown, stop ports before `doca_flow_ct_destroy`, then
+`doca_flow_destroy`. Verify matching and unrelated traffic after restart;
+if the smoke fails, follow this section's rollback overlay.
 
 **configure overlay.**
 

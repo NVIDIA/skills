@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-collectx-deployment.explicit-positive.v1",
-      "prompt": "Use the doca-collectx-deployment skill to help me. Use this skill to deploy and operate a CollectX (clx) based DOCA telemetry collector on a host or BlueField — wiring providers / counters into the collector, running the collection daemon, and shaping its exporters (Prometheus pull, Fluent ",
+      "prompt": "Use the doca-collectx-deployment skill for this task: I need to deploy a telemetry collector beside my accelerated workload, connect its inputs, and verify that events reach the configured sink.",
       "expected_skill": "doca-collectx-deployment",
       "expected_output": "The agent loads doca-collectx-deployment and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-collectx-deployment's scope.",
       "assertions": [
@@ -13,13 +13,23 @@
       ]
     },
     {
-      "id": "doca-collectx-deployment.negative.v1",
-      "prompt": "I need help with something doca-collectx-deployment explicitly says is out of scope (it should be handled by doca-telemetry). Which skill should handle it and why is it not doca-collectx-deployment?",
-      "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-collectx-deployment; it recognizes the request is out of scope and routes to the correct skill (doca-telemetry, doca-telemetry-exporter), explaining the boundary.",
+      "id": "doca-collectx-deployment.implicit-positive.v1",
+      "prompt": "I need to deploy a telemetry collector beside my accelerated workload, connect its inputs, and verify that events reach the configured sink.",
+      "expected_skill": "doca-collectx-deployment",
+      "expected_output": "The agent recognizes the component from the task without a skill label and grounds the workflow in the bundle.",
       "assertions": [
-        "doca-collectx-deployment is not used as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s): doca-telemetry, doca-telemetry-exporter."
+        "The correct skill is selected without a label in the prompt.",
+        "The answer stays grounded in documented commands and workflows."
+      ]
+    },
+    {
+      "id": "doca-collectx-deployment.negative.v1",
+      "prompt": "I need to instrument a C application with a low-level telemetry API; there is no collector service to deploy.",
+      "expected_skill": null,
+      "expected_output": "The agent does not apply doca-collectx-deployment's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-collectx-deployment as the answer.",
+      "assertions": [
+        "The answer does not apply doca-collectx-deployment's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

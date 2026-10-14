@@ -25,6 +25,24 @@ copy-paste recipe. The agent's job is to walk the user through
 the steps in order, verifying preconditions before recommending
 the next call.
 
+## DOCA 3.5 field notes
+
+The emulation features are off in firmware by default, and the
+samples do not say so: PCI samples fail with `Requested Resource Not
+Found`, virtio-fs samples with `variable 'vfs_type' is NULL ...
+Invalid input` (developer review, DOCA 3.5). Enable the feature first:
+
+- **PCI (generic) emulation:** `PCI_SWITCH_EMULATION_ENABLE=1` via
+  `mlxconfig` on the BlueField in DPU mode, then a BlueField
+  system-level reset.
+- **virtio-fs emulation:** `VIRTIO_FS_EMULATION_ENABLE=1` (with
+  `VIRTIO_FS_EMULATION_NUM_PF` and `VIRTIO_FS_EMULATION_NUM_MSIX` as
+  the DOCA 3.5 virtio-fs page shows), then a BlueField system reboot.
+
+Both are firmware changes that need a reset: follow
+`doca-hardware-safety` (inventory, out-of-band access, maintenance
+window, rollback) and get the operator's approval before applying.
+
 ## configure
 
 Goal: stand up a per-sub-library Device Emulation context on

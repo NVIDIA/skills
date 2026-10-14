@@ -123,6 +123,22 @@ The anti-pattern to refuse: declaring a fix without first reproducing the sympto
 
 The canonical layered debug ladder for **any DOCA symptom**. Every per-library `## debug` redirects to this ladder for cross-cutting steps and then layers its library-specific overlay on top.
 
+**Build/link entry gate — capture environment before editing code.** For
+`undefined reference`, identify layer 4 (Link), then request
+`pkg-config --modversion doca-common`, the selected library's version, and
+`pkg-config --libs doca-<library>` from the same host/container and shell that
+ran the failing build. Also request the actual failing link invocation and
+complete error output; pkg-config flags are not that invocation. For Flow,
+use `pkg-config --modversion doca-flow` and `pkg-config --libs doca-flow`.
+If the outputs have not been supplied or observed, pause at the capture
+request. Do not follow it with guessed flags, paths or a replacement compiler
+command: merely naming the checks does not establish their results. If DOCA is
+missing or versions disagree, follow [doca-setup](../doca-setup/TASKS.md#debug)
+and [doca-version](../doca-version/TASKS.md#configure) before changing build
+files. Only after those checks are clean, use the environment-then-program
+order in [doca-programming-guide](../doca-programming-guide/TASKS.md#debug),
+change one thing, and rerun the original build to compare the exact error.
+
 **The ladder is an iterative loop, not a one-shot walk.** The agent
 walks the 7 layers bottom-up, captures the picture at each layer, and
 loops back when the picture changes the hypothesis. Treating the
@@ -190,9 +206,11 @@ supported; symptoms above this layer will be misleading.
 
 **Layer 4 — Link.** Once the build compiles, confirm it links.
 
-- The exact `undefined reference to ...` error, if any. The most common case for first-app developers is **DOCA Flow split into 5 separate `*.so`s on recent versions** (`-ldoca_flow -ldoca_flow_ct -ldoca_flow_info_comp -ldoca_flow_tune_server -ldoca_flow_definitions`). Use `pkg-config --libs doca-<library>` to get the full link line; do not try to construct it by hand.
-- `ldd /path/to/built/binary` — confirms which `*.so` files actually got linked at runtime. A binary that links cleanly but `ldd` shows missing or wrong-version `*.so` entries is a runtime path problem (`LD_LIBRARY_PATH`) not a link problem.
-- For link failures, the fix is almost always *"use the `pkg-config --libs` output verbatim"*. Inventing the link line by hand is the failure mode this skill exists to prevent.
+- Capture the exact error and actual failing linker invocation. A missing symbol does not by itself identify the cause: version skew, an omitted dependency or link ordering require different evidence-backed corrections.
+- Compare that invocation with the complete observed `pkg-config --libs doca-<library>` output. DOCA Flow can use multiple shared objects depending on the release; do not prescribe a fixed library count or flag list. If required flags are absent, correct dependency wiring in the existing build system rather than replacing the shipped sample's build with a guessed compiler command.
+- `ldd /path/to/built/binary` applies only when a relevant binary was produced and its identity is known. It cannot inspect a failed link that produced no binary, and an older binary is not evidence for the failed invocation. Header declarations likewise do not establish shared-object symbol exports.
+- **Companion modules are discovered dependencies, not guessed linker flags.** Add a module only when the installed sample/build configuration and pkg-config evidence identify it; preserve the complete returned flags and their required ordering. Do not append a plausible `-l` flag or substitute an assumed library directory even after mentioning pkg-config.
+- After one justified change, rerun the original build and compare the exact error and exit status. A successful link establishes the link result only, not hardware/runtime correctness. For documentation, follow the knowledge map's verified public links; a local skill filename does not define an SDK URL.
 
 **Layer 5 — Runtime.** Once the binary runs, you reach DOCA's own runtime surface.
 
@@ -259,7 +277,10 @@ Three cross-cutting rules for the appendix:
   classifier ([`## debug`](#debug) layer 5) needs.
 - **Never invent a `-l` link line.** `pkg-config --libs doca-<library>`
   is the source of truth, especially for libraries (DOCA Flow on recent
-  versions) that ship as multiple `*.so` files.
+  versions) that ship as multiple `*.so` files. Any `-l` token shown
+  above is illustrative of what `pkg-config` *returns* — it is not a
+  template to retype with substitutions, and shortening one to a
+  guessed stem such as `-ldoca` invents a library that does not exist.
 - **Cross-link instead of duplicate.** Most rows above are also in the
   [`doca-setup`](../doca-setup/SKILL.md) or
   [`doca-programming-guide`](../doca-programming-guide/SKILL.md)

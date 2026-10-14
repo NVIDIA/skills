@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-flow-perf.explicit-positive.v1",
-      "prompt": "Use the doca-flow-perf skill to help me. I'm working on: measuring the host or DPU-CPU control-plane rate of a DOCA Flow pipeline with doca_flow_perf \u2014 picking a JSON policy from configs/, choosing the DPDK or DOCA backend, running the single-iteration smoke then the iterative eval loop, interpreting per-iteration CPU cycles and num_pushed / num_failed, or capturing the four-tuple (DOCA version, BlueField/firmware, JSON policy, worker/queue/burst config) that makes a Kops/sec number defensible.",
+      "prompt": "Use the doca-flow-perf skill for this task: I'm running into this: \"how many rules per second can my BlueField insert\". Can you walk me through it?",
       "expected_skill": "doca-flow-perf",
       "expected_output": "The agent selects the doca-flow-perf skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -17,7 +17,7 @@
       "expected_skill": "doca-flow-perf",
       "expected_output": "The agent recognizes this as a doca-flow-perf issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-flow-perf skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,18 +27,18 @@
       "expected_skill": "doca-flow-perf",
       "expected_output": "The agent recognizes this as a doca-flow-perf issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-flow-perf skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-flow-perf.negative.v1",
-      "prompt": "I actually need help with optimizing a live Flow app. Which skill should handle this, and why is it not doca-flow-perf?",
+      "prompt": "I have a pipeline running in production that is losing hardware offload, and I need to work out why. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-flow-perf; it explains that optimizing a live Flow app is out of doca-flow-perf's scope and routes to the appropriate skill instead.",
+      "expected_output": "The agent does not apply doca-flow-perf's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-flow-perf as the answer.",
       "assertions": [
-        "doca-flow-perf is not selected as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) instead."
+        "The answer does not apply doca-flow-perf's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

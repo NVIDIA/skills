@@ -21,6 +21,26 @@ copy-paste recipe. The agent's job is to walk the user through
 the steps in order, verifying preconditions before recommending
 the next call.
 
+## DOCA 3.5 field notes
+
+Observed on DOCA 3.5 (developer review); check them before debugging
+further:
+
+- **Size limit.** Query `doca_dma_cap_task_memcpy_get_max_buf_size()`
+  before submitting. The DMA Copy reference app caps files at 2 MiB
+  (2097152 bytes) on the tested BlueField-3; the host only reports
+  `Failure was detected in dma copy`, while the real reason is in the
+  BlueField log.
+- **Validate before submitting.** In the review, `doca_task_try_submit()`
+  rejected a too-large copy cleanly (`buffer byte size=... must be <=
+  maximum_byte size=2097152`), whereas `doca_task_submit()` failed in
+  hardware and stopped the DMA context.
+- **Local copy runs on the host too.** The local-copy sample refuses
+  to run on the host (`Local DMA copy can run only on the DPU`), but
+  the library supports host-local copies in your own program.
+- **Run the BlueField side as root.** Without it, DMA Copy fails with
+  the misleading `do not run on Host` representor message.
+
 ## configure
 
 Goal: bring up a DOCA DMA context on a host or BlueField and
