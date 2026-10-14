@@ -1,0 +1,278 @@
+{
+  "skill_name": "parabricks",
+  "evals": [
+    {
+      "id": "parabricks-001",
+      "prompt": "Can this machine run NVIDIA Parabricks for paired-end WGS alignment? Check the current environment and explain any blockers. Do not install software or launch containers.",
+      "expected_output": "The agent assesses this machine for Parabricks WGS alignment using observed GPU, driver, container-runtime, CPU/RAM, and storage facts. It distinguishes detected blockers from unverified requirements and gives actionable next steps without installing software or launching containers.",
+      "assertions": [
+        "The agent obtains and reports actual GPU visibility, GPU model/memory when available, and driver status from this machine; equivalent diagnostic methods are accepted.",
+        "The agent reports Docker availability and daemon access, and labels container GPU access or Parabricks image execution as unverified when no container was launched.",
+        "The agent reports CPU/RAM and available storage facts, or explicitly identifies unavailable facts and unknown workload paths.",
+        "The agent gives a readiness assessment grounded in the observations and actionable next steps, without claiming release-specific compatibility when the image version is unknown.",
+        "The agent honors the request not to install software or launch containers."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": "check_parabricks_runtime.sh"
+    },
+    {
+      "id": "parabricks-002",
+      "prompt": "I have paired-end Illumina RNA-seq FASTQs and access to a remote NVIDIA GPU server. I need splice-aware alignments in a coordinate-sorted BAM. Recommend a tool and give me a Docker command template, identifying any missing inputs. Do not probe this workstation or execute the workload.",
+      "expected_output": "The agent recommends pbrun rna_fq2bam for GPU STAR alignment and provides a version-aware Docker template with explicit mounts, paired FASTQs, matching reference/STAR index, and sorted BAM output. The command includes --in-fq, --ref, --genome-lib-dir, --output-dir, and --out-bam; the output directory and final BAM are separate required arguments, so omitting either makes the template incomplete. Unknown values are requested or clearly marked as placeholders; no local readiness check or workload execution is needed.",
+      "assertions": [
+        "The agent identifies pbrun rna_fq2bam for splice-aware GPU STAR alignment and coordinate-sorted BAM output.",
+        "The Docker template has an explicit Parabricks image tag or version placeholder, GPU access, working directory, and mounts covering input FASTQs, reference/index, and output paths.",
+        "The pbrun command supplies paired inputs via --in-fq, --ref, --genome-lib-dir, --output-dir, and --out-bam using paths consistent with the mounts.",
+        "The agent asks for or clearly labels unresolved reference build, compatible STAR index, image version, and output location; it does not present guesses as confirmed values.",
+        "The agent does not probe this workstation or execute the alignment, and does not promise a fastest runtime without comparable benchmark evidence."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-003",
+      "prompt": "Assess readiness of a remote DGX A100 for 30x human WGS germline processing with nvcr.io/nvidia/clara/clara-parabricks:4.2-1. Use these administrator-supplied diagnostics: Ubuntu 22.04; 8 physical A100 80 GB GPUs with MIG disabled; driver 470.182.03; nvidia-smi reports CUDA Version 11.4; 128 CPU threads; 1 TB system RAM; Docker 24.0.7 and docker info succeeds. NVIDIA Container Toolkit and GPU access inside containers have not been tested. /raid has 40 GB free, and the plan is to stage 120 GB of FASTQs there before writing temporary files and output. Your terminal is on a separate login machine: do not probe it, install software, or launch containers. Explain blockers, unknowns, and next steps for the remote node, using requirements for the selected release.",
+      "expected_output": "The agent evaluates the supplied remote-host facts against Parabricks 4.2 requirements. It identifies the driver below 525.60.13 and insufficient staging space, distinguishes driver CUDA capability from a host toolkit, recognizes sufficient stated GPU/CPU/RAM resources, and leaves container GPU access and image execution unverified. It provides target-specific remediation without probing the login host.",
+      "assertions": [
+        "The agent uses the supplied remote DGX facts and does not probe the separate login machine or claim to have tested the DGX.",
+        "The agent checks the Parabricks 4.2 requirements and identifies driver 470.182.03 as below the documented minimum 525.60.13; it does not substitute requirements from a newer release.",
+        "The agent explains that nvidia-smi CUDA Version is driver-supported CUDA capability, not proof of an installed host CUDA toolkit, and that the selected container supplies its own runtime.",
+        "The agent recognizes 40 GB free cannot stage 120 GB of FASTQs and additional working files; it does not invent a universal fixed disk requirement for 30x WGS.",
+        "The agent distinguishes the adequate supplied GPU/CPU/RAM and Docker version facts from unverified Toolkit/container GPU/image access, and recommends driver remediation, more staging/scratch space, and subsequent authorized target-host verification."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-004",
+      "prompt": "My existing Nextflow genomics pipeline needs retries for failed tasks and an AWS Batch executor configuration. The alignment and variant-calling commands are already settled. Explain where these settings belong and show a minimal configuration example.",
+      "expected_output": "The agent treats this as Nextflow configuration and provides useful general workflow guidance with a minimal retry and AWS Batch configuration. It does not activate Parabricks or run its helper. A named alternative skill is optional and is not required when none is installed.",
+      "assertions": [
+        "The agent does not invoke the parabricks skill or execute check_parabricks_runtime.sh.",
+        "The agent addresses Nextflow workflow configuration without replacing the settled alignment or variant-calling commands.",
+        "The agent shows a minimal configuration with process retry handling and a bounded retry count, plus AWS Batch executor, queue, region, and an S3 work directory or clearly labeled placeholders.",
+        "The agent explains where the configuration or profile is selected and identifies cloud prerequisites without claiming deployment or execution.",
+        "General Nextflow guidance satisfies the routing requirement; naming another installed skill is optional, and the agent does not claim that an unavailable skill was used."
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-005",
+      "prompt": "Translate these CPU STAR options to a Parabricks rna_fq2bam command template: --genomeDir /refs/star, --readFilesIn R1.fastq.gz R2.fastq.gz, --readFilesCommand zcat, --outSAMtype BAM SortedByCoordinate, --outFilterMismatchNmax 5, --twopassMode Basic, and --runThreadN 16. Explain any mapping that is not one-to-one. Reference FASTA and output paths can be placeholders. Do not run the command or inspect local hardware.",
+      "expected_output": "The agent translates STAR options to the documented Parabricks interface, preserving paired compressed input, mismatch limit, two-pass mode, and sorted BAM output. The command includes --in-fq, --ref, --genome-lib-dir, --output-dir, and --out-bam; the output directory and final BAM are separate required arguments, so omitting either makes the template incomplete. It explains that --num-threads means workers per GPU stream rather than STAR total threads, so --runThreadN 16 cannot be copied as an equivalent resource setting.",
+      "assertions": [
+        "The command uses --genome-lib-dir /refs/star, --in-fq R1.fastq.gz R2.fastq.gz, --read-files-command zcat, and --ref with a FASTA placeholder; it supplies both --output-dir and --out-bam with explicit output placeholders.",
+        "The agent maps --outFilterMismatchNmax 5 to --max-out-filter-mismatch 5 and --twopassMode Basic to --two-pass-mode Basic.",
+        "The agent explains sorted BAM output via --out-bam and does not pass generic STAR --outSAMtype directly to pbrun.",
+        "The agent explains that Parabricks --num-threads controls workers per GPU stream, so STAR --runThreadN 16 is not a one-to-one mapping; it leaves auto/default or labels tuning as a separate choice.",
+        "The agent uses version-specific guidance and does not run the command or probe local hardware."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-006",
+      "prompt": "I am preparing pbrun rna_fq2bam with Parabricks 4.7.1. My reference FASTA is GRCh37, but the STAR genome library was built from GRCh38. Can I use these together if I rename the contigs? Explain what needs to match and how to prepare a valid command. This is a planning question; do not run anything.",
+      "expected_output": "The agent rejects mixing a GRCh37 FASTA with a GRCh38 STAR genome library. Renaming contigs cannot reconcile different assemblies. It advises choosing one reference and rebuilding or obtaining a compatible STAR index from that reference, checking annotation/build consistency and the STAR version supported by Parabricks 4.7.1, then substituting those matching assets into a template. Any runnable template includes a read-input mode, --ref, --genome-lib-dir, --output-dir, and --out-bam; the output directory and final BAM are separate required arguments.",
+      "assertions": [
+        "The agent identifies GRCh37 and GRCh38 as different assemblies and states that contig renaming cannot make the supplied FASTA and STAR index compatible.",
+        "The agent recommends a STAR genome library built from the same reference sequence/build used by --ref, with consistent contig names and annotation where used.",
+        "The agent identifies the documented STAR 2.7.2a compatibility baseline for Parabricks 4.7.1 or verifies the supported STAR/index version from that release manual instead of recommending an arbitrary latest index.",
+        "The proposed command uses matching --ref and --genome-lib-dir placeholders, includes a read-input mode and both --output-dir and --out-bam, and does not present the original mismatched assets as runnable.",
+        "The agent provides planning guidance without executing commands or modifying reference assets."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-007",
+      "prompt": "With Parabricks 4.7.1, I need to index /data/sample.g.vcf.gz using pbrun indexgvcf. In Docker, /data is mounted read-only, and /results is writable. Can I use --out /results/sample.g.vcf.gz.tbi? Explain the actual output naming and give me a safe command plan that preserves the original GVCF. Do not execute it.",
+      "expected_output": "The agent explains that indexgvcf uses --input and derives the .tbi path by appending .tbi to the input filename, with no documented --out override. It proposes a writable copy of the GVCF in /results and indexing that copy, giving /results/sample.g.vcf.gz.tbi while preserving /data and checking existing destination files before copying.",
+      "assertions": [
+        "The agent states that pbrun indexgvcf does not document an --out option and does not invent an output-path override.",
+        "The agent explains that the index is named by appending .tbi to the full input filename, giving sample.g.vcf.gz.tbi beside the indexed GVCF.",
+        "The agent identifies that indexing the read-only /data input cannot create the adjacent index and proposes indexing a writable copy under /results.",
+        "The proposed command uses --input /results/sample.g.vcf.gz and preserves the original; it accounts for existing destination GVCF/index files before copying or overwriting.",
+        "The agent distinguishes the command plan from executed work and does not modify files or launch a workload."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-008",
+      "prompt": "Review the next step of a Parabricks 4.7.1 germline workflow. fq2bam produced /work/sample.markdup.bam and /work/sample.recal.txt using matching known-sites resources; ApplyBQSR has not been run. The reference is /ref/genome.fa. I need HaplotypeCaller to produce a diploid per-sample gVCF at /results/sample.g.vcf.gz, retaining the CPU GATK settings --min-pruning 4 and --pcr-indel-model NONE, without writing another BAM. Give the next pbrun command and explain whether the existing BAM qualities have changed and how the caller uses the report. All paths are inside the intended container and all resources match the sample and reference. This is command planning only; do not execute anything.",
+      "expected_output": "The agent distinguishes a BQSR report from an already recalibrated BAM and uses pbrun haplotypecaller with the existing BAM and --in-recal-file to apply recalibrated qualities during calling. It requests gVCF emission explicitly, preserves diploid calling, and passes the supported pruning/PCR settings as one --haplotypecaller-options string using the Parabricks 4.7.1 single-hyphen spelling. No separate ApplyBQSR BAM or rerun of fq2bam is needed.",
+      "assertions": [
+        "The agent explains that generating sample.recal.txt does not itself rewrite the base qualities in sample.markdup.bam; the caller can use the recalibration report internally.",
+        "The proposed pbrun haplotypecaller command uses --ref /ref/genome.fa, --in-bam /work/sample.markdup.bam, and --in-recal-file /work/sample.recal.txt without requiring a second BAM or another fq2bam run.",
+        "The command explicitly selects --gvcf and writes --out-variants /results/sample.g.vcf.gz; diploid calling is preserved by --ploidy 2 or the documented diploid default.",
+        "The command preserves both requested caller settings in one quoted --haplotypecaller-options value containing -min-pruning 4 and -pcr-indel-model NONE; it does not pass these as unsupported top-level flags or blindly retain GATK double-hyphen spelling inside that value.",
+        "The agent distinguishes the original BAM from the recalibrated qualities used during calling, does not claim a new recalibrated BAM was produced, and provides planning guidance without executing the workflow."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-009",
+      "prompt": "I am moving paired somatic calling to Parabricks 4.7.1. I already have /work/panel.vcf.gz and its .tbi, but the panel's ##contig headers include IDs without lengths. The matching GRCh38 reference is /work/GRCh38.fa with its .fai. The prepared BAMs are /work/tumor.bam (sample T1) and /work/normal.bam (sample N1). Give a command plan to use this existing panel in calling and produce a VCF with PON INFO annotations. Explain the header repair and which index/resources are needed at each step. Preserve the original panel and do not rebuild the panel from normal-sample BAMs. /work and /results are writable container paths; use new output names and do not execute anything.",
+      "expected_output": "The agent repairs missing contig lengths in a new PON VCF.GZ using the matching reference .fai, builds a fresh tabix index for that changed file, and runs prepon to generate the additional .pon resource. It then runs paired mutectcaller with the repaired PON VCF.GZ path in --pon and the supplied tumor/normal sample labels. It uses postpon with the caller VCF and the same PON to create an annotated output, preserving the original panel and treating all commands as a plan.",
+      "assertions": [
+        "The agent identifies contig names and lengths as prepon prerequisites and proposes repairing a new PON copy from /work/GRCh38.fa.fai, for example with bcftools reheader --fai; it preserves the original panel and does not suggest constructing a new panel from the BAMs.",
+        "The plan creates a fresh tabix index for the repaired VCF.GZ rather than reusing the original .tbi, then runs pbrun prepon --in-pon-file on that repaired, indexed PON.",
+        "The agent distinguishes the prepon-generated .pon resource from the tabix index and explains that mutectcaller --pon takes the PON VCF.GZ path, not the generated .pon file.",
+        "The paired pbrun mutectcaller command uses the supplied reference, --in-tumor-bam /work/tumor.bam, --in-normal-bam /work/normal.bam, --tumor-name T1, --normal-name N1, --pon with the repaired panel, and a new --out-vcf destination.",
+        "The plan runs pbrun postpon after calling with --in-vcf pointing to the caller output, --in-pon-file pointing to the same repaired PON, and a distinct --out-vcf destination; it does not claim PON INFO annotation is complete merely because calling finished, and does not execute the plan."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-010",
+      "prompt": "Review this planned Parabricks 4.7.1 command for Illumina WGS: pbrun deepvariant --ref /ref/GRCh38.fa --in-bam /data/sample.bam --mode shortread --proposed-variants /ref/candidates.vcf.gz --gvcf --run-partition --out-variants /results/sample.g.vcf.gz. I require both the proposed-candidate input and gVCF output. I added partitioning to improve throughput; should I also force more streams per GPU? Explain how these options interact and give the minimal revised command while preserving the analysis requirements. Hardware details and benchmark timings are not available. Do not inspect this machine or execute the command.",
+      "expected_output": "The agent identifies the documented Parabricks 4.7.1 interaction: combining --run-partition, --proposed-variants, and --gvcf produces a warning, ignores --run-partition, and can cause substantial slowdown. It retains the required proposed variants and gVCF output, omits the ignored partition flag, and keeps stream tuning at auto without hardware/benchmark evidence. It explains that removing an ignored flag clarifies effective behavior but does not prove a speedup.",
+      "assertions": [
+        "The agent identifies the specific three-option interaction in Parabricks 4.7.1 and states that --run-partition is ignored with a warning when --proposed-variants and --gvcf are both enabled.",
+        "The revised command retains --proposed-variants /ref/candidates.vcf.gz and --gvcf and removes --run-partition rather than dropping a required analysis input or output to obtain partitioning.",
+        "The revised pbrun deepvariant command preserves the supplied reference, BAM, shortread mode or its documented default, and --out-variants /results/sample.g.vcf.gz.",
+        "The agent explains that forcing more streams does not restore partition mode for this combination and leaves --num-streams-per-gpu at its documented auto default or omits the flag pending separate benchmarking.",
+        "The agent acknowledges the documented slowdown caveat while distinguishing it from measured runtime, does not guarantee that removing an already ignored flag speeds up the job, and does not probe hardware or execute the workload."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-011",
+      "prompt": "Review this draft for Parabricks 4.7.1: pbrun giraffe --gbz-name /ref/panel.gbz --dist-name /ref/panel.dist --minimizer-name /ref/panel.min --in-fq /reads/R1.fq.gz /reads/R2.fq.gz --sample S1 --read-group lane1 --align-only --out-bam /results/S1.bam. I need a coordinate-sorted BAM without duplicate marking, in a single pbrun invocation. The validated, mutually compatible graph bundle also includes /ref/panel.zipcodes and /ref/paths.txt; use that path list for the BAM sequence-header order. Preserve read-group ID lane1, SM S1, LB libA, PL ILLUMINA, and PU FC1.1. Explain what is wrong with the draft and give the corrected command. These are container paths, hardware details are unavailable, and this is planning only: do not execute commands or inspect this machine.",
+      "expected_output": "The agent recognizes that giraffe --align-only emits an unsorted alignment BAM and replaces it with --no-markdups to retain sorting while skipping duplicate marking. It supplies the required zipcodes index and requested reference-path list from the compatible bundle, preserves the existing graph inputs, FASTQs and output, and maps every read-group field to the Giraffe-specific flags. It does not add a separate CPU sorting step, invent resources, or tune streams without hardware evidence.",
+      "assertions": [
+        "The agent explains that --align-only does not coordinate-sort the BAM and removes it; the corrected command uses --no-markdups to produce sorted output without duplicate marking in one pbrun giraffe invocation.",
+        "The command preserves --gbz-name /ref/panel.gbz, --dist-name /ref/panel.dist, and --minimizer-name /ref/panel.min and adds the required --zipcodes-name /ref/panel.zipcodes (documented short aliases are acceptable).",
+        "The command uses --ref-paths /ref/paths.txt for the requested BAM header order, keeps the two supplied FASTQs in --in-fq, and writes --out-bam /results/S1.bam.",
+        "The command preserves all supplied read-group values with --read-group lane1, --sample S1, --read-group-library libA, --read-group-platform ILLUMINA, and --read-group-pu FC1.1 rather than borrowing fq2bam read-group flag names.",
+        "The agent does not add a separate sorting workload, claim the BAM was generated, or inspect hardware; it leaves --nstreams at auto or omits it rather than prescribing a fixed stream count without evidence."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-012",
+      "prompt": "I want to migrate this upstream STAR-Fusion command to Parabricks 4.7.1: STAR-Fusion --genome_lib_dir /ref/ctat --chimeric_junction /data/Chimeric.out.junction --left_fq /data/R1.fq.gz --right_fq /data/R2.fq.gz --output_dir /results/fusions --out_prefix S1 --CPU 8 --min_FFPM 0.5 --FusionInspector inspect --verbose_level 3. The junction file, paired FASTQs, and CTAT library are compatible. A plain STAR alignment index is also available at /ref/star_index. The FFPM threshold and FusionInspector inspection are mandatory analysis requirements. Can pbrun starfusion replace this whole invocation? Give its supported command portion using the supplied paths, explain the non-equivalent options, and state how to preserve the mandatory analysis requirements. Do not execute anything or inspect hardware.",
+      "expected_output": "The agent explains that pbrun starfusion consumes the existing junction file and CTAT/STAR-Fusion resource library rather than raw FASTQs or a plain STAR index. It maps the supported I/O, prefix and worker options to the Parabricks spelling, treats verbosity as a boolean rather than a numeric equivalent, and identifies min_FFPM and FusionInspector as unsupported in this wrapper. It labels the pbrun command a partial migration and preserves mandatory analysis behavior by retaining the upstream stage or requiring a separately validated downstream implementation, with the read inputs retained for FusionInspector.",
+      "assertions": [
+        "The pbrun starfusion command uses --chimeric-junction /data/Chimeric.out.junction, --genome-lib-dir /ref/ctat, --output-dir /results/fusions, --out-prefix S1, and --num-threads 8.",
+        "The agent distinguishes the CTAT/STAR-Fusion resource library from /ref/star_index and explains that this pbrun tool consumes junctions; it does not pass the raw FASTQ flags to pbrun starfusion or rerun alignment unnecessarily.",
+        "The agent identifies --min_FFPM 0.5 and --FusionInspector inspect as upstream features not exposed by pbrun starfusion 4.7.1 and does not invent hyphenated equivalents or a generic pass-through mechanism.",
+        "The agent explains that --verbose is boolean and cannot preserve upstream --verbose_level 3 exactly; any proposed pbrun command omits verbosity or uses --verbose without a numeric argument.",
+        "The agent labels the pbrun command a partial migration, keeps the mandatory FFPM and FusionInspector work in the upstream workflow or a separately validated downstream stage with the FASTQs available, and does not claim full parity or execution after simply dropping those options."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-013",
+      "prompt": "Review this RNA migration draft for Parabricks 4.7.1: pbrun rna_fq2bam --ref /ref/GRCh38.fa --genome-lib-dir /ref/star --in-fq /reads/R1.fq.gz /reads/R2.fq.gz --read-files-command zcat --out-bam /results/S1.bam --out-sam-unmapped Within_KeepPairs --out-chim-type WithinBAM HardClip --min-chim-segment 12 --two-pass-mode Basic --num-threads 16. My upstream STAR run used --outSAMunmapped Within KeepPairs, --chimOutType WithinBAM HardClip, and --runThreadN 16. For a multi-mapping mapped mate, our consumer requires a separate unmapped-mate record for every reported alignment, not just one copy somewhere in the BAM. Upstream STAR produced these records in unsorted BAM before a separate coordinate-sort step. This record-level contract is mandatory; separate FASTQs do not satisfy it. I also require coordinate sorting without duplicate marking and hard-clipped supplementary chimeric alignments. The supplied FASTA and STAR 2.7.2a index match. Explain whether one rna_fq2bam invocation can meet the whole contract, provide its valid supported portion with STAR outputs under /results/star, and identify what must remain on another path. These are container paths. Do not run anything or probe hardware.",
+      "expected_output": "The agent identifies that rna_fq2bam 4.7.1 cannot preserve the mandatory per-alignment unmapped-mate copies: Within_KeepPairs behaves like Within in its sorted output. It distinguishes this from ordinary unmapped-read inclusion and does not claim that every unmapped mate is absent. Fastx files are not an equivalent substitute. It explicitly labels the supported pbrun command a partial migration and retains an upstream path meeting the mandatory contract or a separately validated reconstruction. The command includes both --output-dir /results/star and an explicitly identified --out-bam for the supported portion; retaining /results/S1.bam or using a clearly labeled alternate filename to distinguish it from the complete upstream result is acceptable. It uses the single value WithinBAM_HardClip, keeps --min-chim-segment 12 and --two-pass-mode Basic, adds --no-markdups, and omits copied --num-threads 16 or uses auto while explaining workers per GPU stream. A command that silently drops the required per-alignment records does not achieve the requested replacement.",
+      "assertions": [
+        "The agent states that --out-sam-unmapped Within_KeepPairs behaves like Within in Parabricks 4.7.1 sorted output and cannot reproduce the required extra unmapped-mate record for each alignment of a multi-mapping mate; it distinguishes this from ordinary unmapped-read inclusion.",
+        "The agent rejects full migration under the mandatory per-alignment BAM-record contract and retains an upstream path or a separately validated reconstruction. It does not offer separate Fastx files as a substitute; an explicit discussion of that rejected alternative is unnecessary when the plan already satisfies this constraint.",
+        "The supported pbrun rna_fq2bam portion includes the supplied FASTA, STAR library, paired FASTQs and zcat handler, --output-dir /results/star, and an explicit --out-bam. A clearly identified alternate BAM filename is acceptable for the partial result, especially when the upstream path produces /results/S1.bam.",
+        "The command uses --out-chim-type WithinBAM_HardClip as one value, preserves --min-chim-segment 12 and --two-pass-mode Basic, and adds --no-markdups to keep sorting without duplicate marking.",
+        "The agent explains workers-per-GPU-stream semantics, does not carry --runThreadN 16 over as an equivalent --num-threads 16 setting, keeps auto/default, and does not execute commands or probe hardware."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-014",
+      "prompt": "We are recovering reads from /data/archive.cram before realigning to GRCh38. The CRAM was encoded against /ref/GRCh37.fa; /ref/GRCh38.fa is the future alignment reference. Review this Parabricks 4.7.1 draft: pbrun bam2fq --ref /ref/GRCh38.fa --in-bam /data/archive.cram --out-prefix /results/recovered --out-suffixF _R1.fastq --out-suffixF2 _R2.fastq --out-suffixS _single.fastq --rg-tag SM --remove-qc-failure. We must retain available paired reads, first-mate and second-mate orphans, unpaired reads, and QC-failed reads, split by sequencing unit. All read groups share SM S1 and LB libA; each sequencing unit has a distinct PU, with multiple RG IDs per PU. Give a corrected conversion command and a check plan that accounts for every requested read category. Compression is acceptable. Can this guarantee the original raw FASTQs byte for byte? Paths are already inside the container; do not execute or inspect files.",
+      "expected_output": "The corrected bam2fq command decodes with the source GRCh37 FASTA, preserves the input and output prefix, uses --rg-tag PU to group sequencing units, and omits --remove-qc-failure. It explicitly supplies all five .gz-ending suffixes: F, F2, O, O2, and S. Parabricks ignores orphan or unpaired categories when their corresponding suffix is absent; --out-suffixS does not capture orphan first and second mates. The agent checks pairs and each separate retained category, accounts for /1 and /2 read-name suffixes, and rejects byte-for-byte recovery of the original FASTQs because prior processing and conversion can change or remove information. Dropping any required read category is a material failure of this recovery task.",
+      "assertions": [
+        "The corrected command uses --ref /ref/GRCh37.fa for decoding /data/archive.cram, preserves --out-prefix /results/recovered, and distinguishes that source reference from the later GRCh38 alignment reference.",
+        "The command supplies --out-suffixF, --out-suffixF2, --out-suffixO, --out-suffixO2, and --out-suffixS with distinct suffixes all ending in .gz; it does not silently discard either orphan category or unpaired reads.",
+        "The agent explains that missing O, O2, or S suffixes cause the corresponding reads to be ignored, that S alone does not preserve orphan mates, and that bam2fq requires .gz suffixes rather than selecting uncompressed output through .fastq naming.",
+        "The command uses --rg-tag PU, recognizing that only PU or ID is supported and that PU matches the requested grouping, and omits --remove-qc-failure to retain QC-failed reads.",
+        "The check plan reconciles paired names/counts and separate orphan/unpaired outputs, accounts for /1 and /2 suffixes, rejects guaranteed byte-identical recovery of original FASTQs, and remains a plan without executing or inspecting files."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-015",
+      "prompt": "We are comparing Parabricks 4.7.1 pangenome_aware_deepvariant with the compatible Google implementation on the same prepared short-read BAM, linear reference, GBZ graph and model. Differences include tiny zero-quality RefCall score changes, pileup read-order changes when supplementary alignments are retained, and GBZ query results that change when query order changes. A colleague proposes replacing std::sort with std::stable_sort, disabling only updateCache, and then requiring byte-identical VCFs as the release check. Review that proposal using the release-specific mismatch mechanisms. Give a controlled comparison plan and a minimal pbrun command using /data/S1.bam, /ref/GRCh38.fa, /ref/panel.gbz, and /results/S1.vcf.gz. Distinguish upstream source changes from pbrun CLI options and identify performance consequences. Do not patch software, run commands, or inspect hardware.",
+      "expected_output": "The agent separates the three documented Parabricks 4.7.1 mismatch mechanisms: TensorRT/Keras numerical differences around 1e-5 with reported zero-quality RefCall differences, nondeterministic ordering of equal-key supplementary reads, and the order-dependent Google GBZ reader cache fast path. It identifies the upstream stable_sort change in BuildPileupForOneSample in pileup_image_native.cc. For the GBZ comparison build it disables both updateCache and the cached-range lookup in GbzReader::Query() in deepvariant/third_party/nucleus/io/gbz_reader.cc; disabling only updates is incomplete. It confines those patches to a controlled upstream comparison build, notes the potentially substantial slowdown from disabling caching, and refuses to infer byte-identical VCFs or proven biological parity from those changes. Its minimal pbrun command includes --ref, --pangenome, --in-bam, and --out-variants with the supplied paths and does not invent CLI flags for the C++ changes.",
+      "assertions": [
+        "The agent attributes tiny predicted-score differences to TensorRT versus Keras inference and treats zero-quality RefCall mismatches as the manual's reported observations, without promising that ordering/cache changes eliminate numerical differences or guarantee byte-identical VCFs.",
+        "The agent connects supplementary alignments with nondeterministic equal-key read sorting and locates the proposed upstream std::stable_sort change in BuildPileupForOneSample in pileup_image_native.cc.",
+        "The agent explains the order-dependent Google GBZ cache fast path and requires disabling both updateCache and the cached-range lookup in GbzReader::Query() in deepvariant/third_party/nucleus/io/gbz_reader.cc for the controlled comparison.",
+        "The comparison plan uses a separate upstream build with recorded versions/settings, notes that disabling the cache can substantially slow it down and is not routine production tuning, and measures output differences before claiming equivalence.",
+        "The minimal pbrun pangenome_aware_deepvariant command uses --ref /ref/GRCh38.fa, --pangenome /ref/panel.gbz, --in-bam /data/S1.bam, and --out-variants /results/S1.vcf.gz; it invents no CLI flags for upstream C++ changes and does not patch, execute, or probe anything."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "parabricks-016",
+      "prompt": "Convert the three CPU STAR jobs in input/rna-batch.json to Parabricks 4.7.1 command drafts. Preserve every lane, read-group tag, alignment setting, and requested output. The destination output directories deliberately differ from the old STAR prefixes; preserve each prefix basename there. Keep duplicate marking disabled and choose Parabricks thread tuning independently from the CPU thread count. Write output/rna-plan.json with a top-level jobs array. Each job must have id, status (draft or blocked), argv (a token array starting with pbrun rna_fq2bam, or null when blocked), and notes (an array of strings). Use the exact target paths and metadata from the manifest. Use inline --in-fq/--in-se-fq arguments so each draft is self-contained; do not introduce auxiliary input-list files. Preserve supplied decompressor command text as one argument value. This is command preparation: do not run STAR, pbrun, containers, decompression, or hardware probes. You may read the manifest, consult documentation, run command-generation helpers, and write/validate the requested JSON. Briefly summarize any limitations and the artifact path.",
+      "expected_output": "Creates output/rna-plan.json containing treated, control, and rescue drafts. Every argv includes --ref /ref/GRCh38.fa, --genome-lib-dir /ref/GRCh38_STAR_2.7.2a, the job-specific --output-dir and --out-bam, and --no-markdups. Treated has three correctly paired --in-fq groups with exact lane-specific read groups, including the DS value with spaces; control has two --in-se-fq groups; rescue has one pair. Preserve all values through documented flag mappings, including treated --max-junction-mismatches 0 -1 0 0, --out-chim-type WithinBAM_SoftClip, --min-chim-segment 15, --two-pass-mode Basic and ordered SAM attributes; control mismatch/multimap/SA/MAPQ settings; rescue --score-gap -4, --min-match-filter-normalized 0.75, --align-ends-type EndToEnd, Fastx and Within outputs, and Junctions. Decompressors are each a single --read-files-command value, including gzip -dc. Original prefix basenames become --out-prefix in the new directories. Thread tuning is independent of CPU runThreadN: either Parabricks auto defaults or a separately chosen and labeled worker-thread setting is acceptable; it does not claim equivalent CPU/GPU thread semantics. No workload is executed or biological parity claimed.",
+      "assertions": [
+        "Writes parseable output/rna-plan.json with all three requested job IDs and complete pbrun rna_fq2bam argument arrays including the supplied reference, genome library, distinct output directory, final BAM path and --no-markdups.",
+        "Preserves the three treated pairs, two control single-end lanes and one rescue pair in the correct input modes, with every explicit read-group tag/value assigned to its original lane and no guessed metadata.",
+        "Translates treated alignment settings without losing negative vector elements, ordered SAM attributes, two-pass mode, or the combined WithinBAM_SoftClip chimeric value; preserves its nonzero chimeric segment threshold.",
+        "Preserves control mismatch/multimap/SA/MAPQ settings and rescue negative score/normalized match/EndToEnd/unmapped/chimeric settings, represents each decompressor as one value, and relocates outputs while retaining prefix basenames.",
+        "Chooses Parabricks thread tuning independently of CPU --runThreadN (auto/default or a separately chosen setting is acceptable), does not claim equivalent CPU/GPU thread semantics, keeps duplicate marking disabled, and does not execute workloads or probe hardware."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": [
+        "files/rna-batch.json"
+      ]
+    },
+    {
+      "id": "parabricks-017",
+      "prompt": "Review the four STAR migration requests in input/rna-contracts.json for Parabricks 4.7.1. Generate a complete draft only when the supplied inputs and the stated output contract can be preserved by rna_fq2bam. Otherwise mark the job blocked and explain the exact unresolved input or unsupported behavior; do not silently drop a setting or replace the contract with a partial command. Judge each job by its stated consumer requirement. Write output/rna-plan.json with a top-level jobs array. Each job must have id, status (draft or blocked), argv (a token array starting with pbrun rna_fq2bam, or null when blocked), and notes (an array of strings). Use the exact target paths and metadata from the manifest. Use inline --in-fq/--in-se-fq arguments so each draft is self-contained; do not introduce auxiliary input-list files. Preserve supplied decompressor command text as one argument value. This is command preparation: do not run STAR, pbrun, containers, decompression, or hardware probes. You may read the manifest, consult documentation, run command-generation helpers, and write/validate the requested JSON. Briefly summarize any limitations and the artifact path.",
+      "expected_output": "Creates a four-job output/rna-plan.json. per_alignment is blocked: Parabricks sorted output treats Within_KeepPairs as Within and does not preserve the extra unmapped-mate copy per multi-mapping alignment from the upstream unsorted KeepPairs path; neither ordinary Within nor separate Fastx files meets that multiplicity contract. ordinary is a valid draft: ordinary inclusion is supported by --out-sam-unmapped Within or Within_KeepPairs, and losing extra copies/adjacency is irrelevant to its explicitly weaker contract. Its command includes ref, genome-lib-dir, the supplied ordinary output-dir and out-bam, correct paired FASTQs and read group, and --no-markdups; any explanation of performance controls distinguishes CPU thread counts from GPU-stream worker threads; independent Parabricks tuning is allowed. primary_ties is blocked because the documented 4.7.1 rna_fq2bam options do not expose STAR outSAMprimaryFlag AllBestScore; do not invent a corresponding flag or silently accept a different primary policy. unmatched_lanes is blocked because two R1 lanes have only one R2 lane; request the missing mate information without guessing filenames or regrouping reads. Blocked jobs have null argv. No workload or hardware inspection is performed.",
+      "assertions": [
+        "Writes parseable output/rna-plan.json with all four IDs, blocks per_alignment, primary_ties and unmatched_lanes with null argv, and provides a complete ordinary draft.",
+        "Explains that Within_KeepPairs in the sorted Parabricks path does not preserve one unmapped-mate copy for every multi-mapping alignment; does not claim that all unmapped mates disappear or that Fastx preserves this record contract.",
+        "Allows ordinary unmapped-read inclusion, using Within or Within_KeepPairs and a complete command with correct paired reads, exact RG metadata, required reference/index/output flags, and no duplicate marking. Independent runtime tuning is allowed; it does not claim CPU thread counts and GPU-stream worker counts are equivalent.",
+        "Identifies AllBestScore as an unsupported primary-alignment policy in the documented Parabricks 4.7. interface, preserving it as unresolved instead of inventing an option or silently dropping it.",
+        "Identifies the unequal R1/R2 lane counts and missing mate information without guessing or merging lanes; respects the command-preparation-only scope."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": [
+        "files/rna-contracts.json"
+      ]
+    },
+    {
+      "id": "parabricks-018",
+      "prompt": "We are preparing a Parabricks 4.7.1 RNA alignment pilot for new 151-nt paired-end reads. We want to reuse a suitable existing STAR library rather than regenerate one unnecessarily. The target FASTA is /ref/GRCh38.fa and the annotation is unchanged. Treat these administrator-verified facts as supplied: library A at /ref/star_A was generated by the STAR 2.7.2a executable from that exact FASTA and annotation; its original genomeParameters.txt contains versionGenome 2.7.1a and sjdbOverhang 99, and sjdbInfo.txt is present. Its build manifest and all index checksums are intact. Library B at /ref/star_B is a copy of A whose versionGenome field alone was edited to 2.7.2a to match the executable label. Library C at /ref/star_C was generated by STAR 2.7.2a from GRCh37, with versionGenome 2.7.1a and sjdbOverhang 150. A colleague proposes choosing B and passing --sjdb-overhang 150 because the new reads are 151 nt; otherwise they want to rebuild everything. Assess that proposal, choose a library for the planned pilot if one is suitable, and give one pbrun rna_fq2bam command using /reads/new_R1.fq.gz, /reads/new_R2.fq.gz, zcat, STAR outputs in /results/star, and sorted BAM /results/new.bam without duplicate marking. Our command-manifest format requires an explicit positive --sjdb-overhang value. Explain which checks are established by the supplied provenance and what still requires target-container validation. Do not edit metadata, regenerate an index, inspect local files or hardware, or run a workload. Public versioned documentation/source lookup is allowed.",
+      "expected_output": "Choose intact library A for a planned, subsequently validated pilot. STAR 2.7.2a uses the compatibility marker 2.7.1a, so A's version strings do not require a rebuild. Reject B's cosmetic metadata rewrite and C's wrong assembly. Preserve A's explicit junction overhang 99; changing read length does not permit relabeling its stored junctions to 150. Rebuilding a separate index is an optional route for a different overhang, not mandatory just to match executable/version strings. Give a complete command with /ref/GRCh38.fa, /ref/star_A, the paired reads and zcat, separate --output-dir /results/star and --out-bam /results/new.bam, --no-markdups, and --sjdb-overhang 99. Distinguish supplied provenance from untested Parabricks container execution; no changes or workload execution. In the 4.7.1 manual, --ref is required independently of --genome-lib-dir, and rna_fq2bam marks duplicates unless --no-markdups disables that step. A draft omitting --ref cannot run; one omitting --no-markdups violates the requested no-duplicate-marking behavior. Claiming marking is opt-in or mentioning the needed flag only conditionally does not fix the supplied command. These are substantive command requirements when judging goal completion. The documented sjdb-overhang default is 100, not the supplied index-specific 99.",
+      "assertions": [
+        "The agent selects intact library A for the planned pilot and explains why versionGenome 2.7.1a can be correct for a STAR 2.7.2a build, without imposing an unnecessary rebuild based on those strings.",
+        "The agent rejects B's metadata-only rewrite as a compatibility fix and C's GRCh37 index for the supplied GRCh38 target.",
+        "The agent supplies --sjdb-overhang 99 for A, explains the conflict with explicitly forcing 150 on the saved-junction index, and distinguishes reuse from separately rebuilding with a different overhang.",
+        "The command includes pbrun rna_fq2bam, --ref /ref/GRCh38.fa, --genome-lib-dir /ref/star_A, the paired --in-fq paths, --read-files-command zcat, --output-dir /results/star, --out-bam /results/new.bam, and --no-markdups. The 4.7.1 tool requires --ref even with --genome-lib-dir and performs duplicate marking unless --no-markdups is supplied; do not accept the incorrect claim that marking is opt-in.",
+        "The agent accepts the administrator-supplied build/reference/integrity facts as premises, identifies target-container execution as still untested, and does not edit, rebuild, inspect local files/hardware, or run a workload."
+      ],
+      "expected_skill": "parabricks",
+      "expected_script": null,
+      "files": []
+    }
+  ]
+}
