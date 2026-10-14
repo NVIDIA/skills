@@ -71,6 +71,8 @@ runtime assumptions but never installs harnesses or credentials at run time.
   CLI alongside the harness SDK.
 - Provide model credentials through environment variables named by the config
   (`ModelConfig.api_key_env`), never as literals in code.
+- Forward other existing variables with `EnvironmentConfig.env_names`; only names are stored in configuration and run plans. `EnvironmentConfig.env` supplies literal values and does not expand `$NAME` references. Neither field loads a `.env` file.
+- Keep named environment values unchanged while a runtime or service is active. NeMo Fabric rejects changed or unset values before invocation; restart the runtime and any associated service after changing them. With Harbor, deliver values into the task environment through Harbor's managed environment first.
 - Confirm the native extension is importable; SDK calls raise
   `FabricNativeUnavailableError` when it is missing.
 - For descriptor inspection without harness SDKs, install the separate `nemo-fabric-adapter-catalog` package and call `nemo_fabric_adapter_catalog.get_adapter_descriptor(adapter_id)` or `get_target_descriptor(target_id)`. Refer to the [catalog guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/sdk/python/nemo-fabric-adapter-catalog/README.md). Catalog resources do not register execution runners; unknown IDs raise `KeyError`. Validate against the task environment's descriptor before relying on a snapshot claim. Catalog source versions and fingerprints are not runtime-observed provenance.
