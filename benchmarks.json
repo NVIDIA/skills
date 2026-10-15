@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 408,
-  "result_row_count": 3825,
+  "skill_count": 411,
+  "result_row_count": 3855,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -2556,6 +2556,66 @@
       "component": "Earth2Studio",
       "has_results": true,
       "average_uplift_pct": 1.1
+    },
+    {
+      "skill": "ethos-explore",
+      "evaluation_date": "2026-10-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:2f53f8c3e9248b6d7379a877a3fb1ed310c3f5642a339a1c9f49a8e74136db71",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "has_results": true,
+      "average_uplift_pct": 13.5
+    },
+    {
+      "skill": "ethos-orchestrate",
+      "evaluation_date": "2026-10-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:a405e089d93c5fbaef1a4083da0609f55595a62b10d5fc3c59d9ce536e49b4d1",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "has_results": true,
+      "average_uplift_pct": 26.15
+    },
+    {
+      "skill": "ethos-write",
+      "evaluation_date": "2026-10-15",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:61eb4e93c655473defac97dc906db6a892524d69087f73dfed0432a05744c608",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "has_results": true,
+      "average_uplift_pct": 27.43
     },
     {
       "skill": "foundationpose-pipeline",
@@ -6092,12 +6152,12 @@
     },
     {
       "skill": "rtx-remix-modding",
-      "evaluation_date": "2026-10-06",
+      "evaluation_date": "2026-10-15",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:7a32fc881c330ecfeaa36d0afd37f0d220e5dc84fac8aefef0c1bcb3db46b52b",
+      "dataset_digest": "sha256:3a20325201aaaf0e423b220c0c53c7f51ea67a26cd886388f07b2c9084f665b9",
       "validation_status": null,
-      "tasks": 11,
+      "tasks": 14,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -6108,7 +6168,7 @@
       "catalog_dir": "rtx-remix-modding",
       "component": "RTX Remix",
       "has_results": true,
-      "average_uplift_pct": 24.32
+      "average_uplift_pct": 19.03
     },
     {
       "skill": "skill-card-generator",
@@ -18793,6 +18853,276 @@
       "agent": "codex",
       "score_pct": 43.0,
       "uplift_pct": -3.0
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 19.6
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.1,
+      "uplift_pct": 21.4
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-explore",
+      "component": "Ethos",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 41.2
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.2,
+      "uplift_pct": 40.7
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-orchestrate",
+      "component": "Ethos",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.2,
+      "uplift_pct": 40.9
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 48.7
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ethos-write",
+      "component": "Ethos",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "foundationpose-pipeline",
@@ -33425,8 +33755,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 92.9,
+      "uplift_pct": -7.1
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -33434,8 +33764,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.9,
-      "uplift_pct": -4.6
+      "score_pct": 92.9,
+      "uplift_pct": -3.5
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -33443,8 +33773,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 65.5,
-      "uplift_pct": 36.4
+      "score_pct": 72.9,
+      "uplift_pct": 38.6
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -33452,8 +33782,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 72.7,
-      "uplift_pct": 56.3
+      "score_pct": 74.3,
+      "uplift_pct": 42.9
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -33461,7 +33791,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 92.5,
+      "score_pct": 76.4,
       "uplift_pct": null
     },
     {
@@ -33479,8 +33809,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 75.9,
-      "uplift_pct": 22.0
+      "score_pct": 73.1,
+      "uplift_pct": 22.3
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -33488,8 +33818,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.1,
-      "uplift_pct": 35.8
+      "score_pct": 72.4,
+      "uplift_pct": 21.0
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -33497,7 +33827,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.2,
+      "score_pct": 97.1,
       "uplift_pct": null
     },
     {
@@ -33506,7 +33836,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 97.4,
+      "score_pct": 97.7,
       "uplift_pct": null
     },
     {

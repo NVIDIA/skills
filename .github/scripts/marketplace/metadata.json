@@ -1537,6 +1537,42 @@
       }
     },
     {
+      "path": "skills/ethos-explore",
+      "name": "ethos-explore",
+      "description": "Captures what an AI agent is supposed to do — its purpose, boundaries, and success criteria — as a durable snapshot for anyone building, evaluating, reviewing, or changing it. Explores the user's codebase and docs first, then asks one intent question at a time for what source cannot supply. Hands its answers to ethos-write, which writes ethos.md. Use over generic brainstorming when the goal is an agent's ethos.md.",
+      "metadata": {
+        "product.primary": "NeMo Agent Toolkit",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "developer,ai_engineer,ml_engineer,application_developer,hands_on_builder",
+        "discovery.activity_tags": "synthesize,inspect,generate,assess,evaluate"
+      }
+    },
+    {
+      "path": "skills/ethos-orchestrate",
+      "name": "ethos-orchestrate",
+      "description": "Entry point for an AI agent's ethos.md: a durable snapshot of what the agent is for, what it must not do, and what success looks like. Routes a request to explore and capture intent (ethos-explore), or write or edit the file (ethos-write), including renaming an Eval Author 0.1.0 ETHOS.md. Owns the standard every ethos sub-flow follows. Use when the user asks \"help me write an ethos.md\", \"does my agent have an ethos.md?\", \"update my agent's ethos.md\", or when you need to pick between the ethos sub-flows.",
+      "metadata": {
+        "product.primary": "NeMo",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "orchestrate,generate,validate,inspect"
+      }
+    },
+    {
+      "path": "skills/ethos-write",
+      "name": "ethos-write",
+      "description": "Writes an AI agent's ethos.md — a durable snapshot of its purpose, intended behavior, boundaries, and success criteria — from the answers gathered by ethos-explore. Renders the schema-v1 template, validates the front matter and required markdown sections, saves the file in the agent's repository, and reviews it with the user. Also edits an existing ethos.md. Use over generic planning skills for an agent's ethos.md.",
+      "metadata": {
+        "product.primary": "NeMo Agent Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "ai_engineer,developer,ml_engineer,application_developer",
+        "discovery.activity_tags": "generate,validate,synthesize,configure"
+      }
+    },
+    {
       "path": "skills/foundationpose-pipeline",
       "name": "foundationpose-pipeline",
       "description": "Adapt BOP datasets, run the FoundationPose perception pipeline with TAO depth, and evaluate or re-score pose results. Use for dataset runs and result comparisons; environment installation belongs to foundationpose-setup.",
