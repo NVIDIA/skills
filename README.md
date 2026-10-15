@@ -116,6 +116,12 @@ The [`nvidia-skills`](https://construct.neotask.ai/p/nvidia-skills) plugin, whic
 neotask construct install nvidia-skills
 ```
 
+Individual skills are also on Neotask Construct as `nvidia-<skill-name>`; browse them on the [NVIDIA publisher page](https://construct.neotask.ai/u/nvidia). Install one the same way:
+
+```bash
+neotask construct install nvidia-cuopt-numerical-optimization-api
+```
+
 ---
 
 ## Skill Catalog
