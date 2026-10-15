@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: Ethos
+repo: NVIDIA-NeMo/eval-author
+description: Capture an AI agent's purpose, boundaries, and success criteria in a portable ethos.md that developers, reviewers, and evaluators share.
+skills:
+  - path: team-skills/ethos/ethos-orchestrate/
+    catalog_dir: ethos-orchestrate
+  - path: team-skills/ethos/ethos-explore/
+    catalog_dir: ethos-explore
+  - path: team-skills/ethos/ethos-write/
+    catalog_dir: ethos-write
+links:
+  discussions: false
