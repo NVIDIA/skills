@@ -181,6 +181,18 @@
       }
     },
     {
+      "path": "skills/bionemo-genomics-workflow-acceleration",
+      "name": "genomics-workflow-acceleration",
+      "description": "Use when accelerating existing genomics workflows with NVIDIA Parabricks, improving runtime or price/performance, converting pipeline steps to GPUs, or comparing CPU and GPU workflow outputs. Adds optional GPU steps in-place with runtime toggles (default off). Do NOT use for individual pbrun command routing — use parabricks.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "bioinformatician,genomics_researcher,computational_biologist,application_developer,hpc_developer",
+        "discovery.activity_tags": "optimize,integrate,convert,compare,benchmark"
+      }
+    },
+    {
       "path": "skills/bionemo-kermt-add-cmim-pretrain",
       "name": "kermt-add-cmim-pretrain",
       "description": "Convert a grover_base checkpoint (encoder-only or encoder + vocab heads) into a hybrid checkpoint by adding a randomly-initialized cMIM decoder + latent_dist, then continue pretraining on the user's corpus as hybrid (vocab + contrast). Effectively kermt-continue-pretrain with a one-time ckpt-conversion step prepended.",

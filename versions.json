@@ -4,9 +4,9 @@
     {
       "name": "accelerated-computing-cudf",
       "path": "skills/accelerated-computing-cudf",
-      "content_digest": "sha256:cdaa92e74ff6424acbabb2a2ced68160a5434320ea2f90859ce6b272dce45eff",
-      "last_commit": "de8fe184e89e6f84e525d8b347b7c4298d255e11",
-      "last_modified": "2026-10-08"
+      "content_digest": "sha256:2f5513e86974d8b98f7b66621a742527a3b6487069f0f2d3fd14a7556c598387",
+      "last_commit": "7efb297d5999e45571b76d1da6ed1072835b00ed",
+      "last_modified": "2026-10-15"
     },
     {
       "name": "ambient-healthcare-agent-with-nemotron-voice-agent",
@@ -105,6 +105,13 @@
       "content_digest": "sha256:a27ed94b0d4658911e9fafcd682b84d5d712cdc9cad1b4aed55292676299e609",
       "last_commit": "79f18736a4a6b80f347f0b8461d48e40338c0f4c",
       "last_modified": "2026-09-30"
+    },
+    {
+      "name": "bionemo-genomics-workflow-acceleration",
+      "path": "skills/bionemo-genomics-workflow-acceleration",
+      "content_digest": "sha256:87736b3cef8e1ca0bc39278f6268657e7ea3e49215438d8a45c9b60a68f31c1c",
+      "last_commit": "7efb297d5999e45571b76d1da6ed1072835b00ed",
+      "last_modified": "2026-10-15"
     },
     {
       "name": "bionemo-kermt-add-cmim-pretrain",
