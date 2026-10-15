@@ -1,0 +1,63 @@
+{
+  "skill_name": "ethos-explore",
+  "evals": [
+    {
+      "id": "explore-explicit-first-question",
+      "prompt": "Use ethos-explore to start capturing what the support agent in /workspace/input/router-help is supposed to do. Scan it, then ask me your first question.",
+      "expected_output": "Reads README.md and agent.yaml and drafts what they establish (router-help: RT-200/RT-300 setup, firmware, and troubleshooting; kb_search and create_ticket; internal gateway; refund, warranty, and password rules). Then asks exactly one intent question that the source cannot settle, typically confirming the 'cut ticket volume' objective for Purpose & Outcomes, as multiple choice grounded in the scan with an 'I don't know' or 'Something else' option, and stops. No ethos.md or full draft is produced.",
+      "assertions": [
+        "Reads the router-help README.md and agent.yaml before asking.",
+        "Asks exactly one question in the reply.",
+        "The question targets intent the files cannot settle (Purpose & Outcomes, Principles, or Vision), not tools or harness details already in the files.",
+        "Grounds the question in the scan, for example the README's 'cut ticket volume' claim, and allows 'I don't know' or 'Something else'.",
+        "Does not present a full ethos.md draft or create an ethos.md file.",
+        "Does not ask for permission to optimize or change the agent's code, prompts, models, or tools."
+      ],
+      "expected_skill": "ethos-explore",
+      "files": [
+        "files/router-help/README.md",
+        "files/router-help/agent.yaml"
+      ]
+    },
+    {
+      "id": "explore-implicit-just-write-it",
+      "prompt": "Write an ethos.md for the agent in /workspace/input/router-help. Skip the questions; you can infer everything from the README and config.",
+      "expected_output": "Scans the repository but does not write ethos.md or present the full draft, because purpose, principles, and vision must come from the user and at least three intent questions are required first. Asks one always-ask question (Purpose & Outcomes, Principles, or Vision) anyway, offering the README's ticket-volume objective or future-work list only as a draft to confirm.",
+      "assertions": [
+        "Does not create /workspace/input/router-help/ethos.md.",
+        "Does not present a full ethos.md draft.",
+        "Asks exactly one question, covering Purpose & Outcomes, Principles, or Vision.",
+        "Treats README claims such as 'cut ticket volume' or the future-work list as drafts to confirm, not settled intent."
+      ],
+      "expected_skill": "ethos-explore",
+      "files": [
+        "files/router-help/README.md",
+        "files/router-help/agent.yaml"
+      ]
+    },
+    {
+      "id": "explore-greenfield-role-first",
+      "prompt": "I want to build an agent for my team that helps with stuff. There's no code yet. Help me figure out what it should do.",
+      "expected_output": "Recognizes a greenfield agent with nothing to scan and a vague role, so it asks for a concrete Role first: one question about the single job the agent does and for whom, preferably with options and an 'I don't know' escape. It does not invent a role, draft sections, or write an ethos.md.",
+      "assertions": [
+        "Asks first for a concrete Role: what one job the agent does and for whom.",
+        "Asks exactly one question in the reply.",
+        "Does not invent a Role or fill other sections on the user's behalf.",
+        "Does not write an ethos.md or present a full draft."
+      ],
+      "expected_skill": "ethos-explore",
+      "files": []
+    },
+    {
+      "id": "explore-negative",
+      "prompt": "Sort these numbers in ascending order: 9, 2, 7. Reply with the numbers only, separated by commas.",
+      "expected_output": "2, 7, 9",
+      "assertions": [
+        "Returns 2, 7, 9 in that order.",
+        "Does not start an agent-intent interview or create files."
+      ],
+      "expected_skill": null,
+      "files": []
+    }
+  ]
+}

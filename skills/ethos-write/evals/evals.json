@@ -1,0 +1,65 @@
+{
+  "skill_name": "ethos-write",
+  "evals": [
+    {
+      "id": "write-explicit-edit-constraints",
+      "prompt": "Use ethos-write to add this rule to Constraints in /workspace/input/router-help/ethos.md: customer email addresses and phone numbers must be redacted before any text is sent to the model gateway. Edit the file in place and leave the other sections as they are.",
+      "expected_output": "Edits ## Constraints in /workspace/input/router-help/ethos.md in place to add the redaction rule, keeping the gateway and warranty constraints. Preserves every other section, the custom Glossary section, the team_channel and owner front-matter keys, and created_timestamp; sets updated_timestamp to an ISO 8601 time. Runs validate_ethos.py, which reports the file valid, then shows the change for review and asks the user to confirm.",
+      "assertions": [
+        "Adds the email and phone-number redaction rule under ## Constraints and keeps the existing gateway and warranty constraints.",
+        "Leaves the other required sections and the custom ## Glossary section unchanged.",
+        "Keeps created_timestamp, owner, and team_channel unchanged and sets updated_timestamp to an ISO 8601 timestamp.",
+        "Runs validate_ethos.py on the edited file and reports that it is valid.",
+        "Shows the updated contents or the change and asks the user to confirm it.",
+        "Does not create or modify any file other than ethos.md."
+      ],
+      "expected_skill": "ethos-write",
+      "files": [
+        "files/router-help/ethos.md"
+      ],
+      "expected_script": "validate_ethos.py"
+    },
+    {
+      "id": "write-implicit-from-agreed-answers",
+      "prompt": "We finished the intent interview for our invoice-triage agent, and the agreed answers are in /workspace/input/invoice-triage/explore-notes.md. Capture what we agreed as the agent's ethos.md in that directory.",
+      "expected_output": "Writes /workspace/input/invoice-triage/ethos.md from the schema-v1 template: front matter with schema_version 1, name invoice-triage, an ISO 8601 created_timestamp, an author, an owner for the EUR 10,000 sign-off, and no updated_timestamp; all fourteen required sections filled from the notes, with _(none)_ for Metric Semantics and Vision and the unanswered Vision recorded in Open Questions. The per-run USD 20 evaluation budget is left out. validate_ethos.py reports the file valid; a short gut-check paragraph is shown, then the file, with a request to confirm it matches what was agreed.",
+      "assertions": [
+        "Creates /workspace/input/invoice-triage/ethos.md with schema_version 1, name invoice-triage, an ISO 8601 created_timestamp, and an author, and without updated_timestamp.",
+        "Includes all fourteen required sections, with the Role, Constraints, and Trade-offs taken from the notes.",
+        "Writes _(none)_ for Vision and records the open Vision question under Open Questions instead of inventing one.",
+        "Adds an owner naming the accounts-payable team lead or team for the EUR 10,000 sign-off.",
+        "Does not record the USD 20 per-evaluation-run budget in ethos.md.",
+        "Runs validate_ethos.py and reports the file valid, then shows a gut-check paragraph and the file and asks the user to confirm."
+      ],
+      "expected_skill": "ethos-write",
+      "files": [
+        "files/invoice-triage/explore-notes.md"
+      ],
+      "expected_script": "validate_ethos.py"
+    },
+    {
+      "id": "write-explicit-vague-role",
+      "prompt": "Use ethos-write to write an ethos.md for my agent at /workspace/output/ethos.md. Role: it helps with stuff. Fill in the rest however you think is best.",
+      "expected_output": "Stops before writing because Role is a hard precondition and 'helps with stuff' is not concrete. Explains that, asks for one concrete sentence describing the agent's role (or routes back to ethos-explore for Role only), and does not invent a role or other intent. /workspace/output/ethos.md is not created.",
+      "assertions": [
+        "Does not create /workspace/output/ethos.md.",
+        "Says the Role is too vague to write the file.",
+        "Asks for one concrete sentence describing the agent's role, or routes back to ethos-explore for Role.",
+        "Does not invent a Role, purpose, or other intent sections."
+      ],
+      "expected_skill": "ethos-write",
+      "files": []
+    },
+    {
+      "id": "write-negative",
+      "prompt": "What is 12 multiplied by 12? Reply with just the number.",
+      "expected_output": "144",
+      "assertions": [
+        "Answers 144.",
+        "Does not write an ethos.md or create files."
+      ],
+      "expected_skill": null,
+      "files": []
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Evaluating `rtx-remix-modding`
 
-`evals.json` holds 11 cases: **8 that must activate the skill** and **3 that must not**.
+`evals.json` holds 14 cases: **11 that must activate the skill** and **3 that must not**.
 
 Every case is derived from text this skill ships today, and each tests what the agent *says and
 routes to* rather than whether a USD write landed. Nothing here needs a GPU, a running Remix or
@@ -22,14 +22,19 @@ to produce.
 | 6 | Relay a tool's refusal with its remedy, and invent no cause | Reporting "impossible" when the tool said "do X and this works", or guessing at the user's setup |
 | 7 | Missing `remix_*` tools are a gap to name, not to work around | Hand-editing `.usda`, which lands in a layer the runtime ignores — looks like success, renders nothing |
 | 11 | Unsupported prim deletion routes to the Toolkit GUI, including after selection | Omitting the refusal, or substituting raw USD/filesystem edits, hide/off-world/empty-reference tricks, or whole-layer removal — same disappearing geometry, bypassed validation/undo, or collateral edits |
+| 12 | A write that resolves to more than one target needs the user's confirmation of the set | Replacing all five disco-ball maps because "all" plus exact 4K twins looked unambiguous — no undo, and the user never saw the list |
+| 13 | One named target needs no confirmation (control for 12) | Asking a needless scope question for a single named map, which would mean case 12's fix over-reached |
+| 14 | A large set is summarized, not listed, and still confirmed | Writing forty materials' maps because the list was too long to show, or burying the question under every target |
 
-These eight are not a sample of the skill; they are the rules that cost real debugging to get
+These eleven are not a sample of the skill; they are the rules that cost real debugging to get
 right. `.agents/rules/agent-skill-rules.md` records why the wording of each
-one is load-bearing, and four of these cases sit directly on top of it: case 5 because three
+one is load-bearing, and six of these cases sit directly on top of it: case 5 because three
 prohibition-shaped phrasings were walked past before a factual one held, case 4 because the
 repeat-query rule only survives with its exception stated second, case 1 because a competing
-"be brief" instruction silently swallowed the disclosure, and case 3 because a generic "decline
-when no tool exists" never fires when the agent can always reach raw USD and *do* something.
+"be brief" instruction silently swallowed the disclosure, cases 3 and 11 because a generic
+"decline when no tool exists" never fires when the agent can always reach raw USD and *do*
+something, and case 12 because an exact replacement for every member read as the user's
+confirmation.
 
 Cases 8, 9 and 10 are the negatives: an LLM deployment question, a CUDA tiling question, and a
 generic USD composition question. They carry `"expected_skill": null` and assert only that the
