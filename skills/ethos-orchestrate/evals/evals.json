@@ -1,0 +1,68 @@
+{
+  "skill_name": "ethos-orchestrate",
+  "evals": [
+    {
+      "id": "orchestrate-explicit-new-ethos",
+      "prompt": "Use ethos-orchestrate to help me write an ethos.md for the support agent in /workspace/input/router-help.",
+      "expected_output": "Finds no existing ethos.md under /workspace/input/router-help and routes to ethos-explore. Opens with the four-step path-ahead checklist (explore the agent, confirm intent, review the draft, save and validate) as literal '- [ ]' checkboxes with the first step marked 'We're here', ends with 'Ready to start?', and waits. No ethos.md is written.",
+      "assertions": [
+        "Reports that no ethos.md exists yet for router-help.",
+        "Routes the request to ethos-explore rather than writing the file directly.",
+        "Shows the four-step checklist with literal '- [ ]' checkboxes and marks the first step 'We're here'.",
+        "Ends with 'Ready to start?' and waits instead of asking intent questions or drafting sections.",
+        "Does not create an ethos.md or modify any file under /workspace/input/router-help."
+      ],
+      "expected_skill": "ethos-orchestrate",
+      "files": [
+        "files/router-help/README.md",
+        "files/router-help/agent.yaml"
+      ]
+    },
+    {
+      "id": "orchestrate-implicit-existing-status",
+      "prompt": "Does the agent repo in /workspace/input/router-help already have an ethos.md? If so, tell me whether it is valid, what it says the agent is for, and what is still missing. Don't change anything.",
+      "expected_output": "Reports /workspace/input/router-help/ethos.md and leads with whether it validates: front matter with schema_version 1 and all fourteen required sections are present (or says the bundled validator was not run). Then summarizes what the file says the agent is for (answering Acme RT-200/RT-300 router setup, firmware, and connectivity questions to resolve conversations without a ticket), then the gaps: Vision is _(none)_ and RT-400 support is an open question. Offers a next route (ethos-write for specific edits, ethos-explore to revisit intent) without starting to write.",
+      "assertions": [
+        "Identifies /workspace/input/router-help/ethos.md as the agent's ethos.md.",
+        "Leads with whether the file is structurally valid, and says so plainly if the bundled validator was not run.",
+        "Summarizes the Role or Purpose as Acme RT-200/RT-300 router support resolved in chat.",
+        "Names gaps from the file, such as Vision being _(none)_ or the open RT-400 question.",
+        "Offers a next step without starting an interview or editing the file.",
+        "Leaves ethos.md byte-for-byte unchanged."
+      ],
+      "expected_skill": "ethos-orchestrate",
+      "files": [
+        "files/router-help/README.md",
+        "files/router-help/agent.yaml",
+        "files/router-help/ethos.md"
+      ]
+    },
+    {
+      "id": "orchestrate-legacy-rename",
+      "prompt": "Our agent repo at /workspace/input/docs-qa still has the ETHOS.md that Eval Author 0.1.0 created last month. Bring it in line with the current ethos.md convention.",
+      "expected_output": "Treats ETHOS.md as a legacy Eval Author 0.1.0 file whose contents already match schema v1 and routes to ethos-write's rename. /workspace/input/docs-qa/ethos.md exists with contents identical to the original ETHOS.md, and no ETHOS.md remains. No interview is started and no sections are rewritten. Reports whether the renamed file validates, or says the validator was not run.",
+      "assertions": [
+        "Recognizes ETHOS.md as an Eval Author 0.1.0 file with the same schema.",
+        "Leaves /workspace/input/docs-qa/ethos.md with contents identical to the original ETHOS.md.",
+        "Leaves no file named ETHOS.md in /workspace/input/docs-qa.",
+        "Does not start an intent interview or rewrite sections.",
+        "Reports the validation result for ethos.md, or states that the validator was not run."
+      ],
+      "expected_skill": "ethos-orchestrate",
+      "files": [
+        "files/docs-qa/ETHOS.md"
+      ]
+    },
+    {
+      "id": "orchestrate-negative",
+      "prompt": "Write a one-line conventional commit message for a change that fixes a typo in README.md. Reply with the message only.",
+      "expected_output": "A single conventional commit subject such as 'docs: fix typo in README'.",
+      "assertions": [
+        "Replies with one line that is a conventional commit message for a README typo fix.",
+        "Does not start an ethos workflow or create files."
+      ],
+      "expected_skill": null,
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: router-help
+model:
+  gateway_base_url: https://inference.internal.example/v1
+  model: chat-medium
+  max_output_tokens: 800
+system_prompt: |
+  You are router-help, the Acme router support assistant.
+  Only answer questions about Acme RT-200 and RT-300 routers.
+  Give procedures as numbered steps.
+  Never promise refunds or replacements; open a ticket for warranty claims.
+  Never ask for or repeat the customer's Wi-Fi password.
+tools:
+  - name: kb_search
+    description: Search the Acme support knowledge base. Read-only; refreshed nightly.
+  - name: create_ticket
+    description: Open a helpdesk ticket for a human agent. Creates a ticket.
