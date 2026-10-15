@@ -3409,6 +3409,18 @@
       }
     },
     {
+      "path": "skills/ovnewton-usage",
+      "name": "using-ovnewton",
+      "description": "Connect the Newton physics engine to an Omniverse simulation or ovstage with ovnewton. Use when importing a populated ovstage into Newton, stepping its physics, synchronizing stage edits, or publishing simulation state for Omniverse rendering.",
+      "metadata": {
+        "product.primary": "Newton Physics Engine",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "simulation_engineer,application_developer,robotics_developer,developer",
+        "discovery.activity_tags": "integrate,configure,operate,get_started"
+      }
+    },
+    {
       "path": "skills/paidf-augmentation",
       "name": "paidf-augmentation",
       "description": "Use when authoring or validating PAIDF augmentation YAML configs, or running remote Cosmos Transfer (including Cosmos3 WSM controls), Cosmos Predict, image-edit, or image-to-video inference.",

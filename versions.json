@@ -1990,6 +1990,13 @@
       "last_modified": "2026-08-24"
     },
     {
+      "name": "ovnewton-usage",
+      "path": "skills/ovnewton-usage",
+      "content_digest": "sha256:c036fb730e28e9b03417dadc4e7c8df940050150314b227916f79704e875a1bf",
+      "last_commit": "b3b762b49510c26635c7ec48c1a3724bfcad54b5",
+      "last_modified": "2026-10-15"
+    },
+    {
       "name": "paidf-augmentation",
       "path": "skills/paidf-augmentation",
       "content_digest": "sha256:8a3e72da19f22eba091409b6f1748dbe7d2a4eb41965cd26db56fe9e71e829f8",

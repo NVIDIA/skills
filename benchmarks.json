@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 407,
-  "result_row_count": 3815,
+  "skill_count": 408,
+  "result_row_count": 3825,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5661,6 +5661,26 @@
       "component": "Physical AI",
       "has_results": true,
       "average_uplift_pct": 32.8
+    },
+    {
+      "skill": "using-ovnewton",
+      "evaluation_date": "2026-10-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:207f3dfeb5504f9b90e549d26ffcd798dc3df9d4764d50d0f11043cc5e892ab3",
+      "validation_status": null,
+      "tasks": 7,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "has_results": true,
+      "average_uplift_pct": 17.13
     },
     {
       "skill": "paidf-augmentation",
@@ -31823,6 +31843,96 @@
       "agent": "codex",
       "score_pct": 98.0,
       "uplift_pct": 51.0
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 14.3
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 14.3
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 17.1
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 11.4
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 73.9,
+      "uplift_pct": 23.9
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.4,
+      "uplift_pct": 21.8
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 76.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "paidf-augmentation",
