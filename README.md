@@ -108,6 +108,14 @@ npx skills add nvidia/skills --list
 
 For non-interactive installs, global installs, agent-specific installs, updates, removals, and fallback manual copying, see [Advanced installation](docs/advanced-install.mdx).
 
+### Install in Neotask
+
+The [`nvidia-skills`](https://construct.neotask.ai/p/nvidia-skills) plugin, which finds the right NVIDIA skill for a task, is on Neotask Construct. Install it with the Neotask CLI, or from the Neotask desktop app under Agents > Skills > Add-ons:
+
+```bash
+neotask construct install nvidia-skills
+```
+
 ---
 
 ## Skill Catalog
