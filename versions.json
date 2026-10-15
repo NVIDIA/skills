@@ -898,6 +898,27 @@
       "last_modified": "2026-05-29"
     },
     {
+      "name": "ethos-explore",
+      "path": "skills/ethos-explore",
+      "content_digest": "sha256:6349e545dcfc8b430e2a1e0cff7069ecc52615d1262b7ae3728a1c7d0b8a0da2",
+      "last_commit": "675de2f162289f140f428c25cb07c109bded8144",
+      "last_modified": "2026-10-15"
+    },
+    {
+      "name": "ethos-orchestrate",
+      "path": "skills/ethos-orchestrate",
+      "content_digest": "sha256:61251aff7ace135f2c5c8fcc63232ae03fa6c1c1cd4316c2e0073109202c2b03",
+      "last_commit": "675de2f162289f140f428c25cb07c109bded8144",
+      "last_modified": "2026-10-15"
+    },
+    {
+      "name": "ethos-write",
+      "path": "skills/ethos-write",
+      "content_digest": "sha256:d962f9b9f2b10e910527a6e5f20c88bcd43aaff3b4efa023a24d84fa97400622",
+      "last_commit": "675de2f162289f140f428c25cb07c109bded8144",
+      "last_modified": "2026-10-15"
+    },
+    {
       "name": "foundationpose-pipeline",
       "path": "skills/foundationpose-pipeline",
       "content_digest": "sha256:8ab51cf9ccba291b0a21a8024dbee1d229548c1534777bdec58a7183844a5ae7",
@@ -2146,9 +2167,9 @@
     {
       "name": "rtx-remix-modding",
       "path": "skills/rtx-remix-modding",
-      "content_digest": "sha256:510e8f62aa3ba0103471025b92afedc16f2abdb7b56e286780385adb96f527ab",
-      "last_commit": "2c188f5bb27cb9c48baa7e57ab73e2434f15e38e",
-      "last_modified": "2026-10-07"
+      "content_digest": "sha256:fae91fb72cd3be015fe5481badbb3758d99eac018cbc9f99b04bd203dfabcabe",
+      "last_commit": "675de2f162289f140f428c25cb07c109bded8144",
+      "last_modified": "2026-10-15"
     },
     {
       "name": "skill-card-generator",
