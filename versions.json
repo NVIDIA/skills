@@ -2720,9 +2720,9 @@
     {
       "name": "tilegym-converting-cutile-to-triton",
       "path": "skills/tilegym-converting-cutile-to-triton",
-      "content_digest": "sha256:4f6cd572a598689f07b64079f7e761f4128e31bff90a42f2df5e8b8d59a0f8d1",
-      "last_commit": "de3c29225040d96960f77c327d9c5eef0a1acdba",
-      "last_modified": "2026-07-14"
+      "content_digest": "sha256:ff98d3536fb3dad6c6eb88c296d69982b9a63fd0f2fb93c95de48abc55304c74",
+      "last_commit": "970f9e1c3baa9d10b9eaa5715f43f14db7968234",
+      "last_modified": "2026-10-16"
     },
     {
       "name": "tilegym-cutile-autotuning",
@@ -2734,9 +2734,9 @@
     {
       "name": "tilegym-cutile-python",
       "path": "skills/tilegym-cutile-python",
-      "content_digest": "sha256:e6e1554e2ee83516a74b60433bc6a9bca4e3cbea7dc9e4aef176e7e232749c76",
-      "last_commit": "129a1087a1853f32a950e2f7bbc0fd7d57b9d422",
-      "last_modified": "2026-06-09"
+      "content_digest": "sha256:c7cead961a71770ea7ec428ce666431ebea133650feba4a2bd84917d6914869e",
+      "last_commit": "970f9e1c3baa9d10b9eaa5715f43f14db7968234",
+      "last_modified": "2026-10-16"
     },
     {
       "name": "tilegym-improve-cutile-kernel-perf",
