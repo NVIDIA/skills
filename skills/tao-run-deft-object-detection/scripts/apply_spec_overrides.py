@@ -21,8 +21,8 @@ to keep them apart:
    applied last.
 
 The split exists because 1 and 2 are indistinguishable in the finished spec. TAO's
-analytics default for ``kpi.ignore_sqwidth`` is 0 where this workflow needs 40; a
-run that never names it scores a different set of boxes and nothing reports a
+analytics default for ``kpi.num_recall_points`` is 11 where this workflow needs 101;
+a run that never names it reads AP off a coarser curve and nothing reports a
 difference. Holding workflow defaults in a file applies them on every run and makes
 changing one show up as a diff.
 
@@ -111,8 +111,8 @@ def load_overlay(path: Path) -> dict[str, object]:
     """Load a flat ``dotted.key: value`` overlay.
 
     Flat rather than nested so each setting is one line: a nested block would
-    diff as a block, and a reviewer checking whether ``kpi.ignore_sqwidth`` is
-    still 40 would have to read the surrounding structure to find out.
+    diff as a block, and a reviewer checking whether ``kpi.num_recall_points`` is
+    still 101 would have to read the surrounding structure to find out.
 
     A mapping value is rejected for the same reason it would be wrong: writing
     ``kpi: {iou_threshold: 0.5}`` replaces the whole ``kpi`` block, silently

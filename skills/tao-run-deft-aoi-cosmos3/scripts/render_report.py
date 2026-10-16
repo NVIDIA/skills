@@ -612,6 +612,8 @@ def _artifact_rows(state: dict[str, Any], contract: dict[str, Any]) -> str:
     ]
     fields = (
         ("best_ckpt_path", "Checkpoint"),
+        ("framework_config", "Framework Hydra config.yaml"),
+        ("training_spec", "Framework SFT TOML"),
         ("benchmark_results_json", "Benchmark results"),
         ("benchmark_metrics_summary", "Benchmark metrics"),
         ("proxy_results_json", "Proxy results"),

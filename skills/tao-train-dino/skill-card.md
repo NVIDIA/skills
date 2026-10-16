@@ -46,7 +46,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
+1 evaluation task (1 positive), 1 attempt per task, each in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -70,12 +70,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% | 94.3% |
+| Overall | 99.6% | 95.3% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Discoverability | 100.0% | 95.0% |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 70.0% → 78.3% (+8.3 points) |
-| Efficiency | 72.0% | 98.1% |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 48.3% → 83.3% (+35.0 points) |
+| Efficiency | 98.0% | 98.3% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

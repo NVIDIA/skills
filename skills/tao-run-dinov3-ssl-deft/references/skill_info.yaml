@@ -1,0 +1,54 @@
+name: tao-run-dinov3-ssl-deft
+# The DS image owns the controller and already includes TAO PyTorch/Core.
+container_image: tao_toolkit.data_services
+# Agent-facing mount checklist read by SKILL.md step 4, not parsed by DS.
+# Preparation uses the installed DS image_embeddings producer (fixed CLIP/SigLIP),
+# register-store --source-payload-contract, then write-target-contract.
+# Mount the immutable model AND processor snapshot during preparation.
+# Registered seals are mount-bound; re-register after copying/remounting shards
+# or select data.source_store_validation: full_sha256.
+# Target digests recorded by the writer are lineage, not a consumer equality check.
+path_contract:
+  input_mode: pre_mounted_shared_filesystem
+  required_input_fields:
+    - model.base_checkpoint
+    - training.base_spec
+    - data.target_manifest
+    - data.source_payload_contract
+  conditional_input_fields:
+    - model.initial_scoring_checkpoint
+    - data.source_store_manifest
+    - data.target_embedding_contract
+    - data.source_parts[]
+    - data.source_identity_audit
+    - data.benchmark_manifest
+    - data.benchmark_acquisition_units
+    - data.previous_training_manifest
+    - actions.search.dense_store_manifest
+    - actions.search.ann_index_manifest
+    - actions.search.ann_audit_manifest
+    - actions.*.implementation_files[]
+    - continuation.previous_run_dir
+    - continuation.training_contract
+    - continuation.training_commit
+    - continuation.success_marker
+    - continuation.previous_data_lock
+    - continuation.previous_release_lock
+  output_directory_field: output.run_dir
+actions:
+  run:
+    command: >-
+      python -m nvidia_tao_ds.mining.dinov3.workflow
+      run {config_path}
+    mode: config
+    config_format: yaml
+    inputs:
+      config: {type: file, required: true}
+    outputs:
+      run_dir: {type: folder, config_path: output.run_dir}
+    cancellation:
+      signal: SIGTERM
+      behavior: workflow_cancel
+    upload_excludes:
+      - jobs/*.log
+data_format: versioned parquet manifests

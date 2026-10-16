@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-mine-nearest-neighbors`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:acb0bab13a495ae61fed1d8f7d142b32f3d6496e3d1dc838d105cf8bcaad70dd` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,16 +35,18 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 96.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | 64.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 100.0% (+80.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 12.5% → 100.0% (+87.5 points) | 37.5% → 87.5% (+50.0 points) |
-| Efficiency | 97.8% — baseline ran, but no comparable score was available; uplift unavailable | 98.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 80.0% (+60.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 12.5% → 100.0% (+87.5 points) | 40.0% → 45.0% (+5.0 points) |
+| Efficiency | 73.1% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.6% (-1.1 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
 ## Token Usage
 
@@ -52,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 66,952 | 89,885 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-mine-nearest-neighbors-basic | 66,952 | 89,885 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 29,298 | 27,051 | N/A | N/A | skill 1/1; base 2/2 |
-| codex | tao-mine-nearest-neighbors-basic | 29,298 | 27,051 | N/A | N/A | skill 1/1; base 2/2 |
-| ALL AGENTS | Dataset aggregate | 96,250 | 116,936 | N/A | N/A | skill 2/2; base 5/5 |
+| claude-code | All cases | 95,096 | 31,185 | +63,911 | +204.94% | skill 1/1; base 1/1 |
+| claude-code | tao-mine-nearest-neighbors-basic | 95,096 | 31,185 | +63,911 | +204.94% | skill 1/1; base 1/1 |
+| codex | All cases | 13,711 | 13,503 | +208 | +1.54% | skill 1/1; base 1/1 |
+| codex | tao-mine-nearest-neighbors-basic | 13,711 | 13,503 | +208 | +1.54% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 108,807 | 44,688 | +64,119 | +143.48% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -64,7 +66,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 20 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
@@ -78,7 +80,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/data/tao-mine-nearest-neighbors/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/data/tao-mine-nearest-neighbors/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-mine-nearest-neighbors`)
-- 15 additional finding(s) are available in the full evaluation artifacts.
+- 14 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -3,8 +3,8 @@
 The threshold sweep, weakness ranking, and per-lighting expansion all run inside the pinned TAO data-services image below. Confirm Docker, the NVIDIA container toolkit, and a GPU are present and ensure the image is cached:
 
 ```bash
-# Pinned TAO data-services container URI (stamped from the release manifest)
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+# Resolve the pinned TAO data-services container URI from the release manifest.
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"

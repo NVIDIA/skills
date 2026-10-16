@@ -23,7 +23,18 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_NANO_VLM_ARCHITECTURE_MODEL = "Qwen/Qwen3-VL-8B-Instruct"
-CONVERTER_ENTRYPOINT_MODULE = "cosmos_rl.model_preparation.vlm_safetensors"
+CONVERTER_ENTRYPOINT_MODULES = {
+    "cosmos-framework": "cosmos_framework.scripts.convert_model_to_vlm_safetensors",
+    "cosmos-rl": "cosmos_rl.model_preparation.vlm_safetensors",
+}
+
+
+def converter_entrypoint(args: argparse.Namespace) -> str:
+    backend = getattr(args, "backend", "cosmos-rl")
+    try:
+        return CONVERTER_ENTRYPOINT_MODULES[backend]
+    except KeyError as exc:
+        raise ValueError(f"unsupported Cosmos preparation backend: {backend!r}") from exc
 
 
 def sha256(path: Path) -> str:
@@ -45,6 +56,18 @@ def huggingface_model_id(value: str) -> str:
     if value.startswith("hf://"):
         return value.removeprefix("hf://").removeprefix("models/").strip("/")
     return value
+
+
+def materialized_snapshot_dir(cache: Path, model_id: str, revision: str) -> Path:
+    """Return a deterministic, symlink-free Hugging Face snapshot directory.
+
+    The regular Hub cache represents snapshots with symlinks into a blob
+    store. Shared DEFT workspaces can live on SMB filesystems that reject
+    symlink creation, so preparation downloads URI inputs directly into a
+    content-addressed local directory instead.
+    """
+    key = hashlib.sha256(f"{model_id}\0{revision}".encode("utf-8")).hexdigest()
+    return cache / "huggingface" / "materialized" / key
 
 
 def identity(value: str) -> dict[str, Any]:
@@ -115,27 +138,46 @@ def command(args: argparse.Namespace, output: Path, cache: Path) -> list[str]:
     architecture_input = huggingface_model_id(args.vlm_architecture_model_path_or_uri)
     source_mount, source = docker_mount(source_input, "/inputs/base")
     donor_mount, donor = docker_mount(architecture_input, "/inputs/architecture")
-    script = r"""
+    entrypoint = converter_entrypoint(args)
+    script = f"""
 set -Eeuo pipefail
+uv_executable="$(command -v uv)"
+python_bin="$(dirname "$(command -v python)")"
+mkdir -p "$HOME" "$XDG_CACHE_HOME" "$HF_HOME" "$UV_CACHE_DIR" "$TORCHINDUCTOR_CACHE_DIR"
+mkdir -p /tao-local-cache/bin
+ln -s "$uv_executable" /tao-local-cache/bin/uv
+# The image also has an older global ``hf`` executable. Keep it out of PATH
+# so Framework's locked ``uv run ... hf`` resolves the helper it just built.
+export PATH="/tao-local-cache/bin:$python_bin:/usr/bin:/bin"
 source_value="$BASE_MODEL"
 architecture_value="$ARCHITECTURE_MODEL"
 if [[ "$BASE_MODEL_KIND" == "uri" ]]; then
   source_value="$(python - <<'PY'
 import os
+from pathlib import Path
 from huggingface_hub import snapshot_download
-print(snapshot_download(os.environ['BASE_MODEL'], revision=os.environ['BASE_MODEL_REVISION'], cache_dir='/cache/huggingface'))
+print(snapshot_download(
+    os.environ['BASE_MODEL'],
+    revision=os.environ['BASE_MODEL_REVISION'],
+    local_dir=Path(os.environ['BASE_MODEL_LOCAL_DIR']),
+))
 PY
 )"
 fi
 if [[ "$ARCHITECTURE_MODEL_KIND" == "uri" ]]; then
   architecture_value="$(python - <<'PY'
 import os
+from pathlib import Path
 from huggingface_hub import snapshot_download
-print(snapshot_download(os.environ['ARCHITECTURE_MODEL'], revision=os.environ['ARCHITECTURE_MODEL_REVISION'], cache_dir='/cache/huggingface'))
+print(snapshot_download(
+    os.environ['ARCHITECTURE_MODEL'],
+    revision=os.environ['ARCHITECTURE_MODEL_REVISION'],
+    local_dir=Path(os.environ['ARCHITECTURE_MODEL_LOCAL_DIR']),
+))
 PY
 )"
 fi
-python -m cosmos_rl.model_preparation.vlm_safetensors \
+python -m {entrypoint} \
   --checkpoint-path "$source_value" --output-path "/output/$OUTPUT_NAME" \
   --vlm-model-name "$architecture_value"
 """
@@ -147,6 +189,8 @@ python -m cosmos_rl.model_preparation.vlm_safetensors \
         "run",
         "--rm",
         "--shm-size=8g",
+        "--tmpfs",
+        "/tao-local-cache:rw,exec,size=32g,mode=1777",
         "--entrypoint",
         "bash",
         "--user",
@@ -156,11 +200,15 @@ python -m cosmos_rl.model_preparation.vlm_safetensors \
         "-e",
         f"LOGNAME={runtime_user}",
         "-e",
-        "HOME=/cache/tao-home",
+        "HOME=/tao-local-cache/home",
         "-e",
-        "XDG_CACHE_HOME=/cache/tao-home/.cache",
+        "XDG_CACHE_HOME=/tao-local-cache/xdg",
         "-e",
-        "TORCHINDUCTOR_CACHE_DIR=/cache/torchinductor",
+        "HF_HOME=/tao-local-cache/huggingface",
+        "-e",
+        "UV_CACHE_DIR=/tao-local-cache/uv",
+        "-e",
+        "TORCHINDUCTOR_CACHE_DIR=/tao-local-cache/torchinductor",
         "-e",
         f"BASE_MODEL={source}",
         "-e",
@@ -168,15 +216,27 @@ python -m cosmos_rl.model_preparation.vlm_safetensors \
         "-e",
         f"BASE_MODEL_REVISION={args.base_model_revision}",
         "-e",
+        "BASE_MODEL_LOCAL_DIR=" + str(
+            materialized_snapshot_dir(
+                Path("/cache"), source_input, args.base_model_revision
+            )
+        ),
+        "-e",
         f"ARCHITECTURE_MODEL={donor}",
         "-e",
         f"ARCHITECTURE_MODEL_KIND={'uri' if is_uri(architecture_input) else 'local'}",
         "-e",
         f"ARCHITECTURE_MODEL_REVISION={args.vlm_architecture_model_revision}",
         "-e",
-        f"OUTPUT_NAME={output.name}",
+        "ARCHITECTURE_MODEL_LOCAL_DIR=" + str(
+            materialized_snapshot_dir(
+                Path("/cache"),
+                architecture_input,
+                args.vlm_architecture_model_revision,
+            )
+        ),
         "-e",
-        "HF_HOME=/cache/huggingface",
+        f"OUTPUT_NAME={output.name}",
         "-e",
         "PYTHONUNBUFFERED=1",
         "-v",
@@ -199,10 +259,11 @@ def resolve_input(value: str, revision: str, cache: Path) -> str:
         return str(Path(value).expanduser().resolve())
     from huggingface_hub import snapshot_download
 
+    model_id = huggingface_model_id(value)
     return snapshot_download(
-        huggingface_model_id(value),
+        model_id,
         revision=revision,
-        cache_dir=str(cache / "huggingface"),
+        local_dir=str(materialized_snapshot_dir(cache, model_id, revision)),
     )
 
 
@@ -220,7 +281,7 @@ def inside_container_command(
     return [
         sys.executable,
         "-m",
-        CONVERTER_ENTRYPOINT_MODULE,
+        converter_entrypoint(args),
         "--checkpoint-path",
         source,
         "--output-path",
@@ -232,6 +293,12 @@ def inside_container_command(
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--backend",
+        choices=tuple(CONVERTER_ENTRYPOINT_MODULES),
+        default="cosmos-rl",
+        help="Selected backend whose packaged converter must be used.",
+    )
     parser.add_argument("--base-model-path-or-uri", required=True)
     parser.add_argument("--base-model-revision", default="")
     parser.add_argument(

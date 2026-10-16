@@ -17,6 +17,7 @@ from workflow_common import absolute_path
 
 
 INITIAL_STAGES = (
+    "prepare_cosmos_reason_model",
     "baseline_evaluate",
     "prepare_cosmos_embed_inference",
     "cosmos_embed",
@@ -89,9 +90,20 @@ def resume_position(
             "reason": "loop_stop already logged",
         }
 
+    baseline_candidates = [
+        event for (_, event_stage), event in latest.items() if event_stage == "baseline_evaluate"
+    ]
+    legacy_baseline_complete = stage_is_complete(
+        max(baseline_candidates, key=lambda item: item["seq"], default=None)
+    )
     for stage in INITIAL_STAGES:
         candidates = [event for (_, event_stage), event in latest.items() if event_stage == stage]
         event = max(candidates, key=lambda item: item["seq"], default=None)
+        # Runs initialized before this stage existed already proved that their
+        # direct Qwen3-VL baseline completed evaluation. Preserve their resume
+        # position; training_checkpoint() retains the matching legacy fallback.
+        if stage == "prepare_cosmos_reason_model" and not event and legacy_baseline_complete:
+            continue
         if stage == "cosmos_embed" and stage_is_complete(event) and run_dir is not None:
             incomplete = incomplete_specs(run_dir)
             if incomplete:

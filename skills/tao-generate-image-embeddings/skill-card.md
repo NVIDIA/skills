@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to generate image embeddings from datasets for downstream nearest-neighbor or unique-neighbor mining workflows using TAO Data Services. <br>
+Developers and engineers who need to compute CLIP or SigLIP image embeddings from a parquet of image filepaths with TAO Data Services, typically before nearest-neighbor or unique-neighbor mining workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>
+**Requires API Key or External Credential:** [Not Specified] <br>
+**Credential Type(s):** [None identified] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,15 +26,16 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
+- [default_image_embeddings.yaml](assets/default_image_embeddings.yaml) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 - [Agent Skills Standard](https://agentskills.io) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Files, Shell commands] <br>
-**Output Format:** [Parquet file with embedding column, Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Files, Shell commands, Configuration instructions] <br>
+**Output Format:** [Parquet file with an embedding column; YAML spec; Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Embedding dimensionality follows the encoder (768 for the SigLIP default, 512 for CLIP ViT-B/32); extra input columns are carried through to the output] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -43,20 +44,20 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox environment. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt run in an isolated sandbox pod in the k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected and activated when needed. <br>
-- Effectiveness: Checks whether the skill helped the agent complete the user's goal and expected workflow. <br>
-- Efficiency: Checks tool-call productivity and token efficiency to avoid wasted usage. <br>
+- Security: Is it safe to use? Scored from the security signal. <br>
+- Correctness: Is the answer correct? Scored from the accuracy signal. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the skill_execution signal. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal_accuracy and behavior_check. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of skill_efficiency and token_efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
@@ -67,12 +68,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.6% | 71.7% |
+| Overall | 99.7% — baseline ran, but no comparable score was available; uplift unavailable | 96.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 13.3% → 100.0% (+86.7 points) | 30.0% → 100.0% (+70.0 points) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 10.0% → 100.0% (+90.0 points) | 22.5% → 60.0% (+37.5 points) |
-| Efficiency | 98.0% | 99.7% → 98.5% (-1.2 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 10.0% → 100.0% (+90.0 points) | 35.0% → 90.0% (+55.0 points) |
+| Efficiency | 98.4% — baseline ran, but no comparable score was available; uplift unavailable | 98.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

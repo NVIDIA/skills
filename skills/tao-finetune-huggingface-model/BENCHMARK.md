@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-finetune-huggingface-model`
-- Evaluation date: 2026-09-21
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (4 positive)
-- Dataset digest: `sha256:28fd5bf04229375b8bfea649e9cb787a04bb482b80b6ae2ae31e5ff9f076838a` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Dataset digest: `sha256:1dfae0e82b4644c26c4137c7a97c06489a0136400c4aa9454daa97f9d614dacb` (skill-evaluator-dataset-snapshot/1)
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 80.2% — baseline ran, but no comparable score was available; uplift unavailable | 58.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 82.5% — baseline ran, but no comparable score was available; uplift unavailable | 57.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 25.7% → 85.0% (+59.3 points) | 52.0% → 55.0% (+3.0 points) |
-| Discoverability | 58.8% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 35.2% → 81.7% (+46.5 points) | 45.0% → 39.1% (-5.9 points) |
-| Efficiency | 75.7% — baseline ran, but no comparable score was available; uplift unavailable | 98.8% → 99.3% (+0.5 points) |
+| Correctness | 30.0% → 100.0% (+70.0 points) | 35.0% → 70.0% (+35.0 points) |
+| Discoverability | 57.5% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 23.5% → 87.9% (+64.4 points) | 35.0% → 60.4% (+25.4 points) |
+| Efficiency | 67.0% — baseline ran, but no comparable score was available; uplift unavailable | Not available |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 594,721 | 755,784 | N/A | N/A | skill 4/4; base 7/7 |
-| claude-code | tao-finetune-huggingface-model-basic | 70,212 | 506,739 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-finetune-huggingface-model-dedicated-routing | 206,194 | 31,329 | +174,865 | +558.16% | skill 1/1; base 1/1 |
-| claude-code | tao-finetune-huggingface-model-dedicated-routing-non-cosmos | 288,161 | 61,641 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | tao-finetune-huggingface-model-unclaimed-routing | 30,154 | 156,075 | -125,921 | -80.68% | skill 1/1; base 1/1 |
-| codex | All cases | 111,184 | 76,963 | N/A | N/A | skill 8/8; base 5/5 |
-| codex | tao-finetune-huggingface-model-basic | 13,984 | 13,606 | +378 | +2.78% | skill 1/1; base 1/1 |
-| codex | tao-finetune-huggingface-model-dedicated-routing | 41,788 | 31,641 | N/A | N/A | skill 3/3; base 2/2 |
-| codex | tao-finetune-huggingface-model-dedicated-routing-non-cosmos | 41,565 | 17,862 | N/A | N/A | skill 3/3; base 1/1 |
-| codex | tao-finetune-huggingface-model-unclaimed-routing | 13,847 | 13,854 | -7 | -0.05% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 705,905 | 832,747 | -126,842 | -15.23% | skill 12/12; base 12/12 |
+| claude-code | All cases | 1,093,127 | 560,922 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | tao-finetune-huggingface-model-basic | 71,525 | 310,575 | -239,050 | -76.97% | skill 1/1; base 1/1 |
+| claude-code | tao-finetune-huggingface-model-dedicated-routing | 991,593 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | tao-finetune-huggingface-model-dedicated-routing-non-cosmos | N/A | 63,711 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | tao-finetune-huggingface-model-unclaimed-routing | 30,009 | 186,636 | -156,627 | -83.92% | skill 1/1; base 1/1 |
+| codex | All cases | 56,036 | 54,623 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | tao-finetune-huggingface-model-basic | 14,281 | 13,554 | +727 | +5.36% | skill 1/1; base 1/1 |
+| codex | tao-finetune-huggingface-model-dedicated-routing | N/A | 27,449 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | tao-finetune-huggingface-model-dedicated-routing-non-cosmos | 27,952 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | tao-finetune-huggingface-model-unclaimed-routing | 13,803 | 13,620 | +183 | +1.34% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,149,163 | 615,545 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -118,7 +118,6 @@ Signals present in this run:
 - `accuracy` (Accuracy): final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): whether the user's goal was achieved.
 - `behavior_check` (Behavior Check): whether the expected workflow behavior was followed.
-- `token_efficiency` (Token Efficiency): actual uncached prompt plus completion usage (50% of Efficiency).
 
 </details>
 

@@ -175,7 +175,11 @@ def validate(
             )
 
     benchmark_hash = _sha256(role_paths["benchmark"])
-    if expected_benchmark_sha256 and benchmark_hash != expected_benchmark_sha256:
+    benchmark_hash_verified = (
+        expected_benchmark_sha256 is not None
+        and benchmark_hash == expected_benchmark_sha256
+    )
+    if expected_benchmark_sha256 is not None and not benchmark_hash_verified:
         raise ValueError(
             "frozen Benchmark annotation hash mismatch: "
             f"expected {expected_benchmark_sha256}, got {benchmark_hash}"
@@ -211,7 +215,7 @@ def validate(
         "records": counts,
         "target_overlap": overlaps,
         "benchmark_sha256": benchmark_hash,
-        "benchmark_hash_verified": bool(expected_benchmark_sha256),
+        "benchmark_hash_verified": benchmark_hash_verified,
     }
 
 

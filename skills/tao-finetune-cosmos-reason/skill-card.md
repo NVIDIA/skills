@@ -28,6 +28,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [Detailed Guide](references/detailed-guide.md) <br>
 - [Cosmos Reason Evaluate](references/cosmos-reason-evaluate.md) <br>
 - [Cosmos Reproducibility Gates](references/cosmos-reproducibility-gates.md) <br>
+- [Cosmos Backend Operations](references/cosmos-backend-operations.md) <br>
 - [Cosmos Reason Parameters](references/cosmos-reason-parameters.md) <br>
 - [Skill Info](references/skill_info.yaml) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
@@ -46,7 +47,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-7 evaluation tasks (7 positive), each with 3 attempts per task in isolated sandbox pods. <br>
+7 evaluation tasks (7 positive), each with 1 attempt per task in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -70,12 +71,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 87.8% | 72.1% |
-| Security | 94.1% → 100.0% (+5.9 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 29.4% → 74.3% (+44.9 pts) | 46.7% → 77.8% (+31.1 pts) |
-| Discoverability | 94.3% | 40.6% |
-| Effectiveness | 17.8% → 85.4% (+67.6 pts) | 26.7% → 44.1% (+17.4 pts) |
-| Efficiency | 84.9% | 98.0% |
+| Overall | 90.1% | 81.2% |
+| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Correctness | 40.0% → 85.7% (+45.7 pts) | 54.3% → 85.7% (+31.4 pts) |
+| Discoverability | 97.1% | 61.4% |
+| Effectiveness | 30.3% → 80.3% (+50.0 pts) | 33.8% → 61.0% (+27.2 pts) |
+| Efficiency | 87.1% | 98.0% |
 
 ## Skill Version(s): <br>
 0.3.6 (source: frontmatter) <br>

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "tao-token-efficient-execution-routing",
+    "question": "A user request: \"Our team reruns the TAO AutoML workflow every week and the token bill is huge — how do we cut the cost of repeated agentic runs?\" Identify which TAO skill applies and, reading only that skill's documentation, outline the approach it prescribes. Do NOT run any commands, scripts, web searches, or other tools — describe the plan only.",
+    "expected_skill": "tao-token-efficient-execution",
+    "expected_script": null,
+    "ground_truth": "Identify tao-token-efficient-execution as the applicable skill and summarize its documented approach: compile the workflow's skill into stage cards once with a strong model, then execute repeatedly in fresh headless per-stage sessions coordinated by a bash driver, with state on disk (progress marks, commands.log) instead of chat history; for tao-run-automl a shipped card pack already exists next to that skill.",
+    "expected_behavior": [
+      "Identifies tao-token-efficient-execution as the relevant skill",
+      "Explains the compile-once (strong model authors cards) / execute-forever (fresh per-stage sessions) split",
+      "Mentions that state lives on disk (progress marks, commands.log) rather than in one long conversation",
+      "Points to the shipped card pack under skills/applications/tao-run-automl/cards/ rather than proposing to re-author from scratch",
+      "Does not execute any commands"
+    ]
+  },
+  {
+    "id": "tao-token-efficient-execution-run-pack",
+    "question": "A user request: \"There is a card pack for the DEFT AOI loop in the skill bank — what do I need to configure before launching its driver, and where do its sessions and logs go?\" Identify which TAO skill applies and answer from its documentation and the pack README only. Do NOT run any commands, scripts, web searches, or other tools.",
+    "expected_skill": "tao-token-efficient-execution",
+    "expected_script": null,
+    "ground_truth": "Configuration comes from the environment or ~/.tao-kit/kit.env (scaffolded by the kit's install.sh): WS is required (workspace root), MODEL/TRAIN_IMG/DS_IMG/PI_KIT_TURN_BUDGET optional; the provider API key is exported in the shell, never written to kit.env. The driver writes sessions and logs to ~/.tao-kit/deft-aoi/, never into the skill-bank checkout, and run artifacts land under $WS/results/<run>/.",
+    "expected_behavior": [
+      "Names ~/.tao-kit/kit.env (or exported env vars) as the config source and WS as required",
+      "States that credentials are exported in the shell and never stored in kit.env or any file",
+      "States that sessions/driver logs go to ~/.tao-kit/<pack>/ and run artifacts under $WS/results/",
+      "Mentions completing the tao-launch-workflow gate before starting the driver",
+      "Does not execute any commands"
+    ]
+  }
+]

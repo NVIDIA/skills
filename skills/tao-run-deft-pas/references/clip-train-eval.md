@@ -100,6 +100,15 @@ another label/path even when its numeric value is plausible.
 
 ## Train
 
+The fine-tuning method is immutable for a run. LoRA is enabled with
+`peft.enabled: true`, `peft.method: lora`, and nested `vision` and `text`
+adapter blocks. For SigLIP2, target `q_proj`, `k_proj`, `v_proj`, and
+`out_proj`; the materializer emits this contract for `--finetuning-method
+lora`, which is its default. Full-parameter SFT uses
+`--finetuning-method sft`, writes `peft.enabled: false`, and makes both
+encoders trainable. Never translate encoder freezing into LoRA or silently
+switch methods.
+
 1. Generate the canonical train config:
 
    ```bash

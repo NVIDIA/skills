@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to train, evaluate, export, and run inference for TAO metric-learning recognition models for fine-grained visual recognition tasks such as retail product recognition. <br>
+Developers and engineers use this skill to train, evaluate, export, and run inference (including TAO Deploy TensorRT flows) for TAO metric-learning recognition models for fine-grained visual recognition tasks such as retail product recognition. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive), 1 attempt per task, evaluated in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% | 70.4% |
+| Overall | 99.6% | 58.4% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 100.0% → 40.0% (-60.0 points) |
 | Discoverability | 100.0% | 0.0% |
-| Effectiveness | 3.3% → 100.0% (+96.7 points) | 70.0% → 53.3% (-16.7 points) |
-| Efficiency | 72.0% | 99.5% → 98.4% (-1.1 points) |
+| Effectiveness | 43.3% → 100.0% (+56.7 points) | 53.3% → 53.3% (±0.0 points) |
+| Efficiency | 98.1% | 99.5% → 98.5% (-1.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

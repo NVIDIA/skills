@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run per-class mAP and precision/recall analysis after object-detection inference, comparing predictions against ground truth using the TAO Data Services analytics pipeline. <br>
+Developers and engineers use this skill to score object-detection predictions against ground truth after inference, producing per-class precision/recall and mAP with the TAO Data Services `analytics kpi_analyze` action. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, each in an isolated sandbox pod. Evaluator version 1.5.6. <br>
+1 evaluation task (1 positive), 1 attempt per task, each in an isolated sandbox pod. Evaluator version 1.5.6. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -55,11 +55,11 @@ Reported benchmark dimensions: <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.6% | 69.7% |
+| Overall | 97.7% | 70.7% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
 | Discoverability | 100.0% | 0.0% |
-| Effectiveness | 10.0% → 90.0% (+80.0 points) | 30.0% → 50.0% (+20.0 points) |
-| Efficiency | 98.1% | 99.7% → 98.5% (-1.2 points) |
+| Effectiveness | 25.0% → 90.0% (+65.0 points) | 30.0% → 55.0% (+25.0 points) |
+| Efficiency | 98.4% | 99.7% → 98.5% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

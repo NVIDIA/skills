@@ -3,78 +3,83 @@
     "train.optim.lr"
   ],
   "automl_disabled_parameters": [
-    "dataset.normalize",
-    "train.cudnn",
-    "model.head.ffn.act_cfg",
-    "model.head.graph_model",
-    "model.head.decoder",
-    "model.head.ffn.pre_norm",
-    "dataset.augmentation.resize_lim",
-    "dataset.sequences",
-    "model.head.operation_order",
-    "visualize",
-    "train.gpu_ids",
-    "dataset.augmentation.bot_pct_lim",
-    "quantize.backend_kwargs",
-    "model.head.instance_bank",
-    "model.head.loss.reg.cls_allow_reverse",
-    "train.optim.grad_clip",
-    "wandb.tags",
-    "model.backbone",
-    "model.head.sampler.dn_noise_scale",
-    "model.head.sampler.reg_weights",
-    "quantize.skip_names",
-    "dataset.train_dataset",
-    "train.optim.paramwise_cfg",
-    "dataset.augmentation.image_size",
-    "evaluate",
-    "model.neck.in_channels",
-    "inference",
-    "train",
+    "model.head.deformable_model",
     "model.head.anchor_encoder.embed_dims",
-    "model.head.temp_graph_model",
-    "evaluate.tracking",
     "train.optim.lr_scheduler",
-    "model.head.ffn",
-    "dataset.augmentation",
-    "dataset.augmentation.rot3d_range",
-    "dataset.test_dataset",
-    "model.neck",
-    "dataset",
-    "dataset.val_dataset",
-    "dataset.normalize.std",
-    "quantize.layers",
-    "model.head.refine_layer",
+    "model.head.graph_model",
+    "evaluate.tracking",
+    "train.cudnn",
+    "visualize",
+    "model.head.instance_bank",
     "dataset.quant_calibration_dataset",
+    "model.head.visibility_net",
+    "quantize.layers",
+    "model.neck.in_channels",
+    "dataset.normalize.std",
+    "train",
+    "dataset.normalize",
+    "model.head.loss",
+    "model.head.ffn.act_cfg",
+    "model",
+    "dataset.classes",
+    "quantize",
+    "train.optim.grad_clip",
+    "model.backbone",
+    "dataset.train_dataset",
     "evaluate.metrics",
     "model.head",
-    "model.head.deformable_model.kps_generator.fix_scale",
-    "model.head.loss.id",
-    "inference.tracking",
-    "model",
-    "model.head.anchor_encoder",
-    "model.input_shape",
-    "model.head.reg_weights",
-    "model.head.norm_layer",
     "evaluate.gpu_ids",
-    "train.optim",
-    "dataset.classes",
-    "dataset.augmentation.final_dim",
-    "dataset.normalize.mean",
-    "model.head.deformable_model",
-    "model.head.loss.reg",
-    "model.head.bnneck",
-    "quantize",
+    "dataset.val_dataset",
+    "dataset.real_scene_keywords",
+    "model.head.refine_layer",
     "export",
-    "wandb",
-    "model.head.deformable_model.kps_generator",
-    "dataset.augmentation.rot_lim",
-    "model.head.loss.cls",
+    "model.head.deformable_model.kps_generator.fix_scale",
+    "model.head.loss.reg.cls_allow_reverse",
+    "quantize.backend_kwargs",
+    "train.optim.paramwise_cfg",
+    "model.head.bnneck",
+    "wandb.tags",
+    "dataset.sequences",
+    "model.head.ffn.pre_norm",
     "inference.gpu_ids",
+    "wandb",
+    "inference",
+    "model.head.loss.reg",
+    "model.head.ffn",
+    "dataset.augmentation.image_size",
+    "model.head.loss.id",
+    "model.head.temp_graph_model",
+    "dataset",
+    "model.head.anchor_encoder",
+    "dataset.augmentation.resize_lim",
+    "dataset.augmentation.rot_lim",
+    "dataset.augmentation",
+    "dataset.augmentation.final_dim",
+    "quantize.skip_names",
+    "dataset.augmentation.bot_pct_lim",
+    "model.head.sampler.reg_weights",
+    "evaluate",
+    "model.head.reg_weights",
+    "dataset.rtdetr_2d_per_class_score_thr",
+    "dataset.normalize.mean",
+    "model.head.deformable_model.kps_generator",
+    "model.neck",
+    "model.head.decoder",
+    "model.input_shape",
+    "inference.tracking",
+    "train.gpu_ids",
+    "model.head.norm_layer",
+    "train.checkpointer",
+    "dataset.target_fps_choices",
+    "model.head.loss.cls",
+    "model.head.operation_order",
+    "model.head.sampler.dn_noise_scale",
     "model.depth_branch",
-    "model.head.loss",
-    "model.head.visibility_net",
-    "model.head.sampler"
+    "train.optim",
+    "dataset.augmentation.rot3d_range",
+    "model.head.sampler",
+    "dataset.test_dataset",
+    "model.head.loose_to_tight"
   ],
   "default": {
     "dataset": {
@@ -113,6 +118,17 @@
         "nova_carter"
       ],
       "data_root": "???",
+      "eval_dist_fcn": "center_distance",
+      "eval_hota": false,
+      "fps_drop_prob": 0.0,
+      "lazy_load": false,
+      "lazy_load_cache_size": 50,
+      "ltt_2dgt_cache_size": 8,
+      "ltt_2dgt_dedup_regex": "^CT[\\w.]+?__",
+      "ltt_2dgt_frame_regex": "",
+      "ltt_2dgt_sidecar_dir": "",
+      "ltt_2dgt_warn_on_miss": true,
+      "max_cameras": -1,
       "normalize": {
         "mean": [
           123.675,
@@ -130,14 +146,38 @@
       "num_frames": 200,
       "num_ids": 70,
       "num_workers": 4,
+      "pkl_cam_counts_path": "",
+      "pkl_sample_size": 0,
       "quant_calibration_dataset": {
         "images_dir": ""
       },
+      "real_block_prob": -1.0,
+      "real_scene_keywords": [],
+      "rtdetr_2d_cache_dir": "",
+      "rtdetr_2d_cache_path": "",
+      "rtdetr_2d_cache_size": 4,
+      "rtdetr_2d_dedup_regex": "^CT[\\w.]+?__",
+      "rtdetr_2d_mark_real": true,
+      "rtdetr_2d_per_class_score_thr": {},
+      "rtdetr_2d_score_thr": 0.0,
+      "scene_switch_iters": 0,
       "sequences": {
         "keep_consistent_aug": true,
         "same_scene_in_batch": true,
         "split_num": 100
       },
+      "sync_route": false,
+      "target_fps_choices": [
+        30,
+        20,
+        15,
+        10,
+        6,
+        5,
+        3,
+        2,
+        1
+      ],
       "test_dataset": {
         "ann_file": "???",
         "same_scene_in_batch": true,
@@ -172,6 +212,7 @@
       "backbone": {
         "type": "resnet_101"
       },
+      "cotrain_param_touch": false,
       "depth_branch": {
         "embed_dims": 256,
         "loss_weight": 0.2,
@@ -292,7 +333,37 @@
           "feat_grad": false,
           "num_anchor": 900,
           "num_temp_instances": 600,
+          "reset_on_time_gap": false,
           "use_temporal_align": false
+        },
+        "loose_to_tight": {
+          "box2d_key": "gt_boxes_2d_visible",
+          "class_gate": true,
+          "containment_weight": 1.0,
+          "cost_cls": 1.0,
+          "cost_giou": 2.0,
+          "cost_l1": 1.0,
+          "dedup_dist": 0.0,
+          "det_box_key": "det_boxes_2d",
+          "det_cls_key": "det_classes_2d",
+          "det_score_key": "det_scores_2d",
+          "det_score_thr": 0.0,
+          "ego2cam_key": "cam2world_transform",
+          "enable": false,
+          "eps": 0.1,
+          "giou_thr": 0.3,
+          "has_3d_gt_key": "has_3d_gt",
+          "instance_id_key": "instance_id",
+          "loss_weight": 0.1,
+          "min_cams": 1,
+          "min_gt_area": 1.0,
+          "mlp_ckpt": "",
+          "num_classes": 0,
+          "occ_key": "gt_occ_weight",
+          "pseudo_box_weight": 0.1,
+          "pseudo_cls_weight": 1.0,
+          "pseudo_enable": false,
+          "tight_l1_weight": 1.0
         },
         "loss": {
           "cls": {
@@ -475,6 +546,13 @@
     "train": {
       "checkpoint_interval": 1,
       "checkpoint_interval_unit": "epoch",
+      "checkpointer": {
+        "auto_insert_metric_name": false,
+        "enable_topk": false,
+        "filename": "model_best_{epoch:03d}",
+        "replace_periodic": false,
+        "save_top_k": 1
+      },
       "cudnn": {
         "benchmark": false,
         "deterministic": true
@@ -513,6 +591,7 @@
       "pretrained_model_path": "",
       "results_dir": "",
       "resume_training_checkpoint_path": "",
+      "scrub_nan_gradients": false,
       "seed": 1234,
       "validation_interval": 1
     },
@@ -576,6 +655,9 @@
     ],
     "dataset": {
       "automl_disabled_parameters": [
+        "dataset.target_fps_choices",
+        "dataset.rtdetr_2d_per_class_score_thr",
+        "dataset.real_scene_keywords",
         "dataset.classes",
         "dataset.augmentation",
         "dataset.normalize",
@@ -622,6 +704,17 @@
           "nova_carter"
         ],
         "data_root": "???",
+        "eval_dist_fcn": "center_distance",
+        "eval_hota": false,
+        "fps_drop_prob": 0.0,
+        "lazy_load": false,
+        "lazy_load_cache_size": 50,
+        "ltt_2dgt_cache_size": 8,
+        "ltt_2dgt_dedup_regex": "^CT[\\w.]+?__",
+        "ltt_2dgt_frame_regex": "",
+        "ltt_2dgt_sidecar_dir": "",
+        "ltt_2dgt_warn_on_miss": true,
+        "max_cameras": -1,
         "normalize": {
           "mean": [
             123.675,
@@ -639,14 +732,38 @@
         "num_frames": 200,
         "num_ids": 70,
         "num_workers": 4,
+        "pkl_cam_counts_path": "",
+        "pkl_sample_size": 0,
         "quant_calibration_dataset": {
           "images_dir": ""
         },
+        "real_block_prob": -1.0,
+        "real_scene_keywords": [],
+        "rtdetr_2d_cache_dir": "",
+        "rtdetr_2d_cache_path": "",
+        "rtdetr_2d_cache_size": 4,
+        "rtdetr_2d_dedup_regex": "^CT[\\w.]+?__",
+        "rtdetr_2d_mark_real": true,
+        "rtdetr_2d_per_class_score_thr": {},
+        "rtdetr_2d_score_thr": 0.0,
+        "scene_switch_iters": 0,
         "sequences": {
           "keep_consistent_aug": true,
           "same_scene_in_batch": true,
           "split_num": 100
         },
+        "sync_route": false,
+        "target_fps_choices": [
+          30,
+          20,
+          15,
+          10,
+          6,
+          5,
+          3,
+          2,
+          1
+        ],
         "test_dataset": {
           "ann_file": "???",
           "same_scene_in_batch": true,
@@ -813,6 +930,85 @@
           "title": "Path to data root",
           "type": "string"
         },
+        "eval_dist_fcn": {
+          "default": "center_distance",
+          "description": "Evaluation distance function",
+          "enum": [
+            "center_distance",
+            "iou_3d",
+            "both"
+          ],
+          "title": "Evaluation distance function",
+          "type": "categorical"
+        },
+        "eval_hota": {
+          "default": false,
+          "description": "Run HOTA tracking evaluation in addition to AMOTA",
+          "title": "Enable HOTA evaluation",
+          "type": "bool"
+        },
+        "fps_drop_prob": {
+          "default": 0.0,
+          "description": "Probability of downsampling a training scene to a lower FPS",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "FPS drop probability",
+          "type": "float"
+        },
+        "lazy_load": {
+          "default": false,
+          "description": "Defer pkl loading to __getitem__ using a pre-built index",
+          "title": "Lazy load annotations",
+          "type": "bool"
+        },
+        "lazy_load_cache_size": {
+          "default": 50,
+          "description": "Maximum pkl files held in the lazy-loading LRU cache",
+          "maximum": Infinity,
+          "minimum": 1,
+          "title": "Lazy load cache size",
+          "type": "int"
+        },
+        "ltt_2dgt_cache_size": {
+          "default": 8,
+          "description": "Number of per-scene LTT sidecar indices cached per worker",
+          "maximum": Infinity,
+          "minimum": 1,
+          "title": "LTT sidecar cache size",
+          "type": "int"
+        },
+        "ltt_2dgt_dedup_regex": {
+          "default": "^CT[\\w.]+?__",
+          "description": "Regex removed from scene names before resolving LTT sidecars",
+          "title": "LTT scene deduplication regex",
+          "type": "string"
+        },
+        "ltt_2dgt_frame_regex": {
+          "default": "",
+          "description": "Optional regex used to extract frame IDs for LTT sidecar joins",
+          "title": "LTT frame regex",
+          "type": "string"
+        },
+        "ltt_2dgt_sidecar_dir": {
+          "default": "",
+          "description": "Directory of per-scene LooseToTight 2D ground-truth NPZ sidecars",
+          "title": "LTT 2D ground-truth sidecar directory",
+          "type": "string"
+        },
+        "ltt_2dgt_warn_on_miss": {
+          "default": true,
+          "description": "Warn once per scene when an LTT sidecar join has no matches",
+          "title": "Warn on LTT sidecar miss",
+          "type": "bool"
+        },
+        "max_cameras": {
+          "default": -1,
+          "description": "Limit training cameras per frame to reduce GPU memory; a non-positive value disables sampling",
+          "maximum": Infinity,
+          "minimum": -1,
+          "title": "Maximum cameras per frame",
+          "type": "int"
+        },
         "normalize": {
           "automl_disabled_parameters": [
             "dataset.normalize.mean",
@@ -898,6 +1094,20 @@
           "title": "Number of workers",
           "type": "int"
         },
+        "pkl_cam_counts_path": {
+          "default": "",
+          "description": "Path to the pkl-to-camera-count mapping used for balanced sampling",
+          "title": "PKL camera counts path",
+          "type": "string"
+        },
+        "pkl_sample_size": {
+          "default": 0,
+          "description": "Number of PKLs sampled per epoch; zero disables sampling. Requires lazy_load=True",
+          "maximum": Infinity,
+          "minimum": 0,
+          "title": "PKL sample size per epoch",
+          "type": "int"
+        },
         "quant_calibration_dataset": {
           "automl_enabled": false,
           "default": {
@@ -913,6 +1123,75 @@
             }
           },
           "type": "collection"
+        },
+        "real_block_prob": {
+          "default": -1.0,
+          "description": "Probability in [0, 1], or exactly -1 for automatic scene-count weighting; (-1, 0) is invalid",
+          "maximum": 1.0,
+          "minimum": -1.0,
+          "title": "Real route block probability",
+          "type": "float"
+        },
+        "real_scene_keywords": {
+          "automl_enabled": false,
+          "default": [],
+          "description": "Scene-name substrings identifying real 2D-supervised data",
+          "title": "Real scene keywords",
+          "type": "list"
+        },
+        "rtdetr_2d_cache_dir": {
+          "default": "",
+          "description": "Directory of per-scene RT-DETR 2D pseudo-label NPZ caches",
+          "title": "RT-DETR 2D cache directory",
+          "type": "string"
+        },
+        "rtdetr_2d_cache_path": {
+          "default": "",
+          "description": "Optional single RT-DETR 2D pseudo-label NPZ cache",
+          "title": "RT-DETR 2D cache path",
+          "type": "string"
+        },
+        "rtdetr_2d_cache_size": {
+          "default": 4,
+          "description": "Number of RT-DETR scene indices cached per worker",
+          "maximum": Infinity,
+          "minimum": 1,
+          "title": "RT-DETR cache size",
+          "type": "int"
+        },
+        "rtdetr_2d_dedup_regex": {
+          "default": "^CT[\\w.]+?__",
+          "description": "Regex removed from scene names before resolving RT-DETR caches",
+          "title": "RT-DETR scene deduplication regex",
+          "type": "string"
+        },
+        "rtdetr_2d_mark_real": {
+          "default": true,
+          "description": "Mark samples with an RT-DETR scene cache as lacking 3D ground truth",
+          "title": "Treat RT-DETR-cached samples as 2D-only",
+          "type": "bool"
+        },
+        "rtdetr_2d_per_class_score_thr": {
+          "automl_enabled": false,
+          "description": "Optional class-name to score-threshold overrides",
+          "title": "RT-DETR per-class score thresholds",
+          "type": "collection"
+        },
+        "rtdetr_2d_score_thr": {
+          "default": 0.0,
+          "description": "Global score threshold for RT-DETR pseudo-labels",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "RT-DETR score threshold",
+          "type": "float"
+        },
+        "scene_switch_iters": {
+          "default": 0,
+          "description": "Iterations per scene before a synchronized route switch; zero uses legacy cadence",
+          "maximum": Infinity,
+          "minimum": 0,
+          "title": "Scene switch iterations",
+          "type": "int"
         },
         "sequences": {
           "automl_enabled": false,
@@ -946,6 +1225,29 @@
           },
           "title": "Sequences config",
           "type": "collection"
+        },
+        "sync_route": {
+          "default": false,
+          "description": "Keep distributed ranks on the same 3D or 2D supervision route",
+          "title": "Synchronize co-training route",
+          "type": "bool"
+        },
+        "target_fps_choices": {
+          "automl_enabled": false,
+          "default": [
+            30,
+            20,
+            15,
+            10,
+            6,
+            5,
+            3,
+            2,
+            1
+          ],
+          "description": "Candidate target FPS values for FPS-drop augmentation",
+          "title": "Target FPS choices",
+          "type": "list"
         },
         "test_dataset": {
           "automl_enabled": false,
@@ -1070,14 +1372,14 @@
         },
         "use_h5_file_for_depth": {
           "default": true,
-          "description": "Use H5 file",
-          "title": "Use H5 file",
+          "description": "Use H5 file for depth maps",
+          "title": "Use H5 file for depth",
           "type": "bool"
         },
         "use_h5_file_for_rgb": {
           "default": false,
-          "description": "Use H5 file",
-          "title": "Use H5 file",
+          "description": "Read RGB camera images from HDF5 files instead of image directories",
+          "title": "Use HDF5 for RGB images",
           "type": "bool"
         },
         "val_dataset": {
@@ -1157,6 +1459,7 @@
         "backbone": {
           "type": "resnet_101"
         },
+        "cotrain_param_touch": false,
         "depth_branch": {
           "embed_dims": 256,
           "loss_weight": 0.2,
@@ -1277,7 +1580,37 @@
             "feat_grad": false,
             "num_anchor": 900,
             "num_temp_instances": 600,
+            "reset_on_time_gap": false,
             "use_temporal_align": false
+          },
+          "loose_to_tight": {
+            "box2d_key": "gt_boxes_2d_visible",
+            "class_gate": true,
+            "containment_weight": 1.0,
+            "cost_cls": 1.0,
+            "cost_giou": 2.0,
+            "cost_l1": 1.0,
+            "dedup_dist": 0.0,
+            "det_box_key": "det_boxes_2d",
+            "det_cls_key": "det_classes_2d",
+            "det_score_key": "det_scores_2d",
+            "det_score_thr": 0.0,
+            "ego2cam_key": "cam2world_transform",
+            "enable": false,
+            "eps": 0.1,
+            "giou_thr": 0.3,
+            "has_3d_gt_key": "has_3d_gt",
+            "instance_id_key": "instance_id",
+            "loss_weight": 0.1,
+            "min_cams": 1,
+            "min_gt_area": 1.0,
+            "mlp_ckpt": "",
+            "num_classes": 0,
+            "occ_key": "gt_occ_weight",
+            "pseudo_box_weight": 0.1,
+            "pseudo_cls_weight": 1.0,
+            "pseudo_enable": false,
+            "tight_l1_weight": 1.0
           },
           "loss": {
             "cls": {
@@ -1463,6 +1796,12 @@
           "title": "Backbone config",
           "type": "collection"
         },
+        "cotrain_param_touch": {
+          "default": false,
+          "description": "Keep route-specific parameters in the distributed autograd graph",
+          "title": "Co-training parameter touch",
+          "type": "bool"
+        },
         "depth_branch": {
           "automl_enabled": false,
           "default": {
@@ -1531,7 +1870,8 @@
             "model.head.temp_graph_model",
             "model.head.decoder",
             "model.head.norm_layer",
-            "model.head.ffn"
+            "model.head.ffn",
+            "model.head.loose_to_tight"
           ],
           "automl_enabled": false,
           "default": {
@@ -1647,7 +1987,37 @@
               "feat_grad": false,
               "num_anchor": 900,
               "num_temp_instances": 600,
+              "reset_on_time_gap": false,
               "use_temporal_align": false
+            },
+            "loose_to_tight": {
+              "box2d_key": "gt_boxes_2d_visible",
+              "class_gate": true,
+              "containment_weight": 1.0,
+              "cost_cls": 1.0,
+              "cost_giou": 2.0,
+              "cost_l1": 1.0,
+              "dedup_dist": 0.0,
+              "det_box_key": "det_boxes_2d",
+              "det_cls_key": "det_classes_2d",
+              "det_score_key": "det_scores_2d",
+              "det_score_thr": 0.0,
+              "ego2cam_key": "cam2world_transform",
+              "enable": false,
+              "eps": 0.1,
+              "giou_thr": 0.3,
+              "has_3d_gt_key": "has_3d_gt",
+              "instance_id_key": "instance_id",
+              "loss_weight": 0.1,
+              "min_cams": 1,
+              "min_gt_area": 1.0,
+              "mlp_ckpt": "",
+              "num_classes": 0,
+              "occ_key": "gt_occ_weight",
+              "pseudo_box_weight": 0.1,
+              "pseudo_cls_weight": 1.0,
+              "pseudo_enable": false,
+              "tight_l1_weight": 1.0
             },
             "loss": {
               "cls": {
@@ -2031,6 +2401,7 @@
                   "description": "Embedding dimensions",
                   "maximum": Infinity,
                   "minimum": 1,
+                  "title": "Embedding dimensions",
                   "type": "int"
                 },
                 "kps_generator": {
@@ -2165,6 +2536,7 @@
                   "description": "Number of groups",
                   "maximum": Infinity,
                   "minimum": 1,
+                  "title": "Number of groups",
                   "type": "int"
                 },
                 "num_levels": {
@@ -2410,6 +2782,7 @@
                 "feat_grad": false,
                 "num_anchor": 900,
                 "num_temp_instances": 600,
+                "reset_on_time_gap": false,
                 "use_temporal_align": false
               },
               "description": "Instance bank config",
@@ -2471,6 +2844,12 @@
                   "title": "Number of temporal instances",
                   "type": "int"
                 },
+                "reset_on_time_gap": {
+                  "default": false,
+                  "description": "Reset recurrent state when timestamps cross a clip boundary",
+                  "title": "Reset on time gap",
+                  "type": "bool"
+                },
                 "use_temporal_align": {
                   "default": false,
                   "description": "Use temporal alignment",
@@ -2479,6 +2858,235 @@
                 }
               },
               "title": "Instance bank config",
+              "type": "collection"
+            },
+            "loose_to_tight": {
+              "automl_enabled": false,
+              "default": {
+                "box2d_key": "gt_boxes_2d_visible",
+                "class_gate": true,
+                "containment_weight": 1.0,
+                "cost_cls": 1.0,
+                "cost_giou": 2.0,
+                "cost_l1": 1.0,
+                "dedup_dist": 0.0,
+                "det_box_key": "det_boxes_2d",
+                "det_cls_key": "det_classes_2d",
+                "det_score_key": "det_scores_2d",
+                "det_score_thr": 0.0,
+                "ego2cam_key": "cam2world_transform",
+                "enable": false,
+                "eps": 0.1,
+                "giou_thr": 0.3,
+                "has_3d_gt_key": "has_3d_gt",
+                "instance_id_key": "instance_id",
+                "loss_weight": 0.1,
+                "min_cams": 1,
+                "min_gt_area": 1.0,
+                "mlp_ckpt": "",
+                "num_classes": 0,
+                "occ_key": "gt_occ_weight",
+                "pseudo_box_weight": 0.1,
+                "pseudo_cls_weight": 1.0,
+                "pseudo_enable": false,
+                "tight_l1_weight": 1.0
+              },
+              "description": "Loose-to-tight geometric 2D distillation config",
+              "properties": {
+                "box2d_key": {
+                  "default": "gt_boxes_2d_visible",
+                  "description": "Batch key for visible 2D ground-truth boxes",
+                  "title": "Visible 2D box key",
+                  "type": "string"
+                },
+                "class_gate": {
+                  "default": true,
+                  "description": "Require class agreement during pseudo-label matching",
+                  "title": "Pseudo-match class gate",
+                  "type": "bool"
+                },
+                "containment_weight": {
+                  "default": 1.0,
+                  "description": "Weight for the visible-box containment term",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Containment weight",
+                  "type": "float"
+                },
+                "cost_cls": {
+                  "default": 1.0,
+                  "description": "Classification component weight in pseudo-label matching cost",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Pseudo-match class cost",
+                  "type": "float"
+                },
+                "cost_giou": {
+                  "default": 2.0,
+                  "description": "GIoU component weight in pseudo-label matching cost",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Pseudo-match GIoU cost",
+                  "type": "float"
+                },
+                "cost_l1": {
+                  "default": 1.0,
+                  "description": "L1 component weight in pseudo-label matching cost",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Pseudo-match L1 cost",
+                  "type": "float"
+                },
+                "dedup_dist": {
+                  "default": 0.0,
+                  "description": "BEV distance used to deduplicate pseudo matches; zero disables it",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Pseudo-match deduplication distance",
+                  "type": "float"
+                },
+                "det_box_key": {
+                  "default": "det_boxes_2d",
+                  "description": "Batch key for per-camera 2D detection boxes",
+                  "title": "2D detection box key",
+                  "type": "string"
+                },
+                "det_cls_key": {
+                  "default": "det_classes_2d",
+                  "description": "Batch key for per-camera 2D detection classes",
+                  "title": "2D detection class key",
+                  "type": "string"
+                },
+                "det_score_key": {
+                  "default": "det_scores_2d",
+                  "description": "Batch key for per-camera 2D detection scores",
+                  "title": "2D detection score key",
+                  "type": "string"
+                },
+                "det_score_thr": {
+                  "default": 0.0,
+                  "description": "Minimum 2D detection confidence used for matching",
+                  "maximum": 1.0,
+                  "minimum": 0.0,
+                  "title": "2D detection score threshold",
+                  "type": "float"
+                },
+                "ego2cam_key": {
+                  "default": "cam2world_transform",
+                  "description": "Batch key for ego-to-camera transforms",
+                  "title": "Ego-to-camera key",
+                  "type": "string"
+                },
+                "enable": {
+                  "default": false,
+                  "description": "Enable loose-to-tight 2D distillation",
+                  "title": "Enable loose-to-tight distillation",
+                  "type": "bool"
+                },
+                "eps": {
+                  "default": 0.1,
+                  "description": "Minimum projection depth used for numerical stability",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Projection epsilon",
+                  "type": "float"
+                },
+                "giou_thr": {
+                  "default": 0.3,
+                  "description": "Minimum generalized IoU for pseudo-label matching",
+                  "maximum": 1.0,
+                  "minimum": -1.0,
+                  "title": "Pseudo-match GIoU threshold",
+                  "type": "float"
+                },
+                "has_3d_gt_key": {
+                  "default": "has_3d_gt",
+                  "description": "Batch key indicating whether a sample has 3D ground truth",
+                  "title": "Has 3D ground truth key",
+                  "type": "string"
+                },
+                "instance_id_key": {
+                  "default": "instance_id",
+                  "description": "Batch key for instance identifiers",
+                  "title": "Instance ID key",
+                  "type": "string"
+                },
+                "loss_weight": {
+                  "default": 0.1,
+                  "description": "Weight for supervised loose-to-tight 2D box loss",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Loose-to-tight loss weight",
+                  "type": "float"
+                },
+                "min_cams": {
+                  "default": 1,
+                  "description": "Minimum number of cameras supporting a pseudo match",
+                  "maximum": Infinity,
+                  "minimum": 1,
+                  "title": "Minimum matching cameras",
+                  "type": "int"
+                },
+                "min_gt_area": {
+                  "default": 1.0,
+                  "description": "Minimum visible 2D ground-truth area in pixels",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Minimum 2D GT area",
+                  "type": "float"
+                },
+                "mlp_ckpt": {
+                  "default": "",
+                  "description": "Path to the trained frozen loose-to-tight MLP checkpoint",
+                  "title": "Loose-to-tight MLP checkpoint",
+                  "type": "string"
+                },
+                "num_classes": {
+                  "default": 0,
+                  "description": "Number of classes used by the loose-to-tight MLP; zero derives the taxonomy from dataset.classes",
+                  "maximum": Infinity,
+                  "minimum": 0,
+                  "title": "Loose-to-tight classes",
+                  "type": "int"
+                },
+                "occ_key": {
+                  "default": "gt_occ_weight",
+                  "description": "Batch key for 2D occlusion weights",
+                  "title": "Occlusion weight key",
+                  "type": "string"
+                },
+                "pseudo_box_weight": {
+                  "default": 0.1,
+                  "description": "Weight for pseudo-label 2D box loss",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Pseudo 2D box loss weight",
+                  "type": "float"
+                },
+                "pseudo_cls_weight": {
+                  "default": 1.0,
+                  "description": "Weight for pseudo-label classification loss",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Pseudo classification loss weight",
+                  "type": "float"
+                },
+                "pseudo_enable": {
+                  "default": false,
+                  "description": "Enable 2D pseudo-label loss for batches without 3D ground truth",
+                  "title": "Enable 2D pseudo labels",
+                  "type": "bool"
+                },
+                "tight_l1_weight": {
+                  "default": 1.0,
+                  "description": "Weight for the tight-box L1 term",
+                  "maximum": Infinity,
+                  "minimum": 0.0,
+                  "title": "Tight L1 weight",
+                  "type": "float"
+                }
+              },
+              "title": "Loose-to-tight config",
               "type": "collection"
             },
             "loss": {
@@ -3129,6 +3737,7 @@
             },
             "num_outs": {
               "default": 4,
+              "description": "Number of output levels",
               "maximum": Infinity,
               "minimum": 1,
               "title": "Number of output levels",
@@ -3300,8 +3909,8 @@
         }
       },
       "required": [
-        "model_path",
-        "results_dir"
+        "results_dir",
+        "model_path"
       ],
       "type": "collection"
     },
@@ -3315,12 +3924,20 @@
       "automl_disabled_parameters": [
         "train.gpu_ids",
         "train.cudnn",
+        "train.checkpointer",
         "train.optim"
       ],
       "automl_enabled": false,
       "default": {
         "checkpoint_interval": 1,
         "checkpoint_interval_unit": "epoch",
+        "checkpointer": {
+          "auto_insert_metric_name": false,
+          "enable_topk": false,
+          "filename": "model_best_{epoch:03d}",
+          "replace_periodic": false,
+          "save_top_k": 1
+        },
         "cudnn": {
           "benchmark": false,
           "deterministic": true
@@ -3359,15 +3976,16 @@
         "pretrained_model_path": "",
         "results_dir": "",
         "resume_training_checkpoint_path": "",
+        "scrub_nan_gradients": false,
         "seed": 1234,
         "validation_interval": 1
       },
       "description": "Train config",
       "popular": [
-        "num_epochs",
+        "gpu_ids",
         "num_gpus",
         "num_nodes",
-        "gpu_ids"
+        "num_epochs"
       ],
       "properties": {
         "checkpoint_interval": {
@@ -3387,6 +4005,64 @@
           ],
           "title": "Checkpoint interval unit",
           "type": "categorical"
+        },
+        "checkpointer": {
+          "automl_enabled": false,
+          "default": {
+            "auto_insert_metric_name": false,
+            "enable_topk": false,
+            "filename": "model_best_{epoch:03d}",
+            "replace_periodic": false,
+            "save_top_k": 1
+          },
+          "properties": {
+            "auto_insert_metric_name": {
+              "default": false,
+              "type": "bool"
+            },
+            "dirpath": {
+              "description": "Directory for best checkpoints. Defaults to results_dir.",
+              "type": "string"
+            },
+            "enable_topk": {
+              "default": false,
+              "description": "Save checkpoint(s) ranked by a monitored metric. This is additive to periodic checkpoints unless replace_periodic is enabled.",
+              "title": "Enable best-checkpoint saving",
+              "type": "bool"
+            },
+            "filename": {
+              "default": "model_best_{epoch:03d}",
+              "title": "Best-checkpoint filename pattern",
+              "type": "string"
+            },
+            "mode": {
+              "description": "Leave unset to use the network's default direction.",
+              "enum": [
+                "min",
+                "max"
+              ],
+              "title": "Monitor mode",
+              "type": "categorical"
+            },
+            "monitor": {
+              "description": "Leave unset to use the network's default metric.",
+              "title": "Monitored metric",
+              "type": "string"
+            },
+            "replace_periodic": {
+              "default": false,
+              "description": "When best-checkpoint saving is enabled, replace periodic history with one metric-best checkpoint and its latest symlink.",
+              "title": "Replace periodic checkpoints",
+              "type": "bool"
+            },
+            "save_top_k": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Number of best checkpoints",
+              "type": "int"
+            }
+          },
+          "type": "collection"
         },
         "cudnn": {
           "automl_enabled": false,
@@ -3577,6 +4253,12 @@
           "description": "Path to the checkpoint to resume training from.",
           "title": "Resume checkpoint path",
           "type": "string"
+        },
+        "scrub_nan_gradients": {
+          "default": false,
+          "description": "Opt in to classification-logit clipping, non-finite loss recovery, and NaN-gradient scrubbing after backward; gradient infinities remain visible to mixed-precision overflow detection",
+          "title": "Scrub NaN gradients",
+          "type": "bool"
         },
         "seed": {
           "default": 1234,

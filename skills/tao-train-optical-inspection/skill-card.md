@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (tao-train-optical-inspection-basic) across 2 agents with 3 attempts per task in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive) across 2 agents with 1 attempt per task, each run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -56,10 +56,10 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Verifies the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity for skill and tool usage. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity for skill and tool usage. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.4% | 76.9% |
-| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 13.3% → 100.0% (+86.7 pts) | 100.0% → 70.0% (-30.0 pts) |
-| Discoverability | 100.0% | 47.5% |
-| Effectiveness | 10.0% → 100.0% (+90.0 pts) | 31.7% → 68.3% (+36.6 pts) |
-| Efficiency | 96.9% | 98.7% |
+| Overall | 94.3% | 95.3% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 48.3% → 83.3% (+35.0 points) |
+| Efficiency | 71.5% | 98.1% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

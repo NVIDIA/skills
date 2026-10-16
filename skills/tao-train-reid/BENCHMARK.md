@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-train-reid`
-- Evaluation date: 2026-09-21
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:e56d74577eb2d52bf3c78b82bbbb5d7b72f5c078fe9b1c3bcd794756d8509d8f` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 79.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 67.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 80.0% (±0.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 5.6% → 100.0% (+94.4 points) | 75.0% → 100.0% (+25.0 points) |
-| Efficiency | 97.7% — baseline ran, but no comparable score was available; uplift unavailable | 99.5% → 98.4% (-1.1 points) |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 65.0% → 58.3% (-6.7 points) |
+| Efficiency | 72.1% — baseline ran, but no comparable score was available; uplift unavailable | 99.6% → 98.5% (-1.1 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 67,172 | 1,031,393 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-train-reid-basic | 67,172 | 1,031,393 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 14,071 | 14,002 | +69 | +0.49% | skill 1/1; base 1/1 |
-| codex | tao-train-reid-basic | 14,071 | 14,002 | +69 | +0.49% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 81,243 | 1,045,395 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 99,855 | 611,011 | -511,156 | -83.66% | skill 1/1; base 1/1 |
+| claude-code | tao-train-reid-basic | 99,855 | 611,011 | -511,156 | -83.66% | skill 1/1; base 1/1 |
+| codex | All cases | 14,009 | 13,810 | +199 | +1.44% | skill 1/1; base 1/1 |
+| codex | tao-train-reid-basic | 14,009 | 13,810 | +199 | +1.44% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 113,864 | 624,821 | -510,957 | -81.78% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -66,7 +66,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 26 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 25 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
@@ -80,7 +80,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-reid`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-reid/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-reid/SKILL.md`)
-- 21 additional finding(s) are available in the full evaluation artifacts.
+- 20 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -1,0 +1,29 @@
+task_type: texture_ft
+experiment: anomalygen_texture_ft
+model_size: nano
+per_class_lora_rank: 8
+per_class_lora_alpha: 8
+max_iter: 5000
+validation_iter: 1000
+run_validation_on_start: true
+save_iter: 1000
+cycle_lengths: 15000
+warm_up_steps: 500
+logging_iter: 10
+seed: 42
+lr: 0.001
+betas: [0.9, 0.95]
+eps: 0.000001
+weight_decay: 0.0
+image_size: [512, 512]
+batch_size: 4
+num_workers: 4
+ratio_range: [1.5, 8.0]
+model_input_size: 512
+shift: 5.0
+validation_batch_size: 16
+early_stop_enabled: false
+early_stop_metric: nn
+early_stop_patience: 5
+early_stop_min_delta: 0.0
+early_stop_min_delta_mode: rel

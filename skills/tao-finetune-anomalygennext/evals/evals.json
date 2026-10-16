@@ -1,0 +1,17 @@
+[
+  {
+    "id": "prepare-anomalygennext-finetune-recipe",
+    "question": "How should I prepare a user dataset and recipe to fine-tune AnomalyGenNext? Do not run anything.",
+    "expected_skill": "tao-finetune-anomalygennext",
+    "ground_truth": "Validate the paired anomaly/mask/clean layout, runtime-supported image extensions, binary masks, DCP Cosmos3-Nano base checkpoint, defect specification and frozen validation rows, preserve custom recipe knobs, replace run identities, and require iteration-zero validation.",
+    "expected_behavior": [
+      "Select tao-finetune-anomalygennext",
+      "Require the dataset, validation JSONL, DCP-format Cosmos3-Nano base checkpoint, VAE, and complete checkpoint root",
+      "Reject image formats unsupported by the AnomalyGenNext runtime",
+      "Reject masks that do not contain exactly 0 and 255",
+      "Preserve custom recipe settings while replacing run identity fields",
+      "Require aligned validation and checkpoint intervals"
+    ],
+    "expected_script": "scripts/prepare_finetune_recipe.py"
+  }
+]

@@ -75,8 +75,8 @@ checkpoint:
   input: prepared_qwen3_vl_hf_safetensors
   accepted_source_inputs: [qwen3_vl_hf_safetensors, cosmos3_omni, cosmos3_edge_public_hf_snapshot]
   source_model_type_selection: explicit_for_nano
-  cosmos3_omni_preparation: shared_tao_entrypoint_with_native_framework_converter_in_selected_platform_checkpoint_storage
-  cosmos3_omni_preparation_entrypoint: cosmos_rl.model_preparation.vlm_safetensors
+  cosmos3_omni_preparation: native_framework_converter_in_selected_platform_checkpoint_storage
+  cosmos3_omni_preparation_entrypoint: cosmos_framework.scripts.convert_model_to_vlm_safetensors
   cosmos3_omni_native_converter: cosmos_framework.scripts.convert_model_to_vlm_safetensors
   runtime_input_after_preparation: qwen3_vl_hf_safetensors
   public_checkpoint_is_immutable: true

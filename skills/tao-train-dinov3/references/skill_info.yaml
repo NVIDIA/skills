@@ -4,7 +4,7 @@ huggingface_model_ids:
 - timm/vit_base_patch16_dinov3.lvd1689m
 - timm/vit_small_patch16_dinov3.lvd1689m
 automl_enabled: true
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.pyt
 data_format: ssl
 gpu_spec_key: train.num_gpus
 actions:

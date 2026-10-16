@@ -52,6 +52,14 @@ Common optional fields:
 
 The input parquet must contain a `filepath` column. Any additional columns are carried through to the output verbatim, so metadata such as `label` survives into the embedding parquet.
 
+`filepath` values are transitive file inputs. When another workflow emits this
+spec, its platform action request must declare and mount every image root those
+paths reference; mounting only `input_parquet` is insufficient. Keep these
+mount-only folder inputs outside the native embedding YAML, because the Data
+Services config has no `image_root` field. If the producing workflow freezes
+absolute paths, each embedding container must remount the corresponding source
+at the same compute-visible root.
+
 The default template is `assets/default_image_embeddings.yaml`.
 
 ## Encoder Consistency
@@ -77,22 +85,30 @@ GPU_COUNT=1
 python3 skills/data/tao-generate-image-embeddings/scripts/verify_image_embeddings_spec.py \
   --spec "$SPEC"
 
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
+
+RUNTIME_HOME="$RUN_ROOT/.tao-runtime/home"
+HF_CACHE="$HOME/.cache/huggingface"
+mkdir -p "$RUNTIME_HOME/.cache" "$HF_CACHE"
+IDENTITY_ARGS=(--user "$(id -u):$(id -g)"
+  -e USER="$(id -un)" -e LOGNAME="$(id -un)"
+  -e HOME="$RUNTIME_HOME" -e XDG_CACHE_HOME="$RUNTIME_HOME/.cache"
+  -e HF_HOME="$HF_CACHE" -v "$HF_CACHE:$HF_CACHE")
 
 docker run --rm --gpus "$GPU_COUNT" --shm-size=8g --network=host \
+  "${IDENTITY_ARGS[@]}" \
   -v "$RUN_ROOT:$RUN_ROOT" \
-  -v "$HOME/.cache/huggingface:/root/.cache/huggingface" \
   -w "$RUN_ROOT" \
   "$DS_IMAGE" \
   embedding image_embeddings -e "$SPEC"
 ```
 
-Do not pass `--user $(id -u):$(id -g)` to the TAO data-services container; the image imports `transformers` at startup, which calls `getpass.getuser()` and fails when the UID is not present in `/etc/passwd`.
+Keep `--user` and the identity env block above. The image imports `transformers` at startup, which calls `getpass.getuser()`; without `USER`/`LOGNAME` it fails with `KeyError: 'getpwuid(): uid not found: <uid>'` because the UID has no `/etc/passwd` entry. Do not work around it by running the container as root; that leaves root-owned outputs. This follows the launch contract in `tao-run-on-docker`.
 
 To embed several parquets with one encoder, reuse the same spec and override the two paths per run:
 
 ```bash
-docker run --rm --gpus "$GPU_COUNT" --shm-size=8g --network=host \
+docker run --rm --gpus "$GPU_COUNT" --shm-size=8g --network=host "${IDENTITY_ARGS[@]}" \
   -v "$RUN_ROOT:$RUN_ROOT" -w "$RUN_ROOT" "$DS_IMAGE" \
   embedding image_embeddings -e "$SPEC" \
   input_parquet=/abs/path/other_input.parquet \
@@ -144,7 +160,7 @@ nvidia-smi -L
 2. Resolve and pull the data-services image if needed:
 
 ```bash
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 docker image inspect "$DS_IMAGE" > /dev/null || docker pull "$DS_IMAGE"
 ```
 

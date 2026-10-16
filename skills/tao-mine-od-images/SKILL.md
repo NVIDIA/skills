@@ -83,7 +83,7 @@ GPU_COUNT=1
 python3 skills/data/tao-mine-od-images/scripts/verify_unique_neighbor_matching_spec.py \
   --spec "$SPEC"
 
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 
 docker run --rm --gpus "$GPU_COUNT" --shm-size=8g --network=host \
   -v "$RUN_ROOT:$RUN_ROOT" \
@@ -147,7 +147,7 @@ nvidia-smi -L
 2. Resolve and pull the data-services image if needed:
 
 ```bash
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 docker image inspect "$DS_IMAGE" > /dev/null || docker pull "$DS_IMAGE"
 ```
 

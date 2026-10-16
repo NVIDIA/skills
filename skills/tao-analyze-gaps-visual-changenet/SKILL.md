@@ -49,8 +49,8 @@ The `-e` path must resolve inside the container, so the spec must live under the
 The threshold sweep, weakness ranking, and per-lighting expansion all run inside the pinned TAO data-services image below. Confirm Docker, the NVIDIA container toolkit, and a GPU are present and ensure the image is cached:
 
 ```bash
-# Pinned TAO data-services container URI (stamped from the release manifest)
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+# Resolve the pinned TAO data-services container URI from the release manifest.
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"
@@ -142,7 +142,7 @@ MIN_RECALL=1.0                       # zero-miss default; lower if KPI relaxes
 TOP_K=50                             # per-label augmentation budget
 OUT="$EXP_DIR/rca_results/$(date +%Y-%m-%d_%H%M%S)"
 SPEC="$OUT/vcn_aoi_spec.yaml"
-IMG=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+IMG="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 
 mkdir -p "$OUT"
 

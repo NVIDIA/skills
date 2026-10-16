@@ -43,7 +43,7 @@ Cosmos-Embed1 source tree for normal skill use; build from source only when
 developing the container itself.
 
 ```bash
-COSMOS_EMBED_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-cosmos-embed  # versions-key: images.tao_toolkit.cosmos_embed
+COSMOS_EMBED_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.3.0-cosmos-embed  # versions-key: images.tao_toolkit.cosmos_embed
 COSMOS_EMBED_IMAGE="${COSMOS_EMBED_IMAGE:-$COSMOS_EMBED_IMAGE_DEFAULT}"
 docker pull "$COSMOS_EMBED_IMAGE"
 ```
@@ -72,14 +72,17 @@ Use these Docker options for all actions unless the local Docker/platform skill 
 
 ```bash
 set -a; source /path/to/.env; set +a   # omit if already exported
-COSMOS_EMBED_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.1.0-cosmos-embed  # versions-key: images.tao_toolkit.cosmos_embed
+COSMOS_EMBED_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.3.0-cosmos-embed  # versions-key: images.tao_toolkit.cosmos_embed
 COSMOS_EMBED_IMAGE="${COSMOS_EMBED_IMAGE:-$COSMOS_EMBED_IMAGE_DEFAULT}"
 RUN_ROOT="${RUN_ROOT:-$PWD}"
+COSMOS_EMBED_PRETRAINED_CACHE="${COSMOS_EMBED_PRETRAINED_CACHE:-$RUN_ROOT/pretrained_checkpoints}"
+mkdir -p "$COSMOS_EMBED_PRETRAINED_CACHE"
 DOCKER_COMMON=(
   --rm --gpus all --shm-size=8g --network=host
   --shm-size=64g
   --ulimit memlock=-1
   --ulimit stack=67108864
+  -w /results
   -e HF_TOKEN
   -e WANDB_DISABLED=true
   -e WANDB_MODE=disabled
@@ -89,8 +92,25 @@ DOCKER_COMMON=(
   -v "$RUN_ROOT/specs:/specs:ro"
   -v "$RUN_ROOT/results:/results"
   -v "$RUN_ROOT/hf_cache:/hf_cache"
+  --mount "type=bind,source=$COSMOS_EMBED_PRETRAINED_CACHE,target=/usr/local/lib/python3.12/dist-packages/pretrained_checkpoints"
 )
 ```
+
+The pinned 7.1.0 image downloads the BERT Q-Former component under
+`/usr/local/lib/python3.12/dist-packages/pretrained_checkpoints`, even when
+Hugging Face cache variables point elsewhere. The dedicated bind mount above
+must be writable by the container UID selected by the platform skill; create
+it as the launching user before submission. Keep this mount when applying the
+platform's non-root UID/GID and writable HOME settings. It permits normal
+runtime downloads without modifying the image or making all of site-packages
+writable. For another image version, verify its cache location before reusing
+this image-specific destination.
+
+Use a writable per-run results directory as the container working directory.
+With a cold Triton cache in this image, launching from a directory containing
+`specs/` can make GCC read `./specs` as a compiler spec file and fail with
+`cannot read spec file './specs': Is a directory`. Keep the inference spec's
+absolute `results_dir` unchanged; changing the working directory is sufficient.
 
 For Cosmos-Embed images that ship `protobuf==7.x`, run a small startup
 preamble before every action:

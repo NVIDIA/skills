@@ -136,8 +136,21 @@ use it to compare:
 - different checkpoints of the same training run (checkpoint selection),
 - different experiments on the **same** dataset with the **same** backbone.
 
-`mnn_score` (mutual-nearest-neighbour) is a diagnostic for refinement internals.
-`fid` (backbone flag) is a secondary diagnostic.
+`nn_score` measures how closely each generated sample's DINOv2 features match
+real reference images of the same anomaly type. The evaluator compares each
+generated image with all matching real references and averages its three
+highest similarity scores; higher values indicate closer feature
+correspondence. It is useful for relative comparisons within the same dataset
+and evaluation setup, but it is not a complete perceptual-quality metric. Pair
+it with visual or artifact-sensitive evaluation when assessing realism.
+
+`mnn_score` (mutual-nearest-neighbour) is a stricter diagnostic that counts
+only reciprocal feature correspondences, where a real feature and a generated
+feature each select the other as their nearest match.
+`fid` (Fréchet Inception Distance, using the selected backbone) is a
+distribution-level secondary diagnostic. It compares the estimated means and
+covariances of real and generated feature populations; lower values indicate
+closer estimated distributions. It is not a per-image quality score.
 
 **Do not compare `nn_score` across datasets** — absolute values depend on
 dataset difficulty, backbone, and sample size.
@@ -152,6 +165,13 @@ clustering (eps=30) on mask contours. A single image with a multi-region mask
 produces multiple feature crops. Feature counts also depend on how PIL resizes
 masks to 512×512 at load time — small contours may merge or drop, so counts
 can differ from manual mask inspection.
+
+Always interpret FID with the reported real and generated feature counts. When
+either population is small, including when only a few generated images are
+available, FID is less trustworthy. A mean feature can still be calculated,
+but too few observations cannot reliably estimate covariance—the spread and
+relationships among feature dimensions. Do not use a low-count FID alone to
+rank runs or make acceptance decisions, even when the evaluator emits a number.
 
 ---
 

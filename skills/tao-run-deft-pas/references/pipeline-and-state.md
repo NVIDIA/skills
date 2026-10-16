@@ -46,7 +46,7 @@ rejects duplicate, skipped-ahead, post-KPI, and out-of-range transitions.
 `deft_state.json` is a schema-v3 resume snapshot. It records:
 
 - immutable workspace, archives, intended dataset root, bundled-runtime hash,
-  selected TAO platform, pinned images/runtime, config paths and hashes;
+  selected TAO platform, approved images/runtime, config paths and hashes;
 - immutable loop/config values and metric contract;
 - current iteration, gate flag, per-label stage proofs, and stop reason.
 
@@ -190,8 +190,10 @@ auditor recovery statement, and preserved results directory.
 
 ### User-facing result
 
-For a successful terminal run, report the stop reason, contract and target,
-baseline value, operator-directed best value/label, best raw checkpoint and
-normalized state (when an iteration trained), completed iterations, warnings,
-HTML report path, and passing `--require-complete` evidence. For failure,
+For a successful terminal run, report the auditor's canonical
+`completion_result`: stop reason, contract and target, baseline value,
+operator-directed best value/label, best trained raw checkpoint and normalized
+state (when an iteration trained), completed iterations, warnings (explicitly
+`none` when empty), HTML report path, and passing `--require-complete` evidence.
+Do not reconstruct or shorten this payload in agent prose. For failure,
 replace metric claims with the last validated metric and failure evidence.

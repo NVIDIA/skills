@@ -1,5 +1,5 @@
 ## Description: <br>
-CenterPose skill for keypoint and pose estimation that detects object centers and regresses keypoint locations for 6-DoF object pose estimation using NVIDIA TAO. <br>
+CenterPose skill for keypoint and pose estimation that detects object centers and regresses keypoint locations for 6-DoF object pose estimation, used when training, evaluating, exporting, or running inference for a TAO CenterPose model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to train, evaluate, export, or run inference for CenterPose 6-DoF object pose estimation models using NVIDIA TAO. <br>
+Developers and engineers who need to train, evaluate, export, generate TensorRT engines for, or run inference with CenterPose 6-DoF object pose estimation models using NVIDIA TAO containers. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -32,7 +32,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline bash code blocks and YAML spec files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox environment. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt run in an isolated sandbox pod in the k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -56,7 +56,7 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity measured against expected workflow steps. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 71.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 0.0% → 100.0% (+100.0 points) | 70.0% → 83.3% (+13.3 points) |
-| Efficiency | 72.2% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 53.3% → 58.3% (+5.0 points) |
+| Efficiency | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 99.5% → 99.5% (±0.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

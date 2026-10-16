@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to embed target and source images via the DEFT workflow and mine nearest-neighbour source images for data augmentation in iterative VCN AOI training pipelines. <br>
+Developers and engineers use this skill to embed weak target images and a source pool with a shared encoder, mine nearest-neighbour source images, and apply history-aware deduplication to build augmentation data for iterative VCN AOI training rounds. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -44,7 +44,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive), 1 attempt per task, in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -57,6 +57,7 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
@@ -67,12 +68,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 71.1% | 74.7% |
+| Overall | 94.5% | 76.7% |
 | Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 0.0% → 100.0% (+100.0 pts) | 26.7% → 100.0% (+73.3 pts) |
-| Discoverability | 0.0% | 0.0% |
-| Effectiveness | 5.6% → 58.3% (+52.7 pts) | 16.7% → 75.0% (+58.3 pts) |
-| Efficiency | 94.6% → 97.1% (+2.5 pts) | 99.5% → 98.6% (-0.9 pts) |
+| Correctness | 0.0% → 100.0% (+100.0 pts) | 40.0% → 100.0% (+60.0 pts) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 0.0% → 100.0% (+100.0 pts) | 16.7% → 85.0% (+68.3 pts) |
+| Efficiency | 72.3% | 99.5% → 98.5% (-1.0 pts) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

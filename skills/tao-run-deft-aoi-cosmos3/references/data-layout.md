@@ -19,6 +19,9 @@ workspace/
 ├── images/
 │   ├── ... AOI images ...
 │   └── golden/images/... golden references ...
+├── models/
+│   ├── Cosmos3-Nano/                 # downloaded native Omni source
+│   └── Cosmos3-Nano-VLM/             # prepared Qwen3-VL PTM
 └── specs/
     ├── evaluate_spec_proxy.toml
     ├── evaluate_spec_benchmark.toml
@@ -35,9 +38,19 @@ shared one, and accepts `--train-spec` / `--proxy-spec` / `--benchmark-spec`.
 The `augmentation/anomalygen/` tree is required only when the AnomalyGen stage
 runs. Its contents and bootstrap are owned by `references/tao-generate-anomalies.md`.
 
+The default `models/` tree is produced after approval, not required from the
+user. Download the selected published Cosmos Reason 3 source checkpoint, then
+run the model skill's `prepare_cosmos3_vlm_checkpoint.py` to create the
+Qwen3-VL safetensors PTM consumed by Framework. The helper may reuse the
+prepared output only when it verifies the same complete, provenance-bearing
+target; explicit non-default source and output paths remain valid.
+Pass helper `--backend cosmos-framework`; its `--runtime-image` and
+`--runtime-image-digest` use the same immutable Framework image that runs Train,
+Evaluate, and Inference on the prepared PTM.
+
 The three `.json` files are the only input annotation sets. Each file contains
 one non-empty JSON array of bare OK/NG ShareGPT records; JSONL is not accepted
-by the Cosmos-RL dataset loaders. There is no input Train annotation. Relative
+by the Framework dataset loaders. There is no input Train annotation. Relative
 image paths resolve from the workspace root. Ignore legacy `.jsonl` siblings
 when both formats are present.
 
@@ -45,8 +58,8 @@ The workspace TOML files are concrete or staged job specs, not application
 reference templates. They must exist before `init_deft_state.py` runs — it
 refuses to write state without them, because state is initialized exactly once
 and may never be hand-edited, so a state pointing at absent specs would leave
-the run unable to proceed. Build them from
-the current templates owned by `tao-finetune-cosmos-reason`:
+the run unable to proceed. Render them with this application's `render_cfw_sft.py` and
+`render_cfw_evaluate.py` scripts:
 
 - Give Proxy and Benchmark their own evaluate spec, each already pointed at its
   own annotation and bound output path. Only when a single shared
@@ -58,9 +71,9 @@ the current templates owned by `tao-finetune-cosmos-reason`:
   when that gate is unmet. After Proxy RCA selects Mining samples, write
   `train_iter_<N>.json` and point the next staged Train job at that file.
 
-`references/example_lora_config.toml` and `references/example_sft_config.toml`
-show what a staged Train spec looks like at iteration N — with placeholder
-paths rather than a workspace's absolute ones.
+`references/cosmos_framework_sft_full.toml` and
+`references/cosmos_framework_sft_smoke.toml` are the native Framework Train
+templates; rendered workspace specs contain concrete absolute paths.
 
 Explicit non-default paths are valid. Record every path as an absolute path in
 the selected platform's compute frame.
@@ -129,7 +142,7 @@ results/run_<id>/
     ├── mining/
     ├── assemble/
     ├── validate/
-    ├── train/
+    ├── train/                        # native DCP plus saved Hydra config.yaml
     ├── evaluate_proxy/
     ├── proxy_rcca/
     ├── evaluate_benchmark/

@@ -163,6 +163,19 @@ def main() -> int:
             if not path.exists():
                 raise FileNotFoundError(f"{flag} does not exist: {path}")
 
+        # The checkpoint is checked like every other input path. init verified it
+        # once, but this is the value training actually reads, and a checkpoint moved
+        # or deleted since init -- or a mistyped path -- would otherwise be written
+        # into a spec that exits 0 here and fails only after a training stage has
+        # been paid for. A file, not merely an existing path: a directory would pass
+        # an existence check and still fail at load.
+        checkpoint_path = Path(args.pretrained_model_path).expanduser()
+        if not checkpoint_path.is_absolute():
+            raise ValueError(f"--pretrained-model-path must be absolute: {checkpoint_path}")
+        if not checkpoint_path.is_file():
+            raise FileNotFoundError(
+                f"--pretrained-model-path is not a file: {checkpoint_path}")
+
         count = append_source(
             spec,
             str(Path(args.tmm_image_dir).expanduser().resolve()),
@@ -170,7 +183,7 @@ def main() -> int:
             str(Path(args.tmm_label_map_file).expanduser().resolve()),
         )
 
-        checkpoint = set_pretrained(spec, args.pretrained_model_path)
+        checkpoint = set_pretrained(spec, str(checkpoint_path.resolve()))
         classes = set_max_labels(spec, Path(args.tmm_label_map_file).expanduser().resolve())
 
         # Validation is mandatory for `grounding_dino train`, so refuse to emit a spec

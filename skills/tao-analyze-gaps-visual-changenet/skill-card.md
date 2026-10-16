@@ -26,15 +26,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Container Setup and Path Mounting](references/container-setup.md) <br>
-- [Report Output Template](references/output-template.md) <br>
+- [Output Report Structure](references/output-template.md) <br>
 - [Common Pitfalls](references/pitfalls.md) <br>
-- [Visual Spot Check Guide](references/visual-spot-check.md) <br>
+- [Visual Spot Check](references/visual-spot-check.md) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Files, Shell commands] <br>
-**Output Format:** [Markdown report with parquet data files] <br>
+**Output Format:** [Markdown report (RCA_Report.md) with parquet and text artifacts] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -45,36 +45,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed (equal-weight mean of goal_accuracy and behavior_check). <br>
-- Efficiency: Checks tool-call productivity and token efficiency (50% each). <br>
+- Security: Is it safe to use? Scored from the `security` signal. <br>
+- Correctness: Is the answer correct? Scored from the `accuracy` signal. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` and `behavior_check`. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% `skill_efficiency` plus 50% `token_efficiency`. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% | 73.7% |
+| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 75.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 100.0% (+80.0 points) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 22.2% → 100.0% (+77.8 points) | 48.3% → 70.0% (+21.7 points) |
-| Efficiency | 71.9% | 99.7% → 98.6% (-1.1 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 80.0% (+31.7 points) |
+| Efficiency | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.4% (-1.3 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

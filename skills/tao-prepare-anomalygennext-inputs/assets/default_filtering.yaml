@@ -1,0 +1,41 @@
+# Copy this file and replace every /path/to value before running.
+# Optional opaque provenance label; no policy is inferred from this value.
+source_tag: user_provided
+gap_parquet: /path/to/box_gaps.parquet
+# User-level pool source. The platform stages or mounts this folder once, then
+# preparation replaces this value in the frozen config with the compute-visible
+# path supplied through --pool-dataset-root. Later containers reuse that binding.
+pool_dataset_root: /path/to/anomalygen_dataset
+# Required. Each text-routed defect must include a non-empty
+# roi_prompt_defect_location in this JSONL.
+defect_spec: /path/to/anomalygen_dataset/defect_spec.jsonl
+
+datasets:
+  example:
+    # The normalized FN rows carry dataset/type/mask identities. The recipe
+    # proves supported anomaly types; the checkpoint is frozen provenance.
+    checkpoint: /path/to/checkpoints/model/iter_000001000.pt
+    recipe: /path/to/exp_texture_ft.yaml
+
+selection:
+  mode: per_dataset
+  datasets: [example]
+  split: kpi
+  per_dataset: 1
+  mask_sample_seed: 42
+
+embedding:
+  model: SigLIP
+  model_path: google/siglip-base-patch16-224
+  batch_size: 64
+
+retrieval:
+  metric: cosine
+  candidate_topn: 15
+  max_neighbors_per_fn: 5
+  min_similarity: 0.9
+  prior_clean_exclusion_manifest: ""
+
+amp:
+  model_id: nvidia/Cosmos3-Nano
+  seed: 43

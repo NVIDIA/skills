@@ -117,6 +117,13 @@ def test_args_bundle_valid(spec_schema):
     ok(ARGS_BUNDLE, spec_schema)
 
 
+def test_declared_output_accepts_safe_relative_path(spec_schema):
+    b = copy.deepcopy(ARGS_BUNDLE)
+    b["declared_outputs"] = [{"spec_key": "binary_coco", "type": "file",
+                              "relative_path": "pseudo_labels/coco.json"}]
+    ok(b, spec_schema)
+
+
 def test_bundle_accepts_model_owned_action_lifecycle(spec_schema):
     b = copy.deepcopy(DINO_BUNDLE)
     b["execution"] = {
@@ -256,6 +263,14 @@ def test_reject_declared_input_missing_uri(spec_schema):
 def test_reject_empty_declared_outputs(spec_schema):
     b = copy.deepcopy(DINO_BUNDLE)
     b["declared_outputs"] = []
+    bad(b, spec_schema)
+
+
+@pytest.mark.parametrize("path", ["/absolute/coco.json", "../coco.json", "labels/../coco.json"])
+def test_reject_unsafe_declared_output_relative_path(spec_schema, path):
+    b = copy.deepcopy(ARGS_BUNDLE)
+    b["declared_outputs"] = [{"spec_key": "binary_coco", "type": "file",
+                              "relative_path": path}]
     bad(b, spec_schema)
 
 

@@ -12,12 +12,15 @@ and a null-target contract never passes.
 from __future__ import annotations
 
 import math
+import re
 import warnings
 from typing import Any, Iterable
 
 
 OPERATORS = {"<", "<=", ">", ">="}
 MINIMIZING_OPERATORS = {"<", "<="}
+METRIC_EVIDENCE_VERSION = "1"
+RELATIVE_METRIC_SCHEMA_VERSION = "1"
 _OPERATOR_ALIASES = {
     "lt": "<",
     "le": "<=",
@@ -206,6 +209,164 @@ def result_passes(
     if not compare(value, contract["op"], target):
         failures.append(contract["metric_name"])
     return not failures, failures
+
+
+def _relative_change(
+    value: float,
+    reference: float,
+    *,
+    minimizing: bool,
+) -> tuple[float, str]:
+    """Return the signed delta and operator-directed comparison outcome."""
+    delta = value - reference
+    if math.isclose(value, reference, rel_tol=1e-12, abs_tol=1e-12):
+        return delta, "unchanged"
+    improved = delta < 0.0 if minimizing else delta > 0.0
+    return delta, "improved" if improved else "regressed"
+
+
+def relative_evidence_required(state: dict[str, Any]) -> bool:
+    """Return whether a run requires persisted relative metric evidence.
+
+    Absence identifies legacy runs. Any present but unsupported version fails
+    closed instead of silently falling back to legacy warnings. A future bump
+    must update both version constants, evolve ``relative_metric_summary``, and
+    teach the audit how to validate or migrate the preceding schema.
+    """
+    version = state.get("metric_evidence_version")
+    if version is None:
+        return False
+    if version != METRIC_EVIDENCE_VERSION:
+        raise ValueError(
+            "unsupported metric_evidence_version "
+            f"{version!r}; expected {METRIC_EVIDENCE_VERSION!r}"
+        )
+    return True
+
+
+def relative_metric_summary(
+    state: dict[str, Any],
+    iter_label: str,
+    *,
+    current_result: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build canonical per-round metric and relative-change evidence.
+
+    ``current_result`` is accepted for the narrow pre-commit window in which
+    the evaluator result has been parsed but is not yet present in state. All
+    reference values come from already committed state, and comparisons follow
+    the approved operator so lower-is-better contracts are described correctly.
+    """
+    if iter_label == "baseline":
+        number = 0
+    else:
+        match = re.fullmatch(r"iter([1-9][0-9]*)", iter_label)
+        if match is None:
+            raise ValueError("iter_label must be baseline or iterN (N >= 1)")
+        number = int(match.group(1))
+
+    contract = contract_from_state(state)
+    iterations = state.get("iterations")
+    if not isinstance(iterations, dict):
+        raise ValueError("state.iterations must be an object")
+
+    if current_result is None:
+        current_info = iterations.get(iter_label)
+        if not isinstance(current_info, dict):
+            raise ValueError(f"state.iterations.{iter_label} must be an object")
+        current = result_from_iteration(current_info, contract)
+    else:
+        if current_result.get("iter_label") != iter_label:
+            raise ValueError(
+                f"metric result iter_label={current_result.get('iter_label')!r} "
+                f"does not match {iter_label!r}"
+            )
+        if current_result.get("op") is not None and normalize_operator(
+            str(current_result["op"])
+        ) != contract["op"]:
+            raise ValueError("metric result op does not match the metric contract")
+        raw_target = current_result.get("target")
+        target = contract["target"]
+        if (raw_target is None) != (target is None) or (
+            raw_target is not None
+            and not math.isclose(
+                finite_number(raw_target, field="metric_result.target"),
+                target,
+                rel_tol=1e-12,
+                abs_tol=1e-12,
+            )
+        ):
+            raise ValueError("metric result target does not match the metric contract")
+        current = result_from_iteration(
+            {"metric_result": current_result}, contract
+        )
+    if current is None:  # pragma: no cover - guarded by the branches above
+        raise ValueError(f"metric result for {iter_label} is required")
+
+    value = float(current["value"])
+    minimizing = contract["op"] in MINIMIZING_OPERATORS
+    summary: dict[str, Any] = {
+        "schema_version": RELATIVE_METRIC_SCHEMA_VERSION,
+        "iter_label": iter_label,
+        "metric_name": contract["metric_name"],
+        "query_type": contract["query_type"],
+        "op": contract["op"],
+        "target": contract["target"],
+        "value": value,
+    }
+
+    if iter_label == "baseline":
+        summary.update(
+            {
+                "baseline_value": None,
+                "delta_from_baseline": None,
+                "comparison_to_baseline": None,
+                "previous_label": None,
+                "previous_value": None,
+                "delta_from_previous": None,
+                "comparison_to_previous": None,
+            }
+        )
+        return summary
+
+    baseline_info = iterations.get("baseline")
+    if not isinstance(baseline_info, dict):
+        raise ValueError("state.iterations.baseline must be an object")
+    baseline = result_from_iteration(baseline_info, contract)
+    if baseline is None:
+        raise ValueError("committed baseline metric result is required")
+    baseline_value = float(baseline["value"])
+    delta, outcome = _relative_change(
+        value, baseline_value, minimizing=minimizing
+    )
+    summary.update(
+        {
+            "baseline_value": baseline_value,
+            "delta_from_baseline": delta,
+            "comparison_to_baseline": outcome,
+        }
+    )
+
+    previous_label = "baseline" if number == 1 else f"iter{number - 1}"
+    previous_info = iterations.get(previous_label)
+    if not isinstance(previous_info, dict):
+        raise ValueError(f"state.iterations.{previous_label} must be an object")
+    previous = result_from_iteration(previous_info, contract)
+    if previous is None:
+        raise ValueError(f"committed {previous_label} metric result is required")
+    previous_value = float(previous["value"])
+    delta, outcome = _relative_change(
+        value, previous_value, minimizing=minimizing
+    )
+    summary.update(
+        {
+            "previous_label": previous_label,
+            "previous_value": previous_value,
+            "delta_from_previous": delta,
+            "comparison_to_previous": outcome,
+        }
+    )
+    return summary
 
 
 def pick_best(

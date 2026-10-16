@@ -1,14 +1,102 @@
 [
   {
     "id": "tao-train-sparse4d-basic",
-    "question": "A user request: \"Sparse4D for multi-camera temporal 3D object detection and tracking.\" Identify which TAO skill applies and, reading only that skill's documentation, outline the steps it prescribes. Do NOT run any commands, scripts, web searches, or other tools \u2014 describe the plan only.",
+    "question": "A user request: \"Plan a Sparse4D training workflow for calibrated multi-camera 3D detection with labeled OVPKLs.\" Identify the applicable skill and outline the documented plan using its instructions and references. Do NOT run commands, scripts, web searches, or other tools; describe the plan only.",
     "expected_skill": "tao-train-sparse4d",
     "expected_script": null,
-    "ground_truth": "Identify tao-train-sparse4d as the applicable skill and summarize its documented workflow from SKILL.md without executing anything.",
+    "ground_truth": "Route through the Sparse4D skill, preserve selected artifacts and platform, apply the AutoML policy, and verify held-out metrics.",
     "expected_behavior": [
-      "Identifies tao-train-sparse4d as the relevant skill",
-      "Outlines the documented workflow steps from SKILL.md",
-      "Does not run commands, scripts, or web searches"
+      "Identifies tao-train-sparse4d",
+      "Selects a compatible pretrained checkpoint and experiment specification before launch",
+      "Reuses valid OVPKLs and matching anchors instead of requiring a new conversion",
+      "Resolves AutoML and platform using existing user choices",
+      "Does not execute commands or launch jobs"
+    ]
+  },
+  {
+    "id": "tao-train-sparse4d-resnet50",
+    "question": "A user request: \"I selected a ResNet-50 Sparse4D checkpoint and its experiment.yaml. Prepare a plain fine-tuning plan; do not run HPO.\" Identify the applicable skill and outline the documented plan using its instructions and references. Do NOT run commands, scripts, web searches, or other tools; describe the plan only.",
+    "expected_skill": "tao-train-sparse4d",
+    "expected_script": null,
+    "ground_truth": "Preserve the selected ResNet-50 bundle and disable AutoML for this run.",
+    "expected_behavior": [
+      "Uses resnet_50 from the selected checkpoint specification",
+      "Preserves class order, anchors, preprocessing, and temporal dimensions",
+      "Does not substitute ResNet-101 because of the schema default",
+      "Uses automl_policy off",
+      "Does not execute commands or launch jobs"
+    ]
+  },
+  {
+    "id": "tao-train-sparse4d-resnet101-ltt",
+    "question": "A user request: \"I selected a ResNet-101 Sparse4D warehouse checkpoint with the released seven-class order. I have calibrated real images and offline 2D detections but no 3D labels on those scenes. I also have separate 3D-labeled training and validation data. Plan geometric distillation using the released LTT weights.\" Identify the applicable skill and outline the documented plan using its instructions and references. Do NOT run commands, scripts, web searches, or other tools; describe the plan only.",
+    "expected_skill": "tao-train-sparse4d",
+    "expected_script": null,
+    "ground_truth": "Preserve ResNet-101 while using the independent released LTT adapter, annotation-free conversion, mixed supervision, and independent 3D validation.",
+    "expected_behavior": [
+      "Preserves the ResNet-101 Sparse4D architecture despite the LTT file being in the RN50 bundle",
+      "Uses annotation-free Data Services conversion and reuses pretrained anchors",
+      "Downloads the released _loose_to_tight_mlp.pth instead of fitting a new adapter",
+      "Checks ordered classes and teacher scene/camera/frame joins",
+      "Distinguishes 2D-to-3D supervision from 3D-to-2D projection",
+      "Keeps a 3D-supervised route and verifies the runtime supports the required fields",
+      "Does not execute commands or launch jobs"
+    ]
+  },
+  {
+    "id": "tao-train-sparse4d-missing-backbone",
+    "question": "A user request: \"I want to fine-tune Sparse4D but have not selected a model release, checkpoint, or backbone.\" Identify the applicable skill and outline the documented plan using its instructions and references. Do NOT run commands, scripts, web searches, or other tools; describe the plan only.",
+    "expected_skill": "tao-train-sparse4d",
+    "expected_script": null,
+    "ground_truth": "Resolve the missing checkpoint/backbone choice before generating a model-specific training specification.",
+    "expected_behavior": [
+      "Asks for the compatible released model/backbone choice",
+      "Does not choose RN101 from the schema default or RN50 from the LTT bundle location",
+      "Does not execute commands or launch jobs"
+    ]
+  },
+  {
+    "id": "tao-train-sparse4d-evaluate-checkpoint",
+    "question": "A user request: \"Evaluate epoch_9_step_1800.pth from an existing Sparse4D run on heldout_infos_val.pkl; there is no training split available.\" Identify the applicable skill and outline the documented plan using its instructions and references. Do NOT run commands, scripts, web searches, or other tools; describe the plan only.",
+    "expected_skill": "tao-train-sparse4d",
+    "expected_script": null,
+    "ground_truth": "Use the explicit checkpoint and place the held-out PKL in the test-dataset field used by the evaluation CLI.",
+    "expected_behavior": [
+      "Sets evaluate.checkpoint to the selected checkpoint",
+      "Sets dataset.test_dataset.ann_file to heldout_infos_val.pkl",
+      "Uses the matching model configuration and anchors",
+      "Does not invent train/test conversions or select the first checkpoint found",
+      "Does not require the external LTT artifact for evaluation",
+      "Does not execute commands or launch jobs"
+    ]
+  },
+  {
+    "id": "tao-train-sparse4d-taxonomy-mismatch",
+    "question": "A user request: \"I have synchronized, calibrated multi-camera scenes with 2D detections of bicycles and cars, plus separate 3D-labeled training and validation data. Can I use the released warehouse LTT weights unchanged for Sparse4D geometric distillation?\" Identify the applicable skill and outline the documented plan using its instructions and references. Do NOT run commands, scripts, web searches, or other tools; describe the plan only.",
+    "expected_skill": "tao-train-sparse4d",
+    "expected_script": null,
+    "ground_truth": "Identify the incompatible taxonomy and require matching released artifacts before planning geometric distillation for these classes.",
+    "expected_behavior": [
+      "Identifies that the released warehouse LTT taxonomy does not match bicycles and cars",
+      "Requires matching model, teacher, anchor, and LTT class contracts before proceeding",
+      "Does not remap class names to pretend released weights support the new taxonomy",
+      "Does not invent calibration, anchors, or a new LTT fit recipe",
+      "Does not execute commands or launch jobs"
+    ]
+  },
+  {
+    "id": "tao-train-sparse4d-resume",
+    "question": "A user request: \"Continue my exact Sparse4D training run from epoch_4_step_800.pth with its existing specification and external LTT checkpoint. Do not change the settings or launch HPO.\" Identify the applicable skill and outline the documented plan using its instructions and references. Do NOT run commands, scripts, web searches, or other tools; describe the plan only.",
+    "expected_skill": "tao-train-sparse4d",
+    "expected_script": null,
+    "ground_truth": "Resume the explicit training state and retain the matching model and LTT artifacts with AutoML off.",
+    "expected_behavior": [
+      "Uses train.resume_training_checkpoint_path rather than substituting pretrained initialization",
+      "Preserves existing backbone and training settings",
+      "Uses automl_policy off",
+      "Retains the external LTT checkpoint for LTT-enabled resume",
+      "Does not claim completed accuracy validation from a smoke run",
+      "Does not execute commands or launch jobs"
     ]
   }
 ]

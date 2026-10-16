@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-generate-image-grounding`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:6e71bdc7c6749095693b9f75023d66f6cf14ce21a8fcf6026e06418a0f1eb5de` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.7% — baseline ran, but no comparable score was available; uplift unavailable | 79.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 77.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 48.3% → 100.0% (+51.7 points) |
-| Efficiency | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
+| Effectiveness | 31.7% → 100.0% (+68.3 points) | 43.3% → 90.0% (+46.7 points) |
+| Efficiency | 72.7% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.6% (-1.1 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 64,714 | 265,758 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-generate-image-grounding-basic | 64,714 | 265,758 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 13,989 | 13,627 | +362 | +2.66% | skill 1/1; base 1/1 |
-| codex | tao-generate-image-grounding-basic | 13,989 | 13,627 | +362 | +2.66% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 78,703 | 279,385 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 96,884 | 477,868 | -380,984 | -79.73% | skill 1/1; base 1/1 |
+| claude-code | tao-generate-image-grounding-basic | 96,884 | 477,868 | -380,984 | -79.73% | skill 1/1; base 1/1 |
+| codex | All cases | 13,752 | 13,519 | +233 | +1.72% | skill 1/1; base 1/1 |
+| codex | tao-generate-image-grounding-basic | 13,752 | 13,519 | +233 | +1.72% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 110,636 | 491,387 | -380,751 | -77.48% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -79,7 +79,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/data/tao-generate-image-grounding/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-generate-image-grounding`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/data/tao-generate-image-grounding/SKILL.md`)
-- **MEDIUM** SECURITY/Unknown (SQP-2): The skill orchestrates a two-step pipeline that sends both user images and free-text captions to external VLM endpoints  (`SKILL.md:49`)
+- **MEDIUM** SECURITY/Unknown (SQP-2): The skill instructs users to configure VLM endpoints (including third-party services like Google Gemini and NVIDIA NIM)  (`SKILL.md:49`)
 - 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>

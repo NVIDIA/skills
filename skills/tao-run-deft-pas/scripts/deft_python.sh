@@ -48,18 +48,25 @@ export OMP_NUM_THREADS="${OMP_NUM_THREADS:-$cores}"
 export MKL_NUM_THREADS="${MKL_NUM_THREADS:-$cores}"
 
 control_probe='import sys; assert sys.version_info >= (3, 9)'
-if [ "$#" -gt 0 ] && [ "$(basename -- "$1")" = run_deft_action.py ]; then
-  # The platform seam validates tao-artifacts JSON Schemas before submit and
-  # finalize. Do not select an otherwise valid workspace interpreter that
-  # lacks the schema validator and then fail only after mutating action state.
-  control_probe='import sys; assert sys.version_info >= (3, 9); import jsonschema'
+requires_jsonschema=false
+if [ "$#" -gt 0 ]; then
+  case "$(basename -- "$1")" in
+    run_deft_action.py|run_deft_docker_action.py)
+      # Both platform-seam entry points validate tao-artifacts JSON Schemas;
+      # the Docker consumer imports run_deft_action transitively. Reject an
+      # override interpreter that cannot import the validator before any verb
+      # can inspect or mutate action state.
+      requires_jsonschema=true
+      control_probe='import sys; assert sys.version_info >= (3, 9); import jsonschema'
+      ;;
+  esac
 fi
 if [ "$runtime" = true ] && [ ! -f "$script_dir/pas_deft/__init__.py" ]; then
   echo "deft_python: bundled PAS runtime is missing from the installed skill" >&2
   exit 2
 fi
 
-runtime_probe='import sys; assert sys.version_info >= (3, 9); import pandas,numpy,pyarrow,PIL,yaml,matplotlib,sklearn,torch'
+runtime_probe='import sys; assert sys.version_info >= (3, 9); import pandas,numpy,pyarrow,PIL,yaml,matplotlib,sklearn,torch,jsonschema'
 candidates=(
   "${DEFT_PYTHON:-}"
   "${workspace_arg:+$workspace_arg/.venv/bin/python}"
@@ -92,8 +99,10 @@ done
 
 if [ -z "$selected" ]; then
   if [ "$runtime" = true ]; then
-    echo "deft_python: no installed Python provides the bundled PAS runtime dependencies (pandas,numpy,pyarrow,PIL,yaml,matplotlib,sklearn,torch)" >&2
+    echo "deft_python: no installed Python provides the bundled PAS runtime dependencies (pandas,numpy,pyarrow,PIL,yaml,matplotlib,sklearn,torch,jsonschema)" >&2
     echo "deft_python: provision the approved workspace venv, then retry" >&2
+  elif [ "$requires_jsonschema" = true ]; then
+    echo "deft_python: no installed Python 3.9+ provides jsonschema for the PAS platform action contract" >&2
   else
     echo "deft_python: Python 3.9+ not found" >&2
   fi

@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, each in an isolated sandbox pod. <br>
+1 evaluation task (1 positive), 1 attempt per task, each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.3% | 78.7% |
+| Overall | 96.1% — baseline ran, but no comparable score was available; uplift unavailable | 61.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 5.6% → 100.0% (+94.4 points) | 36.7% → 95.0% (+58.3 points) |
-| Efficiency | 71.3% | 99.5% → 98.5% (-1.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 60.0% (-40.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 83.3% (+83.3 points) | 65.0% → 53.3% (-11.7 points) |
+| Efficiency | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 99.5% → 93.4% (-6.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

@@ -61,3 +61,6 @@ rules:
   - id: "SQP-2"
     path: "references/workflow-intake-preflight.md"
     reason: "Reviewed FP (#67): eval-fixture cleanup scoped to the eval's own $WORKSPACE_DIR and its containers; not an unscoped destructive command."
+  - id: "SQP-2"
+    path: "references/compat-workarounds.md"
+    reason: "Reviewed FP (#67): documented HuggingFace probe snippet with an explicit trust_remote_code warning; eval-fixture cleanup is scoped to the eval's own workspace."

@@ -1,5 +1,5 @@
 ## Description: <br>
-One-time session setup and orchestration map for the TAO skill bank. <br>
+One-time session setup and orchestration map for the TAO skill bank that provides the cross-skill discovery flow, credential checks, and host preflight when TAO skills were installed individually. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -42,7 +42,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 positive task with 3 attempts per task in isolated k8s-sandbox pods. <br>
+Evaluated against 1 positive task with 1 attempt per task in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -66,12 +66,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.5% | 73.7% |
+| Overall | 94.6% | 95.4% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 0.0% → 100.0% (+100.0 points) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 16.7% → 70.0% (+53.3 points) |
-| Efficiency | 72.6% | 99.5% → 98.6% (-0.9 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 16.7% → 83.3% (+66.6 points) |
+| Efficiency | 73.1% | 98.4% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

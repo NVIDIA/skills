@@ -1,5 +1,5 @@
 ## Description: <br>
-MAL (Mask Auto-Label) for weakly-supervised segmentation. Produces segmentation masks from minimal annotations (point or box annotations) using a ViT-MAE backbone. <br>
+MAL (Mask Auto-Label) skill for weakly-supervised segmentation that produces segmentation masks from minimal point or box annotations using a ViT-MAE backbone, used when training, evaluating, or running inference for a TAO MAL model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, and running inference on NVIDIA TAO MAL models for weakly-supervised segmentation tasks using minimal point or box annotations. <br>
+Developers and engineers who need to train, evaluate, or run inference with TAO Mask Auto-Label (MAL) models to generate segmentation masks from COCO-style box or point annotations using NVIDIA TAO containers, including AutoML-routed training. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -34,7 +34,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline bash code blocks and YAML spec files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -45,23 +45,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt run in an isolated sandbox pod in the k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Whether the user's goal was achieved and expected workflow behavior was followed (equal-weight mean of goal completion and behavior check). <br>
-- Efficiency: Tool-call productivity and token efficiency (50% each). <br>
+- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the answer produced by the skill-assisted agent is correct. <br>
+- Discoverability: Whether the right skill was loaded and activated when needed. <br>
+- Effectiveness: Whether the skill helped the agent complete the user's goal and expected workflow. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -69,12 +69,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.4% — uplift unavailable | 95.4% — uplift unavailable |
+| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 66.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — uplift unavailable | 95.0% — uplift unavailable |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 53.3% → 83.3% (+30.0 points) |
-| Efficiency | 97.2% — uplift unavailable | 98.4% — uplift unavailable |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 80.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 53.3% → 53.3% (±0.0 points) |
+| Efficiency | 97.8% — baseline ran, but no comparable score was available; uplift unavailable | 99.5% → 98.4% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

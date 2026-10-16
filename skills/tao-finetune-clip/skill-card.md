@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to fine-tune, evaluate, export, and deploy NVIDIA TAO CLIP vision-language models for image-text retrieval, zero-shot classification, and embedding extraction. <br>
+Developers and engineers use this skill to fine-tune, evaluate, run embedding inference on, export to ONNX, and build TensorRT engines for NVIDIA TAO CLIP vision-language models (OpenCLIP/NV-CLIP, Radio-CLIP, SigLIP2) for image-text retrieval and zero-shot classification. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,14 +26,17 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [TAO Skill Bank Repository](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [standalone-setup.md](references/standalone-setup.md) <br>
+- [clip-peft.md](references/clip-peft.md) <br>
+- [pas-metrics.md](references/pas-metrics.md) <br>
 - [tao-deploy-clip.md](references/tao-deploy-clip.md) <br>
 - [error-patterns.md](references/error-patterns.md) <br>
 - [spec-param-inference.md](references/spec-param-inference.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks and YAML spec files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,7 +47,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, run in isolated sandbox pods. <br>
+1 evaluation task (1 positive), 1 attempt per task, each run in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -56,7 +59,7 @@ Reported benchmark dimensions: <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies expected skill selection and workflow execution. <br>
+- `skill_execution`: Verifies expected skill selection, decoy avoidance, and workflow execution. <br>
 - `skill_efficiency`: Measures tool-call productivity. <br>
 - `accuracy`: Verifies final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
@@ -68,12 +71,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.2% | 95.3% |
+| Overall | 99.4% | 94.3% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 20.0% → 100.0% (+80.0 points) |
 | Discoverability | 100.0% | 95.0% |
-| Effectiveness | 16.7% → 83.3% (+66.6 points) | 33.3% → 83.3% (+50.0 points) |
-| Efficiency | 97.4% | 98.3% |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 43.3% → 78.3% (+35.0 points) |
+| Efficiency | 96.9% | 98.3% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

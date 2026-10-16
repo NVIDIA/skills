@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-finetune-cosmos-embed`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:2fd9605b2d1b05b6c7c6e6c916541a13f91bb49a44edcbc8fea84aa73a049c46` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 100.0% (+80.0 points) |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 0.0% → 100.0% (+100.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 43.3% → 83.3% (+40.0 points) |
-| Efficiency | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 98.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 16.7% → 83.3% (+66.6 points) |
+| Efficiency | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 98.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -52,11 +52,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 67,846 | 528,772 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-finetune-cosmos-embed-basic | 67,846 | 528,772 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 31,505 | 13,547 | +17,958 | +132.56% | skill 1/1; base 1/1 |
-| codex | tao-finetune-cosmos-embed-basic | 31,505 | 13,547 | +17,958 | +132.56% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 99,351 | 542,319 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 68,186 | 217,148 | -148,962 | -68.60% | skill 1/1; base 1/1 |
+| claude-code | tao-finetune-cosmos-embed-basic | 68,186 | 217,148 | -148,962 | -68.60% | skill 1/1; base 1/1 |
+| codex | All cases | 31,145 | 13,495 | +17,650 | +130.79% | skill 1/1; base 1/1 |
+| codex | tao-finetune-cosmos-embed-basic | 31,145 | 13,495 | +17,650 | +130.79% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 99,331 | 230,643 | -131,312 | -56.93% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -64,7 +64,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 21 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 23 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
@@ -78,7 +78,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-finetune-cosmos-embed`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-finetune-cosmos-embed/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-finetune-cosmos-embed/SKILL.md`)
-- 16 additional finding(s) are available in the full evaluation artifacts.
+- 18 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

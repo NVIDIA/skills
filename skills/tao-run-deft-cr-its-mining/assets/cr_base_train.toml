@@ -23,6 +23,7 @@ enable_dataset_cache = false
 
 [policy]
 model_name_or_path = ""
+qwen3_vl_patch_embed = "linear"
 model_max_length = 32768
 
 [logging]

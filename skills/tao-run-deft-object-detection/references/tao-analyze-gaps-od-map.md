@@ -38,7 +38,25 @@ Write per-iteration under `${RESULTS_DIR}/iter${N}/gaps/od_gap_spec.yaml` — th
 OD_GAP_SPEC="${RESULTS_DIR}/iter${N}/gaps/od_gap_spec.yaml"
 ```
 
-Build it the same way every other stage does — emit, then fill the run-specific fields:
+**First, write the run's gates to a file.** `weak_thresholds` is the one gate the run
+owns, and it is the only entry in this spec that is a block rather than a scalar, so it
+comes from a file. Write it from state — the thresholds were frozen at init, and
+re-typing them is how the spec and `deft_state.json` come to disagree:
+
+```bash
+<skill_root>/scripts/deft_python.sh \
+  <skill_root>/scripts/prepare_thresholds_for_gap_analysis.py \
+  --results-dir "${RESULTS_DIR}" \
+  --out "${RESULTS_DIR}/iter${N}/gaps/weak_thresholds.yaml"
+```
+
+It writes one entry per `config.target_classes` and nothing else. The asset leaves
+`weak_thresholds` as `???`, so skipping this step fails the build below rather than
+gating on values nobody chose. That matters beyond reporting: the weak set sizes the
+mining budget, so a substituted gate changes which images the iteration mines.
+
+**Then build the spec** the same way every other stage does — emit, then fill the
+run-specific fields, with the file above filling `weak_thresholds`:
 
 ```bash
 <skill_root>/scripts/deft_python.sh <skill_root>/scripts/emit_default_spec.py \
@@ -51,8 +69,13 @@ Build it the same way every other stage does — emit, then fill the run-specifi
   --set images_dir="$KPI_IMAGES_DIR" \
   --set results_dir="${RESULTS_DIR}/iter${N}/gaps" \
   --set kpi="iter${N}" \
-  --set-from-file weak_thresholds="<the threshold mapping from the section above>"
+  --set-from-file weak_thresholds="${RESULTS_DIR}/iter${N}/gaps/weak_thresholds.yaml" \
+  --require-no-mandatory
 ```
+
+`--require-no-mandatory` is what makes a missing input fail here, naming the field,
+instead of reaching the container: every field the asset leaves `???` is one this
+build must set.
 
 `gap_analysis` is absent from TAO's `default_specs` list, so unlike the other stages
 there is no container to emit from: `emit_default_spec.py` copies
@@ -61,8 +84,10 @@ reason. That asset is a **starting spec, not an overlay** — do not pass it to
 `--apply-workflow-defaults`. It carries a nested `weak_thresholds` mapping, and the
 overlay mechanism takes one dotted key per leaf, so it is rejected with
 `'weak_thresholds' has a mapping value`. There is no `--apply-workflow-defaults` step
-for this stage; the emitted spec already holds every documented default.
+for this stage: the emitted spec holds every documented default, and leaves
+`weak_thresholds` and the run's paths `???` for the build to fill.
 
+The resulting spec:
 
 ```yaml
 ground_truth_ann_path: <config.ground_truth_labels_dir>
@@ -74,10 +99,8 @@ input_format:          kitti          # LOWERCASE — see below
 iou_threshold:         0.5
 conf_threshold:        0.0            # inference already filtered; see below
 min_area:              0
-weak_thresholds:
-  car:      {ap50: 0.99}
-  bicycle:  {ap50: 0.7}
-  person:   {ap50: 0.7}
+weak_thresholds:                      # from weak_thresholds.yaml: one entry per
+  <target class>: {ap50: <gate>}      # config.target_classes, gate from config.ap50_thresholds
 default_recall_threshold:    0.0
 default_precision_threshold: 0.0
 default_ap50_threshold:      0.0
@@ -126,6 +149,7 @@ Count the rows of `weak_images.parquet` and pass that number. It is required on 
 ```bash
 <skill_root>/scripts/deft_python.sh <skill_root>/scripts/commit_stage.py \
   --results-dir "${RESULTS_DIR}" --iter-label "iter${N}" --stage gap_analysis \
+  --execution-path skill \
   --weak-images "${RESULTS_DIR}/iter${N}/gaps/weak_images.parquet" \
   --gap-report "${RESULTS_DIR}/iter${N}/gaps/gap_report.json" \
   --weak-image-count <row count of weak_images.parquet> \

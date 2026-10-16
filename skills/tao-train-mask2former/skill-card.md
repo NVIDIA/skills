@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference on Mask2Former models for universal image segmentation tasks using NVIDIA TAO. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference (including TensorRT deploy flows) on Mask2Former models for panoptic, instance, or semantic segmentation using NVIDIA TAO. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,14 +26,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [tao-deploy-mask2former.md](references/tao-deploy-mask2former.md) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 - [NVIDIA TAO Skill Bank Releases](https://github.com/NVIDIA-TAO/tao-skill-bank/releases) <br>
 - [Swin Transformer Pretrained Weights (tiny, ImageNet-22k)](https://github.com/SwinTransformer/storage/releases/download/v1.0.8/swin_tiny_patch4_window7_224_22k.pth) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks and YAML spec files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from dataset snapshot sha256:52024b5b in isolated k8s-sandbox pods, 3 attempts per task. <br>
+1 evaluation task (1 positive) from dataset snapshot sha256:52024b5b, run in isolated k8s-sandbox pods with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,12 +69,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.3% | 62.4% |
+| Overall | 94.3% | 77.7% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 60.0% (-40.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Discoverability | 100.0% | 0.0% |
-| Effectiveness | 5.6% → 100.0% (+94.4 points) | 70.0% → 53.3% (-16.7 points) |
-| Efficiency | 71.3% | 99.5% → 98.5% (-1.0 points) |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 70.0% → 90.0% (+20.0 points) |
+| Efficiency | 71.5% | 99.5% → 98.5% (-1.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

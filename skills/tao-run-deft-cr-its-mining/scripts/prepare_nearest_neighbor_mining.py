@@ -29,6 +29,16 @@ from workflow_common import (
 )
 
 
+def media_match_key(value: str) -> str:
+    """Compare visible symlink aliases without rewriting stored media paths."""
+    path = normalize_media_path(value)
+    try:
+        return str(Path(path).resolve(strict=True))
+    except (OSError, RuntimeError):
+        # Remote, unreadable, or looping paths can still be joined lexically.
+        return path
+
+
 def weak_samples(gaps_jsonl: Path) -> list[dict[str, str]]:
     """Read gap-analysis rows as unique weak `(video_path, question)` samples."""
     samples: list[dict[str, str]] = []
@@ -40,7 +50,7 @@ def weak_samples(gaps_jsonl: Path) -> list[dict[str, str]]:
             raise ValueError(f"{gaps_jsonl}: record {index} is missing non-empty 'video_id'")
         if not isinstance(question, str) or not question:
             raise ValueError(f"{gaps_jsonl}: record {index} is missing non-empty 'question'")
-        key = (normalize_media_path(video_id), clean_question(question))
+        key = (media_match_key(video_id), clean_question(question))
         if key in seen:
             continue
         seen.add(key)
@@ -73,7 +83,7 @@ def text_target_dataframe(
             raise ValueError(f"{kpi_lookup_parquet}: missing required column {column!r}")
     weak_pairs = {(sample["video_path"], sample["question"]) for sample in samples}
     lookup_pairs = lookup.assign(
-        _video_path=lookup["video_path"].map(normalize_media_path),
+        _video_path=lookup["video_path"].map(media_match_key),
         _question=lookup["question"].map(clean_question),
     )
     matched_lookup = lookup_pairs[
@@ -108,7 +118,7 @@ def video_target_dataframe(gaps_jsonl: Path, kpi_embeddings_parquet: Path) -> pd
     require_embedding_columns(embeddings, kpi_embeddings_parquet)
     target = embeddings[
         (embeddings["modality"] == "video")
-        & embeddings["filepath"].map(lambda value: normalize_media_path(str(value)) in weak_videos)
+        & embeddings["filepath"].map(lambda value: media_match_key(str(value)) in weak_videos)
     ].reset_index(drop=True)
     if target.empty:
         raise RuntimeError("no KPI video embeddings matched the weak gap videos")

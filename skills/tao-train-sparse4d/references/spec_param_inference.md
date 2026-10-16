@@ -1,28 +1,20 @@
-# Spec Param / Parent Model Inference
+# Checkpoint and Output Resolution
 
-Model-specific inference mappings belong in this MD file, not in `config.json`. Generated runners should read this section and apply the mappings with SDK helpers before `create_job()`. This mirrors the old microservices `infer_params.py` flow.
+Read the selected action in `skill_info.yaml`. The producing workflow stages inputs and writes a concrete nested specification before the platform submits the job. These mappings describe artifact roles; ordinary model execution does not require an SDK, a service job ID, or generated runner patches.
 
-Inference mappings from TAO Core `sparse4d.config.json`:
+| Action | Specification field | Resolve from |
+|---|---|---|
+| All | `results_dir` | Current job record's explicit results directory |
+| Train (fine-tune) | `train.pretrained_model_path` | Selected compatible pretrained Sparse4D checkpoint |
+| Train (resume) | `train.resume_training_checkpoint_path` | Explicit checkpoint from the run being continued |
+| Evaluate | `evaluate.checkpoint` | Selected completed training/AutoML child checkpoint |
+| Inference | `inference.checkpoint` | Selected completed training/AutoML child checkpoint |
+| Export | `export.checkpoint` | Selected Sparse4D checkpoint |
+| Export | `export.onnx_file` | Explicit output path in the current job's results |
+| Quantize | `quantize.model_path` | Exact selected checkpoint for the chosen backend |
 
-| Action | Spec Field | Inference Function | Meaning |
-|---|---|---|---|
-| dataset_convert | `results_dir` | `output_dir` | current job results directory |
-| evaluate | `encryption_key` | `key` | encryption key |
-| evaluate | `evaluate.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| evaluate | `results_dir` | `output_dir` | current job results directory |
-| export | `encryption_key` | `key` | encryption key |
-| export | `export.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| export | `export.onnx_file` | `create_onnx_file` | output ONNX path |
-| export | `results_dir` | `output_dir` | current job results directory |
-| inference | `encryption_key` | `key` | encryption key |
-| inference | `inference.checkpoint` | `parent_model` | model file inferred from the parent job results folder |
-| inference | `results_dir` | `output_dir` | current job results directory |
-| quantize | `encryption_key` | `key` | encryption key |
-| quantize | `quantize.model_path` | `parent_model` | model file inferred from the parent job results folder |
-| quantize | `results_dir` | `output_dir` | current job results directory |
-| train | `encryption_key` | `key` | encryption key |
-| train | `results_dir` | `output_dir` | current job results directory |
-| train | `train.pretrained_model_path` | `ptm_if_no_resume_model` | PTM when no resume checkpoint exists |
-| train | `train.resume_training_checkpoint_path` | `resume_model` | model file inferred from the current job results folder |
+When the user supplies a job identifier, read its recorded result location and verify the exact checkpoint exists there. Preserve its epoch/step and raw-versus-EMA identity; do not select the first filesystem match or silently replace a resume checkpoint with initialization weights. If several candidates remain and the intended one is not established, resolve the selection before launching.
 
-For `parent_model` or `parent_model_folder`, pass the upstream train/export/AutoML child job id as `parent_job_id`. The SDK lists the parent result folder, filters checkpoint artifacts, and returns the selected model file or folder. Do not add these mappings back to `config.json` and do not patch generated runner scripts to guess checkpoint paths.
+Keep architecture, anchors, class order, and preprocessing paired with that checkpoint. Supply an encryption key only if the artifact requires it, through the platform's approved secret handling. The external LTT MLP is needed for LTT training and resume but not for evaluation, inference, or export.
+
+The legacy `spec_params` mapping in `skill_info.yaml` also serves AutoML consumers. AutoML's dotted `spec_overrides` map is expanded before launch; actual container YAML must use nested keys. It must not override an explicitly selected checkpoint with an inferred parent artifact.
