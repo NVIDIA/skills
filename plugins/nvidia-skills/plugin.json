@@ -1,0 +1,30 @@
+{
+    "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+    "name": "nvidia-skills",
+    "version": "1.4.1",
+    "description": "Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows.",
+    "author": {
+        "name": "NVIDIA",
+        "url": "https://github.com/NVIDIA/skills"
+    },
+    "homepage": "https://build.nvidia.com/skills/",
+    "repository": "https://github.com/NVIDIA/skills",
+    "license": "Apache-2.0 AND CC-BY-4.0",
+    "keywords": [
+        "nvidia",
+        "gpu",
+        "cuda",
+        "ai-agents",
+        "data-loading",
+        "training",
+        "inference",
+        "llm-serving",
+        "robotics",
+        "simulation",
+        "omniverse",
+        "openusd",
+        "digital-twin",
+        "physical-ai",
+        "cad"
+    ]
+}
