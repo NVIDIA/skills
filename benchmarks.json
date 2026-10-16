@@ -7732,14 +7732,14 @@
     },
     {
       "skill": "tilegym-converting-cutile-to-triton",
-      "evaluation_date": "2026-07-14",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:6eb6dce8f7e1fd54fc084bc411e537b99c4ddcfd0385c53ed32c220626278056",
       "validation_status": null,
       "tasks": 5,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -7748,7 +7748,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
       "has_results": true,
-      "average_uplift_pct": 10.9
+      "average_uplift_pct": 7.75
     },
     {
       "skill": "tilegym-cutile-autotuning",
@@ -7772,14 +7772,14 @@
     },
     {
       "skill": "tilegym-cutile-python",
-      "evaluation_date": "2026-06-08",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:8288ba1fc833c22b44a0957b327f0c48f0c9288983f830241d752d6e9dc68716",
       "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
       "verdict": "FAIL",
       "agents": [
         "claude-code",
@@ -7788,7 +7788,7 @@
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "has_results": true,
-      "average_uplift_pct": 13.6
+      "average_uplift_pct": 2.5
     },
     {
       "skill": "tilegym-improve-cutile-kernel-perf",
@@ -40863,7 +40863,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
       "dimension": "Security",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -40872,7 +40872,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
       "dimension": "Security",
-      "num": 5,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -40881,7 +40881,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
       "dimension": "Correctness",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 20.0
@@ -40890,7 +40890,43 @@
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
       "dimension": "Correctness",
-      "num": 5,
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tilegym-converting-cutile-to-triton",
+      "component": "TileGym",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tilegym-converting-cutile-to-triton",
+      "component": "TileGym",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tilegym-converting-cutile-to-triton",
+      "component": "TileGym",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 17.5
+    },
+    {
+      "catalog_dir": "tilegym-converting-cutile-to-triton",
+      "component": "TileGym",
+      "dimension": "Effectiveness",
+      "num": null,
       "agent": "codex",
       "score_pct": 99.0,
       "uplift_pct": 9.0
@@ -40898,56 +40934,20 @@
     {
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
-      "dimension": "Discoverability",
-      "num": 5,
+      "dimension": "Efficiency",
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "tilegym-converting-cutile-to-triton",
-      "component": "TileGym",
-      "dimension": "Discoverability",
-      "num": 5,
-      "agent": "codex",
-      "score_pct": 99.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "tilegym-converting-cutile-to-triton",
-      "component": "TileGym",
-      "dimension": "Effectiveness",
-      "num": 5,
-      "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 17.0
-    },
-    {
-      "catalog_dir": "tilegym-converting-cutile-to-triton",
-      "component": "TileGym",
-      "dimension": "Effectiveness",
-      "num": 5,
-      "agent": "codex",
-      "score_pct": 99.0,
-      "uplift_pct": 14.0
+      "score_pct": 99.2,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
       "dimension": "Efficiency",
-      "num": 5,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 13.0
-    },
-    {
-      "catalog_dir": "tilegym-converting-cutile-to-triton",
-      "component": "TileGym",
-      "dimension": "Efficiency",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 6.0
+      "score_pct": 97.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-cutile-autotuning",
@@ -41043,7 +41043,7 @@
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Security",
-      "num": 6,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -41052,7 +41052,7 @@
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Security",
-      "num": 6,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -41061,73 +41061,73 @@
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Correctness",
-      "num": 6,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 15.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Correctness",
-      "num": 6,
+      "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 6.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Discoverability",
-      "num": 6,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 42.0
+      "score_pct": 87.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Discoverability",
-      "num": 6,
+      "num": null,
       "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 14.0
+      "score_pct": 88.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Effectiveness",
-      "num": 6,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 83.0,
-      "uplift_pct": 1.0
+      "score_pct": 91.1,
+      "uplift_pct": 15.3
     },
     {
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Effectiveness",
-      "num": 6,
+      "num": null,
       "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 12.0
+      "score_pct": 84.5,
+      "uplift_pct": -0.3
     },
     {
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Efficiency",
-      "num": 6,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 78.0,
-      "uplift_pct": 34.0
+      "score_pct": 80.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "dimension": "Efficiency",
-      "num": 6,
+      "num": null,
       "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 12.0
+      "score_pct": 87.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-improve-cutile-kernel-perf",
