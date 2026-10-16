@@ -12,10 +12,6 @@ import pathlib
 import sys
 import tempfile
 import unittest
-from unittest import mock
-
-import yaml
-
 
 SKILL_ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPTS = SKILL_ROOT / "scripts"
@@ -36,7 +32,6 @@ def companion_skill_root(category: str, name: str) -> pathlib.Path:
     )
 
 
-MODEL_ROOT = companion_skill_root("models", "tao-finetune-cosmos-reason")
 sys.path.insert(0, str(SCRIPTS))
 DATA_MINING_SCRIPTS = companion_skill_root(
     "data", "tao-mine-aoi-images"
@@ -66,7 +61,6 @@ import filter_mined_by_cosine  # noqa: E402
 import filter_mined_history  # noqa: E402
 import finalize_run  # noqa: E402
 import init_deft_state  # noqa: E402
-import patch_eval_image_cap  # noqa: E402
 import render_report  # noqa: E402
 import validate_sharegpt  # noqa: E402
 import validate_split_contract  # noqa: E402
@@ -89,6 +83,31 @@ def write_json(path: pathlib.Path, payload: object) -> pathlib.Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + "\n")
     return path
+
+
+def framework_args(workspace: pathlib.Path) -> list[str]:
+    """Create the prepared PTM fixture and return Framework state args."""
+    model = workspace / "models/base"
+    model.mkdir(parents=True, exist_ok=True)
+    (model / "config.json").write_text(
+        '{"model_type": "qwen3_vl"}\n', encoding="utf-8"
+    )
+    (model / "model.safetensors").write_bytes(b"weights")
+    (model / "tao_conversion_provenance.json").write_text(
+        '{"schema_version": 1}\n', encoding="utf-8"
+    )
+    return [
+        "--base-model-path",
+        str(model),
+        "--framework-container",
+        "example/framework:1",
+        "--framework-image-digest",
+        "sha256:" + "a" * 64,
+        "--mining-container",
+        "example/mining:1",
+        "--anomalygen-container",
+        "example/anomalygen:1",
+    ]
 
 
 def write_rcca_report(path: pathlib.Path) -> pathlib.Path:
@@ -125,7 +144,7 @@ class BareAnnotationTests(unittest.TestCase):
     def test_exact_bare_labels_only(self) -> None:
         records = [record("a.png", "golden.png", "OK")]
         summary = validate_sharegpt.validate_records(
-            records, media_root=pathlib.Path("/tmp"), require_files=False
+            records, media_root=pathlib.Path("/tmp"), require_files=False  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
         )
         self.assertEqual(summary["mode"], "bare_okng")
         self.assertEqual(summary["labels"], {"OK": 1})
@@ -134,13 +153,13 @@ class BareAnnotationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exactly OK or NG"):
             validate_sharegpt.validate_records(
                 invalid,
-                media_root=pathlib.Path("/tmp"),
+                media_root=pathlib.Path("/tmp"),  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
                 require_files=False,
             )
 
     def test_evaluation_ids_are_unique_and_filesystem_safe(self) -> None:
-        """cosmos-rl-evaluate hard-indexes id and reuses it as a filename."""
-        media = pathlib.Path("/tmp")
+        """Framework evaluation requires a unique id for each result artifact."""
+        media = pathlib.Path("/tmp")  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
         ok = [
             {**record("a.png", "g.png", "OK"), "id": "a_93c3e56d"},
             {**record("b.png", "g.png", "NG"), "id": "b_1f2e3d4c"},
@@ -209,7 +228,7 @@ class BareAnnotationTests(unittest.TestCase):
             )
 
             # Mining carries no id and must still pass: only the evaluated
-            # splits reach cosmos-rl-evaluate.
+            # splits reach Framework evaluation.
             report, failures = check_annotations.check(
                 {
                     role: workspace / "annotations" / spec["filename"]
@@ -221,53 +240,6 @@ class BareAnnotationTests(unittest.TestCase):
             self.assertEqual(failures, [])
             self.assertEqual(report["mining"]["id_coverage"], "n/a")
             self.assertEqual(report["benchmark"]["id_coverage"], "1/1")
-
-    def test_eval_image_cap_patch_targets_only_the_cap(self) -> None:
-        """bare_okng needs 2 images; the image hardcodes 1 with no override."""
-        source = (
-            "        engine = LLM(\n"
-            "            model=ckpt,\n"
-            '            limit_mm_per_prompt={"video": 1, "image": 1},\n'
-            "            tensor_parallel_size=tp_size,\n"
-            "        )\n"
-        )
-        patched, current = patch_eval_image_cap.apply_cap(source, 2)
-        self.assertEqual(current, 1)
-        self.assertIn('{"video": 1, "image": 2}', patched)
-        # Only the cap changes: same line count, video untouched.
-        self.assertEqual(len(patched.splitlines()), len(source.splitlines()))
-        self.assertEqual(len(patched), len(source))
-
-        # An image that was fixed upstream reports its cap and needs no rewrite.
-        fixed = source.replace('"image": 1', '"image": 4')
-        _, already = patch_eval_image_cap.apply_cap(fixed, 2)
-        self.assertEqual(already, 4)
-
-        # If the image changes shape, fail loudly instead of guessing.
-        with self.assertRaisesRegex(ValueError, "not found"):
-            patch_eval_image_cap.apply_cap("engine = LLM(model=ckpt)\n", 2)
-        with self.assertRaisesRegex(ValueError, "exactly one image cap"):
-            patch_eval_image_cap.apply_cap(source + source, 2)
-
-    def test_eval_image_cap_probe_times_out(self) -> None:
-        timeout = patch_eval_image_cap.subprocess.TimeoutExpired(
-            cmd=["docker", "run"], timeout=120
-        )
-        with mock.patch.object(
-            patch_eval_image_cap.shutil, "which", return_value="/usr/bin/docker"
-        ), mock.patch.object(
-            patch_eval_image_cap.subprocess, "run", side_effect=timeout
-        ) as run:
-            with self.assertRaisesRegex(
-                ValueError,
-                "timed out after 120s.*pre-pull the image",
-            ):
-                patch_eval_image_cap.read_from_image(
-                    "example/cosmos:1",
-                    patch_eval_image_cap.CONTAINER_PATH,
-                    docker="docker",
-                )
-        self.assertEqual(run.call_args.kwargs["timeout"], 120)
 
     def test_media_root_one_level_too_deep_is_diagnosed(self) -> None:
         """Annotations resolve from the workspace root, not workspace/images."""
@@ -337,6 +309,32 @@ class BareAnnotationTests(unittest.TestCase):
         self.assertEqual(output[0]["images"], ["pool/a.png", "golden/g.png"])
         self.assertEqual(output[0]["conversations"][-1]["value"], "NG")
 
+    def test_mined_alignment_prefers_full_path_over_colliding_u77_basename(self) -> None:
+        source = [
+            record(
+                "pool/board-a/U77@1_SolderLight.jpg",
+                "golden/a.jpg",
+                "NG",
+            ),
+            record(
+                "pool/board-b/U77@1_SolderLight.jpg",
+                "golden/b.jpg",
+                "OK",
+            ),
+        ]
+        output, summary = emit_mined_sharegpt.emit_records(
+            ["pool/board-b/U77@1_SolderLight.jpg"],
+            source,
+            media_root=pathlib.Path("/dataset"),
+            relative=True,
+        )
+        self.assertEqual(
+            output[0]["images"],
+            ["pool/board-b/U77@1_SolderLight.jpg", "golden/b.jpg"],
+        )
+        self.assertEqual(output[0]["conversations"][-1]["value"], "OK")
+        self.assertEqual(summary["match_modes"], {"exact": 1})
+
     def test_first_train_is_mined_then_assembly_is_monotonic(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = pathlib.Path(temporary)
@@ -397,39 +395,20 @@ class IsolationAndMetricTests(unittest.TestCase):
             "/models/custom-cosmos3",
         )
 
-    def test_model_skill_owns_train_and_evaluate_templates(self) -> None:
-        info = yaml.safe_load(
-            (MODEL_ROOT / "references/skill_info.yaml").read_text()
+    def test_framework_consumes_the_main_prepared_ptm_contract(self) -> None:
+        helper = (
+            companion_skill_root("models", "tao-finetune-cosmos-reason")
+            / "scripts/prepare_cosmos3_vlm_checkpoint.py"
         )
-        train = yaml.safe_load(
-            (MODEL_ROOT / "references/spec_template_train.yaml").read_text()
-        )
-        evaluate = yaml.safe_load(
-            (MODEL_ROOT / "references/spec_template_evaluate.yaml").read_text()
-        )
-        for action in ("train", "evaluate"):
-            self.assertEqual(info["actions"][action]["mode"], "config")
-            self.assertEqual(info["actions"][action]["config_format"], "toml")
-        self.assertIn("train_dataset", train["custom"])
-        self.assertIn("dataset", evaluate)
-        self.assertFalse(
-            (SKILL_ROOT / "references/train_spec.toml").exists()
-        )
-        self.assertFalse(
-            (SKILL_ROOT / "references/evaluate_spec.toml").exists()
-        )
-        self.assertTrue(
-            (
-                MODEL_ROOT
-                / "scripts/prepare_cosmos3_vlm_checkpoint.py"
-            ).is_file()
-        )
+        self.assertTrue(helper.is_file())
         application_contract = (SKILL_ROOT / "SKILL.md").read_text()
-        self.assertIn("model_type=\"cosmos3_omni\"", application_contract)
+        self.assertIn('model_type="cosmos3_omni"', application_contract)
         self.assertIn(
             "scripts/prepare_cosmos3_vlm_checkpoint.py",
             application_contract,
         )
+        self.assertIn("prepared PTM", application_contract)
+        self.assertIn("cosmos-framework-train", application_contract)
 
     def test_cosine_floor_recomputes_similarity(self) -> None:
         kept, audit = filter_mined_by_cosine.filter_mined_records(
@@ -637,7 +616,7 @@ class StateMachineTests(unittest.TestCase):
     def test_stage_commit_validates_duration_by_skip_contract(self) -> None:
         base = [
             "--results-dir",
-            "/tmp/cosmos3-duration-contract",
+            "/tmp/cosmos3-duration-contract",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
             "--iter-label",
             "baseline",
             "--stage",
@@ -653,7 +632,7 @@ class StateMachineTests(unittest.TestCase):
             )
         skip = [
             "--results-dir",
-            "/tmp/cosmos3-duration-contract",
+            "/tmp/cosmos3-duration-contract",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
             "--iter-label",
             "iter1",
             "--stage",
@@ -699,15 +678,12 @@ class StateMachineTests(unittest.TestCase):
                     "NVIDIA H100 80GB HBM3",
                     "--max-iterations",
                     "1",
-                    "--cosmos-container",
-                    "example/cosmos:1",
-                    "--mining-container",
-                    "example/mining:1",
+                    *framework_args(workspace),
                 ]
             )
             self.assertEqual(rc, 0)
             state = json.loads((results / "deft_state.json").read_text())
-            self.assertEqual(state["version"], 5)
+            self.assertEqual(state["version"], 6)
             self.assertEqual(
                 state["execution_policy"]["network_mode"], "airgap"
             )
@@ -854,10 +830,7 @@ class StateMachineTests(unittest.TestCase):
                         "NVIDIA H100 80GB HBM3",
                         "--max-iterations",
                         "2",
-                        "--cosmos-container",
-                        "example/cosmos:1",
-                        "--mining-container",
-                        "example/mining:1",
+                        *framework_args(workspace),
                     ]
                 ),
                 0,
@@ -954,10 +927,7 @@ class StateMachineTests(unittest.TestCase):
                 "NVIDIA H100 80GB HBM3",
                 "--max-iterations",
                 "1",
-                "--cosmos-container",
-                "example/cosmos:1",
-                "--mining-container",
-                "example/mining:1",
+                *framework_args(workspace),
             ]
             self.assertEqual(init_deft_state.main(argv), 2)
             self.assertFalse((results / "deft_state.json").exists())
@@ -999,10 +969,7 @@ class StateMachineTests(unittest.TestCase):
                             "NVIDIA H100 80GB HBM3",
                             "--max-iterations",
                             "1",
-                            "--cosmos-container",
-                            "example/cosmos:1",
-                            "--mining-container",
-                            "example/mining:1",
+                            *framework_args(workspace),
                             *extra,
                         ]
                     ),
@@ -1069,10 +1036,7 @@ class StateMachineTests(unittest.TestCase):
                         "NVIDIA H100 80GB HBM3",
                         "--max-iterations",
                         "1",
-                        "--cosmos-container",
-                        "example/cosmos:1",
-                        "--mining-container",
-                        "example/mining:1",
+                        *framework_args(workspace),
                     ]
                 ),
                 0,
@@ -1093,7 +1057,7 @@ class StateMachineTests(unittest.TestCase):
                         "--duration-sec",
                         "1",
                         "--summary",
-                        "cosmos-rl-evaluate exited 1 before writing results",
+                        "Framework evaluate exited 1 before writing results",
                     ]
                 ),
                 0,
@@ -1135,10 +1099,7 @@ class StateMachineTests(unittest.TestCase):
                         "NVIDIA H100 80GB HBM3",
                         "--max-iterations",
                         "2",
-                        "--cosmos-container",
-                        "example/cosmos:1",
-                        "--mining-container",
-                        "example/mining:1",
+                        *framework_args(workspace),
                     ]
                 ),
                 0,
@@ -1303,10 +1264,7 @@ class StateMachineTests(unittest.TestCase):
                         "NVIDIA H100 80GB HBM3",
                         "--max-iterations",
                         "2",
-                        "--cosmos-container",
-                        "example/cosmos:1",
-                        "--mining-container",
-                        "example/mining:1",
+                        *framework_args(workspace),
                     ]
                 ),
                 0,
@@ -1333,14 +1291,18 @@ class StateMachineTests(unittest.TestCase):
                 )
 
             def train(label: str) -> None:
-                checkpoint = results / label / "train/safetensors/epoch_1"
+                checkpoint = results / label / "train/checkpoints/epoch_1"
                 checkpoint.mkdir(parents=True)
-                (checkpoint / "adapter_model.safetensors").write_bytes(b"x")
+                (checkpoint / ".metadata").write_bytes(b"x")
+                framework_config = results / label / "train/config.yaml"
+                framework_config.write_text("model: fixture\n", encoding="utf-8")
                 commit(
                     label,
                     "train",
                     "--best-ckpt",
                     str(checkpoint),
+                    "--framework-config",
+                    str(framework_config),
                     "--training-spec",
                     str(workspace / "specs/train_spec.toml"),
                 )
@@ -1581,8 +1543,10 @@ class StateMachineTests(unittest.TestCase):
                 results / "iter1/validate/validation_report.json",
                 {
                     "mode": "bare_okng",
-                    "records": 1,
-                    "labels": {"OK": 1},
+                    "records": 2,
+                    "labels": {"OK": 1, "NG": 1},
+                    "require_files": True,
+                    "unique_target_images": 2,
                 },
             )
             commit(
@@ -1738,6 +1702,7 @@ class StateMachineTests(unittest.TestCase):
                 media_root=root,
                 require_files=False,
             )
+            iter2_validation_summary["require_files"] = True
             iter2_validation_report = write_json(
                 results / "iter2/validate/validation_report.json",
                 iter2_validation_summary,

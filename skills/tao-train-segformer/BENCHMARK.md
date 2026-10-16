@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-train-segformer`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:f80b8692186ac58315e7b714cea67f5c78b935b2d93e3982e2bd26b67c895d4d` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 80.0% → 100.0% (+20.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 70.0% → 83.3% (+13.3 points) |
-| Efficiency | 72.0% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 65.0% → 83.3% (+18.3 points) |
+| Efficiency | 97.8% — baseline ran, but no comparable score was available; uplift unavailable | 98.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -52,11 +52,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 101,184 | 288,806 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-train-segformer-basic | 101,184 | 288,806 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 31,062 | 13,981 | +17,081 | +122.17% | skill 1/1; base 1/1 |
-| codex | tao-train-segformer-basic | 31,062 | 13,981 | +17,081 | +122.17% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 132,246 | 302,787 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 66,746 | 625,118 | -558,372 | -89.32% | skill 1/1; base 1/1 |
+| claude-code | tao-train-segformer-basic | 66,746 | 625,118 | -558,372 | -89.32% | skill 1/1; base 1/1 |
+| codex | All cases | 30,514 | 13,903 | +16,611 | +119.48% | skill 1/1; base 1/1 |
+| codex | tao-train-segformer-basic | 30,514 | 13,903 | +16,611 | +119.48% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 97,260 | 639,021 | -541,761 | -84.78% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -64,7 +64,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 25 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 28 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
@@ -78,7 +78,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-train-segformer`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-train-segformer/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-train-segformer/SKILL.md`)
-- 20 additional finding(s) are available in the full evaluation artifacts.
+- 23 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

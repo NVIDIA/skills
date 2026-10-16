@@ -1,5 +1,5 @@
 ## Description: <br>
-Run a TAO training/evaluation/inference container on an NVIDIA Brev GPU instance. <br>
+Run a TAO training/evaluation/inference container on an NVIDIA Brev GPU instance, delegating instance provisioning to the official brev-cli agent skill or Brev MCP server and covering only container execution over `brev exec` via the four-verb docker contract. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to run TAO training, evaluation, or inference containers on NVIDIA Brev GPU instances using the four-verb docker execution contract over brev exec. <br>
+Developers and engineers who need to run TAO training, evaluation, or inference containers on NVIDIA Brev GPU instances using the four-verb docker execution contract (submit/status/logs/cancel) over brev exec, with job-record tracking and S3-based result staging before instance teardown. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [API key] <br>
+**Credential Type(s):** [API key, Cloud Credentials] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -27,6 +27,7 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Brev CLI](https://github.com/brevdev/brev-cli) <br>
 - [Brev MCP Server Documentation](https://docs.nvidia.com/brev/_mcp/server) <br>
+- [references/skill_info.yaml](references/skill_info.yaml) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
@@ -44,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox environment. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt run in an isolated sandbox pod in the k8s-sandbox environment (evaluator version 1.5.6). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,12 +69,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.5% | 77.7% |
+| Overall | 94.6% | 75.4% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 0.0% → 100.0% (+100.0 points) |
 | Discoverability | 100.0% | 0.0% |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 16.7% → 90.0% (+73.3 points) |
-| Efficiency | 72.3% | 99.6% → 98.4% (-1.2 points) |
+| Effectiveness | 15.0% → 100.0% (+85.0 points) | 16.7% → 78.3% (+61.6 points) |
+| Efficiency | 72.9% | 99.6% → 98.5% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.2.0 (source: frontmatter) <br>

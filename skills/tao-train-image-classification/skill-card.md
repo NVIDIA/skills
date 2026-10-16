@@ -44,23 +44,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, each in an isolated sandbox pod. Dataset digest: sha256:206d62dbc15f845e57ca15d252f0c09ea9b4ea530419388f2525b5f7db4a1d0a. <br>
+1 evaluation task (1 positive), 1 attempt per task, each in an isolated sandbox pod. Dataset digest: sha256:206d62dbc15f845e57ca15d252f0c09ea9b4ea530419388f2525b5f7db4a1d0a. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Verifies final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
-- Efficiency: Tool-call productivity and token efficiency (50% each), measuring avoidance of wasted skill and tool usage. <br>
+- Discoverability: Whether the right skill was loaded when needed. <br>
+- Effectiveness: Whether the skill helped complete the task (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Avoidance of wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
+- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -68,12 +68,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.1% | 71.4% |
+| Overall | 89.5% | 79.9% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
 | Discoverability | 100.0% | 0.0% |
-| Effectiveness | 11.1% → 83.3% (+72.2 points) | 48.3% → 58.3% (+10.0 points) |
-| Efficiency | 97.3% | 99.6% → 98.5% (-1.1 points) |
+| Effectiveness | 0.0% → 50.0% (+50.0 points) | 26.7% → 100.0% (+73.3 points) |
+| Efficiency | 97.6% | 99.5% → 99.4% (-0.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

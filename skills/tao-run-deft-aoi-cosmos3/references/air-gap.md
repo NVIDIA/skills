@@ -8,15 +8,22 @@ infer the mode.
 Air-gap mode is valid only when every selected platform input is already
 visible from the compute frame:
 
-- Cosmos-RL and data-services images;
-- Cosmos3 base model / tokenizer cache;
+- the model skill's resolved Framework image for preparation and model actions,
+  plus the data-services and AnomalyGen images;
+- the selected Cosmos3 native Omni source, the packaged Qwen3-VL architecture
+  mapping, and either a verified prepared PTM or enough local cache/storage to
+  run `prepare_cosmos3_vlm_checkpoint.py` without network access;
 - Proxy, Benchmark, Mining JSON and all referenced images;
-- the AnomalyGen image, its fine-tuned checkpoint (`ag_config.yaml` plus the
+- the AnomalyGen fine-tuned checkpoint (`ag_config.yaml` plus the
   iteration checkpoint), its dataset directory (`defect_spec.jsonl`,
   `semantic_segmentation_labels.json`, clean images, cad masks), and the Cosmos
   base-checkpoints cache — required only when the AnomalyGen stage will run;
 - selected platform native CLI and GPU runtime;
 - host Python with `pyarrow` and `yaml`.
+
+Pass helper `--backend cosmos-framework`; its `--runtime-image` and
+`--runtime-image-digest` use the same immutable Framework image that runs Train,
+Evaluate, and Inference.
 
 In air-gap mode:
 
@@ -32,7 +39,8 @@ In air-gap mode:
   pre-staged instead;
 - use `bash scripts/deft_python.sh` to select an already-provisioned interpreter; if
   no candidate provides `pyarrow` and `yaml`, report those imports and stop;
-- keep `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` set for AnomalyGen runs;
+- keep `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1` set for checkpoint
+  preparation, Framework, and AnomalyGen runs;
 - leave both `HF_TOKEN` and its legacy alias `HUGGING_FACE_HUB_TOKEN` unset
   when local assets are sufficient; clearing only one still leaves a usable
   token in the environment for `huggingface_hub` to pick up;

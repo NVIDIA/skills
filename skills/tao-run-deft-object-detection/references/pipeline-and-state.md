@@ -26,7 +26,7 @@ All stages run inline in the parent context. For SKILL stages, read the matching
 
 ### Prep (`prep`) — once, before baseline
 
-Runs only when the source pool is not already labeled and embedded. Produces `source_pool/odvg/` and `source_pool/source_embeddings.parquet` — the two artifacts every iteration reads. Idempotent: each artifact is skipped when it already exists on disk.
+Runs only when the source pool is not already labeled and embedded. Produces `source_pool/odvg/` and `source_pool/source_embeddings.parquet` — the two artifacts every iteration reads. Skip any step whose output already exists on disk; the skip is the caller's to make, not automatic.
 
 Chain: Co-DETR pseudo-label the pool → fold predictions onto the user's target classes → KITTI→COCO → COCO→ODVG → embed the pool. Full detail, including the class-consistency contract and the hard-stop gates, is in `references/prep-source-pool.md`.
 
@@ -48,7 +48,7 @@ Each iteration's `gap_analysis` consumes the **previous** phase's inference labe
 1. **[SKILL — `tao-analyze-gaps-od-map`] `gap_analysis`.**
    Input: `state["iterations"][<prev_phase>]["inference_labels_dir"]` plus the KPI ground-truth label directory.
    Output: `weak_images.parquet` (with a `filepath` column), `box_gaps.parquet`, `image_metrics.parquet`, `gap_report.json`.
-   Set `default_ap50_threshold: 0.0` and list every class explicitly in `weak_thresholds` — see the overlay for why. See `references/tao-analyze-gaps-od-map.md`.
+   Set `default_ap50_threshold: 0.0` and list every target class explicitly in `weak_thresholds`, which `scripts/prepare_thresholds_for_gap_analysis.py` writes from `config.ap50_thresholds`. See `references/tao-analyze-gaps-od-map.md`.
 
    Every `ok` `gap_analysis` commit must carry `--weak-image-count <rows in weak_images.parquet>`; it is rejected without one.
 
@@ -159,11 +159,14 @@ iterN:     gap_analysis -> embed -> mine -> stage -> train -> inference -> kpi_a
 
 ## Stage Execution
 
-Three stage types:
+Two stage types:
 
 - **SKILL** — read the overlay, then invoke the matching `tao-skill-bank:*` skill.
 - **GLUE** — parent runs a bundled script directly.
-- **AGENT** — parent spawns a subagent. The only AGENT stage is `agents/reporter.md`.
+
+There is no AGENT stage. Reporting was the only one, and it is now a post-commit
+hook in `commit_stage.py`, so every stage of this loop is reachable from a runtime
+that has nothing but `Bash`.
 
 ### Post-stage check
 
@@ -186,21 +189,25 @@ After every stage, before advancing:
    inventing a number.
 3. Run `audit_deft_run.py --results-dir ${RESULTS_DIR}`. If `INVALID`, halt and repair.
 4. If the committed status is `error` — halt, surface the disk evidence, **do not auto-retry**.
-5. If `ok` — print one status line: `[iter <N>/<max> · <stage>] <detail> · <duration> · next: <stage>`. Then advance. Render the HTML report only at iteration end and loop end.
+5. If `ok` — print one status line: `[iter <N>/<max> · <stage>] <detail> · <duration> · next: <stage>`. Then advance.
 
 ## Reports
 
 - `results/iter${N}_summary.md` — ≤300 words, readable after context compaction.
-- `results/DEFT_Loop_Report.md` — re-rendered after each completed iteration and at loop end by the `reporter` subagent.
+- `results/DEFT_Loop_Report.md` — written by `init_deft_state.py` and re-rendered by
+  every accepted `commit_stage.py` call, so it is current after each stage rather
+  than after each iteration. Nothing needs to ask for it.
 
 ## Runtime Behavior
 
-Run without pausing. Between stages, run the audit and print only its one-line next action. Spawn the `reporter` only after a full iteration and at loop end.
+Run without pausing. Between stages, run the audit and print only its one-line next action.
 
 **Loop-end sequence** (in order):
 
 1. Append the final event via `commit_stage.py --stage loop_stop`.
-2. Spawn `reporter` with `trigger="loop-end"`.
+2. That commit re-renders the report with the run's final status. Confirm it is on
+   disk; if the commit warned that rendering failed, fix the cause and run
+   `scripts/render_report.py --results-dir "${RESULTS_DIR}" --require-terminal`.
 
 Before telling the user the loop is complete:
 

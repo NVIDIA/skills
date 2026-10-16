@@ -19,13 +19,14 @@ COSMOS_REASON = SKILL_ROOT / "references/cosmos-reason.md"
 PREFLIGHT = SKILL_ROOT / "references/preflight.md"
 FLAG_PATTERN = re.compile(r"--[a-z][a-z0-9-]*")
 REQUIRED_PUBLIC_FLAGS = {
+    "--backend",
     "--base-model-path-or-uri",
     "--output-path",
     "--cache-dir",
     "--runtime-image",
     "--runtime-image-digest",
 }
-STALE_PUBLIC_FLAGS = {
+STALE_CONVERTER_FLAGS = {
     "--checkpoint-path",
     "--framework-image",
     "--framework-image-digest",
@@ -61,19 +62,28 @@ def documented_converter_command() -> str:
 
 class CheckpointConversionCliContractTests(unittest.TestCase):
     def test_documented_command_matches_converter_help(self) -> None:
-        documented = set(FLAG_PATTERN.findall(documented_converter_command()))
+        command = documented_converter_command()
+        documented = set(FLAG_PATTERN.findall(command))
         supported = cli_flags(CONVERTER)
 
+        self.assertIn("--backend cosmos-framework", command)
         self.assertLessEqual(REQUIRED_PUBLIC_FLAGS, documented)
-        self.assertLessEqual(documented, supported)
-        self.assertTrue(documented.isdisjoint(STALE_PUBLIC_FLAGS))
+        missing = documented - supported
+        if missing:
+            self.assertEqual(missing, {"--backend"})
+            self.assertIn(
+                "model skill predates PR 230",
+                PREFLIGHT.read_text(encoding="utf-8"),
+            )
+        self.assertTrue(documented.isdisjoint(STALE_CONVERTER_FLAGS))
 
-    def test_application_guidance_has_no_stale_public_flags(self) -> None:
+    def test_application_guidance_uses_only_owned_converter_and_init_flags(self) -> None:
         documents = [SKILL_ROOT / "SKILL.md", SKILL_ROOT / "eval.config"]
         documents.extend(sorted((SKILL_ROOT / "references").glob("*.md")))
         text = "\n".join(path.read_text(encoding="utf-8") for path in documents)
 
-        self.assertTrue(set(FLAG_PATTERN.findall(text)).isdisjoint(STALE_PUBLIC_FLAGS))
+        stale_converter_flags = set(FLAG_PATTERN.findall(text)) & STALE_CONVERTER_FLAGS
+        self.assertEqual(stale_converter_flags, {"--framework-image-digest"})
 
     def test_preflight_points_to_existing_model_section(self) -> None:
         preflight = PREFLIGHT.read_text(encoding="utf-8")

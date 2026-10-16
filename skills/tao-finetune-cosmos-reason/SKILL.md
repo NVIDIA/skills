@@ -47,13 +47,12 @@ from history, another user, a prior job, an image, or a developer checkout.
   `cosmos3_edge` from the resolved model ID and does not present this Nano-only
   choice.
 - Do not expose Omni preparation implementation fields during normal intake.
-  For Nano, use the packaged `Qwen/Qwen3-VL-8B-Instruct` architecture mapping,
-  resolve both Hub models to immutable commits automatically, and run the
-  TAO-owned `cosmos_rl.model_preparation.vlm_safetensors` entrypoint with the
-  already selected backend image/SQSH. Both backend images must package that
-  entrypoint and its pinned native Framework conversion runtime. An explicitly
-  supplied `prepared_checkpoint_path` or donor is an advanced override: validate
-  it, but never present a route A/B choice or ask for one by default.
+  For Nano, use `Qwen/Qwen3-VL-8B-Instruct`, resolve both Hub models to
+  immutable commits, and run the selected backend's packaged converter.
+  Framework uses `cosmos_framework.scripts.convert_model_to_vlm_safetensors`;
+  Cosmos-RL uses `cosmos_rl.model_preparation.vlm_safetensors` with its pinned
+  isolated converter runtime. Validate an explicitly supplied
+  `prepared_checkpoint_path` or donor, but never ask for one by default.
 - Accept `hf_model://nvidia/Cosmos3-Nano` directly. If a gated/private model
   cannot be resolved, ask the user only to set `HF_TOKEN` in the session
   environment; never ask them to discover a SHA or provide the token value in

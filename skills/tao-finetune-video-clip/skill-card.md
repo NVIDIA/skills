@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to fine-tune, evaluate, export, and deploy InternVideo2-CLIP L14 models for video-text retrieval, zero-shot video classification, and embedding extraction using NVIDIA TAO Toolkit containers. <br>
+Developers and engineers who need to fine-tune, evaluate, run inference on, export, and deploy InternVideo2-CLIP L14 models for video-text retrieval, zero-shot video classification, and embedding extraction using NVIDIA TAO Toolkit PyTorch and Deploy containers or a local virtualenv. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -44,36 +44,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (3 positive), each with 3 attempts per task in isolated k8s-sandbox pods. <br>
+3 evaluation tasks (3 positive), with 1 attempt per task, each run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Security: Checks whether the skill is safe to use (unsafe operations, secret leakage, and unauthorized access). <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Discoverability: Checks whether the right skill was loaded when needed. <br>
 - Effectiveness: Checks goal completion (50%) and expected workflow behavior adherence (50%). <br>
 - Efficiency: Checks tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
-- `skill_execution`: Verifies skill selection, decoy avoidance, and workflow execution. <br>
-- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Measures tool-call productivity. <br>
-- `token_efficiency`: Measures actual uncached prompt plus completion token usage. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.3% | 80.2% |
-| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 2.2% → 100.0% (+97.8 pts) | 30.0% → 84.0% (+54.0 pts) |
-| Discoverability | 100.0% | 56.0% |
-| Effectiveness | 8.3% → 91.1% (+82.8 pts) | 15.3% → 62.7% (+47.4 pts) |
-| Efficiency | 85.5% | 98.5% |
+| Overall | 90.7% | 58.8% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 26.7% → 60.0% (+33.3 points) |
+| Discoverability | 80.0% | 0.0% |
+| Effectiveness | 9.5% → 87.8% (+78.3 points) | 21.1% → 35.6% (+14.5 points) |
+| Efficiency | 85.9% | 99.5% → 98.3% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

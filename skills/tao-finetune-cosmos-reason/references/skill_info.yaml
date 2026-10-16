@@ -71,12 +71,16 @@ workflow_contract:
     preparation_runtime:
       source: selected_backend_image_and_sqsh
       separate_user_input: forbidden
-      shared_entrypoint: cosmos_rl.model_preparation.vlm_safetensors
-      native_implementation: cosmos_framework.scripts.convert_model_to_vlm_safetensors
+      entrypoints:
+        cosmos-framework: cosmos_framework.scripts.convert_model_to_vlm_safetensors
+        cosmos-rl: cosmos_rl.model_preparation.vlm_safetensors
       sqsh_required_entries:
-        - cosmos_rl/model_preparation/vlm_safetensors.py
-        - cosmos_framework/scripts/convert_model_to_vlm_safetensors.py
-        - opt/tao/framework-converter-runtime.json
+        cosmos-framework:
+          - cosmos_framework/scripts/convert_model_to_vlm_safetensors.py
+        cosmos-rl:
+          - cosmos_rl/model_preparation/vlm_safetensors.py
+          - cosmos_framework/scripts/convert_model_to_vlm_safetensors.py
+          - opt/tao/framework-converter-runtime.json
     huggingface_revision_resolution:
       user_commit_sha_required: false
       default_requested_ref: main

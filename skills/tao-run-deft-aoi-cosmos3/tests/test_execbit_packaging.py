@@ -107,9 +107,82 @@ def _companion_source(category: str, name: str) -> pathlib.Path:
 
 
 class ExecBitAndPackagingTests(unittest.TestCase):
+    def test_deft_python_toml_probe_handles_python_310_and_311(self) -> None:
+        launcher_source = (SKILL_ROOT / "scripts/deft_python.sh").read_text(
+            encoding="utf-8"
+        )
+        isolated_source, replacements = re.subn(
+            r"candidates=\(\n.*?\n\)",
+            'candidates=(\n  "${DEFT_PYTHON:-}"\n)',
+            launcher_source,
+            count=1,
+            flags=re.DOTALL,
+        )
+        self.assertEqual(replacements, 1)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            launcher = root / "deft_python.sh"
+            launcher.write_text(isolated_source, encoding="utf-8")
+            launcher.chmod(0o755)
+
+            candidate = root / "simulated-python"
+            candidate.write_text(
+                f"#!{sys.executable}\n"
+                "import builtins, os, sys, types\n"
+                "version = tuple(int(part) for part in os.environ['SIM_VERSION'].split('.'))\n"
+                "available = set(filter(None, os.environ.get('SIM_MODULES', '').split(',')))\n"
+                "real_import = builtins.__import__\n"
+                "def controlled_import(name, globals=None, locals=None, fromlist=(), level=0):\n"
+                "    root = name.split('.', 1)[0]\n"
+                "    if root in {'pyarrow', 'yaml', 'tomli', 'tomllib'}:\n"
+                "        if root not in available:\n"
+                "            raise ModuleNotFoundError(f\"No module named '{root}'\", name=root)\n"
+                "        return types.ModuleType(root)\n"
+                "    return real_import(name, globals, locals, fromlist, level)\n"
+                "sys.version_info = version\n"
+                "builtins.__import__ = controlled_import\n"
+                "exec(sys.argv[2], {})\n",
+                encoding="utf-8",
+            )
+            candidate.chmod(0o755)
+
+            cases = (
+                ("3.10 without tomli", "3.10", "pyarrow,yaml", False),
+                ("3.10 with tomli", "3.10", "pyarrow,yaml,tomli", True),
+                ("3.11+ with tomllib", "3.11", "pyarrow,yaml,tomllib", True),
+            )
+            for label, version, modules, succeeds in cases:
+                with self.subTest(label=label):
+                    environment = os.environ.copy()
+                    environment.update(
+                        {
+                            "DEFT_PYTHON": str(candidate),
+                            "SIM_VERSION": version,
+                            "SIM_MODULES": modules,
+                        }
+                    )
+                    result = subprocess.run(
+                        ["bash", str(launcher)],
+                        env=environment,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    if succeeds:
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(result.stdout.strip(), str(candidate))
+                    else:
+                        self.assertEqual(result.returncode, 2)
+                        self.assertIn(
+                            "Python 3.11+ tomllib or Python 3.10 with tomli",
+                            result.stderr,
+                        )
+                        self.assertNotIn("Traceback", result.stderr)
+
     def test_documented_invocations_survive_exec_bit_stripped_install(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            skills_root = pathlib.Path(temporary) / ".claude" / "skills"
+            skills_root = pathlib.Path(temporary) / "skills-only"
             skills_root.mkdir(parents=True)
             installed = []
             for name in SKILL_NAMES:
@@ -211,7 +284,7 @@ class ExecBitAndPackagingTests(unittest.TestCase):
             ("data", "tao-mine-aoi-images"),
         )
         with tempfile.TemporaryDirectory() as temporary:
-            skills_root = pathlib.Path(temporary) / ".claude" / "skills"
+            skills_root = pathlib.Path(temporary) / "skills-only"
             skills_root.mkdir(parents=True)
             for category, name in sources:
                 shutil.copytree(

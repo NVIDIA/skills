@@ -69,9 +69,9 @@ def _resolve_image_from_versions_yaml(*path: str) -> str | None:
         return None
 
 
-DEFAULT_COSMOS_IMAGE = os.environ.get(
-    "COSMOS_RL_IMAGE"
-) or _resolve_image_from_versions_yaml("images", "tao_toolkit", "cosmos_rl")
+DEFAULT_FRAMEWORK_IMAGE = os.environ.get(
+    "COSMOS_FRAMEWORK_IMAGE"
+) or _resolve_image_from_versions_yaml("images", "tao_toolkit", "cosmos_framework")
 DEFAULT_MINING_IMAGE = os.environ.get(
     "TAO_DS_IMAGE"
 ) or _resolve_image_from_versions_yaml("images", "tao_toolkit", "data_services")
@@ -253,6 +253,36 @@ def build_state(args: argparse.Namespace) -> dict[str, Any]:
     )
     benchmark_hash = _sha256(annotations["benchmark"])
     media_root = (args.media_root or workspace).expanduser().resolve()
+    base_model_path = args.base_model_path.expanduser().resolve()
+    config_file = base_model_path / "config.json"
+    provenance_file = base_model_path / "tao_conversion_provenance.json"
+    has_weights = (base_model_path / "model.safetensors").is_file() or (
+        base_model_path / "model.safetensors.index.json"
+    ).is_file() or any(base_model_path.glob("*.safetensors"))
+    try:
+        model_type = json.loads(config_file.read_text(encoding="utf-8")).get(
+            "model_type"
+        )
+    except (OSError, json.JSONDecodeError):
+        model_type = None
+    try:
+        provenance_schema = json.loads(
+            provenance_file.read_text(encoding="utf-8")
+        ).get("schema_version")
+    except (OSError, json.JSONDecodeError):
+        provenance_schema = None
+    if (
+        not config_file.is_file()
+        or not has_weights
+        or model_type != "qwen3_vl"
+        or provenance_schema != 1
+    ):
+        raise ValueError(
+            "--base-model-path must be the prepared Qwen3-VL safetensors PTM "
+            "produced or verified by prepare_cosmos3_vlm_checkpoint.py "
+            "(config.json model_type=qwen3_vl, weights, and schema-v1 conversion "
+            f"provenance): {base_model_path}"
+        )
     base_model = validate_base_model(args.base_model)
     network_mode = getattr(args, "network_mode", None) or (
         "airgap" if os.environ.get("AIR_GAPPED") == "1" else "network-enabled"
@@ -266,7 +296,7 @@ def build_state(args: argparse.Namespace) -> dict[str, Any]:
     offline = network_mode == "airgap"
 
     return {
-        "version": 5,
+        "version": 6,
         "workflow": WORKFLOW,
         "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(
             timespec="seconds"
@@ -293,6 +323,7 @@ def build_state(args: argparse.Namespace) -> dict[str, Any]:
             "platform": args.platform,
             "model_skill": "tao-finetune-cosmos-reason",
             "base_model": base_model,
+            "base_model_path": str(base_model_path),
             "automl_policy": "off",
             "annotation_mode": "bare_okng",
             "media_root": str(media_root),
@@ -312,10 +343,14 @@ def build_state(args: argparse.Namespace) -> dict[str, Any]:
             },
             "specs": {role: str(path) for role, path in specs.items()},
             "containers": {
-                "cosmos_rl": args.cosmos_container,
+                "cosmos_framework": args.framework_container,
                 "data_services": args.mining_container,
+                "anomalygen": args.anomalygen_container,
             },
             "training": {
+                "backend": "cosmos-framework",
+                "image": args.framework_container,
+                "image_digest": args.framework_image_digest,
                 "annotation_source": "generated_from_mining_and_anomalygen",
                 "num_gpus": args.num_gpus,
                 "num_nodes": args.num_nodes,
@@ -435,6 +470,12 @@ def _parser() -> argparse.ArgumentParser:
         default="nvidia/Cosmos3-Nano",
         help="Cosmos3 base model; Nano is default, Edge/Super require explicit selection.",
     )
+    parser.add_argument(
+        "--base-model-path",
+        required=True,
+        type=pathlib.Path,
+        help="Prepared Qwen3-VL safetensors PTM consumed by Framework actions.",
+    )
     parser.add_argument("--media-root", type=pathlib.Path)
     parser.add_argument("--train-spec", type=pathlib.Path)
     parser.add_argument(
@@ -470,7 +511,16 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--lora-alpha", type=int, default=32)
     parser.add_argument("--top-k-per-target", type=int, default=5)
     parser.add_argument("--min-similarity", type=float, default=0.9)
-    parser.add_argument("--cosmos-container", default=DEFAULT_COSMOS_IMAGE)
+    parser.add_argument(
+        "--framework-container",
+        default=DEFAULT_FRAMEWORK_IMAGE,
+        help="Resolver-selected images.tao_toolkit.cosmos_framework URI.",
+    )
+    parser.add_argument(
+        "--framework-image-digest",
+        required=True,
+        help="Immutable sha256 digest or repository@sha256 digest for all Framework actions.",
+    )
     parser.add_argument("--mining-container", default=DEFAULT_MINING_IMAGE)
     parser.add_argument("--anomalygen-container", default=DEFAULT_ANOMALYGEN_IMAGE)
     parser.add_argument(
@@ -554,12 +604,16 @@ def main(argv: list[str] | None = None) -> int:
     if not -1.0 <= args.min_similarity <= 1.0:
         print("init_deft_state: --min-similarity must be in [-1, 1]", file=sys.stderr)
         return 2
-    if not args.cosmos_container or not args.mining_container:
+    if not args.framework_container or not args.mining_container or not args.anomalygen_container:
         print(
-            "init_deft_state: both container images are required; resolve "
-            "images.tao_toolkit.{cosmos_rl,data_services} from versions.yaml",
+            "init_deft_state: Framework, data-services, and AnomalyGen images are required; "
+            "resolve their keys from versions.yaml",
             file=sys.stderr,
         )
+        return 2
+    digest = args.framework_image_digest.rsplit("@", 1)[-1].removeprefix("sha256:")
+    if len(digest) != 64 or any(character not in "0123456789abcdef" for character in digest.lower()):
+        print("init_deft_state: --framework-image-digest must be a sha256 digest", file=sys.stderr)
         return 2
     output = args.results_dir.expanduser().resolve() / "deft_state.json"
     if output.exists():

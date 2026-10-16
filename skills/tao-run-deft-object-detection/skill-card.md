@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who want to improve NVIDIA TAO Grounding DINO object-detection model accuracy through automated smart data augmentation, gap analysis, unique-neighbor mining, and iterative retraining. <br>
+Developers and engineers who want to improve NVIDIA TAO Grounding DINO object-detection accuracy through automated smart data augmentation, including one-time source-pool preparation (Co-DETR pseudo-labeling, ODVG conversion, embedding), per-class gap analysis, unique-neighbor mining, and iterative retraining. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [Optional] <br>
+**Credential Type(s):** [API key] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -41,8 +41,8 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks; run artifacts (deft_state.json, loop_log.jsonl, DEFT_Loop_Report.md, checkpoints, KPI files)] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -53,36 +53,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (4 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
+4 evaluation tasks (4 positive), 1 attempt per task, each run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
-- Efficiency: Tool-call productivity (50%) and token efficiency (50%). <br>
+- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed. <br>
+- Effectiveness: Whether the skill helped complete the task (50% goal accuracy + 50% behavior check). <br>
+- Efficiency: Whether wasted tool calls and token usage were avoided (50% tool productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.7% | 83.4% |
-| Security | 83.3% → 100.0% (+16.7 pp) | 100.0% → 100.0% (±0.0 pp) |
-| Correctness | 5.0% → 95.0% (+90.0 pp) | 24.0% → 100.0% (+76.0 pp) |
-| Discoverability | 95.0% | 42.5% |
-| Effectiveness | 10.4% → 86.0% (+75.6 pp) | 17.3% → 80.5% (+63.2 pp) |
-| Efficiency | 82.6% | 94.2% |
+| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 81.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 75.0% → 100.0% (+25.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Correctness | 10.0% → 100.0% (+90.0 points) | 20.0% → 75.0% (+55.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 71.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 5.1% → 87.6% (+82.5 points) | 21.4% → 67.0% (+45.6 points) |
+| Efficiency | 83.2% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

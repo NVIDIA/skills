@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-analyze-detection-kpi`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:6faa124b8e84816c70c039ea26e67277f789709cb91e2065fd3e7fb51dc74b35` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 69.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.7% — baseline ran, but no comparable score was available; uplift unavailable | 70.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 10.0% → 90.0% (+80.0 points) | 30.0% → 50.0% (+20.0 points) |
-| Efficiency | 98.1% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
+| Effectiveness | 25.0% → 90.0% (+65.0 points) | 30.0% → 55.0% (+25.0 points) |
+| Efficiency | 98.4% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 65,507 | 209,655 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-analyze-detection-kpi-basic | 65,507 | 209,655 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 13,862 | 40,594 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | tao-analyze-detection-kpi-basic | 13,862 | 40,594 | N/A | N/A | skill 1/1; base 3/3 |
-| ALL AGENTS | Dataset aggregate | 79,369 | 250,249 | N/A | N/A | skill 2/2; base 6/6 |
+| claude-code | All cases | 64,423 | 408,619 | -344,196 | -84.23% | skill 1/1; base 1/1 |
+| claude-code | tao-analyze-detection-kpi-basic | 64,423 | 408,619 | -344,196 | -84.23% | skill 1/1; base 1/1 |
+| codex | All cases | 14,014 | 13,530 | +484 | +3.58% | skill 1/1; base 1/1 |
+| codex | tao-analyze-detection-kpi-basic | 14,014 | 13,530 | +484 | +3.58% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 78,437 | 422,149 | -343,712 | -81.42% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 

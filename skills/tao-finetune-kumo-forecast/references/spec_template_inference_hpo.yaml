@@ -1,0 +1,33 @@
+dataset:
+  # Eval CSV with ground truth; needs at least seq_len + forecast_horizon rows.
+  csv: ""
+  # DARR context library CSV containing separate normal-behavior history.
+  context_csv: ""
+  # Datetime column shared by eval and context CSVs.
+  timestamp_col: timestamp
+  # Comma-separated target columns to score; empty means infer from forecast columns.
+  target_cols: ""
+  # Number of future rows to hold back from the eval CSV as ground truth.
+  label_horizon: 72
+hpo:
+  # DARR blend weight: alpha * direct forecast + (1 - alpha) * kNN forecast.
+  alpha: 0.01
+  # Number of nearest neighbors retrieved in DARR mode.
+  k: 64
+  # Softmax temperature applied to DARR neighbor distances.
+  temperature: 0.05
+  # Sliding-window stride for DARR context memory.
+  context_stride: 72
+  # Number of future rows to predict and compare against held-out ground truth.
+  forecast_horizon: 72
+  # Number of historical rows consumed for the input context window.
+  seq_len: 512
+  # Optional checkpoint path; empty uses the SDK default/checkpoint auto-download behavior.
+  ckpt: ""
+  # Optional standardizer pickle path; empty uses the SDK default/auto-download behavior.
+  standardizer_pkl: ""
+  # Enable cross-channel attention for multivariate forecasting.
+  use_cross_channel: false
+train:
+  # Directory where inference HPO trial metrics and artifacts are written.
+  output_dir: artifacts/inference_hpo

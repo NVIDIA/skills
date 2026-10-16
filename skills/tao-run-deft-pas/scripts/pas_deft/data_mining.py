@@ -1661,7 +1661,9 @@ def write_iteration_summary(
     mined_pairs_file: str,
     training_checkpoint: str,
     next_checkpoint_path: str,
+    metric: dict[str, object],
     experiment_id: str = "",
+    mining_stats_file: str = "",
 ) -> str:
     """Write iteration_summary.json at the end of a DEFT iteration.
 
@@ -1675,7 +1677,12 @@ def write_iteration_summary(
         mined_pairs_file:     Path to the final mined pairs JSON.
         training_checkpoint:  Checkpoint used as input for this iteration's training.
         next_checkpoint_path: Expected path of the best checkpoint produced by training.
+        metric:               Canonical metric value and relative-change evidence.
         experiment_id:        Optional unique ID for this experiment run.
+        mining_stats_file:    Optional path to this iteration's
+                               ``mined_stats.json``. When supplied, its
+                               requested, selected, and shortfall counts are
+                               validated and recorded in the summary.
 
     Returns:
         Path to the written iteration_summary.json.
@@ -1694,7 +1701,52 @@ def write_iteration_summary(
         "mined_parquet": mined_parquet,
         "mined_pairs_file": mined_pairs_file,
         "eval_results_dir": experiment_dir,
+        "metric": metric,
     }
+
+    if mining_stats_file:
+        if not os.path.isfile(mining_stats_file):
+            raise FileNotFoundError(
+                f"mining stats file not found: {mining_stats_file}"
+            )
+        with open(mining_stats_file, "r", encoding="utf-8") as f:
+            mining_stats = json.load(f)
+        if not isinstance(mining_stats, dict):
+            raise ValueError(
+                f"mining stats must be a JSON object: {mining_stats_file}"
+            )
+
+        def _count(primary: str, fallback: str = "") -> int:
+            value = mining_stats.get(primary)
+            source = primary
+            if value is None and fallback:
+                value = mining_stats.get(fallback)
+                source = fallback
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                expected = primary if not fallback else f"{primary} or {fallback}"
+                raise ValueError(
+                    f"mining stats require non-negative integer {expected}; "
+                    f"got {source}={value!r} in {mining_stats_file}"
+                )
+            return value
+
+        target = _count("target_query_count")
+        selected = _count("selected_count", "final_unique_basenames")
+        shortfall = _count("selection_shortfall", "target_pair_shortfall")
+        payload["mining"] = {
+            "target_query_count": target,
+            "selected_count": selected,
+            "shortfall": shortfall,
+            "mode": str(mining_stats.get("mode") or ""),
+            "stats_file": mining_stats_file,
+        }
+        if shortfall:
+            print(
+                f"WARNING: iteration {iter_num} mined {selected} of {target} "
+                f"requested samples ({shortfall} short) — see mining in "
+                f"{os.path.join(experiment_dir, 'iteration_summary.json')}"
+            )
+
     out_path = os.path.join(experiment_dir, "iteration_summary.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2)

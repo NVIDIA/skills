@@ -1,5 +1,5 @@
 ## Description: <br>
-Run container-backed AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner. <br>
+Run container-backed AutoML / hyperparameter optimization (HPO) for NVIDIA TAO networks using AutoMLRunner, handling algorithm selection (bayesian, hyperband, asha, bohb, llm, hybrid, autoresearch), WandB experiment tracking, job execution on Brev, SLURM, Kubernetes, or Docker, result interpretation, and per-recommendation custom evaluation hooks. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run automated hyperparameter optimization for NVIDIA TAO models, handling algorithm selection, experiment tracking, job execution across platforms, and result interpretation. <br>
+Developers and engineers use this skill to run automated hyperparameter optimization for NVIDIA TAO models, covering baseline evaluation, algorithm and search-space selection, recommendation job execution across platforms, monitoring, and best-checkpoint handoff for train, evaluate, inference, distill, prune, or quantize actions. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -37,7 +37,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Shell commands, Code, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash and Python code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -49,7 +49,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive) against skill-evaluator-dataset-snapshot/1. <br>
+2 evaluation tasks (2 positive) against skill-evaluator-dataset-snapshot/1, one attempt per task in isolated sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -73,12 +73,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.8% — baseline ran, but no comparable score was available; uplift unavailable | 89.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.2% — baseline ran, but no comparable score was available; uplift unavailable | 89.2% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 25.0% → 100.0% (+75.0 points) | 25.0% → 100.0% (+75.0 points) |
+| Correctness | 50.0% → 100.0% (+50.0 points) | 50.0% → 100.0% (+50.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 47.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 33.3% → 100.0% (+66.7 points) | 37.5% → 100.0% (+62.5 points) |
-| Efficiency | 84.2% — baseline ran, but no comparable score was available; uplift unavailable | 99.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 58.3% → 100.0% (+41.7 points) |
+| Efficiency | 95.8% — baseline ran, but no comparable score was available; uplift unavailable | 98.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.1 (source: frontmatter) <br>

@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-finetune-video-clip`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 3 evaluation tasks (3 positive)
 - Dataset digest: `sha256:4ad92205ac85db52d1f0afec780b50c3453900d9a29d2f0b9e60eb9be7225ee0` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.3% — baseline ran, but no comparable score was available; uplift unavailable | 80.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 90.7% — baseline ran, but no comparable score was available; uplift unavailable | 58.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 2.2% → 100.0% (+97.8 points) | 30.0% → 84.0% (+54.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 56.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 8.3% → 91.1% (+82.8 points) | 15.3% → 62.7% (+47.4 points) |
-| Efficiency | 85.5% — baseline ran, but no comparable score was available; uplift unavailable | 98.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 26.7% → 60.0% (+33.3 points) |
+| Discoverability | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 9.5% → 87.8% (+78.3 points) | 21.1% → 35.6% (+14.5 points) |
+| Efficiency | 85.9% — baseline ran, but no comparable score was available; uplift unavailable | 99.5% → 98.3% (-1.2 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,15 +54,15 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 372,020 | 2,636,566 | N/A | N/A | skill 3/3; base 9/9 |
-| claude-code | tao-finetune-video-clip-basic | 101,065 | 1,298,717 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-finetune-video-clip-evaluate-metrics-mode | 73,109 | 291,219 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-finetune-video-clip-tensorrt-deploy | 197,846 | 1,046,630 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 159,368 | 84,457 | N/A | N/A | skill 5/5; base 6/6 |
-| codex | tao-finetune-video-clip-basic | 31,219 | 14,037 | +17,182 | +122.41% | skill 1/1; base 1/1 |
-| codex | tao-finetune-video-clip-evaluate-metrics-mode | 77,239 | 42,016 | +35,223 | +83.83% | skill 3/3; base 3/3 |
-| codex | tao-finetune-video-clip-tensorrt-deploy | 50,910 | 28,404 | N/A | N/A | skill 1/1; base 2/2 |
-| ALL AGENTS | Dataset aggregate | 531,388 | 2,721,023 | N/A | N/A | skill 8/8; base 15/15 |
+| claude-code | All cases | 264,452 | 1,311,415 | -1,046,963 | -79.83% | skill 3/3; base 3/3 |
+| claude-code | tao-finetune-video-clip-basic | 100,204 | 479,374 | -379,170 | -79.10% | skill 1/1; base 1/1 |
+| claude-code | tao-finetune-video-clip-evaluate-metrics-mode | 67,477 | 487,069 | -419,592 | -86.15% | skill 1/1; base 1/1 |
+| claude-code | tao-finetune-video-clip-tensorrt-deploy | 96,771 | 344,972 | -248,201 | -71.95% | skill 1/1; base 1/1 |
+| codex | All cases | 42,852 | 41,863 | +989 | +2.36% | skill 3/3; base 3/3 |
+| codex | tao-finetune-video-clip-basic | 14,099 | 14,092 | +7 | +0.05% | skill 1/1; base 1/1 |
+| codex | tao-finetune-video-clip-evaluate-metrics-mode | 14,255 | 13,907 | +348 | +2.50% | skill 1/1; base 1/1 |
+| codex | tao-finetune-video-clip-tensorrt-deploy | 14,498 | 13,864 | +634 | +4.57% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 307,304 | 1,353,278 | -1,045,974 | -77.29% | skill 6/6; base 6/6 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -70,7 +70,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 28 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 29 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
@@ -84,7 +84,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/models/tao-finetune-video-clip`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/models/tao-finetune-video-clip/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/models/tao-finetune-video-clip/SKILL.md`)
-- 23 additional finding(s) are available in the full evaluation artifacts.
+- 24 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

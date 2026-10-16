@@ -220,7 +220,7 @@ class SdgPathCompatibilityTests(unittest.TestCase):
         ):
             emit_sdg_sharegpt._resolve_pair(
                 {"future_output_path": "new/location.png"},
-                sdg_dir=pathlib.Path("/tmp/sdg"),
+                sdg_dir=pathlib.Path("/tmp/sdg"),  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
                 row_number=2,
             )
 

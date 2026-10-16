@@ -77,7 +77,7 @@ result = runner.run(
 ### VirtualEnvSDK (containerless venv runs)
 
 Model skills with `container_image: null` and `execution.type: python_script`
-(the NV-Tesseract Forecasting and AD Diffusion skills) run trials as local
+(the Kumo-Forecast and Kumo-Anomaly skills) run trials as local
 Python processes instead of containers. Their SDK is `VirtualEnvSDK`, and
 unlike the credential-reading platform SDKs it takes constructor arguments:
 
@@ -98,7 +98,7 @@ Full signature: `VirtualEnvSDK(venv_path, work_dir=None, state_file=None)`.
 > is omitted the SDK resolves it to `$TAO_SDK_STATE_DIR/virtualenv`, or
 > `~/.tao_sdk/virtualenv` when that env var is unset, and creates
 > `<work_dir>/jobs/` on construction. Every trial's checkpoints then land under
-> `$HOME` - roughly 1.4 GB per NV-Tesseract Forecasting trial. Always pass an
+> `$HOME` - roughly 1.4 GB per Kumo-Forecast trial. Always pass an
 > explicit `work_dir` on a filesystem with room for
 > `automl_max_recommendations` checkpoints. Setting `TAO_SDK_STATE_DIR`
 > relocates the default, but an explicit `work_dir` is the reviewable form and

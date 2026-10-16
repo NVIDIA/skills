@@ -1,6 +1,6 @@
 network_arch: video-clip
 automl_enabled: false
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.pyt
 required_credentials:
 - HF_TOKEN
 - NGC_KEY
@@ -73,7 +73,7 @@ actions:
     upload_excludes:
     - inputs/
   gen_trt_engine:
-    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-deploy  # versions-key: images.tao_toolkit.deploy
+    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-deploy  # versions-key: images.tao_toolkit.deploy
     command: video_clip gen_trt_engine -e {config_path}
     config_format: yaml
     mode: config

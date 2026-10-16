@@ -21,6 +21,7 @@ VALID_STATUSES = {"ok", "error", "skipped"}
 VALID_STAGES = {
     "validate_workflow",
     "initialize_workflow",
+    "prepare_cosmos_reason_model",
     "baseline_evaluate",
     "prepare_cosmos_embed_inference",
     "cosmos_embed",

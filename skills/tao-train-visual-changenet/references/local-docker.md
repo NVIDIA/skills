@@ -4,7 +4,7 @@ When running without the TAO SDK (local docker), use the pinned TAO pyt image an
 
 ```bash
 # Pinned TAO pyt container URI (stamped from the release manifest).
-TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.pyt
 
 set -a; source /path/to/.env; set +a   # omit if already exported
 docker run --rm --gpus all --shm-size=8g \

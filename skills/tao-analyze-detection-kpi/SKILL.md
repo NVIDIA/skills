@@ -51,8 +51,8 @@ for each, so filling the template needs none of them changed:
 |---|---:|---|
 | `kpi.iou_threshold` | `0.5` | IoU at or above which a prediction counts as a true positive. |
 | `kpi.conf_threshold` | `0.5` | Predictions below this are dropped. The template uses `0.0`, which keeps the whole PR curve so a threshold can be swept afterwards without re-running inference. On the pinned image that is safe: unmatched ground truth carries a `-1.0` sentinel and lands in FN at any threshold. On a build predating that fix, `0.0` scored every missed box as a true positive — `TP` became the ground-truth count and `FN` was always 0 — so use a small positive value there. |
-| `kpi.num_recall_points` | `11` | Recall points for the interpolated PR curve. The template keeps `11` (VOC-style), matching the reference ITS pipeline. `101` selects COCO-standard sampling and reports different numbers for the same detections. |
-| `kpi.ignore_sqwidth` | `0` | Boxes narrower than this are ignored. The template uses `40`, matching the reference ITS pipeline, which never counted boxes below that. `0` scores small objects the reference excluded, so the two are not comparable. |
+| `kpi.num_recall_points` | `11` | Recall points for the interpolated PR curve. The template keeps `101` (COCO-style), matching the reference ITS pipeline. `11` selects VOC-style sampling and reports different numbers for the same detections. |
+| `kpi.ignore_sqwidth` | `0` | Boxes narrower than this are ignored. The template keeps `0`, matching the reference ITS pipeline, which scores every box. A higher value raises AP by dropping the hardest detections rather than by detecting them. |
 | `kpi.filter` | `false` | Enable source filtering. |
 | `kpi.is_internal` | `false` | When true, drops every class except `person` and appends a `Summary` row. |
 | `visualize.platform` | `local` | `local` writes a PR-curve plot into `results_dir`; `wandb` logs a run and table instead. |
@@ -78,7 +78,7 @@ RUN_ROOT=/absolute/path/that/contains/images/annotations/and/results
 python3 skills/data/tao-analyze-detection-kpi/scripts/verify_kpi_analyze_spec.py \
   --spec "$SPEC"
 
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 
 docker run --rm --gpus all --shm-size=8g --network=host \
   -v "$RUN_ROOT:$RUN_ROOT" \
@@ -137,7 +137,7 @@ docker info > /dev/null
 2. Resolve and pull the data-services image if needed:
 
 ```bash
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 docker image inspect "$DS_IMAGE" > /dev/null || docker pull "$DS_IMAGE"
 ```
 

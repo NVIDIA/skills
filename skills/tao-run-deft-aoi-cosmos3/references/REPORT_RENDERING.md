@@ -14,6 +14,10 @@ panels. Model-specific content and evidence differ, but the report must not
 introduce a separate grid, card geometry, or visual hierarchy. The renderer
 test compares these shared CSS properties across both source templates.
 
+The Cosmos-only report addition is a bounded prompt showcase sourced from
+recorded annotations; keep every other visual convention aligned with
+ChangeNet.
+
 Render a hero KPI banner only when the KPI is met or the run ends at a committed
 hard stop. For in-progress runs and terminal runs that remain short of target,
 render no banner. Never show an informational `i`, `BEST RESULT RECORDED`, or
@@ -60,10 +64,11 @@ Required sections:
    images, and cumulative training records by iteration. Read the
    per-iteration history summary and run-level ledger; surface any
    recommendation to increase top-K or expand the pool.
-8. **Artifacts** — baseline base-model reference, iteration checkpoints,
-   Proxy/Benchmark results, RCCA, mining, AnomalyGen `SDG_result.csv`,
-   `allocation.json`, and generated ShareGPT, assembled JSON, and
-   validation-report links/paths.
+8. **Artifacts** — baseline base-model reference, iteration DCP checkpoints,
+   their saved Hydra `config.yaml` files, input SFT TOMLs, Proxy/Benchmark
+   results, RCCA, mining,
+   AnomalyGen `SDG_result.csv`, `allocation.json`, generated ShareGPT, assembled
+   JSON, and validation-report links/paths.
 9. **Hard Stops / Warnings** — committed error events, if present.
 
 Cosmos3 bare mode is a discrete OK/NG classifier.

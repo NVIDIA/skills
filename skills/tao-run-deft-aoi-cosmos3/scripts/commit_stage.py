@@ -304,17 +304,63 @@ def _required_allocation(
     return path, allocated
 
 
-def _required_checkpoint(value: pathlib.Path | None, flag: str) -> str:
+def _required_validation_report(
+    value: pathlib.Path | None, flag: str
+) -> str:
+    path = _required_file(value, flag)
+    try:
+        payload = json.loads(pathlib.Path(path).read_text())
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(
+            f"{flag} must be a validate_sharegpt.py summary JSON object: "
+            f"{path} ({exc})"
+        ) from exc
+    if not isinstance(payload, dict):
+        raise ValueError(
+            f"{flag} must be a validate_sharegpt.py summary JSON object: {path}"
+        )
+    if payload.get("mode") != "bare_okng":
+        raise ValueError(f"{flag} must record mode=bare_okng")
+    records = payload.get("records")
+    if not isinstance(records, int) or isinstance(records, bool) or records <= 0:
+        raise ValueError(f"{flag} must record a positive integer records count")
+    labels = payload.get("labels")
+    if not isinstance(labels, dict) or not labels:
+        raise ValueError(f"{flag} must record exact OK/NG label counts")
+    invalid_labels = {
+        str(label): count
+        for label, count in labels.items()
+        if label not in {"OK", "NG"}
+        or not isinstance(count, int)
+        or isinstance(count, bool)
+        or count < 0
+    }
+    if invalid_labels or sum(labels.values()) != records:
+        raise ValueError(
+            f"{flag} must record exact OK/NG label counts summing to records"
+        )
+    if payload.get("require_files") is not True:
+        raise ValueError(f"{flag} must prove require_files=true")
+    if payload.get("unique_target_images") != records:
+        raise ValueError(
+            f"{flag} must prove unique_target_images equals records"
+        )
+    return path
+
+
+def _required_dcp_checkpoint(value: pathlib.Path | None, flag: str) -> str:
     if value is None:
         raise ValueError(f"{flag} is required")
     path = value.expanduser()
-    if not path.is_absolute() or not path.exists():
-        raise ValueError(f"{flag} must be an existing absolute path: {value}")
-    if path.is_file() and path.stat().st_size == 0:
-        raise ValueError(f"{flag} must not be empty: {value}")
-    if path.is_dir() and not any(path.iterdir()):
-        raise ValueError(f"{flag} directory must not be empty: {value}")
-    return str(path.resolve())
+    if not path.is_absolute() or not path.is_dir():
+        raise ValueError(f"{flag} must be an existing absolute DCP directory: {value}")
+    resolved = path.resolve()
+    metadata = [resolved / ".metadata", resolved / "model" / ".metadata"]
+    if not any(candidate.is_file() and candidate.stat().st_size > 0 for candidate in metadata):
+        raise ValueError(
+            f"{flag} must contain Framework DCP metadata at .metadata or model/.metadata: {resolved}"
+        )
+    return str(resolved)
 
 
 def _within(path: str, root: pathlib.Path, flag: str) -> str:
@@ -369,11 +415,17 @@ def _apply_success(
     stage = args.stage
     phase_root = results_dir / args.iter_label
     if stage == "train":
-        phase["best_ckpt_path"] = _within(
-            _required_checkpoint(args.best_ckpt, "--best-ckpt"),
+        best_ckpt = _within(
+            _required_dcp_checkpoint(args.best_ckpt, "--best-ckpt"),
             phase_root / "train",
             "--best-ckpt",
         )
+        phase["framework_config"] = _within(
+            _required_file(args.framework_config, "--framework-config"),
+            phase_root / "train",
+            "--framework-config",
+        )
+        phase["best_ckpt_path"] = best_ckpt
         phase["training_spec"] = _required_file(
             args.training_spec, "--training-spec"
         )
@@ -522,7 +574,9 @@ def _apply_success(
         )
     elif stage == "validate_data":
         phase["validation_report"] = _within(
-            _required_file(args.validation_report, "--validation-report"),
+            _required_validation_report(
+                args.validation_report, "--validation-report"
+            ),
             phase_root,
             "--validation-report",
         )
@@ -572,7 +626,7 @@ def commit(args: argparse.Namespace) -> dict[str, Any]:
 
     try:
         _migrate_execution_policy(state)
-        state["version"] = 5
+        state["version"] = 6
         iterations = state.get("iterations")
         if not isinstance(iterations, dict):
             raise ValueError("state.iterations must be an object")
@@ -704,6 +758,11 @@ def _parser() -> argparse.ArgumentParser:
         help="Measured wall-clock seconds; must be positive, or >= 0 with --skip",
     )
     parser.add_argument("--best-ckpt", type=pathlib.Path)
+    parser.add_argument(
+        "--framework-config",
+        type=pathlib.Path,
+        help="Train's saved Hydra config.yaml beside the committed DCP.",
+    )
     parser.add_argument("--training-spec", type=pathlib.Path)
     parser.add_argument("--proxy-results", type=pathlib.Path)
     parser.add_argument("--proxy-gaps-summary", type=pathlib.Path)

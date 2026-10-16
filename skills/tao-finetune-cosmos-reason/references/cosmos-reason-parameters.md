@@ -113,9 +113,10 @@ fine-tuned checkpoints for handoff.
 
 ## Hardware
 
-Cosmos-RL models are 8B parameters and use FSDP sharding. SFT requires at least
-256 GB of cumulative visible GPU memory, with no fixed device count or
-per-device capacity. Set `dp_shard_size` to the actual visible GPU count and
+Cosmos-RL models are 8B parameters and use FSDP sharding. Dense SFT requires at
+least 256 GB of cumulative visible GPU memory, with no fixed device count or
+per-device capacity. PEFT (`training_mode=peft`) requires at least 72 GB instead.
+Set `dp_shard_size` to the actual visible GPU count and
 `dp_replicate_size=1` for a single node. The production recommendation remains
 8x A100 or H100 (80 GB each). A single high-memory GB300 is also viable with a
 compatible image, `dp_shard_size=1`, and the single-GPU video guards documented in
@@ -158,13 +159,17 @@ the worker count is `0`, omit the multiprocessing context and prefetch factor.
 
 **You are trying to access a gated repo**: The HuggingFace model `nvidia/Cosmos3-Nano` requires authentication. All ranks will retry in a loop until they time out. Fix: ensure `HF_TOKEN` is set in your environment (`export HF_TOKEN=...` in your shell, or `set -a; source /path/to/.env; set +a`) and passed into the container with `-e HF_TOKEN`. The user must also accept the model agreement at <https://huggingface.co/nvidia/Cosmos3-Nano>.
 
-**Cosmos-RL GPU resource and architecture gate**: For SFT, the actionable
+**Cosmos-RL GPU resource and architecture gate**: For dense SFT, the actionable
 launch gate is at least 256 GB of cumulative visible GPU memory, a GPU
 architecture supported by the selected Cosmos-RL image, and normal platform,
 container, S3, and credential preflight. Set `dp_shard_size` to the actual GPU
 count and do not require a fixed policy/rollout topology for SFT. Run
 `scripts/check_tao_launch_preflight.py --gpu-min-total-memory-gb 256 --gpu-arch-allowlist cosmos_rl=sm_80,sm_90,sm_100,sm_103,sm_103a,sm_120`
-before launching. If the target architecture is known but cannot be detected
+before launching. For PEFT, run the same command with
+`--gpu-min-total-memory-gb 72`; every other gate still applies. The PEFT floor
+was measured for the LoRA profile (rank 16, batch 4 per replica); a higher
+rank or a larger batch needs more. If the target
+architecture is known but cannot be detected
 from the launch host, pass `--gpu-arch sm_XX` explicitly. Architecture-specific
 suffixes such as `a` and `f` match the same base SM family. `sm_121` is not
 launchable with this image unless direct runtime validation confirms `sm_121`

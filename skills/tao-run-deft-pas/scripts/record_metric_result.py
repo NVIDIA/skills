@@ -24,6 +24,7 @@ from typing import Any
 from metric_contract import (
     contract_from_state,
     normalize_operator,
+    relative_metric_summary,
     result_from_iteration,
     result_passes,
 )
@@ -194,6 +195,11 @@ def commit(args: argparse.Namespace) -> dict[str, Any]:
     # rather than trusting the evaluator JSON (a null target never passes).
     passed, _ = result_passes(contract, result)
     result["passed"] = passed
+    result["relative_change"] = relative_metric_summary(
+        state,
+        args.iter_label,
+        current_result=result,
+    )
 
     iterations = state.get("iterations")
     if not isinstance(iterations, dict):

@@ -1,18 +1,20 @@
 {
   "automl_default_parameters": [],
   "automl_disabled_parameters": [
-    "coco",
-    "kitti",
-    "aicity.class_config.CLASS_LIST",
     "aicity.class_config.CLASS_RANGE_DICT",
-    "aicity.class_config.MAP_CLASS_NAMES",
+    "kitti",
+    "coco",
     "aicity.class_config",
-    "aicity.class_config.SUB_CLASS_DICT",
     "aicity.class_config.ATTRIBUTE_DICT",
-    "aicity.anchor_init_config",
+    "nvidia_pas",
     "data",
     "aicity",
-    "odvg"
+    "aicity.class_config.CLASS_LIST",
+    "aicity.class_config.MAP_CLASS_NAMES",
+    "nvidia_paidf_pas",
+    "odvg",
+    "aicity.class_config.SUB_CLASS_DICT",
+    "aicity.anchor_init_config"
   ],
   "default": {
     "aicity": {
@@ -51,6 +53,8 @@
         "SUB_CLASS_DICT": {}
       },
       "depth_format": "h5",
+      "fps": 30.0,
+      "load_annotations": true,
       "num_frames": 9000,
       "recentering": true,
       "rgb_format": "mp4",
@@ -75,6 +79,22 @@
       "no_skip": false,
       "preserve_hierarchy": false,
       "project": "annotations"
+    },
+    "nvidia_paidf_pas": {
+      "attribute_vocab_path": "<specify TAO-FT attribute vocabulary>",
+      "caption_policy": "all",
+      "input_layout": "split_dataset",
+      "overwrite": false,
+      "raw_output_dir": "<specify PAIDF PAS SDG output root>"
+    },
+    "nvidia_pas": {
+      "clean_output": false,
+      "exclude_natural_from_aug": false,
+      "include_test": false,
+      "only_natural_and_original": false,
+      "root": "<specify NVIDIA_PAS root>",
+      "use_symlinks": true,
+      "val_sample_fraction": 0.1
     },
     "odvg": {
       "ann_file": "<specify path to annotation file>",
@@ -126,6 +146,8 @@
           "SUB_CLASS_DICT": {}
         },
         "depth_format": "h5",
+        "fps": 30.0,
+        "load_annotations": true,
         "num_frames": 9000,
         "recentering": true,
         "rgb_format": "mp4",
@@ -254,6 +276,16 @@
           "default": "h5",
           "type": "string"
         },
+        "fps": {
+          "default": 30.0,
+          "description": "Positive capture frame rate for synchronized, contiguous frames.",
+          "type": "float"
+        },
+        "load_annotations": {
+          "default": true,
+          "description": "Load 3D ground truth and depth; disable for calibrated unlabeled scenes.",
+          "type": "bool"
+        },
         "num_frames": {
           "default": 9000,
           "type": "int"
@@ -286,7 +318,9 @@
       "kitti",
       "coco",
       "odvg",
-      "aicity"
+      "aicity",
+      "nvidia_pas",
+      "nvidia_paidf_pas"
     ],
     "coco": {
       "automl_enabled": false,
@@ -369,6 +403,94 @@
         "project": {
           "default": "annotations",
           "type": "string"
+        }
+      },
+      "type": "collection"
+    },
+    "nvidia_paidf_pas": {
+      "automl_enabled": false,
+      "default": {
+        "attribute_vocab_path": "<specify TAO-FT attribute vocabulary>",
+        "caption_policy": "all",
+        "input_layout": "split_dataset",
+        "overwrite": false,
+        "raw_output_dir": "<specify PAIDF PAS SDG output root>"
+      },
+      "properties": {
+        "attribute_vocab_path": {
+          "default": "<specify TAO-FT attribute vocabulary>",
+          "type": "string"
+        },
+        "caption_policy": {
+          "default": "all",
+          "description": "all emits every PAS query; a named difficulty emits only that difficulty.",
+          "enum": [
+            "all",
+            "easy",
+            "medium",
+            "hard"
+          ],
+          "type": "categorical"
+        },
+        "input_layout": {
+          "default": "split_dataset",
+          "description": "split_dataset uses V3.1 train/ with optional val and eval/test inputs; single_run is the legacy experimental layout.",
+          "enum": [
+            "split_dataset",
+            "single_run"
+          ],
+          "type": "categorical"
+        },
+        "overwrite": {
+          "default": false,
+          "type": "bool"
+        },
+        "raw_output_dir": {
+          "default": "<specify PAIDF PAS SDG output root>",
+          "type": "string"
+        }
+      },
+      "type": "collection"
+    },
+    "nvidia_pas": {
+      "automl_enabled": false,
+      "default": {
+        "clean_output": false,
+        "exclude_natural_from_aug": false,
+        "include_test": false,
+        "only_natural_and_original": false,
+        "root": "<specify NVIDIA_PAS root>",
+        "use_symlinks": true,
+        "val_sample_fraction": 0.1
+      },
+      "properties": {
+        "clean_output": {
+          "default": false,
+          "type": "bool"
+        },
+        "exclude_natural_from_aug": {
+          "default": false,
+          "type": "bool"
+        },
+        "include_test": {
+          "default": false,
+          "type": "bool"
+        },
+        "only_natural_and_original": {
+          "default": false,
+          "type": "bool"
+        },
+        "root": {
+          "default": "<specify NVIDIA_PAS root>",
+          "type": "string"
+        },
+        "use_symlinks": {
+          "default": true,
+          "type": "bool"
+        },
+        "val_sample_fraction": {
+          "default": 0.1,
+          "type": "float"
         }
       },
       "type": "collection"

@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-generate-referring-expressions`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:5d32143561ff4b116cf31ee3c4b782a64cf164ba5aad47c65d8f71564c34eb09` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 74.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 76.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 75.0% (+26.7 points) |
-| Efficiency | 97.7% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.6% (-1.1 points) |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 85.0% (+36.7 points) |
+| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 67,207 | 362,910 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-generate-referring-expressions-basic | 67,207 | 362,910 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 13,695 | 13,600 | +95 | +0.70% | skill 1/1; base 1/1 |
-| codex | tao-generate-referring-expressions-basic | 13,695 | 13,600 | +95 | +0.70% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 80,902 | 376,510 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 66,082 | 245,870 | -179,788 | -73.12% | skill 1/1; base 1/1 |
+| claude-code | tao-generate-referring-expressions-basic | 66,082 | 245,870 | -179,788 | -73.12% | skill 1/1; base 1/1 |
+| codex | All cases | 13,944 | 13,502 | +442 | +3.27% | skill 1/1; base 1/1 |
+| codex | tao-generate-referring-expressions-basic | 13,944 | 13,502 | +442 | +3.27% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 80,026 | 259,372 | -179,346 | -69.15% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -66,8 +66,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 21 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 22 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
 ## Findings and Observations
@@ -75,12 +75,16 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/configuration.md:
+  "### Initial setup" in SKILL.md (lines 28-56)
+  vs "## Configuration" in SKILL.md (lines 82-96)
+  vs "## Key Configuration Decisions" in references/configuration.md (lines 60-73)
+  vs "## All Parameters" in references/configuration.md (lines 123-147) (`SKILL.md:28`)
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/data/tao-generate-referring-expressions/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/data/tao-generate-referring-expressions/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-generate-referring-expressions`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/data/tao-generate-referring-expressions/SKILL.md`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: No verification (`SKILL.md:74`)
-- 16 additional finding(s) are available in the full evaluation artifacts.
+- 18 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

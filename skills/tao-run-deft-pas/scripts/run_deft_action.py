@@ -1057,12 +1057,24 @@ def reconcile_request(args: argparse.Namespace) -> dict[str, Any]:
 def _validate_terminal_job(job: dict[str, Any]) -> None:
     terminal = job.get("terminal_state")
     transitions = job.get("transitions")
-    if not isinstance(transitions, list) or len(transitions) < 3:
+    if not isinstance(transitions, list):
+        raise ValueError("terminal job-record transitions must be a list")
+    states = [item.get("state") if isinstance(item, dict) else None for item in transitions]
+    prelaunch_failure = (
+        terminal == "ERROR"
+        and states == ["PENDING", "ERROR"]
+        and isinstance(job.get("backend_ref"), str)
+        and job["backend_ref"].startswith("submit-error:")
+    )
+    if not prelaunch_failure and len(transitions) < 3:
         raise ValueError(
             "terminal job-record must preserve PENDING, RUNNING, and terminal transitions"
         )
-    states = [item.get("state") if isinstance(item, dict) else None for item in transitions]
-    if states[0] != "PENDING" or states[-1] != terminal or "RUNNING" not in states[1:-1]:
+    if (
+        states[0] != "PENDING"
+        or states[-1] != terminal
+        or (not prelaunch_failure and "RUNNING" not in states[1:-1])
+    ):
         raise ValueError(
             "terminal job-record transition lineage must be PENDING -> RUNNING -> terminal"
         )

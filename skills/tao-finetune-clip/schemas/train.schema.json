@@ -74,6 +74,42 @@
       "type": "ViT-L-14-SigLIP-CLIPA-224"
     },
     "model_name": "clip",
+    "peft": {
+      "enabled": false,
+      "method": "lora",
+      "text": {
+        "alpha": 16,
+        "dropout": 0.05,
+        "enabled": false,
+        "num_last_blocks": 3,
+        "rank": 8,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "out_proj"
+        ]
+      },
+      "vision": {
+        "alpha": 16,
+        "dropout": 0.05,
+        "enabled": false,
+        "num_last_blocks": 3,
+        "rank": 8,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "out_proj"
+        ]
+      }
+    },
+    "regularization": {
+      "cosine_weight": 0.05,
+      "embedding_mse_weight": 0.05,
+      "enabled": false,
+      "similarity_weight": 0.1
+    },
     "results_dir": "",
     "train": {
       "checkpoint_interval": 1,
@@ -453,6 +489,212 @@
       "description": "Name of model for task invocation.",
       "title": "Model Name",
       "type": "string"
+    },
+    "peft": {
+      "default": {
+        "enabled": false,
+        "method": "lora",
+        "text": {
+          "alpha": 16,
+          "dropout": 0.05,
+          "enabled": false,
+          "num_last_blocks": 3,
+          "rank": 8,
+          "target_modules": [
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "out_proj"
+          ]
+        },
+        "vision": {
+          "alpha": 16,
+          "dropout": 0.05,
+          "enabled": false,
+          "num_last_blocks": 3,
+          "rank": 8,
+          "target_modules": [
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "out_proj"
+          ]
+        }
+      },
+      "description": "Parameter-efficient CLIP fine-tuning.",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Enable PEFT; otherwise use standard full fine-tuning.",
+          "type": "bool"
+        },
+        "method": {
+          "default": "lora",
+          "description": "PEFT method.",
+          "enum": [
+            "lora"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "default": {
+            "alpha": 16,
+            "dropout": 0.05,
+            "enabled": false,
+            "num_last_blocks": 3,
+            "rank": 8,
+            "target_modules": [
+              "q_proj",
+              "k_proj",
+              "v_proj",
+              "out_proj"
+            ]
+          },
+          "description": "LoRA adaptation of the text encoder tower.",
+          "properties": {
+            "alpha": {
+              "default": 16,
+              "description": "LoRA scaling numerator; effective scale is alpha/rank.",
+              "minimum": 1,
+              "type": "int"
+            },
+            "dropout": {
+              "default": 0.05,
+              "description": "Finite dropout applied to LoRA input; 0 <= dropout < 1. A value of 1 disables the adapter contribution.",
+              "exclusiveMaximum": 1.0,
+              "maximum": 0.9999999999999999,
+              "minimum": 0.0,
+              "type": "float"
+            },
+            "enabled": {
+              "default": false,
+              "description": "Enable LoRA in the text tower.",
+              "type": "bool"
+            },
+            "num_last_blocks": {
+              "default": 3,
+              "description": "Final transformer blocks to adapt; 0 adapts all blocks.",
+              "minimum": 0,
+              "type": "int"
+            },
+            "rank": {
+              "default": 8,
+              "description": "LoRA rank.",
+              "minimum": 1,
+              "type": "int"
+            },
+            "target_modules": {
+              "automl_enabled": false,
+              "default": [
+                "q_proj",
+                "k_proj",
+                "v_proj",
+                "out_proj"
+              ],
+              "description": "SigLIP2: q_proj, k_proj, v_proj, out_proj; RADIO/OpenCLIP: qkv, proj.",
+              "type": "list"
+            }
+          },
+          "type": "collection"
+        },
+        "vision": {
+          "default": {
+            "alpha": 16,
+            "dropout": 0.05,
+            "enabled": false,
+            "num_last_blocks": 3,
+            "rank": 8,
+            "target_modules": [
+              "q_proj",
+              "k_proj",
+              "v_proj",
+              "out_proj"
+            ]
+          },
+          "description": "LoRA adaptation of the vision encoder tower.",
+          "properties": {
+            "alpha": {
+              "default": 16,
+              "description": "LoRA scaling numerator; effective scale is alpha/rank.",
+              "minimum": 1,
+              "type": "int"
+            },
+            "dropout": {
+              "default": 0.05,
+              "description": "Finite dropout applied to LoRA input; 0 <= dropout < 1. A value of 1 disables the adapter contribution.",
+              "exclusiveMaximum": 1.0,
+              "maximum": 0.9999999999999999,
+              "minimum": 0.0,
+              "type": "float"
+            },
+            "enabled": {
+              "default": false,
+              "description": "Enable LoRA in the vision tower.",
+              "type": "bool"
+            },
+            "num_last_blocks": {
+              "default": 3,
+              "description": "Final transformer blocks to adapt; 0 adapts all blocks.",
+              "minimum": 0,
+              "type": "int"
+            },
+            "rank": {
+              "default": 8,
+              "description": "LoRA rank.",
+              "minimum": 1,
+              "type": "int"
+            },
+            "target_modules": {
+              "automl_enabled": false,
+              "default": [
+                "q_proj",
+                "k_proj",
+                "v_proj",
+                "out_proj"
+              ],
+              "description": "SigLIP2: q_proj, k_proj, v_proj, out_proj; RADIO/OpenCLIP: qkv, proj.",
+              "type": "list"
+            }
+          },
+          "type": "collection"
+        }
+      },
+      "type": "collection"
+    },
+    "regularization": {
+      "default": {
+        "cosine_weight": 0.05,
+        "embedding_mse_weight": 0.05,
+        "enabled": false,
+        "similarity_weight": 0.1
+      },
+      "description": "Frozen-teacher geometry preservation; requires a second full model copy.",
+      "properties": {
+        "cosine_weight": {
+          "default": 0.05,
+          "description": "Student-teacher cosine preservation weight.",
+          "minimum": 0.0,
+          "type": "float"
+        },
+        "embedding_mse_weight": {
+          "default": 0.05,
+          "description": "Student-teacher embedding MSE weight.",
+          "minimum": 0.0,
+          "type": "float"
+        },
+        "enabled": {
+          "default": false,
+          "description": "Enable teacher-based preservation losses.",
+          "type": "bool"
+        },
+        "similarity_weight": {
+          "default": 0.1,
+          "description": "Image-text similarity matrix MSE weight.",
+          "minimum": 0.0,
+          "type": "float"
+        }
+      },
+      "type": "collection"
     },
     "results_dir": {
       "default": "",

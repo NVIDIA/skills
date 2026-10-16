@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "workflow": "tao-run-deft-aoi-cosmos3",
   "started_at": "2026-07-28T00:00:00+00:00",
   "status": "in_progress",
@@ -44,6 +44,7 @@
     "platform": "selected-platform",
     "model_skill": "tao-finetune-cosmos-reason",
     "base_model": "nvidia/Cosmos3-Nano",
+    "base_model_path": "/abs/workspace/models/Cosmos3-Nano-VLM",
     "automl_policy": "off",
     "annotation_mode": "bare_okng",
     "media_root": "/abs/workspace",
@@ -67,14 +68,18 @@
     },
     "specs": {
       "train": "/abs/workspace/specs/train_spec.toml",
-      "proxy": "/abs/workspace/specs/evaluate_spec.toml",
-      "benchmark": "/abs/workspace/specs/evaluate_spec.toml"
+      "proxy": "/abs/workspace/specs/evaluate_spec_proxy.toml",
+      "benchmark": "/abs/workspace/specs/evaluate_spec_benchmark.toml"
     },
     "containers": {
-      "cosmos_rl": "resolved-from-versions.yaml",
-      "data_services": "resolved-from-versions.yaml"
+      "cosmos_framework": "resolved-from-versions.yaml",
+      "data_services": "resolved-from-versions.yaml",
+      "anomalygen": "resolved-from-versions.yaml"
     },
     "training": {
+      "backend": "cosmos-framework",
+      "image": "resolved-from-versions.yaml",
+      "image_digest": "sha256:replace-with-64-hex-digest",
       "annotation_source": "generated_from_mining_and_anomalygen",
       "num_gpus": 1,
       "num_nodes": 1,

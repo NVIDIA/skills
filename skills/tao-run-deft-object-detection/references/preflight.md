@@ -34,10 +34,10 @@ Resolve everything you can before asking the user. Parameter precedence is stric
 
    | Variable | Required for |
    |---|---|
-   | `NGC_KEY` | **Conditionally** — only when an `nvcr.io` image has to be pulled, or the Grounding DINO checkpoint downloaded. Both images already local and an `ngc` CLI holding its own credentials is a complete run with this unset. See check 5. |
-   | `HF_TOKEN` | **Conditionally** — only when the encoder resolves to a HuggingFace id rather than a local snapshot directory. See check 9. |
+   | `NGC_KEY` | **Conditionally** — only when an `nvcr.io` image has to be pulled, or the Grounding DINO checkpoint downloaded. The Co-DETR checkpoint is public HuggingFace and needs no credential. Both images already local and an `ngc` CLI holding its own credentials is a complete run with this unset. See check 5. |
+   | `HF_TOKEN` | **Conditionally** — only when the encoder resolves to a HuggingFace id rather than a local snapshot directory. See check 10. |
 
-   Defer both verdicts. Check 5 sets `WILL_PULL_AFTER_APPROVAL`, and only then does an unset `NGC_KEY` stop the run; check 9 resolves the encoder, and a local snapshot needs no HuggingFace access at all. Stopping a run whose inputs are all present is the failure to avoid here.
+   Defer both verdicts. Check 5 sets `WILL_PULL_AFTER_APPROVAL`, and only then does an unset `NGC_KEY` stop the run; check 10 resolves the encoder, and a local snapshot needs no HuggingFace access at all. Stopping a run whose inputs are all present is the failure to avoid here.
 
    `fetch_gdino_checkpoint.py` shells out to the `ngc` CLI, which is not always on `PATH` — check for it and add its directory before deciding a checkpoint cannot be fetched.
 
@@ -121,16 +121,66 @@ Resolve everything you can before asking the user. Parameter precedence is stric
    image the checkpoint was trained with in the Summary; the pinned image is not
    automatically the right one.
 
-7. **Train-spec template.** Must exist and parse as YAML, and `dataset.train_data_sources` must be a **list** (Grounding DINO ODVG shape). A mapping there means the spec is COCO-shaped and this workflow cannot append to it.
+7. **Co-DETR checkpoint — only when `prep` will run; fetch it unless the user supplied
+   one.** Prep pseudo-labels the whole pool with Co-DETR, and
+   `assets/overlays/codetr_inference.yaml` pins the ViT-L/16 geometry that exactly one
+   published checkpoint loads.
+
+   **The user's own path always wins**, as for the zero-shot checkpoint. It is how an
+   air-gapped host runs prep at all, and a checkpoint someone already staged is not
+   replaced. Hard-stop if the path does not exist. Its size should be
+   2,934,763,233 bytes, the published checkpoint's; flag a different size in the
+   Summary rather than stopping, since a compatible fine-tune can differ, but say that
+   a checkpoint the pinned architecture cannot load empties every pseudo-label and
+   `verify_pseudo_labels.py` catches it only after the labelling pass. A path outside
+   `$WORKSPACE` needs its directory in `$EXTRA_MOUNTS`, or the container cannot see it.
+   Record the source (`user`) in the Summary and skip the fetcher entirely.
+
+   When the user gave no path, fetch the published checkpoint rather than asking: a
+   run should not depend on a file somebody staged by hand. `--dest` belongs under
+   `$WORKSPACE`. The Co-DETR container mounts `$WORKSPACE` and
+   `$EXTRA_MOUNTS` and nothing else, so a checkpoint anywhere else needs an extra `-v`
+   on every launch that reads it.
+
+   ```bash
+   # Report first; --plan prints a sentence, not a path.
+   <skill_root>/scripts/deft_python.sh \
+     <skill_root>/scripts/fetch_codetr_checkpoint.py --plan \
+     --dest "$WORKSPACE/checkpoints/codetr"
+
+   # After approval, the same command without --plan prints the path.
+   CODETR_CHECKPOINT=$(<skill_root>/scripts/deft_python.sh \
+     <skill_root>/scripts/fetch_codetr_checkpoint.py \
+     --dest "$WORKSPACE/checkpoints/codetr")
+   ```
+
+   Skip this on a run whose pool is already labelled and embedded — prep does not run,
+   so nothing reads the checkpoint. On a run that *will* prep, a missing checkpoint is a
+   hard stop here rather than 2.5 hours in: the Co-DETR pass is the longest stage in the
+   workflow and it is the first thing prep does.
+
+   The download is plain HTTPS over stdlib, so it needs nothing installed. Size and
+   SHA-256 are verified before the file is put in place, because a checkpoint that does
+   not match the pinned architecture loads no weights, exits 0, prints
+   `Execution status: PASS` and writes one empty label file per image.
+
+   A checkpoint already at `--dest` is reused after a **size** check, which catches the
+   truncated file an interrupted transfer leaves. Add `--verify` to check its SHA-256 as
+   well when the file is suspect — copied from another host, or left by a run whose
+   pseudo-labels came out empty. It is off by default because it reads the full 2.8 GiB.
+   `--plan` applies the same checks, so a truncated file fails Pre-Flight instead of
+   appearing in the Summary as `ALREADY PRESENT` and failing after approval.
+
+8. **Train-spec template.** Must exist and parse as YAML, and `dataset.train_data_sources` must be a **list** (Grounding DINO ODVG shape). A mapping there means the spec is COCO-shaped and this workflow cannot append to it.
 
    **Seed training data is optional.** Unlike the AOI loop — where ChangeNet must learn the task from a mandatory seed set — Grounding DINO is zero-shot capable and can start cold. Inspect the list and branch:
 
    - **Non-empty** → validate every entry's `image_dir`, `json_file`, and `label_map` resolve on disk. Report the source count and total ODVG record count in the Summary. Iteration 1 appends to what is already there.
    - **Empty or absent** → note in the Summary that iteration 1 trains on mined data alone, and that the first iteration's dataset will be small. Not an error.
 
-   Either way the source pool (check 8) stays mandatory — without it there is nothing to mine and the loop cannot add data at all.
+   Either way the source pool (check 9) stays mandatory — without it there is nothing to mine and the loop cannot add data at all.
 
-8. **Source pool.** Two artifacts, both required:
+9. **Source pool.** Two artifacts, both required:
    - `source_pool_embeddings` parquet — must be non-empty and carry `filepath` and `embedding`.
    - `source_pool_annotations` — an ODVG tree containing `*.jsonl` records keyed by `file_name`, and ideally a `*labelmap.json`. Staging synthesizes a labelmap from observed categories when none is found, but an explicit one is preferred.
 
@@ -140,16 +190,17 @@ Resolve everything you can before asking the user. Parameter precedence is stric
    refuses to write state without these paths, because the alternative is discovering the
    corpus is absent at `mine`, six stages and a training run later.
 
-   Pass `--pool-report` with the prep run's `pool_report.json`. It records which classes the
+   Pass `--pool-report` with the prep run's `pool_report.json`; init refuses an existing
+   pool without one, under every allocation policy. It records which classes the pool
+   actually holds annotations for, and init cross-checks that against the target classes.
 
    A pool prepared elsewhere may not carry `pool_report.json`. Do not re-label to get
    one — generate it from the pool's COCO with `validate_pool_coco.py --record`
    (`references/prep-source-pool.md`).
-   pool actually holds annotations for, and init cross-checks that against the target classes.
    A pool prepared for a different class set does not make mining fail — it makes mining
    return neighbours of something else, and the affected class simply never improves.
 
-9. **Resolve the encoder — local snapshot first, never an implicit online default.**
+10. **Resolve the encoder — local snapshot first, never an implicit online default.**
 
    The encoder that embeds each iteration's weak images must be the *same* one that produced the source-pool parquet. A mismatch is silent: mining succeeds and returns confidently wrong neighbours. Record the resolved values as `config.embedding_model` / `config.embedding_model_path` and reuse them verbatim on every iteration.
 
@@ -189,11 +240,11 @@ Resolve everything you can before asking the user. Parameter precedence is stric
 
    Record the resolved snapshot path (or the verified HF id) in the Summary. If the user cannot say which encoder produced the source pool, surface that as an explicit risk row rather than assuming SigLIP.
 
-10. **KPI inputs.** Image directory, ground-truth KITTI label directory, and class-mapping YAML must all exist. `image_dir` must not end in `/` — `kpi_analyze` derives its `Sequence Name` from the second-to-last path component.
+11. **KPI inputs.** Image directory, ground-truth KITTI label directory, and class-mapping YAML must all exist. `image_dir` must not end in `/` — `kpi_analyze` derives its `Sequence Name` from the second-to-last path component.
 
-11. **Class thresholds and mining config.** Per-class AP50 thresholds and the mining `multiplier` both have reference defaults — do not interrogate the user for them. Omitting `--ap50-thresholds-json` gates each target class at the reference ITS value (`car 0.99`, `bicycle 0.7`, `person 0.7`) and any other target class at `0.7`; `--multiplier` defaults to `3`. Surface the defaulted values in the Pre-Flight Summary so the user can override them, and treat a class gated by assumption as worth flagging: too loose a gate marks no image weak and the iteration mines nothing. If rare classes are configured, also require `source_detection_file` and `target_detection_file` as **COCO JSONs** — `class_stratified` mining needs them and TAO DS will not infer the format.
+12. **Class thresholds and mining config.** Per-class AP50 thresholds and the mining `multiplier` both have reference defaults — do not interrogate the user for them. Omitting `--ap50-thresholds-json` gates each target class at the reference ITS value (`car 0.99`, `bicycle 0.7`, `person 0.7`) and any other target class at `0.7`; `--multiplier` defaults to `3`. Surface the defaulted values in the Pre-Flight Summary so the user can override them, and treat a class gated by assumption as worth flagging: too loose a gate marks no image weak and the iteration mines nothing. If rare classes are configured, also require `source_detection_file` and `target_detection_file` as **COCO JSONs** — `class_stratified` mining needs them and TAO DS will not infer the format.
 
-12. **GPU count.**
+13. **GPU count.**
 
     ```bash
     if command -v nvidia-smi >/dev/null 2>&1; then nvidia-smi --list-gpus | wc -l
@@ -201,7 +252,7 @@ Resolve everything you can before asking the user. Parameter precedence is stric
     fi
     ```
 
-13. **Spec sanity.** `train.checkpoint_interval` must be `<= train.num_epochs`. `prepare_spec_for_train.py` lowers it automatically when an explicit epoch override would violate this, but flag the adjustment in the Summary so it is not a surprise.
+14. **Spec sanity.** `train.checkpoint_interval` must be `<= train.num_epochs`. `prepare_spec_for_train.py` lowers it automatically when an explicit epoch override would violate this, but flag the adjustment in the Summary so it is not a surprise.
 
 **`max_iterations` defaults to `1`.** Confirm it with the user when they have not said how many iterations they want, but do not block on it: an unattended run takes the default.
 
@@ -218,7 +269,7 @@ Resolve everything you can before asking the user. Parameter precedence is stric
   `--rare-class-list` only to override that.
 - `distance_metric` — `euclidean`
 - `candidate_expansion_factor` — `5`
-- `embedding_model` — `SigLIP`; `embedding_model_path` is **resolved**, not defaulted (check 9)
+- `embedding_model` — `SigLIP`; `embedding_model_path` is **resolved**, not defaulted (check 10)
 - `iou_threshold` — `0.5`
 - `kpi.conf_threshold` — `0.0` (frozen as `config.kpi_conf_threshold`; every phase is scored at it)
 - workspace root — user prompt, else `~/workspace`
@@ -423,12 +474,16 @@ if [ -n "${POOL_IMAGES:-}" ]; then
   PREP_FLAGS="$PREP_FLAGS --codetr-classmap $CODETR_CLASSMAP"
 fi
 
-# A pool that already exists must declare what it holds. Under class_stratified both
-# of these are then mandatory: prep is what would otherwise produce the report and
-# derive the rare classes from it, and a prep that is not going to run cannot.
+# A pool that already exists must declare what it holds: prep is what would otherwise
+# produce the report, and a prep that is not going to run cannot. The report is
+# required under every policy; under class_stratified the rare classes are too, since
+# prep would otherwise derive them from it.
 EXISTING_POOL_FLAGS=""
-if [ -z "${POOL_IMAGES:-}" ] && [ "$ALLOCATION_POLICY" = class_stratified ]; then
-  EXISTING_POOL_FLAGS="--pool-report $POOL_REPORT --rare-class-list $RARE_CLASS_LIST"
+if [ -z "${POOL_IMAGES:-}" ]; then
+  EXISTING_POOL_FLAGS="--pool-report $POOL_REPORT"
+  if [ "$ALLOCATION_POLICY" = class_stratified ]; then
+    EXISTING_POOL_FLAGS="$EXISTING_POOL_FLAGS --rare-class-list $RARE_CLASS_LIST"
+  fi
 fi
 
 # Any path the run's own inputs do not name. Repeatable; omit when there are none.

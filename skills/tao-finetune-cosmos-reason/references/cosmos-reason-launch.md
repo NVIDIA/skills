@@ -47,7 +47,8 @@ bounds: newer compatible versions pass, while a driver below the CUDA 13.x
 compatibility floor must fail.
 
 For launch preflight, pass the concrete annotation and media paths to the
-shared helper:
+shared helper. Pass `--gpu-min-total-memory-gb 256` for dense SFT and
+`--gpu-min-total-memory-gb 72` for PEFT (see the GPU memory rule below):
 
 ```bash
 scripts/check_tao_launch_preflight.py --platform slurm \
@@ -102,8 +103,14 @@ directory when annotations reference individual files. Keep a
 `<workspace>/evaluations/data_staging.json` record with the original S3 URI, the
 staged path, and the command/log used to verify the copy.
 
-For Cosmos-RL SFT (`train.train_policy.type="sft"`), require at least 256 GB of
-cumulative visible GPU memory. Do not impose a fixed device count or per-device
+For dense Cosmos-RL SFT (`train.train_policy.type="sft"` with
+`training_mode=dense`, no `policy.lora` table), require at least 256 GB of
+cumulative visible GPU memory. For PEFT (`training_mode=peft`), require at
+least 72 GB instead: pass `--gpu-min-total-memory-gb 72` in the preflight
+commands above and keep every other check in this section. The PEFT floor was
+measured for the LoRA profile (rank 16, batch 4 per replica); a higher rank or
+a larger batch needs more. Do not impose a
+fixed device count or per-device
 capacity: set `policy.parallelism.dp_shard_size` and the platform GPU request to
 the actual visible GPU count, and set `policy.parallelism.dp_replicate_size=1`
 for a single node. Workflows that allocate separate policy and rollout replicas
