@@ -1,6 +1,6 @@
 ---
 name: cuopt-server-api-python
-version: "26.10.00"
+version: "26.12.00"
 description: cuOpt REST server — start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.
 license: Apache-2.0
 metadata:
@@ -56,9 +56,9 @@ docker run --gpus all -d -p 8000:8000 -e CUOPT_SERVER_PORT=8000 \
   nvidia/cuopt:latest-cu13
 ```
 
-Use `latest-cu12` or `latest-cu13` to match your driver's CUDA major version (`latest-cu13-ubi10` for a UBI10 base). Prefer these over the CUDA+Python-specific tags such as `latest-cuda12.9-py3.13` — those track a single Python line and go stale when it stops receiving builds.
+Use `latest-cu12` or `latest-cu13` to match your driver's CUDA major version (`latest-cu13-ubi10` for a UBI10 base).
 
-For production, pin rather than float: `latest-*` tags are mutable and can silently move to a different image. Use a full release tag (`nvidia/cuopt:<release>-cuda<cuda>-py<python>`) or an immutable digest (`nvidia/cuopt@sha256:<digest>`). Check the `nvidia/cuopt` registry for available tags.
+For production, pin rather than float: `latest-*` tags are mutable and can silently move to a different image. Use a full release tag (`nvidia/cuopt:<release>-cu<cuda-major>`) or an immutable digest (`nvidia/cuopt@sha256:<digest>`). Check the `nvidia/cuopt` registry for available tags.
 
 ## Verify
 
@@ -104,7 +104,7 @@ Use `travel_time_matrix_data` (not transit_time_matrix_data). Capacities: `[[50,
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `422 Unprocessable Entity` | Field name not in the schema | Check names against the OpenAPI spec at `/cuopt.yaml`. Most common: `transit_time_matrix_data` → `travel_time_matrix_data` |
+| `422 Unprocessable Content` | Field name not in the schema | Check names against the OpenAPI spec at `/cuopt.yaml`. Most common: `transit_time_matrix_data` → `travel_time_matrix_data` |
 | `422` on `fleet_data` | Capacities nested per vehicle instead of per dimension | Use `[[50, 50]]` (one inner list per capacity dimension), not `[[50], [50]]` |
 | Connection refused | Server not up, or bound to a different interface/port | `curl http://localhost:8000/cuopt/health`; start with `--ip 0.0.0.0 --port 8000` |
 | Docker container exits immediately | No GPU visible to the container | Run with `--gpus all` and confirm the NVIDIA Container Toolkit is installed |
