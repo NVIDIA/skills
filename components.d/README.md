@@ -35,6 +35,7 @@ Each entry under `skills:` requires:
 | `links.contributing`   | `CONTRIBUTING.md`  | Path to the contributing file in the source repo.          |
 | `links.discussions`    | `true`             | Set to `false` if the repo has no Discussions tab.         |
 | `links.security`       | `true`             | Set to `false` if the repo has no `SECURITY.md`.           |
+| `links.primary`        | `true`             | Set to `false` when this component shares its `name` with another component, so the shared README row keeps the other component's help links. |
 
 ## Example
 
