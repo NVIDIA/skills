@@ -96,16 +96,45 @@ parse. A section with nothing to say contains `_(none)_`.
 | `Vision` | Where the agent is headed, beyond today's scope. |
 | `Open Questions` | Unknowns to resolve. |
 
-## Create an ethos.md
+## How to use
 
-Install the three skills together:
+Install all three skills from the [NVIDIA skills catalog](https://github.com/NVIDIA/skills).
+`ethos-orchestrate` routes requests to `ethos-explore` and `ethos-write`, so keep
+the three installed together.
+
+You need Node.js with npm and `npx`, Git, and a coding assistant that supports
+skills. Creating or validating an `ethos.md` also needs Python 3.10+; the bundled
+validator uses only the Python standard library.
+
+From the root of **your agent's repository**, run:
 
 ```bash
-npx skills add https://github.com/NVIDIA-NeMo/eval-author/tree/main/team-skills/ethos --agent claude-code
+npx skills@latest add nvidia/skills \
+  --skill ethos-orchestrate \
+  --skill ethos-explore \
+  --skill ethos-write \
+  --agent claude-code --yes
 ```
 
-Replace `claude-code` with your assistant's identifier. Then, in your agent's
-repository, ask your coding assistant:
+Replace `claude-code` with your assistant's identifier, such as `codex` or
+`cursor`. This installs the skills for the current project. Add `--global` to
+make them available across projects. The `@latest` suffix selects the current
+Skills CLI; NVIDIA requires version 1.5.16 or newer. See the
+[NVIDIA installation guide](https://github.com/NVIDIA/skills/blob/main/docs/advanced-install.mdx)
+for installation options.
+
+Verify the installation from the same directory with the same assistant value:
+
+```bash
+npx skills@latest list --agent claude-code
+```
+
+For a global installation, add `--global` to this check too. Confirm that
+`ethos-orchestrate`, `ethos-explore`, and `ethos-write` are listed.
+
+## Create an ethos.md
+
+Open your agent's repository in a new session of your coding assistant and ask:
 
 ```text
 Use ethos-orchestrate to write an ethos.md for my agent.
@@ -133,4 +162,5 @@ when it writes.
 Eval Author's first evaluations and coverage audits use ethos.md as their target
 and hand off to these skills to create or revise it. Installing Eval Author
 (`npx skills add NVIDIA-NeMo/eval-author --skill '*'`) does not install
-them; add them with the command above.
+them; follow [How to use](#how-to-use) to add all three from
+`nvidia/skills`.

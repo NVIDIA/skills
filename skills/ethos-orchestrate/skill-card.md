@@ -1,5 +1,5 @@
 ## Description: <br>
-Entry point for an AI agent's ethos.md (a durable snapshot of what the agent is for, what it must not do, and what success looks like) that routes a request to explore and capture intent (ethos-explore) or to write or edit the file (ethos-write), including renaming an Eval Author 0.1.0 ETHOS.md, and owns the standard every ethos sub-flow follows. <br>
+Entry point for an AI agent's ethos.md (a durable snapshot of what the agent is for, what it must not do, and what success looks like) that routes requests to explore and capture intent (ethos-explore) or to write or edit the file (ethos-write), including renaming an Eval Author 0.1.0 ETHOS.md. <br>
 
 This skill is for research and development only. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers building AI agents use this skill to create, review, update, or rename their agent's ethos.md; it locates any existing file, picks the right ethos sub-flow, and makes sure the file records intent the user confirmed rather than intent inferred from code. <br>
+Developers building AI agents use this skill with a coding assistant to find, explain, create, update, or rename their agent's ethos.md, routing each request to the ethos-explore or ethos-write sub-flow while ensuring the file records only user-confirmed intent. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,17 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [ethos-explore sub-flow](../ethos-explore/SKILL.md) <br>
-- [ethos-write sub-flow](../ethos-write/SKILL.md) <br>
-- [ethos.md template](../ethos-write/references/templates/ethos.md) <br>
+- [ethos.md overview (README.md)](README.md) <br>
+- [ethos-explore skill](../ethos-explore/SKILL.md) <br>
+- [ethos-write skill](../ethos-write/SKILL.md) <br>
+- [ethos.md schema-v1 template](../ethos-write/references/templates/ethos.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Shell commands, Files] <br>
-**Output Format:** [Markdown with inline bash code blocks; routes to sub-flows that write a local ethos.md] <br>
+**Output Format:** [Markdown with inline bash code blocks; routed sub-flows produce a single local ethos.md file] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Routing reads the local checkout only and works offline; nothing is committed automatically] <br>
+**Other Properties Related to Output:** [Routing reads the local checkout only and works offline; writes are limited to the ethos.md file via sub-flows and nothing is committed automatically.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -43,20 +44,20 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`) with SkillEvaluator 1.5.6; every task was also run without the skill as a baseline. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`) and compared against a no-skill baseline; evaluator version 1.5.6, evaluated 2026-10-16. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? Scored from the `security` signal. <br>
-- Correctness: Is the answer correct? Scored from the `accuracy` signal. <br>
-- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal. <br>
+- Security: Is it safe to use? Scored from the `security` signal (100%). <br>
+- Correctness: Is the answer correct? Scored from the `accuracy` signal (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal (100%). <br>
 - Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` and `behavior_check`. <br>
 - Efficiency: Did it avoid wasted tool calls and token usage? 50% `skill_efficiency` plus 50% `token_efficiency`. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
@@ -67,15 +68,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.6% (no comparable baseline; uplift unavailable) | 94.9% (no comparable baseline; uplift unavailable) |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 95.0% (+45.0 points) | 70.0% → 90.0% (+20.0 points) |
-| Discoverability | 86.7% (no comparable baseline; uplift unavailable) | 91.7% (no comparable baseline; uplift unavailable) |
-| Effectiveness | 51.0% → 95.0% (+44.0 points) | 49.2% → 94.8% (+45.6 points) |
-| Efficiency | 96.2% (no comparable baseline; uplift unavailable) | 97.9% (no comparable baseline; uplift unavailable) |
+| Overall | 95.7% (baseline not comparable; uplift unavailable) | 95.0% (baseline not comparable; uplift unavailable) |
+| Security | 75.0% → 100.0% (+25.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 70.0% → 95.0% (+25.0 points) |
+| Discoverability | 86.7% (baseline not comparable; uplift unavailable) | 91.7% (baseline not comparable; uplift unavailable) |
+| Effectiveness | 61.0% → 96.3% (+35.3 points) | 51.7% → 96.7% (+45.0 points) |
+| Efficiency | 95.5% (baseline not comparable; uplift unavailable) | 91.9% (baseline not comparable; uplift unavailable) |
 
 ## Skill Version(s): <br>
-0.1.0 (source: pyproject.toml; git SHA 8789503, committed 2026-10-15) <br>
+0.1.0 (source: pyproject.toml; git SHA 0b643fb, committed 2026-10-16) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

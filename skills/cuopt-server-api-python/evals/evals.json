@@ -65,7 +65,7 @@
     "question": "How do I run the cuOpt server in Docker so I can reach it on port 8000 from my host? Give me the command and tell me how to choose the image tag.",
     "expected_skill": "cuopt-server-api-python",
     "expected_script": null,
-    "ground_truth": "The agent gives a docker run command that passes --gpus all (the server requires a GPU) and publishes the port with -p 8000:8000. For the tag it recommends latest-cu12 or latest-cu13 chosen to match the driver's CUDA major version (latest-cu13-ubi10 for a UBI10 base), in preference to CUDA+Python-specific tags such as latest-cuda12.9-py3.13 which track a single Python line and go stale. It notes that for production the tag should be pinned to a full release tag or an immutable @sha256 digest, since latest-* tags are mutable. It also mentions verifying with a request to /cuopt/health.",
+    "ground_truth": "The agent gives a docker run command that passes --gpus all (the server requires a GPU) and publishes the port with -p 8000:8000. For the tag it recommends latest-cu12 or latest-cu13 chosen to match the driver's CUDA major version (latest-cu13-ubi10 for a UBI10 base). It notes that for production the tag should be pinned to a full release tag or an immutable @sha256 digest, since latest-* tags are mutable. It also mentions verifying with a request to /cuopt/health.",
     "expected_behavior": [
       "Includes --gpus all and -p 8000:8000 in the docker run command",
       "Recommends latest-cu12 / latest-cu13 selected by CUDA major version over CUDA+Python-specific tags",
