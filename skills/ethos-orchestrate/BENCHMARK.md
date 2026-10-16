@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.3% — baseline ran, but no comparable score was available; uplift unavailable | 96.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.9% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 90.0% (+40.0 points) | 65.0% → 100.0% (+35.0 points) |
-| Discoverability | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 53.8% → 95.0% (+41.2 points) | 53.5% → 94.2% (+40.7 points) |
-| Efficiency | 96.6% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 50.0% → 95.0% (+45.0 points) | 70.0% → 90.0% (+20.0 points) |
+| Discoverability | 86.7% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 51.0% → 95.0% (+44.0 points) | 49.2% → 94.8% (+45.6 points) |
+| Efficiency | 96.2% — baseline ran, but no comparable score was available; uplift unavailable | 97.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,227,288 | 1,868,043 | -640,755 | -34.30% | skill 4/4; base 4/4 |
-| claude-code | orchestrate-explicit-new-ethos | 390,499 | 615,593 | -225,094 | -36.57% | skill 1/1; base 1/1 |
-| claude-code | orchestrate-implicit-existing-status | 468,887 | 218,789 | +250,098 | +114.31% | skill 1/1; base 1/1 |
-| claude-code | orchestrate-legacy-rename | 338,722 | 1,004,678 | -665,956 | -66.29% | skill 1/1; base 1/1 |
+| claude-code | All cases | 1,227,978 | 1,372,629 | -144,651 | -10.54% | skill 4/4; base 4/4 |
+| claude-code | orchestrate-explicit-new-ethos | 397,443 | 420,820 | -23,377 | -5.56% | skill 1/1; base 1/1 |
+| claude-code | orchestrate-implicit-existing-status | 343,746 | 185,636 | +158,110 | +85.17% | skill 1/1; base 1/1 |
+| claude-code | orchestrate-legacy-rename | 457,609 | 737,190 | -279,581 | -37.93% | skill 1/1; base 1/1 |
 | claude-code | orchestrate-negative | 29,180 | 28,983 | +197 | +0.68% | skill 1/1; base 1/1 |
-| codex | All cases | 259,288 | 552,697 | -293,409 | -53.09% | skill 4/4; base 4/4 |
-| codex | orchestrate-explicit-new-ethos | 29,448 | 138,188 | -108,740 | -78.69% | skill 1/1; base 1/1 |
-| codex | orchestrate-implicit-existing-status | 101,619 | 90,809 | +10,810 | +11.90% | skill 1/1; base 1/1 |
-| codex | orchestrate-legacy-rename | 114,849 | 310,483 | -195,634 | -63.01% | skill 1/1; base 1/1 |
+| codex | All cases | 283,185 | 374,720 | -91,535 | -24.43% | skill 4/4; base 4/4 |
+| codex | orchestrate-explicit-new-ethos | 45,590 | 121,416 | -75,826 | -62.45% | skill 1/1; base 1/1 |
+| codex | orchestrate-implicit-existing-status | 127,550 | 89,536 | +38,014 | +42.46% | skill 1/1; base 1/1 |
+| codex | orchestrate-legacy-rename | 96,673 | 150,551 | -53,878 | -35.79% | skill 1/1; base 1/1 |
 | codex | orchestrate-negative | 13,372 | 13,217 | +155 | +1.17% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,486,576 | 2,420,740 | -934,164 | -38.59% | skill 8/8; base 8/8 |
+| ALL AGENTS | Dataset aggregate | 1,511,163 | 1,747,349 | -236,186 | -13.52% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 7 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 8 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -86,7 +86,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`team-skills/ethos/ethos-orchestrate/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`team-skills/ethos/ethos-orchestrate/SKILL.md`)
 - **MEDIUM** SCHEMA/author_missing: Author not specified in metadata (`team-skills/ethos/ethos-orchestrate/SKILL.md`)
-- 2 additional finding(s) are available in the full evaluation artifacts.
+- 3 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
