@@ -907,9 +907,9 @@
     {
       "name": "ethos-orchestrate",
       "path": "skills/ethos-orchestrate",
-      "content_digest": "sha256:61251aff7ace135f2c5c8fcc63232ae03fa6c1c1cd4316c2e0073109202c2b03",
-      "last_commit": "675de2f162289f140f428c25cb07c109bded8144",
-      "last_modified": "2026-10-15"
+      "content_digest": "sha256:5e8033f1ebbe66c273b7a471b942dcca200d7b44cd0b8cec106adb66d65e0971",
+      "last_commit": "b71950db9b50853b9e95da16db573bf22a30bb8e",
+      "last_modified": "2026-10-16"
     },
     {
       "name": "ethos-write",

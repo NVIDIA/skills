@@ -2595,7 +2595,7 @@
       "catalog_dir": "ethos-orchestrate",
       "component": "Ethos",
       "has_results": true,
-      "average_uplift_pct": 26.15
+      "average_uplift_pct": 25.77
     },
     {
       "skill": "ethos-write",
@@ -18968,8 +18968,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
-      "uplift_pct": 40.0
+      "score_pct": 95.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -18977,8 +18977,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 35.0
+      "score_pct": 90.0,
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -18986,7 +18986,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 80.0,
+      "score_pct": 86.7,
       "uplift_pct": null
     },
     {
@@ -19005,7 +19005,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 95.0,
-      "uplift_pct": 41.2
+      "uplift_pct": 44.0
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -19013,8 +19013,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.2,
-      "uplift_pct": 40.7
+      "score_pct": 94.8,
+      "uplift_pct": 45.6
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -19022,7 +19022,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.6,
+      "score_pct": 96.2,
       "uplift_pct": null
     },
     {
@@ -19031,7 +19031,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.3,
+      "score_pct": 97.9,
       "uplift_pct": null
     },
     {
