@@ -9,5 +9,6 @@ skills:
   - path: skills/physical-ai-physics-selection/
     catalog_dir: physical-ai-physics-selection
 links:
+  primary: false
   contributing: README.md#contributing
   discussions: false
