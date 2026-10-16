@@ -172,7 +172,10 @@ rm -f "$SKILLS_ROWS"
 
 # Getting Help & Contributing table — same aggregation pattern.
 # TSV columns:
-#   sort_key | name | issues_cell | discussions_cell | contributing_cell | security_cell | is_manual
+#   sort_key | name | issues_cell | discussions_cell | contributing_cell | security_cell | priority
+# priority: 0 = synced component, 1 = synced component with
+# `links.primary: false`, 2 = manual entry. When rows share a name, the
+# lowest priority wins the shared row's link cells.
 HELP_ROWS=/tmp/help-rows.tsv
 truncate -s 0 "$HELP_ROWS"
 
@@ -188,6 +191,11 @@ for i in $kept_indices; do
   [ "$discussions" = "null" ] && discussions="true"
   security=$(yq -r ".components[$i].links.security" "$CONFIG")
   [ "$security" = "null" ] && security="true"
+  # `links.primary: false` lets a component join a product row that another
+  # component already owns without replacing that row's help links.
+  primary=$(yq -r ".components[$i].links.primary" "$CONFIG")
+  priority=0
+  [ "$primary" = "false" ] && priority=1
 
   issues_cell="[Issues](https://github.com/${repo}/issues)"
   if [ "$discussions" = "true" ]; then
@@ -204,7 +212,7 @@ for i in $kept_indices; do
 
   sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%d\n' \
-    "$sort_key" "$name" "$issues_cell" "$discussions_cell" "$contributing_cell" "$security_cell" 0 \
+    "$sort_key" "$name" "$issues_cell" "$discussions_cell" "$contributing_cell" "$security_cell" "$priority" \
     >> "$HELP_ROWS"
 done
 
@@ -214,20 +222,20 @@ if [ -f "$MANUAL_CONFIG" ]; then
   for i in $(seq 0 $((manual_count - 1))); do
     name=$(yq -r ".components[$i].name" "$MANUAL_CONFIG")
     sort_key=$(echo "$name" | tr 'A-Z' 'a-z')
-    printf '%s\t%s\t—\t—\t—\t—\t%d\n' "$sort_key" "$name" 1 >> "$HELP_ROWS"
+    printf '%s\t%s\t—\t—\t—\t—\t%d\n' "$sort_key" "$name" 2 >> "$HELP_ROWS"
   done
 fi
 
-# Aggregation: prefer the synced row's link cells when both synced + manual
-# rows share the same name. The link cells aren't combined because there's
-# one logical issues / discussions / contributing / security link per
-# product, not per skill.
+# Aggregation: when rows share a name, keep the link cells of the row with
+# the lowest priority (synced over `links.primary: false` over manual). The
+# link cells aren't combined because there's one logical issues /
+# discussions / contributing / security link per product, not per skill.
 {
   echo "| Product | Issues | Discussions | Contributing | Security |"
   echo "|---------|--------|-------------|--------------|----------|"
   sort -t$'\t' -k1,1 "$HELP_ROWS" | awk -F'\t' '
     {
-      sk = $1; name = $2; iss = $3; dis = $4; contrib = $5; sec = $6; man = $7 + 0
+      sk = $1; name = $2; iss = $3; dis = $4; contrib = $5; sec = $6; pri = $7 + 0
       if (!(sk in seen)) {
         seen[sk] = 1
         order[++n] = sk
@@ -236,15 +244,15 @@ fi
         s_dis[sk] = dis
         s_contrib[sk] = contrib
         s_sec[sk] = sec
-        s_man[sk] = man
-      } else if (man == 0 && s_man[sk] == 1) {
-        # Replace manual rows em-dash cells with the synced rows real links.
+        s_pri[sk] = pri
+      } else if (pri < s_pri[sk]) {
+        # A higher-priority row replaces the stored link cells.
         s_name[sk] = name
         s_iss[sk] = iss
         s_dis[sk] = dis
         s_contrib[sk] = contrib
         s_sec[sk] = sec
-        s_man[sk] = 0
+        s_pri[sk] = pri
       }
     }
     END {
