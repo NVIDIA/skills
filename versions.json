@@ -291,9 +291,9 @@
     {
       "name": "cuopt-server-api-python",
       "path": "skills/cuopt-server-api-python",
-      "content_digest": "sha256:164bc205760fec78fa86c761613b00b8d6110e985aa5693e035d06872e44b0a5",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:ff7ced7078cb937b10f0350b36974f84234026aab8cbfdc842355f4d4d00e5a8",
+      "last_commit": "38b6f0dc04e97ad42788b96c258cb3f6e7bb040c",
+      "last_modified": "2026-10-16"
     },
     {
       "name": "dali-dynamic-mode",
@@ -907,8 +907,8 @@
     {
       "name": "ethos-orchestrate",
       "path": "skills/ethos-orchestrate",
-      "content_digest": "sha256:5e8033f1ebbe66c273b7a471b942dcca200d7b44cd0b8cec106adb66d65e0971",
-      "last_commit": "b71950db9b50853b9e95da16db573bf22a30bb8e",
+      "content_digest": "sha256:55a596a93fc386d307a70d2d490f4ceae0ce4d13a3874c6a504e0325ff1934c9",
+      "last_commit": "38b6f0dc04e97ad42788b96c258cb3f6e7bb040c",
       "last_modified": "2026-10-16"
     },
     {

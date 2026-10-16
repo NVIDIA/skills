@@ -847,13 +847,13 @@
     },
     {
       "skill": "cuopt-server-api-python",
-      "evaluation_date": "2026-09-15",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:89ad304517df359a8c33a1f67da3ad9df8aeae5ec234d2adbed1593bf49c4ebc",
+      "dataset_digest": "sha256:c54a53a22db535b2e2101bfcd2c43a8cdfef342f5c166ba343b8fdba517c741d",
       "validation_status": null,
       "tasks": 8,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -863,7 +863,7 @@
       "catalog_dir": "cuopt-server-api-python",
       "component": "cuOpt",
       "has_results": true,
-      "average_uplift_pct": 27.32
+      "average_uplift_pct": 17.1
     },
     {
       "skill": "dali-dynamic-mode",
@@ -2579,7 +2579,7 @@
     },
     {
       "skill": "ethos-orchestrate",
-      "evaluation_date": "2026-10-15",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:a405e089d93c5fbaef1a4083da0609f55595a62b10d5fc3c59d9ce536e49b4d1",
@@ -2595,7 +2595,7 @@
       "catalog_dir": "ethos-orchestrate",
       "component": "Ethos",
       "has_results": true,
-      "average_uplift_pct": 25.77
+      "average_uplift_pct": 26.72
     },
     {
       "skill": "ethos-write",
@@ -11895,7 +11895,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 9.1
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -11904,7 +11904,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 32.0
+      "uplift_pct": 22.5
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -11913,7 +11913,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 32.7
+      "uplift_pct": 17.5
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -11930,7 +11930,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.4,
+      "score_pct": 93.8,
       "uplift_pct": null
     },
     {
@@ -11939,8 +11939,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.2,
-      "uplift_pct": 47.4
+      "score_pct": 94.3,
+      "uplift_pct": 36.2
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -11948,8 +11948,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.2,
-      "uplift_pct": 42.7
+      "score_pct": 90.5,
+      "uplift_pct": 26.4
     },
     {
       "catalog_dir": "cuopt-server-api-python",
@@ -11957,7 +11957,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.1,
+      "score_pct": 97.1,
       "uplift_pct": null
     },
     {
@@ -11966,7 +11966,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.7,
+      "score_pct": 95.1,
       "uplift_pct": null
     },
     {
@@ -18951,7 +18951,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -18968,8 +18968,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 45.0
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -18977,8 +18977,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 20.0
+      "score_pct": 95.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -19004,8 +19004,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 44.0
+      "score_pct": 96.3,
+      "uplift_pct": 35.3
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -19013,8 +19013,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.8,
-      "uplift_pct": 45.6
+      "score_pct": 96.7,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "ethos-orchestrate",
@@ -19022,7 +19022,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.2,
+      "score_pct": 95.5,
       "uplift_pct": null
     },
     {
@@ -19031,7 +19031,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 97.9,
+      "score_pct": 91.9,
       "uplift_pct": null
     },
     {
