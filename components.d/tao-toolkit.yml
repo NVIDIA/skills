@@ -22,8 +22,12 @@ skills:
     catalog_dir: tao-run-deft-cr-its-mining
   - path: skills/applications/tao-run-deft-object-detection/
     catalog_dir: tao-run-deft-object-detection
+  - path: skills/applications/tao-run-deft-od-aoi/
+    catalog_dir: tao-run-deft-od-aoi
   - path: skills/applications/tao-run-deft-pas/
     catalog_dir: tao-run-deft-pas
+  - path: skills/applications/tao-run-dinov3-ssl-deft/
+    catalog_dir: tao-run-dinov3-ssl-deft
   - path: skills/applications/tao-run-inference-service/
     catalog_dir: tao-run-inference-service
   - path: skills/applications/tao-train-single-step/
@@ -43,12 +47,16 @@ skills:
     catalog_dir: tao-analyze-gaps-vlm-bcq
   - path: skills/data/tao-convert-dataset-format/
     catalog_dir: tao-convert-dataset-format
+  - path: skills/data/tao-finetune-anomalygennext/
+    catalog_dir: tao-finetune-anomalygennext
   - path: skills/data/tao-generate-anomalies/
     catalog_dir: tao-generate-anomalies
   - path: skills/data/tao-generate-image-embeddings/
     catalog_dir: tao-generate-image-embeddings
   - path: skills/data/tao-generate-image-grounding/
     catalog_dir: tao-generate-image-grounding
+  - path: skills/data/tao-generate-od-defects/
+    catalog_dir: tao-generate-od-defects
   - path: skills/data/tao-generate-referring-expressions/
     catalog_dir: tao-generate-referring-expressions
   - path: skills/data/tao-generate-video-reasoning-annotations/
@@ -59,6 +67,8 @@ skills:
     catalog_dir: tao-mine-nearest-neighbors
   - path: skills/data/tao-mine-od-images/
     catalog_dir: tao-mine-od-images
+  - path: skills/data/tao-prepare-anomalygennext-inputs/
+    catalog_dir: tao-prepare-anomalygennext-inputs
   - path: skills/data/tao-route-visual-changenet-samples/
     catalog_dir: tao-route-visual-changenet-samples
   - path: skills/data/tao-validate-dataset-format/
@@ -70,10 +80,10 @@ skills:
     catalog_dir: tao-finetune-cosmos-embed
   - path: skills/models/tao-finetune-cosmos-reason/
     catalog_dir: tao-finetune-cosmos-reason
-  - path: skills/models/tao-finetune-nv-tesseract-ad-diffusion/
-    catalog_dir: tao-finetune-nv-tesseract-ad-diffusion
-  - path: skills/models/tao-finetune-nv-tesseract-forecasting/
-    catalog_dir: tao-finetune-nv-tesseract-forecasting
+  - path: skills/models/tao-finetune-kumo-anomaly/
+    catalog_dir: tao-finetune-kumo-anomaly
+  - path: skills/models/tao-finetune-kumo-forecast/
+    catalog_dir: tao-finetune-kumo-forecast
   - path: skills/models/tao-finetune-video-clip/
     catalog_dir: tao-finetune-video-clip
   - path: skills/models/tao-train-action-recognition/
@@ -160,3 +170,5 @@ skills:
     catalog_dir: tao-list-capabilities
   - path: skills/core/tao-setup/
     catalog_dir: tao-setup
+  - path: skills/core/tao-token-efficient-execution/
+    catalog_dir: tao-token-efficient-execution
