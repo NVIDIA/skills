@@ -67,17 +67,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.3% (no comparable baseline; uplift unavailable) | 96.8% (no comparable baseline; uplift unavailable) |
+| Overall | 94.6% (no comparable baseline; uplift unavailable) | 94.9% (no comparable baseline; uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 90.0% (+40.0 points) | 65.0% → 100.0% (+35.0 points) |
-| Discoverability | 80.0% (no comparable baseline; uplift unavailable) | 91.7% (no comparable baseline; uplift unavailable) |
-| Effectiveness | 53.8% → 95.0% (+41.2 points) | 53.5% → 94.2% (+40.7 points) |
-| Efficiency | 96.6% (no comparable baseline; uplift unavailable) | 98.3% (no comparable baseline; uplift unavailable) |
-
-Overall verdict: PASS. Tier 1 static validation passed with observations (11 validators, 7 findings); Tier 2 semantic deduplication passed; Tier 3 live agent evaluation passed (2 agents, 4 tasks). Across all agents, the skill used 38.59% fewer tokens than the baseline (1,486,576 vs. 2,420,740).
+| Correctness | 50.0% → 95.0% (+45.0 points) | 70.0% → 90.0% (+20.0 points) |
+| Discoverability | 86.7% (no comparable baseline; uplift unavailable) | 91.7% (no comparable baseline; uplift unavailable) |
+| Effectiveness | 51.0% → 95.0% (+44.0 points) | 49.2% → 94.8% (+45.6 points) |
+| Efficiency | 96.2% (no comparable baseline; uplift unavailable) | 97.9% (no comparable baseline; uplift unavailable) |
 
 ## Skill Version(s): <br>
-0.1.0 (source: pyproject.toml; git SHA ba3626f, committed 2026-10-15) <br>
+0.1.0 (source: pyproject.toml; git SHA 8789503, committed 2026-10-15) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
