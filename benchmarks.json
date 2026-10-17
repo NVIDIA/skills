@@ -4284,7 +4284,7 @@
     },
     {
       "skill": "nemo-fabric-integrate",
-      "evaluation_date": "2026-10-14",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:4e12e11bb429ad195c00ceab9cd53bbf6351f32173f03b0ae827531ba2441a9e",
@@ -4300,7 +4300,7 @@
       "catalog_dir": "nemo-fabric-integrate",
       "component": "NeMo Fabric",
       "has_results": true,
-      "average_uplift_pct": 25.87
+      "average_uplift_pct": 18.4
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -26180,8 +26180,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 58.3,
-      "uplift_pct": -41.7
+      "score_pct": 66.7,
+      "uplift_pct": -16.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26189,8 +26189,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 0.0
+      "score_pct": 41.7,
+      "uplift_pct": -58.3
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26199,7 +26199,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 86.7,
-      "uplift_pct": 56.7
+      "uplift_pct": 46.7
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26208,7 +26208,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 93.3,
-      "uplift_pct": 60.0
+      "uplift_pct": 56.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26216,7 +26216,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 80.0,
+      "score_pct": 82.5,
       "uplift_pct": null
     },
     {
@@ -26225,7 +26225,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
+      "score_pct": 77.5,
       "uplift_pct": null
     },
     {
@@ -26234,8 +26234,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 67.1,
-      "uplift_pct": 39.2
+      "score_pct": 78.6,
+      "uplift_pct": 44.4
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26243,8 +26243,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.6,
-      "uplift_pct": 41.0
+      "score_pct": 68.2,
+      "uplift_pct": 37.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26252,7 +26252,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 62.1,
+      "score_pct": 65.0,
       "uplift_pct": null
     },
     {
@@ -26261,7 +26261,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.5,
+      "score_pct": 83.1,
       "uplift_pct": null
     },
     {
