@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 411,
-  "result_row_count": 3855,
+  "skill_count": 417,
+  "result_row_count": 3914,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -6212,13 +6212,13 @@
     },
     {
       "skill": "tao-analyze-detection-kpi",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:6faa124b8e84816c70c039ea26e67277f789709cb91e2065fd3e7fb51dc74b35",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6228,17 +6228,17 @@
       "catalog_dir": "tao-analyze-detection-kpi",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 38.87
+      "average_uplift_pct": 38.4
     },
     {
       "skill": "tao-analyze-gaps-od-map",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:201d53df8972c71637b4d01e11df157458227c64bee4b81840057d3aa1144da7",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6248,17 +6248,17 @@
       "catalog_dir": "tao-analyze-gaps-od-map",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 36.73
+      "average_uplift_pct": 50.42
     },
     {
       "skill": "tao-analyze-gaps-visual-changenet",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:ae84a6a3fa64e143c6bed275bc0db66b4be02dc112bc310fce577d286399c2d4",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6268,17 +6268,17 @@
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 37.87
+      "average_uplift_pct": 39.1
     },
     {
       "skill": "tao-analyze-gaps-vlm-bcq",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:e140184632b0fe19bd5db4852af88c561135630f4b93228a40a301a1db96580d",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6288,17 +6288,17 @@
       "catalog_dir": "tao-analyze-gaps-vlm-bcq",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 58.88
+      "average_uplift_pct": 52.77
     },
     {
       "skill": "tao-artifacts",
-      "evaluation_date": "2026-09-18",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:615d7cbfd18bece2985875429c1ee5e8d6c108e1dab4c4a54a048980eb6a637c",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6351,14 +6351,34 @@
       "average_uplift_pct": 58.32
     },
     {
+      "skill": "tao-finetune-anomalygennext",
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:bc0c5f8ff3f720d3a2430566d6a3a31037ffc1c850e46685a4204d649970a7e3",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 32.5
+    },
+    {
       "skill": "tao-finetune-clip",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:0a7b21ad86a50e18923dffbf160fb4dd3cfa26464238a34a4adce47a02e6bc1b",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6368,17 +6388,17 @@
       "catalog_dir": "tao-finetune-clip",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 48.32
+      "average_uplift_pct": 49.17
     },
     {
       "skill": "tao-finetune-cosmos-embed",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:2fd9605b2d1b05b6c7c6e6c916541a13f91bb49a44edcbc8fea84aa73a049c46",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6388,17 +6408,17 @@
       "catalog_dir": "tao-finetune-cosmos-embed",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 48.33
+      "average_uplift_pct": 54.98
     },
     {
       "skill": "tao-finetune-cosmos-reason",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:81bc83868a378e3f3fdece654f6a44dce369888b12a2f872175a72b84b090797",
       "validation_status": null,
       "tasks": 7,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6408,17 +6428,17 @@
       "catalog_dir": "tao-finetune-cosmos-reason",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 27.82
+      "average_uplift_pct": 25.72
     },
     {
       "skill": "tao-finetune-huggingface-model",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:28fd5bf04229375b8bfea649e9cb787a04bb482b80b6ae2ae31e5ff9f076838a",
+      "dataset_digest": "sha256:1dfae0e82b4644c26c4137c7a97c06489a0136400c4aa9454daa97f9d614dacb",
       "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6428,57 +6448,57 @@
       "catalog_dir": "tao-finetune-huggingface-model",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 14.77
+      "average_uplift_pct": 32.47
     },
     {
-      "skill": "tao-finetune-nv-tesseract-ad-diffusion",
-      "evaluation_date": "2026-09-17",
+      "skill": "tao-finetune-kumo-anomaly",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:a53bedf5393757a2bff7bcef25a3b4519c1289a717c1730301d4f49cb539edd8",
+      "dataset_digest": "sha256:86cfdac9a5b6596731d442e69eb446a92efdb9e203f7e61b9ae9d8fd2d53f3d4",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
       ],
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 29.56
+      "average_uplift_pct": 52.2
     },
     {
-      "skill": "tao-finetune-nv-tesseract-forecasting",
-      "evaluation_date": "2026-09-17",
+      "skill": "tao-finetune-kumo-forecast",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:99a0cd83e7725555f593bd8db284bde10731b7cf6a0f40d7accde38614b00fe3",
+      "dataset_digest": "sha256:0d71ed10c27977b5a628fe06b3c1102a02f08586ca0b039cfff6943258746a23",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
       ],
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-forecast",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 47.22
+      "average_uplift_pct": 35.54
     },
     {
       "skill": "tao-finetune-video-clip",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:4ad92205ac85db52d1f0afec780b50c3453900d9a29d2f0b9e60eb9be7225ee0",
       "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6488,17 +6508,17 @@
       "catalog_dir": "tao-finetune-video-clip",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 47.0
+      "average_uplift_pct": 32.13
     },
     {
       "skill": "tao-generate-anomalies",
-      "evaluation_date": "2026-09-22",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:f16074998b03223a85c3a4a806ad96050ff9fba4c9d9125dd3ab7b9e54d2c850",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6508,17 +6528,17 @@
       "catalog_dir": "tao-generate-anomalies",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 39.1
+      "average_uplift_pct": 44.34
     },
     {
       "skill": "tao-generate-image-embeddings",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:5cf432748165358cd9e6fcbb2b75232683f679076f5839eca5ac1f8b5e33bd2f",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6528,17 +6548,17 @@
       "catalog_dir": "tao-generate-image-embeddings",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 40.43
+      "average_uplift_pct": 50.83
     },
     {
       "skill": "tao-generate-image-grounding",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:6e71bdc7c6749095693b9f75023d66f6cf14ce21a8fcf6026e06418a0f1eb5de",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6548,17 +6568,37 @@
       "catalog_dir": "tao-generate-image-grounding",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 45.63
+      "average_uplift_pct": 41.99
+    },
+    {
+      "skill": "tao-generate-od-defects",
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:2b3faca7598b4464583dbea8e5f36e64e696ef58add6e39f847cca97a2f49fef",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 43.33
     },
     {
       "skill": "tao-generate-referring-expressions",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:5d32143561ff4b116cf31ee3c4b782a64cf164ba5aad47c65d8f71564c34eb09",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6568,17 +6608,17 @@
       "catalog_dir": "tao-generate-referring-expressions",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 40.31
+      "average_uplift_pct": 42.69
     },
     {
       "skill": "tao-generate-video-reasoning-annotations",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:fbdeca998d851aa0aab11c3237f6de998b22a3074efd28f8eaa39e1f4d943fa8",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6588,17 +6628,17 @@
       "catalog_dir": "tao-generate-video-reasoning-annotations",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 41.23
+      "average_uplift_pct": 40.54
     },
     {
       "skill": "tao-launch-workflow",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:5edd8af3c36794f4387498841fc8ffd7ba340b18d18d277703ae2b5c4da2c361",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6608,7 +6648,7 @@
       "catalog_dir": "tao-launch-workflow",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 44.83
+      "average_uplift_pct": 42.44
     },
     {
       "skill": "tao-list-capabilities",
@@ -6632,13 +6672,13 @@
     },
     {
       "skill": "tao-mine-aoi-images",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:2f6b99a4a594874f43e0be6c3915392736c3f9b703a55e95ada6d1a02662b36a",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6648,17 +6688,17 @@
       "catalog_dir": "tao-mine-aoi-images",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 35.74
+      "average_uplift_pct": 46.76
     },
     {
       "skill": "tao-mine-nearest-neighbors",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:acb0bab13a495ae61fed1d8f7d142b32f3d6496e3d1dc838d105cf8bcaad70dd",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6668,17 +6708,17 @@
       "catalog_dir": "tao-mine-nearest-neighbors",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 50.7
+      "average_uplift_pct": 35.91
     },
     {
       "skill": "tao-mine-od-images",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:273e0998e3b7f6e713f8e9a19507c191f9e6f744c515fd853c93b71367a1e0ec",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6688,7 +6728,7 @@
       "catalog_dir": "tao-mine-od-images",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 39.7
+      "average_uplift_pct": 50.0
     },
     {
       "skill": "tao-port-huggingface-model",
@@ -6709,6 +6749,26 @@
       "component": "TAO Toolkit",
       "has_results": true,
       "average_uplift_pct": 50.27
+    },
+    {
+      "skill": "tao-prepare-anomalygennext-inputs",
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:f006e725f4b5f639555f92aeb585edc3e6b3689d9af0b0f1ccc4fb471bf87216",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 42.0
     },
     {
       "skill": "tao-route-visual-changenet-samples",
@@ -6732,13 +6792,13 @@
     },
     {
       "skill": "tao-run-automl",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:6e6a8b1880c4283f37cfa5a864e7adf4d95f63ad1728111063fdc09ab2ac0604",
       "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6748,7 +6808,7 @@
       "catalog_dir": "tao-run-automl",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 46.53
+      "average_uplift_pct": 31.95
     },
     {
       "skill": "tao-run-automl-deft-pipeline",
@@ -6772,13 +6832,13 @@
     },
     {
       "skill": "tao-run-deft-aoi",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:ec1289a65b99daada0be3fb22c3130744571015a752689cf955682ed47b014f3",
       "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6788,17 +6848,17 @@
       "catalog_dir": "tao-run-deft-aoi",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 50.1
+      "average_uplift_pct": 31.98
     },
     {
       "skill": "tao-run-deft-aoi-cosmos3",
-      "evaluation_date": "2026-09-22",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:4015aa6d9af5f535d47c8467a34ce351d0cdfc45b0fb0f7be5a6e99c30a1f90a",
       "validation_status": null,
       "tasks": 3,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6808,17 +6868,17 @@
       "catalog_dir": "tao-run-deft-aoi-cosmos3",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 46.8
+      "average_uplift_pct": 53.15
     },
     {
       "skill": "tao-run-deft-cr-its-mining",
-      "evaluation_date": "2026-09-22",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:e2415bd85ab17e2af8a9afff1301e63b0145eceba60a95906283869558f70186",
       "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6828,17 +6888,17 @@
       "catalog_dir": "tao-run-deft-cr-its-mining",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 28.81
+      "average_uplift_pct": 36.99
     },
     {
       "skill": "tao-run-deft-object-detection",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:d3fce2a83efb9ec178ecc5fc8a20f8c2280adffa3b279916a073015372c25237",
       "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6848,17 +6908,37 @@
       "catalog_dir": "tao-run-deft-object-detection",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 53.58
+      "average_uplift_pct": 53.85
+    },
+    {
+      "skill": "tao-run-deft-od-aoi",
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:b99e1e3ff2bffdfd231860bb6af0662e43650359a05baf1323f79367499ce338",
+      "validation_status": null,
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 44.58
     },
     {
       "skill": "tao-run-deft-pas",
-      "evaluation_date": "2026-09-22",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:40d7b333cefc143c30dd17c4ffbefe571c121a4003d1bf967029bf231d1321d9",
+      "dataset_digest": "sha256:a96fe279f8dcd9995cf48dab59613268866481e77e344ffcace5746b56926055",
       "validation_status": null,
-      "tasks": 14,
-      "attempts_per_task": 3,
+      "tasks": 20,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6868,7 +6948,27 @@
       "catalog_dir": "tao-run-deft-pas",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 26.33
+      "average_uplift_pct": 29.98
+    },
+    {
+      "skill": "tao-run-dinov3-ssl-deft",
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:4af41a3d00a986b758547fb383084946dab341ed73b17b47c2a29eadf2a70683",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 37.05
     },
     {
       "skill": "tao-run-inference-service",
@@ -6892,13 +6992,13 @@
     },
     {
       "skill": "tao-run-on-brev",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:be0c191e8b9ac1f2ed8b4cddd431bb80a0d43dc65aced83361bac1b522fd168f",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6908,7 +7008,7 @@
       "catalog_dir": "tao-run-on-brev",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 51.57
+      "average_uplift_pct": 49.36
     },
     {
       "skill": "tao-run-on-docker",
@@ -6972,13 +7072,13 @@
     },
     {
       "skill": "tao-run-on-virtualenv",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:9b5194d2d51b31e12c9a2ba1184b419360d32ffea6d7a3898b853c2f4f4130c9",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6988,17 +7088,17 @@
       "catalog_dir": "tao-run-on-virtualenv",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 44.71
+      "average_uplift_pct": 51.53
     },
     {
       "skill": "tao-setup",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:646cc2eff75323f4c19ef8aa7bab21af9f0d483032dbd24c960e512200242a6c",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7008,7 +7108,7 @@
       "catalog_dir": "tao-setup",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 47.96
+      "average_uplift_pct": 58.32
     },
     {
       "skill": "tao-setup-nvidia-gpu-host",
@@ -7031,14 +7131,34 @@
       "average_uplift_pct": 48.6
     },
     {
+      "skill": "tao-token-efficient-execution",
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:ebb8fd6d9ad84d574915ae829c70455cf26bfbbdbb47e37741290fe1974316e3",
+      "validation_status": null,
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 35.93
+    },
+    {
       "skill": "tao-train-action-recognition",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:5a28679a2ce1c0f618dcb3a8bd8953e64b96e2eda82d50a65fe4ff5081a17989",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7048,7 +7168,7 @@
       "catalog_dir": "tao-train-action-recognition",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 34.88
+      "average_uplift_pct": 33.88
     },
     {
       "skill": "tao-train-bevfusion",
@@ -7072,13 +7192,13 @@
     },
     {
       "skill": "tao-train-centerpose",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:8c9306c1db5f60d09b304b060342bac554886b3493acfb625c7664e8f3bea2fb",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7088,7 +7208,7 @@
       "catalog_dir": "tao-train-centerpose",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 35.55
+      "average_uplift_pct": 29.29
     },
     {
       "skill": "tao-train-codetr",
@@ -7112,13 +7232,13 @@
     },
     {
       "skill": "tao-train-deformable-detr",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:4f8a34c161384c71c13bf95c9766cdeeb78b868fc9e9c8f42dbe2c0081e049a4",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7128,17 +7248,17 @@
       "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 32.5
+      "average_uplift_pct": 35.33
     },
     {
       "skill": "tao-train-depth-anything-v2",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:96006540bebd24e24b84e0982196292c375f2d3abe030951f23e471d24a270e4",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7148,17 +7268,17 @@
       "catalog_dir": "tao-train-depth-anything-v2",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 33.57
+      "average_uplift_pct": 35.79
     },
     {
       "skill": "tao-train-dino",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:a0a4e58efb79400761614702ba482a9d245b9f3b5fd462ee547295fa15ec910e",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7168,17 +7288,17 @@
       "catalog_dir": "tao-train-dino",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 32.87
+      "average_uplift_pct": 39.17
     },
     {
       "skill": "tao-train-dinov3",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:98b0d5d4541134319b23c27e40cd0cbd8cc09fe88f2b03c303fe4735e83e53ce",
       "validation_status": null,
       "tasks": 2,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7188,17 +7308,17 @@
       "catalog_dir": "tao-train-dinov3",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 39.65
+      "average_uplift_pct": 32.72
     },
     {
       "skill": "tao-train-fast-foundation-stereo",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:ef4cacc44fff4e2a7cb4e8bf9bf83d2986cc0a7f0f6e42d6f328744e883b8fe4",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7208,17 +7328,17 @@
       "catalog_dir": "tao-train-fast-foundation-stereo",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 29.76
+      "average_uplift_pct": 20.21
     },
     {
       "skill": "tao-train-foundation-stereo",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:ba7915e145640b0e9eb01b3bee48d1351fc3f79e6c9342339c8557533ba185bf",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7228,17 +7348,17 @@
       "catalog_dir": "tao-train-foundation-stereo",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 50.58
+      "average_uplift_pct": 26.27
     },
     {
       "skill": "tao-train-grounding-dino",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:d5ad56d004c26f0a41b51287912ae2154603d657fc4c3534a90a345f2161c796",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7248,17 +7368,17 @@
       "catalog_dir": "tao-train-grounding-dino",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 33.7
+      "average_uplift_pct": 46.04
     },
     {
       "skill": "tao-train-image-classification",
-      "evaluation_date": "2026-09-18",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:206d62dbc15f845e57ca15d252f0c09ea9b4ea530419388f2525b5f7db4a1d0a",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7268,17 +7388,17 @@
       "catalog_dir": "tao-train-image-classification",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 34.44
+      "average_uplift_pct": 40.46
     },
     {
       "skill": "tao-train-mask-auto-encoder",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:ab9ef648310ea9533b75741eafbf74552631433c44a51aaa277d1e5c58239568",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7288,17 +7408,17 @@
       "catalog_dir": "tao-train-mask-auto-encoder",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 35.1
+      "average_uplift_pct": 26.06
     },
     {
       "skill": "tao-train-mask-auto-label",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:7eacf9398cb6274a04cdbee9950ce4646ee885008b9a42a4066b4fe08e4aeddf",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7308,17 +7428,17 @@
       "catalog_dir": "tao-train-mask-auto-label",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 39.82
+      "average_uplift_pct": 28.41
     },
     {
       "skill": "tao-train-mask-grounding-dino",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:6ede99c47438b61c32d88bbdab9337ea8103308129e5ed5f755eccd17a83949f",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7328,17 +7448,17 @@
       "catalog_dir": "tao-train-mask-grounding-dino",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 25.19
+      "average_uplift_pct": 34.72
     },
     {
       "skill": "tao-train-mask2former",
-      "evaluation_date": "2026-09-18",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:52024b5b07978a81d4aabc7184678bc6e720de4e36c431bd53f4d2b666606646",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7348,17 +7468,17 @@
       "catalog_dir": "tao-train-mask2former",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 19.53
+      "average_uplift_pct": 31.29
     },
     {
       "skill": "tao-train-metric-learning-recognition",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:87cb14ca8ab20738d96652b26ff54723f103dd297fa23d1157beba407e5d344e",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7368,17 +7488,17 @@
       "catalog_dir": "tao-train-metric-learning-recognition",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 24.6
+      "average_uplift_pct": 10.81
     },
     {
       "skill": "tao-train-nvdinov2",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:fa3fa74847cd160aa846ebcf8cbca2d579f21549b3a16539f883b54e9296dd11",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7388,17 +7508,17 @@
       "catalog_dir": "tao-train-nvdinov2",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 22.21
+      "average_uplift_pct": 27.73
     },
     {
       "skill": "tao-train-nvpanoptix3d",
-      "evaluation_date": "2026-09-18",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:cc0384d330cc8872298b458fa580905a2ff75afbdaaf1cdf0c3eddef27369244",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7408,17 +7528,17 @@
       "catalog_dir": "tao-train-nvpanoptix3d",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 45.82
+      "average_uplift_pct": 31.4
     },
     {
       "skill": "tao-train-ocdnet",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:efa0c4ae0da611bf0297a3690e59845bfb8c639705d8ead0825326c2b3602047",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7428,17 +7548,17 @@
       "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 37.4
+      "average_uplift_pct": 22.69
     },
     {
       "skill": "tao-train-ocrnet",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:85ba50bd18348c2652bcb215456f1887ac642a3b81701a68ad5c5259bdde3091",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7448,17 +7568,17 @@
       "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 32.7
+      "average_uplift_pct": 26.01
     },
     {
       "skill": "tao-train-oneformer",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:310962cce2a7dce214ed282e3dde459ece3242954c272b5557e3b2bd3fe04a4a",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7468,17 +7588,17 @@
       "catalog_dir": "tao-train-oneformer",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 35.96
+      "average_uplift_pct": 17.93
     },
     {
       "skill": "tao-train-optical-inspection",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:92300e452114b3453095ca91ce8396d14336ce04619a616cf6393957969fb901",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7488,17 +7608,17 @@
       "catalog_dir": "tao-train-optical-inspection",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 30.55
+      "average_uplift_pct": 42.5
     },
     {
       "skill": "tao-train-pointpillars",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:86fdda83cf047fafe307e854d232a524e239aeaad950b54689e8477f3128e3db",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7508,17 +7628,17 @@
       "catalog_dir": "tao-train-pointpillars",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 19.59
+      "average_uplift_pct": 35.55
     },
     {
       "skill": "tao-train-pose-classification",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:911fdab3189500019ddd510c71614289741cbbf0734c34b2b05952c4027e561a",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7528,17 +7648,17 @@
       "catalog_dir": "tao-train-pose-classification",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 35.11
+      "average_uplift_pct": 45.27
     },
     {
       "skill": "tao-train-reid",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:e56d74577eb2d52bf3c78b82bbbb5d7b72f5c078fe9b1c3bcd794756d8509d8f",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7548,17 +7668,17 @@
       "catalog_dir": "tao-train-reid",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 31.19
+      "average_uplift_pct": 27.46
     },
     {
       "skill": "tao-train-rtdetr",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:f8097d932847587633107ec506f93a5af0100ffc2857d5b55ccf2d0eac54e4ea",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7568,17 +7688,17 @@
       "catalog_dir": "tao-train-rtdetr",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 34.62
+      "average_uplift_pct": 25.31
     },
     {
       "skill": "tao-train-segformer",
-      "evaluation_date": "2026-09-17",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:f80b8692186ac58315e7b714cea67f5c78b935b2d93e3982e2bd26b67c895d4d",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7588,7 +7708,7 @@
       "catalog_dir": "tao-train-segformer",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 33.7
+      "average_uplift_pct": 36.38
     },
     {
       "skill": "tao-train-single-step",
@@ -7612,13 +7732,13 @@
     },
     {
       "skill": "tao-train-sparse4d",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:a66bccd122a4e284a07ecb17ffac7584cd4d490d6b9955f970cea7c4fd14a55a",
+      "dataset_digest": "sha256:2b0115d60b2ccf67771cdf91e07158641e64d575b9497430129ea837a8b28084",
       "validation_status": null,
-      "tasks": 1,
-      "attempts_per_task": 3,
+      "tasks": 7,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7628,17 +7748,17 @@
       "catalog_dir": "tao-train-sparse4d",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 31.3
+      "average_uplift_pct": 34.93
     },
     {
       "skill": "tao-train-visual-changenet",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:80420378cfd4499efd532945c750f94564faa3952f71bad23620578ba587cd9b",
       "validation_status": null,
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -7648,7 +7768,7 @@
       "catalog_dir": "tao-train-visual-changenet",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 27.03
+      "average_uplift_pct": 35.55
     },
     {
       "skill": "tao-validate-dataset-format",
@@ -34044,7 +34164,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 93.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-analyze-detection-kpi",
@@ -34080,7 +34200,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 90.0,
-      "uplift_pct": 80.0
+      "uplift_pct": 65.0
     },
     {
       "catalog_dir": "tao-analyze-detection-kpi",
@@ -34088,8 +34208,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 20.0
+      "score_pct": 55.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "tao-analyze-detection-kpi",
@@ -34097,7 +34217,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.1,
+      "score_pct": 98.4,
       "uplift_pct": null
     },
     {
@@ -34134,7 +34254,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 93.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-analyze-gaps-od-map",
@@ -34160,7 +34280,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 0.0,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -34178,8 +34298,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 10.0
+      "score_pct": 87.5,
+      "uplift_pct": 47.5
     },
     {
       "catalog_dir": "tao-analyze-gaps-od-map",
@@ -34187,7 +34307,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.1,
+      "score_pct": 73.1,
       "uplift_pct": null
     },
     {
@@ -34197,7 +34317,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 98.5,
-      "uplift_pct": -1.2
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
@@ -34224,7 +34344,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
@@ -34233,7 +34353,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 80.0
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
@@ -34260,7 +34380,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 77.8
+      "uplift_pct": 83.3
     },
     {
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
@@ -34268,8 +34388,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 21.7
+      "score_pct": 80.0,
+      "uplift_pct": 31.7
     },
     {
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
@@ -34277,7 +34397,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 71.9,
+      "score_pct": 97.4,
       "uplift_pct": null
     },
     {
@@ -34286,8 +34406,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.6,
-      "uplift_pct": -1.1
+      "score_pct": 98.4,
+      "uplift_pct": -1.3
     },
     {
       "catalog_dir": "tao-analyze-gaps-vlm-bcq",
@@ -34323,7 +34443,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-analyze-gaps-vlm-bcq",
@@ -34359,7 +34479,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 83.3,
-      "uplift_pct": 66.6
+      "uplift_pct": 56.6
     },
     {
       "catalog_dir": "tao-analyze-gaps-vlm-bcq",
@@ -34367,7 +34487,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.5,
+      "score_pct": 73.1,
       "uplift_pct": null
     },
     {
@@ -34376,7 +34496,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.2,
+      "score_pct": 98.7,
       "uplift_pct": null
     },
     {
@@ -34457,7 +34577,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.0,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
@@ -34650,6 +34770,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 20.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 27.5,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-finetune-anomalygennext",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 41.1,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "tao-finetune-clip",
       "component": "TAO Toolkit",
       "dimension": "Security",
@@ -34674,7 +34884,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 93.3
+      "uplift_pct": 80.0
     },
     {
       "catalog_dir": "tao-finetune-clip",
@@ -34709,8 +34919,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.3,
-      "uplift_pct": 66.6
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-finetune-clip",
@@ -34718,8 +34928,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 50.0
+      "score_pct": 78.3,
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "tao-finetune-clip",
@@ -34727,7 +34937,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.4,
+      "score_pct": 96.9,
       "uplift_pct": null
     },
     {
@@ -34764,7 +34974,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
+      "uplift_pct": 80.0
     },
     {
       "catalog_dir": "tao-finetune-cosmos-embed",
@@ -34773,7 +34983,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 80.0
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-finetune-cosmos-embed",
@@ -34809,7 +35019,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 83.3,
-      "uplift_pct": 40.0
+      "uplift_pct": 66.6
     },
     {
       "catalog_dir": "tao-finetune-cosmos-embed",
@@ -34817,7 +35027,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.6,
+      "score_pct": 97.5,
       "uplift_pct": null
     },
     {
@@ -34826,7 +35036,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.1,
+      "score_pct": 98.7,
       "uplift_pct": null
     },
     {
@@ -34836,7 +35046,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 5.9
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-finetune-cosmos-reason",
@@ -34853,8 +35063,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 74.3,
-      "uplift_pct": 44.9
+      "score_pct": 85.7,
+      "uplift_pct": 45.7
     },
     {
       "catalog_dir": "tao-finetune-cosmos-reason",
@@ -34862,8 +35072,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 77.8,
-      "uplift_pct": 31.1
+      "score_pct": 85.7,
+      "uplift_pct": 31.4
     },
     {
       "catalog_dir": "tao-finetune-cosmos-reason",
@@ -34871,7 +35081,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.3,
+      "score_pct": 97.1,
       "uplift_pct": null
     },
     {
@@ -34880,7 +35090,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 40.6,
+      "score_pct": 61.4,
       "uplift_pct": null
     },
     {
@@ -34889,8 +35099,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.4,
-      "uplift_pct": 67.6
+      "score_pct": 80.3,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "tao-finetune-cosmos-reason",
@@ -34898,8 +35108,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 44.1,
-      "uplift_pct": 17.4
+      "score_pct": 61.0,
+      "uplift_pct": 27.2
     },
     {
       "catalog_dir": "tao-finetune-cosmos-reason",
@@ -34907,7 +35117,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 84.9,
+      "score_pct": 87.1,
       "uplift_pct": null
     },
     {
@@ -34943,8 +35153,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": 59.3
+      "score_pct": 100.0,
+      "uplift_pct": 70.0
     },
     {
       "catalog_dir": "tao-finetune-huggingface-model",
@@ -34952,8 +35162,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 55.0,
-      "uplift_pct": 3.0
+      "score_pct": 70.0,
+      "uplift_pct": 35.0
     },
     {
       "catalog_dir": "tao-finetune-huggingface-model",
@@ -34961,7 +35171,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 58.8,
+      "score_pct": 57.5,
       "uplift_pct": null
     },
     {
@@ -34979,8 +35189,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.7,
-      "uplift_pct": 46.5
+      "score_pct": 87.9,
+      "uplift_pct": 64.4
     },
     {
       "catalog_dir": "tao-finetune-huggingface-model",
@@ -34988,8 +35198,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 39.1,
-      "uplift_pct": -5.9
+      "score_pct": 60.4,
+      "uplift_pct": 25.4
     },
     {
       "catalog_dir": "tao-finetune-huggingface-model",
@@ -34997,20 +35207,11 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 75.7,
+      "score_pct": 67.0,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-finetune-huggingface-model",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 99.3,
-      "uplift_pct": 0.5
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -35019,7 +35220,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -35028,97 +35229,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 93.3
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 46.7,
-      "uplift_pct": 26.7
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 83.3,
-      "uplift_pct": 77.7
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 53.3,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 72.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-ad-diffusion",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.7,
-      "uplift_pct": -0.8
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
@@ -35127,16 +35238,16 @@
       "uplift_pct": 100.0
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 60.0
+      "uplift_pct": 80.0
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -35145,7 +35256,7 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -35154,7 +35265,97 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-anomaly",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": 66.6
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-anomaly",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 66.6
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-anomaly",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-anomaly",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-forecast",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-forecast",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-forecast",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-forecast",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 60.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-forecast",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-forecast",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-finetune-kumo-forecast",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
@@ -35163,31 +35364,31 @@
       "uplift_pct": 83.3
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-forecast",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 40.0
+      "score_pct": 53.3,
+      "uplift_pct": 26.6
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-forecast",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 71.7,
+      "score_pct": 72.2,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-finetune-nv-tesseract-forecasting",
+      "catalog_dir": "tao-finetune-kumo-forecast",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.2,
-      "uplift_pct": null
+      "score_pct": 98.4,
+      "uplift_pct": -1.1
     },
     {
       "catalog_dir": "tao-finetune-video-clip",
@@ -35214,7 +35415,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 97.8
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-finetune-video-clip",
@@ -35222,8 +35423,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 54.0
+      "score_pct": 60.0,
+      "uplift_pct": 33.3
     },
     {
       "catalog_dir": "tao-finetune-video-clip",
@@ -35231,7 +35432,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 80.0,
       "uplift_pct": null
     },
     {
@@ -35240,7 +35441,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 56.0,
+      "score_pct": 0.0,
       "uplift_pct": null
     },
     {
@@ -35249,8 +35450,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 91.1,
-      "uplift_pct": 82.8
+      "score_pct": 87.8,
+      "uplift_pct": 78.3
     },
     {
       "catalog_dir": "tao-finetune-video-clip",
@@ -35258,8 +35459,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 62.7,
-      "uplift_pct": 47.4
+      "score_pct": 35.6,
+      "uplift_pct": 14.5
     },
     {
       "catalog_dir": "tao-finetune-video-clip",
@@ -35267,7 +35468,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.5,
+      "score_pct": 85.9,
       "uplift_pct": null
     },
     {
@@ -35276,8 +35477,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": null
+      "score_pct": 98.3,
+      "uplift_pct": -1.2
     },
     {
       "catalog_dir": "tao-generate-anomalies",
@@ -35313,7 +35514,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-generate-anomalies",
@@ -35340,7 +35541,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 83.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-generate-anomalies",
@@ -35357,7 +35558,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.6,
+      "score_pct": 96.9,
       "uplift_pct": null
     },
     {
@@ -35394,7 +35595,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-generate-image-embeddings",
@@ -35403,7 +35604,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 70.0
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-generate-image-embeddings",
@@ -35420,7 +35621,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 0.0,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -35438,8 +35639,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": 37.5
+      "score_pct": 90.0,
+      "uplift_pct": 55.0
     },
     {
       "catalog_dir": "tao-generate-image-embeddings",
@@ -35447,7 +35648,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.0,
+      "score_pct": 98.4,
       "uplift_pct": null
     },
     {
@@ -35457,7 +35658,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 98.5,
-      "uplift_pct": -1.2
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-generate-image-grounding",
@@ -35520,7 +35721,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 88.9
+      "uplift_pct": 68.3
     },
     {
       "catalog_dir": "tao-generate-image-grounding",
@@ -35528,8 +35729,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 51.7
+      "score_pct": 90.0,
+      "uplift_pct": 46.7
     },
     {
       "catalog_dir": "tao-generate-image-grounding",
@@ -35537,7 +35738,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.3,
+      "score_pct": 72.7,
       "uplift_pct": null
     },
     {
@@ -35546,8 +35747,98 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": -1.2
+      "score_pct": 98.6,
+      "uplift_pct": -1.1
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 40.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 55.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-generate-od-defects",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.9,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-generate-referring-expressions",
@@ -35574,7 +35865,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 93.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-generate-referring-expressions",
@@ -35618,8 +35909,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": 26.7
+      "score_pct": 85.0,
+      "uplift_pct": 36.7
     },
     {
       "catalog_dir": "tao-generate-referring-expressions",
@@ -35627,7 +35918,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.7,
+      "score_pct": 98.0,
       "uplift_pct": null
     },
     {
@@ -35636,8 +35927,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.6,
-      "uplift_pct": -1.1
+      "score_pct": 98.5,
+      "uplift_pct": -1.2
     },
     {
       "catalog_dir": "tao-generate-video-reasoning-annotations",
@@ -35664,7 +35955,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 93.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-generate-video-reasoning-annotations",
@@ -35700,7 +35991,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 88.9
+      "uplift_pct": 83.3
     },
     {
       "catalog_dir": "tao-generate-video-reasoning-annotations",
@@ -35717,7 +36008,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.1,
+      "score_pct": 98.0,
       "uplift_pct": null
     },
     {
@@ -35726,8 +36017,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.4,
-      "uplift_pct": 4.7
+      "score_pct": 98.5,
+      "uplift_pct": -1.2
     },
     {
       "catalog_dir": "tao-launch-workflow",
@@ -35789,8 +36080,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 83.3
+      "score_pct": 83.3,
+      "uplift_pct": 66.6
     },
     {
       "catalog_dir": "tao-launch-workflow",
@@ -35798,7 +36089,7 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 100.0,
       "uplift_pct": 51.7
     },
     {
@@ -35807,7 +36098,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.4,
+      "score_pct": 97.9,
       "uplift_pct": null
     },
     {
@@ -35943,7 +36234,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 73.3
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-mine-aoi-images",
@@ -35951,7 +36242,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 0.0,
+      "score_pct": 100.0,
       "uplift_pct": null
     },
     {
@@ -35969,8 +36260,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 58.3,
-      "uplift_pct": 52.7
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-mine-aoi-images",
@@ -35978,8 +36269,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": 58.3
+      "score_pct": 85.0,
+      "uplift_pct": 68.3
     },
     {
       "catalog_dir": "tao-mine-aoi-images",
@@ -35987,8 +36278,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.1,
-      "uplift_pct": 2.5
+      "score_pct": 72.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-mine-aoi-images",
@@ -35996,8 +36287,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.6,
-      "uplift_pct": -0.9
+      "score_pct": 98.5,
+      "uplift_pct": -1.0
     },
     {
       "catalog_dir": "tao-mine-nearest-neighbors",
@@ -36024,7 +36315,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-mine-nearest-neighbors",
@@ -36032,8 +36323,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 80.0
+      "score_pct": 80.0,
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-mine-nearest-neighbors",
@@ -36050,7 +36341,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 0.0,
       "uplift_pct": null
     },
     {
@@ -36068,8 +36359,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.5,
-      "uplift_pct": 50.0
+      "score_pct": 45.0,
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "tao-mine-nearest-neighbors",
@@ -36077,7 +36368,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.8,
+      "score_pct": 73.1,
       "uplift_pct": null
     },
     {
@@ -36086,8 +36377,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.7,
-      "uplift_pct": null
+      "score_pct": 98.6,
+      "uplift_pct": -1.1
     },
     {
       "catalog_dir": "tao-mine-od-images",
@@ -36114,7 +36405,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 93.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-mine-od-images",
@@ -36140,7 +36431,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 0.0,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -36150,7 +36441,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 95.8
+      "uplift_pct": 72.5
     },
     {
       "catalog_dir": "tao-mine-od-images",
@@ -36158,8 +36449,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 50.0,
-      "uplift_pct": 10.0
+      "score_pct": 87.5,
+      "uplift_pct": 47.5
     },
     {
       "catalog_dir": "tao-mine-od-images",
@@ -36167,7 +36458,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.8,
+      "score_pct": 98.5,
       "uplift_pct": null
     },
     {
@@ -36177,7 +36468,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 98.5,
-      "uplift_pct": -1.2
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-port-huggingface-model",
@@ -36268,6 +36559,96 @@
       "agent": "codex",
       "score_pct": 98.7,
       "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 35.0,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-prepare-anomalygennext-inputs",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.5,
+      "uplift_pct": -1.0
     },
     {
       "catalog_dir": "tao-route-visual-changenet-samples",
@@ -36384,7 +36765,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "tao-run-automl",
@@ -36393,7 +36774,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 75.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "tao-run-automl",
@@ -36420,7 +36801,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 66.7
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "tao-run-automl",
@@ -36429,7 +36810,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 62.5
+      "uplift_pct": 41.7
     },
     {
       "catalog_dir": "tao-run-automl",
@@ -36437,7 +36818,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 84.2,
+      "score_pct": 95.8,
       "uplift_pct": null
     },
     {
@@ -36446,7 +36827,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 99.2,
+      "score_pct": 98.7,
       "uplift_pct": null
     },
     {
@@ -36546,7 +36927,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 28.6
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-run-deft-aoi",
@@ -36555,7 +36936,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 16.7
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-run-deft-aoi",
@@ -36564,7 +36945,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 91.4
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-run-deft-aoi",
@@ -36572,89 +36953,89 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.3,
-      "uplift_pct": 66.6
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 93.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 58.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 92.8,
-      "uplift_pct": 69.1
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 69.5,
-      "uplift_pct": 28.2
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 94.9,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 97.7,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi-cosmos3",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 11.1
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi-cosmos3",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 22.2
-    },
-    {
-      "catalog_dir": "tao-run-deft-aoi-cosmos3",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
       "score_pct": 86.7,
-      "uplift_pct": 73.4
+      "uplift_pct": 46.7
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 49.4
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": 35.8
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi-cosmos3",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 33.3
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi-cosmos3",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 33.3
+    },
+    {
+      "catalog_dir": "tao-run-deft-aoi-cosmos3",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 93.3
     },
     {
       "catalog_dir": "tao-run-deft-aoi-cosmos3",
@@ -36662,8 +37043,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": 53.3
+      "score_pct": 73.3,
+      "uplift_pct": 46.6
     },
     {
       "catalog_dir": "tao-run-deft-aoi-cosmos3",
@@ -36689,8 +37070,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 70.8,
-      "uplift_pct": 61.1
+      "score_pct": 68.3,
+      "uplift_pct": 59.1
     },
     {
       "catalog_dir": "tao-run-deft-aoi-cosmos3",
@@ -36698,8 +37079,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.2,
-      "uplift_pct": 59.7
+      "score_pct": 65.8,
+      "uplift_pct": 53.3
     },
     {
       "catalog_dir": "tao-run-deft-aoi-cosmos3",
@@ -36707,7 +37088,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.9,
+      "score_pct": 93.5,
       "uplift_pct": null
     },
     {
@@ -36716,7 +37097,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 96.9,
+      "score_pct": 97.2,
       "uplift_pct": null
     },
     {
@@ -36744,7 +37125,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 98.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-run-deft-cr-its-mining",
@@ -36752,8 +37133,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 53.3,
-      "uplift_pct": 13.3
+      "score_pct": 60.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "tao-run-deft-cr-its-mining",
@@ -36779,8 +37160,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.1,
-      "uplift_pct": 85.8
+      "score_pct": 96.3,
+      "uplift_pct": 89.0
     },
     {
       "catalog_dir": "tao-run-deft-cr-its-mining",
@@ -36788,8 +37169,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 46.0,
-      "uplift_pct": 3.3
+      "score_pct": 47.7,
+      "uplift_pct": 25.6
     },
     {
       "catalog_dir": "tao-run-deft-cr-its-mining",
@@ -36797,7 +37178,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.5,
+      "score_pct": 78.0,
       "uplift_pct": null
     },
     {
@@ -36807,7 +37188,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 98.9,
-      "uplift_pct": 1.0
+      "uplift_pct": -0.7
     },
     {
       "catalog_dir": "tao-run-deft-object-detection",
@@ -36816,7 +37197,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 16.7
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "tao-run-deft-object-detection",
@@ -36825,7 +37206,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "tao-run-deft-object-detection",
@@ -36833,7 +37214,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
+      "score_pct": 100.0,
       "uplift_pct": 90.0
     },
     {
@@ -36842,65 +37223,245 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 76.0
+      "score_pct": 75.0,
+      "uplift_pct": 55.0
     },
     {
       "catalog_dir": "tao-run-deft-object-detection",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-object-detection",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 71.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-object-detection",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.6,
+      "uplift_pct": 82.5
+    },
+    {
+      "catalog_dir": "tao-run-deft-object-detection",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.0,
+      "uplift_pct": 45.6
+    },
+    {
+      "catalog_dir": "tao-run-deft-object-detection",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-object-detection",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 90.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": 77.5
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-od-aoi",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 95.0,
-      "uplift_pct": null
+      "uplift_pct": 60.0
     },
     {
-      "catalog_dir": "tao-run-deft-object-detection",
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
-      "agent": "codex",
-      "score_pct": 42.5,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-run-deft-object-detection",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
       "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": 75.6
-    },
-    {
-      "catalog_dir": "tao-run-deft-object-detection",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 80.5,
-      "uplift_pct": 63.2
-    },
-    {
-      "catalog_dir": "tao-run-deft-object-detection",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 82.6,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-run-deft-object-detection",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 94.2,
+      "score_pct": 67.0,
       "uplift_pct": null
     },
     {
       "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 9.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.5,
+      "uplift_pct": 55.5
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 59.8,
+      "uplift_pct": 30.4
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-deft-pas",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -36909,7 +37470,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -36918,76 +37479,76 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 74.7
+      "score_pct": 100.0,
+      "uplift_pct": 90.0
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 67.8,
-      "uplift_pct": 34.5
+      "score_pct": 90.0,
+      "uplift_pct": 45.0
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 54.7,
+      "score_pct": 100.0,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 0.0,
+      "score_pct": 62.5,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 80.2,
-      "uplift_pct": 55.1
+      "score_pct": 88.1,
+      "uplift_pct": 64.2
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 45.4,
-      "uplift_pct": 20.4
+      "score_pct": 64.4,
+      "uplift_pct": 23.1
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.8,
+      "score_pct": 92.3,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-run-deft-pas",
+      "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 99.2,
-      "uplift_pct": -0.4
+      "score_pct": 96.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-run-inference-service",
@@ -37140,7 +37701,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 88.9
+      "uplift_pct": 85.0
     },
     {
       "catalog_dir": "tao-run-on-brev",
@@ -37148,8 +37709,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 73.3
+      "score_pct": 78.3,
+      "uplift_pct": 61.6
     },
     {
       "catalog_dir": "tao-run-on-brev",
@@ -37157,7 +37718,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.3,
+      "score_pct": 72.9,
       "uplift_pct": null
     },
     {
@@ -37166,8 +37727,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.4,
-      "uplift_pct": -1.2
+      "score_pct": 98.5,
+      "uplift_pct": -1.1
     },
     {
       "catalog_dir": "tao-run-on-docker",
@@ -37473,7 +38034,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 80.0
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-run-on-virtualenv",
@@ -37500,7 +38061,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 88.9
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-run-on-virtualenv",
@@ -37508,8 +38069,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 63.3,
-      "uplift_pct": 45.0
+      "score_pct": 78.3,
+      "uplift_pct": 61.6
     },
     {
       "catalog_dir": "tao-run-on-virtualenv",
@@ -37517,7 +38078,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 73.2,
+      "score_pct": 73.3,
       "uplift_pct": null
     },
     {
@@ -37580,7 +38141,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 0.0,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -37598,8 +38159,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": 53.3
+      "score_pct": 83.3,
+      "uplift_pct": 66.6
     },
     {
       "catalog_dir": "tao-setup",
@@ -37607,7 +38168,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.6,
+      "score_pct": 73.1,
       "uplift_pct": null
     },
     {
@@ -37616,8 +38177,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.6,
-      "uplift_pct": -0.9
+      "score_pct": 98.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-setup-nvidia-gpu-host",
@@ -37710,6 +38271,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 60.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.5,
+      "uplift_pct": 82.5
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 40.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 77.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-token-efficient-execution",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.5,
+      "uplift_pct": -1.0
+    },
+    {
       "catalog_dir": "tao-train-action-recognition",
       "component": "TAO Toolkit",
       "dimension": "Security",
@@ -37734,7 +38385,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 93.3
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-train-action-recognition",
@@ -37743,7 +38394,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-action-recognition",
@@ -37760,7 +38411,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 90.0,
       "uplift_pct": null
     },
     {
@@ -37769,8 +38420,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.3,
-      "uplift_pct": 77.7
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-train-action-recognition",
@@ -37778,8 +38429,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 18.3
+      "score_pct": 73.3,
+      "uplift_pct": 3.3
     },
     {
       "catalog_dir": "tao-train-action-recognition",
@@ -37787,7 +38438,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.2,
+      "score_pct": 72.6,
       "uplift_pct": null
     },
     {
@@ -37796,7 +38447,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 97.8,
+      "score_pct": 98.2,
       "uplift_pct": null
     },
     {
@@ -37940,7 +38591,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 0.0,
       "uplift_pct": null
     },
     {
@@ -37958,8 +38609,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 13.3
+      "score_pct": 58.3,
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "tao-train-centerpose",
@@ -37967,7 +38618,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.2,
+      "score_pct": 98.2,
       "uplift_pct": null
     },
     {
@@ -37976,8 +38627,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.3,
-      "uplift_pct": null
+      "score_pct": 99.5,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-codetr",
@@ -38094,109 +38745,19 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
-    },
-    {
-      "catalog_dir": "tao-train-deformable-detr",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-deformable-detr",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-deformable-detr",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-deformable-detr",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 95.0
-    },
-    {
-      "catalog_dir": "tao-train-deformable-detr",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 13.3
-    },
-    {
-      "catalog_dir": "tao-train-deformable-detr",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 71.5,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-deformable-detr",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 97.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-depth-anything-v2",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-depth-anything-v2",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-depth-anything-v2",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
       "uplift_pct": 100.0
     },
     {
-      "catalog_dir": "tao-train-depth-anything-v2",
+      "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-depth-anything-v2",
+      "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -38205,7 +38766,7 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-depth-anything-v2",
+      "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -38214,115 +38775,25 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-depth-anything-v2",
+      "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 94.4
-    },
-    {
-      "catalog_dir": "tao-train-depth-anything-v2",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 53.3,
-      "uplift_pct": 21.6
-    },
-    {
-      "catalog_dir": "tao-train-depth-anything-v2",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 71.4,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-depth-anything-v2",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "tao-train-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 100.0
     },
     {
-      "catalog_dir": "tao-train-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 88.9
-    },
-    {
-      "catalog_dir": "tao-train-dino",
+      "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 78.3,
-      "uplift_pct": 8.3
+      "score_pct": 85.0,
+      "uplift_pct": 48.3
     },
     {
-      "catalog_dir": "tao-train-dino",
+      "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
@@ -38331,16 +38802,16 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-dino",
+      "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.1,
-      "uplift_pct": null
+      "score_pct": 98.5,
+      "uplift_pct": -1.0
     },
     {
-      "catalog_dir": "tao-train-dinov3",
+      "catalog_dir": "tao-train-depth-anything-v2",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -38349,7 +38820,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-dinov3",
+      "catalog_dir": "tao-train-depth-anything-v2",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -38358,16 +38829,16 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-dinov3",
+      "catalog_dir": "tao-train-depth-anything-v2",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 96.7
+      "uplift_pct": 100.0
     },
     {
-      "catalog_dir": "tao-train-dinov3",
+      "catalog_dir": "tao-train-depth-anything-v2",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
@@ -38376,6 +38847,186 @@
       "uplift_pct": 20.0
     },
     {
+      "catalog_dir": "tao-train-depth-anything-v2",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-depth-anything-v2",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-depth-anything-v2",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-depth-anything-v2",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.3,
+      "uplift_pct": 31.6
+    },
+    {
+      "catalog_dir": "tao-train-depth-anything-v2",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-depth-anything-v2",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.4,
+      "uplift_pct": -1.1
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-dinov3",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-dinov3",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-dinov3",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-dinov3",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
       "catalog_dir": "tao-train-dinov3",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
@@ -38390,7 +39041,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 47.5,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -38399,8 +39050,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 91.2
+      "score_pct": 93.8,
+      "uplift_pct": 81.3
     },
     {
       "catalog_dir": "tao-train-dinov3",
@@ -38408,8 +39059,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 30.0
+      "score_pct": 85.0,
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "tao-train-dinov3",
@@ -38417,7 +39068,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 84.8,
+      "score_pct": 73.0,
       "uplift_pct": null
     },
     {
@@ -38454,7 +39105,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-train-fast-foundation-stereo",
@@ -38462,8 +39113,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": 40.0
+      "score_pct": 40.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-fast-foundation-stereo",
@@ -38490,10 +39141,100 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 77.8
+      "uplift_pct": 66.7
     },
     {
       "catalog_dir": "tao-train-fast-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 48.3,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "tao-train-fast-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-fast-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 99.5,
+      "uplift_pct": -0.2
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": -20.0
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-foundation-stereo",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
@@ -38502,202 +39243,112 @@
       "uplift_pct": 5.0
     },
     {
-      "catalog_dir": "tao-train-fast-foundation-stereo",
+      "catalog_dir": "tao-train-foundation-stereo",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.6,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-fast-foundation-stereo",
+      "catalog_dir": "tao-train-foundation-stereo",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.4,
+      "uplift_pct": -1.1
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 63.3
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-grounding-dino",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
       "score_pct": 98.5,
-      "uplift_pct": -1.2
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 94.4
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 59.1
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 97.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-foundation-stereo",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 88.9
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 13.3
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 71.9,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-grounding-dino",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 97.3,
-      "uplift_pct": null
+      "uplift_pct": -1.0
     },
     {
       "catalog_dir": "tao-train-image-classification",
@@ -38759,8 +39410,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.3,
-      "uplift_pct": 72.2
+      "score_pct": 50.0,
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "tao-train-image-classification",
@@ -38768,8 +39419,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 58.3,
-      "uplift_pct": 10.0
+      "score_pct": 100.0,
+      "uplift_pct": 73.3
     },
     {
       "catalog_dir": "tao-train-image-classification",
@@ -38777,7 +39428,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.3,
+      "score_pct": 97.6,
       "uplift_pct": null
     },
     {
@@ -38786,8 +39437,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": -1.1
+      "score_pct": 99.4,
+      "uplift_pct": -0.1
     },
     {
       "catalog_dir": "tao-train-mask-auto-encoder",
@@ -38823,7 +39474,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-mask-auto-encoder",
@@ -38858,8 +39509,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": 26.7
+      "score_pct": 53.3,
+      "uplift_pct": -16.7
     },
     {
       "catalog_dir": "tao-train-mask-auto-encoder",
@@ -38867,7 +39518,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.1,
+      "score_pct": 72.5,
       "uplift_pct": null
     },
     {
@@ -38877,7 +39528,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 98.5,
-      "uplift_pct": -1.0
+      "uplift_pct": -0.9
     },
     {
       "catalog_dir": "tao-train-mask-auto-label",
@@ -38912,8 +39563,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "score_pct": 80.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-mask-auto-label",
@@ -38930,7 +39581,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 0.0,
       "uplift_pct": null
     },
     {
@@ -38940,7 +39591,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 88.9
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-train-mask-auto-label",
@@ -38948,8 +39599,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 30.0
+      "score_pct": 53.3,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-mask-auto-label",
@@ -38957,7 +39608,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.2,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
@@ -38967,7 +39618,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 98.4,
-      "uplift_pct": null
+      "uplift_pct": -1.1
     },
     {
       "catalog_dir": "tao-train-mask-grounding-dino",
@@ -39020,7 +39671,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 0.0,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -39030,7 +39681,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 88.9
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-train-mask-grounding-dino",
@@ -39038,8 +39689,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 58.3,
-      "uplift_pct": -11.7
+      "score_pct": 83.3,
+      "uplift_pct": 8.3
     },
     {
       "catalog_dir": "tao-train-mask-grounding-dino",
@@ -39047,11 +39698,281 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.4,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
       "catalog_dir": "tao-train-mask-grounding-dino",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-mask2former",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.5,
+      "uplift_pct": -1.0
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 40.0,
+      "uplift_pct": -60.0
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 56.7
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 53.3,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-metric-learning-recognition",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.5,
+      "uplift_pct": -1.0
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": 83.3
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 11.7
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-nvdinov2",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
@@ -39060,276 +39981,6 @@
       "uplift_pct": -0.9
     },
     {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": -40.0
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 94.4
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 53.3,
-      "uplift_pct": -16.7
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 71.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-mask2former",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 93.3
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 96.7
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 53.3,
-      "uplift_pct": -16.7
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 72.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-metric-learning-recognition",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.4,
-      "uplift_pct": -1.1
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 93.3
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 80.0,
-      "uplift_pct": -20.0
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 53.3,
-      "uplift_pct": -16.7
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 97.4,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-nvdinov2",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.4,
-      "uplift_pct": -1.1
-    },
-    {
       "catalog_dir": "tao-train-nvpanoptix3d",
       "component": "TAO Toolkit",
       "dimension": "Security",
@@ -39363,7 +40014,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 40.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-nvpanoptix3d",
@@ -39380,7 +40031,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 0.0,
       "uplift_pct": null
     },
     {
@@ -39398,389 +40049,29 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 51.6
-    },
-    {
-      "catalog_dir": "tao-train-nvpanoptix3d",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 96.9,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-nvpanoptix3d",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.2,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 94.4
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 97.6,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocdnet",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.2,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 30.0
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-ocrnet",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.4,
-      "uplift_pct": -1.1
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 0.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 94.4
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 58.3
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 71.3,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-oneformer",
-      "component": "TAO Toolkit",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 86.7
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 70.0,
-      "uplift_pct": -30.0
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 47.5,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 90.0
-    },
-    {
-      "catalog_dir": "tao-train-optical-inspection",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 68.3,
+      "score_pct": 53.3,
       "uplift_pct": 36.6
     },
     {
-      "catalog_dir": "tao-train-optical-inspection",
+      "catalog_dir": "tao-train-nvpanoptix3d",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.9,
+      "score_pct": 97.4,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-optical-inspection",
+      "catalog_dir": "tao-train-nvpanoptix3d",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.7,
-      "uplift_pct": null
+      "score_pct": 99.4,
+      "uplift_pct": -0.1
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -39789,7 +40080,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -39798,7 +40089,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
@@ -39807,7 +40098,7 @@
       "uplift_pct": 100.0
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
@@ -39816,7 +40107,7 @@
       "uplift_pct": -40.0
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -39825,7 +40116,7 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -39834,7 +40125,7 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
@@ -39843,25 +40134,25 @@
       "uplift_pct": 100.0
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 48.3,
-      "uplift_pct": -21.7
+      "score_pct": 53.3,
+      "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.7,
+      "score_pct": 72.3,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-pointpillars",
+      "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "dimension": "Efficiency",
       "num": null,
@@ -39870,7 +40161,7 @@
       "uplift_pct": -1.2
     },
     {
-      "catalog_dir": "tao-train-pose-classification",
+      "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -39879,7 +40170,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-pose-classification",
+      "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "dimension": "Security",
       "num": null,
@@ -39888,7 +40179,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-pose-classification",
+      "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
@@ -39897,7 +40188,7 @@
       "uplift_pct": 100.0
     },
     {
-      "catalog_dir": "tao-train-pose-classification",
+      "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
       "num": null,
@@ -39906,7 +40197,7 @@
       "uplift_pct": 0.0
     },
     {
-      "catalog_dir": "tao-train-pose-classification",
+      "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -39915,7 +40206,7 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "tao-train-pose-classification",
+      "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "dimension": "Discoverability",
       "num": null,
@@ -39924,6 +40215,366 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "tao-train-ocrnet",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-ocrnet",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.3,
+      "uplift_pct": -16.7
+    },
+    {
+      "catalog_dir": "tao-train-ocrnet",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-ocrnet",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.4,
+      "uplift_pct": -1.2
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 60.0,
+      "uplift_pct": -40.0
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 0.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": 83.3
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 53.3,
+      "uplift_pct": -11.7
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-oneformer",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.4,
+      "uplift_pct": -6.1
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 35.0
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-optical-inspection",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 83.3
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-pointpillars",
+      "component": "TAO Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-pose-classification",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-pose-classification",
+      "component": "TAO Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "tao-train-pose-classification",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 100.0
+    },
+    {
+      "catalog_dir": "tao-train-pose-classification",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "tao-train-pose-classification",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-pose-classification",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "tao-train-pose-classification",
       "component": "TAO Toolkit",
       "dimension": "Effectiveness",
@@ -39938,8 +40589,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 46.7
+      "score_pct": 83.3,
+      "uplift_pct": 51.6
     },
     {
       "catalog_dir": "tao-train-pose-classification",
@@ -39956,8 +40607,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.6,
-      "uplift_pct": -0.9
+      "score_pct": 98.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tao-train-reid",
@@ -39992,7 +40643,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
+      "score_pct": 80.0,
       "uplift_pct": 0.0
     },
     {
@@ -40020,7 +40671,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 94.4
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-train-reid",
@@ -40028,8 +40679,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "score_pct": 58.3,
+      "uplift_pct": -6.7
     },
     {
       "catalog_dir": "tao-train-reid",
@@ -40037,7 +40688,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.7,
+      "score_pct": 72.1,
       "uplift_pct": null
     },
     {
@@ -40046,7 +40697,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.4,
+      "score_pct": 98.5,
       "uplift_pct": -1.1
     },
     {
@@ -40100,7 +40751,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 0.0,
       "uplift_pct": null
     },
     {
@@ -40110,7 +40761,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 94.4
+      "uplift_pct": 90.0
     },
     {
       "catalog_dir": "tao-train-rtdetr",
@@ -40118,8 +40769,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 13.3
+      "score_pct": 58.3,
+      "uplift_pct": -11.7
     },
     {
       "catalog_dir": "tao-train-rtdetr",
@@ -40127,7 +40778,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 79.5,
+      "score_pct": 71.7,
       "uplift_pct": null
     },
     {
@@ -40136,8 +40787,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 96.3,
-      "uplift_pct": null
+      "score_pct": 98.4,
+      "uplift_pct": -1.1
     },
     {
       "catalog_dir": "tao-train-segformer",
@@ -40161,6 +40812,42 @@
       "catalog_dir": "tao-train-segformer",
       "component": "TAO Toolkit",
       "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 80.0
+    },
+    {
+      "catalog_dir": "tao-train-segformer",
+      "component": "TAO Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "tao-train-segformer",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-segformer",
+      "component": "TAO Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "tao-train-segformer",
+      "component": "TAO Toolkit",
+      "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
@@ -40169,47 +40856,11 @@
     {
       "catalog_dir": "tao-train-segformer",
       "component": "TAO Toolkit",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "tao-train-segformer",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-segformer",
-      "component": "TAO Toolkit",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "tao-train-segformer",
-      "component": "TAO Toolkit",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 88.9
-    },
-    {
-      "catalog_dir": "tao-train-segformer",
-      "component": "TAO Toolkit",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
       "score_pct": 83.3,
-      "uplift_pct": 13.3
+      "uplift_pct": 18.3
     },
     {
       "catalog_dir": "tao-train-segformer",
@@ -40217,7 +40868,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.0,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
@@ -40226,7 +40877,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.3,
+      "score_pct": 98.4,
       "uplift_pct": null
     },
     {
@@ -40344,7 +40995,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 94.3
     },
     {
       "catalog_dir": "tao-train-sparse4d",
@@ -40353,7 +41004,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 48.6
     },
     {
       "catalog_dir": "tao-train-sparse4d",
@@ -40379,8 +41030,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "score_pct": 95.5,
+      "uplift_pct": 65.7
     },
     {
       "catalog_dir": "tao-train-sparse4d",
@@ -40388,8 +41039,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 20.0
+      "score_pct": 86.9,
+      "uplift_pct": 35.9
     },
     {
       "catalog_dir": "tao-train-sparse4d",
@@ -40397,7 +41048,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.5,
+      "score_pct": 96.8,
       "uplift_pct": null
     },
     {
@@ -40406,8 +41057,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": -0.9
+      "score_pct": 99.4,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-train-visual-changenet",
@@ -40434,7 +41085,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 66.7
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-train-visual-changenet",
@@ -40470,7 +41121,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 82.2
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-train-visual-changenet",
@@ -40487,7 +41138,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.8,
+      "score_pct": 96.9,
       "uplift_pct": null
     },
     {
@@ -40496,7 +41147,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.3,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
