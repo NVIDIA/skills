@@ -223,6 +223,13 @@ Pick the smallest lifecycle the consumer needs:
   data. The `streaming=True` flag does not enable NeMo Relay by itself. Without
   `streaming=True`, startup leaves the NeMo Relay configuration unchanged.
 
+For explicit environment management, call `prepare_environment(config)` or
+`attach_environment(config, reference)`, then `start_runtime_in(config, environment)`.
+Use typed `EnvironmentHandle` and `EnvironmentReference` objects. Stop the
+runtime before calling `release_environment(environment)` separately. Provider
+availability and reuse limits vary; task paths must remain strings for non-local
+environments. See the [environment lifecycle guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/sdk/python.mdx#explicit-environment-lifecycle).
+
 The selected adapter owns the execution topology. The bundled Claude, Codex,
 Deep Agents, and Hermes Agent adapters retain their native client, graph/checkpointer,
 or agent/database inside one local host for the full runtime. Local `process`

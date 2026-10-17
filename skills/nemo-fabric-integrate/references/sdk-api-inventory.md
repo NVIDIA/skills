@@ -26,6 +26,10 @@ The following table lists the `Fabric` methods and when to use each:
 | `doctor(config, *, base_dir=...)` | Yes | You need preflight diagnostics for adapter resolution, capability routing, declared requirements, and environment assumptions. | `DoctorReport` |
 | `run(config, *, base_dir=..., input=... \| request=...)` | Yes | You need one complete start, invoke, result, and stop cycle. | `RunResult` |
 | `start_runtime(config, *, base_dir=..., overrides=..., streaming=False, launch_collector=None, completion_wait_timeout=1.0)` | Yes | You need state across multiple ordered invocations. Pass `streaming=True` with NVIDIA NeMo Relay enabled only to provision `invoke_stream(...)`. | `Runtime` |
+| `prepare_environment(config, *, base_dir=...)` | Yes | Prepare an environment independently of a runtime; preparation depends on provider support. | `EnvironmentHandle` |
+| `attach_environment(config, reference, *, base_dir=...)` | Yes | Verify a caller-owned resource with a typed `EnvironmentReference` when the provider supports attachment. | `EnvironmentHandle` |
+| `start_runtime_in(config, environment, *, base_dir=..., overrides=..., streaming=False)` | Yes | Start a runtime in a typed environment when the selected runtime provider supports it. | `Runtime` |
+| `release_environment(environment)` | Yes | Release the environment separately after runtime stop; local release preserves files. | `None` |
 
 `input` and `request` on `run(...)` are mutually exclusive. Use `input=...` for
 the common case; use `request=RunRequest(...)` when the invocation needs a
@@ -37,6 +41,14 @@ Both `run()` and `start_runtime()` accept optional
 `expected_descriptor_sha256` to verify the task plan's descriptor before startup.
 The profile is configuration-dependent for telemetry and excludes workflow
 targets and attached services. It is not observed execution provenance.
+
+OpenShell environments use `start_runtime_in` with a prepared or attached
+handle. They support buffered invocation and multiple independent bridge
+runtime IDs per sandbox. Invocations for different runtime IDs can proceed
+independently. The task SDK owns each runtime ID and normalized result. Declared
+files become host paths under the configured artifact destination; a failed SDK
+result still carries its output, error, and artifacts. Lost responses are not
+replayed. See the [OpenShell provider guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/environment-providers/openshell/README.md).
 
 ## Runtime Methods
 
