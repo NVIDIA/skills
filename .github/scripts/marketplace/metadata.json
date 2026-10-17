@@ -3829,6 +3829,18 @@
       }
     },
     {
+      "path": "skills/tao-finetune-anomalygennext",
+      "name": "tao-finetune-anomalygennext",
+      "description": "Validate a user AnomalyGenNext dataset and recipe, freeze its validation set, and prepare a canonical texture fine-tuning recipe. Use when AnomalyGenNext task weights do not yet exist. Do not use for ordinary defect generation.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "fine_tune,validate,train,configure,generate"
+      }
+    },
+    {
       "path": "skills/tao-finetune-clip",
       "name": "tao-finetune-clip",
       "description": "CLIP vision-language model for image-text retrieval, zero-shot classification, embedding extraction, ONNX export, and TensorRT deployment. Use when fine-tuning or training CLIP, running zero-shot classification, computing image embeddings, or deploying CLIP to ONNX/TensorRT. This is a single-action model skill; do not use it for an iterative weak-attribute improvement loop that keeps retraining and evaluating until progress stops, which belongs to tao-run-deft-pas.",
@@ -3877,27 +3889,27 @@
       }
     },
     {
-      "path": "skills/tao-finetune-nv-tesseract-ad-diffusion",
-      "name": "tao-finetune-nv-tesseract-ad-diffusion",
-      "description": "NV-Tesseract AD Diffusion — diffusion-based anomaly detection and fine-tuning for multivariate time series. Use when the user asks to \"fine-tune NV-Tesseract\", \"run AD diffusion inference\", \"detect anomalies with diffusion\", \"time series anomaly detection\", \"finetune ad-diffusion\", \"use perform_anomaly_analysis_with_diffusion\", \"automl ad-diffusion\", \"hyperparameter search ad-diffusion\", \"hyperparameter optimization\" or mentions \"curriculum_medium.yaml\", \"final_model.pth\", \"nv-tesseract-ad-diffusion\", \"ad_diffusion\", or \"TSDiffuser_Generic\".",
+      "path": "skills/tao-finetune-kumo-anomaly",
+      "name": "tao-finetune-kumo-anomaly",
+      "description": "Kumo-Anomaly — diffusion-based anomaly detection and fine-tuning for multivariate time series. Use when the user asks to \"fine-tune Kumo-Anomaly\", \"run Kumo-Anomaly inference\", \"detect anomalies with diffusion\", \"time series anomaly detection\", \"finetune Kumo-Anomaly\", \"use perform_anomaly_analysis_with_diffusion\", \"automl Kumo-Anomaly\", \"hyperparameter search Kumo-Anomaly\", \"hyperparameter optimization\" or mentions \"curriculum_medium.yaml\", \"final_model.pth\", \"kumo-anomaly\", \"sdk/anomaly_analysis\", or \"TSDiffuser_Generic\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
-        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer,developer",
+        "audience": "ml_engineer,data_scientist,ai_engineer,developer,data_engineer",
         "discovery.activity_tags": "fine_tune,inference,optimize,train,evaluate"
       }
     },
     {
-      "path": "skills/tao-finetune-nv-tesseract-forecasting",
-      "name": "tao-finetune-nv-tesseract-forecasting",
-      "description": "NV-Tesseract Forecasting — transformer-based multivariate time series forecasting with DARR (context-enhanced kNN retrieval), interpretability, and fine-tuning. Use when the user asks to \"forecast with NV-Tesseract\", \"run forecasting inference\", \"use perform_forecasting\", \"DARR mode\", \"context-enhanced forecasting\", \"lag horizon attribution\", \"interpretability\", \"fine-tune forecasting\", \"fine-tune forecasting with automl\", \"hyper-parameter optimization with forecasting\", or or mentions \"nv-tesseract-forecasting\", \"moment_head_512_6hr\", or \"run8_best_model_cr\".",
+      "path": "skills/tao-finetune-kumo-forecast",
+      "name": "tao-finetune-kumo-forecast",
+      "description": "Kumo-Forecast — transformer-based multivariate time series forecasting with DARR (context-enhanced kNN retrieval), interpretability, and fine-tuning. Use when the user asks to \"forecast with Kumo-Forecast\", \"run forecasting inference\", \"use perform_forecasting\", \"DARR mode\", \"context-enhanced forecasting\", \"lag horizon attribution\", \"interpretability\", \"fine-tune forecasting\", \"fine-tune forecasting with automl\", \"hyper-parameter optimization with forecasting\", or mentions \"kumo-forecast\", \"moment_head_512_6hr\", or \"run8_best_model_cr\".",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,data_scientist,ai_engineer,developer",
-        "discovery.activity_tags": "fine_tune,inference,optimize,train,inspect"
+        "discovery.activity_tags": "inference,fine_tune,optimize,train,evaluate"
       }
     },
     {
@@ -3946,6 +3958,18 @@
         "catalog.subdomain": "vision-ai",
         "audience": "ml_engineer,data_scientist,ai_engineer,developer",
         "discovery.activity_tags": "generate,extract,configure,inference"
+      }
+    },
+    {
+      "path": "skills/tao-generate-od-defects",
+      "name": "tao-generate-od-defects",
+      "description": "Run AnomalyGenNext 1.1 inference from a native testcase or a prepared generation plan, then publish validated fine-grained and binary COCO labels. Use for synthetic object-detection defect generation, not model training.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "generate,inference,validate,synthesize"
       }
     },
     {
@@ -4045,6 +4069,18 @@
       }
     },
     {
+      "path": "skills/tao-prepare-anomalygennext-inputs",
+      "name": "tao-prepare-anomalygennext-inputs",
+      "description": "Prepare normalized object-detection false negatives, source masks, and clean-image embedding inputs for AnomalyGenNext. Use when turning box-level FN gaps into a frozen, pair-preserving preparation plan. Do not use for training or generation.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "transform,convert,validate,configure,extract"
+      }
+    },
+    {
       "path": "skills/tao-route-visual-changenet-samples",
       "name": "tao-route-visual-changenet-samples",
       "description": "Routes the weakest VCN samples (output of `tao-analyze-gaps-visual-changenet`) into per-augmentation-module subsets based on each module's label eligibility. Use when the user asks to \"route VCN gap samples\", \"split AOI gaps for k-NN mining and AnomalyGen\", or prepare the immediate next step after DEFT gap analysis in a VCN AOI SDA iteration.",
@@ -4095,7 +4131,7 @@
     {
       "path": "skills/tao-run-deft-aoi-cosmos3",
       "name": "tao-run-deft-aoi-cosmos3",
-      "description": "Run the disk-backed DEFT AOI improvement loop for NVIDIA Cosmos Reason 3 / Cosmos3 models, using Nano by default and Edge or Super when explicitly requested: evaluate the base model on Proxy and frozen Benchmark splits, mine real image pairs from Proxy gaps, assemble a per-iteration Train JSON from selected Mining samples, train with cosmos-rl LoRA SFT, and repeat through the selected platform's submit/status/logs/cancel contract. This migration supports bare labels only: the assistant response must be exactly OK or NG. Use for \"run Cosmos3 DEFT AOI\", \"CR3 AOI loop\", or \"improve Cosmos3 PCB inspection with bare OK/NG\"; do not use for rich/reasoning annotation, one-off Cosmos training, or generic anomaly generation.\n",
+      "description": "Run the disk-backed DEFT AOI improvement loop for NVIDIA Cosmos Reason 3 / Cosmos3 models, using Nano by default and Edge or Super when explicitly requested: evaluate the base model on Proxy and frozen Benchmark splits, mine real image pairs from Proxy gaps, generate AnomalyGen synthetic NG pairs, assemble a per-iteration Train JSON from both producers, train with Cosmos Framework LoRA SFT, and repeat through the selected platform's submit/status/logs/cancel contract. This migration supports bare labels only: the assistant response must be exactly OK or NG. Use for \"run Cosmos3 DEFT AOI\", \"CR3 AOI loop\", or \"improve Cosmos3 PCB inspection with bare OK/NG\"; do not use for rich/reasoning annotation, one-off Cosmos training, or generic anomaly generation.\n",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
@@ -4129,6 +4165,18 @@
       }
     },
     {
+      "path": "skills/tao-run-deft-od-aoi",
+      "name": "tao-run-deft-od-aoi",
+      "description": "Run a binary industrial-inspection DEFT loop with TAO RT-DETR: measure on frozen KPI/test roles, mine gap-similar real and clean images with SigLIP, accumulate admitted COCO data, retrain from one base checkpoint, and select by KPI AP50. Use for iterative AOI defect detection, not generic multiclass OD.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
+        "discovery.activity_tags": "train,evaluate,measure,select,inspect"
+      }
+    },
+    {
       "path": "skills/tao-run-deft-pas",
       "name": "tao-run-deft-pas",
       "description": "Run iterative improvement for NVIDIA TAO CLIP / SigLIP image-text retrieval on attribute-labelled data. Use when a request combines retrieval evaluation, weak-attribute or caption-pair mining, repeated retraining, and a stopping condition based on a retrieval KPI, validation plateau, or iteration budget; the customer need not know the DEFT or People Attribute Search (PAS) names. The self-contained workflow performs dataset preparation, zero-shot evaluation, attribute gap analysis, caption-space k-NN mining, history-aware selection, retraining, and re-evaluation. Treat `tao-deft-pas` as shorthand for this canonical `tao-run-deft-pas` workflow. Do not use for standalone CLIP training, one-off evaluation or embedding, generic k-NN mining, or AOI/ChangeNet DEFT workflows.\n",
@@ -4138,6 +4186,18 @@
         "catalog.subdomain": "vision-ai",
         "audience": "ml_engineer,ai_engineer,data_scientist,application_developer",
         "discovery.activity_tags": "orchestrate,fine_tune,evaluate,train,optimize"
+      }
+    },
+    {
+      "path": "skills/tao-run-dinov3-ssl-deft",
+      "name": "tao-run-dinov3-ssl-deft",
+      "description": "Run iterative DINOv3 SSL DEFT data selection and retraining from an unlabeled pool, using GRIT or multi-task weakness and fixed-encoder retrieval. Use for active-learning-style DINOv3 mining, not plain pretraining/fine-tuning (tao-train-dinov3) or AOI/PAS DEFT.",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "ml_engineer,ai_engineer,data_scientist,developer",
+        "discovery.activity_tags": "train,select,fine_tune,orchestrate,monitor"
       }
     },
     {
@@ -4234,6 +4294,18 @@
         "catalog.subdomain": "infrastructure",
         "audience": "devops_engineer,platform_engineer,it_operations,ml_engineer,developer",
         "discovery.activity_tags": "configure,validate,deploy,get_started,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/tao-token-efficient-execution",
+      "name": "tao-token-efficient-execution",
+      "description": "Token-efficient execution kit for repeated TAO agentic workflows. Compiles a skill into stage cards once (with a strong model), then executes them forever in fresh, small headless sessions coordinated by a bash driver — measured 67-91% token reduction and 3-5x lower peak context vs one long conversation. Use when a TAO workflow will be run repeatedly, when token cost matters, when the target model has a small context window, or on trigger phrases like \"token efficient\", \"reduce token cost\", \"card pack\", \"stage cards\", \"run this workflow on a small model\", \"compile this skill into cards\".",
+      "metadata": {
+        "product.primary": "TAO Toolkit",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "agentic-ai",
+        "audience": "ai_engineer,ml_engineer,developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "orchestrate,optimize,package,measure,operate"
       }
     },
     {
@@ -4587,7 +4659,7 @@
     {
       "path": "skills/tao-train-sparse4d",
       "name": "tao-train-sparse4d",
-      "description": "Sparse4D for multi-camera temporal 3D object detection and tracking. Uses sparse queries with deformable attention across camera views and time for end-to-end 3D perception, with an instance bank for temporal tracking. Use when training, evaluating, exporting, quantizing, or running inference for a TAO Sparse4D model. Trigger phrases include \"train Sparse4D\", \"multi-camera 3D detection\", \"temporal 3D tracker\", \"sparse query 3D perception\".",
+      "description": "Prepare calibrated multi-camera data and train, evaluate, run inference, export, or quantize TAO Sparse4D 3D detection and tracking models. Includes 2D-to-3D geometric distillation with released LTT weights. Use for Sparse4D adaptation and temporal multi-camera perception workflows.",
       "metadata": {
         "product.primary": "TAO Toolkit",
         "classification.category.primary": "ai_and_machine_learning",
