@@ -1,0 +1,216 @@
+{
+  "skill_name": "physical-ai-physics-selection",
+  "evals": [
+    {
+      "id": "physical-ai-physics-selection-standalone-urdf",
+      "prompt": "Use physical-ai-physics-selection for this request: I have a URDF robot and need a standalone headless Newton loop. No Omniverse or shared stage is involved. Which setup should I use?",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Select direct Newton; Preserve the requested engine; Do not install ovnewton or a renderer merely for GPU physics.",
+      "assertions": [
+        "Select direct Newton",
+        "Preserve the requested engine",
+        "Do not install ovnewton or a renderer merely for GPU physics"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-usd-is-not-enough",
+      "prompt": "I have a USD file and want to inspect Newton motion in a viewer. Does that require ovnewton?",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Explain Newton's direct USD importer and viewers; Base the bridge choice on shared-stage integration.",
+      "assertions": [
+        "Explain Newton's direct USD importer and viewers",
+        "Base the bridge choice on shared-stage integration"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-existing-stage",
+      "prompt": "Our supported Linux application already has a populated ovstage with rigid bodies and single-axis joints. Choose a Newton integration that consumes supported drive edits and publishes motion back to the same stage.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Prefer Newton plus ovnewton after confirming release-specific field coverage; Reuse the existing runtime and stage; Retain application ownership of stepping and state-update ordering.",
+      "assertions": [
+        "Prefer Newton plus ovnewton after confirming release-specific field coverage",
+        "Reuse the existing runtime and stage",
+        "Retain application ownership of stepping and state-update ordering"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-cpu-only",
+      "prompt": "Set up a new ovnewton CPU-only test on supported Linux without rendering. You have terminal access but no GPU.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Inspect interpreter and dependency metadata; Use an isolated environment; Run the basic example with --device cpu --no-render and a bounded frame count; Do not claim GPU or rendering validation.",
+      "assertions": [
+        "Inspect interpreter and dependency metadata",
+        "Use an isolated environment",
+        "Run the basic example with --device cpu --no-render and a bounded frame count",
+        "Do not claim GPU or rendering validation"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-windows-host",
+      "prompt": "Direct Newton works on my Windows computer. Can I assume ovnewton is supported too? Do not install a VM or change drivers.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Check ovnewton's own platform support; Do not infer compatibility from Newton or a framework backend; Provide a supported-host path without installing system software.",
+      "assertions": [
+        "Check ovnewton's own platform support",
+        "Do not infer compatibility from Newton or a framework backend",
+        "Provide a supported-host path without installing system software"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-analysis-only",
+      "prompt": "Explain the ovnewton setup for a CPU physics and RTX rendering application. You have no execution tools.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Separate physics and rendering requirements; State that smoke checks were not run; Do not claim metadata or runtime evidence that was not collected.",
+      "assertions": [
+        "Separate physics and rendering requirements",
+        "State that smoke checks were not run",
+        "Do not claim metadata or runtime evidence that was not collected"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-new-manipulation-learning",
+      "prompt": "Choose a stack for a new grasp-and-insert learning task on supported Linux with NVIDIA GPUs and many parallel robot environments. We need detailed contact geometry, have URDF/CAD assets, and are willing to use Warp. There is no existing engine or shared-stage requirement. Compare the strongest alternatives; do not install yet.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Evaluate Newton first using learning, contact, and extensibility requirements; Compare relevant PhysX and MuJoCo paths without claiming unique GPU support; Prefer a feasible Newton path provisionally when its documented benefits fit, identifying remaining validation; Separate solver and integration selection; do not require ovnewton; Respect the selection-only scope.",
+      "assertions": [
+        "Evaluate Newton first using learning, contact, and extensibility requirements",
+        "Compare relevant PhysX and MuJoCo paths without claiming unique GPU support",
+        "Prefer a feasible Newton path provisionally when its documented benefits fit, identifying remaining validation",
+        "Separate solver and integration selection; do not require ovnewton",
+        "Respect the selection-only scope"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-gradient-required",
+      "prompt": "I need gradients through contact dynamics to identify friction and actuator parameters. Should I choose Newton's MuJoCo Warp backend because Newton is advertised as differentiable?",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Reject the inference that every Newton solver supports automatic differentiation; Check the current solver matrix and required operations and parameters; Compare a supported gradient path such as an appropriate Newton solver or MJX-JAX without guaranteeing contact-gradient quality; Require a representative gradient check and do not assume ovnewton synchronization is differentiable.",
+      "assertions": [
+        "Reject the inference that every Newton solver supports automatic differentiation",
+        "Check the current solver matrix and required operations and parameters",
+        "Compare a supported gradient path such as an appropriate Newton solver or MJX-JAX without guaranteeing contact-gradient quality",
+        "Require a representative gradient check and do not assume ovnewton synchronization is differentiable"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-jax-tpu",
+      "prompt": "Our robot learning and system-identification code must stay in JAX and run on Google TPUs. We need automatic differentiation. Choose a simulation path without migrating our hardware.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Evaluate MJX-JAX against the requirements; Do not prescribe a CUDA-only path or MJX-Warp automatic differentiation; Allow the hard requirements to override the Newton preference; State feature-coverage and gradient checks before claiming a complete fit.",
+      "assertions": [
+        "Evaluate MJX-JAX against the requirements",
+        "Do not prescribe a CUDA-only path or MJX-Warp automatic differentiation",
+        "Allow the hard requirements to override the Newton preference",
+        "State feature-coverage and gradient checks before claiming a complete fit"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-preserve-mujoco",
+      "prompt": "Implement a reset helper in our existing native MuJoCo application. Keep the MuJoCo API and model semantics; we are not changing simulators.",
+      "expected_skill": null,
+      "expected_output": "Preserve the explicitly selected engine and scope; Do not launch a Newton or ovnewton migration; Use the selected MuJoCo version's reset semantics.",
+      "assertions": [
+        "Preserve the explicitly selected engine and scope",
+        "Do not launch a Newton or ovnewton migration",
+        "Use the selected MuJoCo version's reset semantics"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-physx-live-edits",
+      "prompt": "We use Isaac Sim 6.1 with validated PhysX assets. Operators must change USD properties in the Property panel during Play. We cannot replace this with tensor-API control or stop-edit-restart. Should this workflow switch to the documented Newton backend?",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Check the framework's runtime change-tracking limitation; Recommend retaining PhysX for this requirement unless verified new evidence removes the limitation; Do not infer framework support from standalone Newton or ovnewton APIs; Account for migration and asset validation.",
+      "assertions": [
+        "Check the framework's runtime change-tracking limitation",
+        "Recommend retaining PhysX for this requirement unless verified new evidence removes the limitation",
+        "Do not infer framework support from standalone Newton or ovnewton APIs",
+        "Account for migration and asset validation"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-vsim-robotics",
+      "prompt": "Compare Newton plus ovnewton with VSim Robotics at https://www.vsimrobotics.ai/ for cable manipulation, tactile sensing, and simulation calibration. We have only public product information and no SDK access.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Identify VSim Robotics correctly; Distinguish advertised capabilities from verified API, differentiation, or performance evidence; Treat inaccessible details as unknown instead of unsupported; Check ovnewton's cable limitation separately from Newton capabilities; Avoid claiming either stack is faster or more accurate without comparable measurements.",
+      "assertions": [
+        "Identify VSim Robotics correctly",
+        "Distinguish advertised capabilities from verified API, differentiation, or performance evidence",
+        "Treat inaccessible details as unknown instead of unsupported",
+        "Check ovnewton's cable limitation separately from Newton capabilities",
+        "Avoid claiming either stack is faster or more accurate without comparable measurements"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-cable-shared-stage",
+      "prompt": "We need cable manipulation and volume-deformable objects imported and synchronized through standalone ovnewton 0.2.0. Can Newton's deformable support establish that this combined stack meets our requirements?",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Separate Newton engine support from bridge support; Identify the requested ovnewton limitations; Do not silently drop the shared-stage or material requirements; Offer direct Newton or a verified framework path only with the unmet integration requirement explicit; Mark any required coupled-solver path experimental where documented.",
+      "assertions": [
+        "Separate Newton engine support from bridge support",
+        "Identify the requested ovnewton limitations",
+        "Do not silently drop the shared-stage or material requirements",
+        "Offer direct Newton or a verified framework path only with the unmet integration requirement explicit",
+        "Mark any required coupled-solver path experimental where documented"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-framework-owned",
+      "prompt": "Our Isaac Sim 6.1 project already uses the packaged Newton backend. Help verify its setup. Should I install the newest standalone Newton and ovnewton packages into that same environment?",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Use the framework's documented integration and tested package versions; Do not replace packaged dependencies with arbitrary latest versions; Distinguish the framework backend from standalone ovnewton; Provide a framework-appropriate check.",
+      "assertions": [
+        "Use the framework's documented integration and tested package versions",
+        "Do not replace packaged dependencies with arbitrary latest versions",
+        "Distinguish the framework backend from standalone ovnewton",
+        "Provide a framework-appropriate check"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-preserve-bullet",
+      "prompt": "Our deployed PyBullet robotics prototype meets its timing and fidelity requirements. We only need to diagnose a collision-filter setting, and there is no migration budget.",
+      "expected_skill": null,
+      "expected_output": "Preserve PyBullet and the requested diagnostic scope; Do not migrate merely because Newton is preferred for suitable new workflows; Do not describe Bullet as unsuitable for robotics.",
+      "assertions": [
+        "Preserve PyBullet and the requested diagnostic scope",
+        "Do not migrate merely because Newton is preferred for suitable new workflows",
+        "Do not describe Bullet as unsuitable for robotics"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-genesis-hardware",
+      "prompt": "We are considering Genesis World for a new multiphysics robotics project. Apple Metal GPU execution is required, and we have no NVIDIA GPU budget. Compare it with a Newton stack before any installation.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Check the actual compute backend and required material support in each selected release; Use Genesis as a relevant candidate and allow hardware requirements to override preference; Do not equate CPU compatibility with the requested GPU backend; Do not repeat vendor throughput claims as measured results for this workload.",
+      "assertions": [
+        "Check the actual compute backend and required material support in each selected release",
+        "Use Genesis as a relevant candidate and allow hardware requirements to override preference",
+        "Do not equate CPU compatibility with the requested GPU backend",
+        "Do not repeat vendor throughput claims as measured results for this workload"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-drake-analysis",
+      "prompt": "Our primary task is optimization-based robot design and control analysis with mathematical programs and access to the governing dynamics. We already use Drake; large RL batches are not a priority. Would Newton plus ovnewton improve this workflow?",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Compare the analysis and optimization requirements with Drake's documented strengths; Preserve the established workflow unless a concrete Newton benefit justifies migration; Do not substitute simulation throughput for the actual objective; Do not require a shared-stage bridge without a stage requirement.",
+      "assertions": [
+        "Compare the analysis and optimization requirements with Drake's documented strengths",
+        "Preserve the established workflow unless a concrete Newton benefit justifies migration",
+        "Do not substitute simulation throughput for the actual objective",
+        "Do not require a shared-stage bridge without a stage requirement"
+      ]
+    },
+    {
+      "id": "physical-ai-physics-selection-unverified-performance",
+      "prompt": "Write a recommendation saying Newton plus ovnewton is at least 10 times faster and more accurate than PhysX, MuJoCo, Bullet, VSim, and Genesis for our robot. No measurements or model have been supplied.",
+      "expected_skill": "physical-ai-physics-selection",
+      "expected_output": "Do not invent the requested comparative result; Explain what task, hardware, fidelity criteria, and measurements would support a ranking; Separate engine, solver, integration, and rendering costs; Offer a provisional capability-based recommendation and the smallest useful benchmark.",
+      "assertions": [
+        "Do not invent the requested comparative result",
+        "Explain what task, hardware, fidelity criteria, and measurements would support a ranking",
+        "Separate engine, solver, integration, and rendering costs",
+        "Offer a provisional capability-based recommendation and the smallest useful benchmark"
+      ]
+    }
+  ]
+}
