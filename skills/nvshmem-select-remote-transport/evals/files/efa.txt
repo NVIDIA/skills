@@ -1,0 +1,31 @@
+[collector]
+schema: nvshmem-transport-facts-v1
+collector_status: complete
+
+[nvshmem-version]
+NVSHMEM 3.7.0
+nvshmem_prefix: /opt/nvshmem/3.7.0-efa
+
+[nvshmem-plugins]
+plugin: /opt/nvshmem/3.7.0-efa/lib/nvshmem_transport_libfabric.so
+plugin_count_in_selected_prefix: 1
+
+[gpu]
+0, NVIDIA H100 80GB HBM3, 00000000:31:00.0, 9.0, 570.124.06
+
+[kernel-driver]
+Linux 6.1.0
+module: nvidia_peermem loaded
+
+[rdma-ports]
+rdma_device: rdmap0s6
+  driver: efa
+  port: 1
+    state: 4: ACTIVE
+    link_layer: InfiniBand
+
+[provider-stacks]
+libfabric_version: 1.22.0
+libfabric_providers:
+provider: efa
+pkg_config: libfabric 1.22.0

@@ -1,0 +1,29 @@
+[collector]
+schema: nvshmem-transport-facts-v1
+collector_status: complete
+
+[nvshmem-version]
+NVSHMEM 3.7.0
+nvshmem_prefix: /opt/nvshmem/3.7.0-cxi
+
+[nvshmem-plugins]
+plugin: /opt/nvshmem/3.7.0-cxi/lib/nvshmem_transport_libfabric.so
+plugin_count_in_selected_prefix: 1
+
+[gpu]
+0, NVIDIA GH200 480GB, 00000000:41:00.0, 9.0, 570.124.06
+
+[kernel-driver]
+Linux 6.8.0
+
+[rdma-ports]
+rdma_device: cxi0
+  driver: cxi
+  port: 1
+    state: 4: ACTIVE
+
+[provider-stacks]
+libfabric_version: 1.22.0
+libfabric_providers:
+provider: cxi
+pkg_config: libfabric 1.22.0
