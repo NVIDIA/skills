@@ -3,7 +3,7 @@
 
 name: HoloHub
 repo: nvidia-holoscan/holoscan-applications
-description: Build, run, debug, benchmark, and develop HoloHub applications and Holoscan Modules with validated lifecycle workflows.
+description: Build, run, debug, benchmark, and develop Holoscan applications and Holoscan Modules with validated lifecycle workflows.
 links:
   discussions: false
 skills:
