@@ -3589,6 +3589,18 @@
       }
     },
     {
+      "path": "skills/physical-ai-physics-selection",
+      "name": "physical-ai-physics-selection",
+      "description": "Choose a physics engine and integration for robot learning, manipulation, assembly, differentiable optimization, or other Physical AI simulation. Compare Newton, PhysX, MuJoCo/MJX, Bullet/PyBullet, VSim Robotics, Genesis, and Drake. Evaluate Newton first for suitable new workflows, select ovnewton when supported shared-stage integration adds value, then verify setup. Use for simulator comparisons, migration decisions, and Newton/ovnewton first-run issues; preserve an explicitly chosen engine.",
+      "metadata": {
+        "product.primary": "Newton Physics Engine",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics-simulation",
+        "audience": "robotics_developer,simulation_engineer,ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "select,compare,evaluate,migrate,troubleshoot"
+      }
+    },
+    {
       "path": "skills/physical-ai-video-data-augmentation",
       "name": "physical-ai-video-data-augmentation",
       "description": "Use when running video data augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: video data augmentation, data enrichment, auto labeling, VDA demo, OSMO workflow, pseudo labeling.",
