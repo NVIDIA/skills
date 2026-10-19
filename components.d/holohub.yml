@@ -2,14 +2,14 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 
 name: HoloHub
-repo: nvidia-holoscan/holohub
+repo: nvidia-holoscan/holoscan-applications
 description: Build, run, debug, benchmark, and develop HoloHub applications and Holoscan Modules with validated lifecycle workflows.
 links:
   discussions: false
 skills:
-  - path: skills/holohub-app-lifecycle/
-    catalog_dir: holohub-app-lifecycle
-  - path: skills/holohub-debug-build-run/
-    catalog_dir: holohub-debug-build-run
-  - path: skills/holohub-module-lifecycle/
-    catalog_dir: holohub-module-lifecycle
+  - path: skills/holoscan-app-lifecycle/
+    catalog_dir: holoscan-app-lifecycle
+  - path: skills/holoscan-app-debug-build-run/
+    catalog_dir: holoscan-app-debug-build-run
+  - path: skills/holoscan-module-lifecycle/
+    catalog_dir: holoscan-module-lifecycle
