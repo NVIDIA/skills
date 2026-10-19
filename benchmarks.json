@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 419,
-  "result_row_count": 3939,
+  "skill_count": 428,
+  "result_row_count": 4029,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5681,6 +5681,186 @@
       "component": "NVIDIA Skills",
       "has_results": true,
       "average_uplift_pct": 26.97
+    },
+    {
+      "skill": "nvshmem-collect-performance-data",
+      "evaluation_date": "2026-09-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:cd5ae2cd5f82d92864a6f880eed91e5f33a0a07cd670cf1f8fc9731b592f19b4",
+      "validation_status": null,
+      "tasks": 12,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 36.15
+    },
+    {
+      "skill": "nvshmem-configure-nic-pe-mapping",
+      "evaluation_date": "2026-09-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:3448f01637a5000ccad4f8afc6f67a581949f5b0749b6c973b7c91d24965a8aa",
+      "validation_status": null,
+      "tasks": 18,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 25.45
+    },
+    {
+      "skill": "nvshmem-docs",
+      "evaluation_date": "2026-09-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:b5c07e4c1f1f22740c058d2134cd32b62bf42a16e61e6769cf16319d5239f93d",
+      "validation_status": null,
+      "tasks": 8,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 21.82
+    },
+    {
+      "skill": "nvshmem-enable-tma",
+      "evaluation_date": "2026-09-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:e3c2d48c44ad179c71aae4981c94ea63468db8ca1773417a7723778f19bdf523",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 26.47
+    },
+    {
+      "skill": "nvshmem-get-started",
+      "evaluation_date": "2026-09-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:d4b763e4ad4d346d9193abfe1de56a613a73b0a613ad065db2291289b139b7a0",
+      "validation_status": null,
+      "tasks": 6,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 29.43
+    },
+    {
+      "skill": "nvshmem-install",
+      "evaluation_date": "2026-09-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:aacad0c211dc8fa408a75eb047468fb537abb3a6201640ec4145164ebe0d48b0",
+      "validation_status": null,
+      "tasks": 8,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 13.37
+    },
+    {
+      "skill": "nvshmem-select-remote-transport",
+      "evaluation_date": "2026-09-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:45a53bc4095635c996256a6ac68469f434e10178cc0f13552333e5d84478c787",
+      "validation_status": null,
+      "tasks": 14,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 15.2
+    },
+    {
+      "skill": "nvshmem-troubleshoot-and-report-bugs",
+      "evaluation_date": "2026-09-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:921c8be88893fc6098dc52bb100827d2f0110f99530aa7765eff3e8d7cfe7c72",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 16.73
+    },
+    {
+      "skill": "nvshmem-tune-performance",
+      "evaluation_date": "2026-09-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:126513e60f7ca3d43627ba9aba60b1359057942392c2730e0118164134b1d05d",
+      "validation_status": null,
+      "tasks": 8,
+      "attempts_per_task": 3,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "has_results": true,
+      "average_uplift_pct": 26.43
     },
     {
       "skill": "omniverse-cad-to-simready",
@@ -32242,6 +32422,816 @@
       "num": null,
       "agent": "codex",
       "score_pct": 66.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 26.3
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 14.3
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 37.9
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": 55.2
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.4,
+      "uplift_pct": 41.8
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 41.4
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 76.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-collect-performance-data",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 3.4
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 19.6
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.8,
+      "uplift_pct": 39.9
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.2,
+      "uplift_pct": 19.3
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 73.8,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 78.5,
+      "uplift_pct": 34.5
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-configure-nic-pe-mapping",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 42.0
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 2.5
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.9,
+      "uplift_pct": 54.4
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.2,
+      "uplift_pct": 22.0
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-docs",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.5,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.3,
+      "uplift_pct": 38.8
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-enable-tma",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": 39.2
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 34.0
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 73.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 35.6
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.8,
+      "uplift_pct": 37.8
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-get-started",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.8,
+      "uplift_pct": 8.8
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 6.0
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.3,
+      "uplift_pct": 17.5
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": 37.9
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 70.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-install",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.3,
+      "uplift_pct": 29.6
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.1,
+      "uplift_pct": 12.8
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.9,
+      "uplift_pct": 27.4
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.2,
+      "uplift_pct": 21.4
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-select-remote-transport",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.0,
+      "uplift_pct": 26.7
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 28.7
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 77.5,
+      "uplift_pct": 48.1
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 82.5,
+      "uplift_pct": 34.8
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 74.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.3,
+      "uplift_pct": 34.7
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.1,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvshmem-tune-performance",
+      "component": "NVSHMEM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.3,
       "uplift_pct": null
     },
     {

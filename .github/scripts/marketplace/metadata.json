@@ -3421,6 +3421,114 @@
       }
     },
     {
+      "path": "skills/nvshmem-collect-performance-data",
+      "name": "nvshmem-collect-performance-data",
+      "description": "Collect and package NVSHMEM put/get bandwidth, latency, and other perftest results with system and topology evidence for performance sanity checks.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "benchmark,measure,package,validate,profile"
+      }
+    },
+    {
+      "path": "skills/nvshmem-configure-nic-pe-mapping",
+      "name": "nvshmem-configure-nic-pe-mapping",
+      "description": "Recommend NVSHMEM NIC-to-PE mappings and environment exports. Use for HCA selection, multi-NIC configuration, or topology-based mapping diagnostics.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "configure,optimize,troubleshoot,select,debug"
+      }
+    },
+    {
+      "path": "skills/nvshmem-docs",
+      "name": "nvshmem-docs",
+      "description": "Find version-aware official NVSHMEM and NVSHMEM4Py documentation for releases, installation, APIs, runtime settings, transports, containers, and troubleshooting.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "get_started,configure,troubleshoot,integrate,debug"
+      }
+    },
+    {
+      "path": "skills/nvshmem-enable-tma",
+      "name": "nvshmem-enable-tma",
+      "description": "Prepare or review NVSHMEM CUDA kernels for TMA SMEM registration and direct-SMEM transfers. Do not use for unrelated CUDA tuning.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,application_developer,developer",
+        "discovery.activity_tags": "configure,debug,assess,validate,optimize"
+      }
+    },
+    {
+      "path": "skills/nvshmem-get-started",
+      "name": "nvshmem-get-started",
+      "description": "Use when NVSHMEM beginners want a tutorial-style overview on assessment, mental models, first C/C++ or Python NVSHMEM programs, compilation, launching, and next steps.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,application_developer,developer,student_university",
+        "discovery.activity_tags": "get_started,assess,configure,integrate"
+      }
+    },
+    {
+      "path": "skills/nvshmem-install",
+      "name": "nvshmem-install",
+      "description": "Plan and validate NVSHMEM and NVSHMEM4Py installations. Use for package, container, or source deployments.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,platform_engineer,devops_engineer,developer,application_developer",
+        "discovery.activity_tags": "deploy,configure,validate,package,test"
+      }
+    },
+    {
+      "path": "skills/nvshmem-select-remote-transport",
+      "name": "nvshmem-select-remote-transport",
+      "description": "Select an NVSHMEM remote transport from target system and kernel evidence. Use for inter-node selection, compatibility checks, or configuration.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,platform_engineer,devops_engineer,application_developer",
+        "discovery.activity_tags": "select,configure,validate,optimize,assess"
+      }
+    },
+    {
+      "path": "skills/nvshmem-troubleshoot-and-report-bugs",
+      "name": "nvshmem-troubleshoot-and-report-bugs",
+      "description": "Diagnose NVSHMEM runtime failures and prepare bug reports for launch, crashes, hangs, correctness, transport, or topology issues.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "troubleshoot,debug,inspect,validate,test"
+      }
+    },
+    {
+      "path": "skills/nvshmem-tune-performance",
+      "name": "nvshmem-tune-performance",
+      "description": "Route NVSHMEM tuning to data collection, remote transport, NIC-to-PE mapping, or TMA. Do not use for unrelated CUDA, NCCL, or application tuning.",
+      "metadata": {
+        "product.primary": "NVSHMEM",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,platform_engineer,application_developer,developer",
+        "discovery.activity_tags": "optimize,configure,benchmark,profile,measure"
+      }
+    },
+    {
       "path": "skills/omniverse-cad-to-simready",
       "name": "omniverse-cad-to-simready",
       "description": "Coordinate the end-to-end CAD/source-asset to SimReady workflow. Use for broad requests such as CAD to SimReady, source asset to simulation-ready USD, or prop packaging that require conversion, material/physics assignment, SimReady conformance, validation, and optional package creation; deploy or verify Content Agents services first when property assignment is enabled; route single-stage work through nested references.",
