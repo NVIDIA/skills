@@ -397,6 +397,18 @@
       }
     },
     {
+      "path": "skills/compute-sanitizer-diagnose-cuda-bugs",
+      "name": "compute-sanitizer-diagnose-cuda-bugs",
+      "description": "Detect and diagnose CUDA correctness bugs with NVIDIA Compute Sanitizer. Routes GPU memory errors, shared-memory data races, uninitialized-memory reads, and synchronization/barrier bugs to the right sub-tool (memcheck, racecheck, initcheck, synccheck) and explains how to build, run, and read the report. Use when debugging illegal memory access, out-of-bounds, misaligned access, leaks, WAW/WAR/RAW races, __shared__ hazards, uninitialized reads, garbage results, hangs, divergent __syncthreads/__syncwarp, or cuda::barrier / wgmma issues. Do NOT use for host/CPU-side bugs (use valgrind or AddressSanitizer) or global-memory data races (out of scope). Trigger keywords - compute-sanitizer, memcheck, racecheck, initcheck, synccheck, CUDA memory error, OOB, race condition, uninitialized memory, __syncthreads, barrier, deadlock.",
+      "metadata": {
+        "product.primary": "Compute Sanitizer",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,hpc_developer",
+        "discovery.activity_tags": "debug,troubleshoot,inspect,test,validate"
+      }
+    },
+    {
       "path": "skills/cudaq-guide",
       "name": "cudaq-guide",
       "description": "Use for CUDA-Q setup, simulation targets, QPU access, and @cudaq.kernel authoring guidance.",

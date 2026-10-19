@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 418,
-  "result_row_count": 3924,
+  "skill_count": 419,
+  "result_row_count": 3934,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -684,6 +684,26 @@
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": 1.32
+    },
+    {
+      "skill": "compute-sanitizer-diagnose-cuda-bugs",
+      "evaluation_date": "2026-10-13",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:8a351af431b170a1edcef4f1cfc3449b1209d407dc0915bcf32f226b22c78ff8",
+      "validation_status": null,
+      "tasks": 16,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "has_results": true,
+      "average_uplift_pct": 6.12
     },
     {
       "skill": "cudaq-guide",
@@ -11297,6 +11317,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 65.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.8,
+      "uplift_pct": 2.5
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 3.7
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.4,
+      "uplift_pct": 15.1
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.4,
+      "uplift_pct": 15.4
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
+      "component": "Nsight",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.8,
       "uplift_pct": null
     },
     {
