@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Nsight
+repo: NVIDIA/nsight
+description: Agent guidance for diagnosing CUDA correctness issues with NVIDIA Compute Sanitizer.
+skills:
+  - path: skills/compute-sanitizer-diagnose-cuda-bugs/
+    catalog_dir: compute-sanitizer-diagnose-cuda-bugs
+links:
+  discussions: false
