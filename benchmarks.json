@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 417,
-  "result_row_count": 3914,
+  "skill_count": 418,
+  "result_row_count": 3924,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -4284,7 +4284,7 @@
     },
     {
       "skill": "nemo-fabric-integrate",
-      "evaluation_date": "2026-10-14",
+      "evaluation_date": "2026-10-16",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:4e12e11bb429ad195c00ceab9cd53bbf6351f32173f03b0ae827531ba2441a9e",
@@ -4300,7 +4300,7 @@
       "catalog_dir": "nemo-fabric-integrate",
       "component": "NeMo Fabric",
       "has_results": true,
-      "average_uplift_pct": 25.87
+      "average_uplift_pct": 18.4
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -5958,6 +5958,26 @@
       "component": "Physical AI",
       "has_results": true,
       "average_uplift_pct": 24.72
+    },
+    {
+      "skill": "physical-ai-physics-selection",
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:8f634bf9512031e90d3fd187a56f4049871355b21e5f96efbbe09abb60fa9858",
+      "validation_status": null,
+      "tasks": 18,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "has_results": true,
+      "average_uplift_pct": 7.1
     },
     {
       "skill": "physical-ai-video-data-augmentation",
@@ -26180,8 +26200,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 58.3,
-      "uplift_pct": -41.7
+      "score_pct": 66.7,
+      "uplift_pct": -16.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26189,8 +26209,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 0.0
+      "score_pct": 41.7,
+      "uplift_pct": -58.3
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26199,7 +26219,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 86.7,
-      "uplift_pct": 56.7
+      "uplift_pct": 46.7
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26208,7 +26228,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 93.3,
-      "uplift_pct": 60.0
+      "uplift_pct": 56.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26216,7 +26236,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 80.0,
+      "score_pct": 82.5,
       "uplift_pct": null
     },
     {
@@ -26225,7 +26245,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
+      "score_pct": 77.5,
       "uplift_pct": null
     },
     {
@@ -26234,8 +26254,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 67.1,
-      "uplift_pct": 39.2
+      "score_pct": 78.6,
+      "uplift_pct": 44.4
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26243,8 +26263,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 71.6,
-      "uplift_pct": 41.0
+      "score_pct": 68.2,
+      "uplift_pct": 37.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -26252,7 +26272,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 62.1,
+      "score_pct": 65.0,
       "uplift_pct": null
     },
     {
@@ -26261,7 +26281,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.5,
+      "score_pct": 83.1,
       "uplift_pct": null
     },
     {
@@ -33282,6 +33302,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 83.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.4,
+      "uplift_pct": 5.5
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.4,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 11.1
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.9,
+      "uplift_pct": 1.1
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.1,
+      "uplift_pct": 19.6
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.6,
+      "uplift_pct": 5.3
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "physical-ai-physics-selection",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 43.0,
       "uplift_pct": null
     },
     {
