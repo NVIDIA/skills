@@ -1997,6 +1997,69 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "nvshmem-collect-performance-data",
+      "path": "skills/nvshmem-collect-performance-data",
+      "content_digest": "sha256:a0c75c6add62c9cfbfd499192b9b82df68e44d0d74dab0e36a7fefdcb8f1362f",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-configure-nic-pe-mapping",
+      "path": "skills/nvshmem-configure-nic-pe-mapping",
+      "content_digest": "sha256:af7ad41792396f813185dc76ffe7ee5edc22a501396043dbcac664937f3f3669",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-docs",
+      "path": "skills/nvshmem-docs",
+      "content_digest": "sha256:5d4655887d777bc3ea26cea99cae59fee87790dc80e18cf74a23597527a5e89a",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-enable-tma",
+      "path": "skills/nvshmem-enable-tma",
+      "content_digest": "sha256:aab2f62b929fa73aaf3b02c9127406e4ae65861a28413c3533eb1fd1ceb622b8",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-get-started",
+      "path": "skills/nvshmem-get-started",
+      "content_digest": "sha256:646480d9bfe948c14df31a087a843807c3c6060f7622b2908ad924fa67194ef9",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-install",
+      "path": "skills/nvshmem-install",
+      "content_digest": "sha256:b366e1d19de44798896f1f8eb83eb17825c2b58fa5ed3db95af6bb49f5e9d1ee",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-select-remote-transport",
+      "path": "skills/nvshmem-select-remote-transport",
+      "content_digest": "sha256:943a5738a96992eae29d3db096dcf09240e5c690ef7e893475ede532e0e356a5",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-troubleshoot-and-report-bugs",
+      "path": "skills/nvshmem-troubleshoot-and-report-bugs",
+      "content_digest": "sha256:c89e9dd2c4c6690c3dcc86e241990381f17ed717502fe6185e4c9dae87b9ec87",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
+      "name": "nvshmem-tune-performance",
+      "path": "skills/nvshmem-tune-performance",
+      "content_digest": "sha256:12008a0e0806659c92916a11967e78c323ebdf39ab06a7ca858018ff13703560",
+      "last_commit": "64a442f1378d2034ce129be6705a0a674c6c5822",
+      "last_modified": "2026-10-19"
+    },
+    {
       "name": "omniverse-cad-to-simready",
       "path": "skills/omniverse-cad-to-simready",
       "content_digest": "sha256:d04ef24c0c75416299ac484d324f3b450bec8f9976fe27d607b9e558ea30d8c0",
