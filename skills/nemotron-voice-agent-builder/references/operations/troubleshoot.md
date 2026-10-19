@@ -164,8 +164,9 @@ phrase, approved score, locked model support, and framework wiring before changi
 Confirm the project copied the current upstream
 `nvidia_omni_multimodal_service.py` and instantiates the service class imported by the
 current upstream pipeline, which is currently `NvidiaOmniLLMService`.
-Confirm it also copied `audio_only_smart_turn_strategy.py`. Do not replace either with a
-stock text-only service or transcription-dependent Smart Turn strategy.
+Confirm it uses Pipecat's `TurnAnalyzerUserTurnStopStrategy` with
+`wait_for_transcript=False`. Do not replace the Omni service with a stock text-only
+service or configure Smart Turn to await an upstream transcript.
 
 If speech produces no request, trace input audio, user-start, and user-stop frames into
 the service. If the first greeting races microphone input, confirm

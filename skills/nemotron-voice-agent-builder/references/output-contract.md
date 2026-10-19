@@ -26,8 +26,8 @@ Also write:
 - `compose.yaml` when any model service is self-hosted or the project owns coturn
 - `speech_glossary.json` when speech customization is approved
 - `signaling_server.py` when custom TURN is required for Pipecat WebRTC
-- `nvidia_omni_multimodal_service.py` and `audio_only_smart_turn_strategy.py` from the
-  current upstream blueprint when the pipeline is Omni
+- `nvidia_omni_multimodal_service.py` from the current upstream blueprint when the
+  pipeline is Omni
 
 ## Generated Compose
 
