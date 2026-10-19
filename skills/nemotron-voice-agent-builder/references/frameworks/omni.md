@@ -19,10 +19,9 @@ directly. Copy the current upstream file into the generated project and use the 
 settings classes imported by the current upstream pipeline. They are currently
 `NvidiaOmniLLMService` and `NvidiaOmniSettings`. Do not reimplement or simplify them.
 
-Also copy NVIDIA's current
-[`audio_only_smart_turn_strategy.py`](https://github.com/NVIDIA-AI-Blueprints/nemotron-voice-agent/blob/main/src/examples/omni_assistant/audio_only_smart_turn_strategy.py).
-Pipecat's stock Smart Turn stop strategy waits for an upstream `TranscriptionFrame`, which
-does not exist before an Omni audio turn completes.
+Use Pipecat's built-in `TurnAnalyzerUserTurnStopStrategy` with
+`wait_for_transcript=False`. Omni produces its transcript inside the model request, so no
+upstream `TranscriptionFrame` exists for the strategy to await.
 
 Generate the surrounding Pipecat pipeline, transport, context, turn handling, and TTS
 wiring from the Pipecat docs MCP. Use NVIDIA's current
@@ -109,7 +108,8 @@ support even that.
 Wire transport audio and context into the copied `NvidiaOmniLLMService`, then route its
 text output to TTS.
 
-- Start turns from VAD and stop them with `AudioOnlySmartTurnStopStrategy`.
+- Start turns from VAD and stop them with `TurnAnalyzerUserTurnStopStrategy`, configured
+  with the Smart Turn analyzer and `wait_for_transcript=False`.
 - Use Pipecat's current `MuteUntilFirstBotCompleteUserMuteStrategy` so microphone input
   cannot race the first response.
 - Follow the current upstream pipeline for the connect greeting and use one greeting path
@@ -123,7 +123,8 @@ text output to TTS.
 - `scripts/smoke.sh` passes, using the Omni audio request rather than a chat completion.
   A passing text request proves nothing about the audio path.
 - No ASR service or ASR sidecar exists.
-- The upstream Omni service and audio-only Smart Turn strategy were copied unchanged.
+- The upstream Omni service was copied unchanged, and the built-in Smart Turn stop
+  strategy does not wait for an upstream transcript.
 - The model endpoint serves the locked Omni model, and the agent uses its exact served id.
 - User audio produces a coherent response and, when supported, a user transcription.
 - Exactly one greeting plays and microphone input begins after it completes.
@@ -136,7 +137,7 @@ text output to TTS.
 - LiveKit Omni.
 - Stock text-only LLM service or separate ASR used in place of Omni.
 - Rewriting `NvidiaOmniLLMService`.
-- Stock Smart Turn stop strategy waiting for a transcription.
+- Smart Turn stop strategy left at `wait_for_transcript=True`.
 - Reasoning left at the model default.
 - Serving Omni without the audio extras, or declaring the deployment working from a text
   request alone.

@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nemotron-voice-agent-builder`
-- Evaluation date: 2026-09-23
+- Evaluation date: 2026-10-19
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 5 evaluation tasks (4 positive, 1 negative)
 - Dataset digest: `sha256:820305d412563ab26a2312566e2cd07ced079c651a147528990951cee89bcebc` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 87.1% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | Not available | 36.4% → 80.0% (+43.6 points) |
-| Correctness | Not available | 54.6% → 100.0% (+45.4 points) |
-| Discoverability | Not available | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | Not available | 34.3% → 88.5% (+54.2 points) |
-| Efficiency | Not available | 76.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 86.8% — baseline ran, but no comparable score was available; uplift unavailable | 85.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 70.0% → 80.0% (+10.0 points) | 40.0% → 80.0% (+40.0 points) |
+| Correctness | 48.0% → 88.0% (+40.0 points) | 68.0% → 100.0% (+32.0 points) |
+| Discoverability | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 47.5% → 86.5% (+39.0 points) | 48.5% → 86.5% (+38.0 points) |
+| Efficiency | 82.2% — baseline ran, but no comparable score was available; uplift unavailable | 69.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,19 +54,19 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 3,141,398 | 20,667,844 | N/A | N/A | skill 5/5; base 10/15 |
-| claude-code | nemotron-voice-agent-builder-contextual-high-concurrency-workstation | 853,172 | 77,026 | +776,146 | +1007.64% | skill 1/1; base 1/1 |
-| claude-code | nemotron-voice-agent-builder-explicit-dgx-spark | 691,580 | 437,502 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | nemotron-voice-agent-builder-implicit-low-concurrency-workstation | 456,973 | 14,983,825 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nemotron-voice-agent-builder-livekit-omni-conflict | 132,199 | 3,188,790 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nemotron-voice-agent-builder-negative-text-rag | 1,007,474 | 1,980,701 | -973,227 | -49.14% | skill 1/1; base 1/1 |
-| codex | All cases | 1,388,532 | 7,397,001 | N/A | N/A | skill 5/5; base 11/11 |
-| codex | nemotron-voice-agent-builder-contextual-high-concurrency-workstation | 229,734 | 27,692 | +202,042 | +729.60% | skill 1/1; base 1/1 |
-| codex | nemotron-voice-agent-builder-explicit-dgx-spark | 170,703 | 79,503 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nemotron-voice-agent-builder-implicit-low-concurrency-workstation | 335,169 | 5,002,150 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nemotron-voice-agent-builder-livekit-omni-conflict | 83,428 | 1,762,066 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nemotron-voice-agent-builder-negative-text-rag | 569,498 | 525,590 | +43,908 | +8.35% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 4,529,930 | 28,064,845 | N/A | N/A | skill 10/10; base 21/26 |
+| claude-code | All cases | 11,598,700 | 5,274,254 | +6,324,446 | +119.91% | skill 5/5; base 5/5 |
+| claude-code | nemotron-voice-agent-builder-contextual-high-concurrency-workstation | 709,644 | 97,839 | +611,805 | +625.32% | skill 1/1; base 1/1 |
+| claude-code | nemotron-voice-agent-builder-explicit-dgx-spark | 1,195,656 | 186,462 | +1,009,194 | +541.23% | skill 1/1; base 1/1 |
+| claude-code | nemotron-voice-agent-builder-implicit-low-concurrency-workstation | 626,820 | 696,920 | -70,100 | -10.06% | skill 1/1; base 1/1 |
+| claude-code | nemotron-voice-agent-builder-livekit-omni-conflict | 130,318 | 1,967,971 | -1,837,653 | -93.38% | skill 1/1; base 1/1 |
+| claude-code | nemotron-voice-agent-builder-negative-text-rag | 8,936,262 | 2,325,062 | +6,611,200 | +284.35% | skill 1/1; base 1/1 |
+| codex | All cases | 1,067,133 | 3,887,505 | -2,820,372 | -72.55% | skill 5/5; base 5/5 |
+| codex | nemotron-voice-agent-builder-contextual-high-concurrency-workstation | 102,035 | 25,501 | +76,534 | +300.12% | skill 1/1; base 1/1 |
+| codex | nemotron-voice-agent-builder-explicit-dgx-spark | 182,167 | 47,921 | +134,246 | +280.14% | skill 1/1; base 1/1 |
+| codex | nemotron-voice-agent-builder-implicit-low-concurrency-workstation | 239,160 | 1,926,704 | -1,687,544 | -87.59% | skill 1/1; base 1/1 |
+| codex | nemotron-voice-agent-builder-livekit-omni-conflict | 129,335 | 1,253,480 | -1,124,145 | -89.68% | skill 1/1; base 1/1 |
+| codex | nemotron-voice-agent-builder-negative-text-rag | 414,436 | 633,899 | -219,463 | -34.62% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 12,665,833 | 9,161,759 | +3,504,074 | +38.25% | skill 10/10; base 10/10 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -74,7 +74,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 23 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 5 task(s) |
 
@@ -86,9 +86,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/nemotron-voice-agent-builder/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/nemotron-voice-agent-builder/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nemotron-voice-agent-builder/SKILL.md`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`references/domain/speech-customization.md:110`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`references/domain/speech-customization.md:189`)
-- 12 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Skill Enumeration (AS3): Agent Snooping: skills/nemotron-voice-agent-builder/SKILL.md (`BENCHMARK.md:86`)
+- **MEDIUM** SECURITY/Skill Enumeration (AS3): Agent Snooping: skills/nemotron-voice-agent-builder/SKILL.md (`BENCHMARK.md:87`)
+- 18 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
