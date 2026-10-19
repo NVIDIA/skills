@@ -233,6 +233,13 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "compute-sanitizer-diagnose-cuda-bugs",
+      "path": "skills/compute-sanitizer-diagnose-cuda-bugs",
+      "content_digest": "sha256:f60e527e8be3030f85cde7bdf40e8ebad093cc7462542e307839867f2f3e912a",
+      "last_commit": "8a7430653e0d7c26e17642b03cc9297213fc16ac",
+      "last_modified": "2026-10-19"
+    },
+    {
       "name": "cudaq-guide",
       "path": "skills/cudaq-guide",
       "content_digest": "sha256:1a71ecd2bcb906fdfadceb9dead2211135ed0b3327ff05c415da1821669b3555",
