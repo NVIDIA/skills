@@ -1,0 +1,30 @@
+[collector]
+schema: nvshmem-transport-facts-v1
+collector_status: complete
+
+[nvshmem-version]
+NVSHMEM 3.7.0
+nvshmem_prefix: /opt/nvshmem/3.7.0-gpunetio
+
+[nvshmem-plugins]
+plugin: /opt/nvshmem/3.7.0-gpunetio/lib/nvshmem_transport_gpunetio.so
+plugin_count_in_selected_prefix: 1
+
+[gpu]
+0, NVIDIA H100 80GB HBM3, 00000000:18:00.0, 9.0, 570.124.06
+
+[kernel-driver]
+Linux 6.8.0
+module: nvidia_peermem loaded
+
+[rdma-ports]
+rdma_device: mlx5_0
+  driver: mlx5_core
+  port: 1
+    state: 4: ACTIVE
+    link_layer: InfiniBand
+    rate: 400 Gb/sec (4X NDR)
+
+[provider-stacks]
+pkg_config: gpunetio 3.1.0
+pkg_config: doca-gpunetio not_found

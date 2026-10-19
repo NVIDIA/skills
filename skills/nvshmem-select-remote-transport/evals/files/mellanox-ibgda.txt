@@ -1,0 +1,35 @@
+[collector]
+schema: nvshmem-transport-facts-v1
+collector_status: complete
+
+[nvshmem-version]
+NVSHMEM 3.7.0
+nvshmem_prefix: /opt/nvshmem/3.7.0
+
+[nvshmem-plugins]
+plugin: /opt/nvshmem/3.7.0/lib/nvshmem_transport_ibrc.so
+plugin: /opt/nvshmem/3.7.0/lib/nvshmem_transport_ibgda.so
+plugin_count_in_selected_prefix: 2
+
+[gpu]
+0, NVIDIA H100 80GB HBM3, 00000000:18:00.0, 9.0, 570.124.06
+
+[kernel-driver]
+Linux 6.8.0
+module: nvidia_peermem loaded
+PeerMappingOverride: 0
+
+[rdma-ports]
+rdma_device: mlx5_0
+  pci_device: 0000:17:00.0
+  driver: mlx5_core
+  port: 1
+    state: 4: ACTIVE
+    link_layer: InfiniBand
+    rate: 400 Gb/sec (4X NDR)
+
+[rdma-stack]
+ofed_version: MLNX_OFED_LINUX-24.10
+
+[provider-stacks]
+provider_library_hints: libmlx5.so.1

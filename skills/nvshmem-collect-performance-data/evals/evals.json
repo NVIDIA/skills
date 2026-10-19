@@ -1,0 +1,161 @@
+{
+  "skill_name": "nvshmem-collect-performance-data",
+  "evals": [
+    {
+      "id": "nvshmem-collect-performance-data-001",
+      "prompt": "Please run some NVSHMEM perftests and tell me whether performance looks sane. I have not chosen any particular benchmark yet.",
+      "expected_output": "The agent summarizes the standard perftest families, recommends the four-test device sanity suite, presents the three suite choices, and waits for an explicit selection without collecting the system or running a test.",
+      "assertions": [
+        "The agent offers the recommended default device sanity suite, a custom device suite, and a host or feature-specific suite",
+        "The agent briefly explains device RMA, scalar/store, atomics, completion/signaling, collectives, tile collectives, TMA, host/on-stream, allocation, and special-mode possibilities without enumerating every option variant",
+        "The agent does not scan for installed perftests, collect system evidence, inspect executable help, or run a benchmark before the user selects a suite",
+        "The agent does not claim an expected performance range"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-002",
+      "prompt": "I explicitly choose the recommended NVSHMEM device sanity suite. The perftests are installed under /opt/nvshmem/bin/perftest, and I have an active two-node Slurm allocation with two GPUs per node. Use srun and prepare the collection plan before running anything.",
+      "expected_output": "The agent resolves exactly the four canonical device point-to-point tests, plans two-PE same-node and two-node placements, and stages environment collection, launcher preflight, information probes, serial repetitions, artifacts, validation, and reporting.",
+      "assertions": [
+        "The selected executables are exactly device/pt-to-pt/shmem_put_bw, shmem_put_latency, shmem_get_bw, and shmem_get_latency; shmem_put_bw uses the first nonempty .args line without --bidir and records its full scope, CTA, and thread configuration",
+        "The agent uses two PEs, keeps same-node and one-PE-per-node two-node results separate, and does not use shortened _lat aliases",
+        "The plan collects system evidence with the resolved prefix on every participating node and runs an NVSHMEM_INFO=1 NVSHMEM_DEBUG=INFO shmem_put_latency probe before measured tests for each placement",
+        "The plan uses srun --overlap, retains per-rank launcher-preflight hostname and GPU-binding artifacts, and uses serial execution, machine-readable output, three repetitions, timestamped artifacts, and exact command/stdout/stderr/status capture",
+        "The agent does not inventory unrelated perftest executables"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-003",
+      "prompt": "Collect device atomic-add latency for 64-bit integers between two PEs on one node. Use the installed standard NVSHMEM perftest and preserve my existing transport settings.",
+      "expected_output": "The agent skips the generic menu, selects the canonical device atomic latency benchmark, records the requested operation and datatype, and asks only for unresolved placement or launcher details before execution.",
+      "assertions": [
+        "The agent selects device/pt-to-pt/shmem_atomic_latency and does not add the four-test default suite",
+        "The exact atomic operation and 64-bit integer datatype remain explicit in commands and reporting",
+        "The agent consults only the selected test's standard .args or --help when resolving its requested options and does not perform a preliminary inventory pass",
+        "The agent does not ask for or inject a remote transport override and preserves the user's transport and tuning environment"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-004",
+      "prompt": "Run the device all-to-all latency perftest for me. I have not decided how many nodes or PEs to use.",
+      "expected_output": "The agent selects the device collective family but withholds execution until the user supplies an explicit node, PE, PEs-per-node, and GPU layout.",
+      "assertions": [
+        "The agent identifies device/coll/alltoall_latency without showing the generic suite menu",
+        "The agent requests node count, total PEs, PEs per node, and GPU placement before generating a final launch",
+        "The agent does not inherit the two-PE point-to-point default or infer a production scale",
+        "No benchmark is run while the collective layout is unresolved"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-005",
+      "prompt": "I specifically want the device TMA put-bandwidth perftest on our H100 NVLink node. Help me collect it with two PEs.",
+      "expected_output": "The agent selects shmem_put_tma_bw directly, checks the relevant NVSHMEM build, GPU, CUDA, and option support, and keeps the TMA result distinct from ordinary put bandwidth.",
+      "assertions": [
+        "The selected executable is device/pt-to-pt/shmem_put_tma_bw",
+        "The agent verifies TMA capability using supplied or collected evidence without scanning the complete perftest inventory",
+        "The agent does not silently add device/pt-to-pt/shmem_put_bw or the default four-test suite",
+        "The report plan labels the result as the TMA path and records the exact options and placement"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-006",
+      "prompt": "Measure CUDA-graph-captured reduction-on-stream latency across two nodes. We will use 16 PEs, eight PEs per node, one PE per GPU, float32 sum, and our existing srun launcher.",
+      "expected_output": "The agent selects the host on-stream reduction benchmark, honors the explicit scale and reduction choices, and resolves only the selected test's documented CUDA graph mode before collection.",
+      "assertions": [
+        "The agent selects host/coll/reduction_on_stream and does not substitute a device collective",
+        "The plan records two nodes, 16 total PEs, eight PEs per node, GPU placement, float32, and sum",
+        "CUDA graph mode is enabled only if the selected .args file or executable help documents it",
+        "The agent does not enumerate unrelated special modes or inventory the perftest tree"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-007",
+      "prompt": "Run the standard perftest-mmap-sanity.list preset in this allocation and package the results. Do not replace it with the default sanity suite.",
+      "expected_output": "The agent honors the explicitly selected mmap preset, records the list path and mapped-memory modes, and does not prepend a benchmark-family menu or substitute the four device tests.",
+      "assertions": [
+        "The agent selects perftest-mmap-sanity.list exactly as requested",
+        "The plan preserves and reports buffer type, handle mode, placement, and every exact command from the selected preset",
+        "The agent does not describe the mmap preset as the four-test device sanity suite",
+        "The agent validates each selected run independently and retains partial evidence for failures"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-008",
+      "prompt": "I choose the recommended four-test device suite, but my current Slurm allocation has only one node with two GPUs. Run what is available and do not request another allocation.",
+      "expected_output": "The agent collects and runs the two-PE same-node placement only, records the two-node placement as unavailable, and does not allocate resources or represent the local result as inter-node evidence.",
+      "assertions": [
+        "The agent uses the four canonical device tests with two PEs on the allocated node",
+        "The agent does not call salloc, sbatch, or otherwise request a second node",
+        "The report marks two-node collection incomplete or unavailable and never claims that the remote path was measured",
+        "The same-node run still includes prefix-aware system collection, retained launcher preflight, an NVSHMEM_INFO=1 NVSHMEM_DEBUG=INFO probe with runtime transport proof, repetitions, and raw artifacts"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-009",
+      "prompt": "The same-node information probe failed with exit status 1 and stderr 'nvshmem_init failed: bootstrap initialization error'. Please continue with the selected bandwidth tests anyway and summarize whatever they print.",
+      "expected_output": "The agent refuses to run measured tests for the failed placement, preserves the probe evidence, marks the placement invalid or incomplete, and reports the initialization failure without fabricating performance results.",
+      "assertions": [
+        "The agent stops the placement after the failed NVSHMEM_INFO probe",
+        "The exact command, stdout, stderr, and exit status are retained in the artifact/report plan",
+        "No measured bandwidth or latency row from that placement is accepted as valid",
+        "The agent does not force or substitute a transport, select an HCA, disable P2P, or change tuning variables merely to make initialization pass"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-010",
+      "prompt": "I selected device/pt-to-pt/shmem_get_latency, but /opt/nvshmem/bin/perftest/device/pt-to-pt/shmem_get_latency is missing when you check it. Find another latency test with a similar name and use that instead.",
+      "expected_output": "The agent reports the selected executable as missing from the installation or build and does not search for, alias, or substitute another test.",
+      "assertions": [
+        "The agent checks only the selected executable path and reports an installation/build problem",
+        "The agent does not search the filesystem or inventory other perftest executables",
+        "The agent does not substitute a host latency test, put latency test, or shortened shmem_get_lat alias",
+        "The run is marked incomplete and the missing-executable evidence is retained"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-011",
+      "prompt": "Package these successful shmem_put_bw outputs into the NVSHMEM Markdown report. Statistical row: '&&&& PERF_STATS shmem_put_bw___thread___size__8___bandwidth +GB/s mean=1.25 stddev=0.05 min=1.20 max=1.30 repetitions=3'. Legacy row: '&&&& PERF shmem_put_bw___thread___size__1048576___bandwidth 82.5 +GB/s'. No matched baseline is available.",
+      "expected_output": "The agent validates both machine-readable forms, preserves their native units and repetition metadata, summarizes peak and largest-message bandwidth, retains the full size table, and states that range assessment was not performed.",
+      "assertions": [
+        "The agent parses the encoded test, scope, byte size, bandwidth metric, and GB/s units from both rows",
+        "The plus sign before GB/s is not interpreted as an uncertainty value",
+        "The report includes peak bandwidth and the largest-message value while retaining both complete rows and their provenance",
+        "The report states 'Range assessment: not performed (no matched baseline supplied)' and does not estimate an expected value from link speed"
+      ],
+      "expected_skill": "nvshmem-collect-performance-data",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-collect-performance-data-012",
+      "prompt": "How can I profile an ordinary CUDA matrix-multiplication kernel with Nsight Compute? The application does not use NVSHMEM and I am not asking for communication benchmarks.",
+      "expected_output": "The agent recognizes that the request is unrelated to NVSHMEM performance data collection and answers without invoking this skill.",
+      "assertions": [
+        "The agent does not invoke nvshmem-collect-performance-data",
+        "The agent does not present the NVSHMEM perftest-family menu or system collector",
+        "The response stays focused on ordinary CUDA kernel profiling"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

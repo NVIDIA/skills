@@ -1,0 +1,27 @@
+[collector]
+schema: nvshmem-transport-facts-v1
+collector_status: complete
+
+[nvshmem-version]
+NVSHMEM 3.7.0
+nvshmem_prefix: /opt/nvshmem/3.7.0-ucx
+
+[nvshmem-plugins]
+plugin: /opt/nvshmem/3.7.0-ucx/lib/nvshmem_transport_ucx.so
+plugin_count_in_selected_prefix: 1
+
+[gpu]
+0, NVIDIA A100-SXM4-80GB, 00000000:81:00.0, 8.0, 535.183.01
+
+[kernel-driver]
+Linux 5.15.0
+module: nvidia_peermem not_loaded
+
+[rdma-ports]
+rdma_device: none visible in /sys/class/infiniband
+
+[provider-stacks]
+ucx_version: 1.18.0
+ucx_transports:
+# Transport: tcp
+# Device: eth0

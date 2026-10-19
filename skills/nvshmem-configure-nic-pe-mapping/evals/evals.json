@@ -1,0 +1,241 @@
+{
+  "skill_name": "nvshmem-configure-nic-pe-mapping",
+  "evals": [
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-001",
+      "prompt": "Use the attached topology to tune NVSHMEM 3.7.0 IBRC. There are four local PEs bound in order to GPU0, GPU1, GPU2, and GPU3. I want one closest InfiniBand port per PE.",
+      "files": ["evals/files/four-gpu-four-ib.txt"],
+      "expected_output": "The agent recommends one explicit expanded slot per PE in local-PE order and explains the 3.7 modulo interpretation.",
+      "assertions": [
+        "The agent invokes nvshmem-docs or explicitly reports why live documentation could not be verified",
+        "The mapping pairs PE0..PE3 with their PIX mlx5_0..mlx5_3 ports and emits NVSHMEM_ENABLE_NIC_PE_MAPPING=1 plus NVSHMEM_HCA_PE_MAPPING",
+        "The agent does not emit NVSHMEM_ENABLE_MULTI_PORT or assign multiple NICs to a 3.7 IBRC PE"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-002",
+      "prompt": "For NVSHMEM 3.7.0 IBDevX, use this topology with two PEs bound PE0->GPU0 and PE1->GPU1. Four InfiniBand ports are active; use all of them if supported.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent explains that 3.7 IBDevX does not support multi-NIC per PE and asks the user to confirm the closest-subset choice before finalizing.",
+      "assertions": [
+        "The agent does not apply the 3.8 BLOCK contract to NVSHMEM 3.7",
+        "The agent offers only a supported one-port-per-PE closest subset and does not fabricate an IBDevX multi-port control",
+        "The two unselected active ports are reported rather than silently ignored"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-003",
+      "prompt": "Tune NVSHMEM 3.7.0 IBGDA for the attached two-GPU/four-IB-port node. PE0 uses GPU0 and PE1 uses GPU1. I explicitly want multiple closest ports per PE.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent enables 3.7 IBGDA automatic multi-port selection and distinguishes predicted ports from runtime-selected ports.",
+      "assertions": [
+        "The exports set NVSHMEM_ENABLE_NIC_PE_MAPPING=0 and NVSHMEM_IBGDA_ENABLE_MULTI_PORT=1",
+        "The agent does not set NVSHMEM_HCA_PE_MAPPING, NVSHMEM_HCA_LIST, or the 3.8 common multi-port variable",
+        "The agent explains that exact explicit multi-NIC assignment is unavailable for 3.7 IBGDA"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-004",
+      "prompt": "Use the attached topology for NVSHMEM 3.7.0 GPUNetIO with PE0 on GPU0 and PE1 on GPU1. Enable the transport to consume multiple topology-selected NICs.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent recommends automatic NIC assignment for 3.7 GPUNetIO and avoids an exact multi-slot mapping.",
+      "assertions": [
+        "The exports set NVSHMEM_ENABLE_NIC_PE_MAPPING=0 and do not include either HCA selection variable",
+        "The agent does not invent a GPUNetIO-specific or 3.8 common multi-port variable",
+        "The answer says runtime transport logs must confirm the automatically consumed NICs"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-005",
+      "prompt": "On NVSHMEM 3.7.0 libfabric, two local PEs are bound PE0->GPU0 and PE1->GPU1 on this four-NIC node. Limit each PE to two provider-selected NICs.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent preserves libfabric provider/automatic selection and emits only its documented per-PE maximum when verified.",
+      "assertions": [
+        "The answer uses NVSHMEM_LIBFABRIC_MAX_NIC_PER_PE=2 only if documentation verifies it",
+        "The agent does not generate NVSHMEM_HCA_PE_MAPPING or NVSHMEM_HCA_LIST for libfabric",
+        "The answer distinguishes a topology prediction from provider-controlled selection"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-006",
+      "prompt": "Can you create an exact NVSHMEM 3.7.0 UCX HCA-to-PE mapping from this topology? PE0 is GPU0 and PE1 is GPU1.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent explains that UCX controls NIC selection internally and declines to fabricate a common-HCA exact mapping.",
+      "assertions": [
+        "The agent does not emit NVSHMEM_HCA_PE_MAPPING, NVSHMEM_HCA_LIST, or invented UCX environment values",
+        "The answer may show the topology prediction but clearly labels it non-enforcing",
+        "The answer invokes the documentation workflow for the 3.7 UCX applicability claim"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-007",
+      "prompt": "For published NVSHMEM 3.8.0 IBRC, use all four active InfiniBand ports on this two-PE node. PE0 is GPU0 and PE1 is GPU1. I explicitly choose multiple NICs per PE.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent creates two contiguous expanded slots per PE using the 3.8 BLOCK contract and emits the common multi-port controls.",
+      "assertions": [
+        "The answer emits the mandatory mapping table with PE, GPU PCI BDF, HCA port, NIC PCI BDF, topology distance, and sharing/load notes",
+        "The mapping gives PE0 mlx5_0 and mlx5_1 and PE1 mlx5_2 and mlx5_3 with the complete four-slot expansion",
+        "One exact fenced shell export block includes NVSHMEM_ENABLE_NIC_PE_MAPPING=1, NVSHMEM_ENABLE_MULTI_PORT=1, and only NVSHMEM_HCA_PE_MAPPING",
+        "The answer shows base=2, rem=0 and the slot range for each PE"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-008",
+      "prompt": "Tune published NVSHMEM 3.8.0 IBDevX with this five-port topology. PE0 is GPU0, PE1 is GPU1, and I choose exact multi-NIC mapping using every active InfiniBand port.",
+      "files": ["evals/files/two-gpu-five-ib.txt"],
+      "expected_output": "The agent applies 3.8 uneven BLOCK remainder distribution, assigning three slots to PE0 and two to PE1.",
+      "assertions": [
+        "The answer emits the mandatory mapping table with one row per PE-port assignment and all required BDF, distance, and sharing/load columns",
+        "The answer expands all five slots and shows base=2, rem=1, PE0 count=3, and PE1 count=2",
+        "The slots are grouped contiguously by local PE and minimize the supplied GPU-to-NIC distances subject to the quotas",
+        "One exact fenced shell export block enables both explicit mapping and common multi-port without HCA_LIST"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-009",
+      "prompt": "For published NVSHMEM 3.8.0 IBGDA, use NVSHMEM_HCA_LIST as a set-based filter for these five canonical active ports on two local PEs, PE0->GPU0 and PE1->GPU1. Explain exactly what happens.",
+      "files": ["evals/files/two-gpu-five-ib.txt"],
+      "expected_output": "The agent explains HCA_LIST canonical ordering, removes the fifth trailing slot, and gives two BLOCK slots per PE.",
+      "assertions": [
+        "The answer computes usable=4, warns that the fifth canonical port is removed, and shows the two-port blocks",
+        "The exports include explicit mapping and common multi-port plus HCA_LIST, but not HCA_PE_MAPPING",
+        "The answer explains why HCA_LIST is set-based rather than an exact arbitrary PE order"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-010",
+      "prompt": "Use published NVSHMEM 3.8.0 GPUNetIO on this four-GPU/two-port node. Local PEs map in GPU order. Give each PE its closest port even though ports must be shared.",
+      "files": ["evals/files/four-gpu-two-ib.txt"],
+      "expected_output": "The agent creates four expanded slots with intentional duplicate ports so each PE has an exact one-slot assignment.",
+      "assertions": [
+        "The mapping contains E=4 expanded slots for N=4 PEs even though only two physical ports exist and explains the intentional duplicates",
+        "The answer applies the preserved E<=N one-slot case rather than a multi-port BLOCK assignment",
+        "The exports contain only explicit mapping controls and do not require NVSHMEM_ENABLE_MULTI_PORT=1 for one port per PE"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-011",
+      "prompt": "I use NVSHMEM 3.8.0 UCX with two PEs, PE0->GPU0 and PE1->GPU1. Generate the exact HCA mapping from this topology.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent keeps UCX outside the 3.8 common BLOCK contract and does not generate unsupported HCA controls.",
+      "assertions": [
+        "The agent explicitly says the attached 3.8 contract excludes provider-native UCX selection",
+        "No exact HCA or invented provider-native exports are emitted",
+        "The answer provides validation/log guidance or a non-enforcing proximity table"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-012",
+      "prompt": "For NVSHMEM 3.8.0 libfabric on this two-PE/four-NIC node, create a BLOCK HCA_PE_MAPPING with two NICs per PE.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent rejects the requested common BLOCK mapping because libfabric remains provider controlled.",
+      "assertions": [
+        "The agent does not apply the common 3.8 HCA BLOCK contract to libfabric",
+        "The answer explains that only documented provider/automatic controls such as a verified maximum can be recommended",
+        "The agent does not invent provider-native values"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-013",
+      "prompt": "Tune published NVSHMEM 3.8.0 IBRC from this mixed-link topology. Two local PEs are PE0->GPU0 and PE1->GPU1. I did not select a link layer.",
+      "files": ["evals/files/mixed-link-inactive.txt"],
+      "expected_output": "The agent excludes the down port, separates Ethernet from InfiniBand, and uses InfiniBand as the default on an active-port-count tie.",
+      "assertions": [
+        "mlx5_2 is excluded as inactive and mlx5_3/mlx5_4 are excluded from the default assignment as Ethernet",
+        "The answer does not mix InfiniBand and Ethernet and states that Ethernet alone does not prove RoCE readiness",
+        "The mandatory mapping table uses the active closest InfiniBand ports, includes every required column, and the answer lists all exclusions"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-014",
+      "prompt": "NVSHMEM 3.8.0 IBRC uses two PEs on the attached node, but my launcher may swap GPU0 and GPU1 between local ranks. Please give me the exact closest-NIC exports now.",
+      "files": ["evals/files/ambiguous-two-gpu-two-ib.txt"],
+      "expected_output": "The agent requests the ordered local PE-to-GPU binding and withholds final exact exports because either ordering changes the mapping.",
+      "assertions": [
+        "The agent does not infer PE order from nvidia-smi output or numeric indices",
+        "The answer asks for launcher, CUDA_VISIBLE_DEVICES, or per-rank binding evidence",
+        "Any mapping shown is explicitly conditional and not presented as final exports",
+        "The agent does not bypass the ambiguity by assigning both NICs to both PEs or by adding NVSHMEM_REMOTE_TRANSPORT"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-015",
+      "prompt": "I have this topology and two local PEs bound PE0->GPU0 and PE1->GPU1, but nvshmem-info is unavailable and I do not know the installed NVSHMEM version. Tune IBRC for me.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent requests the installed version and gives only version-conditional guidance without final exports.",
+      "assertions": [
+        "The agent does not assume latest or silently use the 3.8 contract",
+        "The answer explains the material 3.7-versus-3.8 difference",
+        "The agent withholds final environment exports until the version is resolved"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-016",
+      "prompt": "This isolated cluster has NVSHMEM 3.9.0 IBRC, no internet access, and no nvshmem-docs installation. PE0 is GPU0 and PE1 is GPU1 in the attached topology. Recommend a mapping without guessing changes made after 3.8.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent applies the bundled NVSHMEM 3.8 or later BLOCK contract to 3.9 without invoking nvshmem-docs, then resolves or requests the excess-port policy before final exports.",
+      "assertions": [
+        "The agent does not invoke nvshmem-docs merely because the installed version is 3.9.0 and identifies the bundled contract as covering NVSHMEM 3.8 or later",
+        "The agent does not invent variables, defaults, or semantics outside the bundled contract",
+        "Because four usable ports outnumber two PEs, the answer requests or resolves closest-subset versus multi-port intent before emitting final exports"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-017",
+      "prompt": "Using the current/latest official NVSHMEM docs, verify the variables and tune my installed published NVSHMEM 3.8.0 IBRC. Use the closest subset for PE0->GPU0 and PE1->GPU1 from this topology.",
+      "files": ["evals/files/two-gpu-four-ib.txt"],
+      "expected_output": "The agent invokes nvshmem-docs because the user explicitly requested current official documentation, reports the displayed edition, and recommends the closest one-port subset under the NVSHMEM 3.8 or later BLOCK contract.",
+      "assertions": [
+        "The agent invokes the sibling nvshmem-docs workflow and fetches live official environment-variable and release evidence",
+        "The answer reports the exact documentation edition consulted and distinguishes it from installed 3.8.0",
+        "The mandatory mapping table contains all required columns and the exact fenced export block uses HCA_PE_MAPPING, never both HCA selection variables"
+      ],
+      "expected_skill": "nvshmem-configure-nic-pe-mapping",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-configure-nic-pe-mapping-018",
+      "prompt": "How should I configure active-backup bonding for two ordinary Ethernet interfaces on a storage server that does not use NVSHMEM or GPUs?",
+      "expected_output": "The agent recognizes that this is unrelated to NVSHMEM NIC-to-PE tuning and does not invoke the skill.",
+      "assertions": [
+        "The agent does not invoke nvshmem-configure-nic-pe-mapping or nvshmem-docs",
+        "The answer addresses ordinary Linux Ethernet bonding without NVSHMEM HCA variables",
+        "The agent does not run the topology collector"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}
