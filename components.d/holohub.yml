@@ -7,8 +7,6 @@ description: Build, run, debug, benchmark, and develop Holoscan applications and
 links:
   discussions: false
 skills:
-  - path: skills/holoscan-app-lifecycle/
-    catalog_dir: holoscan-app-lifecycle
   - path: skills/holoscan-app-debug-build-run/
     catalog_dir: holoscan-app-debug-build-run
   - path: skills/holoscan-module-lifecycle/
