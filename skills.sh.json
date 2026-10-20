@@ -38,8 +38,7 @@
       "title": "Physical AI",
       "description": "Build and validate AI workflows that interact with the physical world, including robotics, autonomy, simulation, synthetic data, and embodied AI systems.",
       "skills": [
-        "holohub-app-lifecycle",
-        "holohub-debug-build-run",
+        "holoscan-app-debug-build-run",
         "hsb-app",
         "hsb-flash",
         "hsb-ip-def",
@@ -389,7 +388,7 @@
       "skills": [
         "compute-sanitizer-diagnose-cuda-bugs",
         "genomics-workflow-acceleration",
-        "holohub-module-lifecycle",
+        "holoscan-module-lifecycle",
         "hsb-ip-create-top",
         "jetson-video-benchmark",
         "jetson-video-pipeline",
