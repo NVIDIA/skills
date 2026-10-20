@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `rtx-remix-modding`
-- Evaluation date: 2026-10-15
+- Evaluation date: 2026-10-20
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 14 evaluation tasks (11 positive, 3 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 82.4% — baseline ran, but no comparable score was available; uplift unavailable | 86.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 92.9% (-7.1 points) | 96.4% → 92.9% (-3.5 points) |
-| Correctness | 34.3% → 72.9% (+38.6 points) | 31.4% → 74.3% (+42.9 points) |
-| Discoverability | 76.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.8% → 73.1% (+22.3 points) | 51.4% → 72.4% (+21.0 points) |
-| Efficiency | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 97.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.6% — baseline ran, but no comparable score was available; uplift unavailable | 84.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 96.4% → 96.4% (±0.0 points) |
+| Correctness | 31.4% → 78.6% (+47.2 points) | 30.0% → 67.1% (+37.1 points) |
+| Discoverability | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.7% → 93.2% (+42.5 points) | 41.7% → 67.4% (+25.7 points) |
+| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 98.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,37 +54,37 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,119,981 | 1,665,625 | -545,644 | -32.76% | skill 14/14; base 14/14 |
-| claude-code | 1 | 94,479 | 119,967 | -25,488 | -21.25% | skill 1/1; base 1/1 |
-| claude-code | 10 | 30,081 | 28,955 | +1,126 | +3.89% | skill 1/1; base 1/1 |
-| claude-code | 11 | 61,379 | 152,499 | -91,120 | -59.75% | skill 1/1; base 1/1 |
-| claude-code | 12 | 31,375 | 29,020 | +2,355 | +8.12% | skill 1/1; base 1/1 |
-| claude-code | 13 | 65,351 | 30,695 | +34,656 | +112.90% | skill 1/1; base 1/1 |
-| claude-code | 14 | 31,857 | 30,998 | +859 | +2.77% | skill 1/1; base 1/1 |
-| claude-code | 2 | 62,164 | 119,337 | -57,173 | -47.91% | skill 1/1; base 1/1 |
-| claude-code | 3 | 63,014 | 214,931 | -151,917 | -70.68% | skill 1/1; base 1/1 |
-| claude-code | 4 | 61,391 | 248,054 | -186,663 | -75.25% | skill 1/1; base 1/1 |
-| claude-code | 5 | 61,322 | 150,081 | -88,759 | -59.14% | skill 1/1; base 1/1 |
-| claude-code | 6 | 61,913 | 29,811 | +32,102 | +107.69% | skill 1/1; base 1/1 |
-| claude-code | 7 | 118,463 | 148,920 | -30,457 | -20.45% | skill 1/1; base 1/1 |
-| claude-code | 8 | 317,383 | 302,686 | +14,697 | +4.86% | skill 1/1; base 1/1 |
-| claude-code | 9 | 59,809 | 59,671 | +138 | +0.23% | skill 1/1; base 1/1 |
-| codex | All cases | 785,910 | 1,040,450 | -254,540 | -24.46% | skill 14/14; base 14/14 |
-| codex | 1 | 62,585 | 83,292 | -20,707 | -24.86% | skill 1/1; base 1/1 |
-| codex | 10 | 13,683 | 18,033 | -4,350 | -24.12% | skill 1/1; base 1/1 |
-| codex | 11 | 29,160 | 84,574 | -55,414 | -65.52% | skill 1/1; base 1/1 |
-| codex | 12 | 29,619 | 13,505 | +16,114 | +119.32% | skill 1/1; base 1/1 |
-| codex | 13 | 28,922 | 13,391 | +15,531 | +115.98% | skill 1/1; base 1/1 |
-| codex | 14 | 29,413 | 13,440 | +15,973 | +118.85% | skill 1/1; base 1/1 |
-| codex | 2 | 29,262 | 84,188 | -54,926 | -65.24% | skill 1/1; base 1/1 |
-| codex | 3 | 29,114 | 98,415 | -69,301 | -70.42% | skill 1/1; base 1/1 |
-| codex | 4 | 29,533 | 119,200 | -89,667 | -75.22% | skill 1/1; base 1/1 |
-| codex | 5 | 29,198 | 68,701 | -39,503 | -57.50% | skill 1/1; base 1/1 |
-| codex | 6 | 29,065 | 29,440 | -375 | -1.27% | skill 1/1; base 1/1 |
-| codex | 7 | 29,491 | 55,045 | -25,554 | -46.42% | skill 1/1; base 1/1 |
-| codex | 8 | 402,936 | 345,182 | +57,754 | +16.73% | skill 1/1; base 1/1 |
-| codex | 9 | 13,929 | 14,044 | -115 | -0.82% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,905,891 | 2,706,075 | -800,184 | -29.57% | skill 28/28; base 28/28 |
+| claude-code | All cases | 1,215,532 | 1,750,031 | -534,499 | -30.54% | skill 14/14; base 14/14 |
+| claude-code | 1 | 95,878 | 181,968 | -86,090 | -47.31% | skill 1/1; base 1/1 |
+| claude-code | 10 | 30,109 | 29,921 | +188 | +0.63% | skill 1/1; base 1/1 |
+| claude-code | 11 | 61,916 | 219,441 | -157,525 | -71.78% | skill 1/1; base 1/1 |
+| claude-code | 12 | 63,200 | 30,404 | +32,796 | +107.87% | skill 1/1; base 1/1 |
+| claude-code | 13 | 64,827 | 31,275 | +33,552 | +107.28% | skill 1/1; base 1/1 |
+| claude-code | 14 | 92,003 | 31,258 | +60,745 | +194.33% | skill 1/1; base 1/1 |
+| claude-code | 2 | 61,810 | 120,148 | -58,338 | -48.56% | skill 1/1; base 1/1 |
+| claude-code | 3 | 62,985 | 183,962 | -120,977 | -65.76% | skill 1/1; base 1/1 |
+| claude-code | 4 | 63,702 | 154,200 | -90,498 | -58.69% | skill 1/1; base 1/1 |
+| claude-code | 5 | 62,872 | 151,411 | -88,539 | -58.48% | skill 1/1; base 1/1 |
+| claude-code | 6 | 61,849 | 29,736 | +32,113 | +107.99% | skill 1/1; base 1/1 |
+| claude-code | 7 | 185,269 | 118,627 | +66,642 | +56.18% | skill 1/1; base 1/1 |
+| claude-code | 8 | 216,303 | 345,401 | -129,098 | -37.38% | skill 1/1; base 1/1 |
+| claude-code | 9 | 92,809 | 122,279 | -29,470 | -24.10% | skill 1/1; base 1/1 |
+| codex | All cases | 632,481 | 1,020,221 | -387,740 | -38.01% | skill 14/14; base 14/14 |
+| codex | 1 | 29,344 | 117,332 | -87,988 | -74.99% | skill 1/1; base 1/1 |
+| codex | 10 | 13,677 | 13,719 | -42 | -0.31% | skill 1/1; base 1/1 |
+| codex | 11 | 29,103 | 84,654 | -55,551 | -65.62% | skill 1/1; base 1/1 |
+| codex | 12 | 29,603 | 13,529 | +16,074 | +118.81% | skill 1/1; base 1/1 |
+| codex | 13 | 29,638 | 13,589 | +16,049 | +118.10% | skill 1/1; base 1/1 |
+| codex | 14 | 29,065 | 13,591 | +15,474 | +113.85% | skill 1/1; base 1/1 |
+| codex | 2 | 29,190 | 83,774 | -54,584 | -65.16% | skill 1/1; base 1/1 |
+| codex | 3 | 29,151 | 83,205 | -54,054 | -64.96% | skill 1/1; base 1/1 |
+| codex | 4 | 29,368 | 130,843 | -101,475 | -77.55% | skill 1/1; base 1/1 |
+| codex | 5 | 29,334 | 82,255 | -52,921 | -64.34% | skill 1/1; base 1/1 |
+| codex | 6 | 29,145 | 29,504 | -359 | -1.22% | skill 1/1; base 1/1 |
+| codex | 7 | 29,450 | 55,054 | -25,604 | -46.51% | skill 1/1; base 1/1 |
+| codex | 8 | 281,993 | 285,175 | -3,182 | -1.12% | skill 1/1; base 1/1 |
+| codex | 9 | 14,420 | 13,997 | +423 | +3.02% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,848,013 | 2,770,252 | -922,239 | -33.29% | skill 28/28; base 28/28 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 

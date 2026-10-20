@@ -65,15 +65,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 82.4% | 86.5% |
-| Security | 100.0% → 92.9% (-7.1 points) | 96.4% → 92.9% (-3.5 points) |
-| Correctness | 34.3% → 72.9% (+38.6 points) | 31.4% → 74.3% (+42.9 points) |
-| Discoverability | 76.4% | 95.0% |
-| Effectiveness | 50.8% → 73.1% (+22.3 points) | 51.4% → 72.4% (+21.0 points) |
-| Efficiency | 97.1% | 97.7% |
+| Overall | 93.6% | 84.8% |
+| Security | 100.0% → 100.0% (±0.0 points) | 96.4% → 96.4% (±0.0 points) |
+| Correctness | 31.4% → 78.6% (+47.2 points) | 30.0% → 67.1% (+37.1 points) |
+| Discoverability | 98.2% | 95.0% |
+| Effectiveness | 50.7% → 93.2% (+42.5 points) | 41.7% → 67.4% (+25.7 points) |
+| Efficiency | 98.0% | 98.1% |
 
 ## Skill Version(s): <br>
-3d667e1b8 (source: git SHA, committed 2026-10-14) <br>
+4ca8ae58e (source: git SHA, committed 2026-10-20) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

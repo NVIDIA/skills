@@ -3,12 +3,7 @@ name: rtx-remix-modding
 description: Mod or remaster a game with RTX Remix - open and edit projects, swap textures and models. Connect to the Remix Toolkit App via MCP. Not for non-Remix game interaction.
 metadata:
   author: scfitzpatric <scfitzpatric@nvidia.com>
-  tags:
-    - rtx-remix
-    - game-modding
-    - usd
-    - mcp
-    - graphics
+  tags: rtx-remix, game-modding, usd, mcp, graphics
 ---
 
 # RTX Remix Modding
