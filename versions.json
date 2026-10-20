@@ -2865,109 +2865,11 @@
       "last_modified": "2026-07-13"
     },
     {
-      "name": "vss-ask-video",
-      "path": "skills/vss-ask-video",
-      "content_digest": "sha256:f049b5be97d10d9c6f27715339394bf353dfc94d13f172a5f09f6845dd1015f0",
-      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
-      "last_modified": "2026-06-11"
-    },
-    {
-      "name": "vss-deploy-dense-captioning",
-      "path": "skills/vss-deploy-dense-captioning",
-      "content_digest": "sha256:de533343f6449d18caad3e867eadc3e98d2f515c757427c48cd53e4bad7afb1e",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
-    },
-    {
-      "name": "vss-deploy-detection-tracking-2d",
-      "path": "skills/vss-deploy-detection-tracking-2d",
-      "content_digest": "sha256:664dee65a3147fd0b46740f558a1d8e74d431fde8e65774d66ebba74ebb30a9f",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
-    },
-    {
-      "name": "vss-deploy-detection-tracking-3d",
-      "path": "skills/vss-deploy-detection-tracking-3d",
-      "content_digest": "sha256:85cadbf9a0d96294c6f1cd75f880c7e67480f89a5b7781c2367c0ef0aa3bebb5",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
-    },
-    {
-      "name": "vss-deploy-profile",
-      "path": "skills/vss-deploy-profile",
-      "content_digest": "sha256:95b201e41e0de71ef7345a00604d1b7e1731747cbb6f557820e8fdccec01ed3f",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
-    },
-    {
-      "name": "vss-deploy-video-embedding",
-      "path": "skills/vss-deploy-video-embedding",
-      "content_digest": "sha256:53b79bb6b685f56295c1cdb685ba5a9ecae755c7316381d5877074d6005be9eb",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
-    },
-    {
-      "name": "vss-generate-video-calibration",
-      "path": "skills/vss-generate-video-calibration",
-      "content_digest": "sha256:71bb4bd45b39eba19f15517b151403c779e7ab2d7365971f534c01f9d7322bb0",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
-    },
-    {
-      "name": "vss-generate-video-report",
-      "path": "skills/vss-generate-video-report",
-      "content_digest": "sha256:1ce27692d923eb3d11296431aa5c407e2d2fc601d28809b253e8ad3d4c3a135a",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
-    },
-    {
-      "name": "vss-manage-alerts",
-      "path": "skills/vss-manage-alerts",
-      "content_digest": "sha256:eb574ba78055b3d74d6b6b9847095a6e756c0f330f5d1259545099ef9652fa71",
-      "last_commit": "85d89b0017e2486f941e3b902d8134e0f6aa4086",
-      "last_modified": "2026-08-31"
-    },
-    {
-      "name": "vss-manage-video-io-storage",
-      "path": "skills/vss-manage-video-io-storage",
-      "content_digest": "sha256:d5660dd083467dc78a9e75fec176e7b2fa0b6e433f1a5cc2a7ec5995be695bc5",
-      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
-      "last_modified": "2026-06-11"
-    },
-    {
-      "name": "vss-query-analytics",
-      "path": "skills/vss-query-analytics",
-      "content_digest": "sha256:13673b47e8976577db33ddb2420a80eb8eef1aa0c9dd9af14c3ceda5a9796bb4",
-      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
-      "last_modified": "2026-06-11"
-    },
-    {
-      "name": "vss-search-archive",
-      "path": "skills/vss-search-archive",
-      "content_digest": "sha256:2805f3b422b7ae3340ed00a0b04bfaa65e2fad28191459f5dd0f76df18356e03",
-      "last_commit": "84918884635c5f70c8e2d74bf8d1fdb7dcbe63c2",
-      "last_modified": "2026-06-16"
-    },
-    {
-      "name": "vss-setup-behavior-analytics",
-      "path": "skills/vss-setup-behavior-analytics",
-      "content_digest": "sha256:18c6c1fe5e4abb3a1f7c304a1742000eb33fe28554a9ae061a84c84346f52f2a",
-      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
-      "last_modified": "2026-06-11"
-    },
-    {
-      "name": "vss-setup-video-analytics-api",
-      "path": "skills/vss-setup-video-analytics-api",
-      "content_digest": "sha256:556a29576736dfc007e1dfaaeea568e05e87bfeb33be631171b7f1d83ecb6792",
-      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
-      "last_modified": "2026-06-11"
-    },
-    {
-      "name": "vss-summarize-video",
-      "path": "skills/vss-summarize-video",
-      "content_digest": "sha256:5c58a693617710702e61a2fd39d51634046b2846d05e8dfac304f9facefec8da",
-      "last_commit": "a4cb0690c96d361e278d00a4254a935a45224a7d",
-      "last_modified": "2026-07-15"
+      "name": "vss-build-vision-ai",
+      "path": "skills/vss-build-vision-ai",
+      "content_digest": "sha256:5c128c2009301a1f09c229bb44a3e51113a07baca5a1e7a3525071a553369917",
+      "last_commit": "f36169d98aa321a7c7afa0acc404ff20f088a8a7",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "warp-compile-time-optimizer",
