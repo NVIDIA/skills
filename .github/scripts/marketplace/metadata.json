@@ -4909,6 +4909,18 @@
       }
     },
     {
+      "path": "skills/vss-build-vision-ai",
+      "name": "vss-build-vision-ai",
+      "description": "Add agent-ready vision capabilities — dense captioning, detection, search, alerting, summarization — to an agent or application through a customizable, self-contained vision stack built on the NVIDIA VSS Blueprint. Use this skill when a developer or agent wants to give their app vision: pick capabilities via guided intake (\"build a vision agent\", \"add vision capabilities\") or describe them in natural language (\"create a profile for streaming dense captioning\", \"add agentic search to my base deployment\", \"deploy warehouse 3d\"). Route, compose, configure, and deploy stock base, alerts, LVS, search developer profiles, or the warehouse industry profile and lean custom combinations expressed as delta overlays using one current developer profile as the Foundation. Not for operating a stack that is already deployed — searching, asking about a video, summarizing, managing alerts, or generating a report — and not for deploying a single microservice on its own; use the matching vss-* skill for those.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,solutions_architect,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "orchestrate,configure,deploy,integrate,generate"
+      }
+    },
+    {
       "path": "skills/warp-compile-time-optimizer",
       "name": "warp-compile-time-optimizer",
       "description": "Use when compile time or startup time is the problem in code that uses Warp: a request to improve, optimize, or cut compile times; an app that is slow to start or stalls at the first wp.launch; seconds of compiling before real work begins; JIT modules recompiling on every run or every CI job. Only applies when the code being optimized uses Warp kernels. Not for steady-state kernel runtime, memory, correctness, building Warp itself from source, or nvcc/C++ build times.",
