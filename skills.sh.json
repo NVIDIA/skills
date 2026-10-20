@@ -196,7 +196,8 @@
         "tao-train-segformer",
         "tao-train-sparse4d",
         "tao-train-visual-changenet",
-        "tao-validate-recipe-transfer"
+        "tao-validate-recipe-transfer",
+        "vss-build-vision-ai"
       ]
     },
     {
