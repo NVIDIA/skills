@@ -1,0 +1,283 @@
+version: 2
+
+# SkillSpector suppression baseline for skills/vss-build-vision-ai.
+# Entries are scoped to one file and one matched-text pattern; line numbers are
+# not used, so doc edits do not invalidate them. Message globs match the text
+# the scanner records, which it truncates (e.g. `| sh`, `... | python`).
+# Sections:
+#   A. Reviewed scanner false positives. Temporary: remove each entry once the
+#      SkillSpector fix ships.
+#   B. Accurate findings for intended deployment steps, accepted with a reason.
+#   C. Accurate findings for risky steps the skill keeps for now. Prefer the
+#      alternative in the reason; remove the entry if the instruction changes.
+
+rules:
+  # --- A. Reviewed scanner false positives (temporary) ----------------------
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*[.]env*"
+    reason: &pe3_env_docs >-
+      Reviewed false positive (temporary until the SkillSpector PE3 fix ships).
+      The .env files are the VSS Blueprint's own Compose env layers, passed to
+      `docker compose --env-file` or named as paths. The skill reads only
+      non-secret keys from them (FOUNDATION, VSS_CONTAINER_TAG, MODE) and never
+      prints or transmits their contents.
+
+  - id: "PE3"
+    path: "references/composition.md"
+    message: "*[.]env*"
+    reason: *pe3_env_docs
+
+  - id: "PE3"
+    path: "references/deployment.md"
+    message: "*[.]env*"
+    reason: *pe3_env_docs
+
+  - id: "PE3"
+    path: "references/profiles/warehouse.md"
+    message: "*[.]env*"
+    reason: *pe3_env_docs
+
+  - id: "PE3"
+    path: "references/teardown.md"
+    message: "*[.]env*"
+    reason: *pe3_env_docs
+
+  - id: "PE3"
+    path: "scripts/render_warehouse_configurator_env.py"
+    message: "*[.]env*"
+    reason: &pe3_env_code >-
+      Reviewed false positive (temporary until the SkillSpector PE3 fix ships).
+      The skill's own validator builds paths to the Blueprint's Compose env
+      layers and NIM hw-*.env sizing profiles to check and render deployment
+      configuration locally. No credential is read into the agent or sent out.
+
+  - id: "PE3"
+    path: "scripts/validate_warehouse_env.py"
+    message: "*[.]env*"
+    reason: *pe3_env_code
+
+  - id: "PE3"
+    path: "scripts/validate_resolved_yml.py"
+    message: "*[.]env*"
+    reason: *pe3_env_code
+
+  - id: "PE3"
+    path: "scripts/tests/test_analytics_composition_contract.py"
+    message: "*[.]env*"
+    reason: *pe3_env_code
+
+  - id: "PE3"
+    path: "scripts/tests/test_container_tag_override.py"
+    message: "*[.]env*"
+    reason: *pe3_env_code
+
+  - id: "PE3"
+    path: "references/prerequisites.md"
+    message: "*keyring*"
+    reason: >-
+      Reviewed false positive (temporary until the SkillSpector PE3 fix ships).
+      /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg is the public APT
+      repository signing key from NVIDIA's official Container Toolkit install
+      steps, not a credential store.
+
+  - id: "SC2"
+    path: "references/troubleshooting.md"
+    message: "curl -sf *localhost*/v1/models*| python*"
+    reason: >-
+      Reviewed false positive (temporary until SkillSpector #638 is fixed).
+      Both commands pipe a local /v1/models response into `python3 -m json.tool`,
+      which only pretty-prints JSON and does not execute its input.
+
+  - id: "SC6"
+    path: "scripts/alert-notify/requirements.txt"
+    message: "*uvicorn*"
+    reason: >-
+      Reviewed false positive: uvicorn is the standard ASGI server used by
+      FastAPI, not a typosquat of gunicorn.
+
+  - id: "TM1"
+    path: "references/services/rt-vlm.md"
+    message: "DELETE*/v1/*"
+    reason: >-
+      Reviewed false positive (temporary until the SkillSpector TM1 fix ships).
+      These are REST route references for the local RT-VLM API teardown
+      (DELETE /v1/generate_captions/{stream_id}, DELETE /v1/streams/delete/...),
+      not file deletion commands.
+
+  - id: "AR2"
+    path: "references/services/sop.md"
+    message: "no*warning"
+    reason: >-
+      Reviewed false positive (temporary until the SkillSpector AR2 fix ships).
+      The text describes a limitation ("results can be wrong with no warning")
+      and tells the agent to flag the cap to the user; it does not suppress
+      warnings.
+
+  - id: "AE1"
+    path: "SKILL.md"
+    message: "*(partial)"
+    reason: >-
+      Temporary bridge until SkillEvaluator 1.7.0 (SkillSpector 2.12.1) reaches
+      the NV-CARPS gate; remove this entry then. SkillSpector 2.11.2 marks a
+      referenced file "partial" when it contains ordinary shell parameter
+      expansion (${VAR:-default}, "${ARR[@]}") or certain quoted forms, and
+      reports each SKILL.md link to it as AE1. Fixed upstream in SkillSpector
+      #634 and #686 (SKILLSPECT-12, SKILLSPECT-135); with both, this skill scans
+      with 0 AE1.
+
+  - id: "E2"
+    path: "scripts/tests/test_container_tag_override.py"
+    message: "*os.environ.items()*"
+    reason: >-
+      Reviewed false positive (temporary until the SkillSpector E2 fix ships).
+      A unit test copies the runner's environment minus VSS_CONTAINER_TAG* into
+      subprocess.run(env=...) so exported tags cannot skew the result. Nothing
+      is logged or transmitted.
+
+  # --- B. Accurate findings, accepted for intended deployment steps ----------
+  - id: "TM2"
+    path: "references/prerequisites.md"
+    message: "*sudo*"
+    reason: >-
+      Accepted: documented host prerequisites that need root, following NVIDIA's
+      official steps (install nvidia-container-toolkit, write /etc/docker/
+      daemon.json, restart Docker, load nvidia kernel modules, set sysctl, open
+      the ingress port with ufw). The skill checks for passwordless sudo first
+      (`sudo -n true`) and asks the user to run privileged steps when it is
+      unavailable.
+
+  - id: "TM2"
+    path: "references/troubleshooting.md"
+    message: "*sudo*"
+    reason: >-
+      Accepted: troubleshooting table tells the user to load the NVIDIA kernel
+      modules with sudo when the GPU is not detected.
+
+  - id: "TM2"
+    path: "references/teardown.md"
+    message: "*xargs -r docker volume rm*"
+    reason: &tm2_volumes >-
+      Accepted: removes only this deployment's volumes, selected by the Compose
+      project label (com.docker.compose.project=${COMPOSE_PROJECT_NAME}).
+
+  - id: "TM2"
+    path: "references/data-directory.md"
+    message: "*xargs -r docker volume rm*"
+    reason: *tm2_volumes
+
+  - id: "TM4"
+    path: "references/services/sop/deploy-ds-sop.md"
+    message: "*privileged: true*"
+    reason: &ds_sop_privileged >-
+      Accepted: the DS-SOP (DeepStream + vLLM) service runs with privileged
+      access for GPU, camera, and audio devices, as shipped in the Blueprint's
+      Compose definition. The skill documents rather than adds this setting.
+
+  - id: "TM4"
+    path: "references/services/sop/integrate-ds-sop.md"
+    message: "*privileged: true*"
+    reason: *ds_sop_privileged
+
+  - id: "PE5"
+    path: "references/services/sop/build-ds-sop.md"
+    message: "*--network host*"
+    reason: >-
+      Accepted: short-lived local smoke test of the built DS-SOP image, removed
+      on exit. Host networking matches the production service's
+      network_mode: host. Alternative: publish only port 8300 (-p 8300:8300).
+
+  - id: "SSRF1"
+    path: "references/prerequisites.md"
+    message: "169.254.169.254*"
+    reason: >-
+      Accepted: reads only the instance's public IP
+      (/latest/meta-data/public-ipv4) on AWS to set EXTERNAL_IP, with a 2 s
+      timeout, and asks the user to confirm the value. It does not read IAM
+      credentials.
+
+  # --- C. Accurate findings for risky steps kept for now ---------------------
+  - id: "TM2"
+    path: "references/teardown.md"
+    message: "*xargs -r docker rm"
+    reason: >-
+      Accepted risk, to revisit: stale-container cleanup is NOT scoped to the
+      Compose project. It force-removes every container whose name matches the
+      VSS prefixes (vss-, mdx-, alert-, ...), so on a shared host it also removes
+      another VSS stack's containers. Preferred fix: filter by
+      com.docker.compose.project, as the volume cleanup does.
+
+  - id: "SDI-4"
+    path: "references/teardown.md"
+    message: "*docker ps*"
+    reason: >-
+      Accepted risk, to revisit after the release: same catch-all as the TM2
+      entry above, reported by the LLM scanner with varying wording. The sweep
+      removes stale VSS-named containers left by a prior deploy, which otherwise
+      bind ports the new deploy needs (issue #151: /sensor/list returns 502) or
+      serve stale data. It runs only when the user explicitly asks for a
+      teardown. Preferred fix: filter by com.docker.compose.project.
+
+  - id: "TM1"
+    path: "references/data-directory.md"
+    message: "*a+rwx*"
+    reason: >-
+      Accepted risk, to revisit: containers run as different, non-matching UIDs
+      (RT-CV writes TensorRT .engine files back into models/), so the shared
+      data roots (data_log, agent_eval, models, videos) are made world-writable.
+      Preferred fix: a shared group with `chmod -R g+rwX` and setgid
+      directories, which also needs `group_add` on every writing Compose
+      service.
+
+  - id: "TM1"
+    path: "references/services/sop/deploy-ds-sop.md"
+    message: "*chmod -R 777*"
+    reason: >-
+      Accepted risk, to revisit: documented workaround for Redis/data_log
+      permission crashes in ELK/VIOS peers, applied only to
+      <MDX_DATA_DIR>/data_log. Preferred fix: the same group-writable data root
+      as references/data-directory.md.
+
+  - id: "TM1"
+    path: "references/profiles/warehouse.md"
+    message: "*chmod 0777*"
+    reason: >-
+      Accepted risk, to revisit: the auto-calibration projects directory must be
+      writable by the calibration container's UID (1000). Preferred fix: chown
+      to that UID instead of 0777.
+
+  - id: "SDI-2"
+    path: "scripts/tests/test_apply_onboard_config.py"
+    reason: >-
+      Accepted risk, to revisit: the test pins the NemoClaw harness behavior in
+      .openclaw/apply-onboard-config.py, which sets the gateway control UI's
+      allowedOrigins to "*" and disables device auth for a non-loopback UI host.
+      Per that file, the gateway binds loopback and the gateway token, not the
+      origin, is the gate; an origin derived from CHAT_UI_URL can miss the one
+      the browser sends. Matched on id and path only because this LLM finding's
+      wording varies between runs. Preferred fix: an origin allowlist from the
+      resolved UI origin and device auth kept on, then drop this entry.
+
+  - id: "SDI-1"
+    path: "scripts/tests/test_apply_onboard_config.py"
+    message: "*allowedOrigins*"
+    reason: >-
+      Accepted risk, to revisit: same behavior as the SDI-2 entry above, reported
+      under SDI-1 on some runs. The test asserts that
+      .openclaw/apply-onboard-config.py always sets the control UI's
+      allowedOrigins to "*"; the gateway binds loopback and the gateway token is
+      the gate. Id and path alone did not suppress the live high, whose text
+      names allowedOrigins. Preferred fix: an origin allowlist from the resolved
+      UI origin, then drop this entry.
+
+  - id: "TM2"
+    path: "references/prerequisites.md"
+    message: "| sh*"
+    reason: >-
+      Accepted risk, to revisit: the only pipe-to-shell in this file installs uv
+      with its official installer over HTTPS (https://astral.sh/uv/install.sh),
+      shown in an error message next to a `pip install PyYAML` fallback. The
+      scanner records only `| sh`, so this pattern cannot name the URL. Preferred
+      fix: `pipx install uv` or `pip install uv`.
+
+fingerprints: []

@@ -1,0 +1,24 @@
+{
+  "skills": [
+    "vss-build-vision-ai"
+  ],
+  "profile": "alerts-vlm-lvs-subtitle",
+  "runtime_deploy": false,
+  "resources": {
+    "platforms": {
+      "RTXPRO6000BW": {
+        "gpu_count": 2
+      }
+    }
+  },
+  "expects": [
+    {
+      "artifact_expected": false,
+      "query": "Calculate only the UI subtitle for a VDR build with real-time VLM Alerts (`MODE=2d_vlm`) and LVS. Its final enabled profile keys include `vss-ui`, `alert-bridge`, and `lvs-server`, but not `vss-search-analytics-2d-fusion`. Give the exact `NEXT_PUBLIC_APP_SUBTITLE` value from the build vision AI rule. Do not compose or deploy the stack.",
+      "checks": [
+        "The answer gives `NEXT_PUBLIC_APP_SUBTITLE=\"Vision (Alerts - VLM + LVS)\"`, with the VLM alert label and LVS once each.",
+        "The subtitle contains neither `Search` nor `Base`, since neither label is enabled by the supplied keys."
+      ]
+    }
+  ]
+}
