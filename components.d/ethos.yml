@@ -3,7 +3,7 @@
 
 name: Ethos
 repo: NVIDIA-NeMo/eval-author
-description: Capture an AI agent's purpose, boundaries, and success criteria in a portable ethos.md that developers, reviewers, and evaluators share.
+description: Capture an AI agent's purpose, boundaries, and success criteria in a portable ETHOS.md that developers, reviewers, and evaluators share.
 skills:
   - path: team-skills/ethos/ethos-orchestrate/
     catalog_dir: ethos-orchestrate
