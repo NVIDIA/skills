@@ -1,0 +1,122 @@
+[
+  {
+    "id": "build-search-profile",
+    "question": "Build and deploy a VSS search profile for natural-language video retrieval.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Use the profile composition and deployment workflow.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Selects and deploys the search profile."
+    ]
+  },
+  {
+    "id": "search-running-archive",
+    "question": "Search my existing VSS archive for the red truck.",
+    "expected_skill": null,
+    "ground_truth": "Operate the running search deployment rather than building a stack.",
+    "expected_behavior": [
+      "Does not activate vss-build-vision-ai.",
+      "Routes the request to vss-search-archive."
+    ]
+  },
+  {
+    "id": "build-base-release-tag",
+    "question": "Deploy the VSS base profile using container image tag 3.4.0.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Select 3.4.0 as the common container image tag and resolve with it exported.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Exports VSS_CONTAINER_TAG=3.4.0 for every docker compose config that loads containers.env, records it in override.env, and names it before deploying.",
+      "Leaves deploy/docker/containers.env unmodified, and resolves every managed image to 3.4.0 rather than develop-latest."
+    ]
+  },
+  {
+    "id": "build-base-default-tag",
+    "question": "Deploy the VSS base profile.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "No tag was requested, so the containers.env default applies.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Does not ask for a container image tag, export VSS_CONTAINER_TAG, or write it to override.env.",
+      "Resolves the managed images to the containers.env develop-latest default."
+    ]
+  },
+  {
+    "id": "build-base-gb300",
+    "question": "Deploy the VSS base profile on DGX Station GB300.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Use the GB300 single-GPU sizing contract and deploy base.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Applies DGX Station GB300 OS and driver checks from prerequisites.md.",
+      "Writes the complete single-GB300 device placement, RT-VLM utilization 0.2, and concrete SBSA tags directly to the build override — not a two-GPU H100 layout or a dev-profile.sh invocation — and never duplicates an existing -sbsa suffix."
+    ]
+  },
+  {
+    "id": "build-base-gb300-release-tag",
+    "question": "Deploy the VSS base profile on DGX Station GB300 using container image tag 3.4.0.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Derive the SBSA tags from the selected common tag rather than from develop-latest.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Exports VSS_CONTAINER_TAG=3.4.0 and derives the SBSA tags from it, writing VSS_RT_VLM_TAG=3.4.0-sbsa to override.env without duplicating the suffix.",
+      "Resolves rtvi-vlm to 3.4.0-sbsa and the unsuffixed managed images to 3.4.0, with no image left on develop-latest."
+    ]
+  },
+  {
+    "id": "build-lvs-gb300",
+    "question": "Deploy LVS video summarization on DGX Station GB300.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Use the GB300 single-GPU sizing contract and deploy lvs.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Selects the lvs profile with HARDWARE_PROFILE=GB300.",
+      "Co-locates the local LLM and RT-VLM on the one selected GB300 using the documented 0.2 / 0.3 fractions and writes the placement envs directly to override.env."
+    ]
+  },
+  {
+    "id": "build-alerts-gb300",
+    "question": "Deploy the alerts profile on DGX Station GB300.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Use the GB300 single-GPU sizing contract and deploy alerts.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Does not inherit the stock alerts GPU-1 device IDs when they do not identify the selected GB300.",
+      "Writes RT-CV, LLM, and RT-VLM placement on the selected GB300, RT-VLM utilization 0.2, and the applicable concrete SBSA tags directly to override.env."
+    ]
+  },
+  {
+    "id": "build-search-gb300",
+    "question": "Deploy the search profile on DGX Station GB300.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Use the GB300 single-GPU sizing contract and deploy search.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Selects the search profile with HARDWARE_PROFILE=GB300.",
+      "Collapses the stock two-GPU search layout onto the selected GB300 through explicit override.env values and keeps the local LLM nvidia/nemotron-3.5-lightning-30b-a3b."
+    ]
+  },
+  {
+    "id": "build-base-harness-ref",
+    "question": "Deploy the VSS base profile with the NemoClaw harness at nightly-20260928.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "Select nightly-20260928 as the harness source ref and build the sandbox from a staged worktree of it.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Fetches nightly-20260928, verifies it resolves to a commit whose .openclaw/Dockerfile consumes a staged snapshot, and creates a detached worktree of it under _builds/<name>/harness-src.",
+      "Stages that worktree with its own stage_vss_src.py and runs the NemoClaw notebook with VSS_REPO_DIR set to the worktree.",
+      "Does not set VSS_CONTAINER_TAG from the harness ref, and names the ref and its short sha in the architecture diagram and the final summary."
+    ]
+  },
+  {
+    "id": "build-base-harness-default-ref",
+    "question": "Deploy the VSS base profile with the NemoClaw harness.",
+    "expected_skill": "vss-build-vision-ai",
+    "ground_truth": "No harness ref was requested, so the sandbox builds from develop.",
+    "expected_behavior": [
+      "Activates vss-build-vision-ai.",
+      "Does not ask for a harness ref, create a harness worktree, or run stage_vss_src.py.",
+      "Runs the NemoClaw notebook with VSS_REPO_DIR set to the checkout root."
+    ]
+  }
+]
