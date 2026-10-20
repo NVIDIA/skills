@@ -1,0 +1,43 @@
+[
+  {
+    "id": "holoscan-module-lifecycle-001",
+    "question": "Create a standalone Holoscan Module with holoscan-cli 5.0.0 for SDK 5.0.0 with one reusable C++ operator that Python can also call, a finite demo, tests, and metadata for Debian packaging. Preserve my existing holoscan-applications checkout and use an empty destination outside it.",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "Use the packaged CLI Module template with Python 3.12–3.14. Prefer uvx --from holoscan-cli[create]==5.0.0 holoscan create from PyPI with --language cpp python, non-interactive mode, an explicit holoscan_version=5.0.0 context, and agreed metadata, previewed before the matching creation in a parent directory outside the holoscan-applications checkout. No launcher or template setup is needed. Inspect destination/Git state and generated pins. Develop through uv run holoscan with an explicit --language for the two-language example; pip in .venv is the fallback. Package a C++-only DEB; no wheel is generated. Preserve unrelated work and publication authorization. Require actual functional producer and clean-consumer proof before claiming support.",
+    "expected_behavior": [
+      "Activates holoscan-module-lifecycle and preserves the existing holoscan-applications checkout and user work",
+      "Uses uvx with the exact holoscan-cli[create]==5.0.0 pin from PyPI and Python 3.12–3.14, documenting .venv/pip as the fallback",
+      "Previews packaged-template creation with --language cpp python and an explicit SDK 5.0.0 minimum before the identical action, outside the application checkout",
+      "Does not clone other repositories, run template setup, or create a launcher for the standalone module",
+      "Uses uv run holoscan with explicit language selection for builds, runs, and tests and requires finite tests and clean artifact-consumer proof",
+      "Does not invent a wheel or Python-implemented operator or publish without authorization"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-007",
+    "question": "Create an ordinary video application in my holoscan-applications checkout with finite replay and recording modes; it does not expose a reusable module API.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The module-lifecycle skill stays silent because this is an ordinary application with no reusable module API. The agent treats it as application work and follows the checkout's own guidance.",
+    "expected_behavior": [
+      "Does not activate holoscan-module-lifecycle or invent module metadata/packages",
+      "Treats the request as ordinary application work in the checkout",
+      "Uses finite visual evidence appropriate to an application",
+      "Does not invent a reusable API or distribution contract"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-runtime-docs",
+    "question": "Planning only: our holoscan-applications checkout pins holoscan-cli 5.0.0, whose wheel declares Requires-Python >=3.11,<3.15. Can we use Python 3.14? Does that also make an older module pinned to the published 5.0.0a1 wheel usable on 3.14? Where should we read general CLI usage versus this repository's workflow instructions? Do not run commands or change pins.",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The 5.0.0 wheel supports the CLI interpreter on 3.14; recommend 3.12–3.14. The published 5.0.0a1 wheel still requires <3.14, so keep an explicitly requested alpha pin with 3.12/3.13 or obtain authorization to update that module's CLI pins consistently. SDK/native-module compatibility needs separate proof. Use the CLI README, CLI_REFERENCE.md, CONFIGURATION.md, and local help for CLI usage; holoscan-applications README.md, CONTRIBUTING.md, and docs/ci.md for the repository workflow; and a generated module's README.md, DEVELOPER.md, and AGENTS.md for module development. The CLI repository's AGENTS.md is for contributing to the CLI. Respect planning-only scope.",
+    "expected_behavior": [
+      "Distinguishes the 5.0.0 wheel's metadata from the immutable published alpha artifact",
+      "Accepts Python 3.14 where package metadata supports it without claiming SDK compatibility",
+      "Uses CLI-owned documentation for CLI usage and holoscan-applications README, CONTRIBUTING, and docs/ci.md for the repository workflow",
+      "Does not execute, edit pins, bypass Requires-Python, or add a blanket project Python pin"
+    ]
+  }
+]
