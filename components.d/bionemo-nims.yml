@@ -28,6 +28,8 @@ skills:
     catalog_dir: bionemo-evo2-nim
   - path: skills/bionemo-agent-toolkit/skills/rfdiffusion-nim/
     catalog_dir: bionemo-rfdiffusion-nim
+  - path: skills/bionemo-agent-toolkit/skills/rfd4-proteina-nim/
+    catalog_dir: bionemo-rfd4-proteina-nim
   - path: skills/bionemo-agent-toolkit/skills/openfold3-nim/
     catalog_dir: bionemo-openfold3-nim
   - path: skills/bionemo-agent-toolkit/skills/proteinmpnn-nim/
