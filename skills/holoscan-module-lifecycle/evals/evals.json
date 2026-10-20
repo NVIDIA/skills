@@ -1,0 +1,113 @@
+[
+  {
+    "id": "holoscan-module-lifecycle-008",
+    "question": "Planning only: I have Python 3.12 and uv, and no project checkout. Show how to create a standalone Holoscan Module with holoscan-cli 5.0.0 for SDK 5.0.0 whose C++ operator I can also call from Python, then build, test, and package it. Do not execute or publish anything.",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "Use the packaged CLI Module template with Python 3.12–3.14. Prefer uvx --from holoscan-cli[create]==5.0.0 holoscan create from PyPI with --language cpp python, non-interactive mode, an explicit holoscan_version=5.0.0 context, and agreed metadata, previewed before the matching creation; the preview does not validate the SDK floor. No holoscan-applications checkout, launcher, or template setup is needed. Inspect destination/Git state and the generated pins, which route holoscan-cli to NVIDIA's index for uv run. Develop through uv run holoscan with an explicit --language for the two-language example; pip in .venv is the fallback. Package a C++-only DEB; the Python bindings install from the holoscan-<name>-python CMake component, and no wheel is generated. Preserve planning-only limits and publication authorization. Require actual functional producer and clean-consumer proof before claiming support.",
+    "expected_behavior": [
+      "Activates holoscan-module-lifecycle and preserves existing user work",
+      "Uses uvx with the exact holoscan-cli[create]==5.0.0 pin from PyPI and Python 3.12–3.14, documenting .venv/pip as the fallback",
+      "Previews packaged-template creation with --language cpp python and an explicit SDK 5.0.0 minimum before the identical action",
+      "Does not clone holoscan-applications, run template setup, or create a launcher for the standalone module",
+      "Uses uv run holoscan with explicit language selection for builds and runs, requires finite tests, and plans a DEB-only package with clean artifact-consumer proof",
+      "Does not invent a wheel or Python-implemented operator, execute for a planning-only request, or publish without authorization"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-009",
+    "question": "Planning only: an application in my holoscan-applications checkout should use the C++ operator from my standalone module, holoscan-my-module. I added the module to application.dependencies.modules[] with its git URL and an immutable SHA, and I also want to try an uncommitted local working tree of the module. What sequence proves the consumer? Do not execute anything.",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent activates the module lifecycle and explains that in holoscan-applications neither the metadata dependency nor a HOLOSCAN_CLI_LOCAL_HOLOSCAN_MY_MODULE override fetches or builds the module: the CLI writes external_operators_manifest.cmake, but the repository's root CMakeLists.txt does not include it, and changing the shared root CMake needs maintainer agreement. It plans to build the module from the local working tree, install its C++ component from the exact build directory into a fresh task-owned prefix built against the same SDK and image family, have the application's own CMake call find_package(holoscan-my-module CONFIG REQUIRED) and link holoscan::my_module, then mount the prefix with --add-volume and pass -Dholoscan-my-module_DIR with the container path through --configure-args. It previews the identical holoscan run command, notes that dry runs hide CMake option values, requires configure evidence that the package resolved from the mounted prefix plus a finite consumer result, and removes the prefix with verified cleanup. It executes nothing.",
+    "expected_behavior": [
+      "Activates holoscan-module-lifecycle and explains that the metadata dependency and local override do not build the module in holoscan-applications because its root CMake does not include the CLI manifest",
+      "Does not add FetchContent or modify the shared root CMake without maintainer agreement",
+      "Installs the module from the exact build directory into a fresh task-owned prefix and consumes it with find_package and the holoscan::my_module target",
+      "Mounts the prefix with --add-volume and passes the container-side package directory through --configure-args",
+      "Previews the identical run command, requires configure evidence of the mounted package and a finite consumer result, and plans verified prefix cleanup",
+      "Does not execute, fetch, commit, or publish anything"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-006",
+    "question": "Planning only: `uv run holoscan package` fails on my standalone module partway through CMake. Explain how you would reproduce it and make the smallest fix. Do not execute commands or modify files.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The module-lifecycle skill stays silent because one exact command fails. The agent should route to holoscan-app-debug-build-run, preserve and preview the command, isolate the first causal layer, and describe how it would prove a minimal fix without executing anything.",
+    "expected_behavior": [
+      "Does not activate holoscan-module-lifecycle's happy path",
+      "Routes to holoscan-app-debug-build-run",
+      "Preserves the exact failing command, full revision, dirty state, and meaningful inputs",
+      "Does not execute commands or modify files, and avoids speculative cache deletion, broad dependency upgrades, or publishing"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-005",
+    "question": "My standalone module, created by holoscan-cli 5.0.0 with --language cpp python, builds and its tests pass. Package it as a Debian package and a wheel with `uv run holoscan package`, confirm both work for clean consumers, and do not publish.",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The agent validates module metadata and recognizes that the packaged template produces a C++-only DEB that excludes the Python bindings and builds no wheel, so WHEEL is unavailable unless the module's own pyproject.toml builds one; it does not invent wheel packaging and reports that format as unsupported for this module. It previews and runs DEB packaging container-first, records the actual artifact path, inspects dpkg-deb --info and --contents against metadata, installs the DEB in a disposable artifact-only consumer whose package database provides the declared holoscan dependency, and proves a link or import plus a finite smoke result; for Python consumers it uses the holoscan-<name>-python CMake component instead. It does not publish.",
+    "expected_behavior": [
+      "Activates holoscan-module-lifecycle and confirms module metadata, namespace, version, and dependencies",
+      "Recognizes that the packaged template produces a C++-only DEB and no wheel, and does not invent wheel packaging",
+      "Previews explicit uv run holoscan package commands with --dryrun --verbose before the matching action and records actual artifact paths",
+      "Inspects Debian control and payload rather than trusting exit zero, and checks the declared holoscan dependency in the consumer",
+      "Proves the DEB from a clean consumer that cannot import or link from the checkout, build tree, user site, or local override",
+      "Does not commit, push, upload, publish, or remove unrelated files without authorization"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-010",
+    "question": "Planning only: my standalone module is open at src/operators and I want SDK 5.x from a local install, a shared CUDA setting, and a sensor configuration file visible inside Docker. The CLI is 5.0.0. What should I configure?",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "Use root discovery or a global --project-root before the command, [tool.holoscan] for the shared cuda setting and forward-env names, a separate mount for the sensor file, and --local-sdk-root or HOLOSCAN_SDK_ROOT for the SDK; otherwise the CLI picks a default SDK location without checking the module's minimum version. Preview effective sources with --dryrun --verbose. Do not infer SDK 5 compatibility from CLI 5; SDK 5 uses CUDA 13, Python bindings need the SDK's Python package, and actual tests are required. No launcher duplication or secrets in TOML.",
+    "expected_behavior": [
+      "Uses discovered or explicit global project root without copying a launcher",
+      "Separates environment names from values and filesystem mounts",
+      "Selects the SDK explicitly, distinguishes CLI version from SDK support, and keeps native/container artifacts separate",
+      "Proposes effective configuration previews and real compatibility proof without executing"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-011",
+    "question": "Planning only: my module was generated by CLI 5.0.0a1 and still pins holoscan-cli==5.0.0a1. uv chooses Python 3.14 and dependency resolution fails. Should I relax the CLI pin or add uv python pin 3.12 to every project?",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The published 5.0.0a1 wheel excludes Python 3.14+, while the 5.0.0 wheel declares <3.15; a newer release does not update the alpha artifact or the module's pin. Keep the requested CLI pin and select Python 3.12 or 3.13 for this environment, for example uv run --python 3.12 holoscan version --json, or with authorization move the module's requirements, development-group, and pre-commit CLI pins together. Do not impose a repository-wide Python pin, bypass Requires-Python, or downgrade below the workflow Python 3.12 floor. Verify interpreter/version before further commands, respecting planning-only scope.",
+    "expected_behavior": [
+      "Identifies the alpha upper bound and workflow minimum separately",
+      "Preserves the CLI pin and selects a compatible interpreter only where needed",
+      "Does not edit project configuration, install into system Python, or execute during planning"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-012",
+    "question": "My module generated by CLI 5.0.0 builds a DEB, but dpkg -i in my SDK 5.0.0 development container says Package holoscan is not installed. The C++ example builds and runs there. Can I force installation and claim clean-consumer support? Planning only.",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "The module lifecycle covers clean-consumer DEB verification. The agent distinguishes a working SDK build environment from Debian package registration: the DEB declares holoscan (>= the minimum SDK version), which this container's package database does not provide. It compares dpkg-deb --info with dpkg-query in the consumer, uses a consumer with the real declared SDK Debian package, or reports DEB installation unverified. It does not force dependencies, synthesize a provider package, or claim clean-consumer support. Respect planning-only scope.",
+    "expected_behavior": [
+      "Activates holoscan-module-lifecycle for clean-consumer DEB verification",
+      "Separates a working SDK build environment from Debian dependency satisfaction",
+      "Inspects the DEB's declared holoscan dependency against the consumer's package database",
+      "Requires the actual declared dependency or reports DEB installation unverified, without forcing dependencies or fabricating provider packages",
+      "Does not execute commands during planning"
+    ]
+  },
+  {
+    "id": "holoscan-module-lifecycle-013",
+    "question": "Plan a Python consumer proof for a standalone module generated by CLI 5.0.0 with --language cpp python, using an installed copy of its bindings rather than the build tree. The consumer may fail after installation, and the debugging skill may not be installed. Explain what to record, how to scope and verify cleanup, and the outcome if cleanup fails. Do not run commands or edit files.",
+    "expected_skill": "holoscan-module-lifecycle",
+    "expected_script": null,
+    "ground_truth": "Build first, then install only the holoscan-<name>-python CMake component from the exact build directory into a fresh task-owned prefix; do not use install --dev, because this template stages no editable-import hooks. Record the interpreter, build directory, prefix, and installed paths before the consumer runs, and confirm the prefix is new and not shared. Use guaranteed cleanup that removes only that prefix even on consumer failure, and require a zero exit status and absence of the prefix. If cleanup fails, stop using the environment and report incomplete cleanup even without the debugging skill. Do not package or claim restoration. Keep the response planning-only.",
+    "expected_behavior": [
+      "Installs only the holoscan-<name>-python component from the exact build directory into a fresh task-owned prefix and records the interpreter, prefix, and installed paths",
+      "Does not rely on install --dev or editable hooks for this template",
+      "Runs scoped cleanup of only that prefix after a failed consumer and checks both exit status and absence",
+      "Stops and reports incomplete cleanup if removal fails and no debug skill is available",
+      "Does not execute commands, edit files, or claim cleanup success"
+    ]
+  }
+]
