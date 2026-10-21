@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 413,
-  "result_row_count": 3879,
+  "skill_count": 414,
+  "result_row_count": 3889,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -664,6 +664,26 @@
       "component": "BioNeMo NIMs",
       "has_results": true,
       "average_uplift_pct": 10.35
+    },
+    {
+      "skill": "rfd4-proteina-nim",
+      "evaluation_date": "2026-10-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:224e837bd6c72a2b1cbea7a74598bfd69f84f624ae408498e86b04c24da32e02",
+      "validation_status": null,
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "has_results": true,
+      "average_uplift_pct": 24.08
     },
     {
       "skill": "rfdiffusion-nim",
@@ -11107,6 +11127,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 58.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 40.5
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.5,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-rfd4-proteina-nim",
+      "component": "BioNeMo NIMs",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 78.6,
       "uplift_pct": null
     },
     {

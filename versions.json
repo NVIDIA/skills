@@ -226,6 +226,13 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "bionemo-rfd4-proteina-nim",
+      "path": "skills/bionemo-rfd4-proteina-nim",
+      "content_digest": "sha256:535a037d57fe98f0fcd3ca1f83a43cc7b747ab053667c9bde8a29adb8cbdb77c",
+      "last_commit": "1ff5345f84d655bf3b0f339fb9eebd1658ddc774",
+      "last_modified": "2026-10-20"
+    },
+    {
       "name": "bionemo-rfdiffusion-nim",
       "path": "skills/bionemo-rfdiffusion-nim",
       "content_digest": "sha256:f36888eb4b17db75a8a7f79031a04c27c22fa6ff9f0af80ff9566eeb197c9cb7",
