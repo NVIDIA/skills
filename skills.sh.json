@@ -42,6 +42,13 @@
         "cdf-augmentation",
         "cdf-auto-labeling",
         "cdf-curation-and-retrieval",
+        "cdf-defect-image-generation",
+        "cdf-event-video-generation",
+        "cdf-image-attribute-augmentation",
+        "cdf-orchestration-preflight",
+        "cdf-orchestration-setup",
+        "cdf-orchestration-write-dag",
+        "cdf-video-data-augmentation",
         "holoscan-app-debug-build-run",
         "hsb-app",
         "hsb-flash",
@@ -74,11 +81,7 @@
         "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning",
         "paidf-cosmos-predict",
-        "paidf-orchestration-setup",
-        "paidf-orchestration-write-dag",
         "physical-ai-defect-image-generation",
-        "physical-ai-event-video-generation",
-        "physical-ai-image-attribute-augmentation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
         "physical-ai-neural-reconstruction",
         "physical-ai-video-data-augmentation"
@@ -229,6 +232,13 @@
         "physicsnemo-discover",
         "physicsnemo-shard-tensor",
         "using-ovnewton"
+      ]
+    },
+    {
+      "title": "AV Simulation",
+      "description": "Build and run autonomous-vehicle simulation workflows for scenario generation, validation, replay, and autonomy testing.",
+      "skills": [
+        "cdf-autonomous-vehicle-dataset-generation"
       ]
     },
     {

@@ -261,10 +261,66 @@
       "last_modified": "2026-10-20"
     },
     {
+      "name": "cdf-autonomous-vehicle-dataset-generation",
+      "path": "skills/cdf-autonomous-vehicle-dataset-generation",
+      "content_digest": "sha256:66b2ee2384c9aa1e76f560dd3983150f5832385f44362f99aa7f1b5572055945",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
+      "last_modified": "2026-10-20"
+    },
+    {
       "name": "cdf-curation-and-retrieval",
       "path": "skills/cdf-curation-and-retrieval",
       "content_digest": "sha256:12d20c8b0a0bd2ca514993feefe2002288fcf2b2fe7e00861610186895d7c707",
       "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-defect-image-generation",
+      "path": "skills/cdf-defect-image-generation",
+      "content_digest": "sha256:12b052db7c78f7ba6cba21ea35e653f44fb03b335560416ad6a6fd7fb857c588",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-event-video-generation",
+      "path": "skills/cdf-event-video-generation",
+      "content_digest": "sha256:c4d9e05435d0bcab38354fb176876c93b4c1dd0c79ee2439e6a25e3cfb18aafe",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-image-attribute-augmentation",
+      "path": "skills/cdf-image-attribute-augmentation",
+      "content_digest": "sha256:10001df776d2dcaf0d871efccd63a09983c315dacf244f3db236347c41d1798d",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-orchestration-preflight",
+      "path": "skills/cdf-orchestration-preflight",
+      "content_digest": "sha256:c84d0cc275b27116a037386aaa97b3b3c6a79926adf04c5bffb849e3f1592a9a",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-orchestration-setup",
+      "path": "skills/cdf-orchestration-setup",
+      "content_digest": "sha256:92eae12e501f1e3cc09aa87970465ba889699487ed05d686bd6e5f213b320ca0",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-orchestration-write-dag",
+      "path": "skills/cdf-orchestration-write-dag",
+      "content_digest": "sha256:fee21cbc5e8f457f574e08e2f489fdffd1f73489482b083d97741bad7098bce8",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-video-data-augmentation",
+      "path": "skills/cdf-video-data-augmentation",
+      "content_digest": "sha256:79f4deea14e58dbe5e663b306c0bc3a44f320adf63d588cdeddd10bf034046ce",
+      "last_commit": "326c03d772d6c8bb7887a7c865ce3cc95afd0df3",
       "last_modified": "2026-10-20"
     },
     {
@@ -2123,39 +2179,11 @@
       "last_modified": "2026-09-29"
     },
     {
-      "name": "paidf-orchestration-setup",
-      "path": "skills/paidf-orchestration-setup",
-      "content_digest": "sha256:fbe9150428018ef15b4cf5874b3f03789a3a8ea86b8fd0c07a4e6889991d52dc",
-      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
-      "last_modified": "2026-09-02"
-    },
-    {
-      "name": "paidf-orchestration-write-dag",
-      "path": "skills/paidf-orchestration-write-dag",
-      "content_digest": "sha256:21dc1399456096c56ba7d1dad51f1a1c29ee38088a8ee8f03b7f00b4a8b21d46",
-      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
-      "last_modified": "2026-09-02"
-    },
-    {
       "name": "physical-ai-defect-image-generation",
       "path": "skills/physical-ai-defect-image-generation",
       "content_digest": "sha256:bef6d9992cb1b5ada7f16f5e6a5beb03ea0456fe4b8b337c15caea76e2cd28f1",
       "last_commit": "5a9da9bbffff4fab04cd8f7e59cdf7dddf951c0b",
       "last_modified": "2026-06-23"
-    },
-    {
-      "name": "physical-ai-event-video-generation",
-      "path": "skills/physical-ai-event-video-generation",
-      "content_digest": "sha256:7215677b4671cdac27e1e8644acaccde089c2d545ae7b8ade2ed3492f96f2eb1",
-      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
-      "last_modified": "2026-09-02"
-    },
-    {
-      "name": "physical-ai-image-attribute-augmentation",
-      "path": "skills/physical-ai-image-attribute-augmentation",
-      "content_digest": "sha256:92c2af68bddbf020ede6cdcc956462d11e769378a2f9d7924d0c852264ceea96",
-      "last_commit": "1e08e5b597ef6847e79041f3f4dc86887155ab69",
-      "last_modified": "2026-09-02"
     },
     {
       "name": "physical-ai-infrastructure-setup-and-resilient-scaling",
