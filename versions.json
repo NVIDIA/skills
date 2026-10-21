@@ -240,6 +240,34 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "cdf-anomalygen",
+      "path": "skills/cdf-anomalygen",
+      "content_digest": "sha256:fc4b97ef691f743201f95e6e5b80c1b67dbc961ff4a201f836b6275eba1c53cd",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-augmentation",
+      "path": "skills/cdf-augmentation",
+      "content_digest": "sha256:0d7d805cd40ed6c703920b8212109f967482e3d03fa46185e9327ed691d4dbf4",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-auto-labeling",
+      "path": "skills/cdf-auto-labeling",
+      "content_digest": "sha256:cbc30c60857f6ac38b0582f593837da697556b0a9c278918815087e50cd5fd00",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
+    },
+    {
+      "name": "cdf-curation-and-retrieval",
+      "path": "skills/cdf-curation-and-retrieval",
+      "content_digest": "sha256:12d20c8b0a0bd2ca514993feefe2002288fcf2b2fe7e00861610186895d7c707",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
+    },
+    {
       "name": "compute-sanitizer-diagnose-cuda-bugs",
       "path": "skills/compute-sanitizer-diagnose-cuda-bugs",
       "content_digest": "sha256:f60e527e8be3030f85cde7bdf40e8ebad093cc7462542e307839867f2f3e912a",
@@ -963,37 +991,37 @@
     {
       "name": "holoscan-install-conda",
       "path": "skills/holoscan-install-conda",
-      "content_digest": "sha256:04885b4f0495d45024273cb5f02f1df2122726e68f020e803157e6ae1db31e71",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:0f738a25cb530229db1600fc2c6527ca892569288148306e44c9c83f7535fd21",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "holoscan-install-container",
       "path": "skills/holoscan-install-container",
-      "content_digest": "sha256:d047474d1e206af1d57324056908f1f1ef642227d18ce3f2a3841d04705e7622",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:71a8fed844f4c2d8fd0f441b5dcbf22548df620b0ca337614102a658fcd74d9a",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "holoscan-install-debian",
       "path": "skills/holoscan-install-debian",
-      "content_digest": "sha256:b7007e1c88c8c758e8ffc49e80149fd454d8623f770c7628a46324f24d970069",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:2995b0567ca6c5f86c9c6328a76faaa48edc4e6f77e99c5c644f392a2b6cefb0",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "holoscan-install-source",
       "path": "skills/holoscan-install-source",
-      "content_digest": "sha256:8c6912279a79745c255b4e138fedb8f87ed72e1bff6efaf4fca616d3f5b12cc6",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:fa08c10d5e9f686af33f0ccec7cce7dc57eed14eb51e8ac2a86d0d431598c9f0",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "holoscan-install-wheel",
       "path": "skills/holoscan-install-wheel",
-      "content_digest": "sha256:3bca053da12b9b33a6a0adfefd3b12976dba09aca1c9ac428dccae0f82359b41",
-      "last_commit": "a7c1463403ba9ac3d686e2e7397d3eac40572999",
-      "last_modified": "2026-05-31"
+      "content_digest": "sha256:cd559b9b9dc3b0b1c305c02da259a436f089bc84c95359eafc8e442869fda52f",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "holoscan-module-lifecycle",
@@ -1005,9 +1033,9 @@
     {
       "name": "holoscan-setup",
       "path": "skills/holoscan-setup",
-      "content_digest": "sha256:debd8dcbd9e16481d8f8cc62b13deb83bcb082da9c4b41004f3f21f6350a65b7",
-      "last_commit": "3cf3b215d32f2e7072edadb187e502ab47612054",
-      "last_modified": "2026-07-06"
+      "content_digest": "sha256:4e82dc3f15df3a81f86867723ae9c4209772a8ab97dafd77d0f7ee407381ae56",
+      "last_commit": "1b10c687823df18550686534c51aeb9c23883a1a",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "hsb-app",
@@ -2088,32 +2116,11 @@
       "last_modified": "2026-10-15"
     },
     {
-      "name": "paidf-augmentation",
-      "path": "skills/paidf-augmentation",
-      "content_digest": "sha256:8a3e72da19f22eba091409b6f1748dbe7d2a4eb41965cd26db56fe9e71e829f8",
-      "last_commit": "bc6adc00d7c75447733d359b9d4ac75881bb9b3c",
-      "last_modified": "2026-09-22"
-    },
-    {
-      "name": "paidf-auto-labeling",
-      "path": "skills/paidf-auto-labeling",
-      "content_digest": "sha256:44a8afdcbc425705b6beb483d5676175d25ca0a6168cb651676b74a372c9629a",
-      "last_commit": "d9c6f907a6e27063a1946a6d464eddf157f703be",
-      "last_modified": "2026-09-16"
-    },
-    {
       "name": "paidf-cosmos-predict",
       "path": "skills/paidf-cosmos-predict",
       "content_digest": "sha256:695ce48a8e997ef8dad9a8b66171f77456cd4a5e08b2564a51513ba24628311b",
       "last_commit": "7a90aad14dae821f704abd315bd4c5ca1dd7c107",
       "last_modified": "2026-09-29"
-    },
-    {
-      "name": "paidf-curation-and-retrieval",
-      "path": "skills/paidf-curation-and-retrieval",
-      "content_digest": "sha256:b6895349b8b8a9a676cabb9c3ce8a843af55ce5294b427c0435bf5c2624a1e2b",
-      "last_commit": "d9c6f907a6e27063a1946a6d464eddf157f703be",
-      "last_modified": "2026-09-16"
     },
     {
       "name": "paidf-orchestration-setup",
