@@ -2237,9 +2237,9 @@
     {
       "name": "rtx-remix-modding",
       "path": "skills/rtx-remix-modding",
-      "content_digest": "sha256:fae91fb72cd3be015fe5481badbb3758d99eac018cbc9f99b04bd203dfabcabe",
-      "last_commit": "675de2f162289f140f428c25cb07c109bded8144",
-      "last_modified": "2026-10-15"
+      "content_digest": "sha256:0161260ae66af91a1ddc4bb151c9a722663308df7316560bf14ae6e2aba85e1d",
+      "last_commit": "a634c0cc41f12b09519f724545479dd0278d8016",
+      "last_modified": "2026-10-20"
     },
     {
       "name": "skill-card-generator",

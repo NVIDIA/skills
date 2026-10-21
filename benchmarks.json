@@ -6352,7 +6352,7 @@
     },
     {
       "skill": "rtx-remix-modding",
-      "evaluation_date": "2026-10-15",
+      "evaluation_date": "2026-10-20",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:3a20325201aaaf0e423b220c0c53c7f51ea67a26cd886388f07b2c9084f665b9",
@@ -6368,7 +6368,7 @@
       "catalog_dir": "rtx-remix-modding",
       "component": "RTX Remix",
       "has_results": true,
-      "average_uplift_pct": 19.03
+      "average_uplift_pct": 25.42
     },
     {
       "skill": "skill-card-generator",
@@ -34740,8 +34740,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 92.9,
-      "uplift_pct": -7.1
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -34749,8 +34749,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.9,
-      "uplift_pct": -3.5
+      "score_pct": 96.4,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -34758,8 +34758,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.9,
-      "uplift_pct": 38.6
+      "score_pct": 78.6,
+      "uplift_pct": 47.2
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -34767,8 +34767,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 74.3,
-      "uplift_pct": 42.9
+      "score_pct": 67.1,
+      "uplift_pct": 37.1
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -34776,7 +34776,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 76.4,
+      "score_pct": 98.2,
       "uplift_pct": null
     },
     {
@@ -34794,8 +34794,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 73.1,
-      "uplift_pct": 22.3
+      "score_pct": 93.2,
+      "uplift_pct": 42.5
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -34803,8 +34803,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 72.4,
-      "uplift_pct": 21.0
+      "score_pct": 67.4,
+      "uplift_pct": 25.7
     },
     {
       "catalog_dir": "rtx-remix-modding",
@@ -34812,7 +34812,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.1,
+      "score_pct": 98.0,
       "uplift_pct": null
     },
     {
@@ -34821,7 +34821,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 97.7,
+      "score_pct": 98.1,
       "uplift_pct": null
     },
     {
