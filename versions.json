@@ -317,6 +317,13 @@
       "last_modified": "2026-10-20"
     },
     {
+      "name": "cdf-simulation",
+      "path": "skills/cdf-simulation",
+      "content_digest": "sha256:bd066213173fea367099bd32af8e38856bb8b27d1e9371de5f1f0939ca2a876b",
+      "last_commit": "6e0f575fca0ba1ac41617a74d552bbcefa19e977",
+      "last_modified": "2026-10-21"
+    },
+    {
       "name": "cdf-video-data-augmentation",
       "path": "skills/cdf-video-data-augmentation",
       "content_digest": "sha256:79f4deea14e58dbe5e663b306c0bc3a44f320adf63d588cdeddd10bf034046ce",
