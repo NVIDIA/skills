@@ -2916,9 +2916,9 @@
     {
       "name": "vss-build-vision-ai",
       "path": "skills/vss-build-vision-ai",
-      "content_digest": "sha256:5c128c2009301a1f09c229bb44a3e51113a07baca5a1e7a3525071a553369917",
-      "last_commit": "f36169d98aa321a7c7afa0acc404ff20f088a8a7",
-      "last_modified": "2026-10-20"
+      "content_digest": "sha256:089f30ab7fa60ad29106902f0f7545435831ab758656f4dd772142d7db576492",
+      "last_commit": "b091c3d109fc977bb96653f34481efe42e23f602",
+      "last_modified": "2026-10-21"
     },
     {
       "name": "warp-compile-time-optimizer",
