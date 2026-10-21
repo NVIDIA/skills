@@ -1,0 +1,9 @@
+target_dict_cfg:
+  existing_ligand:
+    source: custom_targets
+    target_filename: existing_ligand
+    ligand: FAD
+    ligand_only: true
+    binder_length: [100]
+    hotspot_residues: [null]
+    use_bonds_from_file: true

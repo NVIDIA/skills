@@ -1,0 +1,7 @@
+config_id,wall_clock_min,mean_i_pae
+p0,10,8
+p1,20,6
+p2,20,7
+p3,30,5
+p4,40,6
+p5,20,6

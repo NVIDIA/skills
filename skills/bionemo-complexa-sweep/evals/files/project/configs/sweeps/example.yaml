@@ -1,0 +1,35 @@
+# Example sweep file demonstrating the YAML format.
+#
+# Each key is a dot-notation config path. Each value is a list of values to
+# sweep over. The config generator computes the cartesian product of all axes.
+#
+# In this example: 2 beam widths x 2 nsteps = 4 configs generated.
+#
+# Long lists (e.g., checkpoint paths) can use YAML block-list style for
+# readability — no need for a 1000-character single line.
+#
+# Usage:
+#   python script_utils/generate_inference_configs.py \
+#       --config_name search_binder_pipeline \
+#       --sweeper configs/sweeps/example.yaml \
+#       --run_name my_experiment
+
+# --- Sweep axes (values must be lists) ---
+
+generation.search.beam_search.beam_width:
+  - 2
+  - 4
+
+generation.args.nsteps:
+  - 200
+  - 400
+
+# --- Scalar values (wrapped in a list automatically) ---
+# A single-element list pins the value without adding a sweep dimension.
+# generation.args.self_cond: true
+
+# --- Multi-line lists for long values (e.g., checkpoint paths) ---
+# ckpt_path:
+#   - /path/to/checkpoints/model_v1/epoch_100.ckpt
+#   - /path/to/checkpoints/model_v2/epoch_200.ckpt
+#   - /path/to/checkpoints/model_v3/epoch_50.ckpt

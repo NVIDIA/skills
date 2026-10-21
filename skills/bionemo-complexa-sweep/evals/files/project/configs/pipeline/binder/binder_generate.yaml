@@ -1,0 +1,240 @@
+# Binder Generation Configuration
+#
+# Search algorithms, reward models, and filtering for binder generation.
+# Reward models are independent of search: they can be used with single-pass,
+# beam-search, or any other algorithm, or without search (e.g., for scoring only).
+
+defaults:
+  - /targets/targets_dict@_here_
+  - /pipeline/base_gen_data@_here_
+  - /pipeline/model_sampling@_here_
+  - _self_
+
+# =============================================================================
+# Target and dataloader
+# =============================================================================
+task_name: 33_TrkA # 02_PDL1
+
+dataloader:
+  batch_size: 16
+  dataset:
+    task_name: ${...task_name} #33_TrkA
+    nres:
+      _target_: proteinfoundation.datasets.gen_dataset.UniformInt
+      low: ${....target_dict_cfg.${..task_name}.binder_length[0]}
+      high: ${....target_dict_cfg.${..task_name}.binder_length[1]}
+      nsamples: 4
+      endpoint: true
+    nrepeat_per_sample: 1
+    conditional_features:
+      - _target_: proteinfoundation.datasets.gen_dataset.TargetFeatures
+        task_name: ${...task_name}
+        binder_gen_only: True
+        pdb_path: ${oc.select:.....target_dict_cfg.${.task_name}.target_path,${oc.env:DATA_PATH}/target_data/${.....target_dict_cfg.${.task_name}.source}/${.....target_dict_cfg.${.task_name}.target_filename}.pdb}
+        input_spec: ${.....target_dict_cfg.${.task_name}.target_input}
+        target_hotspots: ${.....target_dict_cfg.${.task_name}.hotspot_residues}
+        binder_center: null
+        pdb_id: ${.....target_dict_cfg.${.task_name}.pdb_id}
+    transforms:
+      - _target_: proteinfoundation.datasets.transforms.CoordsTensorCenteringTransform
+        tensor_name: "x_target"
+        mask_name: "target_mask"
+        data_mode: "all-atom"
+
+# =============================================================================
+# Search algorithm
+# =============================================================================
+search:
+  algorithm: best-of-n #single-pass # best-of-n  # Options: single-pass, best-of-n, beam-search, fk-steering, mcts
+  max_batch_size: ${..dataloader.batch_size}  # Max samples per forward pass during search; inherits from dataloader batch_size
+  reward_threshold: null  # Also used during search to filter lookahead samples
+
+  # Shared step checkpoints for search algorithms
+  step_checkpoints: [0, 100, 200, 300, 400]
+
+  # Algorithm-specific settings
+  best_of_n:
+    replicas: 2
+
+  beam_search:
+    n_branch: 4
+    beam_width: 4
+    keep_lookahead_samples: true
+    save_intermediate_states: false    # Decode & save PDBs at each checkpoint (expensive)
+    # trajectory_dir: ./beam_trajectory  # Directory for intermediate PDBs (required when save_intermediate_states is true)
+
+  fk_steering:
+    n_branch: 4
+    beam_width: 4
+    temperature: 0.1
+    keep_lookahead_samples: true
+
+  mcts:
+    n_simulations: 20
+    exploration_prob: 0.5
+    exploration_constant: 1.0
+    keep_lookahead_samples: true
+
+# =============================================================================
+# Refinement
+# =============================================================================
+refinement:
+  algorithm: null # Options: null, sequence_hallucination
+  # What to refine: "final" or "all".
+  # Only the targeted samples are replaced with refined versions.
+  # Everything else (e.g. lookaheads when refine_targets=final) passes through unchanged.
+  refine_targets: final
+  # Whether to also save copies of the pre-refinement structures alongside the refined ones.
+  # "none" = only output refined versions of the targeted samples (default)
+  # "final" = also output the unrefined finals (sample_type: final_unrefined)
+  # "all"   = also output unrefined finals + unrefined lookaheads (when refine_targets=all)
+  save_pre_refinement: none
+
+  # SequenceHallucination stage toggles
+  enable_soft_optimization: false  # stages 2 + 3 (softmax + one-hot)
+  enable_greedy_optimization: true  # stage 4 (PSSM semigreedy)
+  n_temp_iters: 45
+  n_hard_iters: 5
+  n_recycles: 3
+  n_greedy_iters: 15
+  greedy_percentage: 1
+
+  # ColabDesign AF2 loss weights used during refinement optimisation.
+  # Set any weight to 0.0 to disable that loss term.
+  loss_weights:
+    pae: 0.4
+    plddt: 0.1
+    i_pae: 0.1
+    con: 1.0
+    i_con: 1.0
+    dgram_cce: 0.0
+    rg: 0.3             # radius of gyration (binder compactness)
+    i_ptm: 0.05         # interface pTM
+    helix_binder: -0.3   # encourage helical binder (negative = encourage)
+
+# =============================================================================
+# Post-generation filtering (used by filter.py)
+# =============================================================================
+filter:
+  filter_samples_limit: 1000        # Max samples to keep after filtering (top-N by reward)
+  delete_non_top_n_samples: false  # true = delete unselected dirs, false = move to filtered_out_samples/
+  dedup_sequence: true             # Deduplicate samples with identical sequences before ranking
+  reward_threshold: null           # Drop samples below this reward before top-N selection (null = keep all)
+
+# =============================================================================
+# Reward model
+# =============================================================================
+# Used for scoring samples or guiding search.
+reward_model:
+  _target_: "proteinfoundation.rewards.base_reward.CompositeRewardModel"
+  reward_models:
+    af2folding:
+      _target_: "proteinfoundation.rewards.alphafold2_reward.AF2RewardModel"
+      protocol: "binder"
+      use_multimer: True
+      af_params_dir: ${oc.env:AF2_DIR}
+      num_recycles: 3
+      use_initial_guess: True
+      use_initial_atom_pos: False
+      reward_weights:
+        con: 0.0    # con_intra_binder
+        i_pae: -1.0  # pae_inter
+        plddt: 0.0
+        dgram_cce: 0.0 
+        min_ipae: 0.0
+        min_ipsae: 0.0
+        avg_ipsae: 0.0
+        max_ipsae: 0.0
+        min_ipsae_10: 0.0
+        max_ipsae_10: 0.0
+        avg_ipsae_10: 0.0
+      seed: 0
+      device_id: null  # Auto-detects current CUDA device
+
+    # # TMOL reward model (optional)
+    # tmol:
+    #   _target_: "proteinfoundation.rewards.tmol_reward.TmolRewardModel"
+    #   enable_hbond: True
+    #   enable_elec: False
+    #   hbond_weight: 1.0
+    #   elec_weight: 1.0
+    #   reward_type: "interaction_count"
+    #   energy_threshold: -0.6
+    #   # compute_refolded: false
+
+    # bioinformatics:
+    #   _target_: "proteinfoundation.rewards.bioinformatics_reward.BioinformaticsRewardModel"
+    #   reward_weights:
+    #     surface_hydrophobicity: 0.0
+    #     interface_sc: 1.0
+    #     interface_dSASA: 0.0
+    #     interface_fraction: 0.0
+    #     interface_hydrophobicity: 1.0
+    #     interface_nres: 0.0
+    #   reward_thresholds:
+    #     surface_hydrophobicity: 0.35
+    #     interface_sc: 0.55
+    #     interface_dSASA: 1.0
+    #     interface_fraction: null
+    #     interface_hydrophobicity: 55
+    #     interface_nres: 7
+    #   reward_threshold_modes:
+    #     surface_hydrophobicity: min
+    #     interface_sc: max
+    #     interface_dSASA: max
+    #     interface_fraction: max
+    #     interface_hydrophobicity: max
+    #     interface_nres: max
+    #   structure_source: null  # null = use generated structure. Set to the name of a folding reward model (e.g. "af2folding") to use its refolded structure instead.
+
+    # =============================================================
+    # Example using different folding models for computing rewards
+    # =============================================================
+
+    # rf3folding:
+    #   _target_: "proteinfoundation.rewards.rf3_reward.RF3RewardRunner"
+    #   ckpt_path: ${oc.env:RF3_CKPT_PATH}
+    #   rf3_path: ${oc.env:RF3_EXEC_PATH}
+    #   normalize_pae: true   # Divide PAE-family metrics by 31 so weights are on 0-1 scale
+    #   reward_weights:
+    #     min_ipAE: -1.0      # Lower ipAE is better, so negative weight
+    #     plddt: 0.0
+    #     ipAE: 0.0
+    #     mean_min_ipAE: 0.0
+    #     mean_ipAE: 0.0
+    #     min_mean_ipAE: 0.0
+    #     pAE: 0.0
+    #     ipTM: 0.0
+    #     pTM: 0.0
+    #     ranking_score: 0.0
+    #     has_clash: 0.0      # 1.0 if clash detected; use negative weight to penalize
+    #     min_ipSAE: 0.0      # ipSAE metrics (0-1, higher is better)
+    #     max_ipSAE: 0.0
+    #     avg_ipSAE: 0.0
+
+    # boltz2folding: # fake boltz2 folding model, as boltz2 does not support save_pdb now
+    #   _target_: "proteinfoundation.rewards.alphafold2_reward.AF2RewardModel"
+    #   protocol: "binder"
+    #   use_multimer: True
+    #   af_params_dir: ${oc.env:AF2_DIR}
+    #   num_recycles: 3
+    #   use_initial_guess: True
+    #   use_initial_atom_pos: False
+    #   reward_weights:
+    #     con: 0.0    # con_intra_binder
+    #     i_pae: -1.0  # pae_inter
+    #     dgram_cce: 0.0 
+    #     min_ipae: 0.0
+    #     min_ipsae: 0.0
+    #     avg_ipsae: 0.0
+    #     max_ipsae: 0.0
+    #     min_ipsae_10: 0.0
+    #     max_ipsae_10: 0.0
+    #     avg_ipsae_10: 0.0
+    #   seed: 0
+    #   device_id: null  # Auto-detects current CUDA device
+
+  # weights: #if empty default to 1
+  #   af2folding: 1.0
+    # bioinformatics: 0.0 # 1.0
+    # boltz2folding: 1.0

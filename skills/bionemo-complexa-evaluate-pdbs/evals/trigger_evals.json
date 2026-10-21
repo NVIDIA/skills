@@ -1,0 +1,20 @@
+[
+  {"query": "Evaluate these PDB files with Proteina-Complexa", "should_trigger": true},
+  {"query": "Re-fold these designs and score them", "should_trigger": true},
+  {"query": "Compute interface pAE for my binder designs", "should_trigger": true},
+  {"query": "compute i_pLDDT for a folder of PDBs", "should_trigger": true},
+  {"query": "Run AF2 / RF3 / ESMFold on my designs and report metrics", "should_trigger": true},
+  {"query": "Score these binder candidates", "should_trigger": true},
+  {"query": "What's the designability of this folder of designs?", "should_trigger": true},
+  {"query": "Get scRMSD for these designs", "should_trigger": true},
+  {"query": "motif RMSD for these PDBs", "should_trigger": true},
+  {"query": "run complexa analysis on this evaluate config", "should_trigger": true},
+  {"query": "complexa evaluate from a PDB directory", "should_trigger": true},
+  {"query": "evaluate from pdb dir", "should_trigger": true},
+  {"query": "Score these BindCraft outputs against complexa metrics", "should_trigger": true},
+  {"query": "Evaluate my AlphaProteo and RFdiffusion decoys", "should_trigger": true},
+  {"query": "Design a new binder for TrkA", "should_trigger": false},
+  {"query": "Generate binders with complexa design", "should_trigger": false},
+  {"query": "Submit a binder search to the SLURM cluster", "should_trigger": false},
+  {"query": "How do I open a PDB file in PyMOL?", "should_trigger": false}
+]

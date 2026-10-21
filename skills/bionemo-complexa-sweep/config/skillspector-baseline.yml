@@ -1,0 +1,28 @@
+# SkillSpector suppression baseline — complexa-sweep
+#
+# Audited false positives only. NVSkills applies this file explicitly during
+# Tier 1 and retains suppressed findings plus these reasons in its report.
+version: 2
+
+rules:
+  - id: "TP4"
+    path: "*SKILL.md"
+    reason: >-
+      Reviewed false positive (BioNeMo, 2026-09-02). This is an agent runbook:
+      SKILL.md contains the sweep orchestration and invokes the separately
+      installed first-party Proteina-Complexa CLI and config generator.
+      SkillSpector 2.9.6 TP4 compares the description only with executable
+      files, so it sees the two ancillary preflight/manifest helpers but not
+      the instructions that expand configurations, run them, and rank results.
+  - id: "PE3"
+    path: "*scripts/preflight.sh"
+    message: "*.env*"
+    reason: >-
+      Reviewed false positive after remediation (BioNeMo, 2026-09-02). The
+      helper parses the user's repository-local dotenv as inert key/value data,
+      never sources or executes it, and emits only an explicit allowlist of
+      non-secret Complexa path/runtime settings. SkillSpector 2.9.6 PE3 flags
+      the literal dotenv filename in executable code regardless of this safe
+      handling.
+
+fingerprints: []
