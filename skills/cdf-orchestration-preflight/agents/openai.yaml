@@ -1,0 +1,7 @@
+interface:
+  display_name: "CDF Orchestration Preflight"
+  short_description: "Check CDF installation and workflow readiness"
+  default_prompt: "Use $cdf-orchestration-preflight to audit this checkout and report which packaged workflows are ready."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,12 @@
+{
+  "variables": {
+    "weather": {
+      "cloudy": 0.5,
+      "sunny": 0.5
+    },
+    "time_of_day": {
+      "morning": 0.5,
+      "afternoon": 0.5
+    }
+  }
+}

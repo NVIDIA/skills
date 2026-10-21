@@ -1,0 +1,156 @@
+[
+  {
+    "id": "audit-before-remediation",
+    "question": "Check whether this checkout and cluster can run all CDF workflows. Do not change anything yet.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "Run scripts/preflight.py audit read-only from the repository root with the user-supplied kubeconfig. Report install_readiness and run_readiness as separate gates, with a per-DAG, per-mode matrix. Make no changes; remediation is offered only after the audit and only with approval.",
+    "expected_behavior": [
+      "Runs the read-only audit before recommending changes.",
+      "Reports install readiness separately from run readiness.",
+      "Does not deploy the controller or create cluster resources."
+    ]
+  },
+  {
+    "id": "missing-kubeconfig",
+    "question": "Can this machine install Cosmos Data Factory Orchestration? KUBECONFIG is not set.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "KUBECONFIG is unset, so ask for the absolute kubeconfig path instead of falling back to ~/.kube/config. Local tool, repository, and credential checks can still run; Kubernetes, storage, and GPU checks stay UNVERIFIED until a kubeconfig is supplied.",
+    "expected_behavior": [
+      "Asks for a kubeconfig path.",
+      "Does not silently use ~/.kube/config.",
+      "Continues with safe local checks while Kubernetes readiness remains unverified."
+    ]
+  },
+  {
+    "id": "partial-one-gpu",
+    "question": "My cluster has one free GPU. Tell me exactly which packaged workflows and modes can run.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "Readiness is per DAG and per mode, so report a matrix rather than a single verdict. Compare free GPUs, not allocatable totals, against each mode's gpu_floor. Internal modes whose floor exceeds one are BLOCKED. Modes that need GPU video decode also require libnvcuvid.so.1 on every GPU node; nodes that could not be probed leave those modes UNVERIFIED.",
+    "expected_behavior": [
+      "Reports a per-DAG and per-mode matrix rather than a blanket ready result.",
+      "Distinguishes free GPUs from total allocatable GPUs.",
+      "Verifies libnvcuvid.so.1 on every GPU node or reports incomplete node coverage as unverified.",
+      "Flags internal modes whose absolute GPU floor is not met."
+    ]
+  },
+  {
+    "id": "av-ffmpeg-sidecar-missing",
+    "question": "Is my cluster ready to run autonomous_vehicle_dataset_generation_dag_k8s? The controller is installed. Do not change anything.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "The autonomous-vehicle modes require the operator-provisioned shared-ffmpeg PVC in sdg-workflow, which the Helm chart does not create. A missing or unbound claim blocks both modes. The remediation is the FFmpeg sidecar prerequisite in docs/autonomous-vehicle-dataset-generation/prerequisites.md, performed by the operator. Do not create or fill the claim when the user asked for no changes, and never bundle FFmpeg or PyAV into the Airflow image.",
+    "expected_behavior": [
+      "Runs the read-only audit and reports the AV modes per mode.",
+      "Reports a missing or unbound shared-ffmpeg PVC as a blocker and points to the FFmpeg sidecar prerequisite in the AV prerequisites guide as the operator's remediation.",
+      "Does not create or fill the claim itself, because the user asked for no changes.",
+      "Does not suggest installing FFmpeg or PyAV into the Airflow image or a task command."
+    ]
+  },
+  {
+    "id": "managed-cluster-no-nfs",
+    "question": "Our managed Kubernetes cluster has no StorageClass named nfs. Fix the prerequisite.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "The repository's host NFS installer is not a managed-Kubernetes solution. Ask the administrator for an existing ReadWriteMany StorageClass, then align all three deploy/values.yaml settings to it: postgresql.primary.persistence.storageClass, airflow.logs.persistence.storageClassName, and global.modelCache.storageClassName.",
+    "expected_behavior": [
+      "Does not run the privileged host NFS installer on a managed cluster.",
+      "Requests an administrator-provided RWX StorageClass.",
+      "Identifies all three deploy/values.yaml storage settings that must stay aligned."
+    ]
+  },
+  {
+    "id": "self-managed-nfs",
+    "question": "This is a self-managed Ubuntu cluster. Install the repo NFS prerequisite.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "Audit first, then check the host compatibility gates in references/nfs-remediation.md. The installer needs an explicit node and server IP and must not run while NFS-backed workloads are active. Explain the host mutations it performs and ask approval for the exact make install nfs command before running it.",
+    "expected_behavior": [
+      "Audits first and checks the host compatibility gates.",
+      "Requires an explicit node and server IP and checks for active NFS-backed workloads.",
+      "Explains the host mutations and asks approval for the exact make install nfs command."
+    ]
+  },
+  {
+    "id": "osmo-not-proven",
+    "question": "The Kubernetes workflows look healthy. Are all registered DAGs ready, including OSMO?",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "Kubernetes health says nothing about OSMO. Both packaged OSMO DAGs (event_video_generation_dag_osmo and video_data_augmentation_dag_osmo) need an OSMO token, OSMO pool access, and real external endpoints, because OSMO manifests deploy no in-cluster services. Without that evidence they remain UNVERIFIED.",
+    "expected_behavior": [
+      "Includes both packaged OSMO DAGs in the report.",
+      "Requires OSMO credentials, pool access, and real external endpoints.",
+      "Does not mark OSMO ready from Kubernetes health alone."
+    ]
+  },
+  {
+    "id": "live-unprofiled-dag",
+    "question": "Airflow has a new DAG that is not in the preflight catalog. Is the whole environment ready?",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "A live DAG with no readiness profile is reported as UNPROFILED/UNVERIFIED, and the environment is not declared fully ready. Inspect that DAG's file or manifest before proposing a profile for it.",
+    "expected_behavior": [
+      "Reports the new DAG as unprofiled and unverified.",
+      "Does not silently omit it or declare all workflows ready.",
+      "Inspects its DAG or manifest before proposing a readiness profile."
+    ]
+  },
+  {
+    "id": "quick-start-boundary",
+    "question": "Check the prerequisites, then tell me the exact quick-start commands to build and install the controller and access its UI. Do not execute those commands or change anything.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "Run the read-only prerequisite audit. When install readiness is satisfied, return the cp secrets.env (only if absent), export KUBECONFIG, make setup, make build sdg-controller, make install sdg-controller, make port-forward sequence with the audit's substitutions and warnings. If readiness is blocked or unverified, report the gaps and label the sequence as conditional on resolving them. Do not execute the handoff commands or change anything. Actual deployment belongs to cdf-orchestration-setup.",
+    "expected_behavior": [
+      "Returns the current setup, build, install, and port-forward sequence.",
+      "Runs the read-only prerequisite audit and reports unresolved gaps.",
+      "Does not execute the handoff commands or change anything; identifies setup as the owner of actual deployment."
+    ]
+  },
+  {
+    "id": "negative-controller-deploy",
+    "question": "Preflight passed. Set up and install the controller now, then port-forward its UI.",
+    "expected_skill": null,
+    "ground_truth": "This requests controller deployment, which belongs to cdf-orchestration-setup. Select setup first rather than handling deployment through preflight. Setup may invoke preflight for its required fresh readiness audit; that delegated audit is allowed and is not a routing failure.",
+    "expected_behavior": [
+      "Selects cdf-orchestration-setup first for controller deployment.",
+      "Does not use cdf-orchestration-preflight as the owner of deployment; a fresh audit delegated by setup is allowed."
+    ]
+  },
+  {
+    "id": "prebuilt-controller-image",
+    "question": "Audit this environment for installation using the published controller image registry.example.com/team/controller:release-1. Do not build or push it.",
+    "expected_skill": "cdf-orchestration-preflight",
+    "ground_truth": "Pass --prebuilt-controller-image registry.example.com/team/controller:release-1. Install readiness then depends on a read-only docker manifest inspect using existing Docker authentication instead of build and push prerequisites. Nothing is pulled or pushed, and an unreachable or missing manifest leaves install_readiness UNVERIFIED.",
+    "expected_behavior": [
+      "Passes the exact image through --prebuilt-controller-image.",
+      "Verifies the manifest using current Docker authentication without pulling or pushing the image.",
+      "Does not require Docker daemon or registry push access for the prebuilt path.",
+      "Keeps installation unverified when the manifest cannot be authenticated or found."
+    ]
+  },
+  {
+    "id": "negative-workflow-run",
+    "question": "Trigger video_data_augmentation_dag_k8s with payloads/dev/video_data_augmentation_dag/single_video_w_external_endpoint.json and monitor it.",
+    "expected_skill": null,
+    "ground_truth": "Triggering and monitoring a workflow run is not an environment audit. Route the request to the cdf-video-data-augmentation workflow skill.",
+    "expected_behavior": [
+      "Does not select the environment preflight skill for a workflow execution request.",
+      "Routes the request to the cdf-video-data-augmentation workflow skill."
+    ]
+  },
+  {
+    "id": "negative-trigger-defect-run",
+    "question": "Trigger defect_image_generation_smt_dag_k8s with the default payload and tell me when it finishes.",
+    "expected_skill": null,
+    "ground_truth": "This asks to run a workflow, not to audit the environment. Route it to the cdf-defect-image-generation workflow skill.",
+    "expected_behavior": [
+      "Does not select cdf-orchestration-preflight.",
+      "Does not run the readiness audit as a substitute for triggering the run.",
+      "Routes the request to the defect-image-generation workflow skill."
+    ]
+  },
+  {
+    "id": "negative-author-custom-dag",
+    "question": "Write a new Kubernetes DAG that runs only the Cosmos augmentation stage with no auto-labeling afterward.",
+    "expected_skill": null,
+    "ground_truth": "Authoring a new DAG from existing task groups belongs to cdf-orchestration-write-dag, not to the environment preflight.",
+    "expected_behavior": [
+      "Does not select cdf-orchestration-preflight.",
+      "Routes the request to the DAG-authoring skill."
+    ]
+  }
+]

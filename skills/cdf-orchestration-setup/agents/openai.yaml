@@ -1,0 +1,6 @@
+interface:
+  display_name: "CDF Orchestration Environment Setup"
+  short_description: "Deploy and verify CDF after orchestration preflight"
+
+policy:
+  allow_implicit_invocation: false

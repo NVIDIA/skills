@@ -1,0 +1,234 @@
+[
+  {
+    "id": "dig-full-payload",
+    "question": "Prepare a payload only, with no cluster access: SMT DIG full mode using the existing Artix rendering preset at s3://example-bucket/scenes/artix.zip and output s3://example-bucket/out. Use one internal image-edit replica, golden IDs g1 and g2, and defect ID bridge requesting 3 IC+bridge outputs. Map ic to IC. Shared assets are s3://example-bucket/assets/UC1/, recipe s3://example-bucket/recipe.yaml, checkpoint s3://example-bucket/model.pt. For AMG proposal and judging use model pcb-vlm at https://vlm.example.com/v1; credentials are already configured. Write the JSON and explain the job count without running it.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Produce a full SmtDefectImageGenerationPayload with two golden configurations and one defect configuration, explicit staging assets, the class mapping, AMG endpoints and one internal image-edit replica. It creates two simulation jobs and two AnomalyGen jobs, each requesting three outputs; it does not request three per input image. No cluster or API access is needed.",
+    "expected_behavior": [
+      "Shows the payload JSON, with api_version 1.0, pipeline_mode full, both collections, and the supplied input/output locations.",
+      "Places the mapping in anomaly_input and AMG endpoint/model plus staging in anomaly_generation.",
+      "Explains two simulation jobs and two AnomalyGen jobs without claiming per-input coverage.",
+      "Does not submit a run or request cluster credentials for this payload-only task."
+    ]
+  },
+  {
+    "id": "dig-mode-selection",
+    "question": "Offline planning only: which SMT DIG mode and input fields do I need for (a) rendering only, (b) golden inspection images, and (c) defects from my prepared IC/clean_image folder? I want to avoid unnecessary model services.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Use simulation, sim2real and defect respectively, all on defect_image_generation_smt_dag_k8s. Simulation and sim2real require scene plus golden collection. Defect requires a defect collection and prepared class folders plus shared assets/recipe/checkpoint, not scene, golden collection, class mapping or image-edit. Only sim2real and full run image-edit, so external_services has no effect in simulation or defect mode and can stay false.",
+    "expected_behavior": [
+      "Selects the three existing pipeline_mode values on one DAG without inventing DAG variants.",
+      "Explains defect-only staging and that shared assets remain alongside clean images.",
+      "Explicitly states that fixed-prompt sim2real needs image-edit but no VLM/LLM service, and distinguishes these service roles.",
+      "Does not access a cluster for an offline explanation."
+    ]
+  },
+  {
+    "id": "dig-count-merge",
+    "question": "For SMT DIG, I have two golden configurations and three defect configurations. Defaults set per_defect_counts to {\"IC+bridge\": 4, \"IC+missing\": 2}; one variant overrides it with {\"IC+bridge\": 1}. Explain the jobs, that variant's effective counts, and whether every clean input gets a defect. Do not execute anything.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Full mode builds two simulations and six AnomalyGen jobs. The override replaces the entire count dictionary so that variant requests only one IC+bridge per golden batch, with no inherited IC+missing. Requested counts do not guarantee distinct-input coverage. Full publication keeps one selected export per input that produced outputs.",
+    "expected_behavior": [
+      "Computes the golden-by-defect cross product as six jobs.",
+      "Removes the inherited missing count rather than deep merging per_defect_counts.",
+      "Separates requested counts, raw exports and selected input coverage."
+    ]
+  },
+  {
+    "id": "dig-capacity",
+    "question": "Offline capacity review: my SMT DIG full run uses four internal image-edit replicas and the default AnomalyGen stages with num_gpus=1. I have two nodes with one free GPU each. Can it run? Would external image-edit solve it? Explain the pools and stage order without changing infrastructure.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Four image-edit replicas exceed two available GPUs. The AMG stage requests max(2,num_gpus), requiring two GPUs on one node, so external image-edit still cannot fit AnomalyGen on these nodes. Stages are sequential and services shut down before defects. GPU pool is k8s_rtx6000_1 with two slots for AnomalyGen; internal augmentation runs on default_pool.",
+    "expected_behavior": [
+      "Identifies both replica capacity and single-node two-GPU placement as blockers.",
+      "Explains that external image-edit does not remove local AnomalyGen GPU requirements.",
+      "Uses DIG-specific pool names and does not sum all stage GPUs as simultaneous requirements.",
+      "Does not remove AMG or mutate infrastructure."
+    ]
+  },
+  {
+    "id": "dig-result-provenance",
+    "question": "Interpret these SMT DIG results offline. A successful full run has raw exports a.png and b.png both mapped to IC/clean_image/image_000000.png, and c.png mapped to IC/clean_image/image_000001.png. Which files should be selected, where do I find all three exports, and how do I match them to simulation images? What changes for defect-only?",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Full mode chooses a.png and c.png as the first sorted export per input and publishes them under the input filenames in defects/<golden_id>/<defect_id>/artifact. All three raw exports remain under anomaly_generation with export_manifest.json. Join validated manifest provenance through augmentation/manifest.json to simulation_image and component identity. Defect-only keeps all exports under defects/<defect_id> and has no simulated lineage.",
+    "expected_behavior": [
+      "Distinguishes two selected artifacts from three raw exports.",
+      "Uses input mappings and the augmentation manifest for provenance rather than filename guessing.",
+      "Explains defect-only output hierarchy and retention of all exports."
+    ]
+  },
+  {
+    "id": "dig-api-timeout",
+    "question": "I submitted an SMT DIG run through Airflow 3 with a known dag_run_id, but the POST timed out. Describe how to check safely before trying again, the request envelope, and how to inspect a failed mapped task. Do not connect to the cluster.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Query the same run ID on defect_image_generation_smt_dag_k8s before another POST and compare conf.payload; do not invent a new ID on an ambiguous timeout. Submission wraps payload in conf.payload with explicit logical_date. Fetch task instances with pagination and inspect the failed task's actual map_index/try_number. Do not disclose tokens.",
+    "expected_behavior": [
+      "Queries or describes querying the existing submission ID before retrying.",
+      "Includes conf.payload and logical_date in the Airflow 3 request contract.",
+      "Uses actual mapped task indexes and pagination.",
+      "Does not execute a request or reveal credentials."
+    ]
+  },
+  {
+    "id": "dig-missing-inputs",
+    "question": "Create my SMT DIG defect-only payload, but I have not chosen an output bucket, uploaded the clean images, or configured the recipe, checkpoint or AMG model endpoint yet. Can you just use whatever is checked in? Do not start a run.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Ask for missing output, prepared class dataset and shared assets, recipe/checkpoint, and AMG settings. Explain the class/clean_image structure. Do not silently adopt dev defaults, demand an unnecessary simulation scene, or trigger a job.",
+    "expected_behavior": [
+      "Requests the missing mode-specific inputs without copying the checked-in example locations.",
+      "Explains the prepared class-folder layout and reference assets.",
+      "Does not request a scene or image-edit service for defect-only.",
+      "Does not submit a run."
+    ]
+  },
+  {
+    "id": "dig-golden-prompt-override",
+    "question": "Payload fragment only, no cluster access: in my SMT DIG sim2real payload, golden configuration g-soft should use the image-edit prompt 'Render this PCB component as a soft-lit inspection photograph' and seed 7, while the other golden configurations keep the defaults. Where do these settings go, and which component's documentation defines them?",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Add an augmentation override to golden configuration g-soft: augmentation.captioning.llm.text holds the fixed prompt and augmentation.augmentation.parameters.extra_body.seed holds 7. The outer augmentation key names the workflow component; the inner keys follow the CDF Augmentation PipelineConfig schema in the component's configuration schema reference. The override applies to every image in that golden batch. The data section and the image_edit endpoint are filled by the workflow, and the fixed prompt needs no LLM or VLM endpoint.",
+    "expected_behavior": [
+      "Places the prompt under augmentation.captioning.llm.text and the seed under augmentation.augmentation.parameters.extra_body in configuration g-soft only.",
+      "Refers to the CDF Augmentation component skill or configuration schema for those keys.",
+      "Explains that augmentation data and image_edit endpoints are workflow-managed and that a fixed prompt needs no LLM/VLM service; leaves those workflow-managed fields out of the override.",
+      "Does not access a cluster."
+    ]
+  },
+  {
+    "id": "dig-new-board",
+    "question": "Offline planning: I want to run SMT DIG full mode on my own board scene at s3://example-bucket/scenes/my-board.zip instead of the Artix sample. Besides input_scene, what must I review or override, and where are those settings documented? Do not run anything.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "The image_generation template is an Artix preset, so replacing input_scene alone is not enough. Override the board-specific settings through golden_generation image_generation overrides: scene.root, the solder_joints component allowlist and solder material path, the annotation component lists, and the capture passes' roi_selection, limits and full-board scan settings. Lists replace rather than merge. The fields are defined by the CDF Simulation versioned YAML JobConfig reference. In full mode, map every component type the board's selection produces in anomaly_input.class_by_component_type.",
+    "expected_behavior": [
+      "Explains that the simulation template is Artix-specific, so changing input_scene alone is insufficient.",
+      "Names board-specific image_generation settings such as scene.root, the solder and annotation reference-designator lists, and roi_selection.",
+      "Refers to the CDF Simulation JobConfig documentation for the override schema.",
+      "Does not access a cluster or trigger a run."
+    ]
+  },
+  {
+    "id": "dig-pose-defect-coverage",
+    "question": "Offline payload preparation with no cluster access; include JSON and a brief explanation: using my board scene at s3://example-bucket/scenes/my-board.zip, generate tombstone structural defects on every 0603_H100 (full board coverage), with output in s3://example-bucket/out and one internal image-edit replica. Where will the defect crops and masks end up?",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Use sim2real on defect_image_generation_smt_dag_k8s, because pose defects come from Simulation rather than AnomalyGen. In a golden configuration's image_generation override, add operations.tombstone with ratio 1 and an angle range (propose 70-90 degrees and confirm), limited to 0603_H100 with a component filter; set annotations.operation_labels to defect; and select crops with a defects selector for tombstone on both component_focus and component_focus_roi, with the mask pass emitting class and defect semantic types. No defect collection or AMG endpoint is needed. Crops land under goldens/<id>/augmentation/artifact/ and masks under goldens/<id>/simulation/component_focus_roi/. The part name must match the board's metadata, so confirm it or ask for the reference designators.",
+    "expected_behavior": [
+      "Selects sim2real with a Simulation tombstone operation rather than an AnomalyGen defect configuration.",
+      "Uses ratio 1 limited to 0603_H100 for full board coverage and enables operation labels.",
+      "Selects the crops with a defects selector on both component passes.",
+      "Proposes or asks for the tombstone angle range and confirms that 0603_H100 matches the board's metadata.",
+      "Does not access a cluster or trigger a run.",
+      "Includes the payload JSON and the requested explanation; a file link alone is insufficient."
+    ]
+  },
+  {
+    "id": "dig-texture-full-coverage",
+    "question": "Offline payload preparation; include JSON and a brief coverage explanation: prepare Day 0 for component 115_2819_000 with full board coverage to generate bridge defects. Scene s3://example-bucket/scenes/my-board.zip, output s3://example-bucket/out, shared assets s3://example-bucket/assets/UC1/, recipe s3://example-bucket/recipe.yaml, checkpoint s3://example-bucket/model.pt, AMG model pcb-vlm at https://vlm.example.com/v1, one internal image-edit replica. The board records 12 instances with package type 115_2819_000 and component type ic. Do not run anything.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Use full mode. Select every instance on both component passes with a component_filter on package_type 115_2819_000 and max_images -1, map ic to IC, and request at least 12 IC+bridge defects with explicit staging and the AMG model and endpoint. AnomalyGen may reuse some crops and skip others, so the requested count does not guarantee a defect on every instance; report the achieved coverage from the distinct input_images in export_manifest.json.",
+    "expected_behavior": [
+      "Uses full mode with a component_filter that selects every 115_2819_000 instance on both component passes, without the default 24-crop cap.",
+      "Maps ic to IC and requests at least 12 IC+bridge defects.",
+      "Explains that coverage is not guaranteed and is measured from distinct input_images in export_manifest.json.",
+      "Does not submit a run or access a cluster.",
+      "Includes the payload JSON and the requested explanation; a file link alone is insufficient."
+    ]
+  },
+  {
+    "id": "dig-day1-attached-image",
+    "question": "Offline planning: run Day 1 for component 0603_H100 with a hypothetical local image ./0603_H100.png (no attachment is supplied; assume the file exists for planning only) to generate missing defects. Shared assets are at s3://example-bucket/assets/UC1/, recipe s3://example-bucket/recipe.yaml, checkpoint s3://example-bucket/model.pt, output s3://example-bucket/out, and my input prefix is s3://example-bucket/day1/. Explain what to upload where and the payload shape; do not run or upload anything.",
+    "expected_skill": "cdf-defect-image-generation",
+    "expected_script": null,
+    "ground_truth": "Use defect mode. Upload the image to s3://example-bucket/day1/passive_component/clean_image/0603_H100.png, since 0603_H100 is a passive and the starter payloads' recipe class for passives is passive_component. Stage both s3://example-bucket/assets/UC1/ and s3://example-bucket/day1/ in anomaly_generation.staging.fetch.input with the recipe and checkpoint, and request passive_component+missing in per_defect_counts. No scene, golden collection, class mapping or image-edit service is needed, but the AMG model and endpoint are still required, so ask for them.",
+    "expected_behavior": [
+      "Selects defect mode without a scene, golden collection or image-edit service.",
+      "Places the image in a passive_component/clean_image/ folder and stages that prefix together with the shared assets.",
+      "Requests passive_component+missing and asks for the missing AMG model and endpoint.",
+      "Does not upload files, submit a run or access a cluster.",
+      "Treats the image as a hypothetical planning input; does not claim to have opened or inspected an attachment or require an image fixture for this offline explanation."
+    ]
+  },
+  {
+    "id": "dig-clothing-augmentation-negative",
+    "question": "Change the clothing colors in my person re-identification crops and generate attribute captions.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is person image attribute augmentation, not SMT defect image generation.",
+    "expected_behavior": [
+      "Does not select cdf-defect-image-generation.",
+      "Does not construct or offer an SMT DIG payload for this request.",
+      "Routes clothing changes and attribute captions to cdf-image-attribute-augmentation."
+    ]
+  },
+  {
+    "id": "dig-event-video-negative",
+    "question": "Generate a surveillance video of a person falling from a warehouse seed image.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is event video generation, not PCB component or defect generation.",
+    "expected_behavior": [
+      "Does not select cdf-defect-image-generation.",
+      "Does not construct or offer an SMT DIG payload for this request.",
+      "Routes seed-image fall-event video generation to cdf-event-video-generation."
+    ]
+  },
+  {
+    "id": "dig-video-style-negative",
+    "question": "Make rainy and nighttime variants of my existing traffic videos.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is video style augmentation, not SMT defect generation.",
+    "expected_behavior": [
+      "Does not select cdf-defect-image-generation.",
+      "Does not construct or offer an SMT DIG payload for this request.",
+      "Routes variants of existing videos to cdf-video-data-augmentation."
+    ]
+  },
+  {
+    "id": "dig-anomalygen-finetune-negative",
+    "question": "Fine-tune AnomalyGen on my own labeled PCB defect dataset and evaluate the new checkpoint on my GPU workstation.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is standalone AnomalyGen fine-tuning and evaluation, not the orchestrated SMT DIG workflow.",
+    "expected_behavior": [
+      "Does not select cdf-defect-image-generation.",
+      "Does not construct or offer an SMT DIG payload for this request.",
+      "Identifies standalone AnomalyGen training/evaluation as the appropriate workflow; uses its component skill if available, otherwise reports that no matching installed skill is available instead of offering a DIG payload."
+    ]
+  },
+  {
+    "id": "dig-controller-setup-negative",
+    "question": "Offline routing only: which skill should handle redeploying the CDF Orchestration controller with a bigger k8s_rtx6000_1 pool? Do not change infrastructure.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is controller deployment and pool configuration, handled by cdf-orchestration-setup rather than the DIG run skill.",
+    "expected_behavior": [
+      "Does not select cdf-defect-image-generation.",
+      "Does not construct an SMT DIG payload.",
+      "Routes controller redeployment and pool configuration to cdf-orchestration-setup.",
+      "Keeps the response to offline routing without changing files or infrastructure."
+    ]
+  },
+  {
+    "id": "dig-dag-authoring-negative",
+    "question": "Offline routing only: which skill should handle writing a new Airflow DAG that only runs the augmentation stage on my images? Do not write files or deploy anything.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "This is custom DAG authoring, handled by cdf-orchestration-write-dag rather than running the existing DIG DAG.",
+    "expected_behavior": [
+      "Does not select cdf-defect-image-generation.",
+      "Does not construct an SMT DIG payload.",
+      "Routes custom augmentation-only DAG authoring to cdf-orchestration-write-dag.",
+      "Keeps the response to offline routing without changing files or infrastructure."
+    ]
+  }
+]
