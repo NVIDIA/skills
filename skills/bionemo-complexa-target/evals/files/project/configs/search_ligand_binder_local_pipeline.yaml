@@ -1,0 +1,48 @@
+# Binder Design Pipeline Configuration
+#
+# Modular config that combines all pipeline stages:
+#   - model_sampling: Model schedules, temperatures, noise
+#   - binder_generate: Search, rewards, filtering
+#   - binder_evaluate: Metrics computation
+#   - binder_analyze: Results analysis and aggregation
+#
+# Usage:
+#   complexa design configs/search_ligand_binder_local_pipeline.yaml ++run_name=test_2_4 ++generation.task_name=22_DerF21
+
+defaults:
+  - pipeline/ligand_binder/ligand_binder_generate@generation
+  - pipeline/ligand_binder/ligand_binder_evaluate@_global_
+  - pipeline/ligand_binder/ligand_binder_analyze@_global_
+  - _self_
+ 
+# =============================================================================
+# Run identification
+# =============================================================================
+run_name: search_ligand_binder_local
+ckpt_path: ./ckpts
+ckpt_name: complexa_ligand.ckpt
+autoencoder_ckpt_path: ./ckpts/complexa_ligand_ae.ckpt
+
+# =============================================================================
+# LoRA (Low-Rank Adaptation) - required for the paper ligand model checkpoint - do not remove
+# =============================================================================
+lora:
+  r: 32                 # Rank of low-rank adaptation matrices
+  lora_alpha: 64.0      # Scaling factor (typically 2*rank)
+  lora_dropout: 0.0     # Dropout for LoRA inputs
+  train_bias: none      # Bias training: 'none', 'all', or 'lora_only'
+
+# =============================================================================
+# Job management
+# =============================================================================
+ncpus_: 24
+seed: 5
+gen_njobs: 1
+eval_njobs: 1
+
+# =============================================================================
+# Hydra
+# =============================================================================
+hydra:
+  run:
+    dir: ./logs/hydra_outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}

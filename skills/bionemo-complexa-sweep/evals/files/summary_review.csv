@@ -1,0 +1,10 @@
+config_id,temperature,replicas,n_designs,n_passed,mean_i_pae
+review_05_2,0.5,2,10,3,9.0
+review_05_4,0.5,4,0,0,
+review_05_8,0.5,8,50,30,7.0
+review_1_2,1.0,2,-5,1,8.5
+review_1_4,1.0,4,10,8,6.0
+review_1_8,1.0,8,25,20,5.0
+review_15_2,1.5,2,10,11,4.0
+review_15_4,1.5,4,20,,8.0
+review_15_8,1.5,8,20,14,

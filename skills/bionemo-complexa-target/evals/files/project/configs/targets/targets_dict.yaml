@@ -1,0 +1,7 @@
+target_dict_cfg:
+  existing_protein:
+    source: custom_targets
+    target_filename: existing
+    target_input: A1-100
+    hotspot_residues: [A10]
+    binder_length: [60, 120]

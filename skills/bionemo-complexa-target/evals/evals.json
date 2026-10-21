@@ -1,0 +1,73 @@
+{
+  "skill_name": "complexa-target",
+  "evals": [
+    {
+      "id": "complexa-target-001",
+      "prompt": "Prepare PD-L1 for a Complexa protein-binder campaign named PDL1_custom. The future structure is PD-L1.pdb in the custom_targets target-data folder. Use chain A, residues 18-134, with hotspots Y56, E58, D61, N63, R113, A121 and Y123 on that chain. Binder lengths should range from 80 to 120 residues. No coordinates are supplied yet. Save the updated project at /workspace/output/project, show what you registered, and explain how a later campaign selects this target and what remains unverified.\n\nUse /workspace/input/project and save deliverables under /workspace/output. Preserve existing definitions and unrelated files. This is offline configuration work; no installed Complexa runtime is required. Do not clone repositories, install packages, download structures or weights, run inference, submit jobs, invent scientific inputs or results, or expose secrets. Reopen written artifacts and show their relevant contents in tool output. Finish with output paths, completed work, and remaining prerequisites.",
+      "expected_output": "The agent edits the staged protein target dictionary under target_dict_cfg, translating amino-acid labels into the chain/residue selectors used by Complexa, preserving existing entries, and reporting the limits of validation.",
+      "assertions": [
+        "The agent reads the staged dictionary and writes /workspace/output/project/configs/targets/targets_dict.yaml while preserving existing entries.",
+        "The PDL1_custom block is under target_dict_cfg with source custom_targets, target_filename PD-L1, target_input A18-134, and binder_length [80,120].",
+        "The hotspot_residues are A56, A58, A61, A63, A113, A121, and A123: chain identifiers rather than amino-acid one-letter codes.",
+        "The final answer shows the written block and downstream task key, and states that residue identities/coordinates remain unverified because no target structure was supplied.",
+        "The agent stayed within the offline task: no package installation, repository cloning, model downloads, inference, job submission, secret disclosure, or fabricated scientific results."
+      ],
+      "expected_skill": "complexa-target",
+      "expected_script": null,
+      "files": [
+        "files/project"
+      ]
+    },
+    {
+      "id": "complexa-target-002",
+      "prompt": "Prepare a Complexa ligand-binding campaign named FAD_custom for a 100-residue binder forming a pocket around the isolated FAD molecule from chain B of reference PDB 1a8p. The future structure FAD_1a8p_B.pdb will be in the custom_targets target-data folder and will already contain that selected ligand. Use the bond information in that file and preserve this exact SMILES: CC1=CC2=C(C=C1C)N(C3=NC(=O)NC(=O)C3=N2)CC(O)C(O)C(O)COP(=O)(O)OP(=O)(O)OCC4OC(N5C=NC6=C5N=CN=C6N)C(O)C4O. No structure is supplied yet. Save the updated project at /workspace/output/project, show what you registered, identify the appropriate downstream pipeline and how it selects this target, and report what remains unverified.\n\nUse /workspace/input/project and save deliverables under /workspace/output. Preserve existing definitions and unrelated files. This is offline configuration work; no installed Complexa runtime is required. Do not clone repositories, install packages, download structures or weights, run inference, submit jobs, invent scientific inputs or results, or expose secrets. Reopen written artifacts and show their relevant contents in tool output. Finish with output paths, completed work, and remaining prerequisites.",
+      "expected_output": "The agent writes a ligand-schema entry under target_dict_cfg with the exact supplied SMILES and explains that structure preparation/coordinate validation remains pending.",
+      "assertions": [
+        "The agent writes FAD_custom under target_dict_cfg in the output ligand_targets_dict.yaml and preserves all existing entries.",
+        "The entry contains the supplied source, target_filename, pdb_id, ligand FAD, binder_length [100], ligand_only=true, use_bonds_from_file=true, and exact uppercase SMILES field.",
+        "The agent identifies configs/search_ligand_binder_local_pipeline.yaml as the consumer and does not invent a required target_input or an unsupported chain field for the ligand schema.",
+        "The final answer shows the block and reports that preparation/validation of the chain-B ligand structure has not been performed.",
+        "The agent stayed within the offline task: no package installation, repository cloning, model downloads, inference, job submission, secret disclosure, or fabricated scientific results."
+      ],
+      "expected_skill": "complexa-target",
+      "expected_script": null,
+      "files": [
+        "files/project"
+      ]
+    },
+    {
+      "id": "complexa-target-003",
+      "prompt": "Prepare a new Complexa AME task named M0024_1nzy_custom using the supplied project. Assess whether the available information is sufficient to register it. If information is missing, document the specific inputs needed in missing_inputs.md and provide an explicitly incomplete YAML entry draft. Preserve existing definitions and activate the new entry only when the supplied inputs fully define it. Explain how registration should be completed.\n\nUse /workspace/input/project and save deliverables under /workspace/output. Preserve existing definitions and unrelated files. This is offline configuration work; no installed Complexa runtime is required. Do not clone repositories, install packages, download structures or weights, run inference, submit jobs, invent scientific inputs or results, or expose secrets. Reopen written artifacts and show their relevant contents in tool output. Finish with output paths, completed work, and remaining prerequisites.",
+      "expected_output": "The agent documents the AME motif_target_dict_cfg schema, requests missing contig_atoms and ligand inputs, and leaves the source registry unchanged rather than inventing a motif.",
+      "assertions": [
+        "The agent reads the staged AME registry and identifies motif_target_dict_cfg and the contig_atoms residue/atom selection string.",
+        "The proposed completion procedure updates motif_target_dict_cfg after the missing curated inputs are supplied. It does not claim that the generic complexa target add command supports AME registration; an explicit dictionary-edit procedure is sufficient.",
+        "The agent writes /workspace/output/missing_inputs.md requesting motif atom selections, ligand identity/selection, and the structure location, with placeholders clearly marked as incomplete.",
+        "The agent does not append an active M0024_1nzy_custom entry or invent motif selections, and preserves the input registry.",
+        "The agent stayed within the offline task: no package installation, repository cloning, model downloads, inference, job submission, secret disclosure, or fabricated scientific results."
+      ],
+      "expected_skill": "complexa-target",
+      "expected_script": null,
+      "files": [
+        "files/project"
+      ]
+    },
+    {
+      "id": "complexa-target-004",
+      "prompt": "How do I run a protein binder design campaign end-to-end using complexa design? I already have my target registered and want to know about sampling parameters, number of designs, and how to submit the job to our SLURM cluster. Use the project documentation and configuration snapshot in /workspace/input/campaign_context. For SLURM, show a generic submission template with placeholders for site-specific settings. Explain only; do not install software, download weights, run inference, submit jobs, or edit target dictionaries.",
+      "expected_output": "The agent explains the design pipeline, sampling parameters, sample count, and a generic SLURM submission template using the supplied project documentation/configuration. It does not invoke complexa-target or use that skill's instructions/references as campaign documentation: the target is already registered, so no target-definition operations are needed. It leaves target dictionaries untouched and clearly marks site-specific settings as placeholders.",
+      "assertions": [
+        "The agent recognized this is about pipeline execution and job submission, not target registration or configuration",
+        "The agent provided guidance about design campaign parameters and SLURM submission without modifying any targets dict files",
+        "The agent did not read or write to configs/targets/targets_dict.yaml, ligand_targets_dict.yaml, or ame_dict_v2.yaml",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace",
+        "The agent uses the supplied project documentation/configuration rather than invoking complexa-target or reading its skill instructions/references; it distinguishes generated sample count from batch size and marks site-specific SLURM settings as placeholders."
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "files": [
+        "files/campaign_context"
+      ]
+    }
+  ]
+}
