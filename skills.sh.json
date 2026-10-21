@@ -48,6 +48,7 @@
         "cdf-orchestration-preflight",
         "cdf-orchestration-setup",
         "cdf-orchestration-write-dag",
+        "cdf-simulation",
         "cdf-video-data-augmentation",
         "holoscan-app-debug-build-run",
         "hsb-app",

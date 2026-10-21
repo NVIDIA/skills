@@ -541,6 +541,18 @@
       }
     },
     {
+      "path": "skills/cdf-simulation",
+      "name": "cdf-simulation",
+      "description": "Component-owned guidance for CDF Simulation requests submitted directly or through Airflow-triggered DIG Flow Catalog prompts — golden THT board, THT pin-geometry variation, good/clean SMT images, structural pose defects, and solder texture defects, from a board USD. Turns one matched prompt into one validated `cdf.CDFJob` build and its compiled JobOrder payload; it never executes a render itself. Requires a caller-supplied board USD and output root, asks for either when missing from an interactive request, and resolves optional details with fixed, documented defaults.",
+      "metadata": {
+        "product.primary": "Physical AI Dataset",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "simulation_engineer,ml_engineer,data_scientist,application_developer,ai_engineer",
+        "discovery.activity_tags": "configure,generate,validate,orchestrate,synthesize"
+      }
+    },
+    {
       "path": "skills/cdf-video-data-augmentation",
       "name": "cdf-video-data-augmentation",
       "description": "Run the CDF Video Data Augmentation Airflow workflow on Kubernetes or OSMO to create Cosmos video-to-video variants and auto-label both source and generated videos. Use for VDA payload authoring, preflight, execution, monitoring, output verification, or result retrieval. OSMO requires external endpoints. Standalone augmentation or auto-labeling configuration belongs to the respective component skill. Not for retrieval-driven CDF pipelines or image-to-video event generation.",
