@@ -1,0 +1,16 @@
+{
+  "source_url": "https://build.nvidia.com/ipd/rfd4-proteina/deploy",
+  "source_section": "Step 3. Test the NIM \u2014 complete PD-1 binder request",
+  "retrieved_on": "2026-10-20",
+  "api_schema_version": "1.0.0",
+  "api_schema_url": "https://build.nvidia.com/ipd/rfd4-proteina",
+  "schema_sha256": "7bedd8a5fc7ee3026000f8ae62365e86dc9f66dd3c5d22eac430d046a38cb9b6",
+  "formatting": "JSON pretty-printed with two-space indentation and a final newline; the parsed request and inline mmCIF match the public example.",
+  "files": [
+    {
+      "path": "assets/requests/16_ppi_binder.json",
+      "source_url": "https://build.nvidia.com/ipd/rfd4-proteina/deploy",
+      "sha256": "a66f921312b91b41b90be6846cd6c4e2f64a3cb1794149009e170e1bbbb51731"
+    }
+  ]
+}

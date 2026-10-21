@@ -1,0 +1,4 @@
+interface:
+  display_name: "RFD4-Proteina NIM"
+  short_description: "Design proteins with hosted or local RFD4-Proteina NIM"
+  default_prompt: "Use $rfd4-proteina-nim to run the public PD-1 binder example with the NVIDIA hosted API and save the structures, sequences, and provenance."

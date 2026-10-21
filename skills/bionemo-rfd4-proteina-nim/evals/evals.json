@@ -1,0 +1,67 @@
+{
+  "skill_name": "rfd4-proteina-nim",
+  "evals": [
+    {
+      "id": "hosted-binder",
+      "prompt": "Use RFD4-Proteina NIM to execute the public PD-1 binder example through NVIDIA's hosted API, using my environment API key. Save the full response, structures, sequences, and actual execution metadata in a new output directory.",
+      "expected_output": "A completed production request with response-derived artifacts and an honest account of model outputs. Missing credentials or service access make this execution case incomplete; an accurately reported blocker does not count as a completed design.",
+      "files": [],
+      "assertions": [
+        "Uses https://health.api.nvidia.com/v1/biology/ipd/rfd4-proteina/generative with a Bearer key from NVIDIA_API_KEY (NGC_API_KEY fallback) and NVCF-POLL-SECONDS: 300; never exposes the key in commands, output, or saved metadata.",
+        "Submits the complete public assets/requests/16_ppi_binder.json annotated mmCIF without replacing it with PDB or an RFdiffusion contigs request.",
+        "Preserves request.json and response.raw, extracts actual designs[].structure.content as mmCIF and full returned sequences, and never presents offline preparation or failed requests as completed inference.",
+        "Reports returned counts, backend, schedule, warnings, and diagnostics without inventing refolding confidence or experimental success. Missing credentials or service errors are reported as blockers, not worked around by changing destinations."
+      ]
+    },
+    {
+      "id": "local-public-deployment",
+      "prompt": "Give me commands to run the released RFD4-Proteina NIM locally on port 8000 using my NGC_API_KEY. I only want instructions, not a deployment or inference call.",
+      "expected_output": "Commands using the public nvcr.io/nim/ipd/rfd4-proteina image, a local cache and allocated GPU, with loopback binding, readiness-body validation, and correct local inference route.",
+      "files": [],
+      "assertions": [
+        "Uses nvcr.io/nim/ipd/rfd4-proteina:latest or a user-selected published digest/tag, and does not require a private repository or deployment script.",
+        "Uses NGC_API_KEY for registry login and container model downloads without printing it; does not require an inference Authorization header for the local NIM.",
+        "Binds the service to loopback, avoids replacing an existing container, and checks JSON true from /v1/health/ready rather than HTTP 200 alone.",
+        "Uses http://localhost:8000/biology/ipd/rfd4-proteina/generative without a /v1 prefix and describes /v1/tasks or /openapi.json for the deployed contract.",
+        "Provides commands without executing Docker or inference, and explains that latest must be resolved to a digest for exact reproduction."
+      ]
+    },
+    {
+      "id": "offline-search",
+      "prompt": "Prepare but do not submit a search request using the public PD-1 RFD4 binder example for three independent searches. Use thinking_medium, batch size 1, base seed 42, and the interchain hydrogen-bond reward. Save the request and explain result counts and replay.",
+      "expected_output": "An offline adaptation of the public fixture with three replicates, a pinned 60-step schedule, compatible checkpoints and reward settings, and no network activity.",
+      "files": [],
+      "assertions": [
+        "Preserves the complete public input mmCIF and sets sampling.num_replicates=3, sampling.batch_size=1, and sampling.seed=42.",
+        "Uses thinking_medium with checkpoints [0,30,60] and weights named by actual metric.output_key entries, gated by reward_metrics_tags.",
+        "Explains that survivors and retained intermediates can make design counts differ from replicate counts and checks the metric chain context.",
+        "Explains that replay requires the full search configuration and that search_rollout_seed is provenance, not a standalone replay handle.",
+        "Uses --dry-run without requiring credentials, probing the endpoint, or submitting a request; does not claim the adaptation has been validated by a live run."
+      ]
+    },
+    {
+      "id": "condition-spec",
+      "prompt": "Prepare an RFD4 condition_spec request from my target.cif and an existing JSON condition specification. Do not send it. The JSON names target.cif and uses C_CRD, C_SEQ, and C_HOT.",
+      "expected_output": "A request carrying the user-supplied parsed spec and full inline mmCIF attachments, without inventing targets or changing biological conditions.",
+      "files": [],
+      "assertions": [
+        "Reads the supplied files or asks for missing inputs without inventing their contents or residue selections.",
+        "Uses input.format=condition_spec, input.spec as an object, and input.files with bare filenames and complete contents; verifies referenced files are attached.",
+        "Uses generation for a protein binder when appropriate without inventing a binder task or top-level contigs/hotspot_res fields.",
+        "Does not submit, require an API key for offline preparation, or claim preflight proves scientific correctness."
+      ]
+    },
+    {
+      "id": "oracle-and-pending",
+      "prompt": "My hosted RFD4 job returned HTTP 202 and a request ID but no designs. I also want pLDDT from the default deployment. What should happen next?",
+      "expected_output": "A pending result with preserved diagnostics, no invented completion route or repeated POST, and accurate limits on refolding metrics.",
+      "files": [],
+      "assertions": [
+        "Treats HTTP 202 as pending and preserves the request ID and raw response without claiming a completed design.",
+        "Does not invent a polling URL or automatically repeat the POST; requires a documented retrieval mechanism for the deployment.",
+        "Explains that the public API has no built-in refolding oracle, checks model.oracle and actual predictor results, and does not infer pLDDT from generation or geometry.",
+        "Describes independent refolding or an operator-configured oracle as separate work when requested, without claiming either has already run."
+      ]
+    }
+  ]
+}
