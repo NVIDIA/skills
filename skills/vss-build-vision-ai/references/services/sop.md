@@ -100,7 +100,7 @@ VSS_AGENT_PKG=vss_agents            # develop ships video_analytics under vss_ag
 ```
 
 Do not pin the `vss-va-mcp` image here — it comes from the Foundation (stock
-`ghcr.io/nvidia-ai-blueprints/vss/vss-agent:develop-latest`). The `patches/` files
+`${VSS_AGENT_IMAGE:-${VSS_CONTAINER_REGISTRY:-nvcr.io/nvidia/vss-core}/vss-agent}:${VSS_CONTAINER_TAG:-${VSS_AGENT_VERSION:-3.3.0}}`). The `patches/` files
 (`ds-sop.yml`, `vss-va-mcp.yml`, `logstash.yml`) are generated into `_builds/<name>/`, gitignored.
 
 ## Configuration knobs
@@ -151,10 +151,12 @@ the image's other `video_analytics` tools and targets the old package layout):
    wrongly-guessed package name (e.g. `agent`) can mount under a directory that does not exist on
    disk, and Docker then creates an empty `agent/` that shadows the real package, so `vss-va-mcp`
    crash-loops with `Unknown included functions`. Pick the real on-disk directory (has
-   `video_analytics/`, not a symlink) instead:
+   `video_analytics/`, not a symlink) instead. Export any image, registry, or tag
+   overrides used by the build before running this probe; Compose's `--env-file`
+   does not set shell variables:
    ```bash
    docker run --rm --entrypoint /vss-agent/.venv/bin/python3 \
-     ghcr.io/nvidia-ai-blueprints/vss/vss-agent:develop-latest -c '
+     "${VSS_AGENT_IMAGE:-${VSS_CONTAINER_REGISTRY:-nvcr.io/nvidia/vss-core}/vss-agent}:${VSS_CONTAINER_TAG:-${VSS_AGENT_VERSION:-3.3.0}}" -c '
    import os, sys, sysconfig
    # check purelib AND platlib (the package may live in either); exit non-zero if neither resolves
    for sp in (sysconfig.get_paths()["purelib"], sysconfig.get_paths()["platlib"]):
@@ -165,7 +167,7 @@ the image's other `video_analytics` tools and targets the old package layout):
    sys.stderr.write("no on-disk video_analytics package (vss_agents/ or agent/) under purelib/platlib\n")
    raise SystemExit(1)'
    ```
-   Set `VSS_AGENT_PKG` (`vss_agents` on `develop-latest` — there is no on-disk `agent/` package) and
+   Set `VSS_AGENT_PKG` and
    `VSS_AGENT_SITE_PACKAGES` from the output. The probe exits non-zero (empty stdout) if neither
    resolves — treat that as a hard error, never set `VSS_AGENT_PKG` empty.
 2. **Locate the SOP additions** in the downloaded `tools.py` — a self-contained block of the
@@ -196,12 +198,12 @@ the image's other `video_analytics` tools and targets the old package layout):
    Logstash pipeline not registered (`deploy-ds-sop.md`).
 
 The image is the Foundation's stock `vss-va-mcp`
-(`ghcr.io/nvidia-ai-blueprints/vss/vss-agent:develop-latest`); verify `VSS_AGENT_SITE_PACKAGES`
+(`${VSS_AGENT_IMAGE:-${VSS_CONTAINER_REGISTRY:-nvcr.io/nvidia/vss-core}/vss-agent}:${VSS_CONTAINER_TAG:-${VSS_AGENT_VERSION:-3.3.0}}`); verify `VSS_AGENT_SITE_PACKAGES`
 (python minor) against it. The adaptation is mostly a module move + graft, but a few caveats
 need handling:
 
-- **Register the SOP index in the `es_client` whitelist.** The stock `es_client` on
-  `develop-latest` doesn't know the SOP captions index, so `get_sop_*` raises `ValueError` on the
+- **Register the SOP index in the `es_client` whitelist.** If the selected image's stock
+  `es_client` doesn't know the SOP captions index, `get_sop_*` raises `ValueError` on the
   index whitelist (`get_index`) *before* reaching ES. The release `es_client.py` adds it
   (`vision_llm_messages → mdx-vlm-captions-*` + `NO_PREFIX_INDEXES`). Fix by **either** registering
   the SOP index from within `sop_tools.py` (idempotent, prefix-aware — avoids a third **module** mount, verified

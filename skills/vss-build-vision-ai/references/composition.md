@@ -246,7 +246,7 @@ include:
 ```
 
 The ordered `path` list merges the patch into the included root model before
-including it in the build. Use Docker Compose 2.20.3 or newer.
+including it in the build. Use Docker Compose v2.39.1 or newer, matching the release prerequisites.
 
 Create a `.yml` patch under `patches/` only when:
 
@@ -375,7 +375,7 @@ than left to `override.env`: `containers.env` has already derived every
 the shell environment outranks every `--env-file`. A build that records the tag
 but resolves without the export gets `vss-agent-ui` — the one image whose
 Compose default reads the common knob directly — on the requested tag and every
-other image on `develop-latest`; `--expect-container-tag` fails on exactly that
+other image on the checkout default (`3.3.0` on `release/3.3.0`); `--expect-container-tag` fails on exactly that
 mixture. Service-specific `VSS_*_TAG` pins and `VSS_CONTAINER_TAG_SUFFIX` still
 supersede or augment the common tag; see the SBSA rules in
 [`sizing.md`](sizing.md).

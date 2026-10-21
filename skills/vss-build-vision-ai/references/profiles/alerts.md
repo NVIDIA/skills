@@ -83,7 +83,7 @@ build whose UI still exposes CV Alerts Verification.
 
 ## Efficient Video Sampling
 
-EVS++ is optional and disabled by default. When the user requests EVS++ for
+Adaptive EVS is optional and disabled by default. When the user requests Adaptive EVS for
 alert verification, add this tested set to the build's `override.env`:
 
 ```ini
@@ -97,7 +97,7 @@ Cosmos 3 Super Reasoner FP8 VLM on RTX PRO 6000. It reduced VLM latency by
 approximately 20% with an approximately 1% accuracy decrease. Treat those
 figures as workload-specific, not guarantees. Tune
 `VLLM_EVS_SIMILARITY_THRESHOLD` for the input streams' accuracy/latency
-tradeoff. Do not enable EVS++ unless the user requests it.
+tradeoff. Do not enable Adaptive EVS unless the user requests it.
 
 ## Stock readiness checks
 

@@ -27,7 +27,7 @@
     "expected_behavior": [
       "Activates vss-build-vision-ai.",
       "Exports VSS_CONTAINER_TAG=3.4.0 for every docker compose config that loads containers.env, records it in override.env, and names it before deploying.",
-      "Leaves deploy/docker/containers.env unmodified, and resolves every managed image to 3.4.0 rather than develop-latest."
+      "Leaves deploy/docker/containers.env unmodified, and resolves every managed image to 3.4.0 rather than the checkout default (3.3.0 on release/3.3.0)."
     ]
   },
   {
@@ -38,7 +38,7 @@
     "expected_behavior": [
       "Activates vss-build-vision-ai.",
       "Does not ask for a container image tag, export VSS_CONTAINER_TAG, or write it to override.env.",
-      "Resolves the managed images to the containers.env develop-latest default."
+      "Resolves the managed images to the containers.env 3.3.0 default."
     ]
   },
   {
@@ -56,11 +56,11 @@
     "id": "build-base-gb300-release-tag",
     "question": "Deploy the VSS base profile on DGX Station GB300 using container image tag 3.4.0.",
     "expected_skill": "vss-build-vision-ai",
-    "ground_truth": "Derive the SBSA tags from the selected common tag rather than from develop-latest.",
+    "ground_truth": "Derive the SBSA tags from the selected common tag rather than from the checkout default (3.3.0 on release/3.3.0).",
     "expected_behavior": [
       "Activates vss-build-vision-ai.",
       "Exports VSS_CONTAINER_TAG=3.4.0 and derives the SBSA tags from it, writing VSS_RT_VLM_TAG=3.4.0-sbsa to override.env without duplicating the suffix.",
-      "Resolves rtvi-vlm to 3.4.0-sbsa and the unsuffixed managed images to 3.4.0, with no image left on develop-latest."
+      "Resolves rtvi-vlm to 3.4.0-sbsa and the unsuffixed managed images to 3.4.0, with no image left on the checkout default (3.3.0 on release/3.3.0)."
     ]
   },
   {
@@ -112,11 +112,11 @@
     "id": "build-base-harness-default-ref",
     "question": "Deploy the VSS base profile with the NemoClaw harness.",
     "expected_skill": "vss-build-vision-ai",
-    "ground_truth": "No harness ref was requested, so the sandbox builds from develop.",
+    "ground_truth": "No harness ref was requested, so select and stage release/3.3.0.",
     "expected_behavior": [
       "Activates vss-build-vision-ai.",
-      "Does not ask for a harness ref, create a harness worktree, or run stage_vss_src.py.",
-      "Runs the NemoClaw notebook with VSS_REPO_DIR set to the checkout root."
+      "Does not ask for a harness ref; resolves release/3.3.0 from origin, creates its build-local harness worktree, and runs that revision's stage_vss_src.py.",
+      "Runs the NemoClaw notebook with VSS_REPO_DIR set to the release harness worktree, and reports the selected ref and resolved SHA."
     ]
   }
 ]
