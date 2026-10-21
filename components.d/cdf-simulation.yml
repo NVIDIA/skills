@@ -1,8 +1,0 @@
-name: CDF Simulation
-repo: NVIDIA/cdf-simulation
-description: Author validated Cosmos Data Factory simulation jobs for PCB-AOI synthetic data generation and automated DIG Flow Catalog requests.
-skills:
-  - path: skills/cdf-simulation/
-    catalog_dir: cdf-simulation
-links:
-  discussions: false
