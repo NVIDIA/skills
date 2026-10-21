@@ -144,8 +144,8 @@ reserves `fraction × total` without subtracting co-residents.
 SBSA tags are also part of the build override. Because `containers.env` is
 expanded before `override.env`, setting only `VSS_CONTAINER_TAG_SUFFIX=-sbsa`
 in the build override is too late to recompute per-image tags. Read the
-effective `VSS_CONTAINER_TAG` — the tag the build selected, or `develop-latest`
-when it selected none — and derive `<sbsa-tag>` idempotently: if the tag
+effective `VSS_CONTAINER_TAG` — the tag the build selected, or the default from this checkout's
+`containers.env` (`3.3.0` on `release/3.3.0`) when it selected none — and derive `<sbsa-tag>` idempotently: if the tag
 already ends in `-sbsa`, use it unchanged; otherwise append `-sbsa` exactly
 once. Write that concrete `<sbsa-tag>` for the services the Foundation uses:
 

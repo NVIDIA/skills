@@ -63,7 +63,7 @@ without requiring credentials, probing services, or changing files:
 | `scripts/resolve_service_graph.py` | This file and `references/composition.md`: enforce service ownership and derive analytics readiness targets. |
 | `scripts/render_warehouse_configurator_env.py` | `references/profiles/warehouse.md`: materialize the warehouse configurator environment. |
 | `scripts/validate_warehouse_env.py` | `references/profiles/warehouse.md`: enforce warehouse constraints that Compose cannot express. |
-| `scripts/stage_vss_src.py` | Snapshots a checkout into `.openclaw/` / `.hermes/` so the sandbox image is built from it instead of `develop`. Run only for a [harness source ref](#harness-source-ref), from that ref's worktree; never for a default build. |
+| `scripts/stage_vss_src.py` | Snapshots a checkout into `.openclaw/` / `.hermes/` so the sandbox image is built from it instead of `develop`. Run for the selected [harness source ref](#harness-source-ref), including the release default, from that ref's worktree. |
 | `scripts/sync_skills.py` | Harness runtime utility used by `.openclaw/` and `.hermes/` to activate operation Skills; not part of the build workflow. |
 
 ## Routing
@@ -252,13 +252,13 @@ After Q2b, the selected capabilities **are** the required-capability set. Select
 
 An input of its own, orthogonal to the capability set and to the harness:
 `deploy/docker/containers.env` derives every managed first-party image tag from
-one knob, `VSS_CONTAINER_TAG`, defaulting to `develop-latest`. A build that must
-run a release's images selects that tag. **Never edit `containers.env`** — it is
-checked in and shared by every deployment on the host.
+one knob, `VSS_CONTAINER_TAG`, defaulting to `3.3.0` on `release/3.3.0`. A build
+that must run another image version selects that tag. **Never edit
+`containers.env`** — it is checked in and shared by every deployment on the host.
 
 Take the tag from the first source that answers, and do not ask when one does:
 
-1. The request — "deploy base at 3.4.0", "use image tag `<tag>`".
+1. The request — "deploy base at 3.3.0", "use image tag `<tag>`".
 2. `VSS_CONTAINER_TAG` already exported in the environment.
 3. Neither: select nothing and let `containers.env` default. This is the
    ordinary case and nothing below applies to it.
@@ -270,7 +270,7 @@ version. Do not switch to an older release, legacy image, or another checkout to
 work around a pull or startup failure; diagnose the failure and report a blocker.
 
 A selected tag must be non-empty once trimmed; an empty or whitespace-only
-value is a blocker to report, never a silent fall back to `develop-latest`.
+value is a blocker to report, never a silent fall back to the checkout default.
 Record it as `VSS_CONTAINER_TAG` in `override.env`, name it in the Step 6
 diagram and the final summary, and resolve with it **exported** (Step 8).
 
@@ -278,9 +278,9 @@ diagram and the final summary, and resolve with it **exported** (Step 8).
 `containers.env` before `override.env`, so every per-service `VSS_*_TAG` is
 already fixed by the time the build layer is read. Only `vss-agent-ui`, whose
 Compose default reads `VSS_CONTAINER_TAG` directly, would move — leaving one
-image on the requested tag and the rest on `develop-latest`. The shell export
-outranks every `--env-file` layer, which is what makes the knob take effect;
-the `override.env` line is the build's record of the decision, and Step 8
+image on the requested tag and the rest on the checkout default (`3.3.0` on
+this branch). The shell export outranks every `--env-file` layer, which makes
+the knob take effect; the `override.env` line is the build's record of the decision, and Step 8
 re-exports from it when the shell is silent.
 
 Two things still supersede the common tag, by design:
@@ -296,8 +296,9 @@ Two things still supersede the common tag, by design:
 An input of its own, like the container image tag and independent of it: the
 revision of this repo the NemoClaw sandbox image is built from — its skills,
 the `vss` CLI, the OpenClaw/Hermes plugin and workspace docs. The sandbox
-Dockerfiles fetch `develop` by default, so without a ref a harness always gets
-develop's skills and CLI **whatever the checkout or the image tag says**.
+Dockerfiles fetch `develop` unless a snapshot is staged. On `release/3.3.0`,
+this Skill selects and stages `release/3.3.0` by default so the harness uses
+the release's skills and CLI.
 Applies only when Q3 selected NemoClaw.
 
 Take the ref from the first source that answers, and do not ask when one does:
@@ -305,10 +306,10 @@ Take the ref from the first source that answers, and do not ask when one does:
 1. The request — "harness at `nightly-20260928`", "harness ref `v3.3.0`",
    "deploy base with NemoClaw from `<tag or sha>`".
 2. `VSS_HARNESS_REF` already exported in the environment.
-3. Neither: select nothing. The sandbox builds from `develop`, nothing is
-   staged, and nothing below applies. This is the ordinary case.
+3. Neither: select `release/3.3.0`. Resolve and stage it using the same
+   procedure below as an explicit ref; do not use the Dockerfile's `develop` fallback.
 
-**Never derive it from the container image tag.** `3.4.0` or
+**Never derive it from the container image tag.** `3.3.0` or
 `develop-<sha12>` names images; a harness ref names a git revision. When a user
 wants both pinned they name both, and the summary shows both.
 
@@ -447,8 +448,8 @@ After the selection, ask in one typed-values message only for that provider's st
    ```
 
    A non-zero exit is a blocker: fail clearly instead of writing or deploying an over-pruned build.
-8. Generate `resolved.yml` with `docker compose config` using the ordered env layers in `references/composition.md` — or, for `warehouse`, the env layers and resolve pipeline in `references/profiles/warehouse.md` — normalize dangling optional dependencies with `scripts/normalize_resolved_yml.py`, then run the mandatory check/create gate in `references/data-directory.md` on every build, deploy or not — it **blocks** a `warehouse` build whose `${VSS_DATA_DIR}` is not the supplied app-data bundle — it prepares the external `${VSS_DATA_DIR}` any later bring-up needs (this agent's or a hand-run `docker compose up`) and never touches the repo tree. When the effective `COMPOSE_PROFILES` includes an RT-CV perception key (`perception-alerts`, `perception-2d-fusion`), no host-side or agent detector staging is required: the RT-CV container downloads the detector ONNX at first boot (ds-start phase 0) from its mounted `models-download.json` into the world-writable `${VSS_DATA_DIR}/models` the gate just created. A selected container image tag reaches those layers only as an export — `export VSS_CONTAINER_TAG=<tag>` before `config`, then `--expect-container-tag <tag>` on `scripts/validate_resolved_yml.py`, which blocks a build whose images stayed on `develop-latest` ([Container image tag](#container-image-tag)). `config` is the only command in this lifecycle that reads `containers.env`; the deploy runs from the self-contained `resolved.yml`. Reject stale placeholders and invalid checked-in bind sources with `scripts/validate_resolved_yml.py`; if validation finds real unresolved `${...}` Compose interpolation, add only the missing concrete values to `override.env` and regenerate before proceeding. Do not count escaped container-shell variables such as `$${HOST_IP}` as unresolved Compose interpolation. Validate the selected keys, services, images, required peers, GPU placement, utilization, and requested success checks against that exact file. Derive analytics readiness targets from the resolved service names with `scripts/resolve_service_graph.py`'s `analytics_readiness_targets`; never probe Agent `:8000` or VA-MCP `:9901` when their services are absent.
-9. If deployment was requested, deploy the exact `_builds/<name>/resolved.yml` validated in the previous step, refresh its registry images even when their tags already exist locally, use `references/readiness.md` with the matching profile checks, and follow `references/deployment.md` for the resolved-Compose lifecycle. When a source must be provisioned into an Agent-backed or headless deployed build, follow `vss-manage-video-io-storage` [`provision-vios-source.md`](../operations/vss-manage-video-io-storage/references/provision-vios-source.md) — **except for `warehouse`, which registers its own sources automatically.** Use `vss vios add` on both builds that reached Q3 and headless builds that skipped it. The enabled items in the notification config the build mounts are the fan-out a registered source gets, asynchronously and without a caller. When a search query round-trip is then requested against the deployed build, run `vss configure --base-url <build-origin>` (the fronting `http://$HOST_IP:$HAPROXY_HOST_PORT`) through the project-local entry point (`uv run --project <repo>/libs/vss vss …`, per `references/deployment_resolution.md`) — not a bare `vss` — then defer entirely to `vss-search-archive` for decomposition, mode, and the query itself. For stop or cleanup, follow `references/teardown.md`: remove project volumes by default and preserve model caches only when the user explicitly requests it.
+8. Generate `resolved.yml` with `docker compose config` using the ordered env layers in `references/composition.md` — or, for `warehouse`, the env layers and resolve pipeline in `references/profiles/warehouse.md` — normalize dangling optional dependencies with `scripts/normalize_resolved_yml.py`, then run the mandatory check/create gate in `references/data-directory.md` on every build, deploy or not — it **blocks** a `warehouse` build whose `${VSS_DATA_DIR}` is not the supplied app-data bundle — it prepares the external `${VSS_DATA_DIR}` any later bring-up needs (this agent's or a hand-run `docker compose up`) and never touches the repo tree. When the effective `COMPOSE_PROFILES` includes an RT-CV perception key (`perception-alerts`, `perception-2d-fusion`), no host-side or agent detector staging is required: the RT-CV container downloads the detector ONNX at first boot (ds-start phase 0) from its mounted `models-download.json` into the world-writable `${VSS_DATA_DIR}/models` the gate just created. A selected container image tag reaches those layers only as an export — `export VSS_CONTAINER_TAG=<tag>` before `config`, then `--expect-container-tag <tag>` on `scripts/validate_resolved_yml.py`, which blocks a build whose images stayed on the checkout default instead of the selected tag ([Container image tag](#container-image-tag)). `config` is the only command in this lifecycle that reads `containers.env`; the deploy runs from the self-contained `resolved.yml`. Reject stale placeholders and invalid checked-in bind sources with `scripts/validate_resolved_yml.py`; if validation finds real unresolved `${...}` Compose interpolation, add only the missing concrete values to `override.env` and regenerate before proceeding. Do not count escaped container-shell variables such as `$${HOST_IP}` as unresolved Compose interpolation. Validate the selected keys, services, images, required peers, GPU placement, utilization, and requested success checks against that exact file. Derive analytics readiness targets from the resolved service names with `scripts/resolve_service_graph.py`'s `analytics_readiness_targets`; never probe Agent `:8000` or VA-MCP `:9901` when their services are absent.
+9. If deployment was requested, deploy the exact `_builds/<name>/resolved.yml` validated in the previous step, refresh its registry images even when their tags already exist locally, use `references/readiness.md` with the matching profile checks, and follow `references/deployment.md` for the resolved-Compose lifecycle. When a source must be provisioned into an Agent-backed or headless deployed build, follow `vss-manage-video-io-storage` [`provision-vios-source.md`](../operations/vss-manage-video-io-storage/references/provision-vios-source.md) — **except for `warehouse`, which registers its own sources automatically.** Use `vss vios add` on both builds that reached Q3 and headless builds that skipped it. The enabled items in the notification config the build mounts are the fan-out a registered source gets, asynchronously and without a caller. When a search query round-trip is then requested against the deployed build, run `vss configure --base-url <build-origin>` (the fronting `http://$HOST_IP:$HAPROXY_HOST_PORT`) through the project-local entry point (`uv run --project <repo>/libs/vss vss …`, per `references/deployment_resolution.md`) — not a bare `vss` — then defer entirely to `vss-search-archive` for decomposition, mode, and the query itself. For stop or cleanup, follow `references/teardown.md` only on explicit user request: remove project volumes by default and preserve model caches only when the user explicitly requests it. The cache-preserving path's catch-all `docker rm -f` matches VSS container-name prefixes, not the Compose project, so it also removes other VSS deployments' containers on the same host — before running it, list the matching containers, warn the user, and get confirmation when the host may be shared.
 10. When the harness is NemoClaw, bring it up **after** the readiness gate passes, per `references/agent-harness.md`: resolve the deployed origin, then execute the checked-in `deploy/docker/scripts/deploy_nemoclaw.ipynb` through `deploy/docker/scripts/run_setup_notebook.py`. That notebook is the single source of host-side harness logic — never reimplement its onboarding, policy, skill-install, or workspace steps, and never hand-run the NemoClaw CLI in its place. Pass `NEMOCLAW_RECREATE_SANDBOX=1`: onboard is the only step that applies the harness's provider, endpoint, model and key, so a reused sandbox would keep whatever it was onboarded with and ignore Q3a. For the harness's own LLM, pass exactly the provider and values [Q3a](#harness-model--q3a) settled. A required credential should have blocked at Step 3; reaching here without it is still a blocker to report, never grounds to silently substitute another provider. In the final summary, link the Agent UI's token-free origin and hand over the recipe for the authenticated URL — `nemoclaw <name> gateway-token --quiet` on the deployment host, then that origin plus `/#token=<token>` — per the exact form in `references/agent-harness.md`; never expose its `#token=` fragment in the response, and never send the user to the setup log for it, which carries the fragment redacted. Also **name the sandbox** (`NEMOCLAW_SANDBOX_NAME`, as the notebook echoes it back) alongside that link: it is the handle the harness's own status and destroy commands take, and nothing else in the summary carries it. Say there too when the bring-up rebuilt an existing sandbox of that name, discarding its agent sessions. Harness and build are independent lifecycles — nothing in Compose reaches the sandbox — so tearing down the build starts with the NemoClaw harness section of `references/teardown.md`, which destroys the sandbox and stops its dashboard relay before the Compose project comes down.
 
    When the build includes `vss-ui` and the default OpenClaw runtime, also link

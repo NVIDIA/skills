@@ -588,7 +588,7 @@ confirms it succeeded.
 
 ## Canonical version matrix
 
-Single source of truth for **every** dependency the deploy assumes. Sourced from the [VSS prerequisites page](https://docs.nvidia.com/vss/3.4.0/prerequisites.html); update this table when the upstream blueprint docs change.
+Single source of truth for **every** dependency the deploy assumes. Checked against the [VSS prerequisites](https://docs.nvidia.com/vss/latest/prerequisites.html) and this checkout's [`docs/prerequisites.mdx`](../../../docs/prerequisites.mdx). Keep the matrix aligned with this release; the platform-specific checks also record deployment policies such as the Brev driver minimum and Kubernetes support.
 
 | Component | Required version | Notes |
 |---|---|---|
@@ -603,6 +603,7 @@ Single source of truth for **every** dependency the deploy assumes. Sourced from
 | NVIDIA Container Toolkit | `1.17.8+` | |
 | Docker | `28.3.3+` **and** `< 29.5.0` | pin with [`pin_docker_version.sh`](#docker-pin), which owns the exact versions. Upper bound: `29.5.0`+ breaks NGC image pulls — on a host that cannot be downgraded, see [Docker 29.5.0+ workaround](#docker-2950-workaround) |
 | Docker Compose | `v2.39.1+` | |
+| Docker Buildx | `>= 0.23.0` and `< 0.35.0` | `0.23.0` is the known working version; verify with `docker buildx version` |
 | Kubernetes — where it is supported at all | GPU Operator `v26.3.3`, K8s `v1.29`–`v1.36` | x86_64 and ARM SBSA only. Every Tegra platform (IGX Thor T7000/T5000, Jetson AGX Orin, AGX Thor, Orin NX), DGX Spark, GH200/GB200 and DGX Station GB300 are **Docker Compose only** — Helm paths are not validated there |
 | NGC CLI | `4.10.0+` | follow `ngc.md` |
 

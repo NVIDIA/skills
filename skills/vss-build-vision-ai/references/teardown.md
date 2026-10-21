@@ -165,6 +165,13 @@ stack, especially when switching profiles (`base` → `search`, alerts
 verification → alerts real-time). Compose profile flags only start selected
 services; they do not stop services from a previous deployment.
 
+The catch-all `docker rm -f` below selects containers by VSS name prefix, not
+by Compose project, so it also removes containers belonging to any other VSS
+deployment on the host. Run it only on explicit user request; when the host may
+be shared, first list the matching containers (the same `docker ps -a … | grep
+-E …` without `xargs`), show them to the user, and proceed only after they
+confirm.
+
 ```bash
 # Tear down by the selected project name. This catches every
 # same-project container/network regardless of which resolved.yml is on disk.
