@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 420,
-  "result_row_count": 3949,
+  "skill_count": 423,
+  "result_row_count": 3979,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -244,6 +244,66 @@
       "component": "BioNeMo Open Models",
       "has_results": true,
       "average_uplift_pct": 15.57
+    },
+    {
+      "skill": "complexa-evaluate-pdbs",
+      "evaluation_date": "2026-10-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:0ffad3322b2d22337929bd98734c46260113b2d8ba6f217637a68462c578c8c9",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "has_results": true,
+      "average_uplift_pct": 34.03
+    },
+    {
+      "skill": "complexa-sweep",
+      "evaluation_date": "2026-10-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:b6689c4d32bb5ad0652952057f902b7baa1395cdfd9657997e9b794ba22f3510",
+      "validation_status": null,
+      "tasks": 6,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "has_results": true,
+      "average_uplift_pct": 5.4
+    },
+    {
+      "skill": "complexa-target",
+      "evaluation_date": "2026-10-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:16323930db417ff3f6af55867160aa4eae9f6fbe5929408117c4a7df6d112418",
+      "validation_status": null,
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "has_results": true,
+      "average_uplift_pct": 5.0
     },
     {
       "skill": "diffdock-nim",
@@ -9357,6 +9417,276 @@
       "num": null,
       "agent": "codex",
       "score_pct": 94.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 75.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 61.3,
+      "uplift_pct": 34.2
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 46.3,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-evaluate-pdbs",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 3.3
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 26.7
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 77.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.9,
+      "uplift_pct": 0.3
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.8,
+      "uplift_pct": 2.1
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-sweep",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 73.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 50.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 2.5
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 2.5
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-complexa-target",
+      "component": "BioNeMo Open Models",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 74.0,
       "uplift_pct": null
     },
     {
