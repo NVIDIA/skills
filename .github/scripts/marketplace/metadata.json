@@ -385,6 +385,18 @@
       }
     },
     {
+      "path": "skills/bionemo-rfd4-proteina-nim",
+      "name": "rfd4-proteina-nim",
+      "description": "Run RFD4-Proteina NIM for joint protein structure and sequence design, conditioned generation, and reward-guided search using the NVIDIA hosted API or a self-hosted NIM. Not for the older RFdiffusion contigs API.",
+      "metadata": {
+        "product.primary": "BioNeMo NIMs",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,application_developer,ai_engineer",
+        "discovery.activity_tags": "generate,inference,deploy,evaluate,inspect"
+      }
+    },
+    {
       "path": "skills/bionemo-rfdiffusion-nim",
       "name": "rfdiffusion-nim",
       "description": "Run RFDiffusion protein backbone design via NVIDIA NIM. Use for de novo protein backbones, motif scaffolding, binder design, hotspot residues, contigs syntax, diffusion steps, hosted NVIDIA API calls, local Docker deployment, and PDB backbone outputs for ProteinMPNN sequence design.\n",

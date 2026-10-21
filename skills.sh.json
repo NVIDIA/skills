@@ -350,6 +350,7 @@
         "openfold2-nim",
         "openfold3-nim",
         "proteinmpnn-nim",
+        "rfd4-proteina-nim",
         "rfdiffusion-nim",
         "tao-run-inference-service"
       ]
