@@ -445,6 +445,18 @@
       }
     },
     {
+      "path": "skills/cdf-autonomous-vehicle-dataset-generation",
+      "name": "cdf-autonomous-vehicle-dataset-generation",
+      "description": "Prepare payloads, run and monitor the Autonomous Vehicle Dataset Generation Airflow workflow, and inspect results for driving-clip retrieval and Cosmos3-Nano variants. Existing clips with no retrieval use cdf-video-data-augmentation; seed-image event or anomaly generation uses cdf-event-video-generation.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "av-simulation",
+        "audience": "data_engineer,ml_engineer,simulation_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "orchestrate,configure,monitor,inspect,generate"
+      }
+    },
+    {
       "path": "skills/cdf-curation-and-retrieval",
       "name": "cdf-curation-and-retrieval",
       "description": "NVIDIA CDF curation and retrieval. Cosmos Curator video and image pipelines (split, dedup, shard, annotate) with filtering, captioning, and embedding. Cosmos Dataset Search ingest, search, and capability qualification. TAO data mining embeddings and neighbor matching. Ships domain event catalogs, including workplace employee conduct monitoring, which requires legal review before use. Use when a request names Cosmos Curator, Cosmos Dataset Search, CDF, or their Make and CLI surfaces. Not for model training, orchestration, or unrelated dataset questions.",
@@ -454,6 +466,90 @@
         "catalog.subdomain": "physical-ai",
         "audience": "data_engineer,ml_engineer,ai_engineer,developer,production_operator",
         "discovery.activity_tags": "configure,operate,validate,extract,transform"
+      }
+    },
+    {
+      "path": "skills/cdf-defect-image-generation",
+      "name": "cdf-defect-image-generation",
+      "description": "Generate synthetic PCB inspection images on Kubernetes with the SMT Defect Image Generation (DIG) DAG in CDF Orchestration. The DAG renders components in simulation, turns the renders into realistic golden images (sim2real), and uses AnomalyGen to add texture defects such as solder bridges, excess solder or missing components. Simulation can also render shift, tombstone and sideflip pose defects. Use it to build DIG payloads, pick a pipeline mode (full, simulation, sim2real or defect-only), check GPU readiness, follow a run, and match each defect image to its golden and simulated source. Not for running Simulation, Augmentation or AnomalyGen on their own.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,simulation_engineer,ml_engineer,devops_engineer,data_scientist",
+        "discovery.activity_tags": "generate,orchestrate,synthesize,configure,validate"
+      }
+    },
+    {
+      "path": "skills/cdf-event-video-generation",
+      "name": "cdf-event-video-generation",
+      "description": "Run the CDF Orchestration Event Video Generation DAG on Kubernetes or OSMO - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Covers both event_video_generation_dag_k8s and the external-endpoints-only event_video_generation_dag_osmo. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is cdf-image-attribute-augmentation) and not for video style transfer.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,data_engineer,platform_engineer",
+        "discovery.activity_tags": "generate,orchestrate,synthesize,configure,monitor"
+      }
+    },
+    {
+      "path": "skills/cdf-image-attribute-augmentation",
+      "name": "cdf-image-attribute-augmentation",
+      "description": "Run the CDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "data_engineer,ml_engineer,ai_engineer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "orchestrate,generate,configure,monitor,operate"
+      }
+    },
+    {
+      "path": "skills/cdf-orchestration-preflight",
+      "name": "cdf-orchestration-preflight",
+      "description": "Set up missing Linux prerequisites and audit whether a Cosmos Data Factory (CDF) Orchestration checkout and its Kubernetes or OSMO environment are ready to install the controller and run every packaged DAG. Use for prerequisite, pre-setup, Kubernetes, GPU, RWX/NFS, credential, controller-readiness, and quick-start checks. Not for deploying the controller (use cdf-orchestration-setup, which calls this audit first), authoring payloads, or running workflows.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "platform_engineer,devops_engineer,it_operations,solutions_architect,developer",
+        "discovery.activity_tags": "validate,configure,assess,get_started,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/cdf-orchestration-setup",
+      "name": "cdf-orchestration-setup",
+      "description": "Use when the user asks to deploy, install, reinstall, redeploy, upgrade, or connect to the CDF Orchestration Airflow controller. Owns the end-to-end deploy sequence and runs the cdf-orchestration-preflight audit first. Covers make setup, controller image builds, Helm installation, controller connection, port-forwarding, and post-install verification. Not for standalone prerequisite audits or remediation, K3s environments, authoring DAGs, or running workflow payloads.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "devops_engineer,platform_engineer,application_developer,solutions_architect,developer",
+        "discovery.activity_tags": "deploy,configure,validate,orchestrate,integrate"
+      }
+    },
+    {
+      "path": "skills/cdf-orchestration-write-dag",
+      "name": "cdf-orchestration-write-dag",
+      "description": "Use when a user describes a custom CDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG in airflow/dags/workflows/ covers, and asks for a new Kubernetes DAG. Also use to check that a generated or existing DAG's model/container/prompt choices match an external spec document (e.g. a CDF `launchable.md`). Not for requests that an existing DAG already covers, including payload-only changes such as different inputs, endpoints, models, or variant counts — route those to the matching workflow skill, unless the user still wants a separate DAG after being pointed to it.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "developer,platform_engineer,devops_engineer,ml_engineer,ai_engineer",
+        "discovery.activity_tags": "orchestrate,generate,deploy,validate,configure"
+      }
+    },
+    {
+      "path": "skills/cdf-video-data-augmentation",
+      "name": "cdf-video-data-augmentation",
+      "description": "Run the CDF Video Data Augmentation Airflow workflow on Kubernetes or OSMO to create Cosmos video-to-video variants and auto-label both source and generated videos. Use for VDA payload authoring, preflight, execution, monitoring, output verification, or result retrieval. OSMO requires external endpoints. Standalone augmentation or auto-labeling configuration belongs to the respective component skill. Not for retrieval-driven CDF pipelines or image-to-video event generation.",
+      "metadata": {
+        "product.primary": "Cosmos",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "physical-ai",
+        "audience": "ai_engineer,ml_engineer,data_engineer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "orchestrate,configure,validate,monitor,generate"
       }
     },
     {
@@ -3637,30 +3733,6 @@
       }
     },
     {
-      "path": "skills/paidf-orchestration-setup",
-      "name": "paidf-orchestration-setup",
-      "description": "Audit, prepare, and deploy PAIDF Orchestration on a Kubernetes GPU cluster - single-GPU H100/L40S hosts, managed Kubernetes, kubeadm, and similar. Select for requests to set up, install, deploy, configure, or check a PAIDF Orchestration environment; run a workflow on a new or unverified GPU host; connect via kubeconfig; validate GPU compute; deploy the Airflow controller; or choose external versus in-cluster model services. A plain SSH host is not a supported backend.",
-      "metadata": {
-        "product.primary": "Physical AI Dataset",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "devops_engineer,platform_engineer,solutions_architect,ai_engineer,developer",
-        "discovery.activity_tags": "deploy,configure,validate,orchestrate,get_started"
-      }
-    },
-    {
-      "path": "skills/paidf-orchestration-write-dag",
-      "name": "paidf-orchestration-write-dag",
-      "description": "Use when a user describes a custom PAIDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG in airflow/dags/workflows/ covers, and asks for a new Kubernetes DAG. Also use to check that a generated or existing DAG's model/container/prompt choices match an external spec document (e.g. a PAIDF `launchable.md`).",
-      "metadata": {
-        "product.primary": "Physical AI Dataset",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "application_developer,platform_engineer,devops_engineer,ml_engineer,ai_engineer",
-        "discovery.activity_tags": "orchestrate,generate,configure,deploy,validate"
-      }
-    },
-    {
       "path": "skills/physical-ai-defect-image-generation",
       "name": "physical-ai-defect-image-generation",
       "description": "Use when the user wants to orchestrate defect image generation with NVIDIA Cosmos AnomalyGen (Cosmos-Predict2-derived) on OSMO for PCBA, metal surface, and glass inspection. The Day 0 path handles cold-start with USD-to-ROI, image-edit augmentation, and AnomalyGen to create initial PCBA datasets. The Day 1 path performs inference and labeling on real images. This skill helps with first-time asset setup, creation of finetuning checkpoints, and configuring deployment.\nTrigger keywords: defect image generation, dig workflow, dig pipeline, defect image detection workflow, aoi pipeline, aoi anomalygen, usd2roi anomalygen, day 0 pcba, day 1 pcba, day 1 real-photo alignment, day 1 manual roi, metal surface anomaly, glass defect, anomalygen finetune, setup_pcb, setup_metal, setup_glass, setup_pretrained, dig setup, dig datasets, dig pretrained checkpoint, dig image-edit endpoint, cosmos defect generation, cosmos-predict2 defect, cosmos-anomalygen, cosmos predict2 finetune.",
@@ -3670,30 +3742,6 @@
         "catalog.subdomain": "physical-ai",
         "audience": "developer,ai_engineer,ml_engineer",
         "discovery.activity_tags": "orchestrate,generate,synthesize,fine_tune,configure"
-      }
-    },
-    {
-      "path": "skills/physical-ai-event-video-generation",
-      "name": "physical-ai-event-video-generation",
-      "description": "Run the PAIDF Orchestration Event Video Generation DAG on Kubernetes - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is image-attribute-augmentation-workflow) and not for video style transfer.",
-      "metadata": {
-        "product.primary": "Physical AI Dataset",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "ai_engineer,ml_engineer,data_engineer,application_developer,devops_engineer",
-        "discovery.activity_tags": "generate,synthesize,orchestrate,deploy,configure"
-      }
-    },
-    {
-      "path": "skills/physical-ai-image-attribute-augmentation",
-      "name": "physical-ai-image-attribute-augmentation",
-      "description": "Run the PAIDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.",
-      "metadata": {
-        "product.primary": "Physical AI Dataset",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
-        "audience": "ml_engineer,ai_engineer,data_engineer,developer",
-        "discovery.activity_tags": "generate,configure,orchestrate,monitor,extract"
       }
     },
     {
