@@ -1,0 +1,9 @@
+name: CDF Simulation
+repo: NVIDIA/cdf-simulation
+description: Build and validate Cosmos Data Factory Simulation jobs and compiled payloads for PCB-AOI workflows.
+skills:
+  - path: skills/cdf-simulation/
+    catalog_dir: cdf-simulation
+links:
+  discussions: false
+  security: false
