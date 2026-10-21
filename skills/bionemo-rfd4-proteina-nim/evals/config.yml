@@ -1,0 +1,12 @@
+schema_version: 1
+
+harbor:
+  task_source: evals_json
+  # Forward configured credentials without making offline cases require a key.
+  # The hosted execution case remains incomplete if neither key is available.
+  runtime_env:
+    NVIDIA_API_KEY: "${NVIDIA_API_KEY:-}"
+    NGC_API_KEY: "${NGC_API_KEY:-}"
+
+grading:
+  mode: aces_default
