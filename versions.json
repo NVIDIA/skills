@@ -79,6 +79,27 @@
       "last_modified": "2026-10-09"
     },
     {
+      "name": "bionemo-complexa-evaluate-pdbs",
+      "path": "skills/bionemo-complexa-evaluate-pdbs",
+      "content_digest": "sha256:7a43fb5c8a17b17179069c21333e2c2b488369e6f82806a7e8c6d6229ef3ed18",
+      "last_commit": "69abc1503d755f9c778e4c884554aea3bd83c131",
+      "last_modified": "2026-10-21"
+    },
+    {
+      "name": "bionemo-complexa-sweep",
+      "path": "skills/bionemo-complexa-sweep",
+      "content_digest": "sha256:506d842aacd6a7bb704e9624eeda2ad7c85bac342d42ddb11d1206ea423ffc38",
+      "last_commit": "69abc1503d755f9c778e4c884554aea3bd83c131",
+      "last_modified": "2026-10-21"
+    },
+    {
+      "name": "bionemo-complexa-target",
+      "path": "skills/bionemo-complexa-target",
+      "content_digest": "sha256:fb95f734f1631c0a4146ac710cdda6e77ed010372d93bcb77b3e1372837ff378",
+      "last_commit": "69abc1503d755f9c778e4c884554aea3bd83c131",
+      "last_modified": "2026-10-21"
+    },
+    {
       "name": "bionemo-diffdock-nim",
       "path": "skills/bionemo-diffdock-nim",
       "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",

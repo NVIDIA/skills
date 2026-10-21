@@ -133,6 +133,42 @@
       }
     },
     {
+      "path": "skills/bionemo-complexa-evaluate-pdbs",
+      "name": "complexa-evaluate-pdbs",
+      "description": "Agent runbook for evaluating an existing PDB directory through the separately installed first-party Proteina-Complexa CLI. Use to refold or score designs, compute interface pAE, i_pLDDT, scRMSD, motif RMSD, or designability, run complexa analysis, or assess third-party BindCraft, AlphaProteo, or RFdiffusion outputs. SKILL.md selects and invokes the evaluation configuration; bundled executables only inspect local readiness and write a run manifest.\n",
+      "metadata": {
+        "product.primary": "BioNeMo Open Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,research_academic,genomics_researcher,ml_engineer",
+        "discovery.activity_tags": "evaluate,assess,benchmark,measure,validate"
+      }
+    },
+    {
+      "path": "skills/bionemo-complexa-sweep",
+      "name": "complexa-sweep",
+      "description": "Agent runbook for Proteina-Complexa parameter sweeps through the separately installed first-party CLI and config generator. Use for cartesian-product hyperparameter scans, sweeper YAML authoring, configuration comparisons, ablations, tuning, success-rate ranking, or Pareto searches over quality and wall-clock cost. Do not use for a single existing-job launch or SLURM submission template. SKILL.md performs the orchestration; bundled executables only inspect local readiness and write a run manifest.",
+      "metadata": {
+        "product.primary": "BioNeMo Open Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,ml_engineer,research_academic,bioinformatician,data_scientist",
+        "discovery.activity_tags": "optimize,configure,evaluate,compare,orchestrate"
+      }
+    },
+    {
+      "path": "skills/bionemo-complexa-target",
+      "name": "complexa-target",
+      "description": "Add, edit, inspect, or validate Proteina-Complexa target definitions for protein binders, ligand binders, and AME motif scaffolding. Use for target registries, chain/residue selectors, hotspots, ligand fields, and incomplete motif inputs. Covers direct YAML edits and complexa target/validate target commands; running a campaign with an already registered target belongs to complexa-design.\n",
+      "metadata": {
+        "product.primary": "BioNeMo Open Models",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "computational_biologist,bioinformatician,research_academic,application_developer",
+        "discovery.activity_tags": "configure,validate,inspect"
+      }
+    },
+    {
       "path": "skills/bionemo-diffdock-nim",
       "name": "diffdock-nim",
       "description": "Run DiffDock molecular docking via NVIDIA NIM to predict small-molecule binding poses against protein targets. Use for DiffDock, molecular docking, ligand docking, blind docking, SMILES or SDF ligands, ranked poses, confidence scores, hosted NVIDIA API, or local Docker deployment.\n",
