@@ -1,0 +1,7 @@
+interface:
+  display_name: "Run CDF Video Data Augmentation"
+  short_description: "Augment and auto-label source and generated videos"
+  default_prompt: "Use $cdf-video-data-augmentation to validate and run my video augmentation payload, monitor it, and verify the outputs."
+
+policy:
+  allow_implicit_invocation: true

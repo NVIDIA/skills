@@ -1,0 +1,90 @@
+[
+  {
+    "id": "retrieval-starter-payload",
+    "question": "Use payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-real-retrieval.json to find one similar driving clip. Prepare the JSON and explain how to submit it in Airflow and where to find results. Use MSC profiles inputs and outputs, keep the example paths, and set collection_name to demo_av_retrieval_001. Keep the other starter settings. Do not access the cluster or submit a run.",
+    "expected_skill": "cdf-autonomous-vehicle-dataset-generation",
+    "expected_script": null,
+    "ground_truth": "Expected payload: {\"input_video_path\": \"msc://inputs/av-input\", \"output_directory\": \"msc://outputs/av-output/retrieval\", \"collection_name\": \"demo_av_retrieval_001\", \"search_mode\": \"embedding\", \"query_video\": \"msc://inputs/av-query/camera_front_wide_120fov.mp4\", \"top_k\": 1, \"limit\": 1, \"collect_result_clips\": true, \"cosmos\": {\"enabled\": false}}. Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-real-retrieval.json and replaces only the MSC profile placeholders and collection_name with the supplied values. Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true. Keeps cosmos.enabled=false; this run retrieves a clip without generating a variation. Explains that the input uses <scene-id>/camera_front_wide_120fov.mp4, videos must be at least 9.3 seconds long, and clips from the query source are excluded. Locates search_result.json and results/ under output_directory/<run-folder>/. Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view. Returns the prepared payload and instructions without contacting services or claiming the workflow ran.",
+    "expected_behavior": [
+      "Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-real-retrieval.json and replaces only the MSC profile placeholders and collection_name with the supplied values.",
+      "Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true.",
+      "Keeps cosmos.enabled=false; this run retrieves a clip without generating a variation.",
+      "Explains that the input uses <scene-id>/camera_front_wide_120fov.mp4, videos must be at least 9.3 seconds long, and clips from the query source are excluded.",
+      "Locates search_result.json and results/ under output_directory/<run-folder>/.",
+      "Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view.",
+      "Returns the prepared payload and instructions without contacting services or claiming the workflow ran."
+    ]
+  },
+  {
+    "id": "rain-starter-payload",
+    "question": "Use payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-rain-generation.json to generate one rainy driving clip. Prepare the JSON and explain how to submit it in Airflow and where to find results. Use MSC profiles inputs and outputs, keep the example paths, and set collection_name to demo_av_rain_001. Keep the other starter settings. Do not access the cluster or submit a run. Use default RGB controls; no WSM controls or manifests are prepared.",
+    "expected_skill": "cdf-autonomous-vehicle-dataset-generation",
+    "expected_script": null,
+    "ground_truth": "Expected payload: {\"input_video_path\": \"msc://inputs/av-input\", \"output_directory\": \"msc://outputs/av-output/rain\", \"collection_name\": \"demo_av_rain_001\", \"search_mode\": \"embedding\", \"query_video\": \"msc://inputs/av-query/camera_front_wide_120fov.mp4\", \"top_k\": 1, \"limit\": 1, \"collect_result_clips\": true, \"cosmos\": {\"enabled\": true, \"prompt\": \"Transform this driving scene into rainy conditions with wet pavement and overcast skies. Preserve camera motion, road layout, and vehicle trajectories.\", \"num_clips\": 1, \"num_augmentation\": 1, \"num_frames\": 93, \"fps\": 24, \"camera\": \"camera_front_wide_120fov\", \"size\": \"1280x720\", \"num_inference_steps\": 35, \"control_mode\": \"rgb\"}}. Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-rain-generation.json and replaces only the MSC profile placeholders and collection_name with the supplied values. Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true. Preserves the starter prompt and cosmos settings: enabled=true, num_clips=1, num_augmentation=1, num_frames=93, fps=24, camera=camera_front_wide_120fov, size=1280x720 and num_inference_steps=35, control_mode=rgb. Explains that RGB mode derives edge controls from retrieved clips, resamples inputs to 24 FPS without changing playback speed, and needs no WSM manifests. Locates generated video paths and validation results in output_directory/<run-folder>/cosmos3-nano/result_manifest.json; explains that physical-plausibility checks filter rejected candidates, accepted videos are published to cosmos3-nano/videos/, and a run can succeed with no accepted videos. The output should also be watched to confirm the requested edit. Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view. Returns the prepared payload and instructions without contacting services or claiming the workflow ran.",
+    "expected_behavior": [
+      "Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-rain-generation.json and replaces only the MSC profile placeholders and collection_name with the supplied values.",
+      "Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true.",
+      "Preserves the starter prompt and cosmos settings: enabled=true, num_clips=1, num_augmentation=1, num_frames=93, fps=24, camera=camera_front_wide_120fov, size=1280x720 and num_inference_steps=35, control_mode=rgb.",
+      "Explains that RGB mode derives edge controls from retrieved clips, resamples inputs to 24 FPS without changing playback speed, and needs no WSM manifests.",
+      "Locates generated video paths and validation results in output_directory/<run-folder>/cosmos3-nano/result_manifest.json; explains that physical-plausibility checks filter rejected candidates, accepted videos are published to cosmos3-nano/videos/, and a run can succeed with no accepted videos. The output should also be watched to confirm the requested edit.",
+      "Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view.",
+      "Returns the prepared payload and instructions without contacting services or claiming the workflow ran."
+    ]
+  },
+  {
+    "id": "snow-starter-payload",
+    "question": "Use payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-snow-generation.json to generate one snowy driving clip. Prepare the JSON and explain how to submit it in Airflow and where to find results. Use MSC profiles inputs and outputs, keep the example paths, and set collection_name to demo_av_snow_001. Keep the other starter settings. Do not access the cluster or submit a run. Matching per-scene WSM controls and manifests are already prepared at 10 FPS and 1280x720.",
+    "expected_skill": "cdf-autonomous-vehicle-dataset-generation",
+    "expected_script": null,
+    "ground_truth": "Expected payload: {\"input_video_path\": \"msc://inputs/av-input\", \"output_directory\": \"msc://outputs/av-output/snow\", \"collection_name\": \"demo_av_snow_001\", \"search_mode\": \"embedding\", \"query_video\": \"msc://inputs/av-query/camera_front_wide_120fov.mp4\", \"top_k\": 1, \"limit\": 1, \"collect_result_clips\": true, \"cosmos\": {\"enabled\": true, \"prompt\": \"Transform this driving scene into snowy conditions with visible falling snow, snow along the roadside, and overcast skies. Preserve camera motion, road layout, and vehicle trajectories.\", \"num_clips\": 1, \"num_augmentation\": 1, \"num_frames\": 93, \"fps\": 10, \"camera\": \"camera_front_wide_120fov\", \"size\": \"1280x720\", \"num_inference_steps\": 50, \"control_mode\": \"wsm\"}}. Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-snow-generation.json and replaces only the MSC profile placeholders and collection_name with the supplied values. Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true. Preserves the starter prompt and cosmos settings: enabled=true, num_clips=1, num_augmentation=1, num_frames=93, fps=10, camera=camera_front_wide_120fov, size=1280x720 and num_inference_steps=50, control_mode=wsm. Explains that control_mode=wsm uses each source scene's wsm/wsm-manifest.json and matching controls covering the selected span; the workflow extracts the matching control section. Locates generated video paths and validation results in output_directory/<run-folder>/cosmos3-nano/result_manifest.json; explains that physical-plausibility checks filter rejected candidates, accepted videos are published to cosmos3-nano/videos/, and a run can succeed with no accepted videos. The output should also be watched to confirm the requested edit. Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view. Returns the prepared payload and instructions without contacting services or claiming the workflow ran.",
+    "expected_behavior": [
+      "Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-snow-generation.json and replaces only the MSC profile placeholders and collection_name with the supplied values.",
+      "Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true.",
+      "Preserves the starter prompt and cosmos settings: enabled=true, num_clips=1, num_augmentation=1, num_frames=93, fps=10, camera=camera_front_wide_120fov, size=1280x720 and num_inference_steps=50, control_mode=wsm.",
+      "Explains that control_mode=wsm uses each source scene's wsm/wsm-manifest.json and matching controls covering the selected span; the workflow extracts the matching control section.",
+      "Locates generated video paths and validation results in output_directory/<run-folder>/cosmos3-nano/result_manifest.json; explains that physical-plausibility checks filter rejected candidates, accepted videos are published to cosmos3-nano/videos/, and a run can succeed with no accepted videos. The output should also be watched to confirm the requested edit.",
+      "Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view.",
+      "Returns the prepared payload and instructions without contacting services or claiming the workflow ran."
+    ]
+  },
+  {
+    "id": "day-starter-payload",
+    "question": "Use payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-day-generation.json to generate one daylight driving clip. Prepare the JSON and explain how to submit it in Airflow and where to find results. Use MSC profiles inputs and outputs, keep the example paths, and set collection_name to demo_av_day_001. Keep the other starter settings. Do not access the cluster or submit a run. Use default RGB controls; no WSM controls or manifests are prepared.",
+    "expected_skill": "cdf-autonomous-vehicle-dataset-generation",
+    "expected_script": null,
+    "ground_truth": "Expected payload: {\"input_video_path\": \"msc://inputs/av-input\", \"output_directory\": \"msc://outputs/av-output/day\", \"collection_name\": \"demo_av_day_001\", \"search_mode\": \"embedding\", \"query_video\": \"msc://inputs/av-query/camera_front_wide_120fov.mp4\", \"top_k\": 1, \"limit\": 1, \"collect_result_clips\": true, \"cosmos\": {\"enabled\": true, \"prompt\": \"Transform this driving scene into clear daytime conditions with natural daylight, realistic shadows, and good visibility. Preserve camera motion, road layout, and vehicle trajectories.\", \"num_clips\": 1, \"num_augmentation\": 1, \"num_frames\": 93, \"fps\": 24, \"camera\": \"camera_front_wide_120fov\", \"size\": \"1280x720\", \"num_inference_steps\": 35, \"control_mode\": \"rgb\"}}. Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-day-generation.json and replaces only the MSC profile placeholders and collection_name with the supplied values. Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true. Preserves the starter prompt and cosmos settings: enabled=true, num_clips=1, num_augmentation=1, num_frames=93, fps=24, camera=camera_front_wide_120fov, size=1280x720 and num_inference_steps=35, control_mode=rgb. Explains that RGB mode derives edge controls from retrieved clips, resamples inputs to 24 FPS without changing playback speed, and needs no WSM manifests. Locates generated video paths and validation results in output_directory/<run-folder>/cosmos3-nano/result_manifest.json; explains that physical-plausibility checks filter rejected candidates, accepted videos are published to cosmos3-nano/videos/, and a run can succeed with no accepted videos. The output should also be watched to confirm the requested edit. Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view. Returns the prepared payload and instructions without contacting services or claiming the workflow ran.",
+    "expected_behavior": [
+      "Uses payloads/dev/autonomous_vehicle_dataset_generation_dag/cdf-avdg-day-generation.json and replaces only the MSC profile placeholders and collection_name with the supplied values.",
+      "Preserves search_mode=embedding, limit=1, top_k=1 and collect_result_clips=true.",
+      "Preserves the starter prompt and cosmos settings: enabled=true, num_clips=1, num_augmentation=1, num_frames=93, fps=24, camera=camera_front_wide_120fov, size=1280x720 and num_inference_steps=35, control_mode=rgb.",
+      "Explains that RGB mode derives edge controls from retrieved clips, resamples inputs to 24 FPS without changing playback speed, and needs no WSM manifests.",
+      "Locates generated video paths and validation results in output_directory/<run-folder>/cosmos3-nano/result_manifest.json; explains that physical-plausibility checks filter rejected candidates, accepted videos are published to cosmos3-nano/videos/, and a run can succeed with no accepted videos. The output should also be watched to confirm the requested edit.",
+      "Explains the documented Airflow steps: open autonomous_vehicle_dataset_generation_dag_k8s, enable it if paused, put the edited JSON in the payload Run Parameter, trigger, and follow Grid or Graph view.",
+      "Returns the prepared payload and instructions without contacting services or claiming the workflow ran."
+    ]
+  },
+  {
+    "id": "av-negative-standalone-vda",
+    "question": "I already have driving clips in s3://my-bucket/clips/. Apply snow and night-time variants to them; I don't need any search or curation.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "Augmenting videos the user already has, with no curation or retrieval, is the standalone Video Data Augmentation workflow. Route it to cdf-video-data-augmentation.",
+    "expected_behavior": [
+      "Does not select cdf-autonomous-vehicle-dataset-generation.",
+      "Does not build a curation or retrieval payload.",
+      "Routes the request to the video-data-augmentation workflow skill."
+    ]
+  },
+  {
+    "id": "av-negative-event-generation",
+    "question": "Generate videos of a pedestrian falling from a single seed image of a crosswalk.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "Generating event clips from a seed image is image-to-video anomaly generation. Route it to cdf-event-video-generation.",
+    "expected_behavior": [
+      "Does not select cdf-autonomous-vehicle-dataset-generation.",
+      "Does not treat the seed image as a curation input.",
+      "Routes the request to the event-video-generation workflow skill."
+    ]
+  }
+]
