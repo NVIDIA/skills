@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+version: 2
+rules:
+  # Covers the ordinary reference finding, not SkillEvaluator's independent
+  # skillspector_execution_failure gate for binary-content scope exclusions.
+  - id: "AE1"
+    path: "SKILL.md"
+    message: "*carter_warehouse_navigation.png (partial)*"
+    reason: >-
+      Reviewed: assets/carter_warehouse_navigation.png is the bundled Nav2
+      occupancy-grid image. Its pixels supply obstacle and free-space data;
+      it contains no skill instructions or executable code. The cloud workspace
+      procedure copies the map and its YAML metadata into the run workspace.
+      This exception covers only the reference-level partial-inspection finding
+      for this named image. Image-loading scripts remain in scan scope, and
+      evaluator execution or coverage failures are not suppressed.
+  - id: "PE3"
+    path: "references/isaac-ros-setup.md"
+    message: "keyring"
+    reason: >-
+      Reviewed: this is the public NVIDIA package-signing keyring, not user
+      credentials. The documented helper verifies the pinned public bundle
+      digest and dearmors it unprivileged in a private temporary directory.
+      Only the reviewed public key and fixed signed-by APT source are installed
+      with privilege after checking for existing configuration conflicts.
+  - id: "PE3"
+    path: "scripts/prepare_cli_repository.py"
+    message: "keyring"
+    reason: >-
+      Reviewed: the keyring constant is a destination for public APT verification
+      keys. The script never reads that path or any credential file and never
+      invokes sudo. It downloads one fixed HTTPS public-key endpoint without
+      redirects, checks a pinned digest, and stages public files in a private
+      directory. The hardcoded digest is public integrity metadata, not a secret.
+  - id: "PE3"
+    path: "upstream-versions.lock.json"
+    message: ".env*"
+    reason: >-
+      Reviewed: this is a declared resource filename in a pinned dependency's
+      resource array. The lock is data; doctor and dependency_manifest check
+      this resource's existence only, without reading, sourcing, logging or
+      forwarding its contents. Upstream cloud startup remains governed by the
+      owning skill and its separately reviewed configuration handling.
+fingerprints: []

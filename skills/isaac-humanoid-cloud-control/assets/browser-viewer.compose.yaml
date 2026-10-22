@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Viewer-only adaptation of Isaac Sim's official tools/docker/docker-compose.yml.
+# WEB_VIEWER_CONTEXT must point to the official tools/docker/web-viewer directory.
+services:
+  web-viewer:
+    build:
+      context: ${WEB_VIEWER_CONTEXT:?Set WEB_VIEWER_CONTEXT to IsaacSim/tools/docker/web-viewer}
+      network: host
+      args:
+        ISAACSIM_HOST: ${WEB_VIEWER_HOST:-127.0.0.1}
+        ISAACSIM_SIGNAL_PORT: ${ISAACSIM_SIGNAL_PORT:-49100}
+        ISAACSIM_STREAM_PORT: ${ISAACSIM_STREAM_PORT:-47998}
+    network_mode: host
+    command:
+      - npx
+      - vite
+      - preview
+      - --host
+      - --port
+      - ${WEB_VIEWER_PORT:-8210}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${WEB_VIEWER_PORT:-8210}/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
