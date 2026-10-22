@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Run:ai
+repo: dsx-ai-factory/run-ai
+description: Diagnose failed Run:ai workloads using evidence from workload status, pods, history, and metrics.
+skills:
+  - path: skills/runai-diagnose-failed-workload/
+    catalog_dir: runai-diagnose-failed-workload
