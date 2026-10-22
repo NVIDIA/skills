@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+[package]
+title = "Humanoid cloud-control autoplay"
+description = "Starts the Isaac Sim timeline once the requested stage is loaded."
+version = "1.0.0"
+category = "Simulation"
+
+[core]
+reloadable = true
+
+[dependencies]
+"omni.kit.uiapp" = {}
+"omni.timeline" = {}
+
+[[python.module]]
+name = "humanoid_cloud_control.autoplay"
