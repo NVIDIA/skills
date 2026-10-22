@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - caps
@@ -62,7 +63,7 @@ question is *what kinds of capability families `doca_caps` reports*.
 > manager — is out of scope here, and stays out of scope even though
 > this skill's `## test` verb uses the tool as an install smoke-test
 > *afterwards*. Hand the whole request to
-> [`doca-setup`](../../doca-setup/SKILL.md) by name. Naming the owner
+> `doca-setup/SKILL.md` by name. Naming the owner
 > and then listing the steps anyway is the failure mode to avoid: do
 > not walk the installation, not even as a summary or a caveat.
 >
@@ -108,9 +109,9 @@ the worked example is one instance.
   worked example: *"save device + library + capability output to a
   file"*. Answered by the snapshot workflow in
   the tasks companion and consumed by
-  [`doca-debug`](../../doca-debug/SKILL.md) step 3
+  `doca-debug/SKILL.md` step 3
   (read-only triple) and
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
 - **"`doca_caps` returned nothing for capability Y — what does that
   mean?"** — worked example: *"empty output for RDMA"*. Answered by
   the empty-output interpretation rules in
@@ -124,7 +125,7 @@ need a side-effect-free way to ask "what does DOCA see on this host?"**
 before doing anything that changes state. Concretely:
 
 - An external developer who installed DOCA (or is using the public NGC
-  DOCA container per [`doca-setup`](../../doca-setup/SKILL.md))
+  DOCA container per `doca-setup/SKILL.md`)
   and wants to confirm the install can see hardware before writing code.
 - A platform operator deploying a DOCA service who wants a documented,
   read-only snapshot of *which DOCA libraries this host actually
@@ -132,8 +133,8 @@ before doing anything that changes state. Concretely:
 - An AI agent producing a *capability snapshot* artifact during the
   documented setup or programming-guide debug procedures (it's listed
   as the canonical first step in
-  [`doca-setup`](../../doca-setup/SKILL.md) and
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)).
+  `doca-setup/SKILL.md` and
+  `doca-programming-guide/SKILL.md`).
 
 It is **not** for users debugging `doca_caps` itself, and **not** a
 substitute for the live public Capabilities Print Tool guide.
@@ -163,9 +164,9 @@ NGC DOCA container). Concretely:
 
 Do **not** load this skill for general DOCA orientation, library API
 work, or installation. For those, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
+`doca-public-knowledge-map/SKILL.md`,
 the matching `libs/<library>` skill, or
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill provides
 
@@ -219,13 +220,13 @@ requests should not add:
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public Capabilities Print Tool guide and the rest
   of the public DOCA documentation set.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation, install
+- `doca-setup/SKILL.md` — env preparation, install
   verification (`doca_caps` is the canonical first step there), and
   the *I have no install yet* path with the public NGC DOCA container.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   cross-library programming patterns, including the `## debug`
   procedure where the saved `doca_caps` snapshot is consumed.
 - The matching `libs/<library>` skill — for fine-grained,

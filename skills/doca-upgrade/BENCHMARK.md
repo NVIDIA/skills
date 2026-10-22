@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-upgrade`
-- Evaluation date: 2026-10-14
+- Evaluation date: 2026-10-22
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-sonnet-5-5`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:e8be7babdc43b3f9a24fa01668d434ce2211db9e76f46235c2fd58c6e060860f` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.8% — baseline ran, but no comparable score was available; uplift unavailable | 85.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.2% — baseline ran, but no comparable score was available; uplift unavailable | 85.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 78.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 52.9% → 95.8% (+42.9 points) | 54.2% → 85.8% (+31.6 points) |
-| Efficiency | 83.3% — baseline ran, but no comparable score was available; uplift unavailable | 62.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 65.0% → 100.0% (+35.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 47.3% → 86.5% (+39.2 points) | 43.2% → 82.7% (+39.5 points) |
+| Efficiency | 79.4% — baseline ran, but no comparable score was available; uplift unavailable | 52.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 558,510 | 338,547 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-upgrade.explicit-positive.v1 | 190,602 | 153,685 | +36,917 | +24.02% | skill 1/1; base 1/1 |
-| claude-code | doca-upgrade.implicit-positive.v1 | 337,852 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-upgrade.implicit-positive.v2 | N/A | 95,311 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-upgrade.negative.v1 | 30,056 | 89,551 | -59,495 | -66.44% | skill 1/1; base 1/1 |
-| codex | All cases | 447,725 | 216,069 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-upgrade.explicit-positive.v1 | 168,475 | 58,555 | +109,920 | +187.72% | skill 1/1; base 1/1 |
-| codex | doca-upgrade.implicit-positive.v1 | 265,507 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | doca-upgrade.implicit-positive.v2 | N/A | 88,708 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | doca-upgrade.negative.v1 | 13,743 | 68,806 | -55,063 | -80.03% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,006,235 | 554,616 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 502,393 | 242,748 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-upgrade.explicit-positive.v1 | 100,396 | 60,371 | +40,025 | +66.30% | skill 1/1; base 1/1 |
+| claude-code | doca-upgrade.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-upgrade.implicit-positive.v2 | 279,381 | 91,920 | +187,461 | +203.94% | skill 1/1; base 1/1 |
+| claude-code | doca-upgrade.negative.v1 | 122,616 | 90,457 | +32,159 | +35.55% | skill 1/1; base 1/1 |
+| codex | All cases | 293,087 | 197,928 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-upgrade.explicit-positive.v1 | 111,387 | 58,182 | +53,205 | +91.45% | skill 1/1; base 1/1 |
+| codex | doca-upgrade.implicit-positive.v1 | N/A | 98,037 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-upgrade.implicit-positive.v2 | 168,018 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-upgrade.negative.v1 | 13,682 | 41,709 | -28,027 | -67.20% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 795,480 | 440,676 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/doca-upgrade/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-upgrade/SKILL.md`)
 - **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`CAPABILITIES.md:143`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`SKILL.md:61`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`TASKS.md:221`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`TASKS.md:222`)
-- 11 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`SKILL.md:52`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`SKILL.md:66`)
+- 10 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

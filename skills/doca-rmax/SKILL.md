@@ -4,8 +4,8 @@ name: doca-rmax
 description: >
   DOCA Rivermax (doca_rmax) receive streams for timing-precise media over
   IP (SMPTE ST 2110 video / audio, market data, scientific feeds) on a
-  BlueField DPU or ConnectX host, once the Rivermax SDK and its license
-  are installed; getting the SDK or license is doca-setup /
+  target BlueField DPU (DOCA Rivermax apps run only there), once the
+  Rivermax libraries and license are installed; getting them is doca-setup /
   doca-public-knowledge-map territory. Trigger on "ST 2110 receive isn't
   getting frames", "sub-microsecond jitter on my media receiver",
   "NOT_SUPPORTED from doca_rmax_init", "no recv events after stream
@@ -19,15 +19,16 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - rmax
     - rivermax
 compatibility: >
   Requires DOCA SDK at /opt/mellanox/doca on Linux (Ubuntu 22.04/24.04
-  or RHEL/SLES) with a BlueField DPU or ConnectX NIC, AND the
-  separately- installed NVIDIA Rivermax SDK with a valid Rivermax
-  license readable by the user — DOCA does NOT bundle Rivermax. Reads
+  or RHEL/SLES) on the target BlueField DPU (DOCA Rivermax apps run only
+  there), with `doca-sdk-rmax` from the DOCA repo AND a separately
+  obtained Rivermax license readable by the user. Reads
   the local install via `pkg-config doca-rmax`; route Rivermax SDK
   install/license questions to the public Rivermax guide. The validation
   steps require a live DOCA install.
@@ -49,13 +50,16 @@ Follow Loading order below. Open the tasks companion for configure /
 stream / debug. Open the capabilities companion for Rivermax
 preconditions. Do not open every companion file.
 
-**Where to start:** This skill assumes DOCA is already installed,
-**AND** that the NVIDIA Rivermax SDK is separately installed with a
-valid Rivermax license present on the host. The agent's FIRST
+**Where to start:** This skill assumes DOCA is already installed on
+the target BlueField DPU (DOCA Rivermax apps run only on the target
+DPU), **AND** that the Rivermax libraries (`doca-sdk-rmax` /
+`libdoca-sdk-rmax-dev` from the DOCA repo) are installed with a valid
+Rivermax license present on the DPU. The agent's FIRST
 action on any Rivermax question is to confirm both — without
-Rivermax SDK + license, `doca-rmax` cannot function regardless
+the Rivermax libraries + license, `doca-rmax` cannot function regardless
 of how clean the DOCA-side code is, and this is the #1 first-app
-confusion (DOCA does *not* bundle Rivermax; it wraps it). Open
+confusion (the Rivermax license, and the driver per the Rivermax SDK
+page, are obtained separately from DOCA). Open
 the tasks companion if the user wants to *do* something
 (configure / build / modify / run / test / debug); open
 the capabilities companion when the question is *what

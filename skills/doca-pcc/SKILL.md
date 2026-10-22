@@ -21,6 +21,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - pcc
@@ -66,17 +67,17 @@ open the capabilities companion when the question is
 *what can the host-side PCC API express* on this version + this
 BlueField generation + this firmware. If the user has not
 installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first; if the user is
+`doca-setup/SKILL.md` first; if the user is
 asking how to *write* the DPA-side congestion-control algorithm
 itself (the code that runs on the DPA processor, compiled by
 `dpacc`), that is a different scope — route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 to the public DOCA PCC programming guide and to
-[`doca-dpa`](../doca-dpa/SKILL.md) for the host-side DPA
+`doca-dpa/SKILL.md` for the host-side DPA
 lifecycle this skill builds on. If the user only wants to
 *inspect* PCC counters at runtime without writing a custom
 algorithm, that is the `pcc_counters` CLI tool — route via
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools);
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`);
 this skill is for *custom* algorithms only.
 
 ## Example questions this skill answers well
@@ -122,7 +123,7 @@ instance.
   + the deferred-topic boundaries in
   ## Deferred topic boundaries
   which route to
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
   for the counter tool.
 - **"Is the host-side PCC API I'm reading about on my installed
   DOCA?"** — worked example: *"is the host-side load helper I
@@ -130,9 +131,9 @@ instance.
   this host?"*. Answered by the version-compatibility overlay in
   ## Version compatibility
   which cross-links the canonical detection chain in
-  [`doca-version`](../../doca-version/SKILL.md) and adds the
+  `doca-version/SKILL.md` and adds the
   PCC-specific *DOCA must match DPACC* overlay inherited from
-  [`doca-dpa`](../doca-dpa/SKILL.md).
+  `doca-dpa/SKILL.md`.
 - **"What does this `DOCA_ERROR_*` from a `doca_pcc_*` call mean
   and which layer caused it?"** — worked example:
   *"`DOCA_ERROR_DRIVER` on the host-side algorithm-load call —
@@ -142,82 +143,57 @@ instance.
   ## Error taxonomy
   + the layered ladder in
   ## debug that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  `doca-debug/SKILL.md`.
 
 ## Audience
 
-This skill serves **external developers building applications
-that consume the DOCA PCC library from the host side** — i.e.,
-users whose code calls `doca_pcc_*` from host C / C++ to stand
-up the per-PCC-instance context, load a DPA-side PCC algorithm
-image that `dpacc` produced from their DPA-side source, attach
-it to the BlueField port that carries the RDMA / RoCE traffic
-the algorithm is meant to control, parameterize the algorithm,
-start the context, and observe runtime reports back from the
-algorithm. It is *not* for NVIDIA developers contributing to
-DOCA PCC itself, nor is it the place to learn how to *write*
-the DPA-side congestion-control algorithm itself (that path
-goes through the public DOCA PCC programming guide and the
-companion DOCA DPA / DPACC guides via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
+This skill serves **external developers consuming the DOCA PCC
+library from the host side** — code that calls `doca_pcc_*` to
+stand up the per-port context, load the `dpacc`-produced
+`doca_pcc_app` image, attach it to the RoCE-bearing BlueField
+port, parameterize it, start it, and observe runtime reports.
+It is *not* for NVIDIA developers contributing to DOCA PCC, nor
+the place to learn how to *write* the DPA-side algorithm body
+(route via `doca-public-knowledge-map/SKILL.md` to the public
+PCC / DPA / DPACC guides).
 
 **Language scope.** DOCA PCC ships as a host-side C library
-with `pkg-config` module name `doca-pcc`. The host-side API is
-C; the DPA-side congestion-control algorithm is a separate
-translation unit written in the language the DPACC compiler
-accepts and compiled by `dpacc` into a binary that the host
-packages into the executable as the PCC algorithm image. The
-shipped samples under `/opt/mellanox/doca/samples/doca_pcc/`
-are written in C plus DPA-side source (NVIDIA's choice).
-Other-language consumers are limited in practice — the
-DPA-side algorithm has no FFI escape hatch because it must be
-a translation unit `dpacc` accepts — but a Rust / Go / Python
-host-side wrapper that drives `doca_pcc_*` setup and loads a
-PCC algorithm image built separately is still useful, and the
-skill keeps the lifecycle, capability-discovery,
-env-precondition, and error-taxonomy guidance language-neutral.
+(`pkg-config` module `doca-pcc`). The DPA-side algorithm is a
+separate translation unit `dpacc` compiles into the PCC
+algorithm image — no FFI escape hatch. A Rust / Go / Python
+host-side wrapper driving `doca_pcc_*` is still useful; the
+skill keeps its guidance language-neutral.
 
 ## When to load this skill
 
 Load this skill when the user is doing hands-on DOCA PCC work
 **from the host side** for a **custom** congestion control
-algorithm, in any host language plus a DPA-side translation
-unit built by `dpacc`. Concretely:
+algorithm. Concretely:
 
 - Initializing a `doca_pcc` against a `doca_dev` that maps to
   the BlueField port carrying the RDMA / RoCE traffic to be
   controlled.
-- Loading a PCC algorithm image (`doca_pcc_app`) that `dpacc`
-  produced from the user's DPA-side congestion-control algorithm
-  source, into the `doca_pcc` context.
-- Parameterizing the loaded algorithm with the host-side knobs
-  the algorithm exposes, and starting the `doca_pcc` Core
-  context so the algorithm begins affecting RDMA / RoCE
-  traffic on the attached port.
-- Checking which PCC features are supported on the active
-  `doca_devinfo` via the `doca_pcc_cap_*` family — BlueField
-  generations and firmware revisions differ in whether they
-  permit a custom PCC algorithm.
-- Debugging a `DOCA_ERROR_*` returned from a `doca_pcc_*` call
-  — in particular disambiguating *firmware-level custom-PCC
-  slot disabled* from *device does not support custom PCC at
-  all* from *algorithm image incompatible with this device*
-  from *standard `doca_dev` access denied*.
-- Designing host-side bindings in a non-C language that drive
-  a custom PCC algorithm image they built separately with
-  `dpacc` — the env-precondition and capability-discovery rules
-  in this skill still apply.
+- Loading the `dpacc`-produced `doca_pcc_app` algorithm image
+  into the `doca_pcc` context.
+- Parameterizing the algorithm and starting the `doca_pcc` Core
+  context so it begins affecting RoCE traffic on the port.
+- Checking which PCC features the active `doca_devinfo` supports
+  via `doca_pcc_cap_*` — BlueField generations and firmware
+  revisions differ on permitting a custom PCC algorithm.
+- Debugging a `DOCA_ERROR_*` from `doca_pcc_*` — disambiguating
+  *firmware custom-PCC slot disabled* vs *device cannot do
+  custom PCC* vs *image incompatible* vs *plain `doca_dev`
+  access denied*.
+- Designing non-C host-side bindings that drive a separately
+  `dpacc`-built algorithm image — the env-precondition and
+  capability rules still apply.
 
-Do **not** load this skill for general DOCA orientation, install
-of DOCA or the DPACC compiler, the DPA-side programming model
-itself (how to write the congestion-control algorithm body that
-runs on the DPA), questions about the default factory PCC
-algorithm shipped in ConnectX firmware (no host-side `doca-pcc`
-code needed — that path is firmware-only configuration), or
-questions about the `pcc_counters` diagnostic CLI (route via
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)).
-For all of those, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+Do **not** load this skill for general DOCA orientation, DOCA /
+DPACC install, the DPA-side programming model itself, the
+factory PCC algorithm shipped in ConnectX firmware (firmware-
+only, no host-side code), or the `pcc_counters` diagnostic CLI.
+For those, route through
+`doca-public-knowledge-map/SKILL.md`
 to the matching upstream guide.
 
 ## What this skill provides
@@ -254,7 +230,7 @@ DOCA Compatibility Policy, and the user already knows how
 algorithm that `dpacc` will compile. It does not cover
 installing DOCA, installing the DPACC compiler, or flipping
 firmware-level configuration — those paths go through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -269,7 +245,7 @@ contain — and pull requests should not add:
   route the user to those files and prescribe a minimum-diff
   modification on them via the universal modify-a-sample
   workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the PCC-specific overrides in
   ## modify.
 - **A specific congestion control algorithm.** This library
@@ -292,7 +268,7 @@ contain — and pull requests should not add:
 - **`pcc_counters` tool surface.** That CLI is a *separate
   artifact* (the `pcc_counters.sh` script under
   `tools/pcc_counters/`) with its own page; routing lives in
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
   Conflating it with the library is the most common PCC
   first-app design error.
 
@@ -311,10 +287,10 @@ contain — and pull requests should not add:
    run, test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 DOCA version-handling rules (with the PCC overlay that DOCA
 must match the DPACC compiler), and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public DOCA
 PCC programming guide, the public DPA / DPACC guides, the
 `pcc_counters` tool guide, or in the on-disk install
@@ -322,7 +298,7 @@ layout" rather than "PCC host-side-specific guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation
   source and the on-disk layout of an installed DOCA package.
   The PCC public guide is at
@@ -330,7 +306,7 @@ layout" rather than "PCC host-side-specific guidance".
   `pcc_counters` diagnostic CLI lives under the DOCA Tools
   umbrella as a *companion surface* rather than a redefined
   artifact here.
-- [`doca-dpa`](../doca-dpa/SKILL.md) — the host-side DPA
+- `doca-dpa/SKILL.md` — the host-side DPA
   control library that PCC depends on conceptually: the
   custom PCC algorithm *is* DPA-side code, compiled by the
   DPACC compiler, and the host-side `doca-pcc` Core lifecycle
@@ -338,14 +314,14 @@ layout" rather than "PCC host-side-specific guidance".
   agent loads `doca-dpa` alongside this skill when the user
   has DPA-level questions (kernel-launch model, DPA-side
   libraries) that PCC is layered on top of.
-- [`doca-rdma`](../doca-rdma/SKILL.md) — the library whose
+- `doca-rdma/SKILL.md` — the library whose
   traffic the custom PCC algorithm is controlling. The custom
   PCC algorithm affects RDMA / RoCE flows on the attached
   BlueField port; if the user has not yet set up RDMA / RoCE
   traffic on that port, there is nothing for the algorithm to
   act on, and `doca-rdma` is the skill that brings that
   traffic up.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, DPACC compiler install / verification,
   BlueField firmware configuration (including the custom-PCC
   slot enable), and the *I have no install yet* path with the
@@ -353,24 +329,24 @@ layout" rather than "PCC host-side-specific guidance".
   preconditions are satisfied AND that DPACC is installed at a
   version that matches DOCA AND that the firmware-level
   custom-PCC slot is enabled.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. This skill's `## Version
   compatibility` cross-links the four-way match rule and adds
   the PCC-specific *DOCA-and-DPACC must match* overlay per the
   DOCA Compatibility Policy (inherited from
-  [`doca-dpa`](../doca-dpa/SKILL.md)).
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+  `doca-dpa/SKILL.md`).
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect /
   prefer / fall back / report). The Command appendix in
   the tasks companion honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the
   universal modify-a-shipped-sample first-app workflow, the
   universal Core-context lifecycle, the cross-library
   `DOCA_ERROR_*` taxonomy, and the program-side debug order.
   This skill layers PCC specifics on top.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). PCC-specific debug (custom-PCC slot not
   enabled in firmware, DPACC + DOCA version skew, algorithm
@@ -385,7 +361,7 @@ layout" rather than "PCC host-side-specific guidance".
 > PCC only modulates RoCE traffic that already exists on the
 > `doca_dev` the `doca_pcc` was created against. Settle both here
 > and do not audit the DPA-side algorithm body: that is
-> [`doca-dpa`](../doca-dpa/SKILL.md)'s surface, and reports
+> `doca-dpa/SKILL.md`'s surface, and reports
 > firing already proves the body runs — what is unproven is that
 > it is bound and live. Ordered checks in
 > ## debug.

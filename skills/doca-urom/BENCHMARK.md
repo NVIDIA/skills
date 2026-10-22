@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-urom`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.4% — baseline ran, but no comparable score was available; uplift unavailable | 92.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 80.0% (+25.0 points) | 60.0% → 90.0% (+30.0 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 65.0% → 100.0% (+35.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 53.8% → 100.0% (+46.2 points) | 50.0% → 86.3% (+36.3 points) |
-| Efficiency | 87.1% — baseline ran, but no comparable score was available; uplift unavailable | 94.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 52.5% → 91.9% (+39.4 points) | 43.8% → 92.5% (+48.7 points) |
+| Efficiency | 83.7% — baseline ran, but no comparable score was available; uplift unavailable | 89.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 915,522 | 435,333 | +480,189 | +110.30% | skill 4/4; base 4/4 |
-| claude-code | doca-urom.explicit-positive.v1 | 225,650 | 153,965 | +71,685 | +46.56% | skill 1/1; base 1/1 |
-| claude-code | doca-urom.implicit-positive.v1 | 172,445 | 126,591 | +45,854 | +36.22% | skill 1/1; base 1/1 |
-| claude-code | doca-urom.implicit-positive.v2 | 172,625 | 31,729 | +140,896 | +444.06% | skill 1/1; base 1/1 |
-| claude-code | doca-urom.negative.v1 | 344,802 | 123,048 | +221,754 | +180.22% | skill 1/1; base 1/1 |
-| codex | All cases | 549,589 | 165,866 | +383,723 | +231.35% | skill 4/4; base 4/4 |
-| codex | doca-urom.explicit-positive.v1 | 165,251 | 56,559 | +108,692 | +192.17% | skill 1/1; base 1/1 |
-| codex | doca-urom.implicit-positive.v1 | 194,591 | 14,319 | +180,272 | +1258.97% | skill 1/1; base 1/1 |
-| codex | doca-urom.implicit-positive.v2 | 136,177 | 14,339 | +121,838 | +849.70% | skill 1/1; base 1/1 |
-| codex | doca-urom.negative.v1 | 53,570 | 80,649 | -27,079 | -33.58% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,465,111 | 601,199 | +863,912 | +143.70% | skill 8/8; base 8/8 |
+| claude-code | All cases | 661,273 | 659,915 | +1,358 | +0.21% | skill 4/4; base 4/4 |
+| claude-code | doca-urom.explicit-positive.v1 | 170,174 | 289,115 | -118,941 | -41.14% | skill 1/1; base 1/1 |
+| claude-code | doca-urom.implicit-positive.v1 | 219,898 | 125,149 | +94,749 | +75.71% | skill 1/1; base 1/1 |
+| claude-code | doca-urom.implicit-positive.v2 | 239,855 | 122,528 | +117,327 | +95.76% | skill 1/1; base 1/1 |
+| claude-code | doca-urom.negative.v1 | 31,346 | 123,123 | -91,777 | -74.54% | skill 1/1; base 1/1 |
+| codex | All cases | 530,164 | 165,349 | +364,815 | +220.63% | skill 4/4; base 4/4 |
+| codex | doca-urom.explicit-positive.v1 | 167,672 | 55,883 | +111,789 | +200.04% | skill 1/1; base 1/1 |
+| codex | doca-urom.implicit-positive.v1 | 181,643 | 14,366 | +167,277 | +1164.40% | skill 1/1; base 1/1 |
+| codex | doca-urom.implicit-positive.v2 | 120,431 | 14,043 | +106,388 | +757.59% | skill 1/1; base 1/1 |
+| codex | doca-urom.negative.v1 | 60,418 | 81,057 | -20,639 | -25.46% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,191,437 | 825,264 | +366,173 | +44.37% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -81,12 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-urom/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-urom`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo    (`BENCHMARK.md:85`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo    (`BENCHMARK.md:86`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo    (`CAPABILITIES.md:298`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:87`)
-- 11 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo       (`BENCHMARK.md:85`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo       (`BENCHMARK.md:86`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo       (`BENCHMARK.md:87`)
+- 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

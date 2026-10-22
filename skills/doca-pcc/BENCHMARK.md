@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-pcc`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.4% — baseline ran, but no comparable score was available; uplift unavailable | 94.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 31.3% → 73.1% (+41.8 points) | 42.5% → 95.6% (+53.1 points) |
-| Efficiency | 93.9% — baseline ran, but no comparable score was available; uplift unavailable | 85.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.5% — baseline ran, but no comparable score was available; uplift unavailable | 94.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 87.5% → 100.0% (+12.5 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 23.8% → 83.5% (+59.7 points) | 38.1% → 97.5% (+59.4 points) |
+| Efficiency | 94.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 641,250 | 661,056 | -19,806 | -3.00% | skill 4/4; base 4/4 |
-| claude-code | doca-pcc.explicit-positive.v1 | 224,564 | 246,419 | -21,855 | -8.87% | skill 1/1; base 1/1 |
-| claude-code | doca-pcc.implicit-positive.v1 | 226,016 | 92,726 | +133,290 | +143.75% | skill 1/1; base 1/1 |
-| claude-code | doca-pcc.implicit-positive.v2 | 159,816 | 127,722 | +32,094 | +25.13% | skill 1/1; base 1/1 |
-| claude-code | doca-pcc.negative.v1 | 30,854 | 194,189 | -163,335 | -84.11% | skill 1/1; base 1/1 |
-| codex | All cases | 468,932 | 262,370 | +206,562 | +78.73% | skill 4/4; base 4/4 |
-| codex | doca-pcc.explicit-positive.v1 | 166,768 | 66,566 | +100,202 | +150.53% | skill 1/1; base 1/1 |
-| codex | doca-pcc.implicit-positive.v1 | 118,994 | 74,119 | +44,875 | +60.54% | skill 1/1; base 1/1 |
-| codex | doca-pcc.implicit-positive.v2 | 117,970 | 56,211 | +61,759 | +109.87% | skill 1/1; base 1/1 |
-| codex | doca-pcc.negative.v1 | 65,200 | 65,474 | -274 | -0.42% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,110,182 | 923,426 | +186,756 | +20.22% | skill 8/8; base 8/8 |
+| claude-code | All cases | 633,112 | 996,258 | -363,146 | -36.45% | skill 4/4; base 4/4 |
+| claude-code | doca-pcc.explicit-positive.v1 | 222,685 | 277,187 | -54,502 | -19.66% | skill 1/1; base 1/1 |
+| claude-code | doca-pcc.implicit-positive.v1 | 222,321 | 93,904 | +128,417 | +136.75% | skill 1/1; base 1/1 |
+| claude-code | doca-pcc.implicit-positive.v2 | 157,431 | 161,968 | -4,537 | -2.80% | skill 1/1; base 1/1 |
+| claude-code | doca-pcc.negative.v1 | 30,675 | 463,199 | -432,524 | -93.38% | skill 1/1; base 1/1 |
+| codex | All cases | 502,621 | 259,132 | +243,489 | +93.96% | skill 4/4; base 4/4 |
+| codex | doca-pcc.explicit-positive.v1 | 164,562 | 32,398 | +132,164 | +407.94% | skill 1/1; base 1/1 |
+| codex | doca-pcc.implicit-positive.v1 | 131,579 | 60,164 | +71,415 | +118.70% | skill 1/1; base 1/1 |
+| codex | doca-pcc.implicit-positive.v2 | 145,781 | 86,849 | +58,932 | +67.86% | skill 1/1; base 1/1 |
+| codex | doca-pcc.negative.v1 | 60,699 | 79,721 | -19,022 | -23.86% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,135,733 | 1,255,390 | -119,657 | -9.53% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -83,10 +83,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **CRITICAL** CONTENT_DEDUP/llm_prompt_size_limit: A Tier 2 cluster exceeds the LLM prompt character limit. (`skills/libs/doca-pcc`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-pcc/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-pcc/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-pcc`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`BENCHMARK.md:86`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`CAPABILITIES.md:283`)
-- 8 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo      (`BENCHMARK.md:87`)
+- 10 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

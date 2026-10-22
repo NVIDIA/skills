@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides AI agents through DOCA Rivermax (doca_rmax) receive-stream integration for timing-precise media over IP (SMPTE ST 2110 video/audio, market data, scientific feeds) on a BlueField DPU or ConnectX host, covering the Rivermax SDK and license precondition check, doca_rmax_in_stream sessions, doca_rmax_get_*_supported capability queries, pairing with doca-eth queues and doca-flow steering, and DOCA_ERROR_* diagnosis from Rivermax calls. <br>
+Guides agents through configuring, building, running, and debugging DOCA Rivermax (doca_rmax) receive streams for timing-precise media over IP (SMPTE ST 2110 video/audio, market data, scientific feeds) on a BlueField DPU once the Rivermax SDK and license are installed. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers and engineers building applications that consume the DOCA Rivermax integration to receive timing-precise media-over-IP streams (SMPTE ST 2110, real-time market data, scientific instrument streams) on BlueField DPU or ConnectX hosts with a separately installed and licensed NVIDIA Rivermax SDK. <br>
+External developers building applications that consume the DOCA Rivermax integration (code calling doca_rmax_* directly in C/C++ or through FFI/bindings) use this skill to confirm the Rivermax SDK + license precondition, configure receive-only doca_rmax_in_stream sessions, run doca_rmax_get_*_supported capability queries, pair with doca-eth queues and doca-flow steering, and interpret DOCA_ERROR_* from Rivermax calls. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,14 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
+- [Capabilities companion (CAPABILITIES.md)](CAPABILITIES.md) <br>
+- [Tasks companion (TASKS.md)](TASKS.md) <br>
+- [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Shell commands] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -45,15 +44,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in its own isolated sandbox pod (environment: k8s-sandbox). <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in its own isolated k8s-sandbox pod (evaluator version 1.5.6, evaluated 2026-10-21). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? Scored from the security signal. <br>
-- Correctness: Is the answer correct? Scored from the accuracy signal. <br>
-- Discoverability: Was the right skill loaded when needed? Scored from the skill_execution signal. <br>
-- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal_accuracy and behavior_check. <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? 50% skill_efficiency (tool-call productivity) and 50% token_efficiency. <br>
+- Security: Is it safe to use? <br>
+- Correctness: Is the answer correct? <br>
+- Discoverability: Was the right skill loaded when needed? <br>
+- Effectiveness: Did the skill help complete the task? <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -69,15 +68,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.4% | 97.8% |
+| Overall | 95.5% (uplift unavailable) | 97.8% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 65.0% → 100.0% (+35.0 points) | 45.0% → 100.0% (+55.0 points) |
-| Discoverability | 100.0% | 95.0% |
-| Effectiveness | 46.3% → 100.0% (+53.7 points) | 36.3% → 100.0% (+63.7 points) |
-| Efficiency | 76.9% | 94.1% |
+| Correctness | 65.0% → 100.0% (+35.0 points) | 55.0% → 100.0% (+45.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 93.3% (uplift unavailable) |
+| Effectiveness | 42.5% → 93.8% (+51.3 points) | 43.8% → 100.0% (+56.2 points) |
+| Efficiency | 83.5% (uplift unavailable) | 95.7% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-7e143d8 (source: git SHA, committed 2026-10-12) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

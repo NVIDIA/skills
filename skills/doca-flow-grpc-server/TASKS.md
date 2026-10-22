@@ -31,8 +31,8 @@ Routing for nearby "install" questions:
   DOCA source tree with gRPC support enabled (see
   [`## build`](#build)). For the DOCA SDK / source prerequisites,
   route to
-  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
-  or to [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install).
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
+  or to `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`).
 - *"I need to install gRPC tooling for my client language."*
   → not a DOCA-side install question. The
   [gRPC quickstart](https://grpc.io/docs/) index on
@@ -52,10 +52,10 @@ Steps the agent should walk the user through, in order:
 
 1. **Confirm DOCA is installed and the Flow library is
    present.** Run
-   [`doca-setup ## test`](../../doca-setup/TASKS.md#test);
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`);
    confirm `pkg-config --modversion doca-flow` resolves. If
    the user has no install yet, route to
-   [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    before any gRPC discussion.
 2. **Decide remote-vs-direct.** Per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
@@ -90,9 +90,9 @@ Steps the agent should walk the user through, in order:
    these are optional components for specific configurations.
    Confirm against the operator's intended Flow workload
    shape per
-   [`doca-flow CAPABILITIES.md`](../../libs/doca-flow/CAPABILITIES.md);
+   `doca-flow/CAPABILITIES.md`;
    when DPA-offload is involved, cross-link
-   [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md)
+   `doca-flow-dpa-perf/SKILL.md`
    for the underlying DPA performance surface.
 8. **Sanity check before any invocation.** Confirm with the
    user: what is the client language? Where will the client
@@ -177,7 +177,7 @@ names the *shape* of the flow.
    [`## configure`](#configure) steps 1-7.
 2. **Confirm the surrounding doca-flow application is
    healthy.** Run the Flow application's own smoke per
-   [`doca-flow TASKS.md ## test`](../../libs/doca-flow/TASKS.md#test);
+   `doca-flow TASKS.md ## test` (`doca-flow/TASKS.md#test`);
    the Flow port is up, at least one pipe is created and
    validated, counters are wired. The gRPC server has no
    value if the Flow side is not yet useful.
@@ -241,7 +241,7 @@ The smoke-before-bulk shape:
    right doca-flow application.
 5. **Cross-check the response against the live Flow
    application's own view.** Per
-   [`doca-flow CAPABILITIES.md ## Observability`](../../libs/doca-flow/CAPABILITIES.md#observability),
+   `doca-flow CAPABILITIES.md ## Observability` (`doca-flow/CAPABILITIES.md#observability`),
    the Flow library exposes pipe state programmatically;
    if the gRPC response disagrees with the application's
    own view, that is a finding — walk
@@ -260,7 +260,7 @@ deployment, not just one):
 | 4 → ## debug | RPC returns a non-OK gRPC status code; map the code to the documented contract before retrying | [`## debug`](#debug) layer 4 |
 | 5 → ## debug | gRPC response disagrees with the Flow application's own view; walk the version layer before any wider exposure | [`## debug`](#debug) layer 6 |
 | 1 → external-layer / bind change → 1 | After changing the access surface, re-run the smoke once; the prior smoke is stale | [`## configure`](#configure) steps 4-6 + [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) |
-| 1 → Flow-side pipe change → 1 | After the Flow application creates or destroys pipes, re-run the smoke to confirm the gRPC server's view reflects the change | [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify) |
+| 1 → Flow-side pipe change → 1 | After the Flow application creates or destroys pipes, re-run the smoke to confirm the gRPC server's view reflects the change | `doca-flow TASKS.md ## modify` (`doca-flow/TASKS.md#modify`) |
 
 The agent's rule: every state-changing action on the server
 configuration, the `.proto` contract, or the Flow application
@@ -302,17 +302,17 @@ layers in order:
    guide.
 5. **Flow-precondition-failed.** Confirm the underlying
    Flow application is in a state to accept the RPC per
-   [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify);
+   `doca-flow TASKS.md ## modify` (`doca-flow/TASKS.md#modify`);
    re-running the RPC against an unready Flow application
    is the wrong move.
 6. **Version.** Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end; common gRPC-server-specific symptom is a
    client generated from a different DOCA release's
    `.proto` than the server binary.
 7. **Cross-cutting.** Hand off to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md) and
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)
+   `doca-debug ## debug` (`doca-debug/SKILL.md`) and
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`)
    for the env-side layers (driver, firmware, BlueField
    mode, network reachability).
 
@@ -338,7 +338,7 @@ captured `doca_flow_grpc` session as evidence.
 3. **Cross-check the gRPC response against the Flow
    application's own counter / inspector view.** Disagreement
    is signal — it routes to [`## debug`](#debug) layer 6.
-4. **Route to [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify)**
+4. **Route to `doca-flow TASKS.md ## modify` (`doca-flow/TASKS.md#modify`)**
    only when the agent confirms the next step is a
    Flow-program change, not a gRPC-server-configuration
    change.
@@ -350,16 +350,16 @@ should be routed out before the agent does any of them under
 this skill's name.
 
 - **install DOCA** ⇒
-  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
-  and [`## no-install`](../../doca-setup/TASKS.md#no-install).
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
+  and `## no-install` (`doca-setup/TASKS.md#no-install`).
 - **write a doca-flow application** ⇒
-  [`doca-flow`](../../libs/doca-flow/SKILL.md), layered on
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-flow/SKILL.md`, layered on
+  `doca-programming-guide/SKILL.md`.
   The gRPC server is a remote control plane on top of the
   Flow library; it is not a template for creating Flow
   applications.
 - **library-internal pipe / counter / inspector deep dive**
-  ⇒ [`doca-flow`](../../libs/doca-flow/SKILL.md). The gRPC
+  ⇒ `doca-flow/SKILL.md`. The gRPC
   server transports the same data the Flow library exposes
   programmatically; the deeper per-pipe semantics belong to
   the library.
@@ -371,7 +371,7 @@ this skill's name.
   KPIs** ⇒ not a feature of this tool. The DOCA Telemetry
   Service (DTS) is the documented telemetry surface;
   routing belongs in
-  [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
+  `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 
 ## Command appendix
 
@@ -383,7 +383,7 @@ public DOCA Flow gRPC Server guide.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST
@@ -394,19 +394,19 @@ the agent should:
 3. If the probe fails, fall back to the manual command in
    the row.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
 | Discover the documented CLI surface | `doca_flow_grpc --help` plus the public DOCA Flow gRPC Server guide | [`## configure`](#configure) step 8 + [`## debug`](#debug) layer 1 | Prints the documented flag inventory; the agent uses this as the only source of truth for flag names. |
-| Confirm DOCA Flow library version | `pkg-config --modversion doca-flow` on the side the gRPC server runs | [`## configure`](#configure) step 1 + [`## debug`](#debug) layer 6 | Matches `doca_caps --version` and the version the client-side `.proto` was generated from; disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). |
+| Confirm DOCA Flow library version | `pkg-config --modversion doca-flow` on the side the gRPC server runs | [`## configure`](#configure) step 1 + [`## debug`](#debug) layer 6 | Matches `doca_caps --version` and the version the client-side `.proto` was generated from; disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). |
 | Locate the shipped `.proto` files | On the monorepo source tree the Flow gRPC `.proto` files live under `doca/libs/doca_flow/grpc/` (`common.proto`, `doca_flow.proto`, `packet_buffering/packet_buffering.proto`) — NOT under `doca/tools/flow_grpc_server/`. On a binary install they are shipped via the `doca-flow` include / share path; the agent runs `pkg-config doca-flow --variable=prefix` then `find <prefix> -name '*.proto'` to pin the actual install path on the user's host instead of memorizing one. | [`## configure`](#configure) step 3 | The `.proto` files exist on the user's install at the path the `find` confirms; the agent quotes the confirmed path, not memory. |
 | Generate client stubs in the chosen language | `protoc` + the language-specific gRPC plugin per [grpc.io](https://grpc.io/docs/languages/), with the shipped `.proto` files as input | [`## test`](#test) step 2 | The generated stubs compile in the client language; the client can construct request / response messages matching the contract. |
 | Confirm a client can dial the server end-to-end | The chosen client language's gRPC dial / channel / stub invocation through the selected external proxy / sidecar / VPN to the isolated plaintext endpoint | [`## run`](#run) step 4 + [`## test`](#test) step 3 | The external layer admits the request and the channel is ready to issue RPCs; no TLS / auth knob is configured on `doca_flow_grpc`. |
 | Issue ONE read-only RPC to confirm the server is wired to the live Flow application | The client invocation for a listing / status RPC documented in the shipped `.proto` files (the specific method name comes from the `.proto`, NOT from agent memory) | [`## test`](#test) step 4 | Exit 0 / `OK` status; the response reflects the live Flow application's state. |
-| Save a session snapshot for debug | Capture (a) the server's start / bind log, (b) the client's full command line + stub generation command + dial + RPC trace, (c) the gRPC status code(s) verbatim, (d) the four-tuple of (DOCA version, host, external-layer + plaintext-bind config, Flow application state) | [`## test`](#test) save step + [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) | The saved bundle is consumed by the cross-cutting debug ladder. |
+| Save a session snapshot for debug | Capture (a) the server's start / bind log, (b) the client's full command line + stub generation command + dial + RPC trace, (c) the gRPC status code(s) verbatim, (d) the four-tuple of (DOCA version, host, external-layer + plaintext-bind config, Flow application state) | [`## test`](#test) save step + `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) | The saved bundle is consumed by the cross-cutting debug ladder. |
 
 Three cross-cutting rules for this appendix:
 
@@ -425,9 +425,9 @@ Three cross-cutting rules for this appendix:
 - **Cross-link instead of duplicate.** Cross-cutting
   commands (`pkg-config --modversion`, `dmesg`, network
   tooling) live in
-  [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md);
+  `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md`);
   the Flow application build / port / pipe commands live in
-  [`doca-flow TASKS.md ## Command appendix`](../../libs/doca-flow/TASKS.md);
+  `doca-flow TASKS.md ## Command appendix` (`doca-flow/TASKS.md`);
   gRPC ecosystem commands (`protoc`, auth) live at
   `grpc.io`; this appendix names only Flow-gRPC-server-
   specific invocations on top.
@@ -452,8 +452,8 @@ A few rules that apply across every verb in this file:
   user's interpretation.
 - This skill **assumes a healthy DOCA install** (or the
   public NGC DOCA container) and a working
-  [`doca-flow`](../../libs/doca-flow/SKILL.md) application
+  `doca-flow/SKILL.md` application
   to program against. If either is in doubt, route to
-  [`doca-setup`](../../doca-setup/SKILL.md) and
-  [`doca-flow`](../../libs/doca-flow/SKILL.md) before
+  `doca-setup/SKILL.md` and
+  `doca-flow/SKILL.md` before
   running anything else here.

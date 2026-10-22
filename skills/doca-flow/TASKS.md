@@ -9,7 +9,9 @@ copy a tag from
 https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags
 (*How to pick an NGC tag without guessing*; never invent), then
 `docker pull nvcr.io/nvidia/doca/doca:<tag>` and
-`docker run -it --rm -v $HOME/dev:/work nvcr.io/nvidia/doca/doca:<tag> bash`.
+`docker run -it --rm -v $HOME/dev/doca-work:/work nvcr.io/nvidia/doca/doca:<tag> bash` (a dedicated empty directory, never `$HOME`) —
+`<tag>` is the exact tag copied from the catalog listing; never
+`latest` and never omitted.
 After `docker run`, MUST say: paste back the output of
 `pkg-config --modversion doca-flow` and
 `ls /opt/mellanox/doca/samples/doca_flow/`. Then: I resume from
@@ -27,7 +29,7 @@ For the capability matrix, version compatibility, error taxonomy,
 observability, and safety policy these workflows assume, see
 [CAPABILITIES.md](CAPABILITIES.md). For docs, installed-DOCA layout, or
 release notes, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 Each verb describes the **shape of the workflow**, not a copy-paste
 recipe: walk the user through the steps in order, verifying preconditions
 before recommending the next call.
@@ -68,7 +70,7 @@ the environment is ready for pipe construction.
    Arm.** On a BlueField the hardware-steering plane is owned by only one
    side of the card. Read `INTERNAL_CPU_MODEL` from `mlxconfig -d <pcie> q`
    (the `mlxconfig` command is owned by
-   [`doca-debug`](../../doca-debug/TASKS.md#command-appendix)):
+   `doca-debug/TASKS.md#command-appendix`):
    - `SEPARATED_HOST` → NIC mode; the steering plane lives on the **DPU
      Arm**, and the **x86 host function cannot start a Flow port** (it
      fails with the placement signature in
@@ -76,7 +78,7 @@ the environment is ready for pipe construction.
      `Failed to get hws cap` / `dest action ROOT … err -121`). On the host
      in this mode, STOP and route Flow work to the DPU Arm side, or change
      the card's mode through
-     [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) — do
+     `doca-hardware-safety/SKILL.md` — do
      not proceed to pipe construction.
    - `EMBEDDED_CPU` (DPU mode), or a NIC whose opened function advertises
      a usable steering plane → placement is fine; continue.
@@ -94,7 +96,7 @@ the environment is ready for pipe construction.
 5. **Runtime prerequisites — hugepages + HWS devargs, before any Flow
    program runs.** A DOCA Flow program needs hugepages allocated and
    mounted first. Hugepage reservation and any hugetlbfs mount are
-   env-class: follow [`doca-setup`](../../doca-setup/SKILL.md). Record
+   env-class: follow `doca-setup/SKILL.md`. Record
    the current `nr_hugepages` first. Do not pipe a value into `tee`.
    Do not default to a fixed page count. Do not mix `doca-hugepages`
    with raw sysfs writes. Hardware steering (HWS) must be requested
@@ -260,19 +262,29 @@ without committing to hardware yet.
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
    counters are a **two-step setup**: BOTH the per-entry monitor
    attachment AND a global pool reservation are required, or the
-   counter silently produces no telemetry. Reserve the pool **once**
-   at `doca_flow_init` time — for NON_SHARED per-entry counters via
-   `doca_flow_cfg_set_nr_counters(cfg, N)` (size `N` to the sum of
-   `NON_SHARED` monitor entries across every pipe plus ~10% headroom);
-   for shared counters / meters via the shared-pool path in
-   [`## shared-resources`](#shared-resources):
+   counter silently produces no telemetry. Reserve the pool **once**,
+   sized to the sum of `NON_SHARED` monitor entries across every pipe
+   plus ~10% headroom. Preferred in DOCA 3.5 (experimental; build with
+   `-DDOCA_ALLOW_EXPERIMENTAL_API`): per-port mode —
+   `doca_flow_cfg_set_resource_mode(cfg, DOCA_FLOW_RESOURCE_MODE_PORT)`
+   before `doca_flow_init()`, then
+   `doca_flow_port_cfg_set_nr_resources(port_cfg, DOCA_FLOW_RESOURCE_COUNTER, N)`
+   (`DOCA_FLOW_RESOURCE_METER` for meters) per port. The legacy global
+   `doca_flow_cfg_set_nr_counters(cfg, N)` / `_nr_meters` is **deprecated
+   in 3.5 and removed in 4.0** (still links with deprecation warnings;
+   `DOCA_ALLOW_DEPRECATED_API` silences them). Shared counters / meters
+   use the shared-pool path in [`## shared-resources`](#shared-resources):
 
 ```c
 struct doca_flow_cfg *cfg;
 doca_flow_cfg_create(&cfg);
-doca_flow_cfg_set_nr_counters(cfg, N);   /* MANDATORY for NON_SHARED per-entry counters */
+doca_flow_cfg_set_resource_mode(cfg, DOCA_FLOW_RESOURCE_MODE_PORT); /* 3.5, experimental */
 doca_flow_init(cfg);
 doca_flow_cfg_destroy(cfg);
+/* per port, on the port cfg before the port is started: */
+doca_flow_port_cfg_set_nr_resources(port_cfg, DOCA_FLOW_RESOURCE_COUNTER, N);
+/* legacy (deprecated in 3.5, removed in 4.0), before doca_flow_init():
+ * doca_flow_cfg_set_nr_counters(cfg, N);                               */
 ```
 
    The pool reservation above is only step one. The **per-entry** step
@@ -328,16 +340,16 @@ doca_flow_cfg_destroy(cfg);
 DOCA-installed Linux environment (bare-metal, VM, or NGC container) where
 the agent can read the sample tree and `pkg-config --modversion doca-flow`
 resolves. If that precondition is not met, route to
-[`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install) *before*
+`doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`) *before*
 offering any source. Do **not** author a Flow application from prose, in
-any language — ground rule #3 of [`AGENTS.md`](../../../AGENTS.md) and
+any language — ground rule #3 of bundle `AGENTS.md` and
 [`SKILL.md`](SKILL.md#what-this-skill-deliberately-does-not-ship) forbid
 it; the result would not compile against a real install.
 
 ### Track 1 — C / C++ consumers (the canonical case)
 
 This is the universal *derive a custom first app from a sample* pattern in
-[`doca-programming-guide ## modify`](../../doca-programming-guide/TASKS.md#modify),
+`doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`),
 with these Flow-specific overrides:
 
 - **Source sample (choose by the first-app shape).** Pick the sample whose
@@ -594,7 +606,7 @@ root cause that is either fixable in the spec or escalatable.
 > version / build / link / runtime / program / driver) and its tooling
 > (`gdb`, `valgrind`, `--sdk-log-level`, container-vs-native debug, core
 > dumps, Developer Forum escalation), see
-> [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug). Walk the
+> `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). Walk the
 > cross-cutting ladder first when the symptom layer is unknown; this Flow
 > overlay layers on top once the symptom is confirmed inside the Flow API.
 
@@ -610,7 +622,7 @@ on a BlueField in `SEPARATED_HOST` / NIC mode, and it reproduces on
 *every* device in *both* `vnf` and `switch` modes. Route back to
 [`## configure`](#configure) step 2; the fix is to run Flow on the DPU Arm
 side or change the card's mode via
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) — never a
+`doca-hardware-safety/SKILL.md` — never a
 pipe-spec edit.
 
 Walk in this order — do not skip steps:
@@ -624,35 +636,35 @@ Walk in this order — do not skip steps:
    to determine whether the pipe itself is healthy.
 3. **What's actually programmed / verbose logs third.** To inspect what
    the hardware actually has programmed, route to the
-   [`doca-flow-tune`](../../tools/doca-flow-tune/SKILL.md) sibling skill,
+   `doca-flow-tune/SKILL.md` sibling skill,
    which owns the programmed-state surface. For verbose runtime logging
    during active debugging, build/link the trace flavor
    (`pkg-config doca-flow-trace`) and run with `--sdk-log-level 70`; the
    runtime mechanics live in
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 4. **Error code mapping.** Any `DOCA_ERROR_*` returned during the
    investigation routes through the taxonomy in
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
    The cross-library taxonomy (which family routes to which debug layer)
    is owned by
-   [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+   `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
    this Flow file only adds the Flow-specific overlay.
 5. **Version sanity.** If a spec fails or behaves differently across
    sessions, confirm the installed DOCA version did not change. The
    four-source version-coherence check (`pkg-config --modversion doca-common`,
    `cat /opt/mellanox/doca/applications/VERSION`, `doca_caps --version`,
    BFB version) is owned by
-   [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) Layer 2; the
+   `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) Layer 2; the
    version-detection mechanics live in
-   [`doca-public-knowledge-map ## Where to find the version`](../../doca-public-knowledge-map/SKILL.md#where-to-find-the-version).
+   `doca-public-knowledge-map ## Where to find the version` (`doca-public-knowledge-map/SKILL.md#where-to-find-the-version`).
    A library upgrade between sessions is a common and easy-to-miss cause.
 6. **Escalation criteria.** If counters move correctly but observed
    behavior is still wrong AND what's programmed (step 3) matches the spec
    AND the version is unchanged, the bug is below the Flow API surface
    (driver or firmware). Stop attempting Flow-spec changes; capture state per
-   [`doca-debug ## test`](../../doca-debug/TASKS.md#test) (the read-only
+   `doca-debug ## test` (`doca-debug/TASKS.md#test`) (the read-only
    triple) and escalate via
-   [`doca-debug ## debug` *Where to ask for help*](../../doca-debug/TASKS.md#debug)
+   `doca-debug ## debug` *Where to ask for help* (`doca-debug/TASKS.md#debug`)
    to the public DOCA Developer Forum.
 
 ## flow-ct
@@ -667,11 +679,20 @@ For device support, sizing, and safety, read
 `doca_flow_ct_cfg_create` and the verified `doca_flow_ct_cfg_set_*` setters →
 `doca_flow_ct_init(cfg)` once per process → port start → CT-aware pipes →
 entries. CT is not a per-port `doca_ctx`; do not call `doca_ctx_start` for CT.
-If ports are already running, this is not an in-place attachment: capture
-pipe definitions and counter baselines, obtain approval for the traffic
-interruption, stop the affected ports, initialize CT before restarting,
-and recreate the intended stateless/CT-aware configuration from the
-snapshot and shipped sample. Do not assume old pipe handles survive.
+If ports are already running, this is not an in-place attachment. The
+agent does not perform the restart itself; it hands the operator this
+sequence and stops until the operator confirms:
+(1) **snapshot** — the pipe definitions are the application's own source
+(the `doca_flow_pipe_cfg_*` / `doca_flow_pipe_create` calls), so record the
+source revision plus `doca_flow_query_pipe_miss` / `doca_flow_query_entry`
+counter baselines; there is no runtime pipe-dump API to rely on;
+(2) **approval** — the operator explicitly confirms a maintenance window,
+because stopping ports drops all traffic on them (follow
+`doca-hardware-safety ## configure` (`doca-hardware-safety/TASKS.md#configure`));
+with no human operator available, return `requires_human_decision` instead
+of proceeding; (3) stop the affected ports, initialize CT, restart, and
+recreate the configuration from the recorded source revision and shipped
+sample. Do not assume old pipe handles survive.
 On shutdown, stop ports before `doca_flow_ct_destroy`, then
 `doca_flow_destroy`. Verify matching and unrelated traffic after restart;
 if the smoke fails, follow this section's rollback overlay.
@@ -686,14 +707,20 @@ if the smoke fails, follow this section's rollback overlay.
    already-running port: if ports are started, CT init must move earlier.
 2. **Device-support check for CT.** Call
    `doca_flow_ct_cap_is_dev_supported(devinfo)` against the active
-   `doca_devinfo`. This is the ONLY CT cap query — there is no
-   per-axis `doca_flow_ct_cap_*` family for flow count, aging
-   range, NAT variants, or overlays; do not invent one. If the
+   `doca_devinfo`. There is no per-axis `doca_flow_ct_cap_*`
+   family for flow count, aging range, NAT variants, or overlays;
+   do not invent one. DOCA 3.5 adds the experimental port
+   capabilities API (`doca_flow_port_capabilities_create` /
+   `_get_ct_ipv6` / `_destroy`, after `doca_flow_init()` and before
+   port start) for CT IPv6 support. If the
    device does not support CT, surface that and stop.
 3. **Size the CT module to the user's expected peak, not
    average.** CT entries persist until aging evicts them or
-   policy removes them. Set the table sizing through the
-   `doca_flow_ct_cfg_set_*` setters sized to the peak
+   policy removes them. Since DOCA 3.4 sizing is per CT pipe:
+   `doca_flow_pipe_cfg_set_ct_connections()`,
+   `doca_flow_pipe_cfg_set_ct_max_connections_per_zone()`, and
+   `doca_flow_pipe_cfg_set_ct_dup_filter_size()` on the CT pipe cfg
+   (not `doca_flow_ct_cfg_set_*`), sized to the peak
    concurrent-flow estimate; oversubscription surfaces as
    `DOCA_ERROR_FULL` / `_NO_MEMORY` at runtime.
 4. **Build and init the CT cfg.** Create `struct doca_flow_ct_cfg` via
@@ -719,7 +746,7 @@ if the smoke fails, follow this section's rollback overlay.
 | Slot | Value |
 | --- | --- |
 | pkg-config modules | CT adds no separate module: keep every companion module required by the parent Flow/DPDK build and include `doca-flow`; there is no `doca-flow-ct` module |
-| Version anchor | `pkg-config --modversion doca-flow` MUST equal `doca_caps --version`. Mismatch → escalate to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 BEFORE diagnosing the CT layer itself |
+| Version anchor | `pkg-config --modversion doca-flow` MUST equal `doca_caps --version`. Mismatch → escalate to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 BEFORE diagnosing the CT layer itself |
 | Header includes | Add `doca_flow_ct.h` to the doca-flow headers the parent [`## build`](#build) prescribes; it ships in the same `doca-sdk-flow` devel package |
 | `.pc` discovery | `pkg-config --list-all | grep doca-flow` confirms `doca-flow.pc` is visible to the build; there is no `doca-flow-ct.pc` to look for |
 
@@ -820,7 +847,7 @@ ladder:
 
 **rollback overlay.** A CT add is a pipeline-edit-class mutation (it extends
 an already-up stateless port; it does not touch firmware or eswitch mode), so
-the [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) overlay does
+the `doca-hardware-safety/SKILL.md` overlay does
 NOT fire — CT follows the same snapshot-first rollback discipline as
 [`## rollback`](#rollback), with a CT-specific reversal. **Snapshot before
 mutate:** record the stateless pipe scheme the agent authored (names, root
@@ -862,14 +889,19 @@ decide via that section first, (b) walk the four steps below verbatim,
 `ENCAP`; substitute the matching kind from the table):**
 
 ```c
-/* 1. Reserve K slots BEFORE doca_flow_init() — count first, then type. */
+/* 1. Reserve K slots BEFORE doca_flow_init() — count first, then type.
+ *    DEPRECATED in DOCA 3.5 (removed in 4.0; links with deprecation warnings,
+ *    DOCA_ALLOW_DEPRECATED_API silences them). For counters / meters prefer
+ *    per-port resource mode (experimental): see ## build step above.      */
 doca_flow_cfg_set_nr_shared_resource(cfg, K, DOCA_FLOW_SHARED_RESOURCE_ENCAP);
 
 /* 2. Populate each slot after init (one call per distinct config). */
 doca_flow_shared_resource_set_cfg(DOCA_FLOW_SHARED_RESOURCE_ENCAP, id, &res_cfg);
 /*    (port-scoped form: doca_flow_port_shared_resource_set_cfg(port, type, id, &res_cfg)) */
 
-/* 3. Bind the slot range to the port once at startup. */
+/* 3. Bind the slot range to the port once at startup.
+ *    DEPRECATED in 3.5 (removed in 4.0); in per-port resource mode use
+ *    doca_flow_port_shared_resource_get/put() instead (experimental). */
 uint32_t ids[K] = { 0, 1, /* … */ K - 1 };
 doca_flow_shared_resources_bind(DOCA_FLOW_SHARED_RESOURCE_ENCAP, ids, K, port);
 
@@ -905,7 +937,7 @@ modify-header, NAT-without-CT, hairpin attach. (CT
 additions route through [`## flow-ct`](#flow-ct) rollback overlay
 instead.)
 The
-[universal verification contract](../../doca-setup/CAPABILITIES.md#universal-verification-contract)
+universal verification contract (`doca-setup/CAPABILITIES.md#universal-verification-contract`)
 requires *"the rollback path is documented"* on every change-recommending
 answer.
 
@@ -917,7 +949,7 @@ attachment, miss-pipe linkage), (b) the per-pipe counter baseline
 and (c) the device cap snapshot the edit gated on (`doca_caps --list-devs`
 + Flow cap query results). For an independent view of what is actually
 programmed, route to
-[`doca-flow-tune`](../../tools/doca-flow-tune/SKILL.md). That record IS the
+`doca-flow-tune/SKILL.md`. That record IS the
 rollback target.
 
 1. **Document the reverse-edit verb in the same answer that recommends the
@@ -930,7 +962,7 @@ rollback target.
    `doca_flow_monitor_destroy`, so the reversal is `doca_flow_pipe_destroy`
    + `doca_flow_pipe_create` with a `doca_flow_pipe_cfg` that does NOT call
    `doca_flow_pipe_cfg_set_monitor`.
-2. **Trigger from the [deploy-loop bridge](../../doca-setup/CAPABILITIES.md#deploy-loop-bridge--step-5-not-green-is-the-debug-loop-trigger).**
+2. **Trigger from the deploy-loop bridge (`doca-setup/CAPABILITIES.md#deploy-loop-bridge--step-5-not-green-is-the-debug-loop-trigger`).**
    The contract's smoke probe is constructor-time validation
    ([`## test`](#test) step 1) plus a counter read under traffic
    ([`## run`](#run) step 5). If it does not return green (counter
@@ -947,7 +979,7 @@ rollback target.
 
 Hardware changes (mode flip, SR-IOV, firmware) are NOT pipeline edits and
 route through
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)'s rollback
+`doca-hardware-safety/SKILL.md`'s rollback
 discipline instead.
 
 ## Command appendix
@@ -962,12 +994,12 @@ binary or `pkg-config` against the installed `.pc`, not prose recall.
 | --- | --- | --- | --- |
 | Discover installed Flow version | `pkg-config --modversion doca-flow` | [`## configure`](#configure) step 1 | Matches the version pinned in other places (`doca_caps --version`, `applications/VERSION`). |
 | Discover Flow link flags (release flavor) | `pkg-config --cflags --libs doca-flow doca-common doca-dpdk-bridge libdpdk` | [`## build`](#build) | Returns the canonical `-l` list. `doca-flow` alone omits the companion DSOs → `undefined reference` / `DSO missing from command line`; pass every module the app calls. Hand-typed `-l` lines are the failure mode. |
-| Discover device + steering capabilities | `doca_caps --list-devs` | [`## configure`](#configure) step 2 + [doca-caps](../../tools/doca-caps/SKILL.md) | Lists every device DOCA sees with the active configuration and supported match / action kinds. |
+| Discover device + steering capabilities | `doca_caps --list-devs` | [`## configure`](#configure) step 2 + `doca-caps/SKILL.md` | Lists every device DOCA sees with the active configuration and supported match / action kinds. |
 | Enumerate ports / representors | `devlink dev show` + the installed Flow port-enumeration sample | [`## configure`](#configure) step 3 | Shows the port and every representor the user expects to forward to. |
 | Validate a pipe spec (read-only) | `doca_flow_pipe_create` itself performs constructor-time validation; treat its `DOCA_ERROR_INVALID_VALUE` / `DOCA_ERROR_NOT_SUPPORTED` return as the validate signal. There is no separate `doca_flow_pipe_validate` public symbol in the current release. Use the dry-run / staged-entry pattern from the shipped sample for a fuller validation surface. | [`## test`](#test) step 1 | A successful return from `doca_flow_pipe_create` means the spec is internally consistent against the current device caps; an error means the spec is invalid — do not retry without changing the spec. |
-| Raise log verbosity for a Flow run | `--sdk-log-level 70` on the program command line | [`## run`](#run) + [doca-debug CAPABILITIES.md ## Observability](../../doca-debug/CAPABILITIES.md#observability) | TRACE / DEBUG lines appear in stderr; the Flow lifecycle calls are visible. |
+| Raise log verbosity for a Flow run | `--sdk-log-level 70` on the program command line | [`## run`](#run) + doca-debug CAPABILITIES.md ## Observability (`doca-debug/CAPABILITIES.md#observability`) | TRACE / DEBUG lines appear in stderr; the Flow lifecycle calls are visible. |
 | Read per-entry / per-pipe counters | `doca_flow_resource_query_entry()` / `doca_flow_resource_query_pipe_miss()` | [`## debug`](#debug) step 1 | Counter for the suspected entry is non-zero under expected traffic. |
-| Inspect what's actually programmed | route to [`doca-flow-tune`](../../tools/doca-flow-tune/SKILL.md) | [`## debug`](#debug) step 3 | The programmed state matches the user's mental model of the pipe. Diff = bug. |
+| Inspect what's actually programmed | route to `doca-flow-tune/SKILL.md` | [`## debug`](#debug) step 3 | The programmed state matches the user's mental model of the pipe. Diff = bug. |
 
 Three cross-cutting rules for this appendix:
 
@@ -976,11 +1008,11 @@ Three cross-cutting rules for this appendix:
   doca` are the only safe sources.
 - **Never paraphrase a Flow `DOCA_ERROR_*`.** Quote
   `doca_error_get_descr()` verbatim — the layer-classifier in
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) layer 5
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) layer 5
   needs the exact text.
 - **Cross-cutting commands live in doca-debug.** The read-only triple,
   `dmesg`, and `mlxconfig -d <pcie> q` are in
-  [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+  `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
   reach there for them rather than restating them in this appendix.
 
 ## Deferred task verbs
@@ -991,7 +1023,7 @@ does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [doca-public-knowledge-map ## Layout of an installed DOCA package](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying BlueField images, provisioning DPUs at scale,
   Kubernetes operator workflows — out of scope for Phase 1 and reserved

@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-hardware-safety`
-- Evaluation date: 2026-10-13
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 97.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 92.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 35.0% → 100.0% (+65.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 44.2% → 100.0% (+55.8 points) | 49.6% → 100.0% (+50.4 points) |
-| Efficiency | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 70.0% → 100.0% (+30.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 70.8% → 93.8% (+23.0 points) | 52.1% → 98.1% (+46.0 points) |
+| Efficiency | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 70.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 327,261 | 183,783 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-hardware-safety.explicit-positive.v1 | 67,457 | 29,778 | +37,679 | +126.53% | skill 1/1; base 1/1 |
-| claude-code | doca-hardware-safety.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-hardware-safety.implicit-positive.v2 | 229,825 | 124,382 | +105,443 | +84.77% | skill 1/1; base 1/1 |
-| claude-code | doca-hardware-safety.negative.v1 | 29,979 | 29,623 | +356 | +1.20% | skill 1/1; base 1/1 |
-| codex | All cases | 976,099 | 95,230 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-hardware-safety.explicit-positive.v1 | 204,386 | 25,351 | +179,035 | +706.22% | skill 1/1; base 1/1 |
-| codex | doca-hardware-safety.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-hardware-safety.implicit-positive.v2 | 483,633 | 56,527 | +427,106 | +755.58% | skill 1/1; base 1/1 |
-| codex | doca-hardware-safety.negative.v1 | 288,080 | 13,352 | +274,728 | +2057.58% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,303,360 | 279,013 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 469,015 | 379,467 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-hardware-safety.explicit-positive.v1 | 66,944 | 120,072 | -53,128 | -44.25% | skill 1/1; base 1/1 |
+| claude-code | doca-hardware-safety.implicit-positive.v1 | 371,991 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-hardware-safety.implicit-positive.v2 | N/A | 94,764 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-hardware-safety.negative.v1 | 30,080 | 164,631 | -134,551 | -81.73% | skill 1/1; base 1/1 |
+| codex | All cases | 363,314 | 122,514 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-hardware-safety.explicit-positive.v1 | 109,155 | 34,278 | +74,877 | +218.44% | skill 1/1; base 1/1 |
+| codex | doca-hardware-safety.implicit-positive.v1 | 240,474 | 74,878 | +165,596 | +221.15% | skill 1/1; base 1/1 |
+| codex | doca-hardware-safety.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-hardware-safety.negative.v1 | 13,685 | 13,358 | +327 | +2.45% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 832,329 | 501,981 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 13 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_efficiency: Instructions lack clear action verbs (`skills/doca-hardware-safety/SKILL.md`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`CAPABILITIES.md:358`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`CAPABILITIES.md:363`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`CAPABILITIES.md:369`)
-- **LOW** QUALITY/quality_discoverability: Description very long (926 chars, recommend 50-150) (`skills/doca-hardware-safety/SKILL.md`)
-- 7 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-hardware-safety/SKILL.md`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo     (`CAPABILITIES.md:358`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo     (`CAPABILITIES.md:363`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo     (`CAPABILITIES.md:369`)
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

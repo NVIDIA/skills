@@ -64,14 +64,14 @@ should not add:
 - **Container or bare-metal application launch.** Running a DOCA
   service container or a DOCA-linked binary on an already-working
   BlueField is owned by
-  [`doca-container-deployment`](../../doca-container-deployment/SKILL.md)
+  `doca-container-deployment/SKILL.md`
   and
-  [`doca-bare-metal-deployment`](../../doca-bare-metal-deployment/SKILL.md).
+  `doca-bare-metal-deployment/SKILL.md`.
   This skill stops at "Grace installed, firmware at the target level."
 - **The hardware-change meta-policy.** The preflight / OOB-console /
   maintenance-window / rollback discipline that wraps every PLDM burn,
   ISO reflash, power cycle, and BMC factory reset is owned by
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md). This
+  `doca-hardware-safety/SKILL.md`. This
   skill cross-links it and never redefines it.
 - **Real credentials, internal hostnames, internal paths, or
   pre-release firmware version strings.** This skill uses only
@@ -90,7 +90,7 @@ should not add:
 
 ## Related skills
 
-- [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) — the
+- `doca-hardware-safety/SKILL.md` — the
   CRITICAL cross-cutting meta-policy for any change touching DPU / NIC
   hardware state. Every PLDM firmware burn, ISO reflash, power cycle,
   and BMC factory reset in this skill is a MUTATING op; the
@@ -98,25 +98,25 @@ should not add:
   ALONGSIDE, never duplicating it. This skill's `## Safety policy`
   overlays that meta-policy with BF4-specific rules (never print a
   credential, always detach media, public information only).
-- [`doca-bare-metal-deployment`](../../doca-bare-metal-deployment/SKILL.md)
+- `doca-bare-metal-deployment/SKILL.md`
   — the downstream skill for launching a DOCA-linked binary directly
   on the BlueField Arm once this skill has brought Grace up. Its
   `## bluefield-lifecycle` anchor covers the BF3-era BFB / RShim /
   TMFIFO lifecycle; this skill is the BF4 BMC-driven day-1 analog.
-- [`doca-container-deployment`](../../doca-container-deployment/SKILL.md)
+- `doca-container-deployment/SKILL.md`
   — the downstream skill for deploying a DOCA service container on the
   BlueField once Grace is up.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation on the
+- `doca-setup/SKILL.md` — env preparation on the
   installed Grace OS (install verification, hugepages, pkg-config
   path, devlink mode, representor visibility). This skill hands off to
   it once the platform is up.
-- [`doca-version`](../../doca-version/SKILL.md) — the four-way version
+- `doca-version/SKILL.md` — the four-way version
   match rule. This skill's `## Version compatibility` cross-links the
   body there and adds only the BF4 overlay (install / firmware targets
   come from the public release notes; the Redfish FirmwareInventory
   and `pldmtool GetFwParams` are the post-update anchors; `cat
   /etc/mlnx-release` is the Grace install anchor).
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — the routing table to the public BlueField/DOCA documentation,
   release notes, and download surface. This skill does not duplicate
   URLs or invent exact doc anchors; it points at the map. The

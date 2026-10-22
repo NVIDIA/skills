@@ -14,7 +14,7 @@ taxonomy, observability, and safety policy, see
 patterns layered under everything below (the universal lifecycle,
 the cross-library `DOCA_ERROR_*` taxonomy, the modify-a-shipped-
 sample workflow), see
-[`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through the
@@ -53,7 +53,7 @@ Steps the agent should walk the user through:
    walk `ls /sys/class/net/` on the DPU and `lspci | grep
    Mellanox` on the host BEFORE any object-creation call. If
    either is missing, route to
-   [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure)
+   `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`)
    — this is an env problem, not a code problem.
 2. **Pick the role per side.** DPU = server, host = client. Per
    the role table in
@@ -92,7 +92,7 @@ Steps the agent should walk the user through:
 
 For the canonical DOCA universal lifecycle that underlies steps
 2-6, see
-[`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure).
+`doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`).
 This skill adds the Comch overlay; do not re-explain the
 lifecycle here.
 
@@ -104,7 +104,7 @@ flags.
 
 The build pattern for any DOCA C/C++ consumer is fully documented
 in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the Comch-specific overlay:
 
 | Slot | Value | Why it matters |
@@ -120,7 +120,7 @@ visibility goes through the language's own FFI generator (e.g.
 `bindgen` against the comch headers). The role-split and
 capability-discovery rules still apply — the wrapper consumes a
 `*.so` that has its own runtime version per
-[`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+`doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 
 ## modify
 
@@ -129,7 +129,7 @@ Goal: take the closest-fitting shipped Comch sample and apply a
 rewriting from scratch.
 
 The universal modify-a-shipped-sample workflow is in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify);
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`);
 this skill provides the Comch-specific slot fill.
 
 | Slot | Value | Source |
@@ -137,7 +137,7 @@ this skill provides the Comch-specific slot fill.
 | Sample tree | `/opt/mellanox/doca/samples/doca_comch/<name>/` | Confirmed by `ls /opt/mellanox/doca/samples/doca_comch/`; one subdirectory per shipped sample |
 | Pick the closest sample | Match the user's intent (server vs client; slow-path vs fast-path; one-shot vs streaming) to a sample whose code shape already matches | Per the path-selection table in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) |
 | Identify the modify surface | The connection callbacks; the recv-callback body (slow-path); the producer-submit body (fast-path); the message payload struct | These are the in-place edit points; do not introduce a new translation unit unless the sample is being split for clarity |
-| Re-validate against capabilities | Re-run the `doca_comch_cap_*` queries from [`## configure`](#configure) step 3 against the modified configuration — message size growth, client-count growth, transport change all flip a capability boundary | Per the cross-cutting rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability), the cap query is the runtime authority |
+| Re-validate against capabilities | Re-run the `doca_comch_cap_*` queries from [`## configure`](#configure) step 3 against the modified configuration — message size growth, client-count growth, transport change all flip a capability boundary | Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap query is the runtime authority |
 | Keep the build manifest unchanged | The sample's existing `meson.build` already wires `pkg-config doca-comch`; do not switch to a hand-rolled Makefile for *"simplicity"* — it removes the version-check rail | Per the build slot table in [`## build`](#build) |
 
 The agent's anti-pattern alert: a *"clean rewrite"* from scratch is
@@ -175,7 +175,7 @@ Steps the agent should walk the user through:
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
 underlie *"the program built but does nothing"*, see
-[`doca-version TASKS.md ## run`](../../doca-version/TASKS.md#run).
+`doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
 
@@ -209,7 +209,7 @@ Iteration shape:
    queue sizing is independent.
 5. **Cross-version run** (if the user has multiple installs):
    re-run steps 1-4 on each install; quote the version per
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure)
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)
    in the report.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
@@ -220,13 +220,13 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Slow-path passed; fast-path consumer never fires | Consumer not attached / not progressed; fast-path producer wrote into a queue with no consumer reader | Confirm `doca_comch_consumer_create` + `_progress`; do not assume slow-path patterns transfer |
 | First connect succeeded; reconnect failed with `BAD_STATE` | Connection objects not torn down before re-connect | Walk the connection-event-callback teardown; the disconnected connection needs explicit destroy before the new accept |
 | Producer submit returns `AGAIN` after 100 successful submits | Consumer is not draining at the same rate | This is a flow-control problem in the app, not a Comch bug; the agent must surface the rate gap, not paper over with retries |
-| Same code passes on host A, fails on host B | Different DOCA version or different representor permission | Re-run [`## configure`](#configure) step 1 (env preconditions) + [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) four-way match on host B |
+| Same code passes on host A, fails on host B | Different DOCA version or different representor permission | Re-run [`## configure`](#configure) step 1 (env preconditions) + `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) four-way match on host B |
 
 Loop termination: run the smoke sweep once and permit at most one
 single-variable correction followed by one rerun. If that second
 sweep is still non-green, stop regardless of whether the symptom
 changed; escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured trace + version state as evidence.
 
 ## debug
@@ -235,7 +235,7 @@ Goal: when a Comch session fails, isolate the cause to a single
 layer before recommending any code change.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver. This skill provides the Comch overlay
 at the *runtime* and *program* layers.
@@ -285,12 +285,12 @@ at the *runtime* and *program* layers.
 
 Once the layer is identified, route to the matching debug verb on
 the matching skill: install / build / link / driver to
-[`doca-setup ## debug`](../../doca-setup/TASKS.md#debug); version to
-[`doca-version ## debug`](../../doca-version/TASKS.md#debug);
+`doca-setup ## debug` (`doca-setup/TASKS.md#debug`); version to
+`doca-version ## debug` (`doca-version/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 ## Deferred task verbs
 
@@ -300,9 +300,9 @@ the agent does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [`doca-setup`](../../doca-setup/SKILL.md) and to the install-tree
+  `doca-setup/SKILL.md` and to the install-tree
   layout in
-  [doca-public-knowledge-map ## Layout of an installed DOCA package](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying Comch-using applications at scale (many
   host processes per BlueField, Kubernetes operator workflows
@@ -311,7 +311,7 @@ the agent does not invent guidance:
 - **manage / monitor.** Multi-tenant Comch fan-out, telemetry
   shipping over Comch — covered partially by the operations
   guidance in
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md);
+  `doca-public-knowledge-map/SKILL.md`;
   no operator skill yet ships in this bundle.
 - **firmware burn / reset.** Comch depends on the underlying
   ConnectX firmware and BlueField BFB; if the user's debug
@@ -329,7 +329,7 @@ unprivileged user unless noted. Sudo is called out per row.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -343,24 +343,24 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-comch` | `## configure` step 1; `## build` slot 1 | What is the build-time DOCA Comch version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
+| `pkg-config --modversion doca-comch` | `## configure` step 1; `## build` slot 1 | What is the build-time DOCA Comch version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
 | `pkg-config --cflags --libs doca-comch` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `ls /opt/mellanox/doca/samples/doca_comch/` | `## modify` | Which Comch samples ship in this install, and which is the closest starting point? | A list of sample directories named after the role + path pattern they demonstrate |
 | `ls /sys/class/net/` (DPU side) | `## configure` step 1 | Which host representors are visible to the DPU? | One entry per representor (PF / VF / SF) the host has surfaced |
 | `lspci | grep Mellanox` (host side) | `## configure` step 1 | Which BlueField PCIe addresses are reachable from the host? | One row per BlueField PF, plus VFs and SFs depending on config |
 | `mlxconfig -d <pcie> q INTERNAL_CPU_MODEL` (sudo) | `## configure` step 1 | What mode is this BlueField in (SmartNIC / DPU / switch)? | A single matching mode line; Comch requires the host ↔ DPU pair to agree |
-| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last Comch call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
+| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last Comch call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the Comch-specific rows on top.

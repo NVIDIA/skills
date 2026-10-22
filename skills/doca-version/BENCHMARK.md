@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-version`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.1% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 96.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 60.0% → 100.0% (+40.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 81.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 60.4% → 85.4% (+25.0 points) | 60.4% → 82.5% (+22.1 points) |
-| Efficiency | 70.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 65.0% → 100.0% (+35.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 45.0% → 100.0% (+55.0 points) | 43.8% → 98.8% (+55.0 points) |
+| Efficiency | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 602,832 | 523,100 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-version.explicit-positive.v1 | 261,331 | 243,562 | +17,769 | +7.30% | skill 1/1; base 1/1 |
-| claude-code | doca-version.implicit-positive.v1 | 311,234 | 125,913 | +185,321 | +147.18% | skill 1/1; base 1/1 |
-| claude-code | doca-version.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-version.negative.v1 | 30,267 | 153,625 | -123,358 | -80.30% | skill 1/1; base 1/1 |
-| codex | All cases | 900,021 | 217,882 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-version.explicit-positive.v1 | 196,770 | 26,363 | +170,407 | +646.39% | skill 1/1; base 1/1 |
-| codex | doca-version.implicit-positive.v1 | 487,620 | 93,357 | +394,263 | +422.32% | skill 1/1; base 1/1 |
-| codex | doca-version.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-version.negative.v1 | 215,631 | 98,162 | +117,469 | +119.67% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,502,853 | 740,982 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 750,719 | 553,855 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-version.explicit-positive.v1 | 202,207 | 154,306 | +47,901 | +31.04% | skill 1/1; base 1/1 |
+| claude-code | doca-version.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-version.implicit-positive.v2 | 357,412 | 186,789 | +170,623 | +91.35% | skill 1/1; base 1/1 |
+| claude-code | doca-version.negative.v1 | 191,100 | 212,760 | -21,660 | -10.18% | skill 1/1; base 1/1 |
+| codex | All cases | 443,276 | 192,497 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-version.explicit-positive.v1 | 137,790 | 25,935 | +111,855 | +431.29% | skill 1/1; base 1/1 |
+| codex | doca-version.implicit-positive.v1 | 275,209 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-version.implicit-positive.v2 | N/A | 68,015 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-version.negative.v1 | 30,277 | 98,547 | -68,270 | -69.28% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,193,995 | 746,352 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -84,9 +84,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/doca-version/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/doca-version/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Instructions lack clear action verbs (`skills/doca-version/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: Description very long (876 chars, recommend 50-150) (`skills/doca-version/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/doca-version/SKILL.md`)
-- 6 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-version/SKILL.md`)
+- **LOW** QUALITY/quality_discoverability: Description very long (883 chars, recommend 50-150) (`skills/doca-version/SKILL.md`)
+- 7 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

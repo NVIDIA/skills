@@ -1,5 +1,5 @@
 ## Description: <br>
-Defines the detect, prefer, fall back, and report contract plus locked JSON schemas (doca-env, version-matrix, capability-snapshot, validate-before-commit, and host/DPU collect-state) that other DOCA skills use to consolidate multi-command answers about DOCA environment, versions, devices, capabilities, and validation state, with manual command fallbacks when the structured helpers are absent. <br>
+Defines a locked JSON schema contract that other DOCA skills use to prefer a structured helper tool for DOCA environment, version, device, capability, and spec-validation queries, with an ordered manual fallback chain and mandatory path reporting when the helper is absent. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA DOCA use this skill to get one-shot, consolidated answers about a host or BlueField DOCA install (environment, versions, devices, capabilities, pre-commit validation, host vs DPU state), preferring structured helper output when present and otherwise walking the documented manual command chains. <br>
+Developers and engineers working with NVIDIA DOCA use this skill, loaded as an overlay by other DOCA skills, to get a single consolidated answer about DOCA install state, versions, devices, capabilities, and spec validation by preferring a structured helper tool when present and walking a documented manual command chain when it is not. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Worked routing examples](references/examples.md) <br>
+- [Structured-tools routing examples](references/examples.md) <br>
 - [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline JSON schema fields and bash code blocks] <br>
+**Output Type(s):** [Analysis, Shell commands] <br>
+**Output Format:** [Markdown with inline JSON and shell code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Answers open with a report of whether the structured helper or the manual fallback chain was used] <br>
+**Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -42,38 +42,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative) from skill-evaluator-dataset-snapshot/1, one attempt per task, each in an isolated sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the right skill was loaded when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the task, via goal completion (50%) and expected workflow adherence (50%). <br>
-- Efficiency: Checks for wasted tool calls and token usage, via tool-call productivity (50%) and token efficiency (50%). <br>
+- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed and decoys were avoided. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and the expected workflow was followed. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Checks tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Checks final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Checks whether the user's goal was achieved. <br>
+- `behavior_check`: Checks whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.8% | 94.2% |
-| Security | 100.0% → 100.0% (±0.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 85.0% → 90.0% (+5.0 points) |
-| Discoverability | 100.0% | 95.0% |
-| Effectiveness | 64.6% → 89.0% (+24.4 points) | 67.1% → 85.8% (+18.7 points) |
-| Efficiency | 100.0% | 100.0% |
+| Overall | 98.5% — uplift unavailable | 93.6% — uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 75.0% (-25.0 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — uplift unavailable | 95.0% — uplift unavailable |
+| Effectiveness | 65.8% → 92.5% (+26.7 points) | 83.1% → 98.1% (+15.0 points) |
+| Efficiency | 100.0% — uplift unavailable | 100.0% — uplift unavailable |
 
 ## Skill Version(s): <br>
-e6f852f (source: git SHA, committed 2026-10-13) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

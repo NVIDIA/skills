@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-dpdk-bridge`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-22
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-sonnet-5-5`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:39186cf8437329daca290b6e5ecdc2eeca67966dd967b9e18b89708531366ae3` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 75.0% → 100.0% (+25.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 65.0% → 100.0% (+35.0 points) | 95.0% → 100.0% (+5.0 points) |
+| Overall | 92.1% — baseline ran, but no comparable score was available; uplift unavailable | 94.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 65.0% → 95.0% (+30.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 61.3% → 95.8% (+34.5 points) | 72.9% → 90.8% (+17.9 points) |
-| Efficiency | 75.0% — baseline ran, but no comparable score was available; uplift unavailable | 83.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 46.0% → 91.5% (+45.5 points) | 53.1% → 81.3% (+28.2 points) |
+| Efficiency | 69.1% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 748,473 | 622,017 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-dpdk-bridge.explicit-positive.v1 | 166,715 | 90,515 | +76,200 | +84.18% | skill 1/1; base 1/1 |
-| claude-code | doca-dpdk-bridge.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-dpdk-bridge.implicit-positive.v2 | 428,417 | 249,600 | +178,817 | +71.64% | skill 1/1; base 1/1 |
-| claude-code | doca-dpdk-bridge.negative.v1 | 153,341 | 281,902 | -128,561 | -45.60% | skill 1/1; base 1/1 |
-| codex | All cases | 522,240 | 220,661 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-dpdk-bridge.explicit-positive.v1 | 165,282 | 32,809 | +132,473 | +403.77% | skill 1/1; base 1/1 |
-| codex | doca-dpdk-bridge.implicit-positive.v1 | 324,754 | 126,553 | +198,201 | +156.62% | skill 1/1; base 1/1 |
-| codex | doca-dpdk-bridge.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-dpdk-bridge.negative.v1 | 32,204 | 61,299 | -29,095 | -47.46% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,270,713 | 842,678 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 582,326 | 381,048 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-dpdk-bridge.explicit-positive.v1 | 163,960 | 63,159 | +100,801 | +159.60% | skill 1/1; base 1/1 |
+| claude-code | doca-dpdk-bridge.implicit-positive.v1 | N/A | 155,863 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-dpdk-bridge.implicit-positive.v2 | 386,659 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-dpdk-bridge.negative.v1 | 31,707 | 162,026 | -130,319 | -80.43% | skill 1/1; base 1/1 |
+| codex | All cases | 573,255 | 238,072 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-dpdk-bridge.explicit-positive.v1 | 195,966 | 38,822 | +157,144 | +404.78% | skill 1/1; base 1/1 |
+| codex | doca-dpdk-bridge.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-dpdk-bridge.implicit-positive.v2 | 336,684 | 126,886 | +209,798 | +165.34% | skill 1/1; base 1/1 |
+| codex | doca-dpdk-bridge.negative.v1 | 40,605 | 72,364 | -31,759 | -43.89% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,155,581 | 619,120 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -82,10 +82,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-dpdk-bridge/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-dpdk-bridge/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-dpdk-bridge`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`BENCHMARK.md:86`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`BENCHMARK.md:88`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo      (`BENCHMARK.md:87`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo      (`BENCHMARK.md:88`)
 - 13 additional finding(s) are available in the full evaluation artifacts.
 
 </details>

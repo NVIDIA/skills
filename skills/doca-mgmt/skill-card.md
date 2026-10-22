@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides hands-on DOCA Management programming against BlueField / ConnectX devices, covering management and representor context lifecycle, device capability queries, congestion-control global status, diagnostics data, ICM quotas, and scoped raw firmware commands via the doca_mgmt C API. <br>
+Guides hands-on DOCA Management programming against BlueField / ConnectX devices — standing up management or representor contexts, querying device capabilities, toggling congestion-control global status, modifying diagnostics data, setting ICM quotas, and issuing scoped raw firmware commands via doca_mgmt_raw_cmd. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building fleet-management, orchestration, or device-administration tools that programmatically query and modify BlueField / ConnectX device-level state using the DOCA Management C API. <br>
+Developers and engineers building fleet-management or orchestration tooling use this skill to query and modify device-level state on BlueField / ConnectX devices through the DOCA Management C API, selecting the correct management context, capability surface, and raw-command scope while following the hardware-safety overlay. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
+- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Format:** [Markdown with inline bash and C code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -45,41 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative) run with 1 attempt each in isolated k8s-sandbox pods. <br>
+4 evaluation tasks (3 positive, 1 negative), each run in its own isolated k8s-sandbox pod with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed and decoys were avoided. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (50% goal accuracy + 50% expected workflow adherence). <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool productivity + 50% token efficiency). <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct against the reference answer? <br>
+- Discoverability: Was the right skill loaded when needed and were decoys avoided? <br>
+- Effectiveness: Did the skill help complete the task, measured as the equal-weight mean of goal completion and expected workflow adherence? <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.3% | 92.9% |
+| Overall | 94.4% (uplift unavailable) | 96.4% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% | 81.7% |
-| Effectiveness | 54.2% → 83.3% (+29.1 points) | 47.5% → 88.8% (+41.3 points) |
-| Efficiency | 83.2% | 93.9% |
-
-Overall, Discoverability, and Efficiency: baseline ran, but no comparable score was available; uplift unavailable.
+| Correctness | 50.0% → 100.0% (+50.0 points) | 85.0% → 100.0% (+15.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 88.3% (uplift unavailable) |
+| Effectiveness | 40.4% → 90.6% (+50.2 points) | 56.3% → 98.8% (+42.5 points) |
+| Efficiency | 81.5% (uplift unavailable) | 95.1% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-80aaaff (source: git SHA, committed 2026-10-13) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-argus`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.0% — baseline ran, but no comparable score was available; uplift unavailable | 98.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.9% — baseline ran, but no comparable score was available; uplift unavailable | 94.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 55.0% → 100.0% (+45.0 points) | 60.0% → 100.0% (+40.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 93.8% (+43.8 points) | 43.8% → 100.0% (+56.2 points) |
-| Efficiency | 86.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 87.5% (+37.5 points) | 47.5% → 91.3% (+43.8 points) |
+| Efficiency | 86.8% — baseline ran, but no comparable score was available; uplift unavailable | 95.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 682,329 | 396,921 | +285,408 | +71.91% | skill 4/4; base 4/4 |
-| claude-code | doca-argus.explicit-positive.v1 | 163,630 | 118,064 | +45,566 | +38.59% | skill 1/1; base 1/1 |
-| claude-code | doca-argus.implicit-positive.v1 | 210,745 | 123,070 | +87,675 | +71.24% | skill 1/1; base 1/1 |
-| claude-code | doca-argus.implicit-positive.v2 | 277,520 | 91,200 | +186,320 | +204.30% | skill 1/1; base 1/1 |
-| claude-code | doca-argus.negative.v1 | 30,434 | 64,587 | -34,153 | -52.88% | skill 1/1; base 1/1 |
-| codex | All cases | 448,366 | 175,006 | +273,360 | +156.20% | skill 4/4; base 4/4 |
-| codex | doca-argus.explicit-positive.v1 | 160,163 | 25,824 | +134,339 | +520.21% | skill 1/1; base 1/1 |
-| codex | doca-argus.implicit-positive.v1 | 108,339 | 70,510 | +37,829 | +53.65% | skill 1/1; base 1/1 |
-| codex | doca-argus.implicit-positive.v2 | 132,984 | 18,586 | +114,398 | +615.51% | skill 1/1; base 1/1 |
-| codex | doca-argus.negative.v1 | 46,880 | 60,086 | -13,206 | -21.98% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,130,695 | 571,927 | +558,768 | +97.70% | skill 8/8; base 8/8 |
+| claude-code | All cases | 904,501 | 299,635 | +604,866 | +201.87% | skill 4/4; base 4/4 |
+| claude-code | doca-argus.explicit-positive.v1 | 207,397 | 119,316 | +88,081 | +73.82% | skill 1/1; base 1/1 |
+| claude-code | doca-argus.implicit-positive.v1 | 313,426 | 120,694 | +192,732 | +159.69% | skill 1/1; base 1/1 |
+| claude-code | doca-argus.implicit-positive.v2 | 352,807 | 30,641 | +322,166 | +1051.42% | skill 1/1; base 1/1 |
+| claude-code | doca-argus.negative.v1 | 30,871 | 28,984 | +1,887 | +6.51% | skill 1/1; base 1/1 |
+| codex | All cases | 512,444 | 200,040 | +312,404 | +156.17% | skill 4/4; base 4/4 |
+| codex | doca-argus.explicit-positive.v1 | 134,737 | 38,798 | +95,939 | +247.28% | skill 1/1; base 1/1 |
+| codex | doca-argus.implicit-positive.v1 | 132,683 | 84,492 | +48,191 | +57.04% | skill 1/1; base 1/1 |
+| codex | doca-argus.implicit-positive.v2 | 197,107 | 14,156 | +182,951 | +1292.39% | skill 1/1; base 1/1 |
+| codex | doca-argus.negative.v1 | 47,917 | 62,594 | -14,677 | -23.45% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,416,945 | 499,675 | +917,270 | +183.57% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -81,12 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/services/doca-argus/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/services/doca-argus`)
 - **LOW** QUALITY/quality_discoverability: Description very long (977 chars, recommend 50-150) (`skills/services/doca-argus/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/services/doca-argus/SKILL.md`)
 - **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/services/doca-argus/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No limitations documented (`skills/services/doca-argus/SKILL.md`)
-- 5 additional finding(s) are available in the full evaluation artifacts.
+- 6 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

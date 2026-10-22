@@ -21,6 +21,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - dpa
@@ -64,8 +65,8 @@ the capabilities companion when the question is
 *what does this tool actually trace*, *which DPA programming
 events does it expose*, *what is the trace-overhead vs
 fidelity tradeoff*, or *how does it slot into a DPA debug
-loop alongside [`doca-dpa`](../../libs/doca-dpa/SKILL.md)
-and [`doca-debug`](../../doca-debug/SKILL.md)*. If DPA is not
+loop alongside `doca-dpa/SKILL.md`
+and `doca-debug/SKILL.md`*. If DPA is not
 the right surface for the user's question (e.g. the bug is
 host-side, the bug is in the DPACC-produced image, the user
 wants raw cycle counts), the path-selection rule in
@@ -127,7 +128,7 @@ the load-bearing piece; the worked example is one instance.
   produced?"*. Answered by the version-overlay in
   the capabilities companion,
   which redirects to the canonical
-  [`doca-version`](../../doca-version/SKILL.md) chain and
+  `doca-version/SKILL.md` chain and
   adds the *tracer ↔ `doca-dpa` library ↔ DPACC compiler*
   match rule.
 - **"The capture file looks empty / decode failed — is the
@@ -145,7 +146,7 @@ the load-bearing piece; the worked example is one instance.
 
 This skill serves **external developers, platform operators,
 and AI agents who have already brought up a DPA-side workload
-through [`doca-dpa`](../../libs/doca-dpa/SKILL.md) and now
+through `doca-dpa/SKILL.md` and now
 need higher-level visibility into what the DPA kernel is
 actually doing on the wire** — DPA programming events
 ordering, sync gaps, comm-call latencies, RDMA-WR / completion
@@ -162,7 +163,7 @@ counters. Concretely:
   DPA side without instrumenting the application.
 - An AI agent producing a *DPA-side trace report* as
   evidence for the host-side
-  [`doca-dpa`](../../libs/doca-dpa/SKILL.md)
+  `doca-dpa/SKILL.md`
   ladder when the host side reports clean completions but
   the DPA-side behaviour is wrong.
 
@@ -170,11 +171,11 @@ It is **not** for users debugging the tracer binary itself,
 **not** a substitute for the live public DOCA DPA Tools
 guide, **not** the right place for users learning how to
 write a DPA kernel (that audience belongs in
-[`doca-dpa`](../../libs/doca-dpa/SKILL.md) plus the public
+`doca-dpa/SKILL.md` plus the public
 DOCA DPA / DPACC / DPA-Comms / DPA-Verbs guides), and **not**
 the right place for raw per-instruction cycle profiling
 (different surface, different tool — route via
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)).
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)).
 
 The tracer is shipped as a **CLI binary** under
 `/opt/mellanox/doca/tools/`, not a library you link against.
@@ -195,7 +196,7 @@ the DPA-side workload it traces can be C compiled by DPACC
 or any other DPA translation unit DPACC accepts — and
 routes per-language questions to the public DPA / DPACC
 guides via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## When to load this skill
 
@@ -203,7 +204,7 @@ Load this skill when the user is — or the agent needs to —
 invoke `doca_dpa_hl_tracer` on a real host with DOCA
 installed against a BlueField with a DPA processor visible to
 the host, and the host-side
-[`doca-dpa`](../../libs/doca-dpa/SKILL.md) lifecycle has
+`doca-dpa/SKILL.md` lifecycle has
 already brought a DPA workload up at least once. Concretely:
 
 - Capturing a DPA-side trace to localize a DPA kernel's
@@ -224,15 +225,15 @@ already brought a DPA workload up at least once. Concretely:
   DPA-side ELF to render the human-readable event stream.
 - Capturing a side-effect-bounded trace as prerequisite
   evidence for a host-side
-  [`doca-dpa`](../../libs/doca-dpa/SKILL.md)
+  `doca-dpa/SKILL.md`
   ladder step.
 
 Do **not** load this skill for general DOCA orientation,
 DPA-side programming model questions, raw cycle profiling,
 or DOCA / DPACC install. For those, route to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
-[`doca-dpa`](../../libs/doca-dpa/SKILL.md), or
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`,
+`doca-dpa/SKILL.md`, or
+`doca-setup/SKILL.md`.
 
 ## What this skill provides
 
@@ -251,7 +252,7 @@ companion files:
   capture-window + workload-must-be-running invariant, the
   ELF-must-match-image rule for decode, the
   version-availability overlay (tracer ↔
-  [`doca-dpa`](../../libs/doca-dpa/SKILL.md) library ↔
+  `doca-dpa/SKILL.md` library ↔
   DPACC compiler), the layered error taxonomy
   (install / device-binding / image-instrumented /
   capture-window / decode / overhead-saturated / version /
@@ -279,7 +280,7 @@ present and visible to the host, the DPACC compiler is
 installed at a version matched to the host-side DOCA, the
 DPA-side application image (the ELF the tracer decodes
 against) is on disk and matches what the
-[`doca-dpa`](../../libs/doca-dpa/SKILL.md) lifecycle loaded,
+`doca-dpa/SKILL.md` lifecycle loaded,
 and the operator has the privileges the public DOCA DPA
 Tools guide requires.
 
@@ -313,7 +314,7 @@ contain — and pull requests should not add:
 - **A `samples/` or `reference/` subtree.** This is a thin
   loader for a shipped CLI; substantive material lives on
   the public page, in `--help`, and in
-  [`doca-dpa`](../../libs/doca-dpa/SKILL.md).
+  `doca-dpa/SKILL.md`.
 
 ## Loading order
 
@@ -331,38 +332,38 @@ contain — and pull requests should not add:
 
 ## Related skills
 
-- [`doca-dpa`](../../libs/doca-dpa/SKILL.md) — the host-side
+- `doca-dpa/SKILL.md` — the host-side
   DPA control library whose loaded application image the
   tracer captures. Pair them in every DPA debug session:
   `doca-dpa` brings the workload up; the tracer captures
   what the workload does at the DPA programming event
   layer. Conflating the library with the tracer is the
   most common DPA-debug first-touch error.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the
+- `doca-debug/SKILL.md` — the
   cross-cutting debug ladder. The tracer slots in at the
   *runtime* layer as the DPA-side ground truth before any
   DPA-side perf or correctness conclusion is made.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA DPA Tools page on
   `docs.nvidia.com` and the rest of the public DOCA
   documentation set.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. The `## Version
   compatibility` section in the capabilities companion
   is a concise overlay that redirects here for the body
   and adds the *tracer ↔ `doca-dpa` library ↔ DPACC
   compiler* matching rule.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env
+- `doca-setup/SKILL.md` — env
   preparation, install verification, DPACC compiler
   install / verification, BlueField mode (the DPA
   processor must be exposed before any tracing is
   meaningful), and the *I have no install yet* path with
   the public NGC DOCA container.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle's detect → prefer → fall back → report
   contract for structured helper tools. The command
   appendix in the tasks companion honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+- `doca-programming-guide/SKILL.md`
   — general DOCA programming patterns shared by every
   library / tool surface, including the cross-library
   `DOCA_ERROR_*` taxonomy this tool's host-side error
@@ -375,7 +376,7 @@ primitives the DPA kernel itself calls) and
 are **different artifacts** that the tracer's *DPA
 programming events* surface visibly names; for the
 DPA-side programming model itself, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 to the public DOCA DPA-Comms and DPA-Verbs guides and to
 the shipped `/opt/mellanox/doca/samples/doca_dpa/` samples.
 This tool *traces* their use; it does not redefine them.

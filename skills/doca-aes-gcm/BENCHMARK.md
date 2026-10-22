@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-aes-gcm`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.8% — baseline ran, but no comparable score was available; uplift unavailable | 95.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.6% — baseline ran, but no comparable score was available; uplift unavailable | 96.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 100.0% (+50.0 points) | 72.1% → 97.5% (+25.4 points) |
-| Efficiency | 88.9% — baseline ran, but no comparable score was available; uplift unavailable | 88.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.8% → 87.5% (+43.7 points) | 69.2% → 93.3% (+24.1 points) |
+| Efficiency | 80.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 465,329 | 528,413 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-aes-gcm.explicit-positive.v1 | 214,999 | 184,304 | +30,695 | +16.65% | skill 1/1; base 1/1 |
+| claude-code | All cases | 701,720 | 433,751 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-aes-gcm.explicit-positive.v1 | 308,401 | 123,155 | +185,246 | +150.42% | skill 1/1; base 1/1 |
 | claude-code | doca-aes-gcm.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-aes-gcm.implicit-positive.v2 | 218,452 | 218,319 | +133 | +0.06% | skill 1/1; base 1/1 |
-| claude-code | doca-aes-gcm.negative.v1 | 31,878 | 125,790 | -93,912 | -74.66% | skill 1/1; base 1/1 |
-| codex | All cases | 475,180 | 195,059 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-aes-gcm.explicit-positive.v1 | 116,086 | 52,949 | +63,137 | +119.24% | skill 1/1; base 1/1 |
-| codex | doca-aes-gcm.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-aes-gcm.implicit-positive.v2 | 313,918 | 122,622 | +191,296 | +156.00% | skill 1/1; base 1/1 |
-| codex | doca-aes-gcm.negative.v1 | 45,176 | 19,488 | +25,688 | +131.81% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 940,509 | 723,472 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | doca-aes-gcm.implicit-positive.v2 | 361,366 | 184,044 | +177,322 | +96.35% | skill 1/1; base 1/1 |
+| claude-code | doca-aes-gcm.negative.v1 | 31,953 | 126,552 | -94,599 | -74.75% | skill 1/1; base 1/1 |
+| codex | All cases | 386,942 | 189,369 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-aes-gcm.explicit-positive.v1 | 110,846 | 39,314 | +71,532 | +181.95% | skill 1/1; base 1/1 |
+| codex | doca-aes-gcm.implicit-positive.v1 | N/A | 79,143 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-aes-gcm.implicit-positive.v2 | 244,525 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-aes-gcm.negative.v1 | 31,571 | 70,912 | -39,341 | -55.48% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,088,662 | 623,120 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -83,10 +83,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/libs/doca-aes-gcm/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-aes-gcm/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-aes-gcm/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-aes-gcm`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo    (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo    (`BENCHMARK.md:88`)
-- 11 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo     (`BENCHMARK.md:87`)
+- 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

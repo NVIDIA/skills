@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides wiring the DOCA SHA Offload Engine (an OpenSSL ENGINE) into an existing OpenSSL pipeline to offload one-shot SHA-1, SHA-256, or SHA-512 (EVP_Digest) onto DOCA SHA hardware without rewriting against doca-sha, covering engine load mechanics (openssl engine dynamic, the set_pci_addr ctrl, -engine_impl), the SHA-224 negative test that proves offload engaged, the message-size window where offload beats CPU SHA, and engine-vs-library selection. <br>
+Guides wiring the DOCA SHA Offload Engine (an OpenSSL ENGINE) into an existing OpenSSL pipeline to offload one-shot SHA-1, SHA-256, or SHA-512 (EVP_Digest) onto DOCA SHA hardware without rewriting against doca-sha. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers, operators, and performance engineers with an existing OpenSSL-based SHA pipeline on hosts with an NVIDIA BlueField DPU or ConnectX NIC who want to offload SHA-1/SHA-256/SHA-512 to DOCA SHA hardware without code changes, verify the offload actually engaged, characterize where it beats CPU SHA, and decide between the engine and the doca-sha library. <br>
+Developers and engineers use this skill to load and verify the DOCA SHA Offload Engine in an existing OpenSSL-based pipeline on a DOCA-installed host with a BlueField-2 DPU, offloading one-shot SHA-1/SHA-256/SHA-512 to DOCA SHA hardware without source changes and proving the offload actually engaged. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,17 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
+- [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA-DOCA/doca-samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [NVIDIA/doca-platform](https://github.com/NVIDIA/doca-platform) <br>
+- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Code, Configuration instructions, Shell commands] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,38 +46,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 tasks (3 positive, 1 negative) in isolated k8s-sandbox pods with 1 attempt per task. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task; each task attempt ran in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and workflow adherence). <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity, 50% token efficiency). <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the final answer correct against the reference answer? <br>
+- Discoverability: Was the right skill loaded when needed and were decoys avoided? <br>
+- Effectiveness: Did the skill help complete the task, measured as the equal-weight mean of goal completion and expected workflow adherence? <br>
+- Efficiency: Did it avoid wasted tool calls and token usage, combining tool-call productivity and token efficiency? <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Flags unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.9% — baseline ran, but no comparable score was available; uplift unavailable | 95.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.8% (uplift unavailable) | 94.4% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 56.3% → 81.3% (+25.0 points) | 56.3% → 95.0% (+38.7 points) |
-| Efficiency | 73.3% — baseline ran, but no comparable score was available; uplift unavailable | 90.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 53.8% → 87.5% (+33.7 points) | 65.0% → 93.8% (+28.8 points) |
+| Efficiency | 91.7% (uplift unavailable) | 83.3% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-80aaaff (source: git SHA, committed 2026-10-13) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

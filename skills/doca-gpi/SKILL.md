@@ -2,24 +2,21 @@
 license: Apache-2.0
 name: doca-gpi
 description: >
-  Use this skill for hands-on DOCA GPI programming — wiring a
-  GPU-Packet-Initiator context so a CUDA kernel drives RDMA queues
-  directly from GPU memory without host CPU mediation. Covers picking
-  GPI vs doca-gpunetio, the doca_gpi / domain / channel object model,
-  the GPU-side handle handoff (doca_gpu_gpi_channel*), attaching GPU
-  memory to a GPI domain, the domain and channel attribute objects, and
-  debugging DOCA_ERROR_* from doca_gpi_* calls. Trigger even when the
-  user does not explicitly mention "DOCA GPI" — implicit phrasings
-  include "my CUDA kernel needs to post RDMA directly from GPU memory",
-  "DOCA_ERROR_* from doca_gpi_gpu_channel_get", "how do I hand a GPU
-  handle to my CUDA kernel", "how many channels can a GPI domain hold",
-  or "GPU kernel driving RDMA without the host CPU on the path". Refuse
-  and route elsewhere for the doca-gpunetio Send/Receive surface, the
-  doca-rdma queue lifecycle, DPA-side initiation (doca-rdmi), or the
-  CUDA programming model — those belong to other skills.
+  Use this skill for DOCA GPI work — configuring a GPU Packet
+  Initiator so device code issues RDMA operations straight out of
+  GPU-resident buffers via doca_gpi objects: domain creation and
+  channel limits, attribute objects, the doca_gpu_gpi_channel*
+  handoff consumed inside device code, and DOCA_ERROR_* triage on
+  doca_gpi_* entry points such as doca_gpi_gpu_channel_get. Also
+  load it for implied asks like "how many channels fit in a GPI
+  domain" or "device code issuing one-sided RDMA". Refuse and route
+  to the proper owner for Send/Receive semantics (doca-gpunetio),
+  host-managed QP lifecycle (doca-rdma), Arm-side origination
+  (doca-rdmi), or generic CUDA tutelage.
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - gpi

@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-debug`
-- Evaluation date: 2026-10-06
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 75.0% → 100.0% (+25.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 70.0% → 100.0% (+30.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 43.3% → 93.8% (+50.5 points) | 40.8% → 86.3% (+45.5 points) |
-| Efficiency | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 96.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 65.0% → 95.0% (+30.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 45.8% → 92.5% (+46.7 points) | 47.1% → 91.9% (+44.8 points) |
+| Efficiency | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 98.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 677,014 | 1,209,089 | -532,075 | -44.01% | skill 4/4; base 4/4 |
-| claude-code | doca-debug.explicit-positive.v1 | 111,770 | 248,471 | -136,701 | -55.02% | skill 1/1; base 1/1 |
-| claude-code | doca-debug.implicit-positive.v1 | 64,211 | 62,669 | +1,542 | +2.46% | skill 1/1; base 1/1 |
-| claude-code | doca-debug.implicit-positive.v2 | 160,873 | 94,734 | +66,139 | +69.82% | skill 1/1; base 1/1 |
-| claude-code | doca-debug.negative.v1 | 340,160 | 803,215 | -463,055 | -57.65% | skill 1/1; base 1/1 |
-| codex | All cases | 236,449 | 356,033 | -119,584 | -33.59% | skill 4/4; base 4/4 |
-| codex | doca-debug.explicit-positive.v1 | 30,316 | 18,921 | +11,395 | +60.22% | skill 1/1; base 1/1 |
-| codex | doca-debug.implicit-positive.v1 | 30,308 | 24,605 | +5,703 | +23.18% | skill 1/1; base 1/1 |
-| codex | doca-debug.implicit-positive.v2 | 150,509 | 43,167 | +107,342 | +248.67% | skill 1/1; base 1/1 |
-| codex | doca-debug.negative.v1 | 25,316 | 269,340 | -244,024 | -90.60% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 913,463 | 1,565,122 | -651,659 | -41.64% | skill 8/8; base 8/8 |
+| claude-code | All cases | 558,662 | 997,031 | -438,369 | -43.97% | skill 4/4; base 4/4 |
+| claude-code | doca-debug.explicit-positive.v1 | 111,129 | 89,313 | +21,816 | +24.43% | skill 1/1; base 1/1 |
+| claude-code | doca-debug.implicit-positive.v1 | 111,077 | 91,370 | +19,707 | +21.57% | skill 1/1; base 1/1 |
+| claude-code | doca-debug.implicit-positive.v2 | 206,653 | 127,567 | +79,086 | +62.00% | skill 1/1; base 1/1 |
+| claude-code | doca-debug.negative.v1 | 129,803 | 688,781 | -558,978 | -81.15% | skill 1/1; base 1/1 |
+| codex | All cases | 222,272 | 333,248 | -110,976 | -33.30% | skill 4/4; base 4/4 |
+| codex | doca-debug.explicit-positive.v1 | 30,310 | 25,408 | +4,902 | +19.29% | skill 1/1; base 1/1 |
+| codex | doca-debug.implicit-positive.v1 | 30,310 | 18,420 | +11,890 | +64.55% | skill 1/1; base 1/1 |
+| codex | doca-debug.implicit-positive.v2 | 119,400 | 44,337 | +75,063 | +169.30% | skill 1/1; base 1/1 |
+| codex | doca-debug.negative.v1 | 42,252 | 245,083 | -202,831 | -82.76% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 780,934 | 1,330,279 | -549,345 | -41.30% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 8 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 9 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,10 +81,14 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/doca-debug`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
-  "## Universal debug-loop contract" in CAPABILITIES.md (lines 147-153)
-  vs "## debug" in TASKS.md (lines 161-166) (`CAPABILITIES.md:147`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and TASKS.md:
+  "## Examples" in SKILL.md (lines 3-11)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 77-120)
+  vs "## When to load this skill" in SKILL.md (lines 121-136)
+  vs "## What this skill provides" in SKILL.md (lines 137-143)
+  vs "# DOCA debug workflows" in TASKS.md (lines 1-14)
+  vs "## debug" in TASKS.md (lines 123-123) (`SKILL.md:3`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-debug/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: Description very long (1016 chars, recommend 50-150) (`skills/doca-debug/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/doca-debug/SKILL.md`)
 - **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/doca-debug/SKILL.md`)

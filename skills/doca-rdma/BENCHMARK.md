@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-rdma`
-- Evaluation date: 2026-10-13
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 96.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.0% — baseline ran, but no comparable score was available; uplift unavailable | 97.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 100.0% (+50.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 75.0% → 100.0% (+25.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 47.5% → 99.4% (+51.9 points) | 42.5% → 98.8% (+56.3 points) |
-| Efficiency | 82.4% — baseline ran, but no comparable score was available; uplift unavailable | 87.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 37.5% → 93.8% (+56.3 points) | 50.0% → 100.0% (+50.0 points) |
+| Efficiency | 91.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 645,307 | 552,503 | +92,804 | +16.80% | skill 4/4; base 4/4 |
-| claude-code | doca-rdma.explicit-positive.v1 | 205,826 | 245,989 | -40,163 | -16.33% | skill 1/1; base 1/1 |
-| claude-code | doca-rdma.implicit-positive.v1 | 204,899 | 122,955 | +81,944 | +66.65% | skill 1/1; base 1/1 |
-| claude-code | doca-rdma.implicit-positive.v2 | 205,142 | 151,864 | +53,278 | +35.08% | skill 1/1; base 1/1 |
-| claude-code | doca-rdma.negative.v1 | 29,440 | 31,695 | -2,255 | -7.11% | skill 1/1; base 1/1 |
-| codex | All cases | 406,134 | 146,762 | +259,372 | +176.73% | skill 4/4; base 4/4 |
-| codex | doca-rdma.explicit-positive.v1 | 166,298 | 38,077 | +128,221 | +336.74% | skill 1/1; base 1/1 |
-| codex | doca-rdma.implicit-positive.v1 | 118,293 | 38,026 | +80,267 | +211.08% | skill 1/1; base 1/1 |
-| codex | doca-rdma.implicit-positive.v2 | 106,871 | 55,386 | +51,485 | +92.96% | skill 1/1; base 1/1 |
-| codex | doca-rdma.negative.v1 | 14,672 | 15,273 | -601 | -3.94% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,051,441 | 699,265 | +352,176 | +50.36% | skill 8/8; base 8/8 |
+| claude-code | All cases | 698,651 | 397,896 | +300,755 | +75.59% | skill 4/4; base 4/4 |
+| claude-code | doca-rdma.explicit-positive.v1 | 205,673 | 118,097 | +87,576 | +74.16% | skill 1/1; base 1/1 |
+| claude-code | doca-rdma.implicit-positive.v1 | 204,775 | 93,339 | +111,436 | +119.39% | skill 1/1; base 1/1 |
+| claude-code | doca-rdma.implicit-positive.v2 | 256,061 | 152,631 | +103,430 | +67.76% | skill 1/1; base 1/1 |
+| claude-code | doca-rdma.negative.v1 | 32,142 | 33,829 | -1,687 | -4.99% | skill 1/1; base 1/1 |
+| codex | All cases | 438,766 | 148,533 | +290,233 | +195.40% | skill 4/4; base 4/4 |
+| codex | doca-rdma.explicit-positive.v1 | 137,609 | 25,768 | +111,841 | +434.03% | skill 1/1; base 1/1 |
+| codex | doca-rdma.implicit-positive.v1 | 160,123 | 38,486 | +121,637 | +316.06% | skill 1/1; base 1/1 |
+| codex | doca-rdma.implicit-positive.v2 | 115,270 | 69,589 | +45,681 | +65.64% | skill 1/1; base 1/1 |
+| codex | doca-rdma.negative.v1 | 25,764 | 14,690 | +11,074 | +75.38% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,137,417 | 546,429 | +590,988 | +108.15% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/libs/doca-rdma/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-rdma/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-rdma`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:86`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:88`)
-- 12 additional finding(s) are available in the full evaluation artifacts.
+- 14 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

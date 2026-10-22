@@ -19,6 +19,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - erasure-coding
@@ -66,7 +67,7 @@ wants to *do* something (configure / build / modify / run / test /
 debug); open the capabilities companion when the question
 is *what can DOCA Erasure Coding express* on this version. If the
 user has not installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
+`doca-setup/SKILL.md` first. If the user is
 asking *"should I even use erasure coding here, or just replicate
 the data?"*, the path-selection rule in
 ## Capabilities and modes
@@ -146,7 +147,7 @@ single instance.
   scratch?"*. Answered by the version-compatibility overlay in
   ## Version compatibility,
   which cross-links the canonical detection chain in
-  [`doca-version`](../../doca-version/SKILL.md) and adds the
+  `doca-version/SKILL.md` and adds the
   EC-specific *"discover per-task support + matrix type via cap
   query"* bullets.
 - **"What does this `DOCA_ERROR_*` from an EC call mean and which
@@ -156,7 +157,7 @@ single instance.
   ## Error taxonomy
   + the layered ladder in
   ## debug that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  `doca-debug/SKILL.md`.
 
 ## Audience
 
@@ -246,7 +247,7 @@ LDPC — those belong on a CPU library, not the DOCA accelerator),
 pure replication / mirroring designs (erasure coding is the wrong
 primitive when one extra copy is the right answer), or other
 DOCA libraries. For those, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## What this skill provides
 
@@ -275,7 +276,7 @@ The skill assumes a host or BlueField where DOCA is already
 installed at the standard location and the user has the
 privileges their public install profile expects. It does not
 cover installing DOCA — that path goes through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -289,7 +290,7 @@ contain — and pull requests should not add:
   The agent's job is to route the user to those files and
   prescribe a minimum-diff modification on them via the universal
   modify-a-sample workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the EC-specific overrides in
   ## modify.
 - **Pre-computed parity tables for arbitrary N + K layouts.**
@@ -324,43 +325,43 @@ contain — and pull requests should not add:
    test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 version-handling rules, and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public docs or
 the installed package layout" rather than "EC-specific guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation source
   and the on-disk layout of an installed DOCA package. The DOCA
   Erasure Coding page lives at
   <https://docs.nvidia.com/doca/sdk/DOCA-Erasure-Coding/index.html>;
   the install-tree layout (samples directory, header location)
   belongs to the public knowledge map, not to this skill.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, and the *I have no install yet* path
   with the public NGC DOCA container. This skill assumes its
   preconditions are satisfied.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+- `doca-version/SKILL.md` — canonical DOCA
   version-handling rules. This skill's
   `## Version compatibility`
   cross-links the four-way match rule and adds only the
   EC-specific *"discover per-task support + supported matrix
   types + max block size + max N+K via cap query"* overlay.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
   the tasks companion honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal
   modify-a-shipped-sample first-app workflow, the universal
   lifecycle, the cross-library `DOCA_ERROR_*` taxonomy, and the
   program-side debug order. This skill layers EC specifics on
   top.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). EC-specific debug (task-not-supported,
   matrix-type-unsupported, block-size-over-max, N+K-over-max,

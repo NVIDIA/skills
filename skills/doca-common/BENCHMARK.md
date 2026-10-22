@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-common`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.9% — baseline ran, but no comparable score was available; uplift unavailable | 95.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.7% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 55.0% → 100.0% (+45.0 points) | 85.0% → 100.0% (+15.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 54.2% → 98.8% (+44.6 points) | 55.6% → 97.5% (+41.9 points) |
-| Efficiency | 81.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 48.8% → 98.8% (+50.0 points) | 55.0% → 75.8% (+20.8 points) |
+| Efficiency | 89.9% — baseline ran, but no comparable score was available; uplift unavailable | 94.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 821,044 | 549,131 | +271,913 | +49.52% | skill 4/4; base 4/4 |
-| claude-code | doca-common.explicit-positive.v1 | 300,937 | 274,595 | +26,342 | +9.59% | skill 1/1; base 1/1 |
-| claude-code | doca-common.implicit-positive.v1 | 265,827 | 150,294 | +115,533 | +76.87% | skill 1/1; base 1/1 |
-| claude-code | doca-common.implicit-positive.v2 | 223,635 | 64,385 | +159,250 | +247.34% | skill 1/1; base 1/1 |
-| claude-code | doca-common.negative.v1 | 30,645 | 59,857 | -29,212 | -48.80% | skill 1/1; base 1/1 |
-| codex | All cases | 483,642 | 317,292 | +166,350 | +52.43% | skill 4/4; base 4/4 |
-| codex | doca-common.explicit-positive.v1 | 158,949 | 91,371 | +67,578 | +73.96% | skill 1/1; base 1/1 |
-| codex | doca-common.implicit-positive.v1 | 162,721 | 113,813 | +48,908 | +42.97% | skill 1/1; base 1/1 |
-| codex | doca-common.implicit-positive.v2 | 121,637 | 32,708 | +88,929 | +271.89% | skill 1/1; base 1/1 |
-| codex | doca-common.negative.v1 | 40,335 | 79,400 | -39,065 | -49.20% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,304,686 | 866,423 | +438,263 | +50.58% | skill 8/8; base 8/8 |
+| claude-code | All cases | 774,415 | 599,952 | +174,463 | +29.08% | skill 4/4; base 4/4 |
+| claude-code | doca-common.explicit-positive.v1 | 224,181 | 285,122 | -60,941 | -21.37% | skill 1/1; base 1/1 |
+| claude-code | doca-common.implicit-positive.v1 | 295,340 | 123,008 | +172,332 | +140.10% | skill 1/1; base 1/1 |
+| claude-code | doca-common.implicit-positive.v2 | 224,153 | 97,043 | +127,110 | +130.98% | skill 1/1; base 1/1 |
+| claude-code | doca-common.negative.v1 | 30,741 | 94,779 | -64,038 | -67.57% | skill 1/1; base 1/1 |
+| codex | All cases | 437,321 | 235,301 | +202,020 | +85.86% | skill 4/4; base 4/4 |
+| codex | doca-common.explicit-positive.v1 | 140,533 | 39,092 | +101,441 | +259.49% | skill 1/1; base 1/1 |
+| codex | doca-common.implicit-positive.v1 | 136,218 | 97,244 | +38,974 | +40.08% | skill 1/1; base 1/1 |
+| codex | doca-common.implicit-positive.v2 | 111,207 | 43,385 | +67,822 | +156.33% | skill 1/1; base 1/1 |
+| codex | doca-common.negative.v1 | 49,363 | 55,580 | -6,217 | -11.19% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,211,736 | 835,253 | +376,483 | +45.07% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,14 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **HIGH** DUPLICATE/duplicate: Duplicate content found within TASKS.md:
-  "## test" in TASKS.md (lines 236-241)
-  vs "## test" in TASKS.md (lines 250-254) (`TASKS.md:236`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-common/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-common/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-common`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`CAPABILITIES.md:43`)
-- **LOW** QUALITY/quality_discoverability: Description very long (987 chars, recommend 50-150) (`skills/libs/doca-common/SKILL.md`)
-- 8 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:86`)
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:87`)
+- 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

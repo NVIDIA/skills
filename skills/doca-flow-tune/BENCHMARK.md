@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-flow-tune`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 96.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 60.0% → 100.0% (+40.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 93.8% (+43.8 points) | 43.8% → 92.5% (+48.7 points) |
-| Efficiency | 81.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 40.0% → 100.0% (+60.0 points) | 85.0% → 100.0% (+15.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 60.0% → 100.0% (+40.0 points) | 47.5% → 100.0% (+52.5 points) |
+| Efficiency | 75.6% — baseline ran, but no comparable score was available; uplift unavailable | 83.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 943,454 | 527,316 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-flow-tune.explicit-positive.v1 | 284,231 | 153,261 | +130,970 | +85.46% | skill 1/1; base 1/1 |
-| claude-code | doca-flow-tune.implicit-positive.v1 | 628,180 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-flow-tune.implicit-positive.v2 | N/A | 281,865 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-flow-tune.negative.v1 | 31,043 | 92,190 | -61,147 | -66.33% | skill 1/1; base 1/1 |
-| codex | All cases | 390,707 | 180,708 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-flow-tune.explicit-positive.v1 | 139,541 | 70,899 | +68,642 | +96.82% | skill 1/1; base 1/1 |
-| codex | doca-flow-tune.implicit-positive.v1 | 220,481 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | doca-flow-tune.implicit-positive.v2 | N/A | 95,928 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | doca-flow-tune.negative.v1 | 30,685 | 13,881 | +16,804 | +121.06% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,334,161 | 708,024 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 902,064 | 457,084 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-flow-tune.explicit-positive.v1 | 279,717 | 149,833 | +129,884 | +86.69% | skill 1/1; base 1/1 |
+| claude-code | doca-flow-tune.implicit-positive.v1 | N/A | 184,247 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-flow-tune.implicit-positive.v2 | 591,831 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-flow-tune.negative.v1 | 30,516 | 123,004 | -92,488 | -75.19% | skill 1/1; base 1/1 |
+| codex | All cases | 330,372 | 218,370 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-flow-tune.explicit-positive.v1 | 114,926 | 44,570 | +70,356 | +157.86% | skill 1/1; base 1/1 |
+| codex | doca-flow-tune.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-flow-tune.implicit-positive.v2 | 184,806 | 159,870 | +24,936 | +15.60% | skill 1/1; base 1/1 |
+| codex | doca-flow-tune.negative.v1 | 30,640 | 13,930 | +16,710 | +119.96% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,232,436 | 675,454 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -81,12 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-flow-tune/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-flow-tune`)
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without confirmation (`BENCHMARK.md:85`)
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without confirmation (`BENCHMARK.md:86`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without confirmation (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without confirmation (`TASKS.md:183`)
-- **MEDIUM** SECURITY/Unknown (SQP-2): The skill instructs users to capture the 'full unredacted dumper / analyzer / visualizer output' when documenting a tuni (`SKILL.md:234`)
-- **LOW** QUALITY/quality_discoverability: Description very long (1023 chars, recommend 50-150) (`skills/tools/doca-flow-tune/SKILL.md`)
-- 9 additional finding(s) are available in the full evaluation artifacts.
+- 13 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

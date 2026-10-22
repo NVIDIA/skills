@@ -9,11 +9,11 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `using-ovnewton`
-- Evaluation date: 2026-10-14
+- Evaluation date: 2026-10-19
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 7 evaluation tasks (5 positive, 2 negative)
-- Dataset digest: `sha256:207f3dfeb5504f9b90e549d26ffcd798dc3df9d4764d50d0f11043cc5e892ab3` (skill-evaluator-dataset-snapshot/1)
+- Dataset digest: `sha256:229164b02575b0e70ff657dae1616a1289f9db36e537a0fbb9465d6694922319` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 89.6% — baseline ran, but no comparable score was available; uplift unavailable | 91.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 85.7% → 100.0% (+14.3 points) | 85.7% → 100.0% (+14.3 points) |
-| Correctness | 82.9% → 100.0% (+17.1 points) | 88.6% → 100.0% (+11.4 points) |
-| Discoverability | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 73.9% (+23.9 points) | 68.6% → 90.4% (+21.8 points) |
-| Efficiency | 76.0% — baseline ran, but no comparable score was available; uplift unavailable | 69.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 83.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 57.1% → 100.0% (+42.9 points) | 100.0% → 85.7% (-14.3 points) |
+| Correctness | 71.4% → 94.3% (+22.9 points) | 85.7% → 88.6% (+2.9 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 55.0% → 87.9% (+32.9 points) | 58.2% → 79.3% (+21.1 points) |
+| Efficiency | 93.9% — baseline ran, but no comparable score was available; uplift unavailable | 69.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,23 +54,23 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 2,102,764 | 4,639,799 | -2,537,035 | -54.68% | skill 7/7; base 7/7 |
-| claude-code | using-ovnewton-basic | 130,886 | 433,572 | -302,686 | -69.81% | skill 1/1; base 1/1 |
-| claude-code | using-ovnewton-existing-stage | 195,443 | 1,312,748 | -1,117,305 | -85.11% | skill 1/1; base 1/1 |
-| claude-code | using-ovnewton-newton-only | 1,385,539 | 837,157 | +548,382 | +65.51% | skill 1/1; base 1/1 |
-| claude-code | using-ovnewton-omniverse-authoring | 32,041 | 32,424 | -383 | -1.18% | skill 1/1; base 1/1 |
-| claude-code | using-ovnewton-rendering | 130,584 | 530,250 | -399,666 | -75.37% | skill 1/1; base 1/1 |
-| claude-code | using-ovnewton-stage-edits | 61,856 | 158,065 | -96,209 | -60.87% | skill 1/1; base 1/1 |
-| claude-code | using-ovnewton-vbd | 166,415 | 1,335,583 | -1,169,168 | -87.54% | skill 1/1; base 1/1 |
-| codex | All cases | 479,145 | 1,930,419 | -1,451,274 | -75.18% | skill 7/7; base 7/7 |
-| codex | using-ovnewton-basic | 50,177 | 398,892 | -348,715 | -87.42% | skill 1/1; base 1/1 |
-| codex | using-ovnewton-existing-stage | 105,840 | 95,864 | +9,976 | +10.41% | skill 1/1; base 1/1 |
-| codex | using-ovnewton-newton-only | 141,668 | 946,689 | -805,021 | -85.04% | skill 1/1; base 1/1 |
-| codex | using-ovnewton-omniverse-authoring | 33,653 | 30,100 | +3,553 | +11.80% | skill 1/1; base 1/1 |
-| codex | using-ovnewton-rendering | 43,171 | 74,719 | -31,548 | -42.22% | skill 1/1; base 1/1 |
-| codex | using-ovnewton-stage-edits | 61,032 | 122,449 | -61,417 | -50.16% | skill 1/1; base 1/1 |
-| codex | using-ovnewton-vbd | 43,604 | 261,706 | -218,102 | -83.34% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 2,581,909 | 6,570,218 | -3,988,309 | -60.70% | skill 14/14; base 14/14 |
+| claude-code | All cases | 1,485,116 | 7,071,032 | -5,585,916 | -79.00% | skill 7/7; base 7/7 |
+| claude-code | using-ovnewton-basic | 215,800 | 2,920,898 | -2,705,098 | -92.61% | skill 1/1; base 1/1 |
+| claude-code | using-ovnewton-existing-stage | 63,726 | 160,755 | -97,029 | -60.36% | skill 1/1; base 1/1 |
+| claude-code | using-ovnewton-newton-only | 986,312 | 1,140,901 | -154,589 | -13.55% | skill 1/1; base 1/1 |
+| claude-code | using-ovnewton-omniverse-authoring | 31,404 | 35,063 | -3,659 | -10.44% | skill 1/1; base 1/1 |
+| claude-code | using-ovnewton-rendering | 62,969 | 919,649 | -856,680 | -93.15% | skill 1/1; base 1/1 |
+| claude-code | using-ovnewton-stage-edits | 62,110 | 139,415 | -77,305 | -55.45% | skill 1/1; base 1/1 |
+| claude-code | using-ovnewton-vbd | 62,795 | 1,754,351 | -1,691,556 | -96.42% | skill 1/1; base 1/1 |
+| codex | All cases | 800,187 | 1,376,483 | -576,296 | -41.87% | skill 7/7; base 7/7 |
+| codex | using-ovnewton-basic | 169,217 | 655,583 | -486,366 | -74.19% | skill 1/1; base 1/1 |
+| codex | using-ovnewton-existing-stage | 113,244 | 92,087 | +21,157 | +22.98% | skill 1/1; base 1/1 |
+| codex | using-ovnewton-newton-only | 372,250 | 320,070 | +52,180 | +16.30% | skill 1/1; base 1/1 |
+| codex | using-ovnewton-omniverse-authoring | 19,430 | 19,614 | -184 | -0.94% | skill 1/1; base 1/1 |
+| codex | using-ovnewton-rendering | 41,084 | 58,568 | -17,484 | -29.85% | skill 1/1; base 1/1 |
+| codex | using-ovnewton-stage-edits | 40,854 | 84,070 | -43,216 | -51.40% | skill 1/1; base 1/1 |
+| codex | using-ovnewton-vbd | 44,108 | 146,491 | -102,383 | -69.89% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 2,285,303 | 8,447,515 | -6,162,212 | -72.95% | skill 14/14; base 14/14 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -90,7 +90,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/using-ovnewton/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/using-ovnewton/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/using-ovnewton/SKILL.md`)
-- **MEDIUM** SECURITY/Unsafe Defaults (TM3): Tool Misuse: skip_validation (`SKILL.md:57`)
+- **MEDIUM** SECURITY/Unsafe Defaults (TM3): Tool Misuse: skip_validation (`SKILL.md:69`)
 - **LOW** QUALITY/quality_discoverability: Description very long (243 chars, recommend 50-150) (`skills/using-ovnewton/SKILL.md`)
 - 5 additional finding(s) are available in the full evaluation artifacts.
 

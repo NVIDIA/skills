@@ -19,34 +19,36 @@ precondition the build + run sequence needs **before** any
 GPUNetIO-specific work begins.
 
 This skill does **not** own DOCA installation; that path
-lives in [`doca-setup`](../../doca-setup/SKILL.md). The
+lives in `doca-setup/SKILL.md`. The
 `gpunetio_ib_write_bw`-specific preconditions:
 
 1. **`doca-gpunetio.pc` is present.** Run
    `pkg-config --modversion doca-gpunetio` on each build
    host. If the `.pc` does not resolve, the installed DOCA
    does not include GPUNetIO; route to
-   [`../../libs/doca-gpunetio/TASKS.md`](../../libs/doca-gpunetio/TASKS.md)
+   `../../libs/doca-gpunetio/TASKS.md` (`doca-gpunetio/TASKS.md`)
    for the package-name lookup and re-install.
 2. **`doca-common.pc` and `doca-rdma.pc` agree on the same
    DOCA semver.** Per the four-way match in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 3. **CUDA Toolkit + `nvcc` are on the build host.** The
    `client/kernel.cu` is compiled by `nvcc`; confirm
    `nvcc --version` resolves and the toolkit version is
    paired with the installed DOCA per the DOCA release
    notes (looked up via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
-4. **`nvidia_peermem` kernel module is loaded.** GPUDirect-
+   `doca-public-knowledge-map/SKILL.md`).
+4. **A GPU memory registration path is available.** DOCA
+   3.5 prefers dmabuf (nvidia-open GPU driver); the
+   `nvidia_peermem` kernel module is the fallback. GPUDirect-
    style memory registration is the precondition for
    binding GPU memory to DOCA. Verify per
-   [`../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy`](../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy)
+   `../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy` (`doca-gpunetio/CAPABILITIES.md#safety-policy`)
    and
-   [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`).
 5. **GPU visible to the host.** `nvidia-smi` lists the GPU
    and reports its PCIe bus ID.
 6. **IB device visible to DOCA.** `doca_caps --list-devs`
-   (per [`../doca-caps/TASKS.md#run`](../doca-caps/TASKS.md#run))
+   (per `../doca-caps/TASKS.md#run` (`doca-caps/TASKS.md#run`))
    reports the IB device for `-d <ibdev>`.
 7. **OOB connectivity exists between client and server**
    for the TCP exchange the source's `oob_connection_*`
@@ -81,13 +83,14 @@ Steps the agent walks the user through, in order:
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    GPU-NIC pairing rule. The pairing is a precondition, not
    a tunable parameter.
-3. **Confirm `nvidia_peermem`.** Without it, the doca-gpu
+3. **Confirm dmabuf (preferred) or `nvidia_peermem`
+   (fallback).** Without either, the doca-gpu
    context cannot bind GPU memory; the symptom shows up
    as a layer-4 lifecycle failure per
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
 4. **Pick the GID index.** `--gid-index` is optional but
    the right value is GID-routing-rule-specific per
-   [`../../libs/doca-rdma/CAPABILITIES.md`](../../libs/doca-rdma/CAPABILITIES.md).
+   `../../libs/doca-rdma/CAPABILITIES.md` (`doca-rdma/CAPABILITIES.md`).
    The same index must be used on both client and server.
 5. **Pick the client / server roles and the OOB IP.** The
    server is started first (binds and waits on the TCP
@@ -102,7 +105,7 @@ Steps the agent walks the user through, in order:
 For the canonical DOCA universal lifecycle that underlies
 program-side configuration (which the binary runs internally
 per the GPUNetIO + RDMA libraries), see
-[`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure).
+`doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`).
 
 ## build
 
@@ -115,7 +118,7 @@ DOCA. The build pattern is the canonical `meson` flow:
    find `doca-gpunetio.pc`, `doca-rdma.pc`, and
    `doca-common.pc`. On a stock install the path lives
    under the DOCA `pkgconfig` directory documented in
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+   `doca-public-knowledge-map/SKILL.md`.
 2. **Set up the build directory.** `meson setup <build-dir>
    doca/tools/gpunetio_ib_write_bw/` from the workspace
    root. The top-level `meson.build` wires together the
@@ -138,9 +141,9 @@ Routing for nearby "build" questions:
   install a different DOCA first.
 - *"I want to build my own GPUNetIO-based BW benchmark
   from scratch."* → route to
-  [`../../libs/doca-gpunetio/TASKS.md`](../../libs/doca-gpunetio/TASKS.md)
+  `../../libs/doca-gpunetio/TASKS.md` (`doca-gpunetio/TASKS.md`)
   and
-  [`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+  `doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 
 This documented Meson flow is the supported build path for
 the shipped source tree. The skill forbids inventing wrappers
@@ -174,7 +177,7 @@ Routing for nearby "modify" questions:
   re-examine the runtime-surface choice in
   [`## configure`](#configure) step 1; if the user genuinely
   needs a bespoke benchmark, route to
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+  `doca-programming-guide/SKILL.md`
   and the matching library skill.
 
 ## run
@@ -183,17 +186,21 @@ The smoke-before-bulk flow — every session goes through it.
 The detailed flag surface lives in the binary's `--help` on
 the installed build.
 
-> **Do-not-invent guard (paths + binary layout).** Real
-> downstream agents have hallucinated a
-> `/opt/mellanox/doca/samples/gpunetio/` subtree for this
-> tool — it does not exist. The bundle's verbatim source path
-> is `/opt/mellanox/doca/tools/gpunetio_ib_write_bw/{client/,server/}`
+> **Paths + related GPU-initiated RDMA write samples.** This
+> tool's source path is
+> `/opt/mellanox/doca/tools/gpunetio_ib_write_bw/{client/,server/}`
 > (per [`SKILL.md`](SKILL.md) compatibility block); discover
-> with `ls /opt/mellanox/doca/tools/ | grep gpunetio_ib_write_bw`,
-> NOT under `/opt/mellanox/doca/samples/`. CUDA pairing rules
+> with `ls /opt/mellanox/doca/tools/ | grep gpunetio_ib_write_bw`.
+> DOCA 3.5 also documents GPU-initiated RDMA write samples under
+> `/opt/mellanox/doca/samples/doca_gpunetio/` per the
+> [GPUNetIO Sample Guide](https://docs.nvidia.com/doca/archive/3-5-0/gpunetio-sample-guide).
+> CUDA pairing rules
 > live in
-> [`../../libs/doca-gpunetio/CAPABILITIES.md ## Version compatibility`](../../libs/doca-gpunetio/CAPABILITIES.md#version-compatibility);
+> `../../libs/doca-gpunetio/CAPABILITIES.md ## Version compatibility` (`doca-gpunetio/CAPABILITIES.md#version-compatibility`);
 > there is no `cuda-toolkit` skill in this bundle.
+
+`doca_perftest --engine gpunetio` ([DOCA Perftest](https://docs.nvidia.com/doca/archive/3-5-0/doca-perftest))
+also measures GPU-initiated RDMA write bandwidth / latency.
 
 1. **Confirm the build artifacts and the environment.** Per
    [`## install`](#install) and [`## configure`](#configure).
@@ -262,10 +269,10 @@ The eval-loop overlay:
 | Smoke completes; BW is well below link capacity | One of three candidates (or pairing) — name which before iterating | Re-walk the throughput decomposition in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes); confirm `nvidia-smi dmon` shows the SM at occupancy; confirm `ibstat` shows the link at expected rate. |
 | BW variation fails the acceptance criterion supplied by the benchmark owner or operator | Steady-state not reached; system not at idle | Lengthen the run using the documented iteration control; confirm no background traffic on the link; confirm no concurrent CUDA workloads. Do not invent a percentage threshold. |
 | BW grows with message size but does not move with kernel-side concurrency | NIC issue rate is the binding constraint | Quote the NIC-issue-rate hypothesis; confirm against the device's documented per-transport submission rate. |
-| BW grows with kernel-side concurrency but does not move with message size | GPU compute occupancy is the binding constraint | Re-walk the persistent-kernel pattern in [`../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes`](../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes). |
+| BW grows with kernel-side concurrency but does not move with message size | GPU compute occupancy is the binding constraint | Re-walk the persistent-kernel pattern in `../../libs/doca-gpunetio/CAPABILITIES.md#capabilities-and-modes` (`doca-gpunetio/CAPABILITIES.md#capabilities-and-modes`). |
 | BW does not move with either knob and sits well below link capacity | Likely PCIe crossover (wrong pairing) | Re-walk the GPU-NIC pairing precondition; the answer is platform-side, not benchmark-side. |
-| Same invocation produces different numbers across hosts at the same DOCA version | NUMA / firmware / driver delta below DOCA | Capture the tuple on both hosts; route through [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) and [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug). |
-| Same invocation produces different numbers on the same host across DOCA versions | This is a regression signal — provided both tuples are captured | Cross-link both baselines, name the changed fields, route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug). |
+| Same invocation produces different numbers across hosts at the same DOCA version | NUMA / firmware / driver delta below DOCA | Capture the tuple on both hosts; route through `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) and `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`). |
+| Same invocation produces different numbers on the same host across DOCA versions | This is a regression signal — provided both tuples are captured | Cross-link both baselines, name the changed fields, route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`). |
 
 The agent's rule: every change to the environment re-opens
 the loop. Re-running with a different GPU, NUMA pinning, or
@@ -302,22 +309,22 @@ layers in order:
 4. **GPUNetIO-lifecycle.** Most common: `nvidia_peermem`
    not loaded; CUDA buffer registration with DOCA happened
    *after* `doca_ctx_start()` instead of before. Route to
-   [`../../libs/doca-gpunetio/CAPABILITIES.md#error-taxonomy`](../../libs/doca-gpunetio/CAPABILITIES.md#error-taxonomy).
+   `../../libs/doca-gpunetio/CAPABILITIES.md#error-taxonomy` (`doca-gpunetio/CAPABILITIES.md#error-taxonomy`).
 5. **RDMA-connection.** Confirm GID index matches on
    client and server; confirm RDMA permissions include
    WRITE; confirm the mmap export was accepted. Route to
-   [`../../libs/doca-rdma/CAPABILITIES.md`](../../libs/doca-rdma/CAPABILITIES.md).
+   `../../libs/doca-rdma/CAPABILITIES.md` (`doca-rdma/CAPABILITIES.md`).
 6. **Measurement-soundness.** Walk the
    [`## test`](#test) eval loop; confirm warm-up applied;
    name the binding constraint.
 7. **Version.** Cross-cutting partial-install / mixed-
    version. Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug);
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`);
    confirm same DOCA + CUDA pair on both build hosts.
 8. **Cross-cutting.** Cause is below DOCA. Hand off to
-   [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    and
-   [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`).
 
 In every case: **quote what the binaries reported.** Keep
 full stdout and its ordering; redact only GPU-side handles,
@@ -367,22 +374,22 @@ The decision shape this skill teaches:
 The verbs below are not `gpunetio_ib_write_bw` work and
 should be routed out:
 
-- **install DOCA** ⇒ [`doca-setup TASKS.md`](../../doca-setup/TASKS.md)
+- **install DOCA** ⇒ `doca-setup/TASKS.md`
   (and `## no-install` for the NGC container path).
 - **author a bespoke GPUNetIO-based BW benchmark** ⇒
-  [`../../libs/doca-gpunetio/TASKS.md`](../../libs/doca-gpunetio/TASKS.md)
+  `../../libs/doca-gpunetio/TASKS.md` (`doca-gpunetio/TASKS.md`)
   and
-  [`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+  `doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 - **CPU-initiated WRITE BW** ⇒ upstream `perftest`
   `ib_write_bw` (not in this bundle); route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **GPU-initiated WRITE latency** ⇒
-  [`../doca-gpunetio-ib-write-lat/SKILL.md`](../doca-gpunetio-ib-write-lat/SKILL.md)
+  `../doca-gpunetio-ib-write-lat/SKILL.md` (`doca-gpunetio-ib-write-lat/SKILL.md`)
   for the GPUNetIO latency analog; for the GPI programming
   surface (no shipped GPI benchmark binary) ⇒
-  [`doca-gpi`](../../libs/doca-gpi/SKILL.md).
+  `doca-gpi/SKILL.md`.
 - **hardware-touching changes the benchmark surfaced a
   need for** (NIC firmware burn, BFB reflash, kernel
   command-line changes for IOMMU mode, hugepage
   reservation changes) ⇒
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md).
+  `doca-hardware-safety/SKILL.md`.

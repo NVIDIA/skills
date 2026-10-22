@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-bare-metal-deployment`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-22
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-sonnet-5-5`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:39e7c229748cb1f865ca636d41514792e647c3c5b0bd6c055f1811615a582b6a` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 98.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.0% — baseline ran, but no comparable score was available; uplift unavailable | 96.2% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 70.0% → 95.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 60.4% → 89.4% (+29.0 points) | 58.3% → 100.0% (+41.7 points) |
-| Efficiency | 69.3% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 65.0% → 100.0% (+35.0 points) | 65.0% → 95.0% (+30.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.8% → 93.8% (+50.0 points) | 50.2% → 94.4% (+44.2 points) |
+| Efficiency | 71.4% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,496,311 | 461,029 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-bare-metal-deployment.explicit-positive.v1 | 489,178 | 150,422 | +338,756 | +225.20% | skill 1/1; base 1/1 |
-| claude-code | doca-bare-metal-deployment.implicit-positive.v1 | 945,466 | 125,641 | +819,825 | +652.51% | skill 1/1; base 1/1 |
-| claude-code | doca-bare-metal-deployment.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-bare-metal-deployment.negative.v1 | 61,667 | 184,966 | -123,299 | -66.66% | skill 1/1; base 1/1 |
-| codex | All cases | 447,932 | 118,208 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-bare-metal-deployment.explicit-positive.v1 | 129,705 | 48,341 | +81,364 | +168.31% | skill 1/1; base 1/1 |
-| codex | doca-bare-metal-deployment.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-bare-metal-deployment.implicit-positive.v2 | 304,443 | 56,494 | +247,949 | +438.89% | skill 1/1; base 1/1 |
-| codex | doca-bare-metal-deployment.negative.v1 | 13,784 | 13,373 | +411 | +3.07% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,944,243 | 579,237 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 888,179 | 216,565 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-bare-metal-deployment.explicit-positive.v1 | 264,898 | 31,561 | +233,337 | +739.32% | skill 1/1; base 1/1 |
+| claude-code | doca-bare-metal-deployment.implicit-positive.v1 | 531,197 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-bare-metal-deployment.implicit-positive.v2 | N/A | 93,589 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-bare-metal-deployment.negative.v1 | 92,084 | 91,415 | +669 | +0.73% | skill 1/1; base 1/1 |
+| codex | All cases | 427,001 | 94,457 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-bare-metal-deployment.explicit-positive.v1 | 167,350 | 26,423 | +140,927 | +533.35% | skill 1/1; base 1/1 |
+| codex | doca-bare-metal-deployment.implicit-positive.v1 | 245,906 | 54,384 | +191,522 | +352.17% | skill 1/1; base 1/1 |
+| codex | doca-bare-metal-deployment.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-bare-metal-deployment.negative.v1 | 13,745 | 13,650 | +95 | +0.70% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,315,180 | 311,022 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,15 +81,17 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
+  "## Error taxonomy" in CAPABILITIES.md (lines 395-497)
+  vs "## debug" in TASKS.md (lines 431-523) (`CAPABILITIES.md:395`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in details.md (`skills/doca-bare-metal-deployment/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-bare-metal-deployment/SKILL.md`)
 - **MEDIUM** SECURITY/External Transmission (E1): Data Exfiltration: curl to it is hitting the
       host, not the BlueField. The agent ALWAYS runs
       `ip route get` before trusting `ping` for TMFIFO recovery,
       and accepts either `tmfifo_net0` or `tm-br` as the (`TASKS.md:704`)
-- **LOW** QUALITY/quality_discoverability: Description very long (951 chars, recommend 50-150) (`skills/doca-bare-metal-deployment/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/doca-bare-metal-deployment/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/doca-bare-metal-deployment/SKILL.md`)
-- 6 additional finding(s) are available in the full evaluation artifacts.
+- **LOW** QUALITY/quality_discoverability: Description very long (961 chars, recommend 50-150) (`skills/doca-bare-metal-deployment/SKILL.md`)
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

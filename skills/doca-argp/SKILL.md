@@ -8,8 +8,8 @@ description: >
   `doca_argp_destroy` in order; picking a parameter type from the full
   public enum (`DOCA_ARGP_TYPE_STRING`, `_INT`, `_BOOLEAN`, `_DEVICE`,
   `_DEVICE_REP`, `_DOUBLE` — six values, not three); preserving the
-  standard `--device` / `--representor` / `--json` (`-j`; real flag is
-  `--json`, NOT `--json-config`) / `--sdk-log-level` surface; or
+  built-in DOCA flags (`-h` `-v` `-l` `--sdk-log-level` `--log-filter`
+  `-j`/`--json`, NOT `--json-config`); `--device` is per-program; or
   debugging `DOCA_ERROR_BAD_STATE` / `INVALID_VALUE` / `NOT_SUPPORTED` /
   `IO_FAILED` from `doca_argp_*`. Trigger on implicit phrasings: "add a
   custom flag to a DOCA sample", "should I use getopt here", "BAD_STATE
@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - argp

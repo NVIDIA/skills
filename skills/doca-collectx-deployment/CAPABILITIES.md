@@ -6,18 +6,18 @@ CollectX-based telemetry collector. Pick the pattern first, then
 drill into the H2 that owns the substance. For the *how* of
 executing each pattern, jump to [TASKS.md](TASKS.md). For the
 two telemetry **library** API surfaces this skill routes to, see
-[`doca-telemetry`](../libs/doca-telemetry/SKILL.md) (the
+`doca-telemetry/SKILL.md` (the
 hardware-counter reader) and
-[`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md)
+`doca-telemetry-exporter/SKILL.md`
 (the application-side publisher). For the productized DTS
 container (out of scope here), see the
-[`doca-public-knowledge-map` externally-productized routing row](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+`doca-public-knowledge-map` externally-productized routing row (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 
 This file enumerates the collector-deployment contract **as a
 class**, as described in the public **DOCA Telemetry guide** and
 the public **DOCA Telemetry Service (DTS) guide** (both reachable
 through
-[`doca-public-knowledge-map ## Public documentation entry points`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points)).
+`doca-public-knowledge-map ## Public documentation entry points` (`doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`)).
 Treat this file as a *map of what is documented*, not a substitute
 for reading the live guides and the live collector config against
 the operator's target. The agent does NOT supply clx symbol
@@ -69,9 +69,9 @@ config-level guidance.
 | Surface | What it is | Owner |
 | --- | --- | --- |
 | CollectX (clx) collection mechanism | The framework that gathers provider counters into a schema and ships them through exporters — the *collector runtime* the operator deploys | THIS skill (deployment / operation) |
-| Hardware-counter reader library | The per-domain API a DOCA program links to *read* hardware counters off a `doca_dev` | [`doca-telemetry`](../libs/doca-telemetry/SKILL.md) |
-| Publisher library | The application-side API a DOCA program links to *emit / publish* counters and events to a consumer | [`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md) |
-| Productized DTS container | The packaged, NGC-shipped / kubelet-started DOCA Telemetry Service as-deployed (config schema, built-in providers, manifest) | Out of bundle (Non-goal #7) — route to the [public DTS guide](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route) |
+| Hardware-counter reader library | The per-domain API a DOCA program links to *read* hardware counters off a `doca_dev` | `doca-telemetry/SKILL.md` |
+| Publisher library | The application-side API a DOCA program links to *emit / publish* counters and events to a consumer | `doca-telemetry-exporter/SKILL.md` |
+| Productized DTS container | The packaged, NGC-shipped / kubelet-started DOCA Telemetry Service as-deployed (config schema, built-in providers, manifest) | Out of bundle (Non-goal #7) — route to the public DTS guide (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`) |
 
 Conflating any two of these is the #1 first-touch telemetry
 error. In particular: a collector that uses the operator's own
@@ -110,15 +110,15 @@ The agent does NOT assert which backends are enabled by default,
 the exact config knob that turns each on, or the config file path
 — those are install-bound and documented in the public DTS /
 Telemetry guide reached through
-[`doca-public-knowledge-map ## DOCA tools`](../doca-public-knowledge-map/SKILL.md#doca-tools)
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
 and the
-[externally-productized DTS routing row](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+externally-productized DTS routing row (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 
 ## Version compatibility
 
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-docs
-rule, see [`doca-version`](../doca-version/SKILL.md). The body
+rule, see `doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The collector-deployment-specific overlay** is:
@@ -129,7 +129,7 @@ lives there; this skill does not duplicate it.
   another release is the silent "rows assembled but the consumer
   drops them on a schema-version skew" trap. Anchor the
   collector's DOCA version per
-  [`doca-version TASKS.md ## configure`](../doca-version/TASKS.md#configure).
+  `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 - **The collector's schema version and the downstream consumer's
   expected schema version must agree.** A consumer (Prometheus
   scrape, Fluent Bit pipeline, NetFlow collector) configured for
@@ -157,12 +157,12 @@ skill, not by this one.
 
 | Layer | Symptom | First-stop check / owner |
 | --- | --- | --- |
-| 1. Collector won't start | The daemon exits immediately, reports a missing config, or never binds | Confirm DOCA install health ([`doca-setup ## test`](../doca-setup/TASKS.md#test)); read the daemon's own startup output; do NOT paste a config path from memory |
+| 1. Collector won't start | The daemon exits immediately, reports a missing config, or never binds | Confirm DOCA install health (`doca-setup ## test` (`doca-setup/TASKS.md#test`)); read the daemon's own startup output; do NOT paste a config path from memory |
 | 2. No provider rows | The collector runs but assembles no schema rows for a provider | The provider is not enabled, or the device does not expose it — re-run the per-device support probe ([`## Safety policy`](#safety-policy)); this is the canonical silent-drop |
 | 3. Schema mismatch | Rows are assembled but malformed / unexpected fields | The schema does not match the enabled providers; re-derive the schema from the live provider set, do not invent field names |
 | 4. Exporter silent | Rows exist locally but the export backend ships nothing | The export backend is not enabled, or its sink is unreachable; confirm the backend is on and the sink endpoint is reachable |
 | 5. Downstream skew | The export ships but the consumer shows nothing | Schema-version skew between collector and consumer, or a Data-ID / property-dimension mismatch — align per [`## Version compatibility`](#version-compatibility) |
-| 6. Transport | Network / firewall / DTS-runtime failure between collector and consumer | Cross-cutting host / network layer; route to [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug) and, for productized DTS, the public DTS guide |
+| 6. Transport | Network / firewall / DTS-runtime failure between collector and consumer | Cross-cutting host / network layer; route to `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) and, for productized DTS, the public DTS guide |
 
 The agent's rule: **never declare the collector deployed on
 "the daemon is running" alone.** A running daemon with a silent
@@ -195,19 +195,19 @@ For the cross-cutting observability primitives
 (`--sdk-log-level`, the `DOCA_LOG_LEVEL` env var, the
 `doca-<lib>-trace` build flavor) that apply to a source program
 feeding the collector, see
-[`doca-debug CAPABILITIES.md ## Observability`](../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree layout (where the collector and its config
 live), defer to
-[`doca-public-knowledge-map ## Layout of an installed DOCA package`](../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+`doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
 
 ## Safety policy
 
 > **Overlay on the bundle-wide hardware-safety meta-policy.** The
 > rules below are this skill's per-artifact overlay on the
 > cross-cutting rules in
-> [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+> `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
 > (specifically
-> [### Per-artifact overlay pattern](../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)).
+> ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)).
 > When the two layers disagree, the stricter wins; when either
 > layer says STOP, the agent stops.
 
@@ -217,7 +217,7 @@ live), defer to
   the canonical "silently dropped metric" — the collector does
   not fail loudly, it just emits nothing for that counter. Probe
   per-device support first (the same gate-before-commit rule
-  [`doca-telemetry-utils`](../tools/doca-telemetry-utils/SKILL.md)
+  `doca-telemetry-utils/SKILL.md`
   owns for the exporter-config case), and verify the probe result
   against the live device, not from memory.
 - **The collector is read-only against the device.** Sampling
@@ -225,7 +225,7 @@ live), defer to
   would change device state (`mlxconfig set`, a firmware burn, a
   BlueField mode flip, enabling a privileged-data daemon that
   requires a hardware-state change) leaves this skill and routes
-  to [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
+  to `doca-hardware-safety/SKILL.md`
   for the change-application discipline.
 - **Smoke end-to-end before declaring deployed, and do not invent
   clx names / paths.** Confirm the consumer receives the expected
@@ -233,7 +233,7 @@ live), defer to
   name, schema field, exporter flag, or config path from memory —
   quote it from the live config or the public DOCA Telemetry /
   DTS guide reached through
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 
 ## Deferred topic boundaries
 
@@ -242,14 +242,14 @@ collector. Adjacent topics the agent will get asked but should
 route elsewhere:
 
 - **The hardware-counter reader API** — owned by
-  [`doca-telemetry`](../libs/doca-telemetry/SKILL.md).
+  `doca-telemetry/SKILL.md`.
 - **The application-side publisher API** — owned by
-  [`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md).
+  `doca-telemetry-exporter/SKILL.md`.
 - **The productized DTS container as-deployed** — externally
   productized (Non-goal #7); route to the
-  [public DTS guide](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+  public DTS guide (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 - **Installing DOCA / preparing the env** — owned by
-  [`doca-setup`](../doca-setup/SKILL.md).
+  `doca-setup/SKILL.md`.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** raised by a source
   program — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).

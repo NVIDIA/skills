@@ -4,12 +4,12 @@ name: doca-bare-metal-deployment
 description: >
   Running a DOCA-linked binary directly on the hardware, with no container
   or kubelet: on host x86 with a BlueField NIC over PCIe, or bare-metal on
-  BlueField Arm. Use for launching and supervising it (direct, tmux,
+  BlueField Arm. Use this skill for launching and supervising it (direct, tmux,
   systemd), and when it "exits 1 right after launch", "systemd keeps
   restarting it", reports "no matching device on the BF", or the BlueField
   itself is unhealthy: "bfb-install exited 0 but DPU is dead", "ping
   192.168.100.2 works but ssh fails", "host PFs aren't showing netdevs".
-  Service containers under kubelet belong to doca-container-deployment.
+  Refuse service containers under kubelet (doca-container-deployment).
   Covers PCI/NUMA/CPU/IRQ binding, co-tenant isolation
   (cgroup-v2/netns/numactl), a seven-layer error taxonomy, platform
   lifecycle (BFB install, RShim/TMFIFO, host PF rebind, post-BFB recovery)
@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - deployment
@@ -51,10 +52,10 @@ contract. Do not open every companion file.
 **Where to start:** This skill is the bundle's home for *operating*
 a DOCA-linked application binary **directly on hardware** — no
 container, no kubelet, no static-pod manifest. It is the parallel
-of [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+of `doca-container-deployment/SKILL.md`
 for the non-container path. If the user has a DOCA-linked binary
 they built (per the canonical workflow in
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md))
+`doca-programming-guide/SKILL.md`)
 and they want to know *how to actually run it on the host or on
 the BlueField Arm cores correctly*, open
 the tasks companion and start at
@@ -63,7 +64,7 @@ shape does the bare-metal runtime even have and what is the
 deployment contract*, start at the capabilities companion.
 If the user is not yet sure whether their target system shape is
 the container path or the bare-metal path, route the recognition
-step to [`doca-setup`](../doca-setup/SKILL.md) first; only return
+step to `doca-setup/SKILL.md` first; only return
 here once *bare-metal* is the confirmed shape.
 
 ## Audience
@@ -91,7 +92,7 @@ It is **not** for:
   DOCA tree, not to a bare-metal deployment),
 - full-Kubernetes-cluster operators managing a fleet of
   BlueFields (the bundle covers
-  [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+  `doca-container-deployment/SKILL.md`
   for the single-host kubelet-standalone shape; **fleet/production-scale
   deployment is fleet-orchestration scope** — route to the orchestration
   entry-point in
@@ -104,7 +105,7 @@ It is **not** for:
 The skill teaches the agent the bare-metal-deployment *procedure*
 and the rules for quoting documented commands from the public DOCA
 Programming Guide and the public BlueField / DPU User Manual via
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md);
+`doca-public-knowledge-map/SKILL.md`;
 it does not invent flag names, PCI BDFs, NUMA numbers, devlink
 paths, representor strings, or systemd `Restart=` mode names from
 memory.
@@ -149,18 +150,18 @@ library's API. Concretely:
 
 Do **not** load this skill for the container-path equivalent
 (those questions go to
-[`doca-container-deployment`](../doca-container-deployment/SKILL.md));
+`doca-container-deployment/SKILL.md`);
 for full-Kubernetes-cluster operations (out of scope per the
 bundle's non-goals); for library-API questions (route to the
 matching `libs/<library>` skill); for env-preparation questions
 including hugepages, IOMMU, pkg-config, and devlink mode flips
-(use [`doca-setup`](../doca-setup/SKILL.md)); for any
+(use `doca-setup/SKILL.md`); for any
 hardware-state-changing operation including `mlxconfig` writes
 and BFB reflashes (route to
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) for the
+`doca-hardware-safety/SKILL.md` for the
 cross-cutting meta-policy); or for cross-library programming
 questions (use
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md)).
+`doca-programming-guide/SKILL.md`).
 
 ## What this skill provides
 
@@ -179,13 +180,13 @@ companion files:
   crash-and-investigate vs supervisor-driven restart), the
   bare-metal-specific version overlay on the four-way version
   match owned by
-  [`doca-version`](../doca-version/SKILL.md), the cross-cutting
+  `doca-version/SKILL.md`, the cross-cutting
   error taxonomy (seven layers, walked in order), the observability
   surface (stdout/stderr discipline by launch mode; device-state
   introspection via `devlink` / `sysfs` / `mlxconfig` *query*;
   per-tenant resource visibility), and the safety policy (overlay
   on
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md):
+  `doca-hardware-safety/SKILL.md`:
   smoke-before-bulk for binaries; failed bare-metal process is
   HIGH-STAKES; do not invent PCI addresses, NUMA numbers,
   representor names, devlink paths, or systemd `Restart=` mode
@@ -206,7 +207,7 @@ companion files:
   owning skills. (The change-application discipline for any
   mutating burn invoked from `## bluefield-lifecycle` is still
   meta-policy owned by
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md),
+  `doca-hardware-safety/SKILL.md`,
   loaded alongside.)
 
 The skill assumes a host or BlueField target where:
@@ -220,9 +221,9 @@ The skill assumes a host or BlueField target where:
   launch mode), and bind processes to NUMA nodes.
 
 It does not cover installing DOCA — that path goes through
-[`doca-setup`](../doca-setup/SKILL.md) — and it does not cover
+`doca-setup/SKILL.md` — and it does not cover
 building the binary — that path goes through
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 
 ## Loading order
 

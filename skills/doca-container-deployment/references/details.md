@@ -25,7 +25,7 @@ piece; the worked example is one instance.
   + the documented-recipe rule in
   [`TASKS.md ## modify`](../TASKS.md#modify) (the agent quotes the
   pod-spec shape from the public DOCA Container Deployment Guide via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md);
+  `doca-public-knowledge-map/SKILL.md`;
   it does NOT invent YAML field names).
 - **"My pod spec is in the directory but the pod never starts — how
   do I diagnose it?"** — worked example: *"I dropped the Argus
@@ -81,7 +81,7 @@ bundle. To keep the boundary clean, it deliberately does not contain
 - **Container image names and tags.** The canonical image source
   for any DOCA service container is the public DOCA Container
   Deployment Guide and the NGC catalog; the agent routes through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the current image string and tag rather than quoting one
   from memory. Inventing an image name (e.g. a fictional
   `nvcr.io/nvidia/doca/<service>:latest`) is the load-bearing
@@ -93,7 +93,7 @@ bundle. To keep the boundary clean, it deliberately does not contain
   Guide names. The agent quotes the documented path string, flag
   name, or field name from the guide; the agent does NOT infer it
   from upstream Kubernetes prose. When in doubt, route to
-  [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services)
+  `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`)
   for the public Container Deployment Guide URL.
 - **A `samples/`, `templates/`, or `reference/` subtree** of any
   kind. A mock or incomplete artifact in this skill's tree, even
@@ -102,17 +102,17 @@ bundle. To keep the boundary clean, it deliberately does not contain
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — the routing table to the public DOCA Container Deployment Guide
   (cross-service deployment pattern), the per-service public guides
   for the in-bundle services (Argus, DMS, Firefly, UROM service),
   and the NGC catalog. This skill does
   not duplicate URLs; it points at them and adds the
   deployment-runtime overlay. See in particular
-  [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services)
+  `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`)
   for the per-service URL set and the cross-service Container
   Deployment Guide row at the bottom of that section.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation and
+- `doca-setup/SKILL.md` — env preparation and
   install verification on the BlueField target where the DOCA
   service container will run, including the *I have no install yet*
   path via the public NGC DOCA container and the BFB version check.
@@ -123,41 +123,41 @@ bundle. To keep the boundary clean, it deliberately does not contain
   [`CAPABILITIES.md ## Capabilities and modes`](../CAPABILITIES.md#capabilities-and-modes).)
   This skill assumes its preconditions are satisfied at the
   BlueField target.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+- `doca-version/SKILL.md` — canonical DOCA
   version-handling rules. This skill's `## Version compatibility`
   cross-links the four-way match rule plus the container-tag-vs-
   host-package overlay; the body of those rules lives in
   `doca-version`.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
   [TASKS.md](../TASKS.md) honors this contract — the agent probes the
   BlueField container manager's structured status output first and
   falls back to the documented manual commands when the probe
   fails.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). Container-deployment-specific debug (pod never
   scheduled, image pull failed, ENTRYPOINT exited, volume mount
   missing, network policy blocking, restart loop) layers on top of
   the cross-cutting ladder.
-- [`doca-bare-metal-deployment`](../../doca-bare-metal-deployment/SKILL.md)
+- `doca-bare-metal-deployment/SKILL.md`
   — the SIBLING deployment path: bare-metal hardware (host x86 OR
   BlueField Arm direct launch — systemd / tmux / direct invocation,
   hardware-resource binding, per-tenant isolation, restart
   discipline). This skill (container deployment) owns the
   kubelet-standalone + YAML pod-spec path; that skill owns the
   bare-metal binary-launch path. Both are routed to from
-  [`doca-setup ## recognize`](../../doca-setup/TASKS.md#recognize).
+  `doca-setup ## recognize` (`doca-setup/TASKS.md#recognize`).
 - Per-service skills layered on top of this one (the four DOCA
   services in the bundle, 1:1 with `doca/services/`):
-  [`doca-argus`](../../services/doca-argus/SKILL.md) (runtime
+  `doca-argus/SKILL.md` (runtime
   security / monitoring),
-  [`doca-dms`](../../services/doca-dms/SKILL.md) (DOCA Management
+  `doca-dms/SKILL.md` (DOCA Management
   Service — gNMI / gNOI),
-  [`doca-firefly`](../../services/doca-firefly/SKILL.md) (PTP time
+  `doca-firefly/SKILL.md` (PTP time
   sync),
-  [`doca-urom-svc`](../../services/doca-urom-svc/SKILL.md) (Unified
+  `doca-urom-svc/SKILL.md` (Unified
   Communication Remote Memory Operations). Each of those skills
   shares this skill's deployment runtime and adds its own config
   schema, paired-workload contract, and "healthy" definition. The
@@ -173,7 +173,7 @@ bundle. To keep the boundary clean, it deliberately does not contain
   for that specific product, NOT silently extrapolated from this
   skill's contract. The strict-to-DOCA invariant is documented at
   `AGENTS.md ## Non-goals` row 7.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+- `doca-programming-guide/SKILL.md`
   — general DOCA patterns. Container-deployment is service-shaped
   not library-shaped, so the build / modify / first-app pattern
   there does not apply directly, but the cross-library debug

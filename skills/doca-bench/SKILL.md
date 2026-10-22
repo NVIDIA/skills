@@ -16,6 +16,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - bench
@@ -58,7 +59,7 @@ the capabilities companion when the question is *what
 *how to interpret throughput / latency / op-rate output without
 fooling yourself on warm-up or steady-state*. If DOCA is not
 installed yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first; if the install
+`doca-setup/SKILL.md` first; if the install
 version is < 2.7.0, `doca_bench` is not shipped on this host.
 
 ## Example questions this skill answers well
@@ -113,7 +114,7 @@ the worked example is one instance.
   the tasks companion +
   the capabilities companion.
   Re-route through
-  [`doca-caps`](../doca-caps/SKILL.md) for the coarse
+  `doca-caps/SKILL.md` for the coarse
   per-device per-library capability ground truth, then back
   into bench once the capability is confirmed present.
 
@@ -162,9 +163,9 @@ to measure performance of a DOCA library. Concretely:
 - Picking *which* DOCA library to benchmark for a candidate
   workload (RDMA vs COMPRESS vs DMA, etc.).
 - Picking *which* measurement axis to ask for (throughput vs bulk
-  latency vs precision latency vs max-bandwidth) — the four modes
-  defined in `tools/bench/doca_bench/configuration.hpp` are not
-  interchangeable.
+  latency vs precision latency) — the three modes the public guide
+  documents; confirm the full list (including any `max-bandwidth`
+  mode) with `--help`. The modes are not interchangeable.
 - Probing the install's granular-build state so the agent can
   honestly report *"this library is not exposed on this install"*
   instead of inventing a workload.
@@ -179,9 +180,9 @@ to measure performance of a DOCA library. Concretely:
 
 Do **not** load this skill for general DOCA orientation, library
 API work, or installation. For those, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
+`doca-public-knowledge-map/SKILL.md`,
 the matching `libs/<library>` skill, or
-[`doca-setup`](../../doca-setup/SKILL.md). Do not load it for
+`doca-setup/SKILL.md`. Do not load it for
 *application-level* end-to-end benchmarking either — `doca_bench`
 measures the DOCA library surface, not the user's application
 above it.
@@ -262,37 +263,37 @@ contain — and pull requests should not add:
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA Bench page on `docs.nvidia.com`
   and the rest of the public DOCA documentation set.
-- [`doca-version`](../../doca-version/SKILL.md) — the canonical
+- `doca-version/SKILL.md` — the canonical
   version-detection chain, four-way match rule, NGC container
   semantics, and headers-win-over-docs rule. The
   `## Version compatibility` section in this skill is a thin
   overlay on top of `doca-version`; the body lives there.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle-wide contract for structured-output helper tools.
   Bench-runner / bench-snapshot executables that satisfy the
   detect-prefer-fallback-report loop are deferred to PR2; the
   contract is consumed here in advance so the
   `## Command appendix` in the tasks companion is infra-aware
   from PR1.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, hugepages, NUMA awareness, and the *I
   have no install yet* path with the public NGC DOCA container.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder. Bench surfaces *its own* error taxonomy in
   the capabilities companion;
   when the cause turns out to be below DOCA (driver, firmware,
   NUMA), the bench taxonomy hands off to `doca-debug`.
-- [`doca-caps`](../doca-caps/SKILL.md) — the sibling DOCA tool
+- `doca-caps/SKILL.md` — the sibling DOCA tool
   for the coarse per-device per-library capability snapshot.
   Bench probes capability at finer grain via its own query
   system; `doca_caps` is the cheaper first step to confirm the
   device is even visible to DOCA.
 - The matching `libs/<library>` skill — e.g.
-  [`doca-comch`](../../libs/doca-comch/SKILL.md),
-  [`doca-compress`](../../libs/doca-compress/SKILL.md) — for
+  `doca-comch/SKILL.md`,
+  `doca-compress/SKILL.md` — for
   the workload-side preconditions, capability-query rules, and
   error-taxonomy overlays of the library under test. Bench
   drives the library; the library skill explains *what

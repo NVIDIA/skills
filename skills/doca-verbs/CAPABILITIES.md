@@ -5,9 +5,9 @@ raw-verbs CLASS patterns. Pick the pattern first, then drill into
 the H2 that owns the substance. Every section in this file rests on
 ONE invariant: **`doca-verbs` is a targeted escape hatch, not a
 default.** If the user's case fits the matching higher-level DOCA
-library ([`doca-rdma`](../doca-rdma/SKILL.md) for RDMA work,
-[`doca-eth`](../doca-eth/SKILL.md) for Ethernet queues,
-[`doca-rmax`](../doca-rmax/SKILL.md) for timing-precise media),
+library (`doca-rdma/SKILL.md` for RDMA work,
+`doca-eth/SKILL.md` for Ethernet queues,
+`doca-rmax/SKILL.md` for timing-precise media),
 that is the answer; the rest of this file applies only after the
 drop-down decision in [SKILL.md](SKILL.md) has been made.
 
@@ -16,7 +16,7 @@ Read this file when the loader sent you here from
 capabilities (configure, build, modify, run, test, debug) see
 [TASKS.md](TASKS.md). For where the underlying public
 documentation and installed package paths live, defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+`doca-public-knowledge-map/SKILL.md` —
 do not duplicate URLs or install paths in this file.
 
 ## Pattern overview
@@ -28,7 +28,7 @@ See [references/pattern-overview.md](references/pattern-overview.md).
 DOCA Verbs is a **DOCA Core Context.** Every verbs context follows
 the universal `cfg-create → cfg-set-* → init → start → use → stop →
 destroy` lifecycle (see
-[`doca-common CAPABILITIES.md ## ctx`](../doca-common/CAPABILITIES.md#ctx)).
+`doca-common CAPABILITIES.md ## ctx` (`doca-common/CAPABILITIES.md#ctx`)).
 On top of that lifecycle, the verbs surface layers an ibverbs-like
 object model accessed through `doca_verbs_context_create` and the
 per-object create / destroy families.
@@ -39,7 +39,7 @@ discussion.
 
 | Axis | Higher-level DOCA library | doca-verbs (this skill) |
 | --- | --- | --- |
-| Default for | The vast majority of work in scope: [`doca-rdma`](../doca-rdma/SKILL.md) covers Send / Receive / Read / Write / Write-Imm / Atomic / Sync-Event RDMA tasks; [`doca-eth`](../doca-eth/SKILL.md) covers Ethernet TX / RX queue patterns; [`doca-rmax`](../doca-rmax/SKILL.md) covers timing-precise media / data-over-IP streams | The narrow case where the higher-level library's task abstractions do not expose the specific verb / opcode / WR flag / QP attribute / SRQ option / AH attribute / CC-group attachment the user needs |
+| Default for | The vast majority of work in scope: `doca-rdma/SKILL.md` covers Send / Receive / Read / Write / Write-Imm / Atomic / Sync-Event RDMA tasks; `doca-eth/SKILL.md` covers Ethernet TX / RX queue patterns; `doca-rmax/SKILL.md` covers timing-precise media / data-over-IP streams | The narrow case where the higher-level library's task abstractions do not expose the specific verb / opcode / WR flag / QP attribute / SRQ option / AH attribute / CC-group attachment the user needs |
 | Surface shape | Task-level (`doca_<library>_task_*`) — submit a task, get a completion event | Raw verbs primitives (`doca_verbs_pd` / `_qp` / `_cq` / `_srq` / `_ah_attr` / `_comp_channel` / `_eth_sq` / `_eth_rq` / `_cc_group`) inside DOCA Core — closer to what libibverbs exposes, but inside the DOCA Core lifecycle |
 | Completion handling | DOCA progress engine (`doca_pe_progress`), event per task | DOCA progress engine OR manual completion-queue handling via `doca_verbs_bridge_poll_cq` OR completion-channel event delivery via `doca_verbs_comp_channel_create` + `doca_verbs_get_cq_event`, picked explicitly by the user |
 | Capability discovery | `doca_<library>_cap_*` (per-task supported, per-transport supported, per-property max) against `doca_devinfo` | `doca_verbs_query_device` returns a `doca_verbs_device_attr` handle; the `doca_verbs_device_attr_get_*` family (max QP, max QP WR, max SGE, max CQ / CQE, max MR / PD / AH / SRQ / SRQ-WR / SRQ-SGE, per-QP-type supported, max-rd-atomic, ECE / CC-group / CQE-inline / ordering-semantic / DPA-external-datapath / GPU-external-datapath / plane-index / send-DBR-mode / TS-source-type supported, etc.) is the per-attribute query family |
@@ -62,8 +62,8 @@ the experimental ABI tier on this release:
 | `doca_verbs_ah_attr` (Address-Handle attributes) | The Address-Handle attribute block for routing send WRs over IB or RoCE (address type is one of `DOCA_VERBS_ADDR_TYPE_IPv4` / `_IPv6` / `_IB_GRH` / `_IB_NO_GRH`) | `doca_verbs_ah_attr_create` → `_set_*` (DGID / DLID / SL / SGID-index / static-rate / hop-limit / traffic-class / UDP-source-port / address-type) → attached to a `doca_verbs_qp_attr` via `doca_verbs_qp_attr_set_ah_attr` → `doca_verbs_ah_attr_destroy` |
 | `doca_verbs_comp_channel` (Completion Channel) | An event-delivery channel that fires when a CQ has new completions. Alternative to PE-driven completions and to manual CQ poll | `doca_verbs_comp_channel_create(ctx, &chan)` → `doca_verbs_comp_channel_get_handle` → poll the OS handle → `doca_verbs_get_cq_event` to drain → `doca_verbs_comp_channel_destroy(chan)`. CQ ACK via `doca_verbs_ack_cq_events`; arming via `doca_verbs_req_notify_cq` |
 | `doca_verbs_cc_group` (Congestion-Control Group) | A congestion-control group that QPs can be attached to | `doca_verbs_cc_group_attr_create` → `_set_hint` → `doca_verbs_cc_group_create(ctx, group_attr, &cc_group)` → attach to a QP via `doca_verbs_qp_attr_set_cc_group` → modify / query / destroy. The matching cap-query is `doca_verbs_query_cc_group_caps` |
-| `doca_verbs_eth_sq` (Ethernet Send Queue) | An Ethernet-side SQ (the verbs-tier counterpart to the [`doca-eth`](../doca-eth/SKILL.md) TX queue) — only when the user has confirmed `doca-eth` does not expose the option they need (e.g., explicit TS-source-type, plane-index, multi-pkt-send-WQE) | `doca_verbs_eth_sq_init_attr_create` → `_set_*` (PD / CQ / WR-num / max-SGEs / max-inline-data / queue-id / user-index / external-datapath / DPA / TS-source-type / plane-index / flush-in-error / allow-multi-pkt-send-WQE / sig-all) → `doca_verbs_eth_sq_create(ctx, init_attr, &sq)` → use → `doca_verbs_eth_sq_destroy(sq)`. Query via `doca_verbs_eth_sq_query`; recover from error via `doca_verbs_eth_sq_recover_from_error` |
-| `doca_verbs_eth_rq` (Ethernet Receive Queue) | An Ethernet-side RQ (the verbs-tier counterpart to the [`doca-eth`](../doca-eth/SKILL.md) RX queue) — same drop-down logic as `doca_verbs_eth_sq` | `doca_verbs_eth_rq_init_attr_create` → `_set_*` (PD / CQ / WR-num / max-SGEs / queue-id / user-index / external-datapath / DPA / TS-source-type / SRQ / flush-in-error) → `doca_verbs_eth_rq_create(ctx, init_attr, &rq)` → use → `doca_verbs_eth_rq_destroy(rq)` |
+| `doca_verbs_eth_sq` (Ethernet Send Queue) | An Ethernet-side SQ (the verbs-tier counterpart to the `doca-eth/SKILL.md` TX queue) — only when the user has confirmed `doca-eth` does not expose the option they need (e.g., explicit TS-source-type, plane-index, multi-pkt-send-WQE) | `doca_verbs_eth_sq_init_attr_create` → `_set_*` (PD / CQ / WR-num / max-SGEs / max-inline-data / queue-id / user-index / external-datapath / DPA / TS-source-type / plane-index / flush-in-error / allow-multi-pkt-send-WQE / sig-all) → `doca_verbs_eth_sq_create(ctx, init_attr, &sq)` → use → `doca_verbs_eth_sq_destroy(sq)`. Query via `doca_verbs_eth_sq_query`; recover from error via `doca_verbs_eth_sq_recover_from_error` |
+| `doca_verbs_eth_rq` (Ethernet Receive Queue) | An Ethernet-side RQ (the verbs-tier counterpart to the `doca-eth/SKILL.md` RX queue) — same drop-down logic as `doca_verbs_eth_sq` | `doca_verbs_eth_rq_init_attr_create` → `_set_*` (PD / CQ / WR-num / max-SGEs / queue-id / user-index / external-datapath / DPA / TS-source-type / SRQ / flush-in-error) → `doca_verbs_eth_rq_create(ctx, init_attr, &rq)` → use → `doca_verbs_eth_rq_destroy(rq)` |
 
 The exact symbol names are install-bound; the agent must read them
 from the verbs headers shipped on the user's install rather than
@@ -104,7 +104,7 @@ matching `doca_verbs_device_attr_get_*` for what the user wants:
   `_get_ts_free_running_clock_frequency`.
 
 Per the cross-cutting rule in
-[`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+`doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
 the cap-query is the runtime authority — the public docs are the
 *promise*, the cap-query is the *reality*. **Free the attribute
 handle when done** with `doca_verbs_device_attr_free` (failing to
@@ -138,9 +138,9 @@ that drove the drop-down is covered (the WR flag is set; the
 custom QP attribute is honored; the legacy libibverbs port is
 integrated), the agent should *explicitly* ask whether the user
 can move the rest of the application back up to
-[`doca-rdma`](../doca-rdma/SKILL.md) /
-[`doca-eth`](../doca-eth/SKILL.md) /
-[`doca-rmax`](../doca-rmax/SKILL.md). The maintenance cost of raw
+`doca-rdma/SKILL.md` /
+`doca-eth/SKILL.md` /
+`doca-rmax/SKILL.md`. The maintenance cost of raw
 verbs (capability-query density, manual lifecycle management,
 no-mixing rule with libibverbs) is real; staying down at the verbs
 level for work the higher-level library already covers is not free.
@@ -149,7 +149,7 @@ level for work the higher-level library already covers is not free.
 
 For the canonical DOCA version-detection chain, the four-way match
 rule, NGC container semantics, and the headers-win-over-docs rule,
-see [`doca-version`](../../doca-version/SKILL.md). The body lives
+see `doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The raw-verbs-specific overlay** is:
@@ -165,7 +165,7 @@ there; this skill does not duplicate it.
   the user upgraded `doca-verbs` independently of the rest of
   DOCA; the cap-query at runtime can then return values the
   higher-level library does not honor. Route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any verbs-layer diagnosis.
 - **The DOCA Verbs surface ships under the EXPERIMENTAL ABI tier
   on this release.** Per the source-tree split observable in the
@@ -177,7 +177,7 @@ there; this skill does not duplicate it.
   pin against the release the user is actually building on.
 - **Use the cap-query at runtime, not at configure time alone.**
   Per the cross-cutting rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the cap-query is the runtime authority for *"is this verb /
   opcode / WR flag / QP feature supported on this device + this
   DOCA version"*. For raw verbs the surface is wide enough that
@@ -190,13 +190,13 @@ there; this skill does not duplicate it.
   authoritative truth for what the *built* library exposes. The
   agent must not assert a symbol exists without confirming it
   there — per the headers-win-over-docs rule in
-  [`doca-version`](../../doca-version/SKILL.md).
+  `doca-version/SKILL.md`.
 
 ## Error taxonomy
 
 The cross-library `DOCA_ERROR_*` taxonomy (what each family means
 and which debug layer it routes to) lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 The raw-verbs-specific overlay names the families the agent will
 see most often from `doca_verbs_*` calls and what they specifically
 indicate:
@@ -206,7 +206,7 @@ indicate:
 | `DOCA_ERROR_BAD_STATE` | Lifecycle violation in verbs terms — e.g., `doca_verbs_qp_create` called before `doca_verbs_pd_create`; WR submit (`doca_verbs_bridge_post_send` / `_post_recv` / `_post_srq_recv`) called before the QP transition the verbs surface requires; MR destroyed before context destroy; `doca_verbs_qp_modify` called with an out-of-order state transition | Walk the lifecycle in [`## Capabilities and modes`](#capabilities-and-modes) object-model section; confirm each step's preconditions BEFORE retrying. The QP state machine is exposed directly via `doca_verbs_qp_modify` + the `doca_verbs_qp_attr_set_current_state` / `_set_next_state` pair; misordered transitions return `BAD_STATE` and the right response is to query the current state via `doca_verbs_qp_query` and re-walk |
 | `DOCA_ERROR_NOT_SUPPORTED` | The verb / opcode / WR flag / QP attribute / SRQ option / AH attribute / CC-group hint / Ethernet-queue option the user requested is not on this device + firmware + DOCA version | Run `doca_verbs_query_device` against the active `doca_devinfo`; inspect the matching `doca_verbs_device_attr_get_*`; if the feature flag is false (or the max is zero), that is the answer — climb back up to the matching higher-level library if it covers a viable alternative |
 | `DOCA_ERROR_INVALID_VALUE` | Bad WR flags / opcode / address-handle parameter / WR field that the runtime rejects at submit time; `doca_verbs_qp_modify` with mutually-exclusive attributes set; `doca_verbs_ah_attr_set_*` with an SGID index out of range; `doca_verbs_cq_attr_set_cq_size` with a size beyond the device max | Re-check the user's WR / attribute construction against the headers; do not assume the libibverbs field layout transfers — this is one of the highest-frequency raw-verbs program bugs. For sizing rejections, re-run the matching `doca_verbs_device_attr_get_*` cap-query |
-| `DOCA_ERROR_NOT_PERMITTED` | Missing privileges to open the device, register the MR, or transition the QP — usually a host-side env issue (RDMA stack module loads, user group, ulimits) | Route to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug) — the layer below the verbs API is the suspect |
+| `DOCA_ERROR_NOT_PERMITTED` | Missing privileges to open the device, register the MR, or transition the QP — usually a host-side env issue (RDMA stack module loads, user group, ulimits) | Route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) — the layer below the verbs API is the suspect |
 | `DOCA_ERROR_IO_FAILED` | Work-request completed with error status. **The submit return is not the answer; the completion-queue entry is.** The agent MUST direct the user to inspect the CQE's error field for the specific cause | Drain the CQ (via `doca_pe_progress` if using the DOCA progress engine, or via `doca_verbs_bridge_poll_cq` if using the manual path, or via `doca_verbs_get_cq_event` if using completion-channel delivery); read the CQE error field verbatim; then map THAT to the next action |
 
 The agent's rule: **never recommend a retry loop on `DOCA_ERROR_*`
@@ -217,7 +217,7 @@ scale.
 
 Quote `doca_error_get_descr()` verbatim — do not paraphrase. The
 cross-cutting debug ladder
-([`doca-debug ## debug`](../../doca-debug/TASKS.md#debug)) is the
+(`doca-debug ## debug` (`doca-debug/TASKS.md#debug`)) is the
 canonical layered diagnosis path that the agent escalates to once
 the raw-verbs-specific cause has been narrowed.
 
@@ -233,7 +233,7 @@ drift:
    of the user's DOCA application keeps its single-PE loop. This
    is the recommended default for raw verbs unless the user has
    named a specific reason it does not fit. Per
-   [`doca-common CAPABILITIES.md ## progress engine`](../doca-common/CAPABILITIES.md#progress-engine).
+   `doca-common CAPABILITIES.md ## progress engine` (`doca-common/CAPABILITIES.md#progress-engine`).
 2. **Manual completion-queue handling.** The raw-verbs surface
    exposes manual poll via `doca_verbs_bridge_poll_cq`; the user
    can poll a CQ themselves in whatever loop they want. This is
@@ -290,16 +290,16 @@ Five primary signals the agent should reach for:
 
 For cross-cutting observability primitives (`--sdk-log-level`, the
 `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)
 and the foundation log surface in
-[`doca-common CAPABILITIES.md ## log`](../doca-common/CAPABILITIES.md#log).
+`doca-common CAPABILITIES.md ## log` (`doca-common/CAPABILITIES.md#log`).
 For the install-tree observability (logger names, package layout)
 defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 Raw verbs' safety surface centers on **one rule that has no
 equivalent at the higher-level DOCA-library tier**: **do not mix
@@ -346,15 +346,15 @@ Additional rules:
   not as an immediate error.
 - **Permissions and mmap-export rules inherit from `doca-common`.**
   The PD / MR / device permission envelope is the same as the
-  underlying [`doca-common`](../doca-common/SKILL.md) surface; the
+  underlying `doca-common/SKILL.md` surface; the
   agent should not re-invent them here — defer to
-  [`doca-common CAPABILITIES.md ## buf`](../doca-common/CAPABILITIES.md#buf)
+  `doca-common CAPABILITIES.md ## buf` (`doca-common/CAPABILITIES.md#buf`)
   and the `doca_mmap_*` permission family for the matrix.
 - **Cross-link to `doca-hardware-safety`.** Any verbs-layer change
   that involves a `mlxconfig`-class firmware-stored configuration
   change (e.g., enabling/disabling a specific QP feature at the
   device level) follows the meta-policy in
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) —
+  `doca-hardware-safety/SKILL.md` —
   pre-flight inventory, OOB access, maintenance window, cold
   power cycle, replica-first, rollback documented.
 

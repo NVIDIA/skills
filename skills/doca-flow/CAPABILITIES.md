@@ -5,7 +5,7 @@ into the H2 that owns the substance. For step-by-step workflows that
 *use* these capabilities (configure, build, modify, run, test, debug)
 see [TASKS.md](TASKS.md). Public-doc URLs and installed-package paths
 live in
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Pattern overview
 
@@ -44,7 +44,7 @@ configuration and feature set the device is in:
   *where Flow runs* first: the DPU Arm side (native for a separated-host
   BlueField), or — if it must run host-side — change the card's mode
   (`mlxconfig` + reboot, possibly firmware) via the
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) overlay. This
+  `doca-hardware-safety/SKILL.md` overlay. This
   is step 1 of [`TASKS.md ## configure`](TASKS.md#configure); being
   enumerable in `doca_caps` ≠ having a usable steering plane.
 - **Steering mode.** DOCA Flow runs **only** on hardware steering (HWS) —
@@ -108,8 +108,10 @@ ordered-list pipes **cannot be root** — front them with a basic or control
 pipe. For fine-grained priority, use a control pipe
 (`doca_flow_pipe_control_add_entry(..., priority)`, 0 highest, 7 lowest);
 otherwise priority is implicit (chain via `fwd_miss`, or later-inserted
-overlapping entries win). `fwd_miss` only supports `DOCA_FLOW_FWD_PIPE` and
-`DOCA_FLOW_FWD_DROP`.
+overlapping entries win). The forward types accepted for `fwd_miss` depend on
+release and pipe type (e.g. `DOCA_FLOW_FWD_PIPE`, `DOCA_FLOW_FWD_DROP`,
+`DOCA_FLOW_FWD_TARGET`). Check `enum doca_flow_fwd_type` in the installed
+`doca_flow.h`.
 
 ## Choosing between valid designs that trade off
 
@@ -304,7 +306,7 @@ host traffic** (e.g. a NIC/DPU PF that the host is currently using
 for SSH, package mirrors, or telemetry). Picking the wrong forward
 action on a live management port can disrupt the host's network
 session; getting this right is therefore part of the
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) overlay,
+`doca-hardware-safety/SKILL.md` overlay,
 not just a doca-flow detail.
 
 **Pattern (three public API symbols):**
@@ -337,8 +339,8 @@ agent quotes the sample, never invents the field names.
 **Required safety overlays when the user picks `FWD_TARGET` on a live
 management port:**
 
-- [`doca-hardware-safety ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) — even with the pass-to-kernel action, capture per-port counters BEFORE and AFTER, keep an out-of-band recovery path, and revert via `stop_doca_flow_ports()` + `doca_flow_destroy()` if any host-side counter regresses.
-- [`AGENTS.md ## The universal verification contract`](../../../AGENTS.md#the-universal-verification-contract) — the green signal for an `FWD_TARGET` inline filter is **sustained counter growth under controlled traffic**, not a single-packet match. A single matched packet can be coincidence on a live port; agents declaring "done" on a one-packet read are violating the contract.
+- `doca-hardware-safety ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) — even with the pass-to-kernel action, capture per-port counters BEFORE and AFTER, keep an out-of-band recovery path, and revert via `stop_doca_flow_ports()` + `doca_flow_destroy()` if any host-side counter regresses.
+- `AGENTS.md ## The universal verification contract` (bundle `AGENTS.md#the-universal-verification-contract`) — the green signal for an `FWD_TARGET` inline filter is **sustained counter growth under controlled traffic**, not a single-packet match. A single matched packet can be coincidence on a live port; agents declaring "done" on a one-packet read are violating the contract.
 - [`TASKS.md ## test`](TASKS.md#test) — the staged-entry-on-a-single-port pattern still applies; widen to both ports only after the single-port smoke is green.
 
 **Anti-patterns the agent must refuse:**
@@ -411,17 +413,21 @@ ask for *more*, confirm via the cap-query before promising it.
 | SNAT + DNAT combined (full-cone, hairpin, double NAT) | Same device-support query; confirm the combined behavior empirically — there is no per-variant cap symbol |
 | Overlay-aware CT (inner 5-tuple over VXLAN / GENEVE / …) | Same device-support query; confirm overlay handling against the shipped CT sample |
 
-**Capability discovery — one device-support query.** CT exposes a single
-cap symbol, `doca_flow_ct_cap_is_dev_supported(devinfo)` ("does this device
+**Capability discovery — the device-support query.** CT's primary
+cap symbol is `doca_flow_ct_cap_is_dev_supported(devinfo)` ("does this device
 support CT at all"). There is NO per-axis `doca_flow_ct_cap_*` family — do
 not claim separate cap symbols for flow count, aging range, NAT variants, or
-overlays. Call it against the active `doca_devinfo` BEFORE proposing CT;
-everything below is then sized via the `doca_flow_ct_cfg_*` setters and
-verified empirically, not through more cap queries:
+overlays. DOCA 3.5 adds the port capabilities API
+(`doca_flow_port_capabilities_create` / `_get_ct_ipv6` / `_destroy`,
+experimental) for CT IPv6 support, queried after `doca_flow_init()` and
+before port start. Call the device query against the active `doca_devinfo`
+BEFORE proposing CT; everything below is then configured as listed (CT
+sizing is per CT pipe since DOCA 3.4) and verified empirically, not
+through more cap queries:
 
 | Concern | How it is actually handled |
 | --- | --- |
-| Max concurrent CT flows | Sized through the CT cfg setters (`doca_flow_ct_cfg_set_*`); oversubscription surfaces as `DOCA_ERROR_FULL` / `_NO_MEMORY` at runtime, so validate against the workload's peak |
+| Max concurrent CT flows | Sized per CT pipe since DOCA 3.4 (`doca_flow_pipe_cfg_set_ct_connections`, `doca_flow_pipe_cfg_set_ct_max_connections_per_zone`, `doca_flow_pipe_cfg_set_ct_dup_filter_size`), not via `doca_flow_ct_cfg_set_*`; oversubscription surfaces as `DOCA_ERROR_FULL` / `_NO_MEMORY` at runtime, so validate against the workload's peak |
 | Aging-timer configuration | Set via `doca_flow_ct_cfg_set_aging_query_delay` and the aging plugin ops; an unworkable value surfaces as `DOCA_ERROR_INVALID_VALUE` at init/configure |
 | NAT variants (SNAT / DNAT / combined) | Requested through `doca_flow_ct_cfg_set_direction` and the CT actions; an unsupported request surfaces as `_NOT_SUPPORTED` at entry add — there is no per-variant cap query |
 | Overlay encapsulations for CT | Confirmed against the shipped CT sample and runtime behavior, not a per-overlay cap symbol |
@@ -438,7 +444,7 @@ CT action is supported.
 equal `doca_caps --version`. A skew between the doca-flow library and the
 rest of the install is the canonical *"my CT entry returns `_DRIVER` on a
 device the cap-query says supports it"* cause — route disagreement to
-[`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2
+`doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2
 BEFORE any CT-layer diagnosis.
 
 **CT-specific error overlay.** Add to the cross-library taxonomy
@@ -479,18 +485,18 @@ specific to CT, see
 
 For the DOCA version-detection chain, the four-way match rule, NGC
 container semantics, and the headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The Flow-specific overlay:
+`doca-version/SKILL.md`. The Flow-specific overlay:
 
 - The `doca_flow_*` symbols available on an install are observable from the
   installed Flow headers (path in
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package)).
+  `doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   On an `undefined reference` for a `doca_flow_*` symbol, confirm the
-  version per [`doca-version`](../../doca-version/TASKS.md#configure),
+  version per `doca-version/TASKS.md#configure`,
   verify the symbol exists in the installed headers, then read the Flow
   guide for *that* release.
 - `pkg-config --modversion doca-flow` is the build-time anchor for the
   version-matrix lookup in
-  [`doca-version`](../../doca-version/TASKS.md#test) step 2.
+  `doca-version/TASKS.md#test` step 2.
 
 Read the headers and the matching release notes for symbol
 availability; a static symbol table drifts silently and should not be
@@ -509,7 +515,7 @@ next move:
 | Resource error | `DOCA_ERROR_NO_MEMORY`, `DOCA_ERROR_FULL` on entry add | Pipe entry budget exhausted or actions-memory pool depleted | Inspect counters and pipe statistics (`## Observability` below); enlarge the pool or evict entries before retrying. |
 | Lifecycle error | `DOCA_ERROR_BAD_STATE` on start/stop | Object operated on outside its allowed lifecycle window | Re-read the object's lifecycle in TASKS.md; ensure operations happen in the documented order (port started before pipe created, pipe created before entries added, etc.). |
 | Port-config-incomplete error (compiles, dies at start — the #1 first-run failure) | `doca_flow_port_start` aborts with `failed creating port - port ID is mandatory` (`engine_port.c`), `... either doca_dev or doca_dev_rep must be provided` (`engine_port.c`), or `... port representor cannot be created in VNF mode` (`engine_port.c`); or the binary exits earlier with `rte_eth_dev_count_avail`=0 / "need N ports" (`dpdk_utils.c`) | A mandatory `doca_flow_port_cfg` setter is missing, or the DPDK ports were never probed (collecting BDFs from argv ≠ probing them — the probe is what creates the DPDK port from the `doca_dev`, `samples/doca_flow/flow_common.c`) | Set **both** `doca_flow_port_cfg_set_port_id()` and `doca_flow_port_cfg_set_dev()` (a real `doca_dev` in VNF, not `dev_rep`) before `doca_flow_port_start`, and call `doca_dpdk_port_probe(dev, "dv_flow_en=2")` for **every** opened device *before* `rte_eth_dev_count_avail()`. **On count == 0, or count < expected, return non-zero from `main()` immediately — do NOT enter the keep-alive loop on an un-armed bridge** (a long-running `main()` over zero hardware ports stays alive but never forwards a packet, and the watchdog cannot distinguish it from a healthy program). See [`TASKS.md ## configure`](TASKS.md#configure) step 6 + [`TASKS.md ## run`](TASKS.md#run) step 6. |
-| Placement / steering-plane-unavailable error | Port refuses to start — `doca_flow_port_start` (or the first switch-port `doca_flow_pipe_create`) returns `DOCA_ERROR_DRIVER` / a failed start, and the SDK log shows `Failed to query WQE based flow table capabilities` → `Failed to get hws cap` (devx `op_mod=0x37`, `BAD_PARAM_ERR`), or `failed to create dest action ROOT, flag 64, err -121` | The opened function has no usable hardware-steering plane — almost always running **host-side against a BlueField in `SEPARATED_HOST` / NIC mode**, where the steering plane belongs to the DPU Arm. Identical on every card on such a host, in BOTH `vnf` and `switch` modes. | **Do not touch the pipe spec or steering-mode string.** This is the device-placement signature: check `INTERNAL_CPU_MODEL` per [`## Capabilities and modes`](#capabilities-and-modes) device-placement bullet + [`TASKS.md ## configure`](TASKS.md#configure) step 1. Run DOCA Flow on the DPU Arm side, or change the card's mode via [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md). |
+| Placement / steering-plane-unavailable error | Port refuses to start — `doca_flow_port_start` (or the first switch-port `doca_flow_pipe_create`) returns `DOCA_ERROR_DRIVER` / a failed start, and the SDK log shows `Failed to query WQE based flow table capabilities` → `Failed to get hws cap` (devx `op_mod=0x37`, `BAD_PARAM_ERR`), or `failed to create dest action ROOT, flag 64, err -121` | The opened function has no usable hardware-steering plane — almost always running **host-side against a BlueField in `SEPARATED_HOST` / NIC mode**, where the steering plane belongs to the DPU Arm. Identical on every card on such a host, in BOTH `vnf` and `switch` modes. | **Do not touch the pipe spec or steering-mode string.** This is the device-placement signature: check `INTERNAL_CPU_MODEL` per [`## Capabilities and modes`](#capabilities-and-modes) device-placement bullet + [`TASKS.md ## configure`](TASKS.md#configure) step 1. Run DOCA Flow on the DPU Arm side, or change the card's mode via `doca-hardware-safety/SKILL.md`. |
 | Hardware/firmware error | `DOCA_ERROR_DRIVER` and similar | The kernel driver, firmware, or PCIe path is in a state Flow cannot recover from | Stop. This is not a Flow-spec problem. Capture device state via the platform's diagnostic CLIs and escalate. |
 
 Flow does not invent error codes outside the `DOCA_ERROR_*` family;
@@ -535,7 +541,7 @@ do not fuse them:
   entries.
 - **"What is actually programmed in my pipe right now?"** — for
   programmed-state inspection, route the agent to the
-  [`doca-flow-tune`](../../tools/doca-flow-tune/SKILL.md) skill.
+  `doca-flow-tune/SKILL.md` skill.
 
 Workflow: when investigating "traffic is going to the wrong place", the
 canonical order is *per-entry counters first → pipe statistics second*.
@@ -547,17 +553,26 @@ For verbose runtime logging during active debugging, see
 Per-entry counters need BOTH halves of the setup; either half alone
 yields no telemetry:
 
-1. **Reserve the HW counter pool at `doca_flow_init` time.**
-   `doca_flow_cfg_set_nr_counters(cfg, N)` is **mandatory** for total
-   NON_SHARED per-entry counters across every pipe; without it,
+1. **Reserve the HW counter pool before entries are added.**
+   A counter-pool reservation is **mandatory** for total NON_SHARED
+   per-entry counters across every pipe. Preferred in DOCA 3.5
+   (experimental, `-DDOCA_ALLOW_EXPERIMENTAL_API`):
+   `doca_flow_cfg_set_resource_mode(cfg, DOCA_FLOW_RESOURCE_MODE_PORT)`
+   before `doca_flow_init()`, then
+   `doca_flow_port_cfg_set_nr_resources(port_cfg, DOCA_FLOW_RESOURCE_COUNTER, N)`
+   per port. The legacy global `doca_flow_cfg_set_nr_counters(cfg, N)` is
+   deprecated in 3.5 (removed in 4.0; links with deprecation warnings,
+   `DOCA_ALLOW_DEPRECATED_API` silences them). Without a reservation,
    per-entry `NON_SHARED` monitors silently fail or return `ENOSPC` —
    there is no pool to query against. Size `N` to the sum of
    `NON_SHARED` monitor entries across every pipe plus a small (~10%)
-   headroom. Shared counters/meters take a different path:
+   headroom. Shared counters/meters take a different path: in per-port
+   mode, `doca_flow_port_shared_resource_get/put()` (3.5, experimental);
+   legacy (deprecated in 3.5, removed in 4.0):
    `doca_flow_cfg_set_nr_shared_resource(cfg, M,
    DOCA_FLOW_SHARED_RESOURCE_COUNTER)` (count then type, mind the
-   argument order), `doca_flow_shared_resources_bind(...)` once at
-   startup, then reference the id from each entry's monitor through the
+   argument order) + `doca_flow_shared_resources_bind(...)` once at
+   startup. Either way, reference the id from each entry's monitor through the
    nested `monitor.shared_counter.shared_counter_id` field with
    `monitor.counter_type = DOCA_FLOW_RESOURCE_TYPE_SHARED`. The
    verbatim API call sequence lives in
@@ -583,7 +598,7 @@ Performance rules:
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy). When the two layers disagree, the stricter wins; when either says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety/CAPABILITIES.md#safety-policy`. When the two layers disagree, the stricter wins; when either says STOP, the agent stops.
 
 Programming the steering hardware is **not** a free-form operation. Wrong
 specs can take traffic offline; wrong actions can drop or misroute

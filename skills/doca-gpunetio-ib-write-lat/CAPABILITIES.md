@@ -19,7 +19,7 @@ teaches resolves into one of six patterns.
 
 | `gpunetio_ib_write_lat` pattern | Class shape | Where the substance lives |
 | --- | --- | --- |
-| 1. Pick the runtime surface | Decide *before* building whether the workload's WR-init path should be GPUNetIO (this tool), GPI (the [`doca-gpi`](../../libs/doca-gpi/SKILL.md) library programming surface — `doca/tools/` ships no GPI `ib_write_lat` benchmark binary), or classic CPU-initiated `perftest` `ib_write_lat`. The three measure the same physical operation but answer different runtime questions. | [`## Capabilities and modes`](#capabilities-and-modes) surface-selection table |
+| 1. Pick the runtime surface | Decide *before* building whether the workload's WR-init path should be GPUNetIO (this tool), GPI (the `doca-gpi/SKILL.md` library programming surface — `doca/tools/` ships no GPI `ib_write_lat` benchmark binary), or classic CPU-initiated `perftest` `ib_write_lat`. The three measure the same physical operation but answer different runtime questions. | [`## Capabilities and modes`](#capabilities-and-modes) surface-selection table |
 | 2. Confirm the GPU-NIC pairing | The GPUNetIO path requires the GPU and the IB device to be reachable through the same PCIe / NVLink fabric. A wrong pairing produces a number, but not the property the operator was asking about. | [`## Capabilities and modes`](#capabilities-and-modes) GPU-NIC pairing rule + [TASKS.md ## configure](TASKS.md#configure) |
 | 3. Build against the install | The tool ships under `doca/tools/gpunetio_ib_write_lat/` as client/ + server/ + common/ subtrees with `meson.build` files that wrap `doca-gpunetio`, `doca-rdma`, `doca-common` and the CUDA Toolkit. | [`## Version compatibility`](#version-compatibility) + [TASKS.md ## build](TASKS.md#build) |
 | 4. Characterize the latency distribution | A reported latency is meaningful only when the operator names which statistic it is — median, p99, p99.9, or jitter. The right statistic depends on the workload class (control loop, request-response, batch). | [`## Capabilities and modes`](#capabilities-and-modes) median-vs-p99-vs-jitter rule + [`## Observability`](#observability) |
@@ -76,7 +76,7 @@ runtime surfaces. The agent must surface this choice:
 | Surface | Tool | When this surface is the right answer |
 | --- | --- | --- |
 | GPUNetIO (this skill) | `doca-gpunetio-ib-write-lat` | The CUDA kernel drives RDMA WRITE through the higher-level `doca-gpunetio` framework. Right when the application sits on doca-gpunetio and wants the latency it will see in practice. |
-| GPI | [`doca-gpi`](../../libs/doca-gpi/SKILL.md) (library programming surface; no shipped GPI `ib_write_lat` benchmark binary) | The CUDA kernel drives the RDMA queue **directly** through the `doca-gpi` channel + queue handle. Right when the application is committed to GPI as its programming surface. |
+| GPI | `doca-gpi/SKILL.md` (library programming surface; no shipped GPI `ib_write_lat` benchmark binary) | The CUDA kernel drives the RDMA queue **directly** through the `doca-gpi` channel + queue handle. Right when the application is committed to GPI as its programming surface. |
 | CPU-initiated `perftest` | Upstream `perftest` `ib_write_lat` (out of scope here) | Right when the comparison the operator needs is *"how much overhead does the GPU-initiated path add (or remove) versus the classic CPU-initiated path?"*. |
 
 **Decision rule for the agent.** Surface the three options
@@ -90,12 +90,12 @@ the metric.
 ### The GPU-NIC pairing precondition
 
 Same as the GPUNetIO BW sister tool — see
-[`../doca-gpunetio-ib-write-bw/CAPABILITIES.md#capabilities-and-modes`](../doca-gpunetio-ib-write-bw/CAPABILITIES.md#capabilities-and-modes)
+`../doca-gpunetio-ib-write-bw/CAPABILITIES.md#capabilities-and-modes` (`doca-gpunetio-ib-write-bw/CAPABILITIES.md#capabilities-and-modes`)
 for the verification steps; the precondition is identical
 (GPU + NIC reachable through a common PCIe complex or an
 NVLink path the platform documents). Plus the
 `nvidia_peermem` env precondition from
-[`../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy`](../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy).
+`../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy` (`doca-gpunetio/CAPABILITIES.md#safety-policy`).
 
 A wrong pairing manifests in this tool as additional
 latency on the WR-submission path *and* as a divergence
@@ -153,7 +153,7 @@ different runs of the same tool.
 For the canonical DOCA version-detection chain, the
 four-way match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md).
+`doca-version/SKILL.md`.
 
 **The `doca-gpunetio-ib-write-lat`-specific overlay** is:
 
@@ -162,18 +162,18 @@ headers-win-over-docs rule, see
   installed `doca-gpunetio` (`pkg-config --modversion
   doca-gpunetio`) is the authoritative pin. The four-way
   match in
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)
   must hold across `doca-common`, `doca-rdma`, and
   `doca-gpunetio` on the install.
 - **The CUDA Toolkit is a second axis.** The shipped
   `common/kernel.cu` is compiled with `nvcc`; the
   toolkit version must be paired with the installed DOCA
   per the DOCA release notes (looked up via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
+  `doca-public-knowledge-map/SKILL.md`).
 - **The CUDA driver is a third axis.** GPUDirect-style
   buffer registration requires both the CUDA driver and
   the `nvidia_peermem` kernel module loaded per
-  [`../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy`](../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy).
+  `../../libs/doca-gpunetio/CAPABILITIES.md#safety-policy` (`doca-gpunetio/CAPABILITIES.md#safety-policy`).
 - **Both halves of the benchmark must run against
   compatible DOCA + CUDA pairs.** Mixing a client built
   on one DOCA version with a server built on a different
@@ -202,8 +202,8 @@ escalating order:
    `doca/tools/gpunetio_ib_write_lat/`. Common causes:
    `doca-gpunetio.pc` not found, `nvcc` not on `PATH`,
    GCC / GLIBC mismatch. Re-route through
-   [`doca-setup`](../../doca-setup/SKILL.md) and
-   [`../../libs/doca-gpunetio/TASKS.md`](../../libs/doca-gpunetio/TASKS.md).
+   `doca-setup/SKILL.md` and
+   `../../libs/doca-gpunetio/TASKS.md` (`doca-gpunetio/TASKS.md`).
 3. **GPU-NIC pairing.** Binary built; the runtime cannot
    bind the GPU to the IB device. Re-walk the pairing
    precondition.
@@ -214,12 +214,12 @@ escalating order:
    `doca_ctx_start()` instead of before; the per-CUDA-
    device `doca_gpu` not initialized on the right CUDA
    device. Route to
-   [`../../libs/doca-gpunetio/CAPABILITIES.md#error-taxonomy`](../../libs/doca-gpunetio/CAPABILITIES.md#error-taxonomy).
+   `../../libs/doca-gpunetio/CAPABILITIES.md#error-taxonomy` (`doca-gpunetio/CAPABILITIES.md#error-taxonomy`).
 5. **RDMA-connection.** The OOB socket comes up but the
    queue connection fails: GID index mismatch, RDMA
    permissions do not include WRITE, the remote mmap
    export was rejected. Route to
-   [`../../libs/doca-rdma/CAPABILITIES.md`](../../libs/doca-rdma/CAPABILITIES.md).
+   `../../libs/doca-rdma/CAPABILITIES.md` (`doca-rdma/CAPABILITIES.md`).
 6. **Measurement-soundness.** The benchmark completes and
    prints numbers, but the numbers are unsound. Common
    sub-layers: (a) the GPU-NIC pairing is wrong (PCIe
@@ -234,17 +234,17 @@ escalating order:
    [`## Observability`](#observability).
 7. **Version.** Cross-cutting partial-install /
    mixed-version per
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 8. **Cross-cutting.** Cause is below DOCA — mlx5 driver,
    CUDA driver, `nvidia_peermem`, firmware, NUMA,
    hugepages, kernel boot parameters (IOMMU mode).
    Route to
-   [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    and
-   [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`).
 
 For the cross-library `DOCA_ERROR_*` taxonomy, see
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 
 ## Observability
 
@@ -274,7 +274,7 @@ exchange. Specifically:
   aggregate runs characterize run-to-run variation, not per-iteration tails.
 - **DOCA log levels.** `DOCA_LOG_LEVEL` and
   `--sdk-log-level` apply per the cross-cutting rule in
-  [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+  `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
   The tool's `main.c` sets the SDK logger to `WARNING`
   by default; raise it when hunting bring-up issues.
 - **OOB-socket exchange.** Pre-handshake hangs surface
@@ -294,13 +294,13 @@ exchange. Specifically:
 
 For env-side observability (PCIe scans, link
 introspection, `mlxconfig`) see
-[`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 For program-side observability see
-[`doca-programming-guide CAPABILITIES.md ## Observability`](../../doca-programming-guide/CAPABILITIES.md#observability).
+`doca-programming-guide CAPABILITIES.md ## Observability` (`doca-programming-guide/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 `gpunetio_ib_write_lat` is a measurement tool. It
 allocates GPU-resident memory, registers it with DOCA via
@@ -340,7 +340,7 @@ specific overlay:
   GPUDirect, hugepage reservation, BlueField BFB
   reflash, NIC firmware burn — runs through the
   cross-cutting meta-policy in
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md).
+  `doca-hardware-safety/SKILL.md`.
 
 ## Public-source pointer
 
@@ -350,7 +350,7 @@ programming guide page and the **DOCA RDMA** page on
 at `doca/tools/gpunetio_ib_write_lat/` on the user's
 install (or in the public DOCA SDK download). Routing
 lives in
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 Do not invent flags, GPUNetIO symbols, RDMA queue
 attributes, or expected latency literals beyond what
 those sources document.

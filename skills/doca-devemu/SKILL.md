@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - devemu
@@ -63,7 +64,7 @@ the capabilities companion when the question is
 *what can Device Emulation express* on this DOCA version + this
 BlueField generation + this firmware. If the user has not
 installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first. **Before
+`doca-setup/SKILL.md` first. **Before
 anything else, the agent must route the user to the right
 sub-library** — DOCA Device Emulation is an *umbrella* that
 covers PCI Generic (raw PCIe device emulation), virtio-net
@@ -76,7 +77,7 @@ If the user wants a packaged solution rather than a library
 (e.g. *"I want NVMe SNAP on my host without writing the
 backend myself"*, or *"I want a managed virtio-net daemon"*),
 route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 to the DOCA SNAP Service / DOCA Virtio-net Service guides
 — those services are *built on top of* this library and are a
 different artifact than what this skill covers.
@@ -152,8 +153,8 @@ kernel drivers ship with the host kernel and are not part of
 DOCA), the packaged SNAP / Virtio-net services (they are
 separate artifacts with their own service guides), or for
 standard NIC behavior on the BlueField data path (use
-[`doca-flow`](../doca-flow/SKILL.md) +
-[`doca-eth`](../doca-eth/SKILL.md) instead — Device Emulation
+`doca-flow/SKILL.md` +
+`doca-eth/SKILL.md` instead — Device Emulation
 is for *custom* emulated devices, not for shaping the
 BlueField's built-in NIC personality).
 
@@ -194,7 +195,7 @@ the standard driver for the emulated device class the user is
 building. It does not cover installing DOCA, flipping
 firmware-level configuration, or installing host-side kernel
 drivers — those paths go through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## Loading order
 
@@ -215,13 +216,13 @@ drivers — those paths go through
    run, test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the
+`doca-version/SKILL.md` for the
 canonical DOCA version-handling rules (with the Device
 Emulation overlay that the chosen sub-library's `pkg-config`
 module plus the firmware-level emulation slot plus the
 `doca_devemu_*_cap_*` query are all part of *"is this
 emulation supported here"*), and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public DOCA
 Device Emulation umbrella guide, the per-sub-library guide
 linked from it, the DOCA SNAP / Virtio-net Service guide, or
@@ -230,7 +231,7 @@ specific guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation
   source and the on-disk layout of an installed DOCA
   package. The Device Emulation umbrella URL is
@@ -238,44 +239,44 @@ specific guidance".
   per-sub-library guides are linked from the umbrella, and
   the packaged DOCA SNAP / Virtio-net services are listed
   under the DOCA Services umbrella as separate artifacts.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, DPU-side privilege checks, BlueField
   firmware configuration (including the per-sub-library
   emulation type enable), and the *I have no install yet*
   path with the public NGC DOCA container. This skill assumes
   its preconditions are satisfied AND that the firmware-level
   emulation type for the user's chosen sub-library is enabled.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. This skill's Version
   compatibility overlay cross-links the four-way match rule
   and adds the Device Emulation-specific per-sub-library
   `pkg-config` + `doca_devemu_*_cap_*` overlay.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect /
   prefer / fall back / report). The Command appendix in
   the tasks companion honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the
   universal modify-a-shipped-sample first-app workflow, the
   universal Core-context lifecycle, the cross-library
   `DOCA_ERROR_*` taxonomy, and the program-side debug order.
   This skill layers Device Emulation specifics on top.
-- [`doca-comch`](../doca-comch/SKILL.md) — the right library
+- `doca-comch/SKILL.md` — the right library
   when the user wants a *control-plane channel* between a
   host process and a DPU process over PCIe but does NOT want
   the host to see the DPU as an emulated PCIe device with a
   standard host kernel driver. Device Emulation hides the
   DPU behind a real-looking PCIe device class; Comch is an
   explicit host ↔ DPU IPC.
-- [`doca-flow`](../doca-flow/SKILL.md) and
-  [`doca-eth`](../doca-eth/SKILL.md) — the right libraries
+- `doca-flow/SKILL.md` and
+  `doca-eth/SKILL.md` — the right libraries
   when the user wants to shape traffic on the BlueField's
   built-in NIC personality, not expose a *custom* emulated
   PCIe device. Device Emulation is for *new* emulated PCIe
   devices the host did not previously see; Flow / Eth are
   for the BlueField's existing NIC surface.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). Device Emulation-specific debug
   (firmware-level emulation type not enabled, sub-library

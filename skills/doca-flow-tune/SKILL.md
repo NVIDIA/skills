@@ -21,6 +21,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - flow
@@ -42,7 +43,7 @@ compatibility: >
 - **"Flow rule-install rate is low on BlueField."** — this is
   in scope. Snapshot then pick a tuning axis; do not replace
   this with a flow-perf baseline run.
-- **"Tune visualize step is empty."** — check dumper CSV /
+- **"Tune visualize step is empty."** — check the dumper JSON/CSV /
   analyze JSON before changing the Flow program.
 
 ## Instructions
@@ -51,31 +52,32 @@ Follow Loading order below. Open the tasks companion for configure /
 tune / debug. Open the capabilities companion for online vs
 offline modes. Do not open every companion file.
 
-> **Subcommand surface correction (Run-12, verified Run-13
-> against doca/tools/flow_tune/src/tune/common/tune_config.cpp).**
+> **Command surface (DOCA 3.5 public Flow Tune guide).**
 > `doca_flow_tune` is a single binary whose **role on a given
-> invocation is determined by which of five top-level
-> subcommands** the user picks — `dump`, `monitor`, `web`,
-> `analyze`, `visualize` (case-insensitive on the CLI;
-> uppercased in this skill for readability). All five names
-> are registered via `doca_argp_cmd_set_name(...)` in
-> `tune_config.cpp` (lines 1799 / 1860 / 1896 / 2074 / 2111);
-> `analyze` further accepts `import` / `export` / `packet_trace`
-> / `sim_timing` sub-subcommands. The `dump` / `monitor` / `web`
-> subcommands run the binary in **server-attached online mode**
+> invocation is determined by which of three top-level
+> commands** the user picks — `monitor`, `analyze`,
+> `visualize` (confirm with `--help` on the installed
+> version). `dump`, `web`, `import`, and `sim_timing` are not
+> in the 3.5 guide; do not invoke them.
+> Counter dumping is part of `monitor` (`--enable-dump`, or the
+> `background` sub-command for dumping without screen output),
+> not a separate command; `analyze` accepts the `export` and
+> `packet-trace` sub-commands (hyphenated). `monitor` and
+> `analyze` run the binary in **server-attached online mode**
 > against a live `doca-flow` application reached over a Unix-
 > domain socket whose path lives in `network.server_uds` of the
-> shipped `flow_tune_cfg*.json`; the `analyze` / `visualize`
-> subcommands run in **offline / captured-snapshot mode** against
-> JSON / CSV files the online modes previously dropped into the
+> shipped `flow_tune_cfg*.json`; `visualize` (and offline
+> analysis of a previously exported pipeline file) runs in
+> **offline / captured-snapshot mode** against JSON / CSV files
+> the online commands previously dropped into the
 > configured `outputs_directory`. The rest of this skill (and
 > the capabilities companion / the tasks companion)
 > uses the legacy *"server role / online mode / offline mode"*
 > framing — that framing is internally consistent with the
-> subcommand surface here: *server role* = a server-attached
-> online subcommand (`dump`/`monitor`/`web`); *online mode* =
-> any of `dump`/`monitor`/`web`; *offline mode* =
-> `analyze`/`visualize`. Treat the subcommand name as the
+> command surface here: *server role* = a server-attached
+> online command (`monitor`, `analyze export` / `analyze
+> packet-trace`); *online mode* = any of those; *offline mode* =
+> `visualize` over captured files. Treat the command name as the
 > primary handle; treat *server/online/offline* as the
 > downstream behavioral consequence of the subcommand pick.
 
@@ -94,9 +96,9 @@ server / client roles fit inside the single artifact*, *which DOCA
 version the tool ships in*, or *how to interpret the dumper / monitor
 / analyze / visualize outputs without fooling yourself*. If DOCA is
 not installed, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first; if the user has
+`doca-setup/SKILL.md` first; if the user has
 no running `doca-flow` application yet, route to
-[`doca-flow`](../../libs/doca-flow/SKILL.md) — flow-tune does not
+`doca-flow/SKILL.md` — flow-tune does not
 create pipes, it observes and recommends on top of pipes the
 library already created.
 
@@ -113,7 +115,7 @@ piece; the worked example is one instance.
   Answered by the *tune vs perf* boundary in
   the capabilities companion
   and the routing into
-  [`doca-flow-perf`](../doca-flow-perf/SKILL.md) for baselines vs
+  `doca-flow-perf/SKILL.md` for baselines vs
   this skill for optimization on top of a measured baseline.
 - **"Capture a snapshot of a live `doca-flow` pipeline's hardware
   and software counters without touching the dataplane."** — worked
@@ -163,90 +165,72 @@ understand, characterize, or improve a running `doca-flow`
 pipeline's behavior on the user's actual install and device**.
 Concretely:
 
-- A platform operator running a `doca-flow` service on BlueField
-  who wants a read-only snapshot of which pipes exist and how
-  their hardware / software counters are progressing before
+- An operator wanting a read-only snapshot of which pipes exist
+  and how their hardware / software counters progress before
   recommending any change.
-- A performance engineer who already has a `doca-flow-perf`
-  baseline number and wants to turn the *measurement* into an
-  *optimization* — pick a tuning axis and identify which knob in
-  the doca-flow program is the lever for it.
-- A DOCA Flow application developer who wants the offline analyze
-  + visualize loop to understand a pipe layout without
-  re-instrumenting the Flow program.
-- An AI agent driving the *"is this Flow pipeline behaving as
-  expected, and would a non-mutating tuning hint help"* triage
-  step before recommending any code change to the Flow program.
+- A performance engineer who has a `doca-flow-perf` baseline and
+  wants to turn *measurement* into *optimization* — pick a tuning
+  axis and identify which knob in the doca-flow program is the
+  lever.
+- A Flow developer using the offline analyze + visualize loop to
+  understand a pipe layout without re-instrumenting the program.
+- An AI agent driving the *"is this pipeline behaving as expected,
+  and would a non-mutating tuning hint help"* triage step.
 
 It is **not** for users debugging the `doca_flow_tune` source code,
-**not** a substitute for the live public DOCA Flow Tune guide on
-`docs.nvidia.com`, **not** the right place to learn the
-`doca-flow` API (that audience belongs in
-[`doca-flow`](../../libs/doca-flow/SKILL.md)), and **not** the
-right place for baseline *measurement* methodology — that belongs
-to [`doca-flow-perf`](../doca-flow-perf/SKILL.md).
+**not** a substitute for the live public DOCA Flow Tune guide,
+**not** the place to learn the `doca-flow` API (see
+`doca-flow/SKILL.md`), and **not** the
+place for baseline *measurement* methodology — that belongs to
+`doca-flow-perf/SKILL.md`.
 
 `doca_flow_tune` is shipped as a **single tool** (one binary plus
-its companion analyzer / visualizer scripts and JSON config
+companion analyzer / visualizer scripts and JSON config
 templates) — the historical *server* and *client* roles live
-inside this one artifact, not in two separate executables. The
-skill uses the same `kind: tool` three-file shape as the rest
-of the bundle so the agent's task-verb contract
-(`configure / build / modify / run / test / debug`) is uniform
-across libraries, services, and tools.
+inside this one artifact, not in two executables. It uses the
+same `kind: tool` three-file shape as the rest of the bundle.
 
 ## Language scope
 
 This skill governs invocation, output interpretation, and
-recommendation-to-code-change routing for the C / C++ DOCA Flow
-application that `doca_flow_tune` observes. The tool itself is
-not a programming target — there is no public API the agent is
-supposed to link against; what the agent and the user do with the
-tool is *configure JSON, run, read the outputs, propose minimum-
-diff changes to the surrounding `doca-flow` program in the
-program's own language*. For the `doca-flow` API the
-recommendations route back into, see
-[`doca-flow`](../../libs/doca-flow/SKILL.md);
+recommendation-to-code-change routing for the DOCA Flow
+application `doca_flow_tune` observes. The tool is not a
+programming target — there is no public API to link against; the
+workflow is *configure JSON, run, read outputs, propose minimum-
+diff changes to the surrounding `doca-flow` program*. For the
+`doca-flow` API the recommendations route back into, see
+`doca-flow/SKILL.md`;
 for cross-language application patterns, see
-[`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 
 ## When to load this skill
 
 Load this skill when the user is — or the agent needs to — invoke
 `doca_flow_tune` against a running or planned `doca-flow`
-application (on host or BlueField Arm, or inside the public NGC
-DOCA container with the matching Flow trace-build flavor) to
-characterize, dump, visualize, analyze, or tune that pipeline.
-Concretely:
+application to characterize, dump, visualize, analyze, or tune
+that pipeline. Concretely:
 
-- Picking *which* role of `doca_flow_tune` to engage (offline
-  analyze / visualize on a captured config + state, online
-  dumper / monitor against the live Flow app, or attach-to-app
-  server-role usage when the Flow application links the
-  documented tune server entry points).
+- Picking *which* role to engage (offline analyze / visualize on
+  a captured config + state, online dumper / monitor against the
+  live app, or attach-to-app server-role usage).
 - Picking *which* tuning axis to ask about (rule placement,
-  resource hints / table sizing, or hardware-offload-mode) for a
-  candidate workload.
-- Picking *which* measurement axis to compare against (rule-install
-  rate, lookup latency, hardware-counter delta) — the three are
-  not interchangeable and the chosen axis should be the same one a
-  prior `doca-flow-perf` baseline named.
+  resource hints / table sizing, hardware-offload-mode).
+- Picking *which* measurement axis to compare against
+  (rule-install rate, lookup latency, hardware-counter delta) —
+  not interchangeable; use the axis a prior `doca-flow-perf`
+  baseline named.
 - Capturing a documented before / after pair around a proposed
-  Flow-program change (the documented JSON config file path, the
-  command line, the DOCA version, the device, the as-deployed
-  environment, the full unredacted dumper / analyzer / visualizer
-  output).
-- Diagnosing why a tune session produced empty output, a
-  visualize step rendered a degenerate diagram, or an analyze
-  recommendation does not match what the live counters say.
+  Flow-program change (JSON config path, command line, DOCA
+  version, device, environment, unredacted tool output).
+- Diagnosing an empty session, a degenerate visualize diagram, or
+  an analyze recommendation that contradicts live counters.
 
 Do **not** load this skill for general DOCA orientation, Flow
-program API work, install, or pure measurement methodology.
-For those, route to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
-[`doca-flow`](../../libs/doca-flow/SKILL.md),
-[`doca-setup`](../../doca-setup/SKILL.md), or
-[`doca-flow-perf`](../doca-flow-perf/SKILL.md).
+program API work, install, or pure measurement methodology —
+route to `doca-public-knowledge-map/SKILL.md`,
+`doca-flow/SKILL.md`,
+`doca-setup/SKILL.md`, or
+`doca-flow-perf/SKILL.md`.
 
 ## What this skill provides
 
@@ -263,7 +247,7 @@ companion files:
   software-only variants), the dumper / monitor / analyze /
   visualize output surfaces, the version overlay (this tool rides
   the `doca-flow` library version it observes; the canonical
-  rules live in [`doca-version`](../../doca-version/SKILL.md)),
+  rules live in `doca-version/SKILL.md`),
   the layered error taxonomy
   (config-syntax / attach-failed / pipe-not-found /
   measurement-unsound / recommendation-unactionable / version /
@@ -286,7 +270,7 @@ companion files:
 The skill assumes a host where DOCA is already installed (or the
 public NGC DOCA container is running) and a `doca-flow`
 application is already created and validated per the
-[`doca-flow`](../../libs/doca-flow/SKILL.md) skill. Without those
+`doca-flow/SKILL.md` skill. Without those
 preconditions, the tune session has nothing to observe.
 
 ## What this skill deliberately does not ship
@@ -297,33 +281,25 @@ and pull requests should not add:
 
 - **Verbatim flag inventories, subcommand names, JSON config field
   names, or default endpoint paths quoted as the contract.** The
-  public DOCA Flow Tune guide on `docs.nvidia.com` (reached via
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools))
-  and the installed `--help` on the user's version are the joint
-  source of truth; the shipped `flow_tune_cfg*.json` templates on
-  the user's install are the second source for the JSON schema.
-  Copying them here pins the skill to one release and silently
-  rots when the tool evolves.
+  public DOCA Flow Tune guide (reached via
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`))
+  and the installed `--help` are the joint source of truth; the
+  shipped `flow_tune_cfg*.json` templates are the second source for
+  the JSON schema. Copying them here rots when the tool evolves.
 - **Pre-baked example output (dumper CSV columns, analyzer JSON
   field names, visualizer mermaid output).** Output is install-,
-  device-, firmware-, NUMA-, Flow-pipe-, and DOCA-version-specific;
-  a captured example pinned to one platform misleads operators on
-  a different platform / version.
-- **Wrappers, parsers, or scripts** in any language that consume
-  flow-tune output. The output formats are documented and the
-  shipped `scripts/` directory on the user's install contains
+  device-, firmware-, and version-specific; a captured example
+  pinned to one platform misleads operators elsewhere.
+- **Wrappers, parsers, or scripts** that consume flow-tune output.
+  The shipped `scripts/` directory on the user's install contains
   vendor-provided helpers (e.g. `flow_json_diff.py`,
-  `flow_mermaid_diff.py`, `hw_counters_csv_analyzer.py`); if a
-  user wants to script against the outputs, the right answer is
-  *"read the shipped scripts on your installed version"*.
-- **Pre-baked tuning recommendations.** Recommendations from this
-  tool are install-, device-, firmware-, and workload-specific;
-  shipping one for *"hairpin pipes"* or *"NAT pipes"* misleads
-  operators applying it to a different pipe. The agent always
-  re-derives the recommendation from the user's actual session.
-- **A `samples/`, `templates/`, or `reference/` subtree.** Mock or
-  incomplete tuning recipes in this skill's tree are misleading;
-  operators read them as production-grade.
+  `flow_mermaid_diff.py`, `hw_counters_csv_analyzer.py`); the right
+  answer is *"read the shipped scripts on your installed version"*.
+- **Pre-baked tuning recommendations.** Recommendations are
+  install-, device-, firmware-, and workload-specific; the agent
+  always re-derives them from the user's actual session.
+- **A `samples/`, `templates/`, or `reference/` subtree.** Mock
+  tuning recipes read as production-grade and mislead.
 
 ## Loading order
 
@@ -342,45 +318,45 @@ and pull requests should not add:
 
 ## Related skills
 
-- [`doca-flow`](../../libs/doca-flow/SKILL.md) — the **base
+- `doca-flow/SKILL.md` — the **base
   library** whose pipeline this tool observes and tunes. The
   pipe / entry / rule surface flow-tune reports on is created by
   `doca-flow` program code; recommendations route back into that
   program via the universal modify-a-sample workflow.
-- [`doca-flow-perf`](../doca-flow-perf/SKILL.md) — the sibling
+- `doca-flow-perf/SKILL.md` — the sibling
   *measurement* tool. The rule is: `doca-flow-perf` measures
   baselines; `doca-flow-tune` recommends optimizations on top.
   An agent that reaches for tune without a baseline number from
   perf is optimizing in the dark; an agent that reaches for perf
   without a question is benchmarking for the sake of it.
-- [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md) — the
+- `doca-flow-dpa-perf/SKILL.md` — the
   DPA-offloaded variant of Flow perf. Relevant when the Flow
   pipeline the user is tuning runs through a DPA-offload path;
   the baseline comes from there, not from host-side
   `doca-flow-perf`.
-- [`doca-flow-grpc-server`](../doca-flow-grpc-server/SKILL.md) —
+- `doca-flow-grpc-server/SKILL.md` —
   the remote-control gRPC surface for `doca-flow`. Programmatic
   Flow rule management lives there; flow-tune's recommendations
   may be applied through that surface when the operator's
   control plane is remote.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA Flow Tune page on `docs.nvidia.com`
   and the rest of the public DOCA documentation set.
-- [`doca-version`](../../doca-version/SKILL.md) — the canonical
+- `doca-version/SKILL.md` — the canonical
   version-detection chain, four-way match, NGC semantics, and
   headers-win-over-docs rule. The
   `## Version compatibility`
   overlay in this skill is a thin extension on top.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder. Flow-tune surfaces *its own* error taxonomy; when
   the cause turns out to be below DOCA (driver, firmware, NUMA),
   the tune taxonomy hands off to `doca-debug`.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle's detect → prefer → fall back → report contract.
   The Command appendix in the tasks companion honors it.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, hugepages, NUMA, and the *I have no
   install yet* path with the public NGC DOCA container.
-- [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) —
+- `doca-hardware-safety/SKILL.md` —
   the cross-cutting hardware-safety meta-policy this skill's
   `## Safety policy` overlays.

@@ -20,13 +20,14 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - sha
     - openssl
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
-  22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC
+  22.04/24.04 or RHEL/SLES) with a BlueField-2 DPU (not BF-3)
   attached, plus OpenSSL ≥ 1.1.1 and libssl-dev (or distro equivalent)
   on the build host. The engine ships under
   /opt/mellanox/doca/tools/doca_sha_offload_engine/ as
@@ -92,11 +93,11 @@ the capabilities companion when the question is
 *what the engine actually offloads vs falls back to*,
 *when the engine is a perf win vs not*, or *how to verify
 offload actually engaged*. If DOCA is not installed yet,
-route to [`doca-setup`](../../doca-setup/SKILL.md) first.
+route to `doca-setup/SKILL.md` first.
 If the user is building a new SHA pipeline from scratch
 (not wrapping an existing OpenSSL-based one), this skill
 is the wrong surface — route to
-[`../../libs/doca-sha/SKILL.md`](../../libs/doca-sha/SKILL.md)
+`../../libs/doca-sha/SKILL.md` (`doca-sha/SKILL.md`)
 instead.
 
 ## Example questions this skill answers well
@@ -182,7 +183,7 @@ device. Concretely:
 
 Do **not** load this skill for users building a new
 SHA-pipeline from scratch — route to
-[`../../libs/doca-sha/SKILL.md`](../../libs/doca-sha/SKILL.md).
+`../../libs/doca-sha/SKILL.md` (`doca-sha/SKILL.md`).
 Do not load this skill for users wanting algorithms the
 engine does not implement (MD5, SHA-3, SHA-224, HMAC-SHA,
 streaming/incremental SHA via `EVP_DigestUpdate` chains
@@ -272,7 +273,7 @@ pull requests should not add:
    existing OpenSSL-based pipeline and wants to offload
    to DOCA SHA *without* code changes; if the user is
    building from scratch, route to
-   [`../../libs/doca-sha/`](../../libs/doca-sha/SKILL.md)).
+   `../../libs/doca-sha/` (`doca-sha/SKILL.md`)).
 2. **For what the engine offloads vs falls back, the
    engine-vs-library selection rule, the message-size-
    window rule, the version overlay, the error taxonomy,
@@ -285,7 +286,7 @@ pull requests should not add:
 
 ## Related skills
 
-- [`../../libs/doca-sha/SKILL.md`](../../libs/doca-sha/SKILL.md) —
+- `../../libs/doca-sha/SKILL.md` (`doca-sha/SKILL.md`) —
   the underlying DOCA SHA library. The engine is a
   thin OpenSSL-ENGINE wrapper around doca-sha; when the
   user needs fine-grained control over the SHA task
@@ -294,25 +295,25 @@ pull requests should not add:
   the right answer. The engine wraps the *one-shot*
   task; the library exposes both one-shot and partial-
   hash per
-  [`doca-sha`](../../libs/doca-sha/SKILL.md).
-- [`doca-version`](../../doca-version/SKILL.md) — the
+  `doca-sha/SKILL.md`.
+- `doca-version/SKILL.md` — the
   canonical version-detection chain. The engine has a
   TWO-axis version overlay (DOCA-side and OpenSSL-side);
   the version skill carries the four-way match rule
   this skill layers on top of.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the
+- `doca-debug/SKILL.md` — the
   cross-cutting debug ladder. The engine surfaces its
   own error taxonomy; when the cause is below DOCA
   (driver, firmware), the taxonomy hands off here.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env
+- `doca-setup/SKILL.md` — env
   preparation, install verification, the `libssl-dev`
   install path, and the NGC DOCA container path.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   routing to the public DOCA SHA documentation set on
   `docs.nvidia.com/doca/sdk/` and to the OpenSSL
   ENGINE / `openssl-engine` upstream documentation on
   `openssl.org`.
-- [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) —
+- `doca-hardware-safety/SKILL.md` —
   the bundle-wide hardware-safety meta-policy. The
   engine binds to a specific PCIe device; the
   `set_pci_addr` ctrl is the artifact-specific overlay,

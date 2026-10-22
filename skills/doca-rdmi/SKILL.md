@@ -2,25 +2,23 @@
 license: Apache-2.0
 name: doca-rdmi
 description: >
-  Use this skill when the user is doing hands-on DOCA RDMI (RDMA
-  Initiator) programming — picking doca-rdmi vs doca-rdma for an
-  accelerator-initiated one-sided RDMA flow, standing up a
-  doca_rdmi_connection or doca_rdmi_poster, attaching a
-  doca_dpa_completion or doca_verbs_cq before doca_ctx_start(),
-  retrieving the DPA-side handle for a DPA kernel, auditing whether a
-  doca_rdmi_* symbol is EXPERIMENTAL on this DOCA, or debugging
-  DOCA_ERROR_* returns from RDMI calls. Trigger even when the user does
-  not say "DOCA RDMI" or "initiator" — implicit phrasings include "my
-  DPA kernel needs to post RDMA writes to a remote responder", "DPA
-  kernel sees no completions", "function not found on doca_rdmi_* at
-  link time", "DOCA_ERROR_BAD_STATE from completion attach", or "the DPA
-  posted but the work request never arrived". Refuse and route elsewhere
-  for two-sided or host-CPU RDMA, the DPA programming model, GPU-side
-  RDMA initiation, or general RDMA/IB/RoCE concepts — those belong to
-  other skills.
+  Use this skill when the user works with DOCA RDMI, the RDMA
+  Initiator library that lets a DPA-resident function originate
+  one-sided RDMA toward a remote responder. Covers choosing
+  doca-rdmi versus doca-rdma, instantiating doca_rdmi_connection
+  and doca_rdmi_poster, wiring doca_dpa_completion or doca_verbs_cq
+  ahead of doca_ctx_start(), exporting the datapath handle consumed
+  on-DPA, auditing whether a doca_rdmi_* symbol is EXPERIMENTAL for
+  the installed release, or decoding DOCA_ERROR_* statuses such as
+  BAD_STATE at completion-attach. Also load it for implied asks like
+  "my Arm-side function must originate RDMA writes", "symbol missing
+  at link time on doca_rdmi_*", or "posted work request never
+  arrived". Refuse and route to the proper owner for two-sided host
+  RDMA, GPU-originated traffic, or generic IB/RoCE theory.
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - rdmi

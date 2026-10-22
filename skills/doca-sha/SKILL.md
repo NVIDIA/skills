@@ -2,33 +2,30 @@
 license: Apache-2.0
 name: doca-sha
 description: >
-  Use this skill when the user is doing hands-on DOCA SHA programming —
-  offloading SHA-1, SHA-256, or SHA-512 hashing onto a BlueField DPU or
-  ConnectX accelerator, picking between one-shot `doca_sha_task_hash`
-  and incremental `doca_sha_task_partial_hash`, querying
-  `doca_sha_cap_*` for algorithm support and min destination / max
-  source buffer sizes, setting source / destination `doca_mmap`
-  permissions, or decoding DOCA_ERROR_* returns from the SHA API.
-  Trigger even when the user does not explicitly mention "DOCA SHA" or
-  "doca_sha_task" — typical implicit phrasings include "hash a multi-GiB
-  file on the DPU", "offload SHA-256 to the BlueField", "streaming hash
-  over chunks", "partial hash returns BAD_STATE", "destination buffer
-  too small for digest", or "is SHA-512 available on this card". Refuse
-  and route elsewhere for general cryptographic-hash theory (collision
-  resistance, SHA-3 selection), other DOCA crypto libraries (AES-GCM,
-  Compress, DMA), or DOCA install / BFB bring-up — those belong to other
-  skills.
+  Use this skill when the user needs SHA-1, SHA-256, or SHA-512 digest
+  acceleration on BlueField-2 silicon via doca_sha (absent on BF-3) —
+  selecting one-shot `doca_sha_task_hash` versus incremental
+  `doca_sha_task_partial_hash` for chunked input, consulting
+  `doca_sha_cap_*` for per-algorithm digest-size limits and input
+  alignment, or decoding DOCA_ERROR_* statuses such as BAD_STATE on a
+  resumed partial hash. Also load it for implied asks like "accelerate
+  SHA-256 on the NIC", "streaming digest over chunks", "digest output
+  size mismatch", or "is SHA-512 present on this card". Refuse and
+  route to the proper owner for cryptographic-hash theory (collision
+  resistance, SHA-3 selection), the AES-GCM / Compress / DMA
+  libraries, or SDK install and BFB bring-up.
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - sha
     - hash
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
-  22.04/24.04 or RHEL/SLES) with a BlueField DPU or ConnectX NIC attached.
-  Reads the user's local install via `pkg-config doca-sha` and inspects
+  22.04/24.04 or RHEL/SLES) with a BlueField-2 DPU attached
+  (BlueField-3 has no SHA engine). Reads the user's local install via `pkg-config doca-sha` and inspects
   /opt/mellanox/doca/{lib,include,samples,applications}.
   The validation steps require a live DOCA install.
 ---
@@ -51,13 +48,13 @@ build / run. Open the capabilities companion for one-shot vs
 partial hash and algorithm support. Do not open every companion file.
 
 **Where to start:** This skill assumes DOCA is already installed and
-the user is doing **hands-on SHA-acceleration work** on a BlueField
-/ ConnectX / host with DOCA. Open the tasks companion if the user
+the user is doing **hands-on SHA-acceleration work** on a BlueField-2
+DPU (Arm side or its host) with DOCA. BlueField-3 has no SHA engine. Open the tasks companion if the user
 wants to *do* something (configure / build / modify / run / test /
 debug); open the capabilities companion when the question
 is *what can DOCA SHA express* on this version. If the user has not
 installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
+`doca-setup/SKILL.md` first. If the user is
 asking *"should I even use the accelerator for this hash?"*, the
 path-selection rule in
 ## Capabilities and modes
@@ -113,7 +110,7 @@ the load-bearing piece — the worked example is a single instance.
   overlay in
   ## Version compatibility,
   which cross-links the canonical detection chain in
-  [`doca-version`](../../doca-version/SKILL.md) and adds the
+  `doca-version/SKILL.md` and adds the
   SHA-specific *"discover, do not assume"* bullets.
 - **"What does this `DOCA_ERROR_*` from a SHA call mean and which
   layer caused it?"** — worked example: *"`DOCA_ERROR_INVALID_VALUE`
@@ -122,15 +119,15 @@ the load-bearing piece — the worked example is a single instance.
   ## Error taxonomy
   + the layered ladder in
   ## debug that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  `doca-debug/SKILL.md`.
 
 ## Audience
 
 This skill serves **external developers building applications that
 consume the DOCA SHA library** — i.e., users whose code calls
 `doca_sha_*` (directly in C/C++, or through FFI/bindings from
-another language) to offload SHA hashing onto a BlueField DPU or
-ConnectX accelerator. It is *not* for NVIDIA developers contributing
+another language) to offload SHA hashing onto the BlueField-2 SHA
+engine (BlueField-3 has none). It is *not* for NVIDIA developers contributing
 to DOCA SHA itself.
 
 **Language scope.** DOCA SHA ships as a C library with `pkg-config`
@@ -183,7 +180,7 @@ any language. Concretely:
 Do **not** load this skill for general DOCA orientation, install of
 DOCA itself, non-SHA hashing libraries on CPU (use OpenSSL or
 similar), or other DOCA libraries. For those, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## What this skill provides
 
@@ -210,7 +207,7 @@ The skill assumes a host or BlueField where DOCA is already
 installed at the standard location and the user has the privileges
 their public install profile expects. It does not cover installing
 DOCA — that path goes through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -225,7 +222,7 @@ contain — and pull requests should not add:
   agent's job is to route the user to those files and prescribe a
   minimum-diff modification on them via the universal
   modify-a-sample workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the SHA-specific overrides in
   ## modify.
 - **Pre-computed digest tables for arbitrary inputs.** The skill
@@ -255,40 +252,40 @@ contain — and pull requests should not add:
    test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 version-handling rules, and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public docs or the
 installed package layout" rather than "SHA-specific guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation source and
   the on-disk layout of an installed DOCA package. The DOCA SHA
   page lives at `docs.nvidia.com/doca/sdk/DOCA-SHA/`; the File
   Integrity reference application is the canonical worked example.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, and the *I have no install yet* path with
   the public NGC DOCA container. This skill assumes its
   preconditions are satisfied.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+- `doca-version/SKILL.md` — canonical DOCA
   version-handling rules. This skill's
   `## Version compatibility`
   cross-links the four-way match rule and adds only the SHA-specific
   *"discover algorithms + buffer sizes via cap query"* overlay.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
   the tasks companion honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal
   modify-a-shipped-sample first-app workflow, the universal
   lifecycle, the cross-library `DOCA_ERROR_*` taxonomy, and the
   program-side debug order. This skill layers SHA specifics on
   top.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). SHA-specific debug (algorithm-not-supported,
   destination-buffer-too-small, partial-hash-out-of-order) overlays

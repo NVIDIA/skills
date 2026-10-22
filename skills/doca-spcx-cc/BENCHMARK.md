@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-spcx-cc`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 94.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 65.0% → 100.0% (+35.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 100.0% (+50.0 points) | 38.8% → 100.0% (+61.2 points) |
-| Efficiency | 71.1% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.2% — baseline ran, but no comparable score was available; uplift unavailable | 95.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 50.0% → 100.0% (+50.0 points) |
+| Correctness | 40.0% → 90.0% (+50.0 points) | 55.0% → 100.0% (+45.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 60.0% → 98.1% (+38.1 points) | 43.1% → 99.4% (+56.3 points) |
+| Efficiency | 67.9% — baseline ran, but no comparable score was available; uplift unavailable | 86.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 745,527 | 1,025,197 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-spcx-cc.explicit-positive.v1 | 237,654 | 214,537 | +23,117 | +10.78% | skill 1/1; base 1/1 |
-| claude-code | doca-spcx-cc.implicit-positive.v1 | N/A | 687,992 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-spcx-cc.implicit-positive.v2 | 476,155 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-spcx-cc.negative.v1 | 31,718 | 122,668 | -90,950 | -74.14% | skill 1/1; base 1/1 |
-| codex | All cases | 565,769 | 471,294 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-spcx-cc.explicit-positive.v1 | 161,387 | 39,381 | +122,006 | +309.81% | skill 1/1; base 1/1 |
-| codex | doca-spcx-cc.implicit-positive.v1 | N/A | 389,805 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | doca-spcx-cc.implicit-positive.v2 | 344,239 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | doca-spcx-cc.negative.v1 | 60,143 | 42,108 | +18,035 | +42.83% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,311,296 | 1,496,491 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 1,044,160 | 686,032 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-spcx-cc.explicit-positive.v1 | 318,440 | 184,305 | +134,135 | +72.78% | skill 1/1; base 1/1 |
+| claude-code | doca-spcx-cc.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-spcx-cc.implicit-positive.v2 | 694,423 | 409,381 | +285,042 | +69.63% | skill 1/1; base 1/1 |
+| claude-code | doca-spcx-cc.negative.v1 | 31,297 | 92,346 | -61,049 | -66.11% | skill 1/1; base 1/1 |
+| codex | All cases | 442,234 | 703,057 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-spcx-cc.explicit-positive.v1 | 118,056 | 220,775 | -102,719 | -46.53% | skill 1/1; base 1/1 |
+| codex | doca-spcx-cc.implicit-positive.v1 | 286,637 | 440,164 | -153,527 | -34.88% | skill 1/1; base 1/1 |
+| codex | doca-spcx-cc.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-spcx-cc.negative.v1 | 37,541 | 42,118 | -4,577 | -10.87% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,486,394 | 1,389,089 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -83,10 +83,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/tools/doca-spcx-cc/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/tools/doca-spcx-cc/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-spcx-cc/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-spcx-cc`)
 - **LOW** QUALITY/quality_discoverability: Description very long (1023 chars, recommend 50-150) (`skills/tools/doca-spcx-cc/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/tools/doca-spcx-cc/SKILL.md`)
-- 7 additional finding(s) are available in the full evaluation artifacts.
+- 9 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

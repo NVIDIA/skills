@@ -190,8 +190,8 @@ Steps the agent should walk the user through:
    `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    before assuming a Common bug.
 2. **Set the SDK log tier explicitly on first run.** Pass
-   `--sdk-log-level WARNING` (most shipped samples / reference apps
-   accept it) or `DOCA_LOG_LEVEL_SDK=WARNING` in the environment.
+   `--sdk-log-level 40` (= WARNING; the flag takes a number; most
+   shipped samples / reference apps accept it) or `DOCA_LOG_LEVEL_SDK=WARNING` in the environment.
    The default is WARNING per
    [`CAPABILITIES.md ## log`](CAPABILITIES.md#log); for first runs
    the agent should default the SDK tier to WARNING (do not crank
@@ -235,12 +235,11 @@ hold, the lifecycle is in order, and the PE drive loop is wired —
 before claiming the *"wire doca-common into the app"* journey is
 done.
 
-**`## test` is an iterative loop, not a one-shot pass.** The agent's
-job is to run the four steps below in order, and *loop back to
-step 1 after the first evidence-backed spec mutation*. A finding on
-that complete rerun triggers escalation rather than another mutation.
+**`## test` is an iterative loop, not a one-shot pass.** Run the
+four steps below in order; the table maps each failure back to the
+step it re-opens, and *Loop termination* below bounds the rerun.
 Treating validate-once as good-enough is the failure mode this loop
-replaces; the first spec mutation re-opens validate.
+replaces.
 
 The eval-loop overlay (rows apply to every Common skeleton, not
 just one):
@@ -253,9 +252,8 @@ just one):
 | 4 → ## debug | Tasks submit, PE is driven, completions still do not arrive — escalate to the Common debug overlay | [`## debug`](#debug) |
 
 The agent's rule: the first evidence-backed mutation between steps
-re-opens the four steps for one complete rerun. A further useful
-mutation is captured for escalation instead of opening another rerun.
-Skipping the re-validate after the first mutation is the universal
+re-opens the four steps for one complete rerun (bounded by *Loop
+termination* below); skipping the re-validate is the universal
 foundation-layer failure mode.
 
 Steps:
@@ -410,10 +408,12 @@ The universal skeleton, in order:
     `doca_pe_progress`. Skipping this is the canonical "tasks
     submit but nothing completes" failure mode.
 11. **`doca_ctx_start(ctx)`** — transition the context to RUNNING.
-12. **Drive the run loop** — `while (running) doca_pe_progress(pe);`
+12. **Submit the initial tasks via the per-library task API**, then
+    resubmit from each task's completion callback as needed.
+13. **Drive the run loop** — `while (running) doca_pe_progress(pe);`
     (or the notification-handle variant for control-plane threads).
-13. **Submit tasks via the per-library task API.** Completions
-    surface through the PE on the thread that drives it.
+    Completions, and the resubmissions they trigger, surface through
+    the PE on the thread that drives it.
 14. **Shutdown.** Drain inflight tasks
     (`doca_ctx_flush_tasks(ctx)` or
     `doca_pe_progress(pe)` until
@@ -569,8 +569,8 @@ the agent should:
 | `doca_caps --version` | [`## install`](#install) check 2; [`## debug`](#debug) step 6 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca-common` |
 | `doca_caps --list-devs` | [`## configure`](#configure) step 2; [`## use`](#use) step 1 | Which devices on this host can be used as a `doca_dev`? | One row per visible device with PCIe address and capability flags |
 | `ls "$(pkg-config --variable=includedir doca-common)/"` | [`## configure`](#configure); [`## modify`](#modify) | Which Common headers are installed (the headers-win-over-docs anchor)? | A list including `doca_buf.h`, `doca_ctx.h`, `doca_dev.h`, `doca_pe.h`, `doca_log.h`, `doca_mmap.h`, `doca_error.h` |
-| `<binary> --sdk-log-level WARNING 2> doca.log` | [`## run`](#run) step 2 | What does the SDK tier emit at WARNING (production default)? | Mostly silent on a healthy run; warnings are rare and load-bearing when they fire |
-| `<binary> --sdk-log-level DEBUG 2> doca.log` | [`## test`](#test) | What does the SDK tier emit at DEBUG (DOCA library internal trace)? | A flood of per-call DOCA library internal log lines; the user's own DEBUG lines remain controlled by the app tier and are *not* affected by this flag |
+| `<binary> --sdk-log-level 40 2> doca.log` (40 = WARNING) | [`## run`](#run) step 2 | What does the SDK tier emit at WARNING (production default)? | Mostly silent on a healthy run; warnings are rare and load-bearing when they fire |
+| `<binary> --sdk-log-level 60 2> doca.log` (60 = DEBUG) | [`## test`](#test) | What does the SDK tier emit at DEBUG (DOCA library internal trace)? | A flood of per-call DOCA library internal log lines; the user's own DEBUG lines remain controlled by the app tier and are *not* affected by this flag |
 | `DOCA_LOG_LEVEL_SDK=DEBUG <binary> 2> doca.log` | [`## run`](#run) step 2 | Same as above via env var (for samples that don't accept `--sdk-log-level`) | Same shape |
 | `grep -RH 'doca_log_register_source\|DOCA_LOG_INFO' /opt/mellanox/doca/samples/ \| head` | [`## modify`](#modify); [`## log`](#log) | Which shipped samples have canonical DOCA Log usage to read as a reference? | Multiple hits across `samples/<library>/<sample>/*_main.c` — DOCA Log is in every sample |
 | `cat /opt/mellanox/doca/applications/VERSION` | [`## install`](#install) check 2; [`## debug`](#debug) step 6 | What does the install tree itself claim its version is? | A semver string matching the other version sources |

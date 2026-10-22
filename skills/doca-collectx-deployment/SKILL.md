@@ -21,6 +21,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - collectx
@@ -59,8 +60,8 @@ companion file.
 collection framework that gathers provider counters into a
 schema and ships them out through one or more exporters. It is a
 deployment / operation skill, parallel to
-[`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)
-and [`doca-container-deployment`](../doca-container-deployment/SKILL.md):
+`doca-bare-metal-deployment/SKILL.md`
+and `doca-container-deployment/SKILL.md`:
 it owns the *runtime shape* of a telemetry collector on the
 operator's host or BlueField, not the library APIs the operator's
 own program calls. If the user wants to stand up, wire, or debug
@@ -69,7 +70,7 @@ start at `## configure`. If the question is
 *what surfaces does the collector even have and where is the
 scope boundary*, start at the capabilities companion.
 If the user has not installed DOCA yet, route to
-[`doca-setup`](../doca-setup/SKILL.md) first.
+`doca-setup/SKILL.md` first.
 
 ## The scope boundary (read this before anything else)
 
@@ -85,7 +86,7 @@ CollectX (clx) is NVIDIA's telemetry **collection** framework. It
 underpins the **DOCA Telemetry Service (DTS)** — and DTS
 *as-deployed* (the productized, NGC-shipped / kubelet-started
 service container) is **out of scope** for this bundle per
-[`AGENTS.md` Non-goal #7](../../AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely).
+`AGENTS.md` Non-goal #7 (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`).
 This skill therefore draws a hard line and the agent MUST state
 it up front:
 
@@ -97,17 +98,17 @@ it up front:
   consume the collector.
 - **Routed to the DOCA telemetry libraries:** the
   hardware-counter **reader** API is owned by
-  [`doca-telemetry`](../libs/doca-telemetry/SKILL.md); the
+  `doca-telemetry/SKILL.md`; the
   application-side **publisher** API (emit counters / events from
   a DOCA program) is owned by
-  [`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md).
+  `doca-telemetry-exporter/SKILL.md`.
   This skill does not re-document either API surface.
 - **Routed to public docs (Non-goal #7):** the productized
   **DTS container** — its packaged config schema, its built-in
   provider set, its kubelet manifest, its NGC image — is
   externally productized. Route every "operate the DTS service"
   question to the
-  [`doca-public-knowledge-map` externally-productized routing row](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
+  `doca-public-knowledge-map` externally-productized routing row (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`)
   and the public DTS guide it points at. The agent must NOT
   synthesize DTS config file names, provider knob names, or
   paths from memory.
@@ -139,9 +140,9 @@ administer — people who already have:
 It is **not** for:
 
 - developers writing the hardware-counter reader API (route to
-  [`doca-telemetry`](../libs/doca-telemetry/SKILL.md)) or the
+  `doca-telemetry/SKILL.md`) or the
   publisher API (route to
-  [`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md)),
+  `doca-telemetry-exporter/SKILL.md`),
 - operators deploying / configuring the **productized DTS
   container** as a turnkey service — that is externally
   productized (Non-goal #7); route to the public DTS guide,
@@ -152,7 +153,7 @@ The skill teaches the agent the *procedure and the scope
 boundary*; it does not invent clx symbol names, provider names,
 schema field names, exporter flag names, or config paths from
 memory — those come from the live install and the public docs via
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## When to load this skill
 
@@ -168,7 +169,7 @@ Concretely:
 - Wiring a provider / counter family into the collector and
   confirming the device actually exposes it before the config
   commits (the gate-before-commit rule, shared with
-  [`doca-telemetry-utils`](../tools/doca-telemetry-utils/SKILL.md)).
+  `doca-telemetry-utils/SKILL.md`).
 - Turning on / shaping an exporter so the metrics actually leave
   the box, and confirming the downstream consumer receives them
   end-to-end (not just "the daemon is running").
@@ -182,15 +183,15 @@ Concretely:
   of the collection mechanism this skill owns.
 
 Do **not** load this skill for: the hardware-counter reader API
-(use [`doca-telemetry`](../libs/doca-telemetry/SKILL.md)); the
+(use `doca-telemetry/SKILL.md`); the
 publisher API (use
-[`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md));
+`doca-telemetry-exporter/SKILL.md`);
 operating the productized DTS container (route via
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 Non-goal #7); installing DOCA or preparing the env (use
-[`doca-setup`](../doca-setup/SKILL.md)); or any hardware-state
+`doca-setup/SKILL.md`); or any hardware-state
 change (use
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)).
+`doca-hardware-safety/SKILL.md`).
 
 ## What this skill provides
 
@@ -204,13 +205,13 @@ companion files:
   schema → collector daemon → exporters), the export-backend
   surface (Prometheus pull, Fluent Bit push, NetFlow, file /
   IPC) at class level, the version overlay on
-  [`doca-version`](../doca-version/SKILL.md), the error taxonomy
+  `doca-version/SKILL.md`, the error taxonomy
   (collector won't start → no provider rows → schema mismatch →
   exporter silent → downstream skew → transport), the
   observability surface, and the safety policy (gate provider
   support before commit; collector is read-only against the
   device; route any mutating step to
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md); do
+  `doca-hardware-safety/SKILL.md`; do
   not invent clx names / paths).
 - the tasks companion — step-by-step workflows for the deployment verbs:
   `configure`, `build` (routing stub), `modify`, `run`, `test`,
@@ -223,7 +224,7 @@ installed and healthy (per
 `doca-setup ## test`) and the
 operator can run the collector and reach its exporter sinks. It
 does not cover installing DOCA — that path goes through
-[`doca-setup`](../doca-setup/SKILL.md) — and it does not cover
+`doca-setup/SKILL.md` — and it does not cover
 the reader / publisher library APIs or the productized DTS
 container.
 
@@ -242,20 +243,20 @@ container.
    `Deferred task verbs` block — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 version-handling rules, and
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "read the live config / public docs"
 rather than collector-specific guidance.
 
 ## Related skills
 
-- [`doca-telemetry`](../libs/doca-telemetry/SKILL.md) — hardware-counter reader API.
-- [`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md) — application-side publisher API.
-- [`doca-telemetry-utils`](../tools/doca-telemetry-utils/SKILL.md) — schema / Data ID / support probe CLI.
-- [`doca-setup`](../doca-setup/SKILL.md) — install and env preconditions.
-- [`doca-version`](../doca-version/SKILL.md) — four-way version match.
-- [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) — any mutating hardware step.
-- [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) — collector launch on bare metal.
-- [`doca-container-deployment`](../doca-container-deployment/SKILL.md) — collector launch as a container.
-- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) — public telemetry / DTS routing.
+- `doca-telemetry/SKILL.md` — hardware-counter reader API.
+- `doca-telemetry-exporter/SKILL.md` — application-side publisher API.
+- `doca-telemetry-utils/SKILL.md` — schema / Data ID / support probe CLI.
+- `doca-setup/SKILL.md` — install and env preconditions.
+- `doca-version/SKILL.md` — four-way version match.
+- `doca-hardware-safety/SKILL.md` — any mutating hardware step.
+- `doca-bare-metal-deployment/SKILL.md` — collector launch on bare metal.
+- `doca-container-deployment/SKILL.md` — collector launch as a container.
+- `doca-public-knowledge-map/SKILL.md` — public telemetry / DTS routing.

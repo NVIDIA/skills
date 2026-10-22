@@ -19,6 +19,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - dpa
@@ -61,11 +62,11 @@ something (configure / build / modify / run / test / debug); open
 the capabilities companion when the question is *what
 can the host-side DPA API express* on this version + this
 BlueField generation. If the user has not installed DOCA yet,
-route to [`doca-setup`](../../doca-setup/SKILL.md) first; if the
+route to `doca-setup/SKILL.md` first; if the
 user is asking how to *write* the DPA-side kernel itself (the
 code that runs on the DPA processor, compiled by `dpacc`), that
 is a different scope — route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 to the public DOCA DPA / DPACC / DPA-Comms / DPA-Verbs guides
 (this skill does not redefine those DPA-side surfaces).
 
@@ -81,7 +82,7 @@ completions. It is *not* for NVIDIA developers contributing to
 DOCA DPA itself, nor is it the place to learn how to *write*
 the DPA-side kernel code (that path goes through the public
 DOCA DPA, DPACC, DPA-Comms, and DPA-Verbs guides via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
+`doca-public-knowledge-map/SKILL.md`).
 
 **Language scope.** DOCA DPA ships as a host-side C library
 with `pkg-config` module name `doca-dpa`. The host-side API is
@@ -179,7 +180,7 @@ install of DOCA or the DPACC compiler, the DPA-side
   (`libdoca_dpa_dev_comm.a` / `libdoca_dpa_dev_verbs.a`) that
   run *inside* the DPA kernel), or non-DPA library questions.
 For those, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 to the matching upstream guide.
 
 ## What this skill provides
@@ -215,7 +216,7 @@ DOCA Compatibility Policy, and the user already knows how (at
 least at a sketch level) to write the DPA-side kernel that
 `dpacc` will compile. It does not cover installing DOCA or the
 DPACC compiler — that path goes through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -230,7 +231,7 @@ contain — and pull requests should not add:
   route the user to those files and prescribe a minimum-diff
   modification on them via the universal modify-a-sample
   workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the DPA-specific overrides in
   ## modify.
 - **Standalone build manifests** (`meson.build`,
@@ -250,7 +251,7 @@ contain — and pull requests should not add:
   from inside the DPA kernel and linked into the DPA image by
   `dpacc`, not from the host. Their public guides are reachable
   via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
   This skill names them and routes; it does not redefine them.
 
 ## Loading order
@@ -268,17 +269,17 @@ contain — and pull requests should not add:
    run, test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 DOCA version-handling rules (with the DPA overlay that DOCA
 must match the DPACC compiler), and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public DOCA
 DPA, DPACC, DPA-Comms, or DPA-Verbs guide, or in the on-disk
 install layout" rather than "DPA host-side-specific guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation
   source and the on-disk layout of an installed DOCA package.
   The DPA public guide is at
@@ -288,29 +289,29 @@ install layout" rather than "DPA host-side-specific guidance".
   the DPA Tools umbrella (developer / admin CLIs for DPA)
   live in the same routing table and are *companion surfaces*
   to this skill rather than redefined by it.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, DPACC compiler install / verification,
   and the *I have no install yet* path with the public NGC
   DOCA container. This skill assumes its preconditions are
   satisfied AND that DPACC is installed at a version that
   matches DOCA.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. This skill's `## Version
   compatibility` cross-links the four-way match rule and adds
   the DPA-specific *DOCA-and-DPACC must match* overlay per the
   DOCA Compatibility Policy.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect /
   prefer / fall back / report). The Command appendix in
   the tasks companion honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the
   universal modify-a-shipped-sample first-app workflow, the
   universal Core-context lifecycle, the cross-library
   `DOCA_ERROR_*` taxonomy, and the program-side debug order.
   This skill layers DPA specifics on top.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). DPA-specific debug (DPACC + DOCA version
   skew, DPA not present on this BlueField generation, DPA
@@ -328,7 +329,7 @@ verbs the DPA kernel itself calls, header
 within `doca-dpa`**, not separate pkg-config modules, and each
 has its own public guide. No library skill ships for them in
 this bundle yet; for any DPA-side question, route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 to the public *DOCA DPA Comms* and *DOCA DPA Verbs* guides
 and to the shipped `/opt/mellanox/doca/samples/doca_dpa/`
 samples (which include both host-side and DPA-side

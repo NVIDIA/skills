@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-bf3-deployment`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 3 evaluation tasks (2 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 98.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 80.0% → 100.0% (+20.0 points) | 73.3% → 100.0% (+26.7 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 76.1% → 100.0% (+23.9 points) | 60.0% → 98.3% (+38.3 points) |
-| Efficiency | 89.7% — baseline ran, but no comparable score was available; uplift unavailable | 91.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 80.6% → 100.0% (+19.4 points) | 66.9% → 100.0% (+33.1 points) |
+| Efficiency | 83.3% — baseline ran, but no comparable score was available; uplift unavailable | 94.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,15 +54,15 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 553,135 | 605,997 | -52,862 | -8.72% | skill 3/3; base 3/3 |
-| claude-code | doca-bf3-deployment.explicit-positive.v1 | 200,352 | 225,130 | -24,778 | -11.01% | skill 1/1; base 1/1 |
-| claude-code | doca-bf3-deployment.implicit-positive.v1 | 260,359 | 259,288 | +1,071 | +0.41% | skill 1/1; base 1/1 |
-| claude-code | doca-bf3-deployment.negative.v1 | 92,424 | 121,579 | -29,155 | -23.98% | skill 1/1; base 1/1 |
-| codex | All cases | 383,051 | 576,943 | -193,892 | -33.61% | skill 3/3; base 3/3 |
-| codex | doca-bf3-deployment.explicit-positive.v1 | 166,119 | 278,586 | -112,467 | -40.37% | skill 1/1; base 1/1 |
-| codex | doca-bf3-deployment.implicit-positive.v1 | 134,037 | 225,761 | -91,724 | -40.63% | skill 1/1; base 1/1 |
-| codex | doca-bf3-deployment.negative.v1 | 82,895 | 72,596 | +10,299 | +14.19% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 936,186 | 1,182,940 | -246,754 | -20.86% | skill 6/6; base 6/6 |
+| claude-code | All cases | 489,098 | 553,269 | -64,171 | -11.60% | skill 3/3; base 3/3 |
+| claude-code | doca-bf3-deployment.explicit-positive.v1 | 154,986 | 290,698 | -135,712 | -46.68% | skill 1/1; base 1/1 |
+| claude-code | doca-bf3-deployment.implicit-positive.v1 | 149,264 | 231,284 | -82,020 | -35.46% | skill 1/1; base 1/1 |
+| claude-code | doca-bf3-deployment.negative.v1 | 184,848 | 31,287 | +153,561 | +490.81% | skill 1/1; base 1/1 |
+| codex | All cases | 273,158 | 510,895 | -237,737 | -46.53% | skill 3/3; base 3/3 |
+| codex | doca-bf3-deployment.explicit-positive.v1 | 111,264 | 228,695 | -117,431 | -51.35% | skill 1/1; base 1/1 |
+| codex | doca-bf3-deployment.implicit-positive.v1 | 110,985 | 228,590 | -117,605 | -51.45% | skill 1/1; base 1/1 |
+| codex | doca-bf3-deployment.negative.v1 | 50,909 | 53,610 | -2,701 | -5.04% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 762,256 | 1,064,164 | -301,908 | -28.37% | skill 6/6; base 6/6 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -70,7 +70,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
@@ -84,9 +84,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
   vs "## debug" in TASKS.md (lines 296-328) (`CAPABILITIES.md:184`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/doca-bf3-deployment/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in details.md (`skills/doca-bf3-deployment/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-bf3-deployment/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: Description very long (1008 chars, recommend 50-150) (`skills/doca-bf3-deployment/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/doca-bf3-deployment/SKILL.md`)
-- 6 additional finding(s) are available in the full evaluation artifacts.
+- 7 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

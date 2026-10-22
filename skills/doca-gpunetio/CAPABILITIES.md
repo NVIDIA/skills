@@ -11,7 +11,7 @@ Read this file when the loader sent you here from
 (the verbs `configure / build / modify / run / test / debug`),
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers a GPUNetIO overlay
-on top of, see [`doca-version`](../../doca-version/SKILL.md).
+on top of, see `doca-version/SKILL.md`.
 
 ## Pattern overview
 
@@ -119,19 +119,19 @@ cap-query rule.
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see [`doca-version`](../../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The GPUNetIO-specific overlay** is:
 
 - **DOCA must match CUDA per the DOCA Compatibility Policy.** The public DOCA Compatibility Policy at <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html> defines which CUDA toolkit version a given DOCA release supports. Mismatched CUDA + DOCA combos fail at link time (missing CUDA-side symbols) or at runtime (`DOCA_ERROR_DRIVER` from `doca_gpu_create`) in confusing ways. The agent must compare `pkg-config --modversion doca-gpunetio` with `pkg-config --modversion doca-common`, require those DOCA versions to agree, then compare `nvcc --version` (and `cat /usr/local/cuda/version.txt` when present) against the DOCA Compatibility Policy before any GPUNetIO bring-up.
-- **The DOCA cap-query AND `cudaGetDeviceProperties` are both runtime authorities.** Per the cross-cutting cap-query rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability), the DOCA-side cap query is the runtime authority for *"is this GPUNetIO feature on this DOCA install"*. The CUDA-side device-properties query is the runtime authority for *"is this GPU capable of GPU-initiated networking at all"*. Either being false fails the feature; the agent must report both.
-- **`doca-gpunetio.pc`, `doca-common.pc`, and the matching CUDA toolkit must all line up at the four-way-match check** (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). A common partial-install pattern is that DOCA was upgraded but the CUDA toolkit on the host was not, or vice versa; the agent must surface that as a four-way-match failure and route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) before any GPUNetIO-layer diagnosis.
+- **The DOCA cap-query AND `cudaGetDeviceProperties` are both runtime authorities.** Per the cross-cutting cap-query rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the DOCA-side cap query is the runtime authority for *"is this GPUNetIO feature on this DOCA install"*. The CUDA-side device-properties query is the runtime authority for *"is this GPU capable of GPU-initiated networking at all"*. Either being false fails the feature; the agent must report both.
+- **`doca-gpunetio.pc`, `doca-common.pc`, and the matching CUDA toolkit must all line up at the four-way-match check** (per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)). A common partial-install pattern is that DOCA was upgraded but the CUDA toolkit on the host was not, or vice versa; the agent must surface that as a four-way-match failure and route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) before any GPUNetIO-layer diagnosis.
 
 ## Error taxonomy
 
 GPUNetIO-specific overlays on the cross-library `DOCA_ERROR_*`
 taxonomy. The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *GPUNetIO surface* meaning that the agent
 must disambiguate before falling back to the cross-library
 response.
@@ -142,7 +142,7 @@ response.
 | `DOCA_ERROR_INVALID_VALUE` | `doca_gpu_create` with a GPU PCIe bus-id string; buffer registration via `doca_buf_arr_create_*` | The PCIe bus-id string does not match a GPU present on the host (mismatched between `nvidia-smi -L` / `cudaDeviceGetPCIBusId` and the string passed to DOCA), or the CUDA-allocated buffer has alignment / size that does not match the doca-eth queue expectations. Re-resolve the bus-id and the queue's required alignment; do not paper over with a retry. |
 | `DOCA_ERROR_BAD_STATE` | Any GPUNetIO call against a doca-eth context that is at the wrong lifecycle stage; teardown ordering between the GPU-visible handle and the underlying doca-eth queue | Lifecycle violation. The most common case is calling `doca_gpu_eth_rxq_*` against a doca-eth context that has not been started, or destroying the underlying `doca_eth_rxq` before destroying the GPU-visible handle. Walk the layering rule in [`## Capabilities and modes`](#capabilities-and-modes). |
 | `DOCA_ERROR_AGAIN` | TX submit from inside the CUDA kernel (device-side); RX drain from the persistent kernel | The GPU-visible queue is full from the GPU side. This is *not* a hardware error; the persistent kernel must drain completions before re-submitting (the device-side equivalent of the host-side *"would-block, retry after progress"* pattern). |
-| `DOCA_ERROR_DRIVER` | `doca_gpu_create`; any GPUNetIO call when CUDA + DOCA versions are skewed | The CUDA driver layer reported failure to DOCA. Most common cause is a CUDA + DOCA version mismatch per the DOCA Compatibility Policy. Route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) layer 5 (driver) AND to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) for the version-skew side. |
+| `DOCA_ERROR_DRIVER` | `doca_gpu_create`; any GPUNetIO call when CUDA + DOCA versions are skewed | The CUDA driver layer reported failure to DOCA. Most common cause is a CUDA + DOCA version mismatch per the DOCA Compatibility Policy. Route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layer 5 (driver) AND to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) for the version-skew side. |
 
 The agent's rule: **never recommend a retry loop on
 `DOCA_ERROR_*` without first identifying which of the rows above
@@ -186,14 +186,14 @@ Three primary signals the agent should reach for:
 
 For cross-cutting observability primitives (`--sdk-log-level`,
 the `DOCA_LOG_LEVEL` env var, the trace build flavor) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout, sample tree) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 GPUNetIO's safety surface is **env-precondition-driven**. Unlike
 RDMA (permission-driven) or Comch (representor-visibility-driven),
@@ -207,10 +207,10 @@ GPUNetIO setup:
 
 | Precondition | What must be true | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
-| CUDA toolkit installed and matched to DOCA | The CUDA toolkit on the host is installed at a version listed as compatible with both installed DOCA package surfaces per the DOCA Compatibility Policy | `nvcc --version`; `cat /usr/local/cuda/version.txt`; compare both `pkg-config --modversion doca-gpunetio` and `pkg-config --modversion doca-common`, require those DOCA versions to agree, then cross-check CUDA against the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) | [`doca-setup`](../../doca-setup/SKILL.md) for the install-side; route to [`doca-version`](../../doca-version/SKILL.md) for the four-way-match check |
-| `nvidia_peermem` loaded for GPUDirect RDMA | The `nvidia_peermem` kernel module is loaded so GPUDirect RDMA between the NIC and the GPU works; without it GPU-initiated networking falls back or fails entirely | `lsmod \| grep nvidia_peermem`; missing → `sudo modprobe nvidia_peermem`; persistent via system config | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side; do not modify the program |
-| CUDA device enumerable | `cudaGetDeviceCount` returns at least 1 and `cudaGetDeviceProperties(devOrdinal)` succeeds for the device the user intends to drive | `nvidia-smi -L`; programmatic via the CUDA runtime; `cudaSetDevice(devOrdinal)` must succeed | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side; verify the NVIDIA driver is loaded |
-| doca-eth side already up | The underlying `doca_eth_rxq` / `doca_eth_txq` exists and the doca-eth context is at the right lifecycle stage to expose the queue to the GPU | The [`doca-eth`](../doca-eth/SKILL.md) bring-up workflow is the upstream verb | Configure doca-eth first; do NOT skip ahead to `doca_gpu_*` calls |
+| CUDA toolkit installed and matched to DOCA | The CUDA toolkit on the host is installed at a version listed as compatible with both installed DOCA package surfaces per the DOCA Compatibility Policy | `nvcc --version`; `cat /usr/local/cuda/version.txt`; compare both `pkg-config --modversion doca-gpunetio` and `pkg-config --modversion doca-common`, require those DOCA versions to agree, then cross-check CUDA against the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) | `doca-setup/SKILL.md` for the install-side; route to `doca-version/SKILL.md` for the four-way-match check |
+| `nvidia_peermem` loaded for GPUDirect RDMA | The `nvidia_peermem` kernel module is loaded so GPUDirect RDMA between the NIC and the GPU works; without it GPU-initiated networking falls back or fails entirely | `lsmod \| grep nvidia_peermem`; missing → `sudo modprobe nvidia_peermem`; persistent via system config | `doca-setup/SKILL.md` for the env-side; do not modify the program |
+| CUDA device enumerable | `cudaGetDeviceCount` returns at least 1 and `cudaGetDeviceProperties(devOrdinal)` succeeds for the device the user intends to drive | `nvidia-smi -L`; programmatic via the CUDA runtime; `cudaSetDevice(devOrdinal)` must succeed | `doca-setup/SKILL.md` for the env-side; verify the NVIDIA driver is loaded |
+| doca-eth side already up | The underlying `doca_eth_rxq` / `doca_eth_txq` exists and the doca-eth context is at the right lifecycle stage to expose the queue to the GPU | The `doca-eth/SKILL.md` bring-up workflow is the upstream verb | Configure doca-eth first; do NOT skip ahead to `doca_gpu_*` calls |
 | CUDA buffers registered with DOCA | The GPU-side payload pool allocated via `cudaMalloc` is registered with DOCA via the `doca_buf_arr_create_*` family before `doca_ctx_start()` | Walk the registration sequence in [TASKS.md ## configure](TASKS.md#configure) step 4; a missing registration surfaces as `DOCA_ERROR_BAD_STATE` from the first device-side submit | Program-layer fix — the registration call goes in the host-side bring-up code, before the persistent kernel is launched |
 
 **Do not partial-install one side.** A CUDA-only install
@@ -244,7 +244,7 @@ topics the agent will get asked but should route elsewhere:
 - **DOCA Ethernet queue setup** (`doca_eth_rxq` / `doca_eth_txq`
   bring-up, RSS, representor selection on the NIC side) —
   GPUNetIO depends on it but does not redefine it. Route to
-  [`doca-eth`](../doca-eth/SKILL.md).
+  `doca-eth/SKILL.md`.
 - **DOCA DPA** (DPA-side networking primitives, DPA kernel
   programming) — the *sibling* DOCA library for offloading
   device-side compute onto a different non-CPU target. The
@@ -252,19 +252,19 @@ topics the agent will get asked but should route elsewhere:
   integrate with non-CPU compute"* (see the worked example in
   [TASKS.md ## modify](TASKS.md#modify)) but should not invent
   DPA API surfaces here. Route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   to the public DOCA DPA guide.
 - **DOCA Core context and progress engine internals** — owned
   by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   This skill *uses* the Core lifecycle; it does not redefine
   it.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the GPUNetIO overlay, not the taxonomy itself.
 - **Cross-cutting debug ladder** (install / version / build /
   link / runtime / program / driver) — owned by
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug). This
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). This
   skill's `## debug` redirects there for layer 1-4; layers 5-7
   carry the GPUNetIO-specific overlay (including the
   CUDA-driver-layer route).

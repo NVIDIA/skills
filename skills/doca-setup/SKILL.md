@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - setup
@@ -43,9 +44,9 @@ bundle's front-door: it detects the system shape (host x86 / BlueField
 Arm bare-metal / DPU-only / fresh laptop), asks the developer the
 minimal set of questions needed to disambiguate, and routes to the
 correct downstream skill — the container deployment path
-([`doca-container-deployment`](../doca-container-deployment/SKILL.md)),
+(`doca-container-deployment/SKILL.md`),
 the bare-metal hardware deployment path
-([`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)),
+(`doca-bare-metal-deployment/SKILL.md`),
 or the no-hardware fallback
 ([`TASKS.md ## no-install`](TASKS.md#no-install)). The wrong failure
 mode is to silently steer every developer onto containers because the
@@ -126,7 +127,7 @@ Follow [`## Loading order`](#loading-order). Open `TASKS.md` or
 If the question is library-API-shaped (Flow pipe construction, RDMA
 queue setup, …) or program-shaped (how to build, modify a sample, debug
 the program itself), route to
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md) or the
+`doca-programming-guide/SKILL.md` or the
 matching library skill instead — env-class only lives here.
 
 > **Route the *code* and stop — but keep the orientation.** For a
@@ -162,16 +163,16 @@ Load this skill when the user is dealing with the **environment around DOCA** �
 
 Do **not** load this skill for:
 
-- *"What is DOCA?", "where is the developer guide?", "where is the install layout documented?"* — those are routing questions; use [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
-- *"How do I derive a custom first application from a sample?", "how do I structure a DOCA build?", "what does `DOCA_ERROR_BAD_STATE` mean?"* — those are **programming-class** questions and live in [`doca-programming-guide`](../doca-programming-guide/SKILL.md), which owns the universal `## modify` (first-app derivation), the canonical `## build` pattern, the universal lifecycle, and the cross-library `DOCA_ERROR_*` taxonomy.
-- *Library-internal API questions* (Flow pipe construction, RDMA queue setup, etc.) — those belong in the matching library skill (e.g. [`doca-flow`](../libs/doca-flow/SKILL.md)). This skill stops at *"the install is healthy and the env is ready"*; it does not own program semantics.
+- *"What is DOCA?", "where is the developer guide?", "where is the install layout documented?"* — those are routing questions; use `doca-public-knowledge-map/SKILL.md`.
+- *"How do I derive a custom first application from a sample?", "how do I structure a DOCA build?", "what does `DOCA_ERROR_BAD_STATE` mean?"* — those are **programming-class** questions and live in `doca-programming-guide/SKILL.md`, which owns the universal `## modify` (first-app derivation), the canonical `## build` pattern, the universal lifecycle, and the cross-library `DOCA_ERROR_*` taxonomy.
+- *Library-internal API questions* (Flow pipe construction, RDMA queue setup, etc.) — those belong in the matching library skill (e.g. `doca-flow/SKILL.md`). This skill stops at *"the install is healthy and the env is ready"*; it does not own program semantics.
 
 ## What this skill provides
 
 This is a **thin loader**. The body keeps only the orientation needed to pick the right next file. The substantive env material lives in two companion files:
 
 - `CAPABILITIES.md` — what the install / build / runtime *environment* surface looks like: install profiles (`doca-all`, `doca-ofed`, `doca-networking`), where the build flavors (release vs trace) live on disk and how to point `LD_LIBRARY_PATH` at them, the env-side version-detection rules, the env-class error taxonomy (`pkg-config` not finding `doca-flow`, hugepages not reserved, representors not visible), what a healthy install looks like under observation, and the safety constraints on environment changes (hugepages global, `mlxconfig` reset, eswitch mode change).
-- `TASKS.md` — env workflows: `recognize` (the front-door system-shape detect + dev-Q decision tree that routes deployment-shaped questions to either container or bare-metal), `configure` (env prep), `test` (install health snapshot), `debug` (env-class layered diagnosis), and `no-install` (the *I have no install yet* procedure with the NGC container as Path 0). Three other anchors (`build`, `modify`, `run`) exist for lint compliance and route to [`doca-programming-guide`](../doca-programming-guide/SKILL.md), which owns those verbs after the env / program split.
+- `TASKS.md` — env workflows: `recognize` (the front-door system-shape detect + dev-Q decision tree that routes deployment-shaped questions to either container or bare-metal), `configure` (env prep), `test` (install health snapshot), `debug` (env-class layered diagnosis), and `no-install` (the *I have no install yet* procedure with the NGC container as Path 0). Three other anchors (`build`, `modify`, `run`) exist for lint compliance and route to `doca-programming-guide/SKILL.md`, which owns those verbs after the env / program split.
 
 This skill assumes nothing about whether DOCA is installed — the `## no-install` workflow exists precisely for the *fresh laptop* case.
 
@@ -212,7 +213,7 @@ This skill assumes nothing about whether DOCA is installed — the `## no-instal
 5. **For env workflows — `configure`, `test`, `debug`, and
    `no-install` — see [TASKS.md](TASKS.md).** The `build`, `modify`,
    and `run` anchors route to
-   [`doca-programming-guide`](../doca-programming-guide/SKILL.md).
+   `doca-programming-guide/SKILL.md`.
 6. Once the env is healthy, hand off to the selected deployment skill,
    then `doca-programming-guide`, then the matching library skill.
 
@@ -220,8 +221,8 @@ Both companion files cross-link to each other and to `doca-public-knowledge-map`
 
 ## Related skills
 
-- [`doca-container-deployment`](../doca-container-deployment/SKILL.md) — the container deployment runtime (kubelet standalone + YAML pod-spec drop) for any DOCA service container on BlueField. `## recognize` here routes to this skill when the developer's workload + system shape land on the container path.
-- [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) — the bare-metal hardware deployment runtime (host x86 OR BlueField Arm direct launch — systemd / tmux / direct invocation, hardware-resource binding, per-tenant isolation, restart discipline) for a DOCA-linked binary. `## recognize` here routes to this skill when the developer's workload + system shape land on the bare-metal path.
-- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) — public DOCA documentation routing and the on-disk layout of an installed DOCA package. This skill defers all *"where is X documented"*, *"where on disk is Y"*, and *"how do I check the installed version"* questions to the knowledge-map.
-- [`doca-programming-guide`](../doca-programming-guide/SKILL.md) — general DOCA programming patterns once the env is healthy: the canonical `pkg-config doca-<library>` build pattern, the universal *derive a custom first app from a sample* workflow (with C / C++ + non-C tracks), the universal lifecycle, and the cross-library `DOCA_ERROR_*` taxonomy. Anything beyond *"is the install healthy and the env ready"* lives there.
-- [`doca-flow`](../libs/doca-flow/SKILL.md) — DOCA Flow on BlueField. Builds on this skill for env preparation and on `doca-programming-guide` for the universal first-app derivation, then layers Flow-specific overrides on top.
+- `doca-container-deployment/SKILL.md` — the container deployment runtime (kubelet standalone + YAML pod-spec drop) for any DOCA service container on BlueField. `## recognize` here routes to this skill when the developer's workload + system shape land on the container path.
+- `doca-bare-metal-deployment/SKILL.md` — the bare-metal hardware deployment runtime (host x86 OR BlueField Arm direct launch — systemd / tmux / direct invocation, hardware-resource binding, per-tenant isolation, restart discipline) for a DOCA-linked binary. `## recognize` here routes to this skill when the developer's workload + system shape land on the bare-metal path.
+- `doca-public-knowledge-map/SKILL.md` — public DOCA documentation routing and the on-disk layout of an installed DOCA package. This skill defers all *"where is X documented"*, *"where on disk is Y"*, and *"how do I check the installed version"* questions to the knowledge-map.
+- `doca-programming-guide/SKILL.md` — general DOCA programming patterns once the env is healthy: the canonical `pkg-config doca-<library>` build pattern, the universal *derive a custom first app from a sample* workflow (with C / C++ + non-C tracks), the universal lifecycle, and the cross-library `DOCA_ERROR_*` taxonomy. Anything beyond *"is the install healthy and the env ready"* lives there.
+- `doca-flow/SKILL.md` — DOCA Flow on BlueField. Builds on this skill for env preparation and on `doca-programming-guide` for the universal first-app derivation, then layers Flow-specific overrides on top.

@@ -6,7 +6,7 @@ names the recurring server-side questions. Pick the pattern
 first, then drill into the H2 that owns the substance. For the
 *how* of executing each pattern, jump to [TASKS.md](TASKS.md).
 For the underlying `doca-flow` API the server's RPCs program, see
-[`doca-flow CAPABILITIES.md`](../../libs/doca-flow/CAPABILITIES.md).
+`doca-flow/CAPABILITIES.md`.
 
 This file is loaded by [`SKILL.md`](SKILL.md). It documents *what
 state the server exposes*, *how the gRPC contract is defined and
@@ -69,7 +69,7 @@ this tool at all.
 
 | Surface | When to reach for it |
 | --- | --- |
-| Direct link to `libdoca_flow.so` in the controlling process (see [`doca-flow`](../../libs/doca-flow/SKILL.md)) | The controlling process is C / C++ and runs in the same address space (or the same host with shared libraries available); a network boundary is not required. |
+| Direct link to `libdoca_flow.so` in the controlling process (see `doca-flow/SKILL.md`) | The controlling process is C / C++ and runs in the same address space (or the same host with shared libraries available); a network boundary is not required. |
 | **`doca_flow_grpc`** (this skill) | The controlling process is in a different language than C / C++ (and language bindings are not available), OR runs on a different host / network segment from the BlueField / DPU, OR the deployment topology requires a centralized control plane addressing multiple BlueFields. |
 
 The downstream rule: do not default to gRPC because it sounds
@@ -161,7 +161,7 @@ optional companions:
   that involve DPA-offload paths on a DPA-capable device.
   Cross-references
   `doca-dpa` and
-  [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md) for
+  `doca-flow-dpa-perf/SKILL.md` for
   the underlying DPA programming model and performance
   surface.
 
@@ -173,7 +173,7 @@ gRPC Server page on `docs.nvidia.com`.
 
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-
-docs rule, see [`doca-version`](../../doca-version/SKILL.md).
+docs rule, see `doca-version/SKILL.md`.
 The body lives there; this skill does not duplicate it.
 
 **The `doca_flow_grpc`-specific overlay** is:
@@ -182,9 +182,9 @@ The body lives there; this skill does not duplicate it.
   links against.** A `doca-flow` library `*.so` from one
   DOCA train paired with a gRPC server binary from another
   is a partial-install hazard per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
   The four-way match per
-  [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test)
+  `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`)
   applies without modification.
 - **The `.proto` contract is versioned with the DOCA install.**
   RPC method names, message fields, and field types can shift
@@ -219,9 +219,9 @@ distinguish, in escalating order:
    or a precondition (Flow library missing, device not
    bound) blocked startup. Routing: confirm DOCA is
    installed via
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure)
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)
    and the Flow library is present per
-   [`doca-flow TASKS.md ## test`](../../libs/doca-flow/TASKS.md#test);
+   `doca-flow TASKS.md ## test` (`doca-flow/TASKS.md#test`);
    confirm the binary's own logs.
 2. **Server-binding-failed.** The init ran but the server
    could not bind the configured network address / port.
@@ -233,7 +233,7 @@ distinguish, in escalating order:
    guess. Routing: confirm the address / port against the
    operator's deployment config; route
    env-side issues to
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 3. **External-layer-rejected.** The client did not traverse
    the selected proxy, sidecar, or VPN. Diagnose that layer
    using its own logs and configuration; do not map its
@@ -249,9 +249,9 @@ distinguish, in escalating order:
    means a Flow-side precondition (pipe not created,
    validate-before-commit not performed) blocked the
    operation. Routing for the Flow-side preconditions:
-   [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify)
+   `doca-flow TASKS.md ## modify` (`doca-flow/TASKS.md#modify`)
    plus
-   [`doca-flow CAPABILITIES.md ## Error taxonomy`](../../libs/doca-flow/CAPABILITIES.md#error-taxonomy).
+   `doca-flow CAPABILITIES.md ## Error taxonomy` (`doca-flow/CAPABILITIES.md#error-taxonomy`).
 5. **Flow-precondition-failed.** The RPC was syntactically
    valid but the underlying Flow application is not in a
    state to accept it (port not started, pipe not created,
@@ -259,20 +259,20 @@ distinguish, in escalating order:
    doca-flow side, not the gRPC server side.
 6. **Version.** Cross-cutting partial-install / mixed-
    version layer per
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
    Symptoms: the server's `.proto` contract does not match
    the client-side generated stubs (the client was
    generated from a different DOCA release's `.proto`);
    the server binary version disagrees with the Flow
    library version it links. Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end.
 7. **Cross-cutting.** All layers above are clean and the
    client still cannot use the server. The cause is below
    DOCA — driver, firmware, BlueField mode, network
    reachability, kernel-level firewall. Hand off to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md) and
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-debug ## debug` (`doca-debug/SKILL.md`) and
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 
 The debug loop permits one diagnostic correction and one
 retry. If the same request remains non-green after that retry,
@@ -290,7 +290,7 @@ the agent should consult, in order:
 
 - **Server logs.** The binary's own log output (per
   `DOCA_LOG_LEVEL` and the standard DOCA logging surface; see
-  [`doca-programming-guide CAPABILITIES.md ## Observability`](../../doca-programming-guide/CAPABILITIES.md#observability))
+  `doca-programming-guide CAPABILITIES.md ## Observability` (`doca-programming-guide/CAPABILITIES.md#observability`))
   is the first source of truth for server-side errors.
   Bind start / bind failure / per-RPC accept and reject
   lines live here.
@@ -303,7 +303,7 @@ the agent should consult, in order:
   paraphrasing the code is the canonical lost-fidelity
   failure.
 - **The live Flow application's observability surface.** Per
-  [`doca-flow CAPABILITIES.md ## Observability`](../../libs/doca-flow/CAPABILITIES.md#observability),
+  `doca-flow CAPABILITIES.md ## Observability` (`doca-flow/CAPABILITIES.md#observability`),
   the Flow library exposes pipe / entry / counter / inspector
   state programmatically. When the gRPC RPC succeeds but the
   user's downstream behavior is wrong, this is where the
@@ -311,11 +311,11 @@ the agent should consult, in order:
 
 For the env-side counters that bound the deployment (link
 state, PCIe, IB), reach for
-[`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 Exposing `doca_flow_grpc` in production is a
 **deliberately high-stakes posture** — it is an admin attack
@@ -362,7 +362,7 @@ surface attached to the dataplane:
 The single canonical public source for `doca_flow_grpc`
 is the **DOCA Flow gRPC Server** page on `docs.nvidia.com`,
 reachable through
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 The second authoritative source on the user's install is the
 shipped `.proto` file set under the tool's source tree. For
 generic gRPC ecosystem documentation (auth, status codes,
@@ -370,5 +370,5 @@ language bindings, versioning), the canonical source is
 [`grpc.io`](https://grpc.io/) — the public DOCA Flow gRPC
 Server page does not duplicate that ecosystem documentation.
 For the `doca-flow` API the server programs, see
-[`doca-flow`](../../libs/doca-flow/SKILL.md) plus the public
+`doca-flow/SKILL.md` plus the public
 DOCA Flow guide reached the same way.

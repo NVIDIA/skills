@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-pcc-ztr-rttcc-algo`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.9% — baseline ran, but no comparable score was available; uplift unavailable | 96.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.7% — baseline ran, but no comparable score was available; uplift unavailable | 96.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 85.0% → 100.0% (+15.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 51.3% → 100.0% (+48.7 points) | 71.5% → 96.5% (+25.0 points) |
-| Efficiency | 79.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 51.7% → 92.7% (+41.0 points) | 54.4% → 99.4% (+45.0 points) |
+| Efficiency | 75.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 823,701 | 915,407 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 285,846 | 504,469 | -218,623 | -43.34% | skill 1/1; base 1/1 |
-| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | 506,698 | 219,076 | +287,622 | +131.29% | skill 1/1; base 1/1 |
-| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-pcc-ztr-rttcc-algo.negative.v1 | 31,157 | 191,862 | -160,705 | -83.76% | skill 1/1; base 1/1 |
-| codex | All cases | 585,422 | 309,387 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 166,867 | 39,412 | +127,455 | +323.39% | skill 1/1; base 1/1 |
-| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | 363,070 | 224,861 | +138,209 | +61.46% | skill 1/1; base 1/1 |
-| codex | doca-pcc-ztr-rttcc-algo.negative.v1 | 55,485 | 45,114 | +10,371 | +22.99% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,409,123 | 1,224,794 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 818,684 | 886,847 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 341,587 | 411,330 | -69,743 | -16.96% | skill 1/1; base 1/1 |
+| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | N/A | 285,043 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | 446,107 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-pcc-ztr-rttcc-algo.negative.v1 | 30,990 | 190,474 | -159,484 | -83.73% | skill 1/1; base 1/1 |
+| codex | All cases | 493,290 | 371,506 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 144,775 | 114,708 | +30,067 | +26.21% | skill 1/1; base 1/1 |
+| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | N/A | 218,076 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | 290,685 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-pcc-ztr-rttcc-algo.negative.v1 | 57,830 | 38,722 | +19,108 | +49.35% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,311,974 | 1,258,353 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 13 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-pcc-ztr-rttcc-algo`)
+- **MEDIUM** SECURITY/Unknown (SQP-2): The '## use' workflow section (lines 252–293) describes live tuning of congestion-control parameters on a production RoC (`TASKS.md:252`)
 - **LOW** QUALITY/quality_discoverability: Description very long (921 chars, recommend 50-150) (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
-- 6 additional finding(s) are available in the full evaluation artifacts.
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

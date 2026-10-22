@@ -7,20 +7,20 @@ the user's system shape (host x86 / BlueField Arm bare-metal /
 DPU-only / fresh laptop with no hardware), asks the developer the
 minimal set of questions needed to disambiguate, and routes to the
 correct downstream skill: the container deployment path
-([`doca-container-deployment`](../doca-container-deployment/SKILL.md)),
+(`doca-container-deployment/SKILL.md`),
 the bare-metal hardware deployment path
-([`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)),
+(`doca-bare-metal-deployment/SKILL.md`),
 or the no-hardware fallback ([`## no-install`](#no-install)). If you
 already know the deployment shape and only need env prep, the verb
 order from there is `configure` → `test` → `debug`; each section's
 first paragraph names the precondition the previous one must have
 satisfied.
 
-Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the underlying env surface (install profiles, build-flavor disk locations, version-detection commands, error taxonomy, observability cues, env-side safety constraints), see [CAPABILITIES.md](CAPABILITIES.md). For the *programming-class* counterparts (the canonical build pattern, the universal modify-a-shipped-sample first-app workflow, the universal lifecycle, the cross-library `DOCA_ERROR_*` debug order), see [`doca-programming-guide`](../doca-programming-guide/SKILL.md). For where to find official documentation, the on-disk install layout, or release notes, route through [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the underlying env surface (install profiles, build-flavor disk locations, version-detection commands, error taxonomy, observability cues, env-side safety constraints), see [CAPABILITIES.md](CAPABILITIES.md). For the *programming-class* counterparts (the canonical build pattern, the universal modify-a-shipped-sample first-app workflow, the universal lifecycle, the cross-library `DOCA_ERROR_*` debug order), see `doca-programming-guide/SKILL.md`. For where to find official documentation, the on-disk install layout, or release notes, route through `doca-public-knowledge-map/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a copy-paste recipe. The agent's job is to walk the user through the steps in order, verifying preconditions before recommending the next call.
 
-This skill scopes itself to **env work and the front-door routing decision**. Three of the six lint-required task verbs (`## build`, `## modify`, `## run`) describe their own substance in [`doca-programming-guide`](../doca-programming-guide/SKILL.md) after the env / program split — the anchors here exist for lint compliance and route there. The verbs this skill *owns* are `## recognize` (the front door), `## configure`, `## test`, `## debug`, and the critical `## no-install` (the NGC container path included).
+This skill scopes itself to **env work and the front-door routing decision**. Three of the six lint-required task verbs (`## build`, `## modify`, `## run`) describe their own substance in `doca-programming-guide/SKILL.md` after the env / program split — the anchors here exist for lint compliance and route there. The verbs this skill *owns* are `## recognize` (the front door), `## configure`, `## test`, `## debug`, and the critical `## no-install` (the NGC container path included).
 
 ## recognize
 
@@ -38,7 +38,7 @@ must surface the gap to the user rather than push forward:
   about to recommend (`doca-tools`, `doca-applications`, …) returns
   `Candidate: (none)` or `Unable to locate package` under
   `apt-cache policy <pkg>` on the user's host. See
-  [`doca-version CAPABILITIES.md ## Apt-repo and OS-matrix preconditions`](../doca-version/CAPABILITIES.md#apt-repo-and-os-matrix-preconditions)
+  `doca-version CAPABILITIES.md ## Apt-repo and OS-matrix preconditions` (`doca-version/CAPABILITIES.md#apt-repo-and-os-matrix-preconditions`)
   for the precheck. Do NOT quote an install line whose packages do
   not exist in the user's configured repos.
 - **Off-matrix host OS point release.** The host OS family is in the
@@ -47,12 +47,12 @@ must surface the gap to the user rather than push forward:
   on a DOCA 3.3 host whose matrix lists 24.04.x for `x ≤ 3`). Surface
   the gap verbatim, quote the supported sub-range from the release
   notes, and ask the user to either downgrade or accept the off-matrix
-  risk explicitly before proceeding. Same source: [`doca-version
-  CAPABILITIES.md ## Apt-repo and OS-matrix preconditions`](../doca-version/CAPABILITIES.md#apt-repo-and-os-matrix-preconditions).
+  risk explicitly before proceeding. Same source: `doca-version
+  CAPABILITIES.md ## Apt-repo and OS-matrix preconditions` (`doca-version/CAPABILITIES.md#apt-repo-and-os-matrix-preconditions`).
 
 Steps the agent should walk the user through:
 
-1. **Confirm install presence and version.** Use the procedure in [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) (do not duplicate). Quote the observed `pkg-config --modversion doca-common`; do not assume *"latest"*. The version-detection rules in [CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility) determine whether what the user has on disk is a coherent install or a partial upgrade that needs reinstalling first.
+1. **Confirm install presence and version.** Use the procedure in `doca-public-knowledge-map/SKILL.md` (do not duplicate). Quote the observed `pkg-config --modversion doca-common`; do not assume *"latest"*. The version-detection rules in [CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility) determine whether what the user has on disk is a coherent install or a partial upgrade that needs reinstalling first.
 
 2. **Set `PKG_CONFIG_PATH` for the build environment.** The DOCA `*.pc` files live at `/opt/mellanox/doca/infrastructure/lib/pkgconfig/`. Add this to `PKG_CONFIG_PATH` in the user's shell profile (or in the build invocation itself) so that `pkg-config --modversion doca-flow` (or any other DOCA module) succeeds. Verify with `pkg-config --list-all | grep -i doca`. If the list is empty, the path or the install profile is wrong — see [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy).
 
@@ -65,13 +65,13 @@ Steps the agent should walk the user through:
 
      The verification step is the same as for DOCA: after adding any extra path, `pkg-config --list-all | grep -E '<module>'` and confirm the expected modules appear. Empty result = path wrong or component not installed; do NOT push forward with a build that depends on an invisible module.
 
-3. **Confirm the build-tool baseline is installed.** A clean DOCA build environment expects the following host-OS packages to be present BEFORE the user attempts any sample or application build. On Ubuntu / Debian: `build-essential`, `meson`, `ninja-build`, `cmake`, `pkg-config`, `libjson-c-dev` (DOCA Argp + several services consume `json-c`), `liblz4-dev` (some shipped storage samples link `lz4` — see [`doca-programming-guide TASKS.md ## sample-and-app-categorization` → known sample-build quirks](../doca-programming-guide/TASKS.md#known-sample-build-quirks) for the `doca_storage_gga_offload_sbc_generator` quirk this is the documented fix for). On RHEL / OEL: the equivalent `@"Development Tools"` group plus `meson`, `ninja-build`, `cmake`, `pkgconfig`, `json-c-devel`, `lz4-devel`. The agent surfaces the package set as a precondition checklist (`dpkg -s <pkg>` / `rpm -q <pkg>` per package) BEFORE recommending an install line; on missing packages, ask the user to install them OR surface that this target shape can only build a subset of the DOCA catalog (per [`doca-programming-guide ## sample-and-app-categorization`](../doca-programming-guide/TASKS.md#sample-and-app-categorization) skip vs fail rules).
+3. **Confirm the build-tool baseline is installed.** A clean DOCA build environment expects the following host-OS packages to be present BEFORE the user attempts any sample or application build. On Ubuntu / Debian: `build-essential`, `meson`, `ninja-build`, `cmake`, `pkg-config`, `libjson-c-dev` (DOCA Argp + several services consume `json-c`), `liblz4-dev` (some shipped storage samples link `lz4` — see `doca-programming-guide TASKS.md ## sample-and-app-categorization` → known sample-build quirks (`doca-programming-guide/TASKS.md#known-sample-build-quirks`) for the `doca_storage_gga_offload_sbc_generator` quirk this is the documented fix for). On RHEL / OEL: the equivalent `@"Development Tools"` group plus `meson`, `ninja-build`, `cmake`, `pkgconfig`, `json-c-devel`, `lz4-devel`. The agent surfaces the package set as a precondition checklist (`dpkg -s <pkg>` / `rpm -q <pkg>` per package) BEFORE recommending an install line; on missing packages, ask the user to install them OR surface that this target shape can only build a subset of the DOCA catalog (per `doca-programming-guide ## sample-and-app-categorization` (`doca-programming-guide/TASKS.md#sample-and-app-categorization`) skip vs fail rules).
 
-4. **Detect non-standard MPI layouts before MPI-dependent builds.** Several DOCA applications (UROM / HPC-class) require an MPI compiler wrapper (`mpicc`, `mpic++`, `mpirun`). On BlueField OS images the documented MPI install can live at a NON-standard prefix — for example `/usr/mpi/gcc/openmpi-<ver>/bin/mpicc` instead of `/usr/bin/mpicc`. Before the agent tells the user "the build will pick up `mpicc` automatically", the agent verifies: (a) `command -v mpicc` returns a non-empty path; (b) if (a) is empty, the agent runs the documented discovery (`ls /usr/mpi/gcc/openmpi-*/bin/mpicc 2>/dev/null`, `find /opt -name mpicc 2>/dev/null`, `dpkg -L openmpi-bin | grep bin/mpicc 2>/dev/null`, `rpm -ql openmpi 2>/dev/null`) to surface where MPI actually landed. If MPI is found at a non-standard prefix, the agent recommends `export PATH=<found-prefix>:$PATH` BEFORE the build (and surfaces that the build's `PATH` must be inherited correctly — `sudo` typically resets it). If MPI is genuinely not installed, the agent surfaces that the MPI-dependent subset of DOCA apps will skip-env-absent per the [`doca-programming-guide ## sample-and-app-categorization`](../doca-programming-guide/TASKS.md#sample-and-app-categorization) classification.
+4. **Detect non-standard MPI layouts before MPI-dependent builds.** Several DOCA applications (UROM / HPC-class) require an MPI compiler wrapper (`mpicc`, `mpic++`, `mpirun`). On BlueField OS images the documented MPI install can live at a NON-standard prefix — for example `/usr/mpi/gcc/openmpi-<ver>/bin/mpicc` instead of `/usr/bin/mpicc`. Before the agent tells the user "the build will pick up `mpicc` automatically", the agent verifies: (a) `command -v mpicc` returns a non-empty path; (b) if (a) is empty, the agent runs the documented discovery (`ls /usr/mpi/gcc/openmpi-*/bin/mpicc 2>/dev/null`, `find /opt -name mpicc 2>/dev/null`, `dpkg -L openmpi-bin | grep bin/mpicc 2>/dev/null`, `rpm -ql openmpi 2>/dev/null`) to surface where MPI actually landed. If MPI is found at a non-standard prefix, the agent recommends `export PATH=<found-prefix>:$PATH` BEFORE the build (and surfaces that the build's `PATH` must be inherited correctly — `sudo` typically resets it). If MPI is genuinely not installed, the agent surfaces that the MPI-dependent subset of DOCA apps will skip-env-absent per the `doca-programming-guide ## sample-and-app-categorization` (`doca-programming-guide/TASKS.md#sample-and-app-categorization`) classification.
 
-5. **Apt-source consistency precheck (load-bearing for any subsequent install).** Before recommending ANY `apt install doca-*` line on a host that already has DOCA installed, the agent walks the apt-source precheck in [`doca-version TASKS.md ## apt-source consistency`](../doca-version/TASKS.md#apt-source-consistency) to surface the most common partial-install root cause: `/etc/apt/sources.list.d/doca.list` pointed at one release channel (e.g. `latest` or `3.5`) while the host's installed packages are pinned to a different release (e.g. `3.1.0105`). Installing on top of a mismatched source is the most common cause of *"my BlueField was rolled back to 3.1, but my host packages came back as 3.5 and now nothing works"* — the agent NEVER skips this precheck.
+5. **Apt-source consistency precheck (load-bearing for any subsequent install).** Before recommending ANY `apt install doca-*` line on a host that already has DOCA installed, the agent walks the apt-source precheck in `doca-version TASKS.md ## apt-source consistency` (`doca-version/TASKS.md#apt-source-consistency`) to surface the most common partial-install root cause: `/etc/apt/sources.list.d/doca.list` pointed at one release channel (e.g. `latest` or `3.5`) while the host's installed packages are pinned to a different release (e.g. `3.1.0105`). Installing on top of a mismatched source is the most common cause of *"my BlueField was rolled back to 3.1, but my host packages came back as 3.5 and now nothing works"* — the agent NEVER skips this precheck.
 
-6. **Set `LD_LIBRARY_PATH` for the runtime, if using the trace build flavor.** The program-side rationale for picking trace vs release lives in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes); the env mechanics here are: either link with the `doca-<lib>-trace` `pkg-config` module at build time, or set `LD_LIBRARY_PATH=/opt/mellanox/doca/lib/<arch>-linux-gnu/trace:$LD_LIBRARY_PATH` at runtime.
+6. **Set `LD_LIBRARY_PATH` for the runtime, if using the trace build flavor.** The program-side rationale for picking trace vs release lives in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the env mechanics here are: either link with the `doca-<lib>-trace` `pkg-config` module at build time, or set `LD_LIBRARY_PATH=/opt/mellanox/doca/lib/<arch>-linux-gnu/trace:$LD_LIBRARY_PATH` at runtime.
 
 7. **Mount and reserve hugepages.** Required by DPDK-based DOCA
    libraries (Flow in particular). Hugepages are global state: first
@@ -86,7 +86,10 @@ Steps the agent should walk the user through:
    impact, and obtain explicit approval. Never default to a fixed page
    count. This skill does not run a privileged write and does not
    pipe a value into `tee`. After approval, the operator applies the
-   count through the site privilege process. On BlueField Ubuntu 22.04,
+   count through the site privilege process. Note: the DOCA 3.5 default
+   BlueField OS is Ubuntu 24.04 with 64k pages, where the default
+   hugepage size is 512 MB, so the 2 MiB math above does not apply;
+   read `Hugepagesize` from `/proc/meminfo`. On BlueField Ubuntu 22.04,
    prefer `doca-hugepages config` then `doca-hugepages reload` (the
    helper owns allocation; `config` alone does not apply). Do not mix
    `doca-hugepages` with raw sysfs writes. If the workload requires a
@@ -101,11 +104,11 @@ Steps the agent should walk the user through:
 
 8. **Confirm device and representor visibility.** `devlink dev show` lists the network devices the kernel sees; `cat /sys/class/net/*/phys_port_name` shows the names of any active representors. If representors are expected but absent, first verify the target BDF, driver binding, SR-IOV/VF state, and current eswitch mode. Recommend `switchdev` only when that evidence and the version-matched deployment guide identify legacy eswitch mode as the cause; the change still requires explicit consent because it disrupts existing flows.
 
-9. **Sanity-check before any program work.** Confirm with the user: which BlueField (or which host PCIe slot), which install version, which mode (host / DPU / switch). If any of these is unclear, stop and ask. Once these are confirmed, hand off to [`doca-programming-guide ## configure`](../doca-programming-guide/TASKS.md#configure) for the program-side configuration.
+9. **Sanity-check before any program work.** Confirm with the user: which BlueField (or which host PCIe slot), which install version, which mode (host / DPU / switch). If any of these is unclear, stop and ask. Once these are confirmed, hand off to `doca-programming-guide ## configure` (`doca-programming-guide/TASKS.md#configure`) for the program-side configuration.
 
 ## build
 
-> **Anchor exists for lint compliance.** The substance of this verb — the canonical `pkg-config doca-<library>` + meson build pattern, in two language tracks (C/C++ direct, non-C via FFI) — moved to [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build) when the env / program split happened. *Building a DOCA application is a programming verb, not an env verb.*
+> **Anchor exists for lint compliance.** The substance of this verb — the canonical `pkg-config doca-<library>` + meson build pattern, in two language tracks (C/C++ direct, non-C via FFI) — moved to `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`) when the env / program split happened. *Building a DOCA application is a programming verb, not an env verb.*
 
 The env / program distinction is a CLASS distinction the agent must
 make before it picks an answer. Route by which side of the line the
@@ -113,10 +116,10 @@ question sits on:
 
 | The user asks ... | Route to ... | Reason |
 | --- | --- | --- |
-| "How do I build a DOCA application?" | [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build) | Programming verb. The canonical pattern + language tracks live there. |
-| "How do I build a DOCA Flow app?" | Same. Then layer [`doca-flow ## build`](../libs/doca-flow/TASKS.md#build). | Programming verb with library-specific overlay. |
+| "How do I build a DOCA application?" | `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`) | Programming verb. The canonical pattern + language tracks live there. |
+| "How do I build a DOCA Flow app?" | Same. Then layer `doca-flow ## build` (`doca-flow/TASKS.md#build`). | Programming verb with library-specific overlay. |
 | "Why does my build fail with `pkg-config` not finding `doca-flow`?" | [`## debug`](#debug) layer 3 + [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy) | Env-class symptom (PKG_CONFIG_PATH / install profile). |
-| "My build worked but `ld` says `cannot find -ldoca_flow`." | [`## debug`](#debug) layer 3 first; if env is clean, [`doca-debug ## debug`](../doca-debug/TASKS.md#debug) layer 4 (Link). | Could be either layer; rule env out first. |
+| "My build worked but `ld` says `cannot find -ldoca_flow`." | [`## debug`](#debug) layer 3 first; if env is clean, `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) layer 4 (Link). | Could be either layer; rule env out first. |
 
 The agent should never run an env-class build diagnosis against a
 programming question, and vice versa. The four rows above are the
@@ -124,16 +127,16 @@ CLASSES; specific symptoms are instances.
 
 ## modify
 
-> **Anchor exists for lint compliance.** The substance of this verb — the universal *derive a custom first application from a shipped sample* workflow, with C/C++ + non-C language tracks and an explicit precondition gate — moved to [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) when the env / program split happened. *Deriving a first app from a sample is a programming verb, not an env verb.*
+> **Anchor exists for lint compliance.** The substance of this verb — the universal *derive a custom first application from a shipped sample* workflow, with C/C++ + non-C language tracks and an explicit precondition gate — moved to `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`) when the env / program split happened. *Deriving a first app from a sample is a programming verb, not an env verb.*
 
 Route here only when the modify-class question is actually an env
 question in disguise:
 
 | The user asks ... | Route to ... | Reason |
 | --- | --- | --- |
-| "How do I derive a custom first app from a sample?" | [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify) | Programming verb. Owns the precondition table, the C/C++ + non-C tracks, the language-agnostic schema. |
+| "How do I derive a custom first app from a sample?" | `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`) | Programming verb. Owns the precondition table, the C/C++ + non-C tracks, the language-agnostic schema. |
 | "I have no DOCA install — how do I even reach a sample to modify?" | [`## no-install`](#no-install) below | Env-class prerequisite to the modify workflow. |
-| "I can't find any samples on disk." | [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package) | Routing-class question — where does the install put samples on disk. |
+| "I can't find any samples on disk." | `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`) | Routing-class question — where does the install put samples on disk. |
 | "Samples are there but the build fails." | [`## debug`](#debug) layers 1–3 first | Likely env-class; rule out before assuming sample-content bug. |
 
 The modify-from-sample workflow lives in programming-guide because it
@@ -142,7 +145,7 @@ preconditions that workflow assumes are already true.
 
 ## run
 
-> **Anchor exists for lint compliance.** The substance of this verb — running a built DOCA program, picking the right `--sdk-log-level`, mapping startup failures to env-class vs program-class — moved to [`doca-programming-guide ## run`](../doca-programming-guide/TASKS.md#run) when the env / program split happened. *Running a DOCA program is a programming verb; the env-class pre-run checklist (hugepages, devices, representors) is what this skill owns and what `## test` below verifies.*
+> **Anchor exists for lint compliance.** The substance of this verb — running a built DOCA program, picking the right `--sdk-log-level`, mapping startup failures to env-class vs program-class — moved to `doca-programming-guide ## run` (`doca-programming-guide/TASKS.md#run`) when the env / program split happened. *Running a DOCA program is a programming verb; the env-class pre-run checklist (hugepages, devices, representors) is what this skill owns and what `## test` below verifies.*
 
 The env-class pre-run checklist, listed here so an agent answering a
 "my program won't start" question has the canonical sequence before
@@ -159,7 +162,7 @@ escalating to programming-guide:
 All five must be green before the program's own startup can be
 debugged. A failure in any row is env-class; route to [`## debug`](#debug).
 A clean checklist with a still-failing program is programming-class;
-route to [`doca-programming-guide ## run`](../doca-programming-guide/TASKS.md#run).
+route to `doca-programming-guide ## run` (`doca-programming-guide/TASKS.md#run`).
 
 ## no-install
 
@@ -174,7 +177,7 @@ before any command. **Resume point inside the container:** once the user
 is inside Stage 1, they paste back `pkg-config --modversion doca-<library>`,
 `pkg-config --cflags --libs doca-<library>`, and
 `ls /opt/mellanox/doca/samples/<library>/<sample_name>/`; this skill then
-resumes from [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify).
+resumes from `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`).
 
 ### How to pick an NGC tag without guessing
 
@@ -191,7 +194,7 @@ NGC tag without guessing**, not just a generic Docker pull recommendation:
 3. After pulling that image, run `pkg-config --modversion doca-common`
    **inside the selected container**, not on the outer host. Compare the
    output with the intended DOCA release using
-   [doca-version](../doca-version/TASKS.md#configure). Record the exact image
+   `doca-version/TASKS.md#configure`. Record the exact image
    reference and observed version. A successful pull alone is not version
    verification; missing or mismatched output blocks the build handoff.
 
@@ -228,11 +231,11 @@ The four-step variant of the loop, in detail:
 
 1. **Install health check.** Run the [CAPABILITIES.md ## Observability](CAPABILITIES.md#observability) install-layer commands. Empty output where output is expected = install is wrong; do not proceed. If no install is reachable at all, this is a [`## no-install`](#no-install) situation. **Loop:** if any probe is unexpectedly empty, re-run after fixing (PKG_CONFIG_PATH set, profile reinstalled, etc.); do not skip ahead with one layer broken.
 
-2. **Capability snapshot.** `doca_caps` and (for Flow) the Flow capability-query API. Save the output. Library-internal capability cross-checks live in the library skill — for Flow, [`doca-flow CAPABILITIES.md ## Capabilities and modes`](../libs/doca-flow/CAPABILITIES.md#capabilities-and-modes). **Loop:** if a capability the user's program will need is missing, do *not* recommend code changes — back up to layer 1 and check that the version / firmware actually exposes it; the env may need adjusting first.
+2. **Capability snapshot.** `doca_caps` and (for Flow) the Flow capability-query API. Save the output. Library-internal capability cross-checks live in the library skill — for Flow, `doca-flow CAPABILITIES.md ## Capabilities and modes` (`doca-flow/CAPABILITIES.md#capabilities-and-modes`). **Loop:** if a capability the user's program will need is missing, do *not* recommend code changes — back up to layer 1 and check that the version / firmware actually exposes it; the env may need adjusting first.
 
-3. **Smoke-test by building and running one shipped sample.** A *known-good* sample built and run cleanly is the cheapest possible end-to-end install validation. Use the canonical build pattern in [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build) (Track 1 for C/C++) and the run pattern in [`doca-programming-guide ## run`](../doca-programming-guide/TASKS.md#run). Inside an NGC container, the build half is the meaningful smoke test; the run half against real traffic requires a hardware path. **Loop:** if the build fails, the layer-1 / layer-2 probes either missed something or the env has drifted between probes — re-run them in this session, do not assume yesterday's output.
+3. **Smoke-test by building and running one shipped sample.** A *known-good* sample built and run cleanly is the cheapest possible end-to-end install validation. Use the canonical build pattern in `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`) (Track 1 for C/C++) and the run pattern in `doca-programming-guide ## run` (`doca-programming-guide/TASKS.md#run`). Inside an NGC container, the build half is the meaningful smoke test; the run half against real traffic requires a hardware path. **Loop:** if the build fails, the layer-1 / layer-2 probes either missed something or the env has drifted between probes — re-run them in this session, do not assume yesterday's output.
 
-4. **Loopback / no-traffic run first, then introduce traffic.** Run the sample once with no real traffic offered to it. Successful start, clean shutdown, and zero counter increments is the expected baseline. **Loop:** if the no-traffic run is clean but the with-traffic run is not, the failure is almost certainly *program-class* now (the env passed every probe) — route to [`doca-programming-guide ## test`](../doca-programming-guide/TASKS.md#test) and stop drilling at the env layer.
+4. **Loopback / no-traffic run first, then introduce traffic.** Run the sample once with no real traffic offered to it. Successful start, clean shutdown, and zero counter increments is the expected baseline. **Loop:** if the no-traffic run is clean but the with-traffic run is not, the failure is almost certainly *program-class* now (the env passed every probe) — route to `doca-programming-guide ## test` (`doca-programming-guide/TASKS.md#test`) and stop drilling at the env layer.
 
 The loop terminates when one of:
 
@@ -241,27 +244,27 @@ The loop terminates when one of:
   broke and re-run that layer plus every downstream layer, because the
   fix may invalidate downstream evidence. Earlier independent layers
   need not be repeated.
-- The failure is reproducibly *not* env-class ⇒ hand off to [`doca-programming-guide ## test`](../doca-programming-guide/TASKS.md#test) with the captured probe outputs as evidence.
+- The failure is reproducibly *not* env-class ⇒ hand off to `doca-programming-guide ## test` (`doca-programming-guide/TASKS.md#test`) with the captured probe outputs as evidence.
 
 ## debug
 
-Goal: when something does not work, walk the layered diagnosis tree top-down so the agent does not jump to library-internal code-fix recommendations against an env-class symptom. This anchor is the **env-class half** of the layered debug ladder. The complementary **program-class half** (lifecycle, capability, error-description, library) lives in [`doca-programming-guide ## debug`](../doca-programming-guide/TASKS.md#debug). The **cross-cutting reference both halves escalate to** — tooling that spans env and program (`gdb`, `valgrind`, `ldd`, `strace`, `dmesg`, container introspection, core dumps, the `--sdk-log-level` and `doca-<lib>-trace` surfaces, the *Where to ask for help* escalation to the public Developer Forum) — lives in [`doca-debug ## debug`](../doca-debug/TASKS.md#debug). After completing layers (1)–(4) below, the natural next stop is `doca-debug ## debug` Layer 5 (Runtime) or `doca-programming-guide ## debug` for program-side errors.
+Goal: when something does not work, walk the layered diagnosis tree top-down so the agent does not jump to library-internal code-fix recommendations against an env-class symptom. This anchor is the **env-class half** of the layered debug ladder. The complementary **program-class half** (lifecycle, capability, error-description, library) lives in `doca-programming-guide ## debug` (`doca-programming-guide/TASKS.md#debug`). The **cross-cutting reference both halves escalate to** — tooling that spans env and program (`gdb`, `valgrind`, `ldd`, `strace`, `dmesg`, container introspection, core dumps, the `--sdk-log-level` and `doca-<lib>-trace` surfaces, the *Where to ask for help* escalation to the public Developer Forum) — lives in `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). After completing layers (1)–(4) below, the natural next stop is `doca-debug ## debug` Layer 5 (Runtime) or `doca-programming-guide ## debug` for program-side errors.
 
 Investigation order — **always**:
 
 1. **Install layer.** Re-run the [CAPABILITIES.md ## Observability](CAPABILITIES.md#observability) install-layer commands. If `pkg-config --modversion doca-common` itself fails, no library-internal advice is meaningful. If no install is reachable, this is a [`## no-install`](#no-install) situation.
 2. **Version layer.** `pkg-config --modversion doca-<lib>` against the user's runtime `doca_caps --version`. Mismatch ⇒ partial upgrade or stale build env; reinstall consistently before code changes.
-3. **Build layer.** Did the user build into `/tmp/build*` (correct) or in-tree (wrong; permission errors will mislead)? Did they pick the right build flavor (release vs trace; the program-side rationale lives in [`doca-programming-guide`](../doca-programming-guide/SKILL.md))? Build-time symptoms map to [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy).
+3. **Build layer.** Did the user build into `/tmp/build*` (correct) or in-tree (wrong; permission errors will mislead)? Did they pick the right build flavor (release vs trace; the program-side rationale lives in `doca-programming-guide/SKILL.md`)? Build-time symptoms map to [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy).
 4. **Runtime layer.** Hugepages mounted? Modules loaded? Representors visible? The matrix in [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy) maps each symptom to its likeliest cause.
-5. **Program / library layer.** Only after (1)–(4) are clean: route the conversation to [`doca-programming-guide ## debug`](../doca-programming-guide/TASKS.md#debug) for the universal lifecycle / capability / error-description / library order, and from there to the matching library skill (e.g. [`doca-flow ## debug`](../libs/doca-flow/TASKS.md#debug)) for library-specific overlays.
+5. **Program / library layer.** Only after (1)–(4) are clean: route the conversation to `doca-programming-guide ## debug` (`doca-programming-guide/TASKS.md#debug`) for the universal lifecycle / capability / error-description / library order, and from there to the matching library skill (e.g. `doca-flow ## debug` (`doca-flow/TASKS.md#debug`)) for library-specific overlays.
 
 If the agent finds itself recommending a code change before completing (1)–(4), it is jumping layers — back up.
 
 ## Deferred task verbs
 
-- **`install`.** Installing DOCA itself is a knowledge-map question. Defer to [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package) and [`## no-install`](#no-install) Path 0 for a host without DOCA.
-- **Build / first-app derivation / running a program.** These are programming verbs. After `## configure` and `## test` are green, hand off to [`doca-programming-guide`](../doca-programming-guide/SKILL.md).
-- **Library API specifics.** After the env is known-good, hand off to the matching library skill (for example [`doca-flow`](../libs/doca-flow/SKILL.md)).
+- **`install`.** Installing DOCA itself is a knowledge-map question. Defer to `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`) and [`## no-install`](#no-install) Path 0 for a host without DOCA.
+- **Build / first-app derivation / running a program.** These are programming verbs. After `## configure` and `## test` are green, hand off to `doca-programming-guide/SKILL.md`.
+- **Library API specifics.** After the env is known-good, hand off to the matching library skill (for example `doca-flow/SKILL.md`).
 
 ## Command appendix
 

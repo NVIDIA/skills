@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-erasure-coding`
-- Evaluation date: 2026-10-13
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.1% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 50.0% → 100.0% (+50.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 97.5% (+47.5 points) | 60.0% → 89.4% (+29.4 points) |
-| Efficiency | 67.4% — baseline ran, but no comparable score was available; uplift unavailable | 92.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.2% — baseline ran, but no comparable score was available; uplift unavailable | 85.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 87.5% → 100.0% (+12.5 points) | 50.0% → 75.0% (+25.0 points) |
+| Correctness | 50.0% → 100.0% (+50.0 points) | 55.0% → 100.0% (+45.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 51.7% → 83.8% (+32.1 points) | 43.8% → 96.9% (+53.1 points) |
+| Efficiency | 82.4% — baseline ran, but no comparable score was available; uplift unavailable | 71.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 855,221 | 1,173,129 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-erasure-coding.explicit-positive.v1 | 305,170 | 119,956 | +185,214 | +154.40% | skill 1/1; base 1/1 |
-| claude-code | doca-erasure-coding.implicit-positive.v1 | N/A | 959,927 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-erasure-coding.implicit-positive.v2 | 519,359 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-erasure-coding.negative.v1 | 30,692 | 93,246 | -62,554 | -67.08% | skill 1/1; base 1/1 |
-| codex | All cases | 727,747 | 968,028 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-erasure-coding.explicit-positive.v1 | 173,613 | 471,755 | -298,142 | -63.20% | skill 1/1; base 1/1 |
-| codex | doca-erasure-coding.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-erasure-coding.implicit-positive.v2 | 523,623 | 482,006 | +41,617 | +8.63% | skill 1/1; base 1/1 |
-| codex | doca-erasure-coding.negative.v1 | 30,511 | 14,267 | +16,244 | +113.86% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,582,968 | 2,141,157 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 1,671,747 | 2,204,540 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-erasure-coding.explicit-positive.v1 | 754,623 | 184,486 | +570,137 | +309.04% | skill 1/1; base 1/1 |
+| claude-code | doca-erasure-coding.implicit-positive.v1 | 853,927 | 1,896,739 | -1,042,812 | -54.98% | skill 1/1; base 1/1 |
+| claude-code | doca-erasure-coding.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-erasure-coding.negative.v1 | 63,197 | 123,315 | -60,118 | -48.75% | skill 1/1; base 1/1 |
+| codex | All cases | 889,779 | 1,638,889 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-erasure-coding.explicit-positive.v1 | 424,086 | 420,261 | +3,825 | +0.91% | skill 1/1; base 1/1 |
+| codex | doca-erasure-coding.implicit-positive.v1 | 435,232 | 1,204,262 | -769,030 | -63.86% | skill 1/1; base 1/1 |
+| codex | doca-erasure-coding.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-erasure-coding.negative.v1 | 30,461 | 14,366 | +16,095 | +112.04% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 2,561,526 | 3,843,429 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-erasure-coding/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-erasure-coding/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-erasure-coding`)
 - **MEDIUM** SECURITY/Indirect Prompt Extraction (P7): System Prompt Leakage: encode rule (`BENCHMARK.md:86`)
 - **MEDIUM** SECURITY/Indirect Prompt Extraction (P7): System Prompt Leakage: encode rule (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Indirect Prompt Extraction (P7): System Prompt Leakage: encode rule (`BENCHMARK.md:88`)
-- 13 additional finding(s) are available in the full evaluation artifacts.
+- 14 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

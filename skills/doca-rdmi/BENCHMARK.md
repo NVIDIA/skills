@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-rdmi`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 91.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 40.0% → 100.0% (+60.0 points) | 76.9% → 93.8% (+16.9 points) |
-| Efficiency | 87.1% — baseline ran, but no comparable score was available; uplift unavailable | 80.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 75.0% → 100.0% (+25.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 48.8% → 100.0% (+51.2 points) |
+| Efficiency | 79.8% — baseline ran, but no comparable score was available; uplift unavailable | 82.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 716,644 | 419,940 | +296,704 | +70.65% | skill 4/4; base 4/4 |
-| claude-code | doca-rdmi.explicit-positive.v1 | 228,273 | 29,964 | +198,309 | +661.82% | skill 1/1; base 1/1 |
-| claude-code | doca-rdmi.implicit-positive.v1 | 228,640 | 197,585 | +31,055 | +15.72% | skill 1/1; base 1/1 |
-| claude-code | doca-rdmi.implicit-positive.v2 | 228,616 | 160,521 | +68,095 | +42.42% | skill 1/1; base 1/1 |
-| claude-code | doca-rdmi.negative.v1 | 31,115 | 31,870 | -755 | -2.37% | skill 1/1; base 1/1 |
-| codex | All cases | 858,941 | 472,471 | +386,470 | +81.80% | skill 4/4; base 4/4 |
-| codex | doca-rdmi.explicit-positive.v1 | 260,435 | 227,151 | +33,284 | +14.65% | skill 1/1; base 1/1 |
-| codex | doca-rdmi.implicit-positive.v1 | 299,248 | 128,975 | +170,273 | +132.02% | skill 1/1; base 1/1 |
-| codex | doca-rdmi.implicit-positive.v2 | 284,989 | 102,518 | +182,471 | +177.99% | skill 1/1; base 1/1 |
-| codex | doca-rdmi.negative.v1 | 14,269 | 13,827 | +442 | +3.20% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,575,585 | 892,411 | +683,174 | +76.55% | skill 8/8; base 8/8 |
+| claude-code | All cases | 927,285 | 1,682,780 | -755,495 | -44.90% | skill 4/4; base 4/4 |
+| claude-code | doca-rdmi.explicit-positive.v1 | 274,617 | 149,899 | +124,718 | +83.20% | skill 1/1; base 1/1 |
+| claude-code | doca-rdmi.implicit-positive.v1 | 291,786 | 787,820 | -496,034 | -62.96% | skill 1/1; base 1/1 |
+| claude-code | doca-rdmi.implicit-positive.v2 | 294,790 | 650,602 | -355,812 | -54.69% | skill 1/1; base 1/1 |
+| claude-code | doca-rdmi.negative.v1 | 66,092 | 94,459 | -28,367 | -30.03% | skill 1/1; base 1/1 |
+| codex | All cases | 665,832 | 391,112 | +274,720 | +70.24% | skill 4/4; base 4/4 |
+| codex | doca-rdmi.explicit-positive.v1 | 160,174 | 72,863 | +87,311 | +119.83% | skill 1/1; base 1/1 |
+| codex | doca-rdmi.implicit-positive.v1 | 324,483 | 176,798 | +147,685 | +83.53% | skill 1/1; base 1/1 |
+| codex | doca-rdmi.implicit-positive.v2 | 150,035 | 127,566 | +22,469 | +17.61% | skill 1/1; base 1/1 |
+| codex | doca-rdmi.negative.v1 | 31,140 | 13,885 | +17,255 | +124.27% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,593,117 | 2,073,892 | -480,775 | -23.18% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -81,12 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/libs/doca-rdmi/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-rdmi/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-rdmi/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-rdmi`)
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:86`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without checking (`CAPABILITIES.md:38`)
-- 9 additional finding(s) are available in the full evaluation artifacts.
+- 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

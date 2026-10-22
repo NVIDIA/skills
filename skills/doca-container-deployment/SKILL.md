@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - container
@@ -58,14 +59,14 @@ the pod and runs the container).
 **If the developer has NOT yet decided container vs. bare-metal**
 (*"I just got a BlueField, what now?"*, *"my code is built, how do I
 run it?"*, *"how do I deploy this?"*), route them BACK to
-[`doca-setup`](../doca-setup/SKILL.md) first.
+`doca-setup/SKILL.md` first.
 That is the front-door routing decision. The wrong failure mode is
 to silently push every developer onto the container path because the
 agent loaded this skill first. `## recognize` detects the system
 shape, asks the minimum residual question, and lands the developer on
 either this skill (when the workload is a packaged DOCA service to
 drop on a BlueField) or the bare-metal-path sibling
-[`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)
+`doca-bare-metal-deployment/SKILL.md`
 (when the workload is a DOCA-linked application binary the developer
 launches directly).
 
@@ -78,13 +79,13 @@ overlays, follow the per-service skill under `skills/services/` that
 layers on top of this one — the supported overlays are Argus, DMS,
 Firefly, and UROM service. Flow-Inspector and OS-Inspector are
 policy-excluded from this public bundle; route them through
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 instead of applying this runtime overlay. Externally-productized
 NVIDIA services (BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
 Service as productized, …) are also out of scope and route through
 that map. If DOCA is
 not installed on the BlueField target yet, route to
-[`doca-setup`](../doca-setup/SKILL.md) first.
+`doca-setup/SKILL.md` first.
 
 ## Audience
 
@@ -147,7 +148,7 @@ service's config schema. Concretely:
 Do **not** load this skill for per-service config schema questions
 (those belong to the matching per-service skill); for installing
 DOCA itself or preparing the BlueField env (use
-[`doca-setup`](../doca-setup/SKILL.md)); for library-API
+`doca-setup/SKILL.md`); for library-API
 questions (use the matching `libs/<library>` skill); or for general
 Kubernetes-cluster operations (this skill covers kubelet *standalone*
 mode on the BlueField, not a full Kubernetes control plane).
@@ -185,10 +186,10 @@ on the Arm side, the BlueField OS image ships kubelet standalone +
 the container runtime per the public DOCA Container Deployment
 Guide, and the operator has the host-OS permissions that guide
 names. It does not cover installing DOCA — that path goes through
-[`doca-setup`](../doca-setup/SKILL.md) — and it does not
+`doca-setup/SKILL.md` — and it does not
 re-document the per-service config schema, which is the canonical
 concern of each DOCA service's public guide reached through
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Loading order
 
@@ -205,26 +206,26 @@ concern of each DOCA service's public guide reached through
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — public Container Deployment Guide, per-service guides, and
   NGC. Quote documented paths and tags from there; do not invent
   them.
-- [`doca-setup`](../doca-setup/SKILL.md) — env and install on the
+- `doca-setup/SKILL.md` — env and install on the
   BlueField target, including the recognize front door that
   chooses this skill vs bare-metal.
-- [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)
+- `doca-bare-metal-deployment/SKILL.md`
   — the sibling binary-launch path.
-- [`doca-debug`](../doca-debug/SKILL.md) — cross-cutting debug
+- `doca-debug/SKILL.md` — cross-cutting debug
   ladder this runtime's pod / image / ENTRYPOINT layers sit on.
-- [`doca-version`](../doca-version/SKILL.md) — four-way match and
+- `doca-version/SKILL.md` — four-way match and
   container-tag overlay.
-- [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — prefer structured status when present.
 - Per-service overlays:
-  [`doca-argus`](../services/doca-argus/SKILL.md),
-  [`doca-dms`](../services/doca-dms/SKILL.md),
-  [`doca-firefly`](../services/doca-firefly/SKILL.md),
-  [`doca-urom-svc`](../services/doca-urom-svc/SKILL.md).
-- [`doca-programming-guide`](../doca-programming-guide/SKILL.md)
+  `doca-argus/SKILL.md`,
+  `doca-dms/SKILL.md`,
+  `doca-firefly/SKILL.md`,
+  `doca-urom-svc/SKILL.md`.
+- `doca-programming-guide/SKILL.md`
   — program-side discipline when a service surfaces a library
   error.

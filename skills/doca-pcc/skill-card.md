@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides host-side loading, parameterization, capability discovery, and debugging of a custom Programmable Congestion Control algorithm on a BlueField DPU using the DOCA PCC library. <br>
+Guides hands-on host-side DOCA PCC work to load a custom Programmable Congestion Control algorithm onto a BlueField DPU — creating per-port `doca_pcc` contexts, loading a `dpacc`-compiled `doca_pcc_app` onto the `doca_dev`, parameterizing it, walking triple-axis capability discovery, and debugging `DOCA_ERROR_*` from `doca_pcc_*` calls. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying custom Programmable Congestion Control algorithms onto BlueField DPUs, using the host-side DOCA PCC library to create per-port contexts, load DPACC-compiled algorithm images, parameterize them, query capabilities, and debug DOCA_ERROR codes. <br>
+External developers consuming the DOCA PCC host-side C library use this skill to load a custom, dpacc-built congestion control algorithm onto a BlueField DPU port carrying RDMA/RoCE traffic, query which PCC features their DOCA install and BlueField firmware expose, and debug DOCA_ERROR_* failures from doca_pcc_* calls. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,14 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA PCC SDK Documentation](https://docs.nvidia.com/doca/sdk/DOCA-PCC/index.html) <br>
+- [DOCA PCC Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-PCC/index.html) <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
+- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions, Shell commands, Code] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -46,20 +44,20 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 tasks (3 positive, 1 negative) from skill-evaluator-dataset-snapshot/1, with 1 attempt per task in isolated k8s-sandbox pods. <br>
+4 evaluation tasks (3 positive, 1 negative); each task attempt ran in its own isolated sandbox pod in a k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Measures final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the right skill was loaded when needed. <br>
-- Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: 50% tool-call productivity and 50% token efficiency. <br>
+- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed, with decoys avoided. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and the expected workflow was followed. <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
@@ -68,17 +66,17 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-| Dimension | # Tasks | Claude Code | Codex |
-|---|---:|---:|---:|
-| Overall | 4 | 93.4% | 94.8% |
-| Security | 4 | 100.0% | 100.0% |
-| Correctness | 4 | 100.0% | 100.0% |
-| Discoverability | 4 | 100.0% | 93.3% |
-| Effectiveness | 4 | 73.1% | 95.6% |
-| Efficiency | 4 | 93.9% | 85.2% |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 95.5% | 94.1% |
+| Security | 87.5% → 100.0% (+12.5 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% | 86.7% |
+| Effectiveness | 23.8% → 83.5% (+59.7 points) | 38.1% → 97.5% (+59.4 points) |
+| Efficiency | 94.0% | 86.4% |
 
 ## Skill Version(s): <br>
-00a43cf (source: git SHA, committed 2026-10-11) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

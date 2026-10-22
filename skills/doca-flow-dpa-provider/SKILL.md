@@ -21,6 +21,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - flow
@@ -51,14 +52,14 @@ compatibility: >
 
 Follow Loading order below. Open the tasks companion for configure /
 export / debug. Open the capabilities companion for queue types
-and the handshake. Do not open every companion file.
+and the handshake.
 
 **Where to start:** This skill assumes DOCA is already
 installed, the user has a BlueField with a DPA processor that
 the host can see through DOCA, the user already programs DOCA
 Flow from the host (`doca-flow`) and already runs DPA kernels
 from the host (`doca-dpa` / DPACC compiler), and the user is
-doing **hands-on DPA Flow Provider work** — i.e. using
+doing **hands-on DPA Flow Provider work**: using
 `doca-flow-dpa-provider` to export an existing DOCA Flow pipe
 or external resource into the DPA address space so a DPA
 kernel can manipulate it inline. Open the tasks companion

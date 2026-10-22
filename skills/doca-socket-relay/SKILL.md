@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - socket
@@ -79,10 +80,10 @@ round-trip flow. Open the capabilities companion when the
 question is *what state can the relay carry, what does it report,
 and what does its data-path posture imply*. If the user has not
 installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
+`doca-setup/SKILL.md` first. If the user is
 asking about the host ↔ DPU **control plane** rather than the
 **data plane** the relay carries, route to
-[`doca-comch`](../../libs/doca-comch/SKILL.md) — the relay is the
+`doca-comch/SKILL.md` — the relay is the
 data-plane counterpart to comch.
 
 **How to use this skill.** Read this file, then search the companion file
@@ -146,7 +147,7 @@ the worked example is one instance.
   by the version overlay in
   the capabilities companion,
   which redirects to the canonical
-  [`doca-version`](../../doca-version/SKILL.md) rules and adds the
+  `doca-version/SKILL.md` rules and adds the
   Socket Relay specifics (presence check, host vs BlueField
   packaging, agreement with companion libraries).
 
@@ -177,10 +178,10 @@ device passthrough). Concretely:
 Do **not** load this skill for general DOCA orientation, the comch
 programming API, RDMA programming, line-rate raw packet I/O, or
 DOCA install. For those, route to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
-[`doca-comch`](../../libs/doca-comch/SKILL.md),
-[`doca-eth`](../../libs/doca-eth/SKILL.md), or
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`,
+`doca-comch/SKILL.md`,
+`doca-eth/SKILL.md`, or
+`doca-setup/SKILL.md`.
 
 ## What this skill provides
 
@@ -191,12 +192,12 @@ companion files:
   the three-axis configuration model (deployment shape × socket
   type / protocol × forwarding endpoint), the read-only vs
   state-changing operation split, the version-availability overlay
-  that redirects to [`doca-version`](../../doca-version/SKILL.md),
+  that redirects to `doca-version/SKILL.md`,
   the layered error taxonomy (tool-not-installed / relay-not-bound
   / host-app-not-connecting / DPU-side-terminator-not-reachable /
   permission / version / cross-cutting), the relay's role as the
   data-plane counterpart to
-  [`doca-comch`](../../libs/doca-comch/SKILL.md), and the
+  `doca-comch/SKILL.md`, and the
   high-stakes safety policy that makes a misconfigured forwarding
   endpoint a silent data-path break.
 - the tasks companion — step-by-step workflows for the in-scope task verbs:
@@ -207,7 +208,7 @@ companion files:
   (the smoke-before-bulk eval loop), `debug` (the layered
   diagnosis ladder), plus a `Deferred task verbs` block and a
   `Command appendix` that honors the bundle's
-  [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+  `doca-structured-tools-contract/SKILL.md`
   preamble.
 
 The skill assumes a host or BlueField where DOCA is already
@@ -257,7 +258,7 @@ pull requests should not add:
 
 ## Related skills
 
-- [`doca-comch`](../../libs/doca-comch/SKILL.md) — the host ↔ DPU
+- `doca-comch/SKILL.md` — the host ↔ DPU
   **control-plane** primitive (PCIe-based message channel between a
   host and a DPU process). The Socket Relay is the **data-plane**
   counterpart for socket-oriented applications: comch is what an
@@ -267,14 +268,14 @@ pull requests should not add:
   rewritten. Pair the two when an application owner is migrating
   in stages — control plane first via comch, data plane via the
   relay until a per-library rewrite is justified.
-- [`doca-eth`](../../libs/doca-eth/SKILL.md) — the line-rate raw
+- `doca-eth/SKILL.md` — the line-rate raw
   packet I/O surface that sits *below* the socket level. The relay
   presents a socket-shaped interface to the application and rides
   the underlying DOCA fabric; doca-eth is the right answer when
   the application can be rewritten to operate on packets directly
   rather than sockets, and when the throughput / latency profile
   the relay achieves is no longer sufficient.
-- [`doca-container-deployment`](../../doca-container-deployment/SKILL.md)
+- `doca-container-deployment/SKILL.md`
   — the BlueField service-runtime contract (kubelet standalone +
   static-pod manifests + per-service config-file mount). Load this
   alongside the present skill when the operator's chosen
@@ -282,29 +283,29 @@ pull requests should not add:
   rather than a host-side process; the runtime contract there owns
   the pod-spec / image-pull / static-pod / liveness pieces, this
   skill owns the relay-specific config.
-- [`doca-comm-channel-admin`](../doca-comm-channel-admin/SKILL.md)
+- `doca-comm-channel-admin/SKILL.md`
   — the operator-side admin CLI for comch channels. The
   list → inspect → decide pattern there is the same shape the
   Socket Relay uses for its own state: read-only inspection first,
   state-changing operations gated on a clean smoke. Both tools are
   members of the same family and the same patterns apply.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA Socket Relay guide and the rest of
   the public DOCA documentation set. The canonical URL is reached
-  via [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
-- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+  via `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
+- `doca-version/SKILL.md` — canonical DOCA
   version-handling rules. The `## Version compatibility` section
   in the capabilities companion is a concise overlay
   that redirects here for the body.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle's detect → prefer → fall back → report contract for
   structured helper tools. The Command appendix in
   the tasks companion honors this contract.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, representor visibility checks, and the *I
   have no install yet* path with the public NGC DOCA container.
   This skill assumes its preconditions are satisfied.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder. The Socket Relay slots in at the *runtime* layer
   as a data-path bridge whose layered error surface escalates to
   the cross-cutting ladder when the cause is below DOCA.

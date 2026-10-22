@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-bf4-deployment`
-- Evaluation date: 2026-10-14
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 3 evaluation tasks (2 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.1% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 55.6% → 83.3% (+27.7 points) | 66.1% → 100.0% (+33.9 points) |
-| Efficiency | 76.7% — baseline ran, but no comparable score was available; uplift unavailable | 65.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 82.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 66.1% → 100.0% (+33.9 points) | 66.1% → 88.3% (+22.2 points) |
+| Efficiency | 95.6% — baseline ran, but no comparable score was available; uplift unavailable | 73.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,15 +54,15 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 810,883 | 279,641 | +531,242 | +189.97% | skill 3/3; base 3/3 |
-| claude-code | doca-bf4-deployment.explicit-positive.v1 | 198,290 | 122,185 | +76,105 | +62.29% | skill 1/1; base 1/1 |
-| claude-code | doca-bf4-deployment.implicit-positive.v1 | 253,847 | 94,328 | +159,519 | +169.11% | skill 1/1; base 1/1 |
-| claude-code | doca-bf4-deployment.negative.v1 | 358,746 | 63,128 | +295,618 | +468.28% | skill 1/1; base 1/1 |
-| codex | All cases | 916,592 | 241,306 | +675,286 | +279.85% | skill 3/3; base 3/3 |
-| codex | doca-bf4-deployment.explicit-positive.v1 | 244,459 | 88,212 | +156,247 | +177.13% | skill 1/1; base 1/1 |
-| codex | doca-bf4-deployment.implicit-positive.v1 | 359,300 | 75,048 | +284,252 | +378.76% | skill 1/1; base 1/1 |
-| codex | doca-bf4-deployment.negative.v1 | 312,833 | 78,046 | +234,787 | +300.83% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,727,475 | 520,947 | +1,206,528 | +231.60% | skill 6/6; base 6/6 |
+| claude-code | All cases | 543,072 | 762,040 | -218,968 | -28.73% | skill 3/3; base 3/3 |
+| claude-code | doca-bf4-deployment.explicit-positive.v1 | 194,877 | 513,116 | -318,239 | -62.02% | skill 1/1; base 1/1 |
+| claude-code | doca-bf4-deployment.implicit-positive.v1 | 194,965 | 126,649 | +68,316 | +53.94% | skill 1/1; base 1/1 |
+| claude-code | doca-bf4-deployment.negative.v1 | 153,230 | 122,275 | +30,955 | +25.32% | skill 1/1; base 1/1 |
+| codex | All cases | 491,697 | 212,615 | +279,082 | +131.26% | skill 3/3; base 3/3 |
+| codex | doca-bf4-deployment.explicit-positive.v1 | 141,718 | 76,626 | +65,092 | +84.95% | skill 1/1; base 1/1 |
+| codex | doca-bf4-deployment.implicit-positive.v1 | 283,070 | 63,886 | +219,184 | +343.09% | skill 1/1; base 1/1 |
+| codex | doca-bf4-deployment.negative.v1 | 66,909 | 72,103 | -5,194 | -7.20% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,034,769 | 974,655 | +60,114 | +6.17% | skill 6/6; base 6/6 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -70,8 +70,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
 ## Findings and Observations
@@ -79,12 +79,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
-  "## Error taxonomy" in CAPABILITIES.md (lines 179-229)
-  vs "## debug" in TASKS.md (lines 319-359) (`CAPABILITIES.md:179`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/doca-bf4-deployment/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in details.md (`skills/doca-bf4-deployment/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: Description very long (1020 chars, recommend 50-150) (`skills/doca-bf4-deployment/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-bf4-deployment/SKILL.md`)
+- **LOW** QUALITY/quality_discoverability: Description very long (1019 chars, recommend 50-150) (`skills/doca-bf4-deployment/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/doca-bf4-deployment/SKILL.md`)
 - 6 additional finding(s) are available in the full evaluation artifacts.
 

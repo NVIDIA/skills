@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-comch`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 97.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 98.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 90.0% → 100.0% (+10.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 66.7% → 100.0% (+33.3 points) | 66.7% → 98.8% (+32.1 points) |
-| Efficiency | 83.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 67.9% → 99.4% (+31.5 points) | 63.3% → 87.5% (+24.2 points) |
+| Efficiency | 92.4% — baseline ran, but no comparable score was available; uplift unavailable | 94.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 625,929 | 311,405 | +314,524 | +101.00% | skill 4/4; base 4/4 |
-| claude-code | doca-comch.explicit-positive.v1 | 193,594 | 121,704 | +71,890 | +59.07% | skill 1/1; base 1/1 |
-| claude-code | doca-comch.implicit-positive.v1 | 151,635 | 63,341 | +88,294 | +139.39% | skill 1/1; base 1/1 |
-| claude-code | doca-comch.implicit-positive.v2 | 250,223 | 93,432 | +156,791 | +167.81% | skill 1/1; base 1/1 |
-| claude-code | doca-comch.negative.v1 | 30,477 | 32,928 | -2,451 | -7.44% | skill 1/1; base 1/1 |
-| codex | All cases | 427,872 | 161,784 | +266,088 | +164.47% | skill 4/4; base 4/4 |
-| codex | doca-comch.explicit-positive.v1 | 118,933 | 47,798 | +71,135 | +148.82% | skill 1/1; base 1/1 |
-| codex | doca-comch.implicit-positive.v1 | 120,090 | 32,784 | +87,306 | +266.31% | skill 1/1; base 1/1 |
-| codex | doca-comch.implicit-positive.v2 | 136,738 | 43,524 | +93,214 | +214.17% | skill 1/1; base 1/1 |
-| codex | doca-comch.negative.v1 | 52,111 | 37,678 | +14,433 | +38.31% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,053,801 | 473,189 | +580,612 | +122.70% | skill 8/8; base 8/8 |
+| claude-code | All cases | 678,060 | 461,149 | +216,911 | +47.04% | skill 4/4; base 4/4 |
+| claude-code | doca-comch.explicit-positive.v1 | 194,632 | 151,920 | +42,712 | +28.11% | skill 1/1; base 1/1 |
+| claude-code | doca-comch.implicit-positive.v1 | 246,490 | 124,783 | +121,707 | +97.53% | skill 1/1; base 1/1 |
+| claude-code | doca-comch.implicit-positive.v2 | 206,150 | 92,791 | +113,359 | +122.17% | skill 1/1; base 1/1 |
+| claude-code | doca-comch.negative.v1 | 30,788 | 91,655 | -60,867 | -66.41% | skill 1/1; base 1/1 |
+| codex | All cases | 465,605 | 170,619 | +294,986 | +172.89% | skill 4/4; base 4/4 |
+| codex | doca-comch.explicit-positive.v1 | 119,091 | 53,285 | +65,806 | +123.50% | skill 1/1; base 1/1 |
+| codex | doca-comch.implicit-positive.v1 | 153,498 | 27,608 | +125,890 | +455.99% | skill 1/1; base 1/1 |
+| codex | doca-comch.implicit-positive.v2 | 110,739 | 52,001 | +58,738 | +112.96% | skill 1/1; base 1/1 |
+| codex | doca-comch.negative.v1 | 82,277 | 37,725 | +44,552 | +118.10% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,143,665 | 631,768 | +511,897 | +81.03% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -81,11 +81,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-comch/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-comch`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo    (`BENCHMARK.md:85`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo    (`BENCHMARK.md:86`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo    (`SKILL.md:196`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo    (`BENCHMARK.md:87`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo      (`BENCHMARK.md:85`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo      (`BENCHMARK.md:86`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo      (`BENCHMARK.md:87`)
 - 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
