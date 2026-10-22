@@ -14,8 +14,8 @@ Inputs (hand-maintained):
   plugins.d/<name>.yml
       Catalog plugin spec. Drives full regeneration of plugins/<name>/
       (skills/ tree, .claude-plugin/plugin.json, .codex-plugin/plugin.json,
-      .cursor-plugin/plugin.json) and its entry in all three
-      marketplace.json files.
+      .cursor-plugin/plugin.json, portable plugin.json) and its entry in
+      all three marketplace.json files.
 
   plugins/<name>/.skills-manifest.yml
       Per-plugin skill manifest for hand-curated plugins. Only the skills/
@@ -30,6 +30,10 @@ Generated outputs (committed):
   plugins/<name>/.claude-plugin/plugin.json   (catalog plugins only)
   plugins/<name>/.codex-plugin/plugin.json    (catalog plugins only)
   plugins/<name>/.cursor-plugin/plugin.json   (catalog plugins only)
+  plugins/<name>/plugin.json                  (catalog plugins only; Agent
+                                               Plugins 1.0.0, read by Agent
+                                               Plugins compatible clients
+                                               such as Hermes)
   .claude-plugin/marketplace.json   (catalog plugin entries; others preserved)
   .agents/plugins/marketplace.json  (catalog plugin entries; others preserved)
   .cursor-plugin/marketplace.json   (catalog plugin entries; others preserved)
@@ -74,6 +78,8 @@ SKILLS_DIR = REPO_ROOT / "skills"
 CLAUDE_MARKETPLACE = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 AGENTS_MARKETPLACE = REPO_ROOT / ".agents" / "plugins" / "marketplace.json"
 CURSOR_MARKETPLACE = REPO_ROOT / ".cursor-plugin" / "marketplace.json"
+
+AGENT_PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
 
 # Default policy block written for every plugin entry in
 # .agents/plugins/marketplace.json. Mirrors the existing convention.
@@ -400,6 +406,41 @@ def render_cursor_plugin_json(spec: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def render_agent_plugin_json(spec: dict[str, Any]) -> dict[str, Any]:
+    """Render plugins/<name>/plugin.json for Agent Plugins 1.0.0 compatible
+    clients such as Hermes (`hermes plugins install NVIDIA/skills/plugins/<name>`).
+
+    The v1 schema (AGENT_PLUGIN_SCHEMA) is closed: `$schema` must be the
+    exact v1 URL, no top-level fields beyond the ones emitted here, and
+    `author` may only carry string name/email/url. Hermes refuses the whole
+    plugin when any of that is violated. Skills are discovered from
+    ./skills/ by convention, so there is no `skills` field, and the Codex
+    `interface` block has no v1 equivalent. v1 has no displayName either,
+    and `extensions` is reserved for data a client reads, so display_name
+    is dropped.
+    """
+    out: dict[str, Any] = {
+        "$schema": AGENT_PLUGIN_SCHEMA,
+        "name": spec["name"],
+        "version": str(spec.get("version", "1.0.0")),
+        "description": spec["description"],
+    }
+    author = spec.get("author")
+    if isinstance(author, dict):
+        agent_author = {
+            k: author[k] for k in ("name", "email", "url")
+            if isinstance(author.get(k), str) and author[k]
+        }
+        if agent_author:
+            out["author"] = agent_author
+    for key in ("homepage", "repository", "license"):
+        if key in spec:
+            out[key] = spec[key]
+    if "keywords" in spec:
+        out["keywords"] = list(spec["keywords"])
+    return out
+
+
 def build_catalog_plugin(spec: dict[str, Any]) -> str:
     # `name` is already validated for kebab-case + uniqueness in discover()
     # before specs reach this function.
@@ -417,6 +458,8 @@ def build_catalog_plugin(spec: dict[str, Any]) -> str:
     log("  ✓ .codex-plugin/plugin.json")
     write_json(plugin_dir / ".cursor-plugin" / "plugin.json", render_cursor_plugin_json(spec))
     log("  ✓ .cursor-plugin/plugin.json")
+    write_json(plugin_dir / "plugin.json", render_agent_plugin_json(spec))
+    log("  ✓ plugin.json")
 
     asset_fields = ["logo", "composer_icon"]
     asset_paths: list[str] = [spec[f] for f in asset_fields if isinstance(spec.get(f), str)]

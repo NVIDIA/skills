@@ -7,6 +7,7 @@ parses these files and (re)generates:
 - `plugins/<name>/.claude-plugin/plugin.json`
 - `plugins/<name>/.codex-plugin/plugin.json`
 - `plugins/<name>/.cursor-plugin/plugin.json`
+- `plugins/<name>/plugin.json` ([Agent Plugins 1.0.0](https://agent-plugins.org/schemas/1.0.0/plugin.schema.json) manifest, read by Agent Plugins compatible clients such as Hermes)
 - `plugins/<name>/skills/<skill-basename>/` &nbsp;**symlinks** into the canonical `skills/` catalog
 - `.claude-plugin/marketplace.json` (top-level Claude marketplace registry)
 - `.agents/plugins/marketplace.json` (top-level Codex marketplace registry)
