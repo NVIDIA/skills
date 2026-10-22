@@ -1269,11 +1269,18 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "isaac-humanoid-cloud-control",
+      "path": "skills/isaac-humanoid-cloud-control",
+      "content_digest": "sha256:4259cb2ee5498c7862925d1b34e37753196b7aeb8e414e3c79fdae006ed236b5",
+      "last_commit": "cde6f375396b8693f0978ef03299692fa149828f",
+      "last_modified": "2026-10-22"
+    },
+    {
       "name": "isaac-mission-control-showcase",
       "path": "skills/isaac-mission-control-showcase",
-      "content_digest": "sha256:add44a74fb5f559ace399da795a8cc5e5d73dccf671d567d90dd5af5980ebaa4",
-      "last_commit": "e37f30b0e4095ae323223ad16b180eb6c39e0bd0",
-      "last_modified": "2026-09-29"
+      "content_digest": "sha256:6bd64fc62cb118b924ccf5f72df016f4726522dc13e084ed78e82554fbf019f4",
+      "last_commit": "64747a4e0f35252452cb1b65da11976688d283b2",
+      "last_modified": "2026-10-22"
     },
     {
       "name": "jetson-build-source",
