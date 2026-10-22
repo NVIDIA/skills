@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 423,
-  "result_row_count": 3974,
+  "skill_count": 424,
+  "result_row_count": 3984,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -3618,14 +3618,34 @@
       "average_uplift_pct": 23.57
     },
     {
+      "skill": "isaac-humanoid-cloud-control",
+      "evaluation_date": "2026-10-22",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:e864e89308afa62c8f968b3061cb82e668f628b21b15e26ce6c91b79f3bbe565",
+      "validation_status": null,
+      "tasks": 15,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "isaac-humanoid-cloud-control",
+      "component": "Physical AI",
+      "has_results": true,
+      "average_uplift_pct": 30.57
+    },
+    {
       "skill": "isaac-mission-control-showcase",
-      "evaluation_date": "2026-09-29",
+      "evaluation_date": "2026-10-22",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:d2c173a3311d897cb3c7826dc32cf64d1af3996ab9598cf758d620afbb47d077",
       "validation_status": null,
       "tasks": 4,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -3635,7 +3655,7 @@
       "catalog_dir": "isaac-mission-control-showcase",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 46.77
+      "average_uplift_pct": 27.68
     },
     {
       "skill": "jetson-build-source",
@@ -23730,76 +23750,166 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "isaac-mission-control-showcase",
+      "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 20.0
     },
     {
-      "catalog_dir": "isaac-mission-control-showcase",
+      "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 30.0
+      "score_pct": 60.0,
+      "uplift_pct": 13.3
     },
     {
-      "catalog_dir": "isaac-mission-control-showcase",
+      "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.0,
-      "uplift_pct": 57.5
+      "score_pct": 78.7,
+      "uplift_pct": 50.7
     },
     {
-      "catalog_dir": "isaac-mission-control-showcase",
+      "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 63.0
+      "score_pct": 72.0,
+      "uplift_pct": 52.0
     },
     {
-      "catalog_dir": "isaac-mission-control-showcase",
+      "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.3,
+      "score_pct": 92.3,
       "uplift_pct": null
     },
     {
-      "catalog_dir": "isaac-mission-control-showcase",
+      "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 78.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "isaac-mission-control-showcase",
-      "component": "Physical AI",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 87.5,
-      "uplift_pct": 54.1
-    },
-    {
-      "catalog_dir": "isaac-mission-control-showcase",
-      "component": "Physical AI",
-      "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
       "score_pct": 80.0,
-      "uplift_pct": 51.0
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-humanoid-cloud-control",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 51.8,
+      "uplift_pct": 21.1
+    },
+    {
+      "catalog_dir": "isaac-humanoid-cloud-control",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 51.0,
+      "uplift_pct": 26.3
+    },
+    {
+      "catalog_dir": "isaac-humanoid-cloud-control",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-humanoid-cloud-control",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 65.0
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.9,
+      "uplift_pct": 31.3
+    },
+    {
+      "catalog_dir": "isaac-mission-control-showcase",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 73.8,
+      "uplift_pct": 42.3
     },
     {
       "catalog_dir": "isaac-mission-control-showcase",
@@ -23807,7 +23917,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.4,
+      "score_pct": 73.3,
       "uplift_pct": null
     },
     {
@@ -23816,7 +23926,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.7,
+      "score_pct": 77.4,
       "uplift_pct": null
     },
     {
