@@ -20,7 +20,7 @@ resolve_skills_dir() {
   return 1
 }
 
-# Upstream skills are owned by their own repositories and resolved at runtime.
+# Upstream skills belong to their own repositories and are resolved at runtime.
 # The runner drives them through the parent-owned reference adapters under
 # references/<component>/scripts/run.py, never by package-relative vendored
 # paths and never by a hardcoded upstream path. Nothing here clones, fetches,
@@ -912,34 +912,58 @@ start_static_tf() {
   "
 }
 
-# Nav2 subscribes to /scan. Isaac Sim 6.1 publishes the 2D LiDAR under the
-# sensor's own namespace, so relay whatever LaserScan topic exists onto /scan
-# rather than depending on the scene graph carrying a particular topic name.
+# Nav2 subscribes to /scan. The canonical warehouse publishes its navigation
+# LiDAR on /front_2d_lidar/scan, so use that explicit source rather than topic
+# discovery, which also reports silent topics that only have subscribers.
+FRONT_SCAN_TOPIC="/front_2d_lidar/scan"
+FRONT_SCAN_FRAME="front_2d_lidar"
+
 scan_topic_probe() {
-  local wait_s="$1"
-  timeout "$2" docker exec -i "$NOVA_CONTAINER" \
-    bash -lc "$ROS_SETUP_SNIPPET; exec python3 - $wait_s" <<'PYEOF'
+  local wait_s="$1" command_timeout="$2" topic="$3"
+  timeout "$command_timeout" docker exec -i "$NOVA_CONTAINER" \
+    bash -lc "$ROS_SETUP_SNIPPET; exec python3 - $wait_s '$topic' '$FRONT_SCAN_FRAME'" <<'PYEOF'
 import sys
 import time
 
 import rclpy
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
 
 rclpy.init()
 node = rclpy.create_node("showcase_scan_topic_probe")
 deadline = time.monotonic() + float(sys.argv[1])
-topics = []
-while time.monotonic() < deadline:
-    topics = [
-        name
-        for name, types in node.get_topic_names_and_types()
-        if "sensor_msgs/msg/LaserScan" in types
-    ]
-    if topics:
-        break
-    rclpy.spin_once(node, timeout_sec=0.5)
-if not topics:
-    sys.exit(1)
-print("/scan" if "/scan" in topics else sorted(topics)[0], end="")
+topic = sys.argv[2]
+expected_frame = sys.argv[3]
+observation = {"count": 0, "frame": None, "valid": False}
+
+
+def observe(message):
+    observation["count"] += 1
+    observation["frame"] = message.header.frame_id
+    observation["valid"] = message.header.frame_id == expected_frame
+
+
+node.create_subscription(
+    LaserScan,
+    topic,
+    observe,
+    qos_profile_sensor_data,
+)
+try:
+    while time.monotonic() < deadline and not observation["valid"]:
+        remaining = max(0.0, deadline - time.monotonic())
+        rclpy.spin_once(node, timeout_sec=min(0.2, remaining))
+    if not observation["valid"]:
+        print(
+            f"No {expected_frame} LaserScan received on {topic}; "
+            f"messages={observation['count']} last_frame={observation['frame']!r}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    print(topic, end="")
+finally:
+    node.destroy_node()
+    rclpy.shutdown()
 PYEOF
 }
 
@@ -949,17 +973,17 @@ ensure_scan_topic() {
     return 0
   fi
 
-  local source_topic
-  if ! source_topic="$(scan_topic_probe 90 120)"; then
-    echo "ERROR: no sensor_msgs/msg/LaserScan topic is being published." >&2
+  if scan_topic_probe 5 10 /scan >/dev/null 2>&1; then
+    echo "scan_topic=/scan (no relay needed)"
+    return 0
+  fi
+
+  local source_topic="$FRONT_SCAN_TOPIC"
+  if ! scan_topic_probe 90 120 "$source_topic" >/dev/null; then
+    echo "ERROR: no live $FRONT_SCAN_FRAME LaserScan was received on $source_topic." >&2
     echo "       The Isaac 2D LiDAR render product is not enabled; check the" >&2
     echo "       set_graph_attr lines in the restore_isaac output." >&2
     return 1
-  fi
-
-  if [[ "$source_topic" == "/scan" ]]; then
-    echo "scan_topic=/scan (no relay needed)"
-    return 0
   fi
 
   echo "scan_topic=$source_topic relaying to /scan"
@@ -984,7 +1008,7 @@ RELAYEOF
     "$ROS_SETUP_SNIPPET; exec python3 /tmp/showcase_scan_relay.py '$source_topic' /scan"
 
   local relayed
-  if ! relayed="$(scan_topic_probe 30 60)" || [[ "$relayed" != "/scan" ]]; then
+  if ! relayed="$(scan_topic_probe 30 60 /scan)" || [[ "$relayed" != "/scan" ]]; then
     echo "ERROR: relay from $source_topic to /scan did not come up" >&2
     return 1
   fi
