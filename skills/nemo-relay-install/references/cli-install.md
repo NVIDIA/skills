@@ -5,148 +5,64 @@ SPDX-License-Identifier: Apache-2.0
 
 # CLI Installation
 
-Use this path for the `nemo-relay` executable, a temporary coding-agent run,
-local gateway use, or explicit persistent host-plugin installation.
+Use this reference after establishing that the user needs the executable or a
+coding-agent host integration.
 
-## Contents
-
-- [Check Prerequisites](#check-prerequisites)
-- [Install](#install)
-- [Verify](#verify)
-- [Persistent Codex Desktop Safety Gate](#persistent-codex-desktop-safety-gate)
-
-## Check Prerequisites
-
-Confirm these prerequisites before selecting an installation command:
-
-- Confirm the operating system and architecture have a published CLI asset.
-- Use Cargo when the user prefers a source build or needs an unsupported
-  platform.
-- For a transparent run, confirm the selected `codex`, `claude`, or `hermes`
-  command is already on `PATH`.
-
-## Install
-
-Use the installer on a supported platform when a prebuilt release asset is
-available. Resolve a specific stable version from the NeMo Relay GitHub
-Releases page. Download that version's installer, review it, and run it as a
-separate step. Do not execute a response directly from the repository's `main`
-branch.
-
-For a supported Unix-like shell:
-
-```bash
-RELAY_VERSION="<release-version>"
-curl --fail --location --proto '=https' --tlsv1.2 \
-  "https://raw.githubusercontent.com/NVIDIA/NeMo-Relay/${RELAY_VERSION}/install.sh" \
-  --output nemo-relay-install.sh
-less nemo-relay-install.sh
-NEMO_RELAY_VERSION="${RELAY_VERSION}" sh nemo-relay-install.sh
-```
-
-For Windows PowerShell:
-
-```powershell
-$RelayVersion = "<release-version>"
-$Installer = "nemo-relay-install.ps1"
-Invoke-WebRequest `
-  -Uri "https://raw.githubusercontent.com/NVIDIA/NeMo-Relay/$RelayVersion/install.ps1" `
-  -OutFile $Installer
-Get-Content -LiteralPath $Installer
-$env:NEMO_RELAY_VERSION = $RelayVersion
-& ".\$Installer"
-```
-
-The reviewed installer downloads the selected release binary and its published
-SHA-256 checksum, verifies them before replacing an existing binary, and does
-not invoke `sudo`. Remove the downloaded installer only after verification if
-the user does not want to retain it for audit.
-
-Use Cargo on an unsupported platform or when the user prefers to build from
-source:
-
-```bash
-cargo install nemo-relay-cli
-```
-
-## Verify
-
-Run:
-
-```bash
-nemo-relay --version
-```
-
-For transparent-run readiness, optionally preview the generated temporary hook
-configuration, gateway environment, gateway URL, and final command:
-
-```bash
-nemo-relay run --agent <agent> --dry-run --print
-```
-
-After installation, hand a generic trial to `nemo-relay-get-started`. Its
-default path launches the selected coding agent with `nemo-relay codex`,
-`nemo-relay claude`, `nemo-relay hermes`, or `nemo-relay run -- <command>`.
-The wrapper is temporary for that process.
-
-Use persistent host-plugin installation only when the user explicitly wants
-Claude Code or Codex to load Relay through the host plugin system. Validate that
-path with `nemo-relay doctor --plugin <host>`.
-
-## Persistent Codex Desktop Safety Gate
-
-Apply this gate when the current client is Codex Desktop or the user wants
-Relay to remain active in Codex Desktop after restart.
-
-Persistent installation configures the `nemo-relay-openai` provider in global
-Codex configuration. Codex Desktop currently filters visible threads by the
-active provider, so existing `openai` threads, including the setup thread, may
-appear missing after restart. This is a visibility bug, not session deletion.
-
-Before changing persistent configuration:
-
-> **WARNING:** Persistent Codex installation changes global application
-> configuration and can make existing Desktop threads appear missing after
-> restart. Complete the recovery-file steps and obtain explicit confirmation
-> before making this change.
-
-1. Explain the difference between temporary `nemo-relay codex` and persistent
-   `nemo-relay install codex`. Recommend temporary mode for evaluation.
-2. Preview the persistent change without writing it:
-
-   ```bash
-   nemo-relay install codex --dry-run
-   ```
-
-3. Propose creating `NEMO_RELAY_CODEX_DESKTOP_RECOVERY.md` in the current
-   workspace root from `assets/codex-desktop-recovery.md`.
-4. Ask for confirmation covering both the recovery file and persistent Codex
-   configuration.
-5. Render the file with the current date, workspace path, planned command, and
-   thread ID when available. Verify it is readable before installing.
-6. Run `nemo-relay install codex`, then verify with
-   `nemo-relay doctor --plugin codex`.
-7. Before asking the user to restart Desktop, give them the exact recovery-file
-   path. Do not stage or commit the generated recovery file unless requested.
-
-The recovery file must include both supported exits:
-
-- Restore normal Desktop visibility by fully quitting Desktop, running
-  `nemo-relay uninstall codex`, and restarting Desktop.
-- Continue an existing conversation through temporary Relay wiring by fully
-  quitting Desktop and running `nemo-relay codex -- resume --all` or
-  `nemo-relay codex -- resume <thread-id>`.
-
-Avoid `resume --last` when crossing providers. Never directly inspect, copy,
-delete, edit, or rewrite Codex session storage, private application
-configuration, or SQLite state as a migration workaround. Supported
-`nemo-relay` commands may manage Relay-generated provider and hook
-configuration.
-
-Use these references for the supported installation and host-integration paths:
+## Read Current Instructions
 
 - [Installation](https://docs.nvidia.com/nemo/relay/getting-started/installation)
-- [Transparent run](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/basic-usage#transparent-run)
-- [Codex integration](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/codex)
-- [Persistent plugin installation](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/plugin-installation)
-- [Codex Desktop provider-filter bug](https://github.com/openai/codex/issues/24648)
+- [Support matrix](https://docs.nvidia.com/nemo/relay/reference/support-matrix)
+- [Latest stable release](https://github.com/NVIDIA/NeMo-Relay/releases/latest)
+- [CLI usage](https://docs.nvidia.com/nemo/relay/latest/nemo-relay-cli/basic-usage)
+- [Persistent host installation](https://docs.nvidia.com/nemo/relay/latest/nemo-relay-cli/plugin-installation)
+
+Resolve the current stable release and supported platform before deriving the
+command. Use its documented installer or package route and verify integrity
+before execution. Build from source only when selected by the user or needed
+for a confirmed platform gap; explain that choice.
+
+For coding agents, read the chosen host's current integration instructions for
+host prerequisites, authentication, supported protocols, and whether an
+in-process extension is required. Do not promise that every host supports a
+fully temporary wrapper. Distinguish persistent host changes from a temporary
+gateway session.
+
+Verify executable and host readiness using the current documented checks.
+Do not change provider configuration, start a gateway, or run a model prompt
+as basic executable verification. Hand the established target to get-started.
+
+## Persistent Codex Desktop Continuity
+
+Read the [Codex integration guide](https://docs.nvidia.com/nemo/relay/latest/nemo-relay-cli/codex)
+and the [provider-filtering issue](https://github.com/openai/codex/issues/24648).
+Check whether the issue still applies to the user's setup rather than asserting
+that an infrequently updated skill proves a current bug.
+
+When the selected release and setup change provider identity, explain that
+existing Desktop conversations can appear hidden without deletion. Scope that
+warning to affected setups, such as a legacy `nemo-relay-openai` alias; check
+whether the selected installer preserves the built-in `openai` identity.
+Recommend a temporary trial first when it satisfies the user's goal.
+
+Before an explicitly selected persistent installation:
+
+1. Preview the supported installer change and any relevant continuity risk.
+2. Propose a recovery note in the workspace root using
+   `assets/codex-desktop-recovery.md`; confirm its recovery commands against
+   the current supported documentation.
+3. Obtain explicit confirmation covering the note and global configuration.
+4. Render `NEMO_RELAY_CODEX_DESKTOP_RECOVERY.md`, record the resolved Relay
+   release, planned provider identity, change, and available thread ID, and
+   verify that the file is readable.
+5. Run the supported installer and its documented diagnostic check.
+6. Give the user the recovery-file path before any requested Desktop restart.
+
+For recovery or continuation, use supported uninstall and temporary-resume
+instructions from the current guide. Fully quit Desktop before resuming the
+same local conversation. Avoid selecting the most recent conversation
+implicitly when switching providers.
+
+Never inspect, copy, delete, edit, or rewrite Codex session files, private
+application configuration, or SQLite state as a workaround. Supported Relay
+commands may manage the provider and hooks they generate. Do not stage the
+recovery note unless requested.
