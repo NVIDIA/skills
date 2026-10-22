@@ -6,7 +6,7 @@ names the recurring `doca_flow_dpa_perf`-class questions. Pick the
 pattern first, then drill into the H2 that owns the substance. For
 the *how* of executing each pattern, jump to [TASKS.md](TASKS.md).
 For the `doca-flow` API behind the pipeline this tool drives, see
-[`doca-flow CAPABILITIES.md`](../../libs/doca-flow/CAPABILITIES.md);
+`doca-flow/CAPABILITIES.md`;
 for the DPA programming model behind the device-side execution
 engine, see
 `doca-dpa CAPABILITIES.md`.
@@ -27,7 +27,7 @@ specific board.
 
 | `doca_flow_dpa_perf` pattern | Class shape | Where the substance lives |
 | --- | --- | --- |
-| 1. Pick the right tool | DPA-vs-host path is the load-bearing decision. This tool measures the DPA-offloaded Flow update / disable path; [`doca-flow-perf`](../doca-flow-perf/SKILL.md) measures the host / DPU-CPU Flow path. Quoting a number without naming the tool that produced it is the cross-tool apples-to-oranges failure. | [`## Capabilities and modes`](#capabilities-and-modes) DPA-vs-host bullet + [TASKS.md ## configure](TASKS.md#configure) |
+| 1. Pick the right tool | DPA-vs-host path is the load-bearing decision. This tool measures the DPA-offloaded Flow update / disable path; `doca-flow-perf/SKILL.md` measures the host / DPU-CPU Flow path. Quoting a number without naming the tool that produced it is the cross-tool apples-to-oranges failure. | [`## Capabilities and modes`](#capabilities-and-modes) DPA-vs-host bullet + [TASKS.md ## configure](TASKS.md#configure) |
 | 2. Check DPA preconditions | The DPA-Provider library uses the DPA device. Hardware is gated: ConnectX-7 is the minimum supported ConnectX generation, ConnectX-8 is recommended, and BlueField-3 is supported. SFs are not supported on the DPA path. VNF Flow mode is required per the shipped README. | [`## Capabilities and modes`](#capabilities-and-modes) device-preconditions table + [TASKS.md ## configure](TASKS.md#configure) |
 | 3. Pick the active / passive device split | Two-port boards run the active device for steering + the passive device for outgoing traffic; one-port boards run active only. Picking the wrong split is a configuration error, not a measurement error. | [`## Capabilities and modes`](#capabilities-and-modes) device-split bullet + [TASKS.md ## configure](TASKS.md#configure) |
 | 4. Pick the workload-shape axes | Burst size, queue size, completion threshold, number of PSL tables, table size, number of workers, hash pipe algorithm, work policy, operation (update vs disable). Each axis is documented in the shipped README on the user's install and in the public guide; picking one set silently narrows the answer. | [`## Capabilities and modes`](#capabilities-and-modes) workload-shape table + [TASKS.md ## configure](TASKS.md#configure) |
@@ -70,7 +70,7 @@ measures *that* path specifically.
 | Surface | What it measures | When to reach for it |
 | --- | --- | --- |
 | **`doca_flow_dpa_perf`** (this skill) | The update / disable rate of the DPA-offloaded Flow rule path on a DPA-capable device | Question is *"how fast can the DPA program path-selector entries"* on hardware that supports it |
-| [`doca-flow-perf`](../doca-flow-perf/SKILL.md) | The throughput / latency / rule-install rate of the host / DPU-CPU Flow path | Question is *"how fast does the host / DPU CPU drive the Flow library"*; works on a broader hardware set |
+| `doca-flow-perf/SKILL.md` | The throughput / latency / rule-install rate of the host / DPU-CPU Flow path | Question is *"how fast does the host / DPU CPU drive the Flow library"*; works on a broader hardware set |
 
 The downstream rule: name which tool produced which number.
 Two Kops/sec numbers without a tool name are not comparable.
@@ -81,7 +81,7 @@ The Flow DPA Provider uses the DPA device; the shipped README
 states the hardware support set explicitly. The agent's rule:
 *do not invoke this tool on hardware outside the supported set;
 the right response is to route to host-side
-[`doca-flow-perf`](../doca-flow-perf/SKILL.md) instead*.
+`doca-flow-perf/SKILL.md` instead*.
 
 | Hardware class | Supported by this tool? | Notes from the shipped README |
 | --- | --- | --- |
@@ -152,7 +152,7 @@ not invent one from prose.
 
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-
-docs rule, see [`doca-version`](../../doca-version/SKILL.md).
+docs rule, see `doca-version/SKILL.md`.
 The body lives there; this skill does not duplicate it.
 
 **The `doca_flow_dpa_perf`-specific overlay** is:
@@ -162,11 +162,11 @@ The body lives there; this skill does not duplicate it.
   the install ships, and the DPA programming runtime the
   install ships must all come from the same DOCA install.
   Cross-train pairings are partial-install hazards per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility);
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`);
   the right answer for *"the tool runs but reports
   implausible numbers"* is to confirm the four-way match
   first per
-  [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test).
+  `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`).
 - **The DPA execution engine is firmware-version-sensitive.**
   Per the shipped README, the LAG / multi-port-Eswitch
   preconditions named there are firmware-gated, and DPA-side
@@ -199,7 +199,7 @@ agent should distinguish, in escalating order:
    not exist in `--help` on the installed version. Routing:
    re-read `--help`, the shipped README, and the public DOCA
    Flow DPA Perf guide via
-   [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools);
+   `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`);
    do not guess.
 2. **Device-binding.** Invocation parses; the tool cannot
    bind the active / passive devices. Cause: the PCI address
@@ -207,11 +207,11 @@ agent should distinguish, in escalating order:
    to a one-port board, the device is SF (unsupported on
    DPA per the shipped README), or the driver stack is not
    loaded. Routing: confirm the device is visible to DOCA at
-   all via [`doca-caps ## run`](../doca-caps/TASKS.md#run);
+   all via `doca-caps ## run` (`doca-caps/TASKS.md#run`);
    confirm the device class is in the supported set per
    [`## Capabilities and modes`](#capabilities-and-modes);
    confirm the `mlx5_core` driver stack is loaded per
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 3. **DPA-precondition.** Device bound; the DPA path refuses
    to start. Cause: the device is not DPA-capable
    (BlueField-2, older ConnectX), VNF Flow mode is not
@@ -258,17 +258,17 @@ agent should distinguish, in escalating order:
    during the pause.
 7. **Version.** Cross-cutting partial-install / mixed-
    version layer per
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
    Symptoms: tool version disagrees with
    `pkg-config --modversion doca-flow`, DPA programming
    runtime version disagrees with the tool's expectations,
    firmware band changed underneath the install. Routing:
-   walk [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   walk `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    before any further investigation.
 8. **Cross-cutting.** The cause is below DOCA — driver,
    firmware, NUMA, BlueField mode, hugepages. Routing:
-   hand off to [`doca-debug ## debug`](../../doca-debug/SKILL.md)
-   and [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug);
+   hand off to `doca-debug ## debug` (`doca-debug/SKILL.md`)
+   and `doca-setup ## debug` (`doca-setup/TASKS.md#debug`);
    the tool's surface has reached its limit.
 
 `doca_flow_dpa_perf` does not itself participate in the
@@ -276,7 +276,7 @@ cross-library `DOCA_ERROR_*` taxonomy in the way an
 application-linked library does; the tool is a CLI driving
 libraries. For the cross-library `DOCA_ERROR_*` family and the
 program-side debug order, see
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 
 ## Observability
 
@@ -304,20 +304,20 @@ self-test path. Specifically:
   effective defaults) pair is documented.
 - **Operator-side env primitives.** The tool does not emit
   cross-cutting env metrics of its own; those live in
-  [`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability)
+  `doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`)
   (representor enumeration, `devlink dev show`, `mlxconfig`).
   Capture them alongside the tool's output for downstream
   diagnosis.
 
 For the program-side observability surface
 (`DOCA_LOG_LEVEL`, `--sdk-log-level`) see
-[`doca-programming-guide CAPABILITIES.md ## Observability`](../../doca-programming-guide/CAPABILITIES.md#observability).
+`doca-programming-guide CAPABILITIES.md ## Observability` (`doca-programming-guide/CAPABILITIES.md#observability`).
 For the DPA-side execution-engine observability see
 `doca-dpa CAPABILITIES.md ## Observability`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 `doca_flow_dpa_perf` *does* drive hardware: it binds the active
 (and optionally passive) device, allocates DPA execution
@@ -340,7 +340,7 @@ resources, and programs path-selector entries. The safety rules:
   (command line + DOCA version + device + as-deployed
   environment) tuple AND the tool name. Comparing a number
   from this tool to a number from
-  [`doca-flow-perf`](../doca-flow-perf/SKILL.md) without
+  `doca-flow-perf/SKILL.md` without
   naming both tools is the cross-tool apples-to-oranges
   failure.
 - **Do not invent flags or default values.** The documented
@@ -358,7 +358,7 @@ resources, and programs path-selector entries. The safety rules:
 The single canonical public source for `doca_flow_dpa_perf` is
 the **DOCA Flow DPA Perf** page on `docs.nvidia.com`, reachable
 through
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 The second source on the user's install is the shipped
 `README.md` under the tool's source tree. Do not invent flags,
 default values, workload-axis identifiers, or output column
@@ -367,6 +367,6 @@ names beyond what those pages document — and re-verify against
 support means the *available* surface is install-specific
 within the *documented* surface. For the Flow library behind
 the pipeline this tool drives, see
-[`doca-flow`](../../libs/doca-flow/SKILL.md); for the DPA
+`doca-flow/SKILL.md`; for the DPA
 programming model behind the execution engine, see
 `doca-dpa`.

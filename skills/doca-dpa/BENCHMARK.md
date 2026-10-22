@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-dpa`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.7% — baseline ran, but no comparable score was available; uplift unavailable | 97.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.3% — baseline ran, but no comparable score was available; uplift unavailable | 96.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 53.8% → 89.4% (+35.6 points) | 60.0% → 100.0% (+40.0 points) |
-| Efficiency | 84.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.6% → 71.3% (+20.7 points) | 56.9% → 96.9% (+40.0 points) |
+| Efficiency | 85.4% — baseline ran, but no comparable score was available; uplift unavailable | 94.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,201,395 | 594,450 | +606,945 | +102.10% | skill 4/4; base 4/4 |
-| claude-code | doca-dpa.explicit-positive.v1 | 356,484 | 215,339 | +141,145 | +65.55% | skill 1/1; base 1/1 |
-| claude-code | doca-dpa.implicit-positive.v1 | 450,002 | 126,595 | +323,407 | +255.47% | skill 1/1; base 1/1 |
-| claude-code | doca-dpa.implicit-positive.v2 | 363,522 | 125,801 | +237,721 | +188.97% | skill 1/1; base 1/1 |
-| claude-code | doca-dpa.negative.v1 | 31,387 | 126,715 | -95,328 | -75.23% | skill 1/1; base 1/1 |
-| codex | All cases | 514,136 | 215,299 | +298,837 | +138.80% | skill 4/4; base 4/4 |
-| codex | doca-dpa.explicit-positive.v1 | 171,079 | 54,248 | +116,831 | +215.36% | skill 1/1; base 1/1 |
-| codex | doca-dpa.implicit-positive.v1 | 154,613 | 36,602 | +118,011 | +322.42% | skill 1/1; base 1/1 |
-| codex | doca-dpa.implicit-positive.v2 | 143,971 | 56,476 | +87,495 | +154.92% | skill 1/1; base 1/1 |
-| codex | doca-dpa.negative.v1 | 44,473 | 67,973 | -23,500 | -34.57% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,715,531 | 809,749 | +905,782 | +111.86% | skill 8/8; base 8/8 |
+| claude-code | All cases | 1,143,438 | 627,836 | +515,602 | +82.12% | skill 4/4; base 4/4 |
+| claude-code | doca-dpa.explicit-positive.v1 | 407,241 | 253,210 | +154,031 | +60.83% | skill 1/1; base 1/1 |
+| claude-code | doca-dpa.implicit-positive.v1 | 352,435 | 93,494 | +258,941 | +276.96% | skill 1/1; base 1/1 |
+| claude-code | doca-dpa.implicit-positive.v2 | 320,096 | 154,854 | +165,242 | +106.71% | skill 1/1; base 1/1 |
+| claude-code | doca-dpa.negative.v1 | 63,666 | 126,278 | -62,612 | -49.58% | skill 1/1; base 1/1 |
+| codex | All cases | 484,603 | 208,579 | +276,024 | +132.34% | skill 4/4; base 4/4 |
+| codex | doca-dpa.explicit-positive.v1 | 204,999 | 66,778 | +138,221 | +206.99% | skill 1/1; base 1/1 |
+| codex | doca-dpa.implicit-positive.v1 | 140,454 | 37,951 | +102,503 | +270.09% | skill 1/1; base 1/1 |
+| codex | doca-dpa.implicit-positive.v2 | 87,941 | 71,886 | +16,055 | +22.33% | skill 1/1; base 1/1 |
+| codex | doca-dpa.negative.v1 | 51,209 | 31,964 | +19,245 | +60.21% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,628,041 | 836,415 | +791,626 | +94.65% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -83,10 +83,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **CRITICAL** CONTENT_DEDUP/llm_prompt_size_limit: A Tier 2 cluster exceeds the LLM prompt character limit. (`skills/libs/doca-dpa`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-dpa/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-dpa/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-dpa`)
 - **LOW** QUALITY/quality_discoverability: Description very long (904 chars, recommend 50-150) (`skills/libs/doca-dpa/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/libs/doca-dpa/SKILL.md`)
-- 8 additional finding(s) are available in the full evaluation artifacts.
+- 10 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

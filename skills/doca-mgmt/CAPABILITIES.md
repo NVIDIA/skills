@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 capabilities (install, configure, build, modify, run, test, debug,
 use) see [TASKS.md](TASKS.md). For where the underlying public
 documentation and installed package paths live, defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) — do
+`doca-public-knowledge-map/SKILL.md` — do
 not duplicate URLs or install paths in this file.
 
 ## Pattern overview
@@ -36,7 +36,7 @@ Two cross-cutting rules that apply to *every* pattern above:
   the matching `_get` / `_query` against the current state. The
   pre-state is what the rollback path quotes; without it,
   rollback is impossible. This is the
-  [`doca-hardware-safety` pre-flight inventory](../../doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes)
+  `doca-hardware-safety` pre-flight inventory (`doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes`)
   rule applied at the API surface.
 - **Capability-supported-first.** Each sub-domain has a
   capability gate: for icm-quota, `doca_mgmt_cap_icm_quota_is_supported`;
@@ -65,9 +65,9 @@ They are NOT interchangeable; pick one before writing any code:
 | Surface | Shape | When to pick |
 | --- | --- | --- |
 | `doca-mgmt` (this skill) | Programmatic point-in-time C API for *querying and modifying* device-level state | The fleet tool needs to read or write device-level state through code; the operation is request/response, not streaming |
-| [`doca-telemetry`](../doca-telemetry/SKILL.md) + [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md) | Streaming telemetry producer + exporter for continuous device metrics | The fleet tool needs continuous time-series metrics (counters, gauges, histograms) rather than a one-off query |
-| [`doca-caps`](../../tools/doca-caps/SKILL.md) | Read-only CLI snapshot of device capabilities | The operator wants an interactive look at what a device supports, not a programmatic interface in a fleet agent |
-| [`doca-bench`](../../tools/doca-bench/SKILL.md) | Live performance benchmark for DOCA workloads | The user wants to measure throughput / latency of a DOCA workload, not query or modify device state |
+| `doca-telemetry/SKILL.md` + `doca-telemetry-exporter/SKILL.md` | Streaming telemetry producer + exporter for continuous device metrics | The fleet tool needs continuous time-series metrics (counters, gauges, histograms) rather than a one-off query |
+| `doca-caps/SKILL.md` | Read-only CLI snapshot of device capabilities | The operator wants an interactive look at what a device supports, not a programmatic interface in a fleet agent |
+| `doca-bench/SKILL.md` | Live performance benchmark for DOCA workloads | The user wants to measure throughput / latency of a DOCA workload, not query or modify device state |
 
 **Decision rule for the agent.** If the user's intent is *"my
 fleet agent needs to programmatically read or write device-level
@@ -102,7 +102,7 @@ operations that don't have a dedicated sub-domain surface. The
 
 | Scope | Class of operation | What the agent does before recommending it |
 | --- | --- | --- |
-| `DOCA_MGMT_CMD_SCOPE_CONFIGURATION` | Configuration writes that change device-visible state and persist | Capture pre-state; name rollback; cross-link [`doca-hardware-safety` ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) for the change-application discipline |
+| `DOCA_MGMT_CMD_SCOPE_CONFIGURATION` | Configuration writes that change device-visible state and persist | Capture pre-state; name rollback; cross-link `doca-hardware-safety` ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) for the change-application discipline |
 | `DOCA_MGMT_CMD_SCOPE_DEBUG_WRITE_FULL` | The widest debug-write surface; can mutate firmware-side state with broad blast radius | All of the above PLUS the maintenance-window + OOB-precondition rule from the meta-policy; refuse if either is missing |
 | `DOCA_MGMT_CMD_SCOPE_DEBUG_WRITE` | A debug-write that mutates state with narrower scope than `WRITE_FULL` | Pre-state capture, documented rollback, capability confirmation, and post-write re-query are mandatory. Maintenance-window, OOB-access, and replica-first gates may be relaxed only with explicit operator authorization for a single-device operation confirmed non-traffic-affecting; if either condition cannot be established, refuse and escalate |
 | `DOCA_MGMT_CMD_SCOPE_DEBUG_READ_ONLY` | Read-only debug query; no state mutation | The agent may recommend it without the rollback discipline, but still inside a maintenance window when the device serves traffic |
@@ -144,7 +144,7 @@ fields; the handle's `_destroy` is the final teardown.
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-
 docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body lives
+`doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The doca-mgmt-specific overlay** is:
@@ -161,7 +161,7 @@ there; this skill does not duplicate it.
   [`TASKS.md ## test`](TASKS.md#test)).
 - **The runtime authority is the installed headers, not the
   public docs.** Per the cross-cutting rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the agent confirms a symbol exists by checking the installed
   header set (`doca_mgmt.h`, `doca_mgmt_device_caps_general.h`,
   `doca_mgmt_cc_global_status.h`,
@@ -169,7 +169,7 @@ there; this skill does not duplicate it.
   `doca_mgmt_icm_quota.h`) before recommending it.
 - **`doca-mgmt.pc` plus `doca-common.pc` must match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   Management-plane operations depend on the firmware version
   on the device matching the host-side library's expectations;
   a four-way-match failure is the *first* hypothesis when
@@ -180,7 +180,7 @@ there; this skill does not duplicate it.
   from agent memory; instead it routes to the
   [DOCA SDK index](https://docs.nvidia.com/doca/sdk/) and
   through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the up-to-date URL pattern. Where a *DOCA Management*
   page is published, it is the authoritative source for
   current opcodes, scopes, and supported sub-domains; until
@@ -193,7 +193,7 @@ there; this skill does not duplicate it.
 
 The cross-library `DOCA_ERROR_*` taxonomy (what each family
 means and which debug layer it routes to) lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 The mgmt-specific overlay names the families the agent will see
 most often from `doca_mgmt_*` calls and what they specifically
 indicate:
@@ -205,14 +205,14 @@ indicate:
 | `DOCA_ERROR_BAD_CONFIG` | A sub-domain `_set` was called on a handle with required fields unset (e.g. `doca_mgmt_device_caps_general_set` returns this when `data_direct` was not set before `_set`) | Re-walk the sub-domain handle's field accessors; every field the `_set` requires must be populated via the matching `_set_<field>` before the apply call |
 | `DOCA_ERROR_IN_USE` | A sub-domain `_set` was called against a representor context that is already initialized for the same surface | Re-read the surface's documented re-init rule; some sub-domains require a destroy-then-recreate cycle on the representor context to change fields |
 | `DOCA_ERROR_EMPTY` | A field accessor `_get_*` was called on a handle whose field was never set or whose value the device has not yet returned | The agent surfaces this as a *not-yet-queried* condition, not as an error — call the matching `_get` against the context first |
-| `DOCA_ERROR_OPERATING_SYSTEM` | The underlying `fwctl` RPC `ioctl` failed on the host side | The host kernel's `fwctl` interface is not available, or the user does not have permission to issue it. Confirm root privileges; route to [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug) layer 5 (driver) for `fwctl`-side issues |
-| `DOCA_ERROR_IO_FAILED` | The `fwctl` RPC reached the firmware but the firmware rejected the command | The firmware version, the device state, or the command opcode is wrong. Re-confirm the four-way version match per [`## Version compatibility`](#version-compatibility); confirm the opcode against the vendor docs; if both check out, route through [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) for the device-state investigation |
+| `DOCA_ERROR_OPERATING_SYSTEM` | The underlying `fwctl` RPC `ioctl` failed on the host side | The host kernel's `fwctl` interface is not available, or the user does not have permission to issue it. Confirm root privileges; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) layer 5 (driver) for `fwctl`-side issues |
+| `DOCA_ERROR_IO_FAILED` | The `fwctl` RPC reached the firmware but the firmware rejected the command | The firmware version, the device state, or the command opcode is wrong. Re-confirm the four-way version match per [`## Version compatibility`](#version-compatibility); confirm the opcode against the vendor docs; if both check out, route through `doca-hardware-safety/SKILL.md` for the device-state investigation |
 | `DOCA_ERROR_NO_MEMORY` | The library could not allocate internal state during `_create` | Inspect host-side resource limits; this is rarely an application bug |
-| `DOCA_ERROR_DRIVER` | The layer below DOCA (mlx5 driver, firmware path the management plane traverses) reported a failure | Stop. This is not an API-spec problem. Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) layer 7 |
+| `DOCA_ERROR_DRIVER` | The layer below DOCA (mlx5 driver, firmware path the management plane traverses) reported a failure | Stop. This is not an API-spec problem. Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) layer 7 |
 
 Quote `doca_error_get_descr()` verbatim — do not paraphrase. The
 cross-cutting debug ladder
-([`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug))
+(`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`))
 is the canonical layered diagnosis path that the agent escalates
 to once the mgmt-specific cause has been narrowed.
 
@@ -227,7 +227,7 @@ agent should reach for:
    `_modify`; the pre-state is the baseline every rollback
    depends on. Without it, the agent cannot tell what was
    changed if the user wants to back out. This is the bundle-
-   wide [pre-flight inventory](../../doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes)
+   wide pre-flight inventory (`doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes`)
    rule applied at the API surface.
 2. **Post-write re-query.** After every `_set` / `_modify` /
    `_set_limit` / `raw_cmd` write, the agent re-runs the
@@ -245,17 +245,17 @@ agent should reach for:
 
 For *continuous* observability (counters streamed over time,
 historical metrics), doca-mgmt is the wrong surface — that is
-[`doca-telemetry`](../doca-telemetry/SKILL.md). For cross-cutting
+`doca-telemetry/SKILL.md`. For cross-cutting
 observability primitives (`--sdk-log-level`, `DOCA_LOG_LEVEL`)
 see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 doca-mgmt is — alongside `mlxconfig` and BFB reflash — one of
 the **primary surfaces through which an agent can modify
@@ -271,7 +271,7 @@ follow from that:
    current state. The captured state is what the rollback path
    quotes; the agent does not invent rollback values from
    memory. This is the
-   [`doca-hardware-safety` pre-flight inventory](../../doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes)
+   `doca-hardware-safety` pre-flight inventory (`doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes`)
    rule applied at the API surface.
 2. **Narrowest scope wins.** When the user describes an
    operation, the agent picks the *narrowest*
@@ -285,7 +285,7 @@ follow from that:
    maintenance window, OOB access, replica-first validation,
    documented rollback.
 3. **No documented rollback → refuse and escalate.** Per
-   [`doca-hardware-safety ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy),
+   `doca-hardware-safety ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`),
    any change for which the operator cannot describe a
    rollback path is refused and routed to the operator's
    change-control process. doca-mgmt is the surface where this
@@ -297,7 +297,7 @@ For changes that touch hardware state below the doca-mgmt
 library itself — `mlxconfig`-class writes that bypass DOCA,
 NIC firmware burns, BlueField BFB reflash, host kernel boot
 parameter changes — the cross-cutting meta-policy in
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+`doca-hardware-safety/SKILL.md`
 applies without modification. The agent walks the
 hardware-safety ladder first whenever the recommended change
 falls into any of those classes, then the doca-mgmt overlay
@@ -313,26 +313,26 @@ elsewhere:
   the DOCA API** — out of scope. The doca-mgmt surface and
   `mlxconfig` partially overlap (both can affect device
   configuration); for `mlxconfig` proper, route to the
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+  `doca-hardware-safety/SKILL.md`
   meta-policy and to the public Mellanox / NVIDIA firmware
   tools documentation reachable through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **Live telemetry streaming** — owned by
-  [`doca-telemetry`](../doca-telemetry/SKILL.md) and
-  [`doca-telemetry-exporter`](../doca-telemetry-exporter/SKILL.md).
+  `doca-telemetry/SKILL.md` and
+  `doca-telemetry-exporter/SKILL.md`.
 - **Read-only capability snapshots from a CLI** — owned by
-  [`doca-caps`](../../tools/doca-caps/SKILL.md).
+  `doca-caps/SKILL.md`.
 - **Programmable congestion control** — owned by
-  [`doca-pcc`](../doca-pcc/SKILL.md) and
-  [`doca-pcc-counters`](../../tools/doca-pcc-counters/SKILL.md).
+  `doca-pcc/SKILL.md` and
+  `doca-pcc-counters/SKILL.md`.
   doca-mgmt's `doca_mgmt_cc_global_status_*` surface is the
   *global enable/disable + protocol selection* control plane
   that *layers on* the deeper programmable-CC surface owned by
   doca-pcc.
 - **Cross-library `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the mgmt overlay, not the taxonomy itself.
 - **Cross-cutting hardware-state change discipline** — owned
-  by [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md).
+  by `doca-hardware-safety/SKILL.md`.
   This skill's safety overlay cross-links the meta-policy;
   it does not redefine the rules.

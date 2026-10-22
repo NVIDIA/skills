@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides BlueField-4 day-1 platform bring-up from the BMC, covering DOCA bundle ISO installation (UEFI HTTP Boot, PXE, Redfish Virtual Media), PLDM firmware updates across BMC/NIC/SBIOS/ERoT, and Grace Ubuntu imaging with optional cloud-init, with every potentially irreversible mutating step gated by doca-hardware-safety. <br>
+Guides day-1 platform bring-up of a BlueField-4 (BF4) DPU from the BMC — installing the BlueField/DOCA bundle ISO over UEFI HTTP Boot, PXE, or Redfish Virtual Media and running the PLDM firmware-update flow across BMC/NIC firmware/SBIOS/ERoT — with every irreversible hardware step routed through doca-hardware-safety. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-External operators and engineers standing up a new BlueField-4 DPU use this skill to perform BMC-driven day-1 bring-up: installing the BlueField/DOCA bundle ISO onto Grace, running the PLDM firmware-update flow, installing a Grace Ubuntu image, and diagnosing bring-up failures. <br>
+Developers and infrastructure engineers use this skill for hands-on day-1 bring-up of a BlueField-4 DPU via the BMC: installing the Grace OS, running the PLDM firmware-update flow, and diagnosing boot or firmware failures while routing every mutating hardware step through the hardware-safety policy. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Reference detail](references/details.md) <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [NVIDIA DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [details.md](references/details.md) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA-DOCA/doca-samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [NVIDIA/doca-platform](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline shell/bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,39 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (2 positive, 1 negative) with 1 attempt per task, each in an isolated k8s-sandbox pod. <br>
+3 evaluation tasks (2 positive, 1 negative); each attempt ran in its own isolated k8s-sandbox pod with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the right skill was loaded when needed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
-- Efficiency: Checks tool-call productivity and token efficiency. <br>
+- Security: Whether the skill is safe to use — avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed and decoys were avoided. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and the expected workflow was followed. <br>
+- Efficiency: Whether the run avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.0% | 92.1% |
+| Overall | 99.1% (uplift unavailable) | 88.8% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% | 95.0% |
-| Effectiveness | 55.6% → 83.3% (+27.7 points) | 66.1% → 100.0% (+33.9 points) |
-| Efficiency | 76.7% | 65.4% |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 82.5% (uplift unavailable) |
+| Effectiveness | 66.1% → 100.0% (+33.9 points) | 66.1% → 88.3% (+22.2 points) |
+| Efficiency | 95.6% (uplift unavailable) | 73.0% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-e2bc144 (source: git SHA, committed 2026-10-14) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -88,7 +88,7 @@ table BEFORE writing any code:
 
 | Tier | What it controls | How to set at runtime | Typical default | Symptom when confused |
 | --- | --- | --- | --- | --- |
-| **SDK log level** | Verbosity of DOCA *library internals* — log lines emitted from inside the DOCA libraries themselves as they call into hardware, manage state, validate inputs, … | `--sdk-log-level <level>` CLI flag on any DOCA sample / reference app; `DOCA_LOG_LEVEL_SDK` env var; programmatic SDK setter equivalent | `WARNING` | User sets `--sdk-log-level DEBUG` to see their own DEBUG lines and is flooded with internal DOCA spam instead, or *"my own DEBUG lines do not appear"* despite the flag |
+| **SDK log level** | Verbosity of DOCA *library internals* — log lines emitted from inside the DOCA libraries themselves as they call into hardware, manage state, validate inputs, … | `--sdk-log-level <N>` CLI flag on any DOCA sample / reference app (numeric: 10=DISABLE, 20=CRITICAL, 30=ERROR, 40=WARNING, 50=INFO, 60=DEBUG, 70=TRACE); `DOCA_LOG_LEVEL_SDK` env var; programmatic SDK setter equivalent | `WARNING` | User sets `--sdk-log-level 60` (DEBUG) to see their own DEBUG lines and is flooded with internal DOCA spam instead, or *"my own DEBUG lines do not appear"* despite the flag |
 | **App log level** | Verbosity of *user code* — log lines the user emits via `DOCA_LOG_*` macros from their own source files | App-side global lower-limit setter (`doca_log_level_set_global_lower_limit`); per-source via `doca_logger_set_level` once the source ID is in hand | `INFO` at steady state (per release; quote the observed default). A first diagnostic run may explicitly override it to `DEBUG`, then restore `INFO`. | User sets app level to `INFO`, then wonders why their `DOCA_LOG_DBG`-shaped lines never print; or user expects `--sdk-log-level` to reach their own lines and it does not |
 
 The agent's diagnostic rule: when the user reports *"my log levels
@@ -289,6 +289,12 @@ of representor it is and what filters can apply.
 disambiguating among multiple devices on the host. The agent should
 quote these from the user's running `doca_devinfo_create_list`,
 never from memory.
+
+**Link up/down events (DOCA 3.5).** A device can deliver asynchronous
+`DOCA_DEV_EVENT_TYPE_LINK_UP` / `DOCA_DEV_EVENT_TYPE_LINK_DOWN`
+notifications, surfaced through `doca_pe_progress`; gate on
+`doca_devinfo_cap_is_event_notification_supported()` rather than
+polling link state.
 
 For the verb-side device-discovery walk, see
 [TASKS.md ## configure](TASKS.md#configure) and

@@ -99,7 +99,7 @@ does not contain — and pull requests should not add:
   ELF, no statically-linked test program is shipped with this
   skill. The canonical artifact is the user's own DOCA-linked
   binary, built per
-  [`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build).
+  `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`).
 - **Sample systemd units, sample `numactl` invocations, sample
   `taskset` invocations, or any other ready-to-copy launch
   recipe.** Bare-metal launch is deployment-specific (per-host
@@ -109,7 +109,7 @@ does not contain — and pull requests should not add:
   Programming Guide and the public BlueField / DPU User Manual
   against their own target. The agent's job is to prescribe the
   *procedure* and quote the documented command shapes from
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
+  `doca-public-knowledge-map/SKILL.md`,
   not to ship a `.service` file or a `numactl --cpunodebind=...`
   line the user might run unmodified.
 - **PCI addresses, NUMA node numbers, representor names, devlink
@@ -128,14 +128,14 @@ does not contain — and pull requests should not add:
 
 ## Related skills
 
-- [`doca-container-deployment`](../../doca-container-deployment/SKILL.md)
+- `doca-container-deployment/SKILL.md`
   — the SIBLING path. Two parallel deployment shapes in this
   bundle: containers (that skill) vs bare metal (this one). The
   recognition step that picks between them lives in
-  [`doca-setup`](../../doca-setup/SKILL.md). Once the shape is
+  `doca-setup/SKILL.md`. Once the shape is
   *bare metal*, the agent stays here; if it is *container*, the
   agent routes there.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation
+- `doca-setup/SKILL.md` — env preparation
   (install verification, hugepages mount and reservation, IOMMU
   posture, devlink mode, pkg-config path, representor visibility,
   kernel module load state). This skill assumes its preconditions
@@ -143,7 +143,7 @@ does not contain — and pull requests should not add:
   that decides container-vs-bare-metal is in `doca-setup` per
   the bundle convention; load `doca-setup` in parallel when the
   user's situation is ambiguous.
-- [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) —
+- `doca-hardware-safety/SKILL.md` —
   the cross-cutting meta-policy for any change touching DPU / NIC
   hardware state. This skill's `## Safety policy` overlays that
   meta-policy with bare-metal-specific rules
@@ -155,7 +155,7 @@ does not contain — and pull requests should not add:
   changes a kernel boot parameter, the agent leaves this skill
   for `doca-hardware-safety` and only returns once the
   hardware-state change is complete.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   layered debug ladder (install / version / build / link /
   runtime / program / driver). Bare-metal-deployment-specific
   debug (process didn't start, started and exited, couldn't find
@@ -163,25 +163,25 @@ does not contain — and pull requests should not add:
   layers on top of the cross-cutting ladder; this skill's
   `## debug` cross-links into `doca-debug` for the broader
   context.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+- `doca-programming-guide/SKILL.md`
   — canonical DOCA build / modify / first-app patterns and the
   cross-library `DOCA_ERROR_*` taxonomy. This skill assumes the
   user already has a built binary; questions about *building*
   the binary or interpreting library-specific errors route there.
-- [`doca-version`](../../doca-version/SKILL.md) — the four-way
+- `doca-version/SKILL.md` — the four-way
   version match rule (host package ↔ binary build ↔ BlueField
   firmware ↔ DOCA-version policy). This skill's
   `## Version compatibility` cross-links the body of the rule
   there and adds only the bare-metal-specific overlay (the
   binary's link-time `pkg-config doca-*` version must match the
   runtime `LD_LIBRARY_PATH`'d install).
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — the routing table to the public DOCA Programming Guide, the
   public BlueField / DPU User Manual, the public Installation
   Guide, and the NGC catalog. This skill does not duplicate
   URLs; it points at the map and adds the bare-metal-deployment
   overlay.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle's structured-tools precedence rule
   (detect / prefer / fall back / report). The
   [`## Command appendix`](../TASKS.md#command-appendix) in

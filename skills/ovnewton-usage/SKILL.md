@@ -15,7 +15,8 @@ Standalone Newton simulations and generic Omniverse authoring do not need this s
 
 ## Start from the supported examples
 
-Install `ovnewton` in the application's environment. Let its package metadata
+Install `ovnewton` in the application's environment. This workflow requires
+Newton 1.7 or newer, OVStage 0.3, and OVRTX 0.6 when rendering. Let its package metadata
 select compatible dependencies; do not replace the qualified ovstage dependency
 with an arbitrary build.
 
@@ -38,8 +39,19 @@ repository main may describe a newer API.
 
 1. Call `ovnewton.register_usd_schemas()` before the first USD schema read.
    Create an `ovstage.Stage()` and populate the application-supplied USD with
-   `population.open_usd(stage, scene_path, ordinal=1, domains=PopulationDomain.ALL)`.
+   `population.open_usd_with_desc(stage, scene_path, ordinal=1,
+   time=population.DEFAULT_TIME, descs=(ovnewton.population_desc(),))`.
+   Add a `population.Desc(domains=PopulationDomain.RENDERING)` descriptor when
+   rendering. `ovnewton.population_desc()` preserves composed schema names so
+   unsupported physics remains detectable even without its schema plugin.
    Seal population with `stage.advance_write_floor(1).wait()` before importing.
+   For rendering, create stages with `ovstage.StageConfig` selecting
+   `runtime_default_hierarchy_computation_model=ovstage.HierarchyComputationModel.GPU_INCREMENTAL`,
+   including CPU physics with a GPU renderer. This setting is process-wide;
+   coexisting stages must use a consistent configuration. CPU-only runs do not
+   need this setting.
+   An existing populated stage must preserve the same composed schema metadata;
+   attachment cannot recover schema names discarded during population.
    If the application already supplies a populated stage, reuse it and its sealed
    ordinal; do not reload the scene or assume its ordinal is 1.
 2. Create an empty `newton.ModelBuilder()`. Configure defaults and register any

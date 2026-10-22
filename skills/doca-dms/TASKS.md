@@ -23,9 +23,9 @@ Preparing the management endpoint and choosing a deployment shape.
 1. **Confirm the env is healthy first.** This skill expects DOCA to be
    installed at the management endpoint (host, BlueField Arm, or pod
    image base). If that has not been verified, run
-   [`doca-setup ## test`](../../doca-setup/TASKS.md#test) first. If
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`) first. If
    the user has no install yet, route to
-   [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    for the public NGC DOCA container path. Do not return until the
    `doca-setup ## test` install/version, capability, and smoke checks
    are green for the management endpoint; run that check once. If it
@@ -82,7 +82,7 @@ language, the right routing is:
 If the user is instead asking about building **a DOCA application** in
 the general sense (linking against `libdoca-*`), that is *not* a DMS
 question — route them to
-[`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build)
+`doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
 and the matching `libs/<library>` skill.
 
 ## modify
@@ -276,7 +276,7 @@ without clearing the layer above.
 6. **Library-level errors.** If DMS is acting as a thin wrapper over
    a DOCA library call and that library returned `DOCA_ERROR_*`, the
    relevant cross-library taxonomy lives in
-   [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+   `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
    The library-specific overlay (e.g. for Flow) lives in the
    matching `libs/<library>` skill.
 
@@ -314,21 +314,21 @@ Three cross-cutting rules for this appendix:
   backend.
 - **Cross-link instead of duplicate.** Cross-cutting commands (the
   read-only triple, `dmesg`, `mlxconfig -d <pcie> q`) live in
-  [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+  `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
   this appendix names only the DMS-specific ones.
 
 ## Deferred task verbs
 
 - **Installing DOCA on the management endpoint** — out of scope here.
-  Route to [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+  Route to `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   for env preparation and
-  [`doca-setup ## test`](../../doca-setup/TASKS.md#test) for install
+  `doca-setup ## test` (`doca-setup/TASKS.md#test`) for install
   health verification, or
-  [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+  `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
   for the public NGC DOCA container Path 0 if there is no DOCA install
   yet.
 - **Building a custom DOCA application** — not a DMS question. Route
-  to [`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build)
+  to `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
   for the canonical build pattern, plus the matching `libs/<library>`
   skill for the API surface.
 - **Turnkey telemetry aggregation** — out of scope for DMS. DMS's own
@@ -336,7 +336,7 @@ Three cross-cutting rules for this appendix:
   only `POLL` / `Aggregation` are Unimplemented); for a productized
   telemetry-aggregation surface, route to the DOCA Telemetry Service
   (DTS), discoverable through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **Library-internal API questions** (Flow pipe construction, RDMA
   queue setup, …) — outside DMS. Route to the matching
   `libs/<library>` skill.
@@ -353,4 +353,4 @@ Three cross-cutting rules for this appendix:
 - All operational guidance must preserve the documented two-process
   separation (`dmsd` low-priv frontend, `dmspe` privileged backend).
 - For URL routing to the DMS guide and other public DOCA documentation,
-  see [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services).
+  see doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`).

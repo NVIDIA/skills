@@ -12,7 +12,7 @@ pattern first, then drill into the H2 that owns the substance. For
 the *how* of executing each pattern, jump to [TASKS.md](TASKS.md).
 For the comch programming surface the channels were created
 against, see
-[`doca-comch CAPABILITIES.md`](../../libs/doca-comch/CAPABILITIES.md).
+`doca-comch/CAPABILITIES.md`.
 
 This file is loaded by [`SKILL.md`](SKILL.md). It documents what
 the tool reports, what versions it ships in, the layered error
@@ -38,7 +38,7 @@ Two cross-cutting rules that apply to *every* pattern above:
   or run the same zero-argument scan on the other side.
 - **The admin tool is one half of the picture.** The other half is
   the program-side `doca_comch_*` connection callback per
-  [`doca-comch CAPABILITIES.md ## Observability`](../../libs/doca-comch/CAPABILITIES.md#observability).
+  `doca-comch CAPABILITIES.md ## Observability` (`doca-comch/CAPABILITIES.md#observability`).
   An agent that quotes the admin tool's state without the program
   side (or vice versa) is missing half the evidence.
 
@@ -55,7 +55,7 @@ scan-and-print operation described here.
 The tool exposes a single, read-only family of operations,
 documented in the public DOCA Comm Channel Admin Tool guide
 (reached via
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)):
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)):
 
 - **Read-only operations (the entire tool surface).** The binary
   scans every DOCA device on the side it runs on (host or
@@ -69,9 +69,9 @@ documented in the public DOCA Comm Channel Admin Tool guide
 
 Changing channel or device state is outside this binary and this
 skill. Route program lifecycle work to
-[`doca-comch`](../../libs/doca-comch/SKILL.md), and driver or
-device work to [`doca-setup`](../../doca-setup/SKILL.md) plus
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md).
+`doca-comch/SKILL.md`, and driver or
+device work to `doca-setup/SKILL.md` plus
+`doca-hardware-safety/SKILL.md`.
 
 The tool runs on **both sides of a host ↔ DPU pair** — the host
 sees host-side clients (each bound to a BlueField PCIe address),
@@ -87,14 +87,14 @@ headings emitted by the installed binary.
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see [`doca-version`](../../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The Comm Channel Admin Tool-specific overlay** is:
 
-- **The tool ships under the `Comm Channel` name even on DOCA installs ≥ 2.5.** The companion library was renamed to `doca-comch` in DOCA 2.5 (see [`doca-comch CAPABILITIES.md ## Version compatibility`](../../libs/doca-comch/CAPABILITIES.md#version-compatibility) for the rename); the admin tool's public guide URL slug remains `DOCA-Comm-Channel-Admin-Tool`. An agent searching for *"DOCA Comch Admin"* on `docs.nvidia.com` should fall back to the Comm Channel Admin Tool guide and surface the naming asymmetry to the user, not assume the tool is missing.
-- **Confirm the tool is present before assuming availability.** If the user reports the binary is absent under `/opt/mellanox/doca/tools/`, the right answer is to confirm the installed DOCA version per [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure) and route to [`doca-setup`](../../doca-setup/SKILL.md) for an upgrade or reinstall, not to recommend a wrapper script that simulates the tool from outside.
+- **The tool ships under the `Comm Channel` name even on DOCA installs ≥ 2.5.** The companion library was renamed to `doca-comch` in DOCA 2.5 (see `doca-comch CAPABILITIES.md ## Version compatibility` (`doca-comch/CAPABILITIES.md#version-compatibility`) for the rename); the admin tool's public guide URL slug remains `DOCA-Comm-Channel-Admin-Tool`. An agent searching for *"DOCA Comch Admin"* on `docs.nvidia.com` should fall back to the Comm Channel Admin Tool guide and surface the naming asymmetry to the user, not assume the tool is missing.
+- **Confirm the tool is present before assuming availability.** If the user reports the binary is absent under `/opt/mellanox/doca/tools/`, the right answer is to confirm the installed DOCA version per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`) and route to `doca-setup/SKILL.md` for an upgrade or reinstall, not to recommend a wrapper script that simulates the tool from outside.
 - **Where it runs:** on the x86 / Arm host that has DOCA installed, *or* on the BlueField Arm side. Same binary, same flags; the set of channels it sees differs by side per [`## Capabilities and modes`](#capabilities-and-modes).
-- **Tool version must match the comch `*.so` it inspects.** A program built against one DOCA train inspected by an admin tool from a different train is the same partial-install hazard as case (a) ≠ (c) in the four-way-match rule. When in doubt, run `pkg-config --modversion doca-comch` and the tool's own `--version` per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility) and quote both.
+- **Tool version must match the comch `*.so` it inspects.** A program built against one DOCA train inspected by an admin tool from a different train is the same partial-install hazard as case (a) ≠ (c) in the four-way-match rule. When in doubt, run `pkg-config --modversion doca-comch` and the tool's own `--version` per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`) and quote both.
 
 ## Error taxonomy
 
@@ -105,7 +105,7 @@ The error layers the agent should distinguish, in escalating order:
    on this host, the install does not include the Comm Channel
    tooling subpackage, or the install version pre-dates the
    tool's availability. Routing:
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+   `doca-setup ## install` (`doca-setup/TASKS.md#configure`)
    and the version-compatibility overlay above.
 2. **`resourcedump` prerequisite / execution layer.** The binary
    depends on the MFT `resourcedump` executable for each scanned
@@ -115,13 +115,13 @@ The error layers the agent should distinguish, in escalating order:
    stderr plus the failing `resourcedump` exit/stderr. Do not
    interpret missing tables as “no channels.” Route MFT install,
    PATH, and privilege remediation to
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug), then
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`), then
    rerun the same zero-argument scan.
 3. **Device-binding layer.** The tool runs but cannot scan a DOCA
    device on this side. The underlying driver stack may be absent
    or the expected representor invisible. The tool's exit status,
    stderr, and `resourcedump` diagnostics are ground truth.
-   Routing: [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug).
+   Routing: `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 4. **Row-discovery layer.** The scan exits successfully and prints
    both tables, but the expected server or connection row is
    absent. Inspect the rows already printed; do not rerun with an
@@ -129,26 +129,26 @@ The error layers the agent should distinguish, in escalating order:
    necessary, run the same zero-argument scan on the other side.
    The program may never have reached the CONNECTED
    transition (route to
-   [`doca-comch TASKS.md ## debug`](../../libs/doca-comch/TASKS.md#debug)),
+   `doca-comch TASKS.md ## debug` (`doca-comch/TASKS.md#debug`)),
    or the channel may already have been destroyed.
 5. **Version layer.** The admin tool runs but its view of the
    channel disagrees with what the program-side `doca_comch_*`
    API reports — typically because the tool and the `*.so` came
    from different DOCA installs. This is a partial-install
    hazard; routing belongs in
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2 and the overlay in
    [`## Version compatibility`](#version-compatibility) above.
 6. **Cross-cutting layer.** When the scan and program-side view
    disagree after the version match passes, the cause may be below
    the comch layer — driver, firmware, BlueField mode, or hardware. Escalate
-   to [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+   to `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    with the captured admin-tool inspection plus the program-side
    trace as evidence.
 
 `doca_comm_channel_admin`-class tooling does **not** itself return
 `DOCA_ERROR_*` values to a calling program — those are owned by the
-[`doca-comch`](../../libs/doca-comch/SKILL.md) library API. The
+`doca-comch/SKILL.md` library API. The
 tool's CLI exit codes and printed messages are its own narrow
 surface; the agent maps those into the layers above before
 interpreting any program-side `DOCA_ERROR_*`.
@@ -159,18 +159,18 @@ The Comm Channel Admin Tool is itself an **observability primitive**
 for the rest of the comch surface — it is *what other skills load
 to observe* a comch channel from outside the program. Specifically:
 
-- [`doca-comch TASKS.md ## debug`](../../libs/doca-comch/TASKS.md#debug)
+- `doca-comch TASKS.md ## debug` (`doca-comch/TASKS.md#debug`)
   layer 5 (runtime) prescribes confirming the channel's external
   state before any program-side code change; the admin tool's
   read-only enumeration + inspection is the documented way to
   produce that evidence.
-- [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+- `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
   consumes the captured admin-tool inspection as the
   *channel-state half* of the cross-cutting debug ladder, paired
   with the program-side connection-callback trace per
-  [`doca-comch CAPABILITIES.md ## Observability`](../../libs/doca-comch/CAPABILITIES.md#observability)
+  `doca-comch CAPABILITIES.md ## Observability` (`doca-comch/CAPABILITIES.md#observability`)
   and (when present) the BlueField driver and firmware view via
-  [`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+  `doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 - The admin tool's own output is the artifact downstream debug
   consumes. Save it (file, paste buffer, conversation artifact);
   without it, the next debug step starts guessing.
@@ -179,14 +179,14 @@ The tool does not emit metrics, traces, or DOCA logs of its own
 beyond the printed CLI output. For the program-side observability
 surface (`DOCA_LOG_LEVEL`, `--sdk-log-level`, the trace build
 flavor) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For cross-checking against the BlueField driver / firmware /
 representor view, see
-[`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The Comm Channel Admin Tool is read-only:
 
@@ -199,7 +199,7 @@ The Comm Channel Admin Tool is read-only:
 - **Fail closed on `resourcedump`.** Missing MFT, a missing PATH
   entry, insufficient privilege, non-zero child exit, or child
   stderr is a setup failure, not an empty-channel result. Route to
-  [`doca-setup`](../../doca-setup/SKILL.md) before interpreting
+  `doca-setup/SKILL.md` before interpreting
   the tables.
 
 ## Public-source pointer
@@ -207,9 +207,9 @@ The Comm Channel Admin Tool is read-only:
 The single canonical public source for the DOCA Comm Channel Admin
 Tool is the **DOCA Comm Channel Admin Tool** page on
 `docs.nvidia.com`, reachable through
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 Do not invent application arguments or output columns beyond what
 that page and the installed binary document. For the comch
 library the channels were created against, the public source is
 the **DOCA Comch** page, reached the same way and named on the
-[`doca-comch`](../../libs/doca-comch/SKILL.md) skill.
+`doca-comch/SKILL.md` skill.

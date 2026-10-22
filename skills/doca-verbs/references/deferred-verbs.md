@@ -6,9 +6,9 @@ the agent does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [`doca-setup`](../../../doca-setup/SKILL.md) and to the
+  `doca-setup/SKILL.md` and to the
   install-tree layout in
-  [doca-public-knowledge-map ## Layout of an installed DOCA package](../../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   The [`## install`](install.md) anchor in this file holds only the
   per-skill readiness checks; the deep install chain itself lives
   in `doca-setup`.
@@ -25,16 +25,16 @@ the agent does not invent guidance:
   [`## configure`](../TASKS.md#configure) with corrected parameters.
 - **kernel-level driver install / firmware burn.** Out of scope
   for this skill. Route to
-  [`doca-hardware-safety`](../../../doca-hardware-safety/SKILL.md)
+  `doca-hardware-safety/SKILL.md`
   for the meta-policy and to
-  [`doca-setup TASKS.md ## debug`](../../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   driver layer for the env-side recovery story.
 - **Climb back to the matching higher-level library for a use
   case it actually covers.** Not a verb in this skill at all —
   that conversation belongs in
-  [`doca-rdma TASKS.md ## configure`](../../doca-rdma/TASKS.md#configure)
-  (or [`doca-eth`](../../doca-eth/SKILL.md) /
-  [`doca-rmax`](../../doca-rmax/SKILL.md)). This skill's job is to
+  `doca-rdma TASKS.md ## configure` (`doca-rdma/TASKS.md#configure`)
+  (or `doca-eth/SKILL.md` /
+  `doca-rmax/SKILL.md`). This skill's job is to
   *recognize* when the climb-back is the right answer, then hand
   the conversation off.
 

@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - hardware
@@ -142,7 +143,7 @@ helping the operator apply, a change that touches DPU / NIC hardware
 state on a live system. The decision must be made **before** the
 agent composes its first sentence — the activation checklist below
 is the same one referenced from
-[`AGENTS.md ## Cross-cutting overlay activation triggers`](../../AGENTS.md#cross-cutting-overlay-activation-triggers),
+`AGENTS.md ## Cross-cutting overlay activation triggers` (bundle `AGENTS.md#cross-cutting-overlay-activation-triggers`),
 mirrored here so a per-artifact skill that already loaded this skill
 has the activation rule at hand.
 
@@ -195,12 +196,12 @@ If any of the following is true, the agent MUST stop and refuse to recommend the
 In each of these cases the correct answer shape is *"this change requires X (here is why); the bundle refuses to recommend it without X; here is the route to obtain X"* — not silence and not improvisation. The refuse-and-escalate rule is what makes the bundle's hardware-safety guidance trustworthy to production operators.
 
 Do **not** load this skill for general DOCA orientation (use
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)),
+`doca-public-knowledge-map/SKILL.md`),
 for first-time install or env-class debug (use
-[`doca-setup`](../doca-setup/SKILL.md)), or for purely program-side
+`doca-setup/SKILL.md`), or for purely program-side
 debug that does not touch hardware state (use
-[`doca-debug`](../doca-debug/SKILL.md) or
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md)).
+`doca-debug/SKILL.md` or
+`doca-programming-guide/SKILL.md`).
 
 ## What this skill provides
 
@@ -216,7 +217,7 @@ companion files:
   (bricked-link, runaway-burn, silent-mode-change, missing-rollback),
   the observability gate the operator must satisfy before any
   workload moves, and the thin version-compatibility overlay that
-  redirects to [`doca-version`](../doca-version/SKILL.md).
+  redirects to `doca-version/SKILL.md`.
 - the tasks companion — the change-application workflows: `## configure` (the
   pre-flight inventory + out-of-band + maintenance-window plan),
   `## build` (routing stub — hardware-touching changes do not produce
@@ -247,34 +248,34 @@ companion files:
 
 ## Related skills
 
-- [`doca-version`](../doca-version/SKILL.md) — the four-way match
+- `doca-version/SKILL.md` — the four-way match
   rule and the host ↔ BlueField BFB ↔ container-tag pairing. Every
   hardware-touching change has a version dimension; this skill's
   `## Version compatibility` overlay is a 3-5 line redirect to
   `doca-version` for the body.
-- [`doca-setup`](../doca-setup/SKILL.md) — env-class checks that
+- `doca-setup/SKILL.md` — env-class checks that
   precondition a hardware-touching change (hugepages, IOMMU mode,
   `pkg-config`, representor visibility). The pre-flight inventory in
   this skill's `## configure` cross-links to `doca-setup` for the
   env-class half of the inventory.
-- [`doca-debug`](../doca-debug/SKILL.md) — the cross-cutting layered
+- `doca-debug/SKILL.md` — the cross-cutting layered
   debug ladder. When a hardware-touching change goes wrong, the
   rollback ladder in this skill's `## debug` hands off to
   `doca-debug` once the rollback has restored a known state and the
   symptom now lives at a software layer.
-- [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the JSON schemas the agent prefers when present. The
   `collect-host-state` / `collect-dpu-state` schemas are the
   structured form of this skill's pre-flight inventory; the agent
   uses them as the one-shot answer when the host has the helpers
   installed.
-- [`doca-container-deployment`](../doca-container-deployment/SKILL.md) —
+- `doca-container-deployment/SKILL.md` —
   the canonical container-deployment recipe shared across DOCA
   services. Several hardware-touching changes (BlueField cold
   reboot, BFB reflash) interrupt every hosted service container on
   the BlueField; the rollback path quotes the
   `doca-container-deployment` re-deploy shape.
-- [`doca-programming-guide`](../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   program-side preconditions (capability discovery,
   validate-before-commit). The post-change verification gate in this
   skill's `## run` cross-links there for the program-side
@@ -282,19 +283,19 @@ companion files:
   workload moves.
 - Per-artifact `## Safety policy` anchors in each in-bundle
   service / library / tool skill — e.g. the firmware-slot
-  precondition in [`doca-argus`](../services/doca-argus/SKILL.md),
-  [`doca-dms`](../services/doca-dms/SKILL.md),
-  [`doca-firefly`](../services/doca-firefly/SKILL.md),
-  [`doca-urom-svc`](../services/doca-urom-svc/SKILL.md); the
+  precondition in `doca-argus/SKILL.md`,
+  `doca-dms/SKILL.md`,
+  `doca-firefly/SKILL.md`,
+  `doca-urom-svc/SKILL.md`; the
   device-touching libraries
-  ([`doca-flow`](../libs/doca-flow/SKILL.md),
-  [`doca-rdma`](../libs/doca-rdma/SKILL.md),
-  [`doca-eth`](../libs/doca-eth/SKILL.md),
-  [`doca-pcc`](../libs/doca-pcc/SKILL.md),
-  [`doca-rmax`](../libs/doca-rmax/SKILL.md)); and the
+  (`doca-flow/SKILL.md`,
+  `doca-rdma/SKILL.md`,
+  `doca-eth/SKILL.md`,
+  `doca-pcc/SKILL.md`,
+  `doca-rmax/SKILL.md`); and the
   hardware-touching tools (e.g.
-  [`doca-spcx-cc`](../tools/doca-spcx-cc/SKILL.md),
-  [`doca-pcc-counters`](../tools/doca-pcc-counters/SKILL.md)).
+  `doca-spcx-cc/SKILL.md`,
+  `doca-pcc-counters/SKILL.md`).
   Every in-bundle artifact skill's `## Safety policy` overlays
   this meta-policy with artifact-specific safety. The cross-link is
   intentionally bidirectional: per-artifact skills link here for
@@ -304,5 +305,5 @@ companion files:
   productized analogs (`doca-virtio-net`, `doca-snap`, `doca-hbn`,
   BlueMan, DPF) are NOT in-bundle skills — their safety policies
   live in product documentation reached through
-  [`doca-public-knowledge-map ## Externally-productized DOCA
-  software`](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+  `doca-public-knowledge-map ## Externally-productized DOCA
+  software` (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).

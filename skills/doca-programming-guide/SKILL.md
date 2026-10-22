@@ -16,6 +16,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - programming
@@ -106,7 +107,7 @@ skill answers the library-agnostic shape.
   RMAX / MPI stack is not on this BlueField"*.
 
 If the question is env-class (install / build env / hugepages /
-devices), route to [`doca-setup`](../doca-setup/SKILL.md). If it is
+devices), route to `doca-setup/SKILL.md`. If it is
 library-specific (Flow pipe topology, RDMA QP setup, DMS service
 deploy), layer the matching library skill on top.
 
@@ -148,7 +149,7 @@ without authoring wrappers.
 
 Load this skill when the user has DOCA installed *and* the env-class
 preconditions are already satisfied (i.e.,
-[`doca-setup`](../doca-setup/SKILL.md) has produced a clean install
+`doca-setup/SKILL.md` has produced a clean install
 where `pkg-config doca-<library>` resolves, hugepages are mounted, and
 devices are visible), and is now asking a question about **how to
 actually program against DOCA** in a library-agnostic way:
@@ -181,17 +182,17 @@ Do **not** load this skill for:
 - *"Is my install healthy? Why does `pkg-config` not find `doca-flow`?
   How do I mount hugepages? I don't have DOCA installed yet — can I
   use a container?"* — env-class questions belong in
-  [`doca-setup`](../doca-setup/SKILL.md), which owns install
+  `doca-setup/SKILL.md`, which owns install
   verification, env preparation, env-class debugging, and the
   *no-install → NGC container fallback* path for any user on macOS,
   Windows, or Linux without DOCA.
 - *"What is DOCA? Where is the Flow programming guide? Which package
   do I install?"* — routing / orientation questions belong in
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - *"How do I construct a Flow pipe / set up an RDMA queue / use Comch
   to send a message?"* — library-internal API questions belong in the
   matching library skill (e.g.
-  [`doca-flow`](../libs/doca-flow/SKILL.md)).
+  `doca-flow/SKILL.md`).
 
 ## What this skill provides
 
@@ -215,7 +216,7 @@ companion files:
   `pkg-config doca-<library>` build pattern in two language tracks
   (C/C++ direct, non-C via FFI).
 
-This skill assumes [`doca-setup`](../doca-setup/SKILL.md) has already
+This skill assumes `doca-setup/SKILL.md` has already
 produced a clean install. It does **not** cover env preparation; that
 is `doca-setup`'s job, including the *no-install → NGC container
 (`nvcr.io/nvidia/doca/doca`)* fallback for users on macOS, Windows, or
@@ -263,26 +264,26 @@ It deliberately does not contain — and pull requests should not add:
 If the user is asking for a *first app* in a specific library, walk
 through ## modify for the universal
 copy-and-edit pattern, then hand off to the library skill (e.g.
-[`doca-flow`](../libs/doca-flow/SKILL.md)) for the library-specific values
+`doca-flow/SKILL.md`) for the library-specific values
 to swap.
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — public DOCA documentation routing and the on-disk layout of an
   installed DOCA package. This skill defers all *"where is X
   documented"*, *"where on disk is Y"*, and *"how do I check the
   installed version"* questions to the knowledge-map.
-- [`doca-setup`](../doca-setup/SKILL.md) — env preparation, install
+- `doca-setup/SKILL.md` — env preparation, install
   verification, env-class debugging, and the *I have no install yet*
   procedure with the NGC container (`nvcr.io/nvidia/doca/doca`) as
   the universal Stage-1 fallback for any user on macOS, Windows, or
   Linux without DOCA. This skill assumes `doca-setup`'s preconditions
   are already satisfied.
-- [`doca-flow`](../libs/doca-flow/SKILL.md) — DOCA Flow on BlueField.
+- `doca-flow/SKILL.md` — DOCA Flow on BlueField.
   Extends this skill's `## modify` (universal first-app derivation)
   with the Flow-specific list of fields to swap.
-- [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+- `doca-container-deployment/SKILL.md`
   — shipping an application that already builds: container manifests,
   rollout, and service-readiness verification. This skill ends once the
   program compiles and runs locally; it does not cover deploying it.

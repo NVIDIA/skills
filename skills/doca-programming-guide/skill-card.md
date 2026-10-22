@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides developers through library-agnostic DOCA programming tasks including writing a first app from a shipped sample, the canonical pkg-config + meson build pattern, the Core object lifecycle, DOCA_ERROR decoding, and FFI/bindings for non-C consumers. <br>
+Guides developers writing their first DOCA application or asking a library-agnostic programming question — selecting and modifying a shipped sample, wiring the pkg-config + meson build (or FFI from Rust/Go/Python against the public C ABI), walking the DOCA Core object lifecycle, and decoding DOCA_ERROR_* codes. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,16 +7,16 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers building applications that consume DOCA libraries use this skill to follow library-agnostic programming patterns — from deriving a first app from shipped samples, through build configuration and the Core lifecycle, to error decoding and program-class debugging. <br>
+External developers and engineers building applications that consume DOCA libraries use this skill for library-agnostic programming guidance: deriving a first app from a shipped sample, constructing the canonical pkg-config + meson build (or FFI bindings against the public C ABI), following the DOCA Core object lifecycle, and interpreting DOCA_ERROR_* codes. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [No] <br>
+**Credential Type(s):** [None] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -25,16 +25,16 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
-- [NGC Catalog](https://catalog.ngc.nvidia.com/) <br>
+- [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/) <br>
+- [NGC catalog](https://catalog.ngc.nvidia.com/) <br>
+- [NVIDIA-DOCA/doca-samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Code, Configuration instructions, Shell commands] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -46,39 +46,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 tasks (3 positive, 1 negative) in isolated sandbox pods; dataset digest sha256:2e27fd34. <br>
+4 evaluation tasks (3 positive, 1 negative), each attempt run in its own isolated k8s-sandbox pod against dataset snapshot skill-evaluator-dataset-snapshot/1. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed (goal_accuracy 50% + behavior_check 50%). <br>
-- Efficiency: Checks tool-call productivity and token efficiency (skill_efficiency 50% + token_efficiency 50%). <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed? Checks skill selection, decoy avoidance, and workflow execution. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected-workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Combines tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Detects unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies whether the expected skill was selected and decoys were avoided. <br>
-- `accuracy`: Evaluates final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Assesses whether the user's goal was achieved. <br>
-- `behavior_check`: Assesses whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Measures tool-call productivity. <br>
-- `token_efficiency`: Measures token usage efficiency. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill) | Codex (Baseline → Skill) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.6% | 93.5% |
-| Security | 100.0% → 100.0% (±0.0) | 100.0% → 100.0% (±0.0) |
-| Correctness | 60.0% → 100.0% (+40.0) | 80.0% → 95.0% (+15.0) |
-| Discoverability | 100.0% | 93.3% |
-| Effectiveness | 41.7% → 84.2% (+42.5) | 59.6% → 87.5% (+27.9) |
-| Efficiency | 68.9% | 91.7% |
+| Overall | 87.1% (uplift unavailable) | 91.8% (uplift unavailable) |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 80.0% → 80.0% (±0.0 points) | 95.0% → 85.0% (-10.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 91.7% (uplift unavailable) |
+| Effectiveness | 54.6% → 81.7% (+27.1 points) | 62.1% → 82.5% (+20.4 points) |
+| Efficiency | 73.9% (uplift unavailable) | 100.0% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-6e4ede9 (source: git SHA, committed 2026-10-05) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

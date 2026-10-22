@@ -6,7 +6,7 @@ are routing stubs reached only when the user asks those questions —
 they are not steps in BF4 day-1 bring-up. There is no application
 artifact to build or sample to modify in a platform bring-up; those
 questions live in the application-deployment skills and
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md). This
+`doca-programming-guide/SKILL.md`. This
 skill owns getting a bare BlueField-4 to a Grace OS installed and
 firmware at the target level, driven from the BMC. The `## test` verb
 is the post-install / post-update verification sweep.
@@ -15,11 +15,11 @@ These verbs cover the in-scope BF4-bring-up workflows for an external
 operator standing up a new BlueField-4 through its BMC. Every step
 assumes the operator has consulted the live public BlueField/DOCA
 documentation and release notes (reachable through
-[`doca-public-knowledge-map ## Public documentation entry points`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points))
+`doca-public-knowledge-map ## Public documentation entry points` (`doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`))
 and the Redfish / PLDM / UEFI standards; this file prescribes the
 *order* and *what to look up where*, not a copy-paste runbook. Every
 MUTATING step (PLDM burn, ISO reflash, power cycle, BMC factory reset)
-loads [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
+loads `doca-hardware-safety/SKILL.md`
 ALONGSIDE.
 
 ## configure
@@ -32,7 +32,7 @@ precondition BEFORE any boot, transfer, or burn.
    supplied by the operator — never invented), and that the DPU's OOB
    serial console is reachable via `obmc-console-client`. Without an
    OOB path the bar for proceeding is "stop, establish OOB first" per
-   [`doca-hardware-safety ## Out-of-band access classes`](../doca-hardware-safety/CAPABILITIES.md#out-of-band-access-classes).
+   `doca-hardware-safety ## Out-of-band access classes` (`doca-hardware-safety/CAPABILITIES.md#out-of-band-access-classes`).
 2. **Host the ISO.** Download the BlueField/DOCA bundle ISO (and, for
    the Grace-Ubuntu path, the Grace Ubuntu image and any cloud-init
    config ISO) from the public NVIDIA download surface, and host it at
@@ -60,7 +60,7 @@ precondition BEFORE any boot, transfer, or burn.
 4. **Capture the target versions.** Read the target bundle-ISO build,
    NIC firmware level, and SBIOS / ERoT / BMC component versions from
    the **public BlueField/DOCA release notes** (route via
-   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)).
+   `doca-public-knowledge-map/SKILL.md`).
    Do NOT quote a pre-release firmware version from memory; record the
    release-notes targets as the verification baseline used in
    [`## test`](#test).
@@ -69,7 +69,7 @@ precondition BEFORE any boot, transfer, or burn.
    (current FirmwareInventory, current `/etc/mlnx-release` if Grace is
    already up), agree a maintenance window, and confirm the OOB path
    survives a failed change — all per
-   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify),
+   `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`),
    loaded ALONGSIDE.
 6. **Select optional branches explicitly.** Decide from the public
    release notes whether this bring-up requires the
@@ -91,11 +91,11 @@ not built here.
 
 - If the user is asking how to build a DOCA-linked binary or a service
   to deploy once Grace is up, route to
-  [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build),
+  `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`),
   then to
-  [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)
+  `doca-bare-metal-deployment/SKILL.md`
   or
-  [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+  `doca-container-deployment/SKILL.md`
   to deploy it.
 - If the user is asking how to assemble the bundle ISO or the
   firmware `.fwpkg` themselves, that is NVIDIA-internal release
@@ -114,7 +114,7 @@ change**, and any change to firmware *configuration* leaves this verb:
 1. **A firmware-config change is a hardware-state change.** Adjusting
    NV-config / mode toggles (e.g. via `mlxconfig set`) or burning new
    firmware is MUTATING and is owned by
-   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify);
+   `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`);
    this skill does not redefine that discipline. Control returns to
    [`## configure`](#configure) once the change is complete and
    verified.
@@ -128,7 +128,7 @@ change**, and any change to firmware *configuration* leaves this verb:
    [`### grace-ubuntu-cloud-init`](#grace-ubuntu-cloud-init).
 4. **Modifying a workload's source belongs elsewhere.** Source changes
    to a DOCA application route to
-   [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify);
+   `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`);
    they are not a platform-bring-up concern.
 5. The H2 stays for verb-order parity; the substantive routing is
    above.
@@ -140,7 +140,7 @@ chosen method, update platform firmware via PLDM when required, and
 (optionally) install a Grace Ubuntu image with cloud-init. Each
 sub-anchor below is one documented flow. Reach the OOB console via BMC
 SSH + `obmc-console-client` before starting any of them, and load
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) ALONGSIDE.
+`doca-hardware-safety/SKILL.md` ALONGSIDE.
 The bundle-ISO methods and the Grace-Ubuntu path are alternative OS
 targets selected in [`## configure`](#configure); run one OS-install
 path. The PLDM firmware-update branch may accompany either when the
@@ -201,7 +201,7 @@ step here is MUTATING — `doca-hardware-safety` is loaded ALONGSIDE.
    for the selected bundle explicitly require it; otherwise skip this
    step rather than guessing. When required, program from the host and
    power cycle. Route each mutation through
-   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify).
+   `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`).
 2. **Push the bundle.** Upload the `.fwpkg` ({fw-image}) via a Redfish
    multipart `POST` to the UpdateService update-multipart endpoint.
 3. **Monitor the Task.** Poll the returned Task ({task-id}):
@@ -315,8 +315,9 @@ layer; do not declare the bring-up complete on a single green signal.
 ## debug
 
 Layered diagnosis. Walk the layers in this order; do not skip down
-without clearing the layer above. The six layers match
-[`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+without clearing the layer above. This is the single source for each
+layer's symptoms, evidence and correction; `CAPABILITIES.md ## Error
+taxonomy` only lists the layers.
 
 1. **Boot-source layer.** ISO never starts: UEFI HTTP Boot cannot
    fetch the Boot URI, the PXE menu never appears, or the Virtual
@@ -362,9 +363,9 @@ without clearing the layer above. The six layers match
 
 For any cross-cutting host-side issue on the machine that talks to the
 BF4 (kernel, drivers, PCIe link state), drop to
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug). For any
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`). For any
 mutating recovery action (re-burn, reflash, factory reset), route to
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md).
+`doca-hardware-safety/SKILL.md`.
 
 **Debug-loop bound.** Walk the six-layer sweep once, apply at most one
 evidence-backed, non-mutating correction: the exact failed observed
@@ -388,27 +389,27 @@ debug or request another power cycle.
   install methods). Route to `doca-bf3-deployment`.
 - **Running an application on an already-working BlueField** —
   out of scope. A DOCA service container routes to
-  [`doca-container-deployment`](../doca-container-deployment/SKILL.md);
+  `doca-container-deployment/SKILL.md`;
   a DOCA-linked binary launched directly routes to
-  [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md).
+  `doca-bare-metal-deployment/SKILL.md`.
   This skill hands off once Grace is installed and firmware is at the
   target level.
 - **Library-API questions** (constructing a DOCA-Flow pipe, an RDMA
   queue pair, interpreting a `DOCA_ERROR_*` code) — out of scope.
   Route to the matching `libs/<library>` skill via
-  [`doca-public-knowledge-map ## Library- and module-specific guides`](../doca-public-knowledge-map/SKILL.md#library--and-module-specific-guides).
+  `doca-public-knowledge-map ## Library- and module-specific guides` (`doca-public-knowledge-map/SKILL.md#library--and-module-specific-guides`).
 - **Env preparation on the installed Grace OS** (hugepages,
   `PKG_CONFIG_PATH` / `LD_LIBRARY_PATH`, devlink mode, representor
   visibility) — out of scope here. Route to
-  [`doca-setup ## configure`](../doca-setup/TASKS.md#configure); this
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`); this
   skill stops at "Grace installed, firmware at target."
 - **The hardware-change meta-policy itself** (preflight, OOB-console
   discipline, maintenance window, rollback for any PLDM burn / ISO
   reflash / power cycle / BMC factory reset) — owned by
-  [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify).
+  `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`).
   This skill always loads it ALONGSIDE and adds only the BF4
   sequencing; it never redefines the meta-policy.
 - **Fleet-scale / orchestrated DPU provisioning** (DOCA Platform
   Framework, NVIDIA Network Operator) — out of scope per the bundle's
   non-goals. Route via
-  [`doca-public-knowledge-map ## Externally-productized DOCA software`](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+  `doca-public-knowledge-map ## Externally-productized DOCA software` (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).

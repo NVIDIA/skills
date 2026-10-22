@@ -11,14 +11,15 @@ description: >
   state", "my component is being deprecated, what now", or "roll me back",
   even without the word upgrade. Detect what is installed, find the newer
   release, report the gap, then STOP and ask for explicit confirmation;
-  never upgrade automatically. Not for a runtime error on an unchanged
-  install (doca-debug). Version detection alone belongs to
+  never upgrade automatically. Do not use it for a runtime error on an
+  unchanged install (doca-debug). Version detection alone belongs to
   doca-version, first-time install to doca-setup, any hardware / firmware
   / reboot step to doca-hardware-safety, and public-docs or sunset routing
   to doca-public-knowledge-map.
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - upgrade
@@ -47,7 +48,10 @@ compatibility: >
   install)? This skill does not apply: name `doca-debug` and stop.
 
 These two answers are complete here; open `TASKS.md` only for a guided
-upgrade after the user confirms.
+upgrade after the user confirms. Run only the read-only detection
+commands yourself. Package commands (`sudo dpkg`, `apt`, `apt-get`) need
+root and change the system: give them to the user to run and stop; in an
+agent shell `sudo` waits for a password and the session stalls.
 
 - **"Can I just `apt upgrade` to the next DOCA?"** Never upgrade
   automatically. Detect the installed release with the `doca-version`
@@ -58,8 +62,9 @@ upgrade after the user confirms.
   `doca-hardware-safety`.
 - **"The upgrade aborted half-way and dpkg reports an interrupted
   transaction."** Recover the package database first:
-  `sudo dpkg --configure -a`, then `sudo apt-get -f install`
-  (Debian/Ubuntu). Do not re-run the upgrade as the first action; re-detect
+  after the user explicitly confirms (both commands change system package
+  state), the user runs `sudo dpkg --configure -a`, then
+  `sudo apt-get -f install` (Debian/Ubuntu). Do not re-run the upgrade as the first action; re-detect
   the release with `doca-version` before deciding the next step.
 
 ## Instructions
@@ -96,9 +101,9 @@ Only on an explicit "yes" does it walk a guided upgrade. A failed or
 partial move instead enters the recovery ladder without presenting a
 new target move. In both paths every hardware / firmware / reboot
 step is delegated to
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md), never
+`doca-hardware-safety/SKILL.md`, never
 redefined here. Version detection itself is owned by
-[`doca-version`](../doca-version/SKILL.md); this skill routes there
+`doca-version/SKILL.md`; this skill routes there
 and does not restate the detection chain.
 
 ## Example questions this skill answers well
@@ -112,9 +117,9 @@ load-bearing piece — the worked example is a single instance.
   says `<installed X.Y.Z>`; what's current and what does moving cost me?"*.
   Answered by the detect-and-report-the-gap workflow in
   ## configure, which routes the
-  detection to [`doca-version`](../doca-version/SKILL.md) and the
+  detection to `doca-version/SKILL.md` and the
   *what is current* lookup to
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **"Should I just run `apt upgrade` to move to the next DOCA
   release?"** — worked example: *"I want the newest Flow features;
   can I upgrade in place right now?"*. Answered by the never-auto
@@ -141,7 +146,7 @@ load-bearing piece — the worked example is a single instance.
   reboot — is that safe?"** — worked example: *"the target release
   requires a new BFB; can I reflash now?"*. Answered by routing
   every hardware / firmware / reboot step to
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) via
+  `doca-hardware-safety/SKILL.md` via
   ## run; this skill never redefines the
   reflash, mode-flip, or cold-power-cycle discipline.
 - **"My installed component is being sunset — should I keep building
@@ -151,7 +156,7 @@ load-bearing piece — the worked example is a single instance.
   awareness concern in
   ## Capabilities and modes,
   which routes the user to the public release notes via
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   to confirm lifecycle status rather than recommending continued
   investment in a component that may be sunsetting.
 
@@ -204,7 +209,7 @@ For a planned move, the agent MUST:
    then ask the user to confirm. Do NOT proceed to any upgrade
    command until the user explicitly says yes.
 3. Route every hardware / firmware / reboot step to
-   [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md). This
+   `doca-hardware-safety/SKILL.md`. This
    skill names *when* such a step is part of the upgrade; that skill
    names *how* it is applied safely.
 
@@ -218,10 +223,10 @@ an upgrade path explicitly documented by the Compatibility Policy or
 release notes.
 
 Do **not** load this skill for first-time install (use
-[`doca-setup`](../doca-setup/SKILL.md)), for the version-detection
-chain in isolation (use [`doca-version`](../doca-version/SKILL.md)),
+`doca-setup/SKILL.md`), for the version-detection
+chain in isolation (use `doca-version/SKILL.md`),
 or for general orientation (use
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)).
+`doca-public-knowledge-map/SKILL.md`).
 
 ## What this skill provides
 
@@ -259,33 +264,33 @@ lives in two companion files:
 
 ## Related skills
 
-- [`doca-version`](../doca-version/SKILL.md) — owns the four-source
+- `doca-version/SKILL.md` — owns the four-source
   detection chain and the four-way match rule. This skill's detect
   step routes there and does not redefine version detection; the
   gap report consumes the detected version.
-- [`doca-setup`](../doca-setup/SKILL.md) — owns first-time install,
+- `doca-setup/SKILL.md` — owns first-time install,
   install verification, and the apt-source path. This skill's
   apt-source consistency precheck cross-links there before any
   `apt`-shaped upgrade is contemplated.
-- [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) — owns
+- `doca-hardware-safety/SKILL.md` — owns
   every hardware / firmware / reboot step (mlxconfig, BFB reflash,
   BlueField mode flip, cold power cycle). This skill's `## Safety
   policy` overlays that meta-policy and adds only the
   upgrade-specific surface (confirmation gate, rollback-first,
   maintenance window).
-- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table to public DOCA docs, including the release notes
   and the Compatibility Policy. This skill routes *what is the
   current release* and *is this component sunsetting* there; it does
   not duplicate the routing.
-- [`doca-debug`](../doca-debug/SKILL.md) — the cross-cutting debug
+- `doca-debug/SKILL.md` — the cross-cutting debug
   ladder. A failed upgrade whose residual symptom lives at a
   software layer hands off there once the upgrade state is known.
-- [`doca-programming-guide`](../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   the build pattern a consumer rebuilds against after an upgrade.
   This skill surfaces *that* a rebuild may be needed; the build
   mechanics live there.
-- [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the JSON schemas the agent prefers when present; the upgrade
   detect step reuses the same `doca-env` one-shot the version skill
   uses, when the host has it.

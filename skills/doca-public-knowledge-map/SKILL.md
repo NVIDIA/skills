@@ -17,6 +17,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: knowledge
+  doca_version: "3.5"
   tags:
     - doca
     - documentation
@@ -68,7 +69,7 @@ short message; do not interrogate one-at-a-time.
 
 | Question | Why it matters | What it routes |
 | --- | --- | --- |
-| 1. **What OS are you on?** macOS, Windows, Linux laptop, cloud VM, lab Linux box, BlueField OS itself? | DOCA installs natively only on supported Linux distributions; macOS / Windows users cannot install it at all. | Picks between the four DOCA acquisition paths in [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install). macOS / Windows / no-Linux → Path 0 (NGC container). Supported Linux → Path A or B per the Installation Guide. |
+| 1. **What OS are you on?** macOS, Windows, Linux laptop, cloud VM, lab Linux box, BlueField OS itself? | DOCA installs natively only on supported Linux distributions; macOS / Windows users cannot install it at all. | Picks between the four DOCA acquisition paths in `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`). macOS / Windows / no-Linux → Path 0 (NGC container). Supported Linux → Path A or B per the Installation Guide. |
 | 2. **What hardware do you have?** No NVIDIA hardware, ConnectX SmartNIC, BlueField as a SmartNIC in a host, BlueField as a standalone DPU, not sure? | Real-traffic runtime needs a real NIC; build / read / learn does not. The user's hardware decides which DOCA libraries are even relevant. | Picks the runtime story (container is build-only without hardware). Filters which libraries make sense to learn (Flow needs a real port to do anything visible; Comch needs a host ↔ DPU pair). |
 | 3. **What's your goal?** Just exploring, building a small first app on a specific library (Flow / RDMA / Comch / Telemetry / GPUNetIO / DPA / …), running an existing reference application, operating a service (DMS / DTS / BlueMan / Firefly), or something else? | The bundle's first-app workflow (`doca-programming-guide ## modify`) starts from a **shipped C sample** and edits down. The right sample depends on the library the user is targeting. | Picks which library skill (if any) to load next. If the user does not yet know which library — that itself is a routing answer (see the *Library- and module-specific guides* table above and let the user pick). |
 | 4. **Which language do you plan to write the program in?** C / C++, Rust, Go, Python, other? | DOCA's public surface is a C ABI. Non-C consumers go through FFI / language bindings (`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` and the per-library skill). The C samples are the reference even when the user's language is not C. | Picks whether the agent's first-app guidance is *direct C build* or *FFI / bindings against the C ABI*. Does **not** change which sample the agent points at first. |
@@ -97,16 +98,16 @@ When the user asks something, route as follows:
 | User intent | First place to look |
 | --- | --- |
 | "How do I install DOCA?" | Installation Guide + Downloads page (Public documentation entry points). |
-| "How do I start with DOCA — what's the very first thing?" | Developer Quick Start Guide *if* the user has BlueField + host hardware; otherwise [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) Path 0 (NGC container). Use the four questions in [*First-contact discovery*](#first-contact-discovery--the-four-questions-to-ask-before-any-drill-down) to pick. |
+| "How do I start with DOCA — what's the very first thing?" | Developer Quick Start Guide *if* the user has BlueField + host hardware; otherwise `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`) Path 0 (NGC container). Use the four questions in [*First-contact discovery*](#first-contact-discovery--the-four-questions-to-ask-before-any-drill-down) to pick. |
 | "Do I need a BlueField? A SmartNIC? Or just DOCA-Host?" | Overview page (`doca-overview/index.html`) plus the Installation Guide's *DOCA installation profiles* section. The bundle does not pick the hardware for the user — these two pages do. |
 | "Which package gives me library X?" | Installation Guide section on package matrix; then verify on the user's system with `pkg-config --list-all`. |
 | "Show me a sample that uses library X." | `/opt/mellanox/doca/samples/doca_<X>/` if installed; otherwise the per-library guide on `docs.nvidia.com/doca/sdk/` (each library guide documents the samples shipped with it). |
 | "How do I build a DOCA sample?" | Library guide + the sample's own `meson.build` inside `/opt/mellanox/doca/samples/...`. |
 | "What is the API for X?" | Library guide; confirm by inspecting headers under `$(pkg-config --variable=includedir doca-common)` (commonly `/opt/mellanox/doca/include/` on DOCA 3.3+; `/opt/mellanox/doca/infrastructure/include/` on legacy / split-profile installs). |
-| "Why does my build fail with `pkg-config` not finding `doca-...`?" | "Layout of an installed DOCA package" (`PKG_CONFIG_PATH`), then load [`doca-setup`](../doca-setup/SKILL.md) for environment preparation and debugging; do not silently mutate the environment. |
+| "Why does my build fail with `pkg-config` not finding `doca-...`?" | "Layout of an installed DOCA package" (`PKG_CONFIG_PATH`), then load `doca-setup/SKILL.md` for environment preparation and debugging; do not silently mutate the environment. |
 | "What is the latest version / what changed?" | Release Notes. |
-| "Is there a newer DOCA — should I upgrade / downgrade / roll back?" | [`doca-upgrade`](../doca-upgrade/SKILL.md) for the detect → report → ASK → guided-upgrade discipline (never auto-upgrade); Release Notes for what the target release contains. |
-| "Is the component I depend on being sunset / deprecated?" | Release Notes (lifecycle / deprecation notices), reached via the [`doca-upgrade`](../doca-upgrade/SKILL.md) sunset-awareness check; do not assert deprecation from memory. |
+| "Is there a newer DOCA — should I upgrade / downgrade / roll back?" | `doca-upgrade/SKILL.md` for the detect → report → ASK → guided-upgrade discipline (never auto-upgrade); Release Notes for what the target release contains. |
+| "Is the component I depend on being sunset / deprecated?" | Release Notes (lifecycle / deprecation notices), reached via the `doca-upgrade/SKILL.md` sunset-awareness check; do not assert deprecation from memory. |
 | "What does the DOCA version number mean? Is LTS still supported?" | Compatibility Policy (Public documentation entry points table). |
 | "How do I run DOCA on Kubernetes / provision a DPU?" | DOCA Platform Framework on GitHub. |
 | "I have a behavior I cannot explain." | Release Notes (known issues) first; then the DOCA Developer Forum. Never go to the forum first. |
@@ -125,7 +126,7 @@ This file is intentionally a **map**, not a tutorial. It does not contain:
 
 When the agent needs those, it should fetch the matching public document or
 read the matching installed file. As more focused skills are added, they
-should appear in [SKILLS.md](../../SKILLS.md) and link back here for the
+should appear in bundle `SKILLS.md` and link back here for the
 "where to look" lookups.
 
 ## Related skills
@@ -135,7 +136,7 @@ For env preparation — install verification, build environment
 the *I have no install yet* path with the public NGC DOCA container
 on the catalog Tags page as the universal Stage-1 fallback for any
 user on macOS, Windows, or Linux without DOCA — load
-[`doca-setup`](../doca-setup/SKILL.md). That skill stops at *"the
+`doca-setup/SKILL.md`. That skill stops at *"the
 install is healthy and the env is ready"*.
 
 For general DOCA programming patterns shared across every library —
@@ -144,7 +145,7 @@ or non-C via FFI), the universal *derive a custom first app from a
 shipped sample* workflow, the universal lifecycle (`cfg-create →
 init → start → use → stop → destroy`), the cross-library
 `DOCA_ERROR_*` taxonomy, and the program-side debug order — load
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md). Each
+`doca-programming-guide/SKILL.md`. Each
 library skill extends its `## modify` (first-app derivation) with
 library-specific overrides.
 
@@ -152,14 +153,14 @@ For DOCA Flow internals — port and representor setup, pipe creation,
 match/action specifications, pipe validation before hardware programming,
 Flow counters and traces, Flow version compatibility, and debugging
 `DOCA_ERROR_*` failures from the Flow API — load
-[`doca-flow`](../libs/doca-flow/SKILL.md). That skill assumes this one is
+`doca-flow/SKILL.md`. That skill assumes this one is
 available for shared documentation routing and install-layout lookups,
 `doca-setup` for environment preparation, and `doca-programming-guide`
 for the cross-library programming patterns it layers on top of.
 
 For a concrete local debug loop against a running system — reproducing a
 build, link, or runtime failure on the installed host, narrowing it to a
-component, and iterating on it — [`doca-debug`](../doca-debug/SKILL.md)
+component, and iterating on it — `doca-debug/SKILL.md`
 owns the edit-run-observe cycle and should be loaded alongside this skill.
 Handing off that cycle is not a reason to go quiet: a debug answer still
 needs the two things this skill owns, and it should supply them in the
@@ -212,7 +213,7 @@ Load that companion; do not invent install paths from memory.
 
 Version-detection routing lives in
 [`references/map.md ## Where to find the version`](references/map.md#where-to-find-the-version).
-Then load [`doca-version`](../doca-version/SKILL.md) for the four-source chain.
+Then load `doca-version/SKILL.md` for the four-source chain.
 
 ## URL audit
 

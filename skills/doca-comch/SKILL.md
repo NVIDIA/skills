@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - comch
@@ -59,7 +60,7 @@ pair with DOCA. Open the tasks companion if the user wants to
 open the capabilities companion when the question is
 *what can Comch express* on this version. If the user has not
 installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first. If the user is
+`doca-setup/SKILL.md` first. If the user is
 asking *"is Comch even on this DOCA"* because the docs they read
 mention `doca-comm-channel`, route to
 ## Version compatibility
@@ -101,14 +102,14 @@ load-bearing piece — the worked example is a single instance.
   + the env-prep checklist in
   ## configure step 1, which
   routes representor-side env questions to
-  [`doca-setup`](../../doca-setup/SKILL.md).
+  `doca-setup/SKILL.md`.
 - **"Is this Comch capability on my installed DOCA version?"** —
   worked example: *"is `doca_comch_producer` in DOCA 2.6.0, or do
   I still need the old slow-path API?"*. Answered by the
   version-compatibility overlay in
   ## Version compatibility,
   which cross-links the canonical detection chain in
-  [`doca-version`](../../doca-version/SKILL.md) and adds the
+  `doca-version/SKILL.md` and adds the
   Comch-specific 2.5 rename rule.
 - **"What does this `DOCA_ERROR_*` from a Comch call mean and
   which layer caused it?"** — worked example: *"`DOCA_ERROR_AGAIN`
@@ -117,7 +118,7 @@ load-bearing piece — the worked example is a single instance.
   ## Error taxonomy
   + the layered ladder in
   ## debug that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  `doca-debug/SKILL.md`.
 
 ## Audience
 
@@ -169,7 +170,7 @@ in any language. Concretely:
 
 Do **not** load this skill for general DOCA orientation, install
 of DOCA itself, or non-Comch library questions. For those, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## What this skill provides
 
@@ -196,7 +197,7 @@ installed at the standard location and the user has the privileges
 their public install profile expects (in particular, sudo on the
 DPU side to see the host representor). It does not cover installing
 DOCA — that path goes through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -210,7 +211,7 @@ contain — and pull requests should not add:
   agent's job is to route the user to those files and prescribe a
   minimum-diff modification on them via the universal
   modify-a-sample workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the Comch-specific overrides in
   ## modify.
 - **Standalone build manifests** (`meson.build`, `CMakeLists.txt`,
@@ -234,39 +235,39 @@ contain — and pull requests should not add:
    test, debug — see the tasks companion.**
 
 Both companion files cross-link to each other,
-[`doca-version`](../../doca-version/SKILL.md) for the canonical
+`doca-version/SKILL.md` for the canonical
 version-handling rules, and
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public docs or
 the installed package layout" rather than "Comch-specific
 guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation source and
   the on-disk layout of an installed DOCA package. The Comch URL
   slug is `DOCA-Comch` (DOCA 2.5+), not `doca-comm-channel`.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, representor visibility checks, and the *I
   have no install yet* path with the public NGC DOCA container.
   This skill assumes its preconditions are satisfied.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. This skill's `## Version
   compatibility` cross-links the four-way match rule and adds the
   Comch-specific 2.5 rename overlay.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect / prefer
   / fall back / report). The Command appendix in
   the tasks companion honors this contract.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal
   modify-a-shipped-sample first-app workflow, the universal
   lifecycle, the cross-library `DOCA_ERROR_*` taxonomy, and the
   program-side debug order. This skill layers Comch specifics on
   top.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). Comch-specific debug (lifecycle violations,
   representor visibility, slow-path vs fast-path queue-full

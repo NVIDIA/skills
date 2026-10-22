@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers and engineers building applications that consume the DOCA Comch C library (directly or through FFI/bindings) to exchange control or data messages between a host process and a BlueField DPU agent over PCIe, including configuring, building, modifying, running, testing, and debugging Comch apps. <br>
+External developers and engineers building applications that consume the DOCA Comch library — code that calls doca_comch_* to exchange control or data messages between a host process and a BlueField agent over PCIe. They use this skill for hands-on Comch work: selecting server/client roles, driving the connection lifecycle, choosing slow-path vs fast-path messaging, querying capabilities, and debugging DOCA_ERROR_* returns. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,13 +26,13 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Samples (NVIDIA-DOCA/doca-samples)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Code, Configuration instructions, Shell commands] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -44,39 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated k8s-sandbox pod, with and without the skill (baseline). <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed — selection, decoy avoidance, and workflow execution. <br>
-- Effectiveness: Whether the skill helped complete the task (50% goal completion + 50% expected workflow adherence). <br>
-- Efficiency: Whether wasted tool calls and token usage were avoided (50% tool-call productivity + 50% token efficiency). <br>
+- Security: Is the skill safe to use — free of unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the final answer correct against the reference answer. <br>
+- Discoverability: Was the right skill selected and activated when needed, avoiding decoys. <br>
+- Effectiveness: Did the skill help complete the user's goal and follow the expected workflow. <br>
+- Efficiency: Did the run avoid wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill) | Codex (Baseline → Skill) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.7% (no comparable baseline) | 97.0% (no comparable baseline) |
+| Overall | 98.4% (uplift unavailable) | 95.0% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 90.0% → 100.0% (+10.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% (no comparable baseline) | 91.7% (no comparable baseline) |
-| Effectiveness | 66.7% → 100.0% (+33.3 points) | 66.7% → 98.8% (+32.1 points) |
-| Efficiency | 83.6% (no comparable baseline) | 94.7% (no comparable baseline) |
+| Discoverability | 100.0% (uplift unavailable) | 93.3% (uplift unavailable) |
+| Effectiveness | 67.9% → 99.4% (+31.5 points) | 63.3% → 87.5% (+24.2 points) |
+| Efficiency | 92.4% (uplift unavailable) | 94.0% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-7e143d8 (source: git SHA, committed 2026-10-12) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

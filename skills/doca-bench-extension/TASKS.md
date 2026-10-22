@@ -26,8 +26,8 @@ Routing for nearby "install" questions:
 
 - *"`doca-bench` is not on my system."* → that is a parent
   tool install question. Route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
-  and [`## no-install`](../../doca-setup/TASKS.md#no-install).
+  `doca-setup ## install` (`doca-setup/TASKS.md#configure`)
+  and `## no-install` (`doca-setup/TASKS.md#no-install`).
 - *"The reference `doca_bench_cuda_impl` library is
   missing."* → same routing — the install profile that
   excluded the bench GPU component will have excluded the
@@ -43,7 +43,7 @@ Routing for nearby "install" questions:
   the `DOCA_EXPERIMENTAL` rebuild rule says there is no
   independent upgrade path. Route the cross-release
   decision through
-  [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+  `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 
 ## configure
 
@@ -57,14 +57,14 @@ any step is the canonical failure mode.
 Steps the agent should walk the user through, in order:
 
 1. **Confirm DOCA is installed and `doca-bench` is healthy.**
-   Run [`doca-setup ## test`](../../doca-setup/TASKS.md#test);
+   Run `doca-setup ## test` (`doca-setup/TASKS.md#test`);
    then confirm the parent `doca-bench` is reachable per
-   [`doca-bench TASKS.md ## test`](../doca-bench/TASKS.md#test).
+   `doca-bench TASKS.md ## test` (`doca-bench/TASKS.md#test`).
    The extension has no value without a working parent.
 2. **Re-validate the extension-is-needed decision.** Per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    (Extension-as-exit-ramp): walk
-   [`doca-bench TASKS.md ## configure`](../doca-bench/TASKS.md#configure)
+   `doca-bench TASKS.md ## configure` (`doca-bench/TASKS.md#configure`)
    FIRST. Confirm no built-in workload mode covers the
    class. The agent must NOT skip this — extensions add
    real cost (toolchain, version churn, experimental
@@ -96,7 +96,7 @@ Steps the agent should walk the user through, in order:
    extension is GPU-side: the CUDA toolkit version
    compatible with the running DOCA / driver, the GPU
    architecture flags, the GPUNetIO preconditions per
-   [`doca-gpunetio`](../../libs/doca-gpunetio/SKILL.md).
+   `doca-gpunetio/SKILL.md`.
    When the extension is non-GPU: the relevant
    primitive's preconditions.
 7. **Capture the version stack.** Per
@@ -222,11 +222,11 @@ Recurring rules for the modification:
   smoke.
 - **Cross-link to the right neighbouring skill for the
   workload domain.** GPUNetIO workloads route to
-  [`doca-gpunetio`](../../libs/doca-gpunetio/SKILL.md);
+  `doca-gpunetio/SKILL.md`;
   Flow workloads route to
-  [`doca-flow`](../../libs/doca-flow/SKILL.md); Comch
+  `doca-flow/SKILL.md`; Comch
   workloads route to
-  [`doca-comch`](../../libs/doca-comch/SKILL.md). The
+  `doca-comch/SKILL.md`. The
   extension's BODY uses the underlying primitive's API;
   this skill does not duplicate that semantics.
 
@@ -337,7 +337,7 @@ invocation, not just one):
 | 1 → ## debug | The parent cannot find / load the library; walk the load-failed layer, then re-build with corrected `soversion` / install path and re-run step 1 | [`## debug`](#debug) layers 2-3 |
 | 2 → ## debug | The parent loaded the library but cannot register the entry points; walk the registration-mismatch layer | [`## debug`](#debug) layer 4 |
 | 3 → ## debug | The minimal workload kernel fails or hangs; walk the runtime-call layer and confirm the `stop_flag` discipline | [`## debug`](#debug) layer 5 |
-| 5 → step 6 | Per-iteration variance is high on the scaled measurement; the printed average is misleading | [`doca-bench TASKS.md ## debug`](../doca-bench/TASKS.md#debug) (parent's variance handling) |
+| 5 → step 6 | Per-iteration variance is high on the scaled measurement; the printed average is misleading | `doca-bench TASKS.md ## debug` (`doca-bench/TASKS.md#debug`) (parent's variance handling) |
 | any → DOCA upgrade → 1 | Per the `DOCA_EXPERIMENTAL` rebuild rule, every DOCA upgrade re-opens the smoke; the prior smoke is stale | [`## configure`](#configure) step 7 + [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
 | any → extension source edit → 1 | After ANY edit, re-run BOTH smokes; the prior smoke is stale | [`## modify`](#modify) |
 | any → CUDA toolkit upgrade → 1 | After a CUDA toolkit upgrade, re-run BOTH smokes; the prior smoke is stale | [`## debug`](#debug) layer 6 |
@@ -363,40 +363,40 @@ layers in order:
 1. **Built-in-mode-would-have-sufficed.** First, confirm
    the operator actually needs an extension. If a built-in
    `doca-bench` mode covers the workload, route back to
-   [`doca-bench TASKS.md ## configure`](../doca-bench/TASKS.md#configure)
+   `doca-bench TASKS.md ## configure` (`doca-bench/TASKS.md#configure`)
    and drop the extension entirely.
 2. **Build-failed.** Quote the compiler / linker error
    verbatim. Common causes: wrong DOCA headers (route to
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)),
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)),
    wrong CUDA toolkit version (route to the public CUDA
    docs), missing GPU build flags (cross-reference the
    shipped reference's `meson.build`).
 3. **Load-failed.** Run `ldd` on the built library, check
    `LD_LIBRARY_PATH`, check `SONAME` matches the running
    DOCA `so_version`. Route the dynamic-linker side to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md).
+   `doca-debug ## debug` (`doca-debug/SKILL.md`).
 4. **Registration-mismatch.** Cross-check the
    extension's exported symbols (`nm -D` on the library)
    against the shipped reference's
    `DOCA_EXPERIMENTAL`-marked surface. Confirm against
    the public DOCA Bench documentation on
    `docs.nvidia.com` (via
-   [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)).
+   `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)).
 5. **Runtime-call-failed.** Quote the parent's error
    verbatim. Check the per-workload settings struct
    contents; the most common GPU-side failure is the
    `stop_flag` never being set, leading to a hung kernel
    that requires OOB reset.
 6. **Version.** Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end. Common extension-specific symptoms: the
    extension was built against one DOCA release's headers
    and is loaded by another release's `doca-bench`; the
    CUDA toolkit version doesn't match the driver; the
    firmware doesn't expose what the extension assumes.
 7. **Cross-cutting.** Hand off to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md) and
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)
+   `doca-debug ## debug` (`doca-debug/SKILL.md`) and
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`)
    for env-side layers (driver, firmware, CUDA driver,
    PCIe, dynamic linker).
 
@@ -430,7 +430,7 @@ captured `doca-bench-extension` run as evidence.
    matching version stack.** Comparing across DOCA
    releases (per the `DOCA_EXPERIMENTAL` rebuild rule)
    is NOT apples-to-apples; the agent says so explicitly.
-5. **Route to [`doca-bench TASKS.md ## use`](../doca-bench/TASKS.md)**
+5. **Route to `doca-bench TASKS.md ## use` (`doca-bench/TASKS.md`)**
    for the parent's standard `## use` workflow; the
    extension result feeds into the parent's reporting
    pipeline, not a separate one.
@@ -442,24 +442,24 @@ should be routed out before the agent does any of them
 under this skill's name.
 
 - **install DOCA** ⇒
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
-  and [`## no-install`](../../doca-setup/TASKS.md#no-install).
+  `doca-setup ## install` (`doca-setup/TASKS.md#configure`)
+  and `## no-install` (`doca-setup/TASKS.md#no-install`).
 - **pick a built-in `doca-bench` workload mode** ⇒
-  [`doca-bench`](../doca-bench/SKILL.md). Always the
+  `doca-bench/SKILL.md`. Always the
   first answer to try before any extension work.
 - **CUDA toolkit installation** ⇒ NVIDIA's public CUDA
   Toolkit documentation on `docs.nvidia.com`. The
   bench-extension framework does not duplicate it.
 - **DOCA GPUNetIO programming semantics** ⇒
-  [`doca-gpunetio`](../../libs/doca-gpunetio/SKILL.md).
+  `doca-gpunetio/SKILL.md`.
   The extension's kernel BODY uses GPUNetIO; this skill
   describes the wrapper, not the underlying API.
 - **DOCA Flow programming semantics** ⇒
-  [`doca-flow`](../../libs/doca-flow/SKILL.md) when the
+  `doca-flow/SKILL.md` when the
   extension drives a Flow workload.
 - **firmware / driver upgrade** ⇒
-  [`doca-version`](../../doca-version/SKILL.md) +
-  [`doca-setup`](../../doca-setup/SKILL.md). The
+  `doca-version/SKILL.md` +
+  `doca-setup/SKILL.md`. The
   bench-extension framework has no opinion beyond the
   rebuild-on-DOCA-upgrade rule.
 - **contributor work on the in-tree extensions** ⇒ out
@@ -479,7 +479,7 @@ Bench documentation on `docs.nvidia.com` describes.
 **Infra-aware preamble (every row below).** Per the
 bundle's detect → prefer → fall back → report contract
 documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST
@@ -490,20 +490,20 @@ the agent should:
 3. If the probe fails, fall back to the manual command in
    the row.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
-| Discover the documented bench-extension surface | Inspect the shipped `/opt/mellanox/doca/tools/bench_extension/` source tree on the user's install + the public DOCA Bench documentation on `docs.nvidia.com` (via [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)) | [`## configure`](#configure) steps 3-4 + [`## debug`](#debug) layer 4 | The reference exemplar is reachable on the user's install; the public guide documents the runtime discovery mechanism the parent uses. |
-| Confirm DOCA `version` / `so_version` for the build | `pkg-config --modversion doca-common` or equivalent DOCA version probe on the build host | [`## configure`](#configure) step 7 + [`## debug`](#debug) layer 6 | The reported version matches the parent `doca-bench`'s linked DOCA version per [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2. |
+| Discover the documented bench-extension surface | Inspect the shipped `/opt/mellanox/doca/tools/bench_extension/` source tree on the user's install + the public DOCA Bench documentation on `docs.nvidia.com` (via `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)) | [`## configure`](#configure) steps 3-4 + [`## debug`](#debug) layer 4 | The reference exemplar is reachable on the user's install; the public guide documents the runtime discovery mechanism the parent uses. |
+| Confirm DOCA `version` / `so_version` for the build | `pkg-config --modversion doca-common` or equivalent DOCA version probe on the build host | [`## configure`](#configure) step 7 + [`## debug`](#debug) layer 6 | The reported version matches the parent `doca-bench`'s linked DOCA version per `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2. |
 | Build the extension shared library | A `meson` configure + compile invocation adapted from the shipped `/opt/mellanox/doca/tools/bench_extension/meson.build`, with `version : doca_version` and `soversion : doca_so_version` preserved | [`## build`](#build) steps 2-4 | Exits 0; produces a `.so` with the expected `SONAME`; install path is on the parent loader's search path. |
 | Confirm the built library's `SONAME` | `readelf -d <library>.so` or `objdump -p <library>.so` | [`## build`](#build) step 5 + [`## debug`](#debug) layer 3 | `SONAME` carries the matching `so_version`; `ldd` resolves all dependencies. |
 | Confirm the extension exports the expected entry points | `nm -D <library>.so` cross-referenced against the `DOCA_EXPERIMENTAL`-marked surface in the shipped `doca_bench_cuda.h` | [`## debug`](#debug) layer 4 | The exported symbols match the surface shape (and the *spelling* matches what the parent expects per the public DOCA Bench documentation). |
 | Run the no-op smoke through the parent | `doca-bench` invocation that points at the extension and invokes its no-op kernel (the reference's `doca_bench_cuda_start_nop_kernel` family is the example; the exact CLI surface the parent exposes lives in the parent's documentation) | [`## run`](#run) step 2 + [`## test`](#test) step 1 | Exit 0; parent logs show the extension loaded; the no-op entry returned `DOCA_SUCCESS`. |
 | Run the minimal-workload smoke through the parent | `doca-bench` invocation that points at the extension and invokes the smallest non-no-op workload kernel | [`## run`](#run) step 4 + [`## test`](#test) step 3 | Exit 0; parent's accounting consumed the extension's stats struct; `jobs_processed > 0`; `stop_flag` discipline held (kernel terminated when the parent set the flag). |
-| Save a session snapshot for debug | Capture (a) the parent's invocation + logs, (b) the extension's logs, (c) `ldd` and `nm -D` output for the library, (d) the version stack (DOCA, firmware, CUDA, parent `doca-bench`, extension `SONAME`) | [`## test`](#test) capture step + [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) | The saved bundle is consumed by the cross-cutting debug ladder. |
+| Save a session snapshot for debug | Capture (a) the parent's invocation + logs, (b) the extension's logs, (c) `ldd` and `nm -D` output for the library, (d) the version stack (DOCA, firmware, CUDA, parent `doca-bench`, extension `SONAME`) | [`## test`](#test) capture step + `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) | The saved bundle is consumed by the cross-cutting debug ladder. |
 
 Three cross-cutting rules for this appendix:
 
@@ -522,12 +522,12 @@ Three cross-cutting rules for this appendix:
 - **Cross-link instead of duplicate.** Cross-cutting
   commands (`pkg-config`, `dmesg`, `ldd`, `nm`, `readelf`)
   live in
-  [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md);
+  `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md`);
   parent-tool commands (the `doca-bench` CLI itself) live
   in
-  [`doca-bench TASKS.md ## Command appendix`](../doca-bench/TASKS.md);
+  `doca-bench TASKS.md ## Command appendix` (`doca-bench/TASKS.md`);
   GPUNetIO-specific commands live in
-  [`doca-gpunetio`](../../libs/doca-gpunetio/SKILL.md);
+  `doca-gpunetio/SKILL.md`;
   this appendix names only bench-extension-specific
   invocations on top.
 
@@ -559,7 +559,7 @@ A few rules that apply across every verb in this file:
   termination.
 - This skill **assumes a healthy DOCA install** (or the
   public NGC DOCA container), a healthy parent
-  [`doca-bench`](../doca-bench/SKILL.md), and the
+  `doca-bench/SKILL.md`, and the
   relevant toolchain for the extension's domain (CUDA
   toolkit when GPU-side). If any of those is in doubt,
   route to the appropriate skill before doing any

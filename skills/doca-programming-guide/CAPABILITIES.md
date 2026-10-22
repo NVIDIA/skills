@@ -5,7 +5,7 @@ first to pick the family; then drill into the matching H2. Every
 prescriptive section below stays library-agnostic — overlays for a
 specific library live in that library's `CAPABILITIES.md`.
 
-Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the step-by-step workflows that *use* the surface described here, see [TASKS.md](TASKS.md). For env-class equivalents (install profiles, env-class errors, env observability), see [`doca-setup`](../doca-setup/SKILL.md). For where to find official documentation, the on-disk install layout, or the Installation Guide, route through [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the step-by-step workflows that *use* the surface described here, see [TASKS.md](TASKS.md). For env-class equivalents (install profiles, env-class errors, env observability), see `doca-setup/SKILL.md`. For where to find official documentation, the on-disk install layout, or the Installation Guide, route through `doca-public-knowledge-map/SKILL.md`.
 
 This file describes the **shape every DOCA program shares** — the architecture every library plugs into, the lifecycle every library follows, the error pattern every library returns, the observability surface every library emits into, and the safety rules every program must respect. Library-specific overlays live in the matching library skill.
 
@@ -29,7 +29,7 @@ Two principles cut across all five:
 
 - **Library-agnostic shape, library-specific overlay.** This skill
   prescribes the shape; the matching library skill (e.g.
-  [`doca-flow`](../libs/doca-flow/SKILL.md)) overlays the
+  `doca-flow/SKILL.md`) overlays the
   library-specific specifics (Flow pipe topology, RDMA QP semantics,
   …). Both must be loaded for a complete answer.
 - **Programs run *with* DOCA, not *of* DOCA.** Everything below
@@ -41,7 +41,7 @@ Two principles cut across all five:
 
 DOCA is structured into a small set of orthogonal pieces. The agent must clarify which piece the user is touching before recommending any code or command.
 
-**Where the code runs.** The same DOCA library can be linked from a program running in any of three locations. Which modes are *available* on the user's host is an env property and lives in [`doca-setup CAPABILITIES.md ## Capabilities and modes`](../doca-setup/CAPABILITIES.md#capabilities-and-modes); which mode the program *selects at init time* is a programming property and is described here.
+**Where the code runs.** The same DOCA library can be linked from a program running in any of three locations. Which modes are *available* on the user's host is an env property and lives in `doca-setup CAPABILITIES.md ## Capabilities and modes` (`doca-setup/CAPABILITIES.md#capabilities-and-modes`); which mode the program *selects at init time* is a programming property and is described here.
 
 | Location | What it is | When the user's program is here |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ The library guides describe which mode is meaningful for that library; the agent
 
 The agent's rule: when the user says *"first app"*, the answer always starts from a **sample**, not from an application or a service. Applications are for reading; samples are for modifying.
 
-**Build flavor selection.** The `pkg-config` module name selects which library variant your program links against — same library, different runtime properties. The env-side mechanics (where the trace `*.so` lives on disk, how to set `LD_LIBRARY_PATH`) are in [`doca-setup CAPABILITIES.md ## Capabilities and modes`](../doca-setup/CAPABILITIES.md#capabilities-and-modes); the program-side rationale for *which* flavor to pick is here.
+**Build flavor selection.** The `pkg-config` module name selects which library variant your program links against — same library, different runtime properties. The env-side mechanics (where the trace `*.so` lives on disk, how to set `LD_LIBRARY_PATH`) are in `doca-setup CAPABILITIES.md ## Capabilities and modes` (`doca-setup/CAPABILITIES.md#capabilities-and-modes`); the program-side rationale for *which* flavor to pick is here.
 
 | `pkg-config` module | Variant | When to pick it |
 | --- | --- | --- |
@@ -90,13 +90,13 @@ The agent's rule: never recommend a `use`-phase call before confirming the objec
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, the headers-win-over-docs rule, and the routing to the DOCA Compatibility Policy, see [`doca-version`](../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, the headers-win-over-docs rule, and the routing to the DOCA Compatibility Policy, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The program-side overlay** layers on top of the verified version:
 
-- **Quote the version observed, never "latest" and never agent memory.** API names, sample filenames, and capability availability all depend on the user's installed version. Per the safety policy in [`doca-version CAPABILITIES.md ## Safety policy`](../doca-version/CAPABILITIES.md#safety-policy), a recommendation that quotes a version-pinned URL or invents a feature based on agent memory is the bundle's primary hallucination failure mode.
+- **Quote the version observed, never "latest" and never agent memory.** API names, sample filenames, and capability availability all depend on the user's installed version. Per the safety policy in `doca-version CAPABILITIES.md ## Safety policy` (`doca-version/CAPABILITIES.md#safety-policy`), a recommendation that quotes a version-pinned URL or invents a feature based on agent memory is the bundle's primary hallucination failure mode.
 - **For non-C consumers (FFI / bindings).** The binding tooling generates declarations from the headers at build time. Re-generate after any DOCA upgrade — bindings pinned to a stale header will compile but call into the new `*.so` with mismatched signatures, returning `DOCA_ERROR_INVALID_VALUE` or, worse, silent corruption.
-- **Use the per-library `doca_<library>_cap_*` query family at runtime** as the authoritative answer for *"is this capability supported on this device + this install"*. The version-matrix is the *promise*; the cap query is the *reality*. When they disagree, the cap query wins — see [`doca-version TASKS.md ## test`](../doca-version/TASKS.md#test) step 3.
+- **Use the per-library `doca_<library>_cap_*` query family at runtime** as the authoritative answer for *"is this capability supported on this device + this install"*. The version-matrix is the *promise*; the cap query is the *reality*. When they disagree, the cap query wins — see `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) step 3.
 
 ## Error taxonomy
 
@@ -113,12 +113,12 @@ The general taxonomy the agent must recognize:
 | `DOCA_ERROR_NO_MEMORY` | Allocation failed. | Out-of-memory at the system level (rare during first-app development) or out of a library-managed pool. The library skill names the relevant pool / budget. |
 | `DOCA_ERROR_TIME_OUT` | An async operation did not complete in time. | Increase the timeout if intended; investigate why the underlying operation is slow if not. |
 | `DOCA_ERROR_INITIALIZATION` | Library / object initialization itself failed. | Almost always a missing prerequisite (driver, capability, peer). Walk through the library's `## configure` workflow; do not retry blindly. |
-| `DOCA_ERROR_DRIVER` | The underlying driver / firmware reported failure. | Capture state and route to env-class debug ([`doca-setup ## debug`](../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the program. |
-| `DOCA_ERROR_UNKNOWN` | Internal error not mappable to the taxonomy. | Capture state and escalate through [`doca-debug ## debug`](../doca-debug/TASKS.md#debug); do not paper over with a retry loop. |
+| `DOCA_ERROR_DRIVER` | The underlying driver / firmware reported failure. | Capture state and route to env-class debug (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the program. |
+| `DOCA_ERROR_UNKNOWN` | Internal error not mappable to the taxonomy. | Capture state and escalate through `doca-debug ## debug` (`doca-debug/TASKS.md#debug`); do not paper over with a retry loop. |
 
 For *any* returned `doca_error_t` other than `DOCA_SUCCESS`, the agent's first step is to call `doca_error_get_descr(err)` and quote the actual descriptor string — never paraphrase from memory. The descriptor is the library's own statement of what went wrong; library-specific guides can refine it but cannot contradict it.
 
-The env-class error surface (missing `*.pc`, hugepages not mounted, representor not visible) is **separate** and lives in [`doca-setup CAPABILITIES.md ## Error taxonomy`](../doca-setup/CAPABILITIES.md#error-taxonomy). The agent's debug order is always env first ([`doca-setup ## debug`](../doca-setup/TASKS.md#debug) layers 1–4), then program ([`TASKS.md ## debug`](TASKS.md#debug) layers 2–5).
+The env-class error surface (missing `*.pc`, hugepages not mounted, representor not visible) is **separate** and lives in `doca-setup CAPABILITIES.md ## Error taxonomy` (`doca-setup/CAPABILITIES.md#error-taxonomy`). The agent's debug order is always env first (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layers 1–4), then program ([`TASKS.md ## debug`](TASKS.md#debug) layers 2–5).
 
 ## Observability
 
@@ -146,6 +146,6 @@ DOCA programs share state with the system, the device, and (in production) other
 2. **Stage first, widen later.** Run any new program against the smallest possible scope first — one representor, one queue, one channel. Read the output. Only after the staged run succeeds may the user widen the scope. The library's *unit of damage* (a representor for Flow, a QP for RDMA, a channel for Comch) defines what "smallest scope" means; the library skill names it.
 3. **Trace flavor for development; release flavor for performance.** The `-trace` build variant adds runtime sanitation that is invaluable while learning the API surface but introduces measurable overhead. Make the switch to release a deliberate, documented step before any performance reading is taken seriously.
 4. **Quote the version on every API claim.** Capability availability changes between releases. Statements of the form *"this works in DOCA 3.3"* must come from the user's *installed* `pkg-config --modversion doca-<library>`, not from agent memory or a public docs page that may describe a different release.
-5. **Respect the env-side safety policy.** Hugepage changes, eswitch mode changes, `mlxconfig` resets, BFB updates — all are global system state. The env-side rules in [`doca-setup CAPABILITIES.md ## Safety policy`](../doca-setup/CAPABILITIES.md#safety-policy) bind every program; no library override changes them.
+5. **Respect the env-side safety policy.** Hugepage changes, eswitch mode changes, `mlxconfig` resets, BFB updates — all are global system state. The env-side rules in `doca-setup CAPABILITIES.md ## Safety policy` (`doca-setup/CAPABILITIES.md#safety-policy`) bind every program; no library override changes them.
 6. **Never auto-modify the install tree.** `/opt/mellanox/doca/lib*/` is the release. Programs link against it; programs do not rewrite it. Build flavor changes go via `LD_LIBRARY_PATH` or the `-trace` `pkg-config` module, never by editing `lib/`.
 7. **Trust the C ABI as the source of truth, even from non-C languages.** Wrappers, FFI bindings, and codegen toolchains all eventually call the same `libdoca_<library>.so` the C samples link against. A binding-side decision that contradicts the public C ABI's lifecycle, error handling, or capability gate is wrong even if the binding compiles cleanly; the symptoms surface at runtime as `DOCA_ERROR_BAD_STATE` or `DOCA_ERROR_INVALID_VALUE` from the underlying C call.

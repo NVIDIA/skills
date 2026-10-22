@@ -30,29 +30,29 @@ install path:
 
 1. **Confirm DOCA is installed with the SPCX component.**
    If the binary is missing, route to
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+   `doca-setup ## install` (`doca-setup/TASKS.md#configure`)
    to install or repair the host-side DOCA package
    selection; confirm the version per
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 2. **Confirm the host-side
-   [`doca-pcc`](../../libs/doca-pcc/SKILL.md) library is
+   `doca-pcc/SKILL.md` library is
    installed at the matching version.** The SPCX tool
    links this library; the two must come from the same
    DOCA release band per
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 3. **Confirm the DPACC compiler is installed and
    version-matched.** Per the
-   [`doca-dpa`](../../libs/doca-dpa/SKILL.md) overlay,
+   `doca-dpa/SKILL.md` overlay,
    the DPA-side algorithm image is built by DPACC and
    the host-side DOCA must match DPACC.
 4. **Confirm a BlueField with a DPA processor is
    physically present and visible to the host through
    DOCA.** Walk
-   [`doca-dpa TASKS.md ## configure`](../../libs/doca-dpa/TASKS.md#configure)
+   `doca-dpa TASKS.md ## configure` (`doca-dpa/TASKS.md#configure`)
    step 1 to enumerate the device.
 5. **Confirm the firmware custom-PCC slot is enabled.**
    Per
-   [`doca-pcc CAPABILITIES.md ## Capabilities and modes`](../../libs/doca-pcc/CAPABILITIES.md#capabilities-and-modes)
+   `doca-pcc CAPABILITIES.md ## Capabilities and modes` (`doca-pcc/CAPABILITIES.md#capabilities-and-modes`)
    triple-axis precondition: custom-PCC requires a
    firmware-level slot to be enabled via the
    `mlxconfig`-class knob the public guide names. If
@@ -60,7 +60,7 @@ install path:
    with the firmware-precondition error layer. The
    slot flip is a hardware-touching change per the
    bundle-wide hardware-safety meta-policy in
-   [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+   `doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
    — capture the pre-flight inventory, confirm OOB,
    and follow the cold-power-cycle commit rule.
 6. **Confirm SPCX availability on the installed DOCA +
@@ -97,7 +97,7 @@ through, in order:
    If the user wants a documented default algorithm,
    route to firmware configuration; if the user wants
    the established PCC surface, route to
-   [`doca-pcc`](../../libs/doca-pcc/SKILL.md); only
+   `doca-pcc/SKILL.md`; only
    commit to SPCX when the install + algorithm +
    BlueField combination supports it AND the user
    accepts the newer-surface tradeoff.
@@ -112,10 +112,10 @@ through, in order:
 3. **Source the DPA-side algorithm.** Either build the
    user-authored algorithm via DPACC (walk the public
    DOCA SPCX / DOCA PCC programming guides via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+   `doca-public-knowledge-map/SKILL.md`
    for the algorithm-side discipline) or stage the
    documented shipped reference per
-   [`doca-pcc-ztr-rttcc-algo`](../../libs/doca-pcc-ztr-rttcc-algo/SKILL.md).
+   `doca-pcc-ztr-rttcc-algo/SKILL.md`.
    Pin a SHA + version of the algorithm image; the
    evaluation evidence depends on this.
 4. **Pick the role.** The role decision (RP — Reaction Point —
@@ -141,10 +141,10 @@ through, in order:
    parameter set; the parameters live in the algorithm
    documentation, not in this skill. For a user-authored algorithm, resolve
    the applicable public DOCA SPCX programming guide through
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) and
+   `doca-public-knowledge-map/SKILL.md` and
    validate every name/range there. For the shipped zero-touch RTT reference,
    use
-   [`doca-pcc-ztr-rttcc-algo CAPABILITIES.md`](../../libs/doca-pcc-ztr-rttcc-algo/CAPABILITIES.md).
+   `doca-pcc-ztr-rttcc-algo/CAPABILITIES.md`.
    If no authoritative range is available, stop rather than invent one. Pin the parameter
    set in writing; the parameter set is part of the
    evaluation evidence tuple per
@@ -158,14 +158,14 @@ through, in order:
 8. **Stage the capture surface.** Decide where the
    per-port / per-flow tracer output goes, and pair
    it with a planned read of
-   [`doca-pcc-counters`](../doca-pcc-counters/SKILL.md)
+   `doca-pcc-counters/SKILL.md`
    snapshots before / during / after the evaluation.
 
 For the canonical DOCA universal lifecycle on the
 host-side PCC library this tool drives, see
-[`doca-pcc TASKS.md ## configure`](../../libs/doca-pcc/TASKS.md#configure)
+`doca-pcc TASKS.md ## configure` (`doca-pcc/TASKS.md#configure`)
 and
-[`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure).
+`doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`).
 This skill is concerned with the *operator-side*
 configuration of the SPCX harness.
 
@@ -181,25 +181,25 @@ The user-built half is the **DPA-side algorithm image**:
 the DPA-side translation unit the user wrote (or the
 shipped reference algorithm code), compiled by DPACC into
 an image the tool loads via the
-[`doca-pcc`](../../libs/doca-pcc/SKILL.md) library.
+`doca-pcc/SKILL.md` library.
 
 Routing for nearby "build" questions:
 
 - *"The binary isn't there — do I need to build it?"* → no.
   Route to
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+  `doca-setup ## install` (`doca-setup/TASKS.md#configure`)
   to install or repair the host-side DOCA package
   selection that includes the SPCX component.
 - *"I want to build my own SPCX algorithm."* → that is
   the DPA-side build. Route to
-  [`doca-pcc TASKS.md ## build`](../../libs/doca-pcc/TASKS.md#build)
+  `doca-pcc TASKS.md ## build` (`doca-pcc/TASKS.md#build`)
   for the cross-side build pattern + the public DOCA
   SPCX / DPACC guides via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the SPCX-specific algorithm authoring detail.
 - *"I want to build the shipped reference RTT-based
   algorithm."* → route to
-  [`doca-pcc-ztr-rttcc-algo`](../../libs/doca-pcc-ztr-rttcc-algo/SKILL.md)
+  `doca-pcc-ztr-rttcc-algo/SKILL.md`
   for the algorithm-side discipline; the tool's harness
   is the same.
 - *"I want to extend the tool with a new mode."* → out
@@ -234,7 +234,7 @@ What the agent *does* modify, every time, is:
 2. The **DPA-side algorithm image** — the user-authored
    algorithm body (rebuilt via DPACC) or the shipped
    reference algorithm's parameter set
-   ([`doca-pcc-ztr-rttcc-algo`](../../libs/doca-pcc-ztr-rttcc-algo/SKILL.md)).
+   (`doca-pcc-ztr-rttcc-algo/SKILL.md`).
 
 That is the configuration loop in [`## configure`](#configure)
 above and the iteration loop in [`## test`](#test) below;
@@ -252,9 +252,9 @@ Routing for nearby "modify" questions:
   observability surface in
   [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability);
   pair with
-  [`doca-pcc-counters`](../doca-pcc-counters/SKILL.md)
+  `doca-pcc-counters/SKILL.md`
   and
-  [`doca-rdma`](../../libs/doca-rdma/SKILL.md) for
+  `doca-rdma/SKILL.md` for
   complementary surfaces. Patching the tool's output
   is out of scope.
 
@@ -295,14 +295,14 @@ of the flow, not verbatim command lines (per
    contention fabric reachable.
 2. **Capture the pre-flight inventory.** Per the
    bundle-wide hardware-safety meta-policy
-   ([`doca-hardware-safety CAPABILITIES.md ## Capabilities and modes`](../../doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes)):
+   (`doca-hardware-safety CAPABILITIES.md ## Capabilities and modes` (`doca-hardware-safety/CAPABILITIES.md#capabilities-and-modes`)):
    PCIe topology, link state, firmware level, BFB
    level, current CC algorithm in effect (factory or
    prior programmable), host-side env snapshot. This
    is the baseline the rollback compares against.
 3. **Confirm OOB management path is reachable.** Per
    the meta-policy
-   [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+   `doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
    OOB rule, if the cutover touches a BlueField the
    operator manages over the same RDMA link the SPCX
    algorithm controls.
@@ -319,9 +319,9 @@ of the flow, not verbatim command lines (per
    evaluation only produces signal when the fabric is
    contended in a way that matches the algorithm's
    design. Confirm via
-   [`doca-pcc-counters`](../doca-pcc-counters/SKILL.md)
+   `doca-pcc-counters/SKILL.md`
    snapshots and
-   [`doca-rdma`](../../libs/doca-rdma/SKILL.md) flow
+   `doca-rdma/SKILL.md` flow
    observation that the contention is real.
 6. **Capture per-port / per-flow runtime output.**
    The tool's tracer-style output is the primary
@@ -377,7 +377,7 @@ session):
 | --- | --- | --- |
 | Host-side status never reaches `Active` | Install / device-binding / firmware-slot / DPA-image / algorithm-precondition layer of the error taxonomy | Walk [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy) layers 1–5 in order; do not jump ahead. |
 | Status reaches `Active` but tracer / counters show no effect on the link | Live-link / contention layer — the link is idle, the contention is below the algorithm's signal floor, or the contention pattern is wrong | Inject the planned contention; confirm via `doca-pcc-counters` that the link is in fact congested; re-run. Do NOT conclude the algorithm is broken from an idle-link run. |
-| Algorithm running on a congested link but the captured behaviour is wrong (oscillation, rate collapse, persistent under-utilisation) | Runtime layer of the error taxonomy | Do NOT roll forward; stop the algorithm, capture the runtime evidence, walk [`doca-pcc TASKS.md ## debug`](../../libs/doca-pcc/TASKS.md#debug); fix in the algorithm source, rebuild via DPACC, re-evaluate. |
+| Algorithm running on a congested link but the captured behaviour is wrong (oscillation, rate collapse, persistent under-utilisation) | Runtime layer of the error taxonomy | Do NOT roll forward; stop the algorithm, capture the runtime evidence, walk `doca-pcc TASKS.md ## debug` (`doca-pcc/TASKS.md#debug`); fix in the algorithm source, rebuild via DPACC, re-evaluate. |
 | Behaviour looks right on this replica but the replica does not match production | Per the bundle-wide hardware-safety replica-first rule | Re-run on a replica that matches production on BlueField generation, firmware level, host kernel, fabric topology class, contention pattern, and representative workload class; do NOT roll forward against a non-matching replica. |
 | Two consecutive runs on the same setup produce different captured behaviour | Non-determinism in the contention generator, the algorithm itself, or the observability surface | Pin the contention generator; pin the parameter set; pin the algorithm SHA; re-run; if still divergent, the algorithm's non-determinism is the answer the user came for. |
 | Algorithm passes replica testing on every captured axis | Evidence is ready for the production-rollout gate per [`## use`](#use) | Move to [`## use`](#use); do NOT skip the bounded-blast-radius and rollback-rehearsed steps. |
@@ -411,19 +411,19 @@ in order. The shape of the diagnosis:
 
 1. **Install.** Confirm the binary exists, the SPCX
    optional component is installed, and the host-side
-   [`doca-pcc`](../../libs/doca-pcc/SKILL.md) library
+   `doca-pcc/SKILL.md` library
    is present. Route to
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+   `doca-setup ## install` (`doca-setup/TASKS.md#configure`)
    if not.
 2. **Device-binding.** Confirm the BlueField is
    visible to DOCA per
-   [`doca-pcc TASKS.md ## configure`](../../libs/doca-pcc/TASKS.md#configure)
+   `doca-pcc TASKS.md ## configure` (`doca-pcc/TASKS.md#configure`)
    step 1.
 3. **Firmware custom-PCC slot.** Confirm the slot is
    enabled via the `mlxconfig`-class knob the public
    guide names. The slot flip is a hardware-touching
    change per
-   [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy).
+   `doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`).
 4. **DPA-image.** Confirm the DPA-side algorithm
    image was built by a DPACC version matched to the
    host-side DOCA per
@@ -442,19 +442,19 @@ in order. The shape of the diagnosis:
 7. **Runtime.** If the algorithm is running on a
    congested link but the captured behaviour is
    wrong, capture the evidence and walk
-   [`doca-pcc TASKS.md ## debug`](../../libs/doca-pcc/TASKS.md#debug);
+   `doca-pcc TASKS.md ## debug` (`doca-pcc/TASKS.md#debug`);
    the rollback path is the immediate operational
    response — do NOT keep iterating on a production-
    exposed deployment.
 8. **Version.** Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end; the tool ↔ library ↔ DPACC ↔ firmware
    quadruple is the common version mismatch failure.
 9. **Cross-cutting.** Cause is below DOCA — driver,
    firmware, BlueField mode, host kernel. Hand off
-   to [`doca-debug ## debug`](../../doca-debug/SKILL.md)
+   to `doca-debug ## debug` (`doca-debug/SKILL.md`)
    and
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 
 In every case: **quote what the tool reported.** Do
 not paraphrase the tracer output, do not summarize the
@@ -493,18 +493,18 @@ policy gates. The agent's hand-off:
    every production endpoint the algorithm is loaded
    onto.
 5. **Confirm maintenance window discipline** per
-   [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+   `doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
    — cutovers run inside an explicit, time-boxed
    window with operations notified.
 6. **Refuse the cutover when any gate fails.** The
    agent surfaces the failed gate as blocking and
    does NOT find a creative workaround. Escalate per
-   [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+   `doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
    no-rollback rule.
 
 The agent's rule: the tool evaluates; this verb gates
 the cutover; the
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+`doca-hardware-safety/SKILL.md`
 meta-policy is the final authority. A *"safe to roll
 forward"* answer requires evidence + bounded plan +
 documented rollback + OOB + maintenance window;
@@ -517,30 +517,30 @@ be routed out before the agent does any of them under
 this skill's name.
 
 - **DPA-side algorithm authoring detail** →
-  [`doca-pcc`](../../libs/doca-pcc/SKILL.md) +
-  [`doca-dpa`](../../libs/doca-dpa/SKILL.md) + the
+  `doca-pcc/SKILL.md` +
+  `doca-dpa/SKILL.md` + the
   public DOCA SPCX programming guide via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
   This skill is the operator-side harness; the
   algorithm-side discipline is owned upstream.
 - **Factory PCC configuration** → firmware-level
   knobs, no host-side library or tool needed. Route
   via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **PCC counter inspection without loading an
   algorithm** →
-  [`doca-pcc-counters`](../doca-pcc-counters/SKILL.md).
+  `doca-pcc-counters/SKILL.md`.
   The counter tool is read-only and side-effect-free;
   SPCX loads an algorithm.
 - **Raw DPA cycle profiling** → different surface,
   different tool. Route via
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools);
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`);
   this tool's tracer output is at the SPCX-runtime
   layer, not the DPA-instruction layer.
 - **RDMA library programming questions** →
-  [`doca-rdma`](../../libs/doca-rdma/SKILL.md).
+  `doca-rdma/SKILL.md`.
 - **General DOCA install / repair** →
-  [`doca-setup ## install`](../../doca-setup/TASKS.md#configure).
+  `doca-setup ## install` (`doca-setup/TASKS.md#configure`).
 
 ## Command appendix
 
@@ -553,7 +553,7 @@ installed binary and the public DOCA SPCX page.
 **Infra-aware preamble (every row below).** Per the
 bundle's detect → prefer → fall back → report contract
 documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST
@@ -567,7 +567,7 @@ the agent should:
    command in the row.
 4. The schemas the structured tools emit are defined
    in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas).
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`).
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
@@ -594,8 +594,8 @@ Three cross-cutting rules for this appendix:
   commands (`pkg-config --modversion doca-pcc`,
   `doca_caps --list-devs`, `mlxconfig -d <bdf> q` for
   the custom-PCC slot state) live in
-  [`doca-debug ## debug`](../../doca-debug/SKILL.md) and
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug);
+  `doca-debug ## debug` (`doca-debug/SKILL.md`) and
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`);
   this appendix names only `doca_spcx_cc`-specific
   invocation classes.
 
@@ -627,12 +627,12 @@ action and not buried in [`SKILL.md`](SKILL.md):
   unreplicable.
 - This skill **assumes a healthy DOCA install** with
   the SPCX component, a paired
-  [`doca-pcc`](../../libs/doca-pcc/SKILL.md) library
+  `doca-pcc/SKILL.md` library
   + DPACC, a BlueField with a visible DPA and the
   firmware custom-PCC slot enabled, and a
   contention-positive replica fabric. If any of
   those is in doubt, route to
-  [`doca-setup`](../../doca-setup/SKILL.md),
-  [`doca-pcc`](../../libs/doca-pcc/SKILL.md), or
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md)
+  `doca-setup/SKILL.md`,
+  `doca-pcc/SKILL.md`, or
+  `doca-hardware-safety/SKILL.md`
   before running anything else here.

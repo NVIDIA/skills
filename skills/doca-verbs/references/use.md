@@ -10,10 +10,10 @@ can quote it the same way every time, whether the user is on the
 RDMA-side, the Ethernet-queue side, or porting from libibverbs.
 
 The use sequence, in order, on top of the doca-common foundation
-walked in [`doca-common TASKS.md ## use`](../../doca-common/TASKS.md#use):
+walked in `doca-common TASKS.md ## use` (`doca-common/TASKS.md#use`):
 
 1. **`doca_verbs_context_create(dev, &ctx)`** — wrap the
-   `doca_dev` opened in [`doca-common TASKS.md ## use`](../../doca-common/TASKS.md#use)
+   `doca_dev` opened in `doca-common TASKS.md ## use` (`doca-common/TASKS.md#use`)
    step 4 in a verbs context. The `ctx` handle is the root of
    the per-library object set.
 2. **`doca_verbs_pd_create(ctx, &pd)`** — create the protection

@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-telemetry-exporter`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.3% — baseline ran, but no comparable score was available; uplift unavailable | 95.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.5% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 100.0% (+50.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 40.0% → 100.0% (+60.0 points) | 85.0% → 100.0% (+15.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 52.5% → 100.0% (+47.5 points) | 75.0% → 87.5% (+12.5 points) |
-| Efficiency | 71.7% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 46.3% → 86.9% (+40.6 points) | 61.3% → 100.0% (+38.7 points) |
+| Efficiency | 80.6% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 807,602 | 610,279 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-telemetry-exporter.explicit-positive.v1 | 269,733 | 151,180 | +118,553 | +78.42% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-exporter.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-telemetry-exporter.implicit-positive.v2 | 475,281 | 306,542 | +168,739 | +55.05% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-exporter.negative.v1 | 62,588 | 152,557 | -89,969 | -58.97% | skill 1/1; base 1/1 |
-| codex | All cases | 422,507 | 276,591 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-telemetry-exporter.explicit-positive.v1 | 118,962 | 40,775 | +78,187 | +191.75% | skill 1/1; base 1/1 |
+| claude-code | All cases | 764,766 | 544,826 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-telemetry-exporter.explicit-positive.v1 | 332,912 | 151,078 | +181,834 | +120.36% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-exporter.implicit-positive.v1 | 370,217 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-telemetry-exporter.implicit-positive.v2 | N/A | 273,134 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-telemetry-exporter.negative.v1 | 61,637 | 120,614 | -58,977 | -48.90% | skill 1/1; base 1/1 |
+| codex | All cases | 414,678 | 246,658 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-telemetry-exporter.explicit-positive.v1 | 168,516 | 25,251 | +143,265 | +567.36% | skill 1/1; base 1/1 |
 | codex | doca-telemetry-exporter.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-telemetry-exporter.implicit-positive.v2 | 261,368 | 169,334 | +92,034 | +54.35% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-exporter.negative.v1 | 42,177 | 66,482 | -24,305 | -36.56% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,230,109 | 886,870 | N/A | N/A | skill 6/8; base 6/8 |
+| codex | doca-telemetry-exporter.implicit-positive.v2 | 231,788 | 179,733 | +52,055 | +28.96% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-exporter.negative.v1 | 14,374 | 41,674 | -27,300 | -65.51% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,179,444 | 791,484 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-telemetry-exporter/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-telemetry-exporter/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-telemetry-exporter`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without asking (`BENCHMARK.md:86`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without asking (`TASKS.md:96`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`BENCHMARK.md:87`)
-- 13 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without asking (`BENCHMARK.md:87`)
+- 14 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

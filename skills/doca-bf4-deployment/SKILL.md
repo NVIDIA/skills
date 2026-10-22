@@ -15,11 +15,12 @@ description: >
   bring-up phrasings even without "BF4": {bring up my new BlueField-4},
   {the BlueField ISO will not boot over HTTP from the BMC}, {attach BF4
   virtual media via Redfish}, {BF4 firmware Task stuck at Running}, {prepare a BlueField-4 host: platform
-  support, version alignment, safest first smoke test}. Application
-  launch and library APIs belong to other skills.
+  support, version alignment, safest first smoke test}. Route
+  application launch and library APIs to other skills.
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - bluefield-4
@@ -77,7 +78,7 @@ methods and the BF4 safety overlay. Do not open every companion file.
 > boot media, or cause production outages. Do **not** proceed without a
 > maintenance window and a tested rollback plan. Every mutating step is
 > governed by
-> [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md), which
+> `doca-hardware-safety/SKILL.md`, which
 > MUST be loaded alongside this skill before any destructive action.
 >
 > Before executing any mutating step — PLDM firmware burn, ISO reflash,
@@ -92,9 +93,9 @@ home for **day-1 platform bring-up of a BlueField-4 DPU via the
 BMC** — getting a powered-but-bare BF4 to "Grace OS installed,
 firmware at the target level, ready to deploy a workload." It is the
 upstream of the two application-deployment skills
-([`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+(`doca-container-deployment/SKILL.md`
 and
-[`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)):
+`doca-bare-metal-deployment/SKILL.md`):
 those skills assume a working BlueField; this skill is how the
 BlueField-4 GETS to working. If the user has a fresh BF4 and wants to
 install the OS or update firmware, open the tasks companion and
@@ -110,7 +111,7 @@ environment checks as commands for the user's DOCA host. For out-of-scope
 requests, name the skill that owns them and stop.
 
 > **Scope note — BF4 day-1 is in scope by directive.** The bundle's
-> [`AGENTS.md ## Non-goals`](../../AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely)
+> `AGENTS.md ## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
 > item 7 lists the BlueField BSP / BFB / RShim / TMFIFO layer and the
 > BlueField BMC software as externally-productized. **BlueField-4
 > day-1 bring-up via the BMC is carved into scope for this skill by
@@ -118,7 +119,7 @@ requests, name the skill that owns them and stop.
 > carve-out is narrow: this skill teaches the documented BMC-driven
 > install and firmware-update FLOWS (the CLASS), routing every
 > *mutating* step through
-> [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) for the
+> `doca-hardware-safety/SKILL.md` for the
 > change-application meta-policy. It does NOT redefine that
 > meta-policy, and it does NOT cover BF3 (route to
 > `doca-bf3-deployment`), application launch, or library APIs.
@@ -157,15 +158,15 @@ Concretely:
 Do **not** load this skill for BF3 bring-up (route to
 `doca-bf3-deployment`); for running an application on an
 already-working BlueField (route to
-[`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+`doca-container-deployment/SKILL.md`
 or
-[`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md));
+`doca-bare-metal-deployment/SKILL.md`);
 for env preparation on the installed Grace OS such as hugepages /
-pkg-config / devlink (use [`doca-setup`](../doca-setup/SKILL.md)); for
+pkg-config / devlink (use `doca-setup/SKILL.md`); for
 the cross-cutting hardware-change meta-policy (route to
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)); or for
+`doca-hardware-safety/SKILL.md`); or for
 fleet-scale orchestrated provisioning (route via
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)).
+`doca-public-knowledge-map/SKILL.md`).
 
 ## What this skill provides
 
@@ -177,7 +178,7 @@ companion files:
   and the Grace-Ubuntu-plus-cloud-init Virtual Media path; the PLDM
   firmware-update surface across BMC / NIC firmware / SBIOS / ERoT;
   the version-compatibility overlay on
-  [`doca-version`](../doca-version/SKILL.md) (the install and firmware
+  `doca-version/SKILL.md` (the install and firmware
   targets come from the public release notes, never from memory); the
   bring-up error taxonomy (boot-source -> virtual-media-attach ->
   firmware-Task -> activation -> cloud-init -> boot-loop); the
@@ -185,7 +186,7 @@ companion files:
   the Redfish FirmwareInventory, `pldmtool` GetFwParams, and the
   installed-build check `cat /etc/mlnx-release`); and the safety
   policy (an overlay on
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md): every
+  `doca-hardware-safety/SKILL.md`: every
   PLDM burn / ISO reflash / power cycle / BMC factory reset is a
   MUTATING hardware op; never print a real password; always detach
   virtual media to avoid boot loops; only public hosts for any
@@ -211,7 +212,7 @@ The skill assumes a BlueField-4 target where:
   public BlueField/DOCA release notes.
 
 It does not cover installing DOCA tooling on the host — that path goes
-through [`doca-setup`](../doca-setup/SKILL.md) — and it does not cover
+through `doca-setup/SKILL.md` — and it does not cover
 running a workload once Grace is up — those paths go through the two
 application-deployment skills.
 
@@ -232,16 +233,16 @@ application-deployment skills.
    `###` sub-anchors), `test`, `debug`, plus the `Deferred task verbs`
    block — see the tasks companion.**
 4. **Load
-   [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
+   `doca-hardware-safety/SKILL.md`
    ALONGSIDE** whenever the question reaches a mutating step (PLDM
    firmware burn, ISO reflash, power cycle, BMC factory reset).
 
 ## Related skills
 
-- [`doca-bf3-deployment`](../doca-bf3-deployment/SKILL.md) — BF3 RShim/BFB day-1.
-- [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) — PLDM, reflash, power cycle.
-- [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md) — launch after Grace is up.
-- [`doca-container-deployment`](../doca-container-deployment/SKILL.md) — service container after Grace is up.
-- [`doca-setup`](../doca-setup/SKILL.md) — env prep on the installed Grace OS.
-- [`doca-version`](../doca-version/SKILL.md) — four-way version match.
-- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) — public docs and release notes.
+- `doca-bf3-deployment/SKILL.md` — BF3 RShim/BFB day-1.
+- `doca-hardware-safety/SKILL.md` — PLDM, reflash, power cycle.
+- `doca-bare-metal-deployment/SKILL.md` — launch after Grace is up.
+- `doca-container-deployment/SKILL.md` — service container after Grace is up.
+- `doca-setup/SKILL.md` — env prep on the installed Grace OS.
+- `doca-version/SKILL.md` — four-way version match.
+- `doca-public-knowledge-map/SKILL.md` — public docs and release notes.

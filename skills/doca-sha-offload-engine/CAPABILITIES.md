@@ -71,16 +71,16 @@ Per the verified source (`engine/doca_sha_offload_engine.c`):
 | `EVP_sha256()` | Offloads to DOCA SHA (one-shot). |
 | `EVP_sha512()` | Offloads to DOCA SHA (one-shot). |
 | `EVP_sha224()`, `EVP_sha384()`, `EVP_sha3_*`, `EVP_md5()` | NOT offloaded. Without `-engine_impl`, OpenSSL falls back to its built-in software SHA. With `-engine_impl`, the digest call fails (this is the basis of the "prove offload actually engaged" pattern). |
-| Streaming / chained `EVP_DigestInit_ex` → `EVP_DigestUpdate` → `EVP_DigestFinal_ex` | Per the shipped `readme.md`, the engine is built on the one-shot `EVP_Digest` API. Chained-update workflows that OpenSSL's library code paths convert to one-shot may still be offloaded; workflows that genuinely require incremental hashing are outside the engine's surface — route to [`../../libs/doca-sha/CAPABILITIES.md`](../../libs/doca-sha/CAPABILITIES.md) and the partial-hash task there. |
+| Streaming / chained `EVP_DigestInit_ex` → `EVP_DigestUpdate` → `EVP_DigestFinal_ex` | Per the shipped `readme.md`, the engine is built on the one-shot `EVP_Digest` API. Chained-update workflows that OpenSSL's library code paths convert to one-shot may still be offloaded; workflows that genuinely require incremental hashing are outside the engine's surface — route to `../../libs/doca-sha/CAPABILITIES.md` (`doca-sha/CAPABILITIES.md`) and the partial-hash task there. |
 
 ### Engine vs library: selection rule
 
 | User situation | Right surface | Why |
 | --- | --- | --- |
 | Existing OpenSSL-based pipeline doing SHA-1 / SHA-256 / SHA-512; wants offload with no code change | **This engine.** | Drop in via the `openssl engine dynamic` load pattern; the only application change is the `ENGINE_load_dynamic` block from the shipped `readme.md`, or even less if the user can rely on an `openssl.cnf` engines section. |
-| New SHA-using pipeline being authored from scratch | [`../../libs/doca-sha/`](../../libs/doca-sha/SKILL.md). | The library exposes both one-shot and partial-hash tasks, the full cap-query surface, and the DOCA Core context lifecycle. The engine is a deliberate subset; the library is the full surface. |
-| Existing OpenSSL pipeline needing offload for an algorithm the engine does NOT cover (SHA-224, SHA-3, HMAC-SHA) | Neither this engine, nor doca-sha directly for that algorithm. | DOCA SHA's library surface is documented per [`../../libs/doca-sha/CAPABILITIES.md`](../../libs/doca-sha/CAPABILITIES.md); the engine restricts to one-shot SHA-1 / 256 / 512. The agent surfaces the gap honestly. |
-| Existing pipeline that requires TRUE incremental hashing (gigabytes-into-one-digest with chunks too large for one DOCA SHA task) | [`../../libs/doca-sha/`](../../libs/doca-sha/SKILL.md) directly, using the partial-hash task. | The engine's one-shot path requires the full message fit in a single DOCA SHA call; the partial-hash task in the library exists for exactly this case. |
+| New SHA-using pipeline being authored from scratch | `../../libs/doca-sha/` (`doca-sha/SKILL.md`). | The library exposes both one-shot and partial-hash tasks, the full cap-query surface, and the DOCA Core context lifecycle. The engine is a deliberate subset; the library is the full surface. |
+| Existing OpenSSL pipeline needing offload for an algorithm the engine does NOT cover (SHA-224, SHA-3, HMAC-SHA) | Neither this engine, nor doca-sha directly for that algorithm. | DOCA SHA's library surface is documented per `../../libs/doca-sha/CAPABILITIES.md` (`doca-sha/CAPABILITIES.md`); the engine restricts to one-shot SHA-1 / 256 / 512. The agent surfaces the gap honestly. |
+| Existing pipeline that requires TRUE incremental hashing (gigabytes-into-one-digest with chunks too large for one DOCA SHA task) | `../../libs/doca-sha/` (`doca-sha/SKILL.md`) directly, using the partial-hash task. | The engine's one-shot path requires the full message fit in a single DOCA SHA call; the partial-hash task in the library exists for exactly this case. |
 
 The selection rule is the load-bearing piece. The agent
 must surface the engine-vs-library choice to the user
@@ -112,7 +112,7 @@ The agent's rule: surface BOTH knobs to the user. On
 stock installs `03:00.0` may or may not be the right
 device; the operator must check (`doca_caps --list-devs`
 or platform-specific PCIe inspection per
-[`doca-setup`](../../doca-setup/SKILL.md)).
+`doca-setup/SKILL.md`).
 
 ### Engine-load pattern (the verified surface)
 
@@ -178,7 +178,7 @@ SHA acceleration engine, so the offload engine cannot accelerate there.
 For the canonical DOCA version-detection chain, the
 four-way match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body
+`doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The `doca-sha-offload-engine`-specific overlay** is:
@@ -189,7 +189,7 @@ lives there; this skill does not duplicate it.
   authoritative DOCA-side pin. The four-way match across
   `doca-common`, `doca-sha`, and the rest of the install
   must hold per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 - **OpenSSL ≥ 1.1.1** per the shipped `readme.md`. The
   engine's shipped tests cover OpenSSL 1.1.1f on Ubuntu
   20.04 and OpenSSL 3.0.2 on Ubuntu 22.04. OpenSSL 3.x
@@ -213,7 +213,7 @@ lives there; this skill does not duplicate it.
   package name is distribution-specific; on Ubuntu it is
   `libssl-dev`, on RHEL it is `openssl-devel`. The agent
   routes the package-name lookup through
-  [`doca-setup`](../../doca-setup/SKILL.md) rather than
+  `doca-setup/SKILL.md` rather than
   quoting from memory.
 - **No version literal from memory** for DOCA. The
   agent quotes versions observed from the user's host.
@@ -245,13 +245,13 @@ in escalating order:
    exists but DOCA cannot bind it (driver / firmware
    precondition not met). Routing: verify the device
    via `doca_caps --list-devs`; route to
-   [`doca-caps TASKS.md ## run`](../doca-caps/TASKS.md#run)
+   `doca-caps TASKS.md ## run` (`doca-caps/TASKS.md#run`)
    for the capability snapshot.
 3. **Runtime-layer.** Engine registered; a specific
    digest call returns an error. Common sub-causes:
    message size exceeds the DOCA SHA cap-reported
    maximum source buffer size (per
-   [`../../libs/doca-sha/CAPABILITIES.md#capabilities-and-modes`](../../libs/doca-sha/CAPABILITIES.md#capabilities-and-modes)
+   `../../libs/doca-sha/CAPABILITIES.md#capabilities-and-modes` (`doca-sha/CAPABILITIES.md#capabilities-and-modes`)
    `doca_sha_cap_get_max_src_buf_size`); destination
    buffer too small; transient device errors. The
    engine's source logs at `DOCA_LOG_*` per the
@@ -269,18 +269,18 @@ in escalating order:
    [`## Observability`](#observability).
 5. **Version.** Cross-cutting partial-install /
    mixed-version per
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
    OpenSSL 1.1.1 vs 3.x; DOCA versions across host vs
    container.
 6. **Cross-cutting.** Cause is below DOCA — mlx5
    driver, firmware on the SHA-capable device,
    hugepages, NUMA. Route to
-   [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    and
-   [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug).
+   `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`).
 
 For the cross-library `DOCA_ERROR_*` taxonomy, see
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 
 ## Observability
 
@@ -325,7 +325,7 @@ output) with DOCA-side logging. Specifically:
   the message-size window per
   [`## Capabilities and modes`](#capabilities-and-modes).
 - **DOCA log levels.** `DOCA_LOG_LEVEL` applies per
-  [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+  `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
   The engine's source includes
   `DOCA_LOG_REGISTER(DOCA_SHA_OFFLOAD_ENGINE)` and
   uses `DOCA_LOG_ERR` / `DOCA_LOG_DBG` for its own
@@ -336,13 +336,13 @@ output) with DOCA-side logging. Specifically:
 
 For env-side observability (PCIe scans, firmware
 introspection) see
-[`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 For doca-sha-library-side observability see
-[`../../libs/doca-sha/CAPABILITIES.md#observability`](../../libs/doca-sha/CAPABILITIES.md#observability).
+`../../libs/doca-sha/CAPABILITIES.md#observability` (`doca-sha/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The engine binds to a specific PCIe device (the DOCA
 SHA accelerator) and runs as a shared object loaded by
@@ -364,8 +364,8 @@ overlay:
   accelerators exist, the operator must confirm the
   chosen PCIe address belongs to the workload's
   intended device. Routing through
-  [`doca-caps`](../doca-caps/SKILL.md) and
-  [`doca-setup`](../../doca-setup/SKILL.md) is the
+  `doca-caps/SKILL.md` and
+  `doca-setup/SKILL.md` is the
   agent's first move.
 - **OpenSSL 3.x deprecation warnings are not blockers
   but they are signals.** Loading an ENGINE on OpenSSL
@@ -382,7 +382,7 @@ overlay:
   `-async_jobs <N>`, `-multi <N>`. Anything beyond
   those is either application-side OpenSSL surface
   (route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   to the OpenSSL upstream docs on `openssl.org`) or a
   hallucination.
 - **Hardware-safety meta-policy applies to host-side
@@ -391,7 +391,7 @@ overlay:
   BlueField BFB reflash, host kernel boot parameter
   changes — runs through the cross-cutting meta-policy
   in
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md),
+  `doca-hardware-safety/SKILL.md`,
   not through this engine's load-pattern.
 
 ## Public-source pointer
@@ -400,7 +400,7 @@ The canonical public sources for this engine are:
 
 - The **DOCA SHA** programming guide page on
   `docs.nvidia.com/doca/sdk/`, reached via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - The **OpenSSL ENGINE** upstream documentation on
   `openssl.org/docs/man1.1.1/man1/openssl-engine.html`
   and the `EVP_Digest` man page at

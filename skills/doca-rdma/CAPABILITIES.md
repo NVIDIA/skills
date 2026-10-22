@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 capabilities (configure, build, modify, run, test, debug) see
 [TASKS.md](TASKS.md). For where the underlying public documentation
 and installed package paths live, defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) — do
+`doca-public-knowledge-map/SKILL.md` — do
 not duplicate URLs or install paths in this file.
 
 ## Pattern overview
@@ -52,7 +52,7 @@ connect → use → stop → destroy. Configuration MUST finish before
 `doca_ctx_start()`. The cfg-object phases underneath that
 (`cfg-create → cfg-set-* → init`) are how configure is implemented;
 they do not replace connect as a distinct step after start (see
-[`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)).
+`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`)).
 On top of that lifecycle, RDMA layers its own connection
 state-machine and task model.
 
@@ -91,7 +91,7 @@ On the host any `doca_dev` works; on the BlueField platform,
 applications must provide the library with **SFs as a `doca_dev`**
 (see the public *OpenvSwitch Acceleration — OVS in DOCA* and
 *BlueField DPU Scalable Function* guides, both reachable through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
+`doca-public-knowledge-map/SKILL.md`).
 The exception is RDMA on the DPA datapath, which currently only
 supports PFs.
 
@@ -141,19 +141,19 @@ from the library; query the active value with
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see [`doca-version`](../../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The RDMA-specific overlay** is:
 
-- **DC transport is alpha.** The public DOCA RDMA guide explicitly notes that dynamically-connected (DC) transport support is alpha-level. The agent must surface this when the user asks about DC, not present it as production-stable. Use `pkg-config --modversion doca` as the build-time anchor (per [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure)) when asked which RDMA features are on this install.
-- **Use the `doca_rdma_cap_*` query family at runtime.** Per the cross-cutting rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability), the cap-query is the runtime authority for *"is this task / transport supported on this device + this DOCA version"*. The version-matrix is the *promise*; the cap query is the *reality*.
-- **The resolved DOCA pkg-config module must match `doca_caps --version`** at the four-way-match check (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). RDMA normally ships inside the umbrella `doca` module; `pkg-config --modversion doca` must agree with `doca_caps --version`. On rarer split installs that expose per-library `.pc` files, every resolved component `.pc` must agree; a mismatch (one component reporting release *X*, another release *Y*) is the classic partial-install pattern — route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) ladder step 2 before any RDMA-layer diagnosis.
+- **DC transport is alpha.** The public DOCA RDMA guide explicitly notes that dynamically-connected (DC) transport support is alpha-level. The agent must surface this when the user asks about DC, not present it as production-stable. Use `pkg-config --modversion doca` as the build-time anchor (per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)) when asked which RDMA features are on this install.
+- **Use the `doca_rdma_cap_*` query family at runtime.** Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap-query is the runtime authority for *"is this task / transport supported on this device + this DOCA version"*. The version-matrix is the *promise*; the cap query is the *reality*.
+- **The resolved DOCA pkg-config module must match `doca_caps --version`** at the four-way-match check (per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)). RDMA normally ships inside the umbrella `doca` module; `pkg-config --modversion doca` must agree with `doca_caps --version`. On rarer split installs that expose per-library `.pc` files, every resolved component `.pc` must agree; a mismatch (one component reporting release *X*, another release *Y*) is the classic partial-install pattern — route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) ladder step 2 before any RDMA-layer diagnosis.
 
 ## Error taxonomy
 
 The cross-library `DOCA_ERROR_*` taxonomy (what each family means
 and which debug layer it routes to) lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 The RDMA-specific overlay names the families the agent will see
 most often from RDMA calls and what they specifically indicate:
 
@@ -163,11 +163,11 @@ most often from RDMA calls and what they specifically indicate:
 | `DOCA_ERROR_NOT_PERMITTED` | mmap permissions / RDMA permissions don't cover the task type | Re-check the permission matrix in [`## Safety policy`](#safety-policy); confirm the mmap was exported when required |
 | `DOCA_ERROR_NOT_SUPPORTED` | The task type / transport type is not supported on this device + DOCA version | Run the matching `doca_rdma_cap_*_is_supported` against the active `doca_devinfo`; if false, that is the answer |
 | `DOCA_ERROR_FULL` | Send queue full; bulk-submit exceeded `max_send_buf_list_len * send_queue_size` | Drain completions on the PE before re-submitting; or raise the queue size at configure time |
-| `DOCA_ERROR_DRIVER` | The layer below DOCA (driver / firmware) reported failure | Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) layer 5 |
+| `DOCA_ERROR_DRIVER` | The layer below DOCA (driver / firmware) reported failure | Capture `dmesg | tail` and `mlxconfig -d <pcie> q`; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layer 5 |
 | `DOCA_ERROR_TIME_OUT` | RDMA CM `connection_request_timeout` exceeded | Confirm peer reachability; consider raising the timeout via `doca_rdma_set_connection_request_timeout()` |
 
 Quote `doca_error_get_descr()` verbatim — do not paraphrase. The
-cross-cutting debug ladder ([`doca-debug ## debug`](../../doca-debug/TASKS.md#debug))
+cross-cutting debug ladder (`doca-debug ## debug` (`doca-debug/TASKS.md#debug`))
 is the canonical layered diagnosis path that the agent escalates
 to once the RDMA-specific cause has been narrowed.
 
@@ -201,14 +201,14 @@ Three primary signals the agent should reach for:
 
 For cross-cutting observability primitives (`--sdk-log-level`, the
 `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package layout)
 defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 RDMA's safety surface is **permission-driven**. The library sits
 on top of memory exposed directly to a remote peer; an incorrect
@@ -257,19 +257,19 @@ the agent will get asked but should route elsewhere:
   the abstractions and is asking *how to express them through the
   DOCA RDMA API*.
 - **DOCA Core context and progress engine internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   This skill *uses* the Core context lifecycle; it does not
   redefine it.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the RDMA overlay, not the taxonomy itself.
 - **Cross-cutting debug ladder** (install / version / build / link
   / runtime / program / driver) — owned by
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug). This
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). This
   skill's `## debug` redirects there for layer 1-4 and layer 7;
   layers 5-6 carry the RDMA-specific overlay.
 - **Cross-library `doca_caps` invocation patterns** — owned by
-  [`doca-caps`](../../tools/doca-caps/SKILL.md). This skill
+  `doca-caps/SKILL.md`. This skill
   references the *RDMA capability query family*
   (`doca_rdma_cap_*`), which is per-library; the *cross-library
   capability snapshot tool* (`doca_caps --list-devs`) is a

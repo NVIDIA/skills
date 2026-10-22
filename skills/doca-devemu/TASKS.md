@@ -18,7 +18,7 @@ surface, and the safety policy, see
 patterns layered under everything below (the universal Core
 lifecycle, the cross-library `DOCA_ERROR_*` taxonomy, the
 modify-a-shipped-sample workflow), see
-[`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through
@@ -71,7 +71,7 @@ Steps the agent should walk the user through:
    rest of the setup goes. If the user's intent is actually a
    packaged service (NVMe / virtio-blk SNAP-style storage, or
    a packaged virtio-net daemon), route via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+   `doca-public-knowledge-map/SKILL.md`
    to the DOCA SNAP Service / DOCA Virtio-net Service guide —
    the user does not need this library at all in that case.
 2. **Confirm the env preconditions on BOTH sides for the pinned
@@ -89,7 +89,7 @@ Steps the agent should walk the user through:
    driver for the emulated device class the user picked. If
    ANY of these fails, this is an env / firmware / host-
    kernel problem to fix via
-   [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure),
+   `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`),
    NOT a code change in the DPU-side program.
    As part of this check, run the read-only
    `mlxconfig -d <bdf> q` probe and record both current and
@@ -100,7 +100,7 @@ Steps the agent should walk the user through:
    resolve the exact field from the installed tool / matching guide;
    never derive a field name by analogy. A pending next-boot value
    is not active. Any write or reset leaves this skill for
-   [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md).
+   `doca-hardware-safety/SKILL.md`.
 3. **Run per-sub-library capability discovery against the
    active `doca_devinfo`.** Per the capability-query rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
@@ -121,7 +121,7 @@ Steps the agent should walk the user through:
    per-sub-library context per device; there is no *"global
    Device Emulation context"*. This is a standard DOCA Core
    context create — the universal lifecycle from
-   [`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure)
+   `doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`)
    applies; this skill adds the per-sub-library overlay.
 5. **Wire the per-sub-library doorbell / DMA primitives.**
    Per the doorbell / DMA table in
@@ -174,7 +174,7 @@ Steps the agent should walk the user through:
 
 For the canonical DOCA universal lifecycle that underlies
 steps 4-6, see
-[`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure).
+`doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`).
 This skill adds the Device Emulation overlay; do not
 re-explain the lifecycle here.
 
@@ -188,7 +188,7 @@ chosen sub-library's module as the source of truth for include
 
 The build pattern for any DOCA C / C++ consumer is fully
 documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the Device Emulation-specific overlay:
 
 | Slot | Value | Why it matters |
@@ -197,7 +197,7 @@ This skill carries only the Device Emulation-specific overlay:
 | Include flags | `pkg-config --cflags <the chosen sub-library's module>` | Resolves the per-sub-library headers under $(pkg-config --variable=includedir doca-common); the included headers are sub-library-specific (PCI Generic headers do not declare virtio symbols, and vice versa) |
 | Link flags | `pkg-config --libs <the chosen sub-library's module>` | Pulls in the per-sub-library shared object plus `doca-common`. The companion libraries the link line needs (in particular `doca-common`) are resolved transitively |
 | Companion DOCA libs | `doca-argp` for the standard DOCA argument-parsing surface (if the consumer uses the standard arg style); other DOCA libraries only if the user's DPU-side backend uses them independently | Adding unnecessary companion libraries bloats the link line and obscures real partial-install issues |
-| Header check | The chosen sub-library's primary header resolvable under $(pkg-config --variable=includedir doca-common) after `pkg-config --cflags <module>` resolves | If `pkg-config --cflags <module>` resolves but the include is missing, the install is partial — route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 |
+| Header check | The chosen sub-library's primary header resolvable under $(pkg-config --variable=includedir doca-common) after `pkg-config --cflags <module>` resolves | If `pkg-config --cflags <module>` resolves but the include is missing, the install is partial — route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 |
 | Minimum required DOCA version | Query with `pkg-config --modversion <the chosen sub-library's module>`; never hardcode in build files | Cross-version build / runtime mixing breaks per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
 
 For non-C consumers (Rust, Go, Python), the link surface is
@@ -223,16 +223,16 @@ the user's intent, without rewriting from scratch and without
 crossing the sub-library boundary in-place.
 
 The universal modify-a-shipped-sample workflow is in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify);
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`);
 this skill provides the Device Emulation-specific slot fill.
 
 | Slot | What the agent asks the user | Device Emulation-specific consideration |
 | --- | --- | --- |
 | 1. Starting sample | Enumerate the installed Device Emulation sample tree and identify a sample for the pinned sub-library. If no matching sample exists, **stop the modify-from-sample workflow**; do not scaffold headers, a build manifest, or source from API prose. Route to a verified installed project/example, the matching packaged SNAP / Virtio-net service when that is the user's intent, or the matching public Device Emulation guide. | Pick only a sample whose sub-library matches the user's pinned sub-library from [`## configure`](#configure) step 1. Cross-sub-library re-use is not a substitute for a missing sample |
-| 2. Backend body | What is the backend actually doing (packet forwarding logic for virtio-net, storage backend for a SNAP-style PCI Generic device, filesystem implementation for virtio-fs)? | The agent's anti-pattern alerts: (a) do NOT invent a backend body in this skill — backend design is a domain question (storage / networking / filesystem), not an API question, route via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md); (b) do NOT recommend re-implementing what the packaged DOCA SNAP / Virtio-net services already provide unless the user has confirmed those services do not meet their needs |
+| 2. Backend body | What is the backend actually doing (packet forwarding logic for virtio-net, storage backend for a SNAP-style PCI Generic device, filesystem implementation for virtio-fs)? | The agent's anti-pattern alerts: (a) do NOT invent a backend body in this skill — backend design is a domain question (storage / networking / filesystem), not an API question, route via `doca-public-knowledge-map/SKILL.md`; (b) do NOT recommend re-implementing what the packaged DOCA SNAP / Virtio-net services already provide unless the user has confirmed those services do not meet their needs |
 | 3. Device descriptor / identity values | What device identity does the host see (vendor / device IDs for PCI Generic; virtio device class identifiers and feature-bit subset for virtio-net / virtio-fs)? | Per the `INVALID_VALUE` row in [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy), a malformed or non-cap-supported descriptor is the most common first-submit failure. Re-validate against the per-sub-library cap-query from [`## configure`](#configure) step 3 before accepting the modify |
 | 4. Doorbell / DMA wiring | Does the sample's doorbell / DMA wiring still match what the modified backend needs? | A modify that changes the backend without updating the doorbell / DMA wiring is a common way to introduce *"host driver is active but DPU sees nothing"* — surface this explicitly and re-check the wiring against [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) doorbell / DMA table |
-| 5. Re-validate against per-sub-library capabilities | Re-run the `doca_devemu_<sub>_cap_*` queries from [`## configure`](#configure) step 3 against the modified configuration — descriptor changes, feature-bit changes, or queue-sizing changes can flip a per-sub-library capability boundary | Per the cross-cutting rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability), the cap query is the runtime authority |
+| 5. Re-validate against per-sub-library capabilities | Re-run the `doca_devemu_<sub>_cap_*` queries from [`## configure`](#configure) step 3 against the modified configuration — descriptor changes, feature-bit changes, or queue-sizing changes can flip a per-sub-library capability boundary | Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap query is the runtime authority |
 | 6. Keep the build manifest pointing at the same sub-library | The sample's existing `meson.build` already wires the per-sub-library `pkg-config` module; do not switch to a hand-rolled Makefile or — worse — silently swap to a different sub-library's module | Per the build slot table in [`## build`](#build) |
 
 The agent emits an *intent description + the filled slots*;
@@ -279,7 +279,7 @@ Steps the agent should walk the user through:
 3. **Capture the structured log on first failure.** Set
    `DOCA_LOG_LEVEL=trace` on the DPU side for the first run
    (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability));
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`));
    capture the host's `dmesg` around the moment the DPU
    started the context. The two log streams are the cheapest
    way to make the *DPU-side context start* / *host-side PCI
@@ -304,7 +304,7 @@ Steps the agent should walk the user through:
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
 underlie *"the program built but does nothing"*, see
-[`doca-version TASKS.md ## run`](../../doca-version/TASKS.md#run).
+`doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
 
@@ -384,7 +384,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | DPU-side context starts cleanly; host `lspci` shows no device | The firmware-side slot enable has not taken effect; OR the DPU-side started a context for the wrong `doca_dev` | Confirm the firmware-side slot is on AND the BlueField has been reset since the slot was flipped; confirm the DPU-side context is created against the `doca_dev` for the BlueField the host actually sees |
 | Host `lspci` shows the device but no kernel driver binds | The host kernel ships no driver for the emulated class, OR the driver module is not loaded, OR (virtio-net / virtio-fs) feature negotiation between the host driver and the emulated device failed | Load the matching kernel module on the host; if the driver still does not bind, check host `dmesg` for the feature-negotiation error and re-check the per-sub-library cap-query opt-in vs the host driver's expected feature set. The fix is host-side or sub-library-config-side, not DPU-backend-body-side |
 | Host driver bound; basic operation produces no DPU-side reaction | Doorbell wiring wrong, OR `doca_pe_progress()` not being driven on the DPU side, OR the operation is going to the wrong queue / register | Re-walk the doorbell / DMA wiring per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) doorbell / DMA table; confirm the DPU-side PE is being progressed |
-| Smoke works on one BlueField, fails on another | Different firmware-side emulation-type slot state, different BlueField generation, or different DOCA install | Re-run [`## configure`](#configure) step 2 (env preconditions) + [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test) four-way match on the failing host |
+| Smoke works on one BlueField, fails on another | Different firmware-side emulation-type slot state, different BlueField generation, or different DOCA install | Re-run [`## configure`](#configure) step 2 (env preconditions) + `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) four-way match on the failing host |
 
 Loop termination: investigate each diagnosis axis at most once per
 unchanged evidence set: installed module/header + exact capability
@@ -396,7 +396,7 @@ after seven total diagnosis iterations (one per listed axis), or
 earlier if an iteration reproduces evidence identical to the prior
 iteration. Repeated identical evidence does not prove a lower layer;
 it only means this loop did not isolate the cause. Escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured layer-1-through-5 evidence including BOTH
 the DPU-side DOCA log and the host-side `dmesg` + `lspci`
 output.
@@ -409,7 +409,7 @@ not produce the expected host-side enumeration / driver bind /
 operation, narrow the cause to a specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending Device
 Emulation-specific fixes. This skill's overlay names the
@@ -482,7 +482,7 @@ Device Emulation-specific manifestation at layers 5 (runtime),
   DPU-side privilege, disabled firmware configuration, pending
   activation, wrong device, and unsupported hardware/install.
   Route any configuration write or reset through
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md).
+  `doca-hardware-safety/SKILL.md`.
 - `DOCA_ERROR_IO_FAILED` on host ↔ DPU interaction after
   start (host kernel driver reads / writes / kicks, DMA
   primitives moving payload) points at a host-side driver
@@ -493,19 +493,19 @@ Device Emulation-specific manifestation at layers 5 (runtime),
 - A BlueField in the wrong mode that does NOT expose the
   emulation type at all surfaces as `DOCA_ERROR_NOT_SUPPORTED`
   at per-sub-library context create. Route to
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5 (driver) for the env-side BlueField mode fix; this
   is NOT a code change in the DPU-side program.
 
 Once the layer is identified, route to the matching debug
 verb on the matching skill: install / build / link / driver
-to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug);
+to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`);
 version to
-[`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug);
+`doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 ## Deferred task verbs
 
@@ -517,9 +517,9 @@ follows so the agent does not invent guidance:
   emulation-type slots, installing host-side kernel drivers
   (or loading kernel modules), choosing matched DOCA
   versions, post-install verification, `pkg-config` wiring —
-  defer to [`doca-setup`](../../doca-setup/SKILL.md) and to
+  defer to `doca-setup/SKILL.md` and to
   the install-tree layout in
-  [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is installed, the firmware-side
   emulation type for the chosen sub-library is enabled, and
   the host kernel ships the matching driver.
@@ -534,14 +534,14 @@ follows so the agent does not invent guidance:
   Service or the DOCA Virtio-net Service as the user's
   *backend* rather than writing one with this library — out
   of scope. Route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   to the DOCA SNAP Services guide and the DOCA Virtio-net
   Service Guide; the services are separate artifacts with
   their own service guides.
 - **backend design.** Designing the storage backend, the
   packet-forwarding logic, or the filesystem implementation
   the user runs on the DPU — out of scope. Route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   to the public DOCA Device Emulation umbrella guide and to
   the user's own domain expertise; this skill prescribes how
   to *expose* an emulated PCIe device, not what the backend
@@ -563,7 +563,7 @@ instance. Run-as user is the unprivileged user unless noted. Rows that need elev
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST
@@ -578,26 +578,26 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | Discover `doca-*.pc` under the active install's `pkg-config` directories, then inspect matching installed headers for exported `doca_devemu` capability declarations | `## configure` steps 1 and 3; `## build` `pkg-config` slot | Which exact Device Emulation modules and capability symbols are installed on this DPU? | Report the literal module and symbol names found. Do not assume one module per covered sub-library and do not manufacture shorthand names |
 | `mlxconfig -d <bdf> q` (read-only) | `## configure` step 2; `## debug` layer 7 | What are the current and next-boot firmware-configuration values for the selected emulation class? | The exact documented field is present and current state is enabled; if next-boot differs, activation is pending. `VIRTIO_NET_EMULATION_ENABLE` is used only for virtio-net where documented / present. Absence or probe error is unknown, not disabled |
-| `pkg-config --modversion <the chosen sub-library's module>` | `## configure` step 2; `## build` minimum-version slot | What is the build-time version of the sub-library the user picked? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
+| `pkg-config --modversion <the chosen sub-library's module>` | `## configure` step 2; `## build` minimum-version slot | What is the build-time version of the sub-library the user picked? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
 | `pkg-config --cflags --libs <the chosen sub-library's module>` | `## build` | What include + link flags does the DPU-side linker need for the chosen sub-library? | Includes resolve under $(pkg-config --variable=includedir doca-common); libs include whatever `pkg-config --libs <module>` resolves on this install (the per-sub-library shared object plus its transitive closure; do not predict the `-l<name>` form by hand) |
 | `doca_caps --list-devs` (DPU side) | `## configure` steps 2 and 3 | Which DOCA devices does the DPU see, and which advertise Device Emulation capability for the chosen sub-library? | One entry per `doca_dev` with the BlueField identity and per-library capability flags. No advertised surface means unsupported in the observed state; separately check installed module/header, hardware generation, and read-only firmware configuration before assigning a cause |
 | `ls /opt/mellanox/doca/samples/doca_devemu/` | `## modify` slot 1 | Which verified Device Emulation samples ship in this install? | Use only entries actually listed. Empty / missing / no matching sub-library means stop; do not scaffold headers or source. Route to a verified installed example/project, packaged service, or public guide |
 | `lspci` (host side) | `## configure` step 7; `## run` step 2; `## debug` layer 5 | Has the emulated PCIe device appeared in the host's PCIe enumeration after the DPU-side context started? | A new entry that matches the device class the user emulated (a virtio NIC entry for virtio-net, a virtio filesystem entry for virtio-fs, a raw PCIe entry for PCI Generic). Empty = firmware-side enable did not take effect or the BlueField needs a reset |
 | `dmesg \| tail -n 80` (host side, sudo) | `## configure` step 7; `## run` step 3; `## debug` layer 5 | What did the host kernel see at PCIe enumeration / driver bind / first operation time? | A clean bind line for the matching kernel driver; no virtio feature-negotiation errors; no DMA / BAR mapping failures. Failure messages here narrow the diagnosis to a host-kernel or feature-negotiation cause, not a DPU-side bug |
-| `dmesg \| tail -n 40` (DPU side, sudo) | `## debug` layer 7 | What did the DPU kernel / driver log around the last Device Emulation call? | Empty or recent benign messages. Repeated mlx5 / device-emulation-driver errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
+| `dmesg \| tail -n 40` (DPU side, sudo) | `## debug` layer 7 | What did the DPU kernel / driver log around the last Device Emulation call? | Empty or recent benign messages. Repeated mlx5 / device-emulation-driver errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
 | `DOCA_LOG_LEVEL=trace ./<dpu-binary>` (DPU side) | `## run` step 3 | What did the structured DOCA logger emit for the first failing DPU-side Device Emulation call? | A trace-level line on every per-sub-library lifecycle transition and every doorbell registration. Silence after `doca_ctx_start()` = either DPU-side PE not progressed OR the doorbell was wired against the wrong sub-library context |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the Device Emulation-specific rows on top.

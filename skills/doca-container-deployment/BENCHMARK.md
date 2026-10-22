@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-container-deployment`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.7% — baseline ran, but no comparable score was available; uplift unavailable | 93.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.8% — baseline ran, but no comparable score was available; uplift unavailable | 94.9% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 50.0% → 100.0% (+50.0 points) | 65.0% → 100.0% (+35.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 49.2% → 100.0% (+50.8 points) | 54.6% → 98.8% (+44.2 points) |
-| Efficiency | 63.3% — baseline ran, but no comparable score was available; uplift unavailable | 73.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 54.2% → 98.8% (+44.6 points) | 55.8% → 100.0% (+44.2 points) |
+| Efficiency | 85.0% — baseline ran, but no comparable score was available; uplift unavailable | 81.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 800,507 | 813,748 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-container-deployment.explicit-positive.v1 | 276,740 | 378,971 | -102,231 | -26.98% | skill 1/1; base 1/1 |
-| claude-code | doca-container-deployment.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-container-deployment.implicit-positive.v2 | 493,425 | 277,697 | +215,728 | +77.68% | skill 1/1; base 1/1 |
-| claude-code | doca-container-deployment.negative.v1 | 30,342 | 157,080 | -126,738 | -80.68% | skill 1/1; base 1/1 |
-| codex | All cases | 435,638 | 157,672 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-container-deployment.explicit-positive.v1 | 136,954 | 25,451 | +111,503 | +438.11% | skill 1/1; base 1/1 |
-| codex | doca-container-deployment.implicit-positive.v1 | 269,223 | 102,970 | +166,253 | +161.46% | skill 1/1; base 1/1 |
-| codex | doca-container-deployment.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-container-deployment.negative.v1 | 29,461 | 29,251 | +210 | +0.72% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,236,145 | 971,420 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 925,482 | 650,065 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-container-deployment.explicit-positive.v1 | 278,983 | 340,904 | -61,921 | -18.16% | skill 1/1; base 1/1 |
+| claude-code | doca-container-deployment.implicit-positive.v1 | N/A | 215,675 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-container-deployment.implicit-positive.v2 | 584,391 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-container-deployment.negative.v1 | 62,108 | 93,486 | -31,378 | -33.56% | skill 1/1; base 1/1 |
+| codex | All cases | 410,855 | 146,453 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-container-deployment.explicit-positive.v1 | 136,309 | 25,712 | +110,597 | +430.14% | skill 1/1; base 1/1 |
+| codex | doca-container-deployment.implicit-positive.v1 | 249,783 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-container-deployment.implicit-positive.v2 | N/A | 81,867 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-container-deployment.negative.v1 | 24,763 | 38,874 | -14,111 | -36.30% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,336,337 | 796,518 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -84,13 +84,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **HIGH** DUPLICATE/duplicate: Duplicate content found within TASKS.md:
   "## test" in TASKS.md (lines 305-309)
   vs "## test" in TASKS.md (lines 391-400) (`TASKS.md:305`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
-  "## Error taxonomy" in CAPABILITIES.md (lines 199-308)
-  vs "## run" in TASKS.md (lines 232-286)
-  vs "## debug" in TASKS.md (lines 415-503)
-  vs "## Command appendix" in TASKS.md (lines 533-545) (`CAPABILITIES.md:199`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/doca-container-deployment/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in details.md (`skills/doca-container-deployment/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-container-deployment/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: Description very long (970 chars, recommend 50-150) (`skills/doca-container-deployment/SKILL.md`)
 - 7 additional finding(s) are available in the full evaluation artifacts.
 

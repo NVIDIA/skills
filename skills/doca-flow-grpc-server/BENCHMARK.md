@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-flow-grpc-server`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.1% — baseline ran, but no comparable score was available; uplift unavailable | 97.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.8% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 100.0% (+50.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 37.5% → 93.8% (+56.3 points) | 61.3% → 98.1% (+36.8 points) |
-| Efficiency | 71.7% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 50.0% → 100.0% (+50.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 37.5% → 93.8% (+56.3 points) | 60.0% → 100.0% (+40.0 points) |
+| Efficiency | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 767,127 | 531,792 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-flow-grpc-server.explicit-positive.v1 | 205,204 | 156,646 | +48,558 | +31.00% | skill 1/1; base 1/1 |
-| claude-code | doca-flow-grpc-server.implicit-positive.v1 | N/A | 249,869 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-flow-grpc-server.implicit-positive.v2 | 531,308 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-flow-grpc-server.negative.v1 | 30,615 | 125,277 | -94,662 | -75.56% | skill 1/1; base 1/1 |
-| codex | All cases | 421,975 | 161,196 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-flow-grpc-server.explicit-positive.v1 | 92,991 | 33,071 | +59,920 | +181.19% | skill 1/1; base 1/1 |
-| codex | doca-flow-grpc-server.implicit-positive.v1 | 284,231 | 78,014 | +206,217 | +264.33% | skill 1/1; base 1/1 |
-| codex | doca-flow-grpc-server.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-flow-grpc-server.negative.v1 | 44,753 | 50,111 | -5,358 | -10.69% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,189,102 | 692,988 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 718,310 | 430,700 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-flow-grpc-server.explicit-positive.v1 | 159,973 | 152,063 | +7,910 | +5.20% | skill 1/1; base 1/1 |
+| claude-code | doca-flow-grpc-server.implicit-positive.v1 | 528,984 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-flow-grpc-server.implicit-positive.v2 | N/A | 247,838 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-flow-grpc-server.negative.v1 | 29,353 | 30,799 | -1,446 | -4.69% | skill 1/1; base 1/1 |
+| codex | All cases | 367,251 | 155,199 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-flow-grpc-server.explicit-positive.v1 | 92,192 | 36,005 | +56,187 | +156.05% | skill 1/1; base 1/1 |
+| codex | doca-flow-grpc-server.implicit-positive.v1 | N/A | 89,786 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-flow-grpc-server.implicit-positive.v2 | 230,423 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-flow-grpc-server.negative.v1 | 44,636 | 29,408 | +15,228 | +51.78% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,085,561 | 585,899 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,9 +81,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md:
-  "### Language bindings" in CAPABILITIES.md (lines 139-150)
-  vs "## Language scope" in SKILL.md (lines 164-177) (`CAPABILITIES.md:139`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-flow-grpc-server/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-flow-grpc-server`)
 - **LOW** QUALITY/quality_discoverability: Description very long (882 chars, recommend 50-150) (`skills/tools/doca-flow-grpc-server/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/tools/doca-flow-grpc-server/SKILL.md`)

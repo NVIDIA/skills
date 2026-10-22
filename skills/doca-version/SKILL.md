@@ -6,7 +6,7 @@ description: >
   four-way match across pkg-config doca-common, applications/VERSION,
   doca_caps --version, and bfver/mlnx-release on BlueField; reason about
   NGC tags; look up whether a capability exists on this release; diagnose
-  build-vs-runtime drift. Load it alongside doca-debug when a symptom
+  build-vs-runtime drift. Use this skill alongside doca-debug when a symptom
   smells of version skew: "built but nothing on the wire", "undefined
   reference to a symbol the docs claim exists", "DOCA_ERROR_NOT_SUPPORTED
   at runtime", "what does latest mean for this tag", or "is my LTS still
@@ -18,6 +18,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - version
@@ -79,11 +80,11 @@ instance.
   Flow 2.6.0"*. Answered by the version-matrix lookup procedure in
   ## test (which uses the
   `version-matrix.json` schema defined in
-  [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md#schemas)
+  `doca-structured-tools-contract/SKILL.md#schemas`
   with fallback to per-library docs via
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)).
+  `doca-public-knowledge-map/SKILL.md`).
 - **"Can I run my host package version X against BFB version Y?"** —
-  worked example: *"host is 3.3.0 LTS, BlueField BFB is 3.1.0"*.
+  worked example: *"host is 3.5.0 GA, BlueField BFB is 3.2.3 LTS"*.
   Answered by the routing to the
   [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html)
   documented in
@@ -120,7 +121,7 @@ Load this skill whenever version handling is the load-bearing
 concern. The decision must be made **before** the agent composes
 its first sentence — the activation checklist below is the same
 one referenced from
-[`AGENTS.md ## Cross-cutting overlay activation triggers`](../../AGENTS.md#cross-cutting-overlay-activation-triggers),
+`AGENTS.md ## Cross-cutting overlay activation triggers` (bundle `AGENTS.md#cross-cutting-overlay-activation-triggers`),
 mirrored here so the activation rule is at hand whenever this skill
 is consulted.
 
@@ -142,10 +143,10 @@ When any cell above fires, the agent MUST:
 
 ## Universal version-coherence trigger
 
-Whenever ANOTHER overlay (e.g. [`doca-setup`](../doca-setup/SKILL.md), [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md), [`doca-container-deployment`](../doca-container-deployment/SKILL.md), [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)) calls a `## test` / `## configure` / `## modify` step that requires *"the install is healthy"* or *"versions are consistent"*, that step MUST resolve to a citation of this skill's four-source detection chain and four-way match rule. The agent does NOT redefine the rule per-overlay — every step that needs a version verification must route here. This is the *only* place in the bundle that owns the rule body.
+Whenever ANOTHER overlay (e.g. `doca-setup/SKILL.md`, `doca-hardware-safety/SKILL.md`, `doca-container-deployment/SKILL.md`, `doca-bare-metal-deployment/SKILL.md`) calls a `## test` / `## configure` / `## modify` step that requires *"the install is healthy"* or *"versions are consistent"*, that step MUST resolve to a citation of this skill's four-source detection chain and four-way match rule. The agent does NOT redefine the rule per-overlay — every step that needs a version verification must route here. This is the *only* place in the bundle that owns the rule body.
 
 Do **not** load this skill for general DOCA orientation, for
-install procedures (use [`doca-setup`](../doca-setup/SKILL.md)),
+install procedures (use `doca-setup/SKILL.md`),
 or for library-specific API questions (use the matching library
 skill).
 
@@ -183,26 +184,26 @@ version-handling material lives in two companion files:
 
 ## Related skills
 
-- [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the JSON schemas for the helper tools the agent should prefer
   when present. This skill's `## test` workflow uses the
   `version-matrix.json` schema defined there; do not redefine the
   schema here.
-- [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table to public DOCA docs, including the
   Compatibility Policy. This skill cites the Compatibility Policy
   URL once via that map; it does not duplicate the routing.
-- [`doca-setup`](../doca-setup/SKILL.md) — env-side install /
+- `doca-setup/SKILL.md` — env-side install /
   verify / NGC container path. This skill assumes its
   preconditions are satisfied (i.e., something is installed
   somewhere; the version question is *what was installed and is
   it consistent*).
-- [`doca-programming-guide`](../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   program-side guidance (quote the version observed, header-wins,
   capability-discovery rules). The program-side `## Version
   compatibility` section there is now a 3-5 line redirect to this
   skill plus the program-side overlay (quote vs assume; never use
   agent-memory version).
-- [`doca-debug`](../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder. Layer 2 (*version mismatch*) of that ladder is
   owned by this skill's `## debug` workflow.

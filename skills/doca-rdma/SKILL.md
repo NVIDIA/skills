@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - rdma
@@ -80,6 +81,8 @@ DOCA-RDMA task, regardless of whether bytes moved.
 
 Concrete path (verified on DOCA 3.3, one RoCE port, two processes):
 
+0. **Record the installed version first:** run
+   `pkg-config --modversion doca-rdma` and show the result.
 1. **Build the shipped pair in place, output outside.** The samples'
    `meson.build` reads `../../../VERSION`, so a copied samples tree does
    not configure. Build from the installed directory into your own build
@@ -100,7 +103,8 @@ Concrete path (verified on DOCA 3.3, one RoCE port, two processes):
    checksum or proof line), copy the whole samples tree with
    `/opt/mellanox/doca/VERSION` kept three levels above the sample
    directory, change only the payload and the receiver's print, and keep
-   the same run sequence. Never write a new RDMA program from scratch,
+   the same run sequence and any program names or output format the user
+   asked for. Never write a new RDMA program from scratch,
    never edit the installed samples, and never fall back to raw verbs,
    `rdma_cm` code, `ib_write_bw`, `rping` or a loopback.
 
@@ -115,7 +119,7 @@ host with DOCA. Open the tasks companion if the user wants to *do*
 something (configure / build / modify / run / test / debug); open
 the capabilities companion when the question is *what can
 RDMA express* on this version. If the user has not installed DOCA
-yet, route to [`doca-setup`](../../doca-setup/SKILL.md) first.
+yet, route to `doca-setup/SKILL.md` first.
 
 ## Example questions this skill answers well
 
@@ -161,7 +165,7 @@ load-bearing piece — the worked example is a single instance.
   ## Error taxonomy
   + the layered ladder in
   ## debug that escalates to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  `doca-debug/SKILL.md`.
 
 ## Audience
 
@@ -223,7 +227,7 @@ any language. Concretely:
 
 Do **not** load this skill for general DOCA orientation, install of
 DOCA itself, or non-RDMA library questions. For those, use
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## What this skill provides
 
@@ -252,7 +256,7 @@ The skill assumes a host or BlueField where DOCA is already
 installed at the standard location and the user has the privileges
 their public install profile expects. It does not cover installing
 DOCA — that path goes through
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -268,7 +272,7 @@ pull requests should not add:
   agent's job is to route the user to those files and prescribe a
   minimum-diff modification on them via the universal
   modify-a-sample workflow in
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the RDMA-specific overrides in
   ## modify.
 - **Standalone build manifests** (`meson.build`, `CMakeLists.txt`,
@@ -296,28 +300,28 @@ pull requests should not add:
    capability or safety decision; do not load both unconditionally.
 
 Both companion files cross-link to each other and to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 whenever the right answer is "look it up in the public docs or the
 installed package layout" rather than "RDMA-specific guidance".
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) — the
+- `doca-public-knowledge-map/SKILL.md` — the
   routing table for every public DOCA documentation source and the
   on-disk layout of an installed DOCA package. Always available
   alongside this skill.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, and the *I have no install yet* path with
   the public NGC DOCA container. This skill assumes its
   preconditions are satisfied.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library: the
   canonical `pkg-config` + meson build pattern, the universal
   modify-a-shipped-sample first-app workflow, the universal
   lifecycle, the cross-library `DOCA_ERROR_*` taxonomy, and the
   program-side debug order. This skill layers RDMA specifics on
   top.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). RDMA-specific debug (state-machine transitions,
   permission failures, connection callbacks) overlays on top of

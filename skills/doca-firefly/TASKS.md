@@ -11,7 +11,7 @@ These verbs cover the in-scope Firefly operational workflows for an
 external operator deploying the Firefly container on BlueField.
 Every step assumes the operator has consulted the live public DOCA
 Firefly Service Guide (reachable through
-[doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services))
+doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`))
 and is using it as the authoritative reference; this file prescribes
 the *order* and *what to look up where*, not a copy-paste runbook.
 
@@ -34,9 +34,9 @@ end-to-end discipline before the container starts.
       Firefly speculatively.
 2. **Confirm the env is healthy.** This skill expects DOCA to be
    installed on the BlueField. If that has not been verified, run
-   [`doca-setup ## test`](../../doca-setup/TASKS.md#test) first.
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`) first.
    If the user has no install yet, route to
-   [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    for the public NGC DOCA container path.
    Then check the BlueField PTP prerequisites the DOCA 3.5 Firefly
    Service Guide lists. Query first; change nothing yet:
@@ -107,7 +107,7 @@ end-to-end discipline before the container starts.
    to support a Rivermax SMPTE workload, the Rivermax-side
    precondition matrix (Rivermax SDK + license + scheduling
    discipline) is ALSO required — route the Rivermax side to
-   [`doca-rmax ## configure`](../../libs/doca-rmax/TASKS.md#configure).
+   `doca-rmax ## configure` (`doca-rmax/TASKS.md#configure`).
    For 5G UPF / finance / distributed databases, the consumer-side
    wiring is owned by the workload's own docs; Firefly's job is to
    keep the disciplined time available.
@@ -137,9 +137,9 @@ question:
 - For applications that **read the BlueField PHC directly** via a
   DOCA library (e.g. a Rivermax-based SMPTE workload), the build is
   the DOCA library's build — route to
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+  `doca-programming-guide/SKILL.md`
   and the matching `libs/<library>` skill (e.g.
-  [`doca-rmax`](../../libs/doca-rmax/SKILL.md) for SMPTE).
+  `doca-rmax/SKILL.md` for SMPTE).
 - For applications that **read the OS system clock** that the
   host-side follower is disciplining, no DOCA-specific build is
   needed — the application uses standard `clock_gettime(2)` against
@@ -151,7 +151,7 @@ If the user is instead asking how to build the **Firefly container
 itself** from source, that is *not* an external-operator workflow —
 the container ships pre-built from NGC and rebuilding it is out of
 scope for this skill. Route to the public DOCA Firefly Service
-Guide via [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services).
+Guide via doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`).
 
 ## modify
 
@@ -219,7 +219,7 @@ not, stop and hand off to the BlueField container-runtime owner.
    Firefly Service Guide names. The runtime command shape (e.g.
    `docker run` / `crictl` / BlueField container manager) is
    documented in the Container Deployment Guide reachable through
-   [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
+   `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 3. **Confirm the container is running, not restart-looping.** A
    restart loop is a layer-1 symptom per
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
@@ -254,7 +254,7 @@ not, stop and hand off to the BlueField container-runtime owner.
 
 For the runtime version + container-tag cross-checks that underlie
 *"my Firefly behaves differently from what the docs say"*, see
-[`doca-version TASKS.md ## run`](../../doca-version/TASKS.md#run)
+`doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`)
 and apply the container-tag-lags-host-package overlay from
 [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 
@@ -300,7 +300,7 @@ failure mode the iterative loop is here to prevent.
    observations. This is the required live/shared-system check.
 4. **Consumer-workload smoke.** For Rivermax SMPTE, run the
    `doca-rmax` single-frame smoke (per
-   [`doca-rmax TASKS.md ## test`](../../libs/doca-rmax/TASKS.md#test))
+   `doca-rmax TASKS.md ## test` (`doca-rmax/TASKS.md#test`))
    with the disciplined PHC available; for 5G UPF / finance /
    distributed databases, the workload-side smoke is the workload's
    own concern. The Firefly contribution to the consumer smoke is
@@ -379,19 +379,19 @@ without clearing the layer above. The five layers match
    clock follows PHC; but the consumer workload still reports time
    drift. Resolution: the workload is reading its own time source
    instead of the disciplined system clock. For Rivermax, walk
-   [`doca-rmax TASKS.md ## debug`](../../libs/doca-rmax/TASKS.md#debug);
+   `doca-rmax TASKS.md ## debug` (`doca-rmax/TASKS.md#debug`);
    for 5G UPF / finance / distributed DB, the workload's own docs.
 6. **Version layer.** When the public Firefly Service Guide page
    appears to disagree with what the deployed container does, the
    docs version may not match the container tag. Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2 (partial install / version mismatch) and apply the
    container-tag overlay from
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 7. **Cross-cutting layer.** For env-side and program-side debug
    that is not Firefly-specific (host install, host kernel, DOCA
    library errors Firefly may surface), drop to
-   [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 
 When a diagnosed root cause belongs to the host follower, network
 path, consumer workload, version alignment, or another cross-cutting
@@ -407,7 +407,7 @@ installed tool or the public guide, not prose recall.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -421,10 +421,10 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the row.
    Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Purpose | Command (class shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
@@ -451,17 +451,17 @@ Three cross-cutting rules for this appendix:
   every PTP-layer command meaningless.
 - **Cross-link instead of duplicate.** Cross-cutting env commands
   (port-state, `devlink`, `ip link`, `ethtool`) live in
-  [`doca-setup TASKS.md ## Command appendix`](../../doca-setup/TASKS.md#command-appendix);
+  `doca-setup TASKS.md ## Command appendix` (`doca-setup/TASKS.md#command-appendix`);
   this appendix names only the Firefly-specific ones.
 
 ## Deferred task verbs
 
 - **Installing DOCA on the BlueField** — out of scope here. Route
-  to [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+  to `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   for env preparation and
-  [`doca-setup ## test`](../../doca-setup/TASKS.md#test) for
+  `doca-setup ## test` (`doca-setup/TASKS.md#test`) for
   install health verification, or
-  [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+  `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
   for the public NGC DOCA container path.
 - **Installing or configuring the host-side time-sync follower**
   (chrony / `ptp4l` / `phc2sys`) — out of scope here. The Firefly
@@ -475,17 +475,17 @@ Three cross-cutting rules for this appendix:
   consumes the topology decision.
 - **Building a custom DOCA application that reads the disciplined
   PHC** — not a Firefly question. Route to
-  [`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build)
+  `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
   for the canonical build pattern and the matching `libs/<library>`
   skill (e.g.
-  [`doca-rmax ## configure`](../../libs/doca-rmax/TASKS.md#configure)
+  `doca-rmax ## configure` (`doca-rmax/TASKS.md#configure`)
   for SMPTE) for the API surface.
 - **Other DOCA services** (DMS, DTS, BlueMan, Flow-Inspector,
   HBN, Argus, …) — not Firefly. Route to
-  [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services)
+  doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`)
   for the routing table and the matching `services/<service>` skill
   when it exists (e.g.
-  [`doca-dms ## configure`](../doca-dms/TASKS.md#configure) for
+  `doca-dms ## configure` (`doca-dms/TASKS.md#configure`) for
   device management). The container-shaped deployment pattern is
   shared; the per-service domain is different.
 
@@ -508,4 +508,4 @@ Three cross-cutting rules for this appendix:
   passes, never before.
 - For URL routing to the Firefly guide and other public DOCA
   documentation, see
-  [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services).
+  doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`).

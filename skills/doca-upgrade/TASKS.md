@@ -12,9 +12,9 @@ Read this file when the loader sent you here from
 rule, the sunset concern, the error taxonomy, observability, and the
 safety overlay, see [CAPABILITIES.md](CAPABILITIES.md). The
 version-detection chain is owned by
-[`doca-version`](../doca-version/SKILL.md); the hardware / firmware /
+`doca-version/SKILL.md`; the hardware / firmware /
 reboot discipline is owned by
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md).
+`doca-hardware-safety/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through the
@@ -33,21 +33,21 @@ Steps the agent should walk the user through:
 1. **Confirm this is an upgrade, not a first install.** The target
    must have an existing DOCA state that `doca-version` can detect.
    If no live install is present, STOP and route to
-   [`doca-setup`](../doca-setup/SKILL.md); do not turn a first install
+   `doca-setup/SKILL.md`; do not turn a first install
    into an upgrade workflow.
 2. **Detect the installed version.** Route to
-   [`doca-version ## configure`](../doca-version/TASKS.md#configure)
+   `doca-version ## configure` (`doca-version/TASKS.md#configure`)
    and capture the four-source chain plus the four-way match status.
    This skill consumes that result; it does NOT restate the
    detection chain. Record the version and host kind for the session.
 3. **Discover the available target release.** Look up what release
    is current via the DOCA Release Notes, reached through
-   [`doca-public-knowledge-map ## Public documentation entry points`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points).
+   `doca-public-knowledge-map ## Public documentation entry points` (`doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`).
    Never quote a "latest" version from memory; the target is the one
    the user names or the one the release notes confirm is current.
 4. **Run the apt-source consistency precheck.** For any host that
    will receive an `apt`-shaped upgrade, route to
-   [`doca-version ## apt-source consistency`](../doca-version/TASKS.md#apt-source-consistency)
+   `doca-version ## apt-source consistency` (`doca-version/TASKS.md#apt-source-consistency`)
    to confirm the configured source channel matches the intended
    target before any move is contemplated.
 5. **Validate that the jump is supported.** Check the requested
@@ -59,7 +59,7 @@ Steps the agent should walk the user through:
    [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes),
    surface whether an installed component appears to be on a
    deprecation track and route the user to the release notes via
-   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+   `doca-public-knowledge-map/SKILL.md`
    to confirm, rather than recommending continued investment.
 7. **Report the gap.** State the installed release, the target
    release, the upgrade mode (per the mode table), and what moving
@@ -69,7 +69,7 @@ Steps the agent should walk the user through:
 If detection fails (a `pkg-config` not-found or a four-way mismatch),
 this is failed/partial-state diagnosis, not planned-upgrade loading.
 Route directly through
-[`doca-version ## debug`](../doca-version/TASKS.md#debug), then enter
+`doca-version ## debug` (`doca-version/TASKS.md#debug`), then enter
 this file's [`## debug`](#debug) ladder; do not produce a target gap
 or confirmation prompt from an incoherent baseline.
 
@@ -79,9 +79,9 @@ or confirmation prompt from an incoherent baseline.
 > does not produce a build artifact; there is no compile-time output
 > of moving a host from one DOCA release to the next. The build
 > pattern a DOCA consumer rebuilds against AFTER an upgrade is owned
-> by [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build),
+> by `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`),
 > and the build-time-vs-runtime version match is owned by
-> [`doca-version ## build`](../doca-version/TASKS.md#build).
+> `doca-version ## build` (`doca-version/TASKS.md#build`).
 >
 > This skill's only build-side concern is to SURFACE that an upgrade
 > that moves the runtime release may require the user to rebuild
@@ -100,11 +100,11 @@ or confirmation prompt from an incoherent baseline.
 >
 > - The apt-source channel pin and the local-repo / network-URL
 >   shapes are owned by
->   [`doca-version ## apt-source consistency`](../doca-version/TASKS.md#apt-source-consistency)
+>   `doca-version ## apt-source consistency` (`doca-version/TASKS.md#apt-source-consistency`)
 >   and the install path in
->   [`doca-setup ## configure`](../doca-setup/TASKS.md#configure).
+>   `doca-setup ## configure` (`doca-setup/TASKS.md#configure`).
 > - A build-manifest `pkg-config` minimum or a container-tag pin is
->   owned by [`doca-version ## modify`](../doca-version/TASKS.md#modify).
+>   owned by `doca-version ## modify` (`doca-version/TASKS.md#modify`).
 >
 > This skill's role is to name *which* pin a chosen upgrade target
 > requires changing and to route the edit to the owning skill; the
@@ -145,22 +145,22 @@ Steps the agent should walk the user through (in order):
    proceed without inventing a stakeholder window.
 4. **Apply the mode-appropriate move.** For a host apt upgrade,
    route the package-set convergence to
-   [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
+   `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
    after the apt source is reconciled. The agent does not invent the
    package list; it uses the documented install procedure.
 5. **Delegate every hardware / firmware / reboot step.** A BFB
    reflash, a BlueField mode flip, an `mlxconfig` write, or any cold
    power cycle the target release requires is routed to
-   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify)
+   `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`)
    and the pre-flight discipline in
-   [`doca-hardware-safety ## configure`](../doca-hardware-safety/TASKS.md#configure).
+   `doca-hardware-safety ## configure` (`doca-hardware-safety/TASKS.md#configure`).
    This skill names *when* such a step is part of the upgrade; that
    skill names *how* it is applied safely. The agent never redefines
    the reflash / mode-flip / power-cycle steps here.
 6. **Gate the workload behind verification.** Do not declare the
    upgrade done until [`## test`](#test) passes; route the
    post-change workload gate through
-   [`doca-hardware-safety ## run`](../doca-hardware-safety/TASKS.md#run)
+   `doca-hardware-safety ## run` (`doca-hardware-safety/TASKS.md#run`)
    when the move touched hardware state.
 
 ## test
@@ -176,7 +176,7 @@ when the four-way match holds on the target release.
 Iteration shape:
 
 1. **Post-upgrade four-way match.** Route to
-   [`doca-version ## test`](../doca-version/TASKS.md#test) and
+   `doca-version ## test` (`doca-version/TASKS.md#test`) and
    confirm `pkg-config --modversion doca-common`,
    `cat /opt/mellanox/doca/applications/VERSION`, `doca_caps
    --version`, and (on BlueField) the BFB version all agree on the
@@ -192,7 +192,7 @@ Iteration shape:
    and routes back to [`## debug`](#debug).
 4. **Confirm the consumer still builds / runs.** If the user has an
    application, confirm it builds and runs against the new release
-   per [`doca-version ## test`](../doca-version/TASKS.md#test); a
+   per `doca-version ## test` (`doca-version/TASKS.md#test`); a
    build/runtime skew after the move is a failed upgrade.
 5. **Loop back if any source still reads the old release.** Re-run
    from step 1 after any corrective action until the four-way match
@@ -209,23 +209,25 @@ this verb is the recovery ladder.
 **The recovery ladder.**
 
 1. **Read all four sources.** Route to
-   [`doca-version ## debug`](../doca-version/TASKS.md#debug) and
+   `doca-version ## debug` (`doca-version/TASKS.md#debug`) and
    capture the post-upgrade four-source state. Identify which sources
    moved to the target and which did not.
 2. **Classify the failure.** Map the captured state to a row in
    [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy):
    - **Apt-source drift** → reconcile the source first per
-     [`doca-version ## apt-source consistency`](../doca-version/TASKS.md#apt-source-consistency),
+     `doca-version ## apt-source consistency` (`doca-version/TASKS.md#apt-source-consistency`),
      then re-converge.
    - **Aborted transaction / `dpkg` interrupted** → recover the
-     package database first: `sudo dpkg --configure -a`, then
-     `sudo apt-get -f install` (Debian/Ubuntu); do not re-run the upgrade
-     as the first action, and re-detect via `doca-version` afterwards.
+     package database first: show the user `sudo dpkg --configure -a`,
+     then `sudo apt-get -f install` (Debian/Ubuntu), say that both change
+     system package state, and run them only after the user's explicit
+     confirmation; do not re-run the upgrade as the first action, and
+     re-detect via `doca-version` afterwards.
    - **Partial upgrade** → converge the package set on one release
      via the install path in
-     [`doca-setup ## debug`](../doca-setup/TASKS.md#debug).
+     `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
    - **Host/BFB skew** → route the proposed BFB corrective change to
-     [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify);
+     `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`);
      that skill decides whether the documented rollback/OOB gates
      permit it. Do not prescribe the reflash here.
 3. **Re-verify against the target.** After the corrective action,
@@ -237,13 +239,13 @@ this verb is the recovery ladder.
    rollback/escalation path, and do not recommend an unbounded retry.
 5. **Hand off a residual software-layer symptom.** Once the version
    state is known-good and a symptom remains, route to
-   [`doca-debug ## debug`](../doca-debug/TASKS.md#debug) with the
+   `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) with the
    captured upgrade state as evidence.
 
 When the failure is a hardware-state failure that has no documented
 recovery (a one-way firmware roll, a bricked BFB), the agent applies
 the refuse-and-escalate rule owned by
-[`doca-hardware-safety ## debug`](../doca-hardware-safety/TASKS.md#debug)
+`doca-hardware-safety ## debug` (`doca-hardware-safety/TASKS.md#debug`)
 — it does not guess at a recovery.
 
 ## Deferred task verbs
@@ -253,15 +255,15 @@ asked in the same conversations. Route them as follows so the agent
 does not invent guidance:
 
 - **install / first-time setup.** Owned by
-  [`doca-setup ## recognize`](../doca-setup/TASKS.md#recognize) and
-  [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+  `doca-setup ## recognize` (`doca-setup/TASKS.md#recognize`) and
+  `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`).
   This skill assumes something is already installed; an upgrade is
   *moving from one installed release to another*.
 - **version detection in isolation.** Owned by
-  [`doca-version ## configure`](../doca-version/TASKS.md#configure).
+  `doca-version ## configure` (`doca-version/TASKS.md#configure`).
   This skill consumes the detected version; it does not own the
   detection chain.
 - **the hardware / firmware / reboot step itself.** Owned by
-  [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify).
+  `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`).
   This skill names when a reflash / mode-flip / cold-power-cycle is
   part of an upgrade; that skill owns how it is applied safely.

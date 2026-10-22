@@ -2,24 +2,21 @@
 license: Apache-2.0
 name: doca-sta
 description: >
-  Use this skill when the user is doing hands-on NVMe-over-Fabrics
-  storage-target work on a BlueField DPU or ConnectX NIC with DOCA STA —
-  standing up a doca_sta DOCA Core context that accelerates the
-  target-side NVMe-oF data path over RDMA, defining doca_sta_subsystem
-  targets (NQN + namespaces) backed by local NVMe-PCI backend disks
-  (doca_sta_be), checking device support via doca_sta_cap_is_supported,
-  sizing the per-connection I/O queues, or debugging DOCA_ERROR_* from a
-  STA call. Trigger even when the user does not say "DOCA STA" — typical
-  implicit phrasings include "my NVMe-oF Connect never completes",
-  "Identify Controller times out over RoCE", "16 I/O queues at depth
-  1024 — does this BlueField support that", "offload the nvmf target
-  onto the DPU", or "DOCA_ERROR_IO_FAILED on an NVMe read". Refuse and
-  route elsewhere for DOCA install, raw RDMA data movement, raw packet
-  I/O, flow-rule programming, or initiator-side / host NVMe stack work —
-  those belong to other skills.
+  Use this skill when the user builds an NVMe-over-Fabrics
+  storage target on BlueField with DOCA STA — instantiating
+  doca_sta, declaring doca_sta_subsystem NQNs and namespaces over
+  local NVMe disks via doca_sta_be, validating platform support
+  with doca_sta_cap_is_supported, sizing I/O queue depth, or
+  decoding DOCA_ERROR_* statuses such as IO_FAILED on NVMe reads.
+  Also load it for implied asks like "Identify Controller times out
+  over RoCE", "offload the nvmf target", "NVMe-oF Connect never
+  completes", or "16 I/O queues at depth 1024 — supported?". Refuse
+  and route to the proper owner for raw RDMA movement, packet I/O,
+  steering rules, initiator-side NVMe, or SDK install.
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - sta

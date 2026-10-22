@@ -1,5 +1,5 @@
 ## Description: <br>
-Hardware compression offload with DOCA Compress on a BlueField DPU, ConnectX NIC, or host: DEFLATE compress and decompress, plus LZ4 decompress (stream and block; LZ4 encode is NOT supported), instead of CPU zlib / zstd. <br>
+Hardware compression offload with DOCA Compress on a BlueField DPU, ConnectX NIC, or host — DEFLATE compress and decompress plus LZ4 decompress (stream and block; LZ4 encode is not supported), instead of CPU zlib/zstd. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,10 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache 2.0 <br>
+
 ## Use Case: <br>
-Developers and engineers building applications that consume the DOCA Compress library to offload bulk DEFLATE compression or decompression (and LZ4 decompression) onto a BlueField DPU or ConnectX accelerator, including capability queries, buffer sizing, mmap permissions, offload-vs-CPU decisions, and DOCA_ERROR_* debugging. <br>
+External developers building applications that consume the DOCA Compress library use this skill to offload bulk DEFLATE compression and decompression (plus LZ4 decompression) onto a BlueField DPU or ConnectX NIC, and to configure task types, size buffers against per-task capability queries, set mmap permissions, decide offload-vs-CPU, and debug DOCA_ERROR_* results from Compress calls. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +26,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Compress Guide](https://docs.nvidia.com/doca/sdk/DOCA-Compress/) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
+- [Capabilities and modes companion](CAPABILITIES.md) <br>
+- [Tasks companion (configure/build/modify/run/test/debug)](TASKS.md) <br>
+- [DOCA Compress SDK documentation](https://docs.nvidia.com/doca/sdk/DOCA-Compress/) <br>
+- [DOCA SDK documentation index](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA samples (NVIDIA-DOCA/doca-samples)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Code, Shell commands, Configuration instructions] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
 **Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -45,15 +46,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in an isolated k8s-sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt each, each run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? Scored from the `security` signal. <br>
-- Correctness: Is the answer correct? Scored from the `accuracy` signal. <br>
-- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal. <br>
-- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` and `behavior_check`. <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? 50% `skill_efficiency` (tool-call productivity) + 50% `token_efficiency`. <br>
+- Security: Is it safe to use — checks unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct — final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed — expected skill selected and decoys avoided. <br>
+- Effectiveness: Did the skill help complete the task — equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage — tool-call productivity plus token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -68,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.2% | 98.4% |
+| Overall | 89.8% (uplift unavailable) | 95.6% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% | 93.3% |
-| Effectiveness | 58.8% → 92.5% (+33.7 points) | 73.1% → 98.8% (+25.7 points) |
-| Efficiency | 73.3% | 100.0% |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 90.0% → 100.0% (+10.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 93.3% (uplift unavailable) |
+| Effectiveness | 53.8% → 86.9% (+33.1 points) | 63.8% → 98.1% (+34.3 points) |
+| Efficiency | 62.2% (uplift unavailable) | 86.7% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-7e143d8 (source: git SHA, committed 2026-10-12) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

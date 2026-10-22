@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 to [TASKS.md](TASKS.md). For the JSON schemas that helper tools
 emit (so the agent can prefer the structured one-shot over the
 manual chain), see
-[`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md).
+`doca-structured-tools-contract/SKILL.md`.
 
 ## Pattern overview
 
@@ -63,7 +63,7 @@ continues.
 
 **Discovery shortcut.** When the host has a structured-tools
 helper installed (per
-[`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md#doca-env---json-schema)),
+`doca-structured-tools-contract/SKILL.md#doca-env---json-schema`),
 `doca-env --json` returns all five sources in one JSON object with
 a `version.consistent` boolean that pre-computes the four-way
 match. Prefer this when present; fall back to the chain above
@@ -157,7 +157,9 @@ failure on the user's box.
    *Supported Operating Systems* table; a host whose OS family is
    *listed* but whose minor / point release is outside the supported
    sub-range (the documented case: Ubuntu 24.04.x where `x ≤ 3` per
-   DOCA 3.3's matrix, on a host running 24.04.4) is a stop-and-ask,
+   DOCA 3.3's matrix, on a host running 24.04.4; DOCA 3.5 lists
+   24.04.x for `x ≤ 4` and 22.04.x for `x ≤ 5`, and adds Ubuntu 26.04)
+   is a stop-and-ask,
    NOT silent acceptance. The packages may install cleanly and the
    userspace may even pass the four-source coherence check — and
    then a downstream kernel-module / DKMS / OFED step quietly fails
@@ -165,14 +167,17 @@ failure on the user's box.
    The agent's required move:
    - Read the target release's *Supported Operating Systems* table
      from `docs.nvidia.com/doca/sdk/<release>-release-notes/...`
-     (route via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)).
+     (for DOCA 3.5 the table is on the General Support page:
+     <https://docs.nvidia.com/doca/archive/3-5-0/general-support>)
+     (route via `doca-public-knowledge-map/SKILL.md`).
    - Compare against the user's actual `lsb_release -a` / `uname -r`.
    - If the OS family is unsupported → refuse (this is the
      verification-contract `## step 1 — preconditions` failure mode).
    - If the OS family is supported but the point release is outside
      the documented sub-range → SURFACE the gap to the user verbatim
      ("your Ubuntu 24.04.4 is outside the DOCA 3.3 supported
-     sub-range of 24.04.x for x ≤ 3 per the release notes"), name
+     sub-range of 24.04.x for x ≤ 3 per the release notes"; for DOCA
+     3.5 quote 24.04.x for x ≤ 4 or 22.04.x for x ≤ 5), name
      the documented sub-range, and ask the user to either downgrade
      the point release into the supported window or to accept the
      off-matrix risk explicitly before proceeding.
@@ -197,7 +202,7 @@ to work together*.
 
 **NGC container semantics.** When the user reached an install via
 the public NGC DOCA container (per
-[`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install)
+`doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
 Path 0), the four-way match is *of the container*: the headers,
 `*.so`, samples, and `doca_caps` are all built and shipped together
 at the container tag the user pulled. Mixing artifacts built
@@ -221,24 +226,24 @@ build-time guards.
 Version-related errors the agent should recognize and disambiguate
 before continuing to a library- or program-level diagnosis. For
 the cross-library `DOCA_ERROR_*` taxonomy itself, see
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *version-level* upstream causes that bubble
 up *as* those errors.
 
 | Symptom | Most-likely version cause | First action |
 | --- | --- | --- |
-| `pkg-config: Package 'doca-common' was not found` | `PKG_CONFIG_PATH` is not configured OR the install is missing the `doca-common` package | Locate the live `doca-common.pc` first: `find /opt/mellanox/doca -name doca-common.pc -print -quit` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/` on DOCA 3.3+, OR `/opt/mellanox/doca/infrastructure/lib/pkgconfig/` on legacy / split-profile installs). If found, fix `PKG_CONFIG_PATH` (see [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)). If not found, route to `doca-setup` to select and install the appropriate DOCA profile. |
+| `pkg-config: Package 'doca-common' was not found` | `PKG_CONFIG_PATH` is not configured OR the install is missing the `doca-common` package | Locate the live `doca-common.pc` first: `find /opt/mellanox/doca -name doca-common.pc -print -quit` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/` on DOCA 3.3+, OR `/opt/mellanox/doca/infrastructure/lib/pkgconfig/` on legacy / split-profile installs). If found, fix `PKG_CONFIG_PATH` (see `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)). If not found, route to `doca-setup` to select and install the appropriate DOCA profile. |
 | `pkg-config --modversion doca-common` returns *X*; `doca_caps --version` returns `command not found` (NOT a version disagreement; the binary is ABSENT) | Either the per-tool package that ships the binary was not installed, OR the package IS installed but `/opt/mellanox/doca/tools/` is not on `$PATH` (DOCA 3.3+ ships these binaries off-PATH by default). | First disambiguate with the installed-package query and `ls /opt/mellanox/doca/tools/doca_caps`. If the package is absent, route to `doca-setup` for targeted installation after its package-policy precheck. If the binary is present, it is a `$PATH` issue: invoke it by absolute path or extend `PATH`. See `## Version compatibility` partial-install table. |
 | `pkg-config --modversion doca-common` returns *X*; `cat /opt/mellanox/doca/applications/VERSION` errors with `No such file or directory` | Partial install: the package that ships `applications/VERSION` was not installed. | Route to `doca-setup` for targeted installation after it identifies and validates the package for this DOCA release. |
-| `pkg-config --modversion doca-common` returns *X*; `ls /opt/mellanox/doca/samples/` errors with `No such file or directory` | Partial install: the samples package was not installed alongside `doca-common`. The bundle's modify-from-sample first-app workflow CANNOT apply on this host — the agent must say so explicitly (see [AGENTS.md `## Ground rules` rule 5](../../AGENTS.md#ground-rules-every-agent-must-follow)) rather than scaffold a sample from memory. | Route to `doca-setup` for targeted installation or pivot to the NGC DOCA container via [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) Path 0. |
+| `pkg-config --modversion doca-common` returns *X*; `ls /opt/mellanox/doca/samples/` errors with `No such file or directory` | Partial install: the samples package was not installed alongside `doca-common`. The bundle's modify-from-sample first-app workflow CANNOT apply on this host — the agent must say so explicitly (see AGENTS.md `## Ground rules` rule 5 (bundle `AGENTS.md#ground-rules-every-agent-must-follow`)) rather than scaffold a sample from memory. | Route to `doca-setup` for targeted installation or pivot to the NGC DOCA container via `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`) Path 0. |
 | `pkg-config --modversion doca-common` returns *X*; `doca_caps --version` returns *Y* (*X ≠ Y*) | Partial install: build-time and runtime are from different DOCA releases | Reinstall consistently. Do NOT work around in code. See [TASKS.md ## debug](TASKS.md#debug) ladder step 2. |
 | Program compiles with `DOCA_VERSION_MAJOR = X`; same program returns `DOCA_ERROR_NOT_SUPPORTED` from a call that the docs say is available since *X* | The headers are from version *X*; the runtime `*.so` is from version *Y* < *X* | Same partial-install diagnosis as above; the header path is *not* what the runtime is. |
 | BFB image version differs from the host package version by any amount | The four-way coherence check has failed. A separate compatibility-window policy may still describe whether this mixed pair is temporarily supported, but it does not make the install four-way coherent. | Report the mismatch and do not declare the install coherent. Cite the [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html) only for the separate support-window decision; if the pair is unsupported, bring the BFB and host into agreement rather than patching around it. |
-| NIC firmware version (per `flint -d <bdf> q` `FW Version:` line) major.minor predates the host DOCA's published required-FW level, OR the `FW Release Date:` predates the host DOCA's release by more than 12 months | NIC FW is out-of-window for this DOCA. NIC FW is a DIFFERENT anchor from BFB-image DOCA version — `flint q` reads the FW *image* shipped to the silicon, `bfver` reads the BFB DOCA *userland* — and skew on either independently disqualifies the pairing. | Route to [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify) for a firmware burn (NOT a host-package reinstall). Cross-check the required FW level against the *Supported NICs and Firmware* table in the [DOCA Release Notes](https://docs.nvidia.com/doca/sdk/doca-release-notes/index.html) before burning. |
+| NIC firmware version (per `flint -d <bdf> q` `FW Version:` line) major.minor predates the host DOCA's published required-FW level, OR the `FW Release Date:` predates the host DOCA's release by more than 12 months | NIC FW is out-of-window for this DOCA. NIC FW is a DIFFERENT anchor from BFB-image DOCA version — `flint q` reads the FW *image* shipped to the silicon, `bfver` reads the BFB DOCA *userland* — and skew on either independently disqualifies the pairing. | Route to `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`) for a firmware burn (NOT a host-package reinstall). Cross-check the required FW level against the *Supported NICs and Firmware* table in the [DOCA Release Notes](https://docs.nvidia.com/doca/sdk/doca-release-notes/index.html) before burning. |
 | Two or more BlueField devices on the same host (e.g. BF2 + BF3, or BF3 ×2 from different procurement waves) with DIFFERENT firmware levels | The four-way match is *per-device*: each BlueField/NIC enumerated by `lspci -d 15b3:` is its own anchor and must independently sit inside the host DOCA's compatibility window. BF2 and BF3 FW levels are independent silicon and need not match each other; do not "average" them or pick one. | Run `flint -d <bdf> q` (and `bfver` when the BlueField Arm console is reachable) once per visible 15b3:* device; apply the FW-skew rule above to each independently; surface a per-device verdict to the user rather than a single global verdict. |
-| `doca-flow.pc` exists; `pkg-config --modversion doca-flow` works; `doca_caps --version` is silent or errors | DOCA runtime is not on `LD_LIBRARY_PATH` OR is from a different install | Verify with `ldconfig -p | grep doca`; route to [`doca-setup ## debug`](../doca-setup/TASKS.md#debug) layer 3. |
+| `doca-flow.pc` exists; `pkg-config --modversion doca-flow` works; `doca_caps --version` is silent or errors | DOCA runtime is not on `LD_LIBRARY_PATH` OR is from a different install | Verify with `ldconfig -p | grep doca`; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layer 3. |
 | Public docs say capability *C* exists; on the user's host, `doca_<library>_cap_*` returns false | The user's installed version pre-dates the capability | Look up the minimum version in the version-matrix (see [TASKS.md ## test](TASKS.md#test)); if installed < min, the answer is to upgrade or to use a different approach. |
-| User pastes a URL like `docs.nvidia.com/doca/sdk/.../archive/v2.5.0/...` | Version-pinned doc URL; describes an old release | Tell the user the URL is version-pinned and fetch the current-release equivalent via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md). |
+| User pastes a URL like `docs.nvidia.com/doca/sdk/.../archive/v2.5.0/...` | Version-pinned doc URL; describes an old release | Tell the user the URL is version-pinned and fetch the current-release equivalent via `doca-public-knowledge-map/SKILL.md`. |
 
 ## Observability
 
@@ -258,12 +263,12 @@ Three primary signals the agent should reach for:
    `version-matrix.json` (preferred) or the manual fallback of
    fetching the per-library docs page and extracting the
    *"available since"* prose (per
-   [`doca-structured-tools-contract ## version-matrix.json schema`](../doca-structured-tools-contract/SKILL.md#schemas)).
+   `doca-structured-tools-contract ## version-matrix.json schema` (`doca-structured-tools-contract/SKILL.md#schemas`)).
    **Current shipping state (PR2):** the schema is shipped; the
    populated `version-matrix.json` data file does NOT yet ship in
    the public bundle, so in practice the agent always falls back
    to fetching the *"available since"* prose from the per-library
-   docs via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+   docs via `doca-public-knowledge-map/SKILL.md`.
    That fallback is correct (the answer comes from NVIDIA's
    freshest source) but slower than a local lookup; an offline
    version-data file together with an offline verifier is on the
@@ -280,10 +285,10 @@ Three primary signals the agent should reach for:
 
 For the env-side observability primitives (`LD_LIBRARY_PATH`,
 `PKG_CONFIG_PATH`, `ldconfig -p`) see
-[`doca-setup CAPABILITIES.md ## Observability`](../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 For the cross-cutting debug-time observability (`--sdk-log-level`,
 the `doca-<lib>-trace` flavor, `DOCA_LOG_LEVEL`) see
-[`doca-debug CAPABILITIES.md ## Observability`](../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
@@ -340,7 +345,7 @@ This skill scopes itself to DOCA version handling. Adjacent topics
 the agent will get asked but should route elsewhere:
 
 - **Installing DOCA, choosing packages, post-install verification.**
-  Owned by [`doca-setup`](../doca-setup/SKILL.md). This skill
+  Owned by `doca-setup/SKILL.md`. This skill
   assumes something is installed somewhere; the version question
   is *what was installed and is it consistent*.
 - **Per-library capability availability** (which symbols exist in
@@ -349,15 +354,15 @@ the agent will get asked but should route elsewhere:
   *interpretation* belongs in the matching library skill's
   `## Capabilities and modes`.
 - **Cross-library `DOCA_ERROR_*` taxonomy.** Owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill's `## Error taxonomy` is the *version-level* upstream
   causes that bubble up *as* those errors.
 - **General debug ladder** (install / version / build / link /
   runtime / program / driver). Owned by
-  [`doca-debug ## debug`](../doca-debug/TASKS.md#debug). This
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). This
   skill owns layer 2 (*version mismatch*); the other layers
   redirect.
 - **Routing to public docs and the on-disk install layout.**
-  Owned by [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  Owned by `doca-public-knowledge-map/SKILL.md`.
   This skill cites the Compatibility Policy URL once via that
   map; it does not duplicate the routing.

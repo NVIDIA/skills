@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-telemetry-utils`
-- Evaluation date: 2026-10-13
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,11 +35,11 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 99.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 90.4% — baseline ran, but no comparable score was available; uplift unavailable | 97.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 70.0% → 100.0% (+30.0 points) |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 85.0% → 90.0% (+5.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 43.8% → 92.5% (+48.7 points) | 43.8% → 100.0% (+56.2 points) |
+| Effectiveness | 47.5% → 73.8% (+26.3 points) | 46.3% → 100.0% (+53.7 points) |
 | Efficiency | 78.3% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,067,427 | 517,973 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-telemetry-utils.explicit-positive.v1 | 215,148 | 213,954 | +1,194 | +0.56% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-utils.implicit-positive.v1 | N/A | 182,172 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-telemetry-utils.implicit-positive.v2 | 405,569 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-telemetry-utils.negative.v1 | 446,710 | 121,847 | +324,863 | +266.62% | skill 1/1; base 1/1 |
-| codex | All cases | 529,284 | 329,007 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-telemetry-utils.explicit-positive.v1 | 135,999 | 25,134 | +110,865 | +441.10% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-utils.implicit-positive.v1 | 262,645 | 173,702 | +88,943 | +51.20% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-utils.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-telemetry-utils.negative.v1 | 130,640 | 130,171 | +469 | +0.36% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,596,711 | 846,980 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 786,557 | 549,721 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-telemetry-utils.explicit-positive.v1 | 214,054 | 213,676 | +378 | +0.18% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-utils.implicit-positive.v1 | 356,907 | 214,691 | +142,216 | +66.24% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-utils.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-telemetry-utils.negative.v1 | 215,596 | 121,354 | +94,242 | +77.66% | skill 1/1; base 1/1 |
+| codex | All cases | 422,626 | 298,229 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-telemetry-utils.explicit-positive.v1 | 145,114 | 18,656 | +126,458 | +677.84% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-utils.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-telemetry-utils.implicit-positive.v2 | 199,104 | 169,642 | +29,462 | +17.37% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-utils.negative.v1 | 78,408 | 109,931 | -31,523 | -28.68% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,209,183 | 847,950 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/tools/doca-telemetry-utils/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-telemetry-utils/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-telemetry-utils`)
-- **LOW** QUALITY/quality_discoverability: Description very long (781 chars, recommend 50-150) (`skills/tools/doca-telemetry-utils/SKILL.md`)
+- **LOW** QUALITY/quality_discoverability: Description very long (779 chars, recommend 50-150) (`skills/tools/doca-telemetry-utils/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/tools/doca-telemetry-utils/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/tools/doca-telemetry-utils/SKILL.md`)
-- 6 additional finding(s) are available in the full evaluation artifacts.
+- 7 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

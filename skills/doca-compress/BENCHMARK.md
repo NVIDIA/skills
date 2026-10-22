@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-compress`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.2% — baseline ran, but no comparable score was available; uplift unavailable | 98.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 89.8% — baseline ran, but no comparable score was available; uplift unavailable | 95.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 95.0% → 100.0% (+5.0 points) |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 90.0% → 100.0% (+10.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 58.8% → 92.5% (+33.7 points) | 73.1% → 98.8% (+25.7 points) |
-| Efficiency | 73.3% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 53.8% → 86.9% (+33.1 points) | 63.8% → 98.1% (+34.3 points) |
+| Efficiency | 62.2% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 801,150 | 588,123 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-compress.explicit-positive.v1 | 272,404 | 277,703 | -5,299 | -1.91% | skill 1/1; base 1/1 |
-| claude-code | doca-compress.implicit-positive.v1 | 498,197 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-compress.implicit-positive.v2 | N/A | 188,254 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-compress.negative.v1 | 30,549 | 122,166 | -91,617 | -74.99% | skill 1/1; base 1/1 |
-| codex | All cases | 383,518 | 198,284 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-compress.explicit-positive.v1 | 110,831 | 32,893 | +77,938 | +236.94% | skill 1/1; base 1/1 |
-| codex | doca-compress.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-compress.implicit-positive.v2 | 242,066 | 81,124 | +160,942 | +198.39% | skill 1/1; base 1/1 |
-| codex | doca-compress.negative.v1 | 30,621 | 84,267 | -53,646 | -63.66% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,184,668 | 786,407 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 756,474 | 490,466 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-compress.explicit-positive.v1 | 273,135 | 120,797 | +152,338 | +126.11% | skill 1/1; base 1/1 |
+| claude-code | doca-compress.implicit-positive.v1 | N/A | 248,196 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-compress.implicit-positive.v2 | 452,719 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-compress.negative.v1 | 30,620 | 121,473 | -90,853 | -74.79% | skill 1/1; base 1/1 |
+| codex | All cases | 415,078 | 187,451 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-compress.explicit-positive.v1 | 167,397 | 63,203 | +104,194 | +164.86% | skill 1/1; base 1/1 |
+| codex | doca-compress.implicit-positive.v1 | 217,217 | 54,927 | +162,290 | +295.46% | skill 1/1; base 1/1 |
+| codex | doca-compress.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-compress.negative.v1 | 30,464 | 69,321 | -38,857 | -56.05% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,171,552 | 677,917 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -81,6 +81,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-compress/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-compress`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without
   checking (`BENCHMARK.md:85`)
@@ -88,9 +89,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
   checking (`BENCHMARK.md:87`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without
   checking (`BENCHMARK.md:89`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without
-  checking (`CAPABILITIES.md:36`)
-- 10 additional finding(s) are available in the full evaluation artifacts.
+- 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-gpunetio-ib-write-lat`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.4% — baseline ran, but no comparable score was available; uplift unavailable | 98.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.1% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 70.0% → 100.0% (+30.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 56.3% → 100.0% (+43.7 points) | 46.3% → 100.0% (+53.7 points) |
-| Efficiency | 67.2% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 90.0% → 100.0% (+10.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 53.8% → 93.1% (+39.3 points) |
+| Efficiency | 87.8% — baseline ran, but no comparable score was available; uplift unavailable | 87.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 984,034 | 309,438 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-gpunetio-ib-write-lat.explicit-positive.v1 | 382,756 | 155,304 | +227,452 | +146.46% | skill 1/1; base 1/1 |
-| claude-code | doca-gpunetio-ib-write-lat.implicit-positive.v1 | 570,065 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-gpunetio-ib-write-lat.implicit-positive.v2 | N/A | 123,545 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-gpunetio-ib-write-lat.negative.v1 | 31,213 | 30,589 | +624 | +2.04% | skill 1/1; base 1/1 |
-| codex | All cases | 420,142 | 93,534 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-gpunetio-ib-write-lat.explicit-positive.v1 | 145,986 | 25,334 | +120,652 | +476.25% | skill 1/1; base 1/1 |
-| codex | doca-gpunetio-ib-write-lat.implicit-positive.v1 | 260,103 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | doca-gpunetio-ib-write-lat.implicit-positive.v2 | N/A | 54,473 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | doca-gpunetio-ib-write-lat.negative.v1 | 14,053 | 13,727 | +326 | +2.37% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,404,176 | 402,972 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 718,161 | 307,355 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-gpunetio-ib-write-lat.explicit-positive.v1 | 274,849 | 121,019 | +153,830 | +127.11% | skill 1/1; base 1/1 |
+| claude-code | doca-gpunetio-ib-write-lat.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-gpunetio-ib-write-lat.implicit-positive.v2 | 413,057 | 156,057 | +257,000 | +164.68% | skill 1/1; base 1/1 |
+| claude-code | doca-gpunetio-ib-write-lat.negative.v1 | 30,255 | 30,279 | -24 | -0.08% | skill 1/1; base 1/1 |
+| codex | All cases | 411,256 | 133,748 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-gpunetio-ib-write-lat.explicit-positive.v1 | 122,539 | 46,801 | +75,738 | +161.83% | skill 1/1; base 1/1 |
+| codex | doca-gpunetio-ib-write-lat.implicit-positive.v1 | N/A | 73,236 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-gpunetio-ib-write-lat.implicit-positive.v2 | 257,938 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-gpunetio-ib-write-lat.negative.v1 | 30,779 | 13,711 | +17,068 | +124.48% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,129,417 | 441,103 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -81,11 +81,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-gpunetio-ib-write-lat/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-gpunetio-ib-write-lat`)
-- **LOW** QUALITY/quality_discoverability: Description very long (864 chars, recommend 50-150) (`skills/tools/doca-gpunetio-ib-write-lat/SKILL.md`)
+- **LOW** QUALITY/quality_discoverability: Description very long (658 chars, recommend 50-150) (`skills/tools/doca-gpunetio-ib-write-lat/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/tools/doca-gpunetio-ib-write-lat/SKILL.md`)
 - **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/tools/doca-gpunetio-ib-write-lat/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No limitations documented (`skills/tools/doca-gpunetio-ib-write-lat/SKILL.md`)
 - 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>

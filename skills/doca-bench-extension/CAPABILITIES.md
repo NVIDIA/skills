@@ -2,13 +2,13 @@
 
 **Where to start:** The DOCA Bench Extension framework is
 the plug-in surface that augments
-[`doca-bench`](../doca-bench/SKILL.md). The pattern overview
+`doca-bench/SKILL.md`. The pattern overview
 below names the recurring extension-class questions. Pick
 the pattern first, then drill into the H2 that owns the
 substance. For the *how* of executing each pattern, jump to
 [TASKS.md](TASKS.md). For the parent tool's built-in modes
 and inventory, see
-[`doca-bench CAPABILITIES.md`](../doca-bench/CAPABILITIES.md).
+`doca-bench/CAPABILITIES.md`.
 
 This file is loaded by [`SKILL.md`](SKILL.md). It documents
 *what an extension can do that built-in `doca-bench` modes
@@ -41,7 +41,7 @@ above:
 
 - *"Which built-in `doca-bench` mode do I pick?"* — that is
   not an extension question. Route to
-  [`doca-bench`](../doca-bench/SKILL.md). Extensions exist
+  `doca-bench/SKILL.md`. Extensions exist
   only when the built-in modes don't cover the workload.
 - *"How do I program a custom DOCA Flow / Comch / RMAX
   application?"* — that is a library-level question for
@@ -63,7 +63,7 @@ The framework exists for ONE reason: a workload class that
 no built-in `doca-bench` mode measures. The agent's first
 question, before any extension-shaped answer, is *which
 built-in mode might apply?* Per
-[`doca-bench CAPABILITIES.md`](../doca-bench/CAPABILITIES.md),
+`doca-bench/CAPABILITIES.md`,
 the parent tool ships its own inventory of built-in workload
 modes; the operator must walk that inventory before
 committing to an extension.
@@ -168,7 +168,7 @@ invocation. The extension:
   `doca_bench_cuda_kernel_stats`-style accounting the
   reference uses is consumed by the parent);
 - inherits all of the parent's safety preconditions per
-  [`doca-bench CAPABILITIES.md ## Safety policy`](../doca-bench/CAPABILITIES.md#safety-policy).
+  `doca-bench CAPABILITIES.md ## Safety policy` (`doca-bench/CAPABILITIES.md#safety-policy`).
 
 The agent re-asserts this on every extension answer:
 extensions plug INTO `doca-bench`; they do not replace it.
@@ -197,7 +197,7 @@ on a separate cadence. Specifically:
 
 This skill **does NOT** maintain its own version-handling
 rules in parallel with
-[`doca-version`](../../doca-version/SKILL.md). The agent
+`doca-version/SKILL.md`. The agent
 treats `doca-version` as the source of truth for:
 
 - the four-way DOCA install match (host package, kernel
@@ -240,13 +240,13 @@ order; this section names them so the agent can route fast.
    when an extension is misbehaving is whether the
    workload class could have been expressed by a built-in
    `doca-bench` mode. Route back to
-   [`doca-bench TASKS.md ## configure`](../doca-bench/TASKS.md#configure).
+   `doca-bench TASKS.md ## configure` (`doca-bench/TASKS.md#configure`).
 2. **Build-failed.** The extension's `meson.build` /
    compiler / linker reports an error. Common causes:
    wrong DOCA headers, wrong CUDA toolkit version,
    missing GPU build flags. Route the toolchain side to
    the public CUDA documentation; route the DOCA-side to
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    for the header-version question.
 3. **Load-failed.** The library built, but the parent
    `doca-bench` cannot load it at runtime. Common causes:
@@ -255,7 +255,7 @@ order; this section names them so the agent can route fast.
    architecture / ABI mismatch, missing CUDA runtime when
    the extension is GPU-side. Route the `ldd` /
    `LD_LIBRARY_PATH` / dynamic-linker side to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md).
+   `doca-debug ## debug` (`doca-debug/SKILL.md`).
 4. **Registration-mismatch.** The library loaded, but the
    parent cannot find the extension's expected entry
    points / version handshake. The agent's response is to
@@ -272,7 +272,7 @@ order; this section names them so the agent can route fast.
    passed in; common GPU-side cause is the `stop_flag`
    never being set so the kernel runs forever.
 6. **Version.** Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end. Common extension-specific symptoms: the
    extension was built against a different DOCA release's
    headers than the parent is from (the
@@ -281,8 +281,8 @@ order; this section names them so the agent can route fast.
    was missed; the CUDA toolkit version is wrong; the
    firmware doesn't expose what the extension assumes.
 7. **Cross-cutting.** Hand off to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md) and
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)
+   `doca-debug ## debug` (`doca-debug/SKILL.md`) and
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`)
    for the env-side layers (driver, firmware, CUDA driver,
    GPU PCIe state, dynamic linker).
 
@@ -317,8 +317,8 @@ agent is expected to read each:
 
 For the cross-cutting host / device observability surfaces
 (dynamic linker, CUDA driver, PCIe, firmware), route to
-[`doca-debug ## Observability`](../../doca-debug/SKILL.md)
-and [`doca-setup TASKS.md ## test`](../../doca-setup/TASKS.md#test).
+`doca-debug ## Observability` (`doca-debug/SKILL.md`)
+and `doca-setup TASKS.md ## test` (`doca-setup/TASKS.md#test`).
 
 The skill explicitly does NOT add a streaming-telemetry
 export of extension state — the extension is invoked by
@@ -328,7 +328,7 @@ the parent and reports through the parent's machinery.
 
 > **Hardware-safety meta-policy applies.** Every operator
 > action below inherits the safety contract defined in
-> [`doca-hardware-safety ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy):
+> `doca-hardware-safety ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`):
 > the pre-flight inventory (DOCA version, firmware,
 > kernel module, BlueField mode, OOB access, dataplane
 > co-tenancy), the OOB / blast-radius rules, the
@@ -355,16 +355,16 @@ agent must surface:
   `*_kernel_settings` field) runs forever; recovering
   requires resetting the GPU. The OOB / reset
   precondition from
-  [`doca-hardware-safety ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+  `doca-hardware-safety ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
   is non-negotiable when the extension drives a GPU.
 - **All of `doca-bench`'s safety constraints apply.** Per
-  [`doca-bench CAPABILITIES.md ## Safety policy`](../doca-bench/CAPABILITIES.md#safety-policy),
+  `doca-bench CAPABILITIES.md ## Safety policy` (`doca-bench/CAPABILITIES.md#safety-policy`),
   the parent tool's preconditions (firmware, BlueField
   mode, dataplane co-tenancy) inherit into the extension
   invocation. Extensions add MORE preconditions; they
   never remove any.
 - **The smoke-before-bulk rule from
-  [`doca-hardware-safety ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+  `doca-hardware-safety ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
   applies twice here.** First on the build: confirm the
   extension builds cleanly and the parent can load it
   with a no-op kernel (the reference's
@@ -385,7 +385,7 @@ In addition:
   Extensions add code at load time; they do not patch
   the parent.
 - **Capture before retry.** Per
-  [`doca-hardware-safety ## Error taxonomy`](../../doca-hardware-safety/CAPABILITIES.md#error-taxonomy):
+  `doca-hardware-safety ## Error taxonomy` (`doca-hardware-safety/CAPABILITIES.md#error-taxonomy`):
   if an extension load or invocation fails, capture the
   parent's logs, the extension's logs, `ldd` output,
   and the DOCA + toolchain version stack BEFORE
@@ -401,7 +401,7 @@ The full procedural application of the safety overlay
 (when to abort, when to escalate, what to capture) lives
 in [`TASKS.md ## debug`](TASKS.md#debug) and
 [`TASKS.md ## test`](TASKS.md#test) plus the
-[`doca-debug`](../../doca-debug/SKILL.md) cross-cutting
+`doca-debug/SKILL.md` cross-cutting
 debug ladder. This section names the rules that constrain
 those verbs for the bench-extension framework
 specifically.

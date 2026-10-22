@@ -190,12 +190,12 @@ that are not in the documented list.
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see [`doca-version`](../../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The DMS-specific overlay** is:
 
-- **DMS is currently in beta**, with General Availability scoped to SPC-X use cases. Flags, supported paths, and gNOI operation lists can change between DOCA releases. Always verify against the live public DMS guide whose version corresponds to the DOCA release confirmed by [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
-- **DMS container tags lag DOCA host-package versions.** The DMS container shipped from NGC carries its own tag that may not match the host's `pkg-config --modversion doca-common`. When the user is using DMS-as-a-container, the relevant version anchor is the container tag pulled, not the host install — confirm both and route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 if they diverge.
+- **DMS is currently in beta**, with General Availability scoped to SPC-X use cases. Flags, supported paths, and gNOI operation lists can change between DOCA releases. Always verify against the live public DMS guide whose version corresponds to the DOCA release confirmed by `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
+- **DMS container tags lag DOCA host-package versions.** The DMS container shipped from NGC carries its own tag that may not match the host's `pkg-config --modversion doca-common`. When the user is using DMS-as-a-container, the relevant version anchor is the container tag pulled, not the host install — confirm both and route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 if they diverge.
 DMS-specific check: read the version of the public DMS guide page
 header and confirm it matches the DOCA install version on the target.
 
@@ -223,7 +223,7 @@ DMS errors fall into five layers, each with its own owner:
    that error; DMS is the conduit.
 5. **DOCA-library layer** — if DMS internally calls into a DOCA
    library that returns `DOCA_ERROR_*`, the cross-library taxonomy in
-   [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy)
+   `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`)
    becomes relevant on the *server* side. The library-specific overlay
    (e.g. for Flow) lives in the matching `libs/<library>` skill.
 
@@ -259,13 +259,13 @@ in `gnxi/gnmi/server.go`; `POLL` and `Aggregation` MODES are
 Unimplemented. For the
 externally-productized **DOCA Telemetry Service (DTS)** — turnkey
 aggregator that is OUT OF SCOPE for this bundle — route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+`doca-public-knowledge-map/SKILL.md`
 non-goals; DTS is the right answer when the user wants a productized
 telemetry-aggregation surface separate from DMS's own gNMI Subscribe.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 DMS's safety surface is operational, not programmatic. The documented
 posture:
@@ -309,7 +309,7 @@ posture:
 
 The single canonical public source for DMS is the **DOCA Management
 Service Guide** on `docs.nvidia.com`, reachable through
-[`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
+`doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 Verify that the version of the guide matches the DOCA install on the
 target — DMS surface is documented to evolve, so paths and flags can
 change between releases.

@@ -7,7 +7,7 @@ section assumes are the lifecycle table in
 [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
 and the modify-schema in [`## modify`](#modify) below.
 
-Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the underlying surface — the shape of DOCA, the universal lifecycle, the cross-library version-compat rule, the `DOCA_ERROR_*` taxonomy, the program-side observability surface, and the program-side safety policy — see [CAPABILITIES.md](CAPABILITIES.md). For env-class workflows (install verification, `pkg-config` wiring, hugepages, the *I have no install yet* procedure with the NGC container fallback), see [`doca-setup`](../doca-setup/SKILL.md). For routing, docs URLs, the on-disk install layout, and how to check the installed DOCA version, see [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the underlying surface — the shape of DOCA, the universal lifecycle, the cross-library version-compat rule, the `DOCA_ERROR_*` taxonomy, the program-side observability surface, and the program-side safety policy — see [CAPABILITIES.md](CAPABILITIES.md). For env-class workflows (install verification, `pkg-config` wiring, hugepages, the *I have no install yet* procedure with the NGC container fallback), see `doca-setup/SKILL.md`. For routing, docs URLs, the on-disk install layout, and how to check the installed DOCA version, see `doca-public-knowledge-map/SKILL.md`.
 
 Each verb describes the **shape of the workflow**, not a copy-paste recipe. Library-specific overrides (which sample to start from, which fields to swap, which capabilities to check, which errors to expect) live in the matching library skill — never here.
 
@@ -15,11 +15,11 @@ Each verb describes the **shape of the workflow**, not a copy-paste recipe. Libr
 
 Goal: get the program itself into the right starting state — the right version, the right build flavor, the right capability picture — *after* the env-class precondition (a clean `pkg-config doca-<library>` on the user's host) is already satisfied.
 
-1. **Confirm the env precondition.** This skill assumes [`doca-setup ## configure`](../doca-setup/TASKS.md#configure) has already run and `pkg-config --modversion doca-<library>` returns a version. If it doesn't, **stop** and route the user to [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) (the NGC container fallback is the universal first option there) or [`doca-setup ## debug`](../doca-setup/TASKS.md#debug) (if the env is broken in a recoverable way). Do not work around an env failure with a code change.
+1. **Confirm the env precondition.** This skill assumes `doca-setup ## configure` (`doca-setup/TASKS.md#configure`) has already run and `pkg-config --modversion doca-<library>` returns a version. If it doesn't, **stop** and route the user to `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`) (the NGC container fallback is the universal first option there) or `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) (if the env is broken in a recoverable way). Do not work around an env failure with a code change.
 
-2. **Quote the installed DOCA version.** Use the procedure in [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md). API names, sample filenames, and capability-matrix answers all depend on this — the version the user has on disk is the only honest source.
+2. **Quote the installed DOCA version.** Use the procedure in `doca-public-knowledge-map/SKILL.md`. API names, sample filenames, and capability-matrix answers all depend on this — the version the user has on disk is the only honest source.
 
-3. **Pick the build flavor.** Trace flavor (`doca-<library>-trace`) for first-app development; release flavor (`doca-<library>`) for performance work. Rationale and selection criteria are in [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes); env-side mechanics (where the trace `*.so` lives, `LD_LIBRARY_PATH`) are in [`doca-setup ## configure`](../doca-setup/TASKS.md#configure).
+3. **Pick the build flavor.** Trace flavor (`doca-<library>-trace`) for first-app development; release flavor (`doca-<library>`) for performance work. Rationale and selection criteria are in [CAPABILITIES.md ## Capabilities and modes](CAPABILITIES.md#capabilities-and-modes); env-side mechanics (where the trace `*.so` lives, `LD_LIBRARY_PATH`) are in `doca-setup ## configure` (`doca-setup/TASKS.md#configure`).
 
 4. **Discover the library's capabilities on this host.** Run `doca_caps`, plus the library's own capability-query API (Flow has one, RDMA has one, Comch has one) — the library skill names the call. Record the active mode, the supported features, and the budgets *before* designing the program; designing for features-not-on-this-hardware is the most common cause of *"the spec validates but won't program"*.
 
@@ -46,17 +46,17 @@ The shipped DOCA samples and reference applications are C, built with meson. You
 
 3. **Honor the build flavor decision from [`## configure`](#configure) step 3.** Trace flavor links against the `doca-<library>-trace` module; release flavor links against `doca-<library>`.
 
-4. **Map any build-time error to the env taxonomy first.** If meson reports a missing dependency or ninja reports an undefined symbol, the symptom is almost always env-class (wrong install profile, wrong `PKG_CONFIG_PATH`, wrong build flavor) — route to [`doca-setup ## debug`](../doca-setup/TASKS.md#debug) before touching the source.
+4. **Map any build-time error to the env taxonomy first.** If meson reports a missing dependency or ninja reports an undefined symbol, the symptom is almost always env-class (wrong install profile, wrong `PKG_CONFIG_PATH`, wrong build flavor) — route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) before touching the source.
 
 ### Track 2 — Other languages (Rust, Go, Python, …)
 
 DOCA does not ship official bindings in non-C languages inside this repository. The consumption path is FFI / language-specific bindings against the same `*.so` libraries the C samples link against.
 
-1. **Confirm the install host gives you the C ABI surface.** `pkg-config --cflags --libs doca-<library>` returns the include path and link flags; the headers under $(pkg-config --variable=includedir doca-common) are the authoritative symbol declarations; the `*.so` files under `/opt/mellanox/doca/lib/<arch>-linux-gnu/` are what your binding loads at runtime. Verify all three are present before any binding-side work. If any of those checks fails, route to [`doca-setup ## debug`](../doca-setup/TASKS.md#debug).
+1. **Confirm the install host gives you the C ABI surface.** `pkg-config --cflags --libs doca-<library>` returns the include path and link flags; the headers under $(pkg-config --variable=includedir doca-common) are the authoritative symbol declarations; the `*.so` files under `/opt/mellanox/doca/lib/<arch>-linux-gnu/` are what your binding loads at runtime. Verify all three are present before any binding-side work. If any of those checks fails, route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 
 2. **Pick the binding strategy honestly.** If a community or user-built binding for the user's language exists, point at its repository (the agent **must** verify it exists by fetching its repo or package registry — never invent a binding name). Otherwise the user is doing direct FFI: `bindgen` for Rust, `cgo` for Go, `cffi` / `ctypes` for Python, equivalents for other languages.
 
-3. **Generate or write the binding in the user's own toolchain.** This skill does not author wrappers. The agent describes the C-side surface (header path, `*.so` filename, lifecycle order, error pattern) and lets the user's binding tooling do its job. The library skill (e.g. [`doca-flow`](../libs/doca-flow/SKILL.md)) supplies the API-surface guidance the wrapper has to honor.
+3. **Generate or write the binding in the user's own toolchain.** This skill does not author wrappers. The agent describes the C-side surface (header path, `*.so` filename, lifecycle order, error pattern) and lets the user's binding tooling do its job. The library skill (e.g. `doca-flow/SKILL.md`) supplies the API-surface guidance the wrapper has to honor.
 
 4. **Read the C samples even if you're not writing C.** The order of API calls in `/opt/mellanox/doca/samples/doca_<library>/<sample>/` is the same regardless of the calling language. The wrapper translates the shape; it does not invent a different shape.
 
@@ -66,7 +66,7 @@ Goal: take a working shipped sample and **derive a custom first application** fo
 
 **Language scope of this verb.** The shipped DOCA samples are written in C; this is the only application source code NVIDIA ships in this repository. The modify-a-sample workflow below is therefore the C / C++ first-app track. For consumers writing their first DOCA application in another language (Rust, Go, Python, …), this verb is *not* the right path — those users should still build a shipped sample (Track 1 of [`## build`](#build)) to verify their install is healthy, and then use Track 2 of [`## build`](#build) plus the matching library skill's bindings / FFI guidance for the wrapper-side work the user does in their own toolchain. The agent must not pretend the modify-a-sample workflow produces a Rust crate, a Go module, or a Python package; the workflow's output is a modified copy of NVIDIA's C sample.
 
-The generic pattern below is library-agnostic *across DOCA libraries* (Flow, RDMA, Comch, …) but C-specific *within a library*. Library-specific values (which sample, which fields the user must change, which actions to keep) live in the matching library skill — for Flow, see [`doca-flow ## build`](../libs/doca-flow/TASKS.md#build).
+The generic pattern below is library-agnostic *across DOCA libraries* (Flow, RDMA, Comch, …) but C-specific *within a library*. Library-specific values (which sample, which fields the user must change, which actions to keep) live in the matching library skill — for Flow, see `doca-flow ## build` (`doca-flow/TASKS.md#build`).
 
 ### Precondition
 
@@ -79,7 +79,7 @@ This verb requires *all* of:
 | The source sample is present | `ls /opt/mellanox/doca/samples/<library>/<sample_name>/` lists `meson.build` and the source files |
 | `pkg-config` knows DOCA | `pkg-config --modversion doca-<library>` returns a version string |
 
-If any precondition fails, **do not proceed and do not invent a substitute**. Route to [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install); that section is what the agent does instead, and its Path 0 (NGC DOCA container, `nvcr.io/nvidia/doca/doca`) is the universal way to satisfy these preconditions on macOS, Windows, or Linux without DOCA. Authoring application source code in *any* language (C, C++, Rust, Go, Python, …) from documentation prose to "fill the gap" is the failure mode this verb is here to prevent — it violates [`AGENTS.md`](../../AGENTS.md) ground rule #3 and would ship code that has never been compiled / linked / FFI-loaded against the live DOCA library.
+If any precondition fails, **do not proceed and do not invent a substitute**. Route to `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`); that section is what the agent does instead, and its Path 0 (NGC DOCA container, `nvcr.io/nvidia/doca/doca`) is the universal way to satisfy these preconditions on macOS, Windows, or Linux without DOCA. Authoring application source code in *any* language (C, C++, Rust, Go, Python, …) from documentation prose to "fill the gap" is the failure mode this verb is here to prevent — it violates bundle `AGENTS.md` ground rule #3 and would ship code that has never been compiled / linked / FFI-loaded against the live DOCA library.
 
 ### Modify-from-sample schema (the mental model)
 
@@ -129,7 +129,7 @@ for a given sample shape.
    cd ~/dev/my-first-<library>-app/
    ```
 
-   Never edit the install tree itself ([`doca-setup CAPABILITIES.md ## Safety policy`](../doca-setup/CAPABILITIES.md#safety-policy) item 1). The copy is the user's source code from this point forward. *Inside an NGC container*, mount a host directory at `cp` time (e.g. `docker run -v $HOME/dev:/work …`) so the modified copy persists when the container exits.
+   Never edit the install tree itself (`doca-setup CAPABILITIES.md ## Safety policy` (`doca-setup/CAPABILITIES.md#safety-policy`) item 1). The copy is the user's source code from this point forward. *Inside an NGC container*, mount a host directory at `cp` time (e.g. `docker run -v $HOME/dev:/work …`) so the modified copy persists when the container exits.
 
 4. **Identify the *minimum* set of values to change in the copy.** Library-specific list lives in the library skill. For *every* library the recipe is the same shape: keep all init / teardown boilerplate; keep the validation calls; keep the error handling; only swap the small set of user-domain values. Every byte not changed is a byte not debugged.
 
@@ -171,7 +171,7 @@ for a given sample shape.
    this step works inside the container; the actual hardware-runtime
    half does not — the container has no access to a real NIC / DPU.
    For runtime, the user has to graduate from Path 0 (container) to
-   Path A or Path C in [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+   Path A or Path C in `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`).
 
 8. **Document what was changed.** A two-line `README` next to the modified sample saying *"Derived from `<source-sample>` on `<date>` against DOCA `<version>`. Modified fields: `<list>`."* lets the user re-derive against the next DOCA release without having to re-read the agent's chat history.
 
@@ -182,13 +182,13 @@ Goal: launch a built DOCA program (shipped sample or derived custom app) and rea
 1. **Pre-run checklist.** Refuse to run a derived sample while any
    runtime-affecting placeholder from [`## modify`](#modify) step 5
    remains; a clean compile is only build evidence. Then re-verify the
-   env preconditions via [`doca-setup ## test`](../doca-setup/TASKS.md#test)
+   env preconditions via `doca-setup ## test` (`doca-setup/TASKS.md#test`)
    (hugepages mounted, devices visible, representors enumerated). A
    failed pre-run check is faster to diagnose than a runtime error.
    *Inside an NGC container*, several of these checks are vacuously
    satisfied (no real NIC) — that's expected; runs that need real
    hardware will fail at start, and the right move is to graduate the
-   user to a hardware path per [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+   user to a hardware path per `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`).
 
 2. **Use the program's own CLI flags.** Each shipped sample documents its `-h` flags. The agent must use those, not invent new ones — the most common runtime error is a flag rename across DOCA versions.
 
@@ -196,7 +196,7 @@ Goal: launch a built DOCA program (shipped sample or derived custom app) and rea
 
 4. **Where logs go.** DOCA libraries log to stderr by default. Some long-running services log via `journald` or a configured log directory; check `/var/log/doca*` or the service's own README before assuming output is missing.
 
-5. **Map runtime failures to the right layer.** Startup failures of the form *"cannot find any working PCI driver"*, *"no free 2048 kB hugepages"*, *"representor X not found"* are **env-class** and route to [`doca-setup ## debug`](../doca-setup/TASKS.md#debug). Failures of the form `DOCA_ERROR_*` returned from a library API call are **program-class** and route to [`## debug`](#debug) below (with the library-specific overlay in the matching library skill).
+5. **Map runtime failures to the right layer.** Startup failures of the form *"cannot find any working PCI driver"*, *"no free 2048 kB hugepages"*, *"representor X not found"* are **env-class** and route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`). Failures of the form `DOCA_ERROR_*` returned from a library API call are **program-class** and route to [`## debug`](#debug) below (with the library-specific overlay in the matching library skill).
 
 ## test
 
@@ -237,9 +237,9 @@ The four-step variant of the loop, in detail:
    as a readiness signal, runtime, hardware commit / start / program,
    and source commit until the real values are supplied and verified.
 
-2. **Capability cross-check.** Re-confirm that every feature your program intends to use is supported by the active mode and version on this host. Validation answers *"is the spec internally consistent"*; capability cross-check answers *"will this hardware / library actually accept it"*. **Loop:** if a capability is missing, do *not* code around it — back up to [`## configure`](#configure) step 4 (or to [`doca-setup`](../doca-setup/SKILL.md) if firmware / version is the gap) and re-enter the loop only after the capability is present or the program intent has changed to accommodate.
+2. **Capability cross-check.** Re-confirm that every feature your program intends to use is supported by the active mode and version on this host. Validation answers *"is the spec internally consistent"*; capability cross-check answers *"will this hardware / library actually accept it"*. **Loop:** if a capability is missing, do *not* code around it — back up to [`## configure`](#configure) step 4 (or to `doca-setup/SKILL.md` if firmware / version is the gap) and re-enter the loop only after the capability is present or the program intent has changed to accommodate.
 
-3. **Smoke-test by building and running one shipped sample first.** A *known-good* sample built and run cleanly is the cheapest end-to-end check that the install + your build env + your runtime preconditions are all healthy. Pick the smallest sample that exists for the library family the user cares about — the library skill names it. Inside an NGC container the build half is the meaningful check; the runtime half is reserved for a hardware path. **Loop:** if the shipped sample fails, the failure is almost certainly env-class — route to [`doca-setup ## test`](../doca-setup/TASKS.md#test); do not assume the library is broken until the canonical sample for that library runs cleanly.
+3. **Smoke-test by building and running one shipped sample first.** A *known-good* sample built and run cleanly is the cheapest end-to-end check that the install + your build env + your runtime preconditions are all healthy. Pick the smallest sample that exists for the library family the user cares about — the library skill names it. Inside an NGC container the build half is the meaningful check; the runtime half is reserved for a hardware path. **Loop:** if the shipped sample fails, the failure is almost certainly env-class — route to `doca-setup ## test` (`doca-setup/TASKS.md#test`); do not assume the library is broken until the canonical sample for that library runs cleanly.
 
 4. **Negative test.** Construct one deliberately failing input and confirm the library rejects it with the expected `DOCA_ERROR_*`. This is the cheapest way to detect a stale or wrong-version library before going live. **Loop:** if the negative test is *accepted* (library returns success on a known-bad input), that is a library-version / install bug — re-run version detection ([CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility)) before believing any successful positive test from this session.
 
@@ -249,18 +249,18 @@ The loop terminates when one of:
   spec ⇒ declare the program ready to commit; record the
   validate/capability/sample/negative outputs as evidence.
 - An env regression is detected at any iteration ⇒ hand off to
-  [`doca-setup ## test`](../doca-setup/TASKS.md#test); restart this
+  `doca-setup ## test` (`doca-setup/TASKS.md#test`); restart this
   loop from the iteration that broke after the env is clean again.
 - A program-class fault remains after the env is ruled clean ⇒ route
   to [`## debug`](#debug) with the captured iteration outputs.
 
 ## debug
 
-Goal: when a DOCA program fails *after* the env is known healthy, walk the layered diagnosis tree top-down so the agent does not jump to library-internal code-fix recommendations against a symptom it can explain at a higher layer. This anchor is the **program-class half** of the layered debug ladder. The complementary **env-class half** lives in [`doca-setup ## debug`](../doca-setup/TASKS.md#debug). The **cross-cutting reference both halves escalate to** — the canonical layered ladder spanning install / version / build / link / runtime / program / driver, plus cross-cutting tooling (`gdb`, `valgrind`, `ldd`, `--sdk-log-level`, the `doca-<lib>-trace` build flavor, container introspection, core dumps) and the *Where to ask for help* escalation to the public Developer Forum — lives in [`doca-debug ## debug`](../doca-debug/TASKS.md#debug). Use this anchor for program-side specifics (lifecycle, `DOCA_ERROR_*`, `doca_error_get_descr()`); use `doca-debug ## debug` for the cross-cutting ladder shape and tooling.
+Goal: when a DOCA program fails *after* the env is known healthy, walk the layered diagnosis tree top-down so the agent does not jump to library-internal code-fix recommendations against a symptom it can explain at a higher layer. This anchor is the **program-class half** of the layered debug ladder. The complementary **env-class half** lives in `doca-setup ## debug` (`doca-setup/TASKS.md#debug`). The **cross-cutting reference both halves escalate to** — the canonical layered ladder spanning install / version / build / link / runtime / program / driver, plus cross-cutting tooling (`gdb`, `valgrind`, `ldd`, `--sdk-log-level`, the `doca-<lib>-trace` build flavor, container introspection, core dumps) and the *Where to ask for help* escalation to the public Developer Forum — lives in `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). Use this anchor for program-side specifics (lifecycle, `DOCA_ERROR_*`, `doca_error_get_descr()`); use `doca-debug ## debug` for the cross-cutting ladder shape and tooling.
 
 Investigation order — **always**:
 
-1. **Env layer (sanity check, then move on).** Re-run the env-class checks via [`doca-setup ## debug`](../doca-setup/TASKS.md#debug) layers 1–4 (install / version / build / runtime). Only continue here if those are clean; an env-class failure is not a programming bug.
+1. **Env layer (sanity check, then move on).** Re-run the env-class checks via `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layers 1–4 (install / version / build / runtime). Only continue here if those are clean; an env-class failure is not a programming bug.
 
 2. **Version layer (program-side).** `pkg-config --modversion doca-<library>` against the runtime `doca_caps --version`. Mismatch ⇒ partial upgrade or stale build env; reinstall consistently before code changes ([CAPABILITIES.md ## Version compatibility](CAPABILITIES.md#version-compatibility)).
 
@@ -268,7 +268,7 @@ Investigation order — **always**:
 
 4. **Capability layer.** Did the program ask for a feature the active mode does not support? Re-run capability discovery from [`## configure`](#configure) step 4 and cross-check; an unsupported feature returns `DOCA_ERROR_NOT_SUPPORTED`. Code-side workarounds for `NOT_SUPPORTED` are almost always wrong — change intent, switch hardware/mode, or escalate.
 
-5. **Error-description layer.** For any returned `doca_error_t`, call `doca_error_get_descr()` and quote what it actually says — do not paraphrase from memory. The cross-library error meanings are in [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy); the library-specific overlay is in the matching library skill (Flow's `DOCA_ERROR_*` decision tree, for example, lives in [`doca-flow ## debug`](../libs/doca-flow/TASKS.md#debug)).
+5. **Error-description layer.** For any returned `doca_error_t`, call `doca_error_get_descr()` and quote what it actually says — do not paraphrase from memory. The cross-library error meanings are in [CAPABILITIES.md ## Error taxonomy](CAPABILITIES.md#error-taxonomy); the library-specific overlay is in the matching library skill (Flow's `DOCA_ERROR_*` decision tree, for example, lives in `doca-flow ## debug` (`doca-flow/TASKS.md#debug`)).
 
 6. **Library layer.** Only after (1)–(5) are clean: route the conversation to the library skill for library-internal API semantics.
 
@@ -350,7 +350,7 @@ treats as first-class:
 | `acceleration` | DOCA DMA, AES-GCM, SHA, Compress, Erasure Coding — offloading specific compute kernels | DMA samples, AES-GCM samples, SHA samples, Compress samples, Erasure Coding samples |
 | `dpa-hpc` | DOCA DPA programs (DPACC build, FlexIO DEV) plus the PCC / UROM / RDMO HPC pieces | `dpa_all_to_all`, `pcc`, `urom_rdmo`, DPA samples, UROM samples |
 | `gpu-media` | DOCA GPUNetIO, DOCA GPI, NVIDIA Rivermax integration, RMAX-class media samples | `gpu_packet_processing`, GPUNetIO samples, RMAX / Rivermax-shaped samples |
-| `telemetry` | DOCA Telemetry library + DOCA Telemetry Exporter — counter readers and per-process counter publishers (the on-host **DOCA Telemetry Service** as-deployed binary is externally productized and out of bundle scope per [`AGENTS.md ## Non-goals`](../../AGENTS.md)) | Telemetry samples, telemetry-exporter samples, in-bundle telemetry-shaped diagnostics |
+| `telemetry` | DOCA Telemetry library + DOCA Telemetry Exporter — counter readers and per-process counter publishers (the on-host **DOCA Telemetry Service** as-deployed binary is externally productized and out of bundle scope per `AGENTS.md ## Non-goals` (bundle `AGENTS.md`)) | Telemetry samples, telemetry-exporter samples, in-bundle telemetry-shaped diagnostics |
 
 The agent does NOT add a sample / app to a category without
 evidence (its meson target, its README's "what this does"
@@ -374,7 +374,7 @@ the union of all that evidence; tags do not stand on
 | --- | --- | --- |
 | `needs_cuda` | `nvcc`, `dependency('cuda')` in meson, `<cuda.h>` include | Build requires CUDA Toolkit; runtime requires NVIDIA GPU driver loaded. |
 | `needs_rmax` | `dependency('doca-rmax')`, `rmax/` include path, `doca-rmax` `pkg-config` | Build requires the NVIDIA Rivermax SDK (separate license + install). |
-| `needs_mpi` | `mpicc` / `mpic++` / `mpirun` references, `dependency('mpi')` | Build requires an MPI implementation (OpenMPI, MPICH, …). On BlueField the MPI install can live at non-standard prefixes (e.g. `/usr/mpi/gcc/openmpi-<ver>/bin/`) — see [`doca-setup TASKS.md ## configure`](../doca-setup/TASKS.md#configure). |
+| `needs_mpi` | `mpicc` / `mpic++` / `mpirun` references, `dependency('mpi')` | Build requires an MPI implementation (OpenMPI, MPICH, …). On BlueField the MPI install can live at non-standard prefixes (e.g. `/usr/mpi/gcc/openmpi-<ver>/bin/`) — see `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`). |
 | `needs_dpdk` | `dependency('libdpdk')` in meson, `rte_*` symbols | Build requires a matched DPDK install pulled in via `pkg-config libdpdk`. |
 | `needs_spdk` | `dependency('spdk')` in meson, `spdk_*` symbols | Build requires the SPDK install (typically `/opt/mellanox/spdk/`). |
 | `needs_dpa` | DPACC + FlexIO DEV build path, `dependency('doca-dpa')` | Build requires DOCA DPA + the DPACC compiler; runs only on BlueField. |
@@ -398,7 +398,7 @@ single `passed / failed` ratio without separating the two:
 | `built` | Build succeeded against this target's full required stack. | Move to runtime check (if the operator wanted runtime evidence). |
 | `skipped-env-absent` | Build was attempted but a tagged dependency is not installed on this target (e.g. `needs_cuda` and `nvcc` is missing; `needs_rmax` and `doca-rmax` is not installed; `needs_dpa` and the operator is on host x86, not BlueField). | Report which dependency is missing, route the operator to install it (or accept that this artifact is not in scope for this target shape). |
 | `built-with-known-quirk` | Build succeeded but only after applying a documented workaround listed in [`### known-sample-build-quirks`](#known-sample-build-quirks). | Report the quirk verbatim from the sweep output; do NOT silently suppress it. |
-| `fail-sdk-class` | Build attempt reached the DOCA SDK headers / libs and a documented DOCA symbol / API surface was missing or wrong — this points at a partial install, a version-skew, or a real DOCA SDK bug. | Route to [`doca-debug ## debug`](../doca-debug/TASKS.md#debug) layer 3 (link) or layer 4 (runtime); do NOT close the sweep as "DOCA broken" without the layer 1-2 evidence in hand. |
+| `fail-sdk-class` | Build attempt reached the DOCA SDK headers / libs and a documented DOCA symbol / API surface was missing or wrong — this points at a partial install, a version-skew, or a real DOCA SDK bug. | Route to `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) layer 3 (link) or layer 4 (runtime); do NOT close the sweep as "DOCA broken" without the layer 1-2 evidence in hand. |
 | `fail-unknown` | Build failed and the failure does not match any of the patterns above. | Capture the build log, surface it verbatim to the operator, do NOT classify as SDK fail until evidence narrows it. |
 
 A sweep report MUST present these as separate counters. The
@@ -485,10 +485,10 @@ Two cross-cutting rules:
 
 - **Never invent a `pkg-config` module name or a CLI flag.** Every
   command above comes from a public source (the DOCA SDK index in
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md),
+  `doca-public-knowledge-map/SKILL.md`,
   the library's own `--help`, or the sample's `README`). Agent-invented
   flags are the failure mode the
-  [AGENTS.md `## Ground rules`](../../AGENTS.md#ground-rules-every-agent-must-follow)
+  AGENTS.md `## Ground rules` (bundle `AGENTS.md#ground-rules-every-agent-must-follow`)
   anti-hallucination clause forbids; they break trust in every other
   command in the same answer.
 - **Cite the version the user is on, not "latest".** Every command
@@ -499,7 +499,7 @@ Two cross-cutting rules:
 
 ## Deferred task verbs
 
-- **`install`.** Installing DOCA on a fresh host, or reaching an install from a no-install host (NGC container fallback at `nvcr.io/nvidia/doca/doca` for macOS / Windows / Linux without DOCA, lab box, cloud Linux without NIC, hardware path) — env scope. Defer to [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) and the Installation Guide via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
-- **Env preparation.** `PKG_CONFIG_PATH`, hugepages, devlink, representor enumeration — env scope. Defer to [`doca-setup ## configure`](../doca-setup/TASKS.md#configure).
-- **Library API specifics.** Constructing a Flow pipe, RDMA queue setup, Comch channel construction, etc. — library scope. After this skill's verbs have produced a buildable, runnable program shape, hand off to the matching library skill (e.g. [`doca-flow`](../libs/doca-flow/SKILL.md)) for API-level guidance.
-- **`deploy` / `rollback` at fleet scale.** Provisioning multiple BlueFields, coordinated firmware / BFB updates across a fleet, or staged rollback is **fleet-orchestration scope**, externally owned and out of this bundle's SDK scope. Do **not** hand-roll per-host deployment logic at that scale. Route to the orchestration entry-point in [`doca-public-knowledge-map ## Deploying DOCA services at scale`](../doca-public-knowledge-map/references/services.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing) (DOCA Platform Framework / NVIDIA Network Operator / Kubernetes Launch Kit, with authoritative links). Single-host / handful-of-DPUs PoC deployment stays in-bundle via [`doca-setup ## recognize`](../doca-setup/TASKS.md#recognize).
+- **`install`.** Installing DOCA on a fresh host, or reaching an install from a no-install host (NGC container fallback at `nvcr.io/nvidia/doca/doca` for macOS / Windows / Linux without DOCA, lab box, cloud Linux without NIC, hardware path) — env scope. Defer to `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`) and the Installation Guide via `doca-public-knowledge-map/SKILL.md`.
+- **Env preparation.** `PKG_CONFIG_PATH`, hugepages, devlink, representor enumeration — env scope. Defer to `doca-setup ## configure` (`doca-setup/TASKS.md#configure`).
+- **Library API specifics.** Constructing a Flow pipe, RDMA queue setup, Comch channel construction, etc. — library scope. After this skill's verbs have produced a buildable, runnable program shape, hand off to the matching library skill (e.g. `doca-flow/SKILL.md`) for API-level guidance.
+- **`deploy` / `rollback` at fleet scale.** Provisioning multiple BlueFields, coordinated firmware / BFB updates across a fleet, or staged rollback is **fleet-orchestration scope**, externally owned and out of this bundle's SDK scope. Do **not** hand-roll per-host deployment logic at that scale. Route to the orchestration entry-point in `doca-public-knowledge-map ## Deploying DOCA services at scale` (`doca-public-knowledge-map/references/services.md#deploying-doca-services-at-scale--orchestration-entry-point-personascale-routing`) (DOCA Platform Framework / NVIDIA Network Operator / Kubernetes Launch Kit, with authoritative links). Single-host / handful-of-DPUs PoC deployment stays in-bundle via `doca-setup ## recognize` (`doca-setup/TASKS.md#recognize`).

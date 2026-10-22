@@ -16,11 +16,11 @@ pattern (the verbs `install / configure / build / modify /
 run / test / debug / use`), jump to [TASKS.md](TASKS.md).
 For the canonical DOCA version-handling rules that this
 skill layers on top of, see
-[`doca-version`](../../doca-version/SKILL.md). For the
+`doca-version/SKILL.md`. For the
 host-side PCC framework that loads this algorithm, see
-[`doca-pcc`](../doca-pcc/SKILL.md). For the read-only
+`doca-pcc/SKILL.md`. For the read-only
 counter-inspection side, see
-[`doca-pcc-counters`](../../tools/doca-pcc-counters/SKILL.md).
+`doca-pcc-counters/SKILL.md`.
 
 ## Pattern overview
 
@@ -68,7 +68,7 @@ The two orthogonal selection axes for any ZTR RTTCC
 deployment are *which BlueField-3 port whose RoCE-v2
 traffic the algorithm controls* (inherited from the
 host-side `doca-pcc` per-port-context rule documented in
-[`doca-pcc CAPABILITIES.md ## Capabilities and modes`](../doca-pcc/CAPABILITIES.md#capabilities-and-modes))
+`doca-pcc CAPABILITIES.md ## Capabilities and modes` (`doca-pcc/CAPABILITIES.md#capabilities-and-modes`))
 and *which variant of the algorithm the DPA-side
 translation unit compiled against*. Choose both before
 prescribing any code change.
@@ -79,8 +79,8 @@ framework, counter tool.**
 | Artifact | What it is | This skill's role | Pkg-config module |
 | --- | --- | --- | --- |
 | **`doca-pcc-ztr-rttcc-algo`** (this skill) | The shipped reference PCC algorithm; one of several algorithm bodies that could be loaded onto the DPA, except this one is the no-config-required baseline NVIDIA ships | Walk deployment / tuning / evaluation of this specific algorithm | `doca-pcc-ztr-rttcc-algo` |
-| **`doca-pcc`** | Host-side framework that loads ANY PCC algorithm onto the BlueField DPA via the `doca_pcc` Core context and the `doca_pcc_app` image | Cross-link only — the host-side lifecycle lives there; this skill assumes it is already understood | `doca-pcc` (covered by [`doca-pcc`](../doca-pcc/SKILL.md)) |
-| **`doca-pcc-counters`** | Read-only diagnostic CLI shipped under `/opt/mellanox/doca/tools/` that inspects per-port / per-flow PCC counters | Cross-link only — the observability workflow lives there; this skill names what counters this algorithm emits and routes the inspection to the tool | (covered by [`doca-pcc-counters`](../../tools/doca-pcc-counters/SKILL.md)) |
+| **`doca-pcc`** | Host-side framework that loads ANY PCC algorithm onto the BlueField DPA via the `doca_pcc` Core context and the `doca_pcc_app` image | Cross-link only — the host-side lifecycle lives there; this skill assumes it is already understood | `doca-pcc` (covered by `doca-pcc/SKILL.md`) |
+| **`doca-pcc-counters`** | Read-only diagnostic CLI shipped under `/opt/mellanox/doca/tools/` that inspects per-port / per-flow PCC counters | Cross-link only — the observability workflow lives there; this skill names what counters this algorithm emits and routes the inspection to the tool | (covered by `doca-pcc-counters/SKILL.md`) |
 
 The agent's rule: when the user asks *"how do I deploy this
 algorithm onto my port"*, this skill is the right one. When
@@ -126,7 +126,7 @@ pick deliberately:
 | RX-rate + PM mode | Combination of the two | When both apply |
 | Multipath (MP) mode | Multipath-aware variant | When the deployment is multipath and the user wants multipath-specific shaping |
 | Multipath + credits | Multipath with credit-based pacing | When multipath shaping needs credit-based pacing |
-| Window-probeless | Probeless windowed multipath variant | Specialized; route to the public PCC programming guide via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) for the design rationale |
+| Window-probeless | Probeless windowed multipath variant | Specialized; route to the public PCC programming guide via `doca-public-knowledge-map/SKILL.md` for the design rationale |
 
 The variant is selected at DPACC build time; switching
 variants is a rebuild, not a runtime knob. The agent
@@ -221,7 +221,7 @@ knows what to look for in the tool's output.
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body
+`doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The algorithm-specific overlay** is:
@@ -239,9 +239,9 @@ lives there; this skill does not duplicate it.
   <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>.
 - **DOCA and DPACC must match per the DOCA Compatibility
   Policy.** Inherited from
-  [`doca-pcc CAPABILITIES.md ## Version compatibility`](../doca-pcc/CAPABILITIES.md#version-compatibility)
+  `doca-pcc CAPABILITIES.md ## Version compatibility` (`doca-pcc/CAPABILITIES.md#version-compatibility`)
   and
-  [`doca-dpa CAPABILITIES.md ## Version compatibility`](../doca-dpa/CAPABILITIES.md#version-compatibility):
+  `doca-dpa CAPABILITIES.md ## Version compatibility` (`doca-dpa/CAPABILITIES.md#version-compatibility`):
   the algorithm is DPA-side code compiled by DPACC; a
   DOCA + DPACC version skew fails the algorithm at link
   time or at runtime in confusing ways.
@@ -253,7 +253,7 @@ lives there; this skill does not duplicate it.
   surface that subset of the chain when the user is
   building from source rather than from the installed
   binary packages; otherwise the install verb routes
-  through [`doca-setup`](../../doca-setup/SKILL.md).
+  through `doca-setup/SKILL.md`.
 - **BlueField generation is part of the version axis.** Per
   the README ("over BlueField-3's DPA processor"), the
   shipped library targets BlueField-3-class hardware. The
@@ -261,7 +261,7 @@ lives there; this skill does not duplicate it.
   expose the DPA cannot host this algorithm regardless of
   how recent the DOCA install is — the same cap-query
   rule from
-  [`doca-pcc CAPABILITIES.md ## Capabilities and modes`](../doca-pcc/CAPABILITIES.md#capabilities-and-modes)
+  `doca-pcc CAPABILITIES.md ## Capabilities and modes` (`doca-pcc/CAPABILITIES.md#capabilities-and-modes`)
   applies.
 - **Public-doc routing.** Search
   <https://docs.nvidia.com/doca/sdk/> for the *DOCA PCC*
@@ -270,7 +270,7 @@ lives there; this skill does not duplicate it.
   at
   <https://docs.nvidia.com/doca/sdk/DOCA+PCC+Application+Guide.md>).
   Route through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   rather than quoting URLs from memory.
 
 ## Error taxonomy
@@ -292,7 +292,7 @@ disabled; `DOCA_ERROR_DRIVER` from DOCA + DPACC skew;
 `DOCA_ERROR_INVALID_VALUE` from an attempt to load an
 algorithm image built for a different BlueField), the
 authoritative taxonomy is in
-[`doca-pcc CAPABILITIES.md ## Error taxonomy`](../doca-pcc/CAPABILITIES.md#error-taxonomy)
+`doca-pcc CAPABILITIES.md ## Error taxonomy` (`doca-pcc/CAPABILITIES.md#error-taxonomy`)
 and the agent walks that ladder first.
 
 For runtime observations that the algorithm "loaded but is
@@ -318,7 +318,7 @@ different algorithm) — fix the dispatch in
 ZTR RTTCC observability surface is **multi-tier**: there
 is a host-side surface (the `doca-pcc` framework's host
 observability per
-[`doca-pcc CAPABILITIES.md ## Observability`](../doca-pcc/CAPABILITIES.md#observability)
+`doca-pcc CAPABILITIES.md ## Observability` (`doca-pcc/CAPABILITIES.md#observability`)
 plus the DOCA logger), a per-port-counter surface (the
 canonical `doca-pcc-counters` CLI), an algorithm-internal
 counter surface (the counter table the algorithm emits as
@@ -333,7 +333,7 @@ Three primary signals the agent should reach for, in order:
 1. **The `doca-pcc-counters` CLI output.** This is the
    *operator-side* canonical view of whether the running
    algorithm is shaping flows. Route to
-   [`doca-pcc-counters`](../../tools/doca-pcc-counters/SKILL.md);
+   `doca-pcc-counters/SKILL.md`;
    that skill walks the list → snapshot → watch → diff
    loop. The agent's job here is to surface that this is
    the *first* check whenever the user says "the
@@ -352,7 +352,7 @@ Three primary signals the agent should reach for, in order:
    at framework wiring.
 3. **The host-side `doca-pcc` framework's reporting and
    the DOCA logger.** Inherited from
-   [`doca-pcc CAPABILITIES.md ## Observability`](../doca-pcc/CAPABILITIES.md#observability);
+   `doca-pcc CAPABILITIES.md ## Observability` (`doca-pcc/CAPABILITIES.md#observability`);
    `DOCA_LOG_LEVEL=trace` on the application binary
    surfaces lifecycle transitions and the host-side
    visibility of the algorithm load.
@@ -360,18 +360,18 @@ Three primary signals the agent should reach for, in order:
 For DPA-side hangs (the algorithm body itself is stuck on
 the DPA processor and never returns to the framework
 dispatch), the DPA-side developer tools inherited from
-[`doca-dpa CAPABILITIES.md ## Observability`](../doca-dpa/CAPABILITIES.md#observability)
+`doca-dpa CAPABILITIES.md ## Observability` (`doca-dpa/CAPABILITIES.md#observability`)
 apply. Stuck-DPA cases are not redefined here; the agent
 names them and routes.
 
 For cross-cutting observability primitives
 (`--sdk-log-level`, the `DOCA_LOG_LEVEL` env var, the trace
 build flavor) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 This algorithm modulates RoCE-v2 flows on a production
 BlueField port. Misconfiguration does not just produce a
@@ -381,7 +381,7 @@ congestion control on a fleet that previously had it.
 The five most common ZTR RTTCC first-app failures the
 agent's discipline prevents are (1) deploying the
 algorithm onto a production port without the
-[`doca-pcc CAPABILITIES.md ## Safety policy`](../doca-pcc/CAPABILITIES.md#safety-policy)
+`doca-pcc CAPABILITIES.md ## Safety policy` (`doca-pcc/CAPABILITIES.md#safety-policy`)
 preconditions verified first (firmware slot, DPA-capable
 BlueField, matched DOCA + DPACC); (2) tuning parameters
 without running through
@@ -392,9 +392,9 @@ traffic flowing, then debugging the "no effect" as an
 algorithm bug instead of a traffic-absence problem; (4)
 partial-rebuilding only one side of the DPACC / host
 build (inherited two-side-program rule from
-[`doca-dpa CAPABILITIES.md ## Safety policy`](../doca-dpa/CAPABILITIES.md#safety-policy)
+`doca-dpa CAPABILITIES.md ## Safety policy` (`doca-dpa/CAPABILITIES.md#safety-policy`)
 and
-[`doca-pcc CAPABILITIES.md ## Safety policy`](../doca-pcc/CAPABILITIES.md#safety-policy));
+`doca-pcc CAPABILITIES.md ## Safety policy` (`doca-pcc/CAPABILITIES.md#safety-policy`));
 and (5) skipping the replica-first validation when
 deploying onto a fleet that carries production RoCE-v2
 traffic.
@@ -404,17 +404,17 @@ walk:
 
 | Precondition | What must be true | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
-| The host-side `doca-pcc` preconditions are satisfied | DPA-capable BlueField, firmware custom-PCC slot enabled, matched DOCA + DPACC versions, `doca_dev` access available | Walk [`doca-pcc TASKS.md ## configure`](../doca-pcc/TASKS.md#configure) step 1 (the triple-axis precondition check); do NOT proceed without all three axes green | [`doca-pcc`](../doca-pcc/SKILL.md) and [`doca-setup`](../../doca-setup/SKILL.md) — NOT a fix in this skill |
-| The attached port carries RoCE-v2 traffic | The BlueField port the `doca_pcc` is attached to has live RoCE-v2 flows | Confirm with the user; if no, route to [`doca-rdma`](../doca-rdma/SKILL.md) for bringing up RoCE-v2 traffic; the algorithm has nothing to shape on an idle port | [`doca-rdma`](../doca-rdma/SKILL.md) — NOT a fix in this skill |
+| The host-side `doca-pcc` preconditions are satisfied | DPA-capable BlueField, firmware custom-PCC slot enabled, matched DOCA + DPACC versions, `doca_dev` access available | Walk `doca-pcc TASKS.md ## configure` (`doca-pcc/TASKS.md#configure`) step 1 (the triple-axis precondition check); do NOT proceed without all three axes green | `doca-pcc/SKILL.md` and `doca-setup/SKILL.md` — NOT a fix in this skill |
+| The attached port carries RoCE-v2 traffic | The BlueField port the `doca_pcc` is attached to has live RoCE-v2 flows | Confirm with the user; if no, route to `doca-rdma/SKILL.md` for bringing up RoCE-v2 traffic; the algorithm has nothing to shape on an idle port | `doca-rdma/SKILL.md` — NOT a fix in this skill |
 | Parameters set via `doca_pcc_dev_set_ztr_rttcc_params`, never by direct writes | Every parameter update flows through the framework's set-params path so the algorithm's range-check runs | Walk the parameter-set workflow in [TASKS.md ## use](TASKS.md#use); the public header documents the call signature | Program-side fix; do NOT bypass the framework call |
 | Variant choice is deliberate and rebuilt cleanly | The DPA-side translation unit was compiled against the intended variant (vanilla / PM / RX-rate / MP / etc.); switching variants is a rebuild | Walk the variant selection in [`## Capabilities and modes`](#capabilities-and-modes); the README documents the relevant linkage line in `build_device_code.sh` | DPA-side rebuild via `dpacc`, then host rebuild that embeds it |
-| Replica-first deployment | The algorithm has been deployed and observed under representative RoCE-v2 load on a non-prod replica with matching hardware class BEFORE production exposure | Inherited from [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy); the canonical risk is *"the algorithm shapes my benchmark fine but does the wrong thing under production traffic mix"* | Schedule the replica run; do NOT skip the replica because *"it's the default algorithm, what could go wrong"* — the default algorithm still has tunables that interact with the workload |
-| Rollback path documented | Before deployment, the operator records the exact prior PCC state: attached port, whether a custom algorithm was active, its image/build identity, slot, parameters, and the verified procedure used to attach it (or the recorded default/no-custom state) | Stop the active ZTR instance with `doca_pcc_stop`, release its loaded app, destroy it with `doca_pcc_destroy`, then recreate and reattach the recorded prior state through its verified PCC lifecycle. Re-query counters/state after restoration; if the prior state cannot be identified or restored, fail closed and escalate | Same PCC-specific lifecycle as [`doca-pcc CAPABILITIES.md ## Safety policy`](../doca-pcc/CAPABILITIES.md#safety-policy); rollback is a recorded multi-step restoration, not a “single command” or invented sub-command |
+| Replica-first deployment | The algorithm has been deployed and observed under representative RoCE-v2 load on a non-prod replica with matching hardware class BEFORE production exposure | Inherited from `doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`); the canonical risk is *"the algorithm shapes my benchmark fine but does the wrong thing under production traffic mix"* | Schedule the replica run; do NOT skip the replica because *"it's the default algorithm, what could go wrong"* — the default algorithm still has tunables that interact with the workload |
+| Rollback path documented | Before deployment, the operator records the exact prior PCC state: attached port, whether a custom algorithm was active, its image/build identity, slot, parameters, and the verified procedure used to attach it (or the recorded default/no-custom state) | Stop the active ZTR instance with `doca_pcc_stop`, release its loaded app, destroy it with `doca_pcc_destroy`, then recreate and reattach the recorded prior state through its verified PCC lifecycle. Re-query counters/state after restoration; if the prior state cannot be identified or restored, fail closed and escalate | Same PCC-specific lifecycle as `doca-pcc CAPABILITIES.md ## Safety policy` (`doca-pcc/CAPABILITIES.md#safety-policy`); rollback is a recorded multi-step restoration, not a “single command” or invented sub-command |
 
 **Do not partial-rebuild one side.** Inherited from
-[`doca-pcc CAPABILITIES.md ## Safety policy`](../doca-pcc/CAPABILITIES.md#safety-policy)
+`doca-pcc CAPABILITIES.md ## Safety policy` (`doca-pcc/CAPABILITIES.md#safety-policy`)
 and
-[`doca-dpa CAPABILITIES.md ## Safety policy`](../doca-dpa/CAPABILITIES.md#safety-policy):
+`doca-dpa CAPABILITIES.md ## Safety policy` (`doca-dpa/CAPABILITIES.md#safety-policy`):
 rebuilding only the DPA-side image while the host-side
 application stays at the prior version (or vice versa) is
 the canonical way to introduce `DOCA_ERROR_DRIVER` at
@@ -429,7 +429,7 @@ production port is in the same risk class as a `mlxconfig`
 write — the change takes effect on the next CC event on
 that port and shapes real traffic. The maintenance-window
 discipline from
-[`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+`doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
 applies; the agent does not silently recommend
 aggressive parameter retunes "right now" during business
 hours.

@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and operators deploying and operating CollectX-based DOCA telemetry collectors on hosts or BlueField DPUs, wiring providers and counters, configuring export backends, and diagnosing collection pipeline issues. <br>
+External operators and infrastructure engineers use this skill to deploy, wire, run, and debug a CollectX (clx) based DOCA telemetry collector and its exporters on a host or BlueField they administer, getting provider counters off the box through Prometheus, Fluent Bit, NetFlow, or file/IPC backends. It routes reader/publisher library work and the productized DTS container to their respective owners rather than answering them directly. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,13 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [doca-collectx-deployment reference detail](references/details.md) <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [NVIDIA DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [details.md](references/details.md) <br>
+- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Configuration instructions, Shell commands, Analysis] <br>
+**Output Format:** [Markdown with inline code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,39 +42,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (2 positive, 1 negative), 1 attempt per task, each in an isolated k8s-sandbox pod. <br>
+3 evaluation tasks (2 positive, 1 negative), each attempt run once in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct — final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed — skill selection, decoy avoidance, and workflow execution. <br>
-- Effectiveness: Whether the skill helped complete the task — goal completion (50%) and expected workflow adherence (50%). <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage — tool-call productivity (50%) and token efficiency (50%). <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Checks final-answer accuracy against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed, decoys avoided, and the workflow executed. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected-workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `security`: Flags unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.7% | 95.0% |
-| Security | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
-| Correctness | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
-| Discoverability | 100.0% | 85.0% |
-| Effectiveness | 68.9% → 100.0% (+31.1 points) | 42.2% → 100.0% (+57.8 points) |
-| Efficiency | 73.7% | 90.0% |
+| Overall | 97.1% (uplift unavailable) | 95.3% (uplift unavailable) |
+| Security | 66.7% → 100.0% (+33.3 points) | 50.0% → 100.0% (+50.0 points) |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 92.5% (uplift unavailable) |
+| Effectiveness | 72.2% → 100.0% (+27.8 points) | 43.9% → 97.5% (+53.6 points) |
+| Efficiency | 85.4% (uplift unavailable) | 86.7% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-d2dda0c (source: git SHA, committed 2026-10-12) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-collectx-deployment`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 3 evaluation tasks (2 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.7% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
-| Correctness | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 68.9% → 100.0% (+31.1 points) | 42.2% → 100.0% (+57.8 points) |
-| Efficiency | 73.7% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 66.7% → 100.0% (+33.3 points) | 50.0% → 100.0% (+50.0 points) |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 72.2% → 100.0% (+27.8 points) | 43.9% → 97.5% (+53.6 points) |
+| Efficiency | 85.4% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,15 +54,15 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 701,496 | 1,629,907 | -928,411 | -56.96% | skill 3/3; base 3/3 |
-| claude-code | doca-collectx-deployment.explicit-positive.v1 | 201,460 | 214,959 | -13,499 | -6.28% | skill 1/1; base 1/1 |
-| claude-code | doca-collectx-deployment.implicit-positive.v1 | 242,378 | 1,291,678 | -1,049,300 | -81.24% | skill 1/1; base 1/1 |
-| claude-code | doca-collectx-deployment.negative.v1 | 257,658 | 123,270 | +134,388 | +109.02% | skill 1/1; base 1/1 |
-| codex | All cases | 829,464 | 768,758 | +60,706 | +7.90% | skill 3/3; base 3/3 |
-| codex | doca-collectx-deployment.explicit-positive.v1 | 334,305 | 317,040 | +17,265 | +5.45% | skill 1/1; base 1/1 |
-| codex | doca-collectx-deployment.implicit-positive.v1 | 199,148 | 426,653 | -227,505 | -53.32% | skill 1/1; base 1/1 |
-| codex | doca-collectx-deployment.negative.v1 | 296,011 | 25,065 | +270,946 | +1080.97% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,530,960 | 2,398,665 | -867,705 | -36.17% | skill 6/6; base 6/6 |
+| claude-code | All cases | 600,696 | 1,602,330 | -1,001,634 | -62.51% | skill 3/3; base 3/3 |
+| claude-code | doca-collectx-deployment.explicit-positive.v1 | 240,858 | 244,872 | -4,014 | -1.64% | skill 1/1; base 1/1 |
+| claude-code | doca-collectx-deployment.implicit-positive.v1 | 198,980 | 1,233,801 | -1,034,821 | -83.87% | skill 1/1; base 1/1 |
+| claude-code | doca-collectx-deployment.negative.v1 | 160,858 | 123,657 | +37,201 | +30.08% | skill 1/1; base 1/1 |
+| codex | All cases | 222,891 | 784,281 | -561,390 | -71.58% | skill 3/3; base 3/3 |
+| codex | doca-collectx-deployment.explicit-positive.v1 | 95,393 | 324,886 | -229,493 | -70.64% | skill 1/1; base 1/1 |
+| codex | doca-collectx-deployment.implicit-positive.v1 | 96,918 | 427,398 | -330,480 | -77.32% | skill 1/1; base 1/1 |
+| codex | doca-collectx-deployment.negative.v1 | 30,580 | 31,997 | -1,417 | -4.43% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 823,587 | 2,386,611 | -1,563,024 | -65.49% | skill 6/6; base 6/6 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -70,7 +70,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
@@ -81,10 +81,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **MEDIUM** QUALITY/quality_efficiency: Instructions lack clear action verbs (`skills/doca-collectx-deployment/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in details.md (`skills/doca-collectx-deployment/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-collectx-deployment/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: Description very long (1020 chars, recommend 50-150) (`skills/doca-collectx-deployment/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/doca-collectx-deployment/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/doca-collectx-deployment/SKILL.md`)
-- 5 additional finding(s) are available in the full evaluation artifacts.
+- 7 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

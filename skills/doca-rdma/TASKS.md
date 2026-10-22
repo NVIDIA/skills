@@ -13,7 +13,7 @@ compatibility, error taxonomy, observability surface, and safety
 policy that these workflows assume, see
 [CAPABILITIES.md](CAPABILITIES.md). For where to find docs, the
 installed DOCA layout, or release notes, route through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through the
@@ -33,11 +33,11 @@ Connect is its own step after start; do not fold it into use.
 Steps the agent should walk the user through:
 
 1. **Confirm the installed DOCA version.** Use the procedure in
-   [`doca-setup CAPABILITIES.md ## Version compatibility`](../../doca-setup/CAPABILITIES.md#version-compatibility).
+   `doca-setup CAPABILITIES.md ## Version compatibility` (`doca-setup/CAPABILITIES.md#version-compatibility`).
    Quote the version observed (`pkg-config --modversion doca`,
    then `doca_caps --version`); do not assume "latest".
 2. **Discover the device capability surface for RDMA.** Run
-   `doca_caps --list-devs` ([`doca-caps`](../../tools/doca-caps/SKILL.md))
+   `doca_caps --list-devs` (`doca-caps/SKILL.md`)
    to see which devices have RDMA capability, then run the
    per-`doca_devinfo` `doca_rdma_cap_*` queries against the candidate
    device. Record the link layer the active port already exposes
@@ -89,7 +89,7 @@ installed DOCA, using the canonical cross-library build pattern.
 The build pattern for any DOCA C/C++ consumer is **identical** across
 libraries — `pkg-config` for include + link flags, meson or CMake as
 the build system — and is fully documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 
 **Step 0 — resolve the pkg-config module (do this first; do not assume).**
 DOCA RDMA is normally delivered inside the **umbrella `doca`** pkg-config
@@ -182,7 +182,7 @@ DOCA datapath intact and links `libdoca_rdma`; it is a single small
 wrapper, not a full re-binding of the DOCA API.
 
 The universal modify-a-shipped-sample workflow lives in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify).
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`).
 Use it as-is. The RDMA-specific overlay is the *modify-from-sample
 schema fill* — the five slots the agent must elicit from the user
 before recommending any code-level edit:
@@ -225,7 +225,7 @@ Steps the agent should walk the user through:
    *connection-listening* state before the client / connect-side
    starts. Confirm with the user which side is which.
 3. **Capture the structured log.** Set `DOCA_LOG_LEVEL=trace` for
-   the first run (see [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
+   the first run (see `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)).
    This is the cheapest way to make the lifecycle and connection
    state transitions visible on first failure.
 4. **Capture the completion events on the PE.** A run that produces
@@ -355,7 +355,7 @@ log, capability results, completion events, and connection-state
 callbacks. Stop after two consecutive iterations with that identity
 produce no evidence change — that means the cause is below RDMA.
 Escalate to
-[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug) with the
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`) with the
 captured layer-1-through-5 evidence. The configure workflow reuses
 this exact identity and bound.
 
@@ -366,7 +366,7 @@ program doesn't make forward progress), narrow the cause to a
 specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending RDMA-specific
 fixes. This skill's overlay names the RDMA-specific manifestation
@@ -401,10 +401,10 @@ at layers 5 (runtime) and 6 (program):
 
 Once the layer is identified, route to the matching debug verb on
 the matching skill: install / build / link / driver to
-[`doca-setup ## debug`](../../doca-setup/TASKS.md#debug); cross-cutting
-runtime to [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-setup ## debug` (`doca-setup/TASKS.md#debug`); cross-cutting
+runtime to `doca-debug ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 ## Deferred task verbs
 
@@ -414,9 +414,9 @@ does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [`doca-setup`](../../doca-setup/SKILL.md) and to the install-tree
+  `doca-setup/SKILL.md` and to the install-tree
   layout in
-  [doca-public-knowledge-map ## Layout of an installed DOCA package](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying RDMA-using applications at scale across
   many hosts / DPUs, Kubernetes operator workflows for RDMA
@@ -434,10 +434,10 @@ does not invent guidance:
 - **kernel-level driver install / firmware burn.** Installing the
   `mlx5_core` driver, burning new ConnectX firmware, or modifying
   `mlxconfig` parameters that need a reset — out of scope for this
-  skill. Route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)
+  skill. Route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5 (driver), then to the upstream MLNX OFED / firmware
   documentation reachable through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 
 ## Command appendix
 
@@ -449,7 +449,7 @@ noted. Rows that need elevated privileges call that out explicitly.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -463,20 +463,20 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the row.
    Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC, headers-win)
-   are owned by [`doca-version`](../../doca-version/SKILL.md).
+   are owned by `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). Use `pkg-config --modversion doca-rdma` when that module resolves; otherwise the umbrella `doca` module (verify with `pkg-config --list-all | grep -i doca`) |
+| `pkg-config --modversion doca` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). Use `pkg-config --modversion doca-rdma` when that module resolves; otherwise the umbrella `doca` module (verify with `pkg-config --list-all | grep -i doca`) |
 | `pkg-config --cflags --libs doca` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs doca` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores (`libdoca_rdma.so`), and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. If this probe fails, fix the module name / `PKG_CONFIG_PATH` per `## build` Step 0 — do NOT fall back to raw libibverbs. |
 | `grep -RHn 'DOCA_VERSION_' $(pkg-config --variable=includedir doca)/doca_version.h` | `## configure` step 1 | What macros does this DOCA install expose for compile-time version checks? | A `DOCA_VERSION_MAJOR`, `MINOR`, `PATCH` triple matching the runtime version |
 | `doca_caps --list-devs` | `## configure` step 2 | Which devices on this host can be used as a `doca_dev`? | One row per visible device with PCIe address and capability flags |
 | `doca_caps --version` | `## configure` step 1; `## test` step 1 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca` |
 | `ls "$(pkg-config --variable=prefix doca)/samples/doca_rdma/"` (substitute the resolved module) | `## modify` slot 1 | Which RDMA samples ship in this install, and which is the closest starting point? | A list of sample directories named after the task pattern they demonstrate |
 | `cat "$(pkg-config --variable=prefix doca)/applications/VERSION"` (substitute the resolved module) | `## configure` step 1; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
-| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last RDMA call? | Empty or recent benign messages. Repeated mlx5/IB errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
+| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last RDMA call? | Empty or recent benign messages. Repeated mlx5/IB errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
 | `mlxconfig -d <pcie> q | head -n 40` (sudo) | `## debug` layer 7 | What firmware config does the underlying NIC report? | Stable firmware config; transient values indicate a partial reset |
 | `ibv_devinfo` (sudo) | `## configure` step 2; `## debug` layer 7 | What does the underlying `libibverbs` see for this device? | One device row with `state: PORT_ACTIVE` and a sane MTU |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed |
@@ -487,5 +487,5 @@ the agent should:
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, the install-prefix `applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the RDMA-specific rows on top.

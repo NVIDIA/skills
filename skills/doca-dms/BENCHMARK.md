@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-dms`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.9% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.1% — baseline ran, but no comparable score was available; uplift unavailable | 94.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 95.0% (+45.0 points) | 70.0% → 100.0% (+30.0 points) |
+| Correctness | 35.0% → 100.0% (+65.0 points) | 70.0% → 100.0% (+30.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 30.0% → 87.5% (+57.5 points) | 32.5% → 83.8% (+51.3 points) |
-| Efficiency | 92.0% — baseline ran, but no comparable score was available; uplift unavailable | 89.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 37.5% → 87.5% (+50.0 points) | 41.3% → 85.0% (+43.7 points) |
+| Efficiency | 87.9% — baseline ran, but no comparable score was available; uplift unavailable | 95.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 655,149 | 463,603 | +191,546 | +41.32% | skill 4/4; base 4/4 |
-| claude-code | doca-dms.explicit-positive.v1 | 194,068 | 121,460 | +72,608 | +59.78% | skill 1/1; base 1/1 |
-| claude-code | doca-dms.implicit-positive.v1 | 246,955 | 124,661 | +122,294 | +98.10% | skill 1/1; base 1/1 |
-| claude-code | doca-dms.implicit-positive.v2 | 151,272 | 123,940 | +27,332 | +22.05% | skill 1/1; base 1/1 |
-| claude-code | doca-dms.negative.v1 | 62,854 | 93,542 | -30,688 | -32.81% | skill 1/1; base 1/1 |
-| codex | All cases | 462,264 | 165,395 | +296,869 | +179.49% | skill 4/4; base 4/4 |
-| codex | doca-dms.explicit-positive.v1 | 128,500 | 53,882 | +74,618 | +138.48% | skill 1/1; base 1/1 |
-| codex | doca-dms.implicit-positive.v1 | 148,971 | 38,704 | +110,267 | +284.90% | skill 1/1; base 1/1 |
-| codex | doca-dms.implicit-positive.v2 | 136,987 | 24,621 | +112,366 | +456.38% | skill 1/1; base 1/1 |
-| codex | doca-dms.negative.v1 | 47,806 | 48,188 | -382 | -0.79% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,117,413 | 628,998 | +488,415 | +77.65% | skill 8/8; base 8/8 |
+| claude-code | All cases | 699,681 | 492,308 | +207,373 | +42.12% | skill 4/4; base 4/4 |
+| claude-code | doca-dms.explicit-positive.v1 | 193,526 | 186,453 | +7,073 | +3.79% | skill 1/1; base 1/1 |
+| claude-code | doca-dms.implicit-positive.v1 | 247,827 | 121,799 | +126,028 | +103.47% | skill 1/1; base 1/1 |
+| claude-code | doca-dms.implicit-positive.v2 | 194,487 | 90,704 | +103,783 | +114.42% | skill 1/1; base 1/1 |
+| claude-code | doca-dms.negative.v1 | 63,841 | 93,352 | -29,511 | -31.61% | skill 1/1; base 1/1 |
+| codex | All cases | 427,939 | 159,489 | +268,450 | +168.32% | skill 4/4; base 4/4 |
+| codex | doca-dms.explicit-positive.v1 | 107,821 | 38,387 | +69,434 | +180.88% | skill 1/1; base 1/1 |
+| codex | doca-dms.implicit-positive.v1 | 164,965 | 36,281 | +128,684 | +354.69% | skill 1/1; base 1/1 |
+| codex | doca-dms.implicit-positive.v2 | 110,804 | 19,033 | +91,771 | +482.17% | skill 1/1; base 1/1 |
+| codex | doca-dms.negative.v1 | 44,349 | 65,788 | -21,439 | -32.59% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,127,620 | 651,797 | +475,823 | +73.00% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 20 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 21 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -81,12 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/services/doca-dms/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/services/doca-dms`)
 - **MEDIUM** SECURITY/Session Persistence (RA2): Rogue Agent: SystemD unit, and install (`BENCHMARK.md:85`)
 - **MEDIUM** SECURITY/Session Persistence (RA2): Rogue Agent: SystemD unit, and install (`BENCHMARK.md:86`)
 - **MEDIUM** SECURITY/Session Persistence (RA2): Rogue Agent: SystemD unit, and install (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Session Persistence (RA2): Rogue Agent: SystemD unit, and install (`BENCHMARK.md:88`)
-- 15 additional finding(s) are available in the full evaluation artifacts.
+- 16 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

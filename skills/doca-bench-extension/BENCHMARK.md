@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-bench-extension`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.7% — baseline ran, but no comparable score was available; uplift unavailable | 93.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 89.0% — baseline ran, but no comparable score was available; uplift unavailable | 87.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 80.0% (+30.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 56.3% → 100.0% (+43.7 points) | 45.0% → 96.3% (+51.3 points) |
-| Efficiency | 73.5% — baseline ran, but no comparable score was available; uplift unavailable | 76.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 50.0% → 100.0% (+50.0 points) | 95.0% → 100.0% (+5.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 53.8% → 78.1% (+24.3 points) | 60.0% → 85.0% (+25.0 points) |
+| Efficiency | 66.7% — baseline ran, but no comparable score was available; uplift unavailable | 65.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 863,917 | 905,255 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-bench-extension.explicit-positive.v1 | 329,136 | 443,310 | -114,174 | -25.75% | skill 1/1; base 1/1 |
-| claude-code | doca-bench-extension.implicit-positive.v1 | N/A | 309,310 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-bench-extension.implicit-positive.v2 | 504,600 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-bench-extension.negative.v1 | 30,181 | 152,635 | -122,454 | -80.23% | skill 1/1; base 1/1 |
-| codex | All cases | 455,976 | 263,486 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-bench-extension.explicit-positive.v1 | 118,734 | 67,339 | +51,395 | +76.32% | skill 1/1; base 1/1 |
-| codex | doca-bench-extension.implicit-positive.v1 | N/A | 112,074 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | doca-bench-extension.implicit-positive.v2 | 299,664 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | doca-bench-extension.negative.v1 | 37,578 | 84,073 | -46,495 | -55.30% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,319,893 | 1,168,741 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 773,296 | 835,958 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-bench-extension.explicit-positive.v1 | 301,245 | 343,975 | -42,730 | -12.42% | skill 1/1; base 1/1 |
+| claude-code | doca-bench-extension.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-bench-extension.implicit-positive.v2 | 441,844 | 340,989 | +100,855 | +29.58% | skill 1/1; base 1/1 |
+| claude-code | doca-bench-extension.negative.v1 | 30,207 | 150,994 | -120,787 | -79.99% | skill 1/1; base 1/1 |
+| codex | All cases | 491,688 | 295,956 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-bench-extension.explicit-positive.v1 | 191,322 | 80,450 | +110,872 | +137.81% | skill 1/1; base 1/1 |
+| codex | doca-bench-extension.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-bench-extension.implicit-positive.v2 | 262,628 | 132,303 | +130,325 | +98.50% | skill 1/1; base 1/1 |
+| codex | doca-bench-extension.negative.v1 | 37,738 | 83,203 | -45,465 | -54.64% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,264,984 | 1,131,914 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -73,7 +73,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,12 +81,14 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
+  "## Error taxonomy" in CAPABILITIES.md (lines 235-285)
+  vs "## debug" in TASKS.md (lines 355-408) (`CAPABILITIES.md:235`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/tools/doca-bench-extension/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-bench-extension/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-bench-extension`)
 - **LOW** QUALITY/quality_discoverability: Description very long (980 chars, recommend 50-150) (`skills/tools/doca-bench-extension/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/tools/doca-bench-extension/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/tools/doca-bench-extension/SKILL.md`)
-- 7 additional finding(s) are available in the full evaluation artifacts.
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

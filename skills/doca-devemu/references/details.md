@@ -45,7 +45,7 @@ example is a single instance.
   + the deferred-topic boundaries in
   [`CAPABILITIES.md ## Deferred topic boundaries`](../CAPABILITIES.md#deferred-topic-boundaries)
   which route to
-  [`doca-public-knowledge-map`](../../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   for the packaged-service guides.
 - **"Why does my virtio-net emulation create call return
   `DOCA_ERROR_NOT_PERMITTED` even though my DPU-side process
@@ -63,7 +63,7 @@ example is a single instance.
   version-compatibility overlay in
   [`CAPABILITIES.md ## Version compatibility`](../CAPABILITIES.md#version-compatibility),
   which cross-links the canonical detection chain in
-  [`doca-version`](../../../doca-version/SKILL.md) and adds the
+  `doca-version/SKILL.md` and adds the
   per-sub-library `pkg-config` + `doca_devemu_*_cap_*` overlay.
 - **"What does this `DOCA_ERROR_*` from a `doca_devemu_*` call
   mean and which layer caused it?"** — worked example:
@@ -74,7 +74,7 @@ example is a single instance.
   [`CAPABILITIES.md ## Error taxonomy`](../CAPABILITIES.md#error-taxonomy)
   + the layered ladder in
   [`TASKS.md ## debug`](../TASKS.md#debug) that escalates to
-  [`doca-debug`](../../../doca-debug/SKILL.md).
+  `doca-debug/SKILL.md`.
 
 ## What this skill deliberately does not ship
 
@@ -90,7 +90,7 @@ contain — and pull requests should not add:
   route the user to those files and prescribe a minimum-diff
   modification on them via the universal modify-a-sample
   workflow in
-  [`doca-programming-guide`](../../../doca-programming-guide/SKILL.md),
+  `doca-programming-guide/SKILL.md`,
   layered with the Device Emulation-specific overrides in
   [`TASKS.md ## modify`](../TASKS.md#modify).
 - **A specific emulated-device backend.** This library
@@ -101,7 +101,7 @@ contain — and pull requests should not add:
   should my backend do"* question to the user's domain
   expertise and to the public sub-library guides reachable
   via
-  [`doca-public-knowledge-map`](../../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **Standalone build manifests** (`meson.build`,
   `CMakeLists.txt`, `Cargo.toml`, …) parked inside the skill.
   The agent constructs the build manifest *in the user's
@@ -116,14 +116,14 @@ contain — and pull requests should not add:
   Those services are *separate artifacts* built on top of
   this library, with their own public service guides. Routing
   for them lives in
-  [`doca-public-knowledge-map`](../../../doca-public-knowledge-map/SKILL.md);
+  `doca-public-knowledge-map/SKILL.md`;
   conflating either service with the `doca-devemu`
   library is the single most common Device Emulation first-app
   design error.
 
 ## Related skills
 
-- [`doca-public-knowledge-map`](../../../doca-public-knowledge-map/SKILL.md) —
+- `doca-public-knowledge-map/SKILL.md` —
   the routing table for every public DOCA documentation
   source and the on-disk layout of an installed DOCA
   package. The Device Emulation umbrella URL is
@@ -131,44 +131,44 @@ contain — and pull requests should not add:
   per-sub-library guides are linked from the umbrella, and
   the packaged DOCA SNAP / Virtio-net services are listed
   under the DOCA Services umbrella as separate artifacts.
-- [`doca-setup`](../../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, DPU-side privilege checks, BlueField
   firmware configuration (including the per-sub-library
   emulation type enable), and the *I have no install yet*
   path with the public NGC DOCA container. This skill assumes
   its preconditions are satisfied AND that the firmware-level
   emulation type for the user's chosen sub-library is enabled.
-- [`doca-version`](../../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. This skill's `## Version
   compatibility` cross-links the four-way match rule and adds
   the Device Emulation-specific per-sub-library `pkg-config`
   + `doca_devemu_*_cap_*` overlay.
-- [`doca-structured-tools-contract`](../../../doca-structured-tools-contract/SKILL.md) —
+- `doca-structured-tools-contract/SKILL.md` —
   the bundle's structured-tools precedence rule (detect /
   prefer / fall back / report). The Command appendix in
   [TASKS.md](../TASKS.md) honors this contract.
-- [`doca-programming-guide`](../../../doca-programming-guide/SKILL.md) —
+- `doca-programming-guide/SKILL.md` —
   general DOCA programming patterns shared by every library:
   the canonical `pkg-config` + meson build pattern, the
   universal modify-a-shipped-sample first-app workflow, the
   universal Core-context lifecycle, the cross-library
   `DOCA_ERROR_*` taxonomy, and the program-side debug order.
   This skill layers Device Emulation specifics on top.
-- [`doca-comch`](../../doca-comch/SKILL.md) — the right library
+- `doca-comch/SKILL.md` — the right library
   when the user wants a *control-plane channel* between a
   host process and a DPU process over PCIe but does NOT want
   the host to see the DPU as an emulated PCIe device with a
   standard host kernel driver. Device Emulation hides the
   DPU behind a real-looking PCIe device class; Comch is an
   explicit host ↔ DPU IPC.
-- [`doca-flow`](../../doca-flow/SKILL.md) and
-  [`doca-eth`](../../doca-eth/SKILL.md) — the right libraries
+- `doca-flow/SKILL.md` and
+  `doca-eth/SKILL.md` — the right libraries
   when the user wants to shape traffic on the BlueField's
   built-in NIC personality, not expose a *custom* emulated
   PCIe device. Device Emulation is for *new* emulated PCIe
   devices the host did not previously see; Flow / Eth are
   for the BlueField's existing NIC surface.
-- [`doca-debug`](../../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder (install / version / build / link / runtime /
   program / driver). Device Emulation-specific debug
   (firmware-level emulation type not enabled, sub-library
@@ -181,7 +181,7 @@ The DOCA SNAP Service and the DOCA Virtio-net Service are
 built on top of `doca-devemu` for users who do not
 want to write the backend themselves. They have their own
 public service guides reachable via
-[`doca-public-knowledge-map`](../../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 Conflating either service with this library is the single
 most common Device Emulation first-app design error.
 

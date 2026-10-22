@@ -5,8 +5,8 @@ run → test → debug`. For collector deployment, `build` is a
 *routing stub* — there is no collector binary for the operator to
 build inside this skill (the collector ships with DOCA; a *source
 program* that feeds the collector is built per
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md) +
-[`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md)).
+`doca-programming-guide/SKILL.md` +
+`doca-telemetry-exporter/SKILL.md`).
 The `## test` verb is an iterative end-to-end smoke loop, not a
 one-shot pass.
 
@@ -16,7 +16,7 @@ collector on either target (host x86 or BlueField Arm). Every step
 assumes the operator has consulted the live public **DOCA
 Telemetry guide** and **DOCA Telemetry Service (DTS) guide** on
 `docs.nvidia.com` (reachable through
-[`doca-public-knowledge-map ## Public documentation entry points`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points))
+`doca-public-knowledge-map ## Public documentation entry points` (`doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`))
 and is using them as the authoritative reference; this file
 prescribes the *order* and *what to look up where*, not a
 copy-paste runbook. The agent does NOT invent clx provider names,
@@ -33,19 +33,19 @@ smoke-before-bulk postures are established.
    guidance, surface the four-surface decomposition per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
    the clx collection mechanism (this skill), the reader library
-   [`doca-telemetry`](../libs/doca-telemetry/SKILL.md), the
+   `doca-telemetry/SKILL.md`, the
    publisher library
-   [`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md),
+   `doca-telemetry-exporter/SKILL.md`,
    and the productized DTS container (Non-goal #7 → public docs).
    If the operator actually wants the productized DTS service,
    STOP and route per the
-   [externally-productized DTS row](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+   externally-productized DTS row (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 2. **Confirm the env is healthy first.** This skill expects DOCA
    installed and healthy on the side being collected from (host
    x86 OR BlueField Arm). If install health is unverified, run
-   [`doca-setup ## test`](../doca-setup/TASKS.md#test) on the
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`) on the
    target first. If the operator has no install at all, route to
-   [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install).
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`).
 3. **Decide what the collector will sample.** Map the operator's
    goal to a provider / counter set per the pipeline table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
@@ -53,7 +53,7 @@ smoke-before-bulk postures are established.
    Telemetry / DTS guide and the live collector config — the agent
    does NOT supply them from memory. If a source is the operator's
    own DOCA program, that source side is the publisher library
-   ([`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md)),
+   (`doca-telemetry-exporter/SKILL.md`),
    not this skill.
    Resolve and record the expected sample cadence for each enabled
    provider from the live collector config/help and matching public
@@ -65,7 +65,7 @@ smoke-before-bulk postures are established.
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy),
    probe that THIS device actually exposes each counter under the
    chosen property dimensions (the same discipline
-   [`doca-telemetry-utils`](../tools/doca-telemetry-utils/SKILL.md)
+   `doca-telemetry-utils/SKILL.md`
    owns for the exporter-config case). A counter the device does
    not expose is the canonical silently-dropped metric — gate it
    before the config commits, not after.
@@ -84,7 +84,7 @@ smoke-before-bulk postures are established.
 6. **Confirm the version overlay.** Per
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
    record the collector's DOCA version (via
-   [`doca-version TASKS.md ## configure`](../doca-version/TASKS.md#configure)),
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)),
    any source program's link-time version, and the downstream
    consumer's expected schema version. A skew among these is the
    silent "rows assembled but the consumer drops them" trap.
@@ -99,17 +99,17 @@ stub:
 - If the user is asking how to build a **source program** that
   feeds the collector (a DOCA program that publishes counters /
   events), hand off to
-  [`doca-telemetry-exporter ## build`](../libs/doca-telemetry-exporter/TASKS.md#build)
+  `doca-telemetry-exporter ## build` (`doca-telemetry-exporter/TASKS.md#build`)
   for the publisher library and to
-  [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build)
+  `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
   for the canonical `pkg-config` + meson pattern.
 - If the user is asking how to build a program that **reads**
   hardware counters off a `doca_dev`, that is the reader library —
   route to
-  [`doca-telemetry ## build`](../libs/doca-telemetry/TASKS.md#build).
+  `doca-telemetry ## build` (`doca-telemetry/TASKS.md#build`).
 - If the user is asking how to build the productized DTS container
   image, that is externally productized (Non-goal #7) — route to
-  the [public DTS guide](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+  the public DTS guide (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 - The collector's own config is *composed against the live env*,
   not built ahead of time — see [`## run`](#run).
 
@@ -137,12 +137,12 @@ deploy after the config, the provider set, or the env changes**:
 4. **A source-program change lives in the library skill.** If the
    operator is modifying a DOCA program that feeds the collector,
    that change is owned by
-   [`doca-telemetry-exporter ## modify`](../libs/doca-telemetry-exporter/TASKS.md#modify);
+   `doca-telemetry-exporter ## modify` (`doca-telemetry-exporter/TASKS.md#modify`);
    once the source is rebuilt, control returns here at step 1.
 5. **A hardware-state change leaves this verb entirely.** Any
    change touching device state (`mlxconfig set`, firmware burn,
    BlueField mode flip) is owned by
-   [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md);
+   `doca-hardware-safety/SKILL.md`;
    control returns here at [`## configure`](#configure) step 2
    once the change is complete and verified.
 
@@ -162,9 +162,9 @@ declaring the pipeline deployed. Every step assumes
    [`## configure`](#configure); the launch shape (foreground,
    service-supervised, container) follows the operator's
    deployment posture per
-   [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)
+   `doca-bare-metal-deployment/SKILL.md`
    (non-container) or
-   [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+   `doca-container-deployment/SKILL.md`
    (container). Read the daemon's own startup output first per
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability).
 2. **Confirm providers are enabled and rows are assembling.** Per
@@ -183,7 +183,7 @@ declaring the pipeline deployed. Every step assumes
    is silent while rows exist locally is a layer-4 symptom.
 4. **Capture the as-deployed snapshot.** Record the collector's
    DOCA version (per
-   [`doca-version TASKS.md ## run`](../doca-version/TASKS.md#run)),
+   `doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`)),
    the device / generation, the enabled providers + resolved
    counter identities (not just names), each provider's expected
    sample cadence, the export backend(s) + sink endpoints, and the
@@ -240,7 +240,7 @@ Unchanged checks mean only that the attempted mutation **did not
 isolate the cause**; they do not prove the cause is below the
 collector runtime or identify the device, host, network, or DTS
 layer. Escalate to
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured evidence, or to the public DTS guide if the
 operator is on the productized container.
 
@@ -252,10 +252,10 @@ do not skip down without clearing the layer above.
 
 1. **Collector-won't-start (layer 1).** Daemon exits / never
    binds. Confirm DOCA install health
-   ([`doca-setup ## test`](../doca-setup/TASKS.md#test)); read
+   (`doca-setup ## test` (`doca-setup/TASKS.md#test`)); read
    the daemon's own startup output; do NOT paste a config path
    from memory — resolve it from the live install per
-   [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+   `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
 2. **No-provider-rows (layer 2).** Daemon runs, no rows for a
    provider. Re-run the per-device support probe per
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy);
@@ -274,19 +274,19 @@ do not skip down without clearing the layer above.
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 6. **Transport (layer 6).** Network / firewall / DTS-runtime
    failure. Route to
-   [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug)
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    for the cross-cutting host / network ladder; for the
    productized DTS container, route to the public DTS guide
    (Non-goal #7). If the symptom is a contemplated hardware-state
    change, route to
-   [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
+   `doca-hardware-safety/SKILL.md`
    instead of touching device state from this skill.
 
 Library-level `DOCA_ERROR_*` codes raised by a *source* program
 that feeds the collector are owned by the matching library skill
-([`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md)
+(`doca-telemetry-exporter/SKILL.md`
 for the publisher) plus the cross-library taxonomy in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../doca-programming-guide/CAPABILITIES.md#error-taxonomy),
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`),
 not by this skill.
 
 ## Deferred task verbs
@@ -297,20 +297,20 @@ conversation. Route them so the agent does not invent guidance:
 - **The hardware-counter reader API** (open a per-domain
   `doca_telemetry_<domain>` context, read a counter snapshot off a
   `doca_dev`) — route to
-  [`doca-telemetry`](../libs/doca-telemetry/SKILL.md).
+  `doca-telemetry/SKILL.md`.
 - **The application-side publisher API** (define a schema, create
   sources, emit counters / events from a DOCA program) — route to
-  [`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md).
+  `doca-telemetry-exporter/SKILL.md`.
 - **Operate the productized DTS container** (its packaged config
   schema, built-in provider set, kubelet manifest, NGC image) —
   externally productized (Non-goal #7); route to the
-  [public DTS guide](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+  public DTS guide (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 - **Install DOCA / prepare the env** (install, hugepages,
   pkg-config, devlink, representor visibility) — route to
-  [`doca-setup`](../doca-setup/SKILL.md).
+  `doca-setup/SKILL.md`.
 - **Hardware-state changes** (`mlxconfig set`, firmware burn,
   BlueField mode flip, kernel-boot-parameter changes) — the
   change-application discipline is meta-policy owned by
-  [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify);
+  `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`);
   load it ALONGSIDE this skill whenever a mutating step is on the
   table.

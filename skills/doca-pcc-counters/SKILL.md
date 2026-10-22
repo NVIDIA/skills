@@ -17,12 +17,14 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - pcc
     - counters
 compatibility: >
-  Requires DOCA/MFT on Linux with a ConnectX-6 or newer or BlueField
+  Requires DOCA/MFT on Linux with a ConnectX-6 or newer (not
+  ConnectX-8) or BlueField
   device, mst tools, mounted debugfs, and root access to the mlx5
   diag_cnt interface. The script reads fixed firmware and hardware
   diagnostics independently of custom PCC code. Its set operation
@@ -59,15 +61,15 @@ the canonical `set`-then-`query` sequence, or
 dump is empty"*. Open the capabilities companion when
 the question is *which counters the script reports and how it
 reaches them*. If the user has not installed DOCA / MFT yet,
-route to [`doca-setup`](../../doca-setup/SKILL.md) first.
+route to `doca-setup/SKILL.md` first.
 
 This skill is the **firmware / HW PCC counter readout** surface.
 It is NOT the host-side control library that loads custom
 congestion-control kernels onto the DPA (that is
-[`doca-pcc`](../../libs/doca-pcc/SKILL.md)) and it is NOT the
+`doca-pcc/SKILL.md`) and it is NOT the
 firmware PCC *algorithm* configuration (that path is firmware
 configuration, routed via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
+`doca-public-knowledge-map/SKILL.md`).
 The counters this script reads are device / firmware
 diagnostic counters that exist **regardless of whether a custom
 `doca-pcc` DPA kernel is running** — do not condition them on a
@@ -107,7 +109,7 @@ load-bearing piece; the worked example is one instance.
   install put it"*. Answered by the install overlay in
   the capabilities companion,
   which redirects to the canonical
-  [`doca-version`](../../doca-version/SKILL.md) rules.
+  `doca-version/SKILL.md` rules.
 
 ## Audience
 
@@ -123,17 +125,17 @@ drops) on a port. Concretely:
   effect with the device-level PCC diagnostic counters
   (the script reads the firmware counters; the custom
   algorithm itself is a separate surface owned by
-  [`doca-pcc`](../../libs/doca-pcc/SKILL.md)).
+  `doca-pcc/SKILL.md`).
 - An AI agent producing a *PCC counter snapshot* as evidence
   for a congestion-control investigation.
 
 It is **not** for users debugging the script's bash itself,
 **not** the place to learn how to write a custom PCC
 algorithm — that audience belongs in
-[`doca-pcc`](../../libs/doca-pcc/SKILL.md) — and **not** the
+`doca-pcc/SKILL.md` — and **not** the
 place for users who want to configure the factory firmware PCC
 algorithm (route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)).
+`doca-public-knowledge-map/SKILL.md`).
 
 `pcc_counters.sh` is shipped as a **plain bash script**
 installed under the DOCA tools directory (per `install_data` in
@@ -162,9 +164,9 @@ Do **not** load this skill for general DOCA orientation,
 custom-PCC algorithm design, the host-side `doca-pcc` library
 API, the factory firmware PCC algorithm, or DOCA / MFT install.
 For those, route to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
-[`doca-pcc`](../../libs/doca-pcc/SKILL.md), or
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`,
+`doca-pcc/SKILL.md`, or
+`doca-setup/SKILL.md`.
 
 ## What this skill provides
 
@@ -182,7 +184,7 @@ companion files:
   an mst device to a PCI address (`mst status -v` + `lspci`)
   and reaches `/sys/kernel/debug/mlx5/<pci>/diag_cnt/`, the
   install-availability overlay that redirects to
-  [`doca-version`](../../doca-version/SKILL.md), the layered
+  `doca-version/SKILL.md`, the layered
   error taxonomy (script-not-present / bad-device /
   not-armed-before-query / debugfs-or-permission /
   counter-stuck-at-zero / cross-cutting), and the safety
@@ -243,7 +245,7 @@ contain — and pull requests should not add:
 
 ## Related skills
 
-- [`doca-pcc`](../../libs/doca-pcc/SKILL.md) — the host-side
+- `doca-pcc/SKILL.md` — the host-side
   library for writing and loading custom congestion-control
   kernels onto the DPA. It is a SEPARATE surface: the
   firmware PCC diagnostic counters `pcc_counters.sh` reads
@@ -253,22 +255,22 @@ contain — and pull requests should not add:
   (firmware counter readout) with the library (custom
   algorithm load/control) is the most common PCC first-touch
   error.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA / PCC documentation set,
   including the firmware PCC algorithm configuration.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical
+- `doca-version/SKILL.md` — canonical
   DOCA version-handling rules. The `## Version compatibility`
   section in the capabilities companion is a concise
   overlay that redirects here.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, mst tools, debugfs, and the
   *I have no install yet* path with the public NGC DOCA
   container. This skill assumes its preconditions are
   satisfied.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the
+- `doca-debug/SKILL.md` — the
   cross-cutting debug ladder. The PCC counter readout slots
   in as a read-only device-state evidence source before any
   congestion-control tuning recommendation is made.
-- [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+- `doca-programming-guide/SKILL.md`
   — general DOCA programming patterns shared across the
   bundle.

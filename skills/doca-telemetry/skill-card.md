@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides reading DOCA hardware-counter events from a doca_dev through the per-domain DOCA Telemetry reader libraries (doca_telemetry_pcc, _dpa, _diag, _adp_retx, _phy, and _pci), covering capability checks, context creation, startup, and per-domain reads or samples, while routing publishing/export to doca-telemetry-exporter and the deployed DOCA Telemetry Service to doca-dts. <br>
+Reads DOCA hardware-counter events from a doca_dev through the per-domain Telemetry reader libraries (doca_telemetry_pcc, _dpa, _diag, _adp_retx, _phy, and _pci), covering capability checks, context creation, startup, and per-domain reads or samples. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers building applications on NVIDIA BlueField DPUs or ConnectX NICs use this skill to configure, build, run, test, and debug code that reads per-domain hardware counters (PCC, DPA, DIAG, ADP_RETX, PHY, PCI) from a doca_dev via the DOCA Telemetry reader C API or language bindings over it. <br>
+External developers building applications that read DOCA hardware counters from a doca_dev through one or more of the six per-domain DOCA Telemetry reader libraries, using the per-domain capability-query, lifecycle, sample-window, and error-handling discipline this skill provides. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,11 +25,9 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [CAPABILITIES.md](CAPABILITIES.md) <br>
-- [TASKS.md](TASKS.md) <br>
-- [references/details.md](references/details.md) <br>
-- [DOCA Telemetry Guide](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry/index.html) <br>
-- [DOCA Telemetry Exporter Guide](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry-Exporter/index.html) <br>
+- [details.md](references/details.md) <br>
+- [DOCA Telemetry SDK Guide](https://docs.nvidia.com/doca/sdk/DOCA-Telemetry/index.html) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 
 
 ## Skill Output: <br>
@@ -45,38 +43,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative) executed in isolated k8s-sandbox pods with 1 attempt per task. <br>
+4 evaluation tasks (3 positive, 1 negative), each attempt run in its own isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
-- Efficiency: Checks tool-call productivity and token efficiency. <br>
+- Security: Whether the skill is safe to use (unsafe operations, secret leakage, unauthorized access). <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
+- Discoverability: Whether the right skill was loaded when needed and decoys were avoided. <br>
+- Effectiveness: Whether the skill helped complete the task, as the equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Whether the run avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+| Dimension | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.1% | 92.1% |
+| Overall | 98.3% (uplift unavailable) | 91.7% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 100.0% (+50.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% | 90.0% |
-| Effectiveness | 51.3% → 98.8% (+47.5 points) | 56.3% → 98.1% (+41.8 points) |
-| Efficiency | 91.7% | 72.4% |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 91.7% (uplift unavailable) |
+| Effectiveness | 50.0% → 98.1% (+48.1 points) | 47.5% → 92.5% (+45.0 points) |
+| Efficiency | 93.3% (uplift unavailable) | 74.1% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-e2bc144 (source: git SHA, committed 2026-10-14) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

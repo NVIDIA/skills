@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-dpa-hl-tracer`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.2% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 100.0% (+50.0 points) | 85.0% → 100.0% (+15.0 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 65.0% → 100.0% (+35.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 87.5% (+37.5 points) | 41.3% → 93.8% (+52.5 points) |
-| Efficiency | 93.3% — baseline ran, but no comparable score was available; uplift unavailable | 81.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.8% → 100.0% (+56.2 points) | 41.3% → 100.0% (+58.7 points) |
+| Efficiency | 80.0% — baseline ran, but no comparable score was available; uplift unavailable | 81.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 652,452 | 520,739 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-dpa-hl-tracer.explicit-positive.v1 | 211,180 | 214,647 | -3,467 | -1.62% | skill 1/1; base 1/1 |
-| claude-code | doca-dpa-hl-tracer.implicit-positive.v1 | 410,689 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-dpa-hl-tracer.implicit-positive.v2 | N/A | 245,822 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-dpa-hl-tracer.negative.v1 | 30,583 | 60,270 | -29,687 | -49.26% | skill 1/1; base 1/1 |
-| codex | All cases | 491,245 | 187,994 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-dpa-hl-tracer.explicit-positive.v1 | 140,635 | 52,227 | +88,408 | +169.28% | skill 1/1; base 1/1 |
+| claude-code | All cases | 708,701 | 489,549 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-dpa-hl-tracer.explicit-positive.v1 | 273,066 | 122,202 | +150,864 | +123.45% | skill 1/1; base 1/1 |
+| claude-code | doca-dpa-hl-tracer.implicit-positive.v1 | 405,267 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-dpa-hl-tracer.implicit-positive.v2 | N/A | 245,563 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-dpa-hl-tracer.negative.v1 | 30,368 | 121,784 | -91,416 | -75.06% | skill 1/1; base 1/1 |
+| codex | All cases | 427,783 | 203,319 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-dpa-hl-tracer.explicit-positive.v1 | 142,188 | 25,732 | +116,456 | +452.57% | skill 1/1; base 1/1 |
 | codex | doca-dpa-hl-tracer.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-dpa-hl-tracer.implicit-positive.v2 | 308,882 | 121,751 | +187,131 | +153.70% | skill 1/1; base 1/1 |
-| codex | doca-dpa-hl-tracer.negative.v1 | 41,728 | 14,016 | +27,712 | +197.72% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,143,697 | 708,733 | N/A | N/A | skill 6/8; base 6/8 |
+| codex | doca-dpa-hl-tracer.implicit-positive.v2 | 271,681 | 163,653 | +108,028 | +66.01% | skill 1/1; base 1/1 |
+| codex | doca-dpa-hl-tracer.negative.v1 | 13,914 | 13,934 | -20 | -0.14% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,136,484 | 692,868 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -82,11 +82,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/tools/doca-dpa-hl-tracer/SKILL.md`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-dpa-hl-tracer/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-dpa-hl-tracer`)
 - **LOW** QUALITY/quality_discoverability: Description very long (1013 chars, recommend 50-150) (`skills/tools/doca-dpa-hl-tracer/SKILL.md`)
 - **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/tools/doca-dpa-hl-tracer/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/tools/doca-dpa-hl-tracer/SKILL.md`)
-- 6 additional finding(s) are available in the full evaluation artifacts.
+- 7 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

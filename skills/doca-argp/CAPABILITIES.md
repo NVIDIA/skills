@@ -78,23 +78,27 @@ validation and JSON-config validation Just Work. The enum has
 | `DOCA_ARGP_TYPE_STRING` | `--my-flag VALUE` | `"my-flag": "VALUE"` | File paths, free-form strings |
 | `DOCA_ARGP_TYPE_INT` | `--my-flag 1234` | `"my-flag": 1234` | Queue depth, message size cap, max-num-tasks |
 | `DOCA_ARGP_TYPE_BOOLEAN` | `--my-flag` (presence sets true) | `"my-flag": true` | Enable a code path that is off by default |
-| `DOCA_ARGP_TYPE_DEVICE` | `--my-flag <PCI>` | `"my-flag": "<PCI>"` | A PCIe-address-bearing flag whose value the Arg Parser opens as a `doca_dev` for you (e.g. `--device 0000:03:00.0`) — preferred over hand-rolling the device open via `DOCA_ARGP_TYPE_STRING` |
-| `DOCA_ARGP_TYPE_DEVICE_REP` | `--my-flag <rep>` | `"my-flag": "<rep>"` | A representor-name-bearing flag whose value the Arg Parser opens as a `doca_dev_rep` for you (e.g. `--representor pf0vf0`) — DPU-side counterpart to `_TYPE_DEVICE` |
+| `DOCA_ARGP_TYPE_DEVICE` | `--my-flag pci/<BDF>[,devargs]` | `"my-flag": {"type": "pci", "identifier": "<BDF>"}` (optional `"devargs"`) | A device flag whose value the Arg Parser opens as a `doca_dev` for you (e.g. `--device pci/0000:03:00.0`) — preferred over hand-rolling the device open via `DOCA_ARGP_TYPE_STRING` |
+| `DOCA_ARGP_TYPE_DEVICE_REP` | `--my-flag pci/<BDF>,<rep>[,devargs]` | `"my-flag": {"type": "pci", "identifier": "<BDF>,<rep>"}` (optional `"devargs"`) | A representor flag whose value the Arg Parser opens as a `doca_dev_rep` for you (e.g. `--representor pci/08:00.0,pf0vf1`) — DPU-side counterpart to `_TYPE_DEVICE` |
 | `DOCA_ARGP_TYPE_DOUBLE` | `--my-flag 12.5` | `"my-flag": 12.5` | Floating-point knobs (e.g. timeouts in seconds, fractional caps) |
 | JSON config file *(special, not a type)* | `--json /path/to/file.json` (or `-j`) | n/a (this IS the JSON file) | Drive any of the above from a file instead of expanding argv. The real flag is `--json` / `-j`, NOT `--json-config` — do not invent the longer name. |
 
-**The standard DOCA CLI surface.** Every shipped sample already
-registers these (via `doca_argp_init` and a small set of
-default params) so the user learns ONE CLI for all of DOCA.
+**The standard DOCA CLI surface.** `doca_argp_init` registers a fixed
+set of built-in DOCA flags (printed under "DOCA Flags" by `--help`) so
+the user learns ONE CLI for all of DOCA. Device / representor flags
+(e.g. `--device`, `--representor`) are NOT built-in: each program
+registers its own, typically as `DOCA_ARGP_TYPE_DEVICE` / `_DEVICE_REP`
+(syntax `pci/<BDF>[,devargs]`; representor `pci/<BDF>,pf0vf1`).
 Modifications must preserve this surface.
 
 | Flag | Value type | Meaning |
 | --- | --- | --- |
-| `--device <PCI>` | String (PCIe address, e.g. `0000:03:00.0`) | Which `doca_dev` the program opens |
-| `--representor <name>` | String (representor name, e.g. `pf0vf0`) | Which `doca_dev_rep` the DPU side opens (Comch and similar libraries) |
-| `--rep-list` | Bool flag | Print the visible representors and exit (DPU-side discovery) |
+| `-h` / `--help` | Bool flag | Print the help synopsis (DOCA Flags + Program Flags) and exit |
+| `-v` / `--version` | Bool flag | Print program version information and exit |
+| `-l <N>` / `--log-level <N>` | Numeric level: 10=DISABLE, 20=CRITICAL, 30=ERROR, 40=WARNING, 50=INFO, 60=DEBUG, 70=TRACE | Set the program (app-side) DOCA Log level for this run |
 | `--json <path>` / `-j <path>` | String (path to a JSON file) | Read parameter values from a JSON file instead of expanding argv. The flag is registered as `--json` (`-j`) by `doca_argp.cpp::register_param` (the internal static helper; the public entry point is `doca_argp_register_param`); the bundle previously called this `--json-config`, which is not the real flag. |
-| `--sdk-log-level <level>` | String (one of the DOCA Log level names) | Set the SDK-side DOCA Log threshold for this run |
+| `--sdk-log-level <N>` | Numeric level, same 10-70 scale (e.g. `60` = DEBUG) | Set the SDK-side DOCA Log threshold for this run |
+| `--log-filter <list>` | String (comma-separated module names) | Filter logs from specific modules |
 
 **JSON-config integration.** The `--json <path>` flag (also
 short-form `-j <path>`; the long name is `--json`, NOT

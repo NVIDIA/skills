@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill for BlueField-3 (BF3) day-1 platform bring-up via the classic RShim/BFB path: pushing a BlueField bundle (BFB) to the DPU over RShim with bfb-install from the host, the host-to-DPU TMFIFO management channel, RShim daemon state and console-over-rshim, DPU mode selection via mlxconfig, post-BFB recovery, a six-state BlueField-state classifier, and verifying the install. <br>
+Guides BlueField-3 (BF3) day-1 platform bring-up over the classic RShim/BFB path — pushing a BlueField bundle with bfb-install, bringing up the host-to-DPU TMFIFO management channel, selecting DPU mode via mlxconfig, recovering a DPU after a failed push, and verifying the install. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and operators performing BlueField-3 day-1 platform bring-up, BFB image deployment over RShim, DPU recovery, and install verification on physical BF3 hardware. <br>
+External DOCA operators and engineers bringing up a physical BlueField-3 DPU use this skill to push a BFB image over the RShim interface, recover a DPU that did not come back after a failed install, route mutating mode/firmware changes to the hardware-safety policy, and verify a healthy host-side and Arm-side DOCA deployment. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,13 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [BF3 deployment details](references/details.md) <br>
-- [NVIDIA DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
+- [BF3 deployment reference details](references/details.md) <br>
+- [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline shell code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -44,18 +42,18 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (2 positive, 1 negative), 1 attempt per task, each in an isolated k8s-sandbox pod. <br>
+3 evaluation tasks (2 positive, 1 negative), 1 attempt per task, each run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct — final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed — skill selection, decoy avoidance, and workflow execution. <br>
-- Effectiveness: Whether the skill helped complete the task — goal completion (50%) and expected workflow adherence (50%). <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage — tool-call productivity (50%) and token efficiency (50%). <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct against the reference answer? <br>
+- Discoverability: Was the right skill loaded when needed and decoys avoided? <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
@@ -68,15 +66,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.0% | 95.9% |
+| Overall | 96.7% (uplift unavailable) | 98.0% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 80.0% → 100.0% (+20.0 points) | 73.3% → 100.0% (+26.7 points) |
-| Discoverability | 100.0% | 90.0% |
-| Effectiveness | 76.1% → 100.0% (+23.9 points) | 60.0% → 98.3% (+38.3 points) |
-| Efficiency | 89.7% | 91.1% |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 80.6% → 100.0% (+19.4 points) | 66.9% → 100.0% (+33.1 points) |
+| Efficiency | 83.3% (uplift unavailable) | 94.9% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-d2dda0c (source: git SHA, committed 2026-10-12) <br>
+946399d (source: git SHA, committed 2026-10-21) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

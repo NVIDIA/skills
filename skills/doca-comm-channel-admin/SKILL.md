@@ -19,6 +19,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: tool
+  doca_version: "3.5"
   tags:
     - doca
     - comch
@@ -59,7 +60,7 @@ error layers. Do not open every companion file.
 
 **Where to start:** This is a tool skill for invoking the DOCA Comm
 Channel Admin Tool — the **read-only inventory** CLI counterpart
-to the [`doca-comch`](../../libs/doca-comch/SKILL.md) library. The
+to the `doca-comch/SKILL.md` library. The
 shipped `doca_comm_channel_admin` binary takes **no arguments
 beyond ARGP defaults** (`--help`, `--version`, `--log-level`,
 `--sdk-log-level`, `--json`) and performs **one inventory pass**
@@ -75,18 +76,18 @@ a different channel set than the program. Open
 the capabilities companion when the question is *what
 the printed tables actually mean* and *what is not in this
 tool's scope*. If the user has not installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first; if the user
+`doca-setup/SKILL.md` first; if the user
 needs MFT (`resourcedump` on `PATH` with the privilege documented
 for the installed release), `doca-setup` + `doca-public-knowledge-map`
 cover that. If the user is holding pre-2.5 docs that mention
 "Comm Channel", route to
-[`doca-comch`](../../libs/doca-comch/SKILL.md)
+`doca-comch/SKILL.md`
 for the rename rule. If the user wants to *change* channel
 state, route to the program-side
-reconnect lifecycle in [`doca-comch`](../../libs/doca-comch/SKILL.md)
+reconnect lifecycle in `doca-comch/SKILL.md`
 or to BlueField mode / driver reload in
-[`doca-setup`](../../doca-setup/SKILL.md) +
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) — **not**
+`doca-setup/SKILL.md` +
+`doca-hardware-safety/SKILL.md` — **not**
 to this tool.
 
 ## Example questions this skill answers well
@@ -118,7 +119,7 @@ the worked example is one instance.
   tool available on DOCA 2.4"*. Answered by the overlay in
   the capabilities companion,
   which redirects to the canonical
-  [`doca-version`](../../doca-version/SKILL.md) rules and adds the
+  `doca-version/SKILL.md` rules and adds the
   Comm Channel Admin Tool specifics.
 - **"The tool prints nothing — is the install broken or is there
   genuinely no channel?"** — worked example: *"`list` returned an
@@ -131,7 +132,7 @@ the worked example is one instance.
 
 This skill serves **external operators and AI agents who need to
 inventory a host-DPU comch channel from the outside**
-— after the [`doca-comch`](../../libs/doca-comch/SKILL.md) library
+— after the `doca-comch/SKILL.md` library
 has been used to create the channel from a program. Concretely:
 
 - A platform operator who runs a Comch-using service on BlueField
@@ -147,7 +148,7 @@ It is **not** for users debugging the admin tool itself, **not** a
 substitute for the live public DOCA Comm Channel Admin Tool guide,
 and **not** the right place for users learning the comch API —
 that audience belongs in
-[`doca-comch`](../../libs/doca-comch/SKILL.md).
+`doca-comch/SKILL.md`.
 
 The tool is shipped as a CLI binary under
 `/opt/mellanox/doca/tools/`, not a library you link against. The
@@ -175,9 +176,9 @@ the right device passthrough). Concretely:
 Do **not** load this skill for general DOCA orientation, the comch
 programming API, library install, or comch protocol design. For
 those, route to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
-[`doca-comch`](../../libs/doca-comch/SKILL.md), or
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`,
+`doca-comch/SKILL.md`, or
+`doca-setup/SKILL.md`.
 
 ## What this skill provides
 
@@ -186,11 +187,11 @@ companion files:
 
 - the capabilities companion — what the Comm Channel Admin Tool reports:
   the two read-only tables, the version-availability overlay
-  that redirects to [`doca-version`](../../doca-version/SKILL.md),
+  that redirects to `doca-version/SKILL.md`,
   the layered error taxonomy (tool-not-installed / device-binding
   / channel-discovery / channel-state-stuck / permission /
   version / cross-cutting), the tool's role as an observability
-  primitive for [`doca-comch`](../../libs/doca-comch/SKILL.md)
+  primitive for `doca-comch/SKILL.md`
   debug sessions, and the read-only safety policy.
 - the tasks companion — step-by-step workflows for the in-scope task verbs:
   `configure` (route to install), `build` (route to install),
@@ -198,7 +199,7 @@ companion files:
   (cross-check the printed rows), `debug` (the layered
   diagnosis ladder), plus a `Deferred task verbs` block and a
   `Command appendix` that honors the bundle's
-  [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+  `doca-structured-tools-contract/SKILL.md`
   preamble.
 
 The skill assumes a host or BlueField where DOCA is already
@@ -244,27 +245,27 @@ pull requests should not add:
 
 ## Related skills
 
-- [`doca-comch`](../../libs/doca-comch/SKILL.md) — the library
+- `doca-comch/SKILL.md` — the library
   whose channels this tool inventories. Pair them in every
   triage session: the program-side connection callback and the
   admin tool's channel state are the two halves of the same
   picture.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA Comm Channel Admin Tool guide and
   the rest of the public DOCA documentation set.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+- `doca-version/SKILL.md` — canonical DOCA
   version-handling rules. The `## Version compatibility` section
   in the capabilities companion is a concise overlay
   that redirects here for the body.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle's detect → prefer → fall back → report contract for
   structured helper tools. The Command appendix in
   the tasks companion honors this contract.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+- `doca-setup/SKILL.md` — env preparation,
   install verification, representor visibility checks, and the
   *I have no install yet* path with the public NGC DOCA
   container. This skill assumes its preconditions are satisfied.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder. The Comm Channel Admin Tool slots in at the
   *runtime* layer as the read-only inventory surface before any
   code change is recommended.

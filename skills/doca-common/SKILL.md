@@ -20,6 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca@nvidia.com>
   kind: library
+  doca_version: "3.5"
   tags:
     - doca
     - common
@@ -107,7 +108,7 @@ the load-bearing piece — the worked example is a single instance.
   + the run-loop pattern in ## run.
 - **"Why don't my DOCA log lines appear at the level I expect, and
   what's the difference between `--sdk-log-level` and the app-side
-  setter?"** — worked example: *"I set `--sdk-log-level DEBUG`, my
+  setter?"** — worked example: *"I set `--sdk-log-level 60` (DEBUG), my
   own `DOCA_LOG_DBG` lines still don't print"*. Answered by the
   two-tier log model in ## log
   + the tier-flip iteration in ## log.

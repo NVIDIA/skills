@@ -5,24 +5,26 @@
       "id": "using-ovnewton-basic",
       "prompt": "Use using-ovnewton to show a minimal CPU simulation that connects a USD scene to Newton through ovstage. Return runnable Python and the install and smoke commands; no rendering is needed.",
       "expected_skill": "using-ovnewton",
-      "expected_output": "Registers schemas, populates and seals ordinal 1, calls add_ovstage, finalizes with has_orphan_joints, creates XPBD, model states/control/contacts, computes collisions, steps, swaps states, publishes and seals output. Includes pip install ovnewton and the packaged CPU smoke command.",
+      "expected_output": "Registers schemas, populates through population.open_usd_with_desc with ovnewton.population_desc() and seals ordinal 1, calls add_ovstage, finalizes with has_orphan_joints, creates XPBD, model states/control/contacts, computes collisions, steps, swaps states, publishes and seals output. Includes pip install ovnewton and the packaged CPU smoke command.",
       "assertions": [
         "Reads using-ovnewton/SKILL.md.",
         "Newton consumes ovstage rather than parsing USD.",
         "Seals population before import and output after publication.",
-        "Application owns the solver and stepping loop."
+        "Application owns the solver and stepping loop.",
+        "Preserves composed schema names with ovnewton.population_desc() and supplies population.DEFAULT_TIME."
       ]
     },
     {
       "id": "using-ovnewton-existing-stage",
       "prompt": "Our application already populated an ovstage and sealed it at ordinal 12. Connect Newton physics to this Omniverse simulation without reloading USD, and publish the next result at ordinal 13. Return the integration snippet.",
       "expected_skill": "using-ovnewton",
-      "expected_output": "Reuses the stage, passes ordinal=12 to add_ovstage and attach_ovstage, finalizes with the import result, then publishes and seals at ordinal 13.",
+      "expected_output": "Reuses the stage, passes ordinal=12 to add_ovstage and attach_ovstage, finalizes with the import result, then publishes and seals at ordinal 13. Explains that complete unsupported-physics validation requires composed apiSchemas metadata preserved during population.",
       "assertions": [
         "Reads using-ovnewton/SKILL.md.",
         "Does not recreate the stage or reload USD.",
         "Uses the actual sealed ordinal for import and binding.",
-        "Publishes and seals output at ordinal 13."
+        "Publishes and seals output at ordinal 13.",
+        "Explains the schema metadata prerequisite without recreating the supplied stage."
       ]
     },
     {
@@ -54,12 +56,13 @@
       "id": "using-ovnewton-rendering",
       "prompt": "I want Newton physics driving an Omniverse ovstage rendered with OVRTX. Give installation and example commands and explain the frame handoff; assume I have a supported NVIDIA GPU.",
       "expected_skill": "using-ovnewton",
-      "expected_output": "Installs ovnewton[examples], runs the packaged basic example with rendering, and explains publish/seal before rendering and independent physics/render device selection.",
+      "expected_output": "Installs ovnewton[examples], runs the packaged basic example with rendering, and explains publish/seal before rendering and independent physics/render device selection. Explains GPU_INCREMENTAL hierarchy configuration for caller-owned rendering stages, including CPU physics, and combines rendering and ovnewton population descriptors.",
       "assertions": [
         "Reads using-ovnewton/SKILL.md.",
         "Installs the examples extra.",
         "Uses public packaged examples rather than internal launchers.",
-        "Seals published output before rendering."
+        "Seals published output before rendering.",
+        "Uses compatible OVStage 0.3 and OVRTX 0.6 and explains process-wide GPU hierarchy configuration."
       ]
     },
     {

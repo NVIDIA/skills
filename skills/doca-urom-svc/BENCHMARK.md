@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-urom-svc`
-- Evaluation date: 2026-10-12
+- Evaluation date: 2026-10-22
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-sonnet-5-5`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:ea16cc085828d2133e3ded6b24d1d0cc8cb949802c1ddac4c03c2ddb9c1c05f9` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 98.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 92.8% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 70.0% → 100.0% (+30.0 points) |
+| Correctness | 65.0% → 100.0% (+35.0 points) | 65.0% → 100.0% (+35.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 60.0% → 100.0% (+40.0 points) | 48.8% → 100.0% (+51.2 points) |
-| Efficiency | 86.7% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 38.8% → 95.6% (+56.8 points) | 44.8% → 86.3% (+41.5 points) |
+| Efficiency | 68.5% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,029,689 | 496,175 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-urom-svc.explicit-positive.v1 | 286,205 | 182,540 | +103,665 | +56.79% | skill 1/1; base 1/1 |
-| claude-code | doca-urom-svc.implicit-positive.v1 | 384,732 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-urom-svc.implicit-positive.v2 | N/A | 189,495 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-urom-svc.negative.v1 | 358,752 | 124,140 | +234,612 | +188.99% | skill 1/1; base 1/1 |
-| codex | All cases | 537,200 | 162,581 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-urom-svc.explicit-positive.v1 | 199,626 | 38,625 | +161,001 | +416.83% | skill 1/1; base 1/1 |
-| codex | doca-urom-svc.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-urom-svc.implicit-positive.v2 | 299,069 | 109,590 | +189,479 | +172.90% | skill 1/1; base 1/1 |
-| codex | doca-urom-svc.negative.v1 | 38,505 | 14,366 | +24,139 | +168.03% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,566,889 | 658,756 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 627,493 | 307,007 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-urom-svc.explicit-positive.v1 | 163,123 | 60,308 | +102,815 | +170.48% | skill 1/1; base 1/1 |
+| claude-code | doca-urom-svc.implicit-positive.v1 | 403,136 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-urom-svc.implicit-positive.v2 | N/A | 123,974 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-urom-svc.negative.v1 | 61,234 | 122,725 | -61,491 | -50.10% | skill 1/1; base 1/1 |
+| codex | All cases | 457,663 | 238,550 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-urom-svc.explicit-positive.v1 | 188,668 | 45,217 | +143,451 | +317.25% | skill 1/1; base 1/1 |
+| codex | doca-urom-svc.implicit-positive.v1 | 243,396 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-urom-svc.implicit-positive.v2 | N/A | 125,699 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-urom-svc.negative.v1 | 25,599 | 67,634 | -42,035 | -62.15% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,085,156 | 545,557 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,12 +81,36 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
+  "## Error taxonomy" in CAPABILITIES.md (lines 259-266)
+  vs "## debug" in TASKS.md (lines 361-368) (`CAPABILITIES.md:259`)
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md:
+  "## Pattern overview" in CAPABILITIES.md (lines 23-30)
+  vs "## Pattern overview" in CAPABILITIES.md (lines 32-49)
+  vs "### Service shape" in CAPABILITIES.md (lines 57-98)
+  vs "### Publisher / executor paired-contract model" in CAPABILITIES.md (lines 99-122)
+  vs "## Deployment shape" in CAPABILITIES.md (lines 123-153)
+  vs "### Configuration axes" in CAPABILITIES.md (lines 162-167)
+  vs "### Pairing surface — host library plus RDMA substrate" in CAPABILITIES.md (lines 184-201)
+  vs "## Version compatibility" in CAPABILITIES.md (lines 202-257)
+  vs "## Error taxonomy" in CAPABILITIES.md (lines 267-272)
+  vs "## Safety policy" in CAPABILITIES.md (lines 351-451)
+  vs "# DOCA UROM Service" in SKILL.md (lines 1-8)
+  vs "## Instructions" in SKILL.md (lines 18-45)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 50-111)
+  vs "## Audience" in SKILL.md (lines 115-155)
+  vs "## When to load this skill" in SKILL.md (lines 156-202)
+  vs "## What this skill provides" in SKILL.md (lines 203-236)
+  vs "## What this skill deliberately does not ship" in SKILL.md (lines 237-282)
+  vs "## Related skills" in SKILL.md (lines 300-361)
+  vs "## configure" in TASKS.md (lines 24-134)
+  vs "## run" in TASKS.md (lines 280-286)
+  vs "## debug" in TASKS.md (lines 369-441)
+  vs "## Cross-cutting" in TASKS.md (lines 550-571) (`CAPABILITIES.md:23`)
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/services/doca-urom-svc/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/services/doca-urom-svc`)
 - **LOW** QUALITY/quality_discoverability: Description very long (663 chars, recommend 50-150) (`skills/services/doca-urom-svc/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/services/doca-urom-svc/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No prerequisites/requirements documented (`skills/services/doca-urom-svc/SKILL.md`)
-- **LOW** QUALITY/quality_reliability: No limitations documented (`skills/services/doca-urom-svc/SKILL.md`)
-- 5 additional finding(s) are available in the full evaluation artifacts.
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-sha-offload-engine`
-- Evaluation date: 2026-10-13
+- Evaluation date: 2026-10-21
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.9% — baseline ran, but no comparable score was available; uplift unavailable | 95.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.8% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 56.3% → 81.3% (+25.0 points) | 56.3% → 95.0% (+38.7 points) |
-| Efficiency | 73.3% — baseline ran, but no comparable score was available; uplift unavailable | 90.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 53.8% → 87.5% (+33.7 points) | 65.0% → 93.8% (+28.8 points) |
+| Efficiency | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 83.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 811,277 | 535,142 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-sha-offload-engine.explicit-positive.v1 | 264,500 | 155,559 | +108,941 | +70.03% | skill 1/1; base 1/1 |
-| claude-code | doca-sha-offload-engine.implicit-positive.v1 | 484,537 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-sha-offload-engine.implicit-positive.v2 | N/A | 256,595 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-sha-offload-engine.negative.v1 | 62,240 | 122,988 | -60,748 | -49.39% | skill 1/1; base 1/1 |
-| codex | All cases | 441,126 | 165,067 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-sha-offload-engine.explicit-positive.v1 | 168,609 | 46,343 | +122,266 | +263.83% | skill 1/1; base 1/1 |
-| codex | doca-sha-offload-engine.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-sha-offload-engine.implicit-positive.v2 | 241,405 | 104,837 | +136,568 | +130.27% | skill 1/1; base 1/1 |
-| codex | doca-sha-offload-engine.negative.v1 | 31,112 | 13,887 | +17,225 | +124.04% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,252,403 | 700,209 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 555,354 | 400,610 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-sha-offload-engine.explicit-positive.v1 | 159,321 | 90,936 | +68,385 | +75.20% | skill 1/1; base 1/1 |
+| claude-code | doca-sha-offload-engine.implicit-positive.v1 | N/A | 248,244 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-sha-offload-engine.implicit-positive.v2 | 365,130 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-sha-offload-engine.negative.v1 | 30,903 | 61,430 | -30,527 | -49.69% | skill 1/1; base 1/1 |
+| codex | All cases | 550,894 | 165,294 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-sha-offload-engine.explicit-positive.v1 | 173,056 | 50,609 | +122,447 | +241.95% | skill 1/1; base 1/1 |
+| codex | doca-sha-offload-engine.implicit-positive.v1 | 346,699 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-sha-offload-engine.implicit-positive.v2 | N/A | 100,580 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-sha-offload-engine.negative.v1 | 31,139 | 14,105 | +17,034 | +120.77% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,106,248 | 565,904 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -81,12 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-sha-offload-engine/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-sha-offload-engine`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`BENCHMARK.md:85`)
 - **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`BENCHMARK.md:86`)
 - **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`BENCHMARK.md:87`)
 - **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`BENCHMARK.md:88`)
-- 13 additional finding(s) are available in the full evaluation artifacts.
+- 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
