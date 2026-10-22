@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when choosing or running NeMo Relay installation for the CLI, Python, Node.js, Rust, OpenClaw, Hermes, or maintained framework integrations before runtime configuration or quick-start setup. <br>
+Use this skill when choosing or running NeMo Relay installation for an agent runtime, application language, framework integration, or plugin bundle, or checking a runtime's native Relay readiness. Do not use it for first-run instrumentation or export configuration. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers installing the NeMo Relay CLI, language packages (Python, Node.js, Rust), or maintained framework integrations (LangChain, LangGraph, Deep Agents, OpenClaw, Hermes) before runtime configuration. <br>
+Developers and engineers use this skill to disambiguate the intended NeMo Relay install target (CLI/host integration, maintained framework or plugin integration, or an application-owned language binding), install the current stable package or executable from authoritative sources, and verify availability without extending into configuration, scopes, or a model-consuming trial. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,11 +26,10 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [CLI Installation](references/cli-install.md) <br>
-- [Language Package Installation](references/language-packages.md) <br>
-- [Maintained Integration Installation](references/maintained-integrations.md) <br>
-- [Installation (NVIDIA Docs)](https://docs.nvidia.com/nemo/relay/getting-started/installation) <br>
-- [Prerequisites (NVIDIA Docs)](https://docs.nvidia.com/nemo/relay/getting-started/prerequisites) <br>
-- [GitHub Repository](https://github.com/NVIDIA/NeMo-Relay/) <br>
+- [Language Packages](references/language-packages.md) <br>
+- [Maintained Integrations](references/maintained-integrations.md) <br>
+- [NeMo Relay Installation Guide](https://docs.nvidia.com/nemo/relay/getting-started/installation) <br>
+- [NeMo Relay Support Matrix](https://docs.nvidia.com/nemo/relay/reference/support-matrix) <br>
 
 
 ## Skill Output: <br>
@@ -40,44 +39,45 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`aws/anthropic/bedrock-claude-sonnet-5-5`) <br>
+- Codex (`openai/openai/gpt-5.5`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 10 tasks (9 positive skill-activation, 1 negative) in NVSkills-Eval external profile, astra-sandbox environment, 1 attempt per task, 50% pass threshold. <br>
+15 evaluation tasks (14 positive, 1 negative), each attempt run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is it safe to use? Checks unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed, with decoys avoided? <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 8 | 100% (+0%) | 95% (+0%) |
-| Correctness | 8 | 82% (+65%) | 84% (+22%) |
-| Discoverability | 8 | 78% (+61%) | 84% (+48%) |
-| Effectiveness | 8 | 80% (+59%) | 77% (+23%) |
-| Efficiency | 8 | 76% (+41%) | 82% (+44%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 77.2% — uplift unavailable | 69.7% — uplift unavailable |
+| Security | 70.0% → 76.7% (+6.7 points) | 73.3% → 76.7% (+3.4 points) |
+| Correctness | 50.7% → 82.7% (+32.0 points) | 52.0% → 81.3% (+29.3 points) |
+| Discoverability | 92.8% — uplift unavailable | 71.8% — uplift unavailable |
+| Effectiveness | 35.9% → 59.0% (+23.1 points) | 27.1% → 53.1% (+26.0 points) |
+| Efficiency | 75.0% — uplift unavailable | 65.7% — uplift unavailable |
 
 ## Skill Version(s): <br>
-0.6.0-alpha.20260715 (source: git tag) <br>
+41cf25e2 (source: git SHA, committed 2026-10-22) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
