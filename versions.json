@@ -1789,16 +1789,16 @@
     {
       "name": "nemo-relay-get-started",
       "path": "skills/nemo-relay-get-started",
-      "content_digest": "sha256:6c8b75a699b43af661522be5e6ab700a233fbd4da135172cece1ed1d5b0dd314",
-      "last_commit": "871e31335a0d7fc84284574feb8426ab70338c41",
-      "last_modified": "2026-08-24"
+      "content_digest": "sha256:9931e128807ab5b9324b837f1bfce25b011af0a84349e689c9382b5303a13c2d",
+      "last_commit": "ad6987ab201ab2e26e6a974d1830532741a52c91",
+      "last_modified": "2026-10-22"
     },
     {
       "name": "nemo-relay-install",
       "path": "skills/nemo-relay-install",
-      "content_digest": "sha256:771899e09fb4a1bc9e457b00da4dafc9b64ee56a75d757886187dec853da7394",
-      "last_commit": "31bd53822c1ac5998a23bd5f7c9efb5aefe99ca2",
-      "last_modified": "2026-07-17"
+      "content_digest": "sha256:566327079cfdeb76702c1994c15fd59d614c23ef2bdbe5adb2cc657ad90e6200",
+      "last_commit": "ad6987ab201ab2e26e6a974d1830532741a52c91",
+      "last_modified": "2026-10-22"
     },
     {
       "name": "nemo-relay-instrument-calls",
