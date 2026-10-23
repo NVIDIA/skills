@@ -9,7 +9,7 @@ team_channel: router-help-support
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# ethos.md: router-help
+# ETHOS.md: router-help
 
 ## Role
 

@@ -88,12 +88,12 @@
     "question": "While tracing a cost-vs-emissions frontier for a plant-scheduling MILP with per-solve time limits, three of an analyst's epsilon-constraint solves hit their limit but returned feasible solutions. He asks: 'Can I include those points in the tradeoff table I hand my team?' Advise him.",
     "expected_skill": "cuopt-multi-objective-exploration",
     "expected_script": null,
-    "ground_truth": "The agent says yes, keep the time-limited incumbents — they are feasible and near the frontier — but only with provenance: every point in the table is tagged exact (proved optimal for its scalarization at the gap setting) or approximate (time-limited incumbent or heuristics-only result), each time-limited incumbent quoting its solver-reported remaining gap or bound (a heuristics-only point has no bound, which is itself stated), and the two counts are reported alongside the frontier (e.g. '14 points, 11 exact, 3 approximate near the low-cost end, worst gap 2%'). The mixed frontier is never presented as uniformly optimal; silently including the points and discarding them are both wrong. Optionally it notes that a persistently slow region can be populated with a short heuristics-only run (also tagged approximate) and that a larger per-solve budget can later upgrade approximate points to exact.",
+    "ground_truth": "The agent says yes, keep the time-limited incumbents — they are feasible and near the frontier — but only with provenance: every point in the table is tagged exact (proved optimal for its scalarization at the gap setting) or approximate (time-limited incumbent), each time-limited incumbent quoting its solver-reported remaining gap or bound, and the two counts are reported alongside the frontier (e.g. '14 points, 11 exact, 3 approximate near the low-cost end, worst gap 2%'). The mixed frontier is never presented as uniformly optimal; silently including the points and discarding them are both wrong. Optionally it notes that a larger per-solve budget can later upgrade approximate points to exact.",
     "expected_behavior": [
       "Keeps the feasible time-limited incumbents rather than discarding them",
       "Tags every reported point exact or approximate and reports the two counts with the frontier",
       "Never presents the mixed frontier as uniformly optimal; approximate points are identified, not silently included",
-      "Distinguishes proved-optimal-at-gap (exact) from time-limited or heuristics-only results (approximate), quoting each incumbent's reported gap or bound and noting heuristics-only points carry none",
+      "Distinguishes proved-optimal-at-gap (exact) from time-limited results (approximate), quoting each incumbent's reported gap or bound",
       "Leaves the tradeoff choice to the team; the table shows options, not one answer"
     ]
   },

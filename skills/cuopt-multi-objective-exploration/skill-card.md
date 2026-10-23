@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to explore multi-objective tradeoffs (cost vs. service level, return vs. risk, makespan vs. overtime) by generating and interpreting Pareto frontiers from sequences of cuOpt LP, MILP, or QP solves. <br>
+Developers, analysts, and optimization engineers use this skill when an LP, MILP, QP, or routing problem has two or more competing objectives with no agreed weighting, to build a payoff table, sweep weighted-sum or ε-constraint scalarizations with cuOpt, fill frontier gaps, and report tradeoffs, exchange rates, and knee points so the user can choose a solution. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,54 +26,57 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [cuOpt User Guide](https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html) <br>
-- [cuopt-examples](https://github.com/NVIDIA/cuopt-examples) <br>
+- [cuOpt API Reference](https://docs.nvidia.com/cuopt/user-guide/latest/api.html) <br>
+- [cuopt-examples repository](https://github.com/NVIDIA/cuopt-examples) <br>
+- [Skill Benchmark (BENCHMARK.md)](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Configuration instructions] <br>
-**Output Format:** [Markdown with structured tables and code blocks] <br>
+**Output Type(s):** [Analysis, Code, Configuration instructions] <br>
+**Output Format:** [Markdown with inline pseudocode and code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Frontier points are reported with provenance tags (exact vs. approximate) and the scalarization (weights or ε values) used for each point] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-8 evaluation tasks (6 positive, 2 negative) run in isolated sandbox pods. <br>
+8 evaluation tasks (6 positive, 2 negative), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`), evaluator version `1.5.6`; overall verdict PASS. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Is it safe to use? Scored from the `security` signal (100%). <br>
+- Correctness: Is the answer correct? Scored from the `accuracy` signal (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal (100%). <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` and `behavior_check`. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% `skill_efficiency` (tool-call productivity) and 50% `token_efficiency`. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 65% → 97% (+33 points) | 67% → 90% (+23 points) |
-| Security | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Correctness | 95% → 100% (+5 points) | 95% → 100% (+5 points) |
-| Discoverability | 25% → 100% (+75 points) | 44% → 84% (+40 points) |
-| Effectiveness | 79% → 87% (+8 points) | 73% → 85% (+12 points) |
-| Efficiency | 25% → 100% (+75 points) | 25% → 83% (+58 points) |
+| Overall | 89.1% — baseline ran, but no comparable score was available; uplift unavailable | 82.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 67.5% → 100.0% (+32.5 points) | 90.0% → 85.0% (-5.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 46.9% → 48.5% (+1.6 points) | 65.9% → 62.9% (-3.0 points) |
+| Efficiency | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 69.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-26.10.00 (source: frontmatter) <br>
+26.12.00 (source: frontmatter, matches repo README version badge) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
