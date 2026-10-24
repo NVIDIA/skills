@@ -89,12 +89,13 @@ per the headers-win-over-docs rule in
 
 | Header | Domain | Counter family it reads | Per-domain cap query |
 | --- | --- | --- | --- |
-| `doca_telemetry_pcc.h` | Programmable Congestion Control | Per-algo-slot info + the PCC counter set (`doca_telemetry_pcc_get_counters` / `_get_and_clear_counters`, `_get_num_counters`, `_get_counter_info`, `_get_algo_*`) | `doca_telemetry_pcc_cap_is_supported(devinfo)` (plus `_cap_rep_is_supported` for the representor path and `_cap_get_max_*` sizing caps) |
+| `doca_telemetry_pcc.h` | Programmable Congestion Control | Per-algo-slot info + the PCC counter set (`doca_telemetry_pcc_get_counters` / `_get_and_clear_counters`, `_get_num_counters`, `_get_counter_info`, `_get_algo_*`) plus PCC histogram reads (`doca_telemetry_pcc_get_histo_bins`, `_get_and_clear_histo_bins`, `_get_histo_desc`, `_get_histo_edge_info`, `_get_histo_edges`, `_get_histo_enable_status`, `_get_histo_ids_per_slot`, `_get_max_algo_slots`, `_get_max_histo_bins`, `_get_max_histo_desc_len`, `_get_max_histo_edges`, `_get_max_histo_per_slot`, `_get_max_num_counters`) | `doca_telemetry_pcc_cap_is_supported(devinfo)` (plus `doca_telemetry_pcc_cap_histo_is_supported(pcc)` for the histogram area, `_cap_rep_is_supported` for the representor path and `_cap_get_max_*` sizing caps) |
 | `doca_telemetry_dpa.h` | DPA | DPA process / thread lists, cumulative info, perf-event samples, per-counter start/restart/stop (`doca_telemetry_dpa_read_processes_list`, `_read_thread_list`, `_read_cumul_info_list`, `_read_perf_event_list`, `_counter_start`/`_counter_restart`/`_counter_stop`) | `doca_telemetry_dpa_cap_is_supported(devinfo)` |
 | `doca_telemetry_diag.h` | Device diagnostic counters | Sampled diagnostic-counter data in one of three formats (`doca_telemetry_diag_query_counters` after `_apply_config` + `_apply_counters_list_by_id` + `_start`), with sample-mode / sample-period / num-samples setters | `doca_telemetry_diag_cap_is_supported(devinfo)` (plus `_cap_get_max_num_data_ids`, `_cap_get_log_max_num_samples`, `_cap_is_data_clear_supported`, `_cap_is_sample_mode_supported`) |
 | `doca_telemetry_adp_retx.h` | Adaptive-retransmit histogram | Configurable retransmit-latency histogram (bin widths, time unit, vHCA id, clear-on-read) read off the device | `doca_telemetry_adp_retx_cap_is_supported(devinfo)` (plus `_cap_histogram_is_supported`, `_cap_get_hist_max_bins`, `_cap_get_hist_time_units`) |
-| `doca_telemetry_phy.h` | Physical layer | Operation info, supported info, troubleshooting info, module info, counter-and-BER info, FEC histogram, management-cable info (`doca_telemetry_phy_get_*_info`) | `doca_telemetry_phy_cap_is_supported(devinfo)` **plus per-sub-area caps** `doca_telemetry_phy_cap_operation_info_is_supported`, `_cap_counter_and_ber_info_is_supported`, `_cap_fec_histogram_info_is_supported`, `_cap_module_info_is_supported`, … (query the specific sub-area you intend to read) |
-| `doca_telemetry_pci.h` | PCI / PCIe | Management info, perf-counters set 1, latency histogram (`doca_telemetry_pci_read_management_info`, `_read_perf_counters_1`, `_read_latency_histogram`, plus `_by_pci_addr` variants) | **No single domain-level cap.** Query the per-feature caps: `doca_telemetry_pci_cap_management_info_is_supported`, `_cap_perf_counters_1_is_supported`, `_cap_latency_histogram_is_supported` (plus finer per-counter variants like `_cap_perf_counters_1_fec_error_is_supported`) |
+| `doca_telemetry_phy.h` | Physical layer | Operation info, supported info, troubleshooting info, system temp/power info, module info, counter-and-BER info, FEC histogram, management-cable info (`doca_telemetry_phy_get_*_info` including `_get_supported_info`, `_get_troubleshooting_info`, `_get_system_temp_and_pwr_info`, `_get_fec_histogram_info`, `_get_management_cable_ddm_info`, `_get_management_cable_dump_info`, `_get_management_cable_single_page_info`) | `doca_telemetry_phy_cap_is_supported(devinfo)` **plus per-sub-area caps** `doca_telemetry_phy_cap_operation_info_is_supported`, `_cap_counter_and_ber_info_is_supported`, `_cap_fec_histogram_info_is_supported`, `_cap_module_info_is_supported`, `_cap_management_cable_is_supported`, `_cap_supported_info_is_supported`, `_cap_system_temp_and_pwr_info_is_supported`, `_cap_troubleshooting_info_is_supported` (query the specific sub-area you intend to read) |
+| `doca_telemetry_pci.h` | PCI / PCIe | Management info, perf-counters set 1, latency histogram (`doca_telemetry_pci_read_management_info`, `_read_perf_counters_1`, `_read_latency_histogram`, plus `_by_pci_addr` variants and `doca_telemetry_pci_get_latency_histogram_dimensions_by_pci_addr`) | **No single domain-level cap.** Query the per-feature caps: `doca_telemetry_pci_cap_management_info_is_supported`, `_cap_perf_counters_1_is_supported`, `_cap_latency_histogram_is_supported` (plus finer per-counter variants like `_cap_perf_counters_1_fec_error_is_supported`) |
+
 
 **Per-domain lifecycle.** Every domain follows the same shape;
 the verbs are domain-specific (`doca_telemetry_<domain>_*`), not
@@ -171,12 +172,15 @@ lives there; this skill does not duplicate it.
   `doca-common.pc` was refreshed; route to
   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   ladder step 2 before any reader-layer diagnosis.
-- **New per-domain counters / sub-areas appear across
-  releases.** A counter family or PHY sub-area present on a newer
+- **New per-domain counters / sub-areas and public API functions/constants appear across
+  releases.** A counter family, PHY sub-area, or API function/constant present on a newer
   DOCA may be absent on the user's install; the per-domain
   cap-query is the only safe way to discover what *this* install
-  exposes. Never hardcode the available counter set in a build
-  file or assume it from a docs page.
+  exposes. Never hardcode the available counter set, API surface,
+  or constants in a build file or assume them from a docs page.
+  DOCA 3.5 added PCC histogram query functions, PCI by-address
+  read functions, PHY capability/get functions, and PHY
+  firmware/management constants.
 
 ## Error taxonomy
 
@@ -201,6 +205,19 @@ cause**. `NOT_SUPPORTED` is the cap answer (surface it, don't
 retry); `AGAIN` wants a sample-window-aware retry, not a spin;
 the others want investigation.
 
+### PHY firmware and management firmware error codes
+
+DOCA 3.5 adds PHY-specific error-code constants that are **not** part of the cross-library `DOCA_ERROR_*` taxonomy. Treat them as domain-specific status codes, not as `DOCA_ERROR_*` values.
+
+They come in two families, `DOCA_TELEMETRY_PHY_FW_*` (link-level
+firmware status, e.g. link training or signal detection) and
+`DOCA_TELEMETRY_PHY_MNG_FW_*` (module / cable management status),
+plus `DOCA_TELEMETRY_PHY_ERROR_CODE_CFG_REJECTED_INVALID_VS_SI`.
+Read the exact set from `doca_telemetry_phy.h` on the installed
+release; do not list or hardcode them.
+
+When a PHY read surfaces one of these constants, do not map it to the `DOCA_ERROR_*` rows above; surface the constant name and the PHY firmware/management firmware status it reports.
+
 ## Observability
 
 The reader's observability surface is the per-read return value
@@ -208,6 +225,14 @@ plus the per-domain cap snapshot. There is no progress-engine
 completion stream and no external event transport — visibility
 comes from inspecting each read's `doca_error_t` and the
 configure-time cap-query results.
+
+In DOCA 3.5 this surface extends to PCC histogram queries, PCI
+latency/management/perf counter reads, and PHY
+FEC/management/system/troubleshooting reads, plus the
+corresponding PCC and PHY cap queries. These are all
+`doca_telemetry_<domain>_*` read/query or
+`doca_telemetry_<domain>_cap_*` calls and are covered by the
+same two signals below.
 
 Two primary signals the agent should reach for:
 

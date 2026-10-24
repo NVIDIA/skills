@@ -7,7 +7,7 @@ author: eval-author
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# ethos.md: docs-qa
+# ETHOS.md: docs-qa
 
 ## Role
 

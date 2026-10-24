@@ -57,10 +57,15 @@ Steps the agent should walk the user through:
    versa). Sketch the call sequence per side before writing
    code.
 3. **Run capability discovery against the active `doca_devinfo`.**
-   For RX: `doca_eth_rxq_cap_get_max_burst_size` and, for each
+   For RX: `doca_eth_rxq_cap_get_max_burst_size`, for each
    RX type the user is considering,
-   `doca_eth_rxq_cap_is_type_supported(devinfo, type)`. For TX:
-   `doca_eth_txq_cap_get_max_send_buf_list_len` and, if the
+   `doca_eth_rxq_cap_is_type_supported(devinfo, type)`, and for
+   each CQE format under consideration,
+   `doca_eth_rxq_cap_is_cqe_format_supported(devinfo, format)`.
+   The CQE format values are the `DOCA_ETH_RXQ_CQE_FORMAT_*`
+   family in the DOCA Ethernet public header. For TX:
+   `doca_eth_txq_cap_get_max_send_buf_list_len`,
+   `doca_eth_txq_cap_get_max_inline_data_size`, and, if the
    user wants offload,
    `doca_eth_txq_cap_is_l3_chksum_offload_supported`. Quote the
    queried values back to the user; do not assume from prior
@@ -70,16 +75,26 @@ Steps the agent should walk the user through:
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    regular = per-packet user tasks (debug-friendly first-run);
    cyclic = pre-allocated buffer ring (line-rate, fixed MTU);
-   managed-recv = library-owned buffers (hands-off first app).
-   Do not pick *for* the user when the data-shape intent is
+   managed-recv = library-owned buffers (hands-off first app);
+   shared-mempool = shared buffer pool attached to the RXQ. Do
+   not pick *for* the user when the data-shape intent is
    ambiguous — ask.
 5. **Configure the queue(s).** Mandatory before
    `doca_ctx_start()`: for RX,
-   `doca_eth_rxq_set_type(<chosen>)` plus a burst size at or
-   below the cap; for TX, scatter-gather length at or below the
-   cap and a send-task configuration. Optional but commonly
-   needed: `doca_eth_txq_set_*` for L3 checksum offload (only
-   when the cap query said yes).
+   `doca_eth_rxq_set_type(<chosen>)`, a burst size at or below
+   the cap, and `doca_eth_rxq_set_cqe_format(<format>)` using a
+   format the capability query approved. If the chosen RX type
+   is shared-mempool, also create the shared mempool with
+   `doca_eth_rxq_shared_mempool_create`, configure its
+   properties with the `doca_eth_rxq_shared_mempool_set_*`
+   family in the DOCA Ethernet public header, start it with
+   `doca_eth_rxq_shared_mempool_start`, and attach it to the
+   RXQ with `doca_eth_rxq_set_shared_mempool` before starting
+   the RXQ context. For TX, scatter-gather length at or below
+   the cap, `doca_eth_txq_set_max_inline_data_size(<size>)` at
+   or below the queried cap, and a send-task configuration.
+   Optional but commonly needed: `doca_eth_txq_set_*` for L3
+   checksum offload (only when the cap query said yes).
 6. **Start the context(s)** via `doca_ctx_start()` per queue
    and progress the PE (`doca_pe_progress`). For RX, *no
    packets arriving* at this point is the steering-side
@@ -169,9 +184,27 @@ Steps the agent should walk the user through:
 3. **Send a single-packet smoke.** One TX send-task with a
    minimum-size payload through `doca_eth_txq`, routed (via
    loopback, an external echo, or a paired host) back into the
-   RX queue. Confirm one RX completion fires. The smoke
-   isolates the queue path before traffic shape is added.
-4. **Drive line-rate traffic only after the smoke passes.**
+   RX queue. Confirm one RX completion fires (or, in
+   shared-mempool mode, the registered event batch
+   shared-mempool receive handler fires). The smoke isolates
+   the queue path before traffic shape is added.
+4. **Confirm the shared-mempool receive path (if used).** If
+   the RX queue is in shared-mempool mode, the application must
+   have registered an event batch shared-mempool receive
+   handler with the
+   `doca_eth_rxq_event_batch_shared_mempool_recv_register`
+   family and, inside that handler, retrieved the per-packet
+   arrays with the
+   `doca_eth_rxq_event_batch_shared_mempool_recv_get_*` family
+   (flow tag, L3 OK, L4 OK, metadata, RX hash, and timestamp).
+   Buffers must be returned with the
+   `doca_eth_rxq_shared_mempool_*` family
+   (`..._allocate_non_library_buffer`, `..._free_buf`, and
+   `..._free_buf_bulk`). The RX queue must also have been
+   configured with `doca_eth_rxq_set_shared_mempool` and a CQE
+   format from the `DOCA_ETH_RXQ_CQE_FORMAT_*` family. See the
+   DOCA Ethernet header for the exact signatures and constants.
+5. **Drive line-rate traffic only after the smoke passes.**
    Once the single-packet path is green, raise burst size and
    submit rate. A failure at this point is a sizing / drain
    problem, not a lifecycle problem.

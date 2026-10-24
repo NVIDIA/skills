@@ -40,6 +40,26 @@ is not supported, falling back to legacy registration`, which is
 harmless if peermem is acceptable. A missing `nvidia-peermem` module is
 therefore only a problem when dmabuf is unavailable.
 
+**DOCA 3.5 public API changes** (public GPUNetIO header,
+`doca_gpunetio.h`). Update code that uses the GPUNetIO Verbs API:
+
+- Remove the `send_dbr_mode_ext` argument from every
+  `doca_gpu_verbs_bridge_export_qp()` call. The function no longer takes
+  that parameter.
+- Stop reading QP/CQ fields directly from `struct doca_gpu_verbs_qp`.
+  Use the new `doca_gpu_verbs_get_qp_*` getter family to obtain the
+  underlying QP, send CQ, and receive CQ.
+- Use `doca_gpu_verbs_req_notify_cq()` for CQ notification instead of
+  the previous notification path.
+- Use `doca_gpu_nic_handler_to_string()` when a NIC handler name is
+  needed.
+- Update constant usage to the DOCA 3.5 `DOCA_GPUNETIO_VERBS_*` and
+  `DOCA_GPUNETIO_ETH_*` families, and remove the obsolete
+  `DOCA_GPUNETIO_VERBS_GPU_CODE_OPT_HAS_GDRCOPY` constant.
+
+See the public GPUNetIO header for the exact declarations and constant
+families.
+
 ## configure
 
 Goal: stand up a `doca_gpu` context on a target CUDA device,

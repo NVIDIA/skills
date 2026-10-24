@@ -56,6 +56,14 @@ before debugging further:
   `Skipping compilation of DOCA Application - verbs_multi_rail_server_client
   - Missing json-c support`; install `libjson-c-dev` (not pulled in by
   `doca-all`) and rebuild.
+- **DOCA 3.5 API changes.** Use the new RCX type setter
+  (`doca_verbs_qp_init_attr_set_rcx_type()`) when initializing QP
+  attributes. The DOCA Verbs header now defines new constant families:
+  `DOCA_VERBS_CQ_ST_*`, `DOCA_VERBS_MULTI_RAIL_LB_MODE_*`,
+  `DOCA_VERBS_MULTI_RAIL_PROBE_*`, `DOCA_VERBS_MULTI_RAIL_QP_OP_*`,
+  `DOCA_VERBS_MULTI_RAIL_UPDATE_*`, and
+  `DOCA_VERBS_QP_ORDERING_SEMANTIC_*`. Use these families; see the
+  DOCA Verbs header.
 
 ## configure
 
@@ -244,7 +252,11 @@ model:
    `doca_verbs_pd_create(ctx, &pd)`; create the CQ(s) via the
    `doca_verbs_cq_attr_*` + `doca_verbs_cq_create` family; create
    the QP via the `doca_verbs_qp_init_attr_*` +
-   `doca_verbs_qp_create` family; drive the QP state machine to
+   `doca_verbs_qp_create` family; when setting QP init attributes,
+   call the new RCX type setter (`doca_verbs_qp_init_attr_set_rcx_type`)
+   instead of assigning the field directly, and select ordering
+   semantics from the `DOCA_VERBS_QP_ORDERING_SEMANTIC_*` family in
+   the DOCA Verbs header; drive the QP state machine to
    the in-use state with `doca_verbs_qp_modify` using a
    `doca_verbs_qp_attr` built via the
    `doca_verbs_qp_attr_*` setters; build the AH attributes via

@@ -53,16 +53,16 @@ Two cross-cutting rules that apply to *every* pattern above:
 
 The two orthogonal selection axes for any DOCA Ethernet design
 are *queue side* (RX vs TX) and, for RX, *RX type* (regular vs
-cyclic vs managed-recv). Choose both before writing any code,
-then drill into the relevant capability-query.
+cyclic vs managed-recv vs shared-mempool). Choose both before
+writing any code, then drill into the relevant capability-query.
 
 **Queue object split — RX vs TX.** Each is its own DOCA Core
 context.
 
 | Object | What it does | Key calls | Sizing inputs |
 | --- | --- | --- | --- |
-| `doca_eth_rxq` | Receive queue on a physical port, representor, or SF; surfaces inbound packets to user code as DOCA tasks or library-managed buffers depending on RX type | `doca_eth_rxq_create`, `_set_type`, `_set_max_burst_size`, `doca_ctx_start` | `doca_eth_rxq_cap_get_max_burst_size(devinfo)`; `doca_eth_rxq_cap_is_type_supported(devinfo, type)` |
-| `doca_eth_txq` | Transmit queue on the same device class; user submits send-tasks (`doca_eth_txq_task_send` for regular packets, `doca_eth_txq_task_lso_send` for LSO) that carry a packet `doca_buf` (`doca_eth_txq_task_send_set_pkt`) or a payload `doca_buf` + headers `struct doca_gather_list` (`doca_eth_txq_task_lso_send_set_pkt_payload` + `_set_headers`; headers are a gather list, not a `doca_buf`) plus the target queue | `doca_eth_txq_create`, `_set_max_send_buf_list_len`, `doca_ctx_start`, send-task allocator + submit | `doca_eth_txq_cap_get_max_send_buf_list_len(devinfo)`; `doca_eth_txq_cap_is_l3_chksum_offload_supported(devinfo)` |
+| `doca_eth_rxq` | Receive queue on a physical port, representor, or SF; surfaces inbound packets to user code as DOCA tasks or library-managed buffers depending on RX type | `doca_eth_rxq_create`, `_set_type`, `_set_max_burst_size`, `_set_cqe_format`, `_set_shared_mempool`, `doca_ctx_start` | `doca_eth_rxq_cap_get_max_burst_size(devinfo)`; `doca_eth_rxq_cap_is_type_supported(devinfo, type)`; `doca_eth_rxq_cap_is_cqe_format_supported(devinfo, format)` |
+| `doca_eth_txq` | Transmit queue on the same device class; user submits send-tasks (`doca_eth_txq_task_send` for regular packets, `doca_eth_txq_task_lso_send` for LSO) that carry a packet `doca_buf` (`doca_eth_txq_task_send_set_pkt`) or a payload `doca_buf` + headers `struct doca_gather_list` (`doca_eth_txq_task_lso_send_set_pkt_payload` + `_set_headers`; headers are a gather list, not a `doca_buf`) plus the target queue | `doca_eth_txq_create`, `_set_max_send_buf_list_len`, `_set_max_inline_data_size`, `doca_ctx_start`, send-task allocator + submit | `doca_eth_txq_cap_get_max_send_buf_list_len(devinfo)`; `doca_eth_txq_cap_is_l3_chksum_offload_supported(devinfo)`; `doca_eth_txq_cap_get_max_inline_data_size(devinfo)` |
 | Packet payload | The shipped public surface carries packet bytes as a plain `doca_buf *` (LSO headers as a `struct doca_gather_list *`) attached to the send-task via the setters above. There is **no** `doca_eth_frame` struct family in the public header — do not invent one. | `doca_buf_*` allocators + `doca_eth_txq_task_send_set_pkt` (or `_lso_send_set_pkt_payload` + `_set_headers`) | — (sized by the user's MTU and scatter-gather plan) |
 
 **RX-type taxonomy.** Picking the right type is data-shape-dependent;
@@ -74,6 +74,14 @@ the cap query is the only authority on what the device supports.
 | `DOCA_ETH_RXQ_TYPE_CYCLIC` | A ring of fixed-size buffers preallocated by the user; the library writes packets in order; the user reads the ring head | Max packet-rate ingress with fixed-MTU traffic; GPU packet-processing on a pre-pinned buffer | Variable-sized packets bigger than the ring slot, or workloads that need per-packet completion semantics |
 | `DOCA_ETH_RXQ_TYPE_MANAGED_MEMPOOL` | The library allocates and reclaims the receive buffers from an internal mempool; the user just consumes completion events | Hands-off line-rate ingress with no preallocated buffer plan; lowest-friction first app | Workloads that need to control buffer placement (GPU pinned memory, NUMA-affinity, registered memory regions for downstream RDMA) |
 | `DOCA_ETH_RXQ_TYPE_SHARED_MEMPOOL` | The library manages a **shared** memory pool across multiple RX queues / consumers; receive buffers are drawn from the shared pool. Bundle previously omitted this fourth real RX-type. | Multi-queue ingress where memory must be shared across RX queues; the appropriate type when several `doca_eth_rxq` instances on the same device want a unified buffer plan. See `doca_eth_rxq_shared_mempool.h` for the shared-mempool surface. | Single-queue ingress (use `_REGULAR` / `_CYCLIC` / `_MANAGED_MEMPOOL` instead) |
+
+**CQE format selection.** The public API exposes the
+`DOCA_ETH_RXQ_CQE_FORMAT_*` constant family (regular and
+compressed variants) in `doca_eth_rxq.h`. Query support with
+`doca_eth_rxq_cap_is_cqe_format_supported(devinfo, format)` and
+select the format with `doca_eth_rxq_set_cqe_format(eth_rxq,
+format)`. The agent must not assume a compressed format is
+available; the capability query is the only authority.
 
 **TX submission shape.** A `doca_eth_txq` submission is always
 *one send-task = one packet `doca_buf`*. The `doca_buf` wraps the
@@ -92,17 +100,21 @@ active `doca_devinfo`:
 | --- | --- | --- |
 | Maximum RX burst size | `doca_eth_rxq_cap_get_max_burst_size(devinfo)` | Device-dependent; oversizing returns `DOCA_ERROR_NOT_SUPPORTED` at `doca_ctx_start()` |
 | RX type supported on this device | `doca_eth_rxq_cap_is_type_supported(devinfo, type)` | Not every device supports every RX type; agent must not silently assume managed-recv or cyclic is present |
+| CQE format supported on this RX queue | `doca_eth_rxq_cap_is_cqe_format_supported(devinfo, format)` | Not every device supports every CQE format; agent must not assume compressed formats are present |
 | Maximum send scatter-gather list length | `doca_eth_txq_cap_get_max_send_buf_list_len(devinfo)` | Used to size the scatter-gather plan; assuming "1" works everywhere but "N" does not |
+| Maximum TX inline data size | `doca_eth_txq_cap_get_max_inline_data_size(devinfo)` | Device-dependent; setting above the cap fails at start |
 | L3 checksum offload presence | `doca_eth_txq_cap_is_l3_chksum_offload_supported(devinfo)` | Offload is device-conditional; requesting it on a device that does not advertise it fails at start |
 
 **Configuration shape.** *Mandatory* configurations before
 `doca_ctx_start()`: an RX queue needs its type set via
 `doca_eth_rxq_set_type()` plus a burst size at or below the
-cap, and either a recv-task allocator (regular type) or the
-appropriate buffer wiring per the chosen type; a TX queue needs
-its send-task configuration plus, if used, a scatter-gather
-length at or below the cap. *Optional* configurations
-(checksum offload, advanced flow-tag fields, RSS) gate on the
+cap, and either a recv-task allocator (regular type), the
+appropriate buffer wiring per the chosen type (cyclic or
+managed-mempool), or `doca_eth_rxq_set_shared_mempool()` for
+shared-mempool type; a TX queue needs its send-task configuration
+plus, if used, a scatter-gather length at or below the cap.
+*Optional* configurations (checksum offload, advanced flow-tag
+fields, RSS, CQE format, TX max inline data size) gate on the
 matching `_cap_*` query and use the matching `_set_*` setter.
 
 ## Version compatibility
@@ -133,6 +145,7 @@ there; this skill does not duplicate it.
   partial-install hazard and must be routed to
   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any Ethernet-layer diagnosis.
+- **DOCA 3.5 added shared-mempool RXQ, CQE format selection, and TX max inline data size APIs; earlier releases do not provide them.** The agent must call `doca_eth_rxq_cap_is_cqe_format_supported(devinfo, format)` with the desired format from the `DOCA_ETH_RXQ_CQE_FORMAT_*` family before promising a CQE format, `doca_eth_rxq_cap_is_type_supported(devinfo, type)` with the shared-mempool RXQ type from the `DOCA_ETH_RXQ_TYPE_*` family before promising shared-mempool RXQ, and `doca_eth_txq_cap_get_max_inline_data_size(devinfo, &max_inline_data_size)` before promising TX inline data size. See the public DOCA Ethernet header for the constant families. Quoting these from memory is the same hallucination failure mode.
 
 ## Error taxonomy
 

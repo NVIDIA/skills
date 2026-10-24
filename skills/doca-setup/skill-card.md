@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill for the DOCA environment around a workload — verifying an install is healthy, preparing the build/runtime environment, debugging environment-class failures, deciding container-vs-bare-metal deployment shape, and reaching a DOCA install from a host that does not have one yet via the NGC DOCA container fallback. <br>
+Use this skill for the DOCA environment around a workload — verifying an install is healthy, preparing the build/runtime environment (pkg-config, headers, LD_LIBRARY_PATH, hugepages, devlink, representors), debugging environment-class failures, deciding container-vs-bare-metal deployment shape, and reaching a DOCA install from a host that does not have one yet via the NGC DOCA container Stage-1 fallback. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -29,7 +29,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [hardware-binding.md](references/hardware-binding.md) <br>
 - [no-install.md](references/no-install.md) <br>
 - [recognize.md](references/recognize.md) <br>
-- [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/) <br>
 - [DOCA samples + applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 - [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
@@ -42,8 +42,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-sonnet-5-5`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -72,15 +72,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.9% (uplift unavailable) | 92.1% (uplift unavailable) |
+| Overall | 90.9% (uplift unavailable) | 86.4% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 65.0% → 100.0% (+35.0 points) | 70.0% → 95.0% (+25.0 points) |
-| Discoverability | 98.3% (uplift unavailable) | 90.0% (uplift unavailable) |
-| Effectiveness | 54.6% → 85.0% (+30.4 points) | 54.2% → 88.8% (+34.6 points) |
-| Efficiency | 86.3% (uplift unavailable) | 86.7% (uplift unavailable) |
+| Correctness | 60.0% → 95.0% (+35.0 points) | 70.0% → 85.0% (+15.0 points) |
+| Discoverability | 96.7% (uplift unavailable) | 88.3% (uplift unavailable) |
+| Effectiveness | 50.2% → 74.4% (+24.2 points) | 66.3% → 81.3% (+15.0 points) |
+| Efficiency | 88.2% (uplift unavailable) | 77.4% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-3bc1c5d (source: git SHA, committed 2026-10-22) <br>
+2a83c6b (source: git SHA, committed 2026-10-24) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

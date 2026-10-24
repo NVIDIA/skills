@@ -123,7 +123,13 @@ agent walks four checks before any code change.
    take effect". Adjust this only after the
    `doca-pcc-counters` baseline confirms the algorithm is
    running but a documented behavior gap exists; see
-   [`## use`](#use).
+   [`## use`](#use). In DOCA 3.5, when host-side parameter
+   overrides are needed, call the public parameter setter
+   with the port number and algorithm slot before the
+   parameter ID base. Size parameter, counter, and
+   histogram arrays from the public count getter family in
+   the public header for this component instead of
+   hard-coded values.
 
 The agent does NOT do any host-OS-level configuration of
 RDMA (route to

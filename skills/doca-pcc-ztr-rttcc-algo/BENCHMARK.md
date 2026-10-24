@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-pcc-ztr-rttcc-algo`
-- Evaluation date: 2026-10-21
+- Evaluation date: 2026-10-24
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:0040aac81ff39a4452e43c83c0578d00c594be3bcd12060ef57c30868b8fd007` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.7% — baseline ran, but no comparable score was available; uplift unavailable | 96.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 60.0% → 100.0% (+40.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 51.7% → 92.7% (+41.0 points) | 54.4% → 99.4% (+45.0 points) |
-| Efficiency | 75.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 48.8% → 78.7% (+29.9 points) | 74.3% → 86.9% (+12.6 points) |
+| Efficiency | 76.2% — baseline ran, but no comparable score was available; uplift unavailable | 62.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 818,684 | 886,847 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 341,587 | 411,330 | -69,743 | -16.96% | skill 1/1; base 1/1 |
-| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | N/A | 285,043 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | 446,107 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-pcc-ztr-rttcc-algo.negative.v1 | 30,990 | 190,474 | -159,484 | -83.73% | skill 1/1; base 1/1 |
-| codex | All cases | 493,290 | 371,506 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 144,775 | 114,708 | +30,067 | +26.21% | skill 1/1; base 1/1 |
-| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | N/A | 218,076 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | 290,685 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | doca-pcc-ztr-rttcc-algo.negative.v1 | 57,830 | 38,722 | +19,108 | +49.35% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,311,974 | 1,258,353 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 945,905 | 419,604 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 276,325 | 94,952 | +181,373 | +191.02% | skill 1/1; base 1/1 |
+| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | 500,039 | 222,168 | +277,871 | +125.07% | skill 1/1; base 1/1 |
+| claude-code | doca-pcc-ztr-rttcc-algo.negative.v1 | 169,541 | 102,484 | +67,057 | +65.43% | skill 1/1; base 1/1 |
+| codex | All cases | 475,919 | 321,851 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-pcc-ztr-rttcc-algo.explicit-positive.v1 | 147,979 | 98,426 | +49,553 | +50.35% | skill 1/1; base 1/1 |
+| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-pcc-ztr-rttcc-algo.implicit-positive.v2 | 276,080 | 177,785 | +98,295 | +55.29% | skill 1/1; base 1/1 |
+| codex | doca-pcc-ztr-rttcc-algo.negative.v1 | 51,860 | 45,640 | +6,220 | +13.63% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,421,824 | 741,455 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 13 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,10 +81,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-pcc-ztr-rttcc-algo`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-pcc-ztr-rttcc-algo`)
-- **MEDIUM** SECURITY/Unknown (SQP-2): The '## use' workflow section (lines 252–293) describes live tuning of congestion-control parameters on a production RoC (`TASKS.md:252`)
 - **LOW** QUALITY/quality_discoverability: Description very long (921 chars, recommend 50-150) (`skills/libs/doca-pcc-ztr-rttcc-algo/SKILL.md`)
 - 8 additional finding(s) are available in the full evaluation artifacts.
 

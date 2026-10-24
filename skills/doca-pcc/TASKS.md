@@ -118,7 +118,20 @@ Steps the agent should walk the user through:
    `doca_pcc_destroy`. A `doca_pcc` is not a `doca_ctx`;
    do not substitute `doca_ctx_*` calls.
 5. **Load the PCC algorithm image and parameterize the
-   algorithm.** Load the `doca_pcc_app` produced by `dpacc`
+   algorithm.** Before loading the algorithm image, declare the
+   PCC device configuration using the `doca_pcc_dev_declare_*`
+   family from the public PCC header: number of counter groups,
+   number of histograms, threads per counter set, each algorithm,
+   each slot algorithm, counter types, and user memory. Associate
+   histograms with algorithms via the
+   `doca_pcc_dev_algo_register_hist_ids` call. Initialize each
+   histogram with `doca_pcc_dev_histogram_init` (mode from the
+   `DOCA_PCC_DEV_HISTOGRAM_MODE_*` family) and manage it with the
+   `doca_pcc_dev_histogram_*` family. Validate limits with the
+   `doca_pcc_dev_get_*` family before declaring. These
+   declarations are mandatory before runtime; skipping them
+   leaves the configure flow incomplete. Then load the
+   `doca_pcc_app` produced by `dpacc`
    from the user's DPA-side algorithm source into the
    `doca_pcc`; then set whatever host-side parameters the
    algorithm exposes. Start the `doca_pcc` via

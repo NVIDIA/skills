@@ -43,6 +43,62 @@ Both are firmware changes that need a reset: follow
 `doca-hardware-safety` (inventory, out-of-band access, maintenance
 window, rollback) and get the operator's approval before applying.
 
+DOCA 3.5 changes the devemu public API. Developers must stop using the
+removed NVMe devemu open/close/as_ctx, VFS cfg, PCI TLP channel request
+accessor/completer, PCI dev VF/reset, PCI cap type hotplug/mgmt, and
+vblk PCI TLP type APIs. Use the new virtio offload engine setters, vnet
+capability queries, vnet counters, admin request user-data size, and
+vnet offload engine export/import APIs from the DOCA devemu public
+header.
+
+For NVMe emulation, the removed open/close and devemu-context/PCI-device/
+context conversion APIs are gone. Developers must use the remaining
+`doca_devemu_nvme_*` family: call the init function, create an NVMe
+device, create and configure SQ/CQ objects, create and bind IO objects,
+and use the capability getters. Do not call the removed open/close/as_ctx
+functions. See the devemu public header for exact names and signatures.
+
+For PCI emulation, the removed PCI dev VF/reset getters and reset
+controls, PCI capability hotplug/mgmt queries, and PCI TLP channel
+request accessor and typed completion functions are gone. Developers
+must use the `doca_devemu_pci_type_create_rep_ex` entry point with the
+`doca_devemu_pci_rep_init_attr_set_*` family to configure VF, BAR,
+doorbell, and MSI-X settings; query TLP capabilities with the current
+`doca_devemu_pci_tlp_cap_*` family; use the current
+`doca_devemu_pci_tlp_channel_*` family for channel export/import and
+fatal-state registration; and create started devices with
+`doca_devemu_pci_tlp_dev_create_started` or
+`doca_devemu_pci_tlp_dev_create_started_on_dpa`. Do not use the removed
+PCI dev VF/reset, PCI cap type hotplug/mgmt, or PCI TLP channel request
+accessor/completer APIs. See the devemu PCI public header for the current
+request handling API.
+
+The removed VFS cfg create/destroy/add/rm and notification/fuse
+user-data size getters are gone. Do not use the `doca_devemu_vfs_cfg_*`
+family. Use the admin request user-data size getter/setter from the
+devemu public header for user-data size values, and see the devemu
+public header for the current virtio-fs configuration API.
+
+The removed vblk PCI TLP type support query is replaced by the vnet
+capability query for PCI TLP type support. Use the
+`doca_devemu_vnet_cap_*` family to query max export descriptor length,
+max number of admin queues, offload engine feature support, and PCI TLP
+type support.
+
+DOCA 3.5 adds virtio offload engine setters. Use the
+`doca_devemu_virtio_offload_engine_set_*` family to set feature
+enablement, indirect descriptors, number of admin queues, and shared
+memory directory path.
+
+DOCA 3.5 adds vnet counters. Use the `doca_devemu_vnet_counters_*`
+family to query TX virtqueue header length errors, host address errors,
+LSO/GSO errors, skipped descriptors, and error handler scheduled
+counters.
+
+DOCA 3.5 adds vnet offload engine export/import. Use the vnet offload
+engine export and create-from-export APIs from the devemu public header
+to export and import offload engine state.
+
 ## configure
 
 Goal: stand up a per-sub-library Device Emulation context on
@@ -230,9 +286,9 @@ this skill provides the Device Emulation-specific slot fill.
 | --- | --- | --- |
 | 1. Starting sample | Enumerate the installed Device Emulation sample tree and identify a sample for the pinned sub-library. If no matching sample exists, **stop the modify-from-sample workflow**; do not scaffold headers, a build manifest, or source from API prose. Route to a verified installed project/example, the matching packaged SNAP / Virtio-net service when that is the user's intent, or the matching public Device Emulation guide. | Pick only a sample whose sub-library matches the user's pinned sub-library from [`## configure`](#configure) step 1. Cross-sub-library re-use is not a substitute for a missing sample |
 | 2. Backend body | What is the backend actually doing (packet forwarding logic for virtio-net, storage backend for a SNAP-style PCI Generic device, filesystem implementation for virtio-fs)? | The agent's anti-pattern alerts: (a) do NOT invent a backend body in this skill — backend design is a domain question (storage / networking / filesystem), not an API question, route via `doca-public-knowledge-map/SKILL.md`; (b) do NOT recommend re-implementing what the packaged DOCA SNAP / Virtio-net services already provide unless the user has confirmed those services do not meet their needs |
-| 3. Device descriptor / identity values | What device identity does the host see (vendor / device IDs for PCI Generic; virtio device class identifiers and feature-bit subset for virtio-net / virtio-fs)? | Per the `INVALID_VALUE` row in [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy), a malformed or non-cap-supported descriptor is the most common first-submit failure. Re-validate against the per-sub-library cap-query from [`## configure`](#configure) step 3 before accepting the modify |
+| 3. Device creation path, rep init attrs, and descriptor / identity values | What device identity does the host see (vendor / device IDs for PCI Generic; virtio device class identifiers and feature-bit subset for virtio-net / virtio-fs), and does the sample use the attr-based creation path and rep init attr setters/getters? | Use the `doca_devemu_pci_dev_create_started_attr_*` family to create the started PCI device and set FLR, hotplug state-change, and SR-IOV event handlers, then pass the attr to the `_ex` creation entry point (or the `_on_dpa_ex` variant) instead of the older direct creation path. Use the `doca_devemu_pci_rep_init_attr_*` family to set and get VF count, VF stride, first VF offset, first dynamic VF index, log-exp BAR size, per-VF doorbell count, and per-VF MSI-X count; do not configure these fields directly. See the public devemu PCI header for the exact family names. Per the `INVALID_VALUE` row in [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy), a malformed or non-cap-supported descriptor is the most common first-submit failure. Re-validate against the per-sub-library cap-query from [`## configure`](#configure) step 3 before accepting the modify |
 | 4. Doorbell / DMA wiring | Does the sample's doorbell / DMA wiring still match what the modified backend needs? | A modify that changes the backend without updating the doorbell / DMA wiring is a common way to introduce *"host driver is active but DPU sees nothing"* — surface this explicitly and re-check the wiring against [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) doorbell / DMA table |
-| 5. Re-validate against per-sub-library capabilities | Re-run the `doca_devemu_<sub>_cap_*` queries from [`## configure`](#configure) step 3 against the modified configuration — descriptor changes, feature-bit changes, or queue-sizing changes can flip a per-sub-library capability boundary | Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap query is the runtime authority |
+| 5. Re-validate against per-sub-library capabilities | Before configuring VFs, BARs, hotplug, or stateful BAR regions, query the `doca_devemu_pci_cap_*` family from the devinfo for the relevant VF, BAR, hotplug, and stateful BAR region capabilities. Then re-run the `doca_devemu_<sub>_cap_*` queries from [`## configure`](#configure) step 3 against the modified configuration — descriptor changes, feature-bit changes, or queue-sizing changes can flip a per-sub-library capability boundary | Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap query is the runtime authority |
 | 6. Keep the build manifest pointing at the same sub-library | The sample's existing `meson.build` already wires the per-sub-library `pkg-config` module; do not switch to a hand-rolled Makefile or — worse — silently swap to a different sub-library's module | Per the build slot table in [`## build`](#build) |
 
 The agent emits an *intent description + the filled slots*;

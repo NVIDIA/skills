@@ -62,7 +62,7 @@ Two cross-cutting rules that apply to *every* pattern above:
 
 ## Capabilities and modes
 
-DOCA Telemetry Exporter is a **CollectX-backed publisher library**,
+DOCA Telemetry Exporter is a **publisher library**,
 not a DOCA Core Context. It does NOT use the
 `doca_ctx_create → doca_ctx_start` lifecycle and there is no
 `doca_ctx` handle for the exporter. The lifecycle is instead a
@@ -84,7 +84,7 @@ invent additional object types or a `doca_ctx`.
 
 | Object / handle | What it represents | Created / finalized by | Notes |
 | --- | --- | --- | --- |
-| `struct doca_telemetry_exporter_schema` | The root publisher configuration: which exporters are enabled (file / IPC / opaque), buffer size, and the set of registered event types | `doca_telemetry_exporter_schema_init(name, &schema)`; finalized by `doca_telemetry_exporter_schema_start(schema)`; freed by `doca_telemetry_exporter_schema_destroy` | Configure exporters with the `doca_telemetry_exporter_schema_set_*` family BEFORE `schema_start`. Do NOT add types after `schema_start` |
+| `struct doca_telemetry_exporter_schema` | The root publisher configuration: which exporters are enabled (file / IPC / opaque), buffer size, and the set of registered event types | `doca_telemetry_exporter_schema_init(name, &schema)`; finalized by `doca_telemetry_exporter_schema_start(schema)`; freed by `doca_telemetry_exporter_schema_destroy` | Configure exporters with the `doca_telemetry_exporter_schema_set_*` family BEFORE `schema_start`; per-type indexes through the public header via `doca_telemetry_exporter_schema_set_indexes(schema, type_index, index_names, num_indexes)` and read back with `doca_telemetry_exporter_schema_get_indexes(schema, type_index, &index_names, &num_indexes)`. Do NOT add types after `schema_start` |
 | `struct doca_telemetry_exporter_type` | The shape (field list) of ONE structured event record | `doca_telemetry_exporter_type_create(&type)`, fields added via `doca_telemetry_exporter_type_add_field`, registered into a schema with `doca_telemetry_exporter_schema_add_type(schema, name, type, &type_index)` | `schema_add_type` returns a `doca_telemetry_exporter_type_index_t` — the handle you pass to `_source_report`. Duplicate type name or bad field type → `DOCA_ERROR_INVALID_VALUE` |
 | `struct doca_telemetry_exporter_field` | One field of a type: name, description, type-name, array length | `doca_telemetry_exporter_field_create`, then `_field_set_name` / `_field_set_description` / `_field_set_type_name` / `_field_set_array_len` | Field type is one of the `DOCA_TELEMETRY_EXPORTER_FIELD_TYPE_*` string macros (e.g. `..._UINT64`, `..._INT32`, `..._CHAR`, `..._TIMESTAMP`). Ownership transfers to the type on `_type_add_field` |
 | `struct doca_telemetry_exporter_source` | One logical reporter (per-worker / per-pipeline-stage / per-tenant) | `doca_telemetry_exporter_source_create(schema, &source)` (schema must be started first), `_source_set_id` / `_source_set_tag`, then `doca_telemetry_exporter_source_start(source)` | Report only after `source_start`. Multiple sources per schema are allowed. `_source_flush` forces a buffer flush; `_source_destroy` tears it down |
@@ -95,7 +95,7 @@ before writing any report call.
 
 | Publish surface | How to publish | Precondition | Stability |
 | --- | --- | --- | --- |
-| Typed structured events | `doca_telemetry_exporter_source_report(source, type_index, data, count)` where `data` is an array of `count` packed records matching the registered type | A `type` was added via `_schema_add_type` before `schema_start`; source started | `DOCA_EXPERIMENTAL` |
+| Typed structured events | `doca_telemetry_exporter_source_report(source, type_index, data, count)` where `data` is a read-only `const void *` to an array of `count` packed records matching the registered type | A `type` was added via `_schema_add_type` before `schema_start`; source started | `DOCA_EXPERIMENTAL` |
 | Opaque events | `doca_telemetry_exporter_source_opaque_report(source, app_id, user_defined1, user_defined2, data, data_size)`; size bound via `doca_telemetry_exporter_source_get_opaque_report_max_data_size` | `doca_telemetry_exporter_schema_set_opaque_events_enabled(schema)` BEFORE `schema_start` | `DOCA_STABLE` |
 | Metrics (counter / gauge / histogram) | Create a metrics context on a STARTED source with `doca_telemetry_exporter_metrics_create_context(source)`, then `_metrics_add_counter` / `_add_counter_increment` / `_add_gauge` / `_add_gauge_uint64` / `_add_histogram` / `_add_base_histogram` / `_metrics_histogram_observe` / `_metrics_base_histogram_observe`; labels via `_metrics_add_constant_label` / `_metrics_add_label_names`; flush via `_metrics_flush` or `_metrics_set_flush_interval_ms` | Source started; metrics context created after `source_start` | `DOCA_EXPERIMENTAL` |
 | OTLP logs | Create an OTLP-logs context on a STARTED source with `doca_telemetry_exporter_otlp_logs_create_context(source)`, add resource(s) + scope(s), then `_otlp_logs_write_event` / `_write_event_with_severity`, `_otlp_logs_flush` | `doca_telemetry_exporter_schema_set_opaque_events_enabled(schema)` (OTLP logs ride the opaque path); source started | `DOCA_EXPERIMENTAL` |
@@ -126,7 +126,7 @@ The only runtime introspection the library offers is:
 - `doca_telemetry_exporter_source_get_opaque_report_max_data_size(source, &max)` —
   the max opaque payload size for this source.
 - the `doca_telemetry_exporter_schema_get_*` config getters —
-  read back the buffer / file-write / IPC settings you set.
+  read back the buffer / file-write / IPC settings and per-type indexes (`doca_telemetry_exporter_schema_get_indexes`) you set through the public header.
 
 Everything else is validated the sample-driven way: enable file
 write, run, and inspect the emitted binary data files (and/or
@@ -140,7 +140,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 **The exporter-specific overlay** is:
 
 - **Use `pkg-config --modversion doca-telemetry-exporter` as the build-time anchor.** Per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`), this MUST match the other version sources. Because there is no `doca_caps` data for this library, the four-way match's `doca_caps --version` leg is a whole-install version check, NOT a per-artifact capability probe for the exporter.
-- **The Metrics API, OTLP-logs API, typed-`_source_report`, and `_schema_set_indexes` / `_get_indexes` are `DOCA_EXPERIMENTAL`.** They require building with `-DDOCA_ALLOW_EXPERIMENTAL_API` (per `doca-programming-guide/SKILL.md`); they may change across releases. The `DOCA_STABLE` surface includes the schema → source core (`schema_init` / `schema_start` / `source_create` / `source_start` / `source_destroy` / `schema_destroy`), typed-schema registration (`type_create` / `field_create` / `type_add_field` / `schema_add_type`), `source_opaque_report` / `source_flush` / `check_ipc_status` / `get_timestamp`, the full `schema_set_*` / `schema_get_*` config family, and the entire NetFlow sibling API in `doca_telemetry_exporter_netflow.h`. Confirm the `DOCA_STABLE` / `DOCA_EXPERIMENTAL` marker in the installed header before relying on any symbol — the shipped samples still set `-DDOCA_ALLOW_EXPERIMENTAL_API` blanket-style even when only stable symbols are used.
+- **The Metrics API, OTLP-logs API, typed-`_source_report`, and `_schema_set_indexes` / `_get_indexes` are `DOCA_EXPERIMENTAL`.** They require building with `-DDOCA_ALLOW_EXPERIMENTAL_API` (per `doca-programming-guide/SKILL.md`); they may change across releases. In DOCA 3.5, the `doca_telemetry_exporter_source_report` data parameter became const-qualified, and the `doca_telemetry_exporter_schema_*_indexes` family was added. Code written against earlier DOCA releases must const-qualify source report buffers and add schema index configuration via the `doca_telemetry_exporter_schema_*_indexes` family; the new schema index functions are available only when building against DOCA 3.5 or later. See the installed `doca_telemetry_exporter.h` for the exact signatures. The `DOCA_STABLE` surface includes the schema → source core (`schema_init` / `schema_start` / `source_create` / `source_start` / `source_destroy` / `schema_destroy`), typed-schema registration (`type_create` / `field_create` / `type_add_field` / `schema_add_type`), `source_opaque_report` / `source_flush` / `check_ipc_status` / `get_timestamp`, the full `schema_set_*` / `schema_get_*` config family, and the entire NetFlow sibling API in `doca_telemetry_exporter_netflow.h`. Confirm the `DOCA_STABLE` / `DOCA_EXPERIMENTAL` marker in the installed header before relying on any symbol — the shipped samples still set `-DDOCA_ALLOW_EXPERIMENTAL_API` blanket-style even when only stable symbols are used.
 - **The exporter is distinct from the DOCA Telemetry Service across every release.** When the user reports *"the docs I'm reading talk about a telemetry SERVICE — is that this library?"*, the answer is no. Route to `doca-public-knowledge-map/SKILL.md` for the service guide.
 - **`doca-telemetry-exporter.pc` plus `doca-common.pc` must both match `doca_caps --version`** at the version check (per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)). A common partial-install pattern after a DOCA upgrade is that `doca-telemetry-exporter.pc` lingers from the previous release while `doca-common.pc` was refreshed; route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) ladder step 2 before any exporter-layer diagnosis.
 
@@ -159,8 +159,8 @@ the rows below are the *exporter surface* meanings.
 | `DOCA_ERROR_BAD_STATE` | `doca_telemetry_exporter_source_report` / `_source_opaque_report` when the source was never started; `_otlp_logs_*` when the OTLP context does not exist (or the source is not started, or context already exists on create); NetFlow `_netflow_*` when NetFlow was not initialized / not started / already initialized (per `doca_telemetry_exporter_netflow.h`) | Lifecycle order violation. For schema/source: `schema_start` before `source_create`, `source_start` before any report, and create the OTLP context only AFTER `source_start`. For NetFlow: `_netflow_init` → configure → `_netflow_start` before `_netflow_send` |
 | `DOCA_ERROR_INVALID_VALUE` | NULL handle to almost any call; `_schema_add_type` with a duplicate type name or a field carrying an invalid `DOCA_TELEMETRY_EXPORTER_FIELD_TYPE_*`; a `_metrics_*` call with a NULL handle, mismatched label arity, or invalid histogram ID; an `_otlp_logs_*` call with a NULL or mismatched-arity argument | Re-read the registered type/field definitions and the label-set arity. For events, confirm the packed struct matches the field list you registered. For metrics, note the header documents `INVALID_VALUE` / `NO_MEMORY` on `_metrics_*` — not `BAD_STATE` |
 | `DOCA_ERROR_NO_MEMORY` | `_schema_init`, `_type_create`, `_field_create`, `_schema_add_type`, `_source_create`, metrics/histogram allocation, NetFlow template build | Allocation failure — an env / resource problem, not an API-usage bug. Capture and route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
-| `DOCA_ERROR_INITIALIZATION` | `_schema_init`, `_schema_start` | The schema could not be initialized / finalized (often a bad exporter configuration, e.g. an unwritable data root, or a CollectX-backend init failure). Re-check the enabled exporters and their paths before retrying |
-| `DOCA_ERROR_UNKNOWN` | `_schema_set_indexes` / `_schema_get_indexes` and other experimental paths where the underlying CollectX operation failed for a non-specific reason | Treat as a CollectX-backend failure; capture the trace log and route to `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) |
+| `DOCA_ERROR_INITIALIZATION` | `_schema_init`, `_schema_start` | The schema could not be initialized / finalized (often a bad exporter configuration, e.g. an unwritable data root, or a telemetry-backend init failure). Re-check the enabled exporters and their paths before retrying |
+| `DOCA_ERROR_UNKNOWN` | `_schema_set_indexes` / `_schema_get_indexes` and other experimental paths where the underlying telemetry-backend operation failed for a non-specific reason | Treat as a telemetry-backend failure; capture the trace log and route to `doca-debug ## debug` (`doca-debug/TASKS.md#debug`) |
 
 The agent's rule: **identify which row above is the cause before
 recommending any change; never invent an `AGAIN`/`NOT_FOUND` retry
@@ -247,9 +247,9 @@ elsewhere:
   DOCA service with its own public guide. Reach via
   `doca-public-knowledge-map/SKILL.md`.
   This skill is publisher-side only.
-- **CollectX (`clx`) collection deployment** — the collector-side
-  deployment lives in
-  `doca-collectx-deployment/SKILL.md`.
+- **Collector-side deployment** — running the DOCA Telemetry
+  Service (DTS) that collects and exports the counters lives in
+  `doca-dts/SKILL.md`.
 - **Downstream rendering / dashboards** — once events reach the
   receiver, the downstream sinks (NetFlow / IPFIX / Prometheus /
   Grafana / OpenTelemetry Collector) are governed by their own

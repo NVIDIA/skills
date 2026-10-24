@@ -94,15 +94,13 @@ top-level skills:
   internals stay in the BSP row below. Any mutating firmware/power-cycle
   step routes to `doca-hardware-safety/SKILL.md`.
 
-**CollectX telemetry collection.** Deploying/operating a CollectX (clx)
-telemetry-collection pipeline (providers/counters → schema → collector
-daemon → exporters: Prometheus / Fluent Bit / NetFlow / file-IPC) is
-covered by `doca-collectx-deployment/SKILL.md`;
+**Telemetry collection.** Deploying/operating the DOCA Telemetry
+Service (DTS) collection pipeline (providers/counters → schema →
+collector → exporters: Prometheus / Fluent Bit / NetFlow / file-IPC),
+in all three deployment shapes, is covered by `doca-dts/SKILL.md`;
 the library reader/publisher APIs stay in
 `doca-telemetry/SKILL.md` /
-`doca-telemetry-exporter/SKILL.md`, and
-the productized DTS container (deploy / configure, all three deployment
-shapes) is covered by `doca-dts/SKILL.md`.
+`doca-telemetry-exporter/SKILL.md`.
 
 If the user asks about a DOCA service that is not in this table, open the
 [**DOCA Services** umbrella page](https://docs.nvidia.com/doca/sdk/DOCA-Services/index.html)

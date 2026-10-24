@@ -40,8 +40,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -69,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 87.1% (uplift unavailable) | 91.8% (uplift unavailable) |
+| Overall | 91.0% (uplift unavailable) | 80.1% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 80.0% → 80.0% (±0.0 points) | 95.0% → 85.0% (-10.0 points) |
-| Discoverability | 100.0% (uplift unavailable) | 91.7% (uplift unavailable) |
-| Effectiveness | 54.6% → 81.7% (+27.1 points) | 62.1% → 82.5% (+20.4 points) |
-| Efficiency | 73.9% (uplift unavailable) | 100.0% (uplift unavailable) |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 90.0% → 75.0% (-15.0 points) |
+| Discoverability | 96.7% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 45.8% → 79.4% (+33.6 points) | 56.9% → 68.1% (+11.2 points) |
+| Efficiency | 79.2% (uplift unavailable) | 62.4% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+2a83c6b (source: git SHA, committed 2026-10-24) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

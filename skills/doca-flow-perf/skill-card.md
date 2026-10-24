@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides measuring control-plane rule insertion/deletion throughput of DOCA Flow with the doca_flow_perf binary on x86 host or Arm/DPU-CPU cores — selecting a configs/ JSON policy, weighing the DPDK-versus-DOCA backend, running the smoke and eval loops, interpreting CPU cycles plus num_pushed/num_failed, and capturing the four-tuple that makes an insertion figure defensible. <br>
+Guides measuring control-plane rule insertion throughput of DOCA Flow with the doca_flow_perf binary on x86 host or Arm cores: selecting a configs/ JSON policy, weighing the DPDK-versus-DOCA backend, running the smoke iteration then the eval loop, interpreting CPU cycles plus num_pushed / num_failed, and capturing the four-tuple (DOCA release, firmware, JSON policy, worker config) that makes an insertion figure defensible. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and platform/network engineers use this skill to produce a defensible host-side / DPU-CPU-side DOCA Flow control-plane rule-install/rule-delete throughput number: picking or authoring a configs/ JSON policy, choosing the DPDK or DOCA backend, running the eval loop, and capturing the DOCA-release/firmware/JSON-policy/worker-config four-tuple required for the result to be comparable. <br>
+Developers and platform/network engineers use this skill to produce a defensible host-side or DPU-CPU-side DOCA Flow control-plane rule-install/rule-delete rate with doca_flow_perf: picking or authoring a configs/ JSON policy, choosing the DPDK or DOCA backend, running the smoke and iterative eval loop, and capturing the DOCA-release/firmware/JSON-policy/worker-config four-tuple so the result can be compared. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -39,8 +39,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -68,15 +68,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.8% (baseline ran; no comparable score, uplift unavailable) | 94.9% (baseline ran; no comparable score, uplift unavailable) |
+| Overall | 92.1% (baseline ran; no comparable score, uplift unavailable) | 88.7% (baseline ran; no comparable score, uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 70.0% → 100.0% (+30.0 points) | 90.0% → 100.0% (+10.0 points) |
-| Discoverability | 100.0% (baseline ran; no comparable score, uplift unavailable) | 91.7% (baseline ran; no comparable score, uplift unavailable) |
-| Effectiveness | 50.0% → 93.8% (+43.8 points) | 48.8% → 92.5% (+43.7 points) |
-| Efficiency | 80.0% (baseline ran; no comparable score, uplift unavailable) | 90.5% (baseline ran; no comparable score, uplift unavailable) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 95.0% → 95.0% (±0.0 points) |
+| Discoverability | 100.0% (baseline ran; no comparable score, uplift unavailable) | 95.0% (baseline ran; no comparable score, uplift unavailable) |
+| Effectiveness | 54.4% → 96.9% (+42.5 points) | 77.5% → 94.4% (+16.9 points) |
+| Efficiency | 63.5% (baseline ran; no comparable score, uplift unavailable) | 58.9% (baseline ran; no comparable score, uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+2a83c6b (source: git SHA, committed 2026-10-24) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

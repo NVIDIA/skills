@@ -13,7 +13,7 @@ description: >
   "flow-perf result mismatches release notes", "DPDK-vs-DOCA
   comparison", or "install variance too high". Refuse and route to
   the proper owner for live-app optimization (doca-flow-tune),
-  DPA-side measurement (doca-flow-dpa-perf), wire throughput or
+  wire throughput or
   latency, or library-internal pipe semantics.
 metadata:
   author: NVIDIA <doca@nvidia.com>
@@ -68,13 +68,8 @@ when the question is *what `doca_flow_perf` measures and what
 it deliberately does not measure*, *how its DPDK and DOCA
 backends differ behind the same JSON contract*, *how to
 interpret the per-iteration CPU-cycle output*, or *how it
-differs from `doca-flow-tune` (measurement vs. optimization)
-and `doca-flow-dpa-perf` (host / DPU-CPU vs. DPA-offloaded
-path)*. If DOCA is not installed, route to
-`doca-setup/SKILL.md` first; if the
-target measurement is the DPA-offloaded path, route to
-`doca-flow-dpa-perf/SKILL.md`
-instead; if the goal is to optimize an already-deployed Flow
+differs from `doca-flow-tune` (measurement vs. optimization)*. If DOCA is not installed, route to
+`doca-setup/SKILL.md` first; if the goal is to optimize an already-deployed Flow
 pipeline rather than measure a synthetic one, route to
 `doca-flow-tune/SKILL.md` — `flow-perf`
 is a synthetic-driver microbenchmark, not a tuner of a live
@@ -97,11 +92,10 @@ requests, name the skill that owns them and stop.
   number for it to be defensible?"* — class-shaped flow-perf
   baseline question; the agent walks the `configs/` library,
   the JSON contract, and the four-tuple capture rule.
-- *"What is the difference between `doca-flow-perf`,
-  `doca-flow-dpa-perf`, and `doca-flow-tune`? They all
-  mention `doca-flow` and `perf` in their names — when do I
-  reach for each?"* — measurement-vs-optimization plus
-  host-vs-DPA-path; the agent surfaces the boundaries.
+- *"What is the difference between `doca-flow-perf` and
+  `doca-flow-tune`? They both mention `doca-flow` in their
+  names — when do I reach for each?"* — measurement vs.
+  optimization; the agent surfaces the boundary.
 - *"My policy JSON looks like the example, but the reported
   Kops/sec is dramatically lower than the published numbers I
   see in NVIDIA's release notes. What variables do I have to
@@ -148,8 +142,6 @@ This skill is NOT for:
 - operators who want to optimize an already-deployed
   `doca-flow` application — that is
   `doca-flow-tune/SKILL.md`;
-- operators measuring the DPA-offloaded Flow path — that is
-  `doca-flow-dpa-perf/SKILL.md`;
 - operators measuring end-to-end dataplane throughput or
   latency — that is the application's responsibility,
   layered on
@@ -201,9 +193,6 @@ Co-load this skill with:
 - `doca-flow-tune/SKILL.md` (the
   measurement-vs-optimization distinction is the most
   common confusion);
-- `doca-flow-dpa-perf/SKILL.md`
-  (the host-vs-DPA-path distinction is the second most
-  common confusion);
 - `doca-version/SKILL.md` (the
   four-way version match every reported flow-perf number
   must carry);
@@ -213,9 +202,7 @@ Co-load this skill with:
 
 Do NOT load this skill when the user wants to optimize a live
 Flow application (route to
-`doca-flow-tune/SKILL.md`) or measure
-the DPA-offloaded path (route to
-`doca-flow-dpa-perf/SKILL.md`).
+`doca-flow-tune/SKILL.md`).
 
 ## What this skill provides
 
@@ -256,8 +243,6 @@ right neighbouring skill.
   `doca-flow/SKILL.md`. The agent
   must say this explicitly when the operator asks for "Flow
   throughput".
-- **DPA-offloaded Flow path measurement.** Route to
-  `doca-flow-dpa-perf/SKILL.md`.
 - **Optimization of a deployed Flow application.** Route to
   `doca-flow-tune/SKILL.md`. flow-perf
   is a synthetic driver of a JSON-described pipeline, not a
@@ -297,9 +282,8 @@ When a `doca_flow_perf` question arrives:
 3. Confirm the user wants to *measure*, not *optimize* —
    if optimize, route to
    `doca-flow-tune/SKILL.md`;
-4. Confirm the target path is host / DPU-CPU, not DPA — if
-   DPA, route to
-   `doca-flow-dpa-perf/SKILL.md`;
+4. Confirm the target path is host / DPU-CPU — the path this
+   tool measures;
 5. Read the capabilities companion to commit to
    the three-axis decision (pipeline shape × traffic class ×
    measurement axis);
@@ -321,11 +305,6 @@ contract from `tools/<X>/`:
   unified Flow tuning tool. **Measurement vs. optimization
   boundary** lives here. Ask: "do I want a number, or do I
   want to change the deployed pipeline?"
-- `doca-flow-dpa-perf/SKILL.md` —
-  the DPA-offloaded Flow performance tool. **Host /
-  DPU-CPU vs. DPA path boundary** lives here. Ask: "am I
-  measuring the path that executes on the CPU, or the path
-  that executes on the DPA processor?"
 - `doca-version/SKILL.md` — every
   reported flow-perf number must come with the four-way
   match (host package, kernel module, firmware, target

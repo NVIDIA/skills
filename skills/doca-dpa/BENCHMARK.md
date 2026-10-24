@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-dpa`
-- Evaluation date: 2026-10-21
+- Evaluation date: 2026-10-24
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:99ac207da052504949cf6f114412975da1858f1bcea2374f3fac8c667696bb9c` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.3% — baseline ran, but no comparable score was available; uplift unavailable | 96.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 88.8% — baseline ran, but no comparable score was available; uplift unavailable | 77.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 70.0% → 100.0% (+30.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.6% → 71.3% (+20.7 points) | 56.9% → 96.9% (+40.0 points) |
-| Efficiency | 85.4% — baseline ran, but no comparable score was available; uplift unavailable | 94.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 95.0% (+35.0 points) | 85.0% → 70.0% (-15.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.1% → 72.5% (+29.4 points) | 49.2% → 55.0% (+5.8 points) |
+| Efficiency | 76.5% — baseline ran, but no comparable score was available; uplift unavailable | 64.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,143,438 | 627,836 | +515,602 | +82.12% | skill 4/4; base 4/4 |
-| claude-code | doca-dpa.explicit-positive.v1 | 407,241 | 253,210 | +154,031 | +60.83% | skill 1/1; base 1/1 |
-| claude-code | doca-dpa.implicit-positive.v1 | 352,435 | 93,494 | +258,941 | +276.96% | skill 1/1; base 1/1 |
-| claude-code | doca-dpa.implicit-positive.v2 | 320,096 | 154,854 | +165,242 | +106.71% | skill 1/1; base 1/1 |
-| claude-code | doca-dpa.negative.v1 | 63,666 | 126,278 | -62,612 | -49.58% | skill 1/1; base 1/1 |
-| codex | All cases | 484,603 | 208,579 | +276,024 | +132.34% | skill 4/4; base 4/4 |
-| codex | doca-dpa.explicit-positive.v1 | 204,999 | 66,778 | +138,221 | +206.99% | skill 1/1; base 1/1 |
-| codex | doca-dpa.implicit-positive.v1 | 140,454 | 37,951 | +102,503 | +270.09% | skill 1/1; base 1/1 |
-| codex | doca-dpa.implicit-positive.v2 | 87,941 | 71,886 | +16,055 | +22.33% | skill 1/1; base 1/1 |
-| codex | doca-dpa.negative.v1 | 51,209 | 31,964 | +19,245 | +60.21% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,628,041 | 836,415 | +791,626 | +94.65% | skill 8/8; base 8/8 |
+| claude-code | All cases | 1,094,433 | 435,588 | +658,845 | +151.25% | skill 4/4; base 4/4 |
+| claude-code | doca-dpa.explicit-positive.v1 | 293,211 | 96,028 | +197,183 | +205.34% | skill 1/1; base 1/1 |
+| claude-code | doca-dpa.implicit-positive.v1 | 344,055 | 119,047 | +225,008 | +189.01% | skill 1/1; base 1/1 |
+| claude-code | doca-dpa.implicit-positive.v2 | 296,127 | 93,184 | +202,943 | +217.79% | skill 1/1; base 1/1 |
+| claude-code | doca-dpa.negative.v1 | 161,040 | 127,329 | +33,711 | +26.48% | skill 1/1; base 1/1 |
+| codex | All cases | 426,034 | 270,762 | +155,272 | +57.35% | skill 4/4; base 4/4 |
+| codex | doca-dpa.explicit-positive.v1 | 121,370 | 76,272 | +45,098 | +59.13% | skill 1/1; base 1/1 |
+| codex | doca-dpa.implicit-positive.v1 | 141,810 | 61,224 | +80,586 | +131.62% | skill 1/1; base 1/1 |
+| codex | doca-dpa.implicit-positive.v2 | 127,641 | 54,320 | +73,321 | +134.98% | skill 1/1; base 1/1 |
+| codex | doca-dpa.negative.v1 | 35,213 | 78,946 | -43,733 | -55.40% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,520,467 | 706,350 | +814,117 | +115.26% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 

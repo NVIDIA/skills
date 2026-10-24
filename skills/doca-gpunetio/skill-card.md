@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides hands-on DOCA GPUNetIO programming — wiring a CUDA kernel on an NVIDIA GPU to doca-eth queues via doca_gpu_eth_rxq / doca_gpu_eth_txq, standing up the per-device doca_gpu context, designing the persistent kernel, running the dual capability check, and debugging DOCA_ERROR_* returns from the GPUNetIO API. <br>
+Guides hands-on DOCA GPUNetIO programming — wiring a CUDA kernel on an NVIDIA GPU to doca-eth queues via doca_gpu_eth_rxq / doca_gpu_eth_txq, standing up the per-CUDA-device doca_gpu context, designing the persistent CUDA kernel, running the dual capability check (DOCA cap-query plus cudaGetDeviceProperties), registering cudaMalloc pools via doca_buf_arr_create_*, and debugging DOCA_ERROR_* returns from the GPUNetIO API. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,7 +7,7 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
 External developers and engineers building applications that consume the DOCA GPUNetIO library use this skill to wire DOCA network queues into CUDA kernels on an NVIDIA GPU — standing up the per-device doca_gpu context, creating GPU-visible RX/TX queue handles on top of doca-eth, discovering GPUNetIO capabilities across DOCA and CUDA, and debugging DOCA_ERROR_* returns. <br>
 
@@ -39,8 +39,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -58,25 +58,25 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Flags unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 88.1% (uplift unavailable) | 86.9% (uplift unavailable) |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 90.0% → 100.0% (+10.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Overall | 89.7% (uplift unavailable) | 79.8% (uplift unavailable) |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 65.0% → 95.0% (+30.0 points) | 85.0% → 95.0% (+10.0 points) |
 | Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
-| Effectiveness | 52.5% → 72.5% (+20.0 points) | 48.8% → 70.0% (+21.2 points) |
-| Efficiency | 67.8% (uplift unavailable) | 69.5% (uplift unavailable) |
+| Effectiveness | 40.6% → 60.0% (+19.4 points) | 48.8% → 60.4% (+11.6 points) |
+| Efficiency | 93.3% (uplift unavailable) | 48.8% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+b99bced (source: git SHA, committed 2026-10-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
