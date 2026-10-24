@@ -349,7 +349,7 @@ treats as first-class:
 | `networking` | DOCA Flow, DOCA Eth, DOCA RDMA, DOCA Comch — line-rate or control-plane packet/RDMA path | `eth_l2_fwd`, `simple_fwd_vnf`, `switch`, `upf_accel`, `ip_frag`, Flow samples, RDMA samples, Comch samples |
 | `acceleration` | DOCA DMA, AES-GCM, SHA, Compress, Erasure Coding — offloading specific compute kernels | DMA samples, AES-GCM samples, SHA samples, Compress samples, Erasure Coding samples |
 | `dpa-hpc` | DOCA DPA programs (DPACC build, FlexIO DEV) plus the PCC / UROM / RDMO HPC pieces | `dpa_all_to_all`, `pcc`, `urom_rdmo`, DPA samples, UROM samples |
-| `gpu-media` | DOCA GPUNetIO, DOCA GPI, NVIDIA Rivermax integration, RMAX-class media samples | `gpu_packet_processing`, GPUNetIO samples, RMAX / Rivermax-shaped samples |
+| `gpu-media` | DOCA GPUNetIO, NVIDIA Rivermax integration, RMAX-class media samples | `gpu_packet_processing`, GPUNetIO samples, RMAX / Rivermax-shaped samples |
 | `telemetry` | DOCA Telemetry library + DOCA Telemetry Exporter — counter readers and per-process counter publishers (the on-host **DOCA Telemetry Service** as-deployed binary is externally productized and out of bundle scope per `AGENTS.md ## Non-goals` (bundle `AGENTS.md`)) | Telemetry samples, telemetry-exporter samples, in-bundle telemetry-shaped diagnostics |
 
 The agent does NOT add a sample / app to a category without

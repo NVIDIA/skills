@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-telemetry-exporter`
-- Evaluation date: 2026-10-21
+- Evaluation date: 2026-10-24
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:b1dce467c82515cd711da59c7567693b4f6f017d4de61919fc70f3dbc1d65698` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.5% — baseline ran, but no comparable score was available; uplift unavailable | 98.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 85.0% → 100.0% (+15.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 46.3% → 86.9% (+40.6 points) | 61.3% → 100.0% (+38.7 points) |
-| Efficiency | 80.6% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 85.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 65.0% → 100.0% (+35.0 points) | 70.0% → 100.0% (+30.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 55.0% → 89.8% (+34.8 points) | 51.9% → 77.5% (+25.6 points) |
+| Efficiency | 86.1% — baseline ran, but no comparable score was available; uplift unavailable | 55.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 764,766 | 544,826 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-telemetry-exporter.explicit-positive.v1 | 332,912 | 151,078 | +181,834 | +120.36% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-exporter.implicit-positive.v1 | 370,217 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-telemetry-exporter.implicit-positive.v2 | N/A | 273,134 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-telemetry-exporter.negative.v1 | 61,637 | 120,614 | -58,977 | -48.90% | skill 1/1; base 1/1 |
-| codex | All cases | 414,678 | 246,658 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-telemetry-exporter.explicit-positive.v1 | 168,516 | 25,251 | +143,265 | +567.36% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-exporter.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-telemetry-exporter.implicit-positive.v2 | 231,788 | 179,733 | +52,055 | +28.96% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-exporter.negative.v1 | 14,374 | 41,674 | -27,300 | -65.51% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,179,444 | 791,484 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 819,014 | 464,354 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-telemetry-exporter.explicit-positive.v1 | 160,717 | 95,141 | +65,576 | +68.93% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-exporter.implicit-positive.v1 | N/A | 248,246 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-telemetry-exporter.implicit-positive.v2 | 530,058 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-telemetry-exporter.negative.v1 | 128,239 | 120,967 | +7,272 | +6.01% | skill 1/1; base 1/1 |
+| codex | All cases | 295,116 | 228,242 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-telemetry-exporter.explicit-positive.v1 | 99,504 | 98,398 | +1,106 | +1.12% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-exporter.implicit-positive.v1 | N/A | 102,361 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | doca-telemetry-exporter.implicit-positive.v2 | 161,157 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | doca-telemetry-exporter.negative.v1 | 34,455 | 27,483 | +6,972 | +25.37% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,114,130 | 692,596 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -84,9 +84,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-telemetry-exporter/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-telemetry-exporter/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-telemetry-exporter`)
-- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without asking (`BENCHMARK.md:86`)
 - **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without asking (`BENCHMARK.md:87`)
-- 14 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Autonomous Decision Making (EA2): Excessive Agency: without asking (`BENCHMARK.md:88`)
+- 13 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

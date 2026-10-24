@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-gpunetio`
-- Evaluation date: 2026-10-21
+- Evaluation date: 2026-10-24
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:bea4079fa63e42d320dec085b358c6e3f0550d3990e9aac5f7843f923f7e340b` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 88.1% — baseline ran, but no comparable score was available; uplift unavailable | 86.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 90.0% → 100.0% (+10.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Overall | 89.7% — baseline ran, but no comparable score was available; uplift unavailable | 79.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 65.0% → 95.0% (+30.0 points) | 85.0% → 95.0% (+10.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 52.5% → 72.5% (+20.0 points) | 48.8% → 70.0% (+21.2 points) |
-| Efficiency | 67.8% — baseline ran, but no comparable score was available; uplift unavailable | 69.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 40.6% → 60.0% (+19.4 points) | 48.8% → 60.4% (+11.6 points) |
+| Efficiency | 93.3% — baseline ran, but no comparable score was available; uplift unavailable | 48.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 810,043 | 277,838 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-gpunetio.explicit-positive.v1 | 275,767 | 153,672 | +122,095 | +79.45% | skill 1/1; base 1/1 |
-| claude-code | doca-gpunetio.implicit-positive.v1 | 502,952 | 64,196 | +438,756 | +683.46% | skill 1/1; base 1/1 |
-| claude-code | doca-gpunetio.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-gpunetio.negative.v1 | 31,324 | 59,970 | -28,646 | -47.77% | skill 1/1; base 1/1 |
-| codex | All cases | 439,731 | 105,744 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-gpunetio.explicit-positive.v1 | 136,398 | 31,102 | +105,296 | +338.55% | skill 1/1; base 1/1 |
-| codex | doca-gpunetio.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-gpunetio.implicit-positive.v2 | 289,285 | 60,612 | +228,673 | +377.27% | skill 1/1; base 1/1 |
-| codex | doca-gpunetio.negative.v1 | 14,048 | 14,030 | +18 | +0.13% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,249,774 | 383,582 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 790,318 | 375,106 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-gpunetio.explicit-positive.v1 | 237,405 | 97,568 | +139,837 | +143.32% | skill 1/1; base 1/1 |
+| claude-code | doca-gpunetio.implicit-positive.v1 | N/A | 216,553 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | doca-gpunetio.implicit-positive.v2 | 520,796 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | doca-gpunetio.negative.v1 | 32,117 | 60,985 | -28,868 | -47.34% | skill 1/1; base 1/1 |
+| codex | All cases | 321,933 | 351,091 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-gpunetio.explicit-positive.v1 | 129,436 | 249,410 | -119,974 | -48.10% | skill 1/1; base 1/1 |
+| codex | doca-gpunetio.implicit-positive.v1 | 169,538 | 78,860 | +90,678 | +114.99% | skill 1/1; base 1/1 |
+| codex | doca-gpunetio.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| codex | doca-gpunetio.negative.v1 | 22,959 | 22,821 | +138 | +0.60% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,112,251 | 726,197 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 3 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,12 +81,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-gpunetio`)
+- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-gpunetio`)
+- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-gpunetio`)
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/libs/doca-gpunetio/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-gpunetio/SKILL.md`)
-- **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-gpunetio`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`BENCHMARK.md:86`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`BENCHMARK.md:87`)
-- 14 additional finding(s) are available in the full evaluation artifacts.
+- 15 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

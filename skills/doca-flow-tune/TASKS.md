@@ -72,8 +72,7 @@ Steps the agent should walk the user through, in order:
 3. **Decide tune vs perf.** Per the *tune-vs-perf* boundary in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes);
    if the user's question is *"what is the baseline number"*,
-   route to `doca-flow-perf/SKILL.md` or
-   `doca-flow-dpa-perf/SKILL.md` instead
+   route to `doca-flow-perf/SKILL.md` instead
    of this skill. Tune does not produce a primary baseline number.
 4. **Axis 1 — pick the tuning axis.** Per the three-axis table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
@@ -434,9 +433,7 @@ routed out before the agent does any of them under this skill's
 name.
 
 - **measure a Flow pipeline baseline** ⇒
-  `doca-flow-perf/SKILL.md` (host-side) or
-  `doca-flow-dpa-perf/SKILL.md` (DPA-
-  offloaded). Tune does not produce a primary baseline number.
+  `doca-flow-perf/SKILL.md`. Tune does not produce a primary baseline number.
 - **write a doca-flow application** ⇒
   `doca-flow/SKILL.md`, layered on
   `doca-programming-guide/SKILL.md`.
@@ -514,8 +511,7 @@ Three cross-cutting rules for this appendix:
   Flow-application-side build / port / pipe commands live in
   `doca-flow TASKS.md ## Command appendix` (`doca-flow/TASKS.md`);
   the perf-side measurement commands live in
-  `doca-flow-perf/SKILL.md` and
-  `doca-flow-dpa-perf/SKILL.md`; this
+  `doca-flow-perf/SKILL.md`; this
   appendix names only `doca_flow_tune`-specific invocations on
   top.
 
@@ -553,6 +549,5 @@ in [`SKILL.md`](SKILL.md):
   `doca-flow/SKILL.md` before running
   anything else here. For baselines that the recommendations
   optimize on top of, load
-  `doca-flow-perf/SKILL.md` and / or
-  `doca-flow-dpa-perf/SKILL.md`
+  `doca-flow-perf/SKILL.md`
   alongside.

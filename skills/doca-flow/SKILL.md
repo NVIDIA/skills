@@ -6,8 +6,7 @@ description: >
   application: match/action pipes, ports, representors, forwarding,
   hairpin, counters. Trigger on packet steering, classifier,
   rule-matching, representor, hairpin or 5-tuple-to-queue questions even
-  when "DOCA Flow" is not named. Remote or non-C++ control over gRPC
-  belongs to doca-flow-grpc-server. Also covers pipe validation before
+  when "DOCA Flow" is not named. Also covers pipe validation before
   hardware programming, Flow/DOCA version match, and Flow API errors.
   First app: follow the local bundle (doca-setup, doca-programming-guide,
   doca-flow, doca-public-knowledge-map). Stage 1 pull

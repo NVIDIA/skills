@@ -1,5 +1,5 @@
 ## Description: <br>
-Hands-on guidance for DOCA Ethernet packet-queue work — bringing up `doca_eth_rxq` / `doca_eth_txq` queues, choosing among the RX queue types, sizing and submitting send-tasks, and debugging `DOCA_ERROR_*` results on BlueField DPUs or ConnectX NICs. <br>
+Guides hands-on DOCA Ethernet packet-queue work on a BlueField DPU or ConnectX NIC: bringing up doca_eth_rxq and doca_eth_txq contexts on a port, representor, or SF, choosing among the regular, cyclic, managed-mempool, and shared-mempool RX types, sizing burst and scatter-gather length against the _cap_* queries, submitting doca_eth_txq_task_send / _lso_send tasks with packet doca_bufs, and debugging DOCA_ERROR_* from Ethernet calls. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building applications that consume the DOCA Ethernet C library use this skill for hands-on packet-queue work — initializing RX/TX queues on physical ports, representors, or SFs, selecting the right RX queue type, submitting send-tasks, querying device capabilities, and debugging Ethernet-layer errors on BlueField DPUs or ConnectX NICs. <br>
+External developers and engineers building applications that consume the DOCA Ethernet library use this skill to set up RX and TX queues as independent Core contexts, pick an RX type and query device capabilities, send packets through doca_eth_txq, find out why an RX queue gets no traffic, and work out which layer caused an Ethernet-related DOCA error on BlueField or ConnectX devices. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,58 +25,58 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Capabilities companion (CAPABILITIES.md)](CAPABILITIES.md) <br>
-- [Tasks companion (TASKS.md)](TASKS.md) <br>
-- [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline bash and C code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in its own isolated k8s-sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? <br>
-- Correctness: Is the answer correct? <br>
-- Discoverability: Was the right skill loaded when needed? <br>
-- Effectiveness: Did the skill help complete the task? <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? <br>
+- Security: Is the skill safe to use (unsafe operations, secret leakage, and unauthorized access). <br>
+- Correctness: Is the final answer correct against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed and were decoys avoided. <br>
+- Effectiveness: Did the skill help complete the task (equal-weight mean of goal completion and expected workflow adherence). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage (tool-call productivity and token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `accuracy`: final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: whether the user's goal was achieved. <br>
-- `behavior_check`: whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: actual uncached prompt plus completion usage (50% of Efficiency). <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.1% (uplift unavailable) | 97.9% (uplift unavailable) |
+| Overall | 93.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 55.0% → 100.0% (+45.0 points) |
-| Discoverability | 100.0% (uplift unavailable) | 93.3% (uplift unavailable) |
-| Effectiveness | 49.6% → 87.5% (+37.9 points) | 51.3% → 99.4% (+48.1 points) |
-| Efficiency | 88.1% (uplift unavailable) | 96.9% (uplift unavailable) |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Discoverability | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.2% → 83.1% (+32.9 points) | 59.4% → 68.3% (+8.9 points) |
+| Efficiency | 83.6% — baseline ran, but no comparable score was available; uplift unavailable | 69.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+b99bced (source: git SHA, committed 2026-10-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

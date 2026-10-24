@@ -84,7 +84,16 @@ Steps the agent should walk the user through:
    + `_type_add_field`, then
    `doca_telemetry_exporter_schema_add_type(schema, type_name,
    type, &type_index)`. Keep the `type_index` — it is the handle
-   for `_source_report`. Do NOT add types after `schema_start`.
+   for `_source_report` and for the schema index functions. If the
+   type uses indexes, set them now with
+   `doca_telemetry_exporter_schema_set_indexes` before
+   `schema_start`; read them back with
+   `doca_telemetry_exporter_schema_get_indexes` if needed. Do not
+   assume indexes are implicit or absent. The index family is
+   `doca_telemetry_exporter_type_index_t`; see the public header for
+   exact signatures and semantics. The `_source_report` data
+   argument is now `const void *`; pass a const data pointer. Do NOT
+   add types after `schema_start`.
 6. **Finalize the schema.**
    `doca_telemetry_exporter_schema_start(schema)`. After this no
    new types may be added.
@@ -165,7 +174,7 @@ before recommending any code-level edit:
 | Slot | What the agent asks the user | Exporter-specific consideration |
 | --- | --- | --- |
 | 1. Starting sample | Which of the four samples above is closest to the user's intended publish surface? | Pick by surface first (events / metrics / otlp / netflow), then by shape. A smaller diff is always safer than a re-architecture |
-| 2. Schema / record shape | For events: which fields with which `DOCA_TELEMETRY_EXPORTER_FIELD_TYPE_*` each? For metrics: which counters/gauges/histograms and label sets? For NetFlow: which `DOCA_TELEMETRY_EXPORTER_NETFLOW_*` field IDs? | The packed event struct MUST match the registered field list, or `_source_report` payloads mis-parse. For metrics, label-value arity MUST match the registered label set or `_metrics_add_*` returns `DOCA_ERROR_INVALID_VALUE` |
+| 2. Schema / record shape | For events: which fields with which `DOCA_TELEMETRY_EXPORTER_FIELD_TYPE_*` each? For metrics: which counters/gauges/histograms and label sets? For NetFlow: which `DOCA_TELEMETRY_EXPORTER_NETFLOW_*` field IDs? | The packed event struct MUST match the registered field list, or `_source_report` payloads mis-parse. In DOCA 3.5, `doca_telemetry_exporter_source_report` is const-correct: the data argument is `const void *`. Pass a const-qualified buffer and do not cast away const. For schema index handling, use `doca_telemetry_exporter_schema_get_indexes` / `doca_telemetry_exporter_schema_set_indexes` (DOCA 3.5). For metrics, label-value arity MUST match the registered label set or `_metrics_add_*` returns `DOCA_ERROR_INVALID_VALUE` |
 | 3. Lifecycle order | Where in the app flow do `schema_start`, `source_start`, and (if used) `_metrics_create_context` / `_otlp_logs_create_context` fall? | Per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes): types registered before `schema_start`; source created after `schema_start`; report only after `source_start`; metrics/OTLP context created only after `source_start`. Out-of-order source/report calls return `DOCA_ERROR_BAD_STATE`; metrics misuse more often surfaces as `DOCA_ERROR_INVALID_VALUE` per the header |
 | 4. Destinations | File write, IPC to DTS, Prometheus (metrics only), NetFlow collector — which, and is each reachable? | Enable on the schema (`_set_file_write_enabled` / `_set_ipc_enabled`) BEFORE `schema_start`; `_set_opaque_events_enabled` if opaque/OTLP. Prometheus is the `PROMETHEUS_ENDPOINT` env var, not a `schema_set_*` call |
 | 5. Flush + teardown | Does the modified app flush before destroy? | Call `_source_flush` / `_metrics_flush` / `_netflow_flush` before destroy so trailing buffered events are not lost, per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) |
@@ -265,7 +274,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
-| `DOCA_ERROR_INITIALIZATION` on `schema_start` | Data root unwritable or a CollectX-backend/exporter-config failure | Point the data root at a writable dir via `_schema_set_buf_data_root`; re-check enabled exporters before retrying |
+| `DOCA_ERROR_INITIALIZATION` on `schema_start` | Data root unwritable or a telemetry-backend/exporter-config failure | Point the data root at a writable dir via `_schema_set_buf_data_root`; re-check enabled exporters before retrying |
 | `DOCA_ERROR_BAD_STATE` on a report / OTLP context-create | Source not started, OTLP context created before `source_start`, or OTLP context missing on write/flush | Fix the lifecycle order per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) before re-running |
 | `DOCA_ERROR_INVALID_VALUE` on `_schema_add_type` / a report / a metric | Duplicate type name, bad field type, packed struct ≠ registered fields, NULL metrics handle, label-value arity ≠ label set, or invalid histogram ID | Re-align the type/field definition (or label set) with the report payload |
 | Report returns success but receiver / data file is empty | Receiver not up, IPC `DISABLED`/`FAILED`, or nothing was flushed | Confirm `check_ipc_status` = `CONNECTED`, start the receiver first, and add a `_source_flush` before teardown |
@@ -355,8 +364,8 @@ the agent does not invent guidance:
   public guide via
   `doca-public-knowledge-map/SKILL.md`,
   and to
-  `doca-collectx-deployment/SKILL.md`
-  for the CollectX collection path. This skill is publisher-side
+  `doca-dts/SKILL.md`
+  for the collector side (DTS). This skill is publisher-side
   only.
 - **deploy.** Deploying telemetry-emitting applications at scale
   across many hosts — out of scope and reserved for a future

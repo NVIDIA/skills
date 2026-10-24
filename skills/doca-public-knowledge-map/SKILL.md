@@ -166,7 +166,10 @@ Handing off that cycle is not a reason to go quiet: a debug answer still
 needs the two things this skill owns, and it should supply them in the
 same breath — the `/opt/mellanox/doca/...` install layout that says where
 the samples, libraries and `pkg-config` files actually live, and the
-canonical `docs.nvidia.com` page for the library involved.
+canonical `docs.nvidia.com` page for the library involved. The exception:
+when the user says they already have the documentation and only need the
+local debug loop, route to `doca-debug` and the matching component skill
+and stop; do not tell them to load this skill as well.
 
 ## Examples
 

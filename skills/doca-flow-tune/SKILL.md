@@ -15,7 +15,7 @@ description: >
   this pipe", "tune visualize step is empty", "before/after counters
   don't move", or "which doca-flow knob does this recommendation hit".
   Refuse and route elsewhere for measuring baseline numbers
-  (doca-flow-perf, doca-flow-dpa-perf), writing the doca-flow
+  (doca-flow-perf), writing the doca-flow
   application, DOCA install, or streaming Flow telemetry — those belong
   to other skills.
 metadata:
@@ -329,16 +329,6 @@ and pull requests should not add:
   An agent that reaches for tune without a baseline number from
   perf is optimizing in the dark; an agent that reaches for perf
   without a question is benchmarking for the sake of it.
-- `doca-flow-dpa-perf/SKILL.md` — the
-  DPA-offloaded variant of Flow perf. Relevant when the Flow
-  pipeline the user is tuning runs through a DPA-offload path;
-  the baseline comes from there, not from host-side
-  `doca-flow-perf`.
-- `doca-flow-grpc-server/SKILL.md` —
-  the remote-control gRPC surface for `doca-flow`. Programmatic
-  Flow rule management lives there; flow-tune's recommendations
-  may be applied through that surface when the operator's
-  control plane is remote.
 - `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA Flow Tune page on `docs.nvidia.com`
   and the rest of the public DOCA documentation set.

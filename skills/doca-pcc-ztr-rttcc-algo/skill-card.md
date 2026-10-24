@@ -1,5 +1,5 @@
 ## Description: <br>
-Deploy, tune, and evaluate NVIDIA's DOCA-shipped Zero-Touch RoCE RTT congestion control (ZTR RTTCC) reference algorithm (`doca_pcc_dev_ztr_rttcc_algo`) on a BlueField-3 DPA through the shipped DOCA PCC sample. <br>
+Deploy, tune, and evaluate NVIDIA's DOCA-shipped Zero-Touch RoCE RTT congestion control (ZTR RTTCC) reference algorithm (`doca_pcc_dev_ztr_rttcc_algo`) on a BlueField-3 DPA through the shipped DOCA PCC sample, including variant selection at DPACC build time, host-set parameter tuning, and `DOCA_PCC_DEV_STATUS_FAIL` debugging. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -38,8 +38,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -57,25 +57,25 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Flags unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Measures tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Checks final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Checks whether the user's goal was achieved. <br>
 - `behavior_check`: Checks whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Measures tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.7% (uplift unavailable) | 96.8% (uplift unavailable) |
+| Overall | 91.0% (uplift unavailable) | 88.8% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 60.0% → 100.0% (+40.0 points) |
-| Discoverability | 100.0% (uplift unavailable) | 90.0% (uplift unavailable) |
-| Effectiveness | 51.7% → 92.7% (+41.0 points) | 54.4% → 99.4% (+45.0 points) |
-| Efficiency | 75.6% (uplift unavailable) | 94.4% (uplift unavailable) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 75.0% → 100.0% (+25.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 48.8% → 78.7% (+29.9 points) | 74.3% → 86.9% (+12.6 points) |
+| Efficiency | 76.2% (uplift unavailable) | 62.1% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+b99bced (source: git SHA, committed 2026-10-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

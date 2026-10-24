@@ -75,7 +75,6 @@ question lands on before recommending an invocation.
 | Surface | What it produces | When to reach for it |
 | --- | --- | --- |
 | `doca-flow-perf/SKILL.md` | A defensible, four-tuple-anchored baseline number (throughput / latency / rule-install rate) on a *static* pipeline configuration driven by the perf tool itself | The question is *"what does this Flow pipeline configuration actually deliver on this device"*; no live application is required |
-| `doca-flow-dpa-perf/SKILL.md` | Same idea as `doca-flow-perf` but for the DPA-offloaded Flow path specifically | The question is *"what does this Flow pipeline deliver when offloaded to the DPA processor"*; the device must be DPA-capable |
 | `doca_flow_tune` (this skill) | A snapshot of live (or captured) pipe state plus an *analysis-driven recommendation* for a parameter change | The question is *"given this measured baseline, how do I improve it"*; a `doca-flow` application is running (or its config is captured) |
 
 The downstream rule: use `doca-flow-perf` to *measure*; use
@@ -400,6 +399,5 @@ surface is install-specific within the *documented* surface. For
 the `doca-flow` API behind the pipeline being tuned, the source
 of truth is `doca-flow/SKILL.md` plus the
 public DOCA Flow guide reached the same way. For the matching
-measurement tools, see
-`doca-flow-perf/SKILL.md` and
-`doca-flow-dpa-perf/SKILL.md`.
+measurement tool, see
+`doca-flow-perf/SKILL.md`.

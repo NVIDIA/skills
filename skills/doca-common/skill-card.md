@@ -39,8 +39,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -69,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.7% | 92.5% |
+| Overall | 89.5% | 83.2% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 85.0% → 100.0% (+15.0 points) |
-| Discoverability | 100.0% | 91.7% |
-| Effectiveness | 48.8% → 98.8% (+50.0 points) | 55.0% → 75.8% (+20.8 points) |
-| Efficiency | 89.9% | 94.8% |
+| Correctness | 50.0% → 95.0% (+45.0 points) | 70.0% → 85.0% (+15.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 39.4% → 66.2% (+26.8 points) | 34.2% → 62.9% (+28.7 points) |
+| Efficiency | 86.0% | 73.1% |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+b99bced (source: git SHA, committed 2026-10-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

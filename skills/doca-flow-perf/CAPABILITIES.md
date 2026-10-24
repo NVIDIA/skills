@@ -8,8 +8,6 @@ H2 that owns the substance. For the *how* of executing each
 pattern, jump to [TASKS.md](TASKS.md). For the `doca-flow`
 API surface behind the pipeline this tool drives, see
 `doca-flow/CAPABILITIES.md`;
-for the DPA-offloaded path measurement, see
-`doca-flow-dpa-perf/CAPABILITIES.md`;
 for the optimization-vs-measurement boundary, see
 `doca-flow-tune/CAPABILITIES.md`.
 
@@ -43,10 +41,6 @@ Two non-patterns the agent must NOT collapse into the above:
   `doca-flow-tune/SKILL.md`. The
   flow-perf tool does not modify the live application; it
   drives a synthetic pipeline.
-- *"I want to measure the DPA-offloaded Flow path"* — route
-  to `doca-flow-dpa-perf/SKILL.md`.
-  flow-perf measures the path that executes on the host or
-  DPU-CPU.
 
 ## Capabilities and modes
 

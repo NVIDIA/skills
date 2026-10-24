@@ -402,10 +402,6 @@ skill's name.
   `doca-flow-tune/SKILL.md`. The
   measurement-vs-optimization boundary is exactly the
   flow-perf-vs-flow-tune boundary.
-- **measure the DPA-offloaded Flow path** ⇒
-  `doca-flow-dpa-perf/SKILL.md`.
-  flow-perf measures the host or DPU-CPU path; flow-dpa-perf
-  measures the DPA-offloaded path.
 - **library-internal pipe / counter / inspector deep dive**
   ⇒ `doca-flow/SKILL.md`. The
   deeper per-pipe semantics belong to the library.

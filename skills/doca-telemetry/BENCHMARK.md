@@ -9,9 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-telemetry`
-- Evaluation date: 2026-10-21
+- Evaluation date: 2026-10-24
 - Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:70e265d586a768580828bb54df47441590e24c64d1bf6baa15a2f9c5792734b0` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 98.1% (+48.1 points) | 47.5% → 92.5% (+45.0 points) |
-| Efficiency | 93.3% — baseline ran, but no comparable score was available; uplift unavailable | 74.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.3% — baseline ran, but no comparable score was available; uplift unavailable | 84.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 35.0% → 100.0% (+65.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Discoverability | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 42.5% → 88.1% (+45.6 points) | 53.8% → 78.1% (+24.3 points) |
+| Efficiency | 70.2% — baseline ran, but no comparable score was available; uplift unavailable | 51.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 805,728 | 712,529 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-telemetry.explicit-positive.v1 | 162,561 | 343,331 | -180,770 | -52.65% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry.implicit-positive.v1 | N/A | 246,043 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-telemetry.implicit-positive.v2 | 420,801 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-telemetry.negative.v1 | 222,366 | 123,155 | +99,211 | +80.56% | skill 1/1; base 1/1 |
-| codex | All cases | 476,667 | 216,410 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-telemetry.explicit-positive.v1 | 116,793 | 64,593 | +52,200 | +80.81% | skill 1/1; base 1/1 |
-| codex | doca-telemetry.implicit-positive.v1 | 345,475 | 126,585 | +218,890 | +172.92% | skill 1/1; base 1/1 |
+| claude-code | All cases | 1,132,767 | 407,015 | N/A | N/A | skill 3/4; base 3/4 |
+| claude-code | doca-telemetry.explicit-positive.v1 | 327,838 | 93,198 | +234,640 | +251.77% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry.implicit-positive.v1 | 664,327 | 221,975 | +442,352 | +199.28% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
+| claude-code | doca-telemetry.negative.v1 | 140,602 | 91,842 | +48,760 | +53.09% | skill 1/1; base 1/1 |
+| codex | All cases | 296,630 | 275,517 | N/A | N/A | skill 3/4; base 3/4 |
+| codex | doca-telemetry.explicit-positive.v1 | 76,584 | 142,114 | -65,530 | -46.11% | skill 1/1; base 1/1 |
+| codex | doca-telemetry.implicit-positive.v1 | 175,930 | 83,798 | +92,132 | +109.95% | skill 1/1; base 1/1 |
 | codex | doca-telemetry.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-telemetry.negative.v1 | 14,399 | 25,232 | -10,833 | -42.93% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,282,395 | 928,939 | N/A | N/A | skill 6/8; base 6/8 |
+| codex | doca-telemetry.negative.v1 | 44,116 | 49,605 | -5,489 | -11.07% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,429,397 | 682,532 | N/A | N/A | skill 6/8; base 6/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,8 +72,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,11 +81,34 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md and references/details.md:
+  "# DOCA Telemetry capabilities, version overlay, errors, observability, safety" in CAPABILITIES.md (lines 1-27)
+  vs "## Pattern overview" in CAPABILITIES.md (lines 33-40)
+  vs "## Pattern overview" in CAPABILITIES.md (lines 42-57)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 64-70)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 74-77)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 122-126)
+  vs "## Safety policy" in CAPABILITIES.md (lines 271-275)
+  vs "## Safety policy" in CAPABILITIES.md (lines 276-294)
+  vs "## Deferred topic boundaries" in CAPABILITIES.md (lines 300-337)
+  vs "## Examples" in SKILL.md (lines 3-26)
+  vs "## Instructions" in SKILL.md (lines 27-59)
+  vs "## Audience" in SKILL.md (lines 60-90)
+  vs "## When to load this skill" in SKILL.md (lines 91-148)
+  vs "## What this skill provides" in SKILL.md (lines 149-187)
+  vs "## Loading order" in SKILL.md (lines 188-216)
+  vs "## Related skills" in SKILL.md (lines 218-277)
+  vs "# DOCA Telemetry per-domain hardware-counter-reader workflows" in TASKS.md (lines 1-40)
+  vs "## configure" in TASKS.md (lines 42-44)
+  vs "## configure" in TASKS.md (lines 46-131)
+  vs "## modify" in TASKS.md (lines 179-186)
+  vs "## run" in TASKS.md (lines 198-252)
+  vs "## Example questions this skill answers well" in references/details.md (lines 10-83)
+  vs "## What this skill deliberately does not ship" in references/details.md (lines 87-132) (`CAPABILITIES.md:1`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-telemetry/SKILL.md`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in details.md (`skills/libs/doca-telemetry/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-telemetry/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-telemetry`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo      (`BENCHMARK.md:87`)
 - 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>

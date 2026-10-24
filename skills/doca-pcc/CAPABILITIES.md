@@ -144,9 +144,33 @@ fails the deployment.
 
 | Axis | What to call | Why the agent must ask |
 | --- | --- | --- |
-| DOCA side | The `doca_pcc_cap_*` family against the active `doca_devinfo` for the BlueField port the host is driving | PCC-side compatibility of custom-algorithm load with this device + this DOCA install is device-conditional; do not assume the capability is on every BlueField + DOCA combo |
+| DOCA side | The `doca_pcc_cap_*` family against the active `doca_devinfo` for the BlueField port the host is driving. In DOCA 3.5, also query the device-side declaration limits with the `doca_pcc_dev_get_*` limit getters in the public PCC header (counter sum limit, max threads per counter set) before declaring resources | PCC-side compatibility of custom-algorithm load with this device + this DOCA install is device-conditional; do not assume the capability is on every BlueField + DOCA combo |
 | BlueField generation + DPA presence | `pkg-config --modversion doca-pcc` agrees with `doca_caps --version`; the user's BlueField is on a generation that carries a DPA processor (older generations may not). This is the same hardware axis as `doca-dpa CAPABILITIES.md ## Capabilities and modes` (`doca-dpa/CAPABILITIES.md#capabilities-and-modes`) | A BlueField without DPA hardware will fail the cap query no matter how recent the DOCA install is. Surface that distinction so the user does not chase a software upgrade for a hardware gap |
 | Firmware-level custom-PCC slot | The BlueField firmware's custom-PCC slot must be enabled before any host-side load call. This is a firmware configuration knob set via the env-side firmware tools, not via `doca-pcc` itself — route to `doca-setup/SKILL.md` | A BlueField whose firmware does not enable the custom-PCC slot will reject load calls with `DOCA_ERROR_NOT_PERMITTED` even if DOCA and DPA capability queries are happy; this is a firmware-side fix, not a code change |
+
+**Device-side declaration workflow (DOCA 3.5).** The public
+PCC header adds a declaration stage that must be completed
+before `doca_pcc_start()`. The host declares the device-side
+resource layout with the `doca_pcc_dev_declare_*` family:
+number of counter groups, number of histograms, threads per
+counter set, per-algorithm parameter and counter counts, and
+slot-to-algorithm bindings. Histogram IDs are registered per
+algorithm with `doca_pcc_dev_algo_register_hist_ids`, counter
+types are set with `doca_pcc_dev_set_counter_type`, and the
+declared user memory is committed with
+`doca_pcc_dev_user_declare_memory`. The public PCC header is
+the authoritative source for the exact call order and required
+arguments; do not guess the sequence from function names
+alone.
+
+Histograms are declared with a mode from the
+`DOCA_PCC_DEV_HISTOGRAM_MODE_*` family in the public PCC
+header. The family selects linear, exponential, or free
+histogram binning; the histogram init entry point takes the
+mode, edges, bin count, port, target app, counter group ID,
+histogram ID, and description. The same header defines the
+`doca_pcc_dev_histogram_*` lifecycle entry points for enable,
+disable, clear, update, and description retrieval.
 
 **Configuration shape.** *Mandatory* preconditions before any
 `doca_pcc_start()`: the `doca_pcc`
@@ -154,8 +178,14 @@ context must be created (via `doca_pcc_create`) against a `doca_dev` that maps t
 DPA-capable BlueField port whose firmware has the custom-PCC
 slot enabled; the PCC algorithm image (`doca_pcc_app`)
 compiled by `dpacc` must be loaded into the `doca_pcc`; the
+device-side declaration workflow from the public PCC header
+must be completed (declare counter groups, histograms,
+threads per counter set, per-algorithm parameter/counter
+counts, histogram IDs, counter types, slot bindings, and
+user-declared memory); the
 algorithm's host-side parameters (whatever knobs the
 algorithm exposes) must be set; the `doca_pcc_cap_*` queries
+and the `doca_pcc_dev_get_*` limit getters
 must agree the deployment is supported on this combo.
 *Optional* configurations (algorithm parameter retunes,
 observability queue sizing) are program-side tunables that
@@ -171,6 +201,8 @@ lives there; this skill does not duplicate it.
 **The PCC-specific overlay** is:
 
 - **DOCA must match the DPACC compiler per the DOCA Compatibility Policy.** The DPACC compiler is the build-time component that turns the user's DPA-side PCC algorithm source into the binary embedded in the host executable as a `doca_pcc_app`; the host-side runtime that loads it is `doca-pcc`. Mismatched DOCA + DPACC versions fail at link time (missing symbols on either side) or at load time (`DOCA_ERROR_DRIVER` or `DOCA_ERROR_INVALID_VALUE` from the host-side load call) in ways that look like hardware bugs but are version-skew bugs. This is the same overlay `doca-dpa CAPABILITIES.md ## Version compatibility` (`doca-dpa/CAPABILITIES.md#version-compatibility`) documents for DPA itself, because the custom PCC algorithm *is* DPA-side code. The agent must surface BOTH `pkg-config --modversion doca-pcc` AND the installed `dpacc` version, cross-check them against the DOCA Compatibility Policy at <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>, and route any disagreement to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) before any PCC-layer diagnosis. Per the cross-cutting cap-query rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the `doca_pcc_cap_*` query against the active `doca_devinfo` is the runtime authority for *"is this custom PCC deployment supported on this hardware + this DOCA install + this firmware"*, and the four-way-match check (`doca-pcc.pc` plus `doca-common.pc` plus the matching DPACC) per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`) catches the *DOCA upgraded but DPACC didn't* partial-install pattern before it surfaces as a load failure.
+
+- **DOCA 3.5 expanded the public API surface.** The 3.5 release added the `doca_pcc_dev_*` declaration, histogram, and counter families, the `doca_pcc_*` thread and log families, and the `DOCA_PCC_DEV_HISTOGRAM_MODE_*` constants. Code written against the pre-3.5 API must be recompiled against the 3.5 public headers; code that uses the new declaration/histogram/counter calls requires DOCA 3.5 or later and will not link or load on older DOCA. Treat the presence or absence of these families as a version signal: a build that references the new families is a 3.5+ build, and a 3.5 library paired with pre-3.5 headers (or vice versa) is the same version-skew failure class as the DPACC mismatch above. The authoritative declarations are in the doca-pcc public headers shipped with the component; do not infer the API from older documentation.
 
 ## Error taxonomy
 
@@ -201,7 +233,9 @@ not at retry.
 PCC observability surface is **two-sided**: there is a
 host-side observability surface (what the running algorithm
 reports back to the host through the host-side `doca-pcc`
-API, the DOCA logger, cap-query snapshots) AND an
+API, the DOCA logger, cap-query snapshots, and the PCC log
+file path get/set APIs `doca_pcc_log_file_get` /
+`doca_pcc_log_file_set`) AND an
 infrastructure-side observability surface (the
 `pcc_counters` diagnostic CLI documented in the public
 DOCA Tools umbrella reachable via
@@ -225,6 +259,12 @@ Three primary signals the agent should reach for:
    report-emission path, or a host report queue that is not
    drained and becomes full. Check those in that order before
    attributing the issue to the algorithm body.
+   As of DOCA 3.5, the host-side API also exposes explicit
+   PCC log file path control through `doca_pcc_log_file_get`
+   and `doca_pcc_log_file_set`; the developer must use these
+   to direct PCC logs to a known file and to retrieve the
+   current path before collecting logs, rather than relying
+   only on the generic DOCA logger settings.
 2. **Capability snapshot at configure time.** The output of
    `doca_pcc_cap_*` against the active `doca_devinfo`
    together with the installed `pkg-config --modversion

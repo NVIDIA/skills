@@ -105,10 +105,12 @@ the installed header `doca_pcc_dev_ztr_rttcc_algo.h`:
 | `doca_pcc_dev_ztr_rttcc_get_num_of_histograms(void)` | Number of RTT / rate histograms the algorithm supports on this build (zero if the histogram feature was not compiled in) | Read at init time when the application reserves histogram storage |
 
 These are the ONLY symbols the public header exposes; the
-agent does not invent additional ones. The four `get_*`
-helpers are how the application sizes its per-algorithm
-storage without hardcoding numbers that drift between
-variants.
+agent does not invent additional ones. The setter signature
+in DOCA 3.5 requires `port_num` and `algo_slot` before
+`param_id_base`; callers must supply both and must not call
+a four-argument spelling. The three `get_*` helpers are how
+the application sizes its per-algorithm storage without
+hardcoding numbers that drift between variants.
 
 **Variants — chosen at DPA-side compile time.** The DPA-side
 source ships several variants; the public symbol
@@ -146,7 +148,7 @@ in-place edits on the shipped sample:
 | `/opt/mellanox/doca/applications/pcc/device/rp/rtt_template/rp_rtt_template_dev_main.c` — `#include` block | Add `#include "doca_pcc_dev_ztr_rttcc_algo.h"` | The header that exposes the public DPA-side API for this algorithm |
 | Same file — `doca_pcc_dev_user_algo()` body | Add a dispatch case for the chosen algo slot that calls `doca_pcc_dev_ztr_rttcc_algo(algo_ctxt, event, attr, results)` | Routes CC events on that slot to this algorithm. Per the README, algo slot 0 is normally assigned to the sample rtt-template; if the user reuses slot 0, the sample's rtt-template dispatch must be removed |
 | Same file — `doca_pcc_dev_user_init()` body | Add `doca_pcc_dev_ztr_rttcc_init(algo_idx)` for the chosen algo index | Initializes the algorithm structure |
-| Same file — `doca_pcc_dev_user_set_algo_params()` body | Add `doca_pcc_dev_set_ztr_rttcc_params(port_num, algo_slot, param_id_base, param_num, new_param_values, params)` after verifying the exact installed-header prototype | Routes host-set parameter updates into the algorithm's parameter array. Do not treat a four-argument spelling as equivalent unless the installed sample exposes a named, verified wrapper with that exact signature |
+| Same file — `doca_pcc_dev_user_set_algo_params()` body | Add `doca_pcc_dev_set_ztr_rttcc_params(port_num, algo_slot, param_id_base, param_num, new_param_values, params)` after verifying the exact installed-header prototype | Routes host-set parameter updates into the algorithm's parameter array for the specified port and algorithm slot. Do not treat a four-argument spelling as equivalent; the DOCA 3.5 public API requires the port number and algorithm slot before the parameter ID base |
 | `/opt/mellanox/doca/applications/pcc/build_device_code.sh` — DPACC compilation section | Add `-ldoca_pcc_ztr_rttcc_algo_dev` to the `-device-libs` option | Links the DPA-side static library into the device-side image |
 | `/opt/mellanox/doca/applications/pcc/dependencies/meson.build` | Add `app_doca_depends += ['pcc_ztr_rttcc_algo']` | Wires the dependency into the meson build of the DOCA PCC application |
 | Build invocation | `cd /opt/mellanox/doca/applications` then `meson <BUILD_DIR> -Denable_all_applications=false -Denable_pcc=true && ninja -C <BUILD_DIR>` | Builds the PCC application with the algorithm included |
@@ -161,7 +163,7 @@ the verified base; only the listed lines change.
 algorithm exposes a documented set of parameters
 (declared in the DPA-side parameter table shipped with the
 algorithm and validated by `doca_pcc_dev_set_ztr_rttcc_params`
-before any value lands). The agent's role is to NAME the
+for the specified port and algorithm slot before any value lands). The agent's role is to NAME the
 parameter SHAPE (a bounded array of unsigned 32-bit values
 indexed by parameter id, range-checked per parameter on
 set) and to route the canonical list of parameter
@@ -237,6 +239,15 @@ lives there; this skill does not duplicate it.
   the installed `dpacc` version, and cross-checks them
   against the DOCA Compatibility Policy at
   <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>.
+- **DOCA 3.5 public API change.** Code written against
+  earlier DOCA releases must be updated: the parameter
+  setter in the `doca_pcc_dev_ztr_rttcc_*` family now
+  takes port and algorithm slot arguments before the
+  parameter ID base, and three count getters were added
+  for counters, histograms, and parameters. The agent
+  points to the component's public header for the exact
+  signatures and constants rather than quoting them from
+  memory.
 - **DOCA and DPACC must match per the DOCA Compatibility
   Policy.** Inherited from
   `doca-pcc CAPABILITIES.md ## Version compatibility` (`doca-pcc/CAPABILITIES.md#version-compatibility`)
@@ -343,13 +354,18 @@ Three primary signals the agent should reach for, in order:
    counters, AI / HAI / decrement counters, RTT
    statistics, rate envelope counters, RTT-timeout
    counter, advanced-features counter — categories per
-   the algorithm's shipped header set). A monotonically
-   growing handle counter combined with a stalled
-   AI / decrement counter is the canonical signal that
-   the algorithm is *receiving* CC events but is *not
-   acting* on them; the agent surfaces that this points
-   at parameter tuning or variant selection rather than
-   at framework wiring.
+   the algorithm's shipped header set). The number of
+   counter entries and histogram entries is not fixed;
+   do not assume a fixed count. Use the count getter
+   family in the component public header to determine
+   how many counter and histogram entries to read, and
+   iterate over exactly that many entries. A
+   monotonically growing handle counter combined with a
+   stalled AI / decrement counter is the canonical
+   signal that the algorithm is *receiving* CC events
+   but is *not acting* on them; the agent surfaces that
+   this points at parameter tuning or variant selection
+   rather than at framework wiring.
 3. **The host-side `doca-pcc` framework's reporting and
    the DOCA logger.** Inherited from
    `doca-pcc CAPABILITIES.md ## Observability` (`doca-pcc/CAPABILITIES.md#observability`);

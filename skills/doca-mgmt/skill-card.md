@@ -38,8 +38,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -68,15 +68,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% (uplift unavailable) | 96.4% (uplift unavailable) |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 100.0% (+50.0 points) | 85.0% → 100.0% (+15.0 points) |
-| Discoverability | 100.0% (uplift unavailable) | 88.3% (uplift unavailable) |
-| Effectiveness | 40.4% → 90.6% (+50.2 points) | 56.3% → 98.8% (+42.5 points) |
-| Efficiency | 81.5% (uplift unavailable) | 95.1% (uplift unavailable) |
+| Overall | 92.0% (uplift unavailable) | 90.9% (uplift unavailable) |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 90.0% → 100.0% (+10.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 25.6% → 73.3% (+47.7 points) | 53.1% → 83.1% (+30.0 points) |
+| Efficiency | 86.5% (uplift unavailable) | 76.2% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+b99bced (source: git SHA, committed 2026-10-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

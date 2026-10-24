@@ -52,10 +52,11 @@ Two cross-cutting rules that apply to *every* pattern above:
 DOCA Management is the **management-plane API surface** for
 BlueField / ConnectX device-level operations. The host-side
 library exposes a management context per device, an optional
-representor context per VF / function-level surface, four
+representor context per VF / function-level surface, four typed
 sub-domains (general caps, congestion-control global status,
-diagnostics data, ICM quota), and a raw-command pipe with an
-explicit scope classifier.
+diagnostics data, ICM quota), two raw HCA/register surfaces (raw
+HCA capability, raw register), target info enumeration, and a
+raw-command pipe with an explicit scope classifier.
 
 ### `doca-mgmt` vs telemetry vs caps vs bench
 
@@ -85,8 +86,8 @@ Two objects expose the management plane. Verified surface
 
 | Object | Calls | Note |
 | --- | --- | --- |
-| `doca_mgmt_dev_ctx` | `doca_mgmt_dev_ctx_create(dev, &ctx)`, `doca_mgmt_dev_ctx_destroy(ctx)`, `doca_mgmt_dev_ctx_get_doca_dev(ctx)` | Created on a `doca_dev`; the device-wide management context. Required for `doca_mgmt_raw_cmd`, `doca_mgmt_cap_*_is_supported`, and the device-wide icm-quota and diagnostics-data operations |
-| `doca_mgmt_dev_rep_ctx` | `doca_mgmt_dev_rep_ctx_create(dev_ctx, rep, &ctx)` (with a `doca_dev_rep`), `doca_mgmt_dev_rep_ctx_create_by_pci_addr(dev_ctx, "0000:3a:00.2", &ctx)` (when a representor is not available for the VF), `doca_mgmt_dev_rep_ctx_destroy`, `doca_mgmt_dev_rep_ctx_get_doca_dev_rep`, `doca_mgmt_dev_rep_ctx_get_mgmt_dev_ctx` | Required for representor-targeted sub-domain calls (general caps `_set` / `_get`, icm-quota for representors). The `_by_pci_addr` form is the documented alternative path when the kernel-side representor is not exposed |
+| `doca_mgmt_dev_ctx` | `doca_mgmt_dev_ctx_create(dev, &ctx)`, `doca_mgmt_dev_ctx_create_from_target_string(target_string, &ctx)`, `doca_mgmt_dev_ctx_destroy(ctx)`, `doca_mgmt_dev_ctx_get_doca_dev(ctx)` | Created on a `doca_dev` or from a target string; the device-wide management context. Required for `doca_mgmt_raw_cmd`, `doca_mgmt_cap_*_is_supported`, the device-wide icm-quota and diagnostics-data operations, and the raw HCA/register surfaces |
+| `doca_mgmt_dev_rep_ctx` | `doca_mgmt_dev_rep_ctx_create(dev_ctx, rep, &ctx)` (with a `doca_dev_rep`), `doca_mgmt_dev_rep_ctx_create_by_pci_addr(dev_ctx, "0000:3a:00.2", &ctx)` (when a representor is not available for the VF), `doca_mgmt_dev_rep_ctx_create_from_target_string(target_string, &ctx)` (when only a target string is available), `doca_mgmt_dev_rep_ctx_destroy`, `doca_mgmt_dev_rep_ctx_get_doca_dev_rep`, `doca_mgmt_dev_rep_ctx_get_mgmt_dev_ctx` | Required for representor-targeted sub-domain calls (general caps `_set` / `_get`, icm-quota for representors). The `_by_pci_addr` and `_from_target_string` forms are the documented alternative paths when the kernel-side representor is not exposed |
 
 Every public `doca_mgmt_*` symbol is currently tagged
 `DOCA_EXPERIMENTAL` in the version map under the `DOCA_3` version
@@ -116,6 +117,53 @@ through `raw_cmd`. `raw_cmd` is the escape valve for
 vendor-documented commands without a dedicated wrapper — not the
 primary management surface.
 
+### Raw HCA capability and register surfaces
+
+DOCA 3.5 adds two dedicated raw surfaces for HCA capabilities and
+registers. They are not `doca_mgmt_raw_cmd`; they use typed field
+descriptors and do not take an `enum doca_mgmt_cmd_scope`.
+
+| Surface | Functions | Notes |
+| --- | --- | --- |
+| Raw HCA capability | `doca_mgmt_raw_hca_cap_list(ctx, &hca_cap_types, &count)`, `doca_mgmt_raw_hca_cap_describe(ctx, cap_type, &descriptors, &count)`, `doca_mgmt_raw_hca_cap_query(ctx, cap_type, cap_mode, target, fields_out, count_out)`, `doca_mgmt_raw_hca_cap_query_all(ctx, cap_type, cap_mode, target, &fields_out, &count_out)`, `doca_mgmt_raw_hca_cap_modify(ctx, cap_type, target, fields_in, count_in)` | `cap_mode` is `DOCA_MGMT_RAW_HCA_CAP_MODE_CUR` or `DOCA_MGMT_RAW_HCA_CAP_MODE_MAX`. `target` type is `DOCA_MGMT_RAW_HCA_CAP_TARGET_TYPE_SELF`, `DOCA_MGMT_RAW_HCA_CAP_TARGET_TYPE_OTHER_VHCA_ID`, or `DOCA_MGMT_RAW_HCA_CAP_TARGET_TYPE_OTHER_FUNCTION_ID`. Free lists with `doca_mgmt_raw_field_desc_list_free`, `doca_mgmt_raw_field_list_free`, and `doca_mgmt_raw_str_list_free` |
+| Raw register | `doca_mgmt_raw_register_list(ctx, &registers, &count)`, `doca_mgmt_raw_register_describe(ctx, register_name, &descriptors, &count)`, `doca_mgmt_raw_register_query(ctx, register_name, fields_in, count_in, fields_out, count_out)`, `doca_mgmt_raw_register_query_all(ctx, register_name, fields_in, count_in, &fields_out, &count_out)`, `doca_mgmt_raw_register_modify(ctx, register_name, fields_in, count_in)` | Field access constants: `DOCA_MGMT_RAW_FIELD_ACCESS_RO`, `DOCA_MGMT_RAW_FIELD_ACCESS_RW`, `DOCA_MGMT_RAW_FIELD_ACCESS_WO`, `DOCA_MGMT_RAW_FIELD_ACCESS_INDEX`, `DOCA_MGMT_RAW_FIELD_ACCESS_OP`, `DOCA_MGMT_RAW_FIELD_ACCESS_UNKNOWN`. Free lists with `doca_mgmt_raw_field_desc_list_free`, `doca_mgmt_raw_field_list_free`, and `doca_mgmt_raw_str_list_free` |
+
+`doca_mgmt_raw_hca_cap_modify` and `doca_mgmt_raw_register_modify`
+change device state. Apply the same pre-state capture, rollback,
+and `doca-hardware-safety` discipline as
+`DOCA_MGMT_CMD_SCOPE_CONFIGURATION` writes.
+
+### Target info enumeration
+
+Target info enumeration lists devices and representors available
+as management targets. Use `doca_mgmt_target_info_dev_create_list`
+to enumerate device targets and
+`doca_mgmt_target_info_dev_rep_create_list` on a device target to
+enumerate its representors. Accessors return target strings,
+interface names, PCI function types, and representor indices.
+`doca_mgmt_target_info_dev_rep_get_pci_pf_type` returns
+`DOCA_MGMT_PCI_PF_TYPE_EXTERNAL_HOST` or
+`DOCA_MGMT_PCI_PF_TYPE_SATELLITE`. Destroy lists with the
+corresponding `_destroy_list` calls.
+
+Device target accessors:
+`doca_mgmt_target_info_dev_get_ibdev_name`,
+`doca_mgmt_target_info_dev_get_iface_name`,
+`doca_mgmt_target_info_dev_get_native_port_num`,
+`doca_mgmt_target_info_dev_get_pci_func_type`,
+`doca_mgmt_target_info_dev_get_target_string`.
+
+Representor target accessors:
+`doca_mgmt_target_info_dev_rep_get_controller_num`,
+`doca_mgmt_target_info_dev_rep_get_iface_name`,
+`doca_mgmt_target_info_dev_rep_get_pci_func_type`,
+`doca_mgmt_target_info_dev_rep_get_pci_pf_type`,
+`doca_mgmt_target_info_dev_rep_get_pf_index`,
+`doca_mgmt_target_info_dev_rep_get_sf_index`,
+`doca_mgmt_target_info_dev_rep_get_target_string`,
+`doca_mgmt_target_info_dev_rep_get_vf_index`,
+`doca_mgmt_target_info_dev_rep_get_vhca_id`.
+
 ### Sub-domain surfaces
 
 Four sub-domains expose typed wrappers on top of the management
@@ -125,14 +173,16 @@ context. Each has its own capability gate and lifecycle:
 | --- | --- | --- | --- |
 | General device caps | `doca_mgmt_device_caps_general.h` | Implicit: the `_get` call returns `DOCA_ERROR_NOT_SUPPORTED` on devices without the surface | `doca_mgmt_device_caps_general` handle (`_create` / `_destroy`); apply via `_set(rep_ctx, handle)`; read via `_get(rep_ctx, handle)`; field accessors: `_set_data_direct` / `_get_data_direct`; `_clear` to reset before re-use |
 | Congestion control global status | `doca_mgmt_cc_global_status.h` | Implicit: `_get` returns `DOCA_ERROR_NOT_SUPPORTED` on devices without the surface | `doca_mgmt_cc_global_status` handle; protocol enum (`RP` / `NP`); priority and enable accessors; `_set` / `_get` against a representor or device context |
-| Diagnostics data | `doca_mgmt_diagnostics_data.h` | `doca_mgmt_cap_diagnostics_data_multi_domain_is_supported(dev_ctx)` for the multi-domain capability; per-field cap probes for narrower features | `doca_mgmt_diagnostics_data` handle; `_modify_for_dev` / `_query_for_dev`; multi-domain accessor |
+| Diagnostics data | `doca_mgmt_diagnostics_data.h` | `doca_mgmt_cap_diagnostics_data_multi_domain_is_supported(dev_ctx)` for the multi-domain capability; per-field cap probes for narrower features | `doca_mgmt_diagnostics_data` handle (`_create` / `_destroy` / `_clear`); `_modify_for_dev` / `_query_for_dev`; multi-domain accessors `_get_multi_domain` / `_set_multi_domain` |
 | ICM quota | `doca_mgmt_icm_quota.h` | `doca_mgmt_cap_icm_quota_is_supported(dev_ctx)` for the surface; `doca_mgmt_cap_icm_quota_get_max_limit(dev_ctx, &max)` for the upper bound | `doca_mgmt_icm_quota` handle; per-device or per-representor; `_set_limit` (in 4 KB granularity; `DOCA_MGMT_ICM_QUOTA_LIMIT_UNLIMITED` is `UINT32_MAX`); `_get_current_allocation`, `_get_max_reached`, `_clear`, `_modify`, `_query` |
 
 ### Configuration shape
 
 *Mandatory* before any sub-domain operation: a `doca_mgmt_dev_ctx`
-on the target device, and (for representor-targeted operations) a
-`doca_mgmt_dev_rep_ctx` on the target VF / function. The
+on the target device (created from a `doca_dev` or a target
+string), and (for representor-targeted operations) a
+`doca_mgmt_dev_rep_ctx` on the target VF / function (created from
+a `doca_dev_rep`, a PCI address, or a target string). The
 sub-domain handle is a *transient* configuration carrier: create
 it, populate fields, apply via `_set`, then destroy. Persistent
 state lives on the device, not on the handle. The handle's
@@ -159,6 +209,71 @@ there; this skill does not duplicate it.
   building a long-lived fleet-management tool against this
   surface requires explicit per-release re-verification (see
   [`TASKS.md ## test`](TASKS.md#test)).
+- **DOCA 3.5 added new public API functions and constants.** The agent must treat these additions as part of the same `EXPERIMENTAL` surface and verify them against the installed headers before recommending them. The added functions are:
+
+  ```text
+  doca_mgmt_cap_diagnostics_data_multi_domain_is_supported
+  doca_mgmt_dev_ctx_create_from_target_string
+  doca_mgmt_dev_rep_ctx_create_by_pci_addr
+  doca_mgmt_dev_rep_ctx_create_from_target_string
+  doca_mgmt_diagnostics_data_clear
+  doca_mgmt_diagnostics_data_create
+  doca_mgmt_diagnostics_data_destroy
+  doca_mgmt_diagnostics_data_get_multi_domain
+  doca_mgmt_diagnostics_data_modify_for_dev
+  doca_mgmt_diagnostics_data_query_for_dev
+  doca_mgmt_diagnostics_data_set_multi_domain
+  doca_mgmt_raw_field_desc_list_free
+  doca_mgmt_raw_field_list_free
+  doca_mgmt_raw_hca_cap_describe
+  doca_mgmt_raw_hca_cap_list
+  doca_mgmt_raw_hca_cap_modify
+  doca_mgmt_raw_hca_cap_query
+  doca_mgmt_raw_hca_cap_query_all
+  doca_mgmt_raw_register_describe
+  doca_mgmt_raw_register_list
+  doca_mgmt_raw_register_modify
+  doca_mgmt_raw_register_query
+  doca_mgmt_raw_register_query_all
+  doca_mgmt_raw_str_list_free
+  doca_mgmt_target_info_dev_create_list
+  doca_mgmt_target_info_dev_destroy_list
+  doca_mgmt_target_info_dev_get_ibdev_name
+  doca_mgmt_target_info_dev_get_iface_name
+  doca_mgmt_target_info_dev_get_native_port_num
+  doca_mgmt_target_info_dev_get_pci_func_type
+  doca_mgmt_target_info_dev_get_target_string
+  doca_mgmt_target_info_dev_rep_create_list
+  doca_mgmt_target_info_dev_rep_destroy_list
+  doca_mgmt_target_info_dev_rep_get_controller_num
+  doca_mgmt_target_info_dev_rep_get_iface_name
+  doca_mgmt_target_info_dev_rep_get_pci_func_type
+  doca_mgmt_target_info_dev_rep_get_pci_pf_type
+  doca_mgmt_target_info_dev_rep_get_pf_index
+  doca_mgmt_target_info_dev_rep_get_sf_index
+  doca_mgmt_target_info_dev_rep_get_target_string
+  doca_mgmt_target_info_dev_rep_get_vf_index
+  doca_mgmt_target_info_dev_rep_get_vhca_id
+  ```
+
+  The added constants are:
+
+  ```text
+  DOCA_MGMT_PCI_PF_TYPE_EXTERNAL_HOST
+  DOCA_MGMT_PCI_PF_TYPE_SATELLITE
+  DOCA_MGMT_RAW_FIELD_ACCESS_INDEX
+  DOCA_MGMT_RAW_FIELD_ACCESS_OP
+  DOCA_MGMT_RAW_FIELD_ACCESS_RO
+  DOCA_MGMT_RAW_FIELD_ACCESS_RW
+  DOCA_MGMT_RAW_FIELD_ACCESS_UNKNOWN
+  DOCA_MGMT_RAW_FIELD_ACCESS_WO
+  DOCA_MGMT_RAW_HCA_CAP_MODE_CUR
+  DOCA_MGMT_RAW_HCA_CAP_MODE_MAX
+  DOCA_MGMT_RAW_HCA_CAP_TARGET_TYPE_OTHER_FUNCTION_ID
+  DOCA_MGMT_RAW_HCA_CAP_TARGET_TYPE_OTHER_VHCA_ID
+  DOCA_MGMT_RAW_HCA_CAP_TARGET_TYPE_SELF
+  ```
+
 - **The runtime authority is the installed headers, not the
   public docs.** Per the cross-cutting rule in
   `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
@@ -266,7 +381,9 @@ follow from that:
 
 1. **Pre-state-capture is a hard precondition for any write.**
    The agent does NOT recommend any `_set` / `_modify` /
-   `_set_limit` / `raw_cmd`-with-write-scope call without first
+   `_set_limit` / `raw_cmd`-with-write-scope call — including
+   `doca_mgmt_raw_hca_cap_modify`, `doca_mgmt_raw_register_modify`,
+   and `doca_mgmt_diagnostics_data_modify_for_dev` — without first
    walking the matching `_get` / `_query` to capture the
    current state. The captured state is what the rollback path
    quotes; the agent does not invent rollback values from
@@ -280,10 +397,13 @@ follow from that:
    `DEBUG_READ_ONLY`. Write operations that have a dedicated
    wrapper (caps-general, cc-global-status, diagnostics-data,
    icm-quota) go through that wrapper, NOT through `raw_cmd`.
-   `raw_cmd` with `DEBUG_WRITE_FULL` is the widest scope and
-   requires the most precondition gates from the meta-policy —
-   maintenance window, OOB access, replica-first validation,
-   documented rollback.
+   `doca_mgmt_raw_hca_cap_modify` and
+   `doca_mgmt_raw_register_modify` are write-scope raw surfaces
+   and require the same precondition gates as `raw_cmd` with
+   write scope. `raw_cmd` with `DEBUG_WRITE_FULL` is the widest
+   scope and requires the most precondition gates from the
+   meta-policy — maintenance window, OOB access, replica-first
+   validation, documented rollback.
 3. **No documented rollback → refuse and escalate.** Per
    `doca-hardware-safety ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`),
    any change for which the operator cannot describe a

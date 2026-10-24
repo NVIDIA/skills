@@ -139,6 +139,8 @@ missing the support fails the feature.
 | DOCA side | The `doca_dpa_cap_*` family against the active `doca_devinfo` for the BlueField the host is driving | DPA-side compatibility of a specific feature with this BlueField + this DOCA install is device-conditional; do not assume the feature is on every BlueField + DOCA combo |
 | BlueField generation | `pkg-config --modversion doca-dpa` agrees with `doca_caps --version`; the user's BlueField is on a generation that carries a DPA processor (older generations may not) | The DPA is hardware — a BlueField without DPA hardware will fail the cap query no matter how recent the DOCA install is. Surface that distinction so the user does not chase a software upgrade for a hardware gap |
 
+**DOCA 3.5 DPA capability additions.** The DPA public header now exposes EU group affinity, validation resources, and dev thread retrigger capabilities. Use the `doca_dpa_eu_group_affinity_*` family to create, set, get, clear, and destroy EU group affinity objects; use `doca_dpa_thread_get_group_affinity` and `doca_dpa_thread_set_group_affinity` to attach an affinity to a `doca_dpa_thread`; use `doca_dpa_get_validation_resources` and `doca_dpa_set_validation_resources` to obtain and apply validation resources; use `doca_dpa_resources_get_num_eu_groups` and `doca_dpa_resources_get_eu_groups` to enumerate EU groups from a resources object; and call `doca_dpa_dev_thread_retrigger` from DPA-side code to retrigger the current dev thread. All of these are declared in the DPA public header. A developer targeting DOCA 3.5 must query and apply these capabilities through the `doca_dpa`/`doca_dpa_thread` lifecycle instead of assuming a fixed EU-group layout or a fixed validation-resource set: obtain validation resources with `doca_dpa_get_validation_resources`, apply them with `doca_dpa_set_validation_resources`, enumerate EU groups with the `doca_dpa_resources_get_*` family, and set per-thread EU group affinity with the `doca_dpa_thread_*_group_affinity` family before relying on any EU-group placement.
+
 **Configuration shape.** *Mandatory* preconditions before any
 `doca_dpa_kernel_launch_update_*` call: the `doca_dpa` Core
 context must be created against a `doca_dev` that maps to a
@@ -349,6 +351,8 @@ two-side-program maintenance cost (DPACC + DOCA version pinning,
 cap-query density, host / DPA boundary debugging) is real; do not
 pay it for RDMA the host can handle.
 
+**DOCA 3.5 public API change.** The DPA public header no longer exposes `doca_dpa_dev_devemu_pci_msix_get_user_data`; use the new families `doca_dpa_eu_group_affinity_*`, `doca_dpa_thread_*_group_affinity`, `doca_dpa_get_validation_resources`, `doca_dpa_set_validation_resources`, `doca_dpa_resources_get_num_eu_groups`, `doca_dpa_resources_get_eu_groups`, and `doca_dpa_dev_thread_retrigger` instead. Include the DPA public header.
+
 For the configure / build / modify / run / test / debug shape
 specific to DPA-Verbs, see [TASKS.md ## verbs](TASKS.md#verbs).
 
@@ -362,6 +366,8 @@ lives there; this skill does not duplicate it.
 **The DPA-specific overlay** is:
 
 - **DOCA must match the DPACC compiler per the DOCA Compatibility Policy.** The DPACC compiler is the build-time component that turns DPA-side source into the binary embedded in the host executable as a `doca_dpa_app`; the host-side runtime that loads it is `doca-dpa`. Mismatched DOCA + DPACC versions fail at link time (missing symbols on either side) or at launch time (`DOCA_ERROR_DRIVER` from a `doca_dpa_kernel_launch_update_*` call) in ways that look like hardware bugs but are version-skew bugs. The agent must surface BOTH `pkg-config --modversion doca-dpa` AND the installed `dpacc` version, cross-check them against the DOCA Compatibility Policy at <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>, and route any disagreement to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) before any DPA-layer diagnosis. Per the cross-cutting cap-query rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the `doca_dpa_cap_*` query against the active `doca_devinfo` is the runtime authority for *"is this DPA feature on this hardware + this DOCA install"*, and the four-way-match check (`doca-dpa.pc` plus `doca-common.pc` plus the matching DPACC) per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`) catches the *DOCA upgraded but DPACC didn't* partial-install pattern before it surfaces as a launch failure.
+
+- **DOCA 3.5 changed the DPA public API.** The `doca_dpa_dev_devemu_pci_msix_get_user_data` call was removed. Code that calls it must migrate before building against DOCA 3.5. The release adds the EU group affinity family, the validation resources family, and the dev thread retrigger family; use those APIs from the DPA public API header instead of any prior workaround. Treat any code or documentation that still references the removed call as stale.
 
 ## Error taxonomy
 

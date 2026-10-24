@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides hands-on host-side DOCA DPA work on a BlueField DPU: creating the doca_dpa context, loading a DPACC-compiled DPA application image, creating DPA threads, launching kernels, draining completions, running capability discovery, and debugging DOCA_ERROR_* from doca_dpa_* calls. <br>
+Guides hands-on host-side DOCA DPA work on a BlueField DPU: creating the doca_dpa context, loading a DPACC-compiled DPA application image, creating DPA threads, launching kernels via doca_dpa_kernel_launch_update_*, draining doca_dpa_completion, running doca_dpa_cap_* discovery, choosing between the DPA comm and DPA verbs components, and debugging DOCA_ERROR_* from doca_dpa_* calls. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers and engineers building host-side applications that consume the DOCA DPA library use this skill to stand up the doca_dpa context, load a dpacc-built DPA application image, launch DPA kernels, drain completions, query DPA capabilities, and debug DPA-related DOCA errors on BlueField DPUs. <br>
+External developers and engineers building host-side applications that consume the DOCA DPA library use this skill to stand up the doca_dpa context, load a dpacc-built DPA application image, launch DPA kernels, drain completions, query DPA capabilities, and debug DPA-related DOCA errors (including DOCA/DPACC version skew) on BlueField DPUs. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -28,6 +28,8 @@ Mitigation: Review and scan skill before deployment. <br>
 - [DOCA DPA Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-DPA/index.html) <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
@@ -37,8 +39,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -51,7 +53,7 @@ Reported benchmark dimensions: <br>
 - Correctness: Is the final answer correct against the reference answer. <br>
 - Discoverability: Was the right skill loaded when needed and were decoys avoided. <br>
 - Effectiveness: Did the skill help complete the task (equal-weight mean of goal completion and expected workflow adherence). <br>
-- Efficiency: Did it avoid wasted tool calls and token usage. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage (tool-call productivity and token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -67,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.3% — baseline ran, but no comparable score was available; uplift unavailable | 96.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 88.8% — baseline ran, but no comparable score was available; uplift unavailable | 77.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 70.0% → 100.0% (+30.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.6% → 71.3% (+20.7 points) | 56.9% → 96.9% (+40.0 points) |
-| Efficiency | 85.4% — baseline ran, but no comparable score was available; uplift unavailable | 94.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 95.0% (+35.0 points) | 85.0% → 70.0% (-15.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.1% → 72.5% (+29.4 points) | 49.2% → 55.0% (+5.8 points) |
+| Efficiency | 76.5% — baseline ran, but no comparable score was available; uplift unavailable | 64.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+b99bced (source: git SHA, committed 2026-10-23) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
