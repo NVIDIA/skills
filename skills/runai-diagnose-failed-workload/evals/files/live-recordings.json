@@ -1,0 +1,950 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "source": "Real Run:ai MCP tools against seeded CPU-only workloads in a development environment",
+    "mcp_source_revision": "1375dcb92163224dbc5029a2e74ea7d497f9dd9b",
+    "control_plane_version": "0.0.0-30005683.main-1598e94",
+    "sanitization": "Workload, pod, cluster IDs; workload, pod, node, project and namespace names; internal DNS IP replaced consistently. Timestamps, diagnostic messages, resource values, missing fields, and empty metrics preserved. No invented runtime evidence.",
+    "transport": "Actual server.New read-only tool registry over MCP stdio; local launcher uses existing CLI bearer authentication and rejects non-GET upstream requests."
+  },
+  "recordings": [
+    {
+      "captured_at": "2026-10-21T11:38:57.314628+00:00",
+      "calls": [
+        {
+          "tool": "get_workload_status",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000101"
+          },
+          "response": {
+            "clusterId": "20000000-0000-4000-8000-000000000001",
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-10-21T11:38:44Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "FailureTarget"
+              },
+              {
+                "lastTransitionTime": "2026-10-21T11:38:44Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "Failed"
+              }
+            ],
+            "createdAt": "2026-10-21T11:38:33Z",
+            "departmentName": "default",
+            "events": [
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Container started",
+                "reason": "Started",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Successfully pulled image \"busybox:1.36\" in 557ms (557ms including waiting). Image size: 2217006 bytes.",
+                "reason": "Pulled",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Container created",
+                "reason": "Created",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Pulling image \"busybox:1.36\"",
+                "reason": "Pulling",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:40Z",
+                "message": "Successfully assigned pod runai-eval-project/eval-recorded-app-crash-0 to node eval-recorded-node at node-pool default",
+                "reason": "Scheduled",
+                "type": "Normal"
+              }
+            ],
+            "id": "00000000-0000-4000-8000-000000000101",
+            "k8sPhase": "Failed",
+            "name": "eval-recorded-app-crash",
+            "phase": "Failed",
+            "phaseMessage": "container 'eval-recorded-app-crash' exited with exit code 2 (pod: eval-recorded-app-crash-0)",
+            "phaseUpdatedAt": "2026-10-21T11:38:44Z",
+            "projectName": "eval-project",
+            "type": "Training"
+          }
+        },
+        {
+          "tool": "get_workload_spec",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000101"
+          },
+          "response": {
+            "departmentName": "default",
+            "name": "eval-recorded-app-crash",
+            "projectName": "eval-project",
+            "spec": {
+              "compute": {
+                "cpuCoreLimit": 0.2,
+                "cpuCoreRequest": 0.1,
+                "cpuMemoryLimit": "32M",
+                "cpuMemoryRequest": "32M"
+              },
+              "image": "busybox:1.36",
+              "nodePools": [
+                "default"
+              ],
+              "restartPolicy": "Never"
+            },
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000101"
+          }
+        },
+        {
+          "tool": "get_workload_pods",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000101"
+          },
+          "response": {
+            "hasMore": false,
+            "pods": [
+              {
+                "allocatedResources": {},
+                "clusterId": "20000000-0000-4000-8000-000000000001",
+                "createdAt": "2026-10-21T11:38:39Z",
+                "currentNodePool": "default",
+                "id": "10000000-0000-4000-8000-000000000101",
+                "k8sPhase": "Error",
+                "name": "eval-recorded-app-crash-0",
+                "nodeName": "eval-recorded-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "32M"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000101"
+          }
+        },
+        {
+          "tool": "get_workload_history",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000101",
+            "limit": 50,
+            "offset": 0
+          },
+          "response": {
+            "next": null,
+            "records": [
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:44Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Failed",
+                    "phaseMessage": "container 'eval-recorded-app-crash' exited with exit code 2 (pod: eval-recorded-app-crash-0)"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Pulling image \"busybox:1.36\"",
+                    "reason": "Pulling",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Container started",
+                    "reason": "Started",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Successfully pulled image \"busybox:1.36\" in 557ms (557ms including waiting). Image size: 2217006 bytes.",
+                    "reason": "Pulled",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Container created",
+                    "reason": "Created",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:40Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:40Z",
+                    "message": "Successfully assigned pod runai-eval-project/eval-recorded-app-crash-0 to node eval-recorded-node at node-pool default",
+                    "reason": "Scheduled",
+                    "source": "runai-scheduler",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:40Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:40Z",
+                    "message": "Pod bound successfully to node eval-recorded-node",
+                    "reason": "Bound",
+                    "source": "binder",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:39Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Pending",
+                    "phaseMessage": ""
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:33Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Creating",
+                    "phaseMessage": "The workload is being created in the control plane"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000101"
+          }
+        },
+        {
+          "tool": "get_workload_metrics",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000101",
+            "start": "2026-10-21T11:30:00Z",
+            "end": "2026-10-21T13:30:00Z",
+            "numberOfSamples": 50
+          },
+          "response": {
+            "measurements": [
+              {
+                "type": "GPU_UTILIZATION",
+                "values": []
+              },
+              {
+                "type": "GPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "CPU_USAGE_CORES",
+                "values": []
+              },
+              {
+                "type": "CPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "NVLINK_BANDWIDTH_TOTAL",
+                "values": []
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000101"
+          }
+        }
+      ]
+    },
+    {
+      "captured_at": "2026-10-21T11:38:58.812793+00:00",
+      "calls": [
+        {
+          "tool": "get_workload_status",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000102"
+          },
+          "response": {
+            "clusterId": "20000000-0000-4000-8000-000000000001",
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-10-21T11:38:44Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "FailureTarget"
+              },
+              {
+                "lastTransitionTime": "2026-10-21T11:38:44Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "Failed"
+              }
+            ],
+            "createdAt": "2026-10-21T11:38:35Z",
+            "departmentName": "default",
+            "events": [
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Container started",
+                "reason": "Started",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Pulling image \"busybox:1.36\"",
+                "reason": "Pulling",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Successfully pulled image \"busybox:1.36\" in 546ms (546ms including waiting). Image size: 2217006 bytes.",
+                "reason": "Pulled",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Container created",
+                "reason": "Created",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:40Z",
+                "message": "Successfully assigned pod runai-eval-project/eval-recorded-oom-0 to node eval-recorded-node at node-pool default",
+                "reason": "Scheduled",
+                "type": "Normal"
+              }
+            ],
+            "id": "00000000-0000-4000-8000-000000000102",
+            "k8sPhase": "Failed",
+            "name": "eval-recorded-oom",
+            "phase": "Failed",
+            "phaseMessage": "container 'eval-recorded-oom' was OOMKilled (pod: eval-recorded-oom-0)",
+            "phaseUpdatedAt": "2026-10-21T11:38:44Z",
+            "projectName": "eval-project",
+            "type": "Training"
+          }
+        },
+        {
+          "tool": "get_workload_spec",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000102"
+          },
+          "response": {
+            "departmentName": "default",
+            "name": "eval-recorded-oom",
+            "projectName": "eval-project",
+            "spec": {
+              "compute": {
+                "cpuCoreLimit": 0.2,
+                "cpuCoreRequest": 0.1,
+                "cpuMemoryLimit": "32M",
+                "cpuMemoryRequest": "16M"
+              },
+              "image": "busybox:1.36",
+              "nodePools": [
+                "default"
+              ],
+              "restartPolicy": "Never"
+            },
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000102"
+          }
+        },
+        {
+          "tool": "get_workload_pods",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000102"
+          },
+          "response": {
+            "hasMore": false,
+            "pods": [
+              {
+                "allocatedResources": {},
+                "clusterId": "20000000-0000-4000-8000-000000000001",
+                "createdAt": "2026-10-21T11:38:39Z",
+                "currentNodePool": "default",
+                "id": "10000000-0000-4000-8000-000000000102",
+                "k8sPhase": "OOMKilled",
+                "name": "eval-recorded-oom-0",
+                "nodeName": "eval-recorded-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "16M"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000102"
+          }
+        },
+        {
+          "tool": "get_workload_history",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000102",
+            "limit": 50,
+            "offset": 0
+          },
+          "response": {
+            "next": null,
+            "records": [
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:44Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Failed",
+                    "phaseMessage": "container 'eval-recorded-oom' was OOMKilled (pod: eval-recorded-oom-0)"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Pulling image \"busybox:1.36\"",
+                    "reason": "Pulling",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Container created",
+                    "reason": "Created",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Successfully pulled image \"busybox:1.36\" in 546ms (546ms including waiting). Image size: 2217006 bytes.",
+                    "reason": "Pulled",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Container started",
+                    "reason": "Started",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:40Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:40Z",
+                    "message": "Successfully assigned pod runai-eval-project/eval-recorded-oom-0 to node eval-recorded-node at node-pool default",
+                    "reason": "Scheduled",
+                    "source": "runai-scheduler",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:40Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:40Z",
+                    "message": "Pod bound successfully to node eval-recorded-node",
+                    "reason": "Bound",
+                    "source": "binder",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:39Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Pending",
+                    "phaseMessage": ""
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:35Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Creating",
+                    "phaseMessage": "The workload is being created in the control plane"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:35Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Creating",
+                    "phaseMessage": "The workload is being created in the control plane"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000102"
+          }
+        },
+        {
+          "tool": "get_workload_metrics",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000102",
+            "start": "2026-10-21T11:30:00Z",
+            "end": "2026-10-21T13:30:00Z",
+            "numberOfSamples": 50
+          },
+          "response": {
+            "measurements": [
+              {
+                "type": "GPU_UTILIZATION",
+                "values": []
+              },
+              {
+                "type": "GPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "CPU_USAGE_CORES",
+                "values": []
+              },
+              {
+                "type": "CPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "NVLINK_BANDWIDTH_TOTAL",
+                "values": []
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000102"
+          }
+        }
+      ]
+    },
+    {
+      "captured_at": "2026-10-21T11:39:00.304700+00:00",
+      "calls": [
+        {
+          "tool": "get_workload_status",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000103"
+          },
+          "response": {
+            "clusterId": "20000000-0000-4000-8000-000000000001",
+            "conditions": [],
+            "createdAt": "2026-10-21T11:38:34Z",
+            "departmentName": "default",
+            "events": [
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Error: ImagePullBackOff",
+                "reason": "Failed",
+                "type": "Warning"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Failed to pull image \"registry.invalid/eval/trainer:missing\": failed to pull and unpack image \"registry.invalid/eval/trainer:missing\": failed to resolve reference \"registry.invalid/eval/trainer:missing\": failed to do request: Head \"https://registry.invalid/v2/eval/trainer/manifests/missing\": dial tcp: lookup registry.invalid on 192.0.2.53:53: no such host",
+                "reason": "Failed",
+                "type": "Warning"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Back-off pulling image \"registry.invalid/eval/trainer:missing\"",
+                "reason": "BackOff",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Pulling image \"registry.invalid/eval/trainer:missing\"",
+                "reason": "Pulling",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-21T11:38:41Z",
+                "message": "Error: ErrImagePull",
+                "reason": "Failed",
+                "type": "Warning"
+              }
+            ],
+            "id": "00000000-0000-4000-8000-000000000103",
+            "k8sPhase": "Active",
+            "name": "eval-recorded-image-pull",
+            "phase": "Pending",
+            "phaseUpdatedAt": "2026-10-21T11:38:39Z",
+            "projectName": "eval-project",
+            "type": "Training"
+          }
+        },
+        {
+          "tool": "get_workload_spec",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000103"
+          },
+          "response": {
+            "allocatedResources": {
+              "cpu": 0.1,
+              "cpuMemory": "32M"
+            },
+            "departmentName": "default",
+            "name": "eval-recorded-image-pull",
+            "projectName": "eval-project",
+            "spec": {
+              "compute": {
+                "cpuCoreLimit": 0.2,
+                "cpuCoreRequest": 0.1,
+                "cpuMemoryLimit": "32M",
+                "cpuMemoryRequest": "32M"
+              },
+              "image": "registry.invalid/eval/trainer:missing",
+              "nodePools": [
+                "default"
+              ],
+              "restartPolicy": "Never"
+            },
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000103"
+          }
+        },
+        {
+          "tool": "get_workload_pods",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000103"
+          },
+          "response": {
+            "hasMore": false,
+            "pods": [
+              {
+                "allocatedResources": {
+                  "cpu": 0.1,
+                  "cpuMemory": "32M"
+                },
+                "clusterId": "20000000-0000-4000-8000-000000000001",
+                "createdAt": "2026-10-21T11:38:39Z",
+                "id": "10000000-0000-4000-8000-000000000103",
+                "k8sPhase": "ImagePullBackOff",
+                "name": "eval-recorded-image-pull-0",
+                "nodeName": "eval-recorded-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "32M"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000103"
+          }
+        },
+        {
+          "tool": "get_workload_history",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000103",
+            "limit": 50,
+            "offset": 0
+          },
+          "response": {
+            "next": null,
+            "records": [
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Error: ErrImagePull",
+                    "reason": "Failed",
+                    "source": "kubelet",
+                    "type": "Warning"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Failed to pull image \"registry.invalid/eval/trainer:missing\": failed to pull and unpack image \"registry.invalid/eval/trainer:missing\": failed to resolve reference \"registry.invalid/eval/trainer:missing\": failed to do request: Head \"https://registry.invalid/v2/eval/trainer/manifests/missing\": dial tcp: lookup registry.invalid on 192.0.2.53:53: no such host",
+                    "reason": "Failed",
+                    "source": "kubelet",
+                    "type": "Warning"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Back-off pulling image \"registry.invalid/eval/trainer:missing\"",
+                    "reason": "BackOff",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Error: ImagePullBackOff",
+                    "reason": "Failed",
+                    "source": "kubelet",
+                    "type": "Warning"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:41Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:41Z",
+                    "message": "Pulling image \"registry.invalid/eval/trainer:missing\"",
+                    "reason": "Pulling",
+                    "source": "kubelet",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:40Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:40Z",
+                    "message": "Successfully assigned pod runai-eval-project/eval-recorded-image-pull-0 to node eval-recorded-node at node-pool default",
+                    "reason": "Scheduled",
+                    "source": "runai-scheduler",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:40Z",
+                  "type": "Event"
+                },
+                "spec": {
+                  "event": {
+                    "createdAt": "2026-10-21T11:38:40Z",
+                    "message": "Pod bound successfully to node eval-recorded-node",
+                    "reason": "Bound",
+                    "source": "binder",
+                    "type": "Normal"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:39Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Pending",
+                    "phaseMessage": ""
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:34Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Creating",
+                    "phaseMessage": "The workload is being created in the control plane"
+                  }
+                }
+              },
+              {
+                "meta": {
+                  "creationTimestamp": "2026-10-21T11:38:34Z",
+                  "type": "PhaseUpdate"
+                },
+                "spec": {
+                  "phaseUpdate": {
+                    "phase": "Creating",
+                    "phaseMessage": "The workload is being created in the control plane"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000103"
+          }
+        },
+        {
+          "tool": "get_workload_metrics",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000103",
+            "start": "2026-10-21T11:30:00Z",
+            "end": "2026-10-21T13:30:00Z",
+            "numberOfSamples": 50
+          },
+          "response": {
+            "measurements": [
+              {
+                "type": "GPU_UTILIZATION",
+                "values": []
+              },
+              {
+                "type": "GPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "CPU_USAGE_CORES",
+                "values": []
+              },
+              {
+                "type": "CPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "NVLINK_BANDWIDTH_TOTAL",
+                "values": []
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000103"
+          }
+        }
+      ]
+    }
+  ]
+}
