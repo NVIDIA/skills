@@ -3865,6 +3865,18 @@
       }
     },
     {
+      "path": "skills/runai-diagnose-failed-workload",
+      "name": "runai-diagnose-failed-workload",
+      "description": "Use to diagnose failed, crashed, stopped, OOMKilled, CrashLoopBackOff, ImagePullBackOff, init, mount, node, or policy-terminated Run:ai workloads. Investigate one workload's failure; use other skills for workload health summaries, cluster health, scheduling-only Pending, or inference latency without a confirmed failure.",
+      "metadata": {
+        "product.primary": "KAI Scheduler",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "ai-factory",
+        "audience": "platform_engineer,devops_engineer,ml_engineer,it_operations,production_operator",
+        "discovery.activity_tags": "troubleshoot,debug,inspect,classify,monitor"
+      }
+    },
+    {
       "path": "skills/skill-card-generator",
       "name": "skill-card-generator",
       "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",

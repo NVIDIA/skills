@@ -2256,6 +2256,13 @@
       "last_modified": "2026-10-20"
     },
     {
+      "name": "runai-diagnose-failed-workload",
+      "path": "skills/runai-diagnose-failed-workload",
+      "content_digest": "sha256:8bd61ba11bc8166ad6a664a081da91ba74bb01315aa823d57a3bfb7bf892c0cf",
+      "last_commit": "e08e4f7ad64671568509144cce7ecff67fcafe3d",
+      "last_modified": "2026-10-25"
+    },
+    {
       "name": "skill-card-generator",
       "path": "skills/skill-card-generator",
       "content_digest": "sha256:975d38ea360319d933276ad84e66e898b47472e16e70e9643741866e2a8e5860",
