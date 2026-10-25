@@ -590,13 +590,6 @@
       "last_modified": "2026-10-22"
     },
     {
-      "name": "doca-collectx-deployment",
-      "path": "skills/doca-collectx-deployment",
-      "content_digest": "sha256:2986213ba5ecf280587257d31885db2f89460287bc5c21569a5381691962aa62",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
       "name": "doca-comch",
       "path": "skills/doca-comch",
       "content_digest": "sha256:d7e0830bee8ca70cb5074fce7f24bc36f2f788051b6a1cef3efc5c8b9220b5ba",
@@ -667,13 +660,6 @@
       "last_modified": "2026-10-22"
     },
     {
-      "name": "doca-dpa-hl-tracer",
-      "path": "skills/doca-dpa-hl-tracer",
-      "content_digest": "sha256:0f47bcb5e37c1481a684770607e3956cfdcc2fb7692c346dcdf83742a24831dc",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
       "name": "doca-dpdk-bridge",
       "path": "skills/doca-dpdk-bridge",
       "content_digest": "sha256:ca60f20f8a5fefdca38a601b9e925b117b561a04e3b0deca9989b2fc9f042e0d",
@@ -709,27 +695,6 @@
       "last_modified": "2026-10-22"
     },
     {
-      "name": "doca-flow-dpa-perf",
-      "path": "skills/doca-flow-dpa-perf",
-      "content_digest": "sha256:74486a951923e8cf8225b9c03237afc55c882e6d5b41a64ab1e30e00471c6254",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
-      "name": "doca-flow-dpa-provider",
-      "path": "skills/doca-flow-dpa-provider",
-      "content_digest": "sha256:a0588f3add4f8abbcc3165c30f6cdb61a2e5a3c707ff161f9bcaa7ba636746a7",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
-      "name": "doca-flow-grpc-server",
-      "path": "skills/doca-flow-grpc-server",
-      "content_digest": "sha256:bae2483e93d3ab3a402e9fe88fab4b35b7f2e1a97bce56f2192b7c242a5bbc0d",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
       "name": "doca-flow-perf",
       "path": "skills/doca-flow-perf",
       "content_digest": "sha256:cec82ab0c27fa884261b7d8f119576b5865bae44c715ffd7c9bf81d53cb8b008",
@@ -744,30 +709,9 @@
       "last_modified": "2026-10-22"
     },
     {
-      "name": "doca-gpi",
-      "path": "skills/doca-gpi",
-      "content_digest": "sha256:08e287dd341144171580c15e23b155ca41c7ab5aae3c8f1517af332a2d99b9db",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
       "name": "doca-gpunetio",
       "path": "skills/doca-gpunetio",
       "content_digest": "sha256:8bfd92d131195e8c1fb1b2ba3f9ce92734d9f35671f9dce4ed988f5877b404fc",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
-      "name": "doca-gpunetio-ib-write-bw",
-      "path": "skills/doca-gpunetio-ib-write-bw",
-      "content_digest": "sha256:6c53082cb4284ea7a415023e3c1a40e610e89885322c80e7bcb0a4c45c03ec69",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
-      "name": "doca-gpunetio-ib-write-lat",
-      "path": "skills/doca-gpunetio-ib-write-lat",
-      "content_digest": "sha256:4d4470727860bfbcfe229a76606e5ecaed3bdc54e17993f623bac70b19b403fd",
       "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
       "last_modified": "2026-10-22"
     },
@@ -824,13 +768,6 @@
       "name": "doca-rdma",
       "path": "skills/doca-rdma",
       "content_digest": "sha256:f0ffaa0e5dfd6bfca353cef55dc8b8d166b8bed6bb7ecb1e81f92c869ba2920e",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
-    },
-    {
-      "name": "doca-rdmi",
-      "path": "skills/doca-rdmi",
-      "content_digest": "sha256:4cd9906706aa3e6ab478c6d8e8777264695320ddb8457bf286b8c3fabe7b4a2c",
       "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
       "last_modified": "2026-10-22"
     },

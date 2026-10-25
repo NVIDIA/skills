@@ -13,8 +13,6 @@ skills:
     catalog_dir: doca-bf3-deployment
   - path: skills/doca-bf4-deployment/
     catalog_dir: doca-bf4-deployment
-  - path: skills/doca-collectx-deployment/
-    catalog_dir: doca-collectx-deployment
   - path: skills/doca-container-deployment/
     catalog_dir: doca-container-deployment
   - path: skills/doca-debug/
@@ -57,10 +55,6 @@ skills:
     catalog_dir: doca-eth
   - path: skills/libs/doca-flow/
     catalog_dir: doca-flow
-  - path: skills/libs/doca-flow-dpa-provider/
-    catalog_dir: doca-flow-dpa-provider
-  - path: skills/libs/doca-gpi/
-    catalog_dir: doca-gpi
   - path: skills/libs/doca-gpunetio/
     catalog_dir: doca-gpunetio
   - path: skills/libs/doca-mgmt/
@@ -71,8 +65,6 @@ skills:
     catalog_dir: doca-pcc-ztr-rttcc-algo
   - path: skills/libs/doca-rdma/
     catalog_dir: doca-rdma
-  - path: skills/libs/doca-rdmi/
-    catalog_dir: doca-rdmi
   - path: skills/libs/doca-rmax/
     catalog_dir: doca-rmax
   - path: skills/libs/doca-sha/
@@ -103,20 +95,10 @@ skills:
     catalog_dir: doca-caps
   - path: skills/tools/doca-comm-channel-admin/
     catalog_dir: doca-comm-channel-admin
-  - path: skills/tools/doca-dpa-hl-tracer/
-    catalog_dir: doca-dpa-hl-tracer
-  - path: skills/tools/doca-flow-dpa-perf/
-    catalog_dir: doca-flow-dpa-perf
-  - path: skills/tools/doca-flow-grpc-server/
-    catalog_dir: doca-flow-grpc-server
   - path: skills/tools/doca-flow-perf/
     catalog_dir: doca-flow-perf
   - path: skills/tools/doca-flow-tune/
     catalog_dir: doca-flow-tune
-  - path: skills/tools/doca-gpunetio-ib-write-bw/
-    catalog_dir: doca-gpunetio-ib-write-bw
-  - path: skills/tools/doca-gpunetio-ib-write-lat/
-    catalog_dir: doca-gpunetio-ib-write-lat
   - path: skills/tools/doca-pcc-counters/
     catalog_dir: doca-pcc-counters
   - path: skills/tools/doca-sha-offload-engine/

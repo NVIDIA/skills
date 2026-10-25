@@ -1009,18 +1009,6 @@
       }
     },
     {
-      "path": "skills/doca-collectx-deployment",
-      "name": "doca-collectx-deployment",
-      "description": "Use this skill to deploy and operate a CollectX (clx) based DOCA telemetry collector on a host or BlueField — wiring providers / counters into the collector, running the collection daemon, and shaping its exporters (Prometheus pull, Fluent Bit push, NetFlow, file / IPC) so the metrics actually leave the box. Trigger even when the user never says CollectX or clx — implicit phrasings: {collector emits nothing downstream}, {add a provider to the clx collector}, {turn on the Prometheus endpoint}, {ship counters to Fluent Bit from the DPU}, {daemon starts but no schema rows appear}. This skill owns the CollectX collection mechanism plus the operator's own doca-telemetry / doca-telemetry-exporter usage; it ROUTES the productized DOCA Telemetry Service (DTS) to public docs (AGENTS.md Non-goal #7), the reader API to doca-telemetry, and the publisher API to doca-telemetry-exporter. Refuse to invent clx symbols, provider names, schema fields, flags, or config paths — describe the class and route to the live source.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "networking",
-        "audience": "platform_engineer,devops_engineer,it_operations,production_operator",
-        "discovery.activity_tags": "deploy,operate,monitor,configure,troubleshoot"
-      }
-    },
-    {
       "path": "skills/doca-comch",
       "name": "doca-comch",
       "description": "Use this skill when the user is doing hands-on DOCA Comch work on a host + BlueField pair — bringing up host ↔ DPU PCIe control-plane messaging, picking server (DPU) vs client (host) roles, choosing slow-path send-task / recv-callback vs fast-path producer / consumer, querying max-msg-size or max-clients capabilities, registering connection callbacks, or debugging DOCA_ERROR_* returns from the Comch API. Trigger even when the user does not explicitly mention \"DOCA Comch\" or \"Comm Channel\" (renamed in DOCA 2.5) — typical implicit phrasings include \"send a control message from host to BlueField over PCIe\", \"DPU can't see the host representor\", \"DOCA_ERROR_NOT_PERMITTED on server_create\", \"DOCA_ERROR_AGAIN on task_send submit\", \"connect callback never fires\", or \"stream bulk data from a host driver to a DPU agent\". Refuse and route elsewhere for installing DOCA itself, BFB / firmware bring-up, non-Comch DOCA libraries, or deploying Comch apps at scale — those belong to other skills.\n",
@@ -1141,18 +1129,6 @@
       }
     },
     {
-      "path": "skills/doca-dpa-hl-tracer",
-      "name": "doca-dpa-hl-tracer",
-      "description": "Use this skill when the user runs doca_dpa_hl_tracer to capture/decode DPA-side traces at the programming-events layer (kernel entry/exit, sync points, comm primitive calls, RDMA WR submission, completion drain) — picking TRACE vs CRIT, tuning the JSON config (file-size limits + file_size_limit_policy, thread priorities/cores), decoding against the matching DPA-side ELF, or diagnosing empty/noisy captures. Trigger even when the user does not explicitly mention \"DOCA DPA tracer\" or \"high-level tracer\" — typical implicit phrasings include \"DPA kernel returns wrong result but host completions look clean\", \"kernel-entry to first-comm latency is huge\", \"RDMA WR to drain gap on the DPA\", \"trace file truncated mid-run\", \"TRACE doubled my DPA latency\", or \"tracer wrote a file but parser shows zero events\". Refuse and route elsewhere for writing DPA kernels, DPA-Comms/DPA-Verbs programming, raw per-cycle DPA profiling, host-side doca-dpa debugging, or production DPA telemetry — those belong to other skills.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "developer_tools",
-        "catalog.subdomain": "networking",
-        "audience": "developer,platform_engineer,production_operator,hpc_developer",
-        "discovery.activity_tags": "troubleshoot,debug,profile,configure,optimize"
-      }
-    },
-    {
       "path": "skills/doca-dpdk-bridge",
       "name": "doca-dpdk-bridge",
       "description": "Use this skill when the user has an existing DPDK application and is adding DOCA capabilities in-place — most commonly DOCA Flow hardware steering — without rewriting the data-plane in DOCA-native form: binding a DPDK port id to a `doca_dev` (`doca_dpdk_port_probe` / `doca_dpdk_port_as_dev`), converting `rte_mbuf` ↔ `doca_buf`, querying `doca_dpdk_cap_is_rep_port_supported`, or debugging `DOCA_ERROR_*` from a bridge call. Trigger even without \"DOCA DPDK Bridge\": \"how do I add DOCA Flow to my DPDK app\", \"make a DPDK port visible to DOCA\", \"the bridge loads but every operation returns errors\", \"pkg-config --exists doca-dpdk-bridge fails\", or \"DOCA_ERROR_NOT_FOUND on port registration\". Route elsewhere for fresh DOCA-native packet I/O (doca-eth), flow-rule programming (doca-flow), DOCA or DPDK install (doca-setup), or RDMA data movement (doca-rdma).\n",
@@ -1213,42 +1189,6 @@
       }
     },
     {
-      "path": "skills/doca-flow-dpa-perf",
-      "name": "doca-flow-dpa-perf",
-      "description": "Use this skill when the user is invoking doca_flow_dpa_perf on DPA-capable hardware (ConnectX-7 minimum supported, ConnectX-8 recommended, or BlueField-3) to measure rule update / disable rates on the DPA-offloaded DOCA Flow path — picking the active / passive device split, choosing workload-shape axes (burst, queue, completion threshold, workers, hash pipe algo, PSL tables), or reading Kops/sec iteration stats and the optional self-test. Trigger even when the user does not explicitly mention \"doca_flow_dpa_perf\" or \"DPA Provider\" — typical implicit phrasings include \"how fast can the DPA program path-selector entries\", \"baseline rule-update rate on ConnectX-8\", \"tool reports zero ops on my BlueField\", \"self-test sentinel never shows on tcpdump\", or \"is my BlueField-2 DPA-capable\". Refuse and route elsewhere for the host / DPU-CPU Flow path (doca-flow-perf), Flow pipeline tuning (doca-flow-tune), writing doca-flow / doca-dpa applications, or DOCA install — those belong to other skills.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "networking",
-        "audience": "platform_engineer,developer,devops_engineer,it_operations",
-        "discovery.activity_tags": "benchmark,measure,configure,troubleshoot,profile"
-      }
-    },
-    {
-      "path": "skills/doca-flow-dpa-provider",
-      "name": "doca-flow-dpa-provider",
-      "description": "Use this skill when the user is doing hands-on DOCA Flow DPA Provider work — exporting a `doca-flow` pipe or external resource (index-selector/memory) into BlueField DPA address space so a DPACC-built kernel can read counters, mutate hash-pipe entries, and update/read memory or index-selector resources inline with Flow. Covers per-port `doca_flow_dpa_ctx`, three queue types (general/resources-write/resources-read), the order-sensitive export handshake (`_export_prepare` → add entries → `_export` → `_get_device_addr`), and DPA-side device API. Trigger even when the user does not say \"DOCA Flow DPA Provider\" — implicit phrasings include \"DPA kernel never sees entries in the exported pipe\", \"BAD_STATE from `_pipe_export`\", \"how do I disable a hash entry from a DPA kernel\", \"DPA memory read returns no value\", or \"DPA-side post keeps returning AGAIN\". Refuse and route elsewhere for `doca-flow` pipe construction, generic host-side DPA (`doca-dpa`), or DPA-side kernel-writing — those belong to other skills.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "networking",
-        "audience": "application_developer,developer,platform_engineer,hands_on_builder",
-        "discovery.activity_tags": "integrate,debug,troubleshoot,configure,extend"
-      }
-    },
-    {
-      "path": "skills/doca-flow-grpc-server",
-      "name": "doca-flow-grpc-server",
-      "description": "Remote control of DOCA Flow over gRPC with the shipped `doca_flow_grpc` server: program Flow pipes and entries from Python, Go, Rust or Java, or from another host, instead of linking `libdoca_flow.so`. PLAINTEXT-ONLY: the server uses `grpc::InsecureServerCredentials()` with NO TLS / mTLS / token-auth knob; transport security must come from external infrastructure (e.g. an mTLS proxy / sidecar) on a trusted segment. Trigger even without \"gRPC\": \"program Flow rules from Python on another host\", \"remotely configure pipes on the BlueField\", \"client times out connecting to the Flow server\", \"where is the .proto for Flow\", \"UNAUTHENTICATED / FAILED_PRECONDITION on a Flow RPC\". Covers bringing up, configuring, hardening and debugging the server. Route elsewhere for the underlying doca-flow C API, generic gRPC tooling (protoc, language bindings), or DOCA install / BFB bring-up.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "networking",
-        "audience": "platform_engineer,devops_engineer,application_developer,developer,solutions_architect",
-        "discovery.activity_tags": "configure,troubleshoot,debug,deploy,integrate"
-      }
-    },
-    {
       "path": "skills/doca-flow-perf",
       "name": "doca-flow-perf",
       "description": "Use this skill when the user measures control-plane insertion throughput of DOCA Flow with the doca_flow_perf binary on x86 host or Arm cores — selecting a configs/ JSON policy, weighing the DPDK-versus-DOCA backend, running the smoke iteration then the eval loop, interpreting CPU cycles plus num_pushed / num_failed, or capturing the four-tuple (DOCA release, firmware, JSON policy, worker config) that makes an insertion figure defensible. Also load it for implied asks like \"5-tuple hairpin insert figure\", \"flow-perf result mismatches release notes\", \"DPDK-vs-DOCA comparison\", or \"install variance too high\". Refuse and route to the proper owner for live-app optimization (doca-flow-tune), DPA-side measurement (doca-flow-dpa-perf), wire throughput or latency, or library-internal pipe semantics.\n",
@@ -1273,18 +1213,6 @@
       }
     },
     {
-      "path": "skills/doca-gpi",
-      "name": "doca-gpi",
-      "description": "Use this skill for DOCA GPI work — configuring a GPU Packet Initiator so device code issues RDMA operations straight out of GPU-resident buffers via doca_gpi objects: domain creation and channel limits, attribute objects, the doca_gpu_gpi_channel* handoff consumed inside device code, and DOCA_ERROR_* triage on doca_gpi_* entry points such as doca_gpi_gpu_channel_get. Also load it for implied asks like \"how many channels fit in a GPI domain\" or \"device code issuing one-sided RDMA\". Refuse and route to the proper owner for Send/Receive semantics (doca-gpunetio), host-managed QP lifecycle (doca-rdma), Arm-side origination (doca-rdmi), or generic CUDA tutelage.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "networking",
-        "audience": "application_developer,hpc_developer,platform_engineer,developer",
-        "discovery.activity_tags": "integrate,configure,debug,troubleshoot,select"
-      }
-    },
-    {
       "path": "skills/doca-gpunetio",
       "name": "doca-gpunetio",
       "description": "Use this skill when the user is doing hands-on DOCA GPUNetIO programming — wiring a CUDA kernel on an NVIDIA GPU to a doca-eth queue via doca_gpu_eth_rxq / doca_gpu_eth_txq, standing up the per-CUDA-device doca_gpu context, designing the persistent CUDA kernel that drains the GPU-visible queue, running the dual capability check (DOCA cap-query plus cudaGetDeviceProperties), registering cudaMalloc pools via doca_buf_arr_create_*, or debugging DOCA_ERROR_* returns from the GPUNetIO API. Trigger even when the user does not explicitly mention \"DOCA GPUNetIO\" or \"persistent kernel\" — typical implicit phrasings include \"CUDA kernel reading packets directly from the NIC\", \"GPU-initiated networking on BlueField\", \"DOCA_ERROR_DRIVER on doca_gpu_create\", \"nvidia_peermem not loaded\", \"kernel-per-packet is too slow\", or \"which GPU supports GPU-side packet I/O\". Refuse and route elsewhere for general CUDA programming, DOCA Ethernet queue bring-up, DOCA DPA, or DOCA install — those belong to other skills.\n",
@@ -1294,30 +1222,6 @@
         "catalog.subdomain": "networking",
         "audience": "developer,hpc_developer,application_developer,platform_engineer,hands_on_builder",
         "discovery.activity_tags": "integrate,debug,configure,optimize,validate"
-      }
-    },
-    {
-      "path": "skills/doca-gpunetio-ib-write-bw",
-      "name": "doca-gpunetio-ib-write-bw",
-      "description": "Use this skill when the user is building or interpreting the doca/tools/gpunetio_ib_write_bw tool pair — a CUDA kernel posts RDMA WRITE work requests through the doca-gpunetio device-side surface to measure sustained GPU-driven WRITE BW on a GPU+IB-device pair. Trigger even without the tool name — typical phrasings: \"measure WRITE BW when the GPU posts the WRs\", \"BW swings run to run on the same flags\", \"is the NIC saturated or am I bound on the CUDA kernel\", \"meson compile fails for the GPUNetIO bw tool\", \"nvidia_peermem isn't picking up my GPU buffer\", or \"GPU-posted WRITE BW vs the CPU path\". Refuse and route elsewhere for general doca-gpunetio library work, DOCA setup, the GPU-posted WRITE latency analog, CPU-posted RDMA benchmarking (doca-perftest), and app-level end-to-end rates.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "networking",
-        "audience": "developer,hpc_developer,platform_engineer,hands_on_builder",
-        "discovery.activity_tags": "benchmark,measure,troubleshoot,optimize,debug"
-      }
-    },
-    {
-      "path": "skills/doca-gpunetio-ib-write-lat",
-      "name": "doca-gpunetio-ib-write-lat",
-      "description": "Use this skill when the user characterizes RDMA WRITE round-trip time posted from a CUDA kernel via GPUNetIO — compiling `gpunetio_ib_write_lat` under `doca/tools/`, verifying GPU–NIC affinity, and interpreting the half-iteration / full-iteration / nanosecond columns for median / p99 / tail-jitter analysis of a real-time control loop. Also load it for implied asks like \"p99 WRITE time on H100 + ConnectX\", \"tail delay versus batching\", or \"device-originated versus upstream ib_write_lat\". Refuse and route to the proper owner for throughput runs (doca-gpunetio-ib-write-bw), the GPI channel API (doca-gpi), GPUNetIO API work (doca-gpunetio), or SDK setup.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "networking",
-        "audience": "platform_engineer,hpc_developer,developer,devops_engineer",
-        "discovery.activity_tags": "benchmark,measure,profile,compare,optimize"
       }
     },
     {
@@ -1414,18 +1318,6 @@
         "catalog.subdomain": "networking",
         "audience": "application_developer,platform_engineer,hpc_developer,developer,hands_on_builder",
         "discovery.activity_tags": "debug,configure,integrate,troubleshoot,optimize"
-      }
-    },
-    {
-      "path": "skills/doca-rdmi",
-      "name": "doca-rdmi",
-      "description": "Use this skill when the user works with DOCA RDMI, the RDMA Initiator library that lets a DPA-resident function originate one-sided RDMA toward a remote responder. Covers choosing doca-rdmi versus doca-rdma, instantiating doca_rdmi_connection and doca_rdmi_poster, wiring doca_dpa_completion or doca_verbs_cq ahead of doca_ctx_start(), exporting the datapath handle consumed on-DPA, auditing whether a doca_rdmi_* symbol is EXPERIMENTAL for the installed release, or decoding DOCA_ERROR_* statuses such as BAD_STATE at completion-attach. Also load it for implied asks like \"my Arm-side function must originate RDMA writes\", \"symbol missing at link time on doca_rdmi_*\", or \"posted work request never arrived\". Refuse and route to the proper owner for two-sided host RDMA, GPU-originated traffic, or generic IB/RoCE theory.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "networking",
-        "audience": "developer,application_developer,platform_engineer,hpc_developer,hands_on_builder",
-        "discovery.activity_tags": "debug,troubleshoot,configure,integrate,inspect"
       }
     },
     {
