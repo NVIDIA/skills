@@ -389,9 +389,9 @@
     {
       "name": "cuopt-multi-objective-exploration",
       "path": "skills/cuopt-multi-objective-exploration",
-      "content_digest": "sha256:37663cd09b9ff7402903d38c0b20fd00fbf178f9dfa92bf0c075d89b7d341894",
-      "last_commit": "b3123b1702fe1cfa11e40338d04c1b7e927c65e4",
-      "last_modified": "2026-08-07"
+      "content_digest": "sha256:defe0e1fabf9c408825a52b2d87cee3f70e0c9b225b47e95e981fd2311a28b80",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "cuopt-numerical-optimization-api",
@@ -606,9 +606,9 @@
     {
       "name": "doca-common",
       "path": "skills/doca-common",
-      "content_digest": "sha256:88bb4e1ff1e7ebaa03a35af4682244676a285519cfd13495fbad03847d79a516",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:e9bc12f86a626492637bd325416e406f2498004b180bf7c81e79fc63dbbdfdbe",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-compress",
@@ -634,9 +634,9 @@
     {
       "name": "doca-devemu",
       "path": "skills/doca-devemu",
-      "content_digest": "sha256:34e13042b3a8697984615aa6480e6a6112f2b13e1d5353f8c8aeda9d9ff10770",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:794570ceea121db4fde9cbfbcf52afd98880c595de3b3f7b2a9a84ddced45d46",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-dma",
@@ -655,9 +655,9 @@
     {
       "name": "doca-dpa",
       "path": "skills/doca-dpa",
-      "content_digest": "sha256:66403491af3c7e2ed5383b0bfc94640382bb2a9f632707ced31af55f00e8bd93",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:03d02ad90aef1d2c5009d7e641e731640ba56db8860a1a0325a54756e8417ee6",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-dpdk-bridge",
@@ -676,9 +676,9 @@
     {
       "name": "doca-eth",
       "path": "skills/doca-eth",
-      "content_digest": "sha256:f53e02e3f0977161eba98803b7ce21f49890f6e6e5b0bf8e14799973f9bec336",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:2a4ce7bfc9c32692b54994cd179c2a764b051f5de1422ebb35872d347295e9f4",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-firefly",
@@ -690,30 +690,30 @@
     {
       "name": "doca-flow",
       "path": "skills/doca-flow",
-      "content_digest": "sha256:9eb7df9e5b42a9e41100cb5e6470581b164e124874e525ecb105b1b7bcc7618e",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:4e41db294a1a98f6333b83ca58e87901f1e09a2fdfc5c93e3bb7d54d2e5d8e85",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-flow-perf",
       "path": "skills/doca-flow-perf",
-      "content_digest": "sha256:cec82ab0c27fa884261b7d8f119576b5865bae44c715ffd7c9bf81d53cb8b008",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:7f10e8f313261bcdf0a4644dc8f97161e79f373df18de39c5b3a1b897c2bac20",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-flow-tune",
       "path": "skills/doca-flow-tune",
-      "content_digest": "sha256:27f327176cefd28b37477bf6e67aef097cae186aedb51041c5d439c64d746d69",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:ab9f7ae0d2968142fc0a7db333746a896eae26502d77d542a488868f0b2af64a",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-gpunetio",
       "path": "skills/doca-gpunetio",
-      "content_digest": "sha256:8bfd92d131195e8c1fb1b2ba3f9ce92734d9f35671f9dce4ed988f5877b404fc",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:11e7f3b943ba86b1ee6babe7e03cc562cfe394e3e9baeda6c8226b8934cddc93",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-hardware-safety",
@@ -725,16 +725,16 @@
     {
       "name": "doca-mgmt",
       "path": "skills/doca-mgmt",
-      "content_digest": "sha256:bcc7e0624b5973968de7684d91444558349c83910155a001e755c8565ab7a3b2",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:8bd02b6da5890651deb5bb06db71374af92e0091c4d464fcb40fc9583454891f",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-pcc",
       "path": "skills/doca-pcc",
-      "content_digest": "sha256:78360421667caab46c0fc21be776cf57f7e4b650d6ea51343c3f94b2228a7173",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:feffe4d21a198ef9ac5bca9e652184e0ea948b254f083d1ab81c0cc578b4f7d5",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-pcc-counters",
@@ -746,23 +746,23 @@
     {
       "name": "doca-pcc-ztr-rttcc-algo",
       "path": "skills/doca-pcc-ztr-rttcc-algo",
-      "content_digest": "sha256:038292431e76bb97beb0cf40270c21d034693e92a8ca998bef72c550181da347",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:8385cfdfdea91352b8cc417fbfcefaefe9c4b8e6e581027ad56e7d52fb20d17f",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-programming-guide",
       "path": "skills/doca-programming-guide",
-      "content_digest": "sha256:78f811c2099ecb1d089f69af4d121a6f5509e4d3b2471e6e3dee37bf6ec766cd",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:3b669ed6edec9e0c1a8d19e46448175f1a4436fd54e17e18cc804d52d0b87c0b",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-public-knowledge-map",
       "path": "skills/doca-public-knowledge-map",
-      "content_digest": "sha256:4c6ad72329f457f7ce90d522ab709104955066026d844b06fd5b44103cf78c1b",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:03c8e49b4a5e5551a1731887862df8a2282581a03c9f24f1cc31f52d43c6822e",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-rdma",
@@ -781,9 +781,9 @@
     {
       "name": "doca-setup",
       "path": "skills/doca-setup",
-      "content_digest": "sha256:fc716c7400952f2d1c18e3a3a3a9a836b02fa93cf9269ebd2fb5869de069d0ae",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:f75a3eb472e4101971b66d5923a2b0e45c49836af55b6b6bd6ae196f75bd611c",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-sha",
@@ -830,16 +830,16 @@
     {
       "name": "doca-telemetry",
       "path": "skills/doca-telemetry",
-      "content_digest": "sha256:52f6a1c42197a341a6dbaeb086fca82797b8271ec41ae1f85e1a371ad31e8ee4",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:02654f9095cfcadf20191959d850007ba3e6db8aba51aacf7d198dd0e67c22bb",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-telemetry-exporter",
       "path": "skills/doca-telemetry-exporter",
-      "content_digest": "sha256:87b0e458f88ddb4e24c5c26aca8f84f8a83a4ba2b18f0b7c9f9c81a2cb3b2bc8",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:85c077dc8a9b2483d19f6598ea9aac38e86bb317bbe6c783d116b19b9b5061bd",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-telemetry-utils",
@@ -872,9 +872,9 @@
     {
       "name": "doca-verbs",
       "path": "skills/doca-verbs",
-      "content_digest": "sha256:6df3325bfe79ee1258537281932c3afd905eac3160decd207c6574568f8e42b0",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:b5e33f325334b0f8816012bc0ee068b003bfa33ee241904223d441f2f092b963",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "doca-version",
@@ -970,9 +970,9 @@
     {
       "name": "ethos-orchestrate",
       "path": "skills/ethos-orchestrate",
-      "content_digest": "sha256:55a596a93fc386d307a70d2d490f4ceae0ce4d13a3874c6a504e0325ff1934c9",
-      "last_commit": "38b6f0dc04e97ad42788b96c258cb3f6e7bb040c",
-      "last_modified": "2026-10-16"
+      "content_digest": "sha256:36c67cbce609eac9204be8b4ecac41393fd072879cbbbd2f89b0f4867c6fb070",
+      "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
+      "last_modified": "2026-10-25"
     },
     {
       "name": "ethos-write",
