@@ -452,6 +452,13 @@
       ]
     },
     {
+      "title": "AI Factory",
+      "description": "Design, deploy, operate, and optimize infrastructure and workflows for producing, serving, and managing AI systems at scale.",
+      "skills": [
+        "runai-diagnose-failed-workload"
+      ]
+    },
+    {
       "title": "AI Storage",
       "description": "Plan and operate storage, data movement, and data-access workflows for AI training, inference, evaluation, and production workloads.",
       "skills": [
