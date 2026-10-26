@@ -1,0 +1,697 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "source": "Real Run:ai MCP tools against seeded CPU-only workloads in a development environment",
+    "mcp_source_revision": "cdf06de0b5c35f6ad9a8324cdc7f2275b50276fc",
+    "control_plane_version": "0.0.0-30005939.main-d56d198",
+    "sanitization": "Workload, pod, cluster, project and department IDs; workload, pod, node, project and namespace names; internal DNS IP replaced consistently. Timestamps, diagnostic messages, resource values, missing fields, and empty metrics preserved. No invented runtime evidence.",
+    "transport": "Actual server.New read-only tool registry over MCP stdio; local launcher decodes the existing CLI bearer authentication and rejects non-GET upstream requests.",
+    "cleanup": "All three seeded workloads, their temporary project, and their namespace were deleted after capture."
+  },
+  "recordings": [
+    {
+      "scenario": "project-overview",
+      "captured_at": "2026-10-25T09:34:13.848724+00:00",
+      "calls": [
+        {
+          "tool": "list_workloads",
+          "arguments": {
+            "clusterId": "20000000-0000-4000-8000-000000000002",
+            "projectName": {
+              "operator": "==",
+              "value": "recorded-health-project"
+            },
+            "includeDetails": true,
+            "sortBy": "phaseUpdatedAt",
+            "sortOrder": "desc",
+            "limit": 20,
+            "offset": 0
+          },
+          "response": {
+            "hasMore": false,
+            "workloads": [
+              {
+                "allocatedGpu": null,
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:34:02Z",
+                "id": "00000000-0000-4000-8000-000000000202",
+                "name": "recorded-health-failed",
+                "phase": "Failed",
+                "phaseUpdatedAt": "2026-10-25T09:34:13Z",
+                "preemptible": true,
+                "priority": 40,
+                "priorityClassName": "low",
+                "projectId": "4500201",
+                "projectName": "recorded-health-project",
+                "requestedGpu": null,
+                "requestedNodePools": [
+                  "default"
+                ],
+                "type": "Training"
+              },
+              {
+                "allocatedGpu": null,
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:34:04Z",
+                "id": "00000000-0000-4000-8000-000000000203",
+                "name": "recorded-health-image-pull",
+                "phase": "Pending",
+                "phaseUpdatedAt": "2026-10-25T09:34:09Z",
+                "preemptible": true,
+                "priority": 40,
+                "priorityClassName": "low",
+                "projectId": "4500201",
+                "projectName": "recorded-health-project",
+                "requestedGpu": null,
+                "requestedNodePools": [
+                  "default"
+                ],
+                "type": "Training"
+              },
+              {
+                "allocatedGpu": null,
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:33:58Z",
+                "currentNodePools": [
+                  "default"
+                ],
+                "id": "00000000-0000-4000-8000-000000000201",
+                "name": "recorded-health-running",
+                "phase": "Running",
+                "phaseUpdatedAt": "2026-10-25T09:34:02Z",
+                "preemptible": true,
+                "priority": 40,
+                "priorityClassName": "low",
+                "projectId": "4500201",
+                "projectName": "recorded-health-project",
+                "requestedGpu": null,
+                "requestedNodePools": [
+                  "default"
+                ],
+                "type": "Training"
+              }
+            ]
+          }
+        },
+        {
+          "tool": "get_workloads_summary",
+          "arguments": {
+            "clusterId": "20000000-0000-4000-8000-000000000002",
+            "orgType": "project",
+            "orgName": "recorded-health-project"
+          },
+          "response": {
+            "asOf": "2026-10-25T09:34:14Z",
+            "byPhase": {
+              "Failed": 1,
+              "Pending": 1,
+              "Running": 1
+            },
+            "counts": {
+              "completed": 0,
+              "failed": 1,
+              "other": 0,
+              "pending": 1,
+              "running": 1,
+              "stopped": 0
+            },
+            "scope": {
+              "clusterId": "20000000-0000-4000-8000-000000000002",
+              "orgName": "recorded-health-project",
+              "orgType": "project",
+              "orgUnitId": "4500201"
+            },
+            "total": 3
+          }
+        },
+        {
+          "tool": "list_projects",
+          "arguments": {
+            "clusterId": "20000000-0000-4000-8000-000000000002",
+            "limit": 20,
+            "offset": 0
+          },
+          "response": {
+            "hasMore": false,
+            "projects": [
+              {
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "departmentId": "4500200",
+                "id": "4500201",
+                "name": "recorded-health-project",
+                "phase": "Ready"
+              }
+            ],
+            "totalCount": 1
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "recorded-health-failed",
+      "captured_at": "2026-10-25T09:34:15.625243+00:00",
+      "calls": [
+        {
+          "tool": "get_workload_status",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000202"
+          },
+          "response": {
+            "clusterId": "20000000-0000-4000-8000-000000000002",
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-10-25T09:34:13Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "FailureTarget"
+              },
+              {
+                "lastTransitionTime": "2026-10-25T09:34:13Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "Failed"
+              }
+            ],
+            "createdAt": "2026-10-25T09:34:02Z",
+            "departmentName": "default",
+            "events": [],
+            "id": "00000000-0000-4000-8000-000000000202",
+            "k8sPhase": "Failed",
+            "name": "recorded-health-failed",
+            "phase": "Failed",
+            "phaseMessage": "container 'recorded-health-failed' exited with exit code 2 (pod: recorded-health-failed-0)",
+            "phaseUpdatedAt": "2026-10-25T09:34:13Z",
+            "projectName": "recorded-health-project",
+            "type": "Training"
+          }
+        },
+        {
+          "tool": "get_workload_spec",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000202"
+          },
+          "response": {
+            "allocatedResources": {
+              "cpu": 0.1,
+              "cpuMemory": "32M"
+            },
+            "departmentName": "default",
+            "name": "recorded-health-failed",
+            "projectName": "recorded-health-project",
+            "spec": {
+              "compute": {
+                "cpuCoreLimit": 0.2,
+                "cpuCoreRequest": 0.1,
+                "cpuMemoryLimit": "32M",
+                "cpuMemoryRequest": "32M"
+              },
+              "image": "busybox:1.36",
+              "nodePools": [
+                "default"
+              ],
+              "restartPolicy": "Never"
+            },
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000202"
+          }
+        },
+        {
+          "tool": "get_workload_pods",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000202",
+            "limit": 20,
+            "offset": 0
+          },
+          "response": {
+            "hasMore": false,
+            "pods": [
+              {
+                "allocatedResources": {
+                  "cpu": 0.1,
+                  "cpuMemory": "32M"
+                },
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:34:09Z",
+                "id": "10000000-0000-4000-8000-000000000202",
+                "k8sPhase": "Error",
+                "name": "recorded-health-failed-0",
+                "nodeName": "recorded-health-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "32M"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000202"
+          }
+        },
+        {
+          "tool": "get_workload_metrics",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000202",
+            "start": "2026-10-25T09:24:13Z",
+            "end": "2026-10-25T09:34:13Z",
+            "numberOfSamples": 20
+          },
+          "response": {
+            "measurements": [
+              {
+                "type": "GPU_UTILIZATION",
+                "values": []
+              },
+              {
+                "type": "GPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "CPU_USAGE_CORES",
+                "values": []
+              },
+              {
+                "type": "CPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "NVLINK_BANDWIDTH_TOTAL",
+                "values": []
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000202"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "recorded-health-image-pull",
+      "captured_at": "2026-10-25T09:34:16.890665+00:00",
+      "calls": [
+        {
+          "tool": "get_workload_status",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000203"
+          },
+          "response": {
+            "clusterId": "20000000-0000-4000-8000-000000000002",
+            "conditions": [],
+            "createdAt": "2026-10-25T09:34:04Z",
+            "departmentName": "default",
+            "events": [],
+            "id": "00000000-0000-4000-8000-000000000203",
+            "k8sPhase": "Active",
+            "name": "recorded-health-image-pull",
+            "phase": "Pending",
+            "phaseUpdatedAt": "2026-10-25T09:34:09Z",
+            "projectName": "recorded-health-project",
+            "type": "Training"
+          }
+        },
+        {
+          "tool": "get_workload_spec",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000203"
+          },
+          "response": {
+            "allocatedResources": {
+              "cpu": 0.1,
+              "cpuMemory": "32M"
+            },
+            "departmentName": "default",
+            "name": "recorded-health-image-pull",
+            "projectName": "recorded-health-project",
+            "spec": {
+              "compute": {
+                "cpuCoreLimit": 0.2,
+                "cpuCoreRequest": 0.1,
+                "cpuMemoryLimit": "32M",
+                "cpuMemoryRequest": "32M"
+              },
+              "image": "invalid.example.invalid/nvskills-health:missing",
+              "nodePools": [
+                "default"
+              ],
+              "restartPolicy": "Never"
+            },
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000203"
+          }
+        },
+        {
+          "tool": "get_workload_pods",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000203",
+            "limit": 20,
+            "offset": 0
+          },
+          "response": {
+            "hasMore": false,
+            "pods": [
+              {
+                "allocatedResources": {
+                  "cpu": 0.1,
+                  "cpuMemory": "32M"
+                },
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:34:09Z",
+                "id": "10000000-0000-4000-8000-000000000203",
+                "k8sPhase": "ImagePullBackOff",
+                "name": "recorded-health-image-pull-0",
+                "nodeName": "recorded-health-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "32M"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000203"
+          }
+        },
+        {
+          "tool": "get_workload_metrics",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000203",
+            "start": "2026-10-25T09:24:13Z",
+            "end": "2026-10-25T09:34:13Z",
+            "numberOfSamples": 20
+          },
+          "response": {
+            "measurements": [
+              {
+                "type": "GPU_UTILIZATION",
+                "values": []
+              },
+              {
+                "type": "GPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "CPU_USAGE_CORES",
+                "values": []
+              },
+              {
+                "type": "CPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "NVLINK_BANDWIDTH_TOTAL",
+                "values": []
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000203"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "recorded-health-running",
+      "captured_at": "2026-10-25T09:34:18.161446+00:00",
+      "calls": [
+        {
+          "tool": "get_workload_status",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000201"
+          },
+          "response": {
+            "clusterId": "20000000-0000-4000-8000-000000000002",
+            "conditions": [],
+            "createdAt": "2026-10-25T09:33:58Z",
+            "departmentName": "default",
+            "events": [
+              {
+                "createdAt": "2026-10-25T09:34:00Z",
+                "message": "Container image \"busybox:1.36\" already present on machine and can be accessed by the pod",
+                "reason": "Pulled",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-25T09:34:00Z",
+                "message": "Container started",
+                "reason": "Started",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-25T09:34:00Z",
+                "message": "Container created",
+                "reason": "Created",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-25T09:33:59Z",
+                "message": "Successfully assigned pod runai-recorded-health-project/recorded-health-running-0 to node recorded-health-node at node-pool default",
+                "reason": "Scheduled",
+                "type": "Normal"
+              },
+              {
+                "createdAt": "2026-10-25T09:33:59Z",
+                "message": "Pod bound successfully to node recorded-health-node",
+                "reason": "Bound",
+                "type": "Normal"
+              }
+            ],
+            "id": "00000000-0000-4000-8000-000000000201",
+            "k8sPhase": "Active",
+            "name": "recorded-health-running",
+            "phase": "Running",
+            "phaseUpdatedAt": "2026-10-25T09:34:02Z",
+            "projectName": "recorded-health-project",
+            "type": "Training"
+          }
+        },
+        {
+          "tool": "get_workload_spec",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000201"
+          },
+          "response": {
+            "allocatedResources": {
+              "cpu": 0.1,
+              "cpuMemory": "32M"
+            },
+            "departmentName": "default",
+            "name": "recorded-health-running",
+            "projectName": "recorded-health-project",
+            "spec": {
+              "compute": {
+                "cpuCoreLimit": 0.2,
+                "cpuCoreRequest": 0.1,
+                "cpuMemoryLimit": "32M",
+                "cpuMemoryRequest": "32M"
+              },
+              "image": "busybox:1.36",
+              "nodePools": [
+                "default"
+              ],
+              "restartPolicy": "Never"
+            },
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000201"
+          }
+        },
+        {
+          "tool": "get_workload_pods",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000201",
+            "limit": 20,
+            "offset": 0
+          },
+          "response": {
+            "hasMore": false,
+            "pods": [
+              {
+                "allocatedResources": {
+                  "cpu": 0.1,
+                  "cpuMemory": "32M"
+                },
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:33:59Z",
+                "currentNodePool": "default",
+                "id": "10000000-0000-4000-8000-000000000201",
+                "k8sPhase": "Running",
+                "name": "recorded-health-running-0",
+                "nodeName": "recorded-health-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "32M"
+                  }
+                }
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000201"
+          }
+        },
+        {
+          "tool": "get_workload_metrics",
+          "arguments": {
+            "workloadId": "00000000-0000-4000-8000-000000000201",
+            "start": "2026-10-25T09:24:13Z",
+            "end": "2026-10-25T09:34:13Z",
+            "numberOfSamples": 20
+          },
+          "response": {
+            "measurements": [
+              {
+                "type": "GPU_UTILIZATION",
+                "values": []
+              },
+              {
+                "type": "GPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "CPU_USAGE_CORES",
+                "values": []
+              },
+              {
+                "type": "CPU_MEMORY_USAGE_BYTES",
+                "values": []
+              },
+              {
+                "type": "NVLINK_BANDWIDTH_TOTAL",
+                "values": []
+              }
+            ],
+            "type": "Training",
+            "workloadId": "00000000-0000-4000-8000-000000000201"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "effective-policy",
+      "captured_at": "2026-10-25T09:34:18.161476+00:00",
+      "calls": [
+        {
+          "tool": "get_workload_effective_policy",
+          "arguments": {
+            "projectId": "4500201",
+            "kind": "training"
+          },
+          "response": {
+            "effective": {
+              "defaults": {
+                "security": {
+                  "privileged": false
+                }
+              },
+              "rules": {
+                "security": {
+                  "privileged": {
+                    "canEdit": false,
+                    "sourceOfRule": {
+                      "scope": "system"
+                    }
+                  }
+                },
+                "terminationGracePeriodSeconds": {
+                  "max": 300,
+                  "sourceOfRule": {
+                    "scope": "system"
+                  }
+                }
+              }
+            },
+            "kind": "training",
+            "projectId": "4500201"
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "node-pods",
+      "captured_at": "2026-10-25T09:34:18.364356+00:00",
+      "calls": [
+        {
+          "tool": "get_node_pods",
+          "arguments": {
+            "nodeName": "recorded-health-node",
+            "clusterUuid": "20000000-0000-4000-8000-000000000002",
+            "limit": 200,
+            "offset": 0
+          },
+          "response": {
+            "hasMore": false,
+            "name": "recorded-health-node",
+            "nodePool": "default",
+            "pods": [
+              {
+                "allocatedResources": {
+                  "cpu": 0.1,
+                  "cpuMemory": "32M"
+                },
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:34:09Z",
+                "id": "10000000-0000-4000-8000-000000000203",
+                "k8sPhase": "ImagePullBackOff",
+                "name": "recorded-health-image-pull-0",
+                "nodeName": "recorded-health-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "32M"
+                  }
+                },
+                "workloadId": "00000000-0000-4000-8000-000000000203",
+                "workloadName": "recorded-health-image-pull",
+                "workloadType": "Training"
+              },
+              {
+                "allocatedResources": {
+                  "cpu": 0.1,
+                  "cpuMemory": "32M"
+                },
+                "clusterId": "20000000-0000-4000-8000-000000000002",
+                "createdAt": "2026-10-25T09:33:59Z",
+                "currentNodePool": "default",
+                "id": "10000000-0000-4000-8000-000000000201",
+                "k8sPhase": "Running",
+                "name": "recorded-health-running-0",
+                "nodeName": "recorded-health-node",
+                "requestedResources": {
+                  "cpu": {
+                    "limit": 0.2,
+                    "request": 0.1
+                  },
+                  "cpuMemory": {
+                    "limit": "32M",
+                    "request": "32M"
+                  }
+                },
+                "workloadId": "00000000-0000-4000-8000-000000000201",
+                "workloadName": "recorded-health-running",
+                "workloadType": "Training"
+              }
+            ],
+            "status": "Ready"
+          }
+        }
+      ]
+    }
+  ]
+}
