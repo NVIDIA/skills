@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 77.6% — baseline ran, but no comparable score was available; uplift unavailable | 84.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 75.0% (-25.0 points) | 75.0% → 87.5% (+12.5 points) |
-| Correctness | 55.0% → 95.0% (+40.0 points) | 35.0% → 100.0% (+65.0 points) |
-| Discoverability | 72.7% — baseline ran, but no comparable score was available; uplift unavailable | 85.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 40.6% → 71.9% (+31.3 points) | 31.5% → 73.8% (+42.3 points) |
-| Efficiency | 73.3% — baseline ran, but no comparable score was available; uplift unavailable | 77.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 84.8% — baseline ran, but no comparable score was available; uplift unavailable | 80.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 50.0% → 75.0% (+25.0 points) |
+| Correctness | 60.0% → 95.0% (+35.0 points) | 45.0% → 95.0% (+50.0 points) |
+| Discoverability | 86.7% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 46.3% → 72.9% (+26.6 points) | 31.5% → 68.8% (+37.3 points) |
+| Efficiency | 69.6% — baseline ran, but no comparable score was available; uplift unavailable | 77.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,17 +54,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 830,359 | 427,990 | N/A | N/A | skill 2/4; base 2/4 |
-| claude-code | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | N/A | 242,502 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | isaac-mission-control-showcase-reasoning-swap-resize-refusal | 532,413 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | isaac-mission-control-showcase-trigger-kit-extension-negative | N/A | 185,488 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | isaac-mission-control-showcase-trigger-run-demo | 297,946 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | All cases | 838,193 | 863,787 | N/A | N/A | skill 2/4; base 2/4 |
-| codex | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | 401,308 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | isaac-mission-control-showcase-reasoning-swap-resize-refusal | N/A | 734,239 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | isaac-mission-control-showcase-trigger-kit-extension-negative | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | isaac-mission-control-showcase-trigger-run-demo | 436,885 | 129,548 | +307,337 | +237.24% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,668,552 | 1,291,777 | N/A | N/A | skill 4/8; base 4/8 |
+| claude-code | All cases | 1,359,206 | 429,436 | N/A | N/A | skill 2/4; base 2/4 |
+| claude-code | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | 789,245 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | isaac-mission-control-showcase-reasoning-swap-resize-refusal | N/A | 244,453 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | isaac-mission-control-showcase-trigger-kit-extension-negative | 569,961 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | isaac-mission-control-showcase-trigger-run-demo | N/A | 184,983 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | All cases | 1,027,558 | 662,355 | N/A | N/A | skill 2/4; base 2/4 |
+| codex | isaac-mission-control-showcase-reasoning-isaac-sim-not-installed | 627,088 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | isaac-mission-control-showcase-reasoning-swap-resize-refusal | N/A | 519,354 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | isaac-mission-control-showcase-trigger-kit-extension-negative | N/A | 143,001 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | isaac-mission-control-showcase-trigger-run-demo | 400,470 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| ALL AGENTS | Dataset aggregate | 2,386,764 | 1,091,791 | N/A | N/A | skill 4/8; base 4/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -72,7 +72,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 57 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 50 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -94,7 +94,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_correctness: No documented scripts in table format (`skills/isaac-orchestration/isaac-mission-control-showcase/SKILL.md`)
 - **MEDIUM** QUALITY/quality_correctness: Instructions don't mention 'run_script' (`skills/isaac-orchestration/isaac-mission-control-showcase/SKILL.md`)
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/isaac-orchestration/isaac-mission-control-showcase/SKILL.md`)
-- 54 additional finding(s) are available in the full evaluation artifacts.
+- 47 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
