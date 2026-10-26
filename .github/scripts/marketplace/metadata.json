@@ -3877,6 +3877,18 @@
       }
     },
     {
+      "path": "skills/runai-get-workload-health-summary",
+      "name": "runai-get-workload-health-summary",
+      "description": "Summarizes scoped Run:ai workload health or one workload. Not for root cause, quota, cluster health, fleet utilization, history, or mutations.",
+      "metadata": {
+        "product.primary": "KAI Scheduler",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "ai-factory",
+        "audience": "platform_engineer,devops_engineer,it_operations,production_operator,developer",
+        "discovery.activity_tags": "summarize,monitor,inspect,assess,troubleshoot"
+      }
+    },
+    {
       "path": "skills/skill-card-generator",
       "name": "skill-card-generator",
       "description": "Use only to generate or update a governance skill card for a specified existing agent skill directory. Do not use for explaining, listing, comparing, or discussing skill capabilities.",

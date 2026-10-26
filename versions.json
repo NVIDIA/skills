@@ -2263,6 +2263,13 @@
       "last_modified": "2026-10-25"
     },
     {
+      "name": "runai-get-workload-health-summary",
+      "path": "skills/runai-get-workload-health-summary",
+      "content_digest": "sha256:9dddc704d5cecd15e8b5cf2c842aa32558126d0766e7da65e062c94224d989cb",
+      "last_commit": "38a55d42e94036b7881df2182e89396d8f342376",
+      "last_modified": "2026-10-26"
+    },
+    {
       "name": "skill-card-generator",
       "path": "skills/skill-card-generator",
       "content_digest": "sha256:975d38ea360319d933276ad84e66e898b47472e16e70e9643741866e2a8e5860",

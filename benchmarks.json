@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 416,
-  "result_row_count": 3909,
+  "skill_count": 417,
+  "result_row_count": 3919,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -6429,6 +6429,26 @@
       "component": "Run:ai",
       "has_results": true,
       "average_uplift_pct": 10.2
+    },
+    {
+      "skill": "runai-get-workload-health-summary",
+      "evaluation_date": "2026-10-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:6e09ea63475e9a74d6b84883683da186393aaa90546908bea0e670ac7be05515",
+      "validation_status": null,
+      "tasks": 30,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "has_results": true,
+      "average_uplift_pct": 14.7
     },
     {
       "skill": "skill-card-generator",
@@ -35152,6 +35172,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 56.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 16.7
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.7,
+      "uplift_pct": 20.7
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 64.9,
+      "uplift_pct": 20.6
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 79.0,
+      "uplift_pct": 30.2
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-workload-health-summary",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.8,
       "uplift_pct": null
     },
     {
