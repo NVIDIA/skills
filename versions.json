@@ -1215,9 +1215,9 @@
     {
       "name": "isaac-mission-control-showcase",
       "path": "skills/isaac-mission-control-showcase",
-      "content_digest": "sha256:6bd64fc62cb118b924ccf5f72df016f4726522dc13e084ed78e82554fbf019f4",
-      "last_commit": "64747a4e0f35252452cb1b65da11976688d283b2",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:bf3e600d171a5535554b102cf3035b8df5a89eb0c3f33f61b76af31e77d86f59",
+      "last_commit": "811fb17c1c42cf0d573e14813b87c04b259465fe",
+      "last_modified": "2026-10-26"
     },
     {
       "name": "jetson-build-source",
