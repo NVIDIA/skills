@@ -1247,14 +1247,14 @@
     },
     {
       "skill": "data-designer",
-      "evaluation_date": "2026-06-02",
-      "environment": "local",
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
-      "tasks": 4,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
+      "evaluation_date": "2026-10-26",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.2",
+      "dataset_digest": "sha256:deb7bb002c1a418bbb6f2f9a51c88f65380e4befd2e9ccc4e83a1678dd69f436",
+      "validation_status": "passed",
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -1263,7 +1263,7 @@
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "has_results": true,
-      "average_uplift_pct": 7.2
+      "average_uplift_pct": -14.17
     },
     {
       "skill": "deepstream-dev",
@@ -13803,7 +13803,7 @@
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -13812,82 +13812,82 @@
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 50.0
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": 8.0
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
-      "uplift_pct": 0.0
+      "score_pct": 20.0,
+      "uplift_pct": -80.0
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": 28.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 4.0
+      "score_pct": 75.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 97.0,
-      "uplift_pct": -3.0
+      "score_pct": 100.0,
+      "uplift_pct": 12.5
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 7.0
+      "score_pct": 12.5,
+      "uplift_pct": -87.5
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 64.0,
-      "uplift_pct": 19.0
+      "score_pct": 88.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "data-designer",
       "component": "Data Designer",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 62.0,
-      "uplift_pct": 9.0
+      "score_pct": 96.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "deepstream-dev",

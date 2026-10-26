@@ -431,9 +431,9 @@
     {
       "name": "data-designer",
       "path": "skills/data-designer",
-      "content_digest": "sha256:c8b7a8619f0d978d4d2287fa248332a834d42f39b417dea6bb5681104fb56f2a",
-      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
-      "last_modified": "2026-06-02"
+      "content_digest": "sha256:9f553d874886420da17fd22a67f2214dc9a89953588fbf0787ede7cccd80b7c6",
+      "last_commit": "21777e6a413055903cd0d9329d1efb918b30f817",
+      "last_modified": "2026-10-26"
     },
     {
       "name": "deepstream-dev",
