@@ -196,7 +196,6 @@ def resolve(dependencies, root, *, strict_commit=True):
             "entrypoints": entrypoints,
             "resources": resources,
             "adapter": spec.get("adapter"),
-            "runner_env": spec.get("runner_env", {}),
             "agent_only": bool(spec.get("agent_only")),
         }
         # A per-skill override is trusted only as far as it can be verified. It
@@ -313,10 +312,6 @@ def env_lines(manifest):
     for name, entry in sorted(manifest["skills"].items()):
         var = name.upper().replace("-", "_") + "_SKILL_DIR"
         lines.append(f"export {var}={shlex.quote(entry['skill_dir'])}")
-        for key, path in sorted(entry["entrypoints"].items()):
-            runner = (entry.get("runner_env") or {}).get(key)
-            if runner:
-                lines.append(f"export {runner}={shlex.quote(path)}")
     return "\n".join(lines) + "\n"
 
 

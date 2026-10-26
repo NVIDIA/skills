@@ -45,6 +45,13 @@
 - **Mission returns to IDLE without completion:** query Mission Database by the
   printed mission ID. Only its `COMPLETED` state is canonical.
 
+When invoking `scripts/run.sh` directly, the package can be staged under any
+directory name; an ancestor named `skills` is not required. To invoke it as an
+agent skill, install it in a skill location supported by that agent. Generated
+dependency environment files export supported manifest, checkout-root, and
+skill-directory settings, never direct entrypoint overrides.
+Regenerate an older environment file before sourcing it.
+
 The runner records its state beneath the printed temporary directory.
 `--stop` leaves those artifacts and stopped containers available for
 diagnosis.
@@ -57,17 +64,22 @@ transition: `initializing`, `preflight`, `starting-cloud`, `starting-isaac`,
 `starting-carter`, `ready`, `mission-running`, `accepted`, `failed`, `stopped`.
 
 The manifest records the work directory, lifecycle state, Compose project, the
-exact container names this run created, the Isaac Sim PID and any observed exit
+container names reserved for this run (ownership is checked before cleanup),
+the Isaac Sim PID and any observed exit
 status, selected ports and ROS domain, map and robot configuration, mission ID
 once known, and evidence paths. `run-result.json` is the machine-readable
-acceptance artifact written at the end of a run.
+acceptance artifact written on success, failure, or interruption. A startup-only
+run ends as `ready`, without claiming mission acceptance. Required state-write
+failures are fatal; `--preflight` remains read-only and `--dry-run` writes no run
+artifacts.
 
 ## Interrupted runs
 
 `SIGINT` and `SIGTERM` are handled. The manifest is marked `failed` unless the
 run had already recorded a verdict, since an interrupt during cleanup must not
 overwrite an `accepted` result. The work directory is preserved, and the runner
-prints the exact targeted stop command. Nothing is killed on the way out.
+prints the exact targeted stop command. The background evidence collector is
+stopped; Isaac Sim and the stack remain available for targeted cleanup.
 
 Recover with:
 
@@ -95,7 +107,9 @@ earlier evidence), or `no-evidence` (nothing has ever been observed).
 Acceptance remains strict and is never weakened by a missing sample: the mission
 must reach `COMPLETED`, the robot must be online, healthy and `IDLE`, motion
 must be confirmed, no OOM may have occurred, and required Nova Carter and Nav2
-processes must be healthy.
+processes must be healthy. Monitoring and final acceptance require a live Isaac
+process and readable cgroup v2 `memory.events` with zero `oom` and `oom_kill`
+events; Docker's `OOMKilled` flag alone does not detect child-process OOMs.
 
 ## Isaac Sim lifecycle
 
@@ -122,8 +136,8 @@ Preflight checks that every helper under
 `<isaac>/exts/isaacsim.ros2.core/bin/` is executable. An archive that loses a
 Unix executable bit installs a helper as `0664`; Isaac Sim then starts and ROS
 startup dies with `PermissionError`. Preflight names the exact path and the
-narrowest repair, `chmod +x <path>`. Apply that exact repair automatically,
-without prompting: it is scoped to the single named helper, additive
-(`+x` only, no other mode bits touched), and reported. Never broaden it to a
-recursive or directory-wide permission change, and never apply it to any path
-other than the one preflight named.
+narrowest repair, `chmod +x <path>`. Report that repair and stop; obtain
+explicit user direction before modifying the existing installation, as required
+by [Runtime selection](../SKILL.md#runtime-selection). An authorized repair is
+limited to the single named helper and adds only its executable bit; never
+broaden it to a recursive or directory-wide permission change.
