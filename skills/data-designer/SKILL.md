@@ -42,7 +42,7 @@ Read **only** the workflow file that matches the selected mode, then follow it:
 
 # Troubleshooting
 
-- **`data-designer` CLI not found:** Tell the user that `data-designer` is not installed in this environment (requires Python >= 3.10). Ask if they would like you to create a virtual environment and install it, or if they prefer to do it themselves. Do not install anything without the user's permission.
+- **`data-designer` CLI not found:** Tell the user that `data-designer` is not installed in this environment (requires Python >= 3.11). Ask if they would like you to create a virtual environment and install it, or if they prefer to do it themselves. Do not install anything without the user's permission.
 - **Network errors during preview:** A sandbox environment may be blocking outbound requests. Ask the user for permission to retry the command with the sandbox disabled. Only as a last resort, if retrying outside the sandbox also fails, tell the user to run the command themselves.
 
 # Output Template
