@@ -151,7 +151,7 @@ specify driver **525.60.13 or newer**, Docker **20.10 or newer**, and supported
 NVIDIA GPUs with at least 16 GB each. `fq2bam` needs 24 GB by default, or 16 GB
 with `--low-memory`. For eight GPUs, the documented host baseline is 392 GB
 RAM and 48 CPU threads. The manual's container probe uses CUDA 12.0.0; do not
-test a 4.2 host against the helper's default CUDA 12.9.1 image.
+test a 4.2 host against the helper's default CUDA 13.3.1 image.
 
 For authorized container probes on a Parabricks 4.2 host, explicitly select the
 CUDA image from that manual:
@@ -162,6 +162,25 @@ bash scripts/check_parabricks_runtime.sh \
   --cuda-test-image nvidia/cuda:12.0.0-base-ubuntu20.04 \
   --run-parabricks-check \
   --parabricks-version 4.2-1
+```
+
+For **4.7.1 (`4.7.1-1`)**, the manual's container probe uses CUDA 12.9.1. Pass
+`--cuda-test-image nvidia/cuda:12.9.1-base-ubuntu22.04`; the helper's 13.3.1
+default can fail on a driver that supports 4.7.1.
+
+For **4.8.0 (`4.8.0-1`)**, the
+[requirements](https://docs.nvidia.com/clara/parabricks/v4.8.0/get-started/installation-requirements)
+specify a driver compatible with CUDA 13.3.x. Data center and workstation GPUs
+can use CUDA forward compatibility on the 535+, 570+, 580+, 590+, 595+, or 610+
+driver branches; consumer GPUs need driver 610 or newer. The manual's container
+probe uses CUDA 13.3.1, which is also the helper's default probe image:
+
+```bash
+bash scripts/check_parabricks_runtime.sh \
+  --run-container-check \
+  --cuda-test-image nvidia/cuda:13.3.1-base-ubuntu22.04 \
+  --run-parabricks-check \
+  --parabricks-version 4.8.0-1
 ```
 
 If a CUDA probe fails, inspect the reported image and error before treating
@@ -285,8 +304,8 @@ Open questions:
   <https://docs.nvidia.com/clara/parabricks/about-parabricks/release-notes>
 - Parabricks 4.2 requirements:
   <https://archive.docs.nvidia.com/clara/parabricks/4.2.0/GettingStarted.html>
-- Current installation requirements (use only for that release):
-  <https://docs.nvidia.com/clara/parabricks/get-started/installation-requirements>
+- 4.8.0 installation requirements:
+  <https://docs.nvidia.com/clara/parabricks/v4.8.0/get-started/installation-requirements>
 - NVIDIA Container Toolkit installation:
   <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html>
 - Docker Engine installation:

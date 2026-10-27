@@ -9,7 +9,7 @@
 
 set -o pipefail
 
-DEFAULT_CUDA_TEST_IMAGE="nvidia/cuda:12.9.1-base-ubuntu22.04"
+DEFAULT_CUDA_TEST_IMAGE="nvidia/cuda:13.3.1-base-ubuntu22.04"
 MIN_DOCKER_MAJOR=20
 MIN_DOCKER_MINOR=10
 MIN_GPU_MEMORY_GB=16
@@ -18,7 +18,7 @@ SUMMARY_MAX_CHARS=300
 DEFAULT_TIMEOUT_SECONDS=30
 TIMEOUT_KILL_AFTER_SECONDS=1
 SCHEMA_VERSION=1
-EXAMPLE_PARABRICKS_VERSION="4.7.0-1"
+EXAMPLE_PARABRICKS_VERSION="4.8.0-1"
 PROG=$(basename "$0")
 
 usage() {
@@ -149,9 +149,11 @@ TMP_DIR=$(mktemp -d) || exit 1
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 trim_str() {
-  local s=$1
-  s="${s#"${s%%[![:space:]]*}"}"
-  s="${s%"${s##*[![:space:]]}"}"
+  local s=$1 leading trailing
+  leading=${s%%[![:space:]]*}
+  s=${s#"$leading"}
+  trailing=${s##*[![:space:]]}
+  s=${s%"$trailing"}
   printf '%s' "$s"
 }
 
@@ -632,18 +634,24 @@ json_num() {
 # json_obj INDENT key rendered_value [key rendered_value ...]
 # Pairs whose rendered value is empty are omitted.
 json_obj() {
-  local indent=$1 pad inner sep="" out="{"
+  local indent=$1 pad inner key sep="" out="{"
   shift
   printf -v pad '%*s' "$indent" ''
   inner="$pad  "
   while [ $# -ge 2 ]; do
     if [ -n "$2" ]; then
-      out+="$sep"$'\n'"$inner$(json_str "$1"): $2"
+      key=$(json_str "$1")
+      out+="$sep"
+      out+=$'\n'
+      out+="$inner$key: $2"
       sep=","
     fi
     shift 2
   done
-  [ -n "$sep" ] && out+=$'\n'"$pad"
+  if [ -n "$sep" ]; then
+    out+=$'\n'
+    out+="$pad"
+  fi
   printf '%s}' "$out"
 }
 
@@ -654,10 +662,15 @@ json_arr() {
   printf -v pad '%*s' "$indent" ''
   inner="$pad  "
   for item in "$@"; do
-    out+="$sep"$'\n'"$inner$item"
+    out+="$sep"
+    out+=$'\n'
+    out+="$inner$item"
     sep=","
   done
-  [ -n "$sep" ] && out+=$'\n'"$pad"
+  if [ -n "$sep" ]; then
+    out+=$'\n'
+    out+="$pad"
+  fi
   printf '%s]' "$out"
 }
 

@@ -13,7 +13,7 @@ pbrun postpon \
   --out-vcf /outputdir/<annotated-calls.vcf>
 ```
 
-All three paths are required in 4.7.1. Use the same assembly-compatible PON as
+All three paths are required. Use the same assembly-compatible PON as
 in prepon and mutectcaller, including its matching tabix index. Preserve the
 unannotated calls by selecting a distinct output path. Verify the annotated
 VCF and intended INFO changes after an authorized run; an output directory
@@ -24,4 +24,4 @@ Runtime controls follow the shared command contract. Read the prepon reference
 for header repair and PON preparation; ordinary GATK engine flags do not have
 assumed Parabricks equivalents.
 
-Source: [NVIDIA postpon 4.7.1 manual](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/postpon).
+Source: [NVIDIA postpon manual](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/postpon).

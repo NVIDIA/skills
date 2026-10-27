@@ -18,7 +18,7 @@ running prepon. Do not reuse the original index for changed compressed content.
 pbrun prepon --in-pon-file /workdir/<prepared-pon.vcf.gz>
 ```
 
-Run in a writable working area for generated resources. The 4.7.1 interface
+Run in a writable working area for generated resources. `prepon`
 exposes no `--out` option; retain the prepared PON and generated companion
 resources for the caller. Supply that same PON path to `mutectcaller --pon`.
 Then use postpon to annotate the resulting calls. Keep all three commands as
@@ -28,4 +28,4 @@ The only required tool input is `--in-pon-file`; runtime controls follow the
 shared command contract. Check prepon completion and the caller's access to its
 resources before calling. Do not infer graph or cohort inputs from the name.
 
-Source: [NVIDIA prepon 4.7.1 manual](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/prepon).
+Source: [NVIDIA prepon manual](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/prepon).

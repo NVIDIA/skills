@@ -24,7 +24,7 @@ pbrun mutectcaller \
 Verify exact tumor/normal, resource, interval, and filtering flags against the
 selected version.
 
-For a panel of normals in **4.7.0**, follow
+For a panel of normals, follow
 [prepon](pbrun-prepon.md) for contig-header validation and the required `.pon`
 resource. Pass the prepared **VCF.GZ** to `--pon`, then use
 [postpon](pbrun-postpon.md) for PON INFO annotation of the caller's VCF.
@@ -57,7 +57,7 @@ but common GATK engine and Java controls do not.
 | --- | --- |
 | PON index handoff from `prepon` / `postpon` workflow flags | Parabricks decomposes PON handling into preprocessing, calling, and postprocessing steps. |
 | Parabricks-specific filtering or compatibility flags documented for the selected version | These are wrapper-specific controls; verify current docs before use. |
-| `--num-streams-per-gpu`, `--mutect-low-memory`, `--run-partition` | Parabricks GPU/partition performance controls. `--num-streams-per-gpu` default 1. |
+| `--num-streams-per-gpu`, `--mutect-low-memory`, `--run-partition` | Parabricks GPU/partition performance controls. `--num-streams-per-gpu` defaults to `auto`. |
 
 ## Validation
 

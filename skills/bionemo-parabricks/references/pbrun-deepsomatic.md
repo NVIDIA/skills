@@ -27,7 +27,8 @@ selected version before finalizing.
 
 ## Gotchas
 
-Parabricks DeepSomatic `--gvcf` option actually produces both .g.vcf and .vcf files with the same name. Do not generate separate commands for gvcf and vcf outputs.
+Parabricks `deepsomatic` has no `--gvcf` option; write the VCF with
+`--out-variants`.
 
 ## DeepSomatic Option Mapping
 

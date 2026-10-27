@@ -1,15 +1,16 @@
 # STAR argument translation
 
-Use `scripts/translate_star_to_parabricks.py` for Parabricks 4.7.0 or 4.7.1
-alignment drafts. It reads a JSON request object or array and never opens the
-FASTQs, invokes the decompressor, contacts a service, or launches Parabricks.
+Use `scripts/translate_star_to_parabricks.py` for Parabricks 4.7.0, 4.7.1, or
+4.8.0 alignment drafts. It reads a JSON request object or array and never
+opens the FASTQs, invokes the decompressor, contacts a service, or launches
+Parabricks.
 Requires Python 3.7 or newer; no third-party packages are needed.
 
 ## Request schema
 
 | Field | Meaning |
 | --- | --- |
-| `version` | Explicit `4.7.0` or `4.7.1`; this is the software release, not an image tag |
+| `version` | Explicit `4.7.0`, `4.7.1`, or `4.8.0`; this is the software release, not an image tag |
 | `star_args` | Original STAR argv as strings, including every flag/value; optional leading `STAR` |
 | `ref` | Target reference FASTA |
 | `output_dir` | Directory for STAR's generated outputs |

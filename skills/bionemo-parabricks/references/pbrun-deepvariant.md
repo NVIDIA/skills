@@ -30,11 +30,12 @@ version.
 Parabricks DeepVariant `--gvcf` option actually produces both .g.vcf and .vcf files with the same name. Do not generate separate commands for gvcf and vcf outputs.
 
 The small model is enabled by default. Do not add `--enable-small-model`; that
-flag is not in the current tool reference. For WES, pass `--disable-small-model`
-together with `--use-wes-model` when matching Google DeepVariant.
+flag is not in the current tool reference. For WES, `--use-wes-model` also
+disables the small model, matching Google DeepVariant; in 4.7.1, also pass
+`--disable-small-model`.
 
 With both `--proposed-variants` and `--gvcf`, Parabricks warns and ignores
-`--run-partition`; the [4.7.1 manual](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/deepvariant)
+`--run-partition`; the [manual](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/deepvariant)
 also warns of a slowdown for that combination. Preserve the requested candidate
 input and gVCF output, and omit the ignored partition flag. Removing it does not
 prove a speedup, and increasing GPU streams cannot restore partitioning. Measure
