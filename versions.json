@@ -235,9 +235,9 @@
     {
       "name": "bionemo-parabricks",
       "path": "skills/bionemo-parabricks",
-      "content_digest": "sha256:8477f2bddc7ebdb0a831e82b7d778a01463a768bcb76a0b5903437b542f670b9",
-      "last_commit": "ab9edfd1ef0f2932b3018aef8efeddb8624205ca",
-      "last_modified": "2026-10-14"
+      "content_digest": "sha256:d51088db9c9fd4f5b87a2aea5e01b1e99174743f331ad3853f3aa498147f2421",
+      "last_commit": "b28d346437cf378402b19a730cd55cec516c77ff",
+      "last_modified": "2026-10-27"
     },
     {
       "name": "bionemo-proteinmpnn-nim",
