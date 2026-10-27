@@ -687,12 +687,12 @@
     },
     {
       "skill": "parabricks",
-      "evaluation_date": "2026-10-13",
+      "evaluation_date": "2026-10-27",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:17ca68b3af6d736e9eca9d4b35718991af9564ec9445ac2796bce041668c9567",
-      "validation_status": null,
-      "tasks": 18,
+      "evaluator_version": "1.6.2",
+      "dataset_digest": "sha256:f84268acba708284ca16102928430f9bc95d171ea7c78cb059a4922131f61f97",
+      "validation_status": "passed",
+      "tasks": 25,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -703,7 +703,7 @@
       "catalog_dir": "bionemo-parabricks",
       "component": "BioNeMo Libraries",
       "has_results": true,
-      "average_uplift_pct": 5.57
+      "average_uplift_pct": 12.67
     },
     {
       "skill": "proteinmpnn-nim",
@@ -11285,8 +11285,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.9,
-      "uplift_pct": -5.5
+      "score_pct": 98.0,
+      "uplift_pct": 2.0
     },
     {
       "catalog_dir": "bionemo-parabricks",
@@ -11294,8 +11294,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 8.3
+      "score_pct": 96.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "bionemo-parabricks",
@@ -11303,8 +11303,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.9,
-      "uplift_pct": 4.5
+      "score_pct": 100.0,
+      "uplift_pct": 24.8
     },
     {
       "catalog_dir": "bionemo-parabricks",
@@ -11312,8 +11312,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 2.2
+      "score_pct": 99.2,
+      "uplift_pct": 4.0
     },
     {
       "catalog_dir": "bionemo-parabricks",
@@ -11321,7 +11321,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 99.6,
       "uplift_pct": null
     },
     {
@@ -11330,7 +11330,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.4,
+      "score_pct": 92.1,
       "uplift_pct": null
     },
     {
@@ -11339,8 +11339,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 91.8,
-      "uplift_pct": 15.3
+      "score_pct": 94.8,
+      "uplift_pct": 37.6
     },
     {
       "catalog_dir": "bionemo-parabricks",
@@ -11348,8 +11348,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.9,
-      "uplift_pct": 8.6
+      "score_pct": 84.4,
+      "uplift_pct": 7.6
     },
     {
       "catalog_dir": "bionemo-parabricks",
@@ -11357,7 +11357,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 89.5,
+      "score_pct": 89.0,
       "uplift_pct": null
     },
     {
@@ -11366,7 +11366,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 84.0,
+      "score_pct": 63.3,
       "uplift_pct": null
     },
     {
