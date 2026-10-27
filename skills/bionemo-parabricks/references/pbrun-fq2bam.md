@@ -60,6 +60,7 @@ markdup/BQSR, intervals, GPU write controls, and similar) are in
 | Single-end FASTQ input | `--in-se-fq` | Single-end FASTQ input. |
 | FASTQ manifest or file list | `--in-fq-list`, `--in-se-fq-list` | Parabricks manifest; no direct BWA-MEM flag. |
 | `bwa mem -t` | `--bwa-cpu-thread-pool`, `--num-cpu-threads-per-stage`, `--bwa-primary-cpus` | Partial; CPU controls split across stages. |
+| `bwa mem -SP5M` for Hi-C | `--bwa-options="-SP5M"` | Add other supported BWA-MEM options to the same string. |
 | `bwa mem` alignment-only output | `--align-only` | Stops after BWA-MEM; no sort/markdup. |
 | GATK/Picard `SortSam --SORT_ORDER coordinate` | Default `fq2bam` behavior | Coordinate sorting is part of the normal workflow. |
 | GATK/Picard `MarkDuplicates -I` | Implicit sorted intermediate | Sorted alignments feed duplicate marking unless disabled. |

@@ -9,7 +9,7 @@ their Tools column for the selected command.
 
 Tool examples give the command inside the container. Add one Docker envelope
 only when requested; preserve a requested bare `pbrun` command or argument array.
-Use an exact NVIDIA release tag (4.7.1 uses `4.7.1-1`), never `latest` or an
+Use an exact NVIDIA release tag (4.8.0 uses `4.8.0-1`), never `latest` or an
 implicit tag. For reproducible execution, resolve that release to its trusted
 NGC manifest digest and record the digest with the run. An image's local
 `RepoDigests` after an authorized pull can identify the downloaded manifest;
@@ -48,11 +48,11 @@ consent rules. Preparing a workload command does not authorize executing it.
 
 ## Translating options
 
-The mapping tables primarily describe Parabricks 4.7.1. Check each selected
-release's NVIDIA tool manual before finalizing syntax, defaults, optional flags,
-input modes, or output naming. An upstream option without a documented mapping
-has no assumed Parabricks equivalent; do not pass it through or borrow an option
-from another `pbrun` tool. Flag availability does not establish biological parity.
+Check each selected release's NVIDIA tool manual before finalizing syntax,
+defaults, optional flags, input modes, or output naming. An upstream option
+without a documented mapping has no assumed Parabricks equivalent; do not pass
+it through or borrow an option from another `pbrun` tool. Flag availability
+does not establish biological parity.
 In option tables, **—** in the baseline column denotes a Parabricks-only control.
 If an upstream option is absent from both the tool-specific table and its
 scoped rows in `shared-options.md`, treat it as unmapped until the selected
@@ -106,6 +106,8 @@ or outputs. For example, `rna_fq2bam` needs both `--output-dir` for generated
 STAR outputs and `--out-bam` for the final BAM. A Docker output mount does not
 supply either argument. Retain explicit placeholders when a required path is
 unknown. Check this from the command text without launching a container.
+Appending `--dry-run` has `pbrun` validate the arguments and input paths
+without a GPU; it is still a container launch that needs authorization.
 
 Before execution, check that every input and required index resolves through
 the mounts and that reference, known-sites, model, and graph resources are

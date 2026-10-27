@@ -31,11 +31,9 @@ of the pipeline:
   longer than 512 bp. Valid values are 512 or 1024. Reads above the selected
   value still use CPU recovery, and processing longer reads at all also requires
   raising `--max-read-length`.
-- `--run-partition`: genome/Mutect partitions, not fq2bam GPU-process partitioning.
-- `--bwa-gpu-num-per-partition` (default: 2): BWA GPUs per worker when
-  `--run-partition` is set; must divide `--num-gpus`.
-- `--gpu-num-per-partition`: Mutect GPUs per partition.
-- `--num-streams-per-gpu` (default: 1): Mutect streams, not a partition flag.
+- Partition and stream controls (`--run-partition`,
+  `--bwa-gpu-num-per-partition`, `--gpu-num-per-partition`,
+  `--num-streams-per-gpu`): roles and defaults are in the options table below.
 - `--mutect-low-memory` and `--low-memory` for memory-pressure troubleshooting.
 
 ## Somatic Pipeline Option Mapping
@@ -73,7 +71,7 @@ single-tool mapping.
 | `--run-partition` | Genome/Mutect partitions (one process per partition). Not fq2bam GPU-process partitioning. |
 | `--bwa-gpu-num-per-partition` | BWA GPUs per worker when `--run-partition` is set (default: 2; must divide `--num-gpus`). |
 | `--gpu-num-per-partition` | Mutect GPUs per partition. |
-| `--num-streams-per-gpu` | Mutect streams (default: 1). Not a partition flag. |
+| `--num-streams-per-gpu` | Mutect streams (default: `auto`). Not a partition flag. |
 | `--mutect-low-memory` | Parabricks low-memory mode for the Mutect stage. |
 | GPU alignment/calling stream, queue, and memory controls | Parabricks GPU runtime tuning. |
 | GPU write/sort/storage controls | Parabricks accelerated output pipeline. |

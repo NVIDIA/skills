@@ -14,7 +14,7 @@
 
 ## Preserving reads during conversion
 
-For Parabricks 4.7.0, paired reads use `--out-suffixF` and `--out-suffixF2`.
+Paired reads use `--out-suffixF` and `--out-suffixF2`.
 Orphan first mates, orphan second mates, and unpaired reads are **ignored**
 unless `--out-suffixO`, `--out-suffixO2`, and `--out-suffixS`, respectively, are
 supplied. A single unpaired output does not capture both orphan categories.

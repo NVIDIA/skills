@@ -36,6 +36,7 @@ to several upstream commands rather than one single tool.
 | Baseline option | `pbrun minimap2` equivalent | Notes |
 | --- | --- | --- |
 | `minimap2 <reference>` | `--ref` | Required reference FASTA path. |
+| `minimap2 <reference> <R1> <R2>` paired-end FASTQ | `--in-fq <R1> <R2>` | Two files per `--in-fq` are aligned as a pair; one file is single-end. Interleaved FASTQ is not supported. Pairing is new in 4.8.0; do not rely on it in 4.7.1. |
 | BAM/CRAM input for preprocessing workflow | `--in-bam` | Parabricks input BAM/CRAM mode. |
 | `minimap2 -x` | `--preset` | Parabricks supports documented presets such as `map-pbmm2`, `map-hifi`, `map-ont`, `lr:hq`, `splice`, `splice:hq`, and `splice:sr`. |
 | `minimap2 -t` | `--num-threads` | Processing thread count. |
@@ -55,14 +56,13 @@ to several upstream commands rather than one single tool.
 
 ## minimap2 Options Without minimap2/GATK Equivalents
 
+Pipeline modes and GPU tuning shared with the long-read callers are in
+[minimap2-controls.md](minimap2-controls.md). Memory and output controls are in
+[shared-options.md](shared-options.md); use rows scoped to `minimap2`.
+
 | `pbrun minimap2` option | Why it has no direct baseline equivalent |
 | --- | --- |
-| `--pbmm2`, `--pbmm2-unmapped` | Parabricks compatibility mode for pbmm2-style output and unmapped records. |
 | `--out-qc-metrics-dir` | Parabricks workflow output for QC metrics. |
-| `--standalone-bqsr` | Parabricks mode control for running BQSR after sorted BAM generation. |
-| `--nstreams`, `--max-queue-chunks`, `--max-queue-reads`, `--chunk-size` | Parabricks GPU/CPU pipeline queue and chunk controls. |
-| `--chaining-on-gpu` | GPU offload for minimap2 chaining; may help CPU-bound runs. |
-| `--low-memory` | Parabricks memory-reduction mode. |
 
 ## Validation
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
-"""Draft Parabricks 4.7.0/4.7.1 RNA commands from JSON STAR argument arrays.
+"""Draft Parabricks 4.7.0/4.7.1/4.8.0 RNA commands from JSON STAR argument arrays.
 
 Usage:
     python3 scripts/translate_star_to_parabricks.py --input requests.json
@@ -19,7 +19,7 @@ Exit codes:
 
 Requires Python 3.7 or newer; no additional packages are needed.
 No subprocesses, network requests, input-data inspection, or workloads are run.
-Mappings: Parabricks 4.7.0/4.7.1 rna_fq2bam and STAR 2.7.2a parametersDefault.
+Mappings: Parabricks 4.7.0/4.7.1/4.8.0 rna_fq2bam and STAR 2.7.2a parametersDefault.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ import shlex
 import sys
 
 
-SUPPORTED_VERSIONS = frozenset({"4.7.0", "4.7.1"})
+SUPPORTED_VERSIONS = frozenset({"4.7.0", "4.7.1", "4.8.0"})
 JUNCTION_MISMATCH_COUNT = 4
 
 SCALARS = {
@@ -249,7 +249,7 @@ def validate_request(request):
         raise ValueError(f"Unknown request fields: {sorted(set(request) - allowed)}")
     version = request.get("version")
     if not isinstance(version, str) or version not in SUPPORTED_VERSIONS:
-        raise ValueError('This helper supports explicit versions "4.7.0" and "4.7.1" only')
+        raise ValueError('This helper supports explicit versions "4.7.0", "4.7.1" and "4.8.0" only')
     for field in ("ref", "output_dir", "out_bam"):
         if not nonempty_string(request.get(field)):
             raise ValueError(f"{field} must be an explicit nonempty path string")

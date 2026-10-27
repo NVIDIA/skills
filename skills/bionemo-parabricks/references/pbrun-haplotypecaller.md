@@ -30,8 +30,11 @@ GPU-accelerated HaplotypeCaller counterpart, but the CLI is not one-to-one:
 some GATK flags are direct Parabricks flags, while other supported original
 HaplotypeCaller options must be passed through `--haplotypecaller-options`.
 Use the spelling documented for that inner parser, which differs from GATK's
-top-level CLI for some options. For example, 4.7.1 accepts one quoted value
-`'-min-pruning 4 -pcr-indel-model NONE'`; those are single-hyphen inner flags.
+top-level CLI for some options. For example, the inner parser takes one quoted
+value `'-min-pruning 4 -pcr-indel-model NONE'`; those are single-hyphen inner
+flags. Allele-specific (`AS_*`) annotations, whether from `-G` or from `-A`
+inside `--haplotypecaller-options`, require `--gvcf`; Parabricks rejects them
+during argument checking.
 `--in-recal-file` applies the supplied recalibration table during calling;
 creating that table earlier did not itself rewrite the input BAM. A separate
 ApplyBQSR BAM is unnecessary when using this caller input.
@@ -66,7 +69,7 @@ ApplyBQSR BAM is unnecessary when using this caller input.
 | `--adaptive-pruning` | Parabricks-exposed graph pruning control. |
 | `--force-call-filtered-alleles` | Parabricks force-calling behavior tied to its documented allele input. |
 | `--filter-reads-too-long`, `--no-alt-contigs` | Parabricks read/contig filtering conveniences. |
-| `--htvc-low-memory`, `--num-htvc-threads`, `--num-streams-per-gpu`, `--run-partition`, `--gpu-num-per-partition` | Parabricks GPU/partition performance controls. `--num-streams-per-gpu` default 1. |
+| `--htvc-low-memory`, `--num-htvc-threads`, `--num-streams-per-gpu`, `--run-partition`, `--gpu-num-per-partition` | Parabricks GPU/partition performance controls. `--num-streams-per-gpu` defaults to `auto`. |
 
 ## Validation
 

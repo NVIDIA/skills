@@ -14,8 +14,8 @@
 4. For preprocessing-only questions, route to
    `pbrun-fq2bam.md` and related FASTQ/BAM references; for runtime readiness, use
    `runtime-environment.md`.
-   For prepared BAM/CRAM input, use `pbrun-haplotypecaller.md`; the 4.7.1
-   germline pipeline does not document `--in-bam`.
+   For prepared BAM/CRAM input, use `pbrun-haplotypecaller.md`; the germline
+   pipeline has no `--in-bam` option.
 
 ## Command Shape
 
@@ -42,7 +42,7 @@ markdup/BQSR, intervals, and shared execution controls) for `germline` are in
 | GATK `HaplotypeCaller --output`, `-O` | `--out-variants` | VCF/gVCF output. |
 | GATK `HaplotypeCaller --emit-ref-confidence GVCF` | `--gvcf` | gVCF mode. |
 | GATK `HaplotypeCaller --sample-ploidy` | `--ploidy` | Haploid/diploid where documented. |
-| GATK `HaplotypeCaller` annotation/output-mode/pruning controls | `--haplotypecaller-options` | Pass supported HaplotypeCaller options as one string. |
+| GATK `HaplotypeCaller` annotation/output-mode/pruning controls | `--haplotypecaller-options` | Pass supported HaplotypeCaller options as one string. `AS_*` annotations require `--gvcf`. |
 | `--java-options`, GATK engine/common flags | No direct equivalent | Not exposed as GATK engine controls. |
 
 ## germline Options Without BWA-MEM/GATK Equivalents
@@ -54,7 +54,7 @@ Shared Parabricks pipeline and GPU controls for `germline` are in
 | --- | --- |
 | `--run-partition` | Genome partitions for HaplotypeCaller (one process per partition). Not fq2bam GPU-process partitioning. |
 | `--bwa-gpu-num-per-partition` | BWA GPUs per worker when `--run-partition` is set (default: 2; must divide `--num-gpus`). |
-| `--num-streams-per-gpu` | HaplotypeCaller streams (default: 1). Not a partition flag. |
+| `--num-streams-per-gpu` | HaplotypeCaller streams (default: `auto`). Not a partition flag. |
 
 ## Validation
 

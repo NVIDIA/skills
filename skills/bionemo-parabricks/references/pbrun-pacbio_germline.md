@@ -34,25 +34,21 @@ documents this as a long-read pipeline using minimap2 v2.31 alignment and
 DeepVariant calling. The DeepVariant small model is enabled by default; use
 `--disable-small-model` to turn it off.
 
+Use [shared-options.md](shared-options.md) rows scoped to `pacbio_germline` for
+minimap2 flags, intervals, model files, and memory controls. Pipeline modes
+and GPU tuning are in [minimap2-controls.md](minimap2-controls.md).
+
 | Baseline option | `pbrun pacbio_germline` equivalent | Notes |
 | --- | --- | --- |
 | minimap2 `-x map-pbmm2` or PacBio preset | `--preset map-pbmm2` or `--preset map-hifi` | Confirm PacBio subtype and selected version before changing the default. |
-| minimap2 `-k`, `-uf`, `-ub`, `--MD`, `--eqx`, `-y` | Matching Parabricks minimap2 flags | Parabricks exposes these minimap2 controls directly. |
 | DeepVariant `--model_type PACBIO` | PacBio pipeline default, or `--mode`/model flags where documented | Use PacBio-specific mode/model settings from the selected version. |
-| DeepVariant custom model | `--pb-model-file`, `--pb-small-model-file` | Parabricks TensorRT model files. |
-| Intervals/regions | `--interval` or `--interval-file` | Parabricks separates inline intervals from interval files. |
 | Upstream minimap2/DeepVariant options not listed here | No direct equivalent | Not exposed by current Parabricks docs for `pacbio_germline`. |
 
 ## pacbio_germline Options Without minimap2/DeepVariant Equivalents
 
 | `pbrun pacbio_germline` option | Why it has no direct baseline equivalent |
 | --- | --- |
-| `--pbmm2`, `--pbmm2-unmapped` | Parabricks compatibility controls for pbmm2-style output. |
-| `--standalone-bqsr`, `--out-qc-metrics-dir` | Parabricks pipeline mode/output controls. |
-| DeepVariant channel/allele-counter flags exposed directly by Parabricks | Parabricks first-class controls for DeepVariant internals. |
-| `--nstreams`, `--max-queue-*`, `--chunk-size`, `--chaining-on-gpu` | Parabricks minimap2 GPU pipeline controls. `--chaining-on-gpu` may help CPU-bound alignment. |
 | `--disable-small-model` | Opt-out for the default-on DeepVariant small model. |
-| `--low-memory` | Parabricks memory-reduction mode. |
 
 ## Validation
 

@@ -17,7 +17,7 @@ Read only the selected tool reference and its relevant shared mappings.
 | [`bqsr`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/bqsr) | [pbrun-bqsr.md](pbrun-bqsr.md) | Generate base quality score recalibration data for later `applybqsr`. |
 | [`fq2bam`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/fq2bam) | [pbrun-fq2bam.md](pbrun-fq2bam.md) | Raw paired short-read DNA FASTQ → aligned BAM/CRAM with common preprocessing (align/sort/dedup/BQSR path). |
 | [`fq2bam_meth`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/fq2bam_meth) | [pbrun-fq2bam_meth.md](pbrun-fq2bam_meth.md) | Bisulfite or methylation FASTQ workflows — not standard DNA `fq2bam`. |
-| [`giraffe`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/giraffe) | [pbrun-giraffe.md](pbrun-giraffe.md) | Pangenome graph alignment with vg giraffe; produce aligned BAM for pangenome-aware variant calling. |
+| [`giraffe`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/giraffe) | [pbrun-giraffe.md](pbrun-giraffe.md) | Pangenome graph alignment with vg giraffe; produce aligned BAM or CRAM for pangenome-aware variant calling; also aligns single-end CRAM input. |
 | [`markdup`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/markdup) | [pbrun-markdup.md](pbrun-markdup.md) | Mark duplicate reads in aligned BAM/CRAM when not folded into `fq2bam`. |
 | [`minimap2`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/minimap2) | [pbrun-minimap2.md](pbrun-minimap2.md) | Long-read FASTQ alignment (CRAM v3.1 read support documented for recent releases). |
 
@@ -34,7 +34,7 @@ Read only the selected tool reference and its relevant shared mappings.
 | [`ont_germline`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/ont_germline) | [pbrun-ont_germline.md](pbrun-ont_germline.md) | Oxford Nanopore long-read germline workflow. |
 | [`pacbio_germline`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/pacbio_germline) | [pbrun-pacbio_germline.md](pbrun-pacbio_germline.md) | PacBio long-read germline workflow. |
 | [`pangenome_aware_deepvariant`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/pangenome_aware_deepvariant) | [pbrun-pangenome_aware_deepvariant.md](pbrun-pangenome_aware_deepvariant.md) | Pangenome-aware DeepVariant; for Roche SBX-D/SBX-Fast BAMs use `--sbx` (verify in docs/MCP). CRAM v3.1 reads documented for recent releases. |
-| [`pangenome_germline`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/pangenome_germline) | [pbrun-pangenome_germline.md](pbrun-pangenome_germline.md) | Pangenome-aware germline workflow with graph resources. |
+| [`pangenome_germline`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/pangenome_germline) | [pbrun-pangenome_germline.md](pbrun-pangenome_germline.md) | Pangenome-aware germline workflow with graph resources; also accepts single-end CRAM input. |
 | [`postpon`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/postpon) | [pbrun-postpon.md](pbrun-postpon.md) | Annotate Mutectcaller variants using an existing panel of normals (PON). |
 | [`prepon`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/prepon) | [pbrun-prepon.md](pbrun-prepon.md) | Prepare an existing PON for `mutectcaller --pon`. |
 | [`somatic`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/somatic) | [pbrun-somatic.md](pbrun-somatic.md) | Tumor/normal somatic variant calling pipeline (caller family alternative to `mutectcaller` / `deepsomatic`). |
@@ -59,7 +59,7 @@ Read only the selected tool reference and its relevant shared mappings.
 |------|-----------|----------|
 | [`dbsnp`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/dbsnp) | [pbrun-dbsnp.md](pbrun-dbsnp.md) | dbSNP annotation or variant file processing support. |
 | [`genotypegvcf`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/genotypegvcf) | [pbrun-genotypegvcf.md](pbrun-genotypegvcf.md) | Joint-genotype GVCF input(s) into VCF after indexing. |
-| [`indexgvcf`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/indexgvcf) | [pbrun-indexgvcf.md](pbrun-indexgvcf.md) | Index GVCF before `genotypegvcf` or consolidation workflows. Writes `<input>.tbi` beside the input (no `--out`); for read-only inputs, index a writable copy after checking for existing files. |
+| [`indexgvcf`](https://docs.nvidia.com/clara/parabricks/tool-reference/tools/indexgvcf) | [pbrun-indexgvcf.md](pbrun-indexgvcf.md) | Index GVCF before `genotypegvcf` or consolidation workflows. Writes `<input>.tbi` (`.idx` for an uncompressed `.g.vcf`) beside the input (no `--out`); for read-only inputs, index a writable copy after checking for existing files. |
 
 **CRAM v3.1 reads:** Documented for `bamsort`, `deepsomatic`, `deepvariant`,
 `haplotypecaller`, `minimap2`, `mutectcaller`, and `pangenome_aware_deepvariant`
@@ -92,9 +92,12 @@ CRAM v3.1 inputs to other tools.
 
 ## Key References
 
-- Tool index (4.7.0 baseline): <https://archive.docs.nvidia.com/clara/parabricks/4.7.0/ToolReference.html>
-- Performance notes (4.7.0):
-  <https://archive.docs.nvidia.com/clara/parabricks/4.7.0/GettingStarted/BestPerformance.html>
-- Getting started and deployment (4.7.0):
-  <https://archive.docs.nvidia.com/clara/parabricks/4.7.0/GettingStarted.html>
-- Other releases: <https://docs.nvidia.com/clara/parabricks/about-parabricks/release-notes>
+- Tool index (4.8.0 baseline): <https://docs.nvidia.com/clara/parabricks/v4.8.0/tool-reference>
+- Performance notes (4.8.0):
+  <https://docs.nvidia.com/clara/parabricks/v4.8.0/get-started/getting-the-best-performance>
+- Getting started and deployment (4.8.0):
+  <https://docs.nvidia.com/clara/parabricks/v4.8.0/get-started>
+- Other releases: <https://docs.nvidia.com/clara/parabricks/about-parabricks/release-notes>.
+  Manuals are at `https://docs.nvidia.com/clara/parabricks/v<release>/` for
+  4.7.1 and later, and `https://archive.docs.nvidia.com/clara/parabricks/<release>/`
+  for earlier releases.

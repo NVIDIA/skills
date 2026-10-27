@@ -1,5 +1,5 @@
 {
-  "parabricks_version": "4.7.1",
+  "parabricks_version": "4.8.0",
   "reference_assets": "The FASTA and STAR library use the same reference sequences and annotation; the library was built by STAR 2.7.2a. Input data paths are deployment paths, not local files to probe.",
   "jobs": [
     {

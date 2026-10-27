@@ -41,6 +41,7 @@ pipeline-level rather than one-to-one.
 | DeepVariant custom model | `--pb-model-file` | Optional TensorRT model. Default is the shipped pangenome-aware engine, or the SBX engine when `--sbx` is set. |
 | Roche SBX Google case-study settings | `--sbx` | Roche SBX-D / SBX-Fast mode on the pangenome-aware DeepVariant stage. |
 | `vg giraffe --max-multimaps`, `-M` | `--max-multimaps` | Max alignments per read (default: 1). |
+| `vg giraffe --supplementary` | `--supplementary` | Identify and report supplementary alignments (off by default). |
 | Intervals/regions | `--interval` or `--interval-file` | Verify pangenome workflow support for interval restriction. |
 | Upstream `vg giraffe` or DeepVariant options not listed here | No direct equivalent | Not exposed by current Parabricks docs for `pangenome_germline`. |
 
@@ -50,12 +51,15 @@ pipeline-level rather than one-to-one.
 | --- | --- |
 | `--sbx` | Roche SBX mode for the pangenome-aware DeepVariant stage. |
 | GPU graph-alignment stream, batch, queue, and minimizer controls | Parabricks GPU implementation tuning. |
+| `--in-se-cram`, `--in-cram-ref`, `--cram-read-threads` | Single-end CRAM input, as in `giraffe`; the Ultima tag options are giraffe-only. |
 | GPU write/sort/storage controls | Parabricks accelerated output pipeline. |
 | DeepVariant channel/allele-counter flags exposed directly by Parabricks | Parabricks first-class controls for DeepVariant internals. |
 
 ## Validation
 
 - Pangenome resources are complete and compatible with the reference build.
+- The graph is GBZ version 1 and the indexes were built with vg v1.75.1
+  (v1.70.0 for 4.7.1; see `pbrun-giraffe.md`).
 - Output VCF/gVCF or output directory exists.
 
 ## Guardrails

@@ -33,24 +33,21 @@ this as a long-read pipeline using minimap2 v2.31 alignment and DeepVariant
 calling. The DeepVariant small model is enabled by default; use
 `--disable-small-model` to turn it off.
 
+Use [shared-options.md](shared-options.md) rows scoped to `ont_germline` for
+minimap2 flags, intervals, model files, and memory controls. Pipeline modes
+and GPU tuning are in [minimap2-controls.md](minimap2-controls.md).
+
 | Baseline option | `pbrun ont_germline` equivalent | Notes |
 | --- | --- | --- |
 | minimap2 `-x map-ont` or ONT preset | `--preset map-ont` or selected ONT preset | Confirm ONT chemistry/use case and selected version before changing defaults. |
-| minimap2 `-k`, `-uf`, `-ub`, `--MD`, `--eqx`, `-y` | Matching Parabricks minimap2 flags | Parabricks exposes these minimap2 controls directly. |
 | DeepVariant `--model_type ONT` | ONT pipeline default, or `--mode`/model flags where documented | Use ONT-specific mode/model settings from the selected version. |
-| DeepVariant custom model | `--pb-model-file`, `--pb-small-model-file` | Parabricks TensorRT model files. |
-| Intervals/regions | `--interval` or `--interval-file` | Parabricks separates inline intervals from interval files. |
 | Upstream minimap2/DeepVariant options not listed here | No direct equivalent | Not exposed by current Parabricks docs for `ont_germline`. |
 
 ## ont_germline Options Without minimap2/DeepVariant Equivalents
 
 | `pbrun ont_germline` option | Why it has no direct baseline equivalent |
 | --- | --- |
-| `--standalone-bqsr`, `--out-qc-metrics-dir` | Parabricks pipeline mode/output controls. |
-| DeepVariant channel/allele-counter flags exposed directly by Parabricks | Parabricks first-class controls for DeepVariant internals. |
-| `--nstreams`, `--max-queue-*`, `--chunk-size`, `--chaining-on-gpu` | Parabricks minimap2 GPU pipeline controls. `--chaining-on-gpu` may help CPU-bound alignment. |
 | `--disable-small-model` | Opt-out for the default-on DeepVariant small model. |
-| `--low-memory` | Parabricks memory-reduction mode. |
 
 ## Validation
 

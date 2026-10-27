@@ -33,7 +33,8 @@ Use this when translating BWA-MEM plus Google DeepVariant germline workflows to
 `pbrun deepvariant_germline`. Preprocessing and shared DeepVariant mappings for
 `deepvariant_germline` are in [shared-options.md](shared-options.md). The small
 model is enabled by default; use `--disable-small-model` to turn it off. For WES,
-pass `--disable-small-model` with `--use-wes-model` to match Google DeepVariant.
+`--use-wes-model` also disables it, matching Google DeepVariant; in 4.7.1, also
+pass `--disable-small-model`.
 
 | Baseline option | `pbrun deepvariant_germline` equivalent | Notes |
 | --- | --- | --- |

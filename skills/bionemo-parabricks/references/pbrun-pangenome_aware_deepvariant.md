@@ -28,7 +28,7 @@ For Roche SBX-D or SBX-Fast BAMs, add `--sbx`. That selects the shipped
 `deepvariant_pangenome_aware_sbx.eng` model unless `--pb-model-file` overrides
 it, and applies SBX make-examples/postprocess defaults.
 
-## Parabricks 4.7.0 command
+## Prepared-alignment command
 
 For prepared BAM/CRAM input, the four required arguments are `--ref`,
 `--pangenome` (the GBZ graph), `--in-bam`, and `--out-variants`:
@@ -47,8 +47,8 @@ alignments; it does not require rerunning the `pangenome_germline` FASTQ pipelin
 
 ## Comparing with Google's implementation
 
-The 4.7.0 manual documents three sources of output differences. Investigate
-them separately after matching inputs, model versions, and comparison settings:
+Three known sources cause output differences. Investigate them separately
+after matching inputs, model versions, and comparison settings:
 
 - **CNN inference:** TensorRT and Keras can differ by about `10^-5` in predicted
   scores. The manual reports observed differing variants among zero-quality
