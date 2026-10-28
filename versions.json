@@ -2256,11 +2256,32 @@
       "last_modified": "2026-10-20"
     },
     {
+      "name": "runai-audit-assigned-quota",
+      "path": "skills/runai-audit-assigned-quota",
+      "content_digest": "sha256:d3d8f5edd73a91e6bd9e76b6a253a16a04898c03fc9ef17552affe42d06f9631",
+      "last_commit": "762739911707261915d3912a03e6ec7ab215022a",
+      "last_modified": "2026-10-28"
+    },
+    {
       "name": "runai-diagnose-failed-workload",
       "path": "skills/runai-diagnose-failed-workload",
       "content_digest": "sha256:8bd61ba11bc8166ad6a664a081da91ba74bb01315aa823d57a3bfb7bf892c0cf",
       "last_commit": "e08e4f7ad64671568509144cce7ecff67fcafe3d",
       "last_modified": "2026-10-25"
+    },
+    {
+      "name": "runai-get-cluster-health-summary",
+      "path": "skills/runai-get-cluster-health-summary",
+      "content_digest": "sha256:8fdff9b8714bfd4076c798099f5994544cf9948eba45c273ed9f1371f3fc2893",
+      "last_commit": "762739911707261915d3912a03e6ec7ab215022a",
+      "last_modified": "2026-10-28"
+    },
+    {
+      "name": "runai-get-utilization-overview",
+      "path": "skills/runai-get-utilization-overview",
+      "content_digest": "sha256:c8244d4fc4f2dc308d9789b6a3a5bc3235f2293e5de9f01b1c82c8261bd7f764",
+      "last_commit": "762739911707261915d3912a03e6ec7ab215022a",
+      "last_modified": "2026-10-28"
     },
     {
       "name": "runai-get-workload-health-summary",

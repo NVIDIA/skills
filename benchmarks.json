@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 417,
-  "result_row_count": 3919,
+  "skill_count": 420,
+  "result_row_count": 3949,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -6411,6 +6411,26 @@
       "average_uplift_pct": 25.42
     },
     {
+      "skill": "runai-audit-assigned-quota",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.2",
+      "dataset_digest": "sha256:833313ade3da9598cf390d2adb4483512b9dca520199d8c1c6bf268e180b75e3",
+      "validation_status": "passed",
+      "tasks": 12,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "has_results": true,
+      "average_uplift_pct": 0.03
+    },
+    {
       "skill": "runai-diagnose-failed-workload",
       "evaluation_date": "2026-10-22",
       "environment": "k8s-sandbox",
@@ -6429,6 +6449,46 @@
       "component": "Run:ai",
       "has_results": true,
       "average_uplift_pct": 10.2
+    },
+    {
+      "skill": "runai-get-cluster-health-summary",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.2",
+      "dataset_digest": "sha256:61933beeca043b8c5e2005db58c885512ae496d6b49d9af0571e0233c16a5f23",
+      "validation_status": "passed",
+      "tasks": 22,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "has_results": true,
+      "average_uplift_pct": 13.03
+    },
+    {
+      "skill": "runai-get-utilization-overview",
+      "evaluation_date": "2026-10-25",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:a7626a9135219d3b9fa142abfafe70d7b324df6a04228e5890cf22c718eb975b",
+      "validation_status": null,
+      "tasks": 22,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "has_results": true,
+      "average_uplift_pct": 14.03
     },
     {
       "skill": "runai-get-workload-health-summary",
@@ -35085,6 +35145,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.7,
+      "uplift_pct": -1.6
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.7,
+      "uplift_pct": 4.6
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.7,
+      "uplift_pct": -2.8
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-audit-assigned-quota",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 59.9,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "runai-diagnose-failed-workload",
       "component": "Run:ai",
       "dimension": "Security",
@@ -35172,6 +35322,186 @@
       "num": null,
       "agent": "codex",
       "score_pct": 56.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 9.1
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.2,
+      "uplift_pct": 9.1
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.8,
+      "uplift_pct": 15.4
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 77.2,
+      "uplift_pct": 16.4
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.6,
+      "uplift_pct": 28.2
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-cluster-health-summary",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 59.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.1,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.3,
+      "uplift_pct": 18.2
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.4,
+      "uplift_pct": 22.5
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.3,
+      "uplift_pct": 23.5
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "runai-get-utilization-overview",
+      "component": "Run:ai",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 62.2,
       "uplift_pct": null
     },
     {

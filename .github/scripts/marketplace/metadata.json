@@ -3865,6 +3865,18 @@
       }
     },
     {
+      "path": "skills/runai-audit-assigned-quota",
+      "name": "runai-audit-assigned-quota",
+      "description": "Audit GPU quota fairness across a Run:ai cluster — find which projects are starved and which are borrowing over their deserved quota in each node pool, and where GPUs can be reclaimed. Use when an admin asks \"who is over quota in node-pool X\", \"which projects are starved\", \"is the cluster shared fairly\", \"where can I reclaim GPUs\", \"show deserved vs allocated by project or department\", or when a team reports it can't get GPUs and you suspect unfair borrowing. This is the quota / fairness axis (deserved vs allocated). For idle-but-held GPUs use runai-get-utilization-overview; for a health/scheduling verdict use runai-get-cluster-health-summary.",
+      "metadata": {
+        "product.primary": "KAI Scheduler",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "ai-factory",
+        "audience": "platform_engineer,it_operations,devops_engineer",
+        "discovery.activity_tags": "assess,inspect,troubleshoot,monitor,optimize"
+      }
+    },
+    {
       "path": "skills/runai-diagnose-failed-workload",
       "name": "runai-diagnose-failed-workload",
       "description": "Use to diagnose failed, crashed, stopped, OOMKilled, CrashLoopBackOff, ImagePullBackOff, init, mount, node, or policy-terminated Run:ai workloads. Investigate one workload's failure; use other skills for workload health summaries, cluster health, scheduling-only Pending, or inference latency without a confirmed failure.",
@@ -3874,6 +3886,30 @@
         "catalog.subdomain": "ai-factory",
         "audience": "platform_engineer,devops_engineer,ml_engineer,it_operations,production_operator",
         "discovery.activity_tags": "troubleshoot,debug,inspect,classify,monitor"
+      }
+    },
+    {
+      "path": "skills/runai-get-cluster-health-summary",
+      "name": "runai-get-cluster-health-summary",
+      "description": "Point-in-time Run:ai cluster and node-health check: a HEALTHY, DEGRADED, or STUCK verdict per node pool with the dominant blocker — NotReady nodes, offline or failing GPU capacity, GPU counts, allocation vs utilization, the pending backlog, and a stuck scheduler vs a full pool. Use for \"is the cluster healthy?\", \"is the scheduler stuck?\", \"any nodes down?\", \"are GPUs failing?\", \"how many GPUs are free?\", \"is the cluster saturated?\", or \"why isn't node pool X scheduling?\". Not for quota fairness, team GPU waste, one workload, failed-workload node correlation, XID errors on one node, or writes.",
+      "metadata": {
+        "product.primary": "KAI Scheduler",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "ai-factory",
+        "audience": "platform_engineer,devops_engineer,it_operations,solutions_architect",
+        "discovery.activity_tags": "troubleshoot,monitor,inspect,summarize,assess"
+      }
+    },
+    {
+      "path": "skills/runai-get-utilization-overview",
+      "name": "runai-get-utilization-overview",
+      "description": "GPU efficiency check for a Run:ai cluster: are the GPUs that projects, departments, and node pools hold actually computing? Classifies holders as WELL_UTILIZED, UNDER_UTILIZED, or IDLE from average and p95 GPU utilization over one window of any length (default 7 days), quantifies idle GPUs and GPU-hours, and names idle workloads. Use for \"which projects hold GPUs but aren't using them?\", \"GPU utilization by project or department\", \"where are we wasting GPU cycles?\", \"is llm-serving actually busy? its GPU memory is full\", \"is project X actually using its GPUs?\", \"which workloads in project X are idle?\", \"which node pool wastes the most GPUs?\", or \"idle GPU-hours per project last quarter\". For \"find the idle GPUs and stop them\" it answers the read part only. Not for quota fairness, cluster health or free capacity, one workload's status, comparing windows, forecasts, or prices.",
+      "metadata": {
+        "product.primary": "KAI Scheduler",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "ai-factory",
+        "audience": "platform_engineer,devops_engineer,it_operations,ml_engineer",
+        "discovery.activity_tags": "monitor,measure,assess,inspect,optimize"
       }
     },
     {
