@@ -2207,6 +2207,48 @@
       "last_modified": "2026-09-15"
     },
     {
+      "name": "pva-build-test",
+      "path": "skills/pva-build-test",
+      "content_digest": "sha256:14b93b3529b9c121a6b0845a81fc5888249f4ffe92405039e2bca0564cacf603",
+      "last_commit": "c32b748376837dc67b7d16452379bf86982bbfdc",
+      "last_modified": "2026-10-28"
+    },
+    {
+      "name": "pva-debug",
+      "path": "skills/pva-debug",
+      "content_digest": "sha256:f7a77d135c96b076cb5f9752e9eb06195145686fb61ced9ac9dbfeadfd36b57e",
+      "last_commit": "c32b748376837dc67b7d16452379bf86982bbfdc",
+      "last_modified": "2026-10-28"
+    },
+    {
+      "name": "pva-doctor",
+      "path": "skills/pva-doctor",
+      "content_digest": "sha256:2b65d1f6d8d98d34020499d99186c43a4cebc590dd5d25dbb6ef8289ae32cfa1",
+      "last_commit": "c32b748376837dc67b7d16452379bf86982bbfdc",
+      "last_modified": "2026-10-28"
+    },
+    {
+      "name": "pva-opgen",
+      "path": "skills/pva-opgen",
+      "content_digest": "sha256:c0d53cc7ca8425f9b761a3598af128181332f42da5da3f833f74f97b26d887bc",
+      "last_commit": "c32b748376837dc67b7d16452379bf86982bbfdc",
+      "last_modified": "2026-10-28"
+    },
+    {
+      "name": "pva-setup",
+      "path": "skills/pva-setup",
+      "content_digest": "sha256:6ad9b632b08b1c50258f2afef5cfa485147d13a4ce9460090313bf33e63a5d53",
+      "last_commit": "c32b748376837dc67b7d16452379bf86982bbfdc",
+      "last_modified": "2026-10-28"
+    },
+    {
+      "name": "pva-spec",
+      "path": "skills/pva-spec",
+      "content_digest": "sha256:b99dfa005a3972593c22c918e113e01096dc499ac31dc8be5fdf6bf12879c76a",
+      "last_commit": "c32b748376837dc67b7d16452379bf86982bbfdc",
+      "last_modified": "2026-10-28"
+    },
+    {
       "name": "rag-blueprint",
       "path": "skills/rag-blueprint",
       "content_digest": "sha256:6a577e9d45945709e708c643eef89b236f1defaa965b8c5bef73b1ace699d944",

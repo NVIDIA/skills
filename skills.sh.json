@@ -244,6 +244,13 @@
       ]
     },
     {
+      "title": "In-Vehicle Computing",
+      "description": "Develop, deploy, and validate software workflows for vehicle compute platforms, in-cabin systems, and automotive edge runtime environments.",
+      "skills": [
+        "pva-doctor"
+      ]
+    },
+    {
       "title": "Data Science",
       "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
       "skills": [
@@ -407,6 +414,11 @@
         "nvshmem-select-remote-transport",
         "nvshmem-troubleshoot-and-report-bugs",
         "nvshmem-tune-performance",
+        "pva-build-test",
+        "pva-debug",
+        "pva-opgen",
+        "pva-setup",
+        "pva-spec",
         "tao-run-on-docker",
         "tilegym-adding-cutile-kernel",
         "tilegym-converting-cutile-to-julia",

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 420,
-  "result_row_count": 3949,
+  "skill_count": 426,
+  "result_row_count": 4009,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -6278,6 +6278,126 @@
       "component": "Portfolio Optimization",
       "has_results": true,
       "average_uplift_pct": 11.55
+    },
+    {
+      "skill": "pva-build-test",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.3",
+      "dataset_digest": "sha256:a4f9d1d2892bbba5832f465f6dd847921574c86e3234fd9cba37cf22369034bb",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "has_results": true,
+      "average_uplift_pct": 3.33
+    },
+    {
+      "skill": "pva-debug",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.3",
+      "dataset_digest": "sha256:a8cf25f8aae4bbf25e5486ee05522ad68af43f97d45e798f89157fcb2847840c",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "has_results": true,
+      "average_uplift_pct": 2.5
+    },
+    {
+      "skill": "pva-doctor",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.3",
+      "dataset_digest": "sha256:1e939133a9eb08dc70233be230625ddad334942ffd8ab02383d50cecd32ba340",
+      "validation_status": "passed",
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "has_results": true,
+      "average_uplift_pct": 32.73
+    },
+    {
+      "skill": "pva-opgen",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.3",
+      "dataset_digest": "sha256:b41c5ccca788300ded123f61f44afe9bb7029644a676c0c6531850e9c9d25451",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "has_results": true,
+      "average_uplift_pct": 2.7
+    },
+    {
+      "skill": "pva-setup",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.3",
+      "dataset_digest": "sha256:cd27b6bb41c731994e49ddbe8b4df25c30cf9919ed71f166965f5bb79a16765e",
+      "validation_status": "passed",
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "has_results": true,
+      "average_uplift_pct": 24.1
+    },
+    {
+      "skill": "pva-spec",
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.3",
+      "dataset_digest": "sha256:8afc16927ab74b52ce8abc4e89d82baf444d5004181f7268b76f184587efd3b6",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "has_results": true,
+      "average_uplift_pct": 12.5
     },
     {
       "skill": "rag-blueprint",
@@ -34827,6 +34947,546 @@
       "num": null,
       "agent": "codex",
       "score_pct": 90.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-build-test",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-debug",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 44.0
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 56.0
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 51.9
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 44.5
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-doctor",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 5.6
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.6
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-opgen",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 32.0
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 36.3
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 36.3
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-setup",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 17.5
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": 17.5
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "pva-spec",
+      "component": "PVA SDK",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.7,
       "uplift_pct": null
     },
     {
