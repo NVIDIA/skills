@@ -1,0 +1,70 @@
+{
+  "skill_name": "doca-dts",
+  "evals": [
+    {
+      "id": "doca-dts.explicit-positive.v1",
+      "prompt": "Use the doca-dts skill for this task: I'm running into this: \"prometheus on my BlueField returns nothing on port 9100\". Can you walk me through it?",
+      "expected_skill": "doca-dts",
+      "expected_output": "The agent selects the doca-dts skill, routes the deployment shape first (doca-setup recognize, then the skill's shape table), and answers from its documented workflow, quoting only real paths/options/commands from the bundle and pointing to the DTS guide section for the verbatim recipe (no invented tokens, no fabricated image tags).",
+      "assertions": [
+        "The doca-dts skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The answer decides the deployment shape (BlueField static pod / host docker / DPF DPUService) before giving shape-specific steps.",
+        "Every path, option, env var, port, or command named is traceable to the bundle (no invented tokens); image tags are taken from the NGC tag list, never fabricated.",
+        "The answer ends with the universal verification contract using the Prometheus `/metrics` endpoint as the green signal."
+      ]
+    },
+    {
+      "id": "doca-dts.implicit-positive.v1",
+      "prompt": "I'm running into this: \"prometheus on my BlueField returns nothing on port 9100\". Can you walk me through it?",
+      "expected_skill": "doca-dts",
+      "expected_output": "The agent recognizes this as a doca-dts issue (the BlueField built-in DTS static pod's Prometheus exporter) even though the skill is not named, loads it, and debugs in layers: pod/container state via `crictl pods` / `crictl ps` / `crictl logs`, the `prometheus=` and `enable-provider=` keys in `/opt/mellanox/doca/services/telemetry/config/dts_config.ini`, then exporter reachability.",
+      "assertions": [
+        "The doca-dts skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer identifies the BlueField built-in static-pod shape and uses `crictl` (not `docker`) to inspect it.",
+        "The answer stays grounded in real bundle symbols/commands (dts_config.ini keys, /etc/kubelet.d yaml, crictl) and proposes a single-variable change per debug iteration."
+      ]
+    },
+    {
+      "id": "doca-dts.implicit-positive.v2",
+      "prompt": "I'm running into this: \"the doca_telemetry docker container on my x86 host exits right after start\". Can you walk me through it?",
+      "expected_skill": "doca-dts",
+      "expected_output": "The agent recognizes this as a doca-dts issue (host docker deployment shape) even though the skill is not named, loads it, and checks the documented shape: a `-host` image tag copied from the NGC tag list, the one-shot init container (`DTS_CONFIG_DIR=host /usr/bin/telemetry-init.sh`) run before `telemetry-run.sh`, the host-namespace flags and config/ipc_sockets/data/log volume mounts, and — because the documented run uses `--rm`, which removes the exited container — the host-mounted `/opt/mellanox/doca/services/telemetry/log` dir or a foreground re-run without `-d` for the exit output.",
+      "assertions": [
+        "The doca-dts skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer identifies the host docker shape, distinguishes the init step from the run step, and tells the user to copy the exact invocation from the guide's Host Deployment section rather than inventing flags.",
+        "The answer stays grounded in real bundle symbols/commands and never fabricates an image tag."
+      ]
+    },
+    {
+      "id": "doca-dts.implicit-positive.v3",
+      "prompt": "I'm running into this: \"add ethtool counters to the telemetry DPUService in my DPF cluster\". Can you walk me through it?",
+      "expected_skill": "doca-dts",
+      "expected_output": "The agent recognizes this as a doca-dts issue (DPF DPUService shape) even though the skill is not named, loads it, and explains the dts_config.ini `key=value` to DPUService `key: value` mapping: add `ethtool` to `spec.helmChart.values.configMapData.providers`, put ethtool options (e.g. `ethtool-interfaces`) under `configMapData.general`, re-apply with `kubectl apply -f DPUService.yaml`, confirm chart keys with `helm show values`, and check conditions with `dpfctl describe`.",
+      "assertions": [
+        "The doca-dts skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer uses the DPF DPUService/helm shape (configMapData.providers / general) rather than editing dts_config.ini on the DPU by hand.",
+        "The answer stays grounded in real bundle symbols/commands and defers chart key details to `helm show values`."
+      ]
+    },
+    {
+      "id": "doca-dts.negative.v1",
+      "prompt": "How do I call doca_telemetry_exporter_* from my C application to publish my own counters? Show me where to start.",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-dts; it routes the library-API question to libs/doca-telemetry-exporter (and libs/doca-telemetry where relevant) and explains that doca-dts covers DTS as deployed and configured, not the application-side publish API.",
+      "assertions": [
+        "doca-dts is not selected as the primary skill for this library-API request.",
+        "The answer routes to libs/doca-telemetry-exporter instead, mentioning at most the IPC-socket/shared-memory touchpoint that DTS exposes to such clients."
+      ]
+    },
+    {
+      "id": "doca-dts.negative.v2",
+      "prompt": "I need to install the DOCA Platform Framework (DPF) operator on a fresh Kubernetes cluster and provision my first DPUs. Walk me through it.",
+      "expected_skill": null,
+      "expected_output": "The agent does NOT force doca-dts; it explains that DPF cluster installation and DPU provisioning are out of scope for this skill (which only covers the DTS DPUService on an already-running DPF cluster) and routes to the DPF public documentation via the knowledge-map / setup skills.",
+      "assertions": [
+        "doca-dts is not selected as the primary skill for this out-of-scope request.",
+        "The answer routes to the appropriate skill(s)/public DPF docs instead and does not invent DPF install steps."
+      ]
+    }
+  ]
+}
