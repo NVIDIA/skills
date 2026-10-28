@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 426,
-  "result_row_count": 4009,
+  "skill_count": 427,
+  "result_row_count": 4019,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -6041,6 +6041,26 @@
       "component": "Physical AI",
       "has_results": true,
       "average_uplift_pct": 37.6
+    },
+    {
+      "skill": "omniverse-content-services",
+      "evaluation_date": "2026-10-24",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:26ba432fafb9b59ca9f07418d47b8d52deb447fa024755733b0bc0958056faa1",
+      "validation_status": null,
+      "tasks": 10,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "has_results": true,
+      "average_uplift_pct": 13.95
     },
     {
       "skill": "omniverse-realtime-viewer",
@@ -33958,6 +33978,96 @@
       "agent": "claude-code",
       "score_pct": 89.0,
       "uplift_pct": 47.0
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": -15.0
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": -15.0
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 36.0
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.0,
+      "uplift_pct": 18.0
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.3,
+      "uplift_pct": 41.0
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.4,
+      "uplift_pct": 18.7
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "omniverse-content-services",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",

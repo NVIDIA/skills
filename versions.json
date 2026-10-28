@@ -2123,6 +2123,13 @@
       "last_modified": "2026-09-01"
     },
     {
+      "name": "omniverse-content-services",
+      "path": "skills/omniverse-content-services",
+      "content_digest": "sha256:071cf2d6b70825b1eab52a64e14c900f237fdcb53ed9b1fc646307f089c9e290",
+      "last_commit": "4df760d0ab575af4722d6942f4cb18c1cb4fc54f",
+      "last_modified": "2026-10-28"
+    },
+    {
       "name": "omniverse-realtime-viewer",
       "path": "skills/omniverse-realtime-viewer",
       "content_digest": "sha256:985cd3fe6532b1090e97120596a17899d9c1e66e37878c6f5de3c3cdc04babb1",
