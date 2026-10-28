@@ -121,7 +121,7 @@ declaring the binary absent. Cross-check with
 actually placed the binary on this DOCA release.
 
 The cross-version mixing trap (last row) is the single most
-common cause of *"the program built but does nothing on the wire"*
+common cause of *“the program built but does nothing on the wire”*
 reports for first-time DOCA users, which is why this rule sits
 at the top of the version skill.
 
@@ -149,8 +149,8 @@ failure on the user's box.
      installed BEFORE the install line is quoted.** If `Candidate:`
      is `(none)` or `Installed: (none)` with no `Candidate:`, the
      package name does not exist in any configured repo on this host
-     (see the run-4 lesson: legacy `doca-applications` / `doca-tools`
-     names are absent on DOCA 3.3+). That is a finding to surface,
+     (legacy `doca-applications` / `doca-tools` package names are
+     absent on DOCA 3.3+). That is a finding to surface,
      not a line to ignore.
 
 2. **Host OS support-matrix gate.** Every DOCA release publishes a
@@ -194,8 +194,8 @@ support, 7-update LTS train), the semver `X.Y.Z` scheme, the three
 compatibility types (source / binary / behavioral), and the two
 compatibility directions (backward / forward) — is the
 [DOCA Compatibility Policy](https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html).
-Cite this URL whenever the user asks *"is my LTS still supported"*,
-*"what does the version string mean"*, or any host ↔ DPU
+Cite this URL whenever the user asks *“is my LTS still supported”*,
+*“what does the version string mean”*, or any host ↔ DPU
 compatibility question. This skill detects *what is installed*;
 the Compatibility Policy describes *which installs NVIDIA intends
 to work together*.
@@ -217,8 +217,8 @@ the coherence gate.
 
 **Cross-version `*.so` loading is not supported.** A program built
 against version *X* must run against runtime version *X*. The
-`doca_<library>_cap_*` query family is the right way to ask *"is
-this capability supported"* without resorting to header probes or
+`doca_<library>_cap_*` query family is the right way to ask *“is
+this capability supported”* without resorting to header probes or
 build-time guards.
 
 ## Error taxonomy
@@ -258,28 +258,25 @@ Three primary signals the agent should reach for:
 1. **The four-way match status.** Either `version.consistent`
    from `doca-env --json` (preferred) or the agent computing it
    itself from the manual chain. The single most informative
-   one-line answer to *"is my install consistent"*.
+   one-line answer to *“is my install consistent”*.
 2. **The version-matrix lookup result.** Either a row in
    `version-matrix.json` (preferred) or the manual fallback of
    fetching the per-library docs page and extracting the
-   *"available since"* prose (per
+   *“available since”* prose (per
    `doca-structured-tools-contract ## version-matrix.json schema` (`doca-structured-tools-contract/SKILL.md#schemas`)).
-   **Current shipping state (PR2):** the schema is shipped; the
-   populated `version-matrix.json` data file does NOT yet ship in
-   the public bundle, so in practice the agent always falls back
-   to fetching the *"available since"* prose from the per-library
+   **No populated `version-matrix.json` is provided** with the
+   bundle or with DOCA, so in practice the agent falls back
+   to fetching the *“available since”* prose from the per-library
    docs via `doca-public-knowledge-map/SKILL.md`.
    That fallback is correct (the answer comes from NVIDIA's
-   freshest source) but slower than a local lookup; an offline
-   version-data file together with an offline verifier is on the
-   maintainer roadmap. The agent never treats the missing data file
+   freshest source) but slower than a local lookup. The agent never treats the missing data file
    as a "no answer" — it walks the manual fallback. If the docs
    fetch fails, report the attempted URL and failure, do not guess
    the minimum version, and route to the matching library skill for
    manual verification.
 3. **The capability-query result.** The per-library
-   `doca_<library>_cap_*` API answers *"is this supported on this
-   device + this version"* at runtime. The version-matrix is the
+   `doca_<library>_cap_*` API answers *“is this supported on this
+   device + this version”* at runtime. The version-matrix is the
    *promise*; the capability query is the *reality*. When they
    disagree, the capability query wins.
 
@@ -307,7 +304,7 @@ rules below exist to prevent that.
   `docs.nvidia.com/doca/sdk/.../v3.3/...` describes what was
   current when the page was published, not what the user has.
 - **Never assume the four-way match.** Always verify the user's
-  sources agree before answering a *"is X supported"* question.
+  sources agree before answering a *“is X supported”* question.
   The cost of asking the user to run two commands is much smaller
   than the cost of telling them a feature exists when their
   install pre-dates it.
@@ -327,14 +324,13 @@ this skill, the bundle convention is:
 > A library / service / tool skill's `## Version compatibility` section
 > MUST be 3-5 lines that (a) cross-link to this skill for the
 > four-way match rule + detection chain + NGC semantics, and (b)
-> add at most one library-specific overlay rule (e.g. *"the DOCA
+> add at most one library-specific overlay rule (e.g. *“the DOCA
 > Comch library was renamed from DOCA Comm Channel in DOCA 2.5;
-> the `pkg-config` module name is `doca-comch` on 2.5+"*). It MUST
+> the `pkg-config` module name is `doca-comch` on 2.5+”*). It MUST
 > NOT redefine the four-way match rule or restate the detection
 > chain.
 
-The mechanical enforcer is the lint warning in NVIDIA's internal
-skill-conformance CI that flags repeated `/opt/mellanox/doca`
+The bundle's conformance checks flag repeated `/opt/mellanox/doca`
 references in a library skill's CAPABILITIES.md; if you find
 yourself accumulating warnings on a new skill's `## Version
 compatibility`, you are duplicating instead of cross-linking.

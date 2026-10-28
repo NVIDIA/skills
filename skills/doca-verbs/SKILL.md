@@ -14,7 +14,7 @@ description: >
   doca-eth / doca-rmax workloads, DOCA install, Core internals, and
   general libibverbs theory.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -40,8 +40,7 @@ compatibility: >
   named is out of scope — route to
   `doca-rdma/SKILL.md`.
 - **"I need a raw QP attribute the task API does not expose."** — stay
-  here. Use only the public `doca_verbs.h` surface; do not quote
-  restricted headers.
+  here. Use only the installed `doca_verbs.h` surface.
 
 ## Instructions
 
@@ -181,7 +180,7 @@ Do **not** load for: general RDMA (`doca-rdma/SKILL.md`);
 Ethernet queueing (`doca-eth/SKILL.md`); timing-precise
 media (`doca-rmax/SKILL.md`); cases another
 higher-level library covers (`doca-flow/SKILL.md` for
-steering, storage-transport for NVMe-oF); DOCA install
+steering, `doca-sta/SKILL.md` for NVMe-oF target acceleration); DOCA install
 (`doca-setup/SKILL.md`); or general orientation —
 all routed via
 `doca-public-knowledge-map/SKILL.md`.

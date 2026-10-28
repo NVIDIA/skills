@@ -46,7 +46,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), each attempt run in its own isolated k8s-sandbox pod against dataset snapshot skill-evaluator-dataset-snapshot/1. <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each attempt run in its own isolated k8s-sandbox pod against dataset snapshot skill-evaluator-dataset-snapshot/1. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -63,21 +63,22 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.0% (uplift unavailable) | 80.1% (uplift unavailable) |
+| Overall | 90.6% (uplift unavailable) | 82.9% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 90.0% → 75.0% (-15.0 points) |
-| Discoverability | 96.7% (uplift unavailable) | 95.0% (uplift unavailable) |
-| Effectiveness | 45.8% → 79.4% (+33.6 points) | 56.9% → 68.1% (+11.2 points) |
-| Efficiency | 79.2% (uplift unavailable) | 62.4% (uplift unavailable) |
+| Correctness | 50.0% → 90.0% (+40.0 points) | 70.0% → 80.0% (+10.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 91.7% (uplift unavailable) |
+| Effectiveness | 58.3% → 81.3% (+23.0 points) | 58.3% → 68.8% (+10.5 points) |
+| Efficiency | 81.6% (uplift unavailable) | 74.1% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-2a83c6b (source: git SHA, committed 2026-10-24) <br>
+c98e456 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

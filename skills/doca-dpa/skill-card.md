@@ -69,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 88.8% — baseline ran, but no comparable score was available; uplift unavailable | 77.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 95.0% (+35.0 points) | 85.0% → 70.0% (-15.0 points) |
+| Overall | 94.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 50.0% → 100.0% (+50.0 points) | 80.0% → 85.0% (+5.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 43.1% → 72.5% (+29.4 points) | 49.2% → 55.0% (+5.8 points) |
-| Efficiency | 76.5% — baseline ran, but no comparable score was available; uplift unavailable | 64.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 37.5% → 87.5% (+50.0 points) | 52.1% → 87.5% (+35.4 points) |
+| Efficiency | 82.6% — baseline ran, but no comparable score was available; uplift unavailable | 64.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-b99bced (source: git SHA, committed 2026-10-23) <br>
+259da15 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

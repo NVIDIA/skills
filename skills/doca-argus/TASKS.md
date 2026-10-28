@@ -36,8 +36,7 @@ review) before the container starts.
     - Is the user trying to build a custom DPU-side security
       tool of their own? That is the DOCA App Shield library —
       same shape of BlueField-side observation, different shape of
-      operator effort — which is **not covered by this bundle**
-      (policy-excluded from the public release); route them to the
+      operator effort — which is **not covered by this bundle**; route them to the
       public docs via
       `doca-public-knowledge-map/SKILL.md`.
     - Does the user actually want observability / metrics rather
@@ -117,8 +116,7 @@ If the user is asking how to build a **custom DPU-side security
 tool** (a program that reads host state from the BlueField side
 to make its own decisions), that is not an Argus question — it is
 the path-selection rule pointing at the DOCA App Shield library,
-which is **not covered by this bundle** (policy-excluded from the
-public release):
+which is **not covered by this bundle**:
 
 - For applications that **introspect the host's running kernel
   state from the DPU side** (rootkit detection, periodic process
@@ -501,8 +499,7 @@ Three cross-cutting rules for this appendix:
   posture has decided are worth emitting.
 - **Building a custom DPU-side security tool** — not an Argus
   question. That is the DOCA App Shield library, which is **not
-  covered by this bundle** (policy-excluded from the public
-  release); route the user to the public docs via
+  covered by this bundle**; route the user to the public docs via
   `doca-public-knowledge-map/SKILL.md`
   plus
   `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)

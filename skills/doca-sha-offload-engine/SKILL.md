@@ -18,7 +18,7 @@ description: >
   / SHA-224 / HMAC-SHA offload, incremental hashing via chained
   `EVP_DigestUpdate`, or OpenSSL PROVIDER authoring.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
   doca_version: "3.5"
   tags:
@@ -28,7 +28,7 @@ metadata:
 compatibility: >
   Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
   22.04/24.04 or RHEL/SLES) with a BlueField-2 DPU (not BF-3)
-  attached, plus OpenSSL ≥ 1.1.1 and libssl-dev (or distro equivalent)
+  attached, plus OpenSSL ≥ 1.1.1 (libssl-dev for ENGINE API callers)
   on the build host. The engine ships under
   /opt/mellanox/doca/tools/doca_sha_offload_engine/ as
   libdoca_sha_offload_engine.so; reads the user's local install via
@@ -41,10 +41,10 @@ compatibility: >
 
 ## Examples
 
-- **"Can I offload SHA in an existing OpenSSL pipeline without
-  rewriting?"** — this is in scope. Load the engine; do not
+- **“Can I offload SHA in an existing OpenSSL pipeline without
+  rewriting?”** — this is in scope. Load the engine; do not
   start a new `doca-sha` pipeline here.
-- **"How do I prove OpenSSL used DOCA SHA, not CPU SHA?"** —
+- **“How do I prove OpenSSL used DOCA SHA, not CPU SHA?”** —
   use the SHA-224 negative test; do not treat a successful
   digest as proof of offload.
 
@@ -70,16 +70,10 @@ offload wins and how to verify it. Do not open every
 companion file.
 
 **Where to start:** This is a tool skill for the OpenSSL
-ENGINE shipped in the DOCA SOURCE tree under
-`doca/tools/sha_offload_engine/` and INSTALLED on the host
+ENGINE installed by the `doca-sha-offload-engine` package
 under `${DOCA_DIR}/tools/doca_sha_offload_engine/` as
-`libdoca_sha_offload_engine.so`. The directory-name shift
-(`sha_offload_engine` in the source layout vs
-`doca_sha_offload_engine` in the install layout) is an
-NVIDIA packaging convention, not a bundle inconsistency;
-both forms appear below and are the same artifact at
-different lifecycle stages — quote whichever the prompt is
-about (build-from-source vs runtime-load). It is **not a CLI** —
+`libdoca_sha_offload_engine.so`, next to its
+`engine_readme.md`. It is **not a CLI** —
 it is a shared object loaded by an OpenSSL-based
 application or by `openssl` itself, that re-routes SHA-1 /
 SHA-256 / SHA-512 (one-shot only, via the `EVP_Digest`
@@ -87,8 +81,8 @@ interface) onto the DOCA SHA hardware path. Open
 the tasks companion and start at
 `## configure` for the PCIe-address
 configuration and the OpenSSL prerequisites; jump to
-`## run` for the *"load the engine and
-prove it actually runs"* flow. Open
+`## run` for the *“load the engine and
+prove it actually runs”* flow. Open
 the capabilities companion when the question is
 *what the engine actually offloads vs falls back to*,
 *when the engine is a perf win vs not*, or *how to verify
@@ -107,57 +101,57 @@ skill is built to answer, each with one worked example.
 The class is the load-bearing piece; the worked example
 is one instance.
 
-- **"I have an existing OpenSSL-based pipeline doing SHA;
+- **“I have an existing OpenSSL-based pipeline doing SHA;
   can I offload the SHA to DOCA without rewriting the
-  app?"** — worked example: *"the app uses
+  app?”** — worked example: *“the app uses
   `EVP_DigestInit_ex` / `EVP_DigestUpdate` /
   `EVP_DigestFinal_ex` against `EVP_sha256()`; can I
-  drop in DOCA-SHA offload via an engine load?"*.
-  Answered by the *"when this engine is the right
-  surface"* rule in
+  drop in DOCA-SHA offload via an engine load?”*.
+  Answered by the *“when this engine is the right
+  surface”* rule in
   the capabilities companion
   + the engine-load mechanics in
   the tasks companion.
-- **"Did the engine actually load? Or did OpenSSL just
-  fall back to software SHA?"** — worked example: *"my
+- **“Did the engine actually load? Or did OpenSSL just
+  fall back to software SHA?”** — worked example: *“my
   `openssl dgst` invocation completed; how do I know
   DOCA SHA actually did the work and OpenSSL did not
-  silently use the software path?"*. Answered by the
-  *"prove the engine actually ran"* pattern in
+  silently use the software path?”*. Answered by the
+  *“prove the engine actually ran”* pattern in
   the capabilities companion
   (the SHA-224 negative test and the `-engine_impl`
   flag) + the verification flow in
   the tasks companion.
-- **"For what message-size range is the engine offload a
-  win vs CPU SHA?"** — worked example: *"my pipeline
+- **“For what message-size range is the engine offload a
+  win vs CPU SHA?”** — worked example: *“my pipeline
   hashes 4 KB blocks at a time; is the engine a win
   there, or does the round-trip to DOCA SHA cost more
-  than the CPU hash itself?"*. Answered by the
+  than the CPU hash itself?”*. Answered by the
   message-size-window rule in
   the capabilities companion
   + the `openssl speed` perf-comparison pattern in
   the tasks companion.
-- **"What SHA algorithms does the engine actually
-  support — and what happens for the ones it does not?"**
-  — worked example: *"my pipeline mixes SHA-1, SHA-256,
+- **“What SHA algorithms does the engine actually
+  support — and what happens for the ones it does not?”**
+  — worked example: *“my pipeline mixes SHA-1, SHA-256,
   SHA-512, and SHA-224 — what does the engine do for
-  each?"*. Answered by the algorithm-coverage matrix in
+  each?”*. Answered by the algorithm-coverage matrix in
   the capabilities companion.
-- **"Should I use this engine, or call doca-sha
-  directly?"** — worked example: *"I am writing a new
+- **“Should I use this engine, or call doca-sha
+  directly?”** — worked example: *“I am writing a new
   service from scratch; does the engine save me work or
-  does it add complexity I do not need?"*. Answered by
-  the *"engine vs library"* selection table in
+  does it add complexity I do not need?”*. Answered by
+  the *“engine vs library”* selection table in
   the capabilities companion.
-- **"What OpenSSL versions does the engine require, and
+- **“What OpenSSL versions does the engine require, and
   what about OpenSSL 3.x's deprecation of the ENGINE
-  API?"** — worked example: *"my host has OpenSSL 3.0;
-  will the engine still load?"*. Answered by the version
+  API?”** — worked example: *“my host has OpenSSL 3.0;
+  will the engine still load?”*. Answered by the version
   overlay in
   the capabilities companion
   (verified surface: the engine is documented for
   OpenSSL 1.1.1f on Ubuntu 20.04 and OpenSSL 3.0.2 on
-  Ubuntu 22.04 per the shipped `readme.md`).
+  Ubuntu 22.04 per the shipped `engine_readme.md`).
 
 ## When to load this skill
 
@@ -170,15 +164,15 @@ device. Concretely:
   application or `openssl` CLI invocation, with the
   intent of no source-level code changes (or only the
   minimum `ENGINE_load_dynamic` / `ENGINE_by_id` block
-  shown in the verified `readme.md`).
+  shown in the shipped `engine_readme.md`).
 - Verifying the engine actually engaged for the
-  hot-path digests (the *"is offload real or did OpenSSL
-  fall back to software"* question).
+  hot-path digests (the *“is offload real or did OpenSSL
+  fall back to software”* question).
 - Characterizing the message-size range over which the
   engine is a perf win vs the CPU `sha1` / `sha256` /
   `sha512` paths.
-- Deciding between *"adopt the engine"* (existing
-  pipeline, minimal change) and *"rewrite to doca-sha"*
+- Deciding between *“adopt the engine”* (existing
+  pipeline, minimal change) and *“rewrite to doca-sha”*
   (new pipeline, fine-grained control needed).
 
 Do **not** load this skill for users building a new
@@ -205,25 +199,23 @@ two companion files:
   `Final`), the engine-vs-library selection rule, the
   message-size-window rule for when offload is a perf
   win, the verified ctrl-cmd surface (`set_pci_addr`),
-  the version overlay (OpenSSL ≥ 1.1.1; the engine's
-  shipped tests cover OpenSSL 1.1.1f and OpenSSL 3.0.2
-  per the `readme.md`; OpenSSL 3.x deprecates the ENGINE
+  the version overlay (OpenSSL ≥ 1.1.1; the shipped
+  `engine_readme.md` documents testing on OpenSSL 1.1.1f and 3.0.2; OpenSSL 3.x deprecates the ENGINE
   API but still supports it via the legacy code path),
   the layered error taxonomy, the observability surface
-  (the *"prove offload engaged"* pattern using the
+  (the *“prove offload engaged”* pattern using the
   SHA-224 negative test and `-engine_impl`), and the
   safety overlay.
 - the tasks companion — step-by-step workflows for the in-scope
   task verbs: `install`, `configure` (PCIe address
   selection — the engine defaults to `03:00.0` and
-  exposes the `set_pci_addr` ctrl-cmd plus a build-time
-  override per the shipped `test_cmdline_mode/readme.md`),
-  `build` (the `meson` flow), `modify` (refuses source
-  patching; modify the load-time invocation and the
+  exposes the `set_pci_addr` ctrl-cmd), `build` (none:
+  the package ships the engine pre-built), `modify` (refuses
+  engine patching; modify the load-time invocation and the
   PCIe address instead), `run` (load the engine via
   `openssl engine dynamic`; the verification pattern;
   the OpenSSL programmatic `ENGINE_load_dynamic` block),
-  `test` (the *"prove the engine ran"* SHA-224 negative
+  `test` (the *“prove the engine ran”* SHA-224 negative
   test; the `openssl speed` perf comparison; the
   message-size window characterization), `debug` (walk
   the error taxonomy layer by layer), `use` (the
@@ -244,8 +236,8 @@ scripts bundle. It deliberately does not contain — and
 pull requests should not add:
 
 - **Pre-written OpenSSL ENGINE application source code**
-  beyond the verbatim verified block in the shipped
-  `readme.md` (the `ENGINE_load_dynamic` /
+  beyond the verbatim block in the shipped
+  `engine_readme.md` (the `ENGINE_load_dynamic` /
   `ENGINE_by_id` / `ENGINE_ctrl_cmd_string` /
   `ENGINE_init` / `ENGINE_set_default_digests` sequence,
   cross-referenced into the tasks companion).
@@ -253,7 +245,7 @@ pull requests should not add:
 - **A `samples/`, `bindings/`, or `reference/`
   subtree.** This is a thin loader for a shipped
   shared-object; substantive material lives in the
-  shipped `readme.md` and the doca-sha library docs.
+  shipped `engine_readme.md` and the doca-sha library docs.
 - **Performance numbers from agent memory.** The
   message-size-window where the engine wins is
   device-, firmware-, OpenSSL-version-, and

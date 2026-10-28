@@ -79,7 +79,7 @@ Three architectural properties the operator must hold throughout:
   loop has reached for the wrong artifact and should be routed to
   the DOCA App Shield library — the lower-level library that custom
   security tooling builds on, which is **not covered by this
-  bundle** (policy-excluded from the public release; route via
+  bundle** (outside this bundle's scope; route via
   `doca-public-knowledge-map/SKILL.md`).
 - **Findings are the primary output, not metrics.** Argus's
   surface is "did something security-relevant happen on this

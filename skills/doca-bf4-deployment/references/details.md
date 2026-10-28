@@ -13,7 +13,7 @@ worked example is one instance.
   worked example: *"I do not want to set up PXE; can I just point it at
   an ISO over HTTP?"*. Answered by the install-method table in
   [`CAPABILITIES.md ## Capabilities and modes`](../CAPABILITIES.md#capabilities-and-modes)
-  (UEFI HTTP Boot is the recommended default) + the step-by-step flow
+  + the step-by-step flow
   in [`TASKS.md ### method-a-uefi-http-boot`](../TASKS.md#method-a-uefi-http-boot).
 - **"I want to install the DPU completely out-of-band — no physical
   access, no HTTP server to stand up. Is there a way?"** — worked
@@ -41,7 +41,7 @@ worked example is one instance.
   Media + cloud-init rules in
   [`CAPABILITIES.md ## Capabilities and modes`](../CAPABILITIES.md#capabilities-and-modes)
   + [`TASKS.md ### grace-ubuntu-cloud-init`](../TASKS.md#grace-ubuntu-cloud-init),
-  with the CIDATA / fixed-`config.iso`-URI gotcha in the cloud-init
+  with the CIDATA seed-label gotcha in the cloud-init
   layer of the error taxonomy.
 - **"My BlueField-4 keeps re-entering the installer every time it
   resets. Why?"** — worked example: *"I finished the install but it
@@ -85,8 +85,8 @@ should not add:
 - **A `samples/`, `templates/`, `images/`, or `firmware/` subtree of
   any kind.** A mock or partial artifact in this skill's tree, even one
   labeled "reference", is misleading: operators will read it as
-  production-ready, and a stored credential or firmware blob would fail
-  the bundle's public-release gates.
+  production-ready, and a stored credential or firmware blob would be
+  unsafe to publish.
 
 ## Related skills
 

@@ -16,16 +16,15 @@ the public guides in `docs.nvidia.com/doca/sdk/`.
 | **DOCA Services** (umbrella index) | <https://docs.nvidia.com/doca/sdk/DOCA-Services/index.html> | Canonical list of every public DOCA service with its purpose and guide link. Always check here first when a service is not in the table below. **No standalone SDK doc page in the public index today — use the umbrella above to discover.** |
 | DOCA Management Service (DMS) | <https://docs.nvidia.com/doca/sdk/DOCA-Management-Service-Guide/index.html> | Centralized configuration / operation of BlueField and ConnectX devices via gRPC (gNMI for config, gNOI for system ops). Covered by the `doca-dms/SKILL.md` skill. |
 | DOCA Firefly Service | <https://docs.nvidia.com/doca/sdk/DOCA-Firefly-Service-Guide/index.html> | PTP / time synchronization service. Covered by the `doca-firefly/SKILL.md` skill. |
-| DOCA Flow Inspector Service | <https://docs.nvidia.com/doca/sdk/DOCA-Flow-Inspector-Service-Guide/index.html> | Mirrored-flow inspection service. **Not covered by this bundle** — policy-excluded from this public release (see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`) item 7). Route the user to the public docs above. |
+| DOCA Flow Inspector Service | <https://docs.nvidia.com/doca/sdk/DOCA-Flow-Inspector-Service-Guide/index.html> | Mirrored-flow inspection service. **Not covered by this bundle** (see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`) item 7). Route the user to the public docs above. |
 | DOCA UROM Service | <https://docs.nvidia.com/doca/sdk/DOCA-UROM-Service-Guide/index.html> | Unified Communication Remote Memory Operations service. Covered by the `doca-urom-svc/SKILL.md` skill. |
 | DOCA Telemetry Service (as deployed) | <https://docs.nvidia.com/doca/sdk/DOCA-Telemetry-Service-Guide/index.html> | DTS deployment and configuration by shape — BlueField built-in static pod, host docker container, DPF `DPUService` / `doca-telemetry` helm chart — plus `dts_config.ini` providers, exporters and level labels. Covered by the `doca-dts/SKILL.md` skill (the telemetry *reader* and *exporter* library APIs stay with `doca-telemetry` / `doca-telemetry-exporter`). |
 | DOCA Argus Service | <https://docs.nvidia.com/doca/sdk/DOCA-Argus-Service-Guide/index.html> | DOCA's runtime-security / monitoring service for BlueField. Covered by the `doca-argus/SKILL.md` skill. |
-| DOCA OS Inspector Service | <https://docs.nvidia.com/doca/sdk/DOCA-Services/index.html> | DPU-side out-of-band host-OS introspection container (App-Shield-as-a-service). **Not covered by this bundle** — policy-excluded from this public release (see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`) item 7). Route the user to the umbrella docs above. |
+| DOCA OS Inspector Service | <https://docs.nvidia.com/doca/sdk/DOCA-Services/index.html> | DPU-side out-of-band host-OS introspection container (App-Shield-as-a-service). **Not covered by this bundle** (see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`) item 7). Route the user to the umbrella docs above. |
 
-> **Non-goals.** Externally-productized NVIDIA services that are NOT in
-> `doca/services/` at the bundle's currently-aligned DOCA release —
-> BlueMan, HBN, SNAP, Virtio-net — are intentionally out of scope for
-> this bundle, which is strictly 1:1 with `doca/services/`. The one
+> **Non-goals.** Externally-productized NVIDIA services that are not
+> DOCA SDK services — BlueMan, HBN, SNAP, Virtio-net — are
+> intentionally out of scope for this bundle. The one
 > exception is the DOCA Telemetry Service as deployed, covered by
 > `doca-dts/SKILL.md`. See
 > AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`) for the policy

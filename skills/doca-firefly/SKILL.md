@@ -18,7 +18,7 @@ description: >
   apps that read the disciplined PHC, or other DOCA services (DMS,
   Flow-Inspector, HBN) — those belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: service
   doca_version: "3.5"
   tags:
@@ -38,10 +38,10 @@ compatibility: >
 
 ## Examples
 
-- **"Container green but PTP never advances past LISTENING."**
+- **“Container green but PTP never advances past LISTENING.”**
   — this is in scope. Check role / profile / domain /
   interface before changing host chrony.
-- **"Firefly says synced but the host clock still drifts."** —
+- **“Firefly says synced but the host clock still drifts.”** —
   wire the BlueField PHC follower; Firefly does not replace
   host-side chrony / ptp4l bodies.
 
@@ -51,7 +51,7 @@ Follow Loading order below. Open the tasks companion for configure /
 sync / debug. Open the capabilities companion for PTP axes.
 Do not open every companion file.
 
-> **Subsystem inventory (Run-12 correction, verified Run-13).**
+> **Subsystem inventory.**
 > DOCA Firefly is NOT just "a PTP daemon." The shipped
 > `doca_firefly.yaml` exposes **six** PTP-stack subsystems via
 > environment variables, each with its own `*_STATE`,
@@ -72,8 +72,7 @@ Do not open every companion file.
 >    Firefly, not just a host-side concern.
 > 3. **PHC2SYS** (`PHC2SYS_STATE`, `PHC2SYS_ARGS`,
 >    `PHC2SYS_CONFIG_FILE`) — the **container-internal** `phc2sys`
->    instance; the bundle previously framed `phc2sys` as
->    host-only, which is wrong.
+>    instance (not host-only).
 > 4. **PPS** (`PPS_STATE`, `PPS_DEVICE`) — the Pulse-Per-Second
 >    output (with the additional `enable_while_running` and
 >    `do_nothing` states beyond plain enable/disable).
@@ -114,8 +113,8 @@ of service is Firefly and what PTP roles / profiles does it speak*,
 start at the capabilities companion. If DOCA is not installed
 on the BlueField yet, route to
 `doca-setup/SKILL.md` first. If the user's
-real question is *"I have a Rivermax SMPTE workload and the docs say I
-need PTP"*, the right pairing is this skill **plus**
+real question is *“I have a Rivermax SMPTE workload and the docs say I
+need PTP”*, the right pairing is this skill **plus**
 `doca-rmax/SKILL.md` — Firefly disciplines
 the PHC; Rivermax reads the disciplined time.
 
@@ -125,47 +124,47 @@ The CLASSES of Firefly questions this skill is built to answer, each
 with one worked example. The class is the load-bearing piece; the
 worked example is one instance.
 
-- **"Do I actually need Firefly, or is NTP / chrony good enough?"** —
-  worked example: *"my distributed app is fine on chrony today; is
-  there a reason to add PTP?"*. Answered by the PTP-vs-NTP path-
+- **“Do I actually need Firefly, or is NTP / chrony good enough?”** —
+  worked example: *“my distributed app is fine on chrony today; is
+  there a reason to add PTP?”*. Answered by the PTP-vs-NTP path-
   selection rule in
   the capabilities companion
   + the env-prep checklist in
   the tasks companion.
-- **"What four PTP configuration axes do I have to decide before
-  starting the container?"** — worked example: *"a SMPTE ST 2110
+- **“What four PTP configuration axes do I have to decide before
+  starting the container?”** — worked example: *“a SMPTE ST 2110
   broadcast plant that wants Firefly in slave role on the wire-side
-  port"*. Answered by the four-axis configuration table in
+  port”*. Answered by the four-axis configuration table in
   the capabilities companion
   + the PTP-config step in
   the tasks companion.
-- **"Firefly's container is running but the host's time isn't
-  following — what did I miss?"** — worked example: *"`ptp4l` /
+- **“Firefly's container is running but the host's time isn't
+  following — what did I miss?”** — worked example: *“`ptp4l` /
   Firefly says it's locked but `chronyc tracking` on the host shows
-  drift"*. Answered by the END-TO-END time-sync discipline in
+  drift”*. Answered by the END-TO-END time-sync discipline in
   the capabilities companion
   + the host-follower step in
   the tasks companion.
-- **"PTP locks but the offset / jitter is way past spec — what's
-  wrong with the path?"** — worked example: *"sync acquired but offset
-  is in the tens of microseconds"*. Answered by the PTP-aware-path
+- **“PTP locks but the offset / jitter is way past spec — what's
+  wrong with the path?”** — worked example: *“sync acquired but offset
+  is in the tens of microseconds”*. Answered by the PTP-aware-path
   rule in
   the capabilities companion
   + the layered debug ladder in
   the tasks companion.
-- **"How does Firefly pair with a Rivermax SMPTE workload?"** —
-  worked example: *"SMPTE ST 2110 video sender that needs to be PTP-
-  locked"*. Answered by the Rivermax-pairing rule in
+- **“How does Firefly pair with a Rivermax SMPTE workload?”** —
+  worked example: *“SMPTE ST 2110 video sender that needs to be PTP-
+  locked”*. Answered by the Rivermax-pairing rule in
   the capabilities companion
   + the pairing step in
   the tasks companion, which routes the
   Rivermax side to
   `doca-rmax/SKILL.md` and refuses to
   collapse the two services into one.
-- **"My Firefly container starts but PTP never reaches
+- **“My Firefly container starts but PTP never reaches
   `SLAVE` / `MASTER` state — was it role, domain, profile, or
-  interface?"** — worked example: *"container green but the
-  ports-state output never advances past `LISTENING`"*. Answered by
+  interface?”** — worked example: *“container green but the
+  ports-state output never advances past `LISTENING`”*. Answered by
   the four-axis-mismatch rule in
   the capabilities companion
   + the layered ladder in
@@ -215,7 +214,7 @@ work** on a BlueField where DOCA is already installed. Concretely:
 - Choosing the four PTP configuration axes — PTP role (master /
   slave / boundary clock / transparent clock), profile (the
   `PROFILE` env var accepts EXACTLY `default` / `media` /
-  `telco-l2` / `custom` per `services/firefly/doca_firefly.yaml`;
+  `telco-l2` / `custom` per the shipped `doca_firefly.yaml`;
   these map onto industry PTP profile names: `default` → IEEE 1588,
   `media` → SMPTE 2059-2, `telco-l2` → G.8275.1 only (G.8275.2
   corresponds to the separate `telco-l3` config, reached via
@@ -300,7 +299,7 @@ and pull requests should not add:
   to the host operator and to upstream Linux PTP documentation.
 - **A `samples/`, `templates/`, or `reference/` subtree** of any
   kind. A mock or incomplete artifact in this skill's tree, even
-  one labeled *"reference"*, is misleading: operators will read it
+  one labeled *“reference”*, is misleading: operators will read it
   as production-ready.
 
 ## Loading order

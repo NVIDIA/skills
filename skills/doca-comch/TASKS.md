@@ -23,7 +23,7 @@ next call.
 
 ## DOCA 3.5 field notes
 
-Observed on DOCA 3.5 (developer review); check them before debugging
+Known behaviours on DOCA 3.5; check them before debugging
 further:
 
 - **`doca_ctx_start()` returns `DOCA_ERROR_IN_PROGRESS`** for the
@@ -306,13 +306,12 @@ the agent does not invent guidance:
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying Comch-using applications at scale (many
   host processes per BlueField, Kubernetes operator workflows
-  with sidecar BlueField agents) — out of scope for Phase 1 and
-  reserved for a future platform skill.
+  with sidecar BlueField agents) — out of scope for this skill.
 - **manage / monitor.** Multi-tenant Comch fan-out, telemetry
   shipping over Comch — covered partially by the operations
   guidance in
   `doca-public-knowledge-map/SKILL.md`;
-  no operator skill yet ships in this bundle.
+  operator workflows are out of scope for this bundle.
 - **firmware burn / reset.** Comch depends on the underlying
   ConnectX firmware and BlueField BFB; if the user's debug
   ladder lands on a driver-layer issue, the fix is via
@@ -351,7 +350,7 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-comch` | `## configure` step 1; `## build` slot 1 | What is the build-time DOCA Comch version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --cflags --libs doca-comch` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-comch` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `ls /opt/mellanox/doca/samples/doca_comch/` | `## modify` | Which Comch samples ship in this install, and which is the closest starting point? | A list of sample directories named after the role + path pattern they demonstrate |
 | `ls /sys/class/net/` (DPU side) | `## configure` step 1 | Which host representors are visible to the DPU? | One entry per representor (PF / VF / SF) the host has surfaced |
 | `lspci | grep Mellanox` (host side) | `## configure` step 1 | Which BlueField PCIe addresses are reachable from the host? | One row per BlueField PF, plus VFs and SFs depending on config |

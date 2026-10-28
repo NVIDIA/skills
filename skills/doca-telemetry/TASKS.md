@@ -138,8 +138,8 @@ taxonomy in
 [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
 before retrying. In particular, `DOCA_ERROR_NOT_SUPPORTED` on
 the cap-query or first read is *not* a configure-time bug — it is
-the canonical *"this device does not expose this counter
-domain"* signal, and the correct response is to surface it, not
+the canonical *“this device does not expose this counter
+domain”* signal, and the correct response is to surface it, not
 to retry.
 
 ## build
@@ -186,13 +186,12 @@ user before recommending any code-level edit:
 | 3. Sample shape (sampled domains) | For `diag` / `adp_retx`: what sample mode, sample period, and num-samples / histogram-bin shape? | Bound every setter by the `_cap_*` sizing caps from [`## configure`](#configure) step 3; a value past the cap returns `DOCA_ERROR_INVALID_VALUE`. For `diag`, the `_apply_config` + `_apply_counters_list_by_id` calls MUST stay before `_start` |
 | 4. Read cadence + `AGAIN` behavior | How often does the modified reader read, and what does it do when a read returns `DOCA_ERROR_AGAIN`? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) sample-window rule, the retry must respect the sample window (for diag, wait for the previous sampling cycle); a tight `AGAIN` spin is a sample gap that needs editing out before the modify lands |
 | 5. Clear-on-read intent | Does the modified reader enable clear-on-read (`adp_retx` `_set_hist_clear_on_read`, `diag` data-clear)? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), clear-on-read resets the underlying counters — a second reader sees the counters as they stand after the reset. Decide explicitly; default to NOT clearing unless the user wants destructive reads |
-| 6. Build manifest | Keep the sample's existing `meson.build` (which already wires `pkg-config doca-telemetry`)? | Yes. Do not switch to a hand-rolled Makefile for *"simplicity"* — it removes the version-check rail. And do not silently swap the `pkg-config` module to `doca-telemetry-exporter` — that flips the role and is the load-bearing first-app failure |
+| 6. Build manifest | Keep the sample's existing `meson.build` (which already wires `pkg-config doca-telemetry`)? | Yes. Do not switch to a hand-rolled Makefile for *“simplicity”* — it removes the version-check rail. And do not silently swap the `pkg-config` module to `doca-telemetry-exporter` — that flips the role and is the load-bearing first-app failure |
 
 The agent emits an *intent description + the filled slots*, then
 walks the unified diff line-by-line against the sample source
 read on disk and has the user paste back the result for
-validation. A future modify-from-sample renderer may automate
-this workflow; it is not currently available (per
+validation. This bundle has no diff renderer (per
 `doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`)).
 
 ## run
@@ -254,7 +253,7 @@ Steps the agent should walk the user through:
 
 Goal: prove the per-domain reader can actually read the chosen
 counters off the device, end-to-end, before claiming the
-*"build a first counter-reading app"* journey is done.
+*“build a first counter-reading app”* journey is done.
 
 This is **a loop, not a one-shot pass.** Each iteration narrows
 either the domain / sub-area selection, the cap-query result,
@@ -429,8 +428,7 @@ so the agent does not invent guidance:
   for publishing, or to `doca-dts` for productized
   aggregation.
 - **deploy.** Deploying counter-reading applications at scale
-  across many hosts, Kubernetes operator workflows — out of
-  scope for Phase 1 and reserved for a future platform skill.
+  across many hosts, Kubernetes operator workflows — out of scope for this skill.
 - **firmware burn / reset.** The reader does not depend on a
   firmware-burn step directly; if the debug ladder lands on a
   driver / firmware-feature-gating issue
@@ -460,13 +458,13 @@ the agent should:
    (`doca-env --json` for version + devices + libraries +
    drivers + hugepages in one shot; `doca-capability-snapshot`
    for per-device capability flags; `version-matrix.json` for
-   *"available since"* lookups).
+   *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the
-   row. Report *"falling back to manual chain"*.
+   row. Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
@@ -475,13 +473,13 @@ the agent should:
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-telemetry` | `## configure` step 3; `## build` slot | What is the build-time DOCA Telemetry (reader) version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). If the command returns *"Package 'doca-telemetry' was not found"* and the user actually wanted the publisher, route to `doca-telemetry-exporter/SKILL.md` — wrong direction is the load-bearing first-app failure, not a typo |
+| `pkg-config --modversion doca-telemetry` | `## configure` step 3; `## build` slot | What is the build-time DOCA Telemetry (reader) version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). If the command returns *“Package 'doca-telemetry' was not found”* and the user actually wanted the publisher, route to `doca-telemetry-exporter/SKILL.md` — wrong direction is the load-bearing first-app failure, not a typo |
 | `pkg-config --cflags --libs doca-telemetry` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly |
 | `ls /opt/mellanox/doca/samples/doca_telemetry/` | `## modify` slot 1 | Which reader samples ship in this install, and which is the closest starting point? | A list of sample directories named after the per-domain reader they demonstrate |
 | `doca_caps --version` | `## configure` step 3; `## test` step 2 | What is the *runtime* DOCA version? | A semver string matching `pkg-config --modversion doca-telemetry` |
 | `id` | `## run` step 2 | Does the running user have the privilege the counter domain requires? | The user's id has the device-access privilege the domain needs. Mismatch = `DOCA_ERROR_NOT_PERMITTED` on create / start / read — grant the specific privilege on the env side, not blanket sudo |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 3; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
-| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last reader call? | Empty or recent benign messages. Repeated mlx5 / firmware / device errors → driver / env-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
+| `dmesg \| tail -n 40` (requires sudo) | `## debug` layer 7 | What did the kernel / driver log around the last reader call? | Empty or recent benign messages. Repeated mlx5 / firmware / device errors → driver / env-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 4 | What did the structured DOCA logger emit for the first failing read? | A trace-level line on every per-domain lifecycle transition and every read. Per-read `AGAIN` traces = snapshot not ready — apply a sample-window-aware retry, not a blind spin |
 
 For commands shared across libraries (`pkg-config

@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-urom`
-- Evaluation date: 2026-10-21
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-10-28
+- Evaluator version: `1.6.2`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:4590d521ae42ad89d08024bcda540556f6f701be61e8a2d6499b969602e2ba41` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| doca-urom | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-urom | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-urom | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-urom | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-urom | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+
+- Controls for `doca-urom`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.3% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 65.0% → 100.0% (+35.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 52.5% → 91.9% (+39.4 points) | 43.8% → 92.5% (+48.7 points) |
-| Efficiency | 83.7% — baseline ran, but no comparable score was available; uplift unavailable | 89.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 70.0% → 95.0% (+25.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 68.8% → 100.0% (+31.2 points) |
+| Efficiency | 81.7% — baseline ran, but no comparable score was available; uplift unavailable | 75.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,32 +63,43 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.2% → 92.3% (-5.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 85.5% → 86.2% (+0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 661,273 | 659,915 | +1,358 | +0.21% | skill 4/4; base 4/4 |
-| claude-code | doca-urom.explicit-positive.v1 | 170,174 | 289,115 | -118,941 | -41.14% | skill 1/1; base 1/1 |
-| claude-code | doca-urom.implicit-positive.v1 | 219,898 | 125,149 | +94,749 | +75.71% | skill 1/1; base 1/1 |
-| claude-code | doca-urom.implicit-positive.v2 | 239,855 | 122,528 | +117,327 | +95.76% | skill 1/1; base 1/1 |
-| claude-code | doca-urom.negative.v1 | 31,346 | 123,123 | -91,777 | -74.54% | skill 1/1; base 1/1 |
-| codex | All cases | 530,164 | 165,349 | +364,815 | +220.63% | skill 4/4; base 4/4 |
-| codex | doca-urom.explicit-positive.v1 | 167,672 | 55,883 | +111,789 | +200.04% | skill 1/1; base 1/1 |
-| codex | doca-urom.implicit-positive.v1 | 181,643 | 14,366 | +167,277 | +1164.40% | skill 1/1; base 1/1 |
-| codex | doca-urom.implicit-positive.v2 | 120,431 | 14,043 | +106,388 | +757.59% | skill 1/1; base 1/1 |
-| codex | doca-urom.negative.v1 | 60,418 | 81,057 | -20,639 | -25.46% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,191,437 | 825,264 | +366,173 | +44.37% | skill 8/8; base 8/8 |
+| claude-code | All cases | 880,454 | 360,383 | +520,071 | +144.31% | skill 4/4; base 4/4 |
+| claude-code | doca-urom.explicit-positive.v1 | 312,683 | 72,290 | +240,393 | +332.54% | skill 1/1; base 1/1 |
+| claude-code | doca-urom.implicit-positive.v1 | 312,748 | 108,475 | +204,273 | +188.31% | skill 1/1; base 1/1 |
+| claude-code | doca-urom.implicit-positive.v2 | 218,482 | 71,980 | +146,502 | +203.53% | skill 1/1; base 1/1 |
+| claude-code | doca-urom.negative.v1 | 36,541 | 107,638 | -71,097 | -66.05% | skill 1/1; base 1/1 |
+| codex | All cases | 379,253 | 175,821 | +203,432 | +115.70% | skill 4/4; base 4/4 |
+| codex | doca-urom.explicit-positive.v1 | 121,400 | 60,438 | +60,962 | +100.87% | skill 1/1; base 1/1 |
+| codex | doca-urom.implicit-positive.v1 | 119,809 | 30,507 | +89,302 | +292.73% | skill 1/1; base 1/1 |
+| codex | doca-urom.implicit-positive.v2 | 103,449 | 26,960 | +76,489 | +283.71% | skill 1/1; base 1/1 |
+| codex | doca-urom.negative.v1 | 34,595 | 57,916 | -23,321 | -40.27% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,259,707 | 536,204 | +723,503 | +134.93% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,11 +107,37 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md:
+  "## Pattern overview" in CAPABILITIES.md (lines 24-31)
+  vs "## Pattern overview" in CAPABILITIES.md (lines 33-61)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 79-82)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 104-107)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 151-164)
+  vs "## Version compatibility" in CAPABILITIES.md (lines 181-191)
+  vs "## Error taxonomy" in CAPABILITIES.md (lines 199-206)
+  vs "## Safety policy" in CAPABILITIES.md (lines 276-286)
+  vs "## Safety policy" in CAPABILITIES.md (lines 289-296)
+  vs "## Deferred topic boundaries" in CAPABILITIES.md (lines 337-382)
+  vs "## Examples" in SKILL.md (lines 3-10)
+  vs "## Instructions" in SKILL.md (lines 11-40)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 41-100)
+  vs "## Audience" in SKILL.md (lines 101-123)
+  vs "## When to load this skill" in SKILL.md (lines 124-159)
+  vs "## What this skill provides" in SKILL.md (lines 160-194)
+  vs "## Related skills" in SKILL.md (lines 253-300)
+  vs "## configure" in TASKS.md (lines 28-33)
+  vs "## configure" in TASKS.md (lines 35-134)
+  vs "## modify" in TASKS.md (lines 185-193)
+  vs "## run" in TASKS.md (lines 210-259)
+  vs "## test" in TASKS.md (lines 315-322)
+  vs "## debug" in TASKS.md (lines 360-387)
+  vs "## Command appendix" in TASKS.md (lines 511-522) (`CAPABILITIES.md:24`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
+  "## Safety policy" in CAPABILITIES.md (lines 305-320)
+  vs "## debug" in TASKS.md (lines 389-416) (`CAPABILITIES.md:305`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-urom/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-urom`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo       (`BENCHMARK.md:85`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo       (`BENCHMARK.md:86`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo       (`BENCHMARK.md:87`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo         (`BENCHMARK.md:89`)
 - 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>

@@ -72,7 +72,7 @@ public DOCA Capabilities Print Tool guide:
    available logger names of DOCA libraries. Useful when configuring
    `doca_log_*` filters.
 
-The flags the binary registers in `tools/caps/main.c` are
+The documented flags are
 `--list-devs`, `--list-rep-devs`, `--list-libs`, `--list-loggers`,
 `--pci-addr` (scope to a single PCIe address), and `--lib`. Any of
 the `--list-*` flags above can be combined with `--pci-addr` /
@@ -126,11 +126,13 @@ the agent should distinguish, in escalating order:
      `doca-common`. This is the most common cause on lab boxes and
      CI containers that pinned a minimal install. Confirm via:
      `pkg-config --modversion doca-common` succeeds AND `ls
-     /opt/mellanox/doca/tools/doca_caps` errors. Routing: confirm
-     the package name with `apt-cache policy doca-caps` FIRST, then
-     run `apt install doca-caps` (or, on older releases, the legacy
-     `apt install doca-tools`) — NOT a full `doca-all` reinstall,
-     and NOT a version downgrade. See
+     /opt/mellanox/doca/tools/doca_caps` errors. Routing: this
+     skill does not install packages — hand off to
+     `doca-setup/SKILL.md` with that evidence. The fix there is the
+     single missing tools package (`doca-caps`, or the legacy
+     `doca-tools` on older releases; confirm the name with
+     `apt-cache policy doca-caps`), NOT a full `doca-all`
+     reinstall and NOT a version downgrade. See
      `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)
      partial-install table.
    - (c2) **Package installed, binary off-PATH (DOCA 3.3+ default).**

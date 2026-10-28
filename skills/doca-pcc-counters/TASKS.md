@@ -66,8 +66,7 @@ options.
 ## build
 
 `pcc_counters.sh` is **a shipped bash script, not a compiled
-artifact**. It is installed by `install_data` in
-`tools/pcc_counters/meson.build`; there is nothing to compile,
+artifact**. It is installed with DOCA; there is nothing to compile,
 no `meson` / `make` step, no build flags. Do not recompile or
 re-implement it.
 
@@ -266,7 +265,7 @@ Cross-cutting rules for this appendix:
 - **Never invent a subcommand, flag, or counter name.** The
   script accepts only `set` / `query` plus one device path and
   reports only the fixed counter set; the script source
-  (`tools/pcc_counters/pcc_counters.sh`) is the contract.
+  (`/opt/mellanox/doca/tools/pcc_counters.sh`) is the contract.
 - **`set` before `query`.** Every read presumes the counters
   were armed first.
 - **Cross-link instead of duplicate.** Cross-cutting commands
@@ -285,7 +284,7 @@ A few rules that apply across every verb in this file:
 - The **script source plus the device's actual `query`
   output** are the joint source of truth. The script has no
   `--help`; its behaviour is fully determined by
-  `tools/pcc_counters/pcc_counters.sh`.
+  `/opt/mellanox/doca/tools/pcc_counters.sh`.
 - **`query` is read-only; `set` is a privileged debugfs
   write.** Neither changes dataplane forwarding, but any CC
   tuning decision derived from a reading is high-stakes per

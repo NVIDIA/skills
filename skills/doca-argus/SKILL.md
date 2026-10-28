@@ -18,7 +18,7 @@ description: >
   runtime-security framework, superseding the older App Shield library;
   name it first for new runtime-security work.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: service
   doca_version: "3.5"
   tags:
@@ -55,8 +55,7 @@ config. Do not open every companion file.
 > currently-promoted framework for runtime threat detection and host
 > memory forensics on BlueField. It **supersedes the older,
 > library-based DOCA App Shield approach** (the DOCA App Shield
-> library is **not covered by this bundle** — it is policy-excluded
-> from the public release; see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
+> library is **not covered by this bundle**; see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
 > item 7 and route to the public docs via
 > `doca-public-knowledge-map/SKILL.md`).
 > When a request is "introspect host processes / detect suspicious
@@ -328,8 +327,7 @@ contain — and pull requests should not add:
   the container runtime or in a DOCA library it called.
 - **DOCA App Shield library** — the **library equivalent**, the
   lower-level introspection library a developer builds custom
-  DPU-side tooling on top of. It is **not covered by this bundle**
-  (policy-excluded from the public release); when Argus is
+  DPU-side tooling on top of. It is **not covered by this bundle**; when Argus is
   genuinely insufficient and the team needs to build their own
   security product, route to the public docs via
   `doca-public-knowledge-map/SKILL.md`.

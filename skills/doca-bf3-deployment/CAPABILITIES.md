@@ -76,8 +76,8 @@ operator must be explicit about which one a given step touches.
 | What runs there | Host-side binaries/containers talking to the BF3 NIC over PCIe | Arm-side binaries/containers running on the DPU cores directly |
 | Routes onward to | `doca-bare-metal-deployment/SKILL.md` / `doca-container-deployment/SKILL.md` once healthy | the same two deployment skills, Arm-side leg |
 
-The load-bearing recognition: *"is DOCA on the host or on the Arm
-side?"* is the FIRST question for any BF3 deploy. The agent confirms
+The load-bearing recognition: *“is DOCA on the host or on the Arm
+side?”* is the FIRST question for any BF3 deploy. The agent confirms
 which side a step touches before walking it; conflating them ("just
 install DOCA") is the canonical BF3 first-contact failure.
 
@@ -95,8 +95,8 @@ the legacy in-tree kernel module is no longer shipped, so
 On a multi-DPU host the agent disambiguates which `/dev/rshim<N>`
 maps to which BF3 (via the `DEV_NAME` field of each `misc` file,
 cross-matched against `lspci -d 15b3: -nn`) BEFORE any per-DPU
-`bfb-install` — skipping it is the #1 cause of *"I flashed the wrong
-DPU"* incidents. The agent does NOT fabricate the `bfb-install` flag
+`bfb-install` — skipping it is the #1 cause of *“I flashed the wrong
+DPU”* incidents. The agent does NOT fabricate the `bfb-install` flag
 set, the BFB filename, or the `/dev/rshim<N>` path; all come from
 `--help` and the BSP manual.
 
@@ -151,7 +151,7 @@ this skill does not duplicate it.
   version (`flint -d <bdf> q`, the `FW Version:` line — NOT
   `mlxconfig -d <bdf> q`, which returns the firmware *configuration*
   dump, not the version). A mismatch among any two is the canonical
-  *"the docs say this should work but it does not"* trap.
+  *“the docs say this should work but it does not”* trap.
 - **`cat /etc/mlnx-release` is the BF3 install-verification anchor.**
   After a BFB push, this is the first read that confirms which BFB
   landed; it is the Arm-side leg of the four-way match and the
@@ -245,7 +245,7 @@ sleep is never a substitute for a documented readiness marker.
   `Linux up` and `DPU is ready` markers (per the BSP manual) and for
   any `[MISC]` / `[ERR]` line containing a failure verb ("failed",
   "error", "abort") — the canonical partial-install signature is
-  *"Ubuntu installation completed"* followed by an
+  *“Ubuntu installation completed”* followed by an
   `INFO[MISC]: NIC firmware update failed` line while `bfb-install`
   still exits 0. Exit code 0 alone is NOT proof of success.
 - **TMFIFO reachability (SECOND).** `ip addr show tmfifo_net0` (or

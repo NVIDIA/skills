@@ -478,8 +478,7 @@ so the agent does not invent guidance:
   installed and only checks the mgmt-specific preconditions.
 - **deploy.** Deploying fleet-management agents at scale across
   many hosts and BlueFields, Kubernetes operator workflows,
-  multi-tenant isolation — out of scope and reserved for a
-  future platform skill. For single-host first-run testing,
+  multi-tenant isolation — out of scope for this skill. For single-host first-run testing,
   the right verb is `## run`.
 - **rollback (fleet-wide).** Coordinated rollback of
   doca-mgmt-applied changes across many devices is fleet-tool
@@ -513,7 +512,7 @@ detect → prefer → fall back → report contract documented in
 the agent probes for the matching structured helper FIRST
 (`doca-env --json` for version + devices + libraries +
 drivers; `doca-capability-snapshot` for per-device capability
-flags; `version-matrix.json` for *"available since"* lookups).
+flags; `version-matrix.json` for *“available since”* lookups).
 If the probe succeeds, the structured tool's output is the
 authoritative answer. If the probe fails, fall back to the
 manual command in the row.
@@ -529,8 +528,8 @@ manual command in the row.
 | `id -u` and `getcap <binary>` | [`## run`](#run) step 1 | Does the user / binary have the privileges management operations require? | `0` for root invocation, or a capability set that includes the device-administration `cap_*` the operation requires |
 | `ls /dev/fwctl*` | [`## install`](#install) step 4 | Is the host kernel exposing the `fwctl` character device doca-mgmt's raw command path uses? | One or more `/dev/fwctl*` character devices visible to root |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | [`## run`](#run) step 2 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every management-plane call |
-| `dmesg | tail -n 40` (sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver / firmware log around the last mgmt call? | Empty or recent benign messages. Repeated firmware / `fwctl` errors → route to `doca-hardware-safety/SKILL.md` for the device-state investigation |
-| `mlxconfig -d <pcie> q | head -n 40` (sudo) | [`## debug`](#debug) layer 7 | What firmware-stored config does the NIC / DPU report? | Stable firmware config. Mismatched values vs the pre-state captured in [`## modify`](#modify) indicate the change had side effects beyond the user's intent — trigger the rollback path |
+| `dmesg | tail -n 40` (requires sudo) | [`## debug`](#debug) layer 7 | What did the kernel / driver / firmware log around the last mgmt call? | Empty or recent benign messages. Repeated firmware / `fwctl` errors → route to `doca-hardware-safety/SKILL.md` for the device-state investigation |
+| `mlxconfig -d <pcie> q | head -n 40` (requires sudo) | [`## debug`](#debug) layer 7 | What firmware-stored config does the NIC / DPU report? | Stable firmware config. Mismatched values vs the pre-state captured in [`## modify`](#modify) indicate the change had side effects beyond the user's intent — trigger the rollback path |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,

@@ -18,7 +18,7 @@ description: >
   doca-rdma / doca-eth alongside), installing DOCA (doca-setup), or doc
   lookup (doca-public-knowledge-map).
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

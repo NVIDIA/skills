@@ -9,7 +9,7 @@ Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the 
 
 This file describes the **install / build / runtime *environment*** that any DOCA program assumes has been verified before its own workflows begin. It is deliberately library-agnostic and program-agnostic; everything here is about the host the program runs on, not about the program itself.
 
-> Lint note: this file references `/opt/mellanox/doca` and `docs.nvidia.com` paths several times. For most library skills the lint flags this and asks for cross-links to `doca-public-knowledge-map` instead, since URL/path duplication is normally drift waiting to happen. For `doca-setup` specifically the references are *intrinsic* — the skill's whole job is to operate on the install tree and verify it. The repeated paths are intentional; do not refactor them out.
+> Note: this file references `/opt/mellanox/doca` and `docs.nvidia.com` paths several times on purpose — the skill's whole job is to operate on the install tree and verify it.
 
 ## Pattern overview
 
@@ -190,7 +190,7 @@ The agent MUST treat **"step 5 observability did NOT reach the named green signa
 | NOT-green at step 3 smoke | Fire the bridge directly from step 3 — same shape, debug-loop on the smoke symptom (rather than the post-bulk observability symptom). Bulk step 4 is **not** attempted. |
 | Bridge resolves to "unchanged" or "shape-changed without convergence" after one bounded loop | Walk the rollback path documented at step 1 (per `doca-hardware-safety/SKILL.md` if loaded, or per the per-artifact `## flow-ct` / `## modify` rollback overlay), then re-evaluate at step 1. The bridge is **bounded**: "second failure" means the post-single-mutation re-capture is still not green for the same symptom. At that point rollback is mandatory; do not begin another debug-loop iteration. |
 
-The bridge converts a verification-only answer into a verification + iteration answer for *every* change-recommending prompt — not only error-symptom prompts. Deploy / configure / install / upgrade prompts that previously stopped at *"and watch the metric for green"* now must say *"and watch the metric for green; if the metric is not green within X, walk the debug-loop on the not-green symptom; if the loop's second iteration does not converge, walk the rollback path."* That is the cross-cutting auto-debug-loop coverage the bridge guarantees on change-recommending prompts where no failure has been reported yet.
+The bridge converts a verification-only answer into a verification + iteration answer for *every* change-recommending prompt — not only error-symptom prompts. Deploy / configure / install / upgrade answers must not stop at *"and watch the metric for green"*; they must say *"and watch the metric for green; if the metric is not green within X, walk the debug-loop on the not-green symptom; if the loop's second iteration does not converge, walk the rollback path."* That is the cross-cutting auto-debug-loop coverage the bridge guarantees on change-recommending prompts where no failure has been reported yet.
 
 ## Hardware binding-layer command stanza
 

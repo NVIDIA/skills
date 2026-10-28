@@ -18,7 +18,7 @@ description: >
   / firmware bring-up, non-Comch DOCA libraries, or deploying Comch apps
   at scale — those belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

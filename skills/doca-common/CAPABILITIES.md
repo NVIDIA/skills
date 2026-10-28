@@ -32,7 +32,7 @@ example shown.
 | 2. Gate on device capability before quoting any feature | Run `doca_*_cap_*` against the active `doca_devinfo` BEFORE assuming a feature is available; the runtime cap-query is the authority, the docs are the promise | [`## dev`](#dev) cap-query rule + [TASKS.md ## use](TASKS.md#use) |
 | 3. Wire zero-copy buffers across libraries | `doca_mmap` registers user memory with one or more `doca_dev`s; `doca_buf_inventory` carves the registered range into `doca_buf` handles that flow across DOCA libraries (eth → dma → rdma → …) on the same memory | [`## buf`](#buf) + [TASKS.md ## configure](TASKS.md#configure), [TASKS.md ## use](TASKS.md#use) |
 | 4. Drive the progress engine on every loop iteration | `doca_pe_progress` is the universal task-completion drain. Submitting tasks without driving the PE is the canonical "my program does nothing" failure mode for every DOCA Core context | [`## progress engine`](#progress-engine) + [TASKS.md ## run](TASKS.md#run) |
-| 5. Get the two-tier log model right | SDK tier controls DOCA library internals (`--sdk-log-level` / `DOCA_LOG_LEVEL_SDK`); app tier controls user emissions (app-side registry). Independent setters, independent defaults; confusing them is the number-one first-app debug failure | [`## log`](#log) + [TASKS.md ## log](TASKS.md#log) |
+| 5. Get the two-tier log model right | SDK tier controls DOCA library internals (`--sdk-log-level` / `doca_log_level_set_global_sdk_limit()`); app tier controls user emissions (app-side registry). Independent setters, independent defaults; confusing them is the number-one first-app debug failure | [`## log`](#log) + [TASKS.md ## log](TASKS.md#log) |
 | 6. Diagnose a `DOCA_ERROR_*` from any Common call | Map family (`BAD_STATE` / `INVALID_VALUE` / `NOT_SUPPORTED` / `NOT_PERMITTED` / `NO_MEMORY` / `DRIVER`) to layer (lifecycle / configuration / capability / permission / resource / driver) | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 
 Two cross-cutting rules that apply to *every* pattern above:
@@ -93,7 +93,7 @@ DOCA Log is **DOCA's standardized logging primitive**. Every DOCA
 library (and every shipped DOCA sample and reference application)
 emits its own log lines through DOCA Log, so log output from a DOCA
 app interoperates with DOCA's centralized level controls and
-downstream consumers (DOCA Log Service, DOCA Telemetry Service).
+downstream consumers such as the DOCA Telemetry Service.
 
 **The two-tier log-level model — the single most load-bearing
 rule.** DOCA Log carries two *independent* verbosity tiers, each
@@ -102,7 +102,7 @@ table BEFORE writing any code:
 
 | Tier | What it controls | How to set at runtime | Typical default | Symptom when confused |
 | --- | --- | --- | --- | --- |
-| **SDK log level** | Verbosity of DOCA *library internals* — log lines emitted from inside the DOCA libraries themselves as they call into hardware, manage state, validate inputs, … | `--sdk-log-level <N>` CLI flag on any DOCA sample / reference app (numeric: 10=DISABLE, 20=CRITICAL, 30=ERROR, 40=WARNING, 50=INFO, 60=DEBUG, 70=TRACE); `DOCA_LOG_LEVEL_SDK` env var; programmatic SDK setter equivalent | `WARNING` | User sets `--sdk-log-level 60` (DEBUG) to see their own DEBUG lines and is flooded with internal DOCA spam instead, or *"my own DEBUG lines do not appear"* despite the flag |
+| **SDK log level** | Verbosity of DOCA *library internals* — log lines emitted from inside the DOCA libraries themselves as they call into hardware, manage state, validate inputs, … | `--sdk-log-level <N>` CLI flag on any DOCA sample / reference app (numeric: 10=DISABLE, 20=CRITICAL, 30=ERROR, 40=WARNING, 50=INFO, 60=DEBUG, 70=TRACE); programmatic SDK setter `doca_log_level_set_global_sdk_limit()` | `WARNING` | User sets `--sdk-log-level 60` (DEBUG) to see their own DEBUG lines and is flooded with internal DOCA spam instead, or *"my own DEBUG lines do not appear"* despite the flag |
 | **App log level** | Verbosity of *user code* — log lines the user emits via `DOCA_LOG_*` macros from their own source files | App-side global lower-limit setter (`doca_log_level_set_global_lower_limit`); per-source via `doca_logger_set_level` once the source ID is in hand | `INFO` at steady state (per release; quote the observed default). A first diagnostic run may explicitly override it to `DEBUG`, then restore `INFO`. | User sets app level to `INFO`, then wonders why their `DOCA_LOG_DBG`-shaped lines never print; or user expects `--sdk-log-level` to reach their own lines and it does not |
 
 The agent's diagnostic rule: when the user reports *"my log levels
@@ -138,7 +138,7 @@ is not the only logging framework available; the agent must walk
 this rule before recommending DOCA Log setup. In a DOCA-app context
 (any codebase that calls `doca_*`), DOCA Log is the right primitive
 because its output interoperates with `--sdk-log-level` and with the
-downstream DOCA Log Service / DOCA Telemetry Service consumers. In a
+downstream consumers such as the DOCA Telemetry Service. In a
 non-DOCA codebase with no DOCA-side context, language-native logging
 (`printf`, `fprintf(stderr, …)`, `syslog`, `spdlog`, Python
 `logging`, Rust `tracing`, …) is fine. The anti-pattern alert:
@@ -297,14 +297,12 @@ host program passes to `doca_flow` actions, `doca_eth` queues, etc.,
 when steering traffic to a specific DPU-side function. The
 representor-side capability queries
 (`doca_devinfo_rep_cap_is_filter_*_supported`,
-`doca_devinfo_rep_get_is_uplink_representor`,
-`doca_devinfo_rep_get_is_host_representor`) tell the agent what kind
+`doca_devinfo_rep_get_is_uplink_representor`) tell the agent what kind
 of representor it is and what filters can apply.
 
 **Device-class properties.** `doca_devinfo_get_pci_addr_str`,
 `_get_ibdev_name`, `_get_iface_name`, `_get_mac_addr`, `_get_ipv4_addr`,
-`_get_ipv6_addr`, `_get_lid`, `_get_active_mtu` (experimental),
-`_get_active_speed` (experimental), `_get_pci_func_type`
+`_get_ipv6_addr`, `_get_lid`, `_get_active_rate` (experimental), `_get_pci_func_type`
 (experimental) are the load-bearing identifiers when the user is
 disambiguating among multiple devices on the host. The agent should
 quote these from the user's running `doca_devinfo_create_list`,
@@ -436,8 +434,8 @@ there; this skill does not duplicate it.
   then verify the symbol exists in the installed headers, then read
   the matching release notes.
 - **Common-side experimental markers.** The Common ABI splits into
-  a stable set (the `DOCA_2` global block in the library's
-  version.map — `doca_buf_*`, `doca_ctx_*`, `doca_dev_*`,
+  a stable set (symbols exported under the `DOCA_2` version node,
+  see `readelf -V` — `doca_buf_*`, `doca_ctx_*`, `doca_dev_*`,
   `doca_pe_*`, `doca_mmap_*`, `doca_devinfo_*`) and an experimental
   set (`doca_log_*`, `doca_graph_*`, `doca_sync_event_*`,
   `doca_clock_*`, `doca_uar_*`, `doca_umem_*`, `doca_buf_arr_*`,
@@ -446,8 +444,8 @@ there; this skill does not duplicate it.
   release-specific; the agent must read the installed
   `doca_common.h` family on the user's install before claiming
   experimental-tier surface is available.
-- **No standalone `doca-log.pc` in this contract.** Per the source
-  tree on this DOCA version, the log subsystem is exposed through
+- **No standalone `doca-log.pc` in this contract.** On this DOCA
+  version the log subsystem is exposed through
   the `doca-common` `pkg-config` module (its public headers live
   under the same include root as the rest of the Common surface,
   resolved via `pkg-config --variable=includedir doca-common`).
@@ -540,10 +538,10 @@ consumers can read them.
 | Inflight-task counts | `doca_pe_get_num_inflight_tasks` and `doca_ctx_get_num_inflight_tasks` make the drain state explicit on shutdown | [`## ctx`](#ctx), [`## progress engine`](#progress-engine) |
 | Capability snapshot | The output of every `doca_*_cap_*` query at configure time is the *baseline* the agent compares against when a later call returns `DOCA_ERROR_NOT_SUPPORTED` | [`## dev`](#dev) |
 | Context state | `doca_ctx_get_state` (and the `_set_state_changed_cb` callback) tells the user where in the lifecycle the context currently is — the load-bearing input when a call returns `DOCA_ERROR_BAD_STATE` | [`## ctx`](#ctx) |
-| Device-info fields | `doca_devinfo_get_pci_addr_str`, `_get_ibdev_name`, `_get_iface_name`, `_get_mac_addr`, `_get_active_mtu`, `_get_active_speed` give the operator-readable identity of every candidate device | [`## dev`](#dev) |
+| Device-info fields | `doca_devinfo_get_pci_addr_str`, `_get_ibdev_name`, `_get_iface_name`, `_get_mac_addr`, `_get_active_rate` give the operator-readable identity of every candidate device | [`## dev`](#dev) |
 
-**Downstream consumers.** DOCA Log output is the input to the DOCA
-Log Service and the DOCA Telemetry Service (per
+**Downstream consumers.** DOCA Log output can be consumed downstream,
+for example by the DOCA Telemetry Service (per
 `doca-public-knowledge-map/SKILL.md`):
 when the user pipes / forwards their app's `stderr` (or routes
 through a custom backend), those services can consume the lines
@@ -597,8 +595,8 @@ log-side guardrails the rest of the bundle relies on.
 - **Do not log secrets through `DOCA_LOG_*`.** Format strings
   passed to `DOCA_LOG_*` macros take printf-style varargs; there is
   no automatic redaction. Anything the user passes becomes part of
-  the line and may be forwarded to the DOCA Log Service or DOCA
-  Telemetry Service downstream. Treat `DOCA_LOG_*` as a
+  the line and may be forwarded downstream, for example to the DOCA
+  Telemetry Service. Treat `DOCA_LOG_*` as a
   public-equivalent emission surface and apply the user's normal
   redaction discipline at the call site, not inside the library.
 - **One PE per thread is the default; cross-thread PE sharing

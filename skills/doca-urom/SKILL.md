@@ -17,7 +17,7 @@ description: >
   deployment on the DPU side, MPI / UCX collective algorithm design, and
   RDMA / RoCE / IB substrate bring-up.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

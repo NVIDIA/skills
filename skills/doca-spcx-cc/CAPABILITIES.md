@@ -1,8 +1,8 @@
 # DOCA SPCX Congestion-Control Tool — Capabilities
 
 **Where to start:** `doca_spcx_cc` is the operator-side CLI
-for the documented SPCX-class Programmable Congestion Control
-surface — the next-gen extension on top of the established
+for the documented SPC-X congestion-control
+surface — an extension on top of the established
 `doca-pcc/SKILL.md` story. The pattern
 overview below names the recurring `doca_spcx_cc`-class
 questions. Pick the pattern first, then drill into the H2
@@ -33,8 +33,8 @@ one.
 
 | `doca_spcx_cc` pattern | Class shape | Where the substance lives |
 | --- | --- | --- |
-| 1. SPCX vs PCC vs factory firmware | Picking the right programmable-CC surface for the user's algorithm + install. SPCX is the **newer, more flexible** extension (potentially preview / limited HW); `doca-pcc/SKILL.md` is the **stable, established** surface; factory PCC is the firmware-resident default that needs no host-side code. The agent surfaces all three before committing. | [`## Capabilities and modes`](#capabilities-and-modes) decision-tree table + [TASKS.md ## configure](TASKS.md#configure) step 1 |
-| 2. Authoring vs consumption | The DPA-side algorithm body is either user-authored (the user wrote the algorithm and DPACC compiled it) or consumed (the user is deploying a documented shipped reference such as the zero-touch RTT-based algorithm in `doca-pcc-ztr-rttcc-algo/SKILL.md`). The tool's harness is the same; the algorithm-side discipline differs. | [`## Capabilities and modes`](#capabilities-and-modes) authoring-vs-consumption table + [TASKS.md ## configure](TASKS.md#configure) step 3 |
+| 1. SPCX vs PCC vs factory firmware | Picking the right programmable-CC surface for the user's algorithm + install. SPCX is the SPC-X CC extension this tool drives; `doca-pcc/SKILL.md` is the library for writing your own algorithm; factory PCC is the firmware-resident default that needs no host-side code. The agent surfaces all three before committing. | [`## Capabilities and modes`](#capabilities-and-modes) decision-tree table + [TASKS.md ## configure](TASKS.md#configure) step 1 |
+| 2. Authoring vs consumption | The DPA-side algorithm body is either user-authored (the user wrote the algorithm and DPACC compiled it) or consumed (the user is deploying a documented shipped reference such as the zero-touch RTT-based algorithm; see the ZTR-RTT CC documentation via `doca-public-knowledge-map`). The tool's harness is the same; the algorithm-side discipline differs. | [`## Capabilities and modes`](#capabilities-and-modes) authoring-vs-consumption table + [TASKS.md ## configure](TASKS.md#configure) step 3 |
 | 3. Role + probe packet format | The host-side role (Reaction Point / Notification Point per the public DOCA PCC documentation), the probe-packet format (e.g. CCMAD as the public default; the tool's `--probe-packet-format` axis exposes the documented set), and the threads / cores axis. | [`## Capabilities and modes`](#capabilities-and-modes) role + probe-packet table + [TASKS.md ## configure](TASKS.md#configure) step 4 |
 | 4. Live link + contention | The load-bearing safety invariant. A CC algorithm has **no observable signal** without actual contention on the fabric. Evaluating SPCX on an idle link tells you nothing; evaluating on a saturated link is the test. The agent refuses any *"my algorithm is broken because nothing changed"* conclusion drawn from an idle link. | [`## Safety policy`](#safety-policy) live-link rule + [TASKS.md ## test](TASKS.md#test) |
 | 5. Diagnose a session failure | Walk the error taxonomy in [`## Error taxonomy`](#error-taxonomy) — install / device-binding / fw-slot / DPA-image / algorithm-precondition / live-link-precondition / runtime / version / cross-cutting — instead of guessing. | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
@@ -77,7 +77,7 @@ load-bearing routing rule before any code:
 | --- | --- | --- |
 | **Factory PCC** (firmware-resident default) | The user wants a documented, supported CC algorithm with no custom code; firmware-level configuration is sufficient; no programmable-CC slot is required. | Firmware configuration via `mlxconfig`-class knobs; route via `doca-public-knowledge-map/SKILL.md`. |
 | **`doca-pcc/SKILL.md`** (stable, established) | The user wants a custom CC algorithm on the established PCC surface; the install supports it; the BlueField generation + firmware exposes the custom-PCC slot. | `doca-pcc/SKILL.md` host-side lifecycle + DPA-side algorithm via DPACC. |
-| **`doca_spcx_cc` / SPCX** (newer, more flexible extension) | The user wants the documented SPCX-class flexibility (the extension surface this tool drives), the install has SPCX exposed, and the user accepts that SPCX is the *newer* of the two surfaces (potentially preview / limited HW on some installs). | This skill (operator side) + the DPA-side SPCX algorithm via DPACC. |
+| **`doca_spcx_cc` / SPCX** (SPC-X CC extension) | The user wants the documented SPCX-class flexibility (the extension surface this tool drives), the install has SPCX exposed, and the user accepts that SPCX is the *newer* of the two surfaces (potentially preview / limited HW on some installs). | This skill (operator side) + the DPA-side SPCX algorithm via DPACC. |
 
 The agent's rule: **probe before committing**. Confirm
 which surfaces are exposed on the user's install (via
@@ -91,8 +91,8 @@ body comes from one of two sources:
 
 | Source | What the user has | Skill pairing |
 | --- | --- | --- |
-| User-authored algorithm | A DPA-side translation unit the user wrote and DPACC compiled. | This skill (operator harness) + `doca-pcc/SKILL.md` (library) + `doca-dpa/SKILL.md` (DPA programming model) + the public DOCA SPCX programming guide. |
-| Shipped reference algorithm | A documented NVIDIA-shipped algorithm such as the zero-touch RTT-based CC reference in `doca-pcc-ztr-rttcc-algo/SKILL.md`. | This skill (operator harness) + `doca-pcc-ztr-rttcc-algo/SKILL.md` (algorithm semantics). |
+| User-authored algorithm | A DPA-side translation unit the user wrote and DPACC compiled. | This skill (operator harness) + `doca-pcc/SKILL.md` (library) + `doca-dpa/SKILL.md` (DPA programming model) + the public DOCA PCC programming guide. |
+| Shipped reference algorithm | A documented NVIDIA reference algorithm such as the zero-touch RTT-based CC (ZTR-RTT). | This skill (operator harness) + the ZTR-RTT CC documentation via `doca-public-knowledge-map` (parameters and counters). |
 
 The operator-side flow is the same in both cases; the
 algorithm-side discipline (review, parameter tuning,
@@ -104,8 +104,8 @@ programming guide:
 
 | Role | What it is | When it is loaded |
 | --- | --- | --- |
-| Reaction Point (RP) | The role that REACTS to congestion signal by adjusting send rate. On DOCA 3.3 the shipped reference sample `doca_spcx_cc` hard-codes `cfg.role = PCC_ROLE_RP` in its `pcc.c`; the binary does NOT register a runtime `--role` flag. The agent does NOT quote `--role RP` against the binary's `--help`; it loads RP by running the shipped binary as-is. | The standard custom-CC role; loaded on the side of the fabric that is *sourcing* the RDMA / RoCE traffic and that needs to be rate-adjusted. |
-| Notification Point (NP) | The role that GENERATES the congestion signal — typically the receive side or a switch ASIC. To run NP with the shipped reference sample, the user either rebuilds the sample with `cfg.role = PCC_ROLE_NP` or follows the public DOCA SPCX-CC guide's documented method for the user's installed version. The agent does NOT invent a runtime `--role` flag that the binary does not register. | When the SPCX algorithm needs a custom NP-side behaviour different from the documented factory behaviour. |
+| Reaction Point (RP) | The role that REACTS to congestion signal by adjusting send rate. The shipped `doca_spcx_cc` binary runs in this role and registers no runtime `--role` flag (confirm with `--help`). The agent does NOT quote `--role RP`; it loads RP by running the shipped binary as-is. | The standard custom-CC role; loaded on the side of the fabric that is *sourcing* the RDMA / RoCE traffic and that needs to be rate-adjusted. |
+| Notification Point (NP) | The role that GENERATES the congestion signal — typically the receive side or a switch ASIC. The shipped binary exposes no NP switch; route NP-side questions to the public SPC-X CC documentation via `doca-public-knowledge-map ## DOCA tools` and confirm on `--help`. The agent does NOT invent a runtime `--role` flag that the binary does not register. | When the SPCX algorithm needs a custom NP-side behaviour different from the documented factory behaviour. |
 
 The probe-packet format axis (`--probe-packet-format`)
 selects between the documented formats (CCMAD per the
@@ -151,7 +151,7 @@ style per-port / per-flow runtime captures the user can
 correlate against the algorithm's intended behaviour.
 The exact metric names + tracer formats are
 authoritative on `--help` on the installed binary and the
-public DOCA SPCX guide.
+DOCA release notes.
 
 **Companion observation surfaces.** Beyond the tool's
 own output, the agent typically pairs SPCX evaluation
@@ -192,21 +192,21 @@ lives there; this skill does not duplicate it.
   `doca-pcc/SKILL.md` carries.
 - **SPCX availability is install-specific.** SPCX is
   the newer of the programmable-CC surfaces; the public
-  DOCA SPCX guide documents the BlueField generations
+  DOCA release notes document the BlueField generations
   and DOCA versions on which it is available. The
   agent does NOT assume SPCX is available; the gate is
   `doca_spcx_cc --help` succeeding on the installed
-  binary + the public guide naming the user's
+  binary + the DOCA release notes naming the user's
   BlueField + DOCA combination.
 - **Role / probe-packet format / metric names are
   versioned.** The documented role tokens
   (RP / NP), probe-packet format tokens, and metric
   names evolve across releases; re-verify against the
-  installed `--help` and the public DOCA SPCX guide
+  installed `--help` and the DOCA release notes
   rather than against this skill's prose.
-- **Public DOCA SPCX page is the source of truth for
-  the tool's command-line surface.** When that page
-  disagrees with this skill, the live guide wins.
+- **`--help` and the DOCA release notes are the source of truth for
+  the tool's command-line surface.** When they
+  disagree with this skill, they win.
 
 ## Error taxonomy
 
@@ -262,9 +262,9 @@ user's time on the wrong fix.
    format the install does not expose; the algorithm
    requires a peer NP that is not present. Routing:
    walk the algorithm's own documentation (the public
-   DOCA SPCX programming guide for user-authored
+   DOCA PCC programming guide for user-authored
    algorithms, or
-   `doca-pcc-ztr-rttcc-algo/SKILL.md`
+   the ZTR-RTT CC documentation via `doca-public-knowledge-map`
    for the shipped reference algorithm).
 6. **Live-link / contention.** Algorithm running but
    no observable effect. Cause: the link is idle, the
@@ -330,7 +330,7 @@ RDMA-side observation via
   documented tracer-style runtime output the tool
   produces — re-verify field names + format against
   `--help` on the installed binary and the public
-  DOCA SPCX page.
+  DOCA release notes.
 - **Companion PCC counter snapshots.** Per
   `doca-pcc-counters/SKILL.md`
   — the cheaper *"is anything happening on this port"*
@@ -423,8 +423,7 @@ to recover. The rules:
   business-hours operations.
 - **Do not invent algorithm parameters, role tokens,
   probe-packet format tokens, or metric names.** The
-  documented surface lives on the public DOCA SPCX
-  page and in `--help` on the installed binary;
+  documented surface lives on the DOCA release notes and in `--help` on the installed binary;
   prose-derived names are the most common
   hallucination failure for this skill, and a wrong
   parameter on a production fabric is exactly the
@@ -438,15 +437,15 @@ to recover. The rules:
 
 ## Public-source pointer
 
-The canonical public source for `doca_spcx_cc` is the
-**DOCA SPCX** page on `docs.nvidia.com`, reachable
-through
+The public sources for `doca_spcx_cc` are the installed
+`--help` and the DOCA release notes (Known Issues,
+Changes and New Features), reachable through
 `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 The companion programming-model surface lives in the
 public DOCA PCC, DOCA DPA, and DPACC guides on the
 same site; the shipped reference zero-touch RTT-based
 algorithm lives in
-`doca-pcc-ztr-rttcc-algo/SKILL.md`.
+the ZTR-RTT CC documentation via `doca-public-knowledge-map`.
 Do not invent flags, role tokens, probe-packet format
 tokens, or metric names beyond what those public sources
 document, and re-verify against `--help` on the

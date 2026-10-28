@@ -19,7 +19,7 @@ description: >
   firmware reflash, streaming telemetry, doca_caps CLI snapshots, or
   DOCA install itself — those belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

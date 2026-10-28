@@ -16,7 +16,7 @@ description: >
   (matching library skill), DOCA_ERROR_* taxonomy
   (doca-programming-guide), and the general debug ladder (doca-debug).
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

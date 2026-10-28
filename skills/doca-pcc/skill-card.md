@@ -28,7 +28,8 @@ Mitigation: Review and scan skill before deployment. <br>
 - [DOCA PCC Programming Guide](https://docs.nvidia.com/doca/sdk/DOCA-PCC/index.html) <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
@@ -68,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 85.8% | 88.8% |
+| Overall | 90.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 50.0% → 95.0% (+45.0 points) | 90.0% → 100.0% (+10.0 points) |
-| Discoverability | 100.0% | 95.0% |
-| Effectiveness | 31.9% → 52.7% (+20.8 points) | 60.6% → 78.1% (+17.5 points) |
-| Efficiency | 81.1% | 70.9% |
+| Correctness | 60.0% → 90.0% (+30.0 points) | 90.0% → 100.0% (+10.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 25.0% → 75.0% (+50.0 points) | 45.8% → 79.2% (+33.4 points) |
+| Efficiency | 84.9% — baseline ran, but no comparable score was available; uplift unavailable | 69.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-b99bced (source: git SHA, committed 2026-10-23); targets DOCA 3.5 (source: frontmatter doca_version) <br>
+259da15 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

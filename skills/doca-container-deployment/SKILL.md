@@ -18,7 +18,7 @@ description: >
   services (BlueMan, HBN, SNAP, Virtio-net), or full Kubernetes-cluster
   ops.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -78,7 +78,7 @@ start at the capabilities companion. For per-service
 overlays, follow the per-service skill under `skills/services/` that
 layers on top of this one — the supported overlays are Argus, DMS,
 Firefly, and UROM service. Flow-Inspector and OS-Inspector are
-policy-excluded from this public bundle; route them through
+outside this bundle's scope; route them through
 `doca-public-knowledge-map/SKILL.md`
 instead of applying this runtime overlay. Externally-productized
 NVIDIA services (BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry

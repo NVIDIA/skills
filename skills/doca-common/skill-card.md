@@ -27,7 +27,6 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 - [DOCA Samples and Applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
 
@@ -45,7 +44,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), each attempted once in an isolated k8s-sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -69,15 +68,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 89.5% | 83.2% |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 95.0% (+45.0 points) | 70.0% → 85.0% (+15.0 points) |
+| Overall | 93.8% | 87.5% |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 75.0% → 95.0% (+20.0 points) |
 | Discoverability | 100.0% | 95.0% |
-| Effectiveness | 39.4% → 66.2% (+26.8 points) | 34.2% → 62.9% (+28.7 points) |
-| Efficiency | 86.0% | 73.1% |
+| Effectiveness | 18.8% → 83.3% (+64.5 points) | 52.1% → 77.1% (+25.0 points) |
+| Efficiency | 85.4% | 70.6% |
 
 ## Skill Version(s): <br>
-b99bced (source: git SHA, committed 2026-10-23) <br>
+c98e456 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

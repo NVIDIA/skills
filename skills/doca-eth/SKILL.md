@@ -19,7 +19,7 @@ description: >
   installing DOCA, flow-rule / steering programming, host↔DPU control
   messaging, or RDMA data movement.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

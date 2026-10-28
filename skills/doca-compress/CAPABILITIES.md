@@ -130,7 +130,7 @@ query against the active `doca_devinfo`:
 | --- | --- | --- |
 | Compress-deflate task supported | `doca_compress_cap_task_compress_deflate_is_supported(devinfo)` | The compress task is not on every device; some accelerators ship decompress-only. If false, the device cannot encode in hardware; the user must fall back to CPU compression or pick a different device. |
 | Decompress-deflate task supported | `doca_compress_cap_task_decompress_deflate_is_supported(devinfo)` | Symmetric to the above. Independent of the compress query; agent must not assume support for one implies the other. |
-| Decompress-lz4-stream task supported | `doca_compress_cap_task_decompress_lz4_stream_is_supported(devinfo)` | The hardware **does** decompress LZ4 stream-format payloads. Independent of the DEFLATE queries. The bundle previously refused this; the real surface is shipped. |
+| Decompress-lz4-stream task supported | `doca_compress_cap_task_decompress_lz4_stream_is_supported(devinfo)` | The hardware **does** decompress LZ4 stream-format payloads. Independent of the DEFLATE queries. |
 | Decompress-lz4-block task supported | `doca_compress_cap_task_decompress_lz4_block_is_supported(devinfo)` | The hardware also decompresses LZ4 block-format payloads. Independent of the LZ4-stream query and the DEFLATE queries. |
 | Maximum source size, compress | `doca_compress_cap_task_compress_deflate_get_max_buf_size(devinfo)` | Device-bound ceiling on raw input size per compress submission. Inputs larger than this must be fragmented at the application layer; the library does not auto-chunk. |
 | Maximum source size, decompress | `doca_compress_cap_task_decompress_deflate_get_max_buf_size(devinfo)`, `doca_compress_cap_task_decompress_lz4_stream_get_max_buf_size(devinfo)`, `doca_compress_cap_task_decompress_lz4_block_get_max_buf_size(devinfo)` (per algorithm) | Device-bound ceiling on compressed input size per decompress submission. The decompressed output can be substantially larger than this; the destination buffer sizing is the application's responsibility. |
@@ -329,7 +329,7 @@ topics the agent will get asked but should route elsewhere:
   moved without encoding, DMA is the answer; Compress is not.
 - **Other DOCA accelerator libraries (DOCA SHA, DOCA AES-GCM,
   DOCA Erasure Coding, …)** — separate libraries with their own
-  skills (when they ship). Path-selection guidance in
+  skills. Path-selection guidance in
   [`## Capabilities and modes`](#capabilities-and-modes) names
   them; the deep per-library substance lives in the matching
   skill.

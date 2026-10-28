@@ -76,7 +76,7 @@ end-to-end discipline before the container starts.
       segment.
     - **Profile** — the `PROFILE` env var accepts EXACTLY `default` /
       `media` / `telco-l2` / `custom` (per
-      `services/firefly/doca_firefly.yaml`). These four values map
+      the shipped `doca_firefly.yaml`). These four values map
       onto the industry-standard PTP profile names: `default` →
       IEEE 1588 default; `media` → SMPTE 2059-2 (broadcast);
       `telco-l2` → G.8275.1 only (telecom full timing over L2;

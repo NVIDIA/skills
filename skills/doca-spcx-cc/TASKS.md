@@ -55,7 +55,7 @@ install path:
    `doca-pcc CAPABILITIES.md ## Capabilities and modes` (`doca-pcc/CAPABILITIES.md#capabilities-and-modes`)
    triple-axis precondition: custom-PCC requires a
    firmware-level slot to be enabled via the
-   `mlxconfig`-class knob the public guide names. If
+   `mlxconfig`-class knob the DOCA PCC guide names. If
    the slot is disabled, the SPCX session will fail
    with the firmware-precondition error layer. The
    slot flip is a hardware-touching change per the
@@ -65,17 +65,16 @@ install path:
    and follow the cold-power-cycle commit rule.
 6. **Confirm SPCX availability on the installed DOCA +
    BlueField generation.** SPCX is the newer of the
-   two programmable-CC surfaces; the public DOCA SPCX
-   guide names the supported combinations. The agent
+   two programmable-CC surfaces; the DOCA release notes name the supported combinations. The agent
    does NOT assume SPCX is available — the gate is
    `doca_spcx_cc --help` succeeding on the installed
-   binary + the public guide naming the user's setup.
+   binary + the DOCA release notes naming the user's setup.
 7. **Confirm a non-prod RDMA / RoCE fabric with
    controllable contention is reachable** for the
    evaluation flow in [`## test`](#test). Without
    contention there is no signal to evaluate against.
 8. **Confirm the operator has the privileges the
-   public DOCA SPCX guide requires** for binding the
+   DOCA release notes require** for binding the
    device, loading the algorithm image, and writing
    the captured artifacts.
 
@@ -115,20 +114,14 @@ through, in order:
    `doca-public-knowledge-map/SKILL.md`
    for the algorithm-side discipline) or stage the
    documented shipped reference per
-   `doca-pcc-ztr-rttcc-algo/SKILL.md`.
+   the ZTR-RTT CC documentation via `doca-public-knowledge-map`.
    Pin a SHA + version of the algorithm image; the
    evaluation evidence depends on this.
 4. **Pick the role.** The role decision (RP — Reaction Point —
    vs NP — Notification Point) is a deployment-shape
    choice the user makes per-endpoint. The shipped
-   reference sample binary in DOCA 3.3 (`doca_spcx_cc`)
-   hard-codes `cfg.role = PCC_ROLE_RP` in `pcc.c` — it does
-   NOT register a `--role` CLI flag in
-   `pcc_core.c:register_pcc_params`. To run the NP role with the
-   shipped reference sample, the user either rebuilds the
-   sample with `cfg.role = PCC_ROLE_NP` or uses the public
-   DOCA SPCX-CC guide's documented method for the user's
-   installed version (`--help` first to confirm the actual
+   `doca_spcx_cc` binary runs as RP and registers no
+   `--role` CLI flag (`--help` first to confirm the actual
    registered flag set on that DOCA release; do NOT quote a
    `--role` flag the binary does not expose). The two endpoints
    of the deployment must still agree on the role assignment;
@@ -140,11 +133,11 @@ through, in order:
 6. **Stage the parameters.** Each algorithm exposes a
    parameter set; the parameters live in the algorithm
    documentation, not in this skill. For a user-authored algorithm, resolve
-   the applicable public DOCA SPCX programming guide through
+   the applicable the public DOCA PCC programming guide through
    `doca-public-knowledge-map/SKILL.md` and
    validate every name/range there. For the shipped zero-touch RTT reference,
    use
-   `doca-pcc-ztr-rttcc-algo/CAPABILITIES.md`.
+   the ZTR-RTT CC documentation via `doca-public-knowledge-map`.
    If no authoritative range is available, stop rather than invent one. Pin the parameter
    set in writing; the parameter set is part of the
    evaluation evidence tuple per
@@ -199,7 +192,7 @@ Routing for nearby "build" questions:
   for the SPCX-specific algorithm authoring detail.
 - *"I want to build the shipped reference RTT-based
   algorithm."* → route to
-  `doca-pcc-ztr-rttcc-algo/SKILL.md`
+  the ZTR-RTT CC documentation via `doca-public-knowledge-map`
   for the algorithm-side discipline; the tool's harness
   is the same.
 - *"I want to extend the tool with a new mode."* → out
@@ -223,18 +216,14 @@ What the agent *does* modify, every time, is:
 
 1. The **tool invocation** — the registered argp flags (`--device`,
    `--threads`, `--wait-time`, `--probe-packet-format`),
-   the algorithm-image path (`--app` or whatever the
-   public guide names on this DOCA release), and any
-   capture-surface flags the binary registers. The role
-   selection (RP vs NP) is hard-coded in the shipped
-   sample's `pcc.c` (`cfg.role = PCC_ROLE_RP`) on DOCA 3.3
-   and is NOT a runtime knob; switching role means
-   rebuilding the sample or following the public guide
-   for the user's installed version.
+   the algorithm-image / DPA-resource flags exactly as `--help`
+   lists them, and
+   any capture-surface flags the binary registers. The role
+   (RP) is NOT a runtime knob.
 2. The **DPA-side algorithm image** — the user-authored
    algorithm body (rebuilt via DPACC) or the shipped
    reference algorithm's parameter set
-   (`doca-pcc-ztr-rttcc-algo/SKILL.md`).
+   (the ZTR-RTT CC documentation via `doca-public-knowledge-map`).
 
 That is the configuration loop in [`## configure`](#configure)
 above and the iteration loop in [`## test`](#test) below;
@@ -263,24 +252,21 @@ Routing for nearby "modify" questions:
 The prepare → smoke → contention-positive evaluation
 flow — every SPCX session goes through it, no
 exceptions. The full invocation surface lives in the
-public DOCA SPCX page; this section names the *shape*
+DOCA release notes; this section names the *shape*
 of the flow, not verbatim command lines (per
 [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
 *"do not invent flags"*).
 
 > **Do-not-invent guard (flags vs subcommands).** The
 > `doca_spcx_cc` binary takes **flags only — it has no
-> subcommand surface**. Real downstream agents have
-> hallucinated a `load` / `start` / `observe` / `stop`
-> subcommand family for this binary; it does not exist.
+> subcommand surface**. There is no `load` / `start` /
+> `observe` / `stop` subcommand family for this binary.
 > The flag inventory the bundle enumerates verbatim is
 > `--device`, `--threads`, `--wait-time`,
 > `--probe-packet-format`, plus algorithm-image and
 > capture-surface flags (see
 > [`## Command appendix`](#command-appendix)). The role
-> (RP vs NP) is hard-coded in the shipped sample's
-> `pcc.c` (`cfg.role = PCC_ROLE_RP`) on this DOCA
-> release and is **not** registered as a CLI flag — do
+> (RP vs NP) is **not** registered as a CLI flag — do
 > not quote `--role` against `--help` output that does
 > not list it. The host-side status values reported by
 > the bundle (`Active`, `Standby`, `Deactivated`,
@@ -519,7 +505,7 @@ this skill's name.
 - **DPA-side algorithm authoring detail** →
   `doca-pcc/SKILL.md` +
   `doca-dpa/SKILL.md` + the
-  public DOCA SPCX programming guide via
+  the public DOCA PCC programming guide via
   `doca-public-knowledge-map/SKILL.md`.
   This skill is the operator-side harness; the
   algorithm-side discipline is owned upstream.
@@ -548,7 +534,7 @@ this skill's name.
 above reach for. Every row is a CLASS — the agent must
 not invent flags, role tokens, probe-packet format
 tokens, or metric names beyond `--help` on the
-installed binary and the public DOCA SPCX page.
+installed binary and the DOCA release notes.
 
 **Infra-aware preamble (every row below).** Per the
 bundle's detect → prefer → fall back → report contract
@@ -571,8 +557,8 @@ the agent should:
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
-| Discover the documented flag surface | `doca_spcx_cc --help` + the public DOCA SPCX page | [`## configure`](#configure); [`## debug`](#debug) layer 1 | Prints the documented inventory the shipped binary actually registers via argp: `--device`, `--threads`, `--wait-time`, `--probe-packet-format`, plus algorithm-image / capture-surface flags. The role (RP vs NP) is hard-coded in the shipped sample's `pcc.c` (`cfg.role = PCC_ROLE_RP`) and is NOT registered as a CLI flag on this DOCA release; do not quote `--role` against `--help` output that does not list it. |
-| Smoke-load the algorithm in RP role | `doca_spcx_cc --device <mlx5_*> --probe-packet-format <token> --app <algorithm-image> ... ` (role defaults to RP per the shipped sample's hard-coded `cfg.role = PCC_ROLE_RP`; for NP, see `## configure` step 4 — rebuild or follow the public guide for that DOCA release) | [`## run`](#run) step 4 | Host-side status reaches `Active`; the documented start banner prints; the per-port tracer surface begins emitting. |
+| Discover the documented flag surface | `doca_spcx_cc --help` + the DOCA release notes | [`## configure`](#configure); [`## debug`](#debug) layer 1 | Prints the documented inventory the shipped binary actually registers via argp: `--device`, `--threads`, `--wait-time`, `--probe-packet-format`, plus algorithm-image / capture-surface flags. The role (RP vs NP) is NOT registered as a CLI flag on this DOCA release; do not quote `--role` against `--help` output that does not list it. |
+| Smoke-load the algorithm in RP role | `doca_spcx_cc --device <mlx5_*> --probe-packet-format <token> ... ` (flags per `--help`; the binary runs as RP, see `## configure` step 4) | [`## run`](#run) step 4 | Host-side status reaches `Active`; the documented start banner prints; the per-port tracer surface begins emitting. |
 | Drive the contention-positive evaluation | Smoke-load above + the planned contention pattern injected on the fabric | [`## run`](#run) steps 5–6; [`## test`](#test) iteration | The tracer surface shows the algorithm reacting to the contention; `doca-pcc-counters` snapshots show non-trivial PCC counter activity; `doca-rdma` metrics show the modulation the algorithm is designed for. |
 | Stop the algorithm cleanly | SIGINT / SIGTERM to the running session per the shipped sample's signal handling | [`## run`](#run) step 7 | Host-side status transitions to `Deactivated`; the post-stop fabric state matches the captured pre-flight baseline. |
 | Capture the evidence tuple | Pair the tool's tracer output with `doca-pcc-counters` snapshots, `doca-rdma` metrics, and the metadata tuple per [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability) | [`## test`](#test) baseline-capture rule; [`## use`](#use) gate | The full (DOCA + DPACC + BlueField + firmware + algorithm SHA + parameter set + role + probe-packet format + fabric topology + contention shape + window) tuple is attached to the captured artifact. |
@@ -583,7 +569,7 @@ Three cross-cutting rules for this appendix:
 - **Never invent a flag, role token, probe-packet
   format token, algorithm parameter name, or metric
   name.** `--help` on the installed binary and the
-  public DOCA SPCX page are the joint contract.
+  DOCA release notes are the joint contract.
 - **Smoke before contention, contention before
   conclusion.** Every row above presumes the smoke
   reached `Active` first AND the contention
@@ -605,7 +591,7 @@ A few rules that apply across every verb in this file,
 restated here so they are visible at the point of
 action and not buried in [`SKILL.md`](SKILL.md):
 
-- The **public DOCA SPCX page** plus the installed
+- The **DOCA release notes** plus the installed
   `--help` are the joint source of truth. When they
   disagree, the *installed* `--help` wins for the
   user's actual run.

@@ -69,12 +69,10 @@ DMS exposes two gRPC-based interfaces:
 
 Documented constraints:
 
-- DMS **supports** telemetry streaming via gNMI `Subscribe`: `STREAM`
-  (with `SAMPLE` interval bounds of 1s–60s) and `ONCE` modes are
-  implemented in `gnxi/gnmi/server.go`; only `POLL` and `Aggregation`
-  are Unimplemented. For a turnkey telemetry-aggregation surface
-  separate from DMS's own gNMI Subscribe, the DOCA Telemetry Service
-  (DTS) is the productized answer.
+- DMS does **not** support the gNMI `Subscribe` command (public DMS
+  guide: "DMS currently does not support the Subscribe command").
+  Telemetry streaming is the DOCA Telemetry Service (DTS), owned by
+  `doca-dts/SKILL.md`.
 - DMS does **not** seek full OpenConfig alignment; it uses OpenConfig
   as a framework. Path inventories quoted by the agent must come from
   the live public guide, not be inferred from generic OpenConfig.
@@ -135,13 +133,11 @@ The public DMS guide documents four authentication modes:
 | mTLS | Do not infer certificate roles, trust roots, or client-auth policy | Installed guide's mTLS recipe and Security Best Practices |
 
 Authorization for **gRPC client callers** is the `-allowed_users` flag
-(default `root`; comma-separated list, enforced by `isUserAllowed` in
-`gnxi/utils/credentials/credentials.go`) applied across ALL auth modes
+(default `root`; comma-separated list) applied across ALL auth modes
 (localhost / PAM / credentials / mTLS) — NOT a Unix-group check. The
 `dmsgroup` Unix group is a **separate** authorization layer used by
-the privileged backend (`dmspe`) for its file-system / IPC handoff
-(see `gnxi/dmspe/dmspe.c` `dmsgroup` membership probe and the
-`Group=dmsgroup` line in `gnxi/scripts/dmsd.service`); it is not the
+the privileged backend (`dmspe`) for its file-system / IPC handoff;
+it is not the
 boundary the gRPC client sees. The authoritative rule is: add a gRPC
 caller to `-allowed_users`; add a local user to `dmsgroup` only when
 that user also needs to invoke the privileged `dmspe` backend helper
@@ -213,10 +209,8 @@ DMS errors fall into five layers, each with its own owner:
    `dmsgroup` Unix-group check is `dmspe`-side, not `dmsd`-side, and
    surfaces as a backend-layer error rather than this layer).
 3. **Path / operation layer** — request reached `dmsd` but the path
-   or operation is not in the supported set, or an unsupported gNMI
-   Subscribe MODE was attempted (`STREAM` / `SAMPLE` 1s–60s and
-   `ONCE` ARE supported; `POLL` and `Aggregation` are Unimplemented
-   in `gnxi/gnmi/server.go`).
+   or operation is not in the supported set (for example a gNMI
+   `Subscribe`, which DMS does not support).
 4. **Backend / underlying-tool layer** — request reached `dmspe` and
    the underlying tool (e.g. `mlxconfig`, OS installer, file system)
    returned an error. The underlying tool is the source of truth for
@@ -253,15 +247,9 @@ Documented observability surfaces:
 - **gNOI `System`** — `time`, `ping`, etc., documented as health
   introspection.
 
-DMS provides gNMI Subscribe streaming telemetry — `STREAM` (with
-`SAMPLE` interval bounds of 1s–60s) and `ONCE` modes are implemented
-in `gnxi/gnmi/server.go`; `POLL` and `Aggregation` MODES are
-Unimplemented. For the
-externally-productized **DOCA Telemetry Service (DTS)** — turnkey
-aggregator that is OUT OF SCOPE for this bundle — route via
-`doca-public-knowledge-map/SKILL.md`
-non-goals; DTS is the right answer when the user wants a productized
-telemetry-aggregation surface separate from DMS's own gNMI Subscribe.
+DMS does not support gNMI `Subscribe`, so it does not stream
+telemetry. Streaming and aggregation are the **DOCA Telemetry Service
+(DTS)** — route to `doca-dts/SKILL.md`.
 
 ## Safety policy
 
@@ -278,12 +266,10 @@ posture:
   `dmsgroup` is the dmspe backend-helper unix-group surface, layered
   orthogonally.** Any user that should be allowed to issue DMS
   commands over gRPC must be in the `-allowed_users` comma-separated
-  list (default `root`; enforced by `isUserAllowed` in
-  `gnxi/utils/credentials/credentials.go` across ALL auth modes); the
+  list (default `root`, across ALL auth modes); the
   `dmsgroup` Unix group is a separate gate at the dmspe privileged
   helper for users that also need to invoke the backend directly on
-  the endpoint. The previous "dmsgroup is the authorization
-  boundary" framing is disavowed.
+  the endpoint.
 - **Localhost-only auth is never safe to expose.** The "Local
   testing" mode is for development only and binds to localhost. Do
   not advise binding it to an external interface under any

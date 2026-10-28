@@ -69,9 +69,8 @@ schema-discovery + per-device-support question — the
 operator-side knowledge that exporter / collector setups
 need to be honest.
 
-**Three documented invocation classes.** Per the README
-shipped under `doca/tools/telemetry_utils/` and the
-public DOCA Telemetry guide:
+**Three documented invocation classes.** Per the public DOCA
+Telemetry Utils guide:
 
 | Invocation class | Shape | What it produces |
 | --- | --- | --- |
@@ -80,7 +79,7 @@ public DOCA Telemetry guide:
 | Reverse-resolve Data ID → name | `doca_telemetry_utils [<device PCI>] <DATA_ID>` | Reverse-resolves the Data ID to a counter name + unit + property values. If `<device PCI>` is provided, also probes the device's support. |
 
 Running the tool with no arguments prints a help
-banner per the shipped README; the exact subcommand
+banner; the exact subcommand
 strings and option names are authoritative on `--help`
 on the installed version and on the public DOCA
 Telemetry guide.
@@ -99,8 +98,8 @@ binary):
 | `depth` | Which depth (0-63) the counter refers to. In DOCA 3.5, `node`, `pcie_index`, and `depth` are fields encoded in the `pcie_link_*` Data IDs; they are not a queue-depth condition. |
 | Unit-specific axes (per the counter's `Unit:` line) | Each counter belongs to a `Unit` (e.g. `PCIE`, the host-RX-transport group, the TX-port group); each unit can expose unit-specific property axes beyond the generic three. |
 
-The shipped README's worked example (re-verifiable on a
-local DOCA install):
+A worked example (counter name and Data ID from the public DOCA
+Telemetry Diag counter list; re-verifiable on a local DOCA install):
 
 ```
 $ doca_telemetry_utils pcie_link_write_stalled_time_no_posted_header_credits_ns 1 2 3
@@ -309,7 +308,7 @@ counter name + unit + property values, or the
 enumerated counter set, in human-readable form. There
 is no file output, no daemon, no live-streaming mode.
 
-- **Stdout.** The primary surface. Per the README,
+- **Stdout.** The primary surface. Per the public guide,
   the resolved output is the (Data ID, Name, Unit,
   property-axis values) tuple. Capture stdout for
   every invocation the operator commits to an
@@ -414,10 +413,8 @@ the same site, reachable through
 `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
 and
 `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
-The shipped README under
-`/opt/mellanox/doca/tools/telemetry_utils/README.md`
-on a real DOCA install carries the three documented
-invocation classes and one worked example each. Do
+The public DOCA Telemetry Utils guide carries the three
+documented invocation classes. Do
 not invent counter names, Data IDs, property values,
 or unit-specific axes beyond what those public
 sources document, and re-verify against `--help` on

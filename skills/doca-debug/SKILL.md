@@ -19,7 +19,7 @@ description: >
   interpretation, and performance or incident-response work — those
   belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -172,7 +172,7 @@ Do **not** load this skill for:
 This is a **thin loader**. The body keeps only the orientation needed to pick the right next file. The substantive debug material lives in two companion files:
 
 - the capabilities companion — what *kinds of debug surface* DOCA exposes: the layered debug model (install / version / build / link / runtime / program), the read-only-first stance, version-availability of debug tools (e.g. `doca_caps` since DOCA 2.6.0), the cross-library error taxonomy (cross-link only — owned by `doca-programming-guide`), the observability primitives DOCA emits (`stderr` logs, `--sdk-log-level`, the `doca-<lib>-trace` build flavor, library counters), and the safety constraints on debug actions (read-only first, don't mutate install tree mid-investigation).
-- the tasks companion — the actual debug workflows: `## configure` (set up env for high-verbosity debug), `## test` (capture a reproducible state), `## debug` (the canonical layered ladder, the universal entry point that every library `## debug` redirects to), and the *Where to ask for help* routing (NVIDIA DOCA Developer Forum). Three other anchors (`build`, `modify`, `run`) exist for lint compliance and route to `doca-programming-guide/SKILL.md`, which owns those verbs after the env / program split.
+- the tasks companion — the actual debug workflows: `## configure` (set up env for high-verbosity debug), `## test` (capture a reproducible state), `## debug` (the canonical layered ladder, the universal entry point that every library `## debug` redirects to), and the *Where to ask for help* routing (NVIDIA DOCA Developer Forum). Three other anchors (`build`, `modify`, `run`) route to `doca-programming-guide/SKILL.md`, which owns those verbs after the env / program split.
 
 ## Loading order
 

@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides day-1 platform bring-up of a BlueField-4 (BF4) DPU from the BMC — installing the BlueField/DOCA bundle ISO over UEFI HTTP Boot, PXE, or Redfish Virtual Media and running the PLDM firmware-update flow across BMC/NIC firmware/SBIOS/ERoT — with every irreversible hardware step routed through doca-hardware-safety. <br>
+Guides day-1 platform bring-up of a BlueField-4 (BF4) DPU from the BMC — installing the BlueField/DOCA bundle ISO onto Grace over UEFI HTTP Boot, PXE, or Redfish Virtual Media, running the PLDM platform-firmware update via the Redfish UpdateService and pldmtool, and installing a Grace Ubuntu image with optional cloud-init — with every irreversible hardware step routed through doca-hardware-safety. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and infrastructure engineers use this skill for hands-on day-1 bring-up of a BlueField-4 DPU via the BMC: installing the Grace OS, running the PLDM firmware-update flow, and diagnosing boot or firmware failures while routing every mutating hardware step through the hardware-safety policy. <br>
+Developers and infrastructure engineers use this skill for hands-on day-1 bring-up of a BlueField-4 DPU via the BMC: installing the Grace OS, running the PLDM firmware-update flow, reaching the OOB console, and diagnosing boot, virtual-media, or firmware-Task failures while routing every mutating hardware step through the hardware-safety policy. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -38,8 +38,8 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
@@ -57,10 +57,10 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
@@ -68,15 +68,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.1% (uplift unavailable) | 88.8% (uplift unavailable) |
+| Overall | 99.7% (uplift unavailable) | 92.5% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 100.0% (+40.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% (uplift unavailable) | 82.5% (uplift unavailable) |
-| Effectiveness | 66.1% → 100.0% (+33.9 points) | 66.1% → 88.3% (+22.2 points) |
-| Efficiency | 95.6% (uplift unavailable) | 73.0% (uplift unavailable) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 52.8% → 100.0% (+47.2 points) | 100.0% → 100.0% (±0.0 points) |
+| Efficiency | 98.5% (uplift unavailable) | 67.2% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+256561c (source: git SHA, committed 2026-10-26) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -15,7 +15,7 @@ description: >
   resistance, SHA-3 selection), the AES-GCM / Compress / DMA
   libraries, or SDK install and BFB bring-up.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

@@ -14,7 +14,7 @@ description: >
   use for application end-to-end timing, custom benchmark code, DOCA
   installation, or binary patches.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
   doca_version: "3.5"
   tags:
@@ -164,8 +164,7 @@ to measure performance of a DOCA library. Concretely:
   workload (RDMA vs COMPRESS vs DMA, etc.).
 - Picking *which* measurement axis to ask for (throughput vs bulk
   latency vs precision latency) — the three modes the public guide
-  documents; confirm the full list (including any `max-bandwidth`
-  mode) with `--help`. The modes are not interchangeable.
+  documents; confirm the list with `--help`. The modes are not interchangeable.
 - Probing the install's granular-build state so the agent can
   honestly report *"this library is not exposed on this install"*
   instead of inventing a workload.
@@ -273,11 +272,10 @@ contain — and pull requests should not add:
   overlay on top of `doca-version`; the body lives there.
 - `doca-structured-tools-contract/SKILL.md`
   — the bundle-wide contract for structured-output helper tools.
-  Bench-runner / bench-snapshot executables that satisfy the
-  detect-prefer-fallback-report loop are deferred to PR2; the
-  contract is consumed here in advance so the
-  `## Command appendix` in the tasks companion is infra-aware
-  from PR1.
+  When a site provides a helper that satisfies the
+  detect-prefer-fallback-report loop, the `## Command appendix`
+  in the tasks companion uses it; otherwise it falls back to the
+  manual commands.
 - `doca-setup/SKILL.md` — env preparation,
   install verification, hugepages, NUMA awareness, and the *I
   have no install yet* path with the public NGC DOCA container.

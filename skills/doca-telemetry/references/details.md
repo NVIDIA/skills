@@ -73,7 +73,7 @@ is a single instance.
   worked example: *"I want a NetFlow collector backed by DOCA
   telemetry"*. The honest answer is that this library does NOT
   expose a NetFlow / IPFIX / local-socket *collector* transport
-  surface — the previous bundle framing of that surface was wrong.
+  surface.
   The agent must refuse the collector framing and route the user
   to: (a) the sibling
   `doca-telemetry-exporter/SKILL.md`
@@ -109,12 +109,11 @@ contain — and pull requests should not add:
   guide.** That is the `doca-dts` skill.
 - **A NetFlow / IPFIX / local-socket collector framework.**
   The per-domain reader libraries do NOT expose a NetFlow /
-  IPFIX / local-socket *collector* transport surface. The
-  previous bundle framing of this library as a collector
-  framework was wrong and is now disavowed. Pull requests that
-  reintroduce collector / schema-query / NetFlow / IPFIX
-  framing into this skill must be rejected — the agent must
-  route those questions to the correct surface
+  IPFIX / local-socket *collector* transport surface, and this
+  library is NOT a collector framework. Never apply this skill's
+  workflow to a request to define an event schema or publish
+  application metrics to a collector — the agent must route those
+  questions to the correct surface
   (`doca-telemetry-exporter/SKILL.md`
   for publish, `doca-dts` for productized aggregation, or a generic
   collector outside the DOCA family).

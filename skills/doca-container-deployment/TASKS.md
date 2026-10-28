@@ -11,7 +11,7 @@ source.
 These verbs cover the in-scope cross-cutting deployment workflows
 for an external operator deploying one of the four supported
 service overlays on the BlueField — Argus, DMS, Firefly, or UROM
-service. Flow-Inspector and OS-Inspector are policy-excluded and
+service. Flow-Inspector and OS-Inspector are outside this bundle's scope and
 must route through
 `doca-public-knowledge-map/SKILL.md`,
 not through this deployment workflow. Every step assumes the
@@ -23,9 +23,9 @@ prescribes the *order* and *what to look up where*, not a
 copy-paste runbook.
 
 > **Non-goals (externally-productized NVIDIA services not in the
-> DOCA monorepo):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
-> Service (DTS, as productized), and any future external NVIDIA
-> networking software not under `doca/services/`. A user asking
+> DOCA SDK):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
+> Service (DTS, as productized), and any other NVIDIA networking
+> software that is not a DOCA SDK service. A user asking
 > *"how do I deploy BlueMan?"* (or any of the others) is routed to
 > the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for that
 > specific product, NOT silently extrapolated from this skill's

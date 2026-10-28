@@ -15,7 +15,7 @@ description: >
   Route elsewhere for writing a custom PCC algorithm (doca-pcc), factory
   firmware PCC config, DOCA install, or fleet-wide CC tuning.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
   doca_version: "3.5"
   tags:
@@ -138,8 +138,7 @@ algorithm (route via
 `doca-public-knowledge-map/SKILL.md`).
 
 `pcc_counters.sh` is shipped as a **plain bash script**
-installed under the DOCA tools directory (per `install_data` in
-`tools/pcc_counters/meson.build`), not a compiled binary and
+installed under the DOCA tools directory, not a compiled binary and
 not a library you link against. The skill uses the bundle's
 `kind: tool` three-file shape (this skill + the capabilities companion
 + the tasks companion) so the agent's task-verb contract

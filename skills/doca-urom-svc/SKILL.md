@@ -13,7 +13,7 @@ description: >
   NOT_PERMITTED, or missing completions. Do not use for host application
   code, MPI/UCX integration design, or DOCA install.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: service
   doca_version: "3.5"
   tags:

@@ -9,8 +9,8 @@ description: >
   skill for BlueField-4 (BF4) day-1 platform
   bring-up from the BMC: installing the BlueField/DOCA bundle ISO onto
   the DPU (Grace, the Arm complex) over UEFI HTTP Boot, PXE, or Redfish
-  Virtual Media; the PLDM firmware-update flow (BMC, NIC firmware,
-  SBIOS, ERoT) via the Redfish UpdateService and pldmtool; and a Grace
+  Virtual Media; the PLDM platform-firmware update via the Redfish
+  UpdateService and pldmtool; and a Grace
   Ubuntu image with optional cloud-init. Trigger on BlueField-4/BF4
   bring-up phrasings even without "BF4": {bring up my new BlueField-4},
   {the BlueField ISO will not boot over HTTP from the BMC}, {attach BF4
@@ -18,7 +18,7 @@ description: >
   support, version alignment, safest first smoke test}. Route
   application launch and library APIs to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -110,12 +110,11 @@ browse docs; use the entry points in `doca-public-knowledge-map`. Give
 environment checks as commands for the user's DOCA host. For out-of-scope
 requests, name the skill that owns them and stop.
 
-> **Scope note — BF4 day-1 is in scope by directive.** The bundle's
+> **Scope note — BF4 day-1 is in scope.** The bundle's
 > `AGENTS.md ## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
 > item 7 lists the BlueField BSP / BFB / RShim / TMFIFO layer and the
 > BlueField BMC software as externally-productized. **BlueField-4
-> day-1 bring-up via the BMC is carved into scope for this skill by
-> directive** because day-1 has no other home in the bundle. The
+> day-1 bring-up via the BMC is in scope for this skill** because day-1 has no other home in the bundle. The
 > carve-out is narrow: this skill teaches the documented BMC-driven
 > install and firmware-update FLOWS (the CLASS), routing every
 > *mutating* step through
@@ -132,11 +131,11 @@ question that is not specific to a later application-deployment step.
 Concretely:
 
 - Installing the BlueField/DOCA bundle ISO onto the DPU (Grace) for
-  the first time, and choosing between the three documented install
-  methods — UEFI HTTP Boot (recommended), PXE Boot, or Redfish
-  Virtual Media.
-- Running the PLDM firmware-update flow across the BMC / NIC firmware
-  / SBIOS / ERoT components: pushing the `.fwpkg` bundle through the
+  the first time, and choosing between the install methods — UEFI
+  HTTP Boot, PXE Boot, Redfish Virtual Media, or the DOCA Management
+  Service install path.
+- Running the PLDM firmware-update flow across the BMC, NIC firmware
+  and the other platform components the PLDM package lists: pushing the `.fwpkg` bundle through the
   Redfish UpdateService multipart endpoint, monitoring the returned
   Task, verifying pending images with `pldmtool`, and activating with
   a power cycle.
@@ -176,7 +175,7 @@ companion files:
 - the capabilities companion — the BF4 day-1 bring-up contract: the three OS
   install methods (UEFI HTTP Boot, PXE Boot, Redfish Virtual Media)
   and the Grace-Ubuntu-plus-cloud-init Virtual Media path; the PLDM
-  firmware-update surface across BMC / NIC firmware / SBIOS / ERoT;
+  firmware-update surface across the platform firmware components;
   the version-compatibility overlay on
   `doca-version/SKILL.md` (the install and firmware
   targets come from the public release notes, never from memory); the

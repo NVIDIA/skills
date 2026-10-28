@@ -18,7 +18,7 @@ description: >
   library-internal capability matrices (Flow pipe creation, RDMA verbs
   features), streaming telemetry / DTS, or modifying the shipped binary.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
   doca_version: "3.5"
   tags:

@@ -335,7 +335,7 @@ so the agent does not invent guidance:
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying doca-argp-using applications at scale
   (sample CI, distributing JSON-config files to operators) —
-  out of scope for Phase 1.
+  out of scope for this skill.
 - **manage / monitor.** Per-operator CLI usage analytics or
   config-file change auditing — outside doca-argp's surface;
   the library parses, it does not telemeter.
@@ -377,7 +377,7 @@ the agent should:
 | --- | --- | --- | --- |
 | `pkg-config --exists doca-argp && echo ok` | `## configure` step 1 | Is the Arg Parser installed in this DOCA install profile at all? | `ok`. A non-zero exit = doca-argp not present; route to `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`) |
 | `pkg-config --modversion doca-argp` | `## configure` step 1; `## build` slot 4 | What is the build-time Arg Parser version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --cflags --libs doca-argp` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-argp` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `ls /opt/mellanox/doca/samples/*/*_main.c \| head` | `## configure` step 2; `## modify` slot 1 | Which sample `*_main.c` files ship in this install, and which is the closest starting point for a CLI modification? | A list of `*_main.c` paths, one per shipped sample. Pick the closest in library context |
 | `"$BINARY" --help` | `## run` step 1; `## test` step 1 | Does the built binary's `--help` listing show the standard DOCA CLI surface plus every newly registered param? Assign `BINARY` without `eval` and keep the expansion quoted. | A help listing with `--device`, `--representor`, `--rep-list`, `--json`, `--sdk-log-level`, plus every user-added flag with its description |
 | `jq . -- "$JSON_PATH"` | `## run` step 3; `## debug` layer 6 | Is the `--json` file valid JSON before we blame doca-argp for `IO_FAILED`? Assign `JSON_PATH` from the user value and keep it quoted. | A pretty-printed JSON tree. A `jq` parse error = malformed JSON, fix the file before any code change |

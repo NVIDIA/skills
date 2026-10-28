@@ -1,7 +1,7 @@
 # DOCA BlueField-4 deployment — Tasks
 
 **Where to start:** The executable bring-up path is `configure -> run ->
-test -> debug`. The lint-required `build` and `modify` anchors below
+test -> debug`. The `build` and `modify` anchors below
 are routing stubs reached only when the user asks those questions —
 they are not steps in BF4 day-1 bring-up. There is no application
 artifact to build or sample to modify in a platform bring-up; those
@@ -37,28 +37,24 @@ precondition BEFORE any boot, transfer, or burn.
    the Grace-Ubuntu path, the Grace Ubuntu image and any cloud-init
    config ISO) from the public NVIDIA download surface, and host it at
    {iso-uri} on your own HTTP/HTTPS server. For a remote HTTPS source
-   used by Redfish Virtual Media, confirm it allows unauthenticated
-   access, supports HTTP `HEAD`, and that the BMC has the server
-   certificate in its truststore using the BMC's documented
-   certificate-store query. If trust cannot be verified, stop before
+   used by Redfish Virtual Media, confirm the BMC can reach it and
+   trusts its certificate. If trust cannot be verified, stop before
    transfer; do not improvise certificate-install commands.
 3. **Pick the install method.** Per the install-method table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
-   UEFI HTTP Boot (recommended — fewest moving parts), PXE Boot (when
-   you already have DHCP+TFTP or need a custom `bf.cfg`), or Redfish
-   Virtual Media (fully out-of-band; needs a recent dpu-bmc version).
-   For Virtual Media, read the installed dpu-bmc version from the
-   documented Redfish/BMC inventory surface and compare it with the
-   minimum in the current public BF4 deployment guide. If either value
-   is unavailable, do not use Virtual Media; choose UEFI HTTP Boot or
-   PXE when one fits. If Virtual Media is mandatory, stop and escalate
-   the missing version evidence rather than assuming support.
-   The choice feeds [`## run`](#run). If local BMC-eMMC Virtual Media
-   is selected, preflight the combined local payload and stop if it
-   exceeds 5 GB. For Grace Ubuntu, also record that the BMC-facing
-   URIs must be exactly `image.iso` and `config.iso`.
+   UEFI HTTP Boot (no DHCP/TFTP needed), PXE Boot (when you already
+   have DHCP+TFTP or need a custom `bf.cfg`), Redfish Virtual Media
+   (fully out-of-band; needs Virtual Media support in the installed
+   BMC firmware), or the DOCA Management Service install path (DOCA
+   3.5+, ISO and/or PLDM through the DPU BMC). For Virtual Media,
+   confirm support from the BMC's Redfish inventory first; if it
+   cannot be confirmed, choose UEFI HTTP Boot or PXE when one fits,
+   and if Virtual Media is mandatory, stop and escalate rather than
+   assuming support. The choice feeds [`## run`](#run). If local
+   BMC-eMMC Virtual Media is selected, confirm the payload fits the
+   BMC storage before transfer.
 4. **Capture the target versions.** Read the target bundle-ISO build,
-   NIC firmware level, and SBIOS / ERoT / BMC component versions from
+   NIC firmware level, and platform component versions from
    the **public BlueField/DOCA release notes** (route via
    `doca-public-knowledge-map/SKILL.md`).
    Do NOT quote a pre-release firmware version from memory; record the
@@ -123,7 +119,7 @@ change**, and any change to firmware *configuration* leaves this verb:
    verification sweep — re-walk [`## run`](#run) then
    [`## test`](#test).
 3. **A change to the cloud-init seed is a fresh Grace-Ubuntu install.**
-   Editing the CIDATA seed means re-attaching `config.iso` and
+   Editing the CIDATA seed means re-attaching the seed and
    re-installing; re-walk
    [`### grace-ubuntu-cloud-init`](#grace-ubuntu-cloud-init).
 4. **Modifying a workload's source belongs elsewhere.** Source changes
@@ -153,15 +149,14 @@ mutations.
 
 ### method-a-uefi-http-boot
 
-The recommended OS-install method — no PXE / DHCP / TFTP needed.
+OS install without PXE / DHCP / TFTP.
 
 1. Host the bundle ISO at {iso-uri} on your HTTP server.
 2. Reach the DPU OOB console via BMC SSH + `obmc-console-client`.
 3. Reboot Grace and enter UEFI.
-4. Go Device Manager -> Network Device List -> select the OOB MAC ->
-   HTTP Boot Configuration -> set the Boot URI to {iso-uri} -> save.
-5. Go Boot Manager -> select the UEFI HTTP entry -> boot the
-   installer.
+4. In the UEFI setup, set the HTTP boot URI of the OOB network
+   device to {iso-uri} and save.
+5. Boot the UEFI HTTP entry to start the installer.
 6. Watch the install on the OOB console; then do the shared
    post-install in [`### post-install`](#post-install).
 
@@ -172,17 +167,18 @@ Use when you already have PXE infrastructure or need a custom `bf.cfg`.
 1. Stand up / confirm a PXE server: DHCP + TFTP + the ISO.
 2. Reach the DPU OOB console via BMC SSH + `obmc-console-client`.
 3. In Boot Manager, set next boot to the OOB IPv4 net device.
-4. Select the DOCA arm64 menu, then the ISO, and boot the installer.
+4. Select the installer entry for the ISO and boot it.
 5. Watch the install on the OOB console; then do
    [`### post-install`](#post-install).
 
 ### method-c-redfish-virtual-media
 
-Fully out-of-band; needs a recent dpu-bmc version. No physical access.
+Fully out-of-band; needs Virtual Media support in the installed BMC
+firmware. No physical access.
 
-1. If uploading to local BMC eMMC, verify the combined local payload
-   is no more than 5 GB; otherwise stop and use remote hosting. Then
-   show the exact upload and blast radius, obtain confirmation for
+1. If uploading to local BMC eMMC, confirm the payload fits the BMC
+   storage; otherwise stop and use remote hosting. Then show the
+   exact upload and blast radius, obtain confirmation for
    this upload, and use the Redfish SimpleUpdate API.
 2. Attach it via Redfish VirtualMedia; Grace then sees USB
    mass-storage devices. Confirm the media reports `"Inserted": true`.
@@ -193,7 +189,8 @@ Fully out-of-band; needs a recent dpu-bmc version. No physical access.
 
 ### pldm-firmware-update
 
-Update BMC / NIC firmware / SBIOS / ERoT via PLDM over Redfish. Every
+Update the BMC, NIC firmware and the other platform components the
+PLDM package lists, via PLDM over Redfish. Every
 step here is MUTATING — `doca-hardware-safety` is loaded ALONGSIDE.
 
 1. **NIC firmware from the host (only when explicitly required).**
@@ -237,16 +234,14 @@ Redfish Virtual Media.
 1. **Prepare the cloud-init seed (optional).** Build the seed as an
    ISO with volume label `CIDATA`.
 2. **Choose hosting and preflight it.** Local — calculate the image
-   plus seed size before transfer and proceed only when it is no more
-   than 5 GB combined on BMC eMMC. Remote — host on an HTTPS server that allows
-   unauthenticated access and supports HTTP `HEAD`, with the server
-   certificate in the BMC truststore.
+   plus seed size before transfer and proceed only when it fits the
+   BMC eMMC. Remote — host on an HTTPS server the BMC can reach and
+   whose certificate it trusts.
 3. **Transfer + attach.** For each action, show the exact transfer or
    attach and blast radius and obtain action-specific confirmation;
    then transfer via Redfish SimpleUpdate and attach via Redfish
-   VirtualMedia. The URIs are fixed to `image.iso` and
-   `config.iso` — original filenames do not matter. Confirm
-   `"Inserted": true`.
+   VirtualMedia. Confirm `"Inserted": true` for both the image and
+   the seed.
 4. **Boot.** Show and separately confirm the boot-state change and
    reset with their blast radii. Set BootSourceOverride to USB and
    reset Grace, OR
@@ -322,17 +317,16 @@ taxonomy` only lists the layers.
 1. **Boot-source layer.** ISO never starts: UEFI HTTP Boot cannot
    fetch the Boot URI, the PXE menu never appears, or the Virtual
    Media device is absent from the Boot Manager. Confirm {iso-uri} is
-   reachable from the OOB network and serves the ISO; confirm the OOB
-   MAC matches the Network Device List entry; (Method C) confirm the
+   reachable from the OOB network and serves the ISO; confirm the HTTP
+   boot entry belongs to the OOB network device; (Method C) confirm the
    media was attached before the reset. Evidence: the OOB console via
    `obmc-console-client`.
 2. **Virtual-media-attach layer.** InsertMedia fails or
    `"Inserted": false`; Grace sees no USB mass-storage device. Check
-   the dpu-bmc version supports Redfish Virtual Media; confirm the
+   the BMC firmware supports Redfish Virtual Media; confirm the
    SimpleUpdate transfer completed (Method C local) or that the remote
-   HTTPS source allows unauthenticated access, supports HTTP `HEAD`,
-   and has its certificate in the BMC truststore; confirm the combined
-   local payload is within 5 GB.
+   HTTPS source is reachable from the BMC and its certificate is
+   trusted; confirm the local payload fits the BMC storage.
 3. **Firmware-Task layer.** The multipart `POST` was accepted but the
    Task stays Running, ends with an Exception, or stalls
    `PercentComplete`. Read the Task `Messages`; verify the `.fwpkg`
@@ -353,8 +347,8 @@ taxonomy` only lists the layers.
    the approved action.
 5. **Cloud-init layer (Grace-Ubuntu).** The OS installed but the
    cloud-init seed did not apply: confirm the seed ISO volume label is
-   exactly `CIDATA` and that both `image.iso` and `config.iso` were
-   attached under their fixed URIs.
+   exactly `CIDATA` and that both the image and the seed were
+   attached.
 6. **Boot-loop layer.** Grace re-enters the installer / Virtual Media
    on every reset: the install media was never detached. Detach all
    virtual media, confirm `"Inserted": false`, and clear / re-point

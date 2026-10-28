@@ -10,7 +10,7 @@ Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the 
 
 Each verb below describes the **shape of the workflow**, not a copy-paste recipe. The agent's job is to walk the user through the steps in order, verifying preconditions before recommending the next call.
 
-This skill scopes itself to **cross-cutting debug** — the ladder every library shares and every per-library `## debug` redirects to. Three of the seven lint-required task verbs (`## build`, `## modify`, `## run`) describe their own substance in `doca-programming-guide/SKILL.md`; the anchors here exist for lint compliance and route there. The verbs this skill *owns* are `## configure` (debug-env setup), `## test` (capture a reproducible state), and `## debug` (the canonical layered ladder, including the *Where to ask for help* escalation).
+This skill scopes itself to **cross-cutting debug** — the ladder every library shares and every per-library `## debug` redirects to. Three of the seven task verbs (`## build`, `## modify`, `## run`) describe their own substance in `doca-programming-guide/SKILL.md`; the anchors here route there. The verbs this skill *owns* are `## configure` (debug-env setup), `## test` (capture a reproducible state), and `## debug` (the canonical layered ladder, including the *Where to ask for help* escalation).
 
 ## configure
 
@@ -34,7 +34,7 @@ The anti-pattern to refuse: silently raising the log level in the user's persist
 
 ## build
 
-> **Anchor exists for lint compliance.** Substantive build content for cross-cutting debug (build flags that aid debugging — `-g`, `-O0`, `-DDOCA_ALLOW_EXPERIMENTAL_API`, the `doca-<library>-trace` `pkg-config` module) lives at `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`). Read that section directly. The trace flavor specifically is documented in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`).
+> **Routing anchor.** Substantive build content for cross-cutting debug (build flags that aid debugging — `-g`, `-O0`, `-DDOCA_ALLOW_EXPERIMENTAL_API`, the `doca-<library>-trace` `pkg-config` module) lives at `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`). Read that section directly. The trace flavor specifically is documented in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`).
 
 Debug-specific build overlay (a CLASS of build mutations, not a recipe
 — each row applies to every DOCA library, not just one):
@@ -54,7 +54,7 @@ library skill; this overlay names only the cross-cutting changes.
 
 ## modify
 
-> **Anchor exists for lint compliance.** Substantive *modify* content (the universal "derive a custom first app from a shipped sample" workflow, the canonical sample-edit pattern) lives at `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`). The debug-specific overlay — *adding diagnostics to a sample without rewriting it* — is captured under that section as a special case (instrument the sample's lifecycle calls, log the `doca_error_t` from each, capture state at the moment of failure). The agent should walk the user through `doca-programming-guide ## modify` and emphasize the diagnostics overlay rather than re-deriving the workflow here.
+> **Routing anchor.** Substantive *modify* content (the universal "derive a custom first app from a shipped sample" workflow, the canonical sample-edit pattern) lives at `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`). The debug-specific overlay — *adding diagnostics to a sample without rewriting it* — is captured under that section as a special case (instrument the sample's lifecycle calls, log the `doca_error_t` from each, capture state at the moment of failure). The agent should walk the user through `doca-programming-guide ## modify` and emphasize the diagnostics overlay rather than re-deriving the workflow here.
 
 Debug-specific modify overlay (a CLASS of sample mutations — the rows
 apply when the user is using a shipped sample as the carrier for a
@@ -76,7 +76,7 @@ not generative.
 
 ## run
 
-> **Anchor exists for lint compliance.** Substantive *run* content (how to run a built DOCA program: env vars, command-line conventions, the program-side observability the program is expected to emit) lives at `doca-programming-guide ## run` (`doca-programming-guide/TASKS.md#run`). The debug-specific runtime overlay — *capture stdout, stderr, and the system's view of the program in parallel; reproduce the symptom on the smallest possible scope first* — is the *test* and *debug* verbs below.
+> **Routing anchor.** Substantive *run* content (how to run a built DOCA program: env vars, command-line conventions, the program-side observability the program is expected to emit) lives at `doca-programming-guide ## run` (`doca-programming-guide/TASKS.md#run`). The debug-specific runtime overlay — *capture stdout, stderr, and the system's view of the program in parallel; reproduce the symptom on the smallest possible scope first* — is the *test* and *debug* verbs below.
 
 Debug-specific run overlay (a CLASS, not a recipe — the rows apply to
 every DOCA program, not just one library):
@@ -295,5 +295,5 @@ This skill cross-cuts every library; it does not own library-specific debug, env
 - **Library-internal debug overlays** (Flow pipe trace, RDMA queue-pair stats, Comch channel statistics, GPUNetIO CUDA-side debugging) — owned by the matching library skill's `## debug`. This skill provides the cross-cutting ladder; library skills overlay their library-specific debug on top.
 - **Env-class debug prerequisites** (install verification, `pkg-config` setup, hugepages, devlink visibility, kernel-module presence) — owned by `doca-setup ## debug` (`doca-setup/TASKS.md#debug`). Layers 1–4 of this skill's ladder cross-link there for the env-side details; the ladder summary stays here for the cross-cutting flow.
 - **Program-class error interpretation** (the `DOCA_ERROR_*` taxonomy, `doca_error_get_descr()` use, lifecycle-order debugging) — owned by `doca-programming-guide ## debug` (`doca-programming-guide/TASKS.md#debug`) and `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`). Layers 5–6 of this skill's ladder cross-link there for the taxonomy; the ladder shape stays here.
-- **Performance debugging** (latency tail analysis, throughput regression, jitter characterization) — DOCA performance profiling is a separate problem class that needs its own tooling (`doca-bench`, library-specific perf counters). This skill's ladder is *correctness-debug*; performance-debug is deferred to a future round, with `doca-bench` and per-library inspector tools as the entry points.
+- **Performance debugging** (latency tail analysis, throughput regression, jitter characterization) — DOCA performance profiling is a separate problem class that needs its own tooling (`doca-bench`, library-specific perf counters). This skill's ladder is *correctness-debug*; performance-debug is out of scope here, with `doca-bench` and per-library inspector tools as the entry points.
 - **Production incident response** (SRE-style root-cause analysis under time pressure, on-call escalation) — this skill ladder is for development-time and bug-investigation debug; incident response has its own discipline (timeline reconstruction, blast-radius assessment, comms) that is out of scope here.

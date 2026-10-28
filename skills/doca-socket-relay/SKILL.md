@@ -18,7 +18,7 @@ description: >
   for the comch programming API, line-rate raw packet I/O via doca-eth,
   and DOCA install/bring-up — those belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
   doca_version: "3.5"
   tags:

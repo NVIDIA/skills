@@ -108,7 +108,7 @@ Steps the agent should walk the user through:
    `doca_urom_worker_set_max_inflight_tasks`, and start it with
    `doca_ctx_start(doca_urom_worker_as_ctx(worker))`. A host
    driving UROM toward more than one BlueField needs one Service
-   (with its Workers) per target BlueField, not a *"global"* one,
+   (with its Workers) per target BlueField, not a *“global”* one,
    per the per-BlueField rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
    Both the Service and the Worker are standard DOCA Core context
@@ -202,7 +202,7 @@ handles modify — the agent walks the user through the diff
 line-by-line against the sample source they read on disk, and
 has the user paste back the result for validation.
 
-The agent's anti-pattern alert: a *"clean rewrite"* from
+The agent's anti-pattern alert: a *“clean rewrite”* from
 scratch is almost always slower to first green than a
 minimum-diff modify on a shipped UROM sample, and removes the
 user's ability to bisect against a known-good baseline.
@@ -241,8 +241,8 @@ Steps the agent should walk the user through:
    with enqueues.** Completion events for enqueued operations
    flow through the DOCA progress engine; a host that
    enqueues and then blocks without progressing the PE will
-   see no completions and conclude *"the offload is broken"*
-   incorrectly. This is the cross-library *"PE not progressed"*
+   see no completions and conclude *“the offload is broken”*
+   incorrectly. This is the cross-library *“PE not progressed”*
    failure mode applied to UROM.
 5. **Observe at least one completion before scaling.**
    Confirm the first enqueue's completion event fires on the
@@ -254,7 +254,7 @@ Steps the agent should walk the user through:
    never fires*.
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
-underlie *"the program built but does nothing"*, see
+underlie *“the program built but does nothing”*, see
 `doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
@@ -475,8 +475,7 @@ so the agent does not invent guidance:
   documentation reachable through
   `doca-public-knowledge-map/SKILL.md`.
 - **rollback.** Coordinated rollback of UROM-using HPC
-  applications across multiple nodes — out of scope for Phase
-  1 and reserved for a future platform skill. For a single
+  applications across multiple nodes — out of scope for this skill. For a single
   in-session UROM configuration rollback, the right verb in
   this skill is stopping each Worker context, destroying every
   Worker with `doca_urom_worker_destroy`, stopping the Service
@@ -500,13 +499,13 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env --json`
    for version + devices + libraries + drivers + hugepages in one
    shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+   `version-matrix.json` for *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the
-   row. Report *"falling back to manual chain"*.
+   row. Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
@@ -516,14 +515,14 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-urom` | `## configure` step 2; `## build` minimum-version slot | What is the build-time DOCA UROM host-side library version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). Surface this version ALONGSIDE the DPU-side UROM Service version per the paired-contract rule |
-| `pkg-config --cflags --libs doca-urom` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-urom` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `doca_caps --list-devs` | `## configure` step 2; `## configure` step 4 | Which DOCA devices does the host see, and which map to BlueFields that could be running the UROM Service? | One entry per `doca_dev` with the BlueField identity and per-library capability flags. No entry for the intended BlueField = `doca_dev` enumeration is failing; route to `doca-setup/SKILL.md` BEFORE any UROM-layer diagnosis |
 | `doca_caps --version` | `## configure` step 2; `## test` step 4 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca-urom`. Disagreement = partial install per `doca-version/SKILL.md` |
 | `ls /opt/mellanox/doca/samples/doca_urom/` | `## modify` slot 1 | Which UROM samples ship in this install, and which is the closest starting point? | A list of sample subdirectories named after the operation family / HPC pattern they demonstrate; the per-sample `meson.build` shows the canonical build wiring |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 2; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
 | (route via `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`)) DPU-side UROM Service health / version check | `## configure` step 1; `## run` step 1; `## debug` layer 5 | Is the DOCA UROM Service deployed and running on the BlueField the host is offloading to, and at what version? | The public *DOCA UROM Service* guide documents the exact health-check shape; the agent's job is to NAME the existence of the service-side check and route the user there, NOT to redefine it. This is the load-bearing precondition the agent MUST verify on the FIRST `DOCA_ERROR_NOT_PERMITTED` from `doca_urom_*` |
-| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last UROM call? | Empty or recent benign messages. Repeated mlx5 / IB errors → RDMA substrate bug; route to `doca-rdma TASKS.md ## debug` (`doca-rdma/TASKS.md#debug`) and to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
-| `ibv_devinfo` (sudo) | `## configure` step 3; `## debug` layer 7 | What does the underlying `libibverbs` see for the BlueField port carrying the UROM offload traffic? | One device row with `state: PORT_ACTIVE` and a sane MTU. A down port = UROM cannot offload; fix at the substrate layer per `doca-rdma/SKILL.md` BEFORE any UROM-layer diagnosis |
+| `dmesg \| tail -n 40` (requires sudo) | `## debug` layer 7 | What did the kernel / driver log around the last UROM call? | Empty or recent benign messages. Repeated mlx5 / IB errors → RDMA substrate bug; route to `doca-rdma TASKS.md ## debug` (`doca-rdma/TASKS.md#debug`) and to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
+| `ibv_devinfo` (requires sudo) | `## configure` step 3; `## debug` layer 7 | What does the underlying `libibverbs` see for the BlueField port carrying the UROM offload traffic? | One device row with `state: PORT_ACTIVE` and a sane MTU. A down port = UROM cannot offload; fix at the substrate layer per `doca-rdma/SKILL.md` BEFORE any UROM-layer diagnosis |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing host-side UROM call? | A trace-level line on every host-side lifecycle transition and every enqueue. Silence after `doca_ctx_start()` = either host PE not progressed OR DPU-side service queue stuck — reach for the service-side observability next |
 
 For commands shared across libraries (`pkg-config --modversion`,

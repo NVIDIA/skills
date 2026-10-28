@@ -22,9 +22,9 @@ deployment.
 ## Pattern overview
 
 > **Non-goals (externally-productized NVIDIA services not in the
-> DOCA monorepo):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
-> Service (DTS, as productized), and any future external NVIDIA
-> networking software not under `doca/services/`. A user asking
+> DOCA SDK):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
+> Service (DTS, as productized), and any other NVIDIA networking
+> software that is not a DOCA SDK service. A user asking
 > *"how do I deploy BlueMan?"* (or any of the others) is routed to
 > the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for that
 > specific product, NOT silently extrapolated from this skill's
@@ -67,7 +67,7 @@ Two cross-cutting rules that apply to *every* pattern above:
   counter for UROM service), and the paired-workload contract.
   The agent's job is to walk the shared runtime here, then route
   to the per-service skill for the overlay. Flow-Inspector and
-  OS-Inspector are policy-excluded; route those requests through
+  OS-Inspector are outside this bundle's scope; route those requests through
   `doca-public-knowledge-map/SKILL.md`.
 
 ## Capabilities and modes

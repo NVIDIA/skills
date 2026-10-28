@@ -17,7 +17,7 @@ description: >
   / reboot step to doca-hardware-safety, and public-docs or sunset routing
   to doca-public-knowledge-map.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

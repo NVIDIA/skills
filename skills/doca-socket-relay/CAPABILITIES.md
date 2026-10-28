@@ -81,7 +81,7 @@ flag back to the user.
 | Axis | What it picks | Why the agent must name it |
 | --- | --- | --- |
 | 1. Deployment shape | How and where the relay process runs — *in-process* (linked or co-resident next to the host application), *sidecar* (a separate process / container next to the application on the same host), or *container* (a service container on the BlueField via the documented kubelet-standalone runtime). | Each shape has a different precondition surface (host-OS permissions for in-process; lifecycle coupling for sidecar; image-pull + static-pod + per-service config mount per `doca-container-deployment CAPABILITIES.md ## Capabilities and modes` (`doca-container-deployment/CAPABILITIES.md#capabilities-and-modes`) for the container shape). An answer that picks one shape without naming the alternatives has silently narrowed the relay to a single use case. |
-| 2. Socket type / protocol on the host leg | The shipped `doca_socket_relay` binary uses AF_UNIX (Unix Domain Sockets, SOCK_STREAM) on its host leg — the listener and acceptor threads in the shipped binary are all AF_UNIX, and the relay's `-s/--socket` argument is a filesystem path, not an IP/port pair. The DPU-network leg is the DOCA Comch transport (`-n/--cc-name` selects the named Comch service). If the public DOCA Socket Relay guide on the user's installed version adds TCP / UDP / etc. variants in a later release, the agent verifies that on the user's `--help` output before quoting any non-AF_UNIX behavior — it does not invent transport modes the shipped binary does not support. | Treating the relay as protocol-agnostic and quoting TCP / UDP debug rules against a UDS-only binary is a category error: framing, error semantics, file-descriptor permissions, and peer-credential propagation are AF_UNIX-shaped, not socket-API-generic. |
+| 2. Socket type / protocol on the host leg | The shipped `doca_socket_relay` binary uses AF_UNIX (Unix Domain Sockets, SOCK_STREAM) on its host leg per the public guide, and the relay's `-s/--socket` argument is a filesystem path, not an IP/port pair. The DPU-network leg is the DOCA Comch transport (`-n/--cc-name` selects the named Comch service). If the public DOCA Socket Relay guide on the user's installed version adds TCP / UDP / etc. variants in a later release, the agent verifies that on the user's `--help` output before quoting any non-AF_UNIX behavior — it does not invent transport modes the shipped binary does not support. | Treating the relay as protocol-agnostic and quoting TCP / UDP debug rules against a UDS-only binary is a category error: framing, error semantics, file-descriptor permissions, and peer-credential propagation are AF_UNIX-shaped, not socket-API-generic. |
 | 3. Forwarding endpoint | Where on the DPU side the relay forwards traffic to — the DPU-side terminator (the relay's far half, a DPU-side service, or a documented service container on the BlueField that re-presents the bytes to the DPU peer). | This is the most consequential axis for safety: a *correct* host-side bind with a *wrong* forwarding endpoint produces a relay that the host application can connect to but whose bytes go to the wrong place (or nowhere). The agent's diagnosis ladder in [`## Error taxonomy`](#error-taxonomy) treats forwarding-endpoint misconfiguration as its own layer for that reason. |
 
 The three axes are **independent**; an in-process AF_UNIX relay
@@ -263,9 +263,9 @@ Three primary signals the agent should reach for:
   via the standard DOCA argp surface (`--help`, `--json-config`,
   `--sdk-log-level`, `--log-level` are inherited from DOCA argp),
   and its visibility into "what is the relay actually doing" is
-  delivered via **DOCA logger output** (`DOCA_LOG_REGISTER`-driven
-  category `SOCKET_RELAY`) controlled by `--sdk-log-level` and
-  `DOCA_LOG_LEVEL`, NOT via a dedicated `--list-channels` /
+  delivered via **DOCA logger output** controlled by `-l/--log-level`
+  (numeric, e.g. 50=INFO, 60=DEBUG; `--sdk-log-level` only raises DOCA
+  library internals), NOT via a dedicated `--list-channels` /
   `--list-connections` flag — those flags do NOT exist in the
   shipped binary as of DOCA 3.5. For the container deployment shape,
   ENTRYPOINT log per

@@ -17,7 +17,7 @@ description: >
   Refuse and route elsewhere for the comch programming API, library
   install, protocol design, channel reset, or general orientation.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
   doca_version: "3.5"
   tags:

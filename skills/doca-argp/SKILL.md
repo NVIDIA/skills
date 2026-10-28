@@ -18,7 +18,7 @@ description: >
   variadic-flag / subcommand / shell-completion features, DOCA Core
   context, or DOCA Log internals.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
