@@ -2210,42 +2210,42 @@
       "name": "pva-build-test",
       "path": "skills/pva-build-test",
       "content_digest": "sha256:201538a4b8725e5e65dddca7de2a129d97833d6d8741d556e38c92ed6e88f8ab",
-      "last_commit": "aec4a470169f8900a7ec35f957f65a661743c943",
+      "last_commit": "08f4f298e80884546361646b488920a9a7db855f",
       "last_modified": "2026-10-27"
     },
     {
       "name": "pva-debug",
       "path": "skills/pva-debug",
       "content_digest": "sha256:c809d3174ee97772b444f0ba8a4bb10d083aea368319da28695a9d301dd59cf3",
-      "last_commit": "aec4a470169f8900a7ec35f957f65a661743c943",
+      "last_commit": "08f4f298e80884546361646b488920a9a7db855f",
       "last_modified": "2026-10-27"
     },
     {
       "name": "pva-doctor",
       "path": "skills/pva-doctor",
       "content_digest": "sha256:dda41b04b73a22523f0190a778144601456ae400d60c8d58fd75bc6b3257243e",
-      "last_commit": "aec4a470169f8900a7ec35f957f65a661743c943",
+      "last_commit": "08f4f298e80884546361646b488920a9a7db855f",
       "last_modified": "2026-10-27"
     },
     {
       "name": "pva-opgen",
       "path": "skills/pva-opgen",
       "content_digest": "sha256:1f078911793ea50ed26a7d313080515136c17c4eaaea4dd8940cfe560b45c5d1",
-      "last_commit": "aec4a470169f8900a7ec35f957f65a661743c943",
+      "last_commit": "08f4f298e80884546361646b488920a9a7db855f",
       "last_modified": "2026-10-27"
     },
     {
       "name": "pva-setup",
       "path": "skills/pva-setup",
       "content_digest": "sha256:33f7a6d0a316ffeb0f2aed5c49eb8e33bba0f2dbaee3b34b9cc60e370b24ab75",
-      "last_commit": "aec4a470169f8900a7ec35f957f65a661743c943",
+      "last_commit": "08f4f298e80884546361646b488920a9a7db855f",
       "last_modified": "2026-10-27"
     },
     {
       "name": "pva-spec",
       "path": "skills/pva-spec",
       "content_digest": "sha256:1be38acb4cf6d65727c48e25739e39c38cdfde58b5bb1a91ecf151cb93352672",
-      "last_commit": "aec4a470169f8900a7ec35f957f65a661743c943",
+      "last_commit": "08f4f298e80884546361646b488920a9a7db855f",
       "last_modified": "2026-10-27"
     },
     {
