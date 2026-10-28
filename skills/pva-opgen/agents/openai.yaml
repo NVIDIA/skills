@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "PVA OpGen"
+  short_description: "Generate and verify a vectorized PVA operator"
+  default_prompt: "Use $pva-opgen with these Spec outputs to generate a vectorized PVA operator, run Build-Test, and debug concrete failures."

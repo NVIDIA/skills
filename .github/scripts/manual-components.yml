@@ -24,3 +24,12 @@ components:
       - omniverse-usd-performance-tuning
       - physical-ai-infrastructure-setup-and-resilient-scaling
       - physical-ai-neural-reconstruction
+  - name: PVA SDK
+    description: Skills for PVA SDK setup, diagnostics, development, building, testing, and debugging.
+    catalog_dirs:
+      - pva-build-test
+      - pva-debug
+      - pva-doctor
+      - pva-opgen
+      - pva-setup
+      - pva-spec

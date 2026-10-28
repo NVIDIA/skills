@@ -1,0 +1,122 @@
+{
+  "schema_version": 5,
+  "html": {
+    "article_class": "bd-article",
+    "exclude": []
+  },
+  "guides": [
+    {
+      "id": "orin",
+      "title": "Orin PVA VPU Programmer's Guide",
+      "file_name": "Orin_PVA_VPU_Programmers_Guide.pdf",
+      "document_id": "SWE-PVA-076-PGRF",
+      "chapters": [
+        {"chapter": 1, "title": "Introduction", "file": "01-introduction.md"},
+        {"chapter": 2, "title": "Architecture Overview", "file": "02-architecture-overview.md"},
+        {"chapter": 3, "title": "VPU Core", "file": "03-vpu-core.md"},
+        {"chapter": 4, "title": "VPU Instruction Cache", "file": "04-instruction-cache.md"},
+        {"chapter": 5, "title": "VPU Vector Memory (VMEM)", "file": "05-vector-memory-vmem.md"},
+        {"chapter": 6, "title": "VPU Instruction Set Architecture", "file": "06-instruction-set-architecture.md"},
+        {"chapter": 7, "title": "Decoupled Lookup Unit (DLUT)", "file": "07-dlut.md"},
+        {"chapter": 8, "title": "Programming Examples", "file": "08-programming-examples.md"},
+        {"chapter": 9, "title": "Instruction Set Reference", "file": "09-instruction-set-reference.md"},
+        {"chapter": 10, "title": "Decoupled Lookup Unit Reference", "file": "10-dlut-reference.md"},
+        {"chapter": 11, "title": "Register Spec", "file": "11-register-spec.md"},
+        {"chapter": 12, "title": "General Purpose Input/Output", "file": "12-gpio.md"},
+        {"chapter": 13, "title": "Design for Test and Safety", "file": "13-design-for-test-and-safety.md"}
+      ]
+    },
+    {
+      "id": "thor",
+      "title": "Thor PVA VPU Programmer's Guide",
+      "file_name": "Thor_PVA_VPU_Programmers_Guide.pdf",
+      "document_id": "SWE-PVA-077-PGRF",
+      "chapters": [
+        {"chapter": 1, "title": "Introduction", "file": "01-introduction.md"},
+        {"chapter": 2, "title": "Architecture Overview", "file": "02-architecture-overview.md"},
+        {"chapter": 3, "title": "VPU Core", "file": "03-vpu-core.md"},
+        {"chapter": 4, "title": "VPU Instruction Cache", "file": "04-instruction-cache.md"},
+        {"chapter": 5, "title": "VPU Vector Memory (VMEM)", "file": "05-vector-memory-vmem.md"},
+        {"chapter": 6, "title": "VPU Instruction Set Architecture", "file": "06-instruction-set-architecture.md"},
+        {"chapter": 7, "title": "Decoupled Lookup Unit (DLUT)", "file": "07-dlut.md"},
+        {"chapter": 8, "title": "Programming Examples", "file": "08-programming-examples.md"},
+        {"chapter": 9, "title": "Instruction Set Reference", "file": "09-instruction-set-reference.md"},
+        {"chapter": 10, "title": "Decoupled Lookup Unit Reference", "file": "10-dlut-reference.md"},
+        {"chapter": 11, "title": "Register Spec", "file": "11-register-spec.md"},
+        {"chapter": 12, "title": "General Purpose Input/Output", "file": "12-gpio.md"},
+        {"chapter": 13, "title": "Design for Test and Safety", "file": "13-design-for-test-and-safety.md"}
+      ]
+    }
+  ],
+  "skill_routes": {
+    "pva-doctor": {
+      "html_patterns": [
+        "installation.html",
+        "release-notes.html",
+        "build-system.html",
+        "vpu-compiler.html",
+        "nvvpu/*.html",
+        "sdk-samples.html",
+        "deploy.html",
+        "vpu-allowlist.html",
+        "dev-tools.html",
+        "dev-tools/*.html"
+      ],
+      "search_terms": ["installation", "toolchain", "compiler", "L4T", "emulator", "license"],
+      "guide_chapters": [1, 2]
+    },
+    "pva-spec": {
+      "html_patterns": [
+        "index.html",
+        "architecture.html",
+        "dma-details.html",
+        "tutorial/*.html",
+        "pva_sdk_apis/*.html"
+      ],
+      "search_terms": ["format", "pitch", "border", "dataflow", "RasterDataFlow", "DMA", "API"],
+      "guide_chapters": [2, 5, 6, 7]
+    },
+    "pva-opgen": {
+      "html_patterns": [
+        "index.html",
+        "architecture.html",
+        "build-system.html",
+        "dma-details.html",
+        "sdk-samples.html",
+        "tutorial/*.html",
+        "pva_sdk_apis/*.html"
+      ],
+      "search_terms": ["cuPVA", "VPU", "intrinsic", "vector", "DMA", "VMEM", "dataflow", "sample"],
+      "guide_chapters": [3, 5, 6, 8, 9]
+    },
+    "pva-build-test": {
+      "html_patterns": [
+        "installation.html",
+        "release-notes.html",
+        "build-system.html",
+        "vpu-compiler.html",
+        "deploy.html",
+        "vpu-allowlist.html",
+        "debug-tools/*.html",
+        "dev-tools/*.html",
+        "tutorial/profiling-tools.html",
+        "tutorial/vpu-debugging.html"
+      ],
+      "search_terms": ["system test", "KPI", "profiling", "L4T", "allowlist"],
+      "guide_chapters": [8, 9]
+    },
+    "pva-debug": {
+      "html_patterns": [
+        "build-system.html",
+        "vpu-compiler.html",
+        "vpu-allowlist.html",
+        "debug-tools/*.html",
+        "dev-tools/*.html",
+        "tutorial/*.html",
+        "pva_sdk_apis/*.html"
+      ],
+      "search_terms": ["error", "debug", "assert", "status", "lifecycle", "pitch", "synchronization"],
+      "guide_chapters": [2, 5, 6, 9, 13]
+    }
+  }
+}

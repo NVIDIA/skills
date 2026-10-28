@@ -1,0 +1,63 @@
+{
+  "skill_name": "pva-build-test",
+  "evals": [
+    {
+      "id": "build-test-missing-inputs",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use pva-build-test for a PVA operator with correctness-only scope. SDK 2.10.0~rc3, GEN2, NVVPU, L4T; EMU is optional. Work directory: /workspace/build-check. The source project, Doctor report, test matrix, and board connection details have not been supplied. Do not guess them or ask questions. Report readiness to run.",
+      "expected_skill": "pva-build-test",
+      "expected_script": null,
+      "expected_output": "BLOCKED with the missing required inputs named. No build or hardware test is claimed to have run.",
+      "assertions": [
+        "Identifies the missing project, Doctor report, matrix, and target details.",
+        "Returns BLOCKED rather than PASSED or a demonstrated implementation FAILED verdict.",
+        "Does not invent commands, exit codes, board access, or test results.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": []
+    },
+    {
+      "id": "build-test-emu-is-not-hardware",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. I have an old EMU log in /workspace/input/emu-only/emu.log for a PVA operator. It is the only evidence available; no current source, Doctor report, matrix, or board is supplied. Use pva-build-test to determine whether this proves current L4T hardware correctness. Use /workspace/emu-review as the report work directory. Do not ask questions or invent missing inputs.",
+      "expected_skill": "pva-build-test",
+      "expected_script": null,
+      "expected_output": "BLOCKED: the old emulation log cannot establish current-source L4T hardware correctness. Missing inputs and hardware evidence are stated explicitly.",
+      "assertions": [
+        "Does not treat the EMU log as current hardware evidence.",
+        "Does not infer a current source identity from the old log.",
+        "Reports the required missing inputs and does not return PASSED.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/emu-only"
+      ]
+    },
+    {
+      "id": "build-test-unverified-corpus",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use pva-build-test to check whether verification can start with /workspace/input/unverified/doctor-report.md. The report is the only supplied input and says SDK references were not verified. Target SDK is 2.10.0~rc3, GEN2, NVVPU, L4T; scope is correctness-only. Work directory: /workspace/unverified-build. Do not fabricate inputs, run Doctor, or ask questions.",
+      "expected_skill": "pva-build-test",
+      "expected_script": null,
+      "expected_output": "BLOCKED because a verified SDK corpus is missing, along with other absent build inputs. A LIMITATION entry is not accepted as public-reference-corpus PASS.",
+      "assertions": [
+        "Identifies the unverified SDK reference corpus as a blocker.",
+        "Does not invent a corpus path or verified lock hash.",
+        "Does not build, deploy, or claim passing tests.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/unverified"
+      ]
+    },
+    {
+      "id": "build-test-negative",
+      "prompt": "Explain what a compiler does. Give a short conceptual answer without running commands or testing software.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "A short compiler explanation without invoking PVA verification.",
+      "assertions": [
+        "Answers the conceptual question.",
+        "Does not invoke pva-build-test or run build/test commands."
+      ],
+      "files": []
+    }
+  ]
+}

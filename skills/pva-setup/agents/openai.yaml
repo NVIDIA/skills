@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "PVA Setup"
+  short_description: "Set up the PVA SDK, NVVPU, and L4T runtime"
+  default_prompt: "Use $pva-setup to prepare my PVA development host and L4T target from Doctor's findings."
