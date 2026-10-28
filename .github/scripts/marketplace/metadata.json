@@ -961,18 +961,6 @@
       }
     },
     {
-      "path": "skills/doca-bench-extension",
-      "name": "doca-bench-extension",
-      "description": "Use this skill when the operator is authoring, building, loading, or debugging a custom doca-bench plug-in — a versioned shared library with DOCA_EXPERIMENTAL-marked C entry points that doca-bench loads to measure a workload class its built-in modes do not cover, with doca_bench_cuda as the shipped reference exemplar. Trigger even when the user does not say \"doca-bench-extension\" or \"doca_bench_cuda\" — typical implicit phrasings include \"no built-in doca-bench mode fits my workload\", \"how do I benchmark a CUDA GPUNetIO RX/TX kernel\", \"doca-bench cannot find or load my custom .so\", \"extension exported symbols do not match what the parent expects\", \"soversion mismatch after a DOCA upgrade\", or \"my GPU kernel hangs because stop_flag was never set\". Refuse and route elsewhere for questions about which built-in doca-bench mode to pick, DOCA GPUNetIO programming semantics, CUDA toolkit installation, or contributor work on in-tree extensions — those belong to other skills.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "developer_tools",
-        "catalog.subdomain": "networking",
-        "audience": "platform_engineer,developer,application_developer",
-        "discovery.activity_tags": "benchmark,extend,debug,integrate,package"
-      }
-    },
-    {
       "path": "skills/doca-bf3-deployment",
       "name": "doca-bf3-deployment",
       "description": "Use this skill for BlueField-3 (BF3) day-1 platform bring-up via the classic RShim/BFB path: pushing a BlueField bundle (BFB) to the DPU over RShim with bfb-install from the host, the host-to-DPU TMFIFO management channel (tmfifo_net0, the 192.168.100.x convention), RShim daemon state and console-over-rshim, DPU mode selection (DPU/embedded-function vs separated-host/NIC mode) via mlxconfig, post-BFB recovery, a six-state BlueField-state classifier, and verifying the install (cat /etc/mlnx-release plus version checks). Trigger even when the user does not say \"BF3\" — typical phrasings include {push a BFB to my BlueField-3}, {bfb-install exited 0 but the DPU never came back}, {ping 192.168.100.2 works but ssh fails}, or {is DOCA on the host or the Arm side?}. BFB reflash, mlxconfig set, mode changes, and firmware burns are destructive: require explicit target-bound confirmation and load doca-hardware-safety. App launch, container deploy, env install, and the BF4 BMC-Redfish path route elsewhere.\n",
@@ -987,7 +975,7 @@
     {
       "path": "skills/doca-bf4-deployment",
       "name": "doca-bf4-deployment",
-      "description": "WARNING: guides IRREVERSIBLE BlueField-4 hardware operations (PLDM firmware burns, ISO reflashes, power cycles, BMC factory resets); every mutating step is governed by doca-hardware-safety (window, rollback). BlueField-4 only: BlueField-3 bring-up is doca-bf3-deployment. Use this skill for BlueField-4 (BF4) day-1 platform bring-up from the BMC: installing the BlueField/DOCA bundle ISO onto the DPU (Grace, the Arm complex) over UEFI HTTP Boot, PXE, or Redfish Virtual Media; the PLDM firmware-update flow (BMC, NIC firmware, SBIOS, ERoT) via the Redfish UpdateService and pldmtool; and a Grace Ubuntu image with optional cloud-init. Trigger on BlueField-4/BF4 bring-up phrasings even without \"BF4\": {bring up my new BlueField-4}, {the BlueField ISO will not boot over HTTP from the BMC}, {attach BF4 virtual media via Redfish}, {BF4 firmware Task stuck at Running}, {prepare a BlueField-4 host: platform support, version alignment, safest first smoke test}. Route application launch and library APIs to other skills.\n",
+      "description": "WARNING: guides IRREVERSIBLE BlueField-4 hardware operations (PLDM firmware burns, ISO reflashes, power cycles, BMC factory resets); every mutating step is governed by doca-hardware-safety (window, rollback). BlueField-4 only: BlueField-3 bring-up is doca-bf3-deployment. Use this skill for BlueField-4 (BF4) day-1 platform bring-up from the BMC: installing the BlueField/DOCA bundle ISO onto the DPU (Grace, the Arm complex) over UEFI HTTP Boot, PXE, or Redfish Virtual Media; the PLDM platform-firmware update via the Redfish UpdateService and pldmtool; and a Grace Ubuntu image with optional cloud-init. Trigger on BlueField-4/BF4 bring-up phrasings even without \"BF4\": {bring up my new BlueField-4}, {the BlueField ISO will not boot over HTTP from the BMC}, {attach BF4 virtual media via Redfish}, {BF4 firmware Task stuck at Running}, {prepare a BlueField-4 host: platform support, version alignment, safest first smoke test}. Route application launch and library APIs to other skills.\n",
       "metadata": {
         "product.primary": "DOCA",
         "classification.category.primary": "infrastructure",
@@ -1107,7 +1095,7 @@
     {
       "path": "skills/doca-dms",
       "name": "doca-dms",
-      "description": "Operate NVIDIA DOCA Management Service on a BlueField, Arm/x86 host, or Kubernetes pod: from DOCA 3.5 the local `dms-cli` (one command per YANG path, no server), and the `dmsd` + `dmspe` service: choose deployment and authentication, configure `-allowed_users` and `dmsgroup`, use gNMI Get/Set/Subscribe, run supported gNOI workflows, and debug frontend/backend failures. Trigger even without \"DMS\" for \"manage a remote BlueField over gRPC\", \"gNOI reboot from orchestrator\", or fleet-management requests. SAFETY: reboot, OS install, factory-reset, and managed-file deletion are destructive and require target-bound explicit confirmation; never invoke them speculatively. Route installation and library/API build questions elsewhere, and route turnkey aggregation to the externally-productized DOCA Telemetry Service.\n",
+      "description": "Operate NVIDIA DOCA Management Service on a BlueField, Arm/x86 host, or Kubernetes pod: from DOCA 3.5 the local `dms-cli` (one command per YANG path, no server), and the `dmsd` + `dmspe` service: choose deployment and authentication, configure `-allowed_users` and `dmsgroup`, use gNMI Get/Set, run supported gNOI workflows, and debug frontend/backend failures. Trigger even without \"DMS\" for \"manage a remote BlueField over gRPC\", \"gNOI reboot from orchestrator\", or fleet-management requests. SAFETY: reboot, OS install, factory-reset, and managed-file deletion are destructive and require target-bound explicit confirmation; never invoke them speculatively. Route installation and library/API build questions elsewhere, and route telemetry streaming and aggregation to doca-dts (DOCA Telemetry Service).\n",
       "metadata": {
         "product.primary": "DOCA",
         "classification.category.primary": "infrastructure",
@@ -1138,6 +1126,18 @@
         "catalog.subdomain": "networking",
         "audience": "application_developer,developer,platform_engineer",
         "discovery.activity_tags": "integrate,debug,configure,troubleshoot,convert"
+      }
+    },
+    {
+      "path": "skills/doca-dts",
+      "name": "doca-dts",
+      "description": "Deploy and configure the NVIDIA DOCA Telemetry Service (DTS) as it is actually run: (A) BlueField (built-in static pod), (B) Host (docker) on x86_64 / aarch64, or (C) DPF (DPUService / helm chart) — plus the shared configuration layer (`dts_config.ini`, providers, exporters, level labels) that all three share. The user's DEPLOYMENT TYPE decides everything; pick it first. Trigger even without \"DTS\" for \"prometheus on the DPU shows nothing on 9100\", \"telemetry container exits right after start\", \"add ethtool counters to the telemetry DPUService\", \"how do I upgrade the built-in telemetry on BlueField\", or \"level labels per rack/pod\". Refuse and route elsewhere for installing DOCA itself, the `doca_telemetry` / `doca_telemetry_exporter` library API, installing the DPF cluster, Grafana / Prometheus server setup or dashboard / PromQL authoring, and BFB / BSP imaging — those belong to other skills or to external products.\n",
+      "metadata": {
+        "product.primary": "DOCA",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "networking",
+        "audience": "platform_engineer,devops_engineer,it_operations,developer",
+        "discovery.activity_tags": "deploy,configure,troubleshoot,monitor,operate"
       }
     },
     {
@@ -1189,21 +1189,9 @@
       }
     },
     {
-      "path": "skills/doca-flow-perf",
-      "name": "doca-flow-perf",
-      "description": "Use this skill when the user measures control-plane insertion throughput of DOCA Flow with the doca_flow_perf binary on x86 host or Arm cores — selecting a configs/ JSON policy, weighing the DPDK-versus-DOCA backend, running the smoke iteration then the eval loop, interpreting CPU cycles plus num_pushed / num_failed, or capturing the four-tuple (DOCA release, firmware, JSON policy, worker config) that makes an insertion figure defensible. Also load it for implied asks like \"5-tuple hairpin insert figure\", \"flow-perf result mismatches release notes\", \"DPDK-vs-DOCA comparison\", or \"install variance too high\". Refuse and route to the proper owner for live-app optimization (doca-flow-tune), wire throughput or latency, or library-internal pipe semantics.\n",
-      "metadata": {
-        "product.primary": "DOCA",
-        "classification.category.primary": "infrastructure",
-        "catalog.subdomain": "networking",
-        "audience": "platform_engineer,developer,devops_engineer,solutions_architect,application_developer",
-        "discovery.activity_tags": "benchmark,measure,profile,compare,validate"
-      }
-    },
-    {
       "path": "skills/doca-flow-tune",
       "name": "doca-flow-tune",
-      "description": "Use this skill when the user is tuning a live or captured `doca-flow` pipeline with `doca_flow_tune` — snapshotting pipe / counter / KPI state, picking a tuning axis (rule placement, resource hints / table sizing, HW-offload mode) and a matching measurement (rule-install rate, lookup latency, hardware-counter delta), running offline or online (read-only or state-changing) modes, reading the dumper CSV / analyze JSON / visualize mermaid, or applying a recommendation back into the Flow program. Trigger even when the user does not explicitly mention \"doca_flow_tune\" — typical implicit phrasings include \"Flow rule-install rate is low on BlueField\", \"table sizing looks wrong for this pipe\", \"tune visualize step is empty\", \"before/after counters don't move\", or \"which doca-flow knob does this recommendation hit\". Refuse and route elsewhere for measuring baseline numbers (doca-flow-perf), writing the doca-flow application, DOCA install, or streaming Flow telemetry — those belong to other skills.\n",
+      "description": "Use this skill when the user is tuning a live or captured `doca-flow` pipeline with `doca_flow_tune` — snapshotting pipe / counter / KPI state, picking a tuning axis (rule placement, resource hints / table sizing, HW-offload mode) and a matching measurement (rule-install rate, lookup latency, hardware-counter delta), running offline or online (read-only or state-changing) modes, reading the dumper CSV / analyze JSON / visualize mermaid, or applying a recommendation back into the Flow program. Trigger even when the user does not explicitly mention \"doca_flow_tune\" — typical implicit phrasings include \"Flow rule-install rate is low on BlueField\", \"table sizing looks wrong for this pipe\", \"tune visualize step is empty\", \"before/after counters don't move\", or \"which doca-flow knob does this recommendation hit\". Refuse and route elsewhere for writing the doca-flow application, DOCA install, or streaming Flow telemetry — those belong to other skills.\n",
       "metadata": {
         "product.primary": "DOCA",
         "classification.category.primary": "infrastructure",
@@ -1249,6 +1237,18 @@
       }
     },
     {
+      "path": "skills/doca-ngauge",
+      "name": "doca-ngauge",
+      "description": "Use this skill when the operator is driving the DOCA ngauge tool to analyze, visualize, and debug network performance on a single node by probing NIC hardware counters and storing collected data in HDF5 format. Trigger even when the user does not say \"DOCA ngauge\" — implicit phrasings include \"probe NIC hardware counters\", \"collect HDF5 performance data\", \"plot ngauge output\", \"sample counters on BlueField/ConnectX\", \"measure network performance on a single node\", \"debug network performance with hardware counters\", \"run ngauge YAML config\", \"parse ngauge HDF5 output\". Refuse and route elsewhere: DOCA install/bring-up to doca-setup, version questions to doca-version, hardware/firmware state changes to doca-hardware-safety, raw packet I/O to doca-eth, and host-DPU messaging to doca-comch.\n",
+      "metadata": {
+        "product.primary": "DOCA",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "networking",
+        "audience": "platform_engineer,devops_engineer,it_operations,developer,solutions_architect",
+        "discovery.activity_tags": "measure,monitor,debug,profile,troubleshoot"
+      }
+    },
+    {
       "path": "skills/doca-pcc",
       "name": "doca-pcc",
       "description": "Use this skill when the user is doing hands-on host-side DOCA PCC work to load a CUSTOM Programmable Congestion Control algorithm onto a BlueField DPU — creating per-port `doca_pcc` contexts, loading a `dpacc`-compiled `doca_pcc_app` onto the `doca_dev` for the RoCE-bearing port, parameterizing it, walking triple-axis capability discovery (DOCA cap-query + DPA-capable BlueField + firmware custom-PCC slot enabled), or debugging `DOCA_ERROR_*` from `doca_pcc_*`. Trigger even without explicit \"DOCA PCC\" phrasing — implicit forms include \"loading my own congestion control onto a BF port\", \"DOCA_ERROR_NOT_PERMITTED on algorithm load\", \"DOCA_ERROR_DRIVER when I attach my custom algorithm\", \"my custom rate-update isn't affecting RoCE traffic\", or \"load succeeds but no on-wire change\". Refuse and route elsewhere for DPA-side algorithm-body design, the `pcc_counters` CLI, default factory PCC in ConnectX firmware, or setting up the RDMA / RoCE traffic — those belong to other skills.\n",
@@ -1273,15 +1273,27 @@
       }
     },
     {
-      "path": "skills/doca-pcc-ztr-rttcc-algo",
-      "name": "doca-pcc-ztr-rttcc-algo",
-      "description": "DOCA-shipped Zero-Touch RoCE RTT congestion control (ZTR RTTCC) reference algorithm on a BlueField-3 DPA: deploy, tune and evaluate doca_pcc_dev_ztr_rttcc_algo through the shipped DOCA PCC sample. Trigger on \"my RoCE-v2 flows aren't being throttled\", \"PCC sample isn't dispatching to my algo\", \"set-params returns fail\", \"algorithm loaded but counters are flat\", \"how do I pick the multipath PCC variant\", or \"do I need a custom CC algorithm on BF3\", even without naming ZTR RTTCC. Your own algorithm through the host library belongs to doca-pcc; the doca_spcx_cc command line to doca-spcx-cc. Covers picking a variant (vanilla / PM / RX-rate / multipath / window-probeless) at DPACC build time, tuning host-set parameters, and DOCA_PCC_DEV_STATUS_FAIL from the algorithm. Refuse and route elsewhere for writing a custom PCC algorithm from scratch, read-only PCC counter inspection, or firmware-only pre-Programmable PCC.\n",
+      "path": "skills/doca-perftest",
+      "name": "doca-perftest",
+      "description": "Use this skill when the user is running DOCA Perftest (doca_perftest), the RDMA benchmark that measures bandwidth, message rate and latency for RDMA verbs, point-to-point or across a cluster, with an optional DOCA Verbs backend (-r dv) or GPUNetIO engine (--engine gpunetio). Trigger even when the user does not say \"DOCA Perftest\" — implicit phrasings include \"how do I benchmark RDMA write bandwidth with DOCA\", \"run ib_write_bw but across 8 nodes\", \"perftest says the device is busy\", \"my latency numbers differ between client and server\", \"launch the server over SSH\", or \"run an all-to-all RDMA test from a JSON scenario\". Refuse and route elsewhere for DOCA install (doca-setup), DOCA Bench (doca-bench), and application-level throughput.\n",
       "metadata": {
         "product.primary": "DOCA",
         "classification.category.primary": "infrastructure",
         "catalog.subdomain": "networking",
-        "audience": "platform_engineer,developer,hands_on_builder,devops_engineer,it_operations",
-        "discovery.activity_tags": "deploy,configure,optimize,troubleshoot,evaluate"
+        "audience": "platform_engineer,devops_engineer,it_operations,developer,hpc_developer",
+        "discovery.activity_tags": "benchmark,measure,troubleshoot,debug,configure"
+      }
+    },
+    {
+      "path": "skills/doca-pipeline-language-developer-tools",
+      "name": "doca-pipeline-language-developer-tools",
+      "description": "Use this skill when the operator is driving the DOCA Pipeline Language (DPL) Developer Tools to inspect or debug DPL programs on a BlueField DPU — DPL Nspect for runtime state such as tables, keys, and counters, DPL Debugger for packet flow, DPL Admin for dynamic configuration changes in the DPL Runtime Daemon, P4 Runtime Shell as a P4Runtime control plane manager, or DPL Runtime Controller SDK for custom P4Runtime applications and DPL shared memory APIs. Trigger even when the user does not explicitly mention \"DPL Developer Tools\" — implicit phrasings include \"inspect the DPL tables on the DPU\", \"why can't I start a DPL debug session\", \"change a dpl_rtd configuration item without restarting\", \"build my own P4Runtime app for DPL\", or \"visualize packet flow through my DPL program\". Refuse and route elsewhere: authoring, compiling and deploying DPL programs to the DOCA Pipeline Language Service Guide, DOCA install/bring-up to doca-setup, and hardware or firmware state changes to doca-hardware-safety.\n",
+      "metadata": {
+        "product.primary": "DOCA",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "networking",
+        "audience": "developer,platform_engineer,devops_engineer,application_developer",
+        "discovery.activity_tags": "debug,inspect,configure,troubleshoot,operate"
       }
     },
     {
@@ -1383,7 +1395,7 @@
     {
       "path": "skills/doca-spcx-cc",
       "name": "doca-spcx-cc",
-      "description": "Use this skill when the user is invoking `doca_spcx_cc` (the host-side CLI under /opt/mellanox/doca/tools/) to load, parameterize, start, observe, or stop a Programmable Congestion Control (SPCX) algorithm on a BlueField with a DPA processor against a live RDMA / RoCE fabric, or picking SPCX vs the established `doca-pcc` surface. Trigger even when the user does not say \"DOCA SPCX\" or \"doca_spcx_cc\" — typical implicit phrasings include \"I want to write a custom RTT-based CC algorithm for my RoCE fabric\", \"my SPCX session loaded but throughput / latency didn't change\", \"doca_pcc status shows Active but factory CC seems to still be in charge\", \"DOCA_PCC_PS_ERROR on start\", \"is the programmable-CC surface available on my install\", or \"DPA-side algorithm image won't load\". Refuse and route elsewhere for DPA-side algorithm authoring detail, factory PCC firmware configuration, read-only PCC counter inspection, raw DPA cycle profiling, RDMA library programming, or general DOCA install — those belong to other skills.\n",
+      "description": "Use this skill when the user is invoking `doca_spcx_cc` (the host-side CLI under /opt/mellanox/doca/tools/) to load, parameterize, start, observe, or stop an SPC-X congestion-control algorithm on a BlueField with a DPA processor against a live RDMA / RoCE fabric, or picking SPCX vs the established `doca-pcc` surface. Trigger even when the user does not say \"DOCA SPCX\" or \"doca_spcx_cc\" — typical implicit phrasings include \"I want to write a custom RTT-based CC algorithm for my RoCE fabric\", \"my SPCX session loaded but throughput / latency didn't change\", \"doca_pcc status shows Active but factory CC seems to still be in charge\", \"DOCA_PCC_PS_ERROR on start\", \"is the programmable-CC surface available on my install\", or \"DPA-side algorithm image won't load\". Refuse and route elsewhere for DPA-side algorithm authoring detail, factory PCC firmware configuration, read-only PCC counter inspection, raw DPA cycle profiling, RDMA library programming, or general DOCA install — those belong to other skills.\n",
       "metadata": {
         "product.primary": "DOCA",
         "classification.category.primary": "infrastructure",
@@ -1438,6 +1450,18 @@
         "catalog.subdomain": "networking",
         "audience": "application_developer,developer,platform_engineer,hands_on_builder",
         "discovery.activity_tags": "debug,integrate,configure,monitor,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/doca-telemetry-traceback-application",
+      "name": "doca-telemetry-traceback-application",
+      "description": "Use this skill when the operator is driving the DOCA Telemetry Traceback application to monitor telemetry data locally on a BlueField DPU or ConnectX NIC, detect long-term trends and threshold breaches with user-defined rules, and capture pre-event history plus active-event data to a log file. Trigger even when the user does not explicitly mention \"DOCA Telemetry Traceback\" — typical implicit phrasings include \"monitor telemetry trends on the DPU without streaming all raw data\", \"log the samples before and after a threshold breach\", \"set up a rule that triggers when rx bytes/s exceeds 1M\", \"differential greater than rule on a data ID\", \"circular buffer of telemetry samples\", or \"traceback event log\". Refuse and route elsewhere: the DOCA Telemetry Diag programming API and raw counter reads to doca-telemetry, DOCA install/bring-up to doca-setup, and version questions to doca-version.\n",
+      "metadata": {
+        "product.primary": "DOCA",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "networking",
+        "audience": "production_operator,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "monitor,configure,troubleshoot,debug,operate"
       }
     },
     {
