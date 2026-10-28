@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 95.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 68.0% → 100.0% (+32.0 points) | 56.0% → 100.0% (+44.0 points) |
-| Discoverability | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 91.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 63.7% → 100.0% (+36.3 points) | 51.2% → 100.0% (+48.8 points) |
-| Efficiency | 85.7% — baseline ran, but no comparable score was available; uplift unavailable | 87.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 68.0% → 100.0% (+32.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Discoverability | 98.8% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 63.7% → 100.0% (+36.3 points) | 63.7% → 100.0% (+36.3 points) |
+| Efficiency | 83.4% — baseline ran, but no comparable score was available; uplift unavailable | 87.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.8% → 96.5% (-1.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 97.9% → 96.4% (-1.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 92.1% → 91.2% (-0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 92.3% → 90.9% (-1.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,19 +80,19 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 698,251 | 619,383 | +78,868 | +12.73% | skill 5/5; base 5/5 |
-| claude-code | setup-driveos-out-of-scope | 74,369 | 70,618 | +3,751 | +5.31% | skill 1/1; base 1/1 |
-| claude-code | setup-missing-installation-source | 198,804 | 184,634 | +14,170 | +7.67% | skill 1/1; base 1/1 |
-| claude-code | setup-negative | 35,283 | 35,198 | +85 | +0.24% | skill 1/1; base 1/1 |
-| claude-code | setup-release-mismatch-plan | 194,084 | 182,472 | +11,612 | +6.36% | skill 1/1; base 1/1 |
-| claude-code | setup-solutions-default-source-plan | 195,711 | 146,461 | +49,250 | +33.63% | skill 1/1; base 1/1 |
-| codex | All cases | 350,955 | 348,482 | +2,473 | +0.71% | skill 5/5; base 5/5 |
-| codex | setup-driveos-out-of-scope | 28,831 | 40,541 | -11,710 | -28.88% | skill 1/1; base 1/1 |
-| codex | setup-missing-installation-source | 127,350 | 89,976 | +37,374 | +41.54% | skill 1/1; base 1/1 |
-| codex | setup-negative | 13,390 | 13,320 | +70 | +0.53% | skill 1/1; base 1/1 |
-| codex | setup-release-mismatch-plan | 82,647 | 118,346 | -35,699 | -30.16% | skill 1/1; base 1/1 |
-| codex | setup-solutions-default-source-plan | 98,737 | 86,299 | +12,438 | +14.41% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,049,206 | 967,865 | +81,341 | +8.40% | skill 10/10; base 10/10 |
+| claude-code | All cases | 699,736 | 584,002 | +115,734 | +19.82% | skill 5/5; base 5/5 |
+| claude-code | setup-driveos-out-of-scope | 74,447 | 35,362 | +39,085 | +110.53% | skill 1/1; base 1/1 |
+| claude-code | setup-missing-installation-source | 239,660 | 185,209 | +54,451 | +29.40% | skill 1/1; base 1/1 |
+| claude-code | setup-negative | 35,458 | 35,240 | +218 | +0.62% | skill 1/1; base 1/1 |
+| claude-code | setup-release-mismatch-plan | 154,806 | 182,358 | -27,552 | -15.11% | skill 1/1; base 1/1 |
+| claude-code | setup-solutions-default-source-plan | 195,365 | 145,833 | +49,532 | +33.96% | skill 1/1; base 1/1 |
+| codex | All cases | 392,641 | 351,123 | +41,518 | +11.82% | skill 5/5; base 5/5 |
+| codex | setup-driveos-out-of-scope | 28,816 | 54,843 | -26,027 | -47.46% | skill 1/1; base 1/1 |
+| codex | setup-missing-installation-source | 127,666 | 88,815 | +38,851 | +43.74% | skill 1/1; base 1/1 |
+| codex | setup-negative | 13,391 | 13,320 | +71 | +0.53% | skill 1/1; base 1/1 |
+| codex | setup-release-mismatch-plan | 98,850 | 106,629 | -7,779 | -7.30% | skill 1/1; base 1/1 |
+| codex | setup-solutions-default-source-plan | 123,918 | 87,516 | +36,402 | +41.59% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,092,377 | 935,125 | +157,252 | +16.82% | skill 10/10; base 10/10 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

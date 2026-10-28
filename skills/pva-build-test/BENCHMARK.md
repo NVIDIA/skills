@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.8% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 98.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 85.0% → 100.0% (+15.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 81.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 95.0% → 100.0% (+5.0 points) | 85.0% → 100.0% (+15.0 points) |
+| Discoverability | 93.3% — baseline ran, but no comparable score was available; uplift unavailable | 81.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Effectiveness | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Efficiency | 97.2% — baseline ran, but no comparable score was available; uplift unavailable | 94.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Efficiency | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 94.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 94.5% (-3.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 94.8% (-3.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 92.6% → 89.7% (-2.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 92.5% → 89.3% (-3.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 654,368 | 473,043 | +181,325 | +38.33% | skill 4/4; base 4/4 |
-| claude-code | build-test-emu-is-not-hardware | 207,682 | 183,498 | +24,184 | +13.18% | skill 1/1; base 1/1 |
-| claude-code | build-test-missing-inputs | 206,719 | 108,208 | +98,511 | +91.04% | skill 1/1; base 1/1 |
-| claude-code | build-test-negative | 35,485 | 35,303 | +182 | +0.52% | skill 1/1; base 1/1 |
-| claude-code | build-test-unverified-corpus | 204,482 | 146,034 | +58,448 | +40.02% | skill 1/1; base 1/1 |
-| codex | All cases | 408,329 | 291,810 | +116,519 | +39.93% | skill 4/4; base 4/4 |
-| codex | build-test-emu-is-not-hardware | 160,053 | 137,586 | +22,467 | +16.33% | skill 1/1; base 1/1 |
-| codex | build-test-missing-inputs | 107,166 | 55,664 | +51,502 | +92.52% | skill 1/1; base 1/1 |
-| codex | build-test-negative | 13,291 | 13,192 | +99 | +0.75% | skill 1/1; base 1/1 |
-| codex | build-test-unverified-corpus | 127,819 | 85,368 | +42,451 | +49.73% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,062,697 | 764,853 | +297,844 | +38.94% | skill 8/8; base 8/8 |
+| claude-code | All cases | 653,417 | 473,030 | +180,387 | +38.13% | skill 4/4; base 4/4 |
+| claude-code | build-test-emu-is-not-hardware | 208,791 | 183,553 | +25,238 | +13.75% | skill 1/1; base 1/1 |
+| claude-code | build-test-missing-inputs | 205,522 | 107,944 | +97,578 | +90.40% | skill 1/1; base 1/1 |
+| claude-code | build-test-negative | 35,473 | 35,300 | +173 | +0.49% | skill 1/1; base 1/1 |
+| claude-code | build-test-unverified-corpus | 203,631 | 146,233 | +57,398 | +39.25% | skill 1/1; base 1/1 |
+| codex | All cases | 408,644 | 278,266 | +130,378 | +46.85% | skill 4/4; base 4/4 |
+| codex | build-test-emu-is-not-hardware | 133,572 | 122,645 | +10,927 | +8.91% | skill 1/1; base 1/1 |
+| codex | build-test-missing-inputs | 131,478 | 55,392 | +76,086 | +137.36% | skill 1/1; base 1/1 |
+| codex | build-test-negative | 13,318 | 13,182 | +136 | +1.03% | skill 1/1; base 1/1 |
+| codex | build-test-unverified-corpus | 130,276 | 87,047 | +43,229 | +49.66% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,062,061 | 751,296 | +310,765 | +41.36% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

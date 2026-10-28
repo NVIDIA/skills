@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 92.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Correctness | 85.0% → 100.0% (+15.0 points) | 65.0% → 95.0% (+30.0 points) |
-| Discoverability | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 82.5% → 100.0% (+17.5 points) | 70.0% → 85.0% (+15.0 points) |
-| Efficiency | 92.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 75.0% → 95.0% (+20.0 points) |
+| Discoverability | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 82.5% → 100.0% (+17.5 points) | 67.5% → 85.0% (+17.5 points) |
+| Efficiency | 90.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.6% → 96.1% (-1.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 97.2% → 95.8% (-1.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 92.6% → 91.3% (-1.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 92.3% → 91.4% (-0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 676,366 | 591,162 | +85,204 | +14.41% | skill 4/4; base 4/4 |
-| claude-code | spec-finalize-approved-contract | 238,089 | 225,721 | +12,368 | +5.48% | skill 1/1; base 1/1 |
-| claude-code | spec-missing-doctor | 159,477 | 144,371 | +15,106 | +10.46% | skill 1/1; base 1/1 |
+| claude-code | All cases | 727,189 | 718,308 | +8,881 | +1.24% | skill 4/4; base 4/4 |
+| claude-code | spec-finalize-approved-contract | 197,890 | 351,729 | -153,839 | -43.74% | skill 1/1; base 1/1 |
+| claude-code | spec-missing-doctor | 159,293 | 144,924 | +14,369 | +9.91% | skill 1/1; base 1/1 |
 | claude-code | spec-negative | 35,089 | 34,911 | +178 | +0.51% | skill 1/1; base 1/1 |
-| claude-code | spec-unresolved-contract | 243,711 | 186,159 | +57,552 | +30.92% | skill 1/1; base 1/1 |
-| codex | All cases | 287,757 | 248,502 | +39,255 | +15.80% | skill 4/4; base 4/4 |
-| codex | spec-finalize-approved-contract | 85,194 | 88,247 | -3,053 | -3.46% | skill 1/1; base 1/1 |
-| codex | spec-missing-doctor | 83,106 | 57,406 | +25,700 | +44.77% | skill 1/1; base 1/1 |
-| codex | spec-negative | 13,275 | 13,183 | +92 | +0.70% | skill 1/1; base 1/1 |
-| codex | spec-unresolved-contract | 106,182 | 89,666 | +16,516 | +18.42% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 964,123 | 839,664 | +124,459 | +14.82% | skill 8/8; base 8/8 |
+| claude-code | spec-unresolved-contract | 334,917 | 186,744 | +148,173 | +79.35% | skill 1/1; base 1/1 |
+| codex | All cases | 276,306 | 270,660 | +5,646 | +2.09% | skill 4/4; base 4/4 |
+| codex | spec-finalize-approved-contract | 83,828 | 113,072 | -29,244 | -25.86% | skill 1/1; base 1/1 |
+| codex | spec-missing-doctor | 64,225 | 55,451 | +8,774 | +15.82% | skill 1/1; base 1/1 |
+| codex | spec-negative | 13,255 | 13,183 | +72 | +0.55% | skill 1/1; base 1/1 |
+| codex | spec-unresolved-contract | 114,998 | 88,954 | +26,044 | +29.28% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,003,495 | 988,968 | +14,527 | +1.47% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
