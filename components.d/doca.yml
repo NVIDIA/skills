@@ -61,8 +61,6 @@ skills:
     catalog_dir: doca-mgmt
   - path: skills/libs/doca-pcc/
     catalog_dir: doca-pcc
-  - path: skills/libs/doca-pcc-ztr-rttcc-algo/
-    catalog_dir: doca-pcc-ztr-rttcc-algo
   - path: skills/libs/doca-rdma/
     catalog_dir: doca-rdma
   - path: skills/libs/doca-rmax/
@@ -83,30 +81,36 @@ skills:
     catalog_dir: doca-argus
   - path: skills/services/doca-dms/
     catalog_dir: doca-dms
+  - path: skills/services/doca-dts/
+    catalog_dir: doca-dts
   - path: skills/services/doca-firefly/
     catalog_dir: doca-firefly
   - path: skills/services/doca-urom-svc/
     catalog_dir: doca-urom-svc
   - path: skills/tools/doca-bench/
     catalog_dir: doca-bench
-  - path: skills/tools/doca-bench-extension/
-    catalog_dir: doca-bench-extension
   - path: skills/tools/doca-caps/
     catalog_dir: doca-caps
   - path: skills/tools/doca-comm-channel-admin/
     catalog_dir: doca-comm-channel-admin
-  - path: skills/tools/doca-flow-perf/
-    catalog_dir: doca-flow-perf
   - path: skills/tools/doca-flow-tune/
     catalog_dir: doca-flow-tune
+  - path: skills/tools/doca-ngauge/
+    catalog_dir: doca-ngauge
   - path: skills/tools/doca-pcc-counters/
     catalog_dir: doca-pcc-counters
+  - path: skills/tools/doca-perftest/
+    catalog_dir: doca-perftest
+  - path: skills/tools/doca-pipeline-language-developer-tools/
+    catalog_dir: doca-pipeline-language-developer-tools
   - path: skills/tools/doca-sha-offload-engine/
     catalog_dir: doca-sha-offload-engine
   - path: skills/tools/doca-socket-relay/
     catalog_dir: doca-socket-relay
   - path: skills/tools/doca-spcx-cc/
     catalog_dir: doca-spcx-cc
+  - path: skills/tools/doca-telemetry-traceback-application/
+    catalog_dir: doca-telemetry-traceback-application
   - path: skills/tools/doca-telemetry-utils/
     catalog_dir: doca-telemetry-utils
 links:
