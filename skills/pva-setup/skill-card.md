@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to prepare a PVA development environment, installing and configuring the PVA SDK, NVVPU compiler, and L4T target runtime on an x86-64 development host and an Arm64 Jetson Linux board based on Doctor's findings, then rerunning Doctor to confirm readiness. <br>
+Developers and engineers use this skill to prepare a PVA development environment, installing and configuring the PVA SDK, NVVPU compiler, and L4T target runtime on an x86-64 Ubuntu development host and an Arm64 Jetson Linux board based on Doctor's findings, then rerunning Doctor to confirm readiness. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -67,15 +67,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.7% — baseline ran, but no comparable score was available; uplift unavailable | 95.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 95.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 68.0% → 100.0% (+32.0 points) | 56.0% → 100.0% (+44.0 points) |
-| Discoverability | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 91.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 63.7% → 100.0% (+36.3 points) | 51.2% → 100.0% (+48.8 points) |
-| Efficiency | 85.7% — baseline ran, but no comparable score was available; uplift unavailable | 87.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 68.0% → 100.0% (+32.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Discoverability | 98.8% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 63.7% → 100.0% (+36.3 points) | 63.7% → 100.0% (+36.3 points) |
+| Efficiency | 83.4% — baseline ran, but no comparable score was available; uplift unavailable | 87.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-2975dc7 (source: git SHA, committed 2026-10-28) <br>
+ef85bda (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
