@@ -3637,6 +3637,18 @@
       }
     },
     {
+      "path": "skills/omniverse-content-services",
+      "name": "omniverse-content-services",
+      "description": "Omniverse Content Services, also discoverable as Omniverse Content Workspace or USD Content Workspace. Use for USD content collaboration as well as content access. Guide USD workflows on existing infrastructure, USD content versioning, 3D creation pipelines, and data access across distributed and scale-out compute. Use for manufacturing, automotive, factory and digital-twin workflows, architecture and construction, media and 3D content, robotics, fleet simulation, and physical AI content delivery. Discover requirements and route to ovstorage, ovpackage, ovlive, usd-content-workspace, and usd-caches experts.",
+      "metadata": {
+        "product.primary": "Omniverse",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "digital-twins",
+        "audience": "solutions_architect,application_developer,simulation_engineer,platform_engineer,developer",
+        "discovery.activity_tags": "integrate,configure,orchestrate,assess,deploy"
+      }
+    },
+    {
       "path": "skills/omniverse-realtime-viewer",
       "name": "omniverse-realtime-viewer",
       "description": "Use as the top-level router for Omniverse Realtime Viewer USD app requests and focused viewer reference documents.",

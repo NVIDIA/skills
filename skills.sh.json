@@ -251,6 +251,13 @@
       ]
     },
     {
+      "title": "Digital Twins",
+      "description": "Build, simulate, connect, and operate digital representations of physical systems, environments, factories, and assets.",
+      "skills": [
+        "omniverse-content-services"
+      ]
+    },
+    {
       "title": "Data Science",
       "description": "Prepare, analyze, explore, and model data for AI and accelerated analytics workflows that are not specific to one training, inference, or agent task.",
       "skills": [
