@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "PVA Doctor"
+  short_description: "Check public PVA development requirements"
+  default_prompt: "Use $pva-doctor to check whether this host is ready for my requested NVIDIA PVA work."
