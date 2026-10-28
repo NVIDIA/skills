@@ -20,6 +20,7 @@ components:
       - isaac-humanoid-cloud-control
       - isaac-mission-control-showcase
       - omniverse-cad-to-simready
+      - omniverse-content-services
       - omniverse-realtime-viewer
       - omniverse-usd-performance-tuning
       - physical-ai-infrastructure-setup-and-resilient-scaling
