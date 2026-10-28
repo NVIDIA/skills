@@ -3,10 +3,12 @@
 
 name: Run:ai
 repo: dsx-ai-factory/run-ai
-description: Diagnose failed Run:ai workloads and summarize workload health through the Run:ai MCP server.
+description: Diagnose failed Run:ai workloads, summarize workload health, and find idle GPU capacity through the Run:ai MCP server.
 ref: main
 skills:
   - path: skills/runai-diagnose-failed-workload/
     catalog_dir: runai-diagnose-failed-workload
   - path: skills/runai-get-workload-health-summary/
     catalog_dir: runai-get-workload-health-summary
+  - path: skills/runai-get-utilization-overview/
+    catalog_dir: runai-get-utilization-overview
