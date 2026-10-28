@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "PVA Debug"
+  short_description: "Diagnose and repair focused PVA failures"
+  default_prompt: "Use $pva-debug to reproduce, diagnose, and narrowly repair this recorded OpGen failure."

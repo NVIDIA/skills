@@ -1,0 +1,9 @@
+# Temporary AE1 exception for PVA skills MR !3.
+# Context: https://nvidia.slack.com/archives/C08GC28NBAS/p1789040586702479
+# Remove after the SkillSpector fix and a clean scan without this baseline.
+version: 2
+rules:
+  - id: AE1
+    path: SKILL.md
+    message: "SKILL.md (partial)"
+    reason: "Temporary exception: runtime file references mark readable SKILL.md partial; awaiting SkillSpector fix."

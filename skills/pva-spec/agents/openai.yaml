@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "PVA Spec"
+  short_description: "Create a public-source PVA operator contract"
+  default_prompt: "Use $pva-spec with this Doctor report to create validated JSON for a PVA operator specification, test matrix, evidence manifest, and deterministic OpGen inputs."
