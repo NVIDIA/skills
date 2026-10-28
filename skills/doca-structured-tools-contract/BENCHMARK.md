@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-structured-tools-contract`
-- Evaluation date: 2026-10-21
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-10-28
+- Evaluator version: `1.6.2`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:82695ce3d4c672d09e4623d3003c4c9e5072053ed44721848acd4e0c62cfd09f` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| doca-structured-tools-contract | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+
+- Controls for `doca-structured-tools-contract`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.5% — baseline ran, but no comparable score was available; uplift unavailable | 93.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 75.0% (-25.0 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 65.8% → 92.5% (+26.7 points) | 83.1% → 98.1% (+15.0 points) |
-| Efficiency | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.9% — baseline ran, but no comparable score was available; uplift unavailable | 89.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 60.0% → 95.0% (+35.0 points) | 75.0% → 95.0% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 52.1% → 81.3% (+29.2 points) | 50.0% → 87.5% (+37.5 points) |
+| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 71.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,32 +63,43 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 96.0% (-2.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 83.8% → 89.7% (+5.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 860,374 | 868,401 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-structured-tools-contract.explicit-positive.v1 | 105,894 | 213,273 | -107,379 | -50.35% | skill 1/1; base 1/1 |
-| claude-code | doca-structured-tools-contract.implicit-positive.v1 | 241,057 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-structured-tools-contract.implicit-positive.v2 | N/A | 128,165 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-structured-tools-contract.negative.v1 | 513,423 | 526,963 | -13,540 | -2.57% | skill 1/1; base 1/1 |
-| codex | All cases | 789,324 | 492,163 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-structured-tools-contract.explicit-positive.v1 | 48,894 | 66,510 | -17,616 | -26.49% | skill 1/1; base 1/1 |
-| codex | doca-structured-tools-contract.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-structured-tools-contract.implicit-positive.v2 | 96,071 | 76,599 | +19,472 | +25.42% | skill 1/1; base 1/1 |
-| codex | doca-structured-tools-contract.negative.v1 | 644,359 | 349,054 | +295,305 | +84.60% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,649,698 | 1,360,564 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 503,720 | 255,426 | +248,294 | +97.21% | skill 4/4; base 4/4 |
+| claude-code | doca-structured-tools-contract.explicit-positive.v1 | 119,259 | 36,753 | +82,506 | +224.49% | skill 1/1; base 1/1 |
+| claude-code | doca-structured-tools-contract.implicit-positive.v1 | 119,245 | 38,456 | +80,789 | +210.08% | skill 1/1; base 1/1 |
+| claude-code | doca-structured-tools-contract.implicit-positive.v2 | 118,766 | 72,473 | +46,293 | +63.88% | skill 1/1; base 1/1 |
+| claude-code | doca-structured-tools-contract.negative.v1 | 146,450 | 107,744 | +38,706 | +35.92% | skill 1/1; base 1/1 |
+| codex | All cases | 220,211 | 231,861 | -11,650 | -5.02% | skill 4/4; base 4/4 |
+| codex | doca-structured-tools-contract.explicit-positive.v1 | 73,348 | 131,226 | -57,878 | -44.11% | skill 1/1; base 1/1 |
+| codex | doca-structured-tools-contract.implicit-positive.v1 | 77,580 | 39,658 | +37,922 | +95.62% | skill 1/1; base 1/1 |
+| codex | doca-structured-tools-contract.implicit-positive.v2 | 55,676 | 47,654 | +8,022 | +16.83% | skill 1/1; base 1/1 |
+| codex | doca-structured-tools-contract.negative.v1 | 13,607 | 13,323 | +284 | +2.13% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 723,931 | 487,287 | +236,644 | +48.56% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,12 +107,14 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found within SKILL.md:
+  "## Ground rules for any agent using this skill" in SKILL.md (lines 40-73)
+  vs "## The agent behavior contract" in SKILL.md (lines 74-111) (`SKILL.md:40`)
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/doca-structured-tools-contract/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/doca-structured-tools-contract/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/doca-structured-tools-contract/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/doca-structured-tools-contract/SKILL.md`)
-- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/doca-structured-tools-contract/SKILL.md`)
-- 10 additional finding(s) are available in the full evaluation artifacts.
+- 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
@@ -118,6 +146,7 @@ Signals present in this run:
 - `accuracy` (Accuracy): final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): whether the user's goal was achieved.
 - `behavior_check` (Behavior Check): whether the expected workflow behavior was followed.
+- `token_efficiency` (Token Efficiency): actual uncached prompt plus completion usage (50% of Efficiency).
 
 </details>
 

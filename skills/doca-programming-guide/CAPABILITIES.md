@@ -9,7 +9,7 @@ Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the 
 
 This file describes the **shape every DOCA program shares** — the architecture every library plugs into, the lifecycle every library follows, the error pattern every library returns, the observability surface every library emits into, and the safety rules every program must respect. Library-specific overlays live in the matching library skill.
 
-> Lint note: this file references `/opt/mellanox/doca` and `docs.nvidia.com` paths several times. The lint warns about that for most library skills and asks for cross-links to `doca-public-knowledge-map` instead. For `doca-programming-guide` specifically the references are *intrinsic*: the skill's whole job is to describe how a DOCA program is shaped on disk and on the wire, and the canonical install tree (`/opt/mellanox/doca`) plus the canonical docs tree (`docs.nvidia.com/doca/sdk/`) are the two coordinate systems every prescription is anchored against. The repeated paths are intentional; do not refactor them out.
+> Note: this file references `/opt/mellanox/doca` and `docs.nvidia.com` paths several times on purpose — the canonical install tree and the canonical docs tree are the two coordinate systems every prescription is anchored against.
 
 ## Pattern overview
 
@@ -34,8 +34,7 @@ Two principles cut across all five:
   …). Both must be loaded for a complete answer.
 - **Programs run *with* DOCA, not *of* DOCA.** Everything below
   assumes the user is calling `doca_*` from their own code. Patches
-  to DOCA itself are out of scope and belong in the DOCA contributor
-  repo, not this bundle.
+  to DOCA itself are out of scope for this bundle.
 
 ## Capabilities and modes
 

@@ -368,8 +368,7 @@ the agent does not invent guidance:
   for the collector side (DTS). This skill is publisher-side
   only.
 - **deploy.** Deploying telemetry-emitting applications at scale
-  across many hosts — out of scope and reserved for a future
-  platform skill.
+  across many hosts — out of scope for this skill.
 - **firmware burn / reset.** The exporter does not depend on
   firmware-layer state; telemetry publishing changes no hardware or
   fabric state. If the debug ladder lands on a driver-layer issue,

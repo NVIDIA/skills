@@ -14,7 +14,7 @@ description: >
   lookup (doca-public-knowledge-map), and library-internal API work
   (matching library skill).
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -99,7 +99,7 @@ skill answers the library-agnostic shape.
 - **"How should I classify and build all the shipped DOCA samples and
   applications? What's the difference between a sample and an
   application?"** — worked example: *"I tried to build all DOCA apps
-  and 20/159 failed — which ones are real regressions vs missing
+  and some failed — which ones are real regressions vs missing
   optional stacks?"* Answered by the sample-vs-application model and
   the category / dependency / skip-vs-fail taxonomy in
   ## sample-and-app-categorization,

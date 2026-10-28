@@ -59,8 +59,7 @@ state-machine and task model.
 **Two distinct, orthogonal axes — link-layer vs transport-type.**
 RDMA consists of *two connected sides* passing data between one
 another, and the bundle MUST keep the following two axes
-separate (the bundle previously conflated them — that conflation
-is a real bug):
+separate:
 
 - **Link-layer (network fabric):** the wire/physical fabric
   the connection runs over — either **InfiniBand (IB)** or

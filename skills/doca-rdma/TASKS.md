@@ -16,7 +16,7 @@ installed DOCA layout, or release notes, route through
 `doca-public-knowledge-map/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
-copy-paste recipe. The agent's job is to walk the user through the
+copy-paste recipe. The agent’s job is to walk the user through the
 steps in order, verifying preconditions before recommending the next
 call.
 
@@ -197,8 +197,7 @@ before recommending any code-level edit:
 
 The agent emits an *intent description + the five filled slots*; the
 *actual* unified diff against the sample source is produced by the
-modify-from-sample renderer (deferred to a future round on the
-maintainer roadmap). Until the renderer ships, the agent must walk
+user (this bundle has no diff renderer). The agent must walk
 the user through the diff line-by-line against the sample source
 they read on disk, and have the user paste back the result for
 validation. Modify is complete only when (1) all five slots match
@@ -420,13 +419,11 @@ does not invent guidance:
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying RDMA-using applications at scale across
   many hosts / DPUs, Kubernetes operator workflows for RDMA
-  workloads, multi-tenant RDMA isolation — out of scope for Phase 1
-  and reserved for a future platform skill. For single-host
+  workloads, multi-tenant RDMA isolation — out of scope for this skill. For single-host
   first-run testing, the right verb in this skill is `## run`; do
   not invent a "deploy" workflow.
 - **rollback.** Coordinated rollback of RDMA-using applications
-  across multiple hosts / DPUs — out of scope for Phase 1 and
-  reserved for a future platform skill. For a single in-session
+  across multiple hosts / DPUs — out of scope for this skill. For a single in-session
   RDMA configuration rollback, the right verb in this skill is
   destroying the context (`doca_ctx_stop` → `doca_ctx_destroy`) and
   re-running `## configure` with the corrected parameters; do not
@@ -455,13 +452,13 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env --json`
    for version + devices + libraries + drivers + hugepages in one
    shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+   `version-matrix.json` for *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the row.
-   Report *"falling back to manual chain"*.
+   Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC, headers-win)

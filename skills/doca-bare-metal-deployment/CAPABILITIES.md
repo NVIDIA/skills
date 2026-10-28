@@ -326,7 +326,7 @@ BSP / DOCA Platform Framework documentation for those steps.
    action each evidence pattern lattices to — is in scope and lives in
    [`TASKS.md ## bluefield-lifecycle`](TASKS.md#bluefield-lifecycle); the
    *productized framework / BSP / BFB image / firmware tooling* is out
-   of scope for this bundle's strict-1:1 monorepo alignment, but the
+   of this bundle's DOCA SDK scope, but the
    bundle's `AGENTS.md ## Non-goals #7` contract still applies: the agent
    MUST produce the three-part response shape (recognize + name boundary
    + **route with substance**). For step (c), consult the per-product

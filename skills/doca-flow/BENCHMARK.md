@@ -9,8 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-flow`
-- Evaluation date: 2026-10-24
-- Evaluator version: `1.5.6`
+- Validation status: `passed`
+- Evaluation date: 2026-10-28
+- Evaluator version: `1.6.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:032699772d08005c3ea2e3f46cfade4a93485cbd7e2b58c0414b1f0873c18a03` (skill-evaluator-dataset-snapshot/1)
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| doca-flow | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-flow | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-flow | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-flow | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-flow | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+
+- Controls for `doca-flow`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 92.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 60.0% → 95.0% (+35.0 points) |
-| Discoverability | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 53.1% → 75.6% (+22.5 points) | 57.5% → 66.3% (+8.8 points) |
-| Efficiency | 81.2% — baseline ran, but no comparable score was available; uplift unavailable | 72.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 87.5% (+37.5 points) | 62.5% → 93.8% (+31.3 points) |
+| Efficiency | 84.5% — baseline ran, but no comparable score was available; uplift unavailable | 76.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,32 +63,43 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.3% → 91.5% (-6.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 87.6% → 87.0% (-0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,138,778 | 461,582 | +677,196 | +146.71% | skill 4/4; base 4/4 |
-| claude-code | doca-flow.explicit-positive.v1 | 383,606 | 94,827 | +288,779 | +304.53% | skill 1/1; base 1/1 |
-| claude-code | doca-flow.implicit-positive.v1 | 340,346 | 122,052 | +218,294 | +178.85% | skill 1/1; base 1/1 |
-| claude-code | doca-flow.implicit-positive.v2 | 353,803 | 151,999 | +201,804 | +132.77% | skill 1/1; base 1/1 |
-| claude-code | doca-flow.negative.v1 | 61,023 | 92,704 | -31,681 | -34.17% | skill 1/1; base 1/1 |
-| codex | All cases | 375,940 | 155,765 | +220,175 | +141.35% | skill 4/4; base 4/4 |
-| codex | doca-flow.explicit-positive.v1 | 125,567 | 56,878 | +68,689 | +120.77% | skill 1/1; base 1/1 |
-| codex | doca-flow.implicit-positive.v1 | 102,161 | 26,627 | +75,534 | +283.67% | skill 1/1; base 1/1 |
-| codex | doca-flow.implicit-positive.v2 | 108,727 | 45,638 | +63,089 | +138.24% | skill 1/1; base 1/1 |
-| codex | doca-flow.negative.v1 | 39,485 | 26,622 | +12,863 | +48.32% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,514,718 | 617,347 | +897,371 | +145.36% | skill 8/8; base 8/8 |
+| claude-code | All cases | 1,056,261 | 325,358 | +730,903 | +224.65% | skill 4/4; base 4/4 |
+| claude-code | doca-flow.explicit-positive.v1 | 430,641 | 111,101 | +319,540 | +287.61% | skill 1/1; base 1/1 |
+| claude-code | doca-flow.implicit-positive.v1 | 278,756 | 72,087 | +206,669 | +286.69% | skill 1/1; base 1/1 |
+| claude-code | doca-flow.implicit-positive.v2 | 311,147 | 106,725 | +204,422 | +191.54% | skill 1/1; base 1/1 |
+| claude-code | doca-flow.negative.v1 | 35,717 | 35,445 | +272 | +0.77% | skill 1/1; base 1/1 |
+| codex | All cases | 350,660 | 127,449 | +223,211 | +175.14% | skill 4/4; base 4/4 |
+| codex | doca-flow.explicit-positive.v1 | 99,429 | 52,538 | +46,891 | +89.25% | skill 1/1; base 1/1 |
+| codex | doca-flow.implicit-positive.v1 | 98,821 | 26,423 | +72,398 | +274.00% | skill 1/1; base 1/1 |
+| codex | doca-flow.implicit-positive.v2 | 96,187 | 25,928 | +70,259 | +270.98% | skill 1/1; base 1/1 |
+| codex | doca-flow.negative.v1 | 56,223 | 22,560 | +33,663 | +149.22% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,406,921 | 452,807 | +954,114 | +210.71% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 5 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 4 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -84,11 +110,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-flow`)
 - **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-flow`)
 - **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-flow`)
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-flow`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and TASKS.md:
   "## Non-negotiable: first app is NGC pull + a shipped sample, not authored C" in SKILL.md (lines 22-54)
   vs "# DOCA Flow workflows" in TASKS.md (lines 1-36) (`SKILL.md:22`)
-- 18 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-flow/SKILL.md`)
+- 17 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

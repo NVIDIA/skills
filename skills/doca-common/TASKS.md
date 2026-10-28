@@ -3,8 +3,7 @@
 **Where to start:** The verbs run `configure → build → modify → run
 → test → debug`, with `## use` and `## log` as supplementary
 foundation verbs (the `use` verb walks the universal foundation
-skeleton; the `log` verb is the verb-side of the two-tier log model
-folded in from the historical doca-log content). The `## test` verb
+skeleton; the `log` verb is the verb-side of the two-tier log model). The `## test` verb
 is an iterative loop (cap-query cross-check → lifecycle smoke →
 PE-drive verification → loop back if any of the three findings
 mutate the configure step), not a one-shot pass.
@@ -166,9 +165,9 @@ this skill provides the doca-common-specific slot fill.
 | Pick the closest sample | Whichever sample the user is *already* modifying for their primary library. The Common foundation is identical across them; modifying the foundation of an unrelated sample is a strictly larger diff than the user needs | Per the path-selection table in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) |
 | Identify the foundation modify surface | Device pick (the `doca_devinfo_create_list` loop's filter / pick condition); buffer wiring (`doca_mmap_set_memrange`, `doca_buf_inventory_buf_get_by_args` callers); PE drive loop (`doca_pe_progress` location and cadence); log wiring (the `doca_log_register_source` call at init and the `DOCA_LOG_*` emissions across the file) | The sample's existing `*_main.c` is the carrier; the user's foundation edits are the diff |
 | Keep the lifecycle intact | Do NOT delete `doca_pe_connect_ctx` (the sample wired it; removing it is the universal "tasks submit but nothing completes" failure mode); do NOT reorder `ctx_start` before `pe_connect_ctx`; do NOT remove the `doca_ctx_get_num_inflight_tasks` drain on shutdown | Per the lifecycle order in [`CAPABILITIES.md ## ctx`](CAPABILITIES.md#ctx) and [`CAPABILITIES.md ## progress engine`](CAPABILITIES.md#progress-engine) |
-| Keep the build manifest unchanged | The sample's existing `meson.build` already wires the right `pkg-config` modules (`doca-common` at minimum); do not switch to a hand-rolled Makefile for *"simplicity"* — it removes the version-check rail | Per the build slot table in [`## build`](#build) |
+| Keep the build manifest unchanged | The sample's existing `meson.build` already wires the right `pkg-config` modules (`doca-common` at minimum); do not switch to a hand-rolled Makefile for *“simplicity”* — it removes the version-check rail | Per the build slot table in [`## build`](#build) |
 
-The agent's anti-pattern alert: a *"clean rewrite"* that swaps the
+The agent's anti-pattern alert: a *“clean rewrite”* that swaps the
 sample's foundation wiring for hand-rolled code is almost always
 the wrong shape. The sample is the verified source of truth for the
 exact release that's installed; keeping the minimum diff is what
@@ -191,7 +190,7 @@ Steps the agent should walk the user through:
    before assuming a Common bug.
 2. **Set the SDK log tier explicitly on first run.** Pass
    `--sdk-log-level 40` (= WARNING; the flag takes a number; most
-   shipped samples / reference apps accept it) or `DOCA_LOG_LEVEL_SDK=WARNING` in the environment.
+   shipped samples / reference apps accept it) or call `doca_log_level_set_global_sdk_limit()` in code.
    The default is WARNING per
    [`CAPABILITIES.md ## log`](CAPABILITIES.md#log); for first runs
    the agent should default the SDK tier to WARNING (do not crank
@@ -224,7 +223,7 @@ Steps the agent should walk the user through:
    stable artifact to diff against.
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
-underlie *"the program built but does nothing"*, see
+underlie *“the program built but does nothing”*, see
 `doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
@@ -232,7 +231,7 @@ underlie *"the program built but does nothing"*, see
 Goal: prove the foundation is behaving as expected — the device was
 picked correctly, the cap-queries the configure step ran still
 hold, the lifecycle is in order, and the PE drive loop is wired —
-before claiming the *"wire doca-common into the app"* journey is
+before claiming the *“wire doca-common into the app”* journey is
 done.
 
 **`## test` is an iterative loop, not a one-shot pass.** Run the
@@ -313,8 +312,8 @@ before recommending any code change.
 
 Walk in this order — do not skip steps:
 
-1. **Tier-confusion sanity (cheapest).** If the symptom is *"my log
-   lines do not appear"* or *"my console is flooded"*, the first
+1. **Tier-confusion sanity (cheapest).** If the symptom is *“my log
+   lines do not appear”* or *“my console is flooded”*, the first
    hypothesis is two-tier confusion per
    [`CAPABILITIES.md ## log`](CAPABILITIES.md#log). Walk the table
    before any code change.
@@ -425,8 +424,8 @@ The universal skeleton, in order:
 
 The agent's rule: **this sequence is the same regardless of which
 higher-level library is layered on top.** When the user asks
-*"what's the doca-common skeleton I need before I open my Flow port
-/ my RDMA context / my Eth queue / my DMA context?"*, the answer is
+*“what's the doca-common skeleton I need before I open my Flow port
+/ my RDMA context / my Eth queue / my DMA context?”*, the answer is
 this list, with the per-library `_create` call slotted into step 7
 and the library's `_set_*` setters into step 8.
 
@@ -438,9 +437,8 @@ library's own log lines, with the two tiers under independent
 control.
 
 This verb is the verb-side of the two-tier model documented in
-[`CAPABILITIES.md ## log`](CAPABILITIES.md#log). It is folded from
-the historical doca-log skill into this skill because the log
-subsystem ships through the `doca-common` `pkg-config` module per
+[`CAPABILITIES.md ## log`](CAPABILITIES.md#log). DOCA Log is covered
+here because the log subsystem ships through the `doca-common` `pkg-config` module per
 [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 
 Steps the agent should walk the user through:
@@ -458,7 +456,7 @@ Steps the agent should walk the user through:
    [`CAPABILITIES.md ## log`](CAPABILITIES.md#log), the agent must
    surface that SDK level controls *DOCA library internals*
    (default `WARNING`; setter `--sdk-log-level` /
-   `DOCA_LOG_LEVEL_SDK`) and app level controls *user code
+   `doca_log_level_set_global_sdk_limit()`) and app level controls *user code
    emissions* (default `INFO`; setter is the app-side
    `doca_log_level_set_global_lower_limit`). Confusing the two is
    the number-one first-app debug failure. The agent should
@@ -511,7 +509,7 @@ the agent does not invent guidance:
   centralized aggregation systems, K8s sidecars — out of scope for
   this skill; partial guidance in
   `doca-public-knowledge-map/SKILL.md`
-  for DOCA Log Service and DOCA Telemetry Service routing, and
+  for DOCA Telemetry Service routing, and
   `doca-container-deployment/SKILL.md`
   for the container path.
 - **rollback.** Coordinated rollback across multiple hosts /
@@ -548,13 +546,13 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env
    --json` for version + devices + libraries in one shot;
    `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+   `version-matrix.json` for *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the row.
-   Report *"falling back to manual chain"*.
+   Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
@@ -571,13 +569,12 @@ the agent should:
 | `ls "$(pkg-config --variable=includedir doca-common)/"` | [`## configure`](#configure); [`## modify`](#modify) | Which Common headers are installed (the headers-win-over-docs anchor)? | A list including `doca_buf.h`, `doca_ctx.h`, `doca_dev.h`, `doca_pe.h`, `doca_log.h`, `doca_mmap.h`, `doca_error.h` |
 | `<binary> --sdk-log-level 40 2> doca.log` (40 = WARNING) | [`## run`](#run) step 2 | What does the SDK tier emit at WARNING (production default)? | Mostly silent on a healthy run; warnings are rare and load-bearing when they fire |
 | `<binary> --sdk-log-level 60 2> doca.log` (60 = DEBUG) | [`## test`](#test) | What does the SDK tier emit at DEBUG (DOCA library internal trace)? | A flood of per-call DOCA library internal log lines; the user's own DEBUG lines remain controlled by the app tier and are *not* affected by this flag |
-| `DOCA_LOG_LEVEL_SDK=DEBUG <binary> 2> doca.log` | [`## run`](#run) step 2 | Same as above via env var (for samples that don't accept `--sdk-log-level`) | Same shape |
 | `grep -RH 'doca_log_register_source\|DOCA_LOG_INFO' /opt/mellanox/doca/samples/ \| head` | [`## modify`](#modify); [`## log`](#log) | Which shipped samples have canonical DOCA Log usage to read as a reference? | Multiple hits across `samples/<library>/<sample>/*_main.c` — DOCA Log is in every sample |
 | `cat /opt/mellanox/doca/applications/VERSION` | [`## install`](#install) check 2; [`## debug`](#debug) step 6 | What does the install tree itself claim its version is? | A semver string matching the other version sources |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
-`DOCA_LOG_LEVEL` / `DOCA_LOG_LEVEL_SDK`) the cross-library overlay
+`--sdk-log-level`) the cross-library overlay
 is in
 `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the doca-common-specific rows on top.
@@ -585,8 +582,8 @@ this table adds the doca-common-specific rows on top.
 Three cross-cutting rules for this appendix:
 
 - **Never invent Common symbols or paths.** The Common ABI is
-  large and version-gated; `ls
-  $(pkg-config --variable=includedir doca-common) ` on the user's install
+  large and version-gated; `ls "$(pkg-config --variable=includedir doca-common)"` on the user’s
+  install
   and the installed `doca_*.h` headers are the only safe sources.
 - **Never paraphrase a Common `DOCA_ERROR_*`.** Quote
   `doca_error_get_descr()` verbatim — the layer-classifier in

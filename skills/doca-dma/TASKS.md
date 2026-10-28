@@ -23,15 +23,15 @@ the next call.
 
 ## DOCA 3.5 field notes
 
-Observed on DOCA 3.5 (developer review); check them before debugging
+Known behaviours on DOCA 3.5; check them before debugging
 further:
 
 - **Size limit.** Query `doca_dma_cap_task_memcpy_get_max_buf_size()`
   before submitting. The DMA Copy reference app caps files at 2 MiB
-  (2097152 bytes) on the tested BlueField-3; the host only reports
+  (2097152 bytes) on a BlueField-3; the host only reports
   `Failure was detected in dma copy`, while the real reason is in the
   BlueField log.
-- **Validate before submitting.** In the review, `doca_task_try_submit()`
+- **Validate before submitting.** On DOCA 3.5, `doca_task_try_submit()`
   rejected a too-large copy cleanly (`buffer byte size=... must be <=
   maximum_byte size=2097152`), whereas `doca_task_submit()` failed in
   hardware and stopped the DMA context.
@@ -329,10 +329,9 @@ so the agent does not invent guidance:
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying DMA-using applications at scale across
   many hosts / DPUs, Kubernetes operator workflows for
-  DMA-accelerated workloads, multi-tenant DMA isolation — out of
-  scope for Phase 1 and reserved for a future platform skill.
+  DMA-accelerated workloads, multi-tenant DMA isolation — out of scope for this skill.
 - **rollback.** Coordinated rollback across multiple hosts /
-  DPUs — out of scope for Phase 1. For a single in-session DMA
+  DPUs — out of scope for this skill. For a single in-session DMA
   configuration rollback, the right answer in this skill is
   destroying the context (`doca_ctx_stop` → `doca_ctx_destroy`)
   and re-running [`## configure`](#configure) with the corrected
@@ -377,7 +376,7 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-dma` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA DMA version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --cflags --libs doca-dma` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-dma` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `doca_caps --list-devs` | `## configure` step 2; `## run` step 1 | Which devices on this host can be used as a `doca_dev` for DMA? | One row per visible device with PCIe address and capability flags |
 | `doca_caps --version` | `## configure` step 1; `## test` step 1 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca-dma` |
 | `ls /opt/mellanox/doca/samples/doca_dma/` | `## modify` slot 1 | Which DMA samples ship in this install, and which is the closest starting point? | A list of sample directories named after the buffer / direction pattern they demonstrate |

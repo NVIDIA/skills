@@ -45,36 +45,23 @@ owned by `doca-dpa` and must not lead. Layer 5 below has the detail.
 
 ## configure
 
-Goal: stand up a `doca_pcc` context against a BlueField port
-that carries the user's RDMA / RoCE traffic, load the user's
-custom PCC algorithm image (compiled by `dpacc` from their
-DPA-side algorithm source) onto it, parameterize the algorithm,
-and confirm both the host side and the BlueField (DPA +
-firmware) are in a state where starting the context will
-attach the algorithm to live traffic.
+Goal: load, parameterize and start the user's PCC algorithm on the port.
 
 Steps the agent should walk the user through:
 
-1. **Confirm the triple-axis env preconditions.** Per the
+1. **Confirm the triple-axis env preconditions.** Walk the
    env-precondition matrix in
-   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy):
-   `pkg-config --modversion doca-pcc` returns a version the
-   installed DPACC compiler is listed as compatible with under
-   the DOCA Compatibility Policy; the target BlueField is
-   present and exposes its DPA processor to the host (the
-   `doca_dev` enumeration succeeds AND a `doca_pcc_cap_*`
-   query against its `doca_devinfo` returns supported for the
-   baseline custom-PCC surface); the BlueField firmware has
-   the custom-PCC slot enabled; the user / process can open
-   the target `doca_dev`. The firmware-side custom-PCC slot
-   check is the load-bearing one the agent MUST surface
-   explicitly — it is the precondition baseline agents most
-   often miss, and a disabled slot will silently look like a
-   permission bug at the API surface. If the slot was just
-   enabled, confirm the BlueField has completed the required
-   reset since that change; otherwise stop and route to
-   `doca-setup` for the hardware-safe reset workflow. If ANY
-   of these fails, this is an env / firmware / version problem to fix via
+   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+   for the four environment rows (DPA visible to the host, firmware
+   custom-PCC slot, DOCA + DPACC matched, `doca_dev` access); the
+   parameter-shape and smoke rows are checked later, in `## build`
+   and `## test`. Surface the firmware custom-PCC slot explicitly: it
+   is the precondition agents most often miss, and a disabled slot
+   looks like a permission bug at the API surface. If the slot was
+   just enabled, confirm the BlueField has completed the required
+   reset; otherwise stop and route to `doca-setup` for the
+   hardware-safe reset workflow. Any failing environment row is an env /
+   firmware / version fix via
    `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`)
    + `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`),
    NOT a code change in the host-side PCC program.
@@ -88,29 +75,23 @@ Steps the agent should walk the user through:
    into a binary the host executable embeds as a
    `doca_pcc_app`. The agent must surface this model
    EXPLICITLY before any host-side load call is drafted. If
-   the user is asking *"how do I design the algorithm
-   itself"*, that is the public DOCA PCC programming guide +
+   the user is asking *“how do I design the algorithm
+   itself”*, that is the public DOCA PCC programming guide +
    the user's domain expertise — route via
    `doca-public-knowledge-map/SKILL.md`
    to the public guide; do not invent an algorithm body.
 3. **Run triple-axis capability discovery against the target
-   BlueField.** Per the triple-axis rule in
-   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
-   on the DOCA side, run the matching `doca_pcc_cap_*` against
-   the active `doca_devinfo` for the BlueField port the host
-   is driving; on the install side, confirm `pkg-config
-   --modversion doca-pcc` agrees with `doca_caps --version`
-   and with the installed `dpacc` version per the DOCA
-   Compatibility Policy; on the firmware side, confirm the
-   custom-PCC slot is enabled. Quote ALL THREE results back
-   to the user. If any says *not supported* / *not enabled*,
-   that axis is the answer — do not proceed.
+   BlueField** per the triple-axis rule in
+   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
+   and quote ALL THREE results back to the user. If any says
+   *not supported* / *not enabled*, that axis is the answer — do
+   not proceed.
 4. **Create the `doca_pcc` Core context against the chosen
    `doca_dev`.** Pick the `doca_dev` deliberately: it must
    map to the BlueField port whose RDMA / RoCE traffic the
    custom algorithm is meant to control. A host driving
    custom PCC on more than one port needs one `doca_pcc` per
-   port, not a *"global"* one, per the per-instance rule in
+   port, not a *“global”* one, per the per-instance rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
    Use the PCC-specific lifecycle:
    `doca_pcc_create` → configure / load / parameterize →
@@ -134,20 +115,16 @@ Steps the agent should walk the user through:
    `doca_pcc_app` produced by `dpacc`
    from the user's DPA-side algorithm source into the
    `doca_pcc`; then set whatever host-side parameters the
-   algorithm exposes. Start the `doca_pcc` via
-   `doca_pcc_start()` (the `doca_pcc` has its own lifecycle
-   calls — `doca_pcc_create` / `_start` / `_stop` / `_destroy` —
-   and is NOT a `doca_ctx`; there is no `doca_pcc_as_ctx`) — this
-   is the moment the algorithm becomes live on the port. Per the lifecycle ordering in
-   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy),
-   record the order so teardown happens in reverse: stop the
-   `doca_pcc` → release the loaded `doca_pcc_app` → destroy
-   the `doca_pcc` → close the `doca_dev`.
+   algorithm exposes. Start it with `doca_pcc_start()` (there is
+   no `doca_pcc_as_ctx`) — this is the moment the algorithm becomes
+   live on the port. Record the order so teardown follows the
+   reverse lifecycle in
+   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
 6. **Confirm the attached port actually has RDMA / RoCE
    traffic to control.** A custom PCC algorithm on a port
-   with no RDMA / RoCE flows has nothing to do — *"my
-   algorithm loaded but I see no effect"* is most often
-   *"there is no traffic to affect"*. If the user has not
+   with no RDMA / RoCE flows has nothing to do — *“my
+   algorithm loaded but I see no effect”* is most often
+   *“there is no traffic to affect”*. If the user has not
    stood up RDMA / RoCE on this port, route to
    `doca-rdma/SKILL.md` BEFORE expecting
    visible PCC behavior; PCC modulates existing traffic.
@@ -231,7 +208,7 @@ is produced the way every other library skill in this bundle
 handles modify — the agent walks the user through the diff
 line-by-line against the sample source they read on disk, and
 has the user paste back the result for validation. The
-agent's anti-pattern alert: a *"clean rewrite"* from scratch
+agent's anti-pattern alert: a *“clean rewrite”* from scratch
 is almost always slower to first green than a minimum-diff
 modify on a shipped PCC sample, and removes the user's
 ability to bisect against a known-good baseline.
@@ -247,7 +224,7 @@ Steps the agent should walk the user through:
 
 1. **Confirm the loaded image exposes the algorithm entry
    points the host configure step expects.** The host's view
-   of *"which algorithm is running on this port"* is exactly
+   of *“which algorithm is running on this port”* is exactly
    the entry-point set in the loaded `doca_pcc_app`. If the
    host-side configure step assumes entry points `dpacc` did
    not compile in, that is a build-side bug, not a runtime
@@ -266,8 +243,8 @@ Steps the agent should walk the user through:
    reports the algorithm emits flow through the progress
    engine; a host that starts the `doca_pcc` and then blocks
    without progressing the PE will see no reports and
-   conclude *"the algorithm is broken"* incorrectly. This is
-   the cross-library *"PE not progressed"* failure mode
+   conclude *“the algorithm is broken”* incorrectly. This is
+   the cross-library *“PE not progressed”* failure mode
    applied to PCC.
 4. **Confirm there is RDMA / RoCE traffic on the attached
    port** to observe. If the port is idle, the algorithm
@@ -283,11 +260,11 @@ Steps the agent should walk the user through:
    and routed via
    `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
    to inspect counters at the port — this catches the
-   *"algorithm loaded fine but is not actually affecting
-   traffic"* case the host-side surface alone may not show.
+   *“algorithm loaded fine but is not actually affecting
+   traffic”* case the host-side surface alone may not show.
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
-underlie *"the program built but does nothing"*, see
+underlie *“the program built but does nothing”*, see
 `doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
@@ -330,9 +307,9 @@ Iteration shape:
    with active RDMA / RoCE traffic on the attached port and
    confirm the algorithm's intended effect (even if trivial
    — e.g. a fixed rate cap) is visible in the PCC counters
-   exposed by the `pcc_counters` CLI. Catches the *"the
+   exposed by the `pcc_counters` CLI. Catches the *“the
    algorithm loaded but is not actually modulating
-   traffic"* case; if it fails, the algorithm body has no
+   traffic”* case; if it fails, the algorithm body has no
    effect path, or it is not actually attached to the
    traffic-carrying port — re-verify the `doca_dev`
    selection at configure time. Before starting, confirm the
@@ -437,7 +414,7 @@ and 7 (driver):
   to inspect the port-level counters and confirm which case
   applies. Do not open the algorithm body first: reports firing
   proves the body runs, not that it is bound and live.
-- A *"DPA-side PCC algorithm hung; cannot stop the program"*
+- A *“DPA-side PCC algorithm hung; cannot stop the program”*
   pattern is almost always a missing termination signal in
   the DPA-side algorithm body, per the
   `doca-dpa TASKS.md ## modify` (`doca-dpa/TASKS.md#modify`)
@@ -457,13 +434,13 @@ and 7 (driver):
   parameter shapes, then rebuild the host executable; do
   not patch only one side. See the *do not partial-rebuild
   one side* rule in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
-- Attached-port mismatch: if the user reports *"the
-  algorithm runs but does not affect my flows"* and the
+- Attached-port mismatch: if the user reports *“the
+  algorithm runs but does not affect my flows”* and the
   `doca_pcc` was created against a `doca_dev` for a
   different BlueField port than the one carrying the user's
   RDMA / RoCE traffic, that is the bug. Re-verify the
   `doca_dev` selection at configure time against the
-  user's traffic-carrying port.
+  user’s traffic-carrying port.
 
 **Layer 7 (driver) — PCC overlay.**
 
@@ -519,8 +496,7 @@ follows so the agent does not invent guidance:
 - **deploy.** Deploying custom-PCC-using applications at
   scale (multi-BlueField clusters, Kubernetes operator
   workflows for DPU workloads, multi-tenant PCC sharing) —
-  out of scope for Phase 1 and reserved for a future
-  platform skill. For single-host first-run testing, the
+  out of scope for this skill. For single-host first-run testing, the
   right verb in this skill is `## run`; do not invent a
   "deploy" workflow.
 - **algorithm design.** Designing the congestion-control
@@ -567,13 +543,13 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env --json`
    for version + devices + libraries + drivers + hugepages in one
    shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+   `version-matrix.json` for *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the
-   row. Report *"falling back to manual chain"*.
+   row. Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
@@ -583,13 +559,13 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-pcc` | `## configure` step 1; `## build` minimum-version slot | What is the build-time DOCA PCC host-side library version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --cflags --libs doca-pcc` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-pcc` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `which dpacc && dpacc --version` (or the install-tree path) | `## configure` step 1; `## build` minimum-DPACC slot | Is the DPACC compiler installed and at what version? | A version string the agent compares against the DOCA Compatibility Policy linked from [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility). Missing `dpacc` = the DPA-side algorithm cannot be built; route to `doca-setup/SKILL.md` |
 | `doca_caps --list-devs` | `## configure` step 1; `## configure` step 3 | Which DOCA devices does the host see, and which expose a DPA processor (the hardware substrate the custom PCC algorithm runs on)? | One entry per `doca_dev` with the BlueField identity and the per-library capability flags including the DPA support axis. No DPA-capable entry = the BlueField is not present, not in the right mode, or not on a generation that exposes the DPA; route to `doca-setup/SKILL.md` |
 | `ls /opt/mellanox/doca/samples/doca_pcc/` | `## modify` slot 1 | Which PCC samples ship in this install (both host-side AND DPA-side translation units), and which is the closest starting point? | A list of sample directories that each contain BOTH host-side and DPA-side source plus a `meson.build` that wires `dpacc` and `pkg-config doca-pcc` together |
-| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last PCC call? | Empty or recent benign messages. Repeated mlx5 / PCC-driver / firmware errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`). Repeated *"custom PCC slot not enabled"* or similar → firmware-side fix |
+| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last PCC call? | Empty or recent benign messages. Repeated mlx5 / PCC-driver / firmware errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`). Repeated *“custom PCC slot not enabled”* or similar → firmware-side fix |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 5 | What did the structured DOCA logger emit for the first failing host-side PCC call? | A trace-level line on every host-side lifecycle transition and every algorithm-load / parameter-set call. Silence after a `doca_pcc_start()` = either host PE not progressed OR algorithm body running but emitting nothing — reach for the counter tool next |
-| (route via `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)) `pcc_counters` CLI — read-only PCC counter inspection at the port | `## test` step 2; `## debug` layer 5 | What are the actual PCC-related counters at the BlueField port doing right now, independent of the host-side `doca-pcc` program? | The public *DOCA Tools* umbrella documents the per-tool output; the agent's job is to NAME the existence of this tool and route the user there, not to redefine its surface. This is the load-bearing diagnostic for the *"the algorithm loaded but I see no on-wire change"* case |
+| (route via `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)) `pcc_counters` CLI — read-only PCC counter inspection at the port | `## test` step 2; `## debug` layer 5 | What are the actual PCC-related counters at the BlueField port doing right now, independent of the host-side `doca-pcc` program? | The public *DOCA Tools* umbrella documents the per-tool output; the agent's job is to NAME the existence of this tool and route the user there, not to redefine its surface. This is the load-bearing diagnostic for the *“the algorithm loaded but I see no on-wire change”* case |
 | (route via `doca-public-knowledge-map/SKILL.md`) DPA-side developer tools — DPA debugger, DPA process-state inspector, DPA statistics tool | `## debug` layer 5; `## debug` layer 6 | What is the DPA processor itself doing right now, from the DPA side (for cases where the algorithm body is suspected to be stuck)? | The public *DPA Tools* umbrella documents the per-tool output; the agent's job is to NAME the existence of these tools and route the user there. These overlay the same surface `doca-dpa CAPABILITIES.md ## Observability` (`doca-dpa/CAPABILITIES.md#observability`) documents |
 
 For commands shared across libraries (`pkg-config --modversion`,

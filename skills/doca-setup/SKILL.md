@@ -18,7 +18,7 @@ description: >
   program-side debugging, and "where is X documented" knowledge-map
   questions — those belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -172,7 +172,7 @@ Do **not** load this skill for:
 This is a **thin loader**. The body keeps only the orientation needed to pick the right next file. The substantive env material lives in two companion files:
 
 - `CAPABILITIES.md` — what the install / build / runtime *environment* surface looks like: install profiles (`doca-all`, `doca-ofed`, `doca-networking`), where the build flavors (release vs trace) live on disk and how to point `LD_LIBRARY_PATH` at them, the env-side version-detection rules, the env-class error taxonomy (`pkg-config` not finding `doca-flow`, hugepages not reserved, representors not visible), what a healthy install looks like under observation, and the safety constraints on environment changes (hugepages global, `mlxconfig` reset, eswitch mode change).
-- `TASKS.md` — env workflows: `recognize` (the front-door system-shape detect + dev-Q decision tree that routes deployment-shaped questions to either container or bare-metal), `configure` (env prep), `test` (install health snapshot), `debug` (env-class layered diagnosis), and `no-install` (the *I have no install yet* procedure with the NGC container as Path 0). Three other anchors (`build`, `modify`, `run`) exist for lint compliance and route to `doca-programming-guide/SKILL.md`, which owns those verbs after the env / program split.
+- `TASKS.md` — env workflows: `recognize` (the front-door system-shape detect + dev-Q decision tree that routes deployment-shaped questions to either container or bare-metal), `configure` (env prep), `test` (install health snapshot), `debug` (env-class layered diagnosis), and `no-install` (the *I have no install yet* procedure with the NGC container as Path 0). Three other anchors (`build`, `modify`, `run`) route to `doca-programming-guide/SKILL.md`, which owns those verbs after the env / program split.
 
 This skill assumes nothing about whether DOCA is installed — the `## no-install` workflow exists precisely for the *fresh laptop* case.
 

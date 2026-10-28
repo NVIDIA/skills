@@ -105,7 +105,7 @@ step here is closed.
 
 ## build
 
-> **Anchor exists for lint compliance.** Hardware-touching changes do
+> **Routing anchor.** Hardware-touching changes do
 > not produce build artifacts; there is no compile-time output of a
 > firmware burn, an `mlxconfig` write, a BFB reflash, or a kernel-boot-
 > parameter change. The build-side discipline for DOCA-consuming

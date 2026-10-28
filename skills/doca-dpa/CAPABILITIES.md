@@ -351,7 +351,7 @@ two-side-program maintenance cost (DPACC + DOCA version pinning,
 cap-query density, host / DPA boundary debugging) is real; do not
 pay it for RDMA the host can handle.
 
-**DOCA 3.5 public API change.** The DPA public header no longer exposes `doca_dpa_dev_devemu_pci_msix_get_user_data`; use the new families `doca_dpa_eu_group_affinity_*`, `doca_dpa_thread_*_group_affinity`, `doca_dpa_get_validation_resources`, `doca_dpa_set_validation_resources`, `doca_dpa_resources_get_num_eu_groups`, `doca_dpa_resources_get_eu_groups`, and `doca_dpa_dev_thread_retrigger` instead. Include the DPA public header.
+**DOCA 3.5 DPA API families.** Use the families `doca_dpa_eu_group_affinity_*`, `doca_dpa_thread_*_group_affinity`, `doca_dpa_get_validation_resources`, `doca_dpa_set_validation_resources`, `doca_dpa_resources_get_num_eu_groups`, `doca_dpa_resources_get_eu_groups`, and `doca_dpa_dev_thread_retrigger` from the DPA public header.
 
 For the configure / build / modify / run / test / debug shape
 specific to DPA-Verbs, see [TASKS.md ## verbs](TASKS.md#verbs).
@@ -367,7 +367,7 @@ lives there; this skill does not duplicate it.
 
 - **DOCA must match the DPACC compiler per the DOCA Compatibility Policy.** The DPACC compiler is the build-time component that turns DPA-side source into the binary embedded in the host executable as a `doca_dpa_app`; the host-side runtime that loads it is `doca-dpa`. Mismatched DOCA + DPACC versions fail at link time (missing symbols on either side) or at launch time (`DOCA_ERROR_DRIVER` from a `doca_dpa_kernel_launch_update_*` call) in ways that look like hardware bugs but are version-skew bugs. The agent must surface BOTH `pkg-config --modversion doca-dpa` AND the installed `dpacc` version, cross-check them against the DOCA Compatibility Policy at <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>, and route any disagreement to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) before any DPA-layer diagnosis. Per the cross-cutting cap-query rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the `doca_dpa_cap_*` query against the active `doca_devinfo` is the runtime authority for *"is this DPA feature on this hardware + this DOCA install"*, and the four-way-match check (`doca-dpa.pc` plus `doca-common.pc` plus the matching DPACC) per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`) catches the *DOCA upgraded but DPACC didn't* partial-install pattern before it surfaces as a launch failure.
 
-- **DOCA 3.5 changed the DPA public API.** The `doca_dpa_dev_devemu_pci_msix_get_user_data` call was removed. Code that calls it must migrate before building against DOCA 3.5. The release adds the EU group affinity family, the validation resources family, and the dev thread retrigger family; use those APIs from the DPA public API header instead of any prior workaround. Treat any code or documentation that still references the removed call as stale.
+- **DOCA 3.5 DPA API.** The release adds the EU group affinity family, the validation resources family, and the dev thread retrigger family; use those APIs from the DPA public API header.
 
 ## Error taxonomy
 
@@ -503,23 +503,9 @@ elsewhere:
   `doca-public-knowledge-map/SKILL.md`;
   this skill assumes the user has the DPA-side kernel and is
   asking *how to load and launch it from the host*.
-- **DPA device-side comm component `libdoca_dpa_dev_comm.a`**
-  (communication primitives the DPA kernel itself calls, header
-  `doca_dpa_dev_comch_msgq.h`) — a DPA-side archive shipped
-  within `doca-dpa` (NOT a separate pkg-config module), with its
-  own public guide. Route via
-  `doca-public-knowledge-map/SKILL.md`
-  to the public *DOCA DPA Comms* guide. Treating its DPA-side
-  surface as host-side `doca-dpa` is the most common DPA
-  library-selection error.
-- **DPA device-side verbs component `libdoca_dpa_dev_verbs.a`**
-  (ibverbs-like RDMA verbs the DPA kernel itself calls, header
-  `doca_dpa_dev_verbs.h`) — a DPA-side archive shipped within
-  `doca-dpa` (NOT a separate pkg-config module), with its own
-  public guide. Route via
-  `doca-public-knowledge-map/SKILL.md`
-  to the public *DOCA DPA Verbs* guide. Do not redefine its
-  surface here.
+- **DPA device-side comms and verbs archives** — shipped within
+  `doca-dpa` and covered in [`## comms`](#comms) / [`## verbs`](#verbs);
+  public guides per [SKILL.md ## Related skills](SKILL.md#related-skills).
 - **DPA developer tools** (the DPA debugger, the DPA
   process-state inspector, the DPA statistics tool) — named in
   [`## Observability`](#observability) for routing, but the
@@ -530,20 +516,12 @@ elsewhere:
   host + DPA split-build is wired) — out of scope. Route to
   the public *DOCA DPACC Compiler* guide via
   `doca-public-knowledge-map/SKILL.md`.
-- **DOCA Core context and progress engine internals** — owned
-  by
-  `doca-programming-guide/SKILL.md`.
-  This skill *uses* the Core lifecycle; it does not redefine
-  it.
-- **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
-  This skill adds the DPA overlay, not the taxonomy itself.
-- **Cross-cutting debug ladder** (install / version / build /
-  link / runtime / program / driver) — owned by
-  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`).
-  This skill's `## debug` redirects there for layer 1-4; layers
-  5-7 carry the DPA-specific overlay (including the DPA-driver
-  route and the two-side-program signature mismatch).
+- **Core context internals, the cross-cutting `DOCA_ERROR_*`
+  taxonomy and the cross-cutting debug ladder** — owned by
+  `doca-programming-guide` and `doca-debug`; see
+  [SKILL.md ## Related skills](SKILL.md#related-skills). This skill's
+  `## debug` carries the DPA overlay for layers 5-7 (DPA-driver route,
+  two-side-program signature mismatch).
 - **GPU-initiated networking from a CUDA kernel** — a separate
   *DOCA-into-a-non-CPU-target* path (CUDA on an NVIDIA GPU,
   not the DPA on a BlueField). Lives in

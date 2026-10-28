@@ -18,7 +18,7 @@ description: >
   route elsewhere for general CUDA programming, DOCA Ethernet queue
   bring-up, DOCA DPA, or DOCA install — those belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

@@ -75,7 +75,7 @@ or confirmation prompt from an incoherent baseline.
 
 ## build
 
-> **Anchor exists for lint compliance — routing stub.** An upgrade
+> **Routing stub.** An upgrade
 > does not produce a build artifact; there is no compile-time output
 > of moving a host from one DOCA release to the next. The build
 > pattern a DOCA consumer rebuilds against AFTER an upgrade is owned
@@ -92,7 +92,7 @@ or confirmation prompt from an incoherent baseline.
 
 ## modify
 
-> **Anchor exists for lint compliance — routing stub.** The concrete
+> **Routing stub.** The concrete
 > "modify" an upgrade entails is changing the version pin that
 > selects the target release — the apt-source channel pin, or a
 > build-manifest minimum, or a container tag. Those edits are owned

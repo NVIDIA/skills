@@ -259,12 +259,12 @@ the agent will get asked but should route elsewhere:
   `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the SHA overlay, not the taxonomy itself.
 - **Other DOCA crypto-acceleration libraries (DOCA AES-GCM, DOCA
-  Compress, DOCA DMA)** — separate libraries with their own skills
-  (when they ship). Path-selection guidance in [`## Capabilities
+  Compress, DOCA DMA)** — separate libraries with their own skills.
+  Path-selection guidance in [`## Capabilities
   and modes`](#capabilities-and-modes) names them; the deep
   per-library substance lives in the matching skill.
 - **Cross-library `doca_caps` invocation patterns** — owned by
-  the cross-library `doca-caps` tool skill (when it ships). This
+  the cross-library `doca-caps` tool skill. This
   skill references the *SHA capability query family*
   (`doca_sha_cap_*`), which is per-library; the *cross-library
   capability snapshot tool* (`doca_caps --list-devs`) is a

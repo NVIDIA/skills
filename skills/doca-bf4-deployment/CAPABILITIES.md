@@ -31,7 +31,7 @@ site-specific BMC.
 
 | BF4 bring-up pattern | Class shape | Where the substance lives |
 | --- | --- | --- |
-| 1. Install the bundle ISO onto Grace | Choose UEFI HTTP Boot (recommended), PXE Boot, or Redfish Virtual Media; reach Grace over the OOB console; point the chosen boot path at {iso-uri}; boot the installer | [`## Capabilities and modes`](#capabilities-and-modes) install-method table; [`TASKS.md ## run`](TASKS.md#run) |
+| 1. Install the bundle ISO onto Grace | Choose UEFI HTTP Boot, PXE Boot, or Redfish Virtual Media, or drive the install through DOCA Management Service; reach Grace over the OOB console; point the chosen boot path at {iso-uri}; boot the installer | [`## Capabilities and modes`](#capabilities-and-modes) install-method table; [`TASKS.md ## run`](TASKS.md#run) |
 | 2. Update platform firmware via PLDM | Push the `.fwpkg` bundle through the Redfish UpdateService multipart endpoint; monitor the Task; verify pending images with `pldmtool`; activate with a power cycle | [`## Capabilities and modes`](#capabilities-and-modes) PLDM table; [`TASKS.md ### pldm-firmware-update`](TASKS.md#pldm-firmware-update) |
 | 3. Install a Grace Ubuntu image + optional cloud-init | Transfer the image (and a CIDATA config ISO) to the BMC via Redfish SimpleUpdate; attach via Redfish VirtualMedia; BootSourceOverride to USB then reset Grace; verify and detach | [`## Capabilities and modes`](#capabilities-and-modes) Virtual Media rules; [`TASKS.md ### grace-ubuntu-cloud-init`](TASKS.md#grace-ubuntu-cloud-init) |
 | 4. Map a bring-up failure back to its layer | Boot-source -> virtual-media-attach -> firmware-Task -> activation -> cloud-init -> boot-loop; six layers, each with its own evidence | [`## Error taxonomy`](#error-taxonomy) layered split |
@@ -62,13 +62,22 @@ contract is uniform (reach Grace over the OOB console, point a boot
 path at the ISO, boot the installer, do the shared post-install); the
 boot mechanism differs by method.
 
-| Property | Method A — UEFI HTTP Boot (recommended) | Method B — PXE Boot | Method C — Redfish Virtual Media |
+| Property | Method A — UEFI HTTP Boot | Method B — PXE Boot | Method C — Redfish Virtual Media |
 | --- | --- | --- | --- |
-| What hosts the ISO | An HTTP server the operator runs at {iso-uri} (no PXE/DHCP/TFTP needed) | A configured PXE server: DHCP + TFTP + the ISO | The BMC itself (ISO uploaded to BMC eMMC; preflight the combined local payload and stop above the 5 GB local-payload limit documented by the public BlueField-4 deployment guide), or a remote HTTPS server |
-| How Grace reaches the installer | Reach the OOB console via BMC SSH + `obmc-console-client`; reboot; in UEFI go Device Manager -> Network Device List -> select the OOB MAC -> HTTP Boot Configuration -> set Boot URI to {iso-uri} -> save -> Boot Manager -> select UEFI HTTP -> boot | In Boot Manager set next boot to the OOB IPv4 net device; select the DOCA arm64 menu, then the ISO | Upload the ISO to BMC eMMC via the Redfish SimpleUpdate API; attach via Redfish VirtualMedia (Grace then sees USB mass-storage devices); set BootSourceOverride to USB (Once / UEFI); reset Grace |
-| When to use it | Default — fewest moving parts, no DHCP/TFTP infrastructure | When you already have PXE infrastructure or need a custom `bf.cfg` | Fully out-of-band, no physical access, when you do not want to stand up HTTP/PXE; requires a recent dpu-bmc version |
+| What hosts the ISO | An HTTP server the operator runs at {iso-uri} (no PXE/DHCP/TFTP needed) | A configured PXE server: DHCP + TFTP + the ISO | The BMC itself (ISO uploaded to BMC eMMC; confirm the payload fits the BMC storage before transfer), or a remote HTTPS server the BMC can reach |
+| How Grace reaches the installer | Reach the OOB console via BMC SSH + `obmc-console-client`; reboot into UEFI; set the HTTP boot URI of the OOB network device to {iso-uri} and boot that entry | In Boot Manager set next boot to the OOB IPv4 net device; select the installer entry for the ISO | Upload the ISO to BMC eMMC via the Redfish SimpleUpdate API; attach via Redfish VirtualMedia (Grace then sees USB mass-storage devices); set BootSourceOverride to USB (Once / UEFI); reset Grace |
+| When to use it | No DHCP/TFTP infrastructure needed | When you already have PXE infrastructure or need a custom `bf.cfg` | Fully out-of-band, no physical access, when you do not want to stand up HTTP/PXE; requires Virtual Media support in the installed BMC firmware |
 | Out-of-band? | Console is OOB; the ISO fetch is over the OOB network | Console is OOB; the ISO fetch is over the OOB network | Fully out-of-band end to end |
 | Monitor via | `obmc-console-client` over BMC SSH | `obmc-console-client` over BMC SSH | `obmc-console-client` over BMC SSH |
+
+**DOCA Management Service path.** From DOCA 3.5, DMS drives the
+BlueField-4 DPU-mode install out-of-band through the DPU BMC with an
+ISO, a PLDM package, or both (`dms-cli /nvidia/provisioning/install`;
+`dms-cli --describe /nvidia/provisioning/install` lists the inputs the
+installed version accepts). The target is `-t pci/<bdf>`, with the BMC
+that belongs to that device supplied separately; PLDM activation needs
+an external full card power cycle. Route DMS mechanics to
+`doca-dms/SKILL.md`.
 
 **Post-install (shared across all three methods).** First login with
 the image's documented default credentials, then **immediately change
@@ -79,10 +88,10 @@ re-enters the installer on the next reset). This skill never prints a
 specific default-credential string — it tells the operator to consult
 the image's documented defaults and change them at once.
 
-### PLDM firmware update — BMC / NIC firmware / SBIOS / ERoT
+### PLDM firmware update — platform firmware components
 
-BlueField-4 platform firmware (the BMC, the NIC firmware, the SBIOS,
-and the ERoT root-of-trust) updates through the **PLDM for Firmware
+BlueField-4 platform firmware (the BMC, the NIC firmware and the other
+components the release's PLDM package lists) updates through the **PLDM for Firmware
 Update** flow driven over Redfish. The class-level surface:
 
 - **NIC firmware from the host (only when explicitly required).** Use
@@ -127,11 +136,9 @@ pre-release / "dev drop" firmware version number.
 A Grace Ubuntu image can be installed — with an optional cloud-init
 seed — entirely through Redfish Virtual Media, as a variant of
 Method C above. The load-bearing constraints are: the seed volume
-label is exactly `CIDATA`; local eMMC hosting is allowed only after
-the image-plus-seed total is confirmed at no more than 5 GB; remote
-hosting must meet the documented HTTPS requirements; the BMC-facing
-URIs are exactly `image.iso` and `config.iso` regardless of original
-filenames; and the order is attach → boot → verify → **detach**,
+label is exactly `CIDATA` (the cloud-init NoCloud convention); local
+eMMC hosting must fit the BMC storage; remote hosting must be
+reachable by the BMC; and the order is attach → boot → verify → **detach**,
 never ejecting mid-install. See
 [`TASKS.md ### grace-ubuntu-cloud-init`](TASKS.md#grace-ubuntu-cloud-init)
 for the full step-by-step flow and the cloud-init layer of
@@ -147,7 +154,7 @@ there; this skill does not duplicate it.
 
 - **Every install / firmware target comes from the public release
   notes, never from memory.** The bundle-ISO build, the NIC firmware
-  level, the SBIOS / ERoT / BMC component versions are all read from
+  level and the platform component versions are all read from
   the **public BlueField/DOCA release notes** (route via
   `doca-public-knowledge-map ## Public documentation entry points` (`doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`)).
   Quoting a specific pre-release firmware version string from memory is

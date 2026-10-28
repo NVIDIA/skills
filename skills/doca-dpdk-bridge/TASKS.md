@@ -58,8 +58,8 @@ Steps the agent should walk the user through, in order:
    `pkg-config --modversion libdpdk` falls within the
    compatibility window the bridge expects. Quote all three to
    the user. Disagreement on the third probe is the canonical
-   *"the bridge loads but every operation returns confusing
-   errors"* failure mode and must be surfaced before any code
+   *“the bridge loads but every operation returns confusing
+   errors”* failure mode and must be surfaced before any code
    change — route to
    `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2.
@@ -67,8 +67,8 @@ Steps the agent should walk the user through, in order:
    case.** Per the bridge-vs-native path-selection table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    the bridge is the right answer only when the user has an
-   EXISTING DPDK app. Ask explicitly: *"is there already DPDK
-   code that drives `rte_eth_*` ports in this codebase?"* If
+   EXISTING DPDK app. Ask explicitly: *“is there already DPDK
+   code that drives `rte_eth_*` ports in this codebase?”* If
    the answer is no, stop here and route to
    `doca-eth/SKILL.md`; the bridge is not the
    right starting point for fresh DOCA-native packet I/O.
@@ -151,7 +151,7 @@ spans TWO independent pkg-config namespaces (DOCA and DPDK), and
 | Include flags | `pkg-config --cflags doca-dpdk-bridge libdpdk` | Resolves DOCA-side headers under $(pkg-config --variable=includedir doca-common) AND DPDK-side headers wherever DPDK is installed |
 | Link flags | `pkg-config --libs doca-dpdk-bridge libdpdk` | Pulls in whatever `pkg-config --libs` resolves on this install (do not predict the `-l<name>` form by hand — `.so` basenames use underscores, `.pc` names use hyphens, and `pkg-config` is the only correct translator) on the DOCA side plus the DPDK shared libs (`-lrte_*`) on the DPDK side |
 | Companion libraries | `doca-flow` if the consumer programs steering on the bound `doca_dev` (the common adopter); `doca-argp` for argument parsing if the consumer uses the standard DOCA arg style. **Do not** add other DOCA libraries unless the consumer actually calls them | Adding unnecessary companion libs bloats the link line and obscures real partial-install issues |
-| Build-time version anchors | `pkg-config --modversion doca-dpdk-bridge` AND `pkg-config --modversion libdpdk` — record BOTH in the build log | Cross-version build / runtime mixing breaks per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility); the DPDK side is the under-tested seam |
+| Build-time version anchors | `pkg-config --modversion doca-dpdk-bridge` AND `pkg-config --modversion libdpdk` — record BOTH in the build log | Cross-version build / runtime mixing breaks per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility); the DPDK side is a frequent source of mismatch |
 
 For non-C consumers (Rust, Go, Python), DPDK itself is a C-shaped
 library and a non-C DPDK app is rare; if the user is in that
@@ -178,13 +178,13 @@ code-level edit:
 
 | Slot | What the agent asks the user | Bridge-specific consideration |
 | --- | --- | --- |
-| 1. Starting sample | Which DOCA Flow sample under `/opt/mellanox/doca/samples/doca_flow/` that already drives the bridge (e.g. ones using `flow_common.c`, which calls `doca_dpdk_port_probe()` / `doca_dpdk_port_as_dev()`)? Or which reference application that already pairs DPDK + DOCA Flow (per the reference-applications index in `doca-public-knowledge-map/SKILL.md`)? | Pick the closest *adopter shape* — bridge + DOCA Flow vs bridge + DOCA accelerator — to the user's intent. The sample tree is C; a *"clean rewrite"* in another language is almost always slower to first green |
+| 1. Starting sample | Which DOCA Flow sample under `/opt/mellanox/doca/samples/doca_flow/` that already drives the bridge (e.g. ones using `flow_common.c`, which calls `doca_dpdk_port_probe()` / `doca_dpdk_port_as_dev()`)? Or which reference application that already pairs DPDK + DOCA Flow (per the reference-applications index in `doca-public-knowledge-map/SKILL.md`)? | Pick the closest *adopter shape* — bridge + DOCA Flow vs bridge + DOCA accelerator — to the user's intent. The sample tree is C; a *“clean rewrite”* in another language is almost always slower to first green |
 | 2. Port-handover code | Are you wiring a new DPDK port id into the bridge, or reusing the sample's port-handover code as-is? | The `doca_dpdk_port_probe()` / `doca_dpdk_port_as_dev()` binding and the `doca_dev` open are the load-bearing edits. Do NOT change the DPDK port's start / stop / queue-config calls — those stay owned by the DPDK side. The bridge associates a port id with a `doca_dev`; it does not transfer ownership of the port |
 | 3. Conversion sites | Where in the data plane are `rte_mbuf` ↔ `doca_buf` conversions actually needed? | Per the mbuf-conversion rule in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes), convert at the boundary, NOT in the inner loop. If the diff puts a conversion call on every packet of a high-rate path, surface the cost before recommending the edit — the user often actually wants DOCA Flow steering installed once and DPDK to keep delivering already-steered packets, with no per-packet conversion |
 | 4. Capability re-validation | Did the diff start requesting representors on the probe that the program did not assume before? | Re-run `doca_dpdk_cap_is_rep_port_supported()` from [`## configure`](#configure) step 5 against the active `doca_devinfo`; the device cap is the authority, not the prior install's |
 | 5. Build manifest | Are you keeping the sample's existing `meson.build`, or hand-rolling a Makefile? | Keep the sample's manifest. It already wires `pkg-config doca-dpdk-bridge libdpdk` and pins both versions; switching to a hand-rolled build removes the version-check rail per [`## build`](#build) and re-opens the DPDK ↔ DOCA mismatch failure mode |
 
-The agent's anti-pattern alert: a *"clean rewrite"* from
+The agent's anti-pattern alert: a *“clean rewrite”* from
 scratch is almost always slower to first green than a minimum-
 diff modify on a shipped sample, and removes the user's ability
 to bisect against a known-good baseline. On this stack the
@@ -244,15 +244,15 @@ Steps the agent should walk the user through:
    side errors and masks the next run's first-failure signal.
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
-underlie *"the program built but does nothing"* (especially the
-DPDK side, which is the under-tested seam on this skill), see
+underlie *“the program built but does nothing”* (especially the
+DPDK side, which is a frequent source of mismatch), see
 `doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
 
 Goal: prove a bridge consumer is correct end-to-end, on the
 user's installed DOCA + installed DPDK + device + permissions,
-before claiming the *"add DOCA to my DPDK app"* journey is done.
+before claiming the *“add DOCA to my DPDK app”* journey is done.
 
 This is **a loop, not a one-shot pass.** Each iteration narrows
 either the install / version surface (DOCA-side or DPDK-side),
@@ -302,7 +302,7 @@ Iteration shape:
    DOCA version AND the DPDK version per
    `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`)
    on each host. The bridge fails differently on each pair, so
-   *"works on host A, fails on host B"* without quoted versions
+   *“works on host A, fails on host B”* without quoted versions
    on both sides is an unactionable report.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
@@ -334,7 +334,7 @@ The cross-library debug ladder lives in
 Walk through it in order — install → version → build → link →
 runtime → program → driver. This skill provides the bridge
 overlay at the *version*, *runtime*, and *program* layers; the
-DPDK side overlays on all of them and is the under-tested seam.
+DPDK side overlays on all of them and is a frequent source of mismatch.
 
 **Layer 2 (version) — bridge overlay.**
 
@@ -344,11 +344,11 @@ DPDK side overlays on all of them and is the under-tested seam.
   `pkg-config --modversion libdpdk` against the bridge's
   expected DPDK window per
   [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
-  Disagreement here is the canonical *"the bridge loads but
-  every operation returns confusing errors"* failure; surface
+  Disagreement here is the canonical *“the bridge loads but
+  every operation returns confusing errors”* failure; surface
   it before any code change.
 - `pkg-config --exists doca-dpdk-bridge` returning failure is
-  not always *"the bridge is not installed"* — some DOCA
+  not always *“the bridge is not installed”* — some DOCA
   releases use a slightly different module name. Confirm via
   `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep
   -i dpdk` before claiming the bridge is missing.
@@ -438,8 +438,7 @@ so the agent does not invent guidance:
   `doca-eth/SKILL.md`.
 - **deploy.** Deploying DPDK + DOCA applications at scale
   across many hosts / BlueFields, Kubernetes operator
-  workflows for line-rate data planes — out of scope for
-  Phase 1 and reserved for a future platform skill.
+  workflows for line-rate data planes — out of scope for this skill.
 - **firmware burn / reset / kernel driver install.** Installing
   `mlx5_core`, burning new ConnectX firmware, modifying
   `mlxconfig` parameters that require a reset — out of scope.
@@ -468,13 +467,13 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env --json`
    for version + devices + libraries + drivers + hugepages in one
    shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+   `version-matrix.json` for *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the
-   row. Report *"falling back to manual chain"*.
+   row. Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
@@ -486,13 +485,13 @@ the agent should:
 | `pkg-config --exists doca-dpdk-bridge && echo present` | `## configure` step 1; `## build` slot 1 | Is the bridge module present on this DOCA install (and under this spelling)? | `present`. Empty / non-zero exit = either the bridge is not installed on this DOCA, or the module name in this release differs — confirm via the `ls` row below before claiming the bridge is missing |
 | `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep -i dpdk` | `## configure` step 1; `## debug` layer 2 | If `pkg-config --exists doca-dpdk-bridge` fails, what is the bridge module actually called in this DOCA release? | One `.pc` file containing `dpdk` in its name. Empty = the bridge truly is not installed on this DOCA; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
 | `pkg-config --modversion doca-dpdk-bridge` | `## configure` step 1; `## build` slot 6 | What is the build-time DOCA DPDK Bridge version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --modversion libdpdk` | `## configure` step 1; `## build` slot 6; `## debug` layer 2 | What DPDK version is installed on this host, and does it fall within the bridge's matched-pair window? | A semver string; the agent quotes it against the bridge's installed headers / docs declared window. Disagreement = the canonical *"the bridge loads but every operation returns confusing errors"* failure; do not assume *"latest DPDK works"* |
+| `pkg-config --modversion libdpdk` | `## configure` step 1; `## build` slot 6; `## debug` layer 2 | What DPDK version is installed on this host, and does it fall within the bridge's matched-pair window? | A semver string; the agent quotes it against the bridge's installed headers / docs declared window. Disagreement = the canonical *“the bridge loads but every operation returns confusing errors”* failure; do not assume *“latest DPDK works”* |
 | `pkg-config --cflags --libs doca-dpdk-bridge libdpdk` | `## build` | What include + link flags does the linker need for a bridge consumer? | DOCA-side includes resolve under $(pkg-config --variable=includedir doca-common); libs include whatever `pkg-config --libs doca-dpdk-bridge` resolves (do not predict the `-l<name>` form by hand); DPDK-side includes resolve under the user's DPDK install; libs include the `-lrte_*` set |
 | `ls /opt/mellanox/doca/samples/doca_flow/` | `## modify` slot 1 | Which DOCA Flow samples ship in this install (the bridge API has no samples dir of its own — it is used inside the DOCA Flow samples, e.g. `flow_common.c`), and which is the closest starting point? | A list of DOCA Flow sample directories; pick one whose adopter shape (bridge + Flow steering) is closest. Empty = the user's install does not ship DOCA Flow samples; route to the reference-applications index in `doca-public-knowledge-map/SKILL.md` |
 | `dpdk-devbind.py --status` | `## configure` step 3; `## debug` layer 5 | Is the target PCIe port bound under DPDK? | The target port appears under the `Network devices using DPDK-compatible driver` section. Anything else means the port is not on the DPDK side and the bridge cannot see it |
 | `cat /proc/meminfo | grep Huge` | `## configure` step 3; `## debug` layer 5 | Are hugepages mounted on this host (DPDK precondition)? | `HugePages_Total` non-zero, `HugePages_Free` non-zero before the DPDK app starts |
 | `doca_caps --list-devs` | `## configure` step 4; `## debug` layer 5 | Which devices on this host can be opened as a `doca_dev` and used as the DOCA side of the bridge binding? | One row per visible device with PCIe address; the device the DPDK port is bound to must appear here |
-| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last bridge call? | Empty or recent benign messages. Repeated `mlx5` / IB errors → driver-layer bug; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
+| `dmesg | tail -n 40` (requires sudo) | `## debug` layer 7 | What did the kernel / driver log around the last bridge call? | Empty or recent benign messages. Repeated `mlx5` / IB errors → driver-layer bug; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 2 | What did the structured DOCA logger emit for the first failing bridge call? | A trace-level line on every DOCA Core lifecycle transition and every bridge call. Silence after a bridge call = the DOCA-side PE is not progressed; DPDK-side silence in addition = the DPDK app is not running |
 
 For commands shared across libraries (`pkg-config --modversion`,

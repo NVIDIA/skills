@@ -17,7 +17,7 @@ description: >
   zstd / Snappy / brotli, LZ4 encode (a CPU LZ4 library), pure
   mmap-to-mmap copies (doca-dma), or DOCA Core lifecycle internals.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

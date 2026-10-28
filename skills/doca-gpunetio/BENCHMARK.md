@@ -9,8 +9,9 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-gpunetio`
-- Evaluation date: 2026-10-24
-- Evaluator version: `1.5.6`
+- Validation status: `passed`
+- Evaluation date: 2026-10-28
+- Evaluator version: `1.6.2`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:bea4079fa63e42d320dec085b358c6e3f0550d3990e9aac5f7843f923f7e340b` (skill-evaluator-dataset-snapshot/1)
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| doca-gpunetio | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-gpunetio | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-gpunetio | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-gpunetio | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-gpunetio | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+
+- Controls for `doca-gpunetio`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 89.7% — baseline ran, but no comparable score was available; uplift unavailable | 79.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 92.9% — baseline ran, but no comparable score was available; uplift unavailable | 84.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
 | Correctness | 65.0% → 95.0% (+30.0 points) | 85.0% → 95.0% (+10.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 40.6% → 60.0% (+19.4 points) | 48.8% → 60.4% (+11.6 points) |
-| Efficiency | 93.3% — baseline ran, but no comparable score was available; uplift unavailable | 48.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 18.8% → 75.0% (+56.2 points) | 56.3% → 68.8% (+12.5 points) |
+| Efficiency | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 63.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,32 +63,43 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 89.0% (-9.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 84.5% → 84.4% (-0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 790,318 | 375,106 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-gpunetio.explicit-positive.v1 | 237,405 | 97,568 | +139,837 | +143.32% | skill 1/1; base 1/1 |
-| claude-code | doca-gpunetio.implicit-positive.v1 | N/A | 216,553 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | doca-gpunetio.implicit-positive.v2 | 520,796 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | doca-gpunetio.negative.v1 | 32,117 | 60,985 | -28,868 | -47.34% | skill 1/1; base 1/1 |
-| codex | All cases | 321,933 | 351,091 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-gpunetio.explicit-positive.v1 | 129,436 | 249,410 | -119,974 | -48.10% | skill 1/1; base 1/1 |
-| codex | doca-gpunetio.implicit-positive.v1 | 169,538 | 78,860 | +90,678 | +114.99% | skill 1/1; base 1/1 |
-| codex | doca-gpunetio.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-gpunetio.negative.v1 | 22,959 | 22,821 | +138 | +0.60% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,112,251 | 726,197 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 589,120 | 326,027 | +263,093 | +80.70% | skill 4/4; base 4/4 |
+| claude-code | doca-gpunetio.explicit-positive.v1 | 188,520 | 109,137 | +79,383 | +72.74% | skill 1/1; base 1/1 |
+| claude-code | doca-gpunetio.implicit-positive.v1 | 176,310 | 72,106 | +104,204 | +144.52% | skill 1/1; base 1/1 |
+| claude-code | doca-gpunetio.implicit-positive.v2 | 187,752 | 108,786 | +78,966 | +72.59% | skill 1/1; base 1/1 |
+| claude-code | doca-gpunetio.negative.v1 | 36,538 | 35,998 | +540 | +1.50% | skill 1/1; base 1/1 |
+| codex | All cases | 291,458 | 252,666 | +38,792 | +15.35% | skill 4/4; base 4/4 |
+| codex | doca-gpunetio.explicit-positive.v1 | 93,922 | 168,877 | -74,955 | -44.38% | skill 1/1; base 1/1 |
+| codex | doca-gpunetio.implicit-positive.v1 | 88,379 | 30,871 | +57,508 | +186.28% | skill 1/1; base 1/1 |
+| codex | doca-gpunetio.implicit-positive.v2 | 86,387 | 30,690 | +55,697 | +181.48% | skill 1/1; base 1/1 |
+| codex | doca-gpunetio.negative.v1 | 22,770 | 22,228 | +542 | +2.44% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 880,578 | 578,693 | +301,885 | +52.17% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 17 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 3 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -83,10 +109,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-gpunetio`)
 - **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-gpunetio`)
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-gpunetio`)
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/libs/doca-gpunetio/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-gpunetio/SKILL.md`)
-- 15 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-gpunetio`)
+- 12 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
@@ -118,6 +144,7 @@ Signals present in this run:
 - `accuracy` (Accuracy): final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): whether the user's goal was achieved.
 - `behavior_check` (Behavior Check): whether the expected workflow behavior was followed.
+- `token_efficiency` (Token Efficiency): actual uncached prompt plus completion usage (50% of Efficiency).
 
 </details>
 

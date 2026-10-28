@@ -40,11 +40,8 @@ Preparing the management endpoint and choosing a deployment shape.
    before any further step.
 3. **Identify the management protocol scope.** Confirm whether the
    user needs gNMI (data configuration), gNOI (system operations), or
-   both. gNMI Subscribe streaming IS supported (`STREAM` with `SAMPLE`
-   1s–60s and `ONCE`; only `POLL` / `Aggregation` are Unimplemented per
-   `gnxi/gnmi/server.go`). For a turnkey, productized
-   telemetry-aggregation surface separate from DMS's own gNMI
-   Subscribe, route to the DOCA Telemetry Service (DTS) instead.
+   both. DMS does not support gNMI `Subscribe`; for telemetry
+   streaming route to the DOCA Telemetry Service (`doca-dts/SKILL.md`).
 4. **Plan the authentication mode.** Choose one of the four
    documented modes (localhost-only / PAM / credentials / mTLS) and
    read the *Security Best Practices* subsection before committing.
@@ -55,8 +52,7 @@ Preparing the management endpoint and choosing a deployment shape.
    with the matching documented recipe.
 5. **Plan user authorization.** Identify the human/service users who
    will issue DMS commands over gRPC and ensure they are in the
-   `-allowed_users` list (default `root`; enforced by `isUserAllowed`
-   in `gnxi/utils/credentials/credentials.go`). The `dmsgroup` Unix
+   `-allowed_users` list (default `root`). The `dmsgroup` Unix
    group is a separate, `dmspe`-only gate — add a user to it only if
    they also need to invoke the `dmspe` privileged helper directly on
    the endpoint.
@@ -241,16 +237,15 @@ without clearing the layer above.
 2. **Authentication / authorization layer.** Symptoms:
    `UNAUTHENTICATED`, `PERMISSION_DENIED`, "user not authorized".
    Causes: wrong credentials, user not in the `-allowed_users` list
-   (applies to ALL auth modes, enforced by `isUserAllowed`),
+   (applies to ALL auth modes),
    certificate issuer not trusted by `dmsd`. Resolution: walk the
    documented authentication-mode troubleshooting in the public guide
    for the specific mode in use.
 3. **Path / operation layer.** Symptoms: `INVALID_ARGUMENT`, "path
    not found", "operation not supported". Causes: the path is not in
    the DMS-supported set, the operation is not in the documented
-   gNOI list, or an unsupported gNMI Subscribe MODE was attempted
-   (`POLL` / `Aggregation` are Unimplemented; `STREAM` / `SAMPLE`
-   1s–60s and `ONCE` ARE supported).
+   gNOI list, or a gNMI `Subscribe` was attempted (DMS does not
+   support it).
    Resolution: re-read the supported-paths reference and the gNOI
    operation list in `CAPABILITIES.md`. If the path or operation is
    genuinely not in the public set, the answer is "not supported" —
@@ -331,12 +326,9 @@ Three cross-cutting rules for this appendix:
   to `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
   for the canonical build pattern, plus the matching `libs/<library>`
   skill for the API surface.
-- **Turnkey telemetry aggregation** — out of scope for DMS. DMS's own
-  gNMI Subscribe DOES stream (`STREAM` / `SAMPLE` 1s–60s and `ONCE`;
-  only `POLL` / `Aggregation` are Unimplemented); for a productized
-  telemetry-aggregation surface, route to the DOCA Telemetry Service
-  (DTS), discoverable through
-  `doca-public-knowledge-map/SKILL.md`.
+- **Telemetry streaming and aggregation** — out of scope for DMS,
+  which does not support gNMI `Subscribe`. Route to the DOCA
+  Telemetry Service: `doca-dts/SKILL.md`.
 - **Library-internal API questions** (Flow pipe construction, RDMA
   queue setup, …) — outside DMS. Route to the matching
   `libs/<library>` skill.

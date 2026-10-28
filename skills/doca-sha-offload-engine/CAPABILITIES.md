@@ -20,9 +20,9 @@ skill teaches resolves into one of six patterns.
 | Engine pattern | Class shape | Where the substance lives |
 | --- | --- | --- |
 | 1. Pick engine vs doca-sha directly | Decide *before* writing any code (or before wiring the engine into the deployment) whether the OpenSSL ENGINE wrapper is the right answer or whether the application should call doca-sha directly. The engine is right for existing pipelines wanting offload with no code change; doca-sha is right for new pipelines or for fine-grained control. | [`## Capabilities and modes`](#capabilities-and-modes) engine-vs-library selection table |
-| 2. Configure the PCIe address | The engine defaults to PCIe address `03:00.0` per the shipped source; on systems where DOCA SHA lives at a different PCIe address, the operator must either edit the build-time `DOCA_ENGINE_PCI_ADDR` macro or set the run-time `set_pci_addr` ctrl-cmd. | [`## Capabilities and modes`](#capabilities-and-modes) PCIe-address configuration + [TASKS.md ## configure](TASKS.md#configure) |
-| 3. Load and register the engine | The engine is loaded through OpenSSL's standard ENGINE API — either via `openssl engine dynamic -pre LOAD ...` for CLI usage or via `ENGINE_load_dynamic` / `ENGINE_by_id` / `ENGINE_ctrl_cmd_string` / `ENGINE_init` / `ENGINE_set_default_digests` for programmatic usage. The verified load pattern is in the shipped `readme.md`. | [`## Capabilities and modes`](#capabilities-and-modes) engine-load pattern + [TASKS.md ## run](TASKS.md#run) |
-| 4. Prove offload actually engaged | A successful `openssl dgst` does NOT prove the engine ran — OpenSSL falls back to software SHA when the engine is missing or fails to register. The *"SHA-224 negative test"* + the `-engine_impl` flag are the verified proofs that the engine was actually called. | [`## Observability`](#observability) prove-offload pattern + [TASKS.md ## test](TASKS.md#test) |
+| 2. Configure the PCIe address | The engine defaults to PCIe address `03:00.0` (shipped `engine_readme.md` example); on systems where DOCA SHA lives at a different PCIe address, the operator sets the run-time `set_pci_addr` ctrl-cmd. | [`## Capabilities and modes`](#capabilities-and-modes) PCIe-address configuration + [TASKS.md ## configure](TASKS.md#configure) |
+| 3. Load and register the engine | The engine is loaded through OpenSSL's standard ENGINE API — either via `openssl engine dynamic -pre LOAD ...` for CLI usage or via `ENGINE_load_dynamic` / `ENGINE_by_id` / `ENGINE_ctrl_cmd_string` / `ENGINE_init` / `ENGINE_set_default_digests` for programmatic usage. The verified load pattern is in the shipped `engine_readme.md`. | [`## Capabilities and modes`](#capabilities-and-modes) engine-load pattern + [TASKS.md ## run](TASKS.md#run) |
+| 4. Prove offload actually engaged | A successful `openssl dgst` does NOT prove the engine ran — OpenSSL falls back to software SHA when the engine is missing or fails to register. The *“SHA-224 negative test”* + the `-engine_impl` flag are the verified proofs that the engine was actually called. | [`## Observability`](#observability) prove-offload pattern + [TASKS.md ## test](TASKS.md#test) |
 | 5. Characterize the message-size win | The engine offload adds round-trip cost to each digest; for small messages CPU SHA wins, for large messages (especially with `-async_jobs`) the engine wins. The crossover point is workload- and platform-specific. | [`## Capabilities and modes`](#capabilities-and-modes) message-size-window rule + [TASKS.md ## test](TASKS.md#test) |
 | 6. Diagnose a load / digest failure | Walk the layered error taxonomy — load-layer (engine `.so` not found, OpenSSL version mismatch) / register-layer (engine loaded but digests not registered, PCIe address rejected) / runtime-layer (engine engaged but a specific digest call failed) / version / cross-cutting (driver, firmware, NUMA). | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 
@@ -30,7 +30,7 @@ Two cross-cutting rules that apply to *every* pattern
 above:
 
 - **A successful invocation does not prove offload.**
-  Without the *"SHA-224 negative test"* or the
+  Without the *“SHA-224 negative test”* or the
   `-engine_impl` flag (which disables OpenSSL's software
   fallback when the engine does not implement a digest),
   the operator cannot tell whether DOCA SHA ran or
@@ -38,24 +38,22 @@ above:
   *prove-offload* pattern is the load-bearing primitive
   of this skill — the verified pattern lives in
   [`## Observability`](#observability) and the worked
-  example lives in the shipped `readme.md`.
+  example lives in the shipped `engine_readme.md`.
 - **The engine offloads ONLY one-shot SHA-1 / SHA-256 /
-  SHA-512.** Per the verified `engine/doca_sha_offload_engine.c`
-  source, the registered digests are `doca_sha_digest_sha1`,
-  `doca_sha_digest_sha256`, `doca_sha_digest_sha512` and
-  the engine is built on the EVP_Digest one-shot
-  interface. Anything else — SHA-224, MD5, SHA-3,
+  SHA-512.** Per the shipped `engine_readme.md`, the engine
+  offloads OpenSSL SHA-1, SHA-256 and SHA-512 and is built
+  on the EVP_Digest one-shot interface. Anything else — SHA-224, MD5, SHA-3,
   HMAC-SHA, true incremental SHA via repeated
   `EVP_DigestUpdate` — is either silently handled by
   OpenSSL's software path (without `-engine_impl`) or
-  fails (with `-engine_impl`). The shipped `readme.md`
+  fails (with `-engine_impl`). The shipped `engine_readme.md`
   documents this surface explicitly.
 
 ## Capabilities and modes
 
 The DOCA SHA Offload Engine is a **dynamic OpenSSL
-ENGINE** shipped as `libdoca_sha_offload_engine.so`,
-built from `doca/tools/sha_offload_engine/` against
+ENGINE** shipped as `libdoca_sha_offload_engine.so`
+under `${DOCA_DIR}/tools/doca_sha_offload_engine/`, using
 DOCA's `doca-sha` library and OpenSSL ≥ 1.1.1. There is
 no daemon, no CLI of its own, and no programmatic API
 specific to the engine; the surface is *the OpenSSL
@@ -63,7 +61,7 @@ ENGINE API*.
 
 ### Algorithm-coverage matrix
 
-Per the verified source (`engine/doca_sha_offload_engine.c`):
+Per the shipped `engine_readme.md`:
 
 | OpenSSL EVP digest | What the engine does |
 | --- | --- |
@@ -71,13 +69,13 @@ Per the verified source (`engine/doca_sha_offload_engine.c`):
 | `EVP_sha256()` | Offloads to DOCA SHA (one-shot). |
 | `EVP_sha512()` | Offloads to DOCA SHA (one-shot). |
 | `EVP_sha224()`, `EVP_sha384()`, `EVP_sha3_*`, `EVP_md5()` | NOT offloaded. Without `-engine_impl`, OpenSSL falls back to its built-in software SHA. With `-engine_impl`, the digest call fails (this is the basis of the "prove offload actually engaged" pattern). |
-| Streaming / chained `EVP_DigestInit_ex` → `EVP_DigestUpdate` → `EVP_DigestFinal_ex` | Per the shipped `readme.md`, the engine is built on the one-shot `EVP_Digest` API. Chained-update workflows that OpenSSL's library code paths convert to one-shot may still be offloaded; workflows that genuinely require incremental hashing are outside the engine's surface — route to `../../libs/doca-sha/CAPABILITIES.md` (`doca-sha/CAPABILITIES.md`) and the partial-hash task there. |
+| Streaming / chained `EVP_DigestInit_ex` → `EVP_DigestUpdate` → `EVP_DigestFinal_ex` | Per the shipped `engine_readme.md`, the engine is built on the one-shot `EVP_Digest` API. Chained-update workflows that OpenSSL's library code paths convert to one-shot may still be offloaded; workflows that genuinely require incremental hashing are outside the engine's surface — route to `../../libs/doca-sha/CAPABILITIES.md` (`doca-sha/CAPABILITIES.md`) and the partial-hash task there. |
 
 ### Engine vs library: selection rule
 
 | User situation | Right surface | Why |
 | --- | --- | --- |
-| Existing OpenSSL-based pipeline doing SHA-1 / SHA-256 / SHA-512; wants offload with no code change | **This engine.** | Drop in via the `openssl engine dynamic` load pattern; the only application change is the `ENGINE_load_dynamic` block from the shipped `readme.md`, or even less if the user can rely on an `openssl.cnf` engines section. |
+| Existing OpenSSL-based pipeline doing SHA-1 / SHA-256 / SHA-512; wants offload with no code change | **This engine.** | Drop in via the `openssl engine dynamic` load pattern; the only application change is the `ENGINE_load_dynamic` block from the shipped `engine_readme.md`, or even less if the user can rely on an `openssl.cnf` engines section. |
 | New SHA-using pipeline being authored from scratch | `../../libs/doca-sha/` (`doca-sha/SKILL.md`). | The library exposes both one-shot and partial-hash tasks, the full cap-query surface, and the DOCA Core context lifecycle. The engine is a deliberate subset; the library is the full surface. |
 | Existing OpenSSL pipeline needing offload for an algorithm the engine does NOT cover (SHA-224, SHA-3, HMAC-SHA) | Neither this engine, nor doca-sha directly for that algorithm. | DOCA SHA's library surface is documented per `../../libs/doca-sha/CAPABILITIES.md` (`doca-sha/CAPABILITIES.md`); the engine restricts to one-shot SHA-1 / 256 / 512. The agent surfaces the gap honestly. |
 | Existing pipeline that requires TRUE incremental hashing (gigabytes-into-one-digest with chunks too large for one DOCA SHA task) | `../../libs/doca-sha/` (`doca-sha/SKILL.md`) directly, using the partial-hash task. | The engine's one-shot path requires the full message fit in a single DOCA SHA call; the partial-hash task in the library exists for exactly this case. |
@@ -88,27 +86,22 @@ before recommending the engine.
 
 ### PCIe-address configuration
 
-Per the verified source, the engine has TWO ways to pick
-the PCIe address of the DOCA SHA device it binds to:
+The engine binds the DOCA SHA device at PCIe address
+`03:00.0` by default (the shipped `engine_readme.md`
+example). To use a different device:
 
-1. **Build-time default.** The shipped `meson.build`
-   sets `-DDOCA_ENGINE_PCI_ADDR="03:00.0"`; the source
-   uses `default_engine_pci_addr = "03:00.0"`. The
-   `test_cmdline_mode/readme.md` documents the edit-the-
-   `meson.build` workflow for systems where DOCA SHA
-   lives at a different PCIe address.
-2. **Run-time override via the `set_pci_addr` ctrl-cmd.**
-   The engine registers a ctrl-cmd named `set_pci_addr`
-   (verified in `engine/doca_sha_offload_engine.c`'s
-   `engine_cmd_defns`) that takes a STRING argument and
-   overrides the build-time default at engine init time.
+1. **Run-time override via the `set_pci_addr` ctrl-cmd.**
+   The engine lists a ctrl-cmd named `set_pci_addr`
+   (STRING input) in its `openssl engine -vvv` output; it
+   sets the PCIe address at engine init time.
    The CLI invocation pattern is `openssl engine
    dynamic -pre SO_PATH:... -pre LOAD -pre "set_pci_addr:<bdf>"`;
    the programmatic equivalent is
    `ENGINE_ctrl_cmd_string(e, "set_pci_addr", "<bdf>", 0)`
-   per the shipped `readme.md`.
+   per the shipped `engine_readme.md`.
 
-The agent's rule: surface BOTH knobs to the user. On
+The agent's rule: surface the `03:00.0` default and the
+`set_pci_addr` override to the user. On
 stock installs `03:00.0` may or may not be the right
 device; the operator must check (`doca_caps --list-devs`
 or platform-specific PCIe inspection per
@@ -117,7 +110,7 @@ or platform-specific PCIe inspection per
 ### Engine-load pattern (the verified surface)
 
 Two load patterns, both verified in the shipped
-`readme.md`:
+`engine_readme.md`:
 
 1. **CLI:**
    ```
@@ -158,9 +151,9 @@ large messages it amortizes. Three sub-classes:
 
 | Message size class | Typical engine vs CPU result | Tuning that matters |
 | --- | --- | --- |
-| Small (e.g. ~10 KB) | CPU SHA may match or beat the engine without `-async_jobs`; `-async_jobs` enables asynchronous engine batching and changes the picture per the shipped `readme.md` `openssl speed` examples. | `-async_jobs 256` (or workload-appropriate value); `-multi <N>` for multi-threaded scaling. |
+| Small (e.g. ~10 KB) | CPU SHA may match or beat the engine without `-async_jobs`; `-async_jobs` enables asynchronous engine batching and changes the picture per the shipped `engine_readme.md` `openssl speed` examples. | `-async_jobs 256` (or workload-appropriate value); `-multi <N>` for multi-threaded scaling. |
 | Medium (e.g. ~100 KB) | Engine + `-async_jobs` typically wins. | `-async_jobs`. |
-| Large (e.g. ≥1 MB) | Engine wins comfortably, even synchronous. | The shipped examples in the `readme.md` and `test_cmdline_mode/readme.md` use 10 000 and 100 000 byte messages with various `-async_jobs` values. |
+| Large (e.g. ≥1 MB) | Engine wins comfortably, even synchronous. | The shipped `engine_readme.md` examples use 10 000-byte messages with and without `-async_jobs 256` and `-multi 8`. |
 
 The exact crossover point depends on the DOCA SHA device,
 the CPU's SHA-instruction-set support (SHA-NI), the
@@ -183,16 +176,16 @@ lives there; this skill does not duplicate it.
 
 **The `doca-sha-offload-engine`-specific overlay** is:
 
-- **The engine builds against `doca-sha`** per the
-  shipped `meson.build`. The version of the installed
+- **The engine depends on `doca-sha`** (the package
+  depends on `doca-sdk-sha`). The version of the installed
   `doca-sha` (`pkg-config --modversion doca-sha`) is the
   authoritative DOCA-side pin. The four-way match across
   `doca-common`, `doca-sha`, and the rest of the install
   must hold per
   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
-- **OpenSSL ≥ 1.1.1** per the shipped `readme.md`. The
-  engine's shipped tests cover OpenSSL 1.1.1f on Ubuntu
-  20.04 and OpenSSL 3.0.2 on Ubuntu 22.04. OpenSSL 3.x
+- **OpenSSL ≥ 1.1.1** per the shipped `engine_readme.md`. The
+  shipped `engine_readme.md` documents testing on OpenSSL
+  1.1.1f (Ubuntu 20.04) and OpenSSL 3.0.2 (Ubuntu 22.04). OpenSSL 3.x
   deprecates the ENGINE API in favor of PROVIDERS, but
   still supports ENGINEs via the legacy code path
   (per the OpenSSL upstream documentation on
@@ -208,13 +201,11 @@ lives there; this skill does not duplicate it.
   agent surfaces that as a forward-looking concern
   without inventing a PROVIDER artifact that does not
   exist.
-- **`libssl-dev` is required** at build time per the
-  shipped `test_cmdline_mode/readme.md`. The exact
-  package name is distribution-specific; on Ubuntu it is
-  `libssl-dev`, on RHEL it is `openssl-devel`. The agent
-  routes the package-name lookup through
-  `doca-setup/SKILL.md` rather than
-  quoting from memory.
+- **OpenSSL development headers** (`libssl-dev` on
+  Ubuntu, `openssl-devel` on RHEL) are needed only by
+  applications that call the ENGINE API programmatically.
+  The agent routes the package-name lookup through
+  `doca-setup/SKILL.md` rather than quoting from memory.
 - **No version literal from memory** for DOCA. The
   agent quotes versions observed from the user's host.
 
@@ -254,8 +245,7 @@ in escalating order:
    `../../libs/doca-sha/CAPABILITIES.md#capabilities-and-modes` (`doca-sha/CAPABILITIES.md#capabilities-and-modes`)
    `doca_sha_cap_get_max_src_buf_size`); destination
    buffer too small; transient device errors. The
-   engine's source logs at `DOCA_LOG_*` per the
-   verified `DOCA_LOG_REGISTER(DOCA_SHA_OFFLOAD_ENGINE)`.
+   engine reports these through DOCA logging.
 4. **Engine-not-engaged (silent fallback).** The
    `openssl dgst` call completed and produced a correct
    hash, but DOCA SHA never ran — OpenSSL fell back to
@@ -290,16 +280,16 @@ output) with DOCA-side logging. Specifically:
 
 - **`openssl engine dynamic -vvv -t -c` output.** On
   successful load the verified output per the shipped
-  `readme.md` prints the engine name, the available
+  `engine_readme.md` prints the engine name, the available
   digests (`[SHA1, SHA256, SHA512]`), the `[available]`
   marker, and the `set_pci_addr` ctrl-cmd descriptor.
   This is the agent's first observability signal —
-  *"did the engine load and register the right
-  digests?"*.
-- **The *"prove offload actually engaged"* pattern.**
+  *“did the engine load and register the right
+  digests?”*.
+- **The *“prove offload actually engaged”* pattern.**
   This is the load-bearing observability primitive of
-  this skill. Two verified techniques from the shipped
-  `readme.md` and `test_cmdline_mode/readme.md`:
+  this skill. Two techniques, using the shipped
+  `engine_readme.md` invocations:
   - **`-engine_impl` for an algorithm the engine
     supports.** Run `openssl dgst -sha256 -engine
     <path> -engine_impl`; `-engine_impl` disables
@@ -311,14 +301,13 @@ output) with DOCA-side logging. Specifically:
     NOT in the engine's covered set, and the
     `-engine_impl` flag prevents OpenSSL from falling
     back to software SHA. The expected output is an
-    error (per the verified `test_cmdline_mode/readme.md`:
-    `Error setting digest`); the error PROVES OpenSSL
+    error; the error PROVES OpenSSL
     actually consulted the engine and the engine did
     not implement SHA-224. Without this test, the
-    operator cannot distinguish *"the engine works"*
-    from *"OpenSSL is silently using software SHA"*.
+    operator cannot distinguish *“the engine works”*
+    from *“OpenSSL is silently using software SHA”*.
 - **`openssl speed` for performance characterization.**
-  Per the shipped readmes, the documented invocations
+  Per the shipped `engine_readme.md`, the documented invocations
   use `openssl speed -evp <alg> -bytes <N> -elapsed`
   with and without `--engine <path>`. The agent runs
   both, with and without `-async_jobs`, to characterize
@@ -326,10 +315,8 @@ output) with DOCA-side logging. Specifically:
   [`## Capabilities and modes`](#capabilities-and-modes).
 - **DOCA log levels.** `DOCA_LOG_LEVEL` applies per
   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
-  The engine's source includes
-  `DOCA_LOG_REGISTER(DOCA_SHA_OFFLOAD_ENGINE)` and
-  uses `DOCA_LOG_ERR` / `DOCA_LOG_DBG` for its own
-  diagnostics.
+  The engine reports its own diagnostics through DOCA
+  logging.
 - **`ldd <engine.so>` for the load-layer check.** Useful
   when the engine fails to load and the operator needs
   to confirm transitive dependencies are present.
@@ -353,9 +340,9 @@ overlay:
   prove-offload pattern in
   [`## Observability`](#observability) is the
   load-bearing safety primitive of this skill. Quoting a
-  *"DOCA SHA offload win"* without first running the
+  *“DOCA SHA offload win”* without first running the
   SHA-224 negative test or the `-engine_impl` flag is
-  the canonical *"we measured the wrong thing"* failure
+  the canonical *“we measured the wrong thing”* failure
   mode — the operator may be benchmarking OpenSSL's
   software SHA against itself.
 - **PCIe-address binding is a credential.** The
@@ -405,10 +392,9 @@ The canonical public sources for this engine are:
   `openssl.org/docs/man1.1.1/man1/openssl-engine.html`
   and the `EVP_Digest` man page at
   `openssl.org/docs/manmaster/man3/EVP_Digest.html`
-  (both cited in the shipped `readme.md`).
-- The shipped source tree at
-  `doca/tools/sha_offload_engine/` on the user's
-  install (or in the public DOCA SDK download).
+  (both cited in the shipped `engine_readme.md`).
+- The shipped `engine_readme.md` next to the engine under
+  `${DOCA_DIR}/tools/doca_sha_offload_engine/`.
 
 Do not invent OpenSSL flags, engine ctrl-cmd names,
 DOCA SHA symbols, or message-size crossover literals

@@ -532,14 +532,12 @@ TMFIFO up, host PFs bound, four-way version match closed, DOCA-linked
 binary safely launchable per [`## run`](#run)". This anchor exists
 because the bare-metal-deployment skill's downstream verbs (`## run`,
 `## test`, `## debug`) all assume a working BlueField; when that
-assumption breaks, the bundle previously routed the operator out to
-`doca-hardware-safety/SKILL.md` for the
-mutating-change meta-policy AND out to
-`doca-public-knowledge-map ## Externally-productized DOCA software` (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`)
-for the BSP/BFB documentation entry, but the **operational sequencing
-ladder itself** (which evidence to collect in which order, which
-failure mode each evidence pattern points to, which recovery action
-lattices to which evidence) had no home. This section is that home.
+assumption breaks, this section supplies the **operational sequencing
+ladder** (which evidence to collect in which order, which failure mode
+each evidence pattern points to, which recovery action follows). The
+mutating-change meta-policy stays in `doca-hardware-safety/SKILL.md`, and
+the BSP/BFB documentation entry in
+`doca-public-knowledge-map ## Externally-productized DOCA software` (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 
 This is a **reasoning ladder, not a script.** The agent does not ship
 a `bfb-install-wrapper.sh` or a `classify-bluefield-state.sh`; it
@@ -684,7 +682,7 @@ primary data path.
    different driver versions have shipped slightly different
    names). The address should be the host-side documented address.
 3. **Critical TMFIFO gotcha — ALWAYS `ip route get` before
-   `ping`.** A real failure mode the bundle has hit in the wild
+   `ping`.** A known failure mode
    is: the BlueField-side TMFIFO address (e.g. `192.168.100.2`)
    gets accidentally added to the **host's** loopback or to
    `tmfifo_net0` itself, so `ping 192.168.100.2` from the host
@@ -695,10 +693,8 @@ primary data path.
       the BlueField": `<bf-addr> dev tmfifo_net0 src <host-addr>`
       (driver versions that expose the TMFIFO interface directly)
       OR `<bf-addr> dev tm-br src <host-addr>` (BSP / DOCA-host
-      installs that bridge `tmfifo_net0` into a `tm-br` bridge —
-      observed in the wild on DOCA 3.3 hosts where the BFB-side
-      RShim driver is configured to bridge the TMFIFO endpoint
-      with the host-side management bridge). **Broken output** is
+      installs that bridge `tmfifo_net0` into a `tm-br` bridge, e.g.
+      via `multi-bfb-install`). **Broken output** is
       always: `<bf-addr> dev lo src 127.0.0.1` or
       `local <bf-addr> dev lo` — the address has been bound
       LOCALLY and *every* ping / ssh / curl to it is hitting the

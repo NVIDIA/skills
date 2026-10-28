@@ -19,7 +19,7 @@ description: >
   container deploy, env install, and the BF4 BMC-Redfish path route
   elsewhere.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -101,7 +101,7 @@ It is **not** for:
   to `doca-bf4-deployment/SKILL.md`, the
   BF4 equivalent of this skill,
 - kernel-driver or BlueField-OS developers contributing to `mlx5_*`
-  or the BFB image itself (that is internal-tree work, not a
+  or the BFB image itself (outside the scope of
   field deployment),
 - operators who already have a healthy BF3 and just want to *run a
   binary* (route to

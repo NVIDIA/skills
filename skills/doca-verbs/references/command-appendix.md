@@ -14,13 +14,13 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env
    --json` for version + devices + libraries + drivers in one
    shot; `doca-capability-snapshot` for per-device capability
-   flags; `version-matrix.json` for *"available since"* lookups).
+   flags; `version-matrix.json` for *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the row.
-   Report *"falling back to manual chain"*.
+   Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
@@ -36,14 +36,14 @@ the agent should:
 | `doca_caps --list-devs` | [`## configure`](../TASKS.md#configure) step 4 | Which devices on this host can be used as a `doca_dev`? | One row per visible device with PCIe address and capability flags; raw verbs needs at least one row, same as the higher-level RDMA / Eth / Rmax libraries |
 | `doca_caps --version` | [`## configure`](../TASKS.md#configure) step 3; [`## test`](../TASKS.md#test) step 2 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca-verbs` |
 | `cat /opt/mellanox/doca/applications/VERSION` | [`## configure`](../TASKS.md#configure) step 3; [`## debug`](../TASKS.md#debug) layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
-| `dmesg \| tail -n 40` (sudo) | [`## debug`](../TASKS.md#debug) layer 7 | What did the kernel / driver log around the last raw-verbs call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
-| `ibv_devinfo` (sudo) | [`## configure`](../TASKS.md#configure) step 5; [`## debug`](../TASKS.md#debug) layer 7 | What does the underlying `libibverbs` see for this device? | One device row with `state: PORT_ACTIVE` and a sane MTU. **NOTE:** running `ibv_devinfo` is a diagnostic; it does NOT license the program to also call `ibv_*` against a `doca-verbs`-owned object (per the no-mixing rule in [CAPABILITIES.md ## Safety policy](../CAPABILITIES.md#safety-policy)) |
+| `dmesg \| tail -n 40` (requires sudo) | [`## debug`](../TASKS.md#debug) layer 7 | What did the kernel / driver log around the last raw-verbs call? | Empty or recent benign messages. Repeated mlx5 / IB errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
+| `ibv_devinfo` (requires sudo) | [`## configure`](../TASKS.md#configure) step 5; [`## debug`](../TASKS.md#debug) layer 7 | What does the underlying `libibverbs` see for this device? | One device row with `state: PORT_ACTIVE` and a sane MTU. **NOTE:** running `ibv_devinfo` is a diagnostic; it does NOT license the program to also call `ibv_*` against a `doca-verbs`-owned object (per the no-mixing rule in [CAPABILITIES.md ## Safety policy](../CAPABILITIES.md#safety-policy)) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | [`## run`](../TASKS.md#run) step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every WR submission. Silence after submit = chosen completion-handling path not driven |
 | `<binary> --sdk-log-level DEBUG 2> doca.log` | [`## run`](../TASKS.md#run) step 3 | Same as above via SDK-tier setter | A flood of DOCA library internal trace; the user's own DEBUG lines remain controlled by the app tier per the two-tier model in `doca-common CAPABILITIES.md ## log` (`doca-common/CAPABILITIES.md#log`) |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
-`DOCA_LOG_LEVEL` / `DOCA_LOG_LEVEL_SDK`) the cross-library overlay
+`--sdk-log-level`) the cross-library overlay
 is in
 `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the raw-verbs-specific rows on top.

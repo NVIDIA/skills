@@ -69,11 +69,12 @@ Steps the agent should walk the user through, in order:
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    operating-modes table; offline mode consumes a captured JSON
    only, online mode requires the application.
-3. **Decide tune vs perf.** Per the *tune-vs-perf* boundary in
+3. **Capture the baseline first.** Per the *measure, then tune*
+   rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes);
    if the user's question is *"what is the baseline number"*,
-   route to `doca-flow-perf/SKILL.md` instead
-   of this skill. Tune does not produce a primary baseline number.
+   answer it with a monitor-mode capture (and its CSV export)
+   before any recommendation.
 4. **Axis 1 — pick the tuning axis.** Per the three-axis table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    commit explicitly to which class of change is being explored
@@ -85,8 +86,8 @@ Steps the agent should walk the user through, in order:
    the tuning axis; the agent should quote *why* it picked the
    measurement so the user can challenge the framing.
 6. **Axis 3 — pick the scope.** Confirm the PCI address set and
-   the `flow_port_id` set the session will look at. The shipped
-   `flow_tune_cfg_public.json` template documents the
+   the `flow_port_id` set the session will look at. The guide's
+   configuration-file example documents the
    `monitor.hardware.pci_addresses` and
    `monitor.software[*].flow_port_id` fields as the scope-naming
    knobs; confirm against the live application's port set.
@@ -96,17 +97,16 @@ Steps the agent should walk the user through, in order:
    The state-changing mode is high-stakes; the agent must surface
    the [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
    rules before recommending it.
-8. **Populate the JSON config file.** Start from the shipped
-   `flow_tune_cfg_public.json` template on the user's install (or
-   `flow_tune_cfg_hardware_only.json` /
-   `flow_tune_cfg_software_only.json` for the subset variants);
+8. **Populate the JSON config file.** Start from the configuration-file example in the public DOCA Flow Tune guide
+   (`flow_tune_cfg.json`; remove the `hardware` or `software`
+   section to disable that part);
    set `outputs_directory`, the `network.server_uds` socket path,
    the `dumper` / `analyze` / `visualize` / `monitor` sections
-   per the chosen scope and mode. The shipped templates are the
+   per the chosen scope and mode. The guide's example and `--help` are the
    schema source of truth on the user's installed version; do
    not invent field names from prose memory.
 9. **Sanity check before any invocation.** Confirm with the user:
-   what is the question (tune vs perf)? Which pipeline? Which
+   what is the question (baseline or recommendation)? Which pipeline? Which
    tuning axis? Which measurement? Which mode? If any answer is
    unclear, stop and ask — do NOT run the tune binary against a
    fuzzy posture.
@@ -199,9 +199,8 @@ Routing for nearby "modify" questions:
   contributor question, not an external-consumer question.
 - *"Can I edit the dumper CSV format?"* → no; the documented
   CSV format is the documented format. If the user wants a
-  different post-processing surface, the right answer is *"read
-  the shipped `hw_counters_csv_analyzer.py` and adapt the
-  parsing for your downstream tool"*, but even the adapter is
+  different post-processing surface, the right answer is *"parse
+  the documented CSV in your downstream tool"*, but even the adapter is
   out of scope per
   [`SKILL.md ## What this skill deliberately does not ship`](SKILL.md#what-this-skill-deliberately-does-not-ship).
 
@@ -228,8 +227,7 @@ command lines (per
    a usable recommendation; it is a precondition check.
 3. **Online read-only snapshot.** When a live application is
    available, attach via the documented IPC channel (per the
-   `network.server_uds` field on the user's installed
-   templates), run the dumper / monitor for the configured
+   `network.server_uds` field of the JSON config), run the dumper / monitor for the configured
    duration, and capture the CSV + JSON + mermaid outputs into
    the directory named by `outputs_directory`. This is the
    *online-mode read-only smoke* per
@@ -255,8 +253,7 @@ command lines (per
 7. **For the exact, current invocation surface — mode flag
    names, JSON config field names, dumper CSV columns,
    analyze JSON schema, visualize mermaid format — read
-   `--help`** on the installed binary and the shipped
-   `flow_tune_cfg*.json` templates plus the public DOCA Flow
+   `--help`** on the installed binary plus the public DOCA Flow
    Tune guide via
    `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
    Do **not** invent any of these.
@@ -301,10 +298,9 @@ The smoke-before-bulk shape:
 4. **Capture a post-change snapshot.** Re-run step 1 against the
    redeployed application; the resulting outputs are the
    *after* leg.
-5. **Diff the two legs.** Use the shipped `flow_json_diff.py` /
-   `flow_mermaid_diff.py` helpers under the tool's `scripts/`
-   directory for the structural and counter diff; quote the diff
-   the script produced, do not paraphrase it.
+5. **Diff the two legs.** Compare the two analyze JSON files and
+   dump files field by field for the structural and counter diff;
+   quote the values, do not paraphrase them.
 6. **Only after steps 1-5 read clean** may the agent declare the
    tuning iteration converged on a real change. If the after-leg
    measurement does not move in the direction the recommendation
@@ -339,8 +335,8 @@ disagrees with the Flow application's own view, walk the
 layers in order:
 
 1. **Config-syntax.** Invocation / JSON config does not parse.
-   Confirm flag / field exists on the installed binary and the
-   shipped `flow_tune_cfg*.json` templates; confirm units /
+   Confirm flag / field exists on the installed binary and in
+   the configuration-file example in the public DOCA Flow Tune guide; confirm units /
    values are in the documented form. Do not infer from generic
    CLI / JSON intuition.
 2. **Attach-failed (online mode).** Confirm the live Flow
@@ -418,10 +414,10 @@ The pattern:
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
    layer 5; the right next step is a Flow-program proposal, not
    a tune re-run.
-5. **Save the tune session alongside the perf baseline.** The
-   tune recommendation is downstream of the perf baseline per
+5. **Save the tune session alongside the monitor-mode baseline.** The
+   tune recommendation is downstream of the monitor-mode baseline per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-   tune-vs-perf table; quoting the recommendation without the
+   measure-then-tune table; quoting the recommendation without the
    baseline is half the picture and the
    `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    ladder cannot pick up where the agent left off without both.
@@ -432,8 +428,6 @@ The verbs below are not `doca_flow_tune` work and should be
 routed out before the agent does any of them under this skill's
 name.
 
-- **measure a Flow pipeline baseline** ⇒
-  `doca-flow-perf/SKILL.md`. Tune does not produce a primary baseline number.
 - **write a doca-flow application** ⇒
   `doca-flow/SKILL.md`, layered on
   `doca-programming-guide/SKILL.md`.
@@ -458,8 +452,7 @@ name.
 `doca_flow_tune`-specific invocation classes the verbs above
 reach for. Every row is a CLASS — the agent must not invent
 flags, JSON field names, or recommendation identifiers beyond
-`--help` on the installed binary, the shipped
-`flow_tune_cfg*.json` templates, and the public DOCA Flow Tune
+`--help` on the installed binary and the public DOCA Flow Tune
 guide.
 
 **Infra-aware preamble (every row below).** Per the bundle's
@@ -485,12 +478,11 @@ the agent should:
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
 | Discover the documented flag surface | `doca_flow_tune --help` plus the public DOCA Flow Tune guide for long-form documentation | [`## configure`](#configure) step 4-7; [`## debug`](#debug) layer 1 | Prints the documented mode-flag inventory; the agent uses `--help` as the only source of truth for mode / scope flag names. |
-| Read the shipped JSON config templates | Read `flow_tune_cfg_public.json`, `flow_tune_cfg_hardware_only.json`, `flow_tune_cfg_software_only.json` on the user's install | [`## configure`](#configure) step 8 | The templates' field set is the schema source of truth for the JSON the operator writes; do not infer fields not present in the templates. |
+| Read the JSON config schema | Read the configuration-file example in the public DOCA Flow Tune guide (`flow_tune_cfg.json`) and `--help` | [`## configure`](#configure) step 8 | The documented field set is the schema source of truth for the JSON the operator writes; do not infer fields not present there. |
 | Confirm the Flow library version on the application side | `pkg-config --modversion doca-flow` on the side the Flow app runs | [`## configure`](#configure) step 1; [`## test`](#test) step 2; [`## debug`](#debug) layer 6 | Matches the version reported by the tune binary's `--version`; disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). |
 | Run offline analyze / visualize against a captured config | The documented offline-mode invocation against a captured pipeline-description JSON | [`## run`](#run) step 2 | The analyze JSON and visualize mermaid render without error; the captured config is the only input. |
 | Snapshot a live Flow pipeline (online read-only) | The documented online-mode invocation against a JSON config naming `network.server_uds` and the scope | [`## run`](#run) step 3 | The dumper CSV, analyze JSON, and visualize mermaid land in the `outputs_directory`; live Flow state is not changed. |
-| Diff two captured tune sessions | `scripts/flow_json_diff.py` and `scripts/flow_mermaid_diff.py` from the shipped `scripts/` directory | [`## test`](#test) step 5 | The diff scripts produce a structural and counter diff that the agent quotes verbatim; never paraphrased. |
-| Post-process the dumper CSV | `scripts/hw_counters_csv_analyzer.py` from the shipped `scripts/` directory | [`## run`](#run) step 5 | The analyzer reports per-counter statistics over the captured CSV; the agent quotes the analyzer's output. |
+| Diff two captured tune sessions | Compare the two analyze JSON files and dump files | [`## test`](#test) step 5 | The agent quotes the differing fields verbatim; never paraphrased. |
 | Save a session snapshot for debug | Capture the full `outputs_directory` (CSV + JSON + mermaid + log files) plus the four-tuple of (cmd line, JSON config, DOCA version, device, env) | [`## test`](#test) step 1 + `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) | The saved bundle is consumed by the cross-cutting debug ladder as the Flow-side evidence pair. |
 
 Three cross-cutting rules for this appendix:
@@ -499,8 +491,7 @@ Three cross-cutting rules for this appendix:
   config field name, or recommendation identifier.** `--help` on
   the installed binary plus the public DOCA Flow Tune guide via
   `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
-  plus the shipped `flow_tune_cfg*.json` templates on the user's
-  install are the joint contract.
+  are the joint contract.
 - **Smoke before bulk.** Every row presumes the offline smoke or
   the online read-only smoke succeeded first; a state-changing
   application of a recommendation without the smoke is the
@@ -510,9 +501,7 @@ Three cross-cutting rules for this appendix:
   live in `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md`);
   Flow-application-side build / port / pipe commands live in
   `doca-flow TASKS.md ## Command appendix` (`doca-flow/TASKS.md`);
-  the perf-side measurement commands live in
-  `doca-flow-perf/SKILL.md`; this
-  appendix names only `doca_flow_tune`-specific invocations on
+  this appendix names only `doca_flow_tune`-specific invocations on
   top.
 
 ## Cross-cutting
@@ -522,10 +511,9 @@ here so they are visible at the point of action and not buried
 in [`SKILL.md`](SKILL.md):
 
 - The **public DOCA Flow Tune guide** plus the installed
-  `--help` plus the shipped `flow_tune_cfg*.json` templates are
-  the joint source of truth. When they disagree (e.g. a field
+  `--help` are the joint source of truth. When they disagree (e.g. a field
   landed in a release this skill was not written against), the
-  *installed* templates win for the user's actual session.
+  *installed* `--help` wins for the user's actual session.
 - `doca_flow_tune` *is* one binary with two internal roles.
   The agent must say which role a session uses (offline /
   online read-only / online state-changing) before invocation
@@ -547,7 +535,5 @@ in [`SKILL.md`](SKILL.md):
   route to
   `doca-setup/SKILL.md` and
   `doca-flow/SKILL.md` before running
-  anything else here. For baselines that the recommendations
-  optimize on top of, load
-  `doca-flow-perf/SKILL.md`
-  alongside.
+  anything else here. Capture the monitor-mode baseline before
+  any recommendation.

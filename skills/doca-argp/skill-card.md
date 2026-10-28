@@ -1,5 +1,5 @@
 ## Description: <br>
-A thin-loader DOCA skill for hands-on DOCA Arg Parser CLI work — adding, removing, or renaming flags, wiring the doca_argp init/start/destroy lifecycle, choosing a public parameter type, preserving the standard DOCA CLI surface, and debugging doca_argp_* errors on a shipped sample or new DOCA-using application. <br>
+A thin-loader DOCA skill for hands-on DOCA Arg Parser CLI work — adding, removing, or renaming flags, wiring the doca_argp init/register/start/destroy lifecycle, choosing one of the six public parameter types, preserving the built-in DOCA CLI flags, and debugging doca_argp_* errors on a shipped sample or new DOCA-using application. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building or modifying DOCA-using applications use this skill for hands-on Arg Parser CLI work — adding/renaming flags, wiring the doca_argp lifecycle, selecting parameter types, driving samples from a JSON config, verifying the installed Arg Parser version, and debugging DOCA_ERROR_* results from doca_argp_* calls. <br>
+External developers building or modifying DOCA-using applications use this skill for hands-on Arg Parser CLI work — adding or renaming flags, wiring the doca_argp lifecycle, selecting parameter types, driving samples from a JSON config via --json, verifying the installed Arg Parser version, and debugging DOCA_ERROR_* results from doca_argp_* calls. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -39,13 +39,13 @@ Mitigation: Review and scan skill before deployment. <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), each attempt run in its own isolated k8s-sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each attempt run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -53,15 +53,15 @@ Reported benchmark dimensions: <br>
 - Correctness: Is the answer correct? Final-answer correctness against the reference answer. <br>
 - Discoverability: Was the right skill loaded when needed, and were decoys avoided? <br>
 - Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
@@ -69,15 +69,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.4% (uplift unavailable) | 98.0% (uplift unavailable) |
+| Overall | 96.4% (uplift unavailable) | 88.8% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 75.0% → 100.0% (+25.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% (uplift unavailable) | 93.3% (uplift unavailable) |
-| Effectiveness | 52.5% → 100.0% (+47.5 points) | 71.9% → 100.0% (+28.1 points) |
-| Efficiency | 86.8% (uplift unavailable) | 96.6% (uplift unavailable) |
+| Correctness | 85.0% → 100.0% (+15.0 points) | 95.0% → 95.0% (±0.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 54.2% → 91.7% (+37.5 points) | 66.7% → 79.2% (+12.5 points) |
+| Efficiency | 90.1% (uplift unavailable) | 75.0% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+c98e456 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -20,7 +20,7 @@ Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the 
 
 Each verb below describes the **shape of the workflow**, not a copy-paste recipe. The agent's job is to walk the user through the steps in order, verifying preconditions before recommending the next call.
 
-This skill scopes itself to **env work and the front-door routing decision**. Three of the six lint-required task verbs (`## build`, `## modify`, `## run`) describe their own substance in `doca-programming-guide/SKILL.md` after the env / program split — the anchors here exist for lint compliance and route there. The verbs this skill *owns* are `## recognize` (the front door), `## configure`, `## test`, `## debug`, and the critical `## no-install` (the NGC container path included).
+This skill scopes itself to **env work and the front-door routing decision**. Three of the six task verbs (`## build`, `## modify`, `## run`) describe their own substance in `doca-programming-guide/SKILL.md` after the env / program split — the anchors here route there. The verbs this skill *owns* are `## recognize` (the front door), `## configure`, `## test`, `## debug`, and the critical `## no-install` (the NGC container path included).
 
 ## recognize
 
@@ -108,7 +108,7 @@ Steps the agent should walk the user through:
 
 ## build
 
-> **Anchor exists for lint compliance.** The substance of this verb — the canonical `pkg-config doca-<library>` + meson build pattern, in two language tracks (C/C++ direct, non-C via FFI) — moved to `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`) when the env / program split happened. *Building a DOCA application is a programming verb, not an env verb.*
+> **Routing anchor.** The substance of this verb — the canonical `pkg-config doca-<library>` + meson build pattern, in two language tracks (C/C++ direct, non-C via FFI) — moved to `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`) when the env / program split happened. *Building a DOCA application is a programming verb, not an env verb.*
 
 The env / program distinction is a CLASS distinction the agent must
 make before it picks an answer. Route by which side of the line the
@@ -127,7 +127,7 @@ CLASSES; specific symptoms are instances.
 
 ## modify
 
-> **Anchor exists for lint compliance.** The substance of this verb — the universal *derive a custom first application from a shipped sample* workflow, with C/C++ + non-C language tracks and an explicit precondition gate — moved to `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`) when the env / program split happened. *Deriving a first app from a sample is a programming verb, not an env verb.*
+> **Routing anchor.** The substance of this verb — the universal *derive a custom first application from a shipped sample* workflow, with C/C++ + non-C language tracks and an explicit precondition gate — moved to `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`) when the env / program split happened. *Deriving a first app from a sample is a programming verb, not an env verb.*
 
 Route here only when the modify-class question is actually an env
 question in disguise:
@@ -145,7 +145,7 @@ preconditions that workflow assumes are already true.
 
 ## run
 
-> **Anchor exists for lint compliance.** The substance of this verb — running a built DOCA program, picking the right `--sdk-log-level`, mapping startup failures to env-class vs program-class — moved to `doca-programming-guide ## run` (`doca-programming-guide/TASKS.md#run`) when the env / program split happened. *Running a DOCA program is a programming verb; the env-class pre-run checklist (hugepages, devices, representors) is what this skill owns and what `## test` below verifies.*
+> **Routing anchor.** The substance of this verb — running a built DOCA program, picking the right `--sdk-log-level`, mapping startup failures to env-class vs program-class — moved to `doca-programming-guide ## run` (`doca-programming-guide/TASKS.md#run`) when the env / program split happened. *Running a DOCA program is a programming verb; the env-class pre-run checklist (hugepages, devices, representors) is what this skill owns and what `## test` below verifies.*
 
 The env-class pre-run checklist, listed here so an agent answering a
 "my program won't start" question has the canonical sequence before

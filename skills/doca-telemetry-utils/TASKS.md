@@ -216,11 +216,9 @@ Routing for nearby "modify" questions:
 The three documented invocations — every
 `doca_telemetry_utils` session uses one or more of
 them. The full invocation surface lives in the
-public DOCA Telemetry guide and the shipped README
-at `/opt/mellanox/doca/tools/telemetry_utils/README.md`;
-this section names the *shape* of the flow, not
-verbatim command lines beyond what the README
-documents.
+public DOCA Telemetry Utils guide; this section names
+the *shape* of the flow, not verbatim command lines
+beyond what the guide documents.
 
 1. **Confirm prerequisites.** Per [`## install`](#install)
    and [`## configure`](#configure): binary
@@ -243,7 +241,7 @@ documents.
     - Run `doca_telemetry_utils <name>
       <property-values>` to resolve the Data ID
       with the chosen property values. The output
-      tuple per the shipped README:
+      tuple:
       `Data ID: 0x...`, `Name: ...`, `Unit: ...`,
       property-axis values.
     - Capture the resolved tuple as evidence per
@@ -370,8 +368,7 @@ in order. The shape of the diagnosis:
    at a known version per
    `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 2. **Parse.** Re-read `--help` on the installed
-   binary and the shipped README at
-   `/opt/mellanox/doca/tools/telemetry_utils/README.md`;
+   binary and the public DOCA Telemetry Utils guide;
    confirm the invocation matches one of the
    three documented classes; confirm the Data ID
    format (the documented form is `0x`-prefixed
@@ -486,9 +483,8 @@ of them under this skill's name.
 the verbs above reach for. Every row is a CLASS —
 the agent must not invent flags, counter names,
 property values, or Data IDs beyond `--help` on
-the installed binary, the shipped README at
-`/opt/mellanox/doca/tools/telemetry_utils/README.md`,
-and the public DOCA Telemetry page.
+the installed binary and the public DOCA Telemetry
+Utils page.
 
 **Infra-aware preamble (every row below).** Per
 the bundle's detect → prefer → fall back → report
@@ -513,18 +509,18 @@ the agent should:
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
-| Print help banner / documented flag surface | `doca_telemetry_utils` (no args) + the shipped README + the public DOCA Telemetry page | [`## configure`](#configure); [`## debug`](#debug) layer 2 | Prints the documented inventory of subcommands and option shapes. |
+| Print help banner / documented flag surface | `doca_telemetry_utils` (no args) + the public DOCA Telemetry Utils page | [`## configure`](#configure); [`## debug`](#debug) layer 2 | Prints the documented inventory of subcommands and option shapes. |
 | Enumerate the diagnostic-counter schema | `doca_telemetry_utils get-counters` | [`## run`](#run) step 2 | Prints every counter name DOCA understands on this install; the agent captures the output as the canonical catalog. |
-| Resolve a name to a Data ID with properties | `doca_telemetry_utils <name> <property-values>` (re-run `doca_telemetry_utils <name>` first if property options are unknown) | [`## run`](#run) step 3 | Prints the (Data ID, Name, Unit, property-values) tuple per the shipped README's worked example. |
+| Resolve a name to a Data ID with properties | `doca_telemetry_utils <name> <property-values>` (re-run `doca_telemetry_utils <name>` first if property options are unknown) | [`## run`](#run) step 3 | Prints the (Data ID, Name, Unit, property-values) tuple. |
 | Run a per-device support probe | `doca_telemetry_utils <device PCI> <name> <property-values>` | [`## run`](#run) step 4 | Reports the resolved tuple + a *"supported"* / *"not supported"* answer for this device. |
-| Reverse-resolve a Data ID | `doca_telemetry_utils <DATA_ID>` (`0x`-prefixed hex per the shipped README's worked example) | [`## run`](#run) step 5 | Prints the counter name + unit + property values that the Data ID encodes. |
+| Reverse-resolve a Data ID | `doca_telemetry_utils <DATA_ID>` (`0x`-prefixed hex) | [`## run`](#run) step 5 | Prints the counter name + unit + property values that the Data ID encodes. |
 
 Three cross-cutting rules for this appendix:
 
 - **Never invent a counter name, property value,
   or Data ID.** `--help` on the installed binary,
-  the shipped README, and the public DOCA
-  Telemetry page are the joint contract.
+  and the public DOCA Telemetry Utils page are the
+  joint contract.
 - **Round-trip before commit.** Every counter
   committed to an exporter config is first run
   through name → ID → per-device probe → exporter
@@ -549,8 +545,7 @@ point of action and not buried in
 [`SKILL.md`](SKILL.md):
 
 - The **public DOCA Telemetry page** plus the
-  installed `--help` and the shipped README are
-  the joint source of truth. When they disagree,
+  installed `--help` are the joint source of truth. When they disagree,
   the *installed* output wins for the user's
   actual run.
 - **Exporters ship Data IDs, not names.** Every

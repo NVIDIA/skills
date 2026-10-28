@@ -29,7 +29,7 @@ compatibility: >
 # DOCA structured-tools contract
 
 **Where to start:** Reach for this skill whenever a workflow says
-*"prefer the structured tool per `doca-structured-tools-contract`"*.
+*“prefer the structured tool per `doca-structured-tools-contract`”*.
 Read [`## The agent behavior contract`](#the-agent-behavior-contract)
 first, then the matching schema in [`## Schemas`](#schemas). If the
 host has the structured tool, prefer its output; if not, fall back to
@@ -75,9 +75,9 @@ host, directly or via user-run commands.
    schema, the structured JSON is the source of truth. When the probe
    fails or output is invalid, walk the manual chain and synthesize
    the equivalent answer.
-3. **Report which path you took.** Open the answer with *"using
-   structured `<helper>` (path: `<path>`)"* OR *"falling back to
-   manual chain (structured `<helper>` probe failed: `<reason>`)"*,
+3. **Report which path you took.** Open the answer with *“using
+   structured `<helper>` (path: `<path>`)”* OR *“falling back to
+   manual chain (structured `<helper>` probe failed: `<reason>`)”*,
    substituting the schema-selected helper and the actual probe
    failure; never report a different helper than selected.
 4. **Schemas are locked here; per-skill overlays are NOT.** A
@@ -87,10 +87,10 @@ host, directly or via user-run commands.
 5. **Never invent a JSON field not in the schema.** Extra fields
    in pasted JSON are advisory; quote the schema as the boundary.
 6. **Schemas describe contracts, not implementations.** The
-   executables satisfying them are deferred to a subsequent PR; this
-   skill exists so other skills can be *infra-aware* before they
-   ship. So **no helper named here is installed anywhere today** —
-   never present one as available or send the user to install it.
+   helpers are optional and are not part of the DOCA packages;
+   a site may provide its own. So **never assume a helper named
+   here is installed** — never present one as available or send
+   the user to install it.
    Probe, report absent in one line, then answer from the manual
    fallback.
 7. **Privilege is never implicit.** A fallback command requiring
@@ -106,9 +106,9 @@ contract:
 
 1. **Detect.** Run the schema's probe command. Examples:
    `command -v doca-env`,
-   `test -f /opt/mellanox/doca/share/version-matrix.json`,
+   `test -f <site version-matrix.json path>`,
    `command -v doca-capability-snapshot`. Probes are read-only and
-   safe. Helpers are deferred to PR2, so failed probes are expected.
+   safe. The helpers are optional, so failed probes are expected.
 2. **Prefer.** If the probe succeeds, invoke the structured tool and
    parse its JSON per the schema in [`## Schemas`](#schemas). It is
    authoritative only when parsing succeeds and every required field
@@ -125,14 +125,14 @@ contract:
    completed, and stop rather than presenting partial data as
    complete.
 4. **Report.** Open the answer with one of:
-   - *"Using structured `<tool>` (path: `<path>`)."* — probe succeeded
+   - *“Using structured `<tool>` (path: `<path>`).”* — probe succeeded
      and output validated.
-   - *"Falling back to manual chain (structured `<tool>` probe
-     failed: `<reason>`)."* — probe failed. Include the probe command
+   - *“Falling back to manual chain (structured `<tool>` probe
+     failed: `<reason>`).”* — probe failed. Include the probe command
      and reason; for `command -v`, failure means not on `PATH`, not
      definitively absent. Do not suggest installing it (rule 6).
-   - *"Falling back to manual chain (`<tool>` output failed schema
-     validation: `<reason>`)."* — the helper exists but its output is
+   - *“Falling back to manual chain (`<tool>` output failed schema
+     validation: `<reason>`).”* — the helper exists but its output is
      malformed, missing required fields, or invalid types.
 
 The report step proves the agent tried the helper first.
@@ -150,8 +150,7 @@ walked when the probe fails.
 
 ### doca-env --json schema
 
-**Detection probe:** `command -v doca-env` (same `$PATH` location as
-`doca_caps` when installed).
+**Detection probe:** `command -v doca-env`.
 
 **Top-level shape (JSON object):**
 
@@ -173,7 +172,7 @@ the same answer):
 2. `cat /opt/mellanox/doca/applications/VERSION` → `version.applications_version`
 3. `doca_caps --version` → `version.doca_caps`
 4. `doca_caps --list-devs` → `devices` array (PCIe address + kind + representor)
-5. Find `doca-common.pc` first: if `find /opt/mellanox/doca -name doca-common.pc -print -quit` is empty, stop, surface the partial-install gap, and route to `doca-setup`; never expand an empty glob. Otherwise set `PCDIR` to its directory and run `for pc in "$PCDIR"/*.pc; do pkg-config --exists "$(basename "$pc" .pc)" && echo "$pc"; done` → `libraries` array. If `PCDIR` is not a directory or no module resolves, surface the gap and route to `doca-setup`. `PCDIR` is commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig` on DOCA 3.3+, or `/opt/mellanox/doca/infrastructure/lib/pkgconfig` on legacy / split-profile installs.
+5. Find `doca-common.pc` first: if `find /opt/mellanox/doca -name doca-common.pc -print -quit` is empty, stop, surface the partial-install gap, and route to `doca-setup`; never expand an empty glob. Otherwise set `PCDIR` to its directory and run `for pc in "$PCDIR"/*.pc; do m="${pc##*/}"; pkg-config --exists "${m%.pc}" && echo "$pc"; done` → `libraries` array. If `PCDIR` is not a directory or no module resolves, surface the gap and route to `doca-setup`. `PCDIR` is commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig` on DOCA 3.3+, or `/opt/mellanox/doca/infrastructure/lib/pkgconfig` on legacy / split-profile installs.
 6. `ls /opt/mellanox/doca/samples/` → `sample_paths` array
 7. `lsmod | grep -E '^mlx5_(core|ib)'` + `uname -r` → `drivers` object
 8. `cat /proc/meminfo | grep -i Huge` → `hugepages` object
@@ -182,7 +181,7 @@ the same answer):
 
 ### version-matrix.json schema
 
-**Detection probe:** `test -f /opt/mellanox/doca/share/version-matrix.json`.
+**Detection probe:** `test -f <site version-matrix.json path>`.
 
 **Top-level shape (JSON object):**
 
@@ -210,15 +209,14 @@ the same answer):
    CAPABILITIES.md table.
 2. Fetch its per-library doc page via `doca-public-knowledge-map`.
 3. Search it for the capability name; extract and quote the
-   *"available since"* prose verbatim.
+   *“available since”* prose verbatim.
 4. Cross-check `pkg-config --modversion doca-<library>` on the
-   user's host; if it is older than the *"available since"* line,
+   user's host; if it is older than the *“available since”* line,
    the capability is not on this install regardless of the docs.
 
 ### capability-snapshot schema
 
-**Detection probe:** `command -v doca-capability-snapshot` (same
-`$PATH` as `doca_caps` when installed).
+**Detection probe:** `command -v doca-capability-snapshot`.
 
 **Top-level shape (JSON object):**
 
@@ -309,7 +307,8 @@ collect independently on each side and compare.
 The two sides are symmetric so the agent can diff them when
 diagnosing host ↔ BlueField mismatches.
 
-## Relationship to PR2 executables
+## Relationship to helper executables
 
-No helper named here ships yet (ground rule 6); when one lands it
-satisfies the schema above unchanged — no other skill needs a retrofit.
+The helpers are optional and site-provided (ground rule 6); any helper
+that implements a schema above emits it unchanged, so no other skill
+needs a change.

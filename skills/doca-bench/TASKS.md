@@ -57,7 +57,11 @@ Steps the agent should walk the user through, in order:
    test (e.g. COMPRESS, RDMA, AES-GCM, SHA, DMA, EC, Eth,
    Comch, GPUNetIO). An answer that picks one without naming
    the alternatives has silently narrowed the bench to a
-   single-library tool; surface that to the user.
+   single-library tool; surface that to the user. For
+   GPUNetIO, confirm the GPU prerequisites first (DOCA Bench
+   Extension package, GDRCopy with `GDRCOPY_PATH_L`, root,
+   throughput only) per
+   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes).
 4. **Axis 2 — pick the workload shape.** Direction (e.g.
    send vs receive, encrypt vs decrypt, compress vs
    decompress), data provider (file / file-set / random-data
@@ -71,11 +75,9 @@ Steps the agent should walk the user through, in order:
    generation.
 5. **Axis 3 — pick the measurement mode.** Throughput vs
    bulk-latency vs precision-latency — the three modes the
-   public guide documents; confirm the full list (e.g. whether
-   `max-bandwidth` is accepted) with `--help`. Quote back to the user *why* you
+   public guide documents; confirm the list with `--help`. Quote back to the user *why* you
    picked the mode — *"throughput because the user asked
-   about aggregate op-rate"*, *"max-bandwidth (only if `--help` lists it) because the
-   user asked for the saturation ceiling"*,
+   about aggregate op-rate"*,
    *"precision-latency because the user
    asked about per-job tail latency"* — so the user can
    challenge the framing if it does not match intent. The
@@ -273,7 +275,7 @@ one library × mode):
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
 | Smoke completed; number is far below datasheet headline | Could be cold pipeline, wrong workload shape, wrong NUMA, or actually-right for this install. Do not assume datasheet first. | Confirm warm-up applied per [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy) layer 5; re-check axis 2 (workload shape) in [`## configure`](#configure) step 4; only then question hardware. |
-| Throughput- or max-bandwidth-mode result exceeds the workload's predeclared tolerance across re-runs | Steady-state not reached; outlier-dominated run | Lengthen the run via the documented duration / job-count limit and re-run. Do not substitute an after-the-fact tolerance. |
+| Throughput-mode result exceeds the workload's predeclared tolerance across re-runs | Steady-state not reached; outlier-dominated run | Lengthen the run via the documented duration / job-count limit and re-run. Do not substitute an after-the-fact tolerance. |
 | Precision-latency mean looks good; 99.99th percentile is huge | Tail-latency story is the actual answer; the mean is misleading | Quote the percentile breakdown, not the mean, per [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability) the precision-latency mode's reported distribution. |
 | Same invocation produces different numbers on two hosts at the same DOCA version | NUMA / firmware / driver delta below DOCA | Walk axis 2 environment (cores / threads / NUMA) and the version layer per `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) before blaming bench. |
 | Same invocation produces different numbers on the same host across DOCA versions | This *is* a regression signal — provided both four-tuples are captured | Cross-link the two baselines, name the changed fields, route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) for the version-delta diagnosis. |
@@ -428,10 +430,9 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env --json`
    for version + devices + libraries + drivers + hugepages in one
    shot; `doca-capability-snapshot` for per-device capability
-   flags; `version-matrix.json` for *"available since"* lookups;
-   a future bench-runner / bench-snapshot helper for the
-   four-tuple-capturing baseline pattern when it lands per
-   `doca-structured-tools-contract ## Relationship to PR2 executables` (`doca-structured-tools-contract/SKILL.md#relationship-to-pr2-executables`)).
+   flags; `version-matrix.json` for *"available since"* lookups —
+   all per
+   `doca-structured-tools-contract ## Relationship to helper executables` (`doca-structured-tools-contract/SKILL.md#relationship-to-helper-executables`)).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

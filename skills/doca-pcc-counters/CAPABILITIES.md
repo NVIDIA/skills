@@ -34,8 +34,8 @@ Two cross-cutting rules that apply to *every* pattern above:
 - **`set` arms, `query` reads — in that order.** `query`
   without a prior `set` reads whatever the device's `diag_cnt`
   was last configured for (possibly nothing). The documented
-  sequence in the script's own header comment is *"always
-  `set` first then `query`"*.
+  sequence in the script's own header comment is *“always
+  `set` first then `query`”*.
 - **These are firmware / HW diagnostic counters.** They exist
   at the device level and are INDEPENDENT of any custom
   `doca-pcc` DPA kernel. Do not condition a reading on a
@@ -45,9 +45,7 @@ Two cross-cutting rules that apply to *every* pattern above:
 ## Capabilities and modes
 
 `pcc_counters.sh` is a **bash script** installed under the
-DOCA tools directory (`install_data` in
-`tools/pcc_counters/meson.build`, installed when the build is
-not an internal-tool build). There is no daemon, no library to
+DOCA tools directory on a standard install. There is no daemon, no library to
 link against, no `--help`, no `--version`, and no subcommands
 beyond the two operations below. The entire interaction model
 is *run the script with two positional arguments, read the
@@ -112,9 +110,7 @@ there; this skill does not duplicate it.
 
 - **Confirm the script is present before assuming
   availability.** It is installed under the DOCA tools
-  directory by `install_data` in
-  `tools/pcc_counters/meson.build` (and only when the build is
-  not an internal-tool build). If the script is absent, route
+  directory on a standard install. If the script is absent, route
   to `doca-setup/SKILL.md`; do NOT
   re-implement the script or quote counter values from memory.
 - **mst / MFT and debugfs are the real preconditions.** The
@@ -137,7 +133,7 @@ order:
 
 1. **Script-not-present.** `pcc_counters.sh` is not under the
    DOCA tools directory. Cause: DOCA / MFT not installed, or an
-   internal-tool build that did not install it. Routing:
+   install that did not include it. Routing:
   `doca-setup ## configure` (`doca-setup/TASKS.md#configure`).
 2. **Bad-device.** The script prints `ERROR: Bad Device`.
    Cause: the mst device path does not match an entry in
@@ -242,7 +238,7 @@ firmware congestion-control surface is the DOCA / PCC
 documentation on `docs.nvidia.com`, reachable through
 `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 The authoritative source for the script's exact behaviour is
-the script itself (`tools/pcc_counters/pcc_counters.sh`) on the
+the script itself (`/opt/mellanox/doca/tools/pcc_counters.sh`) on the
 user's install. For the `doca-pcc` library that loads custom
 congestion-control kernels (a separate surface), see
 `doca-pcc/SKILL.md`.

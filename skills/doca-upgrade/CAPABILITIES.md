@@ -69,10 +69,9 @@ number; the agent does not conflate them.
 
 When the agent detects what is installed, part of the gap report is
 checking whether an installed component is on a deprecation / sunset
-track. The team has flagged DOCA App Shield and the DOCA Flow
-Inspector service — both now policy-excluded from this public
-bundle (see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
-item 7) — as worked examples to watch on this front. The discipline is:
+track. DOCA App Shield and the DOCA Flow Inspector service (both
+outside this bundle's scope; see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
+item 7) are worked examples to watch on this front. The discipline is:
 
 - Treat a possible sunset as a finding to **surface**, not a fact to
   assert from memory. The authoritative statement of a component's

@@ -15,7 +15,7 @@ description: >
   mutation — those belong to doca-programming-guide, doca-setup, the
   per-library skills, and doca-hardware-safety.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: knowledge
   doca_version: "3.5"
   tags:
@@ -60,9 +60,9 @@ install path, and only then answer.
 
 ## First-contact discovery — the four questions to ask before any drill-down
 
-When a user opens with an open-ended orientation question (*"I'm new with
-DOCA, how do I start?"*, *"can you guide me?"*, *"what's the easiest way to
-try DOCA?"*), the agent does **not** have enough information yet to pick a
+When a user opens with an open-ended orientation question (*“I'm new with
+DOCA, how do I start?”*, *“can you guide me?”*, *“what's the easiest way to
+try DOCA?”*), the agent does **not** have enough information yet to pick a
 path. Asking these four questions before drilling avoids wasted recommendations
 that the user cannot actually execute on their setup. Ask them as a single
 short message; do not interrogate one-at-a-time.
@@ -136,8 +136,8 @@ For env preparation — install verification, build environment
 the *I have no install yet* path with the public NGC DOCA container
 on the catalog Tags page as the universal Stage-1 fallback for any
 user on macOS, Windows, or Linux without DOCA — load
-`doca-setup/SKILL.md`. That skill stops at *"the
-install is healthy and the env is ready"*.
+`doca-setup/SKILL.md`. That skill stops at *“the
+install is healthy and the env is ready”*.
 
 For general DOCA programming patterns shared across every library —
 the canonical `pkg-config doca-<library>` build pattern (C/C++ direct
@@ -247,14 +247,14 @@ Do not hand-roll per-host `bfb-install` loops at that scale.
 
 In-bundle DOCA tool guide rows live in
 [`references/tools.md`](references/tools.md#doca-tools).
-Open that companion for caps / bench / tune / tracer docs routes.
+Open that companion for caps / bench / tune docs routes.
 
 ## Externally-productized DOCA software — not in this bundle, but here is where to route
 
-The 26-product route-not-answer table starts in
+The 25-product route-not-answer table starts in
 [`references/external-dpu.md`](references/external-dpu.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
 and continues from its last section for fabric, orchestration, firmware
 and switch products.
-Recognize the class, name the monorepo boundary, and route with a public
+Recognize the class, name the DOCA SDK boundary, and route with a public
 URL plus a Developer Forum search hint. Do not synthesize those products
 from training knowledge.

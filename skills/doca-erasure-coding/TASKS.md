@@ -52,7 +52,7 @@ Steps the agent should walk the user through:
    `doca_ec_cap_task_recover_is_supported(devinfo)`,
    `doca_ec_cap_task_update_is_supported(devinfo)`,
    `doca_ec_cap_task_galois_mul_is_supported(devinfo)` (the 4th
-   public task — bundle previously omitted this row),
+   public task),
    `doca_ec_cap_get_max_block_size(devinfo)`,
    `doca_ec_cap_get_max_buf_list_len(devinfo, &max_buf_list_len)`, and a
    per-variant `doca_ec_matrix_create()` / `_create_from_raw()`
@@ -181,9 +181,7 @@ before recommending any code-level edit:
 
 The agent emits an *intent description + the filled slots*; the
 *actual* unified diff against the sample source is produced by
-the modify-from-sample renderer (deferred to a future round, per
-`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`)).
-Until the renderer ships, the agent must walk the user through
+the user (this bundle has no diff renderer; see `doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`)). The agent must walk the user through
 the diff line-by-line against the sample source they read on
 disk, and have the user paste back the result for validation.
 
@@ -428,8 +426,7 @@ so the agent does not invent guidance:
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying EC-using applications at scale (storage
   daemons running create / recover / update on many nodes,
-  rebuild workers, Kubernetes operator workflows) — out of
-  scope for Phase 1 and reserved for a future platform skill.
+  rebuild workers, Kubernetes operator workflows) — out of scope for this skill.
   For single-host first-run testing, the right verb in this
   skill is `## run`; do not invent a "deploy" workflow.
 - **rollback.** Coordinated rollback of EC-using applications
@@ -485,7 +482,7 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-erasure-coding` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA EC version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --cflags --libs doca-erasure-coding` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-erasure-coding` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `doca_caps --list-devs` | `## configure` step 2; `## run` step 1 | Which devices on this host can be used as a `doca_dev` for EC? | One row per visible device with PCIe address and capability flags; the agent must still run `doca_ec_cap_*` per-device to confirm per-task and matrix-type support |
 | `doca_caps --version` | `## configure` step 1; `## test` step 1 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca-erasure-coding` |
 | `ls /opt/mellanox/doca/samples/doca_erasure_coding/` | `## modify` slot 1 | Which EC samples ship in this install, and which is the closest starting point? | A list of sample directories named after the task direction they demonstrate (create / recover / update) |

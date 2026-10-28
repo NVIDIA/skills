@@ -18,7 +18,7 @@ description: >
   stdout logging via doca_log, or real-time event subscription back into
   the app via doca-comch — those belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

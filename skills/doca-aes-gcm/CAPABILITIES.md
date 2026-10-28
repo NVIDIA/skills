@@ -169,7 +169,7 @@ there; this skill does not duplicate it.
   the cap query is the runtime authority — never quote a key
   type as available from agent memory.
 - **Per-device task presence is independent of the library install.**
-  An install that ships the `doca-aes-gcm` shared object (verify with `ldconfig -p | grep -i doca_aes_gcm`; the on-disk basename uses underscores on every DOCA release where we have ground truth) does not guarantee a
+  An install that ships the `doca-aes-gcm` shared object (verify with `ldconfig -p | grep -i doca_aes_gcm`; the on-disk basename uses underscores) does not guarantee a
   particular device exposes both encrypt and decrypt; some device
   generations advertise only one. Confirm via
   `doca_aes_gcm_cap_task_encrypt_is_supported(devinfo)` and
@@ -380,12 +380,12 @@ topics the agent will get asked but should route elsewhere:
   `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the AES-GCM overlay, not the taxonomy itself.
 - **Other DOCA crypto-acceleration libraries (DOCA SHA, DOCA
-  Compress, DOCA DMA)** — separate libraries with their own skills
-  (when they ship). Path-selection guidance in
+  Compress, DOCA DMA)** — separate libraries with their own skills.
+  Path-selection guidance in
   [`## Capabilities and modes`](#capabilities-and-modes) names them;
   the deep per-library substance lives in the matching skill.
 - **Cross-library `doca_caps` invocation patterns** — owned by the
-  cross-library `doca-caps` tool skill (when it ships). This skill
+  cross-library `doca-caps` tool skill. This skill
   references the *AES-GCM capability query family*
   (`doca_aes_gcm_cap_*`), which is per-library; the *cross-library
   capability snapshot tool* (`doca_caps --list-devs`) is a separate

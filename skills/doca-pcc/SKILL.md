@@ -19,7 +19,7 @@ description: >
   ConnectX firmware, or setting up the RDMA / RoCE traffic — those
   belong to other skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -266,8 +266,8 @@ contain — and pull requests should not add:
   even one labeled "reference", is misleading: users will read
   it as buildable.
 - **`pcc_counters` tool surface.** That CLI is a *separate
-  artifact* (the `pcc_counters.sh` script under
-  `tools/pcc_counters/`) with its own page; routing lives in
+  artifact* (the `pcc_counters.sh` script installed at
+  `/opt/mellanox/doca/tools/pcc_counters.sh`) with its own page; routing lives in
   `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
   Conflating it with the library is the most common PCC
   first-app design error.

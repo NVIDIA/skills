@@ -17,7 +17,7 @@ description: >
   installation elsewhere. DPU OS installation is destructive and always
   requires explicit confirmation.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -36,10 +36,10 @@ compatibility: >
 
 ## Examples
 
-- **"How do I bring up a Flow port on a representor?"** — this is in
+- **“How do I bring up a Flow port on a representor?”** — this is in
   scope. Use the installed header and a shipped sample; do not author
   a first-app `main.c`.
-- **"Match 5-tuple and send to a queue."** — express it as a Flow
+- **“Match 5-tuple and send to a queue.”** — express it as a Flow
   pipe. Do not fall back to kernel tc or iptables.
 
 ## Instructions
@@ -214,27 +214,27 @@ costs the user more than an honest refusal plus the legal alternative.
 The CLASSES of Flow questions this skill answers (the *class* is the
 load-bearing piece; the example is one instance):
 
-- **"How do I bring up a Flow port on a representor?"** →
+- **“How do I bring up a Flow port on a representor?”** →
   ## configure +
   ## Capabilities and modes.
-- **"How do I express *<match X, do Y>* as a pipe?"** →
+- **“How do I express *<match X, do Y>* as a pipe?”** →
   ## Capabilities and modes
   + ## modify.
-- **"Will this pipe spec program the HW, or will commit fail?"** →
+- **“Will this pipe spec program the HW, or will commit fail?”** →
   ## Safety policy
   + ## test.
-- **"How do I read Flow counters to investigate observed traffic?"** →
+- **“How do I read Flow counters to investigate observed traffic?”** →
   ## Observability
   + ## debug.
-- **"My Flow port won't start — `Failed to get hws cap` / `dest action
+- **“My Flow port won't start — `Failed to get hws cap` / `dest action
   ROOT … err -121`."** → device-placement signature (not a pipe bug);
   the steering plane belongs to the DPU Arm on a `SEPARATED_HOST` /
   NIC-mode BlueField. See the device-placement bullet in
   ## Capabilities and modes
   + ## configure step 2 + Step 0 of
   ## debug.
-- **"How do I add hardware-accelerated stateful 5-tuple connection
-  tracking (aging, NAT) on top of my existing doca-flow setup?"** →
+- **“How do I add hardware-accelerated stateful 5-tuple connection
+  tracking (aging, NAT) on top of my existing doca-flow setup?”** →
   ## flow-ct +
   ## flow-ct.
 

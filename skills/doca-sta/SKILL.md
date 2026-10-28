@@ -14,7 +14,7 @@ description: >
   and route to the proper owner for raw RDMA movement, packet I/O,
   steering rules, initiator-side NVMe, or SDK install.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -158,8 +158,8 @@ itself, and it is *not* for initiator/host-side NVMe stacks.
 
 **Language scope.** DOCA STA ships as a C library with
 `pkg-config` module name `doca-sta`. DOCA STA ships **no public
-samples** — it is absent from the DOCA libraries /
-extension_libraries sample profiles — so the worked examples in
+samples** — the public packages install no
+`samples/doca_sta/` directory — so the worked examples in
 the tasks companion build against the public headers directly rather than
 modify a shipped sample. C and C++ consumers are the canonical
 case. Other-language
@@ -258,9 +258,7 @@ contain — and pull requests should not add:
 
 - **Pre-written DOCA STA application source code, in any
   language.** DOCA STA ships **no public samples** — there is no
-  `/opt/mellanox/doca/samples/doca_sta/` directory, and STA is
-  absent from the libraries / extension_libraries sample
-  profiles. The authoritative surface is the public headers under
+  `/opt/mellanox/doca/samples/doca_sta/` directory. The authoritative surface is the public headers under
   $(pkg-config --variable=includedir doca-common) plus the public
   DOCA STA guide; the agent builds against those directly rather
   than modifying a shipped sample, per the

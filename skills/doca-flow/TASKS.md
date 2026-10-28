@@ -210,16 +210,16 @@ doca_flow_port_cfg_destroy(port_cfg);
    `doca_flow_port_cfg_set_devargs()` carries *other* per-port options
    (the shipped `flow_common.c` passes `"th_win_us=0"`), not
    identity; a numeric devargs string like `"0"` leaves the `port_id`
-   unset and `doca_flow_port_start()` aborts with *"port ID is
-   mandatory"*. Only `doca_flow_port_cfg_set_port_id()` binds the port
+   unset and `doca_flow_port_start()` aborts with *“port ID is
+   mandatory”*. Only `doca_flow_port_cfg_set_port_id()` binds the port
    (`flow_common.c`), and it is a *different* "devargs" from the
    EAL probe devarg `dv_flow_en=2` in step 5 — three unrelated uses of
    the word. In VNF mode, pair it with the *matching* probed `doca_dev`
    via `set_dev()` — **mandatory, not HWS-only**. In switch mode, use the
    installed sample's matching `doca_dev_rep` path instead. Omitting both
-   device sources aborts with *"either doca_dev or doca_dev_rep must be
-   provided"* (`engine_port.c`, sometimes surfaced as a bare *"Unknown
-   error"*). The `port_id` MUST be the DOCA-probed id from above (per
+   device sources aborts with *“either doca_dev or doca_dev_rep must be
+   provided”* (sometimes surfaced as a bare *“Unknown
+   error”*). The `port_id` MUST be the DOCA-probed id from above (per
    the hardware-neutral rule earlier in this step); a hard-coded `0`
    surfaces as `doca_dpdk_port_as_dev(0): Requested Resource Not
    Found`.
@@ -330,7 +330,8 @@ doca_flow_port_cfg_set_nr_resources(port_cfg, DOCA_FLOW_RESOURCE_COUNTER, N);
    `actions.decap_cfg` (e.g. `decap_cfg.is_l2 = true`) describes *how* to
    decap but does not turn it on — you must also set `actions.decap_type =
    DOCA_FLOW_RESOURCE_TYPE_NON_SHARED` (the enable used across every
-   shipped app — grep `decap_type =` in the sample/test tree). The same
+   shipped app — grep `decap_type =` under `/opt/mellanox/doca/samples/` and
+`/opt/mellanox/doca/applications/`). The same
    pairing holds for `encap_type` / `encap_cfg`. A pipe that sets only
    `*_cfg` compiles and runs, but the header is never stripped/added.
 5. Do **not** call the entry-add API yet — the spec is built, not
@@ -832,7 +833,7 @@ ladder:
   and the traffic on the wire. Read both sides verbatim — the
   cap-query is NOT the right diagnostic here; the entry shape
   vs traffic shape comparison is. Same shape as the parent
-  *"pipe matches nothing"* diag in [`## debug`](#debug), with
+  *“pipe matches nothing”* diag in [`## debug`](#debug), with
   CT's 5-tuple match instead of an arbitrary pipe match.
 - NAT translation conflicts surface as `DOCA_ERROR_INVALID_VALUE`
   on entry add. Per
@@ -938,7 +939,7 @@ additions route through [`## flow-ct`](#flow-ct) rollback overlay
 instead.)
 The
 universal verification contract (`doca-setup/CAPABILITIES.md#universal-verification-contract`)
-requires *"the rollback path is documented"* on every change-recommending
+requires *“the rollback path is documented”* on every change-recommending
 answer.
 
 **Snapshot before mutate.** Before any change-recommending edit on an
@@ -1026,13 +1027,11 @@ does not invent guidance:
   doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying BlueField images, provisioning DPUs at scale,
-  Kubernetes operator workflows — out of scope for Phase 1 and reserved
-  for a future platform skill. For now, point the user at the DOCA
-  Platform Framework entry in `doca-public-knowledge-map` and stop
+  Kubernetes operator workflows — out of scope for this skill. Point
+  the user at the DOCA Platform Framework entry in `doca-public-knowledge-map` and stop
   there.
 - **rollback.** Coordinated steering-plane rollback across multiple
-  DPUs and host nodes — out of scope for Phase 1 and reserved for a
-  future platform skill. For single-DPU spec rollback within a session,
+  DPUs and host nodes — out of scope for this skill. For single-DPU spec rollback within a session,
   use the snapshot-first [`## rollback`](#rollback) workflow. Its
   reverse edit may be a `## modify` delta, but only against the
   captured baseline and with the bounded re-verification defined there.

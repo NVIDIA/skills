@@ -14,7 +14,7 @@ description: >
   `doca-telemetry-exporter`; route the deployed DOCA Telemetry Service
   to `doca-dts`, and collectors and plain stdout logging elsewhere.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -68,9 +68,8 @@ opening a per-domain `doca_telemetry_<domain>` context against a
 `doca_dev` and reading the latest hardware-counter snapshot for
 that domain. The library is the **counter-READER** half of DOCA
 telemetry; it is NOT a NetFlow / IPFIX collector and NOT a
-generic schema-event consumer (the bundle previously framed it
-that way and that framing was wrong — there is no NetFlow /
-IPFIX / local-socket transport surface in the public header).
+generic schema-event consumer (there is no NetFlow / IPFIX /
+local-socket transport surface in the public header).
 Open the tasks companion if the user wants to *do* something
 (configure / build / modify / run / test / debug); open
 the capabilities companion when the question is *which

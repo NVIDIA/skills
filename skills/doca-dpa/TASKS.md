@@ -36,18 +36,13 @@ kernel launch can succeed.
 
 Steps the agent should walk the user through:
 
-1. **Confirm the env preconditions.** Per the env-precondition
-   matrix in
-   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy):
-   `pkg-config --modversion doca-dpa` returns a version the
-   installed DPACC compiler is listed as compatible with under
-   the DOCA Compatibility Policy; the target BlueField is
-   present and exposes its DPA processor to the host (the
-   `doca_dev` enumeration succeeds AND a `doca_dpa_cap_*` query
-   against its `doca_devinfo` returns supported for the
-   baseline DPA surface); the user / process can open the
-   target `doca_dev`. If ANY of these fails, this is an env /
-   version / mode problem to fix via
+1. **Confirm the env preconditions.** Walk the three environment
+   rows of the env-precondition matrix in
+   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+   (DPA exposed to the host, DOCA + DPACC compatible, `doca_dev`
+   accessible); the signature and smoke rows are checked later, in
+   `## build` and `## test`. Any failing environment row is an env /
+   version / mode fix via
    `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`)
    + `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`),
    NOT a code change in the host-side DPA program.
@@ -66,16 +61,10 @@ Steps the agent should walk the user through:
    to the public DOCA DPA / DPACC / DPA-Comms / DPA-Verbs
    guides; do not redefine those surfaces here.
 3. **Run dual capability discovery against the target
-   BlueField.** Per the dual-axis rule in
-   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
-   on the DOCA side, run the matching `doca_dpa_cap_*` against
-   the active `doca_devinfo` for the BlueField the host is
-   driving; on the install side, confirm `pkg-config
-   --modversion doca-dpa` agrees with `doca_caps --version`
-   and with the installed `dpacc` version per the DOCA
-   Compatibility Policy. Quote BOTH results back to the user.
-   If either says *not supported*, that axis is the answer —
-   do not proceed.
+   BlueField** per the dual-axis rule in
+   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
+   and quote BOTH results back to the user. If either says *not
+   supported*, that axis is the answer — do not proceed.
 4. **Create the `doca_dpa` Core context against the chosen
    `doca_dev`.** This is a standard DOCA Core context create —
    the universal lifecycle from
@@ -689,8 +678,7 @@ follows so the agent does not invent guidance:
   matched.
 - **deploy.** Deploying DPA-using applications at scale
   (multi-BlueField clusters, Kubernetes operator workflows
-  for DPU workloads, multi-tenant DPA sharing) — out of scope
-  for Phase 1 and reserved for a future platform skill. For
+  for DPU workloads, multi-tenant DPA sharing) — out of scope for this skill. For
   single-host first-run testing, the right verb in this skill
   is `## run`; do not invent a "deploy" workflow.
 - **DPA-side kernel programming and DPACC usage.** Writing the
@@ -745,7 +733,7 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-dpa` | `## configure` step 1; `## build` minimum-version slot | What is the build-time DOCA DPA host-side library version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --cflags --libs doca-dpa` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-dpa` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `which dpacc && dpacc --version` (or the install-tree path) | `## configure` step 1; `## build` minimum-DPACC slot | Is the DPACC compiler installed and at what version? | A version string the agent compares against the DOCA Compatibility Policy linked from [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility). Missing `dpacc` = the DPA-side translation unit cannot be built; route to `doca-setup/SKILL.md` |
 | `doca_caps --list-devs` | `## configure` step 1; `## configure` step 3 | Which DOCA devices does the host see, and which expose a DPA processor? | One entry per `doca_dev` with the BlueField identity and the per-library capability flags including the DPA support axis. No DPA-capable entry = the BlueField is not present, not in the right mode, or not on a generation that exposes the DPA; route to `doca-setup/SKILL.md` |
 | `ls /opt/mellanox/doca/samples/doca_dpa/` | `## modify` slot 1 | Which DPA samples ship in this install (both host-side AND DPA-side translation units), and which is the closest starting point? | A list of sample directories that each contain BOTH host-side and DPA-side source plus a `meson.build` that wires `dpacc` and `pkg-config doca-dpa` together |

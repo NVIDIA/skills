@@ -104,7 +104,7 @@ Three concrete shapes the modify workflow handles:
 
 Each modify intent produces a *minimum diff*; never expand scope
 to "while we're here". A version-only modify that also re-flows
-prose in adjacent sections is a lint regression in disguise.
+prose in adjacent sections is a scope creep in disguise.
 
 ## run
 
@@ -281,9 +281,9 @@ referenced from the cross-cutting precondition step there.
     - **Local file-repo form** — `file:/usr/share/doca-host-<full-build-id>/repo ./`,
       dropped on disk by the `doca-host` meta-package on Ubuntu /
       Debian hosts that installed via the offline `.deb` bundle.
-      Observed in the wild on real DOCA 3.3 installs (the build-id
-      embeds the release: e.g. `doca-host-3.3.0-088910-26.01-ubuntu2204`
-      is DOCA 3.3.0 host build 088910, OFED 26.01, on Ubuntu 22.04).
+      The build-id embeds the release: e.g.
+      `doca-host-3.3.0-088000-26.01-ubuntu2204` is DOCA 3.3.0 host
+      build 088000, OFED 26.01, on Ubuntu 22.04.
       The release channel is the `X.Y.Z` inside the build-id; it
       is **already pinned** by the bundle and cannot drift across
       `apt upgrade` unless `doca-host` itself is upgraded.
@@ -371,13 +371,11 @@ the agent does not invent guidance:
   something is installed; version handling is *what was installed
   and is it consistent*.
 - **deploy.** Deploying DOCA-using applications at scale across
-  multiple hosts / DPUs, Kubernetes operator workflows — out of
-  scope for Phase 1. The multi-host *version match* is handled in
+  multiple hosts / DPUs, Kubernetes operator workflows — out of scope for this skill. The multi-host *version match* is handled in
   this skill's [`## test`](#test) cross-host check; the *deploy
   mechanics* are not.
 - **rollback.** Coordinated rollback of a DOCA release across
-  multiple hosts / DPUs — out of scope for Phase 1 and reserved
-  for a future platform skill. For single-host version rollback,
+  multiple hosts / DPUs — out of scope for this skill. For single-host version rollback,
   the right verb is reinstalling the previous release via
   `doca-setup`; this skill does not own the rollback procedure.
 - **firmware burn / BFB re-image.** Burning new ConnectX firmware

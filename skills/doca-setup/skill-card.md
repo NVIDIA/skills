@@ -15,8 +15,8 @@ Developers and engineers working with NVIDIA DOCA on BlueField or host x86 use t
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [Not Specified] <br>
-**Credential Type(s):** [None identified] <br>
+**Requires API Key or External Credential:** [Optional] <br>
+**Credential Type(s):** [API key] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -30,6 +30,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [no-install.md](references/no-install.md) <br>
 - [recognize.md](references/recognize.md) <br>
 - [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/) <br>
+- [NGC DOCA container tags](https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags) <br>
 - [DOCA samples + applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
 - [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
@@ -61,10 +62,10 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage (50% of Efficiency). <br>
 
 
@@ -72,15 +73,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.9% (uplift unavailable) | 86.4% (uplift unavailable) |
+| Overall | 98.8% (uplift unavailable) | 91.4% (uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 60.0% → 95.0% (+35.0 points) | 70.0% → 85.0% (+15.0 points) |
-| Discoverability | 96.7% (uplift unavailable) | 88.3% (uplift unavailable) |
-| Effectiveness | 50.2% → 74.4% (+24.2 points) | 66.3% → 81.3% (+15.0 points) |
-| Efficiency | 88.2% (uplift unavailable) | 77.4% (uplift unavailable) |
+| Correctness | 65.0% → 100.0% (+35.0 points) | 60.0% → 95.0% (+35.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 83.3% (uplift unavailable) |
+| Effectiveness | 52.1% → 100.0% (+47.9 points) | 83.3% → 100.0% (+16.7 points) |
+| Efficiency | 93.9% (uplift unavailable) | 78.7% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-2a83c6b (source: git SHA, committed 2026-10-24) <br>
+c98e456 (source: git SHA, committed 2026-10-28); DOCA 3.5 (source: frontmatter doca_version) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -282,8 +282,8 @@ samples work on my hardware". The honest answer is *"that depends on
 which category you mean, which dependency stack you have, and which
 target shape you are on"* — and treating *all DOCA samples* or *all
 DOCA applications* as a single bucket is the load-bearing failure
-mode the external feedback flagged (a build sweep that returns
-"139/159 built" hides the fact that the 20 misses are mostly *env
+mode to avoid (a build sweep that returns
+"most built, some failed" hides the fact that the misses are mostly *env
 not present* (GPUNetIO needs `nvcc`, RMAX needs `doca-rmax`), not
 *the DOCA SDK is broken*).
 

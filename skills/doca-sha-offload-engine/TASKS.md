@@ -30,23 +30,23 @@ lives in `doca-setup/SKILL.md`. The
    `../../libs/doca-sha/SKILL.md` (`doca-sha/SKILL.md`)
    and `doca-setup/SKILL.md`.
 2. **OpenSSL ≥ 1.1.1 is present** per the shipped
-   `readme.md`. Verify via `openssl version`. OpenSSL
+   `engine_readme.md`. Verify via `openssl version`. OpenSSL
    3.x is supported via the legacy ENGINE code path
    per
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
-3. **`libssl-dev` (or distribution equivalent) is
-   installed** for the build host per the shipped
-   `test_cmdline_mode/readme.md`. On Ubuntu:
-   `sudo apt install libssl-dev`. On RHEL:
-   `sudo dnf install openssl-devel`. The exact package
-   name is distribution-specific; the agent does not
-   invent it.
+3. **The `doca-sha-offload-engine` package is
+   installed**, so `libdoca_sha_offload_engine.so` and
+   `engine_readme.md` are present under
+   `${DOCA_DIR}/tools/doca_sha_offload_engine/`. For
+   applications that call the ENGINE API, the OpenSSL
+   development headers are also needed (`libssl-dev` on
+   Ubuntu, `openssl-devel` on RHEL).
 4. **DOCA SHA device is visible to DOCA.**
    `doca_caps --list-devs` (per
    `../doca-caps/TASKS.md#run` (`doca-caps/TASKS.md#run`))
    reports a device whose PCIe address the operator
    plans to bind via `set_pci_addr`. The default PCIe
-   address in the shipped source is `03:00.0`; the
+   address in the shipped `engine_readme.md` is `03:00.0`; the
    operator must confirm this matches their hardware
    before relying on it.
 5. **The application embedding the engine has access to
@@ -76,12 +76,9 @@ Steps the agent walks the user through, in order:
 2. **Identify the DOCA SHA PCIe address.** Run
    `doca_caps --list-devs` and pick the device the
    workload should bind. If the host's DOCA SHA device
-   is at `03:00.0`, the engine's build-time default
-   works without override; otherwise the operator must
-   either re-build with the alternative PCIe address
-   (per the shipped `test_cmdline_mode/readme.md` edit-
-   the-`meson.build` workflow) OR pass the PCIe address
-   at load time via the `set_pci_addr` ctrl-cmd.
+   is at `03:00.0`, the engine's default works without
+   override; otherwise the operator passes the PCIe
+   address at load time via the `set_pci_addr` ctrl-cmd.
 3. **Decide CLI vs programmatic load.** For an `openssl
    dgst` / `openssl speed` driven pipeline, CLI is the
    right answer (no application change). For an
@@ -89,7 +86,7 @@ Steps the agent walks the user through, in order:
    verified `ENGINE_load_dynamic` / `ENGINE_by_id` /
    `ENGINE_ctrl_cmd_string` / `ENGINE_init` /
    `ENGINE_set_default_digests` block from the shipped
-   `readme.md` is the minimum source change.
+   `engine_readme.md` is the minimum source change.
 4. **Decide whether to use `-engine_impl`.** Per
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability),
    `-engine_impl` disables OpenSSL's software fallback.
@@ -100,43 +97,27 @@ Steps the agent walks the user through, in order:
    surfaces as an error, not a silent software hash).
 5. **For `openssl speed` perf characterization, decide
    the `-async_jobs` and `-multi` values.** Per the
-   shipped readmes, the engine's perf surface depends on
+   shipped `engine_readme.md`, the engine's perf surface depends on
    the OpenSSL async pipeline; the agent surfaces this
-   to the user before they ask for a *"quick benchmark"*
+   to the user before they ask for a *“quick benchmark”*
    that would not exercise the engine's actual scaling
    shape.
-6. **Confirm the build inputs.** `PKG_CONFIG_PATH`
-   includes the install's `pkgconfig` directory; OpenSSL
-   headers are visible to the `meson` build.
+6. **Confirm the engine path.**
+   `ls ${DOCA_DIR}/tools/doca_sha_offload_engine/libdoca_sha_offload_engine.so`.
 
 ## build
 
-The engine is **not pre-built** under `/opt/mellanox/doca/`
-on all install profiles; the user typically builds it
-from source under `doca/tools/sha_offload_engine/`
-against the installed DOCA. The build pattern (per the
-shipped `test_cmdline_mode/readme.md`):
+The engine ships **pre-built** in the `doca-sha-offload-engine`
+package; there is nothing to compile:
 
-1. **(Optional) edit the build-time PCIe address.** If
-   the user's DOCA SHA device is not at `03:00.0`, edit
-   `doca/tools/sha_offload_engine/meson.build` to
-   change the `-DDOCA_ENGINE_PCI_ADDR="03:00.0"` macro
-   per the verified `test_cmdline_mode/readme.md`. The
-   alternative is to leave the macro alone and pass the
-   PCIe address at load time via `set_pci_addr`.
-2. **Set the right `PKG_CONFIG_PATH`** so `pkg-config`
-   can find `doca-sha.pc`, `doca-common.pc`, and the
-   OpenSSL `.pc` files. The DOCA `pkgconfig` directory
-   is documented in
-   `doca-public-knowledge-map/SKILL.md`.
-3. **Build under the DOCA top-level meson tree.** Per
-   `test_cmdline_mode/readme.md`: `cd ${DOCA_DIR}`;
-   `meson setup build`; `cd build`; `ninja`. The engine's
-   `.so` lands under the build tree at a path the
-   shipped readme documents.
-4. **Confirm the `.so` was produced.** `ls
-   <build-dir>/.../libdoca_sha_offload_engine.so` (or
-   equivalent for the user's install layout).
+1. **Install the package** (`doca-sha-offload-engine`) with the
+   DOCA install, per `doca-setup/SKILL.md`.
+2. **Confirm the `.so` is present.**
+   `ls ${DOCA_DIR}/tools/doca_sha_offload_engine/libdoca_sha_offload_engine.so`.
+3. **Set the PCIe address at load time** when the DOCA SHA
+   device is not at `03:00.0`, via `set_pci_addr`.
+4. **Read the shipped `engine_readme.md`** next to the engine
+   for the load, digest and `openssl speed` examples.
 5. **Confirm transitive dependencies.** Run
    `ldd <engine.so>` and verify the OpenSSL and DOCA
    shared objects all resolve. Missing transitive
@@ -146,50 +127,45 @@ shipped `test_cmdline_mode/readme.md`):
 
 Routing for nearby "build" questions:
 
-- *"I want to build a PROVIDER instead of an ENGINE for
-  OpenSSL 3.x."* → out of scope; the shipped artifact is
+- *“I want to build a PROVIDER instead of an ENGINE for
+  OpenSSL 3.x.”* → out of scope; the shipped artifact is
   an ENGINE, not a PROVIDER. Route to the OpenSSL
   upstream PROVIDERS migration guide via
   `doca-public-knowledge-map/SKILL.md`.
-- *"I want to author my own ENGINE wrapping a different
-  doca library."* → out of scope; route to
+- *“I want to author my own ENGINE wrapping a different
+  doca library.”* → out of scope; route to
   `doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 
 ## modify
 
-**Do not patch the shipped engine source tree.** The
-shipped `engine/doca_sha_offload_engine.c` and
-`lib/doca_sha_offload_lib.{c,h}` are the verified worked
-example for this engine class; modifying them puts the
-user in contributor-to-DOCA territory.
+**Do not patch the engine.** It ships pre-built; change
+only how it is loaded and invoked.
 
 What the agent *does* modify is the **load + invocation
-environment** — the PCIe address (either via the
-build-time macro or the run-time ctrl-cmd), the
+environment** — the PCIe address (via the `set_pci_addr`
+ctrl-cmd), the
 `-async_jobs` / `-multi` knobs on `openssl speed`, the
 inclusion of `-engine_impl`, the OpenSSL `engines`
 configuration in `openssl.cnf` for system-wide loads.
-Treat *"modify the invocation, not the engine source"*
+Treat *“modify the invocation, not the engine source”*
 as the operating mode.
 
 Routing for nearby "modify" questions:
 
-- *"The engine should support SHA-224 / SHA-384 /
-  SHA-3 / HMAC-SHA."* → out of scope; that would be a
+- *“The engine should support SHA-224 / SHA-384 /
+  SHA-3 / HMAC-SHA.”* → out of scope; that would be a
   source-level extension. The user can either (a) use
   doca-sha directly for those algorithms if the library
   supports them per
   `../../libs/doca-sha/CAPABILITIES.md` (`doca-sha/CAPABILITIES.md`),
-  (b) use OpenSSL's software path for the non-covered
-  algorithms, or (c) route to a different bundle that
-  ships a customized engine.
-- *"I want to enable the engine's debug logging."* → the
-  shipped source supports a `PRINT_DEBUG_INFO`
-  compile-time macro and a `debug_level` ctrl-cmd; the
-  user has to re-build with the macro to surface them.
-- *"I need the engine to do incremental hashing across
-  many `EVP_DigestUpdate` calls."* → the verified
-  engine is one-shot per the shipped `readme.md`. For
+  or (b) use OpenSSL's software path for the non-covered
+  algorithms.
+- *“I want to enable the engine's debug logging.”* → the
+  engine exposes only the `set_pci_addr` ctrl-cmd; raise
+  DOCA logging per `doca-debug/SKILL.md`.
+- *“I need the engine to do incremental hashing across
+  many `EVP_DigestUpdate` calls.”* → the verified
+  engine is one-shot per the shipped `engine_readme.md`. For
   true incremental hashing, route to
   `../../libs/doca-sha/` (`doca-sha/SKILL.md`)
   and the partial-hash task there.
@@ -201,29 +177,19 @@ The detailed OpenSSL surface lives in the upstream
 OpenSSL documentation; this section names the *shape* of
 the flow, not the verbatim recipe.
 
-> **Do-not-invent guard (openssl flag spellings).** Real
-> downstream agents have hallucinated an `-engine-options`
+> **Do-not-invent guard (openssl flag spellings).** There
+> is no `-engine-options`
 > flag for `openssl dgst` — **it does not exist** in
-> upstream OpenSSL. The bundle's canonical pattern is two
+> upstream OpenSSL. The bundle’s canonical pattern is two
 > commands: first
 > `openssl engine dynamic -pre NO_VCHECK:1 -pre SO_PATH:<path> -pre LOAD -vvv -t -c`
 > to probe the engine, then `openssl dgst -sha256 -engine <path> -engine_impl`
-> to run the digest through it. The bundle's exact spelling
+> to run the digest through it. The bundle’s exact spelling
 > is `-engine_impl` with an **underscore** — not `-engine-impl`
 > with a hyphen; some OpenSSL builds may accept both, but the
-> bundle's verbatim form is the underscore. The engine ID is
-> `doca_sha_offload_engine`; the install path of the `.so` varies:
-> the public 3.5 guide path is
-> `${DOCA_DIR}/infrastructure/doca_sha_offload_engine/`; some installs
-> ship it under `${DOCA_DIR}/tools/doca_sha_offload_engine/` (per
-> `install_dir: 'tools/doca_sha_offload_engine'` in
-> `tools/sha_offload_engine/meson.build`). Locate it with
-> `find ${DOCA_DIR} -name libdoca_sha_offload_engine.so`. These names belong to
-> different lifecycle stages: source is under
-> `doca/tools/sha_offload_engine/`, Meson installs under
-> `tools/doca_sha_offload_engine/`, and OpenSSL registers the engine ID
-> `doca_sha_offload_engine`. Do not derive one spelling from another; inspect
-> the installed `.so` path before loading it.
+> bundle’s verbatim form is the underscore. The engine ID is
+> `doca_sha_offload_engine`; the `.so` is installed at
+> `${DOCA_DIR}/tools/doca_sha_offload_engine/libdoca_sha_offload_engine.so`.
 
 1. **Confirm the `.so` and the environment.** Per
    [`## install`](#install), [`## configure`](#configure),
@@ -232,16 +198,15 @@ the flow, not the verbatim recipe.
    `openssl engine dynamic -pre NO_VCHECK:1 -pre
    SO_PATH:<path-to-libdoca_sha_offload_engine.so> -pre
    LOAD -vvv -t -c` invocation per the shipped
-   `readme.md`. On success the output prints the engine
+   `engine_readme.md`. On success the output prints the engine
    name, the `[SHA1, SHA256, SHA512]` available digests,
    and the `set_pci_addr` ctrl-cmd. If the output is
    missing any of those, route to
    [`## debug`](#debug) layer 1 or 2.
-3. **Run the SHA-224 negative test first.** Per the
-   shipped `test_cmdline_mode/readme.md`, run
+3. **Run the SHA-224 negative test first.** Run
    `openssl dgst -sha224 -engine <path> -engine_impl`
    on a known input. The expected output is an error
-   (`Error setting digest`); the error PROVES OpenSSL
+   (SHA-224 is not in the engine's set); the error PROVES OpenSSL
    actually consulted the engine. If the call succeeds
    anyway, the engine is NOT being consulted — route to
    [`## debug`](#debug) layer 4.
@@ -249,10 +214,10 @@ the flow, not the verbatim recipe.
    -engine <path> -engine_impl` on a known input.
    Expected: a correct SHA-256 hash and a stderr line
    matching `engine "doca_sha_offload_engine" set.` per
-   the verified `readme.md` examples.
+   the shipped `engine_readme.md` examples.
 5. **For programmatic deployment, drop the verified
    load block into the application** per the shipped
-   `readme.md`:
+   `engine_readme.md`:
    ```
    ENGINE *e;
    const char *doca_engine_path = "${DOCA_DIR}/tools/doca_sha_offload_engine/libdoca_sha_offload_engine.so";
@@ -313,8 +278,8 @@ prove-offload pattern:
 
 ### Performance-characterization loop
 
-Per the shipped `test_cmdline_mode/readme.md` and
-`readme.md`, `openssl speed` is the documented surface.
+Per the shipped `engine_readme.md`, `openssl speed` is the
+documented surface.
 The eval-loop overlay:
 
 | Iteration trigger | What it looks like | What changes next iteration |
@@ -392,8 +357,8 @@ collapse the SHA-224 test into "the engine works".
 ## use
 
 Goal: turn a verified engine + perf characterization
-into an integration decision — *"do I deploy this engine
-or rewrite to doca-sha?"*.
+into an integration decision — *“do I deploy this engine
+or rewrite to doca-sha?”*.
 
 The decision shape this skill teaches:
 
@@ -402,9 +367,9 @@ The decision shape this skill teaches:
    engine deployment is a deployment that silently
    falls back to software SHA on a moment's notice.
 2. **Quote the win alongside the message-size mix.**
-   *"The engine wins at 100 KB with `-async_jobs 256`;
-   at 4 KB the CPU wins"* is a defensible deployment
-   recommendation; *"the engine is faster"* is not.
+   *“The engine wins at 100 KB with `-async_jobs 256`;
+   at 4 KB the CPU wins”* is a defensible deployment
+   recommendation; *“the engine is faster”* is not.
 3. **For deployments where the workload's message-size
    mix is below the crossover, the right answer is NOT
    the engine.** It may be doca-sha directly with a
@@ -421,9 +386,7 @@ The decision shape this skill teaches:
    code path per
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
    but a deployment that wants to be future-proof
-   should plan a doca-sha-direct rewrite (or wait for a
-   PROVIDER artifact if one ships in a future DOCA
-   release).
+   should plan a doca-sha-direct rewrite.
 6. **Per-release re-verification.** Every DOCA upgrade
    AND every OpenSSL upgrade requires re-running the
    SHA-224 verification AND the `openssl speed`

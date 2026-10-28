@@ -36,7 +36,7 @@ See [references/install.md](references/install.md).
 
 ## DOCA 3.5 field notes
 
-Observed on DOCA 3.5 with BlueField-3 (developer review); check them
+Known behaviours on DOCA 3.5 with BlueField-3; check them
 before debugging further:
 
 - **Async events block.** `doca_verbs_get_async_event()` blocks until
@@ -50,8 +50,8 @@ before debugging further:
   default settings: `EWMA (measured-BW) LB mode is supported only on
   Spectrum-X devices`, and `doca_verbs_multi_rail_update_qp` returns
   `DOCA_ERROR_NOT_SUPPORTED`. Use `lb_mode: port_speed` (listed in the
-  app's `--help`). The app has no guide yet; treat `--help` as the
-  reference.
+  app's `--help`). No dedicated application guide is published; treat
+  `--help` as the reference.
 - **Multi-Rail build is skipped without json-c.** meson prints
   `Skipping compilation of DOCA Application - verbs_multi_rail_server_client
   - Missing json-c support`; install `libjson-c-dev` (not pulled in by
@@ -288,8 +288,7 @@ model:
 The agent emits an *intent description + the five filled slots*
 (modify-from-sample case) or *the six-step porting walk*
 (libibverbs case); the *actual* unified diff against the sample
-source is produced by the modify-from-sample renderer (deferred to
-a future round). Until the renderer ships, the agent walks the
+source is produced by the user (this bundle has no diff renderer). The agent walks the
 user through the diff line-by-line against the sample source they
 read on disk, and has the user paste back the result for
 validation.

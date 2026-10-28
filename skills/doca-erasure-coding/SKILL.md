@@ -17,7 +17,7 @@ description: >
   (fountain / LDPC / raptor), pure-replication designs, network FEC, or
   other DOCA accelerator libraries (SHA / Compress / AES-GCM / DMA).
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

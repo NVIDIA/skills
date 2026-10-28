@@ -30,7 +30,7 @@ the next call.
 The emulation features are off in firmware by default, and the
 samples do not say so: PCI samples fail with `Requested Resource Not
 Found`, virtio-fs samples with `variable 'vfs_type' is NULL ...
-Invalid input` (developer review, DOCA 3.5). Enable the feature first:
+Invalid input` (DOCA 3.5). Enable the feature first:
 
 - **PCI (generic) emulation:** `PCI_SWITCH_EMULATION_ENABLE=1` via
   `mlxconfig` on the BlueField in DPU mode, then a BlueField
@@ -44,23 +44,14 @@ Both are firmware changes that need a reset: follow
 window, rollback) and get the operator's approval before applying.
 
 DOCA 3.5 changes the devemu public API. Developers must stop using the
-removed NVMe devemu open/close/as_ctx, VFS cfg, PCI TLP channel request
-accessor/completer, PCI dev VF/reset, PCI cap type hotplug/mgmt, and
-vblk PCI TLP type APIs. Use the new virtio offload engine setters, vnet
+removed VFS cfg, PCI dev VF-count/reset, and PCI capability-type
+hotplug query APIs (use `doca_devemu_pci_cap_is_hotplug_supported`). Use the new virtio offload engine setters, vnet
 capability queries, vnet counters, admin request user-data size, and
 vnet offload engine export/import APIs from the DOCA devemu public
 header.
 
-For NVMe emulation, the removed open/close and devemu-context/PCI-device/
-context conversion APIs are gone. Developers must use the remaining
-`doca_devemu_nvme_*` family: call the init function, create an NVMe
-device, create and configure SQ/CQ objects, create and bind IO objects,
-and use the capability getters. Do not call the removed open/close/as_ctx
-functions. See the devemu public header for exact names and signatures.
-
-For PCI emulation, the removed PCI dev VF/reset getters and reset
-controls, PCI capability hotplug/mgmt queries, and PCI TLP channel
-request accessor and typed completion functions are gone. Developers
+For PCI emulation, the removed PCI dev VF-count getters and reset
+controls are gone. Developers
 must use the `doca_devemu_pci_type_create_rep_ex` entry point with the
 `doca_devemu_pci_rep_init_attr_set_*` family to configure VF, BAR,
 doorbell, and MSI-X settings; query TLP capabilities with the current
@@ -69,8 +60,7 @@ doorbell, and MSI-X settings; query TLP capabilities with the current
 fatal-state registration; and create started devices with
 `doca_devemu_pci_tlp_dev_create_started` or
 `doca_devemu_pci_tlp_dev_create_started_on_dpa`. Do not use the removed
-PCI dev VF/reset, PCI cap type hotplug/mgmt, or PCI TLP channel request
-accessor/completer APIs. See the devemu PCI public header for the current
+PCI dev VF-count/reset APIs. See the devemu PCI public header for the current
 request handling API.
 
 The removed VFS cfg create/destroy/add/rm and notification/fuse
@@ -78,12 +68,6 @@ user-data size getters are gone. Do not use the `doca_devemu_vfs_cfg_*`
 family. Use the admin request user-data size getter/setter from the
 devemu public header for user-data size values, and see the devemu
 public header for the current virtio-fs configuration API.
-
-The removed vblk PCI TLP type support query is replaced by the vnet
-capability query for PCI TLP type support. Use the
-`doca_devemu_vnet_cap_*` family to query max export descriptor length,
-max number of admin queues, offload engine feature support, and PCI TLP
-type support.
 
 DOCA 3.5 adds virtio offload engine setters. Use the
 `doca_devemu_virtio_offload_engine_set_*` family to set feature
@@ -582,8 +566,7 @@ follows so the agent does not invent guidance:
 - **deploy.** Deploying Device Emulation-using applications at
   scale (multi-BlueField clusters, Kubernetes operator
   workflows for emulated-device daemons, multi-tenant
-  isolation between emulated devices) — out of scope for
-  Phase 1 and reserved for a future platform skill. For
+  isolation between emulated devices) — out of scope for this skill. For
   single-host first-run testing the right verb in this skill
   is `## run`; do not invent a *"deploy"* workflow.
 - **packaged-service adoption.** Adopting the DOCA SNAP

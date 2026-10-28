@@ -19,7 +19,7 @@ description: >
   OpenSSL), key management (KMS / HSM / rotation), SHA (doca-sha), or
   general AEAD background.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

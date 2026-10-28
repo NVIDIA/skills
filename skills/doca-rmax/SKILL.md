@@ -17,7 +17,7 @@ description: >
   underlying queue (doca-eth), steering rules (doca-flow), PTP / clock
   sync (doca-firefly), or best-effort packet I/O.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -40,6 +40,12 @@ compatibility: >
 
 - **"ST 2110 receive isn't getting frames."** — this is in
   scope after Rivermax SDK + license are already present.
+- **"How do I obtain / install the Rivermax SDK and its license?"** —
+  out of scope for this skill. Say so, give no install or licensing
+  steps, and route: DOCA packages to `doca-setup/SKILL.md`, the
+  Rivermax SDK + license to the public DOCA Rivermax guide via
+  `doca-public-knowledge-map/SKILL.md`. Come back here once both
+  are present.
 - **"NOT_SUPPORTED from doca_rmax_init."** — run the
   `doca_rmax_get_*_supported` queries before changing stream
   setup.

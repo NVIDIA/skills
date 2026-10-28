@@ -6,17 +6,17 @@ description: >
   or Kubernetes pod: from DOCA 3.5 the local `dms-cli` (one command per
   YANG path, no server), and the `dmsd` + `dmspe` service: choose deployment and
   authentication, configure `-allowed_users` and `dmsgroup`, use gNMI
-  Get/Set/Subscribe, run supported gNOI workflows, and debug
+  Get/Set, run supported gNOI workflows, and debug
   frontend/backend failures. Trigger even without "DMS" for "manage a
   remote BlueField over gRPC", "gNOI reboot from orchestrator", or
   fleet-management requests. SAFETY: reboot, OS install, factory-reset,
   and managed-file deletion are destructive and require target-bound
   explicit confirmation; never invoke them speculatively. Route
   installation and library/API build questions elsewhere, and route
-  turnkey aggregation to the externally-productized DOCA Telemetry
-  Service.
+  telemetry streaming and aggregation to doca-dts (DOCA Telemetry
+  Service).
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: service
   doca_version: "3.5"
   tags:
@@ -88,7 +88,7 @@ BlueField Arm with no server or daemon. One syntax per YANG path:
 path plus a value sets it, and action paths run operations. Explore before
 writing: `--tree /nvidia`, `--describe <path>` and `list-xpaths <path>`;
 script with `--json`; validate with `--dry-run`. VFs and SFs take
-`-t pci/<BDF>,pf<N>vf<M>` or `pf<N>sf<M>`. Observed on DOCA 3.5: as a normal
+`-t pci/<BDF>,pf<N>vf<M>` or `pf<N>sf<M>`. On DOCA 3.5: as a normal
 user it fails with `backend fork/exec .../dmspe: permission denied` — run it
 with `sudo` or add the user to `dmsgroup`; some example paths do not exist on
 every device (for example congestion-control slots are under

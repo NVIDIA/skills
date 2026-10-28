@@ -5,7 +5,7 @@ run → test → debug`. For BF3 platform bring-up, `build` is a
 *routing stub* — there is no application or BFB artifact to build
 inside this skill (building a DOCA-linked binary lives in
 `doca-programming-guide/SKILL.md`;
-building the BFB image itself is internal-tree work, out of scope).
+building the BFB image itself is out of scope).
 This skill owns taking a real BF3 from "powered card" to "Arm OS
 healthy, host PFs bound, version match closed". The `## run` verb is
 the BFB-install + RShim/TMFIFO bring-up sequence; `## test` is the
@@ -104,7 +104,7 @@ skill.
   the BF3 is healthy, control routes onward to
   `doca-bare-metal-deployment/SKILL.md`.
 - If the user is asking how to build the **BFB image** itself, that
-  is internal BlueField-OS tree work — out of scope for this bundle;
+  is out of scope for this bundle;
   route to the public BlueField Platform Software documentation via
   `doca-public-knowledge-map/SKILL.md`.
 - If the user is asking how to author `bf.cfg`, that is composed

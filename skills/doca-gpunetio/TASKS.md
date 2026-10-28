@@ -43,9 +43,6 @@ therefore only a problem when dmabuf is unavailable.
 **DOCA 3.5 public API changes** (public GPUNetIO header,
 `doca_gpunetio.h`). Update code that uses the GPUNetIO Verbs API:
 
-- Remove the `send_dbr_mode_ext` argument from every
-  `doca_gpu_verbs_bridge_export_qp()` call. The function no longer takes
-  that parameter.
 - Stop reading QP/CQ fields directly from `struct doca_gpu_verbs_qp`.
   Use the new `doca_gpu_verbs_get_qp_*` getter family to obtain the
   underlying QP, send CQ, and receive CQ.
@@ -54,8 +51,7 @@ therefore only a problem when dmabuf is unavailable.
 - Use `doca_gpu_nic_handler_to_string()` when a NIC handler name is
   needed.
 - Update constant usage to the DOCA 3.5 `DOCA_GPUNETIO_VERBS_*` and
-  `DOCA_GPUNETIO_ETH_*` families, and remove the obsolete
-  `DOCA_GPUNETIO_VERBS_GPU_CODE_OPT_HAS_GDRCOPY` constant.
+  `DOCA_GPUNETIO_ETH_*` families from the public header.
 
 See the public GPUNetIO header for the exact declarations and constant
 families.
@@ -503,8 +499,7 @@ so the agent does not invent guidance:
 - **deploy.** Deploying GPUNetIO-using applications at scale
   (multi-GPU multi-NIC clusters, Kubernetes operator workflows
   for GPU + DPU workloads, multi-tenant GPU sharing for
-  GPU-initiated networking) — out of scope for Phase 1 and
-  reserved for a future platform skill. For single-host
+  GPU-initiated networking) — out of scope for this skill. For single-host
   first-run testing, the right verb in this skill is `## run`;
   do not invent a "deploy" workflow.
 - **CUDA kernel design and tuning.** Block / thread sizing,
@@ -551,7 +546,7 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-gpunetio` + `pkg-config --modversion doca-common` | `## configure` step 1; `## build` DOCA-version gate | Do the GPUNetIO and common package surfaces come from the same DOCA install? | Two matching semver strings. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2); then compare the matched DOCA version with `nvcc --version` per the compatibility policy |
-| `pkg-config --cflags --libs doca-gpunetio` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-gpunetio` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `nvcc --version` | `## configure` step 1; `## build` minimum-CUDA slot | What is the installed CUDA toolkit version? | A release string the agent compares against the DOCA Compatibility Policy linked from [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
 | `nvidia-smi -L` | `## configure` step 1; `## test` step 4 | Which CUDA devices are enumerable on this host? | One row per GPU with device ordinal, name, and UUID. Empty = NVIDIA driver not loaded; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
 | `lsmod \| grep nvidia_peermem` | `## configure` step 1; `## debug` layer 7 | Is the `nvidia_peermem` module loaded for GPUDirect RDMA? | One line showing the module loaded. Empty = `sudo modprobe nvidia_peermem` (env-side fix, not a code change) |

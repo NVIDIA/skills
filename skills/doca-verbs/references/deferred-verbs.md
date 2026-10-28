@@ -14,8 +14,7 @@ the agent does not invent guidance:
   in `doca-setup`.
 - **deploy.** Deploying raw-verbs-using applications at scale,
   Kubernetes operator workflows, multi-tenant RDMA isolation —
-  out of scope for Phase 1 and reserved for a future platform
-  skill. For single-host first-run testing, the right verb in
+  out of scope for this skill. For single-host first-run testing, the right verb in
   this skill is [`## run`](../TASKS.md#run).
 - **rollback.** Coordinated rollback across multiple hosts /
   DPUs — out of scope. For a single in-session raw-verbs

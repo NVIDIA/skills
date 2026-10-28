@@ -9,9 +9,10 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `doca-telemetry-utils`
-- Evaluation date: 2026-10-21
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-10-28
+- Evaluator version: `1.6.2`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:ef327ce957c8da4909cf567b4eda8fafaeaad3a86ec256da673d9215cecba117` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
@@ -20,6 +21,20 @@ Recommended for publication based on the completed evaluation evidence in this r
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| doca-telemetry-utils | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-telemetry-utils | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-telemetry-utils | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-telemetry-utils | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-telemetry-utils | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+
+- Controls for `doca-telemetry-utils`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.4% — baseline ran, but no comparable score was available; uplift unavailable | 97.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.2% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 70.0% → 100.0% (+30.0 points) | 85.0% → 90.0% (+5.0 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 50.0% → 100.0% (+50.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 47.5% → 73.8% (+26.3 points) | 46.3% → 100.0% (+53.7 points) |
-| Efficiency | 78.3% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 43.8% → 93.8% (+50.0 points) |
+| Efficiency | 86.2% — baseline ran, but no comparable score was available; uplift unavailable | 80.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,32 +63,43 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.2% → 95.6% (-2.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 87.6% → 86.2% (-1.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 786,557 | 549,721 | N/A | N/A | skill 3/4; base 3/4 |
-| claude-code | doca-telemetry-utils.explicit-positive.v1 | 214,054 | 213,676 | +378 | +0.18% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-utils.implicit-positive.v1 | 356,907 | 214,691 | +142,216 | +66.24% | skill 1/1; base 1/1 |
-| claude-code | doca-telemetry-utils.implicit-positive.v2 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| claude-code | doca-telemetry-utils.negative.v1 | 215,596 | 121,354 | +94,242 | +77.66% | skill 1/1; base 1/1 |
-| codex | All cases | 422,626 | 298,229 | N/A | N/A | skill 3/4; base 3/4 |
-| codex | doca-telemetry-utils.explicit-positive.v1 | 145,114 | 18,656 | +126,458 | +677.84% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-utils.implicit-positive.v1 | N/A | N/A | N/A | N/A | skill 0/1; base 0/1 |
-| codex | doca-telemetry-utils.implicit-positive.v2 | 199,104 | 169,642 | +29,462 | +17.37% | skill 1/1; base 1/1 |
-| codex | doca-telemetry-utils.negative.v1 | 78,408 | 109,931 | -31,523 | -28.68% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,209,183 | 847,950 | N/A | N/A | skill 6/8; base 6/8 |
+| claude-code | All cases | 642,163 | 395,353 | +246,810 | +62.43% | skill 4/4; base 4/4 |
+| claude-code | doca-telemetry-utils.explicit-positive.v1 | 200,176 | 107,890 | +92,286 | +85.54% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-utils.implicit-positive.v1 | 203,191 | 72,115 | +131,076 | +181.76% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-utils.implicit-positive.v2 | 201,544 | 108,354 | +93,190 | +86.01% | skill 1/1; base 1/1 |
+| claude-code | doca-telemetry-utils.negative.v1 | 37,252 | 106,994 | -69,742 | -65.18% | skill 1/1; base 1/1 |
+| codex | All cases | 373,437 | 196,919 | +176,518 | +89.64% | skill 4/4; base 4/4 |
+| codex | doca-telemetry-utils.explicit-positive.v1 | 116,455 | 81,277 | +35,178 | +43.28% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-utils.implicit-positive.v1 | 111,663 | 13,477 | +98,186 | +728.54% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-utils.implicit-positive.v2 | 92,669 | 70,805 | +21,864 | +30.88% | skill 1/1; base 1/1 |
+| codex | doca-telemetry-utils.negative.v1 | 52,650 | 31,360 | +21,290 | +67.89% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,015,600 | 592,272 | +423,328 | +71.48% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,12 +107,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/tools/doca-telemetry-utils`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/tools/doca-telemetry-utils/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-telemetry-utils/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-telemetry-utils`)
 - **LOW** QUALITY/quality_discoverability: Description very long (779 chars, recommend 50-150) (`skills/tools/doca-telemetry-utils/SKILL.md`)
-- **LOW** QUALITY/quality_discoverability: Broad description without negative triggers may cause over-triggering (`skills/tools/doca-telemetry-utils/SKILL.md`)
-- 7 additional finding(s) are available in the full evaluation artifacts.
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
@@ -118,6 +144,7 @@ Signals present in this run:
 - `accuracy` (Accuracy): final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): whether the user's goal was achieved.
 - `behavior_check` (Behavior Check): whether the expected workflow behavior was followed.
+- `token_efficiency` (Token Efficiency): actual uncached prompt plus completion usage (50% of Efficiency).
 
 </details>
 

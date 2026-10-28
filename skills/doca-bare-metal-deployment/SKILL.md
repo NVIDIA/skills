@@ -18,7 +18,7 @@ description: >
   doca-hardware-safety; library APIs, env prep, and build use other
   skills.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -88,8 +88,8 @@ It is **not** for:
 
 - kernel-driver developers contributing to `mlx5_*` or the
   BlueField OS,
-- DOCA library contributors (those changes go to the internal
-  DOCA tree, not to a bare-metal deployment),
+- DOCA library contributors (library changes are outside the
+  scope of a bare-metal deployment),
 - full-Kubernetes-cluster operators managing a fleet of
   BlueFields (the bundle covers
   `doca-container-deployment/SKILL.md`

@@ -16,7 +16,7 @@ description: >
   (doca-eth), flow-rule programming (doca-flow), DOCA or DPDK install
   (doca-setup), or RDMA data movement (doca-rdma).
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:

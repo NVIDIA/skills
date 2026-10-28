@@ -26,7 +26,7 @@ every DOCA library bench can drive, not just one.
 | --- | --- | --- |
 | 1. Pick the target library | Cross-library — bench can drive AES-GCM, Comch, Compress, DMA, EC, Eth, RDMA, SHA, GPUNetIO. Picking the target library is axis 1 of the three-axis configuration. | [`## Capabilities and modes`](#capabilities-and-modes) cross-library table + [TASKS.md ## configure](TASKS.md#configure) step 1 |
 | 2. Pick the workload shape | The pipeline-of-steps model is axis 2 — what *operation* is the device being asked to do on each iteration (e.g. compress vs decompress, send vs receive, encrypt vs decrypt), with the data provider, batching, and remote-memory choices that go with it. | [`## Capabilities and modes`](#capabilities-and-modes) workload-shape rules + [TASKS.md ## configure](TASKS.md#configure) step 3 |
-| 3. Pick the measurement axis | Throughput vs bulk-latency vs precision-latency vs max-bandwidth is axis 3 — the public guide documents three modes (`throughput`, `bulk-latency`, `precision-latency`); the shipped binary may accept more (e.g. `max-bandwidth`), so confirm the full list with `--help`. The public guide documents the modes as **not interchangeable**; a single number reported without naming the mode is ambiguous and the agent must surface that. | [`## Capabilities and modes`](#capabilities-and-modes) measurement-axis table + [TASKS.md ## configure](TASKS.md#configure) step 4 |
+| 3. Pick the measurement axis | Throughput vs bulk-latency vs precision-latency is axis 3 — the public guide documents three modes (`throughput`, `bulk-latency`, `precision-latency`); confirm the list with `--help`. The public guide documents the modes as **not interchangeable**; a single number reported without naming the mode is ambiguous and the agent must surface that. | [`## Capabilities and modes`](#capabilities-and-modes) measurement-axis table + [TASKS.md ## configure](TASKS.md#configure) step 4 |
 | 4. Smoke-before-bulk | Confirm the bench can talk to the target device with a trivial workload before a long run; predeclare the workload's acceptable run-to-run tolerance, then require two consecutive runs within it before calling the result stable | [TASKS.md ## configure](TASKS.md#configure) tolerance step + [TASKS.md ## run](TASKS.md#run) smoke flow + [TASKS.md ## test](TASKS.md#test) eval-loop overlay |
 | 5. Diagnose a bench failure | Walk the layered error taxonomy in [`## Error taxonomy`](#error-taxonomy) — config-syntax / device-binding / library-precondition / workload-precondition / measurement-soundness / version / cross-cutting — instead of guessing at causes from a stack trace. | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 | 6. Interpret a bench number | A bench number is only meaningful with the (command line + DOCA version + device + as-deployed environment) four-tuple. Quoting one without the other three is the cross-version regression-hunt failure mode. | [`## Observability`](#observability) + [TASKS.md ## test](TASKS.md#test) baseline-capture rule |
@@ -68,7 +68,7 @@ omitting any axis produces an ambiguous result.
 | --- | --- | --- |
 | 1. Target library | Which DOCA library is the unit under test (AES-GCM / Comch / Compress / DMA / EC / Eth / RDMA / SHA / GPUNetIO per the public guide's documented surface). | The cross-library scope is the bench's defining feature; an answer that picks one library and never names the others has silently narrowed the bench to a single-library tool. |
 | 2. Workload shape | The pipeline-of-steps the device runs each iteration — direction (e.g. send vs receive for RDMA / Eth, encrypt vs decrypt for AES-GCM, compress vs decompress for COMPRESS), the data provider (file / file-set / random-data per the public guide), batching, and whether remote-memory input / output is in play. | Two runs against the *same* library can report wildly different numbers if the workload shape differs; quoting "DOCA Compress throughput" without naming compress-vs-decompress, the data provider, and the buffer sizing is ambiguous. |
-| 3. Measurement axis | Throughput vs bulk-latency vs precision-latency vs max-bandwidth per the operating modes (the public guide documents three: `throughput`, `bulk-latency`, `precision-latency`; confirm the full list, including any `max-bandwidth` mode, with `--help`). | The modes are explicitly **not interchangeable** — precision-latency disables batching, bulk-latency uses bucketing, throughput maximizes pipeline occupancy, max-bandwidth holds the pipeline at the saturation point. Comparing a precision-latency number to a throughput-mode number (or a max-bandwidth number to either) is the cross-mode apples-to-oranges failure. |
+| 3. Measurement axis | Throughput vs bulk-latency vs precision-latency per the operating modes (the public guide documents three: `throughput`, `bulk-latency`, `precision-latency`; confirm the list with `--help`). | The modes are explicitly **not interchangeable** — precision-latency disables batching, bulk-latency uses bucketing, throughput maximizes pipeline occupancy. Comparing a precision-latency number to a throughput-mode number is the cross-mode apples-to-oranges failure. |
 
 **Cross-library scope — what bench can drive.** The public DOCA
 Bench guide enumerates the supported DOCA libraries explicitly;
@@ -78,6 +78,21 @@ the bench's own built-in query system reports which subset is
 install is the intersection of "documented by bench" and
 "installed by this DOCA package selection" — the agent must
 probe, not assume.
+
+**GPUNetIO benchmarks — extra prerequisites.** When the target is
+GPUNetIO (task submission and processing offloaded to a GPU), the
+DOCA Bench guide lists three requirements beyond `doca_bench`
+itself: DOCA GPUNetIO, the **DOCA Bench Extension** package (it
+installs `libdoca_bench_cuda_impl`), and the NVIDIA GDRCopy
+library, with `GDRCOPY_PATH_L` set. Documented limits: both
+`doca_bench` and `doca_bench_companion` run as root, only
+throughput testing is supported (duration by time, job count or
+byte limit), one CPU core, and no multi-step tests. GPU device
+capabilities are queried with
+`doca_bench --gpu <pci-addr> --query device-capabilities`. A
+`DOCA_ERROR_NOT_SUPPORTED` when GPU acceleration initializes is a
+known issue keyed to `libdoca_bench_cuda_impl` — check the
+release notes before debugging the workload.
 
 **Pipeline of steps — the workload primitive.** Bench expresses
 a workload as a pipeline of steps, where each step is a
@@ -105,7 +120,6 @@ later run is going to be compared against.
 | `throughput` (default) | Maximum pipeline occupancy and aggregate bandwidth / op-rate | Per-job latency precision; results are aggregate, not per-job |
 | `bulk-latency` | A balance — submits batches, measures the time from first-submit to last-complete per batch, uses bucketing to report latency distribution | Per-job precision; latency is per-batch + bucketed, not per-job |
 | `precision-latency` | Per-job latency precision (min / max / median / percentiles) by submitting one job at a time | Throughput; the pipeline is deliberately serialized and capacity is wasted by design |
-| `max-bandwidth` (not in the public 3.5 guide; use only if `--help` lists it) | Pushes the workload at maximum sustainable bandwidth — separate operating mode from `throughput` in the parser (`tools/bench/doca_bench/configuration.hpp` defines four `benchmark_mode` enum values: `throughput`, `bulk_latency`, `precision_latency`, **`max_bandwidth`**; the CLI parser at `tools/bench/doca_bench/impl/configuration_parser.cpp` accepts the kebab-case spelling `max-bandwidth`). Use when the question is about the achievable bandwidth ceiling rather than aggregate op-rate. | Per-job latency precision; bandwidth-pinned runs deliberately hold the pipeline at the saturation point. |
 
 **Built-in query system.** Bench ships a documented query
 surface that reports which DOCA libraries are *installed* on

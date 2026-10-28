@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides raw verbs usage inside DOCA Core (doca-verbs) — direct control of QP, CQ, PD, SRQ and address-handle objects through doca_verbs_context, porting libibverbs code into DOCA Core, and diagnosing QP attributes, opcodes, or WR flags the higher-level doca-rdma task API does not expose, while routing ordinary RDMA, Ethernet, and Rivermax workloads back to their higher-level libraries. <br>
+Raw verbs inside DOCA Core (doca-verbs): direct control of QP, CQ, PD, SRQ and address-handle objects through doca_verbs_context and doca_verbs_qp_create / doca_verbs_qp_modify / doca_verbs_cq_create, porting libibverbs code into DOCA Core, or a QP attribute, opcode or WR flag the doca-rdma task API does not expose, while routing ordinary doca-rdma / doca-eth / doca-rmax workloads, DOCA install, Core internals, and general libibverbs theory elsewhere. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building applications that consume the DOCA Verbs library use this skill to decide whether to drop from a higher-level DOCA library to raw doca_verbs_* control, and to configure, build, modify, run, test, and debug raw QP / CQ / PD / MR / SRQ / Address-Handle verbs inside a DOCA Core context on a BlueField DPU or ConnectX NIC. <br>
+External developers and engineers building applications that consume the DOCA Verbs library (in C/C++ or via FFI/bindings) for raw QP / CQ / PD / MR / SRQ / Address-Handle / Ethernet-SQ / Ethernet-RQ control inside a DOCA Core context use this skill to decide whether dropping below doca-rdma / doca-eth / doca-rmax is actually needed, port libibverbs code into the DOCA Core model, and configure, build, modify, run, test, and debug raw-verbs applications (including diagnosing DOCA_ERROR_IO_FAILED from completion-queue entries). <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,19 +25,22 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [command-appendix.md](references/command-appendix.md) <br>
-- [deferred-topics.md](references/deferred-topics.md) <br>
-- [deferred-verbs.md](references/deferred-verbs.md) <br>
-- [install.md](references/install.md) <br>
-- [pattern-overview.md](references/pattern-overview.md) <br>
-- [use.md](references/use.md) <br>
-- [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [NVIDIA DOCA samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Samples (NVIDIA-DOCA/doca-samples)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
+- [references/command-appendix.md](references/command-appendix.md) <br>
+- [references/install.md](references/install.md) <br>
+- [references/use.md](references/use.md) <br>
+- [references/pattern-overview.md](references/pattern-overview.md) <br>
+- [references/deferred-topics.md](references/deferred-topics.md) <br>
+- [references/deferred-verbs.md](references/deferred-verbs.md) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline code blocks] <br>
+**Output Type(s):** [Analysis, Shell commands, Code, Configuration instructions] <br>
+**Output Format:** [Markdown with inline C and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -48,23 +51,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in its own isolated k8s-sandbox pod against dataset snapshot skill-evaluator-dataset-snapshot/1. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each run in its own isolated k8s-sandbox pod and compared against a no-skill baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — no unsafe operations, secret leakage, or unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed and decoys were avoided. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and the expected workflow was followed. <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
+- Security: Is it safe to use? Scored from the security signal (100%). <br>
+- Correctness: Is the answer correct? Scored from final-answer accuracy (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from skill execution (100%). <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal accuracy and behavior check. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
@@ -72,15 +75,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.5% (uplift unavailable) | 93.3% (uplift unavailable) |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 85.0% → 100.0% (+15.0 points) |
-| Discoverability | 93.3% (uplift unavailable) | 95.0% (uplift unavailable) |
-| Effectiveness | 37.5% → 74.8% (+37.3 points) | 60.0% → 95.6% (+35.6 points) |
-| Efficiency | 84.4% (uplift unavailable) | 75.9% (uplift unavailable) |
+| Overall | 93.8% — baseline ran, but no comparable score was available; uplift unavailable | 89.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 45.0% → 95.0% (+50.0 points) | 80.0% → 95.0% (+15.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 31.3% → 87.5% (+56.2 points) | 68.8% → 87.5% (+18.7 points) |
+| Efficiency | 86.5% — baseline ran, but no comparable score was available; uplift unavailable | 67.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-b99bced (source: git SHA, committed 2026-10-23; targets DOCA 3.5 per frontmatter metadata) <br>
+c98e456 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

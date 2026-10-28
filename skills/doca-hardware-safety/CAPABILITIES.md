@@ -350,9 +350,8 @@ item 7.
 When the answer to a hardware-safety scenario ends with the operator
 running a shell script (preflight capture, upgrade wrapper, rollback
 ladder), the agent's script-shaped guidance MUST cover three hygiene
-rules. These are not aesthetic preferences — each closes a recurring
-operational failure mode reported by real operators against earlier
-bundle revisions:
+rules. These are not aesthetic preferences — each closes a common
+operational failure mode:
 
 - **Hand log ownership back to the invoking user.** Scripts that
   capture under `sudo` write logs as root; later non-sudo inspection

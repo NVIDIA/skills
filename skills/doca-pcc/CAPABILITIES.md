@@ -33,28 +33,15 @@ combination.
 | 5. Choose `doca-pcc` only when a CUSTOM algorithm is needed | The default factory PCC in ConnectX firmware does not need this library; the `pcc_counters` CLI does not either; the library is for *custom* algorithms only | [`## Capabilities and modes`](#capabilities-and-modes) path-selection rule + [`## Deferred topic boundaries`](#deferred-topic-boundaries) |
 | 6. Diagnose a PCC error | Map `DOCA_ERROR_NOT_SUPPORTED` / `_NOT_PERMITTED` / `_INVALID_VALUE` / `_BAD_STATE` / `_DRIVER` to a root cause without leaving the PCC layer prematurely | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 
-Two cross-cutting rules that apply to *every* pattern above:
-
-- **The two-side-program model is non-negotiable.** Every custom
-  PCC deployment is two programs: the host side (this skill,
-  `doca-pcc`) and the DPA side (the user's congestion control
-  algorithm compiled by `dpacc`). An agent that treats the
-  deployment as one program — for example by proposing that
-  the host code *"compute the rate-update directly"* — has the
-  model wrong for every version of PCC. The host loads,
-  parameterizes, and starts; the DPA-side algorithm executes
-  per packet / per event; the two sides are coupled by the
-  algorithm's entry points and the parameter shape.
-- **Capability is a TRIPLE-axis question, not a single-axis
-  one.** *"Is custom PCC available on this host"* requires
-  ALL THREE of: a DOCA cap-query against the active
-  `doca_devinfo` (the `doca_pcc_cap_*` family), the BlueField
-  generation actually carrying a DPA processor exposed to the
-  host, AND the BlueField firmware having the custom-PCC slot
-  enabled. An agent that quotes only one or two axes will
-  miss the *"the doc page says custom PCC exists but
-  `doca_pcc_*` returns `DOCA_ERROR_NOT_PERMITTED` on my
-  hardware"* cases.
+Two cross-cutting rules apply to *every* pattern above, both
+defined in [`## Capabilities and modes`](#capabilities-and-modes):
+the **two-side-program model** (host loads, parameterizes and
+starts; the DPA-side algorithm executes — a proposal that the host
+*“compute the rate-update directly”* has the model wrong) and
+**triple-axis capability discovery** (DOCA cap-query + DPA exposure +
+firmware custom-PCC slot — quoting one or two axes misses the *“the
+doc page says custom PCC exists but `doca_pcc_*` returns
+`DOCA_ERROR_NOT_PERMITTED`”* cases).
 
 ## Capabilities and modes
 
@@ -370,7 +357,7 @@ agent will get asked but should route elsewhere:
   this skill assumes the user has the DPA-side algorithm and
   is asking *how to load and attach it from the host*.
 - **`pcc_counters` diagnostic CLI** (the real artifact is the
-  `pcc_counters.sh` script under `tools/pcc_counters/`) — a separate
+  `pcc_counters.sh` script installed at `/opt/mellanox/doca/tools/pcc_counters.sh`) — a separate
   artifact with its own public page; route via
   `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
   It is read-only inspection; this skill is control + load.
@@ -380,12 +367,8 @@ agent will get asked but should route elsewhere:
   firmware** — does not need this library. Configuration of
   the factory PCC is a firmware-side concern; route via
   `doca-public-knowledge-map/SKILL.md`.
-- **Host-side DPA control library (`doca-dpa`)** — the
-  generic *run a DPA kernel from the host* library. PCC
-  conceptually inherits the DPA two-side-program shape from
-  it, but `doca-dpa` is the right skill when the user wants
-  a generic DPA workload that is NOT congestion control on
-  RDMA / RoCE traffic. See `doca-dpa/SKILL.md`.
+- **Generic DPA workloads that are not congestion control** —
+  `doca-dpa/SKILL.md` (see [SKILL.md ## Related skills](SKILL.md#related-skills)).
 - **DPA developer tools** (the DPA debugger, the DPA
   process-state inspector, the DPA statistics tool) — named
   in [`## Observability`](#observability) for routing, but
@@ -396,25 +379,12 @@ agent will get asked but should route elsewhere:
   the host + DPA split-build is wired) — out of scope. Route
   to the public *DOCA DPACC Compiler* guide via
   `doca-public-knowledge-map/SKILL.md`.
-- **Setting up the RDMA / RoCE traffic the custom PCC
-  algorithm controls** — owned by
-  `doca-rdma/SKILL.md`. This skill *modulates*
-  RDMA / RoCE traffic on the attached port; it does not
-  stand up that traffic. A `doca-pcc` deployment with no
-  RDMA / RoCE traffic on the attached port is a
-  pre-flight gap, not a `doca-pcc` bug.
-- **DOCA Core context and progress engine internals** —
-  owned by
-  `doca-programming-guide/SKILL.md`.
-  This skill *uses* the Core lifecycle; it does not redefine
-  it.
-- **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
-  This skill adds the PCC overlay, not the taxonomy itself.
-- **Cross-cutting debug ladder** (install / version / build /
-  link / runtime / program / driver) — owned by
-  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`).
-  This skill's `## debug` redirects there for layer 1-4;
-  layers 5-7 carry the PCC-specific overlay (including the
-  firmware-side custom-PCC slot route and the two-side-program
-  parameter-shape mismatch).
+- **RDMA / RoCE traffic bring-up, Core context internals, the
+  cross-cutting `DOCA_ERROR_*` taxonomy and the cross-cutting debug
+  ladder** — owned by `doca-rdma`, `doca-programming-guide` and
+  `doca-debug`; see [SKILL.md ## Related skills](SKILL.md#related-skills).
+  A `doca-pcc` deployment with no RDMA / RoCE traffic on the
+  attached port is a pre-flight gap, not a `doca-pcc` bug. This
+  skill's `## debug` carries the PCC overlay for layers 5-7
+  (firmware custom-PCC slot, two-side-program parameter-shape
+  mismatch).

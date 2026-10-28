@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the operator is driving the DOCA Socket Relay to bridge a socket-oriented host application onto a BlueField DPU peer without rewriting it — picking the deployment shape (in-process, sidecar, or BlueField service container), configuring the host-side socket and the DPU-side forwarding endpoint, walking the bind → connect → round-trip → admit-fleet smoke, or diagnosing a stuck or silent relay. <br>
+Guides an agent in driving the DOCA Socket Relay to bridge a socket-oriented host application onto a BlueField DPU peer without rewriting it, covering deployment-shape selection (in-process, sidecar, or BlueField service container), host-side socket and DPU-side forwarding-endpoint configuration, the bind → connect → round-trip → admit-fleet smoke, and diagnosis of stuck or silent relays. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and infrastructure engineers use this skill to drive the DOCA Socket Relay so a socket-oriented host application can terminate its sockets locally while the relay forwards traffic to a DPU-side terminator across the DOCA fabric, including choosing the deployment shape, configuring host and DPU endpoints, and diagnosing relay connectivity and data-path failures. <br>
+Developers and engineers working with NVIDIA DOCA and BlueField DPUs use this skill to migrate an AF_UNIX socket-based host application onto a DPU-side peer via the DOCA Socket Relay without rewriting it, configure and smoke-test the relay deployment, and diagnose connection or silent data-path failures. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,33 +25,33 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Capabilities companion (CAPABILITIES.md)](CAPABILITIES.md) <br>
-- [Tasks companion (TASKS.md)](TASKS.md) <br>
-- [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
+- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline shell command citations] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), each attempt run in its own isolated k8s-sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative); each task attempt ran in its own isolated k8s-sandbox pod with one attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, covering unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded when needed and decoys were avoided. <br>
-- Effectiveness: Whether the skill helped complete the task, as the equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
+- Security: Is it safe to use? <br>
+- Correctness: Is the answer correct against the reference answer? <br>
+- Discoverability: Was the right skill loaded when needed, with decoys avoided? <br>
+- Effectiveness: Did the skill help complete the task, measured as the equal-weight mean of goal completion and expected workflow adherence? <br>
+- Efficiency: Did it avoid wasted tool calls and token usage, measured as equal-weight tool-call productivity and token efficiency? <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -60,21 +60,22 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 90.8% — baseline ran, but no comparable score was available; uplift unavailable | 94.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 65.0% → 100.0% (+35.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 58.8% → 93.8% (+35.0 points) | 56.3% → 86.3% (+30.0 points) |
-| Efficiency | 60.0% — baseline ran, but no comparable score was available; uplift unavailable | 100.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.2% (uplift unavailable) | 90.5% (uplift unavailable) |
+| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 75.0% → 95.0% (+20.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
+| Effectiveness | 50.0% → 100.0% (+50.0 points) | 75.0% → 87.5% (+12.5 points) |
+| Efficiency | 85.9% (uplift unavailable) | 74.9% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-946399d (source: git SHA, committed 2026-10-21) <br>
+c98e456 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

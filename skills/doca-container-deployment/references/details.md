@@ -150,7 +150,7 @@ bundle. To keep the boundary clean, it deliberately does not contain
   bare-metal binary-launch path. Both are routed to from
   `doca-setup ## recognize` (`doca-setup/TASKS.md#recognize`).
 - Per-service skills layered on top of this one (the four DOCA
-  services in the bundle, 1:1 with `doca/services/`):
+  services in the bundle):
   `doca-argus/SKILL.md` (runtime
   security / monitoring),
   `doca-dms/SKILL.md` (DOCA Management
@@ -165,10 +165,10 @@ bundle. To keep the boundary clean, it deliberately does not contain
   bundle uses this deployment runtime — the per-service skill is
   the overlay, not a re-statement of the runtime"*.
 - **Non-goals (externally-productized NVIDIA services not in the
-  DOCA monorepo and therefore not in this bundle):** BlueMan, HBN,
+  DOCA SDK and therefore not in this bundle):** BlueMan, HBN,
   SNAP, Virtio-net, DOCA Telemetry Service (as productized), and
-  any future external NVIDIA networking software not under
-  `doca/services/`. A user asking *"how do I deploy BlueMan?"* is
+  any other NVIDIA networking software that is not a DOCA SDK
+  service. A user asking *"how do I deploy BlueMan?"* is
   routed to the public NVIDIA docs at `docs.nvidia.com/doca/sdk/`
   for that specific product, NOT silently extrapolated from this
   skill's contract. The strict-to-DOCA invariant is documented at

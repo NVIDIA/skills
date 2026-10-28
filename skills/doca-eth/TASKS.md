@@ -153,12 +153,12 @@ recommending any code-level edit:
 
 Keep the build manifest unchanged: the sample's existing
 `meson.build` already wires `pkg-config doca-eth`; do not switch
-to a hand-rolled Makefile for *"simplicity"* — it removes the
+to a hand-rolled Makefile for *“simplicity”* — it removes the
 version-check rail per [`## build`](#build).
 
-The agent's anti-pattern alert: a *"clean rewrite"* from scratch
+The agent's anti-pattern alert: a *“clean rewrite”* from scratch
 is almost always slower to first green than a minimum-diff
-modify on a shipped sample, and removes the user's ability to
+modify on a shipped sample, and removes the user’s ability to
 bisect against a known-good baseline.
 
 ## run
@@ -210,14 +210,14 @@ Steps the agent should walk the user through:
    problem, not a lifecycle problem.
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
-underlie *"the program built but does nothing"*, see
+underlie *“the program built but does nothing”*, see
 `doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
 
 Goal: prove a DOCA Ethernet consumer is correct end-to-end, on
 the user's installed DOCA + device + steering plan, before
-claiming the *"build a first DOCA Ethernet app"* journey is
+claiming the *“build a first DOCA Ethernet app”* journey is
 done.
 
 This is **a loop, not a one-shot pass.** Each iteration narrows
@@ -259,7 +259,7 @@ Iteration shape:
    intentionally request something the device should NOT
    support (per step 1 the cap query returns false) and confirm
    the failure is the expected `DOCA_ERROR_NOT_SUPPORTED`.
-   This validates the agent's capability-discovery is itself
+   This validates the agent’s capability-discovery is itself
    correct.
 
 Eval-loop overlay — why this is a loop, not a one-shot pass:
@@ -358,8 +358,7 @@ so the agent does not invent guidance:
 - **deploy.** Deploying DOCA-Ethernet-using applications at
   scale across many hosts / DPUs, Kubernetes operator workflows
   for line-rate data planes, multi-tenant queue isolation —
-  out of scope for Phase 1 and reserved for a future platform
-  skill.
+  out of scope for this skill.
 - **firmware burn / reset / kernel driver install.** Installing
   the `mlx5_core` driver, burning new ConnectX firmware, or
   modifying `mlxconfig` parameters that need a reset — out of
@@ -385,13 +384,13 @@ the agent should:
 1. Probe for the matching structured helper FIRST (`doca-env --json`
    for version + devices + libraries + drivers + hugepages in one
    shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+   `version-matrix.json` for *“available since”* lookups).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
-   manual command in the row below. Report *"using structured
-   `<tool>`"*.
+   manual command in the row below. Report *“using structured
+   `<tool>`”*.
 3. If the probe fails, fall back to the manual command in the
-   row. Report *"falling back to manual chain"*.
+   row. Report *“falling back to manual chain”*.
 4. The schemas the structured tools emit are defined in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
@@ -401,14 +400,14 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --modversion doca-eth` | `## configure` step 1; `## build` slot 1 | What is the build-time DOCA Ethernet version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
-| `pkg-config --cflags --libs doca-eth` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --cflags --libs doca-eth` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `ls /opt/mellanox/doca/samples/doca_eth/` | `## modify` slot 1 | Which DOCA Ethernet samples ship in this install, and which is the closest starting point? | A list of sample directories named after the queue + RX-type pattern they demonstrate |
-| `devlink dev show` (sudo) | `## configure` step 1; `## debug` layer 7 | Is the underlying port up at the driver layer? | One row per port with `state: PORT_ACTIVE`; anything else means the port is down and the queue will be silent |
+| `devlink dev show` (requires sudo) | `## configure` step 1; `## debug` layer 7 | Is the underlying port up at the driver layer? | One row per port with `state: PORT_ACTIVE`; anything else means the port is down and the queue will be silent |
 | `ip -j link show <dev>` | `## configure` step 1; `## debug` layer 7 | Does the kernel report this device as UP, and is `PROMISC` set? | `flags` contains `UP,LOWER_UP`; `promiscuity` field reflects whether promiscuous mode is on |
 | `ethtool <dev>` | `## configure` step 1; `## debug` layer 7 | Does the driver report link / speed / duplex? | A non-zero speed and `Link detected: yes` |
 | `doca_caps --list-devs` | `## configure` step 3 | Which devices on this host can be used as a `doca_dev` for Ethernet I/O? | One row per visible device with PCIe address and capability flags |
-| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last Ethernet call? | Empty or recent benign messages. Repeated `mlx5` errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
-| `mlxconfig -d <pcie> q | head -n 40` (sudo) | `## debug` layer 7 | What firmware config does the underlying NIC report? | Stable firmware config; transient values indicate a partial reset |
+| `dmesg | tail -n 40` (requires sudo) | `## debug` layer 7 | What did the kernel / driver log around the last Ethernet call? | Empty or recent benign messages. Repeated `mlx5` errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
+| `mlxconfig -d <pcie> q | head -n 40` (requires sudo) | `## debug` layer 7 | What firmware config does the underlying NIC report? | Stable firmware config; transient values indicate a partial reset |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 2 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed |
 
 For commands shared across libraries (`pkg-config --modversion`,

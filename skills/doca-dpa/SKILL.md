@@ -17,7 +17,7 @@ description: >
   host↔DPU messaging (doca-comch), host-side RDMA (doca-rdma), and
   GPU-initiated networking (doca-gpunetio).
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
   doca_version: "3.5"
   tags:
@@ -304,21 +304,15 @@ install layout" rather than "DPA host-side-specific guidance".
   the bundle's structured-tools precedence rule (detect /
   prefer / fall back / report). The Command appendix in
   the tasks companion honors this contract.
-- `doca-programming-guide/SKILL.md` —
-  general DOCA programming patterns shared by every library:
-  the canonical `pkg-config` + meson build pattern, the
-  universal modify-a-shipped-sample first-app workflow, the
-  universal Core-context lifecycle, the cross-library
-  `DOCA_ERROR_*` taxonomy, and the program-side debug order.
-  This skill layers DPA specifics on top.
-- `doca-debug/SKILL.md` — the cross-cutting
-  debug ladder (install / version / build / link / runtime /
-  program / driver). DPA-specific debug (DPACC + DOCA version
-  skew, DPA not present on this BlueField generation, DPA
-  kernel hangs that show no host-side completion,
-  launch-argument shape mismatches between the host launch
-  call and the DPA-side function signature) overlays on top
-  of that ladder.
+- `doca-programming-guide/SKILL.md` — shared build, first-app,
+  Core-lifecycle and cross-library `DOCA_ERROR_*` patterns; this
+  skill layers DPA specifics on top.
+- `doca-debug/SKILL.md` — the cross-cutting debug ladder; this
+  skill's `## debug` adds the DPA overlay (DOCA + DPACC skew, no
+  DPA on this BlueField, kernel hangs with no host-side completion,
+  launch-argument / signature mismatch).
+
+### DPA device-side components
 
 DOCA DPA's DPA device-side components — the comm archive
 `libdoca_dpa_dev_comm.a` (communication primitives the DPA
@@ -327,8 +321,8 @@ the verbs archive `libdoca_dpa_dev_verbs.a` (ibverbs-like RDMA
 verbs the DPA kernel itself calls, header
 `doca_dpa_dev_verbs.h`) — are **DPA-side archives shipped
 within `doca-dpa`**, not separate pkg-config modules, and each
-has its own public guide. No library skill ships for them in
-this bundle yet; for any DPA-side question, route via
+has its own public guide. This skill covers them in its
+`## comms` / `## verbs` sections; for per-symbol detail, route via
 `doca-public-knowledge-map/SKILL.md`
 to the public *DOCA DPA Comms* and *DOCA DPA Verbs* guides
 and to the shipped `/opt/mellanox/doca/samples/doca_dpa/`

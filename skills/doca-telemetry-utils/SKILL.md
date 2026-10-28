@@ -15,7 +15,7 @@ description: >
   doca-telemetry, DTS deployment to doca-dts, and DOCA install or repair
   to doca-setup.
 metadata:
-  author: NVIDIA <doca@nvidia.com>
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
   doca_version: "3.5"
   tags:

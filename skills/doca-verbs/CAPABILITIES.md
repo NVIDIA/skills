@@ -56,7 +56,7 @@ the experimental ABI tier on this release:
 | --- | --- | --- |
 | `doca_verbs_context` | The per-library context — the DOCA Core context that owns the verbs surface. Wraps a `doca_dev` and surfaces to the PE | `doca_verbs_context_create(dev, &ctx)` → use → `doca_verbs_context_destroy(ctx)`. Bridge import / export via `doca_verbs_context_export_handle` / `_import_from_handle` for cross-process / cross-runtime cases; bridge default device via `doca_verbs_bridge_verbs_context_get_default_doca_dev` |
 | `doca_verbs_pd` (Protection Domain) | The protection domain QPs, MRs, and AHs live within | `doca_verbs_pd_create(ctx, &pd)` → use → `doca_verbs_pd_destroy(pd)`. Conversion to `doca_dev` via `doca_verbs_pd_as_doca_dev`; export / import via `doca_verbs_pd_export_handle` / `_import_from_handle` |
-| `doca_verbs_qp` (Queue Pair) | The QP. Created from a `doca_verbs_qp_init_attr` configured via the `doca_verbs_qp_init_attr_set_*` setters (including the `DOCA_VERBS_QP_ORDERING_SEMANTIC_*` and `DOCA_VERBS_RCX_TYPE_*` families; the RCX-type setter is part of the `doca_verbs_qp_init_attr_set_*` family); transitioned via `doca_verbs_qp_modify` using a `doca_verbs_qp_attr` configured via the `doca_verbs_qp_attr_set_*` setters; queried via `doca_verbs_qp_query` / `_query_ece`; ECE attributes set via `doca_verbs_qp_set_ece` | `doca_verbs_qp_init_attr_create` → `_set_*` → `doca_verbs_qp_create(ctx, init_attr, &qp)` → `doca_verbs_qp_modify(qp, qp_attr)` to drive the QP state machine → use → `doca_verbs_qp_destroy(qp)`. The matching `doca_verbs_qp_init_attr_get_*` getters expose ordering semantic and RCX type |
+| `doca_verbs_qp` (Queue Pair) | The QP. Created from a `doca_verbs_qp_init_attr` configured via the `doca_verbs_qp_init_attr_set_*` setters (including the `DOCA_VERBS_QP_ORDERING_SEMANTIC_*` family and the `rcx_type` value set via `doca_verbs_qp_init_attr_set_rcx_type`); transitioned via `doca_verbs_qp_modify` using a `doca_verbs_qp_attr` configured via the `doca_verbs_qp_attr_set_*` setters; queried via `doca_verbs_qp_query` / `_query_ece`; ECE attributes set via `doca_verbs_qp_set_ece` | `doca_verbs_qp_init_attr_create` → `_set_*` → `doca_verbs_qp_create(ctx, init_attr, &qp)` → `doca_verbs_qp_modify(qp, qp_attr)` to drive the QP state machine → use → `doca_verbs_qp_destroy(qp)`. The matching `doca_verbs_qp_init_attr_get_*` getters expose ordering semantic and RCX type |
 | `doca_verbs_cq` (Completion Queue) | The CQ that holds completion entries for the QPs feeding into it | `doca_verbs_cq_attr_create` → `_set_*` (size, overrun, collapsed, external DBR umem, state, entry size, completion channel) → `doca_verbs_cq_create(ctx, cq_attr, &cq)` → use → `doca_verbs_cq_destroy(cq)`. Direct WQ / DBR / CQN accessors via `doca_verbs_cq_get_wq` / `_get_dbr_addr` / `_get_cqn`; CQ context via `doca_verbs_cq_set_cq_context`; external DBR umem and state queried via the matching `doca_verbs_cq_attr_get_*` getters |
 | `doca_verbs_srq` (Shared Receive Queue) | The shared receive queue that multiple QPs can pull receive WRs from | `doca_verbs_srq_init_attr_create` → `_set_*` → `doca_verbs_srq_create(ctx, init_attr, &srq)` → use (`doca_verbs_bridge_post_srq_recv`) → `doca_verbs_srq_destroy(srq)`. Query via `doca_verbs_srq_query`; SRQ number via `doca_verbs_srq_get_srqn` |
 | `doca_verbs_ah_attr` (Address-Handle attributes) | The Address-Handle attribute block for routing send WRs over IB or RoCE (address type is one of the `DOCA_VERBS_ADDR_TYPE_*` family) | `doca_verbs_ah_attr_create` → `_set_*` (DGID / DLID / SL / SGID-index / static-rate / hop-limit / traffic-class / UDP-source-port / address-type) → attached to a `doca_verbs_qp_attr` via `doca_verbs_qp_attr_set_ah_attr` → `doca_verbs_ah_attr_destroy`. UDP source port is read/written via the `doca_verbs_ah_attr_get_udp_sport` / `_set_udp_sport` pair |
@@ -183,8 +183,8 @@ there; this skill does not duplicate it.
   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any verbs-layer diagnosis.
 - **The DOCA Verbs surface ships under the EXPERIMENTAL ABI tier
-  on this release.** Per the source-tree split observable in the
-  library's `version.map` on disk, the entire `doca_verbs_*`
+  on this release.** Per the symbol versions the installed
+  library exports, the entire `doca_verbs_*`
   symbol family is exposed under the experimental section. The
   agent should surface this: experimental-tier symbols may
   rename, reshape, or graduate between releases. Quote the symbol
@@ -321,9 +321,8 @@ Six primary signals the agent should reach for:
    loop the same way as the comp-channel handle when those events
    are operationally relevant.
 5. **Public-header boundary.** Only recommend observability APIs declared by
-   the installed public `doca_verbs.h`. If a local installation exposes
-   additional non-public headers or symbols, treat them as out of scope and do
-   not quote, route to, or infer behavior from them.
+   the installed `doca_verbs.h`; do not quote, route to, or infer behavior
+   from any header or symbol not declared there.
 6. **Multi-rail probe and error state.** The multi-rail surface exposes
    per-QP observability in the public `doca_verbs.h`:
    `doca_verbs_multi_rail_probe_get_status` reports the probe status for a QP,

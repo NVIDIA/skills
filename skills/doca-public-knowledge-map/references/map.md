@@ -94,8 +94,12 @@ To build against DOCA from a user-owned directory, the canonical environment
 hint is to expose the DOCA `pkg-config` directory before running `meson setup`:
 
 ```bash
-PCDIR="$(dirname "$(find /opt/mellanox/doca -name doca-common.pc -print -quit 2>/dev/null)")"
-export PKG_CONFIG_PATH="${PCDIR}:${PKG_CONFIG_PATH}"  # commonly /opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig on DOCA 3.3+; or /opt/mellanox/doca/infrastructure/lib/pkgconfig on legacy / split-profile installs
+PC=$(find /opt/mellanox/doca -name doca-common.pc -print -quit 2>/dev/null)
+if [ -n "$PC" ]; then
+  export PKG_CONFIG_PATH="${PC%/*}:$PKG_CONFIG_PATH"  # commonly /opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig on DOCA 3.3+; or /opt/mellanox/doca/infrastructure/lib/pkgconfig on legacy / split-profile installs
+else
+  echo "doca-common.pc not found: partial install, see doca-setup" >&2
+fi
 ```
 
 If `pkg-config --modversion doca-common` fails after that, treat it as a real
@@ -152,11 +156,9 @@ Libraries / Services / Tools umbrella pages) and search from there.
    user's local install, or in the official docs you fetched, say so and ask.
 4. **Public sources only.** Reference NVIDIA documentation only on the
    public hosts listed in `AGENTS.md` ground rule #1 (bundle `AGENTS.md`).
-   Anything else is not available to a customer agent and is rejected
-   by an internal CI pipeline before the bundle ships.
-5. **No source-tree paths.** Do not reference `devtools/...`, `docs/ai/...`,
-   or any path that only exists inside the DOCA repository. Customers do not
-   have those.
+   Anything else is not available to a customer agent.
+5. **No source-tree paths.** Cite installed paths (under `/opt/mellanox/doca/`
+   or standard system paths) or public URLs only.
 
 > **Hardware-safety meta-policy.** Every per-artifact `## Safety policy`
 > in this bundle overlays the cross-cutting hardware-safety

@@ -89,9 +89,8 @@ Two objects expose the management plane. Verified surface
 | `doca_mgmt_dev_ctx` | `doca_mgmt_dev_ctx_create(dev, &ctx)`, `doca_mgmt_dev_ctx_create_from_target_string(target_string, &ctx)`, `doca_mgmt_dev_ctx_destroy(ctx)`, `doca_mgmt_dev_ctx_get_doca_dev(ctx)` | Created on a `doca_dev` or from a target string; the device-wide management context. Required for `doca_mgmt_raw_cmd`, `doca_mgmt_cap_*_is_supported`, the device-wide icm-quota and diagnostics-data operations, and the raw HCA/register surfaces |
 | `doca_mgmt_dev_rep_ctx` | `doca_mgmt_dev_rep_ctx_create(dev_ctx, rep, &ctx)` (with a `doca_dev_rep`), `doca_mgmt_dev_rep_ctx_create_by_pci_addr(dev_ctx, "0000:3a:00.2", &ctx)` (when a representor is not available for the VF), `doca_mgmt_dev_rep_ctx_create_from_target_string(target_string, &ctx)` (when only a target string is available), `doca_mgmt_dev_rep_ctx_destroy`, `doca_mgmt_dev_rep_ctx_get_doca_dev_rep`, `doca_mgmt_dev_rep_ctx_get_mgmt_dev_ctx` | Required for representor-targeted sub-domain calls (general caps `_set` / `_get`, icm-quota for representors). The `_by_pci_addr` and `_from_target_string` forms are the documented alternative paths when the kernel-side representor is not exposed |
 
-Every public `doca_mgmt_*` symbol is currently tagged
-`DOCA_EXPERIMENTAL` in the version map under the `DOCA_3` version
-bucket. The agent must surface this whenever it recommends a
+Every public `doca_mgmt_*` symbol is currently declared
+`DOCA_EXPERIMENTAL` in the installed headers. The agent must surface this whenever it recommends a
 symbol — see [`## Version compatibility`](#version-compatibility).
 
 ### The raw-command scope ladder
@@ -200,10 +199,8 @@ there; this skill does not duplicate it.
 **The doca-mgmt-specific overlay** is:
 
 - **Every public `doca_mgmt_*` symbol is currently tagged
-  `EXPERIMENTAL`.** The library's public version map (the
-  authoritative source for what the shipped `.so` actually
-  exports) places every `doca_mgmt_*` symbol under the
-  `EXPERIMENTAL` set under the `DOCA_3` version bucket. The
+  `EXPERIMENTAL`.** The installed headers declare every
+  `doca_mgmt_*` symbol `DOCA_EXPERIMENTAL`. The
   agent must surface this whenever it recommends a management
   symbol: the API can change shape between DOCA releases, and
   building a long-lived fleet-management tool against this
