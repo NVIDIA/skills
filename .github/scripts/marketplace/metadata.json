@@ -3781,6 +3781,78 @@
       }
     },
     {
+      "path": "skills/pva-build-test",
+      "name": "pva-build-test",
+      "description": "Build and verify an NVIDIA PVA operator with the public PVA SDK. Use alone or from OpGen. Run optional EMU correctness, a fresh L4T build with the NVVPU or ASIP/Chess backend that Doctor proved, direct-SSH Tegra hardware correctness, and optional hardware performance. Return PASSED, FAILED, or BLOCKED with exact evidence.",
+      "metadata": {
+        "product.primary": "PVA",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,platform_engineer,hands_on_builder",
+        "discovery.activity_tags": "test,validate,benchmark,debug,configure"
+      }
+    },
+    {
+      "path": "skills/pva-debug",
+      "name": "pva-debug",
+      "description": "Diagnose and narrowly repair one reproduced NVIDIA PVA operator failure. Use from OpGen or manually for compile, link, cuPVA lifecycle, dataflow, DMA, numerical, EMU-versus-hardware, runtime, or performance failures. Preserve the original evidence and return the repaired source to the caller for a fresh Build-Test.",
+      "metadata": {
+        "product.primary": "PVA",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "troubleshoot,debug,test,optimize,profile"
+      }
+    },
+    {
+      "path": "skills/pva-doctor",
+      "name": "pva-doctor",
+      "description": "Check whether a host is ready for requested NVIDIA PVA work. Use before Spec, OpGen, Build-Test, or Debug. Verify references to the installed SDK documentation, inspect only the requested capabilities, and prove that either NVVPU or ASIP/Chess can compile target VPU code when L4T compilation is required. Report READY, READY_WITH_LIMITATIONS, or NOT_READY. Do not install or configure software.",
+      "metadata": {
+        "product.primary": "PVA",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "in-vehicle-computing",
+        "audience": "developer,application_developer,platform_engineer,devops_engineer,robotics_developer",
+        "discovery.activity_tags": "validate,inspect,troubleshoot,test,debug"
+      }
+    },
+    {
+      "path": "skills/pva-opgen",
+      "name": "pva-opgen",
+      "description": "Generate, change, or repair a complete vectorized NVIDIA PVA operator from a validated pva-spec handoff. Deliver the contract's API, host and VPU code, independent CPU reference, sample, build integration, tests, and documentation. Verify with pva-build-test and use pva-debug within the configured attempt limit.",
+      "metadata": {
+        "product.primary": "PVA",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,hands_on_builder,platform_engineer",
+        "discovery.activity_tags": "generate,integrate,test,debug,validate"
+      }
+    },
+    {
+      "path": "skills/pva-setup",
+      "name": "pva-setup",
+      "description": "Install and configure the NVIDIA PVA SDK, NVVPU compiler, and L4T target runtime from the selected installation guide. Use when the user requests PVA environment setup on a development host and board.",
+      "metadata": {
+        "product.primary": "PVA",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "configure,get_started,validate,deploy"
+      }
+    },
+    {
+      "path": "skills/pva-spec",
+      "name": "pva-spec",
+      "description": "Create and validate an NVIDIA PVA operator specification, test matrix, evidence manifest, and deterministic OpGen handoff. Use after Doctor for new operators, changes, or repairs, using requirements, a partial spec, reference code, or an existing operator. Accept text, files, and public URLs. Record unresolved requirements without inventing behavior.",
+      "metadata": {
+        "product.primary": "PVA",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer",
+        "discovery.activity_tags": "generate,validate,test,synthesize,configure"
+      }
+    },
+    {
       "path": "skills/rag-blueprint",
       "name": "rag-blueprint",
       "description": "NVIDIA RAG Blueprint — deploy, configure, troubleshoot, and manage. Handles any RAG action: deploy, install, start, enable, disable, toggle, change, configure, troubleshoot, debug, fix, shutdown, stop, or tear down any RAG feature or service (Agentic RAG, VLM, guardrails, query rewriting, models, search, ingestion, observability, summarization, reasoning, and more).",
