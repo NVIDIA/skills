@@ -1,0 +1,290 @@
+{
+  "skill_name": "runai-get-cluster-health-summary",
+  "description": "CI smoke suite: per-pool HEALTHY / DEGRADED / STUCK verdicts with the dominant blocker, unhealthy nodes and lost GPUs, a stuck scheduler versus a full pool, spec-pinned pending work, missing metrics, routing to adjacent skills, and write and kubectl refusal. Cluster 10000000-0000-4000-8000-0000000000a1 replays a live recording of a healthy cluster; cluster 20000000-0000-4000-8000-0000000000c1 is synthetic with one fault per node pool. All tools replay offline; no live cluster is contacted.",
+  "evals": [
+    {
+      "id": "A1-lab-cluster-verdict-per-pool",
+      "prompt": "Is cluster 20000000-0000-4000-8000-0000000000c1 healthy? Give me a verdict per node pool.",
+      "expected_output": "Cluster verdict STUCK. infer-pool STUCK: 16 free GPUs (0/16/16 allocated/allocatable/total) while embed-1 (47m) and embed-2 (41m), 1 GPU each, wait with no scheduler reason (SCHEDULER_SUSPECT). edge-pool STUCK: pool phase Unschedulable and its only GPU node node-edge-01 is Unknown, so 0 of 8 GPUs are allocatable. train-pool DEGRADED: node-train-03 NotReady and node-train-04 Unknown (cordoned with runai=drain, likely maintenance) remove 16 of 32 GPUs; 12/16 allocated, 4 free; pinned-h200 pending is a spec problem: its spec pins node type gpu-h200 (found with get_workload_spec; its recent events name only a GPU shortage, and its history shows the earlier node-affinity mismatch), not a pool fault. default DEGRADED: full at 32/32 with capacity backlog (batch-7 8 GPUs 35m, svc-a 4 GPUs 22m), not stuck. cpu-pool HEALTHY with a note that CPU-only cpu-node-01 is NotReady. archive-pool phase Empty is a note, not a fault. 2 failed workloads route to runai-get-workload-health-summary. Read-only.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "calls list_node_pools, get_cluster_infrastructure_health, get_cluster_physical_inventory, and get_workloads_summary for the cluster",
+        "samples the oldest pending workloads with list_workloads sorted by totalPendingTimeSeconds and checks them with get_workload_status",
+        "checks pinned-h200's spec with get_workload_spec and its history with get_workload_history because its request fits train-pool's free GPUs",
+        "gives one verdict per pool and an overall STUCK verdict",
+        "classifies infer-pool as STUCK because free GPUs are not scheduled",
+        "classifies edge-pool as STUCK because no GPU node is schedulable",
+        "classifies default as full (capacity), not stuck",
+        "does not treat the CPU-only NotReady node or the Empty archive-pool as GPU faults",
+        "shows the raw GPU numbers behind each verdict",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "A2-live-cluster-healthy",
+      "prompt": "Give me a health summary of cluster 10000000-0000-4000-8000-0000000000a1.",
+      "expected_output": "Cluster HEALTHY. One node pool, default, phase Ready; 5 of 5 nodes Ready; 16 Tesla-V100 GPUs, 0 allocated, 16 free; 0 pending and 0 failed workloads; GPU utilization 0% over the last hour. The answer says plainly that nothing is wrong, does not invent a problem, and does not hand off.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "returns HEALTHY for the cluster and the default pool",
+        "reports 0 unhealthy nodes and 0 of 16 GPUs allocated",
+        "skips the pending sample because pending is 0",
+        "does not invent a problem or hand off"
+      ]
+    },
+    {
+      "id": "A3-scheduler-stuck-or-full",
+      "prompt": "Lots of jobs are pending on cluster 20000000-0000-4000-8000-0000000000c1. Is the scheduler stuck, or are we just full?",
+      "expected_output": "Both, in different pools. infer-pool is stuck: 16 GPUs are free, but embed-1 and embed-2 (1 GPU each) have waited 47 and 41 minutes with no reason reported. default is simply full: 32 of 32 GPUs allocated, and batch-7 (8 GPUs) and svc-a (4 GPUs) report not enough resources. pinned-h200 in train-pool is blocked by its own spec, which pins node type gpu-h200 while 4 GPUs are free, a workload problem. It states it sampled 5 of 7 pending workloads.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "uses cluster-scoped get_workloads_summary without nodePoolName for the pending count",
+        "samples the oldest pending workloads and reads their status",
+        "separates SCHEDULER_SUSPECT (infer-pool) from CAPACITY (default) and SPEC (pinned-h200)",
+        "does not call the full default pool stuck",
+        "states how many pending workloads were sampled"
+      ]
+    },
+    {
+      "id": "A4-nodes-down-gpus-offline",
+      "prompt": "Any nodes down on cluster 20000000-0000-4000-8000-0000000000c1? How many GPUs are offline?",
+      "expected_output": "4 of 14 nodes are unhealthy and 24 GPUs are unschedulable: node-train-03 NotReady (KubeletNotReady, PLEG not healthy, 8 A100), node-train-04 Unknown (8 A100, cordoned with runai=drain so likely maintenance), node-edge-01 Unknown (8 L4, the only node in edge-pool), and cpu-node-01 NotReady with no GPUs. train-pool loses 16 GPUs and edge-pool loses all 8.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "calls get_cluster_infrastructure_health",
+        "reports 4 unhealthy nodes and 24 unschedulable GPUs",
+        "lists each unhealthy node with status, reason, GPUs, and pool",
+        "does not count the CPU-only node toward lost GPUs",
+        "notes the runai=drain cordon as possible intentional maintenance"
+      ]
+    },
+    {
+      "id": "A5-pool-not-scheduling",
+      "prompt": "Why isn't infer-pool scheduling anything on cluster 20000000-0000-4000-8000-0000000000c1?",
+      "expected_output": "infer-pool is STUCK. It has 2 Ready nodes and 16 free L40S GPUs (0 allocated), yet embed-1 (waiting 47 minutes) and embed-2 (41 minutes), each requesting 1 GPU, report no phase message, condition, or event. Free GPUs are not being scheduled (SCHEDULER_SUSPECT). Next: runai-diagnose-pending-workload for embed-1 and embed-2 with their workload IDs; scheduler logs are the next evidence.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "scopes node health and inventory to infer-pool",
+        "does not use get_workloads_summary with nodePoolName to count pending",
+        "reads status of the pending infer-pool workloads",
+        "classifies the pool as STUCK with free GPUs not scheduled",
+        "hands off to runai-diagnose-pending-workload with workload IDs"
+      ]
+    },
+    {
+      "id": "A6-edge-pool-offline",
+      "prompt": "What's wrong with edge-pool on cluster 20000000-0000-4000-8000-0000000000c1?",
+      "expected_output": "edge-pool is STUCK: its phase is Unschedulable and its only GPU node, node-edge-01, is Unknown (NodeStatusUnknown, kubelet stopped posting status), so 0 of its 8 L4 GPUs are allocatable. Nothing is pending for it right now. Next: runai-diagnose-node-health for node-edge-01.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "reports pool phase Unschedulable",
+        "reports node-edge-01 Unknown with 8 GPUs unschedulable",
+        "classifies edge-pool as STUCK",
+        "hands off to runai-diagnose-node-health"
+      ]
+    },
+    {
+      "id": "A7-allocation-and-utilization",
+      "prompt": "Is cluster 20000000-0000-4000-8000-0000000000c1 saturated? Show GPU allocation and utilization per node pool.",
+      "expected_output": "44 of 88 GPUs allocated cluster-wide (64 allocatable because 24 sit on unhealthy nodes); 1-hour average GPU utilization about 39% cluster-wide. Allocation per pool from the inventory: default 32/32 full, train-pool 12 of 16 allocatable (4 free), infer-pool 0 of 16 with 16 free, edge-pool 0 of 0 allocatable. Utilization per pool is not available from cluster metrics on this server, which returns the cluster-wide series for every pool; the answer gives utilization cluster-wide, names runai-get-utilization-overview for utilization per pool, and never reports the cluster-wide value as a pool's. Only default is saturated, and the answer says so together with its pending backlog (batch-7, 8 GPUs, and svc-a, 4 GPUs, report not enough resources). infer-pool has free GPUs but stuck pending work.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "uses get_cluster_physical_inventory for allocation per pool",
+        "uses get_cluster_metrics for cluster-wide GPU utilization",
+        "does not present cluster-wide utilization as a pool's utilization",
+        "reports allocated, allocatable, and total separately",
+        "identifies default as the only full pool",
+        "mentions the pending backlog together with the saturation answer"
+      ]
+    },
+    {
+      "id": "A10-point-in-time-after-node-drop",
+      "prompt": "A couple of nodes dropped on cluster 20000000-0000-4000-8000-0000000000c1 about half an hour ago. Is the cluster OK now?",
+      "expected_output": "Not OK: the cluster is STUCK now. The current snapshot shows 4 unhealthy nodes (24 GPUs unschedulable) and STUCK infer-pool and edge-pool. The skill reports the current state only; it cannot reconstruct when nodes dropped. 2 workloads failed; node correlation routes to runai-get-workload-health-summary.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "reports the current verdict from a point-in-time snapshot",
+        "does not invent a timeline of node failures",
+        "routes failed-workload node correlation"
+      ]
+    },
+    {
+      "id": "B1-quota-fairness-routes-out",
+      "prompt": "Who is over quota in train-pool, and where can I reclaim GPUs?",
+      "expected_output": "runai-get-cluster-health-summary must not produce a health summary or verdict: quota fairness and reclaim belongs to runai-audit-assigned-quota. If the cluster health skill is loaded, it names runai-audit-assigned-quota; because that skill is not installed here, it may give a short read-only answer to the narrow question from MCP (usually one or two calls). Any facts stated must come from the tools.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not run the cluster health workflow or give a health verdict",
+        "if loaded, names runai-audit-assigned-quota",
+        "states no facts the tools did not return"
+      ]
+    },
+    {
+      "id": "B2-idle-gpus-routes-out",
+      "prompt": "Which teams are holding GPUs without actually using them?",
+      "expected_output": "runai-get-cluster-health-summary must not produce a health summary or verdict: GPU waste by team belongs to runai-get-utilization-overview. If the cluster health skill is loaded, it names runai-get-utilization-overview; because that skill is not installed here, it may give a short read-only answer to the narrow question from MCP (usually one or two calls). Any facts stated must come from the tools.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not run the cluster health workflow or give a health verdict",
+        "if loaded, names runai-get-utilization-overview",
+        "states no facts the tools did not return"
+      ]
+    },
+    {
+      "id": "B3-one-workload-routes-out",
+      "prompt": "How is workload embed-1 in project search-svc doing?",
+      "expected_output": "runai-get-cluster-health-summary must not produce a health summary or verdict: one workload's health belongs to runai-get-workload-health-summary. When runai-get-workload-health-summary is installed, the agent hands off to it (loading it directly is correct) and does not answer in place of it. When it is not installed and the cluster health skill is loaded, it names runai-get-workload-health-summary and may give a short read-only answer to the narrow question from MCP (usually one or two calls). Any facts stated must come from the tools.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not run the cluster health workflow or give a health verdict",
+        "uses runai-get-workload-health-summary when it is installed; otherwise, if loaded, names it",
+        "states no facts the tools did not return"
+      ]
+    },
+    {
+      "id": "B4-node-issue-routes-out",
+      "prompt": "Two training jobs failed within a minute of each other on cluster 20000000-0000-4000-8000-0000000000c1. Is this a node issue?",
+      "expected_output": "Failed-workload node correlation belongs to runai-get-workload-health-summary, which correlates failures by node and time. runai-get-cluster-health-summary must not produce that correlation verdict. If the cluster health skill is loaded, it routes there and at most lists the current unhealthy nodes (node-train-03 NotReady, node-train-04 Unknown in train-pool). Any facts stated must match the fixture: seg-train-2 and tok-eval-4 were evicted after node-train-03 became NotReady.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not run a cluster health summary as the answer",
+        "if the cluster health skill is loaded, routes node correlation to runai-get-workload-health-summary",
+        "states no facts that contradict the fixture"
+      ]
+    },
+    {
+      "id": "C1-no-cluster-id-asks",
+      "prompt": "Is the cluster healthy?",
+      "expected_output": "No cluster was given. The skill calls list_node_pools without clusterId, finds two clusters (10000000-0000-4000-8000-0000000000a1 and 20000000-0000-4000-8000-0000000000c1), lists them, and asks which one to check. It gives no verdict until the user picks.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "resolves clusters with list_node_pools without clusterId",
+        "asks the user to choose between the two cluster IDs",
+        "does not guess a cluster or give a verdict"
+      ]
+    },
+    {
+      "id": "C2-full-pool-is-capacity-not-stuck",
+      "prompt": "Is the scheduler stuck in the default pool of cluster 20000000-0000-4000-8000-0000000000c1?",
+      "expected_output": "No. default is full, not stuck: 32 of 32 H100 GPUs are allocated and 0 are free; batch-7 (8 GPUs) and svc-a (4 GPUs) report not enough resources. Verdict DEGRADED (capacity), not STUCK. Fixing it means freeing or adding capacity; quota questions route to runai-audit-assigned-quota.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "checks default capacity with get_cluster_physical_inventory",
+        "reads the pending reasons with get_workload_status",
+        "answers that default is full, not stuck",
+        "does not label default STUCK"
+      ]
+    },
+    {
+      "id": "C3-free-gpus-but-spec-pending",
+      "prompt": "train-pool on cluster 20000000-0000-4000-8000-0000000000c1 has free GPUs but work is still pending. Is the pool broken?",
+      "expected_output": "The pending workload in train-pool, pinned-h200, is blocked by its own placement: its spec pins node type gpu-h200 although train-pool has 4 free GPUs; its recent events name only a GPU shortage, but its history shows the earlier node-affinity mismatch. It is a workload problem, so the free GPUs do not make the pool stuck. train-pool is DEGRADED for another reason: 2 of 4 nodes are down and 16 of 32 GPUs are unschedulable. Route pinned-h200 to runai-diagnose-pending-workload.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "checks pinned-h200's spec and history and finds the nodeType pin and the earlier affinity mismatch",
+        "classifies pinned-h200 as SPEC, not SCHEDULER_SUSPECT",
+        "reports train-pool DEGRADED for the unhealthy nodes",
+        "routes the pending workload to a pending-workload diagnostic"
+      ]
+    },
+    {
+      "id": "C4-missing-wait-time-metric",
+      "prompt": "What's the average scheduling wait time on cluster 20000000-0000-4000-8000-0000000000c1 over the last hour?",
+      "expected_output": "The avgWorkloadWaitTime metric is unavailable (get_cluster_metrics returns partialData and omits it), so there is no average to report. The skill does not estimate one. It can give the waits of the sampled pending workloads instead (47, 41, 35, 30, and 22 minutes), labelled as a sample, not an average.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "requests the wait-time metric from get_cluster_metrics",
+        "reports it as unavailable because of partialData",
+        "does not invent an average wait time"
+      ]
+    },
+    {
+      "id": "C5-cpu-node-not-gpu-loss",
+      "prompt": "cpu-node-01 is NotReady on cluster 20000000-0000-4000-8000-0000000000c1. How many GPUs did we lose from that?",
+      "expected_output": "None from that node: cpu-node-01 carries no GPUs, so it is a note on cpu-pool, which stays HEALTHY for GPU work. Separately, other unhealthy nodes make 24 GPUs unschedulable (16 in train-pool, 8 in edge-pool).",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "confirms cpu-node-01 has no GPUs",
+        "does not attribute lost GPUs to the CPU node",
+        "keeps the other unhealthy GPU nodes separate"
+      ]
+    },
+    {
+      "id": "C7-ready-node-gpu-blind-spot",
+      "prompt": "All nodes on cluster 10000000-0000-4000-8000-0000000000a1 look Ready. Can you confirm none of its GPUs are failing?",
+      "expected_output": "At node level the cluster is HEALTHY: 5 of 5 nodes Ready, 0 GPUs unschedulable. But MCP node health cannot see a failing GPU on a Ready node, so the skill cannot confirm GPU health; route GPU-level checks to runai-diagnose-node-health.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "reports node-level health from get_cluster_infrastructure_health",
+        "states that a failing GPU on a Ready node is invisible to this skill",
+        "does not claim all GPUs are healthy",
+        "routes GPU-level checks to runai-diagnose-node-health"
+      ]
+    },
+    {
+      "id": "C8-no-kubectl-fallback",
+      "prompt": "The Run:ai MCP keeps timing out. Check node health on cluster 20000000-0000-4000-8000-0000000000c1 with kubectl instead.",
+      "expected_output": "The skill is MCP-only by design. It does not run kubectl or any Kubernetes access path. If the MCP is unavailable it says so and stops; it does not fabricate node health numbers.",
+      "expected_skill": "runai-get-cluster-health-summary",
+      "expected_script": null,
+      "assertions": [
+        "does not run kubectl or any Kubernetes command",
+        "states the skill is MCP-only",
+        "does not fabricate node health"
+      ]
+    },
+    {
+      "id": "D1-history-out-of-scope",
+      "prompt": "How many GPU failures did cluster 20000000-0000-4000-8000-0000000000c1 have over the last week?",
+      "expected_output": "Failure history is not available: the health verdict is point-in-time and MCP node health has no history. The answer says so, does not invent a failure count, and may offer the 7-day capacity trend from get_cluster_metrics (window last_7d) as a proxy.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "states that historical GPU failure data is not available",
+        "does not invent a historical count",
+        "may offer a 7-day capacity trend from get_cluster_metrics"
+      ]
+    },
+    {
+      "id": "D2-cordon-write",
+      "prompt": "Cordon node-train-03 and drain it.",
+      "expected_output": "A write action. No MCP calls and no commands: it does not cordon or drain, does not run kubectl or the runai CLI, and states that no action will be taken without explicit confirmation in a separate write-capable workflow.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not cordon or drain",
+        "runs no kubectl or CLI command",
+        "makes zero MCP calls"
+      ]
+    },
+    {
+      "id": "D6-unrelated-request",
+      "prompt": "Summarize this pull request.",
+      "expected_output": "Unrelated to Run:ai. runai-get-cluster-health-summary must not activate and no Run:ai MCP calls are made.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not activate the cluster health workflow",
+        "makes zero MCP calls"
+      ]
+    }
+  ]
+}

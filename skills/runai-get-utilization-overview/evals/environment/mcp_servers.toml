@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# The evaluator stages evals/files here inside the container.
+[[mcp_servers]]
+name = "runai"
+transport = "stdio"
+command = "/workspace/input/mock_mcp.py"
