@@ -455,7 +455,10 @@
       "title": "AI Factory",
       "description": "Design, deploy, operate, and optimize infrastructure and workflows for producing, serving, and managing AI systems at scale.",
       "skills": [
+        "runai-audit-assigned-quota",
         "runai-diagnose-failed-workload",
+        "runai-get-cluster-health-summary",
+        "runai-get-utilization-overview",
         "runai-get-workload-health-summary"
       ]
     },
