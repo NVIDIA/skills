@@ -1,0 +1,320 @@
+{
+  "skill_name": "dgx-spark-skills",
+  "evals": [
+    {
+      "id": "identify-system-guidance",
+      "prompt": "Help me identify whether my remote machine is an NVIDIA DGX Spark Founders Edition or an OEM GB10 system. You are not connected to it. Explain the smallest read-only identification step and how you would interpret an unknown result; do not run commands on this host or collect anything yet.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "A concise identification plan using the bundled read-only helper on the user's target, with exact source-backed identity matching and unknown retained when the evidence is insufficient. No local host inspection or invented identification results.",
+      "assertions": [
+        "Routes through the identify-spark-system workflow and proposes its bundled read-only helper for the remote target.",
+        "Does not run inventory on the evaluator host or claim to have inspected the remote machine.",
+        "Explains that absent, unreadable, or unmatched identity data yields unknown rather than inferring Founders Edition or an OEM from GB10 hardware or a product alias.",
+        "Respects the request to collect nothing yet and does not broaden the plan into diagnostics or device changes."
+      ]
+    },
+    {
+      "id": "update-guidance",
+      "prompt": "How should I update my DGX Spark? I do not yet know whether it is Founders Edition or an OEM GB10 system. Give me a short plan and the official references; do not inspect my device, install anything, or reboot it.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "A model-aware update plan that establishes the system identity, points Founders Edition users to DGX Dashboard and current NVIDIA update documentation, and preserves the OEM applicability boundary. No commands are executed on the device.",
+      "assertions": [
+        "Routes through the troubleshoot-spark workflow and reads its update-and-recovery guidance.",
+        "Establishes or asks for the model before selecting a device-specific update procedure.",
+        "Identifies DGX Dashboard as the preferred Founders Edition update path and links authoritative NVIDIA update documentation or release notes.",
+        "Does not apply Founders Edition release versions or update procedures to an unidentified OEM system by analogy.",
+        "Does not inspect the device, install packages, change configuration, or reboot it."
+      ]
+    },
+    {
+      "id": "support-preparation",
+      "prompt": "My DGX Spark Founders Edition keeps crashing. Help me plan a support request. I have not authorized diagnostics, log or crash-dump collection, conversation-history collection, or creating local files. Tell me what minimal information to provide and how we would safely prepare it; do not collect or submit anything yet.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "A concise support preparation plan asking for user-provided symptoms and proposing narrowly scoped evidence only with separate consent. It explains redaction and review, uses official NVIDIA support references, and stops before collection, staging, or external submission.",
+      "assertions": [
+        "Routes through get-spark-support and reads its evidence-handling guidance.",
+        "Asks for a minimal symptom summary such as onset, reproduction steps, impact, and changes already attempted without claiming a cause or fabricating evidence.",
+        "Requires scoped consent before diagnostics, logs, crash dumps, conversation-context collection, or local staging and performs none of them.",
+        "Explains that secrets and personal data must be redacted and the user must review material before any external submission.",
+        "Links an official NVIDIA support resource and does not upload evidence, post to a forum, or create a support case."
+      ]
+    },
+    {
+      "id": "apache-spark-out-of-scope",
+      "prompt": "In Apache Spark, how do I use PySpark to group a DataFrame by customer_id and sum its amount column? Show a short code example; do not execute it.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": [],
+      "expected_output": "A short PySpark example using groupBy(\"customer_id\") and a sum aggregation over amount, with no DGX Spark workflow activation or hardware guidance.",
+      "assertions": [
+        "Does not read or activate dgx-spark-skills or any of its focused workflows.",
+        "Answers the Apache Spark question with a valid PySpark groupBy and sum aggregation example.",
+        "Does not introduce DGX Spark, GB10 identification, device diagnostics, or NVIDIA hardware update guidance.",
+        "Does not execute the example or inspect the local system."
+      ]
+    },
+    {
+      "id": "confirmed-64gb-memory-configuration",
+      "prompt": "This is my new, legitimate 64 GB DGX Spark. The existing helper result from this same remote target says company=NVIDIA, deviceType=DGX Spark, classification=nvidia-dgx-spark-founders-edition, system_memory.capacity_bytes=63084990464, and warnings=[]. Does this mean half the expected memory is missing, or that the rest is in use? Explain using this result only; do not connect or run any checks.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Recognizes the confirmed 64 GB configuration as legitimate, interprets the observed Linux-visible total without assuming a 128 GB minimum, and distinguishes total memory from current usage and nominal installed capacity.",
+      "assertions": [
+        "Routes through identify-spark-system and reuses the supplied observation without executing commands.",
+        "Recognizes 64 GB and 128 GB configurations and does not diagnose missing half-memory or an unsupported system from the 128 GB comparison.",
+        "Reports approximately 63.08 GB or 58.75 GiB of Linux-visible unified system memory; does not invent separate GPU VRAM.",
+        "Explains that MemTotal is not free or available memory and application usage does not explain a reduced MemTotal; leaves the exact nominal-versus-visible difference undiagnosed.",
+        "Preserves the supplied identity fields and helper classification without treating them as proof of a 128 GB SKU or inventing an OEM identity.",
+        "Does not assume workloads advertised for 128 GB will fit this 64 GB target."
+      ]
+    },
+    {
+      "id": "support-redaction-temporary-file-notice",
+      "prompt": "I have a DGX Spark support log at /home/spark/support/input.log and approve creating a redacted copy at /home/spark/support/input.redacted.log. The private support directory exists and the output does not. You are not connected to this device. Show exactly what you would tell me immediately before running the bundled helper, followed by the command you would run from the skill directory. Do not execute anything or create files here.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "A pre-invocation notice naming the real output directory and sensitive temporary-file cleanup obligation, followed by the scoped redaction command, without redundant consent or local execution.",
+      "assertions": [
+        "Routes through get-spark-support and reads its evidence-handling guidance.",
+        "Before presenting the --output invocation, tells the user that a private temporary file will be created in /home/spark/support and must be treated as sensitive; does not leave an output-directory placeholder.",
+        "Explains that normal completion and handled errors remove temporary output, but forced shutdown of the process or session can leave a .redaction-* file.",
+        "Tells the user to check that directory after unexpected interruption and remove only leftovers from this run once confirmed no longer in use; does not promise automatic cleanup after forced termination.",
+        "Uses python3 -B with the bundled redact-support-text.py, the supplied input path, and --output with the supplied output path; does not request fresh approval for these already-authorized writes.",
+        "Does not execute commands, stage files, disclose log contents, upload evidence, or claim redaction has completed. Retains manual review before sharing."
+      ]
+    },
+    {
+      "id": "support-redaction-check-only",
+      "prompt": "For my DGX Spark support request, I only want to check /home/spark/support/input.redacted.log with the bundled redaction helper. I authorize that read-only check but no file creation or modification. You are not connected to the device. Show the command you would run from the skill directory and explain its results. Do not run anything here.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "A check-only helper command with accurate count-only reporting and exit-code interpretation, without an output-producing invocation or an inapplicable temporary-file warning.",
+      "assertions": [
+        "Routes through get-spark-support and reads its evidence-handling guidance.",
+        "Proposes python3 -B with the bundled redact-support-text.py and --check on the given file, without --output.",
+        "Does not say that this check creates a temporary file or requires cleanup of a newly created .redaction-* file.",
+        "Explains exit 0 as no recognized suspected matches, exit 1 as suspected matches found, and exit 2 as processing failure; does not equate a clean check with guaranteed absence of secrets.",
+        "Does not execute commands, create or modify files, upload evidence, or claim to have inspected the remote file."
+      ]
+    },
+    {
+      "id": "oem-capacity-context",
+      "prompt": "My HP ZGX Nano AI Station has a GB10. How much GPU VRAM and disk space does this machine have? You have no connection to it; explain what can be established without inspecting it.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Routes to identification for a recognized partner product, distinguishes unified system memory and disk capacity from free space, and leaves local values unknown.",
+      "assertions": [
+        "Recognizes HP ZGX Nano AI Station as in-scope GB10 context and reads identify-spark-system.",
+        "Does not assert a separate GPU VRAM pool or infer local installed capacity from a product specification.",
+        "Explains how the read-only helper could obtain capacity on the user's target, without running it on the evaluator host.",
+        "Does not classify the local OEM identity from a marketing name or invent OEM-specific inventory fields."
+      ]
+    },
+    {
+      "id": "contextual-inventory-reuse",
+      "prompt": "Earlier in this chat, my Founders Edition machine was identified by the bundled helper, which reported 128 GB total memory and a 2 TB disk. Now I only want to know how much free disk space is left. You are not connected to the machine; do not run anything.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Uses prior identity and capacity as historical context, while explaining that free disk space needs a fresh, separately authorized observation on the same target.",
+      "assertions": [
+        "Routes through identification reuse rules and the relevant readiness workflow without rerunning full identity inventory.",
+        "Distinguishes total disk capacity from current free space and does not calculate or guess free space from 2 TB.",
+        "Treats the earlier result as previously observed and verifies target continuity.",
+        "Does not execute diagnostics or claim a current observation."
+      ]
+    },
+    {
+      "id": "known-issue-unified-memory",
+      "prompt": "On my DGX Spark Founders Edition, nvidia-smi shows Memory-Usage: Not Supported. Is my GPU broken? Please check the current NVIDIA Known Issues and release notes; do not inspect my machine.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Checks current NVIDIA documentation for an applicable issue or expected behavior and reports model/version qualifications without guessing a repair.",
+      "assertions": [
+        "Routes through known-spark-issues and reads its matching guide.",
+        "Uses current NVIDIA Known Issues and Release Notes as source evidence, with direct links and applicability conditions.",
+        "Distinguishes documented expected behavior from hardware failure and does not invent a workaround.",
+        "Does not run diagnostics, change the device, or treat a forum lead as an official issue."
+      ]
+    },
+    {
+      "id": "known-issue-oem-version-boundary",
+      "prompt": "My ASUS Ascent GX10 has the same driver number as a DGX Spark Founders Edition release. Does that prove its firmware is current? Give me the applicable known issue or release guidance; do not inspect it.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Rejects Founders Edition version equivalence as proof of OEM currency and names the authoritative model-specific evidence needed.",
+      "assertions": [
+        "Recognizes the OEM GB10 model and routes to known-spark-issues with model/version matching.",
+        "Checks current NVIDIA release and Known Issues scope rather than applying Founders Edition guidance by analogy.",
+        "Reports uncertainty when authoritative OEM applicability is absent and does not invent OEM firmware or recovery steps.",
+        "Does not inspect or modify the device."
+      ]
+    },
+    {
+      "id": "playbook-selection",
+      "prompt": "I want to run inference across two DGX Spark machines. Which official NVIDIA playbook fits, and what should I check first? Do not start setup.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Finds current candidate playbooks, explains the fit and prerequisites for two systems, and links both the reader catalog and exact GitHub source.",
+      "assertions": [
+        "Routes through reference-spark-playbooks and checks the current catalog and relevant GitHub README.",
+        "Compares topology, software, access, and execution model prerequisites before recommending a playbook.",
+        "Links the reader-facing catalog and the current authoritative GitHub playbook source.",
+        "Does not run setup or present a remembered playbook as current."
+      ]
+    },
+    {
+      "id": "playbook-stale-execution-source",
+      "prompt": "Continue NVIDIA's Ollama playbook for DGX Spark that we discussed last month. Please use the old README I gave you then as-is. Do not run any device-changing steps yet.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Refreshes the matching GitHub source before continuing, flags material changes, and stops if the current source cannot be retrieved.",
+      "assertions": [
+        "Routes through reference-spark-playbooks and discloses the current GitHub source before any same-agent execution.",
+        "Does not treat the pasted or remembered README as the execution source.",
+        "Preserves valid completed work and asks for target environment details that affect the next step.",
+        "Does not execute a device-changing action without scoped consent."
+      ]
+    },
+    {
+      "id": "sync-remote-access",
+      "prompt": "I have an Acer Veriton GN100-UD11 at home and a macOS laptop. How can NVIDIA Sync help me reach it remotely? Just explain the options; do not enroll devices or collect keys.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Uses current NVIDIA Sync guidance to distinguish direct and Tailscale paths, with OEM scope and no enrollment.",
+      "assertions": [
+        "Recognizes the partner GB10 model and routes through use-sync and remote-access.",
+        "Checks and links the current NVIDIA Sync User Guide for relevant access options and prerequisites.",
+        "Keeps authentication keys out of commands and output and does not assume device reachability.",
+        "Does not enroll the device, enable Tailscale, or modify SSH settings."
+      ]
+    },
+    {
+      "id": "sync-cluster-scope",
+      "prompt": "Can NVIDIA Sync Cluster Assistant connect four directly cabled DGX Spark systems and configure Slurm for me? I only want a feasibility answer.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Explains current supported Cluster Assistant topology and its network/SSH scope, and separates workload orchestration from that feature.",
+      "assertions": [
+        "Routes through use-sync and cluster-assistant, checking current NVIDIA Sync documentation.",
+        "Identifies that Cluster Assistant support must be verified for this four-system topology.",
+        "Does not claim Cluster Assistant installs or configures Slurm, NCCL, or workloads.",
+        "Does not change networking, SSH, or cluster state."
+      ]
+    },
+    {
+      "id": "field-diagnostics-planning",
+      "prompt": "My DGX Spark Founders Edition may have faulty hardware. Plan the official Field Diagnostics run and its restoration, but I have authorized no prerequisite inspection, installs, reboots, stress test, or log collection.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Explains the full official Field Diagnostics workflow and restoration risks while stopping at each unapproved action class.",
+      "assertions": [
+        "Routes through run-spark-diagnostics and checks all three current official NVIDIA sources plus its field-diagnostics reference.",
+        "Explains package and CX7 prerequisites, Secure Boot and GDM effects, stable access and power, approximate run time, and restoration.",
+        "Requires separate consent for inspection, install, reboot/security or GUI changes, stress test, and logs.",
+        "Does not execute commands, modify firmware, or collect diagnostic output."
+      ]
+    },
+    {
+      "id": "field-diagnostics-result-boundary",
+      "prompt": "The Field Diagnostics screen on my Founders Edition says FAIL with code 123456789012. Does that mean NVIDIA approved an RMA? Please do not collect logs or open a case.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Preserves the reported FAIL and code as user-provided evidence, explains its limits, and gives the official support route without submission.",
+      "assertions": [
+        "Routes through run-spark-diagnostics, then get-spark-support only for support-channel guidance.",
+        "Preserves the exact user-reported result and does not claim independent verification or automatic RMA approval.",
+        "Uses current NVIDIA diagnostic and support references.",
+        "Does not inspect logs, stage files, upload evidence, or create a case."
+      ]
+    },
+    {
+      "id": "support-forum-source-boundary",
+      "prompt": "Find a DGX Spark forum discussion about intermittent Wi-Fi and help me draft a question. Please distinguish NVIDIA staff advice from community suggestions. Do not post, inspect my device, or collect chat history.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Searches current scoped forum discussions, labels author authority, drafts only a minimal question, and keeps current NVIDIA documentation authoritative.",
+      "assertions": [
+        "Routes through get-spark-support and its evidence-handling rules.",
+        "Opens relevant forum threads rather than relying on snippets, checks dates and model applicability, and links any thread used.",
+        "Distinguishes NVIDIA staff guidance from community suggestions and verifies fixes against official documentation.",
+        "Does not post, collect device data or conversation history, or stage local files."
+      ]
+    },
+    {
+      "id": "github-spark-out-of-scope",
+      "prompt": "How do I deploy a small website made with GitHub Spark? Give me the GitHub product steps, not hardware advice.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "files": [],
+      "expected_output": "Answers the GitHub Spark question without activating the DGX Spark collection.",
+      "assertions": [
+        "Does not read or activate dgx-spark-skills or its workflows.",
+        "Does not introduce DGX Spark, GB10, NVIDIA Sync, diagnostics, or GPU guidance.",
+        "Does not inspect the local system or perform deployment."
+      ]
+    },
+    {
+      "id": "founders-exact-identity-match",
+      "prompt": "A read-only identity result from my remote machine reports status=ok, company=NVIDIA, deviceType=DGX Spark, and 128 GB total system memory. I am not asking you to connect to it. What can you identify from these literal fields, and what would change if company were lowercase nvidia?",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Uses the bundled exact, case-sensitive identity catalog to identify the supplied NVIDIA match as Founders Edition, while treating the lowercase near match as unknown and describing memory as unified system memory only for the verified GB10 classification.",
+      "assertions": [
+        "Routes through identify-spark-system and reads its spark-systems.yaml catalog before interpreting the supplied fields.",
+        "Classifies company=NVIDIA plus deviceType=DGX Spark as nvidia-dgx-spark-founders-edition only because both literal matcher fields agree.",
+        "Leaves company=nvidia with the same deviceType unknown; does not use aliases or marketing names as automatic identity matchers.",
+        "Describes the reported 128 GB as unified CPU/GPU system-memory capacity for the matched GB10 target without inventing separate GPU VRAM or claiming a fresh inspection."
+      ]
+    },
+    {
+      "id": "oem-recovery-source-boundary",
+      "prompt": "My Acer Veriton GN100-UD11 will not boot. A forum reply says to flash the DGX Spark Founders Edition recovery image to a USB drive and follow its erase steps. Is that the right fix for my system? Do not inspect it, download an image, or write to any drive.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Applies the troubleshooting source hierarchy and recovery scope: treats the forum reply as a lead, states the NVIDIA Founders Edition recovery procedure does not establish an Acer procedure, and stops before destructive instructions or writes.",
+      "assertions": [
+        "Routes through troubleshoot-spark and reads both source-policy.md and update-and-recovery.md.",
+        "Labels the forum reply as a community suggestion unless its author and authority are verified, and checks current NVIDIA recovery scope.",
+        "Explains that Founders Edition recovery erases the internal SSD and cannot be adapted to an OEM GB10 by analogy.",
+        "Does not invent Acer recovery media, commands, keys, or support routing, and does not inspect, download, or write anything."
+      ]
+    },
+    {
+      "id": "sync-custom-app-draft",
+      "prompt": "Help me draft an NVIDIA Sync Custom App to start an existing web service on my DGX Spark from /srv/demo on port 8000 and open it in my browser. You have not verified that path or installed service. Do not save or launch the Custom App yet.",
+      "expected_skill": "dgx-spark-skills",
+      "should_trigger": true,
+      "files": [],
+      "expected_output": "Routes to Sync Custom Apps, identifies the missing remote prerequisites and per-device runtime contract, proposes only a reviewable draft, and stops before save or launch.",
+      "assertions": [
+        "Routes through use-sync and reads custom-apps.md plus current NVIDIA Sync Applications guidance.",
+        "Checks the connected target, remote user, existence of /srv/demo, service command, prerequisites, port conflicts, and desired browser path before finalizing a script.",
+        "Explains that Sync runs the Bash script from the remote user home, so a verified non-home directory needs an explicit quoted cd; port 8000 is tunneled to the local host.",
+        "Offers a reviewable script structure with the missing service command left explicit, and explains port, launch effects, stop behavior, and rollback without inventing commands or embedding secrets.",
+        "Treats saving and launching as separate consent-gated actions and performs neither."
+      ]
+    }
+  ]
+}
