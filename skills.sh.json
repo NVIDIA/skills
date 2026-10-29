@@ -451,6 +451,7 @@
       "title": "Infrastructure",
       "description": "Deploy, operate, monitor, and troubleshoot clusters, runtimes, services, networking, and platform infrastructure for accelerated and AI workloads.",
       "skills": [
+        "dgx-spark-skills",
         "holoscan-install-conda",
         "holoscan-install-container",
         "holoscan-install-debian",

@@ -478,6 +478,13 @@
       "last_modified": "2026-09-04"
     },
     {
+      "name": "dgx-spark-skills",
+      "path": "skills/dgx-spark-skills",
+      "content_digest": "sha256:bee81d2e8e371075df6a41ba462c20f4ecff8646500ef75dde98e534462dc72b",
+      "last_commit": "f5337e8a388a87bec81ccd960d70174ec2c189bc",
+      "last_modified": "2026-10-29"
+    },
+    {
       "name": "dicom-metadata-extract",
       "path": "skills/dicom-metadata-extract",
       "content_digest": "sha256:ac05b7f648c31f2bb3426e01bed81f4d8a5c8b7947273513f9ad00cfbc8bad92",
