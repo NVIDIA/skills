@@ -817,6 +817,18 @@
       }
     },
     {
+      "path": "skills/dgx-spark-skills",
+      "name": "dgx-spark-skills",
+      "description": "Use for NVIDIA DGX Spark and related GB10 system identification, capacity, troubleshooting, known issues, updates, recovery, playbooks, examples, NVIDIA Sync, clustering, Custom Apps, Field Diagnostics, or support evidence. Always route through this skill. Do not use for Apache Spark or unrelated meanings of spark.",
+      "metadata": {
+        "product.primary": "DGX Spark",
+        "classification.category.primary": "infrastructure",
+        "catalog.subdomain": "infrastructure",
+        "audience": "it_operations,platform_engineer,devops_engineer,developer,ml_engineer",
+        "discovery.activity_tags": "troubleshoot,operate,configure,recover,inspect"
+      }
+    },
+    {
       "path": "skills/dicom-metadata-extract",
       "name": "dicom-metadata-extract",
       "description": "Used for extracting selected metadata from one DICOM file and flagging standard-tag PHI presence. Not for anonymization or clinical use.",
