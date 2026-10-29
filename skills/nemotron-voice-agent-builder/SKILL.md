@@ -1,7 +1,7 @@
 ---
 name: nemotron-voice-agent-builder
 description: Create, refine, or fix NVIDIA voice agents (Cascaded or Omni) with Pipecat or LiveKit. Use when building, scaffolding, or iterating on a real-time voice-agent pipeline, including speech (ASR/TTS) customization and cloud or local deployment. Not for offline/batch speech-to-text, text-only chat or RAG, or generic Docker or CUDA work unrelated to a voice agent.
-version: "2.3.0"
+version: "2.3.1"
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
   author: NVIDIA Voice Agent Team <nemotron-voice-agent@nvidia.com>

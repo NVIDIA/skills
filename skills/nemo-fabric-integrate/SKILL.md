@@ -407,6 +407,7 @@ result-field and error inventory, and
 Link to these canonical sources instead of duplicating them:
 
 - [Python SDK guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/sdk/python.mdx)
+- [Resource usage and stats](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/sdk/system-stats.mdx) for collection controls, local and remote scope, sample quality, and repeatable code-review and Harbor examples. Harbor accepts the SDK configuration through `fabric_system_stats`; omission uses before/after collection, and explicit null disables invocation stats.
 - [NeMo Fabric overview](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/about-nemo-fabric/overview.mdx) and
   [installation guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/getting-started/install.mdx)
 - Generated API reference (public API index; the installed `nemo_fabric` type
@@ -427,3 +428,7 @@ Link to these canonical sources instead of duplicating them:
   inside a private transient run specification at the task-process boundary.
   Follow the code-review example for consumer integration code; Harbor's
   transport representation is an internal process-boundary contract.
+
+### Software Evidence
+
+Inspect optional `RunResult.execution` for selected software inventories. Preserve full version values, status/reasons, source, origin and original `observed_at` when forwarding. Context refs are result-local; participants describe installation users. Use `FabricConfig.provenance=ProvenanceConfig(enabled=False)` before startup to disable collectors on host and guest. Explicit owner snapshots use typed `ProvenanceConfig.reports` through existing configuration dispatch; guests never inspect the caller installation. Old results can omit execution evidence. Unknown or incomplete reports are not proof of equal environments.

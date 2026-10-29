@@ -32,6 +32,14 @@ def validate(filepath: str) -> list[str]:
         errors.append("WARNING: Missing 'using CUDA'")
     if "import cuda.tile" in content:
         errors.append("ERROR: Python import found — use 'import cuTile as ct'")
+    has_cutile_backend = re.search(r"\bbackend\s*=\s*cuTile\b", content)
+    has_bare_cutile_name = re.search(
+        r"^\s*using\s+(?:\w+\s*,\s*)*cuTile\s*(?:$|[,#])|^\s*using\s+cuTile\s*:[^#\n]*\bcuTile\b",
+        content,
+        re.MULTILINE,
+    )
+    if has_cutile_backend and not has_bare_cutile_name:
+        errors.append("ERROR: '@cuda backend=cuTile' needs the bare 'cuTile' name — add 'using cuTile: cuTile'")
 
     # --- Identify kernel function bodies (between 'function' and 'end') ---
     # We look for functions that take ct.TileArray parameters
@@ -119,10 +127,17 @@ def validate(filepath: str) -> list[str]:
 
             # max(a, b) without dot (should be max.(a, b))
             # Only flag if it looks like two tile arguments, not max(tile; dims=...)
-            if re.search(r"\bmax\([^;)]+,[^;)]+\)", line) and "dims" not in line:
+            if re.search(r"(?<![\w.])max\([^;)]+,[^;)]+\)", line) and "dims" not in line:
                 errors.append(f"WARNING (line {i}): max(a, b) — use max.(a, b) for element-wise max on tiles")
-            if re.search(r"\bmin\([^;)]+,[^;)]+\)", line) and "dims" not in line:
+            if re.search(r"(?<![\w.])min\([^;)]+,[^;)]+\)", line) and "dims" not in line:
                 errors.append(f"WARNING (line {i}): min(a, b) — use min.(a, b) for element-wise min on tiles")
+
+            # max./min. with an integer literal may be a mistranslated ct.max/ct.min reduction
+            if re.search(r"(?<![\w.])(max|min)\.\([^,()]+,\s*-?\d+\s*\)", line):
+                errors.append(
+                    f"WARNING (line {i}): max./min. with an integer literal; if this came from "
+                    "ct.max(t, axis=k)/ct.min(t, axis=k), use maximum/minimum(t; dims=k+1)"
+                )
 
         # --- Checks that apply everywhere ---
 
@@ -164,12 +179,23 @@ def validate(filepath: str) -> list[str]:
         if re.search(r"ct\.MemoryOrder\.RELEASE\b", line):
             errors.append(f"ERROR (line {i}): ct.MemoryOrder.RELEASE — use ct.MemoryOrder.Release")
 
-        # rsqrt.(tile) is valid — cuTile.jl exports rsqrt, so broadcast dot works.
-        # No longer flagged as an error.
+        # rsqrt is public but not exported by cuTile.jl — must be qualified
+        if re.search(r"(?<![\w.])rsqrt\b", line):
+            errors.append(f"ERROR (line {i}): unqualified rsqrt — cuTile.jl does not export it, use ct.rsqrt.(tile)")
+
+        # ct.cat was removed in cuTile.jl 1.0
+        if re.search(r"\bct\.cat\(", line):
+            errors.append(f"ERROR (line {i}): ct.cat() was removed — use cat(a, b; dims=k), vcat/hcat, or [a; b]")
+
+        # Python reductions ct.max/ct.min (Julia max/min are element-wise)
+        if re.search(r"\bct\.(max|min)\(", line):
+            errors.append(f"ERROR (line {i}): ct.max/ct.min — use maximum/minimum(tile; dims=k) for reductions")
 
         # Python-style launch with stream argument
         if re.search(r"ct\.launch\([^,]+,\s*stream", line) or re.search(r"ct\.launch\(\s*stream", line):
-            errors.append(f"ERROR (line {i}): ct.launch(stream, ...) — Julia ct.launch does not take a stream argument")
+            errors.append(
+                f"ERROR (line {i}): ct.launch(stream, ...) — use @cuda backend=cuTile blocks=grid kernel(args...)"
+            )
 
         # ct.ones (wrong namespace — use Base overlay ones(T, dims...))
         if re.search(r"\bct\.ones\(", line):
