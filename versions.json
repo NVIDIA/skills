@@ -1586,9 +1586,9 @@
     {
       "name": "nemo-fabric-integrate",
       "path": "skills/nemo-fabric-integrate",
-      "content_digest": "sha256:02fc55cb022c11bfc361897890b0558e436cb4863798205368b06a3a8cdf23e4",
-      "last_commit": "4fc9cf6cec785070e0bf5bb4aa6c992f71b1c97e",
-      "last_modified": "2026-10-17"
+      "content_digest": "sha256:d4b9ed18fab7b91297dc88a84f6a9040218347b3698a640e584f29d3a26fa591",
+      "last_commit": "4ec84730fd5edd8a6e3c134e751589c61c1d1257",
+      "last_modified": "2026-10-29"
     },
     {
       "name": "nemo-mbridge-mlm-bridge-training",
@@ -1887,9 +1887,9 @@
     {
       "name": "nemotron-voice-agent-builder",
       "path": "skills/nemotron-voice-agent-builder",
-      "content_digest": "sha256:03aaa81a71ee23d58f47fcd1752d071cdac7e3d06584df30271bfbc582e87cbd",
-      "last_commit": "901efd38824e6a96a711f0dc6250e057fc717ed7",
-      "last_modified": "2026-10-19"
+      "content_digest": "sha256:3bc5d9dbb34860f7756084bab891a082f03cc158a807086f844aabab7fc235b3",
+      "last_commit": "4ec84730fd5edd8a6e3c134e751589c61c1d1257",
+      "last_modified": "2026-10-29"
     },
     {
       "name": "nv-generate-ct-rflow",
@@ -2937,9 +2937,9 @@
     {
       "name": "tilegym-converting-cutile-to-julia",
       "path": "skills/tilegym-converting-cutile-to-julia",
-      "content_digest": "sha256:d76955ac871225f2f61463fdaaab7d4ba5eb6a5c3baba1330d9933f3cf73ce63",
-      "last_commit": "276eb868b92c336de92be49622e6627135eb95cc",
-      "last_modified": "2026-06-11"
+      "content_digest": "sha256:c8d97b1b51e14bd0041988a805c7ed6c2928e19b5632c14123f9a8c97ebe95e7",
+      "last_commit": "4ec84730fd5edd8a6e3c134e751589c61c1d1257",
+      "last_modified": "2026-10-29"
     },
     {
       "name": "tilegym-converting-cutile-to-triton",

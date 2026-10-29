@@ -4504,11 +4504,11 @@
     },
     {
       "skill": "nemo-fabric-integrate",
-      "evaluation_date": "2026-10-16",
+      "evaluation_date": "2026-10-28",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
+      "evaluator_version": "1.6.2",
       "dataset_digest": "sha256:4e12e11bb429ad195c00ceab9cd53bbf6351f32173f03b0ae827531ba2441a9e",
-      "validation_status": null,
+      "validation_status": "passed",
       "tasks": 6,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
@@ -4520,7 +4520,7 @@
       "catalog_dir": "nemo-fabric-integrate",
       "component": "NeMo Fabric",
       "has_results": true,
-      "average_uplift_pct": 18.4
+      "average_uplift_pct": 18.37
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -5364,11 +5364,11 @@
     },
     {
       "skill": "nemotron-voice-agent-builder",
-      "evaluation_date": "2026-10-19",
+      "evaluation_date": "2026-10-29",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
+      "evaluator_version": "1.6.4",
       "dataset_digest": "sha256:820305d412563ab26a2312566e2cd07ced079c651a147528990951cee89bcebc",
-      "validation_status": null,
+      "validation_status": "passed",
       "tasks": 5,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
@@ -5380,7 +5380,7 @@
       "catalog_dir": "nemotron-voice-agent-builder",
       "component": "Nemotron Voice Agent",
       "has_results": true,
-      "average_uplift_pct": 33.17
+      "average_uplift_pct": 28.33
     },
     {
       "skill": "nv-generate-ct-rflow",
@@ -8352,15 +8352,15 @@
     },
     {
       "skill": "tilegym-converting-cutile-to-julia",
-      "evaluation_date": "2026-06-10",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
+      "evaluation_date": "2026-10-28",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.3",
+      "dataset_digest": "sha256:6c40b3ade1f94e92fef9c18ae5ede5d84019b586662db8dd15b37ef7e88c5ef4",
+      "validation_status": "passed",
       "tasks": 5,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
-      "verdict": "FAIL",
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
       "agents": [
         "claude-code",
         "codex"
@@ -8368,7 +8368,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "has_results": true,
-      "average_uplift_pct": 11.8
+      "average_uplift_pct": 12.75
     },
     {
       "skill": "tilegym-converting-cutile-to-triton",
@@ -27410,8 +27410,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 66.7,
-      "uplift_pct": -16.6
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -27419,8 +27419,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 41.7,
-      "uplift_pct": -58.3
+      "score_pct": 83.3,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -27428,8 +27428,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.7,
-      "uplift_pct": 46.7
+      "score_pct": 90.0,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -27437,8 +27437,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.3,
-      "uplift_pct": 56.6
+      "score_pct": 73.3,
+      "uplift_pct": 26.6
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -27446,7 +27446,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.5,
+      "score_pct": 90.0,
       "uplift_pct": null
     },
     {
@@ -27455,7 +27455,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 77.5,
+      "score_pct": 87.5,
       "uplift_pct": null
     },
     {
@@ -27464,8 +27464,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 78.6,
-      "uplift_pct": 44.4
+      "score_pct": 62.9,
+      "uplift_pct": 36.4
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -27473,8 +27473,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 68.2,
-      "uplift_pct": 37.6
+      "score_pct": 54.9,
+      "uplift_pct": 7.2
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -27482,7 +27482,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 65.0,
+      "score_pct": 68.3,
       "uplift_pct": null
     },
     {
@@ -27491,7 +27491,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.1,
+      "score_pct": 71.3,
       "uplift_pct": null
     },
     {
@@ -31191,7 +31191,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 80.0,
-      "uplift_pct": 10.0
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemotron-voice-agent-builder",
@@ -31199,26 +31199,26 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "nemotron-voice-agent-builder",
+      "component": "Nemotron Voice Agent",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
       "score_pct": 80.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "nemotron-voice-agent-builder",
-      "component": "Nemotron Voice Agent",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 88.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "nemotron-voice-agent-builder",
-      "component": "Nemotron Voice Agent",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 32.0
+      "uplift_pct": 16.0
     },
     {
       "catalog_dir": "nemotron-voice-agent-builder",
@@ -31226,7 +31226,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.5,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -31235,7 +31235,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.5,
+      "score_pct": 93.8,
       "uplift_pct": null
     },
     {
@@ -31244,8 +31244,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.5,
-      "uplift_pct": 39.0
+      "score_pct": 46.0,
+      "uplift_pct": 12.0
     },
     {
       "catalog_dir": "nemotron-voice-agent-builder",
@@ -31253,8 +31253,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.5,
-      "uplift_pct": 38.0
+      "score_pct": 50.0,
+      "uplift_pct": 22.0
     },
     {
       "catalog_dir": "nemotron-voice-agent-builder",
@@ -31262,7 +31262,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.2,
+      "score_pct": 89.9,
       "uplift_pct": null
     },
     {
@@ -31271,7 +31271,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 69.0,
+      "score_pct": 81.3,
       "uplift_pct": null
     },
     {
@@ -44049,7 +44049,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Security",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -44058,7 +44058,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Security",
-      "num": 5,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -44067,7 +44067,7 @@
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Correctness",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 20.0
@@ -44076,64 +44076,64 @@
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Correctness",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 99.0,
-      "uplift_pct": 14.0
+      "score_pct": 100.0,
+      "uplift_pct": 24.0
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Discoverability",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 20.0
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Discoverability",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 99.0,
-      "uplift_pct": 8.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Effectiveness",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 99.0,
-      "uplift_pct": 18.0
+      "score_pct": 100.0,
+      "uplift_pct": 17.5
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Effectiveness",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 96.0,
-      "uplift_pct": 18.0
+      "score_pct": 87.5,
+      "uplift_pct": 15.0
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Efficiency",
-      "num": 5,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 13.0
+      "score_pct": 99.1,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "dimension": "Efficiency",
-      "num": 5,
+      "num": null,
       "agent": "codex",
-      "score_pct": 97.0,
-      "uplift_pct": 7.0
+      "score_pct": 93.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "tilegym-converting-cutile-to-triton",
