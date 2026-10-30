@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: cuML
+repo: NVIDIA/cuml
+description: Official NVIDIA-authored guidance for cuML GPU machine learning, scikit-learn acceleration with cuml.accel, API compatibility, multi-GPU process execution, and model export.
+skills:
+  - path: skills/cuml
+    catalog_dir: cuml
+links:
+  discussions: false
