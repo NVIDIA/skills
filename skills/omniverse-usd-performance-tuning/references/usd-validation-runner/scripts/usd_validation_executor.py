@@ -8,11 +8,15 @@ never enumerate rules, guess class names, or shell out to a CLI.
 
 Why this exists
 ---------------
-Bare rule names are not unique. ``IndexedPrimvarChecker`` is registered by both
-Usd Optimize (0.3 s triage) and the usd-validation-nvidia (376 s full audit). A
-name-only lookup picks one by registry order, so the same scope note produces
-different work and wildly different runtimes on different hosts. That is the
-root cause of "every run finds a different solution and it takes forever."
+Bare rule names are not unique. Before usd-optimize 1.3, ``IndexedPrimvarChecker``
+was registered by both Usd Optimize (0.3 s triage) and usd-validation-nvidia (376 s
+full audit). A name-only lookup picks one by registry order, so the same scope note
+produces different work and wildly different runtimes on different hosts. That is
+the root cause of "every run finds a different solution and it takes forever."
+From 1.3, Usd Optimize registers its rules as ``UsdOptimize<Name>`` and
+``validator-concepts.json`` names those classes; a bare 1.1-era name resolves to
+nothing. Identity stays ``(family, class_name)`` regardless, so a future collision
+cannot reintroduce the problem.
 
 Contract (no ambiguity, no fallbacks)
 -------------------------------------
@@ -21,8 +25,9 @@ Contract (no ambiguity, no fallbacks)
    resolved by identity, never by bare name. The family is the stable part:
    ``usd_validation_nvidia`` and ``omni.asset_validator`` are one provider
    family, ``usd_optimize`` and ``omni.scene.optimizer`` are the other, so an
-   upstream module rename inside a family still resolves. That is what keeps
-   the two ``IndexedPrimvarChecker`` classes apart while tolerating drift.
+   upstream module rename inside a family still resolves. That is what kept
+   the two ``IndexedPrimvarChecker`` classes apart before 1.3 while tolerating
+   drift.
 2. Resolution is fail-closed: zero matches raises, more than one *distinct*
    class matches raises. The executor never "best-guesses" a rule.
 3. The Python validation runtime is required. If it cannot be imported, the
@@ -96,7 +101,7 @@ _RUNTIME_UNAVAILABLE = (
 #: ``usd_validation_nvidia.rules.*``, ``omni.scene.optimizer.validators.*`` ->
 #: ``usd_optimize.validators.*``). Matching on (family, class_name) is therefore
 #: version-tolerant while still telling the two providers apart — which is the
-#: whole point, because ``IndexedPrimvarChecker`` is registered by both.
+#: whole point: before usd-optimize 1.3, ``IndexedPrimvarChecker`` was registered by both.
 #: Longest prefix wins, so a new root can be added without reordering.
 _MODULE_FAMILIES: dict[str, str] = {
     "usd_validation_nvidia": "oav",
@@ -367,9 +372,10 @@ def resolve_rule_class(
 ) -> type:
     """Resolve ``(module, class_name)`` to exactly one registered rule class.
 
-    This is the collision-safe core. ``IndexedPrimvarChecker`` exists twice by
-    bare name; it is disambiguated here by the *provider family* of ``module``,
-    never by bare name.
+    This is the collision-safe core. Before usd-optimize 1.3,
+    ``IndexedPrimvarChecker`` existed twice by bare name; such a pair is
+    disambiguated here by the *provider family* of ``module``, never by bare
+    name.
 
     Matching is deliberately version-tolerant. An exact ``__module__`` hit wins.
     Failing that, any registered class of the same name whose module belongs to
@@ -422,7 +428,7 @@ def resolve_rule_class(
 # Scoped stage open                                                            #
 # --------------------------------------------------------------------------- #
 def open_scoped_stage(stage_path: str, mask_paths: list[str] | None = None) -> Any:
-    """Open a stage, optionally masked to ``mask_paths`` (+ the default prim).
+    """Open a stage, optionally masked to exactly ``mask_paths`` and their ancestors.
 
     ``Usd.Stage.OpenMasked()`` is the only reliable scoping mechanism for the
     usd-validation-nvidia (it discards caller ``StageLoadRules`` but preserves the
@@ -436,13 +442,13 @@ def open_scoped_stage(stage_path: str, mask_paths: list[str] | None = None) -> A
 
     root_layer = Sdf.Layer.FindOrOpen(stage_path)
     mask = Usd.StagePopulationMask()
-    default_prim_path = f"/{root_layer.defaultPrim}" if root_layer.defaultPrim else None
-    for path in [*mask_paths, default_prim_path]:
+    # USD includes ancestors of requested paths. Adding defaultPrim would
+    # include its entire subtree and silently turn this into a whole-stage scan.
+    for path in mask_paths:
         if path:
             mask.Add(path)
 
     stage = Usd.Stage.OpenMasked(root_layer, mask)
-    assert stage.GetDefaultPrim().IsValid(), "masked stage excluded default prim"
 
     mesh_count = sum(
         1

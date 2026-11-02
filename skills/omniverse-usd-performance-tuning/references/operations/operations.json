@@ -56,8 +56,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -112,9 +111,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
       "parameter_prerequisites": [
@@ -140,10 +137,10 @@
       "recommendation_signals": [
         {
           "source": "SceneOptimizerMeshDensityChecker",
-          "signal": "High-density outlier meshes detected — meshes with triangle density disproportionate to their physical extent are strong candidates for decimation. This Phase-2c validator reads actual geometry and is the canonical over-tessellation signal (SA does not flag density; it reads no geometry arrays)."
+          "signal": "High-density outlier meshes detected \u2014 meshes with triangle density disproportionate to their physical extent are strong candidates for decimation. This scoped validator reads actual geometry and is the canonical over-tessellation signal (SA does not flag density; it reads no geometry arrays)."
         },
         {
-          "note": "maxMeanError is inherently scale-aware: over-tessellated meshes (e.g. a 1M-poly screw at 20mm) lose most triangles because nearly all vertices fall within the error budget. Under-tessellated meshes barely change. No per-mesh targeting is needed — apply uniformly to all meshes."
+          "note": "maxMeanError is inherently scale-aware: over-tessellated meshes (e.g. a 1M-poly screw at 20mm) lose most triangles because nearly all vertices fall within the error budget. Under-tessellated meshes barely change. No per-mesh targeting is needed \u2014 apply uniformly to all meshes."
         }
       ],
       "anti_patterns": [
@@ -179,9 +176,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
       "anti_patterns": [
@@ -218,12 +213,10 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/restructure-decision/README.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
-      "notes": "Collapses structurally-identical sub-hierarchies into shared prototypes referenced from each original site (referencing prims marked instanceable=true). Contrast deduplicateGeometry, which operates on individual mesh data. paths starts the breadth-first walk at the CHILDREN of each listed frontier prim (empty = children of the default prim). maxDepth caps the TOTAL breadth-first levels descended, counting those children as level 1; 0 = unbounded — a global cap on the whole walk, not a per-prototype recursion budget. The remaining two args tune duplicate matching, not grain: tolerance (default 0.001 stage units; 0 = bitwise-exact) is the float slack for property-value comparison, and ignoreShaderOutputs (default true) skips shader output attributes in that comparison. Grain follows depth: a low maxDepth shares at coarse named components; unbounded lets the value-hash reach the finest leaf library, which over-shares below the named unit and dissolves part identity, so unbounded is not a default endpoint. Invoke it per frontier region — one call per region, paths scoped to that region, maxDepth chosen for that region's structure. A single stage-wide maxDepth applied to every branch is forbidden: named units sit at varying depths, so no one cut lands on them (issue #175, an 85,871-mesh automotive battery-assembly stage: maxDepth 3 → 1 prototype, 4 → 38, 5 → 3,061, while the real named-unit frontier of ~48 falls between depth 4 and depth 5). Measured depth→grain and placement (issue #168, a 7,711-mesh rack-tray prototype): maxDepth 1 → 1 prototype / 1 instance / 7,700 authored meshes; 2 → 11 / 47 / 6,510; 0 (unbounded) → 623 / 3,072 / 6,220; rendered mesh count preserved 7,711 at every depth; world-translation drift 0.0 at every depth. Placement-correct by construction: root xformOp:* excluded from identity, the duplicate's local transform preserved (no hand-rolled transform-correct placement needed). Role: the op is the per-region authoring primitive for instanceable-reference collapse. Inside the Phase 2f/2g descent pipeline the phase contract binds (restructure-role manifest, frontier/identity gating, kept_inline_for_merge tagging, recorded convergence), so the deduplicate-internally branch routes through apply-restructure, whose per-level driver drives this op per descent region and emits that manifest. Passing paths + maxDepth directly with no manifest is canonical only for standalone, already-approved dedup runs outside the Phase 0-7 pipeline (usd-optimize-run-operations). deduplicateGeometry remains the last-mile per-mesh leaf cleanup after hierarchy dedup."
+      "notes": "Replaces matching subtrees with instanceable references while preserving each occurrence transform. paths starts at the children of each listed boundary; maxDepth counts those children as level 1, and 0 is unbounded. Choose paths and maxDepth per region so the operation shares the selected components or subcomponents. An unbounded walk can share anonymous leaves below the required asset boundary. tolerance is property-value slack in stage units (0 means bitwise-exact); ignoreShaderOutputs controls shader-output comparison. Use the same boundary manifest for internal and external references, retain kept_inline_for_merge fragments and record the reuse rescan. Verify occurrence placement and appearance in the written consumer assembly. deduplicateGeometry handles per-mesh duplicates separately."
     },
     {
       "key": "deleteHiddenPrims",
@@ -293,7 +286,7 @@
         "streaming"
       ],
       "source": "scene-optimizer-core/source/operations/diceMeshes/DiceMeshes.cpp",
-      "summary": "Dice Meshes cuts meshes into smaller pieces along a 3D grid — like slicing a block of cheese with a wire grid.",
+      "summary": "Dice Meshes cuts meshes into smaller pieces along a 3D grid \u2014 like slicing a block of cheese with a wire grid.",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "documentary",
@@ -308,7 +301,7 @@
       "risk_class": "low",
       "requires_confirmation": false,
       "apply_authority": "auto",
-      "args_count": 4,
+      "args_count": 5,
       "requires_mesh": false,
       "pipelines": [],
       "keywords": [
@@ -319,7 +312,7 @@
         "metadata"
       ],
       "source": "scene-optimizer-core/source/operations/editStageMetrics/EditStageMetrics.cpp",
-      "summary": "Edit Stage Metrics modifies a stage's global metrics — up axis and linear units.",
+      "summary": "Edit Stage Metrics modifies a stage's global metrics \u2014 up axis and linear units.",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "documentary",
@@ -344,13 +337,12 @@
         "analysis"
       ],
       "source": "scene-optimizer-core/source/operations/findCoincidingGeometry/FindCoincidingGeometry.cpp",
-      "summary": "Find Coinciding Geometry detects meshes that occupy the same space — overlapping or near-identical geometry that causes z-fighting and wasted rendering.",
+      "summary": "Find Coinciding Geometry detects meshes that occupy the same space \u2014 overlapping or near-identical geometry that causes z-fighting and wasted rendering.",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "analysis",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -372,13 +364,12 @@
         "analysis"
       ],
       "source": "scene-optimizer-core/source/operations/findFlatHierarchies/FindFlatHierarchiesOperation.cpp",
-      "summary": "Find Flat Hierarchies identifies prims with an excessively large number of children — \"flat\" hierarchy patterns where a single prim has hundreds or thousands of direct children.",
+      "summary": "Find Flat Hierarchies identifies prims with an excessively large number of children \u2014 \"flat\" hierarchy patterns where a single prim has hundreds or thousands of direct children.",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "analysis",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -408,15 +399,13 @@
       "curation": {
         "status": "analysis",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/config-from-evidence.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
       "parameter_prerequisites": {
         "ordering": {
           "position": "first",
-          "rationale": "Remove internal geometry before spending compute on meshCleanup, deduplicateGeometry, decimation, or any other op. Dead weight is removed first.",
+          "rationale": "Perform authorized removal before optimizing geometry that will be deleted.",
           "invariants": [
             "findOccludedMeshes + removePrims BEFORE meshCleanup",
             "findOccludedMeshes + removePrims BEFORE deduplicateGeometry",
@@ -427,32 +416,32 @@
         "scoping": {
           "trigger": "SA validation_scope.cross_component_pairs not explicitly transparent (enclosure_opaque true or unset)",
           "exclude": "Pairs where the enclosing geometry has a transparent/translucent material (opacity < 1.0, transmission shader, glass MDL, alpha-blend mode). Objects visible through transparent enclosures must NOT be removed.",
-          "asset_types": "Equipment, machines, vehicles, cabinets, housings, enclosures, pumps, motors, compressors, sealed assemblies — anything with an opaque shell/casing that could hide internal parts."
+          "asset_types": "Equipment, machines, vehicles, cabinets, housings, enclosures, pumps, motors, compressors, sealed assemblies \u2014 anything with an opaque shell/casing that could hide internal parts."
         },
         "fields": [
           {
             "field": "containment_pairs",
             "source": "SA validation_scope.cross_component_pairs not explicitly transparent (enclosure_opaque true or unset)",
             "required": true,
-            "description": "Enclosing/enclosed boundary-ID pairs from SA §2.1, derived from boundary nomination (candidate_source hash OR semantics) and resolved to prim paths via asset_boundary_suggestions.boundaries[]. Pairs explicitly marked transparent (enclosure_opaque: false) are excluded; true or unset qualify (unknown opacity is resolved by the probe). Without scoped pairs, findOccludedMeshes has no scope and must not run on the full stage."
+            "description": "Enclosing/enclosed boundary-ID pairs from SA \u00a72.1, derived from boundary nomination (candidate_source hash OR semantics) and resolved to prim paths via asset_boundary_suggestions.boundaries[]. Pairs explicitly marked transparent (enclosure_opaque: false) are excluded; true or unset qualify (unknown opacity is resolved by the probe). Without scoped pairs, findOccludedMeshes has no scope and must not run on the full stage."
           }
         ],
         "elicit_from_user": [
           {
             "id": "confirm_removal",
             "canonical_question": "These enclosed assets contain internal geometry invisible from outside. Remove the occluded prims found by the scoped probe? (you lose the internals)",
-            "context": "Present per asset on the Phase 7 iteration-2 opt-in menu, with the occluded-prim count and saving from the already-run scoped probe.",
+            "context": "Use the measured occluded-prim count and affected components. Ask only if the user has not already authorized removing those internals.",
             "skip_option": "Keep internal geometry"
           }
         ],
         "action_chain": {
           "analysis_op": "findOccludedMeshes",
           "action_op": "removePrims",
-          "pattern": "Run findOccludedMeshes in analysis mode on the scoped pairs in Phase 4 (scoped Tier 3 probe, no approval). It produces a list of fully-occluded prim paths. Feed those paths to removePrims; only the deletion step is intent-gated (Phase 7 iteration-2 opt-in)."
+          "pattern": "Run the scoped probe without an additional approval, then pass its selected paths to removePrims only within the authorized deletion scope."
         },
         "apply_approval": {
-          "detection": "Scoped probe runs in Phase 4 without approval (bounded by scope + timeout_recorded).",
-          "deletion": "Removing the discovered occluded prims is intent-gated — offered per asset on the Phase 7 iteration-2 opt-in menu."
+          "detection": "Run nominated pairs within the recorded time budget.",
+          "deletion": "Requires the purpose and affected internal geometry to be authorized; reuse authorization already supplied."
         }
       }
     },
@@ -474,13 +463,12 @@
         "analysis"
       ],
       "source": "scene-optimizer-core/source/operations/findOverlappingMeshes/FindOverlappingMeshesOperation.cpp",
-      "summary": "Find Overlapping Meshes detects interfering geometry — meshes whose surfaces intersect or penetrate each other.",
+      "summary": "Find Overlapping Meshes detects interfering geometry \u2014 meshes whose surfaces intersect or penetrate each other.",
       "since_version": "2026-05-08T22:40:32Z",
       "curation": {
         "status": "analysis",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -509,29 +497,27 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/units-and-tolerances.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
       "recommendation_signals": [
         {
           "source": "phase4_targets[].archetype (apply-restructure manifest)",
-          "signal": "Archetype decides the posture, and it is already tagged on every Phase-4 target. On `piping` and `large-spatial` targets — pipe runs, conduit, duct, structural runs, architectural shells — a cylinder or a box IS the correct representation of the part: run at default args, say so in a one-line notice, and do not prompt. That is the expected win on this content, and skipping it is the failure. On `encapsulated-product` prompt instead: a serviceable machine's parts carry part numbers, and a maintenance twin needs them addressable, so fitting can erase something real. On `generic` use judgement and lean toward fitting when the geometry is prismatic."
+          "signal": "Archetype decides the posture, and it is already tagged on each selected target. On `piping` and `large-spatial` targets \u2014 pipe runs, conduit, duct, structural runs, architectural shells \u2014 a cylinder or a box IS the correct representation of the part: run at default args, say so in a one-line notice, and do not prompt. That is the expected win on this content, and skipping it is the failure. On `encapsulated-product` prompt instead: a serviceable machine's parts carry part numbers, and a maintenance twin needs them addressable, so fitting can erase something real. On `generic` use judgement and lean toward fitting when the geometry is prismatic."
         },
         {
-          "source": "PrimitiveFitChecker (validator concept `primitive_fit`)",
+          "source": "UsdOptimizePrimitiveFitChecker (validator concept `primitive_fit`)",
           "signal": "Fittable-mesh counts size the win and belong in the notice. They are not a precondition on a `piping` or `large-spatial` target: the SO validators go unregistered in some runtimes, and the archetype tag alone is enough to run at defaults."
         },
         {
-          "note": "Default args are the expected configuration. `ignoreNonConstPrimvars` and `ignoreSubsets` both default to `true` (fit more); set either to `false` only when validator analysis reports non-constant non-`Normal` primvars AND the user asked to preserve UVs, displayColors, or subsets. `Normal` primvars are allow-listed upstream and never block a fit at any setting. The tolerance comes from the `fitPrimitives` column of the scale-band table in units-and-tolerances.md, which runs about 10x looser than the decimateMeshes column."
+          "note": "Default args are the expected configuration. `ignoreNonConstPrimvars` and `ignoreSubsets` both default to `true` (fit more); set either to `false` only when validator analysis reports non-constant non-`Normal` primvars AND the user asked to preserve UVs, displayColors, or subsets. `Normal` primvars are allow-listed upstream and never block a fit at any setting. The tolerance comes from the `fitPrimitives` column of the scale-band table in operations.md, which runs about 10x looser than the decimateMeshes column."
         },
         {
           "note": "Bias toward fitting. An unwanted refit is visible and reversible from the source asset; a fit never attempted is an invisible loss that surfaces later as a stage nobody wants to open."
         }
       ],
       "anti_patterns": [
-        "Do not ask for a tolerance ladder. fitPrimitives carries no parameter_prerequisites block by design (issue #207) — the number comes from the fitPrimitives scale band in units-and-tolerances.md, and an invented option set is the improvised-option-set anti-pattern.",
+        "Do not ask for a tolerance ladder. fitPrimitives carries no parameter_prerequisites block by design (issue #207) \u2014 the number comes from the fitPrimitives scale band in operations.md, and an invented option set is the improvised-option-set anti-pattern.",
         "Identity is not a reason to skip the fit on a `piping` or `large-spatial` target. The fit preserves identity there: the prim keeps its path, its name, and its place in the hierarchy, which is why the restructure manifest classifies reduction_route `fit_primitive` as identity-preserving bounded-loss.",
         "Do not make an analysis pass a precondition for running at defaults on piping or large-spatial content. Analysis sizes the win; the archetype has already settled the decision.",
         "Do not reflexively set `ignoreNonConstPrimvars: false` on a CAD/BIM scene. That is the restrictive setting, and it suppresses fits the default would take."
@@ -559,7 +545,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -613,8 +599,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -687,7 +672,7 @@
         "topology"
       ],
       "source": "scene-optimizer-core/source/operations/manifoldMeshes/Manifold.cpp",
-      "summary": "**Legacy command — use `meshCleanup` with `makeManifold: true` instead.** This operation exists for backward compatibility.",
+      "summary": "**Legacy command \u2014 use `meshCleanup` with `makeManifold: true` instead.** This operation exists for backward compatibility.",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "deprecated",
@@ -721,19 +706,14 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-structure-assessment/references/apply-restructure/references/mesh-merge-rewrite-spec.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
-      "notes": "First-class but intent-gated Phase-4 step that EXECUTES the manifest `merge` disposition (usd-structure-assessment disposition matrix). Runs WITHIN a prototype only (merge once, benefit N instances), never across an instance boundary; ordered after occluded-geometry removal and ahead of the meshCleanup -> deduplicateGeometry -> computeExtents tail. Fails closed on strong-identity units (only weak/none identity may be fused) and on bounds-incoherent fusions (mesh-merge-rewrite-spec.md §9 merge-eligibility guard). Credited as an axis-B prim-count / scene-graph reduction (traversal + stage-open + memory + draw calls), NEVER as a disk win; a conditional vertex-weld tail credits reclaimed bytes on axis C via disk_win_source=vertex_weld.",
+      "notes": "Merge eligible interior meshes within one retained component. Follow references/operations.md for scope, authorization, operation order and native spatial settings. Measure render performance before claiming a render improvement. Attribute storage savings to measured changes.",
       "anti_patterns": [
-        "Do not call `merge` without an absolute `rootPath` under the target prim. With `rootPath` unset the output is authored at `/merged` on the stage root, which sits outside the `defaultPrim`. On a masked stage that path is also outside the population mask, so the operation deletes every source mesh, authors nothing, and returns success. Measured on one masked unit: 334 meshes and 292,058 triangles in, 0 and 0 out; the same call with `rootPath` set kept every triangle.",
-        "Do not pass a relative `rootPath`. It has been seen resolving against an existing prim path instead of the stage root, producing stray duplicate meshes.",
-        "Do not avoid merging on a masked stage. An absolute `rootPath` under the target makes it safe; exporting the subset to its own file first is not required.",
-        "Do not expect `meshPrimPaths` to scope the merge point. It selects sources only, and made no difference to any of the failure modes above. Scope comes from `mergePoint` plus `rootPath`: only `mergePoint` Stage with an absolute `rootPath` under a unit merges everything beneath that unit into it. Parent merges immediate mesh siblings and ignores `rootPath`, Original Prim is a no-op, and Root Prim resolves to the `defaultPrim`. The enum is referred to by name across this skill; the integer codes are an upstream detail and are not stable to quote.",
-        "Do not run a merge pass without a stage-level `pruneLeaves` afterwards. `merge` removes the Mesh prims it fuses and leaves the Xforms that held them, each still carrying a transform and a material binding that bind nothing. Run it once after every per-unit call has completed, never inside the per-prototype chain -- see the apply-restructure mesh-merge-rewrite spec, which owns that placement."
+        "Do not leave the destination unset or outside the retained boundary or population mask. Keep the absolute destination in operation_scope.output_path and use the scoped merge helper described in references/operations.md to construct the native mergePoint and rootPath settings.",
+        "Do not treat meshPrimPaths as the output scope; it selects input meshes. Resolve the native output against the recorded destination before remapping source paths.",
+        "After the scoped merge calls, inspect empty ancestor prims and apply assembly cleanup while preserving protected prims and unloaded payloads. Follow references/operations.md; do not delete a prim merely because its meshes moved."
       ]
     },
     {
@@ -754,15 +734,13 @@
         "tolerance"
       ],
       "source": "scene-optimizer-core/source/operations/mergeVertices/MergeVertices.cpp",
-      "summary": "**Legacy command — use `meshCleanup` instead.** This operation exists for backward compatibility.",
+      "summary": "**Legacy command \u2014 use `meshCleanup` instead.** This operation exists for backward compatibility.",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "deprecated",
         "status_override": "deprecated",
         "rationale": "deprecated: meshCleanup: legacy standalone vertex welder superseded by meshCleanup.",
-        "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
-        ]
+        "wired_into": []
       }
     },
     {
@@ -792,10 +770,34 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
+      }
+    },
+    {
+      "key": "moveMaterials",
+      "title": "Move Materials",
+      "category": "materials",
+      "loss_class": "lossless",
+      "risk_class": "medium",
+      "requires_confirmation": true,
+      "apply_authority": "intent-gated",
+      "args_count": 2,
+      "requires_mesh": false,
+      "pipelines": [],
+      "keywords": [
+        "materials",
+        "looks",
+        "namespace",
+        "defaultPrim",
+        "move"
+      ],
+      "source": "usd-optimize/lib/operations/moveMaterials/__init__.py",
+      "summary": "Move Materials moves every material under one prim path, such as /World/Looks, and can make that path's root prim the default prim when the stage has none.",
+      "since_version": "2026-08-03T00:00:00Z",
+      "curation": {
+        "status": "documentary",
+        "wired_into": []
       }
     },
     {
@@ -825,8 +827,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -853,7 +854,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -908,8 +909,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -936,7 +936,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -988,7 +988,7 @@
       "curation": {
         "status": "specialty",
         "status_override": "specialty",
-        "rationale": "specialty: escape-hatch — the only path to convert analytic primitives back to UsdGeomMesh for downstream tools that reject primitives (some renderers, physics, exporters). Recommend only when the downstream context explicitly requires mesh output.",
+        "rationale": "specialty: escape-hatch \u2014 the only path to convert analytic primitives back to UsdGeomMesh for downstream tools that reject primitives (some renderers, physics, exporters). Recommend only when the downstream context explicitly requires mesh output.",
         "wired_into": []
       }
     },
@@ -1014,9 +1014,7 @@
       "since_version": "2026-05-08T22:40:32Z",
       "curation": {
         "status": "analysis",
-        "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
-        ]
+        "wired_into": []
       }
     },
     {
@@ -1041,14 +1039,12 @@
         "cleanup"
       ],
       "source": "scene-optimizer-core/source/operations/pruneLeaves/PruneLeaves.cpp",
-      "summary": "Prune Leaves finds and removes leaf grouping primitives — Xforms and Scopes that contain no meaningful children (or only other empty groups).",
+      "summary": "Prune Leaves finds and removes leaf grouping primitives \u2014 Xforms and Scopes that contain no meaningful children (or only other empty groups).",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
       "anti_patterns": [
@@ -1079,13 +1075,12 @@
       "curation": {
         "status": "specialty",
         "status_override": "specialty",
-        "rationale": "specialty: escape-hatch op used by usd-optimize-create-proxy's USD-authoring recipes; not part of the general optimization flow.",
+        "rationale": "specialty: executes a supplied or reviewed Python script for an explicitly requested operation outside the general workflow.",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/usd-optimize-create-proxy/README.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       },
-      "notes": "SECURITY: executes arbitrary user-supplied Python code with the privileges of the running process. Never agent-initiated (specialty escape-hatch, see CLASSIFICATION.md); require a user-supplied or reviewed script and explicit confirmation before execution (operation-safety.md). Omitted from probe-snapshot operations_available captures (documented, not granted)."
+      "notes": "SECURITY: executes arbitrary user-supplied Python code with the privileges of the running process. Never agent-initiated (specialty escape-hatch, see CLASSIFICATION.md); require a user-supplied or reviewed script and explicit confirmation before execution (operations.md). Omitted from probe-snapshot operations_available captures (documented, not granted)."
     },
     {
       "key": "remeshMeshes",
@@ -1160,7 +1155,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -1190,8 +1185,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/operation-safety.md",
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -1243,7 +1237,7 @@
       "curation": {
         "status": "canonical",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-optimize-run-operations/references/pipelines.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -1269,9 +1263,7 @@
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "analysis",
-        "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
-        ]
+        "wired_into": []
       }
     },
     {
@@ -1282,7 +1274,7 @@
       "risk_class": "high",
       "requires_confirmation": true,
       "apply_authority": "intent-gated",
-      "args_count": 7,
+      "args_count": 13,
       "requires_mesh": true,
       "pipelines": [],
       "keywords": [
@@ -1317,15 +1309,14 @@
         "geometry"
       ],
       "source": "scene-optimizer-core/source/operations/sparseMeshes/SparseMeshes.cpp",
-      "summary": "Sparse Meshes reduces meshes with poor spatial density — geometry that occupies a large bounding box relative to its actual surface area.",
+      "summary": "Sparse Meshes reduces meshes with poor spatial density \u2014 geometry that occupies a large bounding box relative to its actual surface area.",
       "since_version": "2026-02-11T07:51:19Z",
       "curation": {
         "status": "specialty",
         "status_override": "specialty",
-        "rationale": "specialty: bespoke triage — surfaced from usd-validation-runner Tier 2 sparse-mesh findings; reach for it on user request, not from a named pipeline.",
+        "rationale": "specialty: bespoke triage \u2014 surfaced from usd-validation-runner Tier 2 sparse-mesh findings; reach for it on user request, not from a named pipeline.",
         "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/usd-validation-runner/references/usd-optimize-interpret-validators/references/rule-reference.md",
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
+          "skills/omniverse-usd-performance-tuning/references/operations.md"
         ]
       }
     },
@@ -1427,9 +1418,7 @@
         "status": "specialty",
         "status_override": "specialty",
         "rationale": "specialty: bespoke ad-hoc SO scripting (Deinstance / Unbind Materials / Set Instanceable / Flatten Instances); recommend only when a recipe needs one of those structural sub-functions.",
-        "wired_into": [
-          "skills/omniverse-usd-performance-tuning/references/workflow.md"
-        ]
+        "wired_into": []
       }
     }
   ]

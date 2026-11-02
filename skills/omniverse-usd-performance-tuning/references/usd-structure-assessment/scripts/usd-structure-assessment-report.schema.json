@@ -333,7 +333,7 @@
         "optimization",
         "already_optimized"
       ],
-      "description": "Routing signal for workflow Phase 2e gate and edit-target planner"
+      "description": "Legacy assessment recommendation: structuring, optimization, or already optimized. This field does not require a user approval pause."
     },
     "assets": {
       "type": "object",

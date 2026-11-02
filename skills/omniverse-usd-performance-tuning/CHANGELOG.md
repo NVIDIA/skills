@@ -1,99 +1,55 @@
 # Changelog — omniverse-usd-performance-tuning
 
+## 0.5.0
+
+- Select complete equipment assets and independently movable bodies using workload
+  and source evidence. Publish separately referenceable definitions in semantic
+  category libraries, with shared materials and editable occurrence placement.
+- Reuse accepted product identities and confirmed content across scenes. Skip
+  preparation and optimization for confirmed reusable definitions while preserving
+  each occurrence's placement, including scaled occurrences.
+- Use USD Optimize 1.3.1 for scoped cleanup, reduction, merging and hierarchy
+  cleanup. Fit analytic primitives before merging piping and conduit sections.
+- Reuse unchanged source inspection between assessment rounds. Run native work
+  concurrently on independent definition scopes.
+- Follow phase progress, assessment rounds and grouped decisions in the packaged
+  read-only browser dashboard. Review operations per asset, before/after
+  measurements and reusable next-run steering instructions in the final report.
+- Consolidate assessment, execution and report entry points. Keep independent
+  geometry qualification in development tests; runtime checks cover authored USD
+  composition, references, bindings, placement and required interfaces.
+
+Earlier entries describe their released versions. Use the current guides for instructions.
+
 ## 0.4.1
 
 ### Fixed
 
-- **The validation aggregate no longer reports `PASS` when nothing was
-  validated.** The completion gate treats `blocked_validation_runtime`,
-  `timeout_recorded` and `user_declined` as resolved dispositions, which they
-  are — but all three mean no validator ran, and a unit that never ran cannot
-  contribute a finding, so `errorCount` stayed 0 and the summary read `PASS`.
-  Reported on Windows with all 15 requested Tier 1 concepts blocked; the
-  aggregate has no platform branch and reproduces anywhere. `summary.status` is
-  now `BLOCKED` unless every planned unit actually ran, so a single unchecked
-  safety gate withholds the pass. Findings and timeouts are unchanged otherwise.
-- **The validator subprocess starts on Windows.** The child environment is built
-  from an explicit allowlist rather than a wholesale `os.environ` copy, and that
-  allowlist carried only POSIX names. Without `SYSTEMROOT`, CPython cannot
-  initialise Winsock while importing `asyncio` and the worker dies in
-  `asyncio/_overlapped` with WinError 10106 before reading its job — which is
-  what produced the all-blocked set above. `SYSTEMROOT`, `SYSTEMDRIVE`,
-  `WINDIR`, `COMSPEC`, `PATHEXT`, `PROCESSOR_ARCHITECTURE` and
-  `NUMBER_OF_PROCESSORS` are now allowed through. It is still an allowlist.
+- Validation summaries reported `BLOCKED` when planned validation had not run,
+  instead of treating absent findings as a pass.
+- Validator subprocesses received the Windows environment variables required to
+  start, while retaining an explicit environment allowlist.
 
 ## 0.4.0
 
-Behaviour changes to the decimation contract, the Phase 2e gate, and merge
-scoping, plus a new briefing reference. All five came out of six end-to-end runs
-against a converted customer CAD station and a comparison against a hand-optimized
-reference for the same asset.
-
 ### Changed
 
-- **A stated triangle target is a ceiling, not a mode switch.** Naming a polygon
-  count previously satisfied the condition that switches `decimateMeshes` out of
-  error-budget mode, zeroing `maxMeanError` and leaving the quota as the only stop
-  condition. Two runs of the same brief differing only in that clause lost 3.84%
-  and 0.00% of the asset's surface. A stated target now bounds the result while the
-  quality budget stays active.
-- **Welding is a validated precondition of decimation**, not an ordering
-  preference. When `vertex_weld` fires, weld before reducing: on unwelded CAD
-  nearly every edge is a boundary edge, so `pinBoundaries` pins almost the whole
-  mesh and decimation barely moves. It also restores `reductionFactor`'s meaning —
-  it is keep-percent of the *welded* count, so on ~2.4x redundant input `90.0`
-  retained 35.5%.
-- **Phase 2e resolves unattended instead of halting.** The gate previously told a
-  non-interactive agent to stop and forbade substituting a default, so a brief that
-  never mentioned restructuring produced no optimized asset at all. It now resolves
-  from measured reuse at the candidate frontier (>=30% recoverable ->
-  `deduplicate-internally`, <15% -> `optimize-as-is`, between -> halt as before) and
-  records the measurement in `decision_basis`. Not a fixed default: measured reuse
-  at the same depth is 10.3% on a production line and 83% on a rack, so one fixed
-  answer is wrong for one of them whichever way it points. Interactive behaviour is
-  unchanged.
-- **Merge scoping now leads with scope, not material.** Phase 4c states the rule
-  from the merge spec that decides whether output is usable: one scoped call per
-  boundary, never a single global call. A global call buckets by material
-  stage-wide and `mergePoint` resolves to the stage root — measured, that produced
-  298 meshes of which 39.6% each spanned more than half the asset, with 0 of 617
-  named units surviving. The `GeomSubset` ceiling is also quantified: 6,674 subsets
-  measured 12 FPS against 50 for the same geometry at 298 draw calls, while RTX was
-  66 either way.
+- Stated triangle targets retained the decimation quality budget.
+- Welding became a prerequisite for decimation when validation identified unwelded
+  vertices.
+- Unattended Phase 2e decisions used measured reuse under the rules of that release.
+- Merge guidance required boundary-scoped operations.
 
 ### Added
 
-- **`references/briefing-the-skill.md`** — what a request should state and why,
-  with three worked briefs for the three asset shapes (production line, rack,
-  building/MEP) that need three different dominant operations. Names the two
-  phrasings that silently cost quality: a stated triangle count and a stated mesh
-  count.
-- **A required composition check after every structural op.** Counts and bounding
-  boxes are not evidence the output survived. Four observed runtime failures each
-  reported success while leaving the layer composing to nothing or to mangled
-  prims. Three lines — reference the written layer from a throwaway stage and
-  assert the mesh count — catch all four.
+- Briefing guidance explained how workload and quality requirements affected
+  optimization choices; it was later consolidated into the workflow guides.
+- Composition checks were added after structural operations.
 
-### Known issues carried into this release
+### Known limitations at release
 
-The five runtime behaviours behind the composition check belong to `usd-optimize`, not
-the skill, and are unfixed upstream:
-
-- `merge` on a masked stage with `rootPath` unset deletes every mesh, authors
-  nothing, and returns success. Both conditions are required; passing an absolute
-  `rootPath` under the target makes merging on a masked stage safe.
-  `meshPrimPaths` is not involved.
-- `merge` with `rootPath` unset parks output outside the `defaultPrim`; with
-  `rootPath` set the path has been seen mis-parsed as relative.
-- `flattenHierarchy` at its upstream default, run whole-stage, has deleted the
-  `defaultPrim`.
-- `merge` leaves the source Xforms standing after fusing their meshes, so a merge
-  pass needs a stage-level `pruneLeaves` to finish. The composition check does not
-  catch this one: it asserts the mesh count, which is correct on a stage still
-  carrying the empty scaffolding.
-
-All are classed `apply_authority: auto` / `loss_class: lossless`. Until they are
-fixed, `auto` means "no user decision needed", never "cannot break the layer".
+- Merge and hierarchy-flattening behavior required explicit scope and output checks.
+- Merging could leave empty Xforms requiring subsequent cleanup.
 
 ## 0.3.0
 
