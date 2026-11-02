@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 430,
-  "result_row_count": 4049,
+  "skill_count": 431,
+  "result_row_count": 4059,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1084,6 +1084,26 @@
       "component": "CUDA-Q",
       "has_results": true,
       "average_uplift_pct": 7.83
+    },
+    {
+      "skill": "cuml",
+      "evaluation_date": "2026-11-02",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.6",
+      "dataset_digest": "sha256:4dad3d83e6a81208bd4d1bb359ae83e0666d9ab17ea5d4df92b5a3c1b825229f",
+      "validation_status": "passed",
+      "tasks": 32,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "has_results": true,
+      "average_uplift_pct": 5.77
     },
     {
       "skill": "cuopt-developer",
@@ -13337,6 +13357,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 86.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.3,
+      "uplift_pct": -4.7
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.6,
+      "uplift_pct": -9.4
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.6,
+      "uplift_pct": 16.8
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 1.9
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.6,
+      "uplift_pct": 20.6
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.1,
+      "uplift_pct": 9.4
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cuml",
+      "component": "cuML",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 57.3,
       "uplift_pct": null
     },
     {
