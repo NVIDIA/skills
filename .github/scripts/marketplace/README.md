@@ -29,10 +29,15 @@ config) live under `.github/scripts/marketplace/`:
   [`skills-subdomains.json`](./skills-subdomains.json).
 - Skills can be temporarily withheld from both outputs by adding them to
   [`metadata-exclusions.yaml`](./metadata-exclusions.yaml).
-- Skill-to-product mapping is deterministic only when a skill is declared in
-  one of the synced `components.d/*.yml` registries. Skills outside that set
-  (e.g. catalog-only entries staged via direct PR) fall through to AI
-  enrichment for `product.primary` like any other skill missing a mapping.
+- A registry can declare `product_primary` to set `product.primary` for all
+  its skills. Without that key, the generator uses the registry `name` only
+  when it exactly matches an allowed product value; otherwise it keeps valid
+  existing metadata or uses AI enrichment.
+- Declared product values must match the schema enum exactly. Invalid
+  declarations fail before any output is written, including declarations in
+  registries that have no currently published skills. An authoritative product
+  value overrides existing metadata and cannot be changed by AI amendments.
+  See [the registry format](../../../components.d/README.md).
 
 ## Running the generator locally
 
@@ -130,8 +135,9 @@ The generator calls the inference API in one of two narrow modes per skill:
    warrants a different controlled value. The prompt explicitly biases toward
    preserving existing values; only clear mismatches should be amended.
 
-Skills classified as `unchanged` never trigger an AI call — their metadata
-flows through byte-identically. Running with `--no-ai` disables both modes;
+Skills classified as `unchanged` never trigger an AI call. Their metadata
+stays the same unless an authoritative product mapping changes it. Running
+with `--no-ai` disables both modes;
 in that case `materially_changed` skills keep their existing metadata as-is
 (only `name` / `description` update) and any `added` skill that needs fill
 mode causes a hard error.
@@ -162,7 +168,6 @@ validation runs on every output before files are written.
 
 1. Add the canonical product display name to `product.primary.enum` in the
    schema.
-2. If a `components.d/<product>.yml` exists, ensure its `name:` matches the
-   new enum entry exactly. The generator deterministically maps a component
-   to `product.primary` only when the names are identical.
+2. If a `components.d/<product>.yml` exists, set `product_primary:` to the
+   new enum entry exactly. The display `name:` can stay the same.
 3. Re-run the generator.

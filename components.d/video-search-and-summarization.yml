@@ -1,4 +1,5 @@
 name: Video Search and Summarization
+product_primary: Video Search and Summarization (VSS)
 repo: NVIDIA-AI-Blueprints/video-search-and-summarization
 ref: release/3.3.0
 description: VSS Blueprint — build and deploy a vision AI stack (dense captioning, detection, search, alerting, summarization) for an agent or application.
