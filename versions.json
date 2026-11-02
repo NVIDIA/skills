@@ -1593,9 +1593,9 @@
     {
       "name": "nemo-fabric-integrate",
       "path": "skills/nemo-fabric-integrate",
-      "content_digest": "sha256:d4b9ed18fab7b91297dc88a84f6a9040218347b3698a640e584f29d3a26fa591",
-      "last_commit": "4ec84730fd5edd8a6e3c134e751589c61c1d1257",
-      "last_modified": "2026-10-29"
+      "content_digest": "sha256:97afdf3c13d14cc0940b6f487f3ccaeb7714b0e9af4a75ba5c627b5c68ad21c6",
+      "last_commit": "c8f420e0d486ee7573db82225d8a7f75a42da60e",
+      "last_modified": "2026-11-02"
     },
     {
       "name": "nemo-mbridge-mlm-bridge-training",
