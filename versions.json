@@ -373,6 +373,13 @@
       "last_modified": "2026-09-12"
     },
     {
+      "name": "cuml",
+      "path": "skills/cuml",
+      "content_digest": "sha256:6e24a9698c1c8b9140b0a1746e4f16692595d4ddd0ce624d5a45f4131760e1e6",
+      "last_commit": "e33b0c39cd26e885e4e7a547edb20fb058db2cb9",
+      "last_modified": "2026-11-02"
+    },
+    {
       "name": "cuopt-developer",
       "path": "skills/cuopt-developer",
       "content_digest": "sha256:2146d5b9c801f3298e75179f6bd898c42a2c0ca26531fb2313b39449b99cf281",

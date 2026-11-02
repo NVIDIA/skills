@@ -264,6 +264,7 @@
         "accelerated-computing-cudf",
         "codonfm-setup",
         "complexa-target",
+        "cuml",
         "nvflare-fed-stats",
         "nvidia-ontology-management",
         "parabricks",
