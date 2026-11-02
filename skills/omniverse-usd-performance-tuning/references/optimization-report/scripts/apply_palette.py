@@ -108,7 +108,7 @@ def _author_material(layer, scope_path, colour):
 
 
 def collapse(path, canonical, pinned, write=True):
-    """Collapse one layer onto `canonical`. Returns a per-layer result dict."""
+    """Collapse one layer onto the canonical palette. Returns a per-layer result dict."""
     stage = Usd.Stage.Open(path)
     if not stage:
         raise SystemExit(f"cannot open layer: {path}")
