@@ -1,4 +1,5 @@
 name: Holoscan SDK
+product_primary: Holoscan
 repo: nvidia-holoscan/holoscan-sdk
 description: Install and set up the Holoscan SDK on any platform (container, Debian, Python, Conda, or source).
 skills:

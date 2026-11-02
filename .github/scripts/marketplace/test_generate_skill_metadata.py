@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
-"""Induced-failure tests for generate-skill-metadata.py.
+"""Failure and product-declaration tests for generate-skill-metadata.py.
 
 The generator's failure handling is the part that cannot be exercised by a
 normal run: on a healthy catalog every skill builds, so the recovery and
@@ -24,6 +24,8 @@ Properties under test:
   5. A run that fails validation reports the per-skill enrichment reason, in
      the log and in the structured warnings file CI reads, alongside the
      summary line naming the skills that produced no entry.
+  6. Product declarations are validated and take precedence over carried
+     metadata and AI amendments, including when an enum spelling changes.
 
 Run:
     python3 .github/scripts/marketplace/test_generate_skill_metadata.py
@@ -91,6 +93,114 @@ def pick_reference_entry(gen, baseline: dict, validator: Draft202012Validator) -
         "FATAL: no complete, schema-valid entry found in metadata.json; "
         "cannot construct test fixtures."
     )
+
+
+def check_product_declarations(gen, validator, taxonomy, baseline, prior, skill, r):
+    """Exercise declared products without inference calls or repository writes."""
+    import tempfile
+    from unittest.mock import patch
+
+    products = taxonomy["product.primary"]["values"]
+    product = next(v for v in products if v != prior["metadata"]["product.primary"])
+    r.check("no component -> no derived product",
+            gen.derive_product_from_component(None, products) is None)
+    r.check("legacy exact-name match is preserved",
+            gen.derive_product_from_component({"component_name": product}, products) == product)
+    r.check("legacy non-match still falls through",
+            gen.derive_product_from_component({"component_name": "not-a-product"}, products) is None)
+    r.check("explicit product wins over component name",
+            gen.derive_product_from_component(
+                {"component_name": products[0], "product_primary": product}, products) == product)
+
+    def no_api(*args, **kwargs):
+        raise AssertionError("complete entry must not call AI")
+
+    component = {"product_primary": product, "components_file": "fixture.yml"}
+    expected = dict(prior["metadata"], **{"product.primary": product})
+    entry = gen.build_skill_entry(skill, {skill.path: component}, baseline, {},
+                                 validator, taxonomy, no_api, [])
+    r.check("declared product overrides carried metadata", entry["metadata"] == expected)
+    legacy = json.loads(json.dumps(prior))
+    legacy["metadata"]["product.primary"] = "removed-product-spelling"
+    original_legacy = json.loads(json.dumps(legacy))
+    migrated = gen.build_skill_entry(
+        skill, {skill.path: component}, {"skills": [legacy]}, {},
+        validator, taxonomy, no_api, [],
+    )
+    r.check("enum rename preserves unrelated metadata without AI", migrated["metadata"] == expected)
+    r.check("enum migration does not mutate the baseline", legacy == original_legacy)
+    requested = []
+
+    def amend_api(_skill, _component, fields, _taxonomy, current_values=None):
+        requested.extend(fields)
+        # Include a conflicting product to verify only requested fields apply.
+        return dict(prior["metadata"])
+
+    entry = gen.build_skill_entry(skill, {skill.path: component}, baseline, {},
+                                 validator, taxonomy, amend_api, [], is_materially_changed=True)
+    r.check("AI amendment excludes the authoritative product", "product.primary" not in requested)
+    r.check("AI cannot replace the declared product", entry["metadata"] == expected)
+    requested.clear()
+    entry = gen.build_skill_entry(skill, {skill.path: {"component_name": product}}, baseline,
+                                 {}, validator, taxonomy, amend_api, [], is_materially_changed=True)
+    r.check("AI cannot replace legacy exact-name mapping", entry["metadata"]["product.primary"] == product)
+
+    def fill_api(_skill, _component, fields, _taxonomy):
+        requested.extend(fields)
+        return {f: prior["metadata"][f] for f in fields}
+
+    requested.clear()
+    entry = gen.build_skill_entry(skill, {skill.path: component}, None, {},
+                                 validator, taxonomy, fill_api, [])
+    r.check("new skill fill preserves the declared product", entry["metadata"] == expected)
+    r.check("new skill fill requests only other fields",
+            set(requested) == set(gen.MVP_FIELDS) - {"product.primary"})
+
+    with tempfile.TemporaryDirectory() as tmp:
+        directory = Path(tmp)
+        registry = directory / "fixture.yml"
+        data = {
+            "name": "Display name", "repo": "NVIDIA/fixture", "product_primary": product,
+            "skills": [
+                {"path": ".agents/skills/one/", "catalog_dir": "one"},
+                {"path": "skills/models/two/", "catalog_dir": "two"},
+                {"path": "skills/three/"},
+            ],
+        }
+
+        def write_registry(obj):
+            registry.write_text(gen.yaml.safe_dump(obj))
+
+        with patch.object(gen, "COMPONENTS_DIR", directory):
+            write_registry(data)
+            mapping = gen.load_components(products)
+            r.check("declared product applies across source layouts",
+                    set(mapping) == {"skills/one", "skills/two", "skills/three"}
+                    and all(v["product_primary"] == product for v in mapping.values()))
+            del data["product_primary"]
+            write_registry(data)
+            mapping = gen.load_components(products)
+            r.check("legacy registry adds no product declaration",
+                    all("product_primary" not in v for v in mapping.values()))
+
+            for value in ("unknown-value", "", None, True, [product]):
+                write_registry({"name": "Unused registry", "product_primary": value, "skills": []})
+                try:
+                    gen.load_components(products)
+                except gen.GeneratorError as exc:
+                    valid_error = "fixture.yml" in str(exc) and "product_primary" in str(exc)
+                else:
+                    valid_error = False
+                r.check(f"invalid product_primary {value!r} fails even without skills", valid_error)
+
+            # main must fail cleanly before inference, rendering, or writes.
+            out, err = io.StringIO(), io.StringIO()
+            with patch.object(gen, "build_ai_client", no_api), \
+                 patch.object(gen, "write_if_changed", no_api), \
+                 contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                rc = gen.main(["--no-ai"])
+            r.check("invalid product fails main before output writes",
+                    rc == 1 and "product_primary" in err.getvalue())
 
 
 def main() -> int:
@@ -294,6 +404,8 @@ def main() -> int:
             for w in json.loads(warnings_file.read_text()).get("stale_skills", [])
         ),
     )
+
+    check_product_declarations(gen, validator, taxonomy, baseline, prior, skill, r)
 
     return r.report()
 

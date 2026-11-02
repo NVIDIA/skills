@@ -31,11 +31,28 @@ Each entry under `skills:` requires:
 
 | Field                  | Default            | Description                                                |
 |------------------------|--------------------|------------------------------------------------------------|
+| `product_primary`      | Exact `name` match, then existing metadata or AI | Canonical `product.primary` value from the metadata schema. Applies to every skill in this registry. |
 | `ref`                  | `main`             | Branch to sync from.                                       |
 | `links.contributing`   | `CONTRIBUTING.md`  | Path to the contributing file in the source repo.          |
 | `links.discussions`    | `true`             | Set to `false` if the repo has no Discussions tab.         |
 | `links.security`       | `true`             | Set to `false` if the repo has no `SECURITY.md`.           |
 | `links.primary`        | `true`             | Set to `false` when this component shares its `name` with another component, so the shared README row keeps the other component's help links. |
+
+## Declared product mapping
+
+`product_primary` is separate from the display `name`. Use it when the display
+name differs from the canonical product value. The generator checks the value
+against [the metadata schema](../.github/scripts/marketplace/metadata.schema.json).
+An invalid declaration fails the run before output files are written.
+
+The declared value overrides existing metadata and AI amendments. Without this
+key, the generator keeps the existing exact-name match and enrichment behavior.
+The published field remains `product.primary`; the output structure does not change.
+
+```yaml
+name: Jetson BSP
+product_primary: Jetson
+```
 
 ## Example
 

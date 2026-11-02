@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: Jetson BSP
+product_primary: Jetson
 repo: NVIDIA-AI-IOT/jetson-bsp-skills
 description: Agentic skills for setting up and customizing an NVIDIA Jetson Linux Board Support Package (BSP) — pick a target, prepare image and sources, customize IO (camera, PCIe, USB, pinmux, clocks, and more), then promote, flash, and validate.
 skills:
