@@ -1,0 +1,100 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Reviewed findings for SkillSpector and nvcarps. Rules match an exact rule ID,
+# file path and message; unrelated findings remain visible. This shipped path
+# is discovered by nvcarps. CI uses the same file.
+version: 2
+rules:
+- id: EA2
+  path: references/operations/operations.json
+  message: '*Autonomous Decision Making*'
+  reason: 'Expected, and scoped narrowly on purpose. EA2 flags autonomous-decision language in the operation
+    catalog. This skill is an unattended optimization workflow: choosing an operation chain without a
+    prompt is documented behaviour on the archetypes that carry it, and every destructive step is separately
+    scoped by references/operations.md. The NVSkills gate classes these medium and does not block.'
+- id: EA2
+  path: references/usd-structure-assessment/references/apply-restructure/scripts/apply-restructure-manifest.schema.json
+  message: '*Autonomous Decision Making*'
+  reason: 'Expected. EA2 flags autonomous-decision language in the operation catalog and schemas. This
+    skill is an unattended optimization workflow: choosing an operation chain without a prompt is the
+    documented behaviour on archetypes that carry it, and every destructive step is separately gated by
+    the operation authority rules in references/operations.md. Advisory (medium) at the NVSkills gate, not blocking.'
+- id: EA2
+  path: references/usd-validation-runner/references/validator-concepts.json
+  message: '*Autonomous Decision Making*'
+  reason: 'Expected. EA2 flags autonomous-decision language in the operation catalog and schemas. This
+    skill is an unattended optimization workflow: choosing an operation chain without a prompt is the
+    documented behaviour on archetypes that carry it, and every destructive step is separately gated by
+    the operation authority rules in references/operations.md. Advisory (medium) at the NVSkills gate, not blocking.'
+- id: AST7
+  path: references/report-templates/render_preview.py
+  message: '*Dynamic attribute access*'
+  reason: Expected. getattr reads named fields off a validated report object while rendering the preview;
+    the attribute names come from the template, not from report content.
+- id: AST4
+  path: references/usd-optimize-run-operations/scripts/run_batch.py
+  message: '*subprocess*'
+  reason: Expected. This is the batch runner; invoking the optimizer as a subprocess is its purpose. The
+    command is assembled from a validated plan, not from free text.
+- id: AST4
+  path: references/usd-validation-runner/scripts/usd_validation_executor.py
+  message: '*subprocess*'
+  reason: 'Expected. Parent/child worker split: the child is launched as a fixed [interpreter, this_file]
+    pair with an explicit env allowlist, and reads a locally-built JSON job from stdin. Nothing external
+    is executed.'
+- id: LP3
+  path: SKILL.md
+  message: '*declares no tool scope*'
+  reason: Known gap, not a false positive. The skill declares no permissions/allowed-tools block while
+    using env, file read, file write and shell. Worth adding a tool scope; recorded here so it stays visible
+    rather than being silently accepted. Tracked at
+    https://github.com/jensjebens/agent_config/issues/113.
+- id: TM1
+  path: references/usd-structure-assessment/references/usd-hierarchy-dedupe-candidates/scripts/instance_candidate_finder.py
+  message: "Tool Parameter Abuse"
+  reason: "The --no-confirm-bbox flag disables a geometric bounding-box comparison; it does not bypass human authorization."
+- id: EA2
+  path: references/usd-structure-assessment/references/usd-hierarchy-dedupe-candidates/scripts/instance_candidate_finder.py
+  message: "Autonomous Decision Making"
+  reason: "The --no-confirm-bbox flag controls geometric comparison, not an approval prompt."
+- id: EA2
+  path: references/install-standalone.md
+  message: "Autonomous Decision Making"
+  reason: "The instruction requires checking bundled validator dependencies before using that environment."
+- id: EA2
+  path: references/operations.md
+  message: "Autonomous Decision Making"
+  reason: "Tools expand already accepted internal subtrees within the recorded scope and protected paths; this grants no additional operation authority."
+- id: AS3
+  path: references/upstreams/usd-optimize.md
+  message: "Skill Enumeration"
+  reason: "These five fixed paths identify documentation shipped with the selected USD Optimize package; they do not enumerate unrelated installed skills."
+- id: AST4
+  path: scripts/stage_profile.py
+  message: "subprocess module call"
+  reason: "Profiling launches this same script with an argument list, no shell, and a timeout. The stage path is a positional argument, not executable code."
+- id: AST7
+  path: references/usd-optimize-run-operations/scripts/pack_definitions.py
+  message: "Dynamic attribute access via getattr()"
+  reason: "Attribute names come from a fixed tuple of Sdf list-operation fields when rewriting references and payloads."
+- id: AST7
+  path: references/usd-optimize-run-operations/scripts/semantic_library.py
+  message: "Dynamic attribute access via getattr()"
+  reason: "Attribute names come from fixed Sdf field tuples and a fixed relationship/connection field mapping; input content cannot select arbitrary attributes."
+- id: AST7
+  path: references/usd-optimize-run-operations/scripts/run_batch.py
+  message: "Dynamic attribute access via getattr()"
+  reason: "Resuming a job reads a fixed tuple of target status fields. Saved job data cannot select attribute names."
+- id: TT5
+  path: references/usd-validation-runner/scripts/usd_validation_executor.py
+  message: "Tainted flow: 'request_payload' from sys.stdin.read (line *, user input) → subprocess.run (code execution)"
+  reason: "False positive: the scanner joins both ends of a parent/child pipe that live in one module. The parent never reads stdin; it builds request_payload from its own arguments and passes it as input= to a fixed [interpreter, this_file] command with no shell. The only sys.stdin.read is the child's _worker_main reading that job, which _validate_job checks fail-closed against four typed keys; the child does not spawn processes. No caller passes a payload-derived interpreter. Re-review if payload data ever reaches the argument list. Same call as the AST4 entry above."
+- id: TT2
+  path: references/usd-validation-runner/scripts/usd_validation_executor.py
+  message: "Tainted flow: 'env' from os.environ (line *, credential/environment) → subprocess.run (code execution)"
+  reason: "False positive: env is an explicit allowlist of interpreter, temp-directory, USD_OPTIMIZE_ROOT and Windows start-up variables copied from the parent so the child interpreter can start. It is passed as env= to the fixed [interpreter, this_file] command with no shell; no variable reaches the argument list. Re-review if environment values ever select the executable or its arguments. Same call as the AST4 and TT5 entries above."
+- id: AST7
+  path: references/usd-optimize-run-operations/scripts/current_run_reuse.py
+  message: "Dynamic attribute access via getattr()"
+  reason: "Attribute names come from a fixed literal tuple of Sdf list-operation fields when redirecting references and payloads to within-run outputs. Layer content cannot select attribute names. Same pattern as the pack_definitions.py entry."

@@ -2,20 +2,32 @@
   "$comment": "SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.\nSPDX-License-Identifier: Apache-2.0",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Apply-Restructure Manifest",
-  "description": "Contract for <output_dir>/apply-restructure-manifest.json, the Phase 2f -> Phase 4 handoff. phase4_targets[] is the authoritative list of files Phase 4 must mesh-optimize; the final optimization-report's target_coverage must cover the UNION of every iteration's phase4_targets (see validate_report.py --manifest). A mode=restructure manifest MUST carry a non-empty phase4_targets[], and every entry MUST declare its default-predicate mesh_count so a 'skipped_zero_meshes' disposition cannot be faked. apply-restructure POSTCONDITION: when extraction leaves > 0 mesh prims on the assembly root, record the authoritative residual count under 'assembly_root' AND list that same root in phase4_targets[] as target_class 'assembly_root'. validate_manifest_structure() fails loud if assembly_root.mesh_count > 0 has no matching phase4_targets[] entry.",
+  "description": "Definition manifest and derived worker targets. Version 2 records complete geometry ownership, structural classification, occurrence contexts and independent inventory. Legacy phase4_targets fields remain accepted. Residual source geometry is accounted for during assessment; aggregate outputs may not own geometry.",
   "type": "object",
-  "required": ["mode", "phase4_targets"],
+  "required": [
+    "mode",
+    "phase4_targets"
+  ],
   "properties": {
     "mode": {
       "type": "string",
-      "enum": ["restructure", "ref_remap"]
+      "enum": [
+        "restructure",
+        "ref_remap"
+      ]
     },
-    "input_stage": { "type": "string" },
-    "output_dir": { "type": "string" },
-    "new_assembly_root": { "type": "string" },
+    "input_stage": {
+      "type": "string"
+    },
+    "output_dir": {
+      "type": "string"
+    },
+    "new_assembly_root": {
+      "type": "string"
+    },
     "assembly_root": {
       "type": "object",
-      "description": "Residual-mesh state of the new assembly root after extraction, measured by apply-restructure with the USD stage open. When mesh_count > 0 the manifest MUST also list this root in phase4_targets[] with target_class 'assembly_root' (enforced by validate_manifest_structure), so a retained-mesh assembly root is never silently dropped from Phase 4.",
+      "description": "Source residual geometry tracked until assigned to an output child asset; an aggregate output must own no geometry.",
       "properties": {
         "path": {
           "type": "string",
@@ -33,24 +45,50 @@
       "items": {
         "type": "object",
         "properties": {
-          "path": { "type": "string" },
+          "path": {
+            "type": "string"
+          },
           "kind": {
             "type": "string",
-            "enum": ["prototype", "shared_layer", "loadable_subasset", "parent_assembly", "new_root"]
+            "enum": [
+              "prototype",
+              "shared_layer",
+              "loadable_subasset",
+              "parent_assembly",
+              "new_root"
+            ]
           },
-          "provenance": { "type": "string" },
-          "size_bytes": { "type": "integer", "minimum": 0 },
-          "validate_usd_minimum": { "type": "string", "enum": ["pass", "fail", "skipped"] },
-          "notes": { "type": "string" }
+          "provenance": {
+            "type": "string"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "validate_usd_minimum": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "skipped"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
         }
       }
     },
     "phase4_targets": {
       "type": "array",
-      "description": "Every written prototype/shared layer/loadable sub-asset that needs Phase 4 mesh optimization, PLUS the assembly root itself when it retains > 0 meshes after extraction. ONLY path, target_class, and mesh_count are required output; all other members (copy_count, own_*, value_variant_*, arc_estimate, decision_reason, grain_source, package_group, descent_level, weight_hints, frontier.by_* rollups, etc.) are OPTIONAL decision/audit trail — select_frontier.py writes them and humans read them, but no machine gate consumes them, so they are never mandatory.",
+      "description": "Written definition targets plus residual assembly geometry. Existing path, target_class and mesh_count remain required. Scoped merges additionally declare the retained boundary, protected children and exact selected meshes.",
       "items": {
         "type": "object",
-        "required": ["path", "target_class", "mesh_count"],
+        "required": [
+          "path",
+          "target_class",
+          "mesh_count"
+        ],
         "properties": {
           "path": {
             "type": "string",
@@ -58,7 +96,12 @@
           },
           "target_class": {
             "type": "string",
-            "enum": ["prototype", "shared_layer", "loadable_subasset", "assembly_root"]
+            "enum": [
+              "prototype",
+              "shared_layer",
+              "loadable_subasset",
+              "assembly_root"
+            ]
           },
           "mesh_count": {
             "type": "integer",
@@ -67,16 +110,27 @@
           },
           "dependency_group": {
             "type": "string",
-            "enum": ["shared_first", "dependent_after", "independent"]
+            "enum": [
+              "shared_first",
+              "dependent_after",
+              "independent"
+            ]
           },
           "level": {
             "type": "string",
-            "enum": ["assembly", "component", "subcomponent"],
-            "description": "Target-tree tag (= USD `kind`). Drives the bounded-descent stopping rule (workflow.md Phase 2g): descend while there are dedupe/semantic boundaries AND (level < component OR the node is important)."
+            "enum": [
+              "assembly",
+              "component",
+              "subcomponent"
+            ],
+            "description": "Logical assembly/component/subcomponent level. This does not require authoring USD kind metadata; do not nest component models."
           },
           "importance": {
             "type": "string",
-            "enum": ["important", "normal"],
+            "enum": [
+              "important",
+              "normal"
+            ],
             "description": "Target-tree tag. Descend to `subcomponent` only for `important` sub-hierarchies. Also a functional-tolerance signal input (with `articulated`) for the auto-within-tolerance lossy gate in operation-safety.md."
           },
           "articulated": {
@@ -85,45 +139,79 @@
           },
           "archetype": {
             "type": "string",
-            "enum": ["large-spatial", "encapsulated-product", "piping", "generic"],
+            "enum": [
+              "large-spatial",
+              "encapsulated-product",
+              "piping",
+              "generic"
+            ],
             "description": "Target-tree tag, derived from semantic_label + structural signals. Selects which Phase-4 op-chain steps apply and the per-target scale-banded tolerance (see workflow.md op chain + usd-optimize-run-operations/references/units-and-tolerances.md)."
           },
-          "source": { "type": "string" },
+          "source": {
+            "type": "string"
+          },
           "descent_level": {
             "type": "string",
-            "enum": ["assembly", "component", "subcomponent", "detail"],
+            "enum": [
+              "assembly",
+              "component",
+              "subcomponent",
+              "detail"
+            ],
             "description": "Descent frontier level. Carries the resume-from-existing-level entry point: when the input arrives already instanced / BIM-CAD-exported, the descent ENTERS at the level the asset is already at rather than restarting from the top."
           },
           "identity_disposition": {
             "type": "string",
-            "enum": ["externalize_shared", "internal_share", "keep_local"],
+            "enum": [
+              "externalize_shared",
+              "internal_share",
+              "keep_local"
+            ],
             "description": "Frontier Axis A (where the definition lives; identity preserved). externalize_shared = nested external referenced prototype reused across components; internal_share = shared inside one parent; keep_local = meaningful one-off cleaned in place."
           },
           "reduction_route": {
             "type": "string",
-            "enum": ["point_instance", "merge", "fit_primitive", "mesh_cleanup_leaf", "none"],
-            "description": "Frontier Axis B (optional reduction). point_instance / merge are IDENTITY-LOSING (intent-gated, weak-identity units only). fit_primitive is identity-PRESERVING bounded-loss (the step-3 fitPrimitives op). mesh_cleanup_leaf is terminal lossless cleanup. none = placement only."
+            "enum": [
+              "point_instance",
+              "merge",
+              "fit_primitive",
+              "mesh_cleanup_leaf",
+              "none"
+            ],
+            "description": "Geometry operation, independent of definition sharing. A merge with a validated interior operation_scope retains boundary_path; an unscoped merge or point_instance can remove identity and retains the existing explicit-authorization requirement."
           },
           "identity_signal": {
             "type": "string",
-            "enum": ["kind", "naming", "semantic", "structural_fallback", "none"],
+            "enum": [
+              "kind",
+              "naming",
+              "semantic",
+              "structural_fallback",
+              "none"
+            ],
             "description": "Which signal set the grain (the queryable boundary basis). kind/naming/semantic = STRONG authored identity; structural_fallback = identity absent, the coarsest repeating subtree proposed the grain (never a leaf); none = anonymous geometry. REQUIRED on every shared (externalize_shared/internal_share) or identity-destroying (point_instance/merge) entry. A shared entry with identity_signal=none (landed on anonymous meshes) fails the contract; an identity-destroying route on a strong-identity unit (kind/naming/semantic) fails the contract."
           },
           "grain_source": {
             "type": "string",
-            "enum": ["identity", "structural_fallback"],
-            "description": "Whether the grain came from authored identity (default) or the structural-fallback (coarsest repeating subtree where identity is absent). When this is structural_fallback, identity_signal is emitted as 'structural_fallback' — the two agree, and 'none' is reserved for a grain that has no fallback justification either."
+            "enum": [
+              "identity",
+              "structural_fallback"
+            ],
+            "description": "Whether the grain came from authored identity (default) or the structural-fallback (coarsest repeating subtree where identity is absent). When this is structural_fallback, identity_signal is emitted as 'structural_fallback' \u2014 the two agree, and 'none' is reserved for a grain that has no fallback justification either."
           },
           "intent_confirmed": {
             "type": "boolean",
-            "description": "The user explicitly confirmed an identity-destroying reduction_route (point_instance / merge) on a unit that would otherwise be refused it — the one exemption to the strong-identity rule. select_frontier.py writes it when it grants the exemption, so the manifest gate can honour the same call instead of re-failing the run. Absent means no confirmation was given."
+            "description": "The user explicitly confirmed an identity-destroying reduction_route (point_instance / merge) on a unit that would otherwise be refused it \u2014 the one exemption to the strong-identity rule. select_frontier.py writes it when it grants the exemption, so the manifest gate can honour the same call instead of re-failing the run. Absent means no confirmation was given."
           },
           "kind_untrusted": {
             "type": "boolean",
-            "description": "Kind-trust preflight (finder spec §6.0.1, issue #172): true when this unit carried an authored kind that was demoted STAGE-WIDE because kind does not partition geometry (~1 mesh per component on monolithic CAD imports). The grain was re-derived structurally (grain_source=structural_fallback); the frontier.kind_trust block carries the sampled stats that justified the demotion."
+            "description": "Kind-trust preflight (finder spec \u00a76.0.1, issue #172): true when this unit carried an authored kind that was demoted STAGE-WIDE because kind does not partition geometry (~1 mesh per component on monolithic CAD imports). The grain was re-derived structurally (grain_source=structural_fallback); the frontier.kind_trust block carries the sampled stats that justified the demotion."
           },
           "value_variant_id": {
-            "type": ["string", "integer"],
+            "type": [
+              "string",
+              "integer"
+            ],
             "description": "Value-variant partition id within a structural group (one prototype per genuine variant, e.g. a group of 18 near-identical copies that partitions into 17 identical plus 1 real variant)."
           },
           "value_variant_count": {
@@ -135,18 +223,30 @@
             "type": "string",
             "description": "The parent prototype that references this one (the nested-library link; parents reference child prototypes, not inline copies)."
           },
-          "parent_target_id": { "type": "string" },
+          "parent_target_id": {
+            "type": "string"
+          },
           "share_scope": {
             "type": "string",
-            "enum": ["cross_component", "internal_parent", "none"]
+            "enum": [
+              "cross_component",
+              "internal_parent",
+              "none"
+            ]
           },
           "own_prims": {
             "type": "integer",
             "minimum": 0,
             "description": "NON-double-counted own prim count (a parent and its nested child do not both claim the same savings)."
           },
-          "own_meshes": { "type": "integer", "minimum": 0 },
-          "own_points": { "type": "integer", "minimum": 0 },
+          "own_meshes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "own_points": {
+            "type": "integer",
+            "minimum": 0
+          },
           "copy_count": {
             "type": "integer",
             "minimum": 1,
@@ -160,13 +260,22 @@
             "type": "boolean",
             "description": "Sub-MINP leaf intentionally NOT instanced so a later within-prototype mesh-merge can fuse it (instancing finely bakes in granularity a merge pass would have to tear down)."
           },
-          "non_double_counted_savings": { "type": "integer", "minimum": 0 },
+          "non_double_counted_savings": {
+            "type": "integer",
+            "minimum": 0
+          },
           "arc_estimate": {
             "type": "object",
             "description": "Load-bearing anti-failure evidence: arcs if shared at the frontier vs arcs at mesh level (empirically ~100-150 vs ~156,691). A descent that explodes arcs without reusing proportionally more DISTINCT data is too deep.",
             "properties": {
-              "frontier": { "type": "integer", "minimum": 0 },
-              "mesh_level": { "type": "integer", "minimum": 0 }
+              "frontier": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "mesh_level": {
+                "type": "integer",
+                "minimum": 0
+              }
             }
           },
           "package_group": {
@@ -175,7 +284,10 @@
           },
           "frontier_estimate_basis": {
             "type": "string",
-            "enum": ["exact", "spot_check"],
+            "enum": [
+              "exact",
+              "spot_check"
+            ],
             "description": "Set to spot_check when the cost guard degraded the frontier scan to a masked spot-check on a large stage."
           },
           "decision_reason": {
@@ -184,24 +296,184 @@
             "properties": {
               "identity_signal": {
                 "type": "string",
-                "enum": ["kind", "naming", "semantic", "structural_fallback", "none"]
+                "enum": [
+                  "kind",
+                  "naming",
+                  "semantic",
+                  "structural_fallback",
+                  "none"
+                ]
               },
               "stop_condition": {
                 "type": "string",
-                "enum": ["min_meaningful_unit", "arc_cost", "below_floor"]
+                "enum": [
+                  "min_meaningful_unit",
+                  "arc_cost",
+                  "below_floor"
+                ]
               },
               "descend_trigger": {
                 "type": "string",
-                "enum": ["variant_outlier", "unique_container_shared_children"]
+                "enum": [
+                  "variant_outlier",
+                  "unique_container_shared_children"
+                ]
               },
-              "note": { "type": "string" }
+              "note": {
+                "type": "string"
+              }
             }
           },
           "weight_hints": {
             "type": "object",
             "description": "Optional pre-extraction estimates for adaptive batching. NON-authoritative; mesh_count above is the authoritative count the gate uses."
           },
-          "notes": { "type": "string" }
+          "notes": {
+            "type": "string"
+          },
+          "boundary_path": {
+            "type": "string",
+            "pattern": "^/[^.{}\\[\\]\\s]+$",
+            "description": "Retained component or subcomponent Xform in the written definition."
+          },
+          "protected_paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^/[^.{}\\[\\]\\s]+$"
+            },
+            "uniqueItems": true,
+            "description": "Retained child components and addressed semantic, animation or physics prims."
+          },
+          "operation_scope": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "mesh_paths",
+                  "output_path"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "interior"
+                  },
+                  "mesh_paths": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^/[^.{}\\[\\]\\s]+$"
+                    }
+                  },
+                  "output_path": {
+                    "type": "string",
+                    "pattern": "^/[^.{}\\[\\]\\s]+$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "geometry_paths",
+                  "mesh_paths",
+                  "exclude_paths"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "definition"
+                  },
+                  "geometry_paths": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^/"
+                    }
+                  },
+                  "mesh_paths": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^/"
+                    }
+                  },
+                  "exclude_paths": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^/"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "occurrence_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "source_path",
+                "output_path"
+              ],
+              "properties": {
+                "source_path": {
+                  "type": "string",
+                  "pattern": "^/[^.{}\\[\\]\\s]+$"
+                },
+                "output_path": {
+                  "type": "string",
+                  "pattern": "^/[^.{}\\[\\]\\s]+$"
+                }
+              }
+            }
+          },
+          "preservation_policy": {
+            "type": "string",
+            "description": "Path to the versioned stage-verification policy JSON, relative to this manifest."
+          },
+          "identity_change_authorization": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "operation",
+              "paths",
+              "reason"
+            ],
+            "properties": {
+              "operation": {
+                "enum": [
+                  "merge",
+                  "point_instance"
+                ]
+              },
+              "paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^/[^.{}\\[\\]\\s]+$"
+                }
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "definition_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Definition identity within the writer layer. Omit only for legacy file-level coverage."
+          }
         }
       }
     },
@@ -213,16 +485,27 @@
           "type": "boolean",
           "description": "True when the remaining reuse was MEASURED (distinct vs total prototypes/units), not estimated. Required true whenever a shared disposition is claimed."
         },
-        "distinct_prototypes": { "type": "integer", "minimum": 0 },
-        "total_units": { "type": "integer", "minimum": 0 },
+        "distinct_prototypes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_units": {
+          "type": "integer",
+          "minimum": 0
+        },
         "descent_entry_level": {
           "type": "string",
-          "enum": ["assembly", "component", "subcomponent", "detail"],
+          "enum": [
+            "assembly",
+            "component",
+            "subcomponent",
+            "detail"
+          ],
           "description": "Resume-from-existing-level: the level the descent ENTERED at when the input arrived already partway down (already instanced / BIM-CAD). The stop/descend rules are unchanged from there."
         },
         "descent_converged": {
           "type": "boolean",
-          "description": "Convergence gate: true only when a re-run of the reuse analyzer on the authored structure surfaced NO new shareable group above the inclusion floor (MINP, occurrence >=2) — the descent reached a fixpoint. The remaining residue is sub-MINP kept_inline_for_merge leaves, already-split value-variants, or unique content. Phase 4 geometry ops (decimation, within-prototype merge) must NOT run until this is true; otherwise geometry is reduced/merged on a structure further sharing would still have collapsed, and a merge runs before its kept_inline_for_merge leaves were reserved."
+          "description": "Convergence gate: true only when a re-run of the reuse analyzer on the authored structure surfaced NO new shareable group above the inclusion floor (MINP, occurrence >=2) \u2014 the descent reached a fixpoint. The remaining residue is sub-MINP kept_inline_for_merge leaves, already-split value-variants, or unique content. Phase 4 geometry ops (decimation, within-prototype merge) must NOT run until this is true; otherwise geometry is reduced/merged on a structure further sharing would still have collapsed, and a merge runs before its kept_inline_for_merge leaves were reserved."
         },
         "final_rescan_new_groups_above_floor": {
           "type": "integer",
@@ -237,37 +520,70 @@
           "type": "object",
           "description": "Optional audit rollup: count of phase4_targets[] by their identity_signal. A quick read of how much of the frontier rests on strong authored identity (kind/naming/semantic) vs the structural_fallback grain vs anonymous (none). Additive; emitted by select_frontier.py.",
           "properties": {
-            "kind": { "type": "integer", "minimum": 0 },
-            "naming": { "type": "integer", "minimum": 0 },
-            "semantic": { "type": "integer", "minimum": 0 },
-            "structural_fallback": { "type": "integer", "minimum": 0 },
-            "none": { "type": "integer", "minimum": 0 }
+            "kind": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "naming": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "semantic": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "structural_fallback": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "none": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         },
         "by_disposition": {
           "type": "object",
           "description": "Optional audit rollup: count of phase4_targets[] by their identity_disposition. Additive; emitted by select_frontier.py.",
           "properties": {
-            "externalize_shared": { "type": "integer", "minimum": 0 },
-            "internal_share": { "type": "integer", "minimum": 0 },
-            "keep_local": { "type": "integer", "minimum": 0 }
+            "externalize_shared": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "internal_share": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "keep_local": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         },
         "by_stop_condition": {
           "type": "object",
           "description": "Optional audit rollup: count of phase4_targets[] by their decision_reason.stop_condition. Additive; emitted by select_frontier.py.",
           "properties": {
-            "min_meaningful_unit": { "type": "integer", "minimum": 0 },
-            "below_floor": { "type": "integer", "minimum": 0 }
+            "min_meaningful_unit": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "below_floor": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         },
         "frontier_estimate_basis": {
           "type": "string",
-          "enum": ["exact", "spot_check"]
+          "enum": [
+            "exact",
+            "spot_check"
+          ]
         },
         "kind_trust": {
           "type": "object",
-          "description": "Optional audit block (finder spec §6.0.1, issue #172): the stage-wide meshes-per-kind preflight stats, so a sampled-and-REJECTED kind is auditable in the manifest (why kind-labeled units arrived as structural_fallback / kind_untrusted). Additive; emitted by the finder's --emit-candidates packet and passed through by select_frontier.py.",
+          "description": "Optional audit block (finder spec \u00a76.0.1, issue #172): the stage-wide meshes-per-kind preflight stats, so a sampled-and-REJECTED kind is auditable in the manifest (why kind-labeled units arrived as structural_fallback / kind_untrusted). Additive; emitted by the finder's --emit-candidates packet and passed through by select_frontier.py.",
           "properties": {
             "kind_trusted": {
               "type": "boolean",
@@ -285,7 +601,10 @@
               "description": "Fraction of sampled kind prims whose subtree holds <= 1 mesh."
             },
             "median_meshes_per_kind": {
-              "type": ["number", "null"],
+              "type": [
+                "number",
+                "null"
+              ],
               "description": "Median subtree mesh count across the sample (null when the sample is empty)."
             },
             "max_single_mesh_fraction": {
@@ -294,29 +613,474 @@
             },
             "articulation_check": {
               "type": "string",
-              "enum": ["enabled", "unavailable"],
+              "enum": [
+                "enabled",
+                "unavailable"
+              ],
               "description": "Whether the walk-up articulation stop could consult UsdPhysics; 'unavailable' means the guard was skipped gracefully."
             }
           }
         }
       }
     },
-    "rewrite_steps": { "type": "array" },
-    "material_rewrites": { "type": "array" },
-    "warnings": { "type": "array" }
+    "rewrite_steps": {
+      "type": "array"
+    },
+    "material_rewrites": {
+      "type": "array"
+    },
+    "warnings": {
+      "type": "array"
+    },
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "definitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source_layer",
+          "source_prim_path",
+          "boundary_path",
+          "structural_type",
+          "rationale",
+          "owned_geometry",
+          "protected_paths",
+          "children",
+          "occurrences",
+          "operation_scope",
+          "geometry_counts",
+          "material_dependencies",
+          "assessment"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_layer": {
+            "type": "string"
+          },
+          "source_prim_path": {
+            "type": "string"
+          },
+          "boundary_path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "structural_type": {
+            "enum": [
+              "atomic",
+              "aggregate",
+              "package",
+              null
+            ]
+          },
+          "rationale": {
+            "type": "object",
+            "required": [
+              "reason",
+              "evidence"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          },
+          "owned_geometry": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^/"
+            }
+          },
+          "protected_paths": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^/"
+            }
+          },
+          "children": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "occurrences": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^/"
+            }
+          },
+          "operation_scope": {
+            "type": "object",
+            "required": [
+              "type",
+              "geometry_paths",
+              "mesh_paths",
+              "exclude_paths"
+            ],
+            "properties": {
+              "type": {
+                "const": "definition"
+              },
+              "geometry_paths": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^/"
+                }
+              },
+              "mesh_paths": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^/"
+                }
+              },
+              "exclude_paths": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^/"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "geometry_counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "material_dependencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "asset_path",
+                "resolved_path",
+                "kind",
+                "exists"
+              ],
+              "properties": {
+                "asset_path": {
+                  "type": "string"
+                },
+                "resolved_path": {
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "material",
+                    "shader",
+                    "texture",
+                    "resource"
+                  ]
+                },
+                "exists": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "assessment": {
+            "type": "object",
+            "required": [
+              "status",
+              "operations"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "ready",
+                  "decision_required"
+                ]
+              },
+              "operations": {
+                "type": "array"
+              }
+            }
+          },
+          "selection": {
+            "$ref": "#/$defs/boundarySelection"
+          }
+        }
+      }
+    },
+    "occurrences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "definition_id",
+          "effective_kind",
+          "context_fingerprint"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "definition_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "effective_kind": {
+            "type": "string"
+          },
+          "context_fingerprint": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "inventory": {
+      "type": "object",
+      "required": [
+        "geometry",
+        "uninspected",
+        "source_fingerprint"
+      ],
+      "properties": {
+        "geometry": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "schema"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^/"
+              },
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "uninspected": {
+          "type": "array"
+        },
+        "source_fingerprint": {
+          "type": "string"
+        }
+      }
+    },
+    "decisions_required": {
+      "type": "array"
+    },
+    "revision": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "assessed",
+        "incomplete"
+      ]
+    },
+    "boundary_review_version": {
+      "const": 1
+    },
+    "boundary_reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "group_id",
+          "paths",
+          "owner_path",
+          "status",
+          "evidence_fingerprint",
+          "dispositions"
+        ],
+        "properties": {
+          "group_id": {
+            "type": "string"
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^/"
+            }
+          },
+          "owner_path": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "reviewed",
+              "decision_required"
+            ]
+          },
+          "evidence_fingerprint": {
+            "type": "string"
+          },
+          "selection": {
+            "$ref": "#/$defs/boundarySelection"
+          },
+          "dispositions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "disposition",
+                "selection"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "disposition": {
+                  "enum": [
+                    "boundary",
+                    "internal"
+                  ]
+                },
+                "selection": {
+                  "$ref": "#/$defs/boundarySelection"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
   "allOf": [
     {
       "if": {
-        "properties": { "mode": { "const": "restructure" } },
-        "required": ["mode"]
+        "properties": {
+          "mode": {
+            "const": "restructure"
+          }
+        },
+        "required": [
+          "mode"
+        ]
       },
       "then": {
         "properties": {
-          "phase4_targets": { "minItems": 1 }
+          "phase4_targets": {
+            "minItems": 1
+          }
         },
-        "required": ["phase4_targets"]
+        "required": [
+          "phase4_targets"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": 2
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "definitions",
+          "occurrences",
+          "inventory",
+          "decisions_required",
+          "source",
+          "context",
+          "revision",
+          "status"
+        ]
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "boundary_review_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "boundary_reviews"
+        ],
+        "properties": {
+          "definitions": {
+            "items": {
+              "required": [
+                "selection"
+              ]
+            }
+          }
+        }
       }
     }
-  ]
+  ],
+  "$defs": {
+    "boundarySelection": {
+      "type": "object",
+      "required": [
+        "basis",
+        "reason",
+        "independent_use",
+        "evidence"
+      ],
+      "properties": {
+        "basis": {
+          "enum": [
+            "observed",
+            "user_specified",
+            "inferred"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "independent_use": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        },
+        "legacy": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
 }

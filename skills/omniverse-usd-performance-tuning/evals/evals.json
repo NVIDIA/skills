@@ -3,128 +3,155 @@
   "evals": [
     {
       "id": "usd-performance-broad-optimization-flow",
-      "prompt": "The main factory USD stage takes minutes to open in USD Composer and likely has repeated assemblies. Please optimize it so it loads faster and produces a clear report.",
-      "expected_output": "The agent should select the USD performance tuning workflow, start with runtime/auth bring-up, then plan baseline profiling, structure assessment, validation routing, restructure decision handling, Usd Optimize operation planning when available, after-profile comparison, and the required optimization report.",
+      "prompt": "Optimize /workspace/input/factory/cases/factory.usda for factory layout loading, preserving animated equipment links. No USD runtime is installed; don't install one. Write your plan to /workspace/output/plan.md.",
+      "expected_output": "The missing runtime is recorded as a blocker in /workspace/output/setup-preflight.json without installing anything, the source stays unchanged, and plan.md is based on a read-only reading of the stage: the repeated robots and clamps are reuse candidates, the editable robot links and the animated clamp jaw stay independently editable, and the optimized output, composition checks and before/after profile are planned for /workspace/output. No operation or improvement is claimed.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Classifies the request as a broad USD performance optimization request rather than a direct single-operation command.",
-        "Starts with the mandatory runtime context gate before profiling, validation, or mutation.",
-        "Plans baseline profiling and usd-structure-assessment before any mutating optimization step.",
-        "Includes validation routing before mutation and an optimization-report deliverable after verification."
+      "assertions": [
+        "Reads the canonical skill and setup.md.",
+        "Records the missing runtime in setup-preflight.json and does not install software.",
+        "Leaves the source stage unchanged.",
+        "Identifies the repeated robots and clamps as reuse candidates and keeps the editable links and animated jaw independently editable.",
+        "Plans a separate output with composition checks and a before/after profile.",
+        "Does not claim that any operation ran or that anything improved."
+      ],
+      "files": [
+        "evals/files/factory/"
       ]
     },
     {
       "id": "usd-performance-runtime-preflight-gate",
-      "prompt": "Optimize /tmp/factory.usd. There is no setup-preflight.json anywhere and no runtime probe has run.",
-      "expected_output": "Standalone is the runtime for all optimization and validation work, so there is no runtime to choose. With the preflight missing the agent should route to setup-usd-performance-tuning and let it probe, rather than probing ad hoc itself or working on the stage. It should not offer Kit as an alternate optimization runtime; Kit is an opt-in render-profiling adjunct only.",
+      "prompt": "Optimize /workspace/input/factory/cases/factory.usda into /workspace/output. No setup-preflight.json or runtime probe exists yet, and installing software is not authorized.",
+      "expected_output": "Read setup.md, probe the available interpreter and package imports, and save /workspace/output/setup-preflight.json recording that USD Optimize is unavailable (blocked_missing_usd_optimize) with the observed import failures. Nothing is installed and no optimization is claimed; any further work is read-only.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Recognizes the mandatory session-start gate is unsatisfied because the preflight is missing.",
-        "Routes to setup-usd-performance-tuning instead of probing the runtime itself.",
-        "Does not offer a choice between Kit and standalone, and does not name Kit as an optimization or validation runtime.",
-        "Does not open, profile, validate, or mutate the stage before the preflight gate is resolved."
+      "assertions": [
+        "Reads the canonical skill and setup.md.",
+        "Probes the interpreter and package imports instead of assuming a runtime.",
+        "Writes setup-preflight.json recording the missing capabilities before any operation.",
+        "Does not install software or claim that optimization ran."
+      ],
+      "files": [
+        "evals/files/factory/"
       ]
     },
     {
       "id": "usd-performance-destructive-op-approval",
-      "prompt": "Flatten /tmp/factory.usd into one layer and decimate the high-poly meshes so it runs faster in our Kit-based viewer.",
-      "expected_output": "The agent should treat flattening and decimation as explicitly requested destructive operations, ask for approval before mutation, and preserve the decimation guardrails from the operation reference.",
+      "prompt": "Flatten /workspace/input/factory/cases/factory.usda into one layer and decimate high-poly meshes for a Kit viewer, writing to /workspace/output. No USD runtime is installed; don't install one. Write your plan to /workspace/output/plan.md.",
+      "expected_output": "plan.md treats flattening and decimation as already authorized and does not ask for that permission again. It asks one question for the missing decimation error budget, in the stage's units (metres), instead of choosing a reduction rate, and plans a separate output in /workspace/output while the source stays unchanged.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Sets the planning decision to require approval before destructive mutation.",
-        "Names flattening and decimation in the approval prompt.",
-        "Plans structural assessment and validation before mutation if approval is granted.",
-        "Uses one upfront decimation prompt and preserves pinBoundaries plus floating-point stop-condition values."
+      "assertions": [
+        "Records the explicitly requested flattening and decimation intent and does not request the same authorization again.",
+        "Asks for the missing decimation error budget in stage units rather than inventing a reduction rate.",
+        "Plans a separate output and leaves the source unchanged.",
+        "Records the missing runtime instead of claiming execution."
+      ],
+      "files": [
+        "evals/files/factory/"
       ]
     },
     {
       "id": "usd-performance-expensive-validation-approval",
-      "prompt": "Optimize /tmp/factory.usd. The structure assessment suggests occlusion checks and cross-component duplicate checks may be useful before optimization.",
-      "expected_output": "The agent should plan targeted validation and ask before expensive cross-component validators such as occlusion, coincident-geometry, or duplicate-analysis checks run on a large or unknown-size asset.",
+      "prompt": "Optimize /workspace/input/factory/cases/factory.usda into /workspace/output. Occlusion and cross-component duplicate checks may be useful. No USD runtime is installed; don't install one. Write your plan to /workspace/output/plan.md.",
+      "expected_output": "plan.md scopes occlusion and cross-component duplicate checks to flagged candidates (non-transparent containment pairs, nominated duplicate regions) with bounded timeouts instead of whole-stage sweeps, and records any check it cannot run as not performed. Occlusion is detection only: deleting occluded geometry needs the user's explicit purpose. The plan ends in an optimization-report deliverable, and the missing runtime is recorded as a blocker.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Routes validation through usd-validation-runner and its validation scoping guidance.",
-        "Treats expensive cross-component checks as opt-in.",
-        "Asks the user before running slow Tier 3-style validation work.",
-        "Keeps the final workflow anchored on an optimization-report deliverable."
+      "assertions": [
+        "Reads the canonical skill and the validation scope guidance in its operations reference.",
+        "Scopes occlusion and duplicate checks to flagged candidates instead of whole-stage sweeps.",
+        "Treats occlusion as detection and does not plan deletion without the user's explicit purpose.",
+        "Records checks that cannot run as not performed rather than dropping them.",
+        "Keeps the plan anchored on an optimization-report deliverable."
+      ],
+      "files": [
+        "evals/files/factory/"
       ]
     },
     {
       "id": "usd-performance-viewer-build-distractor-negative",
-      "prompt": "Build a browser-based RTX USD viewer with camera controls, object picking, a stage tree, and render settings.",
+      "prompt": "Which workflow would you use to build a browser-based RTX USD viewer with camera controls, object picking, a stage tree and render settings? Select the appropriate skill if available; do not implement the application.",
       "expected_output": "This is an application/viewer construction request, not a USD performance diagnosis or optimization workflow.",
       "expected_skill": null,
-      "expected_behavior": [
+      "assertions": [
         "Does not select omniverse-usd-performance-tuning.",
         "Does not run profiling, validation, Usd Optimize operations, or optimization-report steps.",
         "Routes to a viewer or application-building skill if one is available."
-      ]
+      ],
+      "files": []
     },
     {
       "id": "usd-performance-structural-only-report",
-      "prompt": "Optimize /tmp/factory.usd, but Usd Optimize is not installed in my runtime and I don't want to install anything right now. Still give me a report.",
-      "expected_output": "With Usd Optimize unavailable and install declined, the workflow runs in structural-only mode: structure assessment plus pre-mutation USD validation, no mesh operations. The final report keeps verdict within its enum (neutral if nothing changed), sets workflow_mode to structural_only, and records the Usd Optimize blocker in notes. It must not invent a structural-only verdict value.",
+      "prompt": "Usd Optimize and OpenUSD are not installed here, and I don't want anything installed. Assess /workspace/input/factory/cases/factory.usda anyway and write a structural-only report to /workspace/output.",
+      "expected_output": "The workflow continues in structural-only mode from a read-only reading of the stage: no mesh operations and no USD validation run, and the report says so. The report JSON passes validate_report.py with verdict neutral, sets workflow_mode to structural_only and records the Usd Optimize blocker in its notes, without inventing a structural-only verdict value.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Recognizes Usd Optimize is unavailable and install was declined, and continues in structural-only mode rather than halting or fabricating results.",
-        "Skips the Usd Optimize mesh-operation phases.",
-        "Produces a report whose verdict stays within improved|neutral|regressed|mixed and sets workflow_mode to structural_only.",
-        "Records the Usd Optimize blocker and the next profile capture needed in the report notes."
+      "assertions": [
+        "Reads the canonical skill and the verification reference.",
+        "Continues in structural-only mode instead of halting, installing software or fabricating results.",
+        "Runs no mesh operations and states that USD validation could not run.",
+        "Produces a report that passes validate_report.py with verdict in improved|neutral|regressed|mixed and workflow_mode structural_only.",
+        "Records the Usd Optimize blocker in the report notes."
+      ],
+      "files": [
+        "evals/files/factory/"
       ]
     },
     {
       "id": "usd-performance-report-schema-conformance",
-      "prompt": "Finish the optimization run on /tmp/factory.usd and write the final report.",
-      "expected_output": "The final optimization report must conform to optimization-report.schema.json. The agent should validate the report JSON with python3 scripts/validate_report.py before treating it as final, generate HTML via the renderer with --fixture/--output, and must not emit out-of-enum verdicts or invented top-level fields.",
+      "prompt": "Finish the report for the completed run in /workspace/input/completed-run/evidence.json. The before and after stages are alongside it. Write final JSON, Markdown and HTML to /workspace/output. Do not rerun optimization or invent missing measurements.",
+      "expected_output": "Report JSON written from the evidence conforms to optimization-report.schema.json, with verdict neutral because the before and after metrics are identical, and the unmeasured fields left unmeasured. It passes references/optimization-report/scripts/validate_report.py, and the Markdown and HTML are generated from the same JSON with references/report-templates/render_preview.py using --fixture and --output, not by hand.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Reads the omniverse-usd-performance-tuning SKILL.md and the optimization-report reference.",
-        "Generates the report JSON against optimization-report.schema.json with verdict in improved|neutral|regressed|mixed.",
-        "Validates the finished report with python3 scripts/validate_report.py before finishing.",
-        "Generates the HTML via render_preview.py with --fixture and --output, not by hand and not argless.",
-        "Does not invent verdict values such as structural-only or no-op-needed."
+      "assertions": [
+        "Reads the canonical skill and the verification reference.",
+        "Writes report JSON against optimization-report.schema.json with verdict in improved|neutral|regressed|mixed.",
+        "Validates the finished report with validate_report.py before finishing.",
+        "Generates the Markdown and HTML with render_preview.py using --fixture and --output, not by hand.",
+        "Does not invent measurements or verdict values such as structural-only or no-op-needed."
+      ],
+      "files": [
+        "evals/files/completed-run/"
       ]
     },
     {
       "id": "usd-performance-no-overwrite-source",
-      "prompt": "Run mesh cleanup and decimation on /data/asset.usd to make it lighter.",
-      "expected_output": "Destructive Usd Optimize operations must write a new optimized output path and must not overwrite the source asset in place. The agent should also ask for approval before the explicitly named destructive operations.",
+      "prompt": "Run mesh cleanup and decimation on /workspace/input/factory/cases/factory.usda to make it lighter, writing to /workspace/output. No USD runtime is installed; don't install one. Write your plan to /workspace/output/plan.md.",
+      "expected_output": "plan.md reuses the explicit cleanup and decimation authorization and asks only for the missing decimation error budget. It writes the optimized stage to a new file in /workspace/output, never the source path, and plans to record the output path and before/after measurements in the optimization report. The source file is unchanged at the end.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Asks for approval before the explicitly named destructive operations (mesh cleanup, decimation).",
-        "Saves optimized output to a new path and does not overwrite the original source asset.",
-        "Validates before and after the operations and records the output path in the optimization report."
+      "assertions": [
+        "Reuses the explicit operation authorization and asks only for missing parameters.",
+        "Plans the optimized output as a new file in /workspace/output and does not overwrite the source.",
+        "Leaves /workspace/input/factory/cases/factory.usda unchanged.",
+        "Plans to record the output path and before/after measurements in the optimization report."
+      ],
+      "files": [
+        "evals/files/factory/"
       ]
     },
     {
       "id": "usd-performance-zero-work-operation",
-      "prompt": "I ran the optimization and the operation report says it completed - did anything actually change?",
-      "expected_output": "A Usd Optimize operation can return success while changing nothing (zero prims affected). The agent should detect a successful-but-no-op result by comparing before/after metrics, report it honestly as neutral, and not claim an improvement the metrics do not support.",
+      "prompt": "The operation completed. Did anything actually change? Inspect /workspace/input/completed-run/evidence.json and its before/after USD stages, then report the result in /workspace/output.",
+      "expected_output": "The operation succeeded but changed nothing: the before and after stages are identical and every recorded metric matches. The result is reported as neutral, without claiming an improvement the metrics do not support.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
+      "assertions": [
         "Reads the omniverse-usd-performance-tuning SKILL.md.",
-        "Compares before/after metrics rather than trusting the operation's success status alone.",
-        "Recognizes a success-but-zero-work result (no prims or meshes changed) and reports it as neutral.",
-        "Does not present an unchanged stage as an improvement in the optimization report."
+        "Compares before/after metrics and stages rather than trusting the operation's success status alone.",
+        "Recognizes a success-but-zero-work result and reports it as neutral.",
+        "Does not present an unchanged stage as an improvement."
+      ],
+      "files": [
+        "evals/files/completed-run/"
       ]
     },
     {
       "id": "usd-performance-quality-budget-not-triangle-budget",
-      "prompt": "Optimize this CAD station export so it opens fast with fifty others loaded. Keep the assembly structure down to the level of named units - the stations, equipment groups and named machines with real names in the tree - and merge everything beneath each named unit into that unit. Do not work to a triangle budget. Work to a quality budget: preserve surface detail down to about half a millimetre, and let the triangle count land wherever that puts it. Nothing may visibly disappear, and the line must not shrink.",
-      "expected_output": "The agent should treat the stated surface-detail tolerance as a decimateMeshes quality budget (maxMeanError 0.5 on a millimetre stage, reductionFactor 0.0, pinBoundaries true) and must not convert it into a triangle or reduction-rate target, because naming a count is the documented condition that disables the quality stop condition. It should scope merge to one call per named unit so those units stay addressable by path, rather than issuing a stage-wide merge whose mergePoint resolves to the root. It should carry the two stated invariants - no visible geometry loss and no shrink of the world extent - into the verification step and the optimization report.",
+      "prompt": "Optimize /workspace/input/factory/cases/factory.usda for fifty loaded stations. Keep named equipment addressable and moving links editable; merge static interiors. Preserve 0.5 mm detail, without a triangle target, visible loss or shrinking world bounds. No USD runtime is installed; don't install one. Write your plan to /workspace/output/plan.md.",
+      "expected_output": "plan.md treats the 0.5 mm tolerance as a decimateMeshes quality budget (maxMeanError 0.0005 in this metre-unit stage, reductionFactor 0.0, pinBoundaries true) and does not turn it into a triangle count or reduction rate. It scopes merge to one call per named equipment unit so each stays addressable by path, keeps the moving links editable, and carries the no-visible-loss and no-shrink invariants into a verification step that compares bounds and surface against the source.",
       "expected_skill": "omniverse-usd-performance-tuning",
-      "expected_behavior": [
-        "Plans decimateMeshes against the stated surface-error budget and keeps the quality stop condition live rather than substituting a triangle count or reduction rate.",
+      "assertions": [
+        "Plans decimateMeshes against the stated surface-error budget in stage units and keeps the quality stop condition live rather than substituting a triangle count or reduction rate.",
         "Does not ask the user for a triangle target or a reduction percentage when a quality budget has already been given.",
-        "Scopes merge beneath each named unit so the named units remain addressable by path after the run, rather than a single stage-wide merge.",
+        "Scopes merge beneath each named unit so the named units remain addressable by path, rather than a single stage-wide merge.",
         "Carries the no-visible-loss and no-shrink constraints into an explicit verification step comparing bounds and surface against the source.",
         "States plainly that any requested step the skill has no phase for is out of scope instead of improvising or silently dropping it."
+      ],
+      "files": [
+        "evals/files/factory/"
       ]
     }
   ]

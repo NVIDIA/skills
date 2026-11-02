@@ -5,28 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>USD Performance Tuning Report - {{ asset_name }}</title>
   <style>
-    :root {
-      --bg: #0d1016;
-      --panel: #171c22;
-      --panel-2: #222934;
-      --ink: #f4f7fb;
-      --muted: #b2becd;
-      --line: #34404d;
-      --good: #76b900;
-      --warn: #f6c85f;
-      --bad: #ff7f7f;
-      --unknown: #8793a1;
-      --accent: #7dd3fc;
-      --score-deg: {{ score_degrees }}deg;
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: linear-gradient(180deg, #0d1016 0%, #111820 42%, #0d1016 100%);
-      color: var(--ink);
-      font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    /* shared-report-theme */
     main { max-width: 1180px; margin: 0 auto; padding: 32px 28px 48px; }
     header {
       display: grid;
@@ -58,19 +37,6 @@
       font-size: 15px;
     }
     .reasoning p { margin-bottom: 12px; }
-    .score-ring {
-      width: 184px;
-      height: 184px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background:
-        radial-gradient(circle at center, #111820 0 58%, transparent 59%),
-        conic-gradient(var(--good) 0 var(--score-deg), #303846 var(--score-deg) 360deg);
-      border: 1px solid var(--line);
-    }
-    .score-number { font-size: 42px; font-weight: 760; line-height: 1; }
-    .score-caption { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
     .badge {
       display: inline-flex;
       align-items: center;
@@ -138,7 +104,21 @@
       color: #f7e7ba;
       border-radius: 6px;
     }
-    code { color: var(--accent); }
+    code { color: var(--accent); overflow-wrap: anywhere; }
+    .verdict-ring {
+      width: 184px; height: 184px; border-radius: 50%;
+      border: 10px solid {{ verdict_color }};
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #111820;
+    }
+    .verdict-label { text-align: center; overflow-wrap: anywhere; max-width: 160px; font-size: 22px; font-weight: 760; color: {{ verdict_color }}; }
+    .verdict-caption { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+
+    details.asset-result { border: 1px solid var(--line); padding: 14px; margin: 10px 0; border-radius: 8px; }
+    summary { cursor: pointer; }
+    input, textarea { box-sizing: border-box; width: 100%; padding: 12px; margin: 8px 0; color: inherit; background: var(--panel); border: 1px solid var(--line); }
+    td, th { overflow-wrap: anywhere; }
+
     @media (max-width: 860px) {
       main { padding: 20px 16px 36px; }
       header { grid-template-columns: 1fr; }
@@ -152,19 +132,18 @@
 <body>
   <main>
     <header>
-      <div class="score-ring" aria-label="Stage optimization score {{ optimization_score }} out of 10">
-        <div>
-          <div class="score-number">{{ optimization_score }}</div>
-          <div class="score-caption">stage score</div>
-        </div>
+      <div class="verdict-ring" aria-label="Overall verdict: {{ verdict_label }}">
+        <div class="verdict-label">{{ verdict_label }}</div>
+        <div class="verdict-caption">Overall verdict</div>
       </div>
       <div>
         <div class="report-kicker">USD Performance Tuning Report</div>
-        <div class="badge good">{{ score_label }}</div>
+        <div class="badge">{{ completion }}</div>
         <h1>{{ asset_name }}</h1>
-        <p class="subtle">{{ executive_summary }}</p>
+        {% if report_summary %}{% else %}<p>{{ executive_summary }}</p>{% endif %}
+
         <p class="subtle">
-          Verdict: <strong>{{ verdict }}</strong> · Generated {{ timestamp }}<br>
+          Generated {{ timestamp }}<br>
           Output: <code>{{ output_path }}</code>
         </p>
       </div>
@@ -173,7 +152,7 @@
     {% if safety_gate %}
     <h2>Correctness Safety Gate</h2>
     <div class="note">
-      The Phase-2c correctness precondition. A status outside <code>resolved | clear | none | passed | not_required</code> means the run carries a known defect; the run-scoring oracle zeroes it.
+      Required composition, metadata and binding checks. A status outside <code>resolved | clear | none | passed | not_required</code> means the run carries a known defect; it cannot be reported as a successful optimization.
     </div>
     <table>
       <tbody>
@@ -184,39 +163,46 @@
     </table>
     {% endif %}
 
-    <h2>Reasoning</h2>
+    <h2>Measured results</h2>
+    <section class="grid impact-grid">
+      {% for metric in headline_metrics %}
+      <article class="card"><h3>{{ metric.display_name }}</h3>
+        <p>{{ metric.before_display }} → <strong>{{ metric.after_display }}</strong></p>
+        <p>{{ metric.change_display }}</p></article>
+      {% endfor %}
+    </section>
+    <h2>What changed</h2>
     <section class="reasoning">
       {% for paragraph in reasoning_paragraphs %}
       <p>{{ paragraph }}</p>
       {% endfor %}
     </section>
 
+    {% if execution_summary %}
+    <p>{{ execution_summary.native_definition_count }} geometry definitions processed in {{ execution_summary.native_job_count }} native worker jobs; {{ execution_summary.assembly_definition_count }} geometry-free assemblies; {{ execution_summary.reused_definition_count }} definitions reused from existing libraries. Within-scene occurrences are listed per asset below.</p>
+    {% endif %}
+    {% if report_summary %}
+    <h2>What was checked</h2>
+    {% for check in report_summary.checks %}
+    <p>{{ check }}</p>
+    {% endfor %}
+    <h2>Measurement limits</h2>
+    {% for limit in report_summary.limitations %}
+    <p class="subtle">{{ limit }}</p>
+    {% endfor %}
+    {% endif %}
     {% if notes %}
     <h2>Notes</h2>
-    <div class="note">{{ notes }}</div>
-    {% endif %}
-
-    <h2>Stage Impact Areas</h2>
-    <section class="grid impact-grid">
-      {% for group in metric_groups %}
-      <article class="card">
-        <h3>{{ group.display_name }}</h3>
-        {% if group.status == "not_measured" %}
-        <div class="metric-score subtle">Not measured</div>
-        <div class="bar"><span style="--bar-width: 100%; --bar-color: var(--unknown);"></span></div>
-        {% else %}
-        <div class="metric-score">{{ group.score_display }}</div>
-        <div class="bar"><span style="--bar-width: {{ group.score_percent }}%; --bar-color: var(--good);"></span></div>
-        {% endif %}
-        <p class="subtle">{{ group.summary }}</p>
-        {% if group.caveat %}<p class="subtle">{{ group.caveat }}</p>{% endif %}
-      </article>
+    <div class="note">
+      {% for paragraph in note_paragraphs %}
+      <p>{{ paragraph }}</p>
       {% endfor %}
-    </section>
+    </div>
+    {% endif %}
 
     <h2>Measurement Context</h2>
     <div class="note">
-      This score measures stage/composition optimization effectiveness. Runtime performance metrics such as RAM, VRAM, FPS, frame time, shader cost, and renderer activity should be captured with Omniperf or an equivalent runtime profiler and reviewed separately.
+      Stage opening and traversal timings describe USD processing. They do not measure rendering speed or memory usage.
     </div>
     <table>
       <tbody>
@@ -253,9 +239,9 @@
         {% for metric in metrics %}
         <tr>
           <td>{{ metric.display_name }}</td>
-          <td>{{ metric.before }} {{ metric.unit }}</td>
-          <td>{{ metric.after }} {{ metric.unit }}</td>
-          <td class="change {{ metric.verdict }}">{{ metric.change_pct }}%</td>
+          <td>{{ metric.before_display }}</td>
+          <td>{{ metric.after_display }}</td>
+          <td class="change {{ metric.verdict }}">{{ metric.change_display }}</td>
           <td>{{ metric.evidence_type }}</td>
           <td>{{ metric.verdict }}</td>
         </tr>
@@ -266,14 +252,14 @@
     {% if footprint %}
     <h2>Storage Footprint (repack-normalized)</h2>
     <div class="note">
-      A USDC/crate repack is the free re-encode any export achieves, not the optimization. The structural win is measured against the repack-normalized baseline, never the raw input.
+      Delivery size is compared with the original used layers re-encoded to USDC. This separates encoding savings from the measured optimization result.
     </div>
     <table>
       <tbody>
-        <tr><th>Raw input</th><td>{{ footprint.raw_input_bytes }} bytes</td></tr>
-        <tr><th>Repack-normalized baseline</th><td>{{ footprint.repack_normalized_baseline_bytes }} bytes ({{ footprint.repack_delta_pct }}% re-encode, free)</td></tr>
-        <tr><th>Optimized</th><td>{{ footprint.optimized_bytes }} bytes</td></tr>
-        <tr><th>Structural win (vs normalized baseline)</th><td>{{ footprint.structural_delta_pct }}%</td></tr>
+        <tr><th>Raw input</th><td>{{ footprint.raw_input_bytes }}</td></tr>
+        <tr><th>Repack-normalized baseline</th><td>{{ footprint.repack_normalized_baseline_bytes }} ({{ footprint.repack_delta_pct }}% encoding change)</td></tr>
+        <tr><th>Optimized</th><td>{{ footprint.optimized_bytes }}</td></tr>
+        <tr><th>Delivery-size change (vs normalized baseline)</th><td>{{ footprint.structural_delta_pct }}%</td></tr>
         <tr><th>Total raw &rarr; optimized</th><td>{{ footprint.raw_delta_pct }}%</td></tr>
       </tbody>
     </table>
@@ -291,6 +277,59 @@
     </table>
     {% endif %}
 
+    {% if assets %}
+    <h2>Results by asset</h2>
+    <p>One entry per unique definition. Geometry counts and operations cover this definition’s own geometry; child assets are reported separately. Operation time excludes assessment, publication and verification.</p>
+    <label for="asset-filter">Find an asset by name, category or prim path</label>
+    <input id="asset-filter" type="search" placeholder="Search assets" />
+    {% for asset in assets %}
+    <details class="asset-result" data-search="{{ asset.search_text }}">
+      <summary><strong>{{ asset.name }}</strong> · {{ asset.semantic_category }} · {{ asset.structural_type }} · {{ asset.disposition }} · {{ asset.occurrence_count }} occurrence(s)</summary>
+      <p>Source prim: <code>{{ asset.source_prim_path }}</code><br>Definition: <code>{{ asset.definition_id }}</code></p>
+      <p><strong>Boundary decision:</strong> {% if asset.boundary_reason %}{{ asset.boundary_reason }}{% else %}Not recorded.{% endif %}</p>
+      {% if asset.equipment_family %}<p><strong>Equipment family:</strong> {{ asset.equipment_family }}</p>{% endif %}
+      {% if asset.structure_reason %}<p><strong>Structure:</strong> {{ asset.structure_reason }}</p>{% endif %}
+      {% if asset.independent_use %}<p><strong>Independent use:</strong> {{ asset.independent_use }}</p>{% endif %}
+      {% if asset.reused_from_library %}<p>Reused from an existing library. Prior optimization history is shown separately below.</p>{% endif %}
+      <details><summary>{{ asset.occurrence_count }} occurrence(s) in this scene</summary>
+        {% for path in asset.occurrences %}<p><code>{{ path }}</code></p>{% endfor %}
+      </details>
+      {% if asset.child_names %}
+      <details><summary>Child assets (reported separately)</summary><ul>
+        {% for name in asset.child_names %}<li>{{ name }}</li>{% endfor %}
+      </ul></details>
+      {% endif %}
+      <table><thead><tr><th>Own geometry</th><th>Before</th><th>After</th></tr></thead><tbody>
+        {% for metric in asset.metrics %}<tr><td>{{ metric.name }}</td><td>{{ metric.before }}</td><td>{{ metric.after }}</td></tr>{% endfor %}
+      </tbody></table>
+      <p>Native operation time in this run: {{ asset.operation_seconds }}</p>
+      {% if asset.operation_groups %}
+      <table><thead><tr><th>Operation (execution order)</th><th>Outcomes</th></tr></thead><tbody>
+        {% for group in asset.operation_groups %}<tr><td>{{ group.name }}</td><td>{{ group.outcomes }}</td></tr>{% endfor %}
+      </tbody></table>
+      {% else %}<p>No native geometry operations recorded in this run.</p>{% endif %}
+      {% if asset.prior_operations %}
+      <details><summary>Prior optimization history — not executed in this run</summary>
+        <table><thead><tr><th>#</th><th>Operation</th><th>Outcome</th><th>Prior time</th><th>Recorded reason</th></tr></thead><tbody>
+          {% for op in asset.prior_operations %}<tr><td>{{ op.order }}</td><td>{{ op.name }}</td><td>{{ op.status }}</td><td>{{ op.seconds_display }}</td><td>{{ op.reason }}</td></tr>{% endfor %}
+        </tbody></table>
+      </details>
+      {% endif %}
+      {% for retained in asset.retained_geometry %}<p>{{ retained.category }}: {{ retained.reason }}</p>{% endfor %}
+      <details><summary>Operation details in execution order</summary>
+        <table><thead><tr><th>#</th><th>Operation</th><th>Outcome</th><th>Time</th><th>Recorded reason</th></tr></thead><tbody>
+          {% for op in asset.operations %}<tr><td>{{ op.order }}</td><td>{{ op.name }}</td><td>{{ op.status }}</td><td>{{ op.seconds_display }}</td><td>{{ op.reason }}</td></tr>{% endfor %}
+        </tbody></table>
+      </details>
+    </details>
+    {% endfor %}
+    {% if shared_operations %}
+    <h3>Shared material library operations</h3>
+    <table><thead><tr><th>Operation</th><th>Result</th></tr></thead><tbody>
+      {% for op in shared_operations %}<tr><td>{{ op.name }}</td><td>{{ op.result }}</td></tr>{% endfor %}
+    </tbody></table>
+    {% endif %}
+    {% else %}
     <h2>Operations</h2>
     <table>
       <thead><tr><th>#</th><th>Operation</th><th>Method</th><th>Result</th></tr></thead>
@@ -300,6 +339,15 @@
         {% endfor %}
       </tbody>
     </table>
+
+    {% endif %}
+    <h2>Next-run instructions</h2>
+    {% if next_run_text %}
+    <p>Suggestions from recorded findings. Edit and copy these instructions to steer a subsequent run. Edits here are not saved.</p>
+    <textarea aria-label="Next-run instructions" rows="5">{{ next_run_text }}</textarea>
+    {% else %}
+    <p>No next-run instructions recorded. This does not establish that no further optimization is possible.</p>
+    {% endif %}
 
     <h2>Validators</h2>
     <table>
@@ -311,5 +359,14 @@
       </tbody>
     </table>
   </main>
+<script>
+const filter = document.getElementById('asset-filter');
+if (filter) filter.addEventListener('input', () => {
+  const query = filter.value.toLowerCase();
+  document.querySelectorAll('.asset-result').forEach(asset => {
+    asset.hidden = !asset.dataset.search.toLowerCase().includes(query);
+  });
+});
+</script>
 </body>
 </html>
