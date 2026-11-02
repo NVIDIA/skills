@@ -173,7 +173,7 @@ RESTRUCTURE_ROLES = dcc.RESTRUCTURE_ROLES
 
 
 def _is_number(value: Any) -> bool:
-    """True for a real JSON number. ``bool`` is an ``int`` in Python and is not one."""
+    """True for a real JSON number. Python counts a bool as an int; JSON does not."""
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
