@@ -14,4 +14,4 @@ skills:
 links:
   contributing: CONTRIBUTING.md
   discussions: false
-  security: false
+  security: true
