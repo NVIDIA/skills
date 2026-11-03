@@ -4,11 +4,11 @@ These pairs sound similar but are different things. When in doubt,
 come back to the router.
 
 - **NuRec vs NRE.** NuRec is the product name; NRE is the engine
-  inside it. Both map to the upstream `nre` skill.
+  inside it. Both map to the upstream `nurec` skill.
 - **NRE's built-in Fixer vs standalone DiffusionHarmonizer.** `nre`'s
   `--enable-difix` flag is an inline NRE rendering feature that runs
   a built-in Fixer / Difix3D+ variant inside the NRE container as it
-  renders. The `nurec-fixer` skill wraps the standalone public
+  renders. The `harmonizer` skill wraps the standalone public
   **NVIDIA DiffusionHarmonizer** release — code at
   <https://github.com/NVIDIA/harmonizer>, model at
   <https://huggingface.co/nvidia/Harmonizer>, paired data at
@@ -18,21 +18,22 @@ come back to the router.
   layered on `nvcr.io/nvidia/pytorch:25.10-py3`), and it also pulls
   the base model `nvidia/Cosmos-Predict2-0.6B-Text2Image`. Default to
   the built-in `--enable-difix` for live rendering; reach for
-  `nurec-fixer` when you need the public code/model card, paired
+  `harmonizer` when you need the public code/model card, paired
   evaluation, fine-tuning, or fixes on frames that were rendered
   earlier without re-running NRE. Do not assume the two paths share
   cache layout or weights unless the NRE tag's own docs say so.
-- **`ncore` vs `nre`.** They run **in order**, never as alternatives.
-  `ncore` produces the input format; `nre` reads it. (Older
-  snapshots called this skill `ncore-data-conversion`; update any
-  stale links to `ncore`.)
+- **`ncore-data-conversion` vs `nurec`.** They run **in order**, never
+  as alternatives. `ncore-data-conversion` produces the input format;
+  `nurec` reads it. (Older snapshots called this skill `ncore`;
+  update any stale links to `ncore-data-conversion`.)
 - **`asset-harvester` vs `nre`'s `export-external-assets`.** Asset
   Harvester **produces** the per-object `.ply` files; `nre`'s
   `export-external-assets` **packages** them into a USDZ. Always
-  Asset Harvester first.
+  Asset Harvester first. The owning skill for that command is
+  `nurec`.
 - **Carline adaptation vs retraining.** Carline adaptation reuses an
   existing USDZ and renders it through an augmented target rig
-  (`export-custom-rig-trajectory` → `render` → `nurec-fixer`). It is
+  (`export-custom-rig-trajectory` → `render` → `harmonizer`). It is
   not a retrain and needs no NCore clip.
 - **`Cosmos-Drive-Dreams` vs `PhysicalAI-Autonomous-Vehicles-NuRec`.**
   Both are AV datasets on Hugging Face, both managed by
