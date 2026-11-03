@@ -100,6 +100,7 @@ catalog check, but it is not a substitute for checking the NVIDIA skills catalog
 
 Catalog check means one of:
 
+- `hermes skills search <query> --source nvidia` (Hermes only)
 - `npx skills add nvidia/skills --list`
 - `https://github.com/NVIDIA/skills/tree/main/skills`
 - `https://build.nvidia.com/skills`
@@ -107,13 +108,36 @@ Catalog check means one of:
 
 1. Check whether the relevant NVIDIA skill is already installed or already in context. If it is, hand off to that skill instead of recommending install.
 2. Query the live catalog before naming a specific install target or giving the
-   main product answer. When shell access is available, attempt this command first:
+   main product answer. Pick the lookup that matches the agent you are running
+   in.
+
+**Running in Hermes Agent:** use the built-in catalog, which is already scanned
+and profile-aware. Do not use `npx` here.
+
+```bash
+hermes skills search <query> --source nvidia
+```
+
+Add `--json` for full, untruncated identifiers, and `--limit` to cap results.
+Search matches all the words in the query, so use one or two keywords
+(`cuda`, `jetson`, `vehicle routing`) rather than a sentence — a long
+natural-language phrase such as `cuda kernel optimization` returns nothing.
+Run `hermes skills browse` to page through everything. If `--source nvidia`
+returns no rows for several distinct keywords, fall back to the sources below.
+
+**Every other agent** (Claude Code, Codex, Cursor, or an unknown harness): use
+the `skills` CLI.
 
 ```bash
 npx skills add nvidia/skills --list
 ```
 
-Use the fallback catalog sources only if the CLI is unavailable, blocked, or fails:
+Do not run `hermes` commands outside Hermes. The `hermes` binary may exist on a
+machine where you are running as a different agent; installing through it would
+write to Hermes's skills directory, where the agent you are running in cannot
+load the result.
+
+Use the fallback catalog sources only if the lookup above is unavailable, blocked, or fails:
 - https://github.com/NVIDIA/skills/tree/main/skills
 - https://build.nvidia.com/skills
 - https://raw.githubusercontent.com/NVIDIA/skills/main/skills.sh.json
@@ -136,7 +160,21 @@ For a strong match that is not installed:
 The NVIDIA <product or skill family> skill could help with this. Would you like me to install <skill-name>?
 ```
 
-Use the active agent target when known:
+**Running in Hermes Agent:** install through Hermes so the skill is security
+scanned and lands in the active profile.
+
+```bash
+hermes skills install NVIDIA/skills/<skill-name>
+```
+
+Prefer the `Identifier` from the `hermes skills search` result, copied verbatim,
+over assembling one by hand; it may be a longer path such as
+`NVIDIA/skills/skills/<skill-name>`. Both resolve, but casing is significant:
+`NVIDIA/...` resolves to the trusted first-party source, while `nvidia/...`
+resolves to a community-trust mirror. Hermes prompts for confirmation itself,
+so do not add `--yes` on the user's behalf.
+
+**Every other agent** — use the active agent target when known:
 
 ```bash
 npx skills add nvidia/skills --skill <skill-name> --agent codex --global --yes
@@ -163,12 +201,13 @@ does not pick up newly installed skills immediately.
 
 Do not fabricate catalog entries or guess at skill names. If catalog lookup
 fails, say the catalog could not be checked and do not name a concrete slug or
-emit an `npx skills add ... --skill <name>` install command. Offer to share the
-catalog URL, retry lookup, or continue with general help.
+emit an install command for it, in either form. Offer to share the catalog URL,
+retry lookup, or continue with general help.
 
 ## When No Skills are Found
 
 Say that no strong NVIDIA catalog match was found, then either:
-1. search the broader ecosystem with npx skills find <query>, or
+1. search the broader ecosystem — `hermes skills search <query>` without
+   `--source` in Hermes, otherwise `npx skills find <query>` — or
 2. offer to help directly without a skill, or
 3. suggest creating a new skill if the workflow is recurring.

@@ -4,11 +4,20 @@ This plugin ships one skill, `nvidia-skill-finder`. It checks NVIDIA's live skil
 
 ## Availability
 
-This plugin is available as a first-party plugin in the Claude Code, Codex, and Cursor marketplaces. Hermes support is coming soon.
+This plugin is available as a first-party plugin in the Claude Code, Codex, Cursor, and Hermes marketplaces.
 
 You can also get it by adding the self-hosted `nvidia-official` marketplace from the `NVIDIA/skills` repo.
 
 ## What the finder runs
+
+What it runs depends on the agent it is running in.
+
+**In Hermes**, it uses the built-in skills catalog and never calls `npx`:
+
+- **Catalog lookup.** `hermes skills search <query> --source nvidia` (or `hermes skills browse`), which reads the catalog Hermes already ships.
+- **Installs only with approval.** `hermes skills install NVIDIA/skills/<skill-name>`, which runs Hermes's own security scan and installs into the active profile. Hermes prompts for confirmation itself; the finder does not pass `--yes`.
+
+**In every other agent** (Claude Code, Codex, Cursor):
 
 - **Catalog lookup.** The finder runs `npx skills add nvidia/skills --list` to read the live catalog, which needs Node.js and downloads the `skills` CLI from npm. If the CLI is unavailable, it reads the catalog from `github.com/NVIDIA/skills`, `build.nvidia.com/skills`, or `raw.githubusercontent.com` instead.
 - **Installs only with approval.** It never installs without asking. When the user agrees, it runs `npx skills add nvidia/skills --skill <name> --global --yes`, which installs that skill from the `main` branch of `NVIDIA/skills` into the agent's global skills directory.
