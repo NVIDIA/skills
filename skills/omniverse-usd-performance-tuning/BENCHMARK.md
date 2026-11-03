@@ -10,7 +10,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `omniverse-usd-performance-tuning`
 - Validation status: `passed`
-- Evaluation date: 2026-11-02
+- Evaluation date: 2026-11-03
 - Evaluator version: `1.6.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 10 evaluation tasks (9 positive, 1 negative)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 75.8% — baseline ran, but no comparable score was available; uplift unavailable | 78.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 79.4% — baseline ran, but no comparable score was available; uplift unavailable | 78.9% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 90.0% (-10.0 points) | 90.0% → 100.0% (+10.0 points) |
-| Correctness | 60.0% → 76.0% (+16.0 points) | 66.0% → 84.0% (+18.0 points) |
-| Discoverability | 78.9% — baseline ran, but no comparable score was available; uplift unavailable | 76.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 40.3% → 55.5% (+15.2 points) | 45.8% → 57.9% (+12.1 points) |
-| Efficiency | 78.6% — baseline ran, but no comparable score was available; uplift unavailable | 74.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 86.0% (+26.0 points) | 60.0% → 82.0% (+22.0 points) |
+| Discoverability | 82.8% — baseline ran, but no comparable score was available; uplift unavailable | 76.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 36.6% → 60.4% (+23.8 points) | 36.6% → 57.2% (+20.6 points) |
+| Efficiency | 77.6% — baseline ran, but no comparable score was available; uplift unavailable | 79.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 88.4% → 85.7% (-2.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 89.8% → 82.4% (-7.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 85.0% → 79.2% (-5.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 86.1% → 81.2% (-4.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,29 +80,29 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 7,414,490 | 3,447,634 | +3,966,856 | +115.06% | skill 10/10; base 10/10 |
-| claude-code | usd-performance-broad-optimization-flow | 494,353 | 586,825 | -92,472 | -15.76% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-destructive-op-approval | 375,980 | 605,643 | -229,663 | -37.92% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-expensive-validation-approval | 4,379,560 | 490,583 | +3,888,977 | +792.73% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-no-overwrite-source | 414,410 | 208,228 | +206,182 | +99.02% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-quality-budget-not-triangle-budget | 444,638 | 298,689 | +145,949 | +48.86% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-report-schema-conformance | 150,133 | 187,484 | -37,351 | -19.92% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-runtime-preflight-gate | 433,568 | 603,928 | -170,360 | -28.21% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-structural-only-report | 541,085 | 286,130 | +254,955 | +89.10% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-viewer-build-distractor-negative | 35,751 | 35,744 | +7 | +0.02% | skill 1/1; base 1/1 |
-| claude-code | usd-performance-zero-work-operation | 145,012 | 144,380 | +632 | +0.44% | skill 1/1; base 1/1 |
-| codex | All cases | 4,676,096 | 2,322,905 | +2,353,191 | +101.30% | skill 10/10; base 10/10 |
-| codex | usd-performance-broad-optimization-flow | 412,119 | 358,167 | +53,952 | +15.06% | skill 1/1; base 1/1 |
-| codex | usd-performance-destructive-op-approval | 276,085 | 278,140 | -2,055 | -0.74% | skill 1/1; base 1/1 |
-| codex | usd-performance-expensive-validation-approval | 767,016 | 474,406 | +292,610 | +61.68% | skill 1/1; base 1/1 |
-| codex | usd-performance-no-overwrite-source | 292,841 | 186,489 | +106,352 | +57.03% | skill 1/1; base 1/1 |
-| codex | usd-performance-quality-budget-not-triangle-budget | 412,686 | 252,324 | +160,362 | +63.55% | skill 1/1; base 1/1 |
-| codex | usd-performance-report-schema-conformance | 611,473 | 182,857 | +428,616 | +234.40% | skill 1/1; base 1/1 |
-| codex | usd-performance-runtime-preflight-gate | 732,768 | 218,931 | +513,837 | +234.70% | skill 1/1; base 1/1 |
-| codex | usd-performance-structural-only-report | 548,884 | 257,121 | +291,763 | +113.47% | skill 1/1; base 1/1 |
-| codex | usd-performance-viewer-build-distractor-negative | 37,576 | 26,621 | +10,955 | +41.15% | skill 1/1; base 1/1 |
-| codex | usd-performance-zero-work-operation | 584,648 | 87,849 | +496,799 | +565.51% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 12,090,586 | 5,770,539 | +6,320,047 | +109.52% | skill 20/20; base 20/20 |
+| claude-code | All cases | 6,706,896 | 3,093,234 | +3,613,662 | +116.82% | skill 10/10; base 10/10 |
+| claude-code | usd-performance-broad-optimization-flow | 678,645 | 532,071 | +146,574 | +27.55% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-destructive-op-approval | 309,506 | 496,764 | -187,258 | -37.70% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-expensive-validation-approval | 1,670,524 | 346,372 | +1,324,152 | +382.29% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-no-overwrite-source | 418,774 | 351,316 | +67,458 | +19.20% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-quality-budget-not-triangle-budget | 543,103 | 223,488 | +319,615 | +143.01% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-report-schema-conformance | 1,289,622 | 187,833 | +1,101,789 | +586.58% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-runtime-preflight-gate | 635,290 | 430,375 | +204,915 | +47.61% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-structural-only-report | 980,372 | 308,288 | +672,084 | +218.01% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-viewer-build-distractor-negative | 35,986 | 35,825 | +161 | +0.45% | skill 1/1; base 1/1 |
+| claude-code | usd-performance-zero-work-operation | 145,074 | 180,902 | -35,828 | -19.81% | skill 1/1; base 1/1 |
+| codex | All cases | 4,825,372 | 2,202,842 | +2,622,530 | +119.05% | skill 10/10; base 10/10 |
+| codex | usd-performance-broad-optimization-flow | 380,616 | 327,709 | +52,907 | +16.14% | skill 1/1; base 1/1 |
+| codex | usd-performance-destructive-op-approval | 248,592 | 251,168 | -2,576 | -1.03% | skill 1/1; base 1/1 |
+| codex | usd-performance-expensive-validation-approval | 930,589 | 314,874 | +615,715 | +195.54% | skill 1/1; base 1/1 |
+| codex | usd-performance-no-overwrite-source | 335,037 | 300,793 | +34,244 | +11.38% | skill 1/1; base 1/1 |
+| codex | usd-performance-quality-budget-not-triangle-budget | 426,719 | 235,931 | +190,788 | +80.87% | skill 1/1; base 1/1 |
+| codex | usd-performance-report-schema-conformance | 529,614 | 181,246 | +348,368 | +192.21% | skill 1/1; base 1/1 |
+| codex | usd-performance-runtime-preflight-gate | 593,564 | 251,186 | +342,378 | +136.30% | skill 1/1; base 1/1 |
+| codex | usd-performance-structural-only-report | 1,024,821 | 232,254 | +792,567 | +341.25% | skill 1/1; base 1/1 |
+| codex | usd-performance-viewer-build-distractor-negative | 33,326 | 21,207 | +12,119 | +57.15% | skill 1/1; base 1/1 |
+| codex | usd-performance-zero-work-operation | 322,494 | 86,474 | +236,020 | +272.94% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 11,532,268 | 5,296,076 | +6,236,192 | +117.75% | skill 20/20; base 20/20 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
