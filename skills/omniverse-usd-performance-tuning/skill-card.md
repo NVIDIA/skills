@@ -16,7 +16,7 @@ Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Optional] <br>
-**Credential Type(s):** [OAuth Token] <br>
+**Credential Type(s):** [OAuth Token, Service Account] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -75,12 +75,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 75.8% — baseline ran, but no comparable score was available; uplift unavailable | 78.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 79.4% — baseline ran, but no comparable score was available; uplift unavailable | 78.9% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 90.0% (-10.0 points) | 90.0% → 100.0% (+10.0 points) |
-| Correctness | 60.0% → 76.0% (+16.0 points) | 66.0% → 84.0% (+18.0 points) |
-| Discoverability | 78.9% — baseline ran, but no comparable score was available; uplift unavailable | 76.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 40.3% → 55.5% (+15.2 points) | 45.8% → 57.9% (+12.1 points) |
-| Efficiency | 78.6% — baseline ran, but no comparable score was available; uplift unavailable | 74.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 60.0% → 86.0% (+26.0 points) | 60.0% → 82.0% (+22.0 points) |
+| Discoverability | 82.8% — baseline ran, but no comparable score was available; uplift unavailable | 76.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 36.6% → 60.4% (+23.8 points) | 36.6% → 57.2% (+20.6 points) |
+| Efficiency | 77.6% — baseline ran, but no comparable score was available; uplift unavailable | 79.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.5.0 (source: frontmatter, CHANGELOG) <br>
