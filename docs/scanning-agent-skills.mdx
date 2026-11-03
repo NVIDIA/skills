@@ -68,6 +68,20 @@ skillspector scan https://github.com/user/my-skill
 skillspector scan ./my-skill.zip
 ```
 
+## Inspect locked npm dependencies
+
+Advisory lookups identify known vulnerable releases. To also inspect the code shipped in locked npm packages, opt in to dependency content inspection:
+
+```bash
+skillspector scan ./my-skill/ --inspect-dependencies --no-llm --fail-on-incomplete
+```
+
+The scanner reads `package-lock.json` or `npm-shrinkwrap.json` lockfile versions 2 and 3, including recorded transitive, development, and optional dependencies. It downloads credential-free HTTPS tarballs from the public npm registry, verifies their SHA-512 integrity, and applies local static checks to supported package contents without installing packages or executing their code.
+
+Inspection requires Linux on x86-64 or AArch64 with seccomp filter synchronization available. Missing locks, unsupported sources or platforms, and failed inspections leave coverage incomplete and prevent a `SAFE` recommendation. `--fail-on-incomplete` also makes incomplete scans exit with a failure status.
+
+See [Locked npm dependency content inspection](https://github.com/NVIDIA/SkillSpector/blob/main/docs/DEPENDENCY_CONTENT_INSPECTION.md) for supported content, resource limits, and configuration.
+
 ## Choose an Output Format
 
 Use terminal output while iterating locally, JSON for automation, Markdown for review packets, and SARIF for CI or code scanning systems.
@@ -119,4 +133,5 @@ Use scan results as one of the release gates. Scanning determines whether a skil
 | Description-behavior mismatch | Rewrite the skill description or change the code |
 
 The goal is not just a clean report. The goal is a skill whose declared purpose, permissions, code, and documented risks all agree.
+
 
