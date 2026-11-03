@@ -747,7 +747,7 @@
     {
       "path": "skills/data-designer",
       "name": "data-designer",
-      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline.",
+      "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline. The argument is the description of the dataset to generate.",
       "metadata": {
         "product.primary": "NeMo",
         "classification.category.primary": "ai_and_machine_learning",
@@ -3711,11 +3711,11 @@
     {
       "path": "skills/omniverse-usd-performance-tuning",
       "name": "omniverse-usd-performance-tuning",
-      "description": "Top-level workflow skill for USD performance diagnosis and optimization. Handles slow loading, high memory, low FPS, and broad scene-optimization requests; delegates auth/runtime setup to Phase 0 owners.",
+      "description": "Diagnose and optimize USD stages for slow loading, high memory, low FPS or validation; preserve asset boundaries and reuse shared definitions.",
       "metadata": {
         "product.primary": "Omniverse",
         "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
+        "catalog.subdomain": "digital-twins",
         "audience": "developer,simulation_engineer,application_developer",
         "discovery.activity_tags": "profile,optimize,validate,measure"
       }

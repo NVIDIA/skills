@@ -438,9 +438,9 @@
     {
       "name": "data-designer",
       "path": "skills/data-designer",
-      "content_digest": "sha256:9f553d874886420da17fd22a67f2214dc9a89953588fbf0787ede7cccd80b7c6",
-      "last_commit": "21777e6a413055903cd0d9329d1efb918b30f817",
-      "last_modified": "2026-10-26"
+      "content_digest": "sha256:99a666705cbe85a36f9338a3e6c677fb44d486f6a536be3688ec660cefa8a6cb",
+      "last_commit": "fea423859bdc70e92d95d0b1e84ac4e0c630db24",
+      "last_modified": "2026-11-03"
     },
     {
       "name": "deepstream-dev",
@@ -2167,9 +2167,9 @@
     {
       "name": "omniverse-usd-performance-tuning",
       "path": "skills/omniverse-usd-performance-tuning",
-      "content_digest": "sha256:14507580e1707c9664401775d5d2c3b3ec8e2f8e80e3926efc6e9af440b4ed86",
-      "last_commit": "afbce3f428130e0b5753d4553a8826cba1a42d30",
-      "last_modified": "2026-08-24"
+      "content_digest": "sha256:3ce5d62ac6cb3513ab8fbfb29f8c7f326843f5f4dc469973aba70fb6481deb38",
+      "last_commit": "9a0c79f866bb55cfb22135aa4161dfb41ba88685",
+      "last_modified": "2026-11-03"
     },
     {
       "name": "ovnewton-usage",

@@ -80,7 +80,6 @@
         "jetson-video-capability",
         "omniverse-cad-to-simready",
         "omniverse-realtime-viewer",
-        "omniverse-usd-performance-tuning",
         "paidf-cosmos-predict",
         "physical-ai-defect-image-generation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
@@ -254,7 +253,8 @@
       "title": "Digital Twins",
       "description": "Build, simulate, connect, and operate digital representations of physical systems, environments, factories, and assets.",
       "skills": [
-        "omniverse-content-services"
+        "omniverse-content-services",
+        "omniverse-usd-performance-tuning"
       ]
     },
     {
