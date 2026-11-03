@@ -33,7 +33,9 @@ Mitigation: Review and scan skill before deployment. <br>
 - [mix-ups.md](references/mix-ups.md) <br>
 - [maintenance.md](references/maintenance.md) <br>
 - [teardown.md](references/teardown.md) <br>
-- [NVIDIA NuRec Skills (GitHub)](https://github.com/NVIDIA/nurec-skills) <br>
+- [NVIDIA NuRec (GitHub)](https://github.com/NVIDIA/nurec) <br>
+- [NVIDIA NCore (GitHub)](https://github.com/NVIDIA/ncore) <br>
+- [NVIDIA Harmonizer (GitHub)](https://github.com/NVIDIA/harmonizer) <br>
 - [NVIDIA Asset Harvester (GitHub)](https://github.com/NVIDIA/asset-harvester) <br>
 
 

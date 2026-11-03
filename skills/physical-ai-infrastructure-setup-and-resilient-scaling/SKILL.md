@@ -190,9 +190,11 @@ are mandatory:
 
 - Video Data Augmentation: use `skills/physical-ai-video-data-augmentation/SKILL.md`.
 - Defect Image Generation: use `skills/physical-ai-defect-image-generation/SKILL.md`.
-- NuRec carline adaptation: use `skills/carline-adaptation/SKILL.md`.
-- NRE, NCore, and Asset Harvester live in the canonical NuRec catalog listed in
-  `skills/INDEX.md`.
+- NuRec carline adaptation: use [`nurec`](https://github.com/NVIDIA/nurec/blob/main/skills/nurec/references/carline-adaptation.md).
+- NRE, NCore, and Asset Harvester live in their product repos:
+  [`NVIDIA/nurec`](https://github.com/NVIDIA/nurec/blob/main/skills/nurec/SKILL.md),
+  [`NVIDIA/ncore`](https://github.com/NVIDIA/ncore/blob/main/skills/ncore-data-conversion/SKILL.md),
+  and [`NVIDIA/asset-harvester`](https://github.com/NVIDIA/asset-harvester/blob/main/skills/asset-harvester/SKILL.md).
 - Custom workload: submit the provided workflow YAML through OSMO after checking
   resource requests, image credentials, data credentials, and inference URLs.
 

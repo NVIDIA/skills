@@ -1,96 +1,75 @@
 # Locating and Fetching Upstream Skills
 
-The canonical NuRec router (named `nurec-index`) and four of its five
-sibling skills live in `https://github.com/NVIDIA/nurec-skills` under
-`skills/<name>/SKILL.md`. **`asset-harvester` is the exception** — it is
-maintained in its own product repo; see the next section.
+Each sibling skill ships from its own product repo. Use the
+**Skill source** column in `SKILL.md` (and the matching
+`metadata.upstream.sibling_skills` entries) for the registered
+`name`, `skill_repo`, and `skill_path`. Companion files
+(`references/`, `scripts/`, `assets/`) live next to that sibling's
+`SKILL.md`, not next to this router.
 
-The `nurec-skills` repo also exposes `.agents/skills` as a
-symlink onto `skills/`, so both paths resolve to the same tree. Refer
-to a sibling skill by its `name:` (e.g. `nre`) — that name is portable
-across agent runtimes that implement the `agentskills.io` standard.
-The folder name always matches the skill `name:` (e.g. the `ncore`
-skill lives at `skills/ncore/`).
+There is no shared product-repo namespace and no upstream index to
+fetch. This catalog router owns its picker tables and workflow
+letters.
 
-## `asset-harvester` — fetched from its own repo
+## `asset-harvester` and `physical-ai-datasets` — canonical product source
 
-That skill ships from
-[`NVIDIA/asset-harvester`](https://github.com/NVIDIA/asset-harvester) under
-`skills/asset-harvester/` and is maintained there.
+Those two skills kept their names. A generic same-name local hit may
+be the retired bundled copy. Use their product-repo homes:
 
-**Do not read it from a `nurec-skills` checkout.** That copy still exists but
-is no longer updated, so reading it silently yields stale guidance instead of
-failing.
+- [`NVIDIA/asset-harvester`](https://github.com/NVIDIA/asset-harvester)
+  under `skills/asset-harvester/`
+- [`NVIDIA/nurec`](https://github.com/NVIDIA/nurec) under
+  `skills/physical-ai-datasets/`
 
-Fetch it as you would any other upstream. **[Ask before
-cloning](#ask-before-cloning)** applies here too — it is a network fetch plus
-a local write. Companion files (`references/`, `scripts/`) sit beside its
-`SKILL.md`.
+A canonical definition already acquired for this task can be reused.
 
-## Where to look on the local disk (try in order)
+## Where to look on the local disk
 
-This applies to the four `nurec-skills`-hosted siblings only. It does **not**
-override the `asset-harvester` exception above — a local copy of that one may
-be the stale `nurec-skills` version, so do not read it from here.
+For `ncore-data-conversion`, `nurec`, and `harmonizer`, try in this
+order. A matching installed definition can be read locally without a
+mandatory network refresh. If it is a symlink, read the selected
+definition and its own companion files. Do not search broad developer
+workspaces.
 
 1. `.agents/skills/<name>/SKILL.md` (Cursor, Codex, NemoClaw)
 2. `.claude/skills/<name>/SKILL.md` (Claude Code)
 3. `.cursor/skills/<name>/SKILL.md` (project-scoped)
 4. `~/.cursor/skills/<name>/SKILL.md` (personal skills)
-5. An existing `nurec-skills` clone under the shared upstream root.
+
+This local eligibility does **not** apply to `physical-ai-datasets`
+or `asset-harvester` — see the previous section.
+
+Do not read sibling skills from a `nurec-skills` checkout: those
+copies are retired and may still exist. Use each skill's product-repo
+home. In particular, `physical-ai-datasets` and `asset-harvester`
+kept their names, so a generic same-name local hit may be the old
+copy. Renamed skills may resolve locally under their current names;
+never fall back to the retired `ncore`, `nre` or `nurec-fixer`
+skill folders.
+
+Never accept a definition known to originate from the retired bundle
+merely because someone renamed its local directory.
 
 ## Ask before cloning
 
-> **Do not auto-clone.** The step below performs a **network fetch**
-> of an external GitHub repository **and writes to the local
-> filesystem**. That can violate organizational network/security
-> policy and exposes the user to supply-chain risk if the upstream is
-> ever tampered with. Show the user the exact command and get explicit
-> consent (e.g. "OK to `git clone
-> https://github.com/NVIDIA/nurec-skills` into `<DIR>`?") **before**
-> running it. Prefer a pinned tag or SHA (`--branch <tag-or-sha>`)
-> over `HEAD`, prefer fetching only the needed `SKILL.md` when the
-> layout allows it, and never silently default to `/tmp`.
->
-> If the user declines, stop and report which sibling skill is
-> missing. Do not fall back to silent network access.
+> Before cloning a product repo or fetching an update to obtain a
+> missing skill, show the user the selected repo, the skill path and
+> the exact retrieval action and local destination. Get explicit
+> consent before that network fetch and filesystem write. If consent
+> is declined, report which skill is unavailable; do not silently
+> fetch or fall back to the retired copy.
 
-## Clone or refresh the upstream
+This does not require a new approval to read an already usable local
+renamed skill, and it does not redefine ordinary read-only
+documentation browsing as installation. The router supplies no
+executable retrieval command, default directory, branch-switching
+sequence or cache-refresh policy. Do not reuse an old clone or
+change a user's current branch as an implied part of lookup.
 
-Use the shared upstream root unless the user has set a NuRec-specific
-override:
+If the selected current definition is unavailable after local lookup,
+follow this consent step before obtaining it from the mapped product
+repo. Missing a renamed local skill never falls back to an old folder
+or clone.
 
-```bash
-UPSTREAM_ROOT="${NUREC_SKILLS_UPSTREAM_ROOT:-${PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT:-$HOME/.physical-ai-skill-hub/upstreams}}"
-mkdir -p "$UPSTREAM_ROOT"
-if [ -d "$UPSTREAM_ROOT/nurec-skills/.git" ]; then
-  git -C "$UPSTREAM_ROOT/nurec-skills" fetch --tags
-  git -C "$UPSTREAM_ROOT/nurec-skills" checkout main
-  git -C "$UPSTREAM_ROOT/nurec-skills" pull --ff-only
-else
-  # Only after the user has agreed to the clone.
-  git clone --depth 1 https://github.com/NVIDIA/nurec-skills.git \
-    "$UPSTREAM_ROOT/nurec-skills"
-fi
-test -f "$UPSTREAM_ROOT/nurec-skills/skills/nurec-index/SKILL.md"
-```
-
-Then read the upstream skill before running any mutating command:
-
-```bash
-# Upstream router (table of contents), name: nurec-index
-cat "$UPSTREAM_ROOT/nurec-skills/skills/nurec-index/SKILL.md"
-
-# Sibling skills (replace <folder> per the table in SKILL.md):
-cat "$UPSTREAM_ROOT/nurec-skills/skills/<folder>/SKILL.md"
-```
-
-Skills that pin a specific upstream commit ship the actual file under
-`skills/<folder>/_versions/<branch>/<commit>/SKILL.md` with a
-top-level `<folder>/SKILL.md` symlink to the currently-selected
-version. Follow the symlink; don't hand-pick a `_versions/` path
-unless the user asked for a specific revision.
-
-Companion files (`references/`, `scripts/`, `assets/`) live next to
-**the sibling skill's** `SKILL.md`, not next to this router. Open the
-sibling skill first and follow its References section.
+Read the selected definition before running any mutating command.
+Open its own References section on demand.
