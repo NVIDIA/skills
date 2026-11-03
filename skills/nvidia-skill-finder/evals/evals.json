@@ -7,7 +7,7 @@
     "ground_truth": "The agent identifies Decision Optimization as a strong NVIDIA taxonomy match, checks the live NVIDIA skills catalog, and recommends a current cuOpt routing skill rather than implementing a routing solver from memory.",
     "expected_behavior": [
       "Treats vehicle routing as a strong NVIDIA Decision Optimization signal",
-      "Checks the live NVIDIA catalog (e.g. `npx skills add nvidia/skills --list`) before naming a specific skill",
+      "Checks the live NVIDIA catalog before naming a specific skill, using the lookup for the current agent (`hermes skills search <query> --source nvidia` in Hermes, otherwise `npx skills add nvidia/skills --list`)",
       "Recommends a cuOpt routing-related skill if present in the catalog",
       "Asks before installing the skill",
       "Does not implement a routing solver before offering the skill"
@@ -99,7 +99,7 @@
     "ground_truth": "The agent treats Jetson driver installation as a strong NVIDIA Robotics / Jetson workflow signal, checks the live NVIDIA catalog before naming a skill, and recommends the current Jetson setup or quick-start skill if available.",
     "expected_behavior": [
       "Invokes the NVIDIA skill finder for the Jetson driver / JetPack / BSP request",
-      "Attempts `npx skills add nvidia/skills --list` when shell access is available, or uses an approved catalog fallback if the CLI is unavailable",
+      "Attempts the catalog lookup for the current agent when shell access is available (`hermes skills search <query> --source nvidia` in Hermes, otherwise `npx skills add nvidia/skills --list`), or uses an approved catalog fallback if it is unavailable",
       "Does not count developer.nvidia.com or docs.nvidia.com product documentation as the live catalog check",
       "Recommends a Jetson setup skill (e.g. jetson-quick-start) if present",
       "Explains that Jetson drivers are normally bundled with JetPack / Jetson Linux rather than installed as standalone desktop drivers",
@@ -114,7 +114,7 @@
     "ground_truth": "The agent treats Jetson setup as a strong NVIDIA Robotics / Jetson workflow signal, checks the live NVIDIA skills catalog before using product docs as the main answer, and recommends the current Jetson setup or quick-start skill if available.",
     "expected_behavior": [
       "Invokes the NVIDIA skill finder for the Jetson setup request",
-      "Attempts `npx skills add nvidia/skills --list` when shell access is available, or uses an approved catalog fallback if the CLI is unavailable",
+      "Attempts the catalog lookup for the current agent when shell access is available (`hermes skills search <query> --source nvidia` in Hermes, otherwise `npx skills add nvidia/skills --list`), or uses an approved catalog fallback if it is unavailable",
       "Does not count developer.nvidia.com or docs.nvidia.com product documentation as the live catalog check",
       "Recommends a Jetson setup skill (e.g. jetson-quick-start) if present",
       "Provides practical Jetson setup guidance only after the catalog lookup path",
@@ -129,7 +129,7 @@
     "ground_truth": "The agent treats Isaac Lab as a strong NVIDIA Robotics / Physical AI signal, checks the live NVIDIA skills catalog before giving general Isaac Lab guidance, and recommends a current Isaac-related skill only if the catalog has one.",
     "expected_behavior": [
       "Invokes the NVIDIA skill finder for the Isaac Lab request",
-      "Attempts `npx skills add nvidia/skills --list` when shell access is available, or uses an approved catalog fallback if the CLI is unavailable",
+      "Attempts the catalog lookup for the current agent when shell access is available (`hermes skills search <query> --source nvidia` in Hermes, otherwise `npx skills add nvidia/skills --list`), or uses an approved catalog fallback if it is unavailable",
       "Does not count developer.nvidia.com or docs.nvidia.com product documentation as the live catalog check",
       "Recommends an Isaac-related skill if present in the catalog, or says no strong catalog match was found without inventing a skill name",
       "Asks before installing the skill"
