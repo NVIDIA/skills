@@ -3,10 +3,10 @@ repo: dsx-ai-factory/dsx-sim-skills
 description: Agent skills for CAD-to-SimReady authoring, OpenUSD processing, and validated asset publication.
 ref: main
 skills:
-  - path: skills/dsx-cad-to-simready/
-    catalog_dir: dsx-cad-to-simready
-  - path: skills/publish-simready-assets-hf/
-    catalog_dir: publish-simready-assets-hf
+  - path: skills/dsx-sim-cad-to-simready/
+    catalog_dir: dsx-sim-cad-to-simready
+  - path: skills/dsx-sim-publish-simready-assets-hf/
+    catalog_dir: dsx-sim-publish-simready-assets-hf
 links:
   contributing: CONTRIBUTING.md
   discussions: false
