@@ -52,10 +52,10 @@ Any skill exposing an OSMO workflow YAML can be submitted via `osmo workflow sub
 |--------|-------|-------|
 | Video Data Augmentation (VDA) | `skills/physical-ai-video-data-augmentation/SKILL.md` | End-to-end SDG: augmentation + auto-labeling |
 | Defect Image Generation (AOI) | `skills/physical-ai-defect-image-generation/SKILL.md` | PCBA / metal / glass defect image generation: Day 0 from CAD (texture / good-image / structural-defect) or Day 1 from clean inspection images |
-| NRE (Neural Reconstruction) | [`nurec`](https://github.com/NVIDIA/nurec/blob/main/skills/nurec/SKILL.md) (canonical: `NVIDIA/nurec`) | Train / render / export via NRE Docker CLI (covers 26.02 + 26.04) |
-| NCore data conversion | [`ncore-data-conversion`](https://github.com/NVIDIA/ncore/blob/main/skills/ncore-data-conversion/SKILL.md) (canonical: `NVIDIA/ncore`) | Convert sensor datasets to NCore V4 |
-| NuRec carline adaptation | [`nurec`](https://github.com/NVIDIA/nurec/blob/main/skills/nurec/references/carline-adaptation.md) (canonical: `NVIDIA/nurec`) | Adapt USDZ reconstructions to new camera rigs |
-| Asset Harvester | [`asset-harvester`](https://github.com/NVIDIA/asset-harvester/blob/main/skills/asset-harvester/SKILL.md) (canonical: `NVIDIA/asset-harvester`) | 3DGS asset extraction from NCore clips |
+| NRE (Neural Reconstruction) | [`nre`](https://github.com/NVIDIA/nurec-skills/blob/main/.agents/skills/nre/SKILL.md) (canonical: `NVIDIA/nurec-skills`) | Train / render / export via NRE Docker CLI (covers 26.02 + 26.04) |
+| NCore data conversion | [`ncore`](https://github.com/NVIDIA/nurec-skills/blob/main/.agents/skills/ncore/SKILL.md) (canonical: `NVIDIA/nurec-skills`) | Convert sensor datasets to NCore V4 |
+| NuRec carline adaptation | `skills/carline-adaptation/SKILL.md` | Adapt USDZ reconstructions to new camera rigs |
+| Asset Harvester | [`asset-harvester`](https://github.com/NVIDIA/nurec-skills/blob/main/.agents/skills/asset-harvester/SKILL.md) (canonical: `NVIDIA/nurec-skills`) | 3DGS asset extraction from NCore clips |
 | Custom / external spec | any YAML path | `osmo workflow submit /abs/path/spec.yaml --pool <pool>` |
 
 ## Compatibility matrix
