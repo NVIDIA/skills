@@ -2006,9 +2006,9 @@
     {
       "name": "nvflare-convert-huggingface",
       "path": "skills/nvflare-convert-huggingface",
-      "content_digest": "sha256:8dfdd1749879e2e4260539f51cceffab7693e66deadadb35cbaf46457e47c00a",
-      "last_commit": "e34d95b71f9d672d9bdbb3e3879b56d27db14836",
-      "last_modified": "2026-09-13"
+      "content_digest": "sha256:a4c84e79bfa626c9aa0e33317cdc228c640e464e90386ca3386b0278b35ec767",
+      "last_commit": "12dd2a06e8fd05b5e832bad855381e1444652091",
+      "last_modified": "2026-11-04"
     },
     {
       "name": "nvflare-convert-lightning",
