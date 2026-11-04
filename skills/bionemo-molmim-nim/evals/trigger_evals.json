@@ -1,0 +1,22 @@
+[
+  {"query": "Generate analogs with MolMIM from this seed SMILES", "should_trigger": true},
+  {"query": "Use the hosted MolMIM NIM to optimize QED with CMA-ES", "should_trigger": true},
+  {"query": "Run MolMIM algorithm none with scaled_radius sampling", "should_trigger": true},
+  {"query": "Get molecular embeddings from a local MolMIM container", "should_trigger": true},
+  {"query": "Use MolMIM /hidden and /decode to round-trip a SMILES string", "should_trigger": true},
+  {"query": "Launch nvcr.io/nim/nvidia/molmim:1.0.0 locally", "should_trigger": true},
+  {"query": "Map NGC_API_KEY to NGC_CLI_API_KEY for MolMIM Docker startup", "should_trigger": true},
+  {"query": "Sample nearby molecules with MolMIM /sampling", "should_trigger": true},
+  {"query": "Use MolMIM plogP optimization on a seed molecule", "should_trigger": true},
+  {"query": "Save MolMIM generated SMILES and validate with RDKit", "should_trigger": true},
+  {"query": "Call the NVIDIA MolMIM generate endpoint with smi and property_name", "should_trigger": true},
+  {"query": "Compare MolMIM latent sampling to GenMol SAFE generation", "should_trigger": true},
+  {"query": "Generate SAFE masked molecules with GenMol", "should_trigger": false},
+  {"query": "Predict an OpenFold2 monomer structure from an A3M alignment", "should_trigger": false},
+  {"query": "Dock a ligand to a receptor with DiffDock", "should_trigger": false},
+  {"query": "Design a protein backbone with RFDiffusion", "should_trigger": false},
+  {"query": "Use ProteinMPNN to design sequences for a fixed backbone", "should_trigger": false},
+  {"query": "Search UniRef30 for an MSA using ColabFold", "should_trigger": false},
+  {"query": "Predict a protein-ligand complex using Boltz2", "should_trigger": false},
+  {"query": "Generate DNA sequence with Evo2", "should_trigger": false}
+]

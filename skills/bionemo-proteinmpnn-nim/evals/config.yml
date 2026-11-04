@@ -1,0 +1,17 @@
+schema_version: 1
+
+# The shared Astra sandbox uses a fixed agent image and does not launch the
+# native task's GPU NIM image. Use the hosted execution dataset for CI.
+# The native local-GPU task is retained under harbor/; see README.md to run it
+# in a runtime configured for that image and GPU.
+harbor:
+  task_source: evals_json
+  n_attempts: 1
+  pass_threshold: 0.8
+  stop_on_pass: false
+  n_concurrent: 1
+  runtime_env:
+    - NGC_API_KEY
+
+grading:
+  mode: aces_default

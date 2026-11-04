@@ -1,0 +1,72 @@
+[
+  {
+    "id": "holoscan-app-debug-build-run-004",
+    "question": "I want to create a new C++ application in my holoscan-applications checkout from a sensor-processing brief, with a finite ci mode, visual recording, tests, and a flow benchmark. No command is failing. Say which guidance applies and outline only the first non-mutating planning step; do not scaffold, build, or run anything yet.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The debug skill stays silent because no concrete command is failing. The agent treats the request as non-failing application work in the checkout, follows the repository's own guidance, and limits the response to requirements and evidence planning without executing the application workflow.",
+    "expected_behavior": [
+      "Does not activate holoscan-app-debug-build-run or begin failure reproduction",
+      "Treats the request as non-failing application work rather than a debugging task",
+      "Captures the requested application layout, finite ci mode, visual recording, tests, and flow benchmark as requirements and evidence boundaries",
+      "Stops at a non-mutating planning step and does not scaffold, build, run, diagnose, or clear caches"
+    ]
+  },
+  {
+    "id": "holoscan-app-debug-build-run-007",
+    "question": "My standalone Holoscan Module builds and its tests pass. Now package it into DEB and WHEEL artifacts with `uv run holoscan package` and verify they install cleanly.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The debug skill stays silent because this is a non-failing module packaging and clean-consumer task. The agent should use holoscan-module-lifecycle.",
+    "expected_behavior": [
+      "Does not activate holoscan-app-debug-build-run or manufacture a failure",
+      "Routes the task to holoscan-module-lifecycle",
+      "Requires artifact inspection and clean-consumer proof",
+      "Does not publish, upload, or remove unrelated files without authorization"
+    ]
+  },
+  {
+    "id": "holoscan-app-debug-build-run-010",
+    "question": "Before executing anything, outline how to diagnose this exact failure in my holoscan-applications checkout: `holoscan run endoscopy_tool_tracking ci --local` exits 1 at CMake configure with `Could not find a configuration file for package \"holoscan\" that is compatible with requested version \"5.0\"`, listing /opt/nvidia/holoscan/lib/cmake/holoscan/holoscan-config.cmake, version: 4.6.0. State the evidence to preserve, preview and reproduction order, first boundary to test, and proof required. Do not run commands or change files.",
+    "expected_skill": "holoscan-app-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "Activate the debug skill for the concrete failing command. Preserve the exact command, full revision, dirty state, SDK-related environment such as HOLOSCAN_SDK_ROOT, and the complete configure error. Read local help, then preview the identical command with --dryrun --verbose to see the selected local SDK and its source, and compare it with the application's holoscan_sdk range in metadata.json and the SDK reported by env-check. The first boundary is SDK selection versus application source: with no SDK root selected, the CLI's default chose the SDK 4.6.0 installation at /opt/nvidia/holoscan without checking the application's 5.0 minimum. The fix is to select a compatible SDK 5 installation with HOLOSCAN_SDK_ROOT or --local-sdk-root, or to use the container path with a matching SDK 5 base image, not to lower the find_package version, edit the application, or change the host SDK. After the environment change, refresh the identical preview to confirm the selected SDK, rerun the same command, and require the finite ci verdict plus the nearest focused test. The planning-only request must not execute commands or edit files.",
+    "expected_behavior": [
+      "Activates holoscan-app-debug-build-run for the concrete failing command",
+      "Preserves the exact command, revision, dirty state, SDK-related environment, and the complete configure error",
+      "Uses an identical --dryrun --verbose preview to identify the selected local SDK and its source and compares it with the application's SDK range",
+      "Identifies the CLI's default SDK selection, not application source, as the first boundary and does not lower the version requirement or change the host SDK",
+      "Proposes HOLOSCAN_SDK_ROOT, --local-sdk-root, or an SDK 5 container base image, then a refreshed identical preview, rerun, finite ci verdict, and focused test",
+      "Does not execute commands, edit files, clear caches, or change privileges"
+    ]
+  },
+  {
+    "id": "holoscan-app-debug-build-run-002",
+    "question": "In my holoscan-applications checkout, `holoscan test endoscopy_tool_tracking --no-xvfb --cmake-options='-DENDOSCOPY_ENABLE_VISUALIZATION=ON;-DENDOSCOPY_DATA_DIR=/home/me/holoscan-applications/data/endoscopy'` runs in the development container, and the endoscopy_inference test fails because the prepared data directory does not exist, although the files are present on the host. holoscan-cli is 5.0.0. Find the first causal error and make the smallest fix while preserving my unrelated edits; do not clear caches.",
+    "expected_skill": "holoscan-app-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The agent freezes the exact command, revision, dirty baseline, data identity, and CLI identity. It reads local help, metadata, and the application README, then previews the identical test command with --dryrun --verbose, noting that dry runs hide CMake option values. It knows container commands mount the checkout at a container path that the preview's volume options show, so the host path passed through --cmake-options does not exist inside the container. It reproduces once unchanged and confirms that boundary inside the container, for example through a previewed run-container check, without editing application code, tests, or data. The smallest fix is the command rather than the source: pass the data directory's container path under the checkout mount, or use --local with the host path when local execution is authorized and a compatible SDK is selected. It refreshes the identical preview for the corrected command, reruns it, and requires the inference test to pass, preserving unrelated edits and caches.",
+    "expected_behavior": [
+      "Activates holoscan-app-debug-build-run and records the exact command, revision, dirty baseline, data identity, and CLI version",
+      "Previews the identical test command and accounts for dry runs hiding CMake option values",
+      "Identifies from the preview's volume options that container commands mount the checkout at a container path, so the host data path is invalid inside the container",
+      "Confirms the path boundary in the container before changing anything and does not edit application code, tests, or data",
+      "Fixes the command with the container path or an authorized --local run, refreshes the preview, and proves the passing inference test",
+      "Preserves unrelated edits and does not reset, clear caches, or commit without authorization"
+    ]
+  },
+  {
+    "id": "holoscan-app-debug-build-run-019",
+    "question": "A failing holoscan command in my holoscan-applications checkout produced env-info JSON containing an access token, an authenticated package-index URL, and a private input path. Explain how to prepare evidence for a public issue while retaining useful diagnostics. Planning only: do not run commands, post an issue, or change files.",
+    "expected_skill": "holoscan-app-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "Use the debugging workflow and prepare a separate minimal redacted excerpt. Keep raw evidence local, redact secret values including URL credentials and sensitive query values, replace private identifiers, retain nonsecret versions and failure evidence, and inspect the excerpt before any authorized sharing. Do not post or execute in planning-only mode.",
+    "expected_behavior": [
+      "Routes the concrete failure to holoscan-app-debug-build-run",
+      "Keeps raw diagnostics local and prepares a separate excerpt",
+      "Redacts secret values and URL credentials rather than relying only on field names",
+      "Replaces private paths for the public destination and retains useful nonsecret evidence",
+      "Does not execute commands or post evidence"
+    ]
+  }
+]

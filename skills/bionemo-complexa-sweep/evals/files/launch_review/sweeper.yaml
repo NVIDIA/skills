@@ -1,0 +1,2 @@
+generation.search.beam_search.beam_width: [4, 8]
+generation.args.nsteps: [100, 200, 400]

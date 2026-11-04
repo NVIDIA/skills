@@ -55,9 +55,9 @@ anything it changes downstream.
 - TTS or language change: restart TTS when required, then query its voice-discovery API
   again.
 - Cascaded to Omni:
-  - copy current `nvidia_omni_multimodal_service.py` and
-    `audio_only_smart_turn_strategy.py`
-  - remove ASR from agent wiring and add the Omni turn and initial-mute strategies
+  - copy current `nvidia_omni_multimodal_service.py`
+  - remove ASR from agent wiring, add `TurnAnalyzerUserTurnStopStrategy` with
+    `wait_for_transcript=False`, and add the initial-mute strategy
   - replace local `llm` + `asr` Compose services with `omni`, retaining `tts`
   - recalculate Omni + TTS fit
 - Omni to cascaded:

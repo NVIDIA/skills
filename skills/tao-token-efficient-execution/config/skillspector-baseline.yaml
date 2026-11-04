@@ -1,0 +1,21 @@
+version: 2
+# Reviewed false positives — NVIDIA/nvskills-ci#67. No content removed.
+rules:
+  - id: "AE*"
+    path: "*"
+    reason: "Reviewed FP: SkillSpector 2.11.0 (SkillEvaluator 1.5.4+) introduced hard runtime budgets (MAX_WORKFLOW_SECONDS=60) that cannot be raised externally; large skills are only partially inspected and the partial read is reported as evasion. Upstream: nvcarps-ci!252. Artifacts are present, small and plain-text; nothing is hidden from analysis."
+  - id: "skillspector_execution_failure"
+    path: "*"
+    reason: "Reviewed FP: scan aborts via the same 2.11.0 runtime budget and on reference_resolution of slash-containing prose and template paths (PASS/NO_PASS, schemas/<action>.schema.json, nvcr.io image URIs, frontmatter version strings). Not a property of the skill content. Upstream: nvcarps-ci!252."
+  - id: "skillspector_execution_failure"
+    path: "."
+    reason: "Reviewed FP: scan aborts via the same 2.11.0 runtime budget and on reference_resolution of slash-containing prose and template paths (PASS/NO_PASS, schemas/<action>.schema.json, nvcr.io image URIs, frontmatter version strings). Not a property of the skill content. Upstream: nvcarps-ci!252."
+  - id: "LP1"
+    path: "adapters/pi/guard.ts"
+    reason: "Reviewed FP (#67): the Pi guard extension reads only its own configuration from the environment (HOME, PI_KIT_TURN_BUDGET); the MCP permissions schema does not apply to this skill."
+  - id: "PE3"
+    path: "adapters/pi/guard.ts"
+    reason: "Reviewed FP (#67): the credential-path regex in guard.ts is a DENY list - the guard blocks reads, writes and copies of .netrc/.npmrc/.ssh/.aws files (GUARD(secrets)); it is the control, not the risk."
+  - id: "SQP-2"
+    path: "templates/driver.template.sh"
+    reason: "Reviewed (#67): the driver intentionally launches headless Claude Code batch sessions with --permission-mode auto for unattended execution, as the skill documents; operator opt-in. Flagged to the skill owner as a design review item; not hidden behaviour."

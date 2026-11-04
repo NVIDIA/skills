@@ -1,0 +1,28 @@
+[gpu-pci]
+command=nvidia-smi-query exit_status=0
+0, 00000000:01:00.0, NVIDIA H100
+1, 00000000:21:00.0, NVIDIA H100
+2, 00000000:81:00.0, NVIDIA H100
+3, 00000000:a1:00.0, NVIDIA H100
+[gpu-nic-topology]
+        GPU0 GPU1 GPU2 GPU3 NIC0 NIC1 NIC2 NIC3
+GPU0    X    PXB  SYS  SYS  PIX  PHB  SYS  SYS
+GPU1    PXB  X    SYS  SYS  PHB  PIX  SYS  SYS
+GPU2    SYS  SYS  X    PXB  SYS  SYS  PIX  PHB
+GPU3    SYS  SYS  PXB  X    SYS  SYS  PHB  PIX
+NIC0    PIX  PHB  SYS  SYS  X    PXB  SYS  SYS
+NIC1    PHB  PIX  SYS  SYS  PXB  X    SYS  SYS
+NIC2    SYS  SYS  PIX  PHB  SYS  SYS  X    PXB
+NIC3    SYS  SYS  PHB  PIX  SYS  SYS  PXB  X
+NIC Legend:
+NIC0: mlx5_0
+NIC1: mlx5_1
+NIC2: mlx5_2
+NIC3: mlx5_3
+[rdma-ports]
+hca=mlx5_0 port=1 pci=0000:41:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib0
+hca=mlx5_1 port=1 pci=0000:61:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib1
+hca=mlx5_2 port=1 pci=0000:c1:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib2
+hca=mlx5_3 port=1 pci=0000:e1:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib3
+[diagnostics]
+status=complete

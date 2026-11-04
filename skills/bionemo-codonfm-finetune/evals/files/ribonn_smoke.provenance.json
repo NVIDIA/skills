@@ -1,0 +1,12 @@
+{
+  "source_url": "https://raw.githubusercontent.com/CenikLab/TE_classic_ML/512fca642b6b7b61ae494ad83cfc2b72831636d2/data/data_with_human_TE_cellline_all_NA_plain.csv",
+  "upstream_revision": "512fca642b6b7b61ae494ad83cfc2b72831636d2",
+  "selection": "First valid rows per split: 8 train (folds 0-7), 2 val (fold 8), 2 test (fold 9); CDS <= 2046 codons. Only columns required for preprocessing retained; sequences and mean_te values unchanged.",
+  "purpose": "Real public-data input preparation fixture, not a benchmark",
+  "split_counts": {
+    "train": 8,
+    "val": 2,
+    "test": 2
+  },
+  "rows": 12
+}

@@ -1,0 +1,5 @@
+Synthetic historical emulation log; not hardware evidence.
+Mode: EMU
+Case: matmul-small
+Result: PASS
+Source identity: not recorded

@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "schema_authority": "skill_workflow",
+  "additional_evidence_used": [],
+  "public_sources": [],
+  "user_sources": [
+    {
+      "source": "Approved structural evaluation contract",
+      "requirement_ids": [
+        "REQ-MATMUL"
+      ]
+    }
+  ],
+  "assumptions": [],
+  "conflicts": []
+}

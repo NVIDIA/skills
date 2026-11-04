@@ -1,0 +1,33 @@
+{
+  "vlm_captioning": {
+    "model": "Qwen/Qwen3-VL-235B-A22B-Instruct",
+    "parameters": {
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "stream": false
+    }
+  },
+  "paidf": {
+    "augmentation": {
+      "model": {
+        "name": "cosmos-predict",
+        "version": "2B",
+        "executor_type": "local"
+      },
+      "parameters": {
+        "inference_type": "text2world",
+        "num_output_frames": 160,
+        "num_steps": 35,
+        "enable_autoregressive": true,
+        "guidance": 7,
+        "resolution": "none",
+        "inference_name": "cosmos_predict_output"
+      },
+      "local_parameters": {
+        "num_processes": 4,
+        "master_port": 12341
+      }
+    }
+  }
+}

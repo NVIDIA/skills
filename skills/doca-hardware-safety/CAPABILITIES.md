@@ -12,7 +12,7 @@ Read this file when the loader sent you here from
 [SKILL.md](SKILL.md). For the *how* of executing the change-application
 discipline, jump to [TASKS.md](TASKS.md). For the JSON schemas of the
 structured helpers the agent prefers when present, see
-[`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md).
+`doca-structured-tools-contract/SKILL.md`.
 
 ## Pattern overview
 
@@ -86,7 +86,7 @@ in the operator's runbook, not in this skill.
 
 For the structured one-shot form of this inventory, see the
 `collect-host-state` and `collect-dpu-state` schemas in
-[`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md);
+`doca-structured-tools-contract/SKILL.md`;
 the agent prefers the structured tool when present and falls back to
 the manual chain documented there otherwise.
 
@@ -120,9 +120,9 @@ Each change class has a documented *commit* action. The class shapes:
 | --- | --- | --- |
 | `mlxconfig`-class parameter write | Cold power cycle of the NIC / DPU (full A/C power removal) | A warm reboot does NOT commit firmware-stored configuration. The agent does not declare the change applied after a warm reboot. |
 | NIC firmware burn | The burn tool's documented completion handshake plus a power cycle if the tool requires it | The agent quotes the tool's own documented completion criterion; never invents a "looks done" judgment from log noise. |
-| BFB reflash | The BFB's documented post-flash boot + BlueField cold reboot | The BlueField comes up on the new BFB; every hosted service container has to be re-deployed per [`doca-container-deployment ## run`](../doca-container-deployment/TASKS.md#run). |
+| BFB reflash | The BFB's documented post-flash boot + BlueField cold reboot | The BlueField comes up on the new BFB; every hosted service container has to be re-deployed per `doca-container-deployment ## run` (`doca-container-deployment/TASKS.md#run`). |
 | BlueField mode flip | Cold power cycle + post-reboot verification of the new personality (per the matching per-artifact skill) | Confirm the host-visible representor topology matches the post-flip plan before any workload moves. |
-| Kernel boot parameter change | A host reboot. An installed DOCA runtime helper alone does NOT make up for a wrong IOMMU mode or for hugepages that were not reserved at boot. | The agent does not promise that a host-side runtime helper substitutes for the boot-time parameter. Cross-link to [`doca-setup`](../doca-setup/SKILL.md) for env-class verification of the post-reboot state. |
+| Kernel boot parameter change | A host reboot. An installed DOCA runtime helper alone does NOT make up for a wrong IOMMU mode or for hugepages that were not reserved at boot. | The agent does not promise that a host-side runtime helper substitutes for the boot-time parameter. Cross-link to `doca-setup/SKILL.md` for env-class verification of the post-reboot state. |
 | Link state down / up, PCIe rescan | The operator's documented procedure for the affected function | The agent surfaces that any workload currently using the function will see the function disappear; the verification gate is that the function comes back in the expected state. |
 
 ### Replica-first validation
@@ -140,7 +140,7 @@ before production is exposed to that risk.
 The replica's hardware class must match production on:
 
 - The BlueField generation (per
-  [`doca-version`](../doca-version/SKILL.md), the BFB anchor must be
+  `doca-version/SKILL.md`, the BFB anchor must be
   in the same compatibility band).
 - The running firmware level on the NIC / DPU.
 - The host kernel version and the loaded `mlx5_*` modules.
@@ -157,7 +157,7 @@ advisory and then proceed.
 
 For the canonical DOCA version-detection chain, the four-way match
 rule, NGC container semantics, and the headers-win-over-docs rule,
-see [`doca-version`](../doca-version/SKILL.md). The body lives there;
+see `doca-version/SKILL.md`. The body lives there;
 this skill does not duplicate it.
 
 **The hardware-safety overlay** is:
@@ -172,12 +172,12 @@ this skill does not duplicate it.
 - **The version anchor is jointly bound by host package, BFB,
   firmware, and (when applicable) the per-artifact container tag.**
   After the change, the agent re-runs the four-way match per
-  [`doca-version TASKS.md ## test`](../doca-version/TASKS.md#test); a
+  `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`); a
   change that leaves the four-way match in a partial state is a
   failed change and the rollback path applies.
 - **Never quote a firmware version, BFB version, or DOCA version
   literal from agent memory.** The version handling rules in
-  [`doca-version CAPABILITIES.md ## Safety policy`](../doca-version/CAPABILITIES.md#safety-policy)
+  `doca-version CAPABILITIES.md ## Safety policy` (`doca-version/CAPABILITIES.md#safety-policy`)
   apply here without modification; the agent quotes the version
   observed from the operator's host, not from agent memory or from a
   public docs URL.
@@ -196,14 +196,14 @@ mode with the policy rule that prevents it.
 | Silent mode change (an `mlxconfig` write happens; a warm reboot occurs; the agent declares the change applied; the firmware-stored configuration in fact did not commit) | The operator was not told that `mlxconfig`-class writes commit at cold power cycle, not at warm reboot | The `mlxconfig`-class commit-action row in [`## Capabilities and modes`](#capabilities-and-modes) and the apply-with-cold-power-cycle workflow in [TASKS.md ## modify](TASKS.md#modify) |
 | Missing rollback (the change is applied; it fails; the operator and the agent cannot agree on what state the system is supposed to revert to) | The pre-flight inventory was not captured, OR the change was applied without a documented rollback path | The pre-flight inventory rule + the rollback-must-be-documented rule in [`## Safety policy`](#safety-policy) |
 | Discovered-during-failure rollback (the rollback path is invented mid-incident; the invented rollback does not work) | The rollback was not rehearsed on the replica before production was exposed to the change | The replica-first rule in [`## Capabilities and modes`](#capabilities-and-modes) and the replica-smoke step in [TASKS.md ## test](TASKS.md#test) |
-| IOMMU / hugepages drift (host-side runtime helper is installed; the operator believes the env is configured; the change still fails because the IOMMU mode or hugepage reservation is wrong at boot) | A kernel-boot-parameter change was treated as if a runtime helper could substitute for it | The kernel-boot-parameter commit-action row in [`## Capabilities and modes`](#capabilities-and-modes); cross-link to [`doca-setup`](../doca-setup/SKILL.md) for env-class verification |
+| IOMMU / hugepages drift (host-side runtime helper is installed; the operator believes the env is configured; the change still fails because the IOMMU mode or hugepage reservation is wrong at boot) | A kernel-boot-parameter change was treated as if a runtime helper could substitute for it | The kernel-boot-parameter commit-action row in [`## Capabilities and modes`](#capabilities-and-modes); cross-link to `doca-setup/SKILL.md` for env-class verification |
 | Version regression (the change is applied; the four-way match no longer holds; the agent does not notice because no post-change verification ran) | The post-change verification gate in [`## Observability`](#observability) was skipped | The verification-before-workload rule in [`## Safety policy`](#safety-policy) and the post-change four-way match in [TASKS.md ## run](TASKS.md#run) |
 | Workload-during-burn (a firmware burn or BFB reflash is started while real traffic is on the wire; the burn interrupts the workload, or the workload interrupts the burn) | The do-not-interrupt rule was not surfaced | The firmware-burn precondition list in [`## Safety policy`](#safety-policy) |
 
 For DOCA-program-level errors that surface AFTER the rollback has
 restored a known state (e.g. `DOCA_ERROR_DRIVER`, `DOCA_ERROR_NOT_SUPPORTED`),
 hand off to
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug) — the
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) — the
 hardware-safety ladder owns the change-application discipline; the
 program-side debug ladder owns what comes after.
 
@@ -222,16 +222,16 @@ belong in the operator's runbook or in the per-artifact skill's
 | Pre-change | Workload state (is the affected NIC / DPU / port currently carrying traffic? Are workloads using representors on the affected function?) | The set of workloads that need to be drained or scheduled around the change. |
 | During change | The commit tool's own output (firmware burn progress, BFB reflash progress, `mlxconfig` apply confirmation) | The documented signal of the change's progress. The agent quotes the tool's documented signal verbatim and never paraphrases it as "looks done". |
 | Post-change | Re-captured inventory (the same set of signals as pre-flight) | Did the change land as expected? Specifically, did the PCIe topology / link state / firmware level / BFB level move to the post-change values the plan named? |
-| Post-change | Post-change four-way match (per [`doca-version TASKS.md ## test`](../doca-version/TASKS.md#test)) | Is the install consistent on the new state? A change that breaks the four-way match is a failed change. |
+| Post-change | Post-change four-way match (per `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`)) | Is the install consistent on the new state? A change that breaks the four-way match is a failed change. |
 | Post-change | Per-artifact health metric (the smoke test from the matching per-artifact skill) | Did the artifact this change was made for actually come back to a healthy state on its own observability surface? |
 | Pre-workload | Observability path proven end-to-end (logs visible, counters readable, dmesg readable, container / service stdout reachable) | Can the operator see what the workload is doing once it moves? The agent does not declare the deployment "ready" until this gate passes. |
 
 For the env-side observability primitives (PCIe scans, link
 introspection, kernel-module presence), see
-[`doca-setup CAPABILITIES.md ## Observability`](../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 For the program-side cross-library observability (`--sdk-log-level`,
 the `doca-<lib>-trace` build flavor, `DOCA_LOG_LEVEL`), see
-[`doca-debug CAPABILITIES.md ## Observability`](../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 This skill names the *gates*; the named skills carry the surface
 itself.
 
@@ -285,7 +285,7 @@ the meta-policy.
   sufficient; the agent does not promise that a host-side helper
   substitutes for the boot-time configuration. The post-change gate
   is verified after the host reboot per
-  [`doca-setup ## debug`](../doca-setup/TASKS.md#debug).
+  `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
 - **Replica-first validation.** Apply the change on a non-prod
   replica that matches production's hardware class first; run the
   per-artifact smoke on the replica; only then schedule the
@@ -342,7 +342,7 @@ but-no-`Linux up`, TMFIFO down, BF PFs visible but link severed) are
 operationally similar but live in NVIDIA's BlueField BSP / DOCA
 Platform Framework documentation, not this bundle. The agent routes
 DPU-side recovery questions to those docs per
-[`AGENTS.md ## Non-goals`](../../AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely)
+`AGENTS.md ## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
 item 7.
 
 ### Script hygiene for hardware-touching scripts the operator runs
@@ -350,9 +350,8 @@ item 7.
 When the answer to a hardware-safety scenario ends with the operator
 running a shell script (preflight capture, upgrade wrapper, rollback
 ladder), the agent's script-shaped guidance MUST cover three hygiene
-rules. These are not aesthetic preferences — each closes a recurring
-operational failure mode reported by real operators against earlier
-bundle revisions:
+rules. These are not aesthetic preferences — each closes a common
+operational failure mode:
 
 - **Hand log ownership back to the invoking user.** Scripts that
   capture under `sudo` write logs as root; later non-sudo inspection
@@ -377,8 +376,8 @@ bundle revisions:
   underlying tool emits and SHOULD return non-zero (or surface the
   finding under a distinct status code) when one is present. This is
   the universal-verification-contract `## step 5 — first-failure
-  ladder` rule (see [`AGENTS.md ## The universal verification
-  contract`](../../AGENTS.md#the-universal-verification-contract))
+  ladder` rule (see `AGENTS.md ## The universal verification
+  contract` (bundle `AGENTS.md#the-universal-verification-contract`))
   applied to script-shaped outputs.
 
 ### Per-artifact overlay pattern
@@ -403,27 +402,27 @@ policy` adds the per-artifact preconditions on top of the meta-
 policy here. The canonical in-bundle overlays are:
 
 - Services (kubelet-standalone container deployments that touch
-  device state): [`doca-argus`](../services/doca-argus/SKILL.md),
-  [`doca-dms`](../services/doca-dms/SKILL.md),
-  [`doca-firefly`](../services/doca-firefly/SKILL.md),
-  [`doca-urom-svc`](../services/doca-urom-svc/SKILL.md).
+  device state): `doca-argus/SKILL.md`,
+  `doca-dms/SKILL.md`,
+  `doca-firefly/SKILL.md`,
+  `doca-urom-svc/SKILL.md`.
 - Device-touching libraries:
-  [`doca-flow`](../libs/doca-flow/SKILL.md),
-  [`doca-rdma`](../libs/doca-rdma/SKILL.md),
-  [`doca-eth`](../libs/doca-eth/SKILL.md),
-  [`doca-pcc`](../libs/doca-pcc/SKILL.md),
-  [`doca-rmax`](../libs/doca-rmax/SKILL.md).
+  `doca-flow/SKILL.md`,
+  `doca-rdma/SKILL.md`,
+  `doca-eth/SKILL.md`,
+  `doca-pcc/SKILL.md`,
+  `doca-rmax/SKILL.md`.
 - Hardware-touching tools:
-  [`doca-spcx-cc`](../tools/doca-spcx-cc/SKILL.md),
-  [`doca-pcc-counters`](../tools/doca-pcc-counters/SKILL.md),
-  [`doca-flow-tune`](../tools/doca-flow-tune/SKILL.md).
+  `doca-spcx-cc/SKILL.md`,
+  `doca-pcc-counters/SKILL.md`,
+  `doca-flow-tune/SKILL.md`.
 
 Each of those is an overlay; this skill is the meta-policy they
 share. **Externally-productized analogs** — `doca-virtio-net`,
 `doca-snap`, `doca-hbn`, BlueMan, DPF — are NOT in-bundle skills;
 their per-product safety policies live in the public product
 documentation reached through
-[`doca-public-knowledge-map ## Externally-productized DOCA software`](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+`doca-public-knowledge-map ## Externally-productized DOCA software` (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).
 The meta-policy in this skill still applies operationally (OOB
 console, preflight, maintenance window, rollback), but the
 artifact-specific preconditions for those products are owned by

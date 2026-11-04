@@ -1,0 +1,89 @@
+{
+  "skill_name": "using-ovnewton",
+  "evals": [
+    {
+      "id": "using-ovnewton-basic",
+      "prompt": "Use using-ovnewton to show a minimal CPU simulation that connects a USD scene to Newton through ovstage. Return runnable Python and the install and smoke commands; no rendering is needed.",
+      "expected_skill": "using-ovnewton",
+      "expected_output": "Registers schemas, populates through population.open_usd_with_desc with ovnewton.population_desc() and seals ordinal 1, calls add_ovstage, finalizes with has_orphan_joints, creates XPBD, model states/control/contacts, computes collisions, steps, swaps states, publishes and seals output. Includes pip install ovnewton and the packaged CPU smoke command.",
+      "assertions": [
+        "Reads using-ovnewton/SKILL.md.",
+        "Newton consumes ovstage rather than parsing USD.",
+        "Seals population before import and output after publication.",
+        "Application owns the solver and stepping loop.",
+        "Preserves composed schema names with ovnewton.population_desc() and supplies population.DEFAULT_TIME."
+      ]
+    },
+    {
+      "id": "using-ovnewton-existing-stage",
+      "prompt": "Our application already populated an ovstage and sealed it at ordinal 12. Connect Newton physics to this Omniverse simulation without reloading USD, and publish the next result at ordinal 13. Return the integration snippet.",
+      "expected_skill": "using-ovnewton",
+      "expected_output": "Reuses the stage, passes ordinal=12 to add_ovstage and attach_ovstage, finalizes with the import result, then publishes and seals at ordinal 13. Explains that complete unsupported-physics validation requires composed apiSchemas metadata preserved during population.",
+      "assertions": [
+        "Reads using-ovnewton/SKILL.md.",
+        "Does not recreate the stage or reload USD.",
+        "Uses the actual sealed ordinal for import and binding.",
+        "Publishes and seals output at ordinal 13.",
+        "Explains the schema metadata prerequisite without recreating the supplied stage."
+      ]
+    },
+    {
+      "id": "using-ovnewton-vbd",
+      "prompt": "Connect my USD scene in ovstage to Newton using VBD. Show builder construction and a headless CPU smoke command.",
+      "expected_skill": "using-ovnewton",
+      "expected_output": "Registers VBD custom attributes before add_ovstage, colors after population, finalizes using has_orphan_joints, creates SolverVBD with rigid_compliant_alm=True, attaches the model. Packaged CPU smoke uses --solver vbd --device cpu --no-render --num-frames 8.",
+      "assertions": [
+        "Reads using-ovnewton/SKILL.md.",
+        "Registers VBD attributes before population.",
+        "Colors the populated builder before finalization.",
+        "Explicitly enables compliant rigid-body contacts with rigid_compliant_alm=True.",
+        "Uses an application-owned solver and model."
+      ]
+    },
+    {
+      "id": "using-ovnewton-stage-edits",
+      "prompt": "In our Newton/ovstage loop, the application edits drive targets after publishing a frame. Show how to consume the edits on the next step. Can an old ordinal replay earlier values?",
+      "expected_skill": "using-ovnewton",
+      "expected_output": "Seal edits, call update_from_ovstage(state, control) before stepping with the same control, and publish and seal output at coordinated increasing ordinals. Read ordinals constrain current payload consistency and cannot replay overwritten history.",
+      "assertions": [
+        "Reads using-ovnewton/SKILL.md.",
+        "Seals edits before consuming them.",
+        "Passes the solver control to update_from_ovstage.",
+        "Explains read ordinals are not historical playback."
+      ]
+    },
+    {
+      "id": "using-ovnewton-rendering",
+      "prompt": "I want Newton physics driving an Omniverse ovstage rendered with OVRTX. Give installation and example commands and explain the frame handoff; assume I have a supported NVIDIA GPU.",
+      "expected_skill": "using-ovnewton",
+      "expected_output": "Installs ovnewton[examples], runs the packaged basic example with rendering, and explains publish/seal before rendering and independent physics/render device selection. Explains GPU_INCREMENTAL hierarchy configuration for caller-owned rendering stages, including CPU physics, and combines rendering and ovnewton population descriptors.",
+      "assertions": [
+        "Reads using-ovnewton/SKILL.md.",
+        "Installs the examples extra.",
+        "Uses public packaged examples rather than internal launchers.",
+        "Seals published output before rendering.",
+        "Uses compatible OVStage 0.3 and OVRTX 0.6 and explains process-wide GPU hierarchy configuration."
+      ]
+    },
+    {
+      "id": "using-ovnewton-newton-only",
+      "prompt": "Show a standalone Newton XPBD rigid-body simulation built directly with ModelBuilder. No USD, ovstage, or Omniverse integration is needed.",
+      "expected_skill": null,
+      "expected_output": "Provides standalone Newton code without loading using-ovnewton or adding ovstage.",
+      "assertions": [
+        "Does not load using-ovnewton/SKILL.md.",
+        "Does not introduce ovnewton or ovstage."
+      ]
+    },
+    {
+      "id": "using-ovnewton-omniverse-authoring",
+      "prompt": "How do I author cameras and lights in USD for Omniverse rendering? I am not adding a physics engine.",
+      "expected_skill": null,
+      "expected_output": "Addresses camera/light authoring without loading using-ovnewton or adding a Newton bridge.",
+      "assertions": [
+        "Does not load using-ovnewton/SKILL.md.",
+        "Does not add a Newton simulation loop."
+      ]
+    }
+  ]
+}

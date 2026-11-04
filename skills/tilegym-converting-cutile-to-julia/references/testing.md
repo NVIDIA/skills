@@ -16,7 +16,7 @@ julia/test/test_<op>.jl             # Per-op test file
   ↓ include()
 julia/kernels/<op>.jl               # Julia kernel (cuTile.jl) — bridge functions
   ↓
-Bridge function wraps CuArrays, launches ct.kernel, CUDA.synchronize()
+Host function launches the kernel (@cuda backend=cuTile ...) asynchronously; Array(result) waits for it
   ↓
 Compare result vs reference (NNlib.jl, manual CPU computation, or CUDA.jl builtins)
 ```
@@ -32,8 +32,8 @@ julia --project=julia/ julia/test/runtests.jl
 # Run a single test file directly
 julia --project=julia/ julia/test/test_softmax.jl
 
-# Run with IR dump for compilation issues
-CUDA_TILE_LOGS=CUTILEIR julia --project=julia/ julia/test/test_<op>.jl
+# Dump Tile IR bytecode for compilation issues
+JULIA_CUTILE_DUMP_BYTECODE=/tmp/julia_tiles julia --project=julia/ julia/test/test_<op>.jl
 ```
 
 ---
@@ -83,7 +83,7 @@ Use these for ground-truth comparison in tests:
 
 | Operation | Reference | Package |
 |-----------|-----------|---------|
-| softmax | `NNlib.softmax(x; dims=2)` (for row-wise on `(M,N)` matrices) | NNlib.jl |
+| softmax | `NNlib.softmax(x; dims=1)` (per column of an `(N, M)` matrix — Python's per-row on `(M, N)`) | NNlib.jl |
 | matmul | `A * B` (BLAS) | stdlib |
 | batched matmul | `NNlib.batched_mul(A, B)` | NNlib.jl |
 | attention | `NNlib.dot_product_attention(q, k, v; nheads=H)` | NNlib.jl |
@@ -115,12 +115,13 @@ For complex ops (attention, softmax), prefer NNlib.jl.
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `IRError: Unsupported function call: max` | `max(a, b)` on tiles | Use `max.(a, b)` (broadcast dot) |
+| `CodegenErrors: ... Unsupported function call ...: isless` (stack shows `max`) | `max(a, b)` on tiles | Use `max.(a, b)` (broadcast dot) |
 | `IRError` or `MethodError` mentioning `IRStructurizer` | Internal compiler bug | Do not work around — file upstream with minimal reproducer |
-| All zeros in output | `ct.launch` arg order wrong | Verify args map positionally to kernel params |
+| All zeros in output | Launch arg order wrong | Verify args map positionally to kernel params |
 | Slight numerical drift | Reduction order differs | Increase tolerance to 2x default |
-| Transposed results | Column-major layout mismatch | Verify data is created in col-major for Julia |
-| `UndefVarError: rsqrt not defined` | `rsqrt` used without cuTile import | Ensure `import cuTile as ct`; then `rsqrt.(tile)` works |
+| Transposed results | Python `(M, N)` data fed to a Julia `(N, M)` kernel (or vice versa) | Reverse the dims when moving data between layouts: Julia `(N, M)` = Python row-major `(M, N)` |
+| Correct but 3–8× slower than expected | Python shape kept, so the reduced/tiled axis is strided (e.g. `dims=2` on `(M, N)`) | Reverse dims so the axis is dim 1 — see `api-mapping.md` § Memory Layout Considerations |
+| `UndefVarError: rsqrt not defined` | Unqualified `rsqrt` (not exported by cuTile) | Use `ct.rsqrt.(tile)` |
 
 ---
 

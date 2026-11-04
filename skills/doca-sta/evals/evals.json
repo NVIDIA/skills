@@ -3,11 +3,13 @@
   "evals": [
     {
       "id": "doca-sta.explicit-positive.v1",
-      "prompt": "Use the doca-sta skill to help me. I'm working on: doing hands-on NVMe-over-Fabrics storage-target work on a BlueField DPU or ConnectX NIC with DOCA STA \u2014 standing up a doca_sta DOCA Core context that accelerates the target-side NVMe-oF data path over RDMA, defining doca_sta_subsystem targets (NQN + namespaces) backed by local NVMe-PCI backend disks (doca_sta_be), checking device support via doca_sta_cap_is_supported, sizing the per-connection I/O queues, or debugging DOCA_ERROR_* from a STA call.",
+      "prompt": "Use the doca-sta skill for this task: I'm running into this: \"my NVMe-oF Connect never completes\". Can you walk me through it?",
       "expected_skill": "doca-sta",
       "expected_output": "The agent selects the doca-sta skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
         "The doca-sta skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "The answer walks the documented preconditions -- RDMA substrate, device access, and whether a DOCA Flow rule steers the NVMe-oF traffic to this instance's queues -- before proposing any STA code change.",
+        "The steering side is routed to doca-flow rather than solved with an invented doca_sta_* steering call.",
         "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
       ]
     },
@@ -17,7 +19,9 @@
       "expected_skill": "doca-sta",
       "expected_output": "The agent recognizes this as a doca-sta issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-sta skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer walks the documented preconditions -- RDMA substrate, device access, and whether a DOCA Flow rule steers the NVMe-oF traffic to this instance's queues -- before proposing any STA code change.",
+        "The steering side is routed to doca-flow rather than solved with an invented doca_sta_* steering call.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,17 +31,19 @@
       "expected_skill": "doca-sta",
       "expected_output": "The agent recognizes this as a doca-sta issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-sta skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer treats an Identify Controller timeout as a substrate/steering question first -- whether the NVMe-oF traffic reaches this instance's queues at all -- rather than as an STA lifecycle or target-code defect.",
+        "The steering side is routed to doca-flow rather than solved with an invented doca_sta_* steering call.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-sta.negative.v1",
-      "prompt": "I actually need help with DOCA install. Which skill should handle this, and why is it not doca-sta?",
+      "prompt": "I need to get DOCA installed and verified on this machine before I can build anything at all. How should I approach this?",
       "expected_skill": null,
       "expected_output": "The agent does NOT force doca-sta; it explains that DOCA install is out of doca-sta's scope and routes to the appropriate skill instead.",
       "assertions": [
-        "doca-sta is not selected as the primary skill for this out-of-scope request.",
+        "The answer does not attempt the out-of-scope work itself.",
         "The answer routes to the appropriate skill(s) instead."
       ]
     }

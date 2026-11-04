@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "dag_id": "image_attribute_augmentation_dag_k8s",
+      "platform": "kubernetes",
+      "package_path": "airflow/dags/workflows/image_attribute_augmentation_dag/configs/image_attribute_augmentation_k8s_manifest.yaml",
+      "modes": [
+        {"name": "external", "gpu_floor": 0, "gpu_practical": 0, "pools": ["default_pool", "external_image_edit_service_pool"], "external_endpoints": true},
+        {"name": "internal", "gpu_floor": 2, "gpu_practical": 2, "pools": ["default_pool", "k8s_rtx6000_1"], "secrets": ["HF_TOKEN"]}
+      ]
+    },
+    {
+      "dag_id": "event_video_generation_dag_k8s",
+      "platform": "kubernetes",
+      "package_path": "airflow/dags/workflows/event_video_generation_dag/configs/event_video_generation_k8s_manifest.yaml",
+      "modes": [
+        {"name": "external", "gpu_floor": 1, "gpu_practical": 2, "pools": ["default_pool", "k8s_rtx6000_1", "external_image2video_service_pool"], "external_endpoints": true, "requires_nvcuvid": true},
+        {"name": "internal", "gpu_floor": 5, "gpu_practical": 5, "pools": ["default_pool", "k8s_rtx6000_1"], "secrets": ["HF_TOKEN"], "requires_nvcuvid": true}
+      ]
+    },
+    {
+      "dag_id": "event_video_generation_dag_osmo",
+      "platform": "osmo",
+      "package_path": "airflow/dags/workflows/event_video_generation_dag/configs/event_video_generation_osmo_manifest.yaml",
+      "modes": [
+        {"name": "external", "gpu_floor": 0, "gpu_practical": 0, "pools": ["default_pool", "osmo_rtx6000_1"], "secrets": ["OSMO_TOKEN"], "external_endpoints": true, "osmo_access": true}
+      ]
+    },
+    {
+      "dag_id": "video_data_augmentation_dag_k8s",
+      "platform": "kubernetes",
+      "package_path": "airflow/dags/workflows/video_data_augmentation_dag/configs/video_data_augmentation_k8s_manifest.yaml",
+      "modes": [
+        {"name": "external", "gpu_floor": 1, "gpu_practical": 2, "pools": ["default_pool", "k8s_rtx6000_1", "cosmos_transfer_3_service_pool"], "external_endpoints": true, "requires_nvcuvid": true},
+        {"name": "internal", "gpu_floor": 4, "gpu_practical": 5, "pools": ["default_pool", "k8s_rtx6000_1"], "secrets": ["HF_TOKEN"], "requires_nvcuvid": true}
+      ]
+    },
+    {
+      "dag_id": "video_data_augmentation_dag_osmo",
+      "platform": "osmo",
+      "package_path": "airflow/dags/workflows/video_data_augmentation_dag/configs/video_data_augmentation_osmo_manifest.yaml",
+      "modes": [
+        {"name": "external", "gpu_floor": 0, "gpu_practical": 0, "pools": ["osmo_h100_1"], "secrets": ["OSMO_TOKEN"], "external_endpoints": true, "osmo_access": true}
+      ]
+    },
+    {
+      "dag_id": "defect_image_generation_smt_dag_k8s",
+      "platform": "kubernetes",
+      "package_path": "airflow/dags/workflows/defect_image_generation_dag/configs/smt/defect_image_generation_k8s_manifest.yaml",
+      "modes": [
+        {"name": "external", "gpu_floor": 1, "gpu_practical": 1, "pools": ["default_pool", "k8s_rtx6000_1", "external_image_edit_service_pool"], "external_endpoints": true},
+        {"name": "internal", "gpu_floor": 2, "gpu_practical": 8, "pools": ["default_pool", "k8s_rtx6000_1"], "secrets": ["HF_TOKEN"]}
+      ]
+    },
+    {
+      "dag_id": "autonomous_vehicle_dataset_generation_dag_k8s",
+      "platform": "kubernetes",
+      "package_path": "airflow/dags/workflows/autonomous_vehicle_dataset_generation_dag/configs/autonomous_vehicle_dataset_generation_k8s_manifest.yaml",
+      "legacy_package_paths": ["airflow/dags/workflows/curation_and_retrieval_dag/configs/curation_and_retrieval_k8s_manifest.yaml"],
+      "modes": [
+        {"name": "retrieval", "gpu_floor": 1, "gpu_practical": 1, "pools": ["default_pool", "k8s_rtx6000_1"], "secrets": ["HF_TOKEN"], "required_pvcs": [{"name": "shared-ffmpeg", "remediation": "fill it as described in docs/autonomous-vehicle-dataset-generation/prerequisites.md#shared-ffmpeg-installation"}]},
+        {"name": "generation", "gpu_floor": 4, "gpu_practical": 4, "pools": ["default_pool", "k8s_rtx6000_1"], "secrets": ["HF_TOKEN"], "required_pvcs": [{"name": "shared-ffmpeg", "remediation": "fill it as described in docs/autonomous-vehicle-dataset-generation/prerequisites.md#shared-ffmpeg-installation"}]}
+      ]
+    },
+    {
+      "dag_id": "k8s_resource_cleanup_dag",
+      "platform": "operational",
+      "package_path": "airflow/dags/workflows/k8s_resource_cleanup_dag/k8s_resource_cleanup_dag.py",
+      "modes": [
+        {"name": "kubernetes", "gpu_floor": 0, "gpu_practical": 0, "pools": ["default_pool"]}
+      ]
+    }
+  ]
+}

@@ -23,7 +23,7 @@ requires without fetching a doc page?"
 
 Use the `version-matrix.json` schema. Its manual fallback fetches the
 matching per-library page through
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Hardware topology
 
@@ -64,4 +64,4 @@ path, ask it to do so.
 
 Questions about writing code, debugging crashes, or setting up an
 environment route through the matching skill in
-[`AGENTS.md`](../../../AGENTS.md).
+bundle `AGENTS.md`.

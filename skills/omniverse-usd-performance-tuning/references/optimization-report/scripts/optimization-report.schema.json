@@ -21,6 +21,194 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "asset_results": {
+      "description": "One entry per unique definition, joined from manifest decisions and worker receipts. Geometry metrics exclude child definitions; operation seconds exclude other phases.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "definition_id",
+          "name",
+          "source_prim_path",
+          "semantic_category",
+          "structural_type",
+          "boundary_reason",
+          "structure_reason",
+          "independent_use",
+          "disposition",
+          "occurrences",
+          "children",
+          "before",
+          "after",
+          "operations",
+          "retained_geometry",
+          "reused_from_library"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "definition_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source_prim_path": {
+            "type": "string"
+          },
+          "product_identity": {"type": "object", "description": "Recorded product identification and accepted representation substitution."},
+          "equipment_family": {"type": "string", "minLength": 1},
+          "semantic_category": {
+            "type": "string"
+          },
+          "structural_type": {
+            "type": "string"
+          },
+          "boundary_reason": {
+            "type": "string"
+          },
+          "structure_reason": {
+            "type": "string"
+          },
+          "independent_use": {
+            "type": "string"
+          },
+          "disposition": {
+            "type": "string"
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "before": {
+            "type": "object"
+          },
+          "after": {
+            "type": "object"
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "order",
+                "name",
+                "status",
+                "reason",
+                "seconds"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "order": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "seconds": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "prior_operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "order",
+                "name",
+                "status",
+                "reason",
+                "seconds"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "order": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "seconds": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "retained_geometry": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "reused_from_library": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "report_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "completion": {
+          "type": "string"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_run_instructions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
     "asset_name": {
       "type": "string",
       "description": "Name of the asset that was optimized."
@@ -58,7 +246,7 @@
     },
     "runtime_context": {
       "type": "object",
-      "description": "Snapshot of the Kit / Usd Optimize / usd-validation-nvidia versions in effect for this run. Copied verbatim from setup-preflight.json so later readers can reproduce or audit the report. Mirrors the runtime-context fields defined in skills/omniverse-usd-performance-tuning/references/setup-usd-performance-tuning/references/runtime-context-header.md.",
+      "description": "Snapshot of the Kit / Usd Optimize / usd-validation-nvidia versions in effect for this run. Copied verbatim from setup-preflight.json so later readers can reproduce or audit the report. Mirrors the runtime-context fields defined in skills/omniverse-usd-performance-tuning/references/setup.md.",
       "required": ["usdOptimize", "assetValidator"],
       "properties": {
         "kit": {
@@ -128,7 +316,7 @@
     "score_scope": {
       "type": "string",
       "enum": ["stage_optimization"],
-      "description": "Optional. Scope of optimization_score: this report scores stage/composition optimization effectiveness, not full runtime performance. Single-value enum kept for explicitness; not rendered (the renderer uses score_scope_label) and not gated, so it is optional rather than required."
+      "description": "Optional. Scope of optimization_score: legacy scope identifier for measured-area scores, not full runtime performance. Numeric scores remain in JSON for compatibility; the rendered report presents one measured-result verdict. Single-value enum kept for explicitness; not rendered (the renderer uses score_scope_label) and not gated, so it is optional rather than required."
     },
     "score_label": {
       "type": "string",
@@ -314,7 +502,7 @@
         },
         "merge_locality_preserved": {
           "type": "boolean",
-          "description": "Merge LOCALITY invariant: true only when every fused mesh stayed UNDER its named-component merge boundary — no geometry relocated to a shallower ancestor or the stage root. A single stage-wide merge buckets meshes by material across the whole stage and mergePoint=Parent resolves to their common ancestor (the root), dumping anonymous merged* blobs at the root and emptying the named kind-tagged components of their geometry. That is identity-destroying even when triangles and the mesh-count accounting balance, so on any allow_merge run the scorer fails closed unless this is true (and meshes_relocated_outside_boundary is 0). Compute it by checking each merged prim's parent against the expected boundary — kind-prim survival alone is NOT enough (the kind Xforms can survive while emptied). Scope one merge call per component to keep locality (mesh-merge-rewrite-spec.md §5)."
+          "description": "Merge LOCALITY invariant: true only when every fused mesh stayed UNDER its named-component merge boundary — no geometry relocated to a shallower ancestor or the stage root. A single stage-wide merge buckets meshes by material across the whole stage and mergePoint=Parent resolves to their common ancestor (the root), dumping anonymous merged* blobs at the root and emptying the named kind-tagged components of their geometry. That is identity-destroying even when triangles and the mesh-count accounting balance, so on any allow_merge run the scorer fails closed unless this is true (and meshes_relocated_outside_boundary is 0). Compute it by checking each merged prim's parent against the expected boundary — kind-prim survival alone is NOT enough (the kind Xforms can survive while emptied). Scope one merge call per component to keep locality (references/operations.md, Interior merge)."
         },
         "meshes_relocated_outside_boundary": {
           "type": "integer",
@@ -455,7 +643,7 @@
       "properties": {
         "complete": {
           "type": "boolean",
-          "description": "True only when every entry's disposition is one of optimized | skipped_zero_meshes | skipped_user_declined. A 'blocked' or unresolved entry keeps this false and the report is not final."
+          "description": "True only when every entry's disposition is one of optimized | exact_cache_hit | normalized_cache_hit | product_identity_hit | verified_unchanged | skipped_zero_meshes | skipped_user_declined and its required evidence passes. A 'blocked' or unresolved entry keeps this false and the report is not final."
         },
         "source_manifests": {
           "type": "array",
@@ -490,15 +678,54 @@
               },
               "disposition": {
                 "type": "string",
-                "enum": ["optimized", "skipped_zero_meshes", "skipped_user_declined", "blocked"],
-                "description": "optimized = the per-target mesh op chain ran; skipped_zero_meshes = no meshes to optimize (requires mesh_count == 0); skipped_user_declined = user opted out of optimizing this target; blocked = could not be processed (keeps complete=false)."
+                "enum": ["optimized", "exact_cache_hit", "normalized_cache_hit", "product_identity_hit", "verified_unchanged", "skipped_zero_meshes", "skipped_user_declined", "blocked"],
+                "description": "exact_cache_hit = completed result reused under exact source identity; normalized_cache_hit = completed result reused under normalized source identity with recorded workload authorization; product_identity_hit = published representation reused under accepted product identity and recorded substitution; optimized = verified useful change; verified_unchanged = assessed operations with evidence and passed preservation checks; skipped_zero_meshes = no geometry to optimize (requires mesh_count and geometry_count == 0); skipped_user_declined = user opted out of optimizing this target; blocked = could not be processed (keeps complete=false)."
               },
               "operations": {
                 "type": "array",
                 "items": { "type": "string" },
                 "description": "Optional: the mesh op chain applied to this target, for traceability."
               },
-              "notes": { "type": "string" }
+              "notes": { "type": "string" },
+              "geometry_count": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "All geometry schemas, including analytic primitives and point instancers."
+              },
+              "assessment": {
+                "type": "object",
+                "properties": {
+                  "complete": {
+                    "type": "boolean"
+                  },
+                  "operations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "required": [
+                  "complete",
+                  "operations"
+                ]
+              },
+              "verification": {
+                "type": "object",
+                "properties": {
+                  "passed": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "passed"
+                ]
+              },
+              "definition_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Definition identity within the writer layer. Omit only for legacy file-level coverage."
+              }
             }
           }
         }

@@ -1,0 +1,65 @@
+{
+  "skill_name": "rfdiffusion-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to design a de novo protein backbone with RFDiffusion. Generate a protein of around 80-120 residues from scratch with the maximum quality settings using the hosted NVIDIA API. Create and execute the request now using NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted RFDiffusion request with Bearer auth, an 80-120 residue contig range, diffusion_steps=50, and the required non-empty dummy input_pdb, plus the actual returned backbone saved as a PDB artifact and summarized from the response.",
+      "files": [],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived backbone information and the saved .pdb path",
+        "[hosted-endpoint-url] Uses the correct hosted RFDiffusion endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/ipd/rfdiffusion/generate'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from NGC_API_KEY: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[contigs-length-range] contigs field specifies a length range for de novo generation: Script contains 'contigs' with a length-range string like '80-120' or similar (no chain letter prefix — de novo, not motif scaffolding)",
+        "[diffusion-steps-max] diffusion_steps set to 50 (maximum quality): Script contains 'diffusion_steps' and '50'",
+        "[saves-pdb-output] Saves the output_pdb from the response to a PDB file: Script accesses 'output_pdb' from the response and writes it to a .pdb file",
+        "[dummy-input-pdb-for-denovo] Passes a non-empty dummy input_pdb for de novo inline generation: Script includes an 'input_pdb' field with a minimal non-empty PDB string such as CRYST1/ATOM/END; it must not omit both input_pdb and input_pdb_asset because live hosted validation requires one of them even for de novo generation"
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "I have a protein structure (target.pdb) with a functional motif at residues 25-35 of chain A. I want to scaffold this motif — keep those residues and design a new protein structure of 50-80 residues around them. Use the hosted RFDiffusion API.",
+      "expected_output": "A Python script that reads target.pdb, calls the hosted endpoint with contigs='A25-35/0 50-80' (or equivalent), diffusion_steps=50, and saves the scaffolded backbone PDB.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/ipd/rfdiffusion/generate'",
+        "[input-pdb-provided] Reads target.pdb and passes content as input_pdb: Script reads target.pdb and sends its content as 'input_pdb' in the payload",
+        "[contigs-preserves-motif] contigs field preserves chain A residues 25-35: Script contains 'contigs' with a value including 'A25-35' and a generated segment like '50-80'",
+        "[chain-break-syntax] Contigs uses /0 chain break separator between kept residues and generated segment: Script contigs value contains '/0' as chain break separator",
+        "[diffusion-steps-set] diffusion_steps is set (max is 50): Script contains 'diffusion_steps' with a value between 1 and 50",
+        "[saves-pdb-output] Saves output_pdb to a PDB file: Script accesses 'output_pdb' and writes it to a .pdb file"
+      ]
+    },
+    {
+      "id": "3",
+      "prompt": "I want to design a protein binder for my target protein (target.pdb, chain A). The hotspot residues I want the binder to contact are A50, A51, A52, A53, and A54. Design a binder of 50-100 residues. Use the hosted API.",
+      "expected_output": "A Python script with input_pdb=target.pdb content, contigs referencing chain A of the target and a binder segment, hotspot_res=['A50','A51','A52','A53','A54'], calling the hosted endpoint and saving the generated binder PDB.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/ipd/rfdiffusion/generate'",
+        "[hotspot-res-field] hotspot_res field contains the specified residue identifiers: Script contains 'hotspot_res' with at least some of: 'A50', 'A51', 'A52', 'A53', 'A54'",
+        "[contigs-binder-segment] contigs includes both a target chain reference and a binder generation segment: Script 'contigs' value includes chain A reference and a generated segment separated by '/0'",
+        "[input-pdb-target] Reads and submits target.pdb as input_pdb: Script reads target.pdb and passes its content as 'input_pdb'",
+        "[saves-pdb-output] Saves output_pdb to a PDB file: Script writes 'output_pdb' content to a .pdb file",
+        "[hotspot-format] hotspot_res uses array of strings format like ['A50', 'A51']: Script 'hotspot_res' is a list/array of strings in 'ChainResidue' format"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "4",
+      "prompt": "Help me set up RFDiffusion locally with Docker on my GPU machine. I have an A100 and NGC_API_KEY set. Once it's running, design a de novo protein backbone of 100 residues.",
+      "expected_output": "Docker setup instructions using shell env first and optional repo-root .env overrides, requiring NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, with the correct image (:2 tag), single GPU flag, cache mount, health check loop, then a local no-auth prediction script targeting localhost:8000 without /v1/ prefix and passing a non-empty dummy input_pdb for de novo generation.",
+      "files": [],
+      "assertions": [
+        "[docker-image-tag] References the correct RFDiffusion container image with :2 tag: Output contains 'nvcr.io/nim/ipd/rfdiffusion' and ':2'",
+        "[single-gpu-flag] Uses single GPU device specification (device=0): Output contains '--gpus' and 'device=0'",
+        "[env-contract-and-cache] Local setup uses the repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE to /opt/nim/.cache",
+        "[health-check] Includes health check before submitting prediction: Output contains health check against localhost:8000/v1/health/ready",
+        "[local-endpoint-no-v1] Local inference URL has no /v1/ prefix: Script contains 'localhost:8000/biology/ipd/rfdiffusion/generate'",
+        "[de-novo-contigs] Local de novo request includes contigs plus required dummy input_pdb: Script contains 'contigs' with a value like '100', 'diffusion_steps', and a non-empty dummy 'input_pdb' string"
+      ]
+    }
+  ]
+}

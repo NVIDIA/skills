@@ -1,0 +1,22 @@
+[
+  {"query": "Generate 20 drug-like molecules similar to aspirin using GenMol", "should_trigger": true},
+  {"query": "I want to use the GenMol NIM to do scaffold decoration on this SMILES", "should_trigger": true},
+  {"query": "Run de novo molecule generation with GenMol NIM and rank by QED", "should_trigger": true},
+  {"query": "Use GenMol to extend a molecular scaffold and generate analogs for lead optimization", "should_trigger": true},
+  {"query": "I need to generate novel molecules from a fragment using the BioNeMo GenMol microservice", "should_trigger": true},
+  {"query": "Generate molecules with SAFE notation using the hosted NVIDIA GenMol API", "should_trigger": true},
+  {"query": "I have a hit compound and want to decorate its scaffold with GenMol", "should_trigger": true},
+  {"query": "Use GenMol to generate 50 molecules starting from this motif and rank by LogP", "should_trigger": true},
+  {"query": "Run the GenMol Docker container locally to do fragment-based molecule generation", "should_trigger": true},
+  {"query": "Convert my SMILES to SAFE notation and generate analogs with GenMol NIM", "should_trigger": true},
+  {"query": "I want to optimize a hit compound by generating structural variants using GenMol", "should_trigger": true},
+  {"query": "De novo drug discovery: generate 100 molecules from scratch using GenMol", "should_trigger": true},
+  {"query": "Predict the 3D structure of this drug candidate binding to its protein target", "should_trigger": false},
+  {"query": "Search for protein homologs and generate an MSA for AlphaFold input", "should_trigger": false},
+  {"query": "Dock my ligand to a receptor and return the top 10 binding poses", "should_trigger": false},
+  {"query": "Design a protein backbone for binder design using RFDiffusion", "should_trigger": false},
+  {"query": "Calculate the molecular weight and logP of aspirin using RDKit", "should_trigger": false},
+  {"query": "I want to predict protein structure from a FASTA sequence using OpenFold3", "should_trigger": false},
+  {"query": "Find all molecules in ChEMBL with QED > 0.8", "should_trigger": false},
+  {"query": "Run ProteinMPNN inverse folding on my backbone PDB structure", "should_trigger": false}
+]

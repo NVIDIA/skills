@@ -1,0 +1,8 @@
+name: CDF Curation and Retrieval
+repo: NVIDIA/cdf-curation-and-retrieval
+description: Author, validate, and run Cosmos Data Factory curation and retrieval pipelines.
+skills:
+  - path: skills/cdf-curation-and-retrieval/
+    catalog_dir: cdf-curation-and-retrieval
+links:
+  discussions: false

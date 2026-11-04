@@ -1,16 +1,11 @@
 ---
 name: nvidia-skill-finder
 description: >-
-  Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.
+  Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. Trigger on NVIDIA products, hardware, software, SDKs, GPUs, Jetson/JetPack/L4T/BSP/SDK Manager/driver/flashing/setup, CUDA, NIM, NeMo, Omniverse/OpenUSD/SimReady, Isaac, RAPIDS/cuDF, cuPyNumeric, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, VSS, TAO, NGC/NVCF. Do not use for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks.
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
   author: NVIDIA
-  tags:
-    - nvidia
-    - skills
-    - discovery
-    - catalog
-    - router
+  tags: "nvidia, skills, discovery, catalog, router"
   domain: agent-skills
 ---
 
@@ -46,7 +41,7 @@ Continue with this skill only when the request is plausibly related to an NVIDIA
 Strong signals:
 
 - The user mentions NVIDIA, CUDA, GPU acceleration, NIM, NeMo, Omniverse, OpenUSD,
-  SimReady, cuOpt, RAPIDS/cuDF, cuPyNumeric, Dynamo, Holoscan, TensorRT, VSS,
+  SimReady, Isaac, cuOpt, RAPIDS/cuDF, cuPyNumeric, Dynamo, Holoscan, TensorRT, VSS,
   DeepStream, Jetson, JetPack, L4T, BSP, SDK Manager, TAO, NGC, NVCF, or another
   NVIDIA product.
 - The task maps strongly to an NVIDIA catalog lane such as Agentic AI, Physical

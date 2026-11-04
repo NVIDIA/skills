@@ -1,0 +1,11 @@
+name: DGX Spark Skills
+repo: NVIDIA/dgx-spark-skills
+ref: main
+description: Agent guidance for DGX Spark and related GB10 system identification, troubleshooting, updates, playbooks, NVIDIA Sync, diagnostics, and support.
+skills:
+  - path: skills/dgx-spark-skills/
+    catalog_dir: dgx-spark-skills
+links:
+  contributing: CONTRIBUTING.md
+  discussions: false
+  security: true

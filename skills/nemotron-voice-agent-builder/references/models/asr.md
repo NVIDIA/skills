@@ -80,6 +80,20 @@ An auto-detecting multilingual row does not become single-language because the r
 carries a locale. Resolve that distinction through `models/language-routing.md` before
 promising fixed-language recognition.
 
+## Speaker Labels
+
+Use this when the user wants to know who is speaking, such as a meeting room.
+
+- Diarization is a property of the locked row. Confirm it on the matrix row and the
+  `/deploy` page, and do not promise labels on a row the docs do not list.
+- Speaker tags arrive on the words of a final transcript, not on interim results, so
+  labeled text appears at each final.
+- Do not assume tags start at 0. Print the first tags in `scripts/smoke.sh` and number
+  speakers by first appearance.
+- Prefix each user line with its speaker, such as `Speaker 1:`, and tell the LLM that these
+  labels come from the recognizer and are not names. For a shared room, reply only when the
+  assistant is called by name.
+
 ## Sizing
 
 Planning estimates only. Authoritative GPU memory is the chosen row on the
@@ -126,3 +140,4 @@ memory gate.
 - Skipping docs.nvidia.com/nim/speech for a remembered build.nvidia.com slug.
 - Setting a function id on self-hosted ASR.
 - Inventing a locale not on the matrix language table.
+- Promising speaker labels on an ASR row the docs do not list as diarization-capable.

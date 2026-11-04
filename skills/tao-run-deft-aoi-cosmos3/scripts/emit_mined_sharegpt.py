@@ -16,10 +16,15 @@ from typing import Any, Iterable
 from validate_sharegpt import load_records, prompt_and_label, resolve_image
 
 
-def _path_keys(path_text: str, media_root: pathlib.Path) -> set[str]:
+def _full_path_keys(path_text: str, media_root: pathlib.Path) -> set[str]:
     normalized = path_text.replace("\\", "/").rstrip("/")
     resolved = str(resolve_image(path_text, media_root))
-    return {normalized, resolved, pathlib.PurePosixPath(normalized).name}
+    return {normalized, resolved}
+
+
+def _basename(path_text: str) -> str:
+    normalized = path_text.replace("\\", "/").rstrip("/")
+    return pathlib.PurePosixPath(normalized).name
 
 
 def _load_mined_paths(path: pathlib.Path, column: str) -> list[str]:
@@ -40,8 +45,12 @@ def _load_mined_paths(path: pathlib.Path, column: str) -> list[str]:
 
 def _source_index(
     records: list[dict[str, Any]], media_root: pathlib.Path
-) -> dict[str, list[tuple[int, dict[str, Any]]]]:
-    index: dict[str, list[tuple[int, dict[str, Any]]]] = {}
+) -> tuple[
+    dict[str, list[tuple[int, dict[str, Any]]]],
+    dict[str, list[tuple[int, dict[str, Any]]]],
+]:
+    by_path: dict[str, list[tuple[int, dict[str, Any]]]] = {}
+    by_name: dict[str, list[tuple[int, dict[str, Any]]]] = {}
     for record_index, record in enumerate(records):
         images = record.get("images")
         if not isinstance(images, list) or len(images) != 2:
@@ -50,33 +59,48 @@ def _source_index(
                 "[AOI, golden_reference]"
             )
         prompt_and_label(record, context=f"source record[{record_index}]")
-        for key in _path_keys(str(images[0]), media_root):
-            index.setdefault(key, []).append((record_index, record))
-    return index
+        target = str(images[0])
+        for key in _full_path_keys(target, media_root):
+            by_path.setdefault(key, []).append((record_index, record))
+        by_name.setdefault(_basename(target), []).append((record_index, record))
+    return by_path, by_name
+
+
+def _candidates(
+    keys: Iterable[str],
+    index: dict[str, list[tuple[int, dict[str, Any]]]],
+) -> dict[int, dict[str, Any]]:
+    candidates: dict[int, dict[str, Any]] = {}
+    for key in keys:
+        for source_index, record in index.get(key, []):
+            candidates[source_index] = record
+    return candidates
 
 
 def _match(
     mined_path: str,
     *,
     media_root: pathlib.Path,
-    index: dict[str, list[tuple[int, dict[str, Any]]]],
+    by_path: dict[str, list[tuple[int, dict[str, Any]]]],
+    by_name: dict[str, list[tuple[int, dict[str, Any]]]],
 ) -> tuple[int, dict[str, Any], str]:
-    candidates: dict[int, dict[str, Any]] = {}
-    matched_by: list[str] = []
-    for key in _path_keys(mined_path, media_root):
-        hits = index.get(key, [])
-        if hits:
-            matched_by.append(key)
-        for source_index, record in hits:
-            candidates[source_index] = record
-    if len(candidates) != 1:
-        reason = "missing" if not candidates else "ambiguous"
+    exact = _candidates(_full_path_keys(mined_path, media_root), by_path)
+    if len(exact) == 1:
+        source_index, record = next(iter(exact.items()))
+        return source_index, record, "exact"
+
+    named = _candidates([_basename(mined_path)], by_name)
+    if not exact and len(named) == 1:
+        source_index, record = next(iter(named.items()))
+        return source_index, record, "name"
+
+    if exact or named:
         raise ValueError(
-            f"{reason} source match for mined path {mined_path!r}; "
-            f"candidate_indexes={sorted(candidates)}"
+            f"ambiguous source match for mined path {mined_path!r}; "
+            f"exact_candidate_indexes={sorted(exact)}; "
+            f"basename_candidate_indexes={sorted(named)}"
         )
-    source_index, record = next(iter(candidates.items()))
-    return source_index, record, "exact" if str(resolve_image(mined_path, media_root)) in matched_by else "name"
+    raise ValueError(f"missing source match for mined path {mined_path!r}")
 
 
 def _format_path(
@@ -104,7 +128,7 @@ def emit_records(
     relative: bool,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     mined_paths = list(mined_paths)
-    index = _source_index(source_records, media_root)
+    by_path, by_name = _source_index(source_records, media_root)
     output: list[dict[str, Any]] = []
     matches: Counter[str] = Counter()
     seen_targets: set[str] = set()
@@ -113,7 +137,10 @@ def emit_records(
         if resolved_target in seen_targets:
             continue
         source_index, source, match_mode = _match(
-            mined_path, media_root=media_root, index=index
+            mined_path,
+            media_root=media_root,
+            by_path=by_path,
+            by_name=by_name,
         )
         seen_targets.add(resolved_target)
         matches[match_mode] += 1

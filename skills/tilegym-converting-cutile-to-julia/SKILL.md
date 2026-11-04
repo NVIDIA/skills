@@ -19,7 +19,7 @@ Convert `@ct.kernel` Python kernels to Julia `function ... end` cuTile.jl kernel
 ## Workflow Selection
 
 - **Standard conversion** → Full workflow: [`translations/workflow.md`](translations/workflow.md)
-- **Errors** (`MethodError`, `IRError`, numerical mismatch) → [`references/debugging.md`](references/debugging.md)
+- **Errors** (`CodegenErrors`, `MethodError`, `UndefVarError`, numerical mismatch) → [`references/debugging.md`](references/debugging.md)
 - **Quick reference** → [`references/api-mapping.md`](references/api-mapping.md) + [`references/critical-rules.md`](references/critical-rules.md)
 - **Test patterns** → [`references/testing.md`](references/testing.md)
 
@@ -59,15 +59,17 @@ Full conversion checklist with post-conversion verification → [`translations/w
 
 ## ⚠️ Top Pitfalls
 
-The most dangerous translation errors. Full rules (17 total) in [`references/critical-rules.md`](references/critical-rules.md).
+The most dangerous translation errors. Full rules (18 total) in [`references/critical-rules.md`](references/critical-rules.md).
 
 | # | Pitfall | One-line fix |
 |---|---------|-------------|
 | 1 | `ct.full()` doesn't exist in Julia | Use `fill(val, shape)`, `zeros(T, dims...)`, or `ones(T, dims...)` |
-| 2 | `max(a, b)` on tiles → `IRError` | Use `max.(a, b)` (broadcast dot) |
+| 2 | `max(a, b)` on tiles → `CodegenErrors` (unsupported `isless`) | Use `max.(a, b)` (broadcast dot) |
 | 3 | `IRError` / `MethodError` mentioning `IRStructurizer` | Compiler bug — file upstream with minimal reproducer |
-| 4 | `ct.launch` arg order silently wrong | Args are positional — match kernel signature exactly |
-| 5 | `ct.load` with `order` — index positions wrong | `order` remaps BOTH shape AND index (Critical Rule 16) |
+| 4 | Launch arg order silently wrong | `@cuda backend=cuTile blocks=grid kernel(args...)` — args are positional, match kernel signature exactly |
+| 5 | `ct.max(t, axis=0)` → `max(...)` | Python `ct.max` is a *reduction* → `maximum(t; dims=1)`; Julia `max` is element-wise |
+| 6 | `ct.load` with `order` — index positions wrong | `order` remaps BOTH shape AND index (Critical Rule 16) |
+| 7 | Kept Python's `(M, N)` shape → strided loads, 3–8× slower | Reverse dims: Python row-major `(M, N)` = Julia `(N, M)`; reduce over `dims=1` (Critical Rule 7) |
 
 ## Worked Examples
 
@@ -76,8 +78,8 @@ Side-by-side Python → Julia conversions matching the released Julia kernels in
 | # | Example | Key Patterns | When to Reference |
 |---|---------|-------------|-------------------|
 | 01 | [`add`](examples/01_add/) | 1D `ct.load`/`ct.store`, alpha scaling, scalar broadcast, `fill`/`zeros`, keyword load/store | Starting point; basic TMA + element-wise patterns |
-| 02 | [`matmul`](examples/02_matmul/) | `muladd`, TF32 conversion, K-loop with `for`, 2D swizzle, standard Julia layout, `ct.@compiler_options` | MMA / tensor core operations |
-| 03 | [`softmax`](examples/03_softmax/) | Persistent scheduling, `for` loops, `gather`/`scatter`, `padding_mode`, multi-pass | Large-tensor reduction patterns |
+| 02 | [`matmul`](examples/02_matmul/) | `muladd`, TF32 conversion, K-loop with `for`, 2D swizzle, standard Julia layout, tile sizes and `num_ctas` chosen per problem size at launch | MMA / tensor core operations |
+| 03 | [`softmax`](examples/03_softmax/) | Row-major `(M, N)` → column-major `(N, M)` layout, persistent scheduling, `for` loops, `gather`/`scatter`, `padding_mode`, multi-pass | Large-tensor reduction patterns; any per-row Python kernel |
 
 These match the released kernels in `julia/kernels/` (`add.jl`, `matmul.jl`, `softmax.jl`). The examples are simplified teaching versions — always consult `julia/kernels/*.jl` for the canonical, tested implementations.
 
@@ -86,7 +88,7 @@ These match the released kernels in `julia/kernels/` (`add.jl`, `matmul.jl`, `so
 | Category | Document | Content |
 |----------|----------|---------|
 | **Workflows** | [`translations/workflow.md`](translations/workflow.md) | Full conversion workflow with todo list, validation loop, checklist |
-| **Rules** | [`references/critical-rules.md`](references/critical-rules.md) | 17 Critical Rules for cuTile Python → Julia conversion |
+| **Rules** | [`references/critical-rules.md`](references/critical-rules.md) | 18 Critical Rules for cuTile Python → Julia conversion |
 | **API** | [`references/api-mapping.md`](references/api-mapping.md) | Python↔Julia bidirectional API mapping + kernel patterns |
 | **Testing** | [`references/testing.md`](references/testing.md) | Julia-native test patterns, tolerances, failure diagnosis |
 | **Debugging** | [`references/debugging.md`](references/debugging.md) | Julia-specific error diagnosis + IR debug commands |
@@ -109,6 +111,14 @@ julia --project=julia/ julia/test/runtests.jl
 
 Requirements:
 - Julia (minimum version declared in `julia/Project.toml` under `[compat] julia`)
-- CUDA 13.1+ driver
-- Blackwell GPU (compute capability 10+)
-- Dependencies managed via `julia/Project.toml`: CUDA.jl, cuTile.jl, NNlib.jl, Test
+- NVIDIA driver supporting CUDA 13 (r580+); CUDA.jl downloads the toolkit and `tileiras` artifacts itself
+- GPU with compute capability 8.0+ (TileGym CI targets Blackwell)
+- Dependencies managed via `julia/Project.toml` (versions pinned in `julia/Manifest.toml`): cuTile.jl 1.x, CUDA.jl 6.3+, NNlib.jl, Test
+
+CUDA versions follow cuTile.jl and CUDA.jl upstream: use the CUDA.jl version cuTile.jl's compat
+allows and the toolchain artifacts CUDA.jl selects by default. Do not pin a CUDA toolkit version
+(e.g., via `LocalPreferences.toml`) in this repo.
+
+Kernels are launched with `@cuda backend=cuTile blocks=grid kernel(args...)`, which needs both
+`using cuTile: cuTile` (for the `backend=cuTile` name) and `import cuTile as ct` (for the API) —
+see `julia/kernels/*.jl`.

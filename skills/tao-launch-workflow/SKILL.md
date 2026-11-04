@@ -28,6 +28,35 @@ tags:
 
 Use this skill before launching any TAO workflow or model action.
 
+For direct invocation, run the complete-checkout check in
+`references/platform-preflight.md` before Step 0 or any helper. Individual
+skill installs lack shared scripts; stop if the check fails. Use its verified
+`TAO_SKILL_BANK_PATH` for every helper.
+
+## Step 0 — Execution Mode: Card Packs (check first)
+
+Before running a multi-stage application workflow inside this conversation,
+check whether a compiled card pack ships next to the application skill:
+
+```bash
+ls "${TAO_SKILL_BANK_PATH}/skills/applications/<skill>/cards/" 2>/dev/null
+```
+
+- **Pack exists** → prefer the token-efficient path: the pack's `driver.sh`
+  runs the workflow as fresh per-stage sessions (measured 74-91% cheaper than
+  in-conversation execution, and the only mode validated on small models).
+  Read the pack's `README.md` for required env, complete THIS gate's items
+  1-9 for the launch review, then start the pack driver detached instead of
+  executing stages in this conversation. Monitor via the driver log and the
+  run dir's progress marks.
+- **No pack** → execute normally through this gate. If the workflow will be
+  run repeatedly, suggest compiling a pack once with a strong model — see
+  `skills/core/tao-token-efficient-execution` (authoring prompt + contracts).
+
+The card path replaces only in-conversation stage execution; it never skips
+this gate. A pack driver launch is side-effecting work and requires the same
+confirmed launch review.
+
 ## Quick Start
 
 Run the platform helper, ask for platform and monitoring preferences, then run
@@ -90,8 +119,12 @@ platform skills); nothing else is platform-specific.
   uploads). Then lint the assembled command with `redact_secrets.py lint` and
   **open the record and launch, in that order**:
   ```bash
-  JOB_ID=$("$BANK/scripts/tao_job_record.py" open --platform <p> --image <img> \
-    --network-arch <arch> --action <action> --storage-tier <A|B|C> --results-root <root>)
+  BANK="$TAO_SKILL_BANK_PATH"
+  if ! JOB_ID=$("$BANK/scripts/tao_job_record.py" open --platform <p> --image <img> \
+    --network-arch <arch> --action <action> --storage-tier <A|B|C> --results-root <root>); then
+    echo "TAO job-record creation failed; do not submit" >&2; exit 1
+  fi
+  [ -n "$JOB_ID" ] || { echo "TAO job-record returned no ID; do not submit" >&2; exit 1; }
   # <native launch, naming the backend object after $JOB_ID>
   "$BANK/scripts/tao_job_record.py" mark "$JOB_ID" --state RUNNING --backend-ref <ref>
   ```
@@ -141,7 +174,7 @@ should run it. Discover the choices from the **platform skills installed in this
 session** — you already see them by name and description (`tao-run-on-docker`,
 `-slurm`, `-kubernetes`, `-brev`, `-virtualenv`, plus any externally installed one such as the
 official `brev-cli` skill). There is no central platform registry to read. If
-your runtime surfaces only the core router skills (e.g. Codex), list the bank's
+your runtime surfaces only the core router skills, list the bank's
 platform skills by reading `skills/platform/tao-run-on-*/SKILL.md` frontmatter
 (name + one-line description) under `${TAO_SKILL_BANK_PATH}`.
 
@@ -204,14 +237,15 @@ Before creating specs, runner scripts, workspaces, logs, state files, or
 submitting a job, resolve the image for the selected model/action:
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/resolve_tao_image.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} \
+"$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py" \
+  --skill-bank "$TAO_SKILL_BANK_PATH" \
   --model <network> --action <action> --backend <auto-or-explicit> \
   --workload <workload-hint> --format text
 ```
 
-If the helper is unavailable, read `skills/models/<network>/config.json`
-directly. Resolve image fields in this order:
+For manual inspection, read the packaged
+`$TAO_SKILL_BANK_PATH/skills/models/<network>/references/skill_info.yaml`.
+If the helper is unavailable, stop before launch. Resolve image fields in this order:
 
 1. `backend_contracts.<selected-backend>.container_image`, when present
 2. `actions.<action>.container_image`
@@ -278,6 +312,11 @@ needed, then ask before installing. Examples:
 
 After user approval and installation, rerun the same preflight. Do not create
 runner files or launch jobs between the failed check and the rerun.
+
+### Runtime downloads
+
+Follow `references/runtime-downloads.md` for runtime-download rules. Local
+checkpoints do not imply cached packages.
 
 ## Dataset Intake
 

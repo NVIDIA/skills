@@ -1,10 +1,10 @@
 ---
 name: "tilegym-cutile-python"
-version: 1.3.0
 description: "Expert cuTile programming assistant. Write high-performance GPU kernels using cuTile's tile-based programming model with proper validation and optimization. Supports deep agent orchestration for complex multi-kernel tasks."
 license: CC-BY-4.0 AND Apache-2.0
 metadata:
   author: "TileGym Team <TileGym@nvidia.com>"
+  version: "1.3.0"
   tags:
     - cutile
     - gpu-kernels

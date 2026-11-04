@@ -14,17 +14,14 @@ behavior, parameters, defaults, and implementation gotchas.
 The package resolution rule is centralized once in
 [`usd-optimize` upstream handoff](../upstreams/usd-optimize.md): derive the
 upstream operation guide from the operation key as
-`docs/operations/<operation-key>.rst` (1.1.x packages), or
-`.agents/operations/<operation-key>.md` (1.0.x packages), then resolve it under
+`docs/operations/<operation-key>.rst`, then resolve it under
 the selected Usd Optimize package root. Do not duplicate package URLs, root fallbacks, or
 upstream parameter/default tables here. Before executing any operation, consume
 `<output_path>/setup-preflight.json` and confirm the op appears in
 `usdOptimize.operationsAvailable`.
 
 **Companion docs:**
-- [Execution reference](EXECUTION.md) — docs-class wrapper/API invocation shape, batch orchestration, and validator import variants.
-- [Classification rubric](CLASSIFICATION.md) — curation tiers and the canonical-over-specialty selection rule.
-- [`pipelines.md`](../usd-optimize-run-operations/references/pipelines.md) — curated multi-op chains organized by bottleneck.
+- [Scoped operations](../operations.md) — operation selection, validation, physical tolerances and execution.
 - [`operations.json`](operations.json) — machine-readable catalog (same data as below), including the per-op `curation` block (generated `status` + authored `wired_into`; `rationale` only on overrides).
 - [`usd-optimize` upstream handoff](../upstreams/usd-optimize.md) — central upstream operation-guide and prebuilt package resolution.
 
@@ -39,10 +36,10 @@ with the user before running). `analysis-only` is read-only (`context.analysisMo
 | Fit Primitives | `fitPrimitives` | 22 | bounded-loss | medium | yes | — |
 | Split Meshes | `splitMeshes` | 16 | lossless | low | no | — |
 | Primitives to Meshes | `primitivesToMeshes` | 13 | lossless | low | no | — |
+| Shrinkwrap | `shrinkwrap` | 13 | bounded-loss | high | yes | — |
 | De-duplicate Geometry | `deduplicateGeometry` | 12 | lossless | low | no | `safe-cleanup`, `memory-reduction`, `mesh-count-reduction` |
 | Mesh Cleanup | `meshCleanup` | 11 | lossless | low | yes | `mesh-count-reduction`, `data-quality-baseline` |
 | Decimate Meshes | `decimateMeshes` | 8 | bounded-loss | medium | yes | `mesh-count-reduction` |
-| Shrinkwrap | `shrinkwrap` | 7 | bounded-loss | high | yes | — |
 | Generate Normals | `generateNormals` | 6 | lossless | low | no | `data-quality-baseline` |
 | Merge Vertices | `mergeVertices` | 5 | lossless | low | no | — |
 | Subdivide Meshes | `subdivideMeshes` | 5 | lossless | low | no | — |
@@ -69,6 +66,7 @@ with the user before running). `analysis-only` is read-only (`context.analysisMo
 | Operation | Key | Args | Loss | Risk | Confirm | Pipelines |
 |---|---|---|---|---|---|---|
 | Optimize Materials | `optimizeMaterials` | 4 | lossless | low | no | `safe-cleanup`, `memory-reduction`, `load-time-reduction` |
+| Move Materials | `moveMaterials` | 2 | lossless | medium | yes | — |
 
 ## Uv
 | Operation | Key | Args | Loss | Risk | Confirm | Pipelines |
@@ -82,7 +80,7 @@ with the user before running). `analysis-only` is read-only (`context.analysisMo
 |---|---|---|---|---|---|---|
 | Optimize Primvars | `optimizePrimvars` | 6 | lossless | low | no | — |
 | Optimize Time Samples | `optimizeTimeSamples` | 6 | lossless | low | no | `safe-cleanup`, `load-time-reduction` |
-| Edit Stage Metrics | `editStageMetrics` | 4 | lossless | low | no | — |
+| Edit Stage Metrics | `editStageMetrics` | 5 | lossless | low | no | — |
 | Remove Attributes | `removeAttributes` | 3 | bounded-loss | medium | yes | — |
 | Compute Extents | `computeExtents` | 1 | lossless | low | no | `safe-cleanup`, `load-time-reduction`, `data-quality-baseline` |
 
@@ -115,10 +113,10 @@ with the user before running). `analysis-only` is read-only (`context.analysisMo
 
 ## Summary
 
-Total operations: **47**
+Total operations: **48**
 - geometry: 16
 - hierarchy: 9
-- materials: 1
+- materials: 2
 - uv: 3
 - metadata: 5
 - transform: 3
@@ -127,11 +125,9 @@ Total operations: **47**
 
 ## Catalog currency
 
-Two probe snapshots are checked in, `probe-snapshots/usd-optimize-1.0.4.json`
-and `probe-snapshots/usd-optimize-1.1.0.json`, each captured live from the
-matching usd-optimize release package. 1.1.0 is the newer of the two; both
-register the same 47 operations. Neither is authoritative at runtime: the live
-`operationsAvailable` list from the session's setup-preflight always wins.
+Use the live `operationsAvailable` list from setup-preflight to establish available operations.
+The catalog records supported operation names; release snapshots used by development tests do
+not establish what the current runtime provides.
 
 The `Args` column renders `args_count` from the catalog. The observed argument
 counts behind those values are recorded per runtime in

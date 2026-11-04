@@ -125,6 +125,13 @@ class PythonSelectorTests(unittest.TestCase):
 class DocumentationTests(unittest.TestCase):
     """Keep documented helper invocations on the selected interpreter."""
 
+    def test_cosmos_embed_runs_from_writable_results_directory(self) -> None:
+        model_skill = (
+            SKILL_ROOT.parents[1] / "models/tao-finetune-cosmos-embed/SKILL.md"
+        ).read_text(encoding="utf-8")
+        docker_common = model_skill.split("DOCKER_COMMON=(", 1)[1].split("\n)", 1)[0]
+        self.assertIn("-w /results", docker_common)
+
     def test_documented_helpers_use_selected_python(self) -> None:
         documentation = "\n".join(
             (SKILL_ROOT / path).read_text(encoding="utf-8")

@@ -2,7 +2,7 @@
 name: tao-run-on-virtualenv
 description: Run a Python training/eval script directly in an existing local virtualenv — no docker, no container. Implements the four-verb consumer contract (submit/status/logs/cancel) over a vendored process-lifecycle runner with durable on-disk state, PID-reuse-safe identity, and process-group cleanup. Use for docker-free local execution, plain-Python model scripts, fast HPO/AutoML trial smokes, or hosts where containers are unavailable. Trigger phrases include "run in my venv", "no docker", "virtualenv execution", "local python training", "run this training script directly".
 license: Apache-2.0
-compatibility: Requires a local Python virtualenv (pyvenv.cfg + bin/python) with the training script's dependencies installed. Linux is first-class (/proc); macOS works for smokes with documented caveats. No nvidia-tao-sdk, no docker.
+compatibility: Requires a local Python virtualenv (pyvenv.cfg + bin/python) with the training script's dependencies installed. Linux with procfs and pidfd signaling is required for active job cancellation; other POSIX hosts can run jobs and prove empty groups but fail closed rather than signal numeric process IDs. No nvidia-tao-sdk, no docker.
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
@@ -119,15 +119,17 @@ python3 "$RUNNER" cancel --job-dir "$RESULTS_DIR"
 ```
 
 Cancel marks first (a not-yet-started wrapper self-cancels at its start gate),
-verifies process identity (never kills a reused PID), then SIGTERM→SIGKILLs the
-whole process group. `already_terminal` in the reply means the job finished
-before the cancel — mark the record with the status it reports instead.
+then uses a durable group guardian and Linux pidfds for SIGTERM→SIGKILL. The
+guardian prevents PGID reuse during discovery; a pidfd pins each target across
+the observation/signal boundary. `already_terminal` in the reply means the job
+finished before the cancel — mark the record with the status it reports instead.
 
 ## Platform caveats
 
-- **Linux first-class.** Identity and group cleanup use `/proc`; on macOS the
-  runner falls back to `ps`/`pgrep` — fine for local smokes, but GPU training
-  targets are Linux hosts.
+- **Linux active cancellation.** Safe active-process termination requires
+  procfs, `pidfd_open`, and `pidfd_send_signal`. On another POSIX host the
+  `ps`/`pgrep` fallback can prove a group is empty, but cancellation of active
+  members returns `UNKNOWN` instead of risking a reused numeric PID or PGID.
 - **No multi-node, no image resolution** — there is no container. The "image"
   recorded is the venv's interpreter path.
 - The runner never downloads anything. Remote inputs are the agent's job to

@@ -122,6 +122,20 @@
     ]
   },
   {
+    "id": "nvidia-skill-finder-pos-isaac-lab",
+    "question": "How do I get started with Isaac Lab to train a quadruped locomotion policy?",
+    "expected_skill": "nvidia-skill-finder",
+    "expected_script": null,
+    "ground_truth": "The agent treats Isaac Lab as a strong NVIDIA Robotics / Physical AI signal, checks the live NVIDIA skills catalog before giving general Isaac Lab guidance, and recommends a current Isaac-related skill only if the catalog has one.",
+    "expected_behavior": [
+      "Invokes the NVIDIA skill finder for the Isaac Lab request",
+      "Attempts `npx skills add nvidia/skills --list` when shell access is available, or uses an approved catalog fallback if the CLI is unavailable",
+      "Does not count developer.nvidia.com or docs.nvidia.com product documentation as the live catalog check",
+      "Recommends an Isaac-related skill if present in the catalog, or says no strong catalog match was found without inventing a skill name",
+      "Asks before installing the skill"
+    ]
+  },
+  {
     "id": "nvidia-skill-finder-neg-express-route",
     "question": "Add an Express route for POST /api/orders.",
     "expected_skill": null,

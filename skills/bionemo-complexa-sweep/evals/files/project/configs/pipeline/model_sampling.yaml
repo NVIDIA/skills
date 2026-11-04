@@ -1,0 +1,60 @@
+# Model Sampling Configuration
+#
+# Defines model-specific sampling parameters: schedules, temperatures, noise scales.
+
+# =============================================================================
+# Diffusion sampling parameters (goes to generation.args)
+# =============================================================================
+
+args:
+  nsteps: 400
+  self_cond: True
+  guidance_w: 1.0
+  ag_ratio: 0.0
+  ag_ckpt_path: null
+  save_trajectory_every: 0
+  fold_cond: False
+
+# =============================================================================
+# Model-specific sampling parameters (goes to generation.model)
+# =============================================================================
+model:
+  # Backbone CA coordinates
+  bb_ca:
+    schedule:
+      mode: log
+      p: 2.0
+    gt:
+      mode: 1/t
+      p: 1.0
+      clamp_val: null
+    simulation_step_params:
+      sampling_mode: sc
+      sc_scale_noise: 0.1
+      sc_scale_score: 1.0
+      t_lim_ode: 0.98
+      t_lim_ode_below: 0.02
+      tsr_k: 1.0
+      tsr_sigma: 1.0
+      center_every_step: False
+
+  # Local latent features
+  local_latents:
+    schedule:
+      mode: power
+      p: 2.0
+    gt:
+      mode: tan
+      p: 1.0
+      clamp_val: null
+    simulation_step_params:
+      sampling_mode: sc
+      sc_scale_noise: 0.1
+      sc_scale_score: 1.0
+      t_lim_ode: 0.98
+      t_lim_ode_below: 0.02
+      tsr_k: 1.0
+      tsr_sigma: 1.0
+      center_every_step: False
+      
+n_recycle: 0

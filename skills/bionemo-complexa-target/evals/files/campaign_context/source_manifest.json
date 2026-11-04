@@ -1,0 +1,22 @@
+{
+  "source_revision": "50b5b310b62db98759e202260c9c0de4f8a8c790",
+  "files": {
+    "configs/search_binder_local_pipeline.yaml": {
+      "source": "configs/search_binder_local_pipeline.yaml",
+      "sha256": "1b856a07672277e227aae02340422e509981a87cdc7dc66b9dfc0ec80cde3b00"
+    },
+    "configs/pipeline/binder/binder_generate.yaml": {
+      "source": "configs/pipeline/binder/binder_generate.yaml",
+      "sha256": "501005c8a4b796da01ec00348af79510dba21230d14ae6331a60a1f6d0817aff"
+    },
+    "README-excerpts.md": {
+      "source": "README.md",
+      "sections": [
+        "Quick Start",
+        "CLI Reference"
+      ],
+      "source_sha256": "de5ab6410206dcbccaa4011146de9c61969e88cbaeb85f4c13d23dd645eda49a",
+      "sha256": "4f2181de42cd1a0d8af6aeecb72caa9187fc28bd91a41c7005f7623ab25ea5f7"
+    }
+  }
+}

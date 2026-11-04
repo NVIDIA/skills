@@ -1,0 +1,24 @@
+[collector]
+schema: nvshmem-transport-facts-v1
+collector_status: partial
+
+[nvshmem-version]
+nvshmem_info: not found
+nvshmem_prefix: /opt/nvshmem/current
+
+[nvshmem-plugins]
+plugin: /opt/nvshmem/current/lib/nvshmem_transport_ibrc.so
+plugin: /opt/nvshmem/current/lib/nvshmem_transport_ibgda.so
+
+[gpu]
+0, NVIDIA H100 80GB HBM3, 00000000:18:00.0, 9.0, 570.124.06
+
+[rdma-ports]
+rdma_device: mlx5_0
+  driver: mlx5_core
+  port: 1
+    state: 4: ACTIVE
+    link_layer: InfiniBand
+
+[diagnostics]
+partial: exact NVSHMEM version was not found

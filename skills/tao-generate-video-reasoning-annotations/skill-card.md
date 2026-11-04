@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to create Chain-of-Thought video training datasets from raw videos, generating multi-level captions, structured descriptions, and QA pairs with reasoning traces using VLM/LLM distillation. <br>
+Developers and ML engineers use this skill to auto-label raw videos with VLM/LLM teacher models inside the TAO Toolkit container, producing captions, structured descriptions, and Chain-of-Thought QA datasets (tao-vl-reason-v1.0 JSON) for training video understanding models in general, traffic, warehouse, or custom domains. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,19 +25,19 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [configuration.md](references/configuration.md) <br>
-- [domain_adaptation.md](references/domain_adaptation.md) <br>
-- [prompts_traffic.py](references/prompts_traffic.py) <br>
-- [prompts_warehouse.py](references/prompts_warehouse.py) <br>
-- [skill_info.yaml](references/skill_info.yaml) <br>
+- [Video Reasoning Annotation — Full Configuration Reference](references/configuration.md) <br>
+- [Video Reasoning Annotation — Domain Adaptation Guide](references/domain_adaptation.md) <br>
+- [Traffic domain prompts module (prompts_traffic.py)](references/prompts_traffic.py) <br>
+- [Warehouse domain prompts module (prompts_warehouse.py)](references/prompts_warehouse.py) <br>
+- [Skill contract (skill_info.yaml)](references/skill_info.yaml) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Files] <br>
-**Output Format:** [JSONL and tao-vl-reason-v1.0 JSON] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash and YAML code blocks; pipeline writes JSONL per step and tao-vl-reason-v1.0 JSON task files] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Per-step subdirectories; Step 4 produces up to 10 task-specific JSON files with metadata envelope] <br>
+**Other Properties Related to Output:** [Outputs are written to results_dir with per-step subdirectories; the pipeline resumes by skipping already-processed videos.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -46,23 +46,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. <br>
+1 evaluation task (1 positive), 1 attempt per task, each run in an isolated k8s sandbox pod and compared against a no-skill baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helped the agent complete the user's goal and expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
+- Security: Is it safe to use? Scored from the security signal. <br>
+- Correctness: Is the answer correct? Scored from the accuracy signal. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the skill_execution signal. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal_accuracy and behavior_check. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of skill_efficiency and token_efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -70,12 +70,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.6% — uplift unavailable | 73.7% — uplift unavailable |
+| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 73.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
-| Discoverability | 100.0% — uplift unavailable | 0.0% — uplift unavailable |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 48.3% → 70.0% (+21.7 points) |
-| Efficiency | 98.1% — uplift unavailable | 93.7% → 98.4% (+4.7 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 70.0% (+21.7 points) |
+| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

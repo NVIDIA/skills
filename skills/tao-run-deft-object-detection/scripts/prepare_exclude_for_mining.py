@@ -8,7 +8,7 @@ Merges this iteration's ``final_unique_files.parquet`` with the previous
 cumulative parquet and de-duplicates, producing the ``exclude_path`` the next
 iteration's miner uses to avoid re-mining images it already has.
 
-``--parquet-b`` is optional so iteration 1 works: with no previous cumulative,
+``--parquet-b`` is optional **only on iteration 1**: with no previous cumulative,
 the output is just this iteration's mined set.
 """
 
@@ -44,6 +44,19 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
+        # Argument consistency first, before any file is read: omitting the flag and
+        # pointing it at a missing file are the same mistake with the same cost, and
+        # only the second was caught. `if args.parquet_b:` is false when the flag is
+        # absent, which skipped the block and dropped every earlier exclusion without
+        # a word, leaving the next mine free to re-select images already trained on.
+        if not args.parquet_b and args.iteration != 1:
+            raise ValueError(
+                "--parquet-b was not given. Only iteration 1 may run without a previous "
+                "cumulative exclude set; pass --iteration 1 if that is the case, otherwise "
+                "pass the previous iteration's mined_cumulative.parquet. Continuing would "
+                "re-mine images earlier iterations already used."
+            )
+
         frames = []
 
         path_a = Path(args.parquet_a).expanduser().resolve()

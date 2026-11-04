@@ -4,8 +4,9 @@ description: >
   Run the disk-backed DEFT AOI improvement loop for NVIDIA Cosmos Reason 3 /
   Cosmos3 models, using Nano by default and Edge or Super when explicitly
   requested: evaluate the base model on Proxy and frozen Benchmark splits,
-  mine real image pairs from Proxy gaps, assemble a per-iteration Train JSON
-  from selected Mining samples, train with cosmos-rl LoRA SFT, and repeat
+  mine real image pairs from Proxy gaps, generate AnomalyGen synthetic NG
+  pairs, assemble a per-iteration Train JSON from both producers, train with
+  Cosmos Framework LoRA SFT, and repeat
   through the selected platform's submit/status/logs/cancel contract.
   This migration supports bare labels only: the assistant response must be
   exactly OK or NG. Use for "run Cosmos3 DEFT AOI", "CR3 AOI loop", or
@@ -13,10 +14,10 @@ description: >
   rich/reasoning annotation, one-off Cosmos training, or generic anomaly
   generation.
 license: Apache-2.0 AND CC-BY-4.0
-compatibility: Requires the companion TAO skill-bank skills from `eval.config`, host Python with `pyarrow` and `yaml`, and the selected platform's native CLI.
+compatibility: Requires the companion TAO skill-bank skills from `eval.config`, host Python with `pyarrow`, `yaml`, and either Python 3.11+ `tomllib` or Python 3.10 with the `tomli` fallback used by the shared `cosmos_workflow.py` planner, the selected platform's native CLI, and PR 230 model helper `--backend`.
 metadata:
   author: NVIDIA Corporation
-  version: "0.1.0"
+  version: "0.2.0"
 allowed-tools: Read Task Bash Write
 tags:
 - application
@@ -26,19 +27,20 @@ tags:
 - cosmos
 ---
 
-# Skill: tao-run-deft-aoi-cosmos3
+# tao-run-deft-aoi-cosmos3
 
 ## Installation
 
 Install this application as part of the full TAO skill-bank root, not as only
-the companion skill folders: `TAO_SKILL_BANK_PATH` must point at a directory
-containing `versions.yaml`, `scripts/resolve_versions_key.py`, and the
-Cosmos model resolver `scripts/resolve_tao_image.py`, plus the
-`skills/{applications,models,data,platform,core}/...` tree listed in
-`eval.config`. Run bundled validation with the skill Python so dependencies
-match runtime: `PYTHON=$(bash scripts/deft_python.sh); "$PYTHON" -m unittest
-tests.test_cosmos3_bare`. Resolve network mode first. Missing air-gap imports
-are a hard stop; network-enabled setup lives only in
+the companion skill folders: a usable install places `skills/`, `scripts/`,
+`templates/`, and `versions.yaml` under the same `TAO_SKILL_BANK_PATH`. Any
+install that ships only the skill folders, for example an agent plugin or
+skills-only install, must also provide the bank-level scripts, templates, and
+`versions.yaml` and point `TAO_SKILL_BANK_PATH` at their common root before
+running `scripts/resolve_tao_model.py`. Run bundled validation with the skill
+Python so dependencies match runtime: `PYTHON=$(bash scripts/deft_python.sh); "$PYTHON"
+-m unittest tests.test_cosmos3_bare`. Resolve network mode first. Missing
+air-gap imports are a hard stop; network-enabled setup lives only in
 `references/network-bootstrap.md`.
 
 ## Execution Contract
@@ -57,7 +59,9 @@ Treat a run as a disk-backed state machine.
    approval.
 5. After approval, set `PYTHON=$(bash scripts/deft_python.sh)` and initialize
    `${RESULTS_DIR}/deft_state.json` once with
-   `"$PYTHON" scripts/init_deft_state.py`. Pass the exact GPU model reported by the
+   `"$PYTHON" scripts/init_deft_state.py`. Require `--base-model-path` to name
+   the prepared Qwen3-VL PTM, freeze the image with `--framework-image-digest`,
+   and pass its container URI with `--framework-container`. Pass the exact GPU model reported by the
    selected platform's Preflight through `--gpu-model` (include accelerator
    memory when available), plus the resolved network mode/source and selected
    absolute Python. Never reinitialize a resumed run or edit
@@ -79,7 +83,9 @@ Treat a run as a disk-backed state machine.
    `PENDING RUNNING COMPLETE ERROR CANCELED UNKNOWN`.
 9. Commit every completed or failed DEFT stage with
    `"$PYTHON" scripts/commit_stage.py`. It verifies the stage inputs and atomically
-   updates both the resume snapshot and ordered `events` array in state. Every
+   updates both the resume snapshot and ordered `events` array in state.
+   `commit_stage.py --stage train` requires `--framework-config` with the saved
+   Hydra `config.yaml`. Every
    executed-stage commit requires a positive, measured `--duration-sec`: use
    backend elapsed wall time for submitted jobs and a host wall-clock timer for
    inline stages. A documented `--skip` may record `0`; negative durations are
@@ -87,12 +93,12 @@ Treat a run as a disk-backed state machine.
 10. Claim completion only after `"$PYTHON" scripts/finalize_run.py` verifies final
    Benchmark evidence, successfully commits `loop_stop`, and a fresh
    read of `deft_state.json` shows `status == "complete"`,
+   `version == 6`, non-empty `final_artifacts`,
    `iterations.baseline.status == "complete"`, and the final iteration's
    `status == "complete"`.
 
 Never place secrets in a spec, command, transcript, job-record, or chat. Check
-credential presence only, for example
-`[ -n "$HF_TOKEN" ] && echo SET || echo UNSET`. Credentials come from the
+credential presence only. Credentials come from the
 user's exported shell environment or from a user-approved env file —
 `~/.tao/secrets.env`, `~/.config/tao/.env`, or a path the user points at, never
 one merely found in the workspace — loaded with
@@ -114,60 +120,55 @@ credential value.
   recommendation based on hardware or workload, recommend one with the
   tradeoff, but require an explicit selection before state initialization.
   Never silently switch or fall back to another variant.
+- Resolve actions with `resolve_tao_model.py`, then `cosmos_workflow.py
+  resolve --backend cosmos-framework --workload training`.
 - Keep the selected canonical ID as source-model lineage, but do not pass the
-  native online checkpoint directly to Cosmos-RL.
+  native online checkpoint directly to Framework.
 - The published Cosmos Reason 3 reasoners ship in Cosmos3's own native Omni
-  format (`model_type="cosmos3_omni"`), which Cosmos-RL cannot load. After
+  format (`model_type="cosmos3_omni"`), which Framework cannot load. After
   launch approval and before baseline evaluation, run
   `"$PYTHON" <model_skill>/scripts/prepare_cosmos3_vlm_checkpoint.py`
-  to convert the selected reasoner
-  into a Qwen3-VL safetensors PTM, or validate and reuse an existing prepared
-  output.
-- Use the prepared PTM consistently for zero-shot evaluation, Train
-  `policy.model_name_or_path`, and LoRA `model.base_model_path`. The model
-  being trained is still the selected Cosmos Reason 3 reasoner — keep its
-  canonical ID as checkpoint lineage; the Qwen3-VL PTM is only the on-disk
-  format Cosmos-RL consumes.
+  to convert the selected reasoner into a Qwen3-VL safetensors PTM, or validate
+  and reuse an existing prepared output.
+- Use the prepared PTM consistently for zero-shot evaluation, Framework Train,
+  Inference, and DCP vision loading. The model being trained is still the
+  selected Cosmos Reason 3 reasoner — keep its canonical ID as checkpoint
+  lineage; the Qwen3-VL PTM is only the on-disk format Framework consumes.
 - Nano may use the helper's packaged Qwen3-VL default. Edge and Super require
   a variant-specific, validated VLM base; never reuse Nano's conversion
   arguments.
-- Container image: resolve the `cosmos-rl` backend from
-  `tao-finetune-cosmos-reason/references/skill_info.yaml` with
-  `"$PYTHON" "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py"`; never copy a Cosmos image pin into this
-  application skill.
-- Train action: `cosmos-rl --config <spec.toml>
-  /opt/cosmos_rl/tao_sft_example.py`.
-- Before the first evaluate job, run `"$PYTHON" scripts/patch_eval_image_cap.py` to
-  source-classify the selected image. Mount its output read-only into every
-  evaluation container only when it reports `patch_required`; no mount is
-  needed for `already_sufficient` or `cap_absent`. An unrecognized cap/vLLM
-  shape is a hard stop; see `references/cosmos-reason.md`.
-- Workflow override: `automl_policy: off`. DEFT owns iteration and checkpoint
-  selection; this is a workflow argument, not a TOML key.
-- Default adaptation: LoRA over the language-side projections
-  `["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj",
-  "down_proj"]`, leaving the vision tower's pretrained weights untouched. The
-  schema also accepts `"all-linear"`, which additionally adapts the vision
-  linear layers; use it only when the user explicitly requests it. Derive all
-  other Train defaults from the model skill's current template.
+- Pass helper `--backend cosmos-framework`; use the resolved Framework
+  image/digest for `--runtime-image`/`--runtime-image-digest` and the same
+  immutable image for Train, Evaluate, and Inference. Never copy its pin here.
+- Train with `cosmos-framework-train --sft-toml=/tao/config/train.toml`;
+  Evaluate with `cosmos-framework-evaluate --config /tao/config/evaluate.toml`;
+  use the public Framework inference entrypoint for standalone inference.
+- Render Train through `"$PYTHON" scripts/render_cfw_sft.py` and each role's
+  Evaluate TOML through `"$PYTHON" scripts/render_cfw_evaluate.py`. Never reuse a packaged
+  workspace TOML: the renderers/submitters fail closed on stale backend paths,
+  tokenizer/generation-era fields, or missing Framework-native keys.
+- Train keeps `model.attn_implementation="cosmos"` because `sdpa` collapses
+  Framework LoRA SFT to the majority label on this image. Evaluate uses `sdpa`
+  because its Hugging Face loader rejects `cosmos`.
+- Framework Train writes a native DCP checkpoint and a saved Hydra `config.yaml`
+  beside it. Record both; iteration Evaluate sets `model.config_file` to that
+  `config.yaml`, never the input SFT TOML, and uses the prepared PTM for vision.
+  The next Train sets `checkpoint.load_path` to the preceding DCP. Commit the
+  DCP right after a successful Train and clear checkpoints before an intentional retrain.
 - Every spec is a nested dictionary serialized to TOML. Never write literal
   flat dotted keys into a spec.
-- Do not mount user data over `/workspace`; cosmos-rl is installed there.
+- Do not mount user data over `/workspace`; Framework is installed there.
 - Run every Docker container with a writable host mount as the invoking
-  UID:GID with `USER`, `LOGNAME`, `HOME=/tmp`, and the read-only host
-  passwd/group databases; never fall back to a root repair container. This
-  covers checkpoint preparation, Train, Proxy/Benchmark evaluate, AnomalyGen,
-  and mining. See `references/cosmos-reason.md` and
+  UID:GID with `USER`, `LOGNAME`, `HOME=/tmp`, and read-only host
+  passwd/group databases. The submit helpers add automatic read-only identity
+  mounts for absolute model, annotation, media, config, and checkpoint paths.
+  See `references/cosmos-reason.md` and
   `references/tao-mine-aoi-images.md`.
 
-Read `skills/models/tao-finetune-cosmos-reason/SKILL.md` and its
-`references/skill_info.yaml` before authoring a spec. Start from the model
-skill's current packaged template for the selected action and apply only the
-AOI workflow overrides in `references/cosmos-reason.md`. Replace every
-dataset/output path with the chosen platform's compute-frame path. Prove that
-the selected Cosmos-RL image can load the prepared PTM and train the requested
-variant; do not reuse Nano conversion, parallelism, or memory assumptions for
-Edge or Super.
+Read `skills/models/tao-finetune-cosmos-reason/SKILL.md`, its
+`references/skill_info.yaml`, and the selected Framework backend contract
+before authoring a spec. Replace every dataset/output path with the chosen
+platform's compute-frame path and preserve the selected model variant.
 
 ## Bare OK/NG Contract
 
@@ -233,12 +234,12 @@ Per-role evaluate specs are preferred over one shared `evaluate_spec.toml`;
 both are accepted. See `references/data-layout.md`.
 
 The user supplies annotations and images. The specs are **not** an input to
-ask for: build them from the `tao-finetune-cosmos-reason` templates plus the
-AOI overrides, and write them after the approval gate and before
-`init_deft_state.py`, which refuses to initialize without them. A workspace
-carrying its own specs is still valid — reuse them rather than overwriting —
-but their absence is normal and is never a reason to stop and ask the user for
-a TOML file.
+ask for: render them with this application's Framework renderers after the
+approval gate and before `init_deft_state.py`, which refuses to initialize
+without them. A workspace carrying its own specs is valid data input, but every packaged
+TOML is stale evidence: regenerate Train, Proxy Evaluate, and Benchmark
+Evaluate specs with this checkout's Framework renderers. Their absence is
+normal and is never a reason to stop and ask the user for a TOML file.
 
 Non-default paths are valid when passed explicitly to
 `scripts/init_deft_state.py`; downstream stages must read the recorded paths
@@ -257,11 +258,10 @@ Read `references/preflight.md` and run every ordered check:
 2. resolve workspace, annotations, media root, and `max_iterations`;
 3. validate bare ShareGPT and Proxy/Benchmark/Mining target isolation;
 4. hash and freeze Benchmark annotations;
-5. resolve current Cosmos-RL and data-services images from `versions.yaml`;
-6. plan conversion of the selected Cosmos Reason 3 reasoner into a Qwen3-VL
-   PTM, and that output's platform-visible path;
+5. resolve current Framework and data-services images from `versions.yaml`;
+6. plan its Qwen3-VL PTM conversion and platform-visible output;
 7. check only required environment-variable presence;
-8. construct Proxy / Benchmark TOML specs and validate the Train template;
+8. render Framework Train / Proxy Evaluate / Benchmark Evaluate TOML specs;
 9. verify compute shape and path visibility from the selected platform;
 10. run the model/platform launch preflight;
 11. show the full Pre-Flight Summary and stop for approval.
@@ -332,29 +332,20 @@ For each `iterN` when the frozen Benchmark gate is unmet:
 passes, `max_iterations` is reached, or a hard stop occurs. For an ordinary
 stop, run `"$PYTHON" scripts/finalize_run.py` with the explicit reason, then run
 `"$PYTHON" scripts/render_report.py --require-terminal` after optional token alignment.
-The Cosmos-only report addition is a bounded prompt showcase sourced from
-recorded annotations; keep every other visual convention aligned with
-ChangeNet. See `references/REPORT_RENDERING.md`. Never delegate or hand-author
-report rendering.
+Follow `references/REPORT_RENDERING.md`; never delegate or hand-author report
+rendering.
 
 ## Stage References
 
-| Stage | Producer | Read first |
-|---|---|---|
-| Train | `tao-finetune-cosmos-reason` train, `automl_policy: off` | `references/cosmos-reason.md`, `references/example_lora_config.toml` |
-| Proxy / Benchmark evaluate | `tao-finetune-cosmos-reason` evaluate | `references/cosmos-reason.md` |
-| Proxy RCCA / Benchmark metric | bundled `analyze_gaps.py` | `references/gap-analysis.md` |
-| Routing / mining | Proxy gaps + `tao-mine-aoi-images` | `references/tao-mine-aoi-images.md` |
-| AnomalyGen | `tao-generate-anomalies`, `mode=inference_only` | `references/tao-generate-anomalies.md` |
-| Assemble / validate | bundled bare ShareGPT scripts | `references/aoi-annotation.md` |
-| State/report | bundled state commit + deterministic report hook | `references/scripts-and-agents.md` |
+Read the stage-to-producer/reference table in
+`references/scripts-and-agents.md` before each stage.
 
 ## Hard Stops
 
 Commit an error stage and do not auto-retry for: invalid disk state; a rich or
-non-exact training label; a JSONL or non-array annotation input; an
-an unconverted Cosmos Reason 3 checkpoint still in native Omni format at a
-Cosmos-RL boundary;
+non-exact training label; a JSONL or non-array annotation input; a
+native Omni at a Framework boundary; stale TOML; an invalid Framework DCP; or
+a missing saved Train Hydra `config.yaml`;
 missing/ambiguous mined-to-source alignment; missing/tampered mining history,
 cross-iteration mined filepath duplication; target overlap among
 Proxy/Benchmark/Mining; a generated Train target outside Mining and AnomalyGen

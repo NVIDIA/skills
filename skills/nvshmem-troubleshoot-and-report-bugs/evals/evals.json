@@ -1,0 +1,56 @@
+{
+  "skill_name": "nvshmem-troubleshoot-and-report-bugs",
+  "evals": [
+    {
+      "id": "nvshmem-troubleshoot-and-report-bugs-001",
+      "prompt": "Can you use the nvshmem-troubleshoot-and-report-bugs skill to help me? I get a missing symbol error when I try to launch an NVSHMEM application using PMIx with the OpenMPI implementation of mpirun.",
+      "expected_output": "The agent used nvshmem-troubleshoot-and-report-bugs and routed the PMIx/OpenMPI missing-symbol launch failure to the documented fix, advising the user to launch with 'srun --pmix'.",
+      "assertions": [
+        "The agent read the nvshmem-troubleshoot-and-report-bugs SKILL.md and consulted its troubleshooting knowledge base",
+        "The agent identified the failure as a PMIx bootstrap/launcher symbol issue and recommended using 'srun --pmix'",
+        "The agent requested the exact launch command and complete per-PE output if not already provided",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-troubleshoot-and-report-bugs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-troubleshoot-and-report-bugs-002",
+      "prompt": "My NVSHMEM job is crashing with these errors:\nsrc/comm/transports/ibrc/ibrc.cpp:962: non-zero status: 10 ibv_poll_cq failed, status: 10\nsrc/comm/transports/ibrc/ibrc.cpp:1021: non-zero status: 7 progress_send failed, outstanding_count: 0\nsrc/comm/transports/ibrc/ibrc.cpp:1294: non-zero status: 7 check_poll failed\nsrc/comm/proxy/proxy.cu:progress_quiet:612: aborting due to error in progress_quiet\nWhat's going on?",
+      "expected_output": "The agent used nvshmem-troubleshoot-and-report-bugs to explain the ibrc transport ibv_poll_cq status:10 as a Remote Protection Error, most likely from using a non-symmetric-heap address as a remote buffer, and pointed to the ibv_poll_cq documentation for status codes.",
+      "assertions": [
+        "The agent read the nvshmem-troubleshoot-and-report-bugs SKILL.md and diagnosed the ibrc InfiniBand work-request failure",
+        "The agent interpreted status: 10 as a Remote Protection Error and named symmetric-heap/registered-buffer misuse as the common cause",
+        "The agent referenced the ibv_poll_cq man page for looking up the status value rather than confirming a single root cause from the paraphrased error",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-troubleshoot-and-report-bugs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-troubleshoot-and-report-bugs-003",
+      "prompt": "Our 8-node multi-GPU NVSHMEM training job hangs forever right after nvshmem_init and never produces any output past the banner. It worked last week on 4 nodes. How do I figure out what's wrong and file this if it's a real bug?",
+      "expected_output": "The agent used nvshmem-troubleshoot-and-report-bugs to guide collection of the exact launch command and complete per-PE output, request INFO-level logging, and prepare a portable bug report if escalation was warranted.",
+      "assertions": [
+        "The agent asked for the exact launch command/batch stanza and complete stdout/stderr from every PE before diagnosing",
+        "The agent requested the run be repeated with NVSHMEM_DEBUG=INFO, NVSHMEM_DEBUG_SUBSYS=ALL, and NVSHMEM_DEBUG_FILE since INFO logging was not confirmed",
+        "The agent referenced the bug-report template and prepared paste-ready escalation material rather than submitting a report directly",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-troubleshoot-and-report-bugs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-troubleshoot-and-report-bugs-004",
+      "prompt": "What's the best way to visualize a large pandas DataFrame as a heatmap in a Jupyter notebook using seaborn?",
+      "expected_output": "The agent recognized this as an unrelated data-visualization question and answered it directly without invoking the nvshmem-troubleshoot-and-report-bugs skill.",
+      "assertions": [
+        "The agent did not invoke the nvshmem-troubleshoot-and-report-bugs skill",
+        "The agent provided seaborn/pandas heatmap guidance relevant to the question",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

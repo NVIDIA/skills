@@ -1,0 +1,70 @@
+{
+  "skill_name": "nvshmem-enable-tma",
+  "evals": [
+    {
+      "id": "nvshmem-enable-tma-001",
+      "prompt": "Can you use the nvshmem-enable-tma skill to update the attached NVSHMEM 3.7.0 CUDA application for TMA? It runs on H100 GPUs with direct single-node NVLink. Prepare the application and preserve unrelated kernels.",
+      "files": [
+        "evals/files/gmem-staging.cu"
+      ],
+      "expected_output": "The agent used nvshmem-enable-tma, classified TMA as useful, prepared only the NVSHMEM communication kernel for NVSHMEM-managed GMEM staging, and left the unrelated CUDA kernel unchanged.",
+      "assertions": [
+        "The agent read the nvshmem-enable-tma SKILL.md, registration-and-launch reference, and GMEM-staging reference before changing the application; it did not treat external NVSHMEM TMA documentation as a prerequisite for this routine conversion",
+        "The agent used only the canonical NVSHMEM 3.7.0 TMA symbols specified by the bundled registration-and-launch reference, kept the existing NVSHMEM put operands and API, queried nvshmemx_ask_smem(NVSHMEMX_SMEM_RECOMMENDED) on the host, passed dynamic shared memory to the launch, and called both nvshmemx_give_smem and nvshmemx_release_smem unconditionally from every thread of each participating CTA on a CTA-uniform path rather than following the incorrect single-thread documentation; all threads passed identical give_smem arguments and the agent preserved the required synchronization and flush-or-quiet drain",
+        "The agent stated that NVSHMEM_TMA_POLICY=ENABLE must be set before initialization and reported the NVLink, SM90, alignment, size, and fallback conditions without promising a speedup",
+        "The agent left the unrelated CUDA scaling kernel unchanged and did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-enable-tma",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-enable-tma-002",
+      "prompt": "I want to use TMA with the attached NVSHMEM 3.7.0 H100/NVLink application. I explicitly opt into the direct shared-memory optimization if inspection proves the intermediate GMEM staging is redundant.",
+      "files": [
+        "evals/files/direct-smem-put.cu"
+      ],
+      "expected_output": "The agent used nvshmem-enable-tma to apply the explicitly requested direct-SMEM put optimization, removing only the redundant GMEM staging copy while preserving the required NVSHMEM-owned shared-memory prefix and completion behavior.",
+      "assertions": [
+        "The agent used the nvshmem-enable-tma skill and its bundled registration-and-launch and direct-SMEM references without treating external NVSHMEM TMA documentation as a prerequisite",
+        "The agent treated direct shared memory as an explicit opt-in and established that the intermediate GMEM staging buffer had no other dataflow or lifetime role",
+        "The agent reserved a separate NVSHMEM prefix using NVSHMEMX_SMEM_BARRIERS_ONLY, kept the application tile outside that prefix, and updated the total dynamic shared-memory launch size",
+        "The agent passed the application tile to the existing block put, added CTA synchronization and the exact SM90 asm volatile(\"fence.proxy.async.shared::cta;\" ::: \"memory\") ordering fence, and removed only the redundant tile-to-GMEM copy",
+        "The agent called both nvshmemx_give_smem and nvshmemx_release_smem unconditionally from every thread of the participating CTA on a CTA-uniform path with identical give_smem arguments, drained outstanding TMA work with a scope-appropriate flush or quiet, synchronized the CTA before release, preserved matching give/release lifetime, and did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-enable-tma",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-enable-tma-003",
+      "prompt": "I want to use TMA with the attached application. It uses NVSHMEM 3.6.5 on A100/SM80 GPUs across two nodes, and every communicating PE pair goes over InfiniBand with no NVLink peer path.",
+      "files": [
+        "evals/files/multi-node-put.cu"
+      ],
+      "expected_output": "The agent used nvshmem-enable-tma to determine that TMA is unsupported and not useful for the stated target, explained all three blockers, and made no kernel or launch changes.",
+      "assertions": [
+        "The agent used the stated target facts and bundled skill guidance without treating external NVSHMEM TMA documentation as a prerequisite",
+        "The agent identified NVSHMEM 3.6.5 as older than the 3.7.0 TMA requirement",
+        "The agent identified A100/SM80 as older than the SM90 TMA architecture requirement",
+        "The agent explained that InfiniBand-only communication has no peer GPU load/store or NVLink path for TMA and did not add shared-memory registration",
+        "The agent made no source changes and did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-enable-tma",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-enable-tma-005",
+      "prompt": "How can I reduce shared-memory bank conflicts in the attached tiled CUDA matrix-transpose kernel? It does not use NVSHMEM.",
+      "files": [
+        "evals/files/cuda-transpose.cu"
+      ],
+      "expected_output": "The agent recognized this as an ordinary CUDA shared-memory optimization question unrelated to NVSHMEM TMA preparation and answered it without invoking nvshmem-enable-tma.",
+      "assertions": [
+        "The agent did not invoke the nvshmem-enable-tma skill",
+        "The agent provided relevant CUDA shared-memory bank-conflict guidance and did not add NVSHMEM registration or TMA configuration",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

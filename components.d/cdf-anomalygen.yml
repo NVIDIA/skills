@@ -1,0 +1,8 @@
+name: CDF AnomalyGen
+repo: NVIDIA/cdf-anomalygen
+description: Run Cosmos Data Factory AnomalyGen workflows for fine-tuning, synthetic defect generation, evaluation, refinement, and pseudo-labeling.
+skills:
+  - path: skills/cdf-anomalygen/
+    catalog_dir: cdf-anomalygen
+links:
+  discussions: false

@@ -2,34 +2,53 @@
 license: Apache-2.0
 name: doca-comm-channel-admin
 description: >
-  Use this skill to enumerate host↔DPU DOCA comch (formerly
-  Comm Channel) servers and connections via the shipped
-  doca_comm_channel_admin binary — listing comch-capable
-  devices and decoding the per-device server / connection
-  table (server name, PID, in-use / max, PCIe address). The
-  shipped binary is a SINGLE-SHOT SCAN-AND-PRINT tool with no
-  registered arguments — NO list / inspect / drain / restart
-  subcommands; one inventory pass over every comch-capable
-  doca_dev on this side. Channel reset / drain / restart go to
-  doca-comch (program side), doca-setup / doca-hardware-safety
-  (driver reload), or BFB / RShim — NOT to this binary.
-  Trigger on phrasings like "list comch servers", "which
-  channels are active on this BlueField", or "verify admin
-  tool sees same channel as program." Refuse and route
-  elsewhere for the comch programming API, library install,
-  protocol design, channel reset, or general orientation.
+  Use this skill to enumerate host↔DPU DOCA comch (formerly Comm
+  Channel) servers and connections via the shipped
+  doca_comm_channel_admin binary — listing comch-capable devices and
+  decoding the per-device server / connection table (server name, PID,
+  in-use / max, PCIe address). The shipped binary is a SINGLE-SHOT
+  SCAN-AND-PRINT tool with no registered arguments — NO list / inspect /
+  drain / restart subcommands; one inventory pass over every
+  comch-capable doca_dev on this side. Channel reset / drain / restart
+  go to doca-comch (program side), doca-setup / doca-hardware-safety
+  (driver reload), or BFB / RShim — NOT to this binary. Trigger on
+  phrasings like "list comch servers", "which channels are active on
+  this BlueField", or "verify admin tool sees same channel as program."
+  Refuse and route elsewhere for the comch programming API, library
+  install, protocol design, channel reset, or general orientation.
 metadata:
+  author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
+  doca_version: "3.5"
+  tags:
+    - doca
+    - comch
+    - tools
 compatibility: >
-  Requires DOCA SDK installed at /opt/mellanox/doca on Linux
-  (Ubuntu 22.04/24.04 or RHEL/SLES) with the Comm Channel tooling
-  subpackage so the CLI is present under
-  /opt/mellanox/doca/tools/. Runs from either the x86/Arm host or
-  the BlueField Arm side; a live host↔DPU comch channel created
-  via the doca-comch library is needed for non-empty tables.
+  Requires DOCA SDK installed at /opt/mellanox/doca on Linux (Ubuntu
+  22.04/24.04 or RHEL/SLES) with the Comm Channel tooling subpackage so
+  the CLI is present under /opt/mellanox/doca/tools/. Runs from either
+  the x86/Arm host or the BlueField Arm side; a live host↔DPU comch
+  channel created via the doca-comch library is needed for non-empty
+  tables. The validation steps require a live DOCA install.
 ---
 
 # DOCA Comm Channel Admin Tool
+
+## Examples
+
+- **"Which comch servers and connections are currently visible?"** —
+  this is in scope. Stay on the admin CLI; do not open a new
+  comch channel from this skill.
+- **"The program reports CONNECTED but the admin tool lists zero
+  channels."** — cross-check representor binding before rewriting
+  the comch app.
+
+## Instructions
+
+Follow Loading order below. Open the tasks companion for run /
+debug. Open the capabilities companion for table columns and
+error layers. Do not open every companion file.
 
 > **Actual binary contract.** `doca_comm_channel_admin` is one
 > zero-application-argument, read-only scan-and-print operation.
@@ -41,7 +60,7 @@ compatibility: >
 
 **Where to start:** This is a tool skill for invoking the DOCA Comm
 Channel Admin Tool — the **read-only inventory** CLI counterpart
-to the [`doca-comch`](../../libs/doca-comch/SKILL.md) library. The
+to the `doca-comch/SKILL.md` library. The
 shipped `doca_comm_channel_admin` binary takes **no arguments
 beyond ARGP defaults** (`--help`, `--version`, `--log-level`,
 `--sdk-log-level`, `--json`) and performs **one inventory pass**
@@ -50,25 +69,25 @@ to comch-capable devices, shells out to `resourcedump` (MFT) on
 each, and prints two ASCII tables (SERVERS and CONNECTIONS).
 There is no `list` subcommand, no `inspect` subcommand, no
 `drain` flag, and no `restart` flag — those are not part of the
-tool's surface. Open [`TASKS.md`](TASKS.md) and start at
-[`## run`](TASKS.md#run) for the single-shot invocation, or
-[`## debug`](TASKS.md#debug) when the user reports the tool sees
+tool's surface. Open the tasks companion and start at
+`## run` for the single-shot invocation, or
+`## debug` when the user reports the tool sees
 a different channel set than the program. Open
-[`CAPABILITIES.md`](CAPABILITIES.md) when the question is *what
+the capabilities companion when the question is *what
 the printed tables actually mean* and *what is not in this
 tool's scope*. If the user has not installed DOCA yet, route to
-[`doca-setup`](../../doca-setup/SKILL.md) first; if the user
+`doca-setup/SKILL.md` first; if the user
 needs MFT (`resourcedump` on `PATH` with the privilege documented
 for the installed release), `doca-setup` + `doca-public-knowledge-map`
 cover that. If the user is holding pre-2.5 docs that mention
 "Comm Channel", route to
-[`doca-comch CAPABILITIES.md ## Version compatibility`](../../libs/doca-comch/CAPABILITIES.md#version-compatibility)
+`doca-comch/SKILL.md`
 for the rename rule. If the user wants to *change* channel
 state, route to the program-side
-reconnect lifecycle in [`doca-comch`](../../libs/doca-comch/SKILL.md)
+reconnect lifecycle in `doca-comch/SKILL.md`
 or to BlueField mode / driver reload in
-[`doca-setup`](../../doca-setup/SKILL.md) +
-[`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) — **not**
+`doca-setup/SKILL.md` +
+`doca-hardware-safety/SKILL.md` — **not**
 to this tool.
 
 ## Example questions this skill answers well
@@ -80,40 +99,40 @@ the worked example is one instance.
 - **"Which comch servers and connections are currently visible?"** —
   worked example: *"print every server and connection row visible
   on this side"*. Answered by the scan-and-print surface in
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
+  the capabilities companion
   + the single invocation in
-  [`TASKS.md ## run`](TASKS.md#run).
+  the tasks companion.
 - **"What does the tool report for this server or connection?"** —
   locate the matching row in the SERVERS or CONNECTIONS table;
   there is no second per-channel query. Answered by
-  [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-  + [`TASKS.md ## run`](TASKS.md#run).
+  the capabilities companion
+  + the tasks companion.
 - **"How do I know the admin tool's view matches what my Comch
   program sees?"** — worked example: *"the program reports
   CONNECTED but the admin tool lists zero channels"*. Answered by
   the cross-checking pattern in
-  [`TASKS.md ## test`](TASKS.md#test) and the representor-binding
+  the tasks companion and the representor-binding
   layer in
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+  the capabilities companion.
 - **"Is this admin tool on my installed DOCA version, and does it
   match the comch library version?"** — worked example: *"is the
   tool available on DOCA 2.4"*. Answered by the overlay in
-  [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
+  the capabilities companion,
   which redirects to the canonical
-  [`doca-version`](../../doca-version/SKILL.md) rules and adds the
+  `doca-version/SKILL.md` rules and adds the
   Comm Channel Admin Tool specifics.
 - **"The tool prints nothing — is the install broken or is there
   genuinely no channel?"** — worked example: *"`list` returned an
   empty result on a host with a known-good Comch client"*.
   Answered by the empty-output interpretation rules in
-  [`TASKS.md ## debug`](TASKS.md#debug) +
-  [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+  the tasks companion +
+  the capabilities companion.
 
 ## Audience
 
 This skill serves **external operators and AI agents who need to
 inventory a host-DPU comch channel from the outside**
-— after the [`doca-comch`](../../libs/doca-comch/SKILL.md) library
+— after the `doca-comch/SKILL.md` library
 has been used to create the channel from a program. Concretely:
 
 - A platform operator who runs a Comch-using service on BlueField
@@ -129,7 +148,7 @@ It is **not** for users debugging the admin tool itself, **not** a
 substitute for the live public DOCA Comm Channel Admin Tool guide,
 and **not** the right place for users learning the comch API —
 that audience belongs in
-[`doca-comch`](../../libs/doca-comch/SKILL.md).
+`doca-comch/SKILL.md`.
 
 The tool is shipped as a CLI binary under
 `/opt/mellanox/doca/tools/`, not a library you link against. The
@@ -157,30 +176,30 @@ the right device passthrough). Concretely:
 Do **not** load this skill for general DOCA orientation, the comch
 programming API, library install, or comch protocol design. For
 those, route to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md),
-[`doca-comch`](../../libs/doca-comch/SKILL.md), or
-[`doca-setup`](../../doca-setup/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`,
+`doca-comch/SKILL.md`, or
+`doca-setup/SKILL.md`.
 
 ## What this skill provides
 
 This is a **thin loader**. Substantive material lives in two
 companion files:
 
-- `CAPABILITIES.md` — what the Comm Channel Admin Tool reports:
+- the capabilities companion — what the Comm Channel Admin Tool reports:
   the two read-only tables, the version-availability overlay
-  that redirects to [`doca-version`](../../doca-version/SKILL.md),
+  that redirects to `doca-version/SKILL.md`,
   the layered error taxonomy (tool-not-installed / device-binding
   / channel-discovery / channel-state-stuck / permission /
   version / cross-cutting), the tool's role as an observability
-  primitive for [`doca-comch`](../../libs/doca-comch/SKILL.md)
+  primitive for `doca-comch/SKILL.md`
   debug sessions, and the read-only safety policy.
-- `TASKS.md` — step-by-step workflows for the in-scope task verbs:
+- the tasks companion — step-by-step workflows for the in-scope task verbs:
   `configure` (route to install), `build` (route to install),
   `modify` (refuse), `run` (one scan-and-print), `test`
   (cross-check the printed rows), `debug` (the layered
   diagnosis ladder), plus a `Deferred task verbs` block and a
   `Command appendix` that honors the bundle's
-  [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+  `doca-structured-tools-contract/SKILL.md`
   preamble.
 
 The skill assumes a host or BlueField where DOCA is already
@@ -213,40 +232,40 @@ pull requests should not add:
 
 ## Loading order
 
-1. Read this `SKILL.md` first to confirm the user's question is in
+1. Read this skill first to confirm the user's question is in
    scope (the user wants to inventory a comch
    channel from the outside, not learn the comch API).
 2. **For what the tool reports, version availability, the layered error surface,
    observability, and safety posture, see
-   [CAPABILITIES.md](CAPABILITIES.md).**
+   the capabilities companion.**
 3. **For the single invocation and cross-check
    workflow — `configure`, `build`, `modify`, `run`, `test`,
    `debug`, plus the `Command appendix` — see
-   [TASKS.md](TASKS.md).**
+   the tasks companion.**
 
 ## Related skills
 
-- [`doca-comch`](../../libs/doca-comch/SKILL.md) — the library
+- `doca-comch/SKILL.md` — the library
   whose channels this tool inventories. Pair them in every
   triage session: the program-side connection callback and the
   admin tool's channel state are the two halves of the same
   picture.
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — routing to the public DOCA Comm Channel Admin Tool guide and
   the rest of the public DOCA documentation set.
-- [`doca-version`](../../doca-version/SKILL.md) — canonical DOCA
+- `doca-version/SKILL.md` — canonical DOCA
   version-handling rules. The `## Version compatibility` section
-  in [`CAPABILITIES.md`](CAPABILITIES.md) is a concise overlay
+  in the capabilities companion is a concise overlay
   that redirects here for the body.
-- [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+- `doca-structured-tools-contract/SKILL.md`
   — the bundle's detect → prefer → fall back → report contract for
   structured helper tools. The Command appendix in
-  [`TASKS.md`](TASKS.md) honors this contract.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation,
+  the tasks companion honors this contract.
+- `doca-setup/SKILL.md` — env preparation,
   install verification, representor visibility checks, and the
   *I have no install yet* path with the public NGC DOCA
   container. This skill assumes its preconditions are satisfied.
-- [`doca-debug`](../../doca-debug/SKILL.md) — the cross-cutting
+- `doca-debug/SKILL.md` — the cross-cutting
   debug ladder. The Comm Channel Admin Tool slots in at the
   *runtime* layer as the read-only inventory surface before any
   code change is recommended.

@@ -20,8 +20,10 @@ from workflow_common import (
     load_toml,
     load_yaml,
     path_in_workspace,
+    prepared_baseline_checkpoint,
     require_mapping,
     require_string,
+    validate_qwen3_vl_checkpoint,
     write_json_array,
 )
 
@@ -227,12 +229,22 @@ def training_checkpoint(
     if not isinstance(continual_model, bool):
         raise ValueError("cosmos_reason.continual_model must be true or false")
     if iteration == 1 or not continual_model:
-        return existing_absolute_path(
+        manifest = run_dir / "baseline" / "model_preparation.json"
+        if manifest.is_file():
+            return prepared_baseline_checkpoint(run_dir, workspace)
+        # Backward compatibility for runs whose baseline completed before the
+        # preparation stage was introduced. Native Omni could never complete
+        # that old baseline, so require the legacy direct checkpoint to pass
+        # the existing Qwen3-VL validation through prepared_baseline_checkpoint's
+        # caller-independent path contract below.
+        baseline = existing_absolute_path(
             require_string(cosmos_reason, "cosmos_reason.baseline_model_path"),
             workspace,
             "cosmos_reason.baseline_model_path",
-            "path",
+            "dir",
         )
+        validate_qwen3_vl_checkpoint(baseline)
+        return baseline
 
     previous_evaluate_toml = run_dir / f"iter_{iteration - 1}" / "evaluate" / "specs" / "evaluate.toml"
     if not previous_evaluate_toml.is_file():

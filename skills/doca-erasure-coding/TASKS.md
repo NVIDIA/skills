@@ -18,7 +18,7 @@ safety / path-selection policy, see
 patterns layered under everything below (the universal lifecycle,
 the cross-library `DOCA_ERROR_*` taxonomy, the
 modify-a-shipped-sample workflow), see
-[`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through
@@ -35,16 +35,16 @@ actually intends to use.
 Steps the agent should walk the user through:
 
 1. **Confirm the installed DOCA version.** Use the procedure in
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
    Quote the version observed (`pkg-config --modversion
    doca-erasure-coding`, then `doca_caps --version`); do not
    assume "latest". The four-way match rule lives in
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility);
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`);
    if the observed sources disagree, route there before any EC
    diagnosis.
 2. **Discover the device capability surface for Erasure Coding.**
    Run `doca_caps --list-devs` (per
-   [`doca-caps`](../../tools/doca-caps/SKILL.md)) to see which
+   `doca-caps/SKILL.md`) to see which
    devices are visible, then run the per-`doca_devinfo`
    `doca_ec_cap_*` queries against the candidate device. Record
    at minimum:
@@ -52,7 +52,7 @@ Steps the agent should walk the user through:
    `doca_ec_cap_task_recover_is_supported(devinfo)`,
    `doca_ec_cap_task_update_is_supported(devinfo)`,
    `doca_ec_cap_task_galois_mul_is_supported(devinfo)` (the 4th
-   public task — bundle previously omitted this row),
+   public task),
    `doca_ec_cap_get_max_block_size(devinfo)`,
    `doca_ec_cap_get_max_buf_list_len(devinfo, &max_buf_list_len)`, and a
    per-variant `doca_ec_matrix_create()` / `_create_from_raw()`
@@ -129,7 +129,7 @@ Steps the agent should walk the user through:
 
 For the canonical DOCA universal lifecycle that underlies steps
 4-7, see
-[`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure).
+`doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`).
 This skill adds the EC overlay; do not re-explain the lifecycle
 here.
 
@@ -142,14 +142,14 @@ build pattern.
 The build pattern for any DOCA C/C++ consumer is **identical**
 across libraries — `pkg-config` for include + link flags, meson
 or CMake as the build system — and is fully documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the EC-specific overlay:
 
 | Slot | Value for Erasure Coding | Why it matters |
 | --- | --- | --- |
 | `pkg-config` module name | `doca-erasure-coding` | The library's `.pc` file installed by the DOCA host packages. Wrong module name = `pkg-config: Package 'doca-erasure-coding' was not found` |
 | Required runtime libs | `libdoca-common`, `libdoca-erasure-coding`, plus whatever `pkg-config --libs doca-erasure-coding` resolves transitively | EC depends on Core; the link line should not pull in unrelated DOCA libraries |
-| Header check | The public header that `pkg-config --cflags` for this artifact resolves to actually exists on disk at the path pkg-config reports (do not hardcode the include path) | If `pkg-config --cflags doca-erasure-coding` resolves but the include is missing, the install is partial — route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 |
+| Header check | The public header that `pkg-config --cflags` for this artifact resolves to actually exists on disk at the path pkg-config reports (do not hardcode the include path) | If `pkg-config --cflags doca-erasure-coding` resolves but the include is missing, the install is partial — route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 |
 | Minimum required DOCA version | Query with `pkg-config --modversion doca-erasure-coding`; never hardcode in build files | Cross-version build/runtime mixing breaks per [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility) |
 
 For non-C consumers (Rust, Go, Python), the link surface is the
@@ -164,7 +164,7 @@ point and apply a **minimum-diff modification** to express the
 user's intent.
 
 The universal modify-a-shipped-sample workflow lives in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify).
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`).
 Use it as-is. The EC-specific overlay is the *modify-from-sample
 schema fill* — the slots the agent must elicit from the user
 before recommending any code-level edit:
@@ -181,9 +181,7 @@ before recommending any code-level edit:
 
 The agent emits an *intent description + the filled slots*; the
 *actual* unified diff against the sample source is produced by
-the modify-from-sample renderer (deferred to a future round, per
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify)).
-Until the renderer ships, the agent must walk the user through
+the user (this bundle has no diff renderer; see `doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`)). The agent must walk the user through
 the diff line-by-line against the sample source they read on
 disk, and have the user paste back the result for validation.
 
@@ -201,7 +199,7 @@ Steps the agent should walk the user through:
    selection (opening a NIC without the requested EC task on
    its accelerator) returns `DOCA_ERROR_NOT_SUPPORTED` at task
    submit, not at open. Re-quote the output of `doca_caps
-   --list-devs` ([`doca-caps`](../../tools/doca-caps/SKILL.md))
+   --list-devs` (`doca-caps/SKILL.md`)
    and confirm the device the binary opens is the same one the
    cap-query ran against.
 2. **Run the known-vector recover smoke first.** A binary that
@@ -214,7 +212,7 @@ Steps the agent should walk the user through:
    state → compare parity byte-for-byte) as the second smoke.
 3. **Capture the structured log.** Set `DOCA_LOG_LEVEL=trace`
    for the first run (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability)).
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`)).
    This is the cheapest way to make the lifecycle and
    task-submit transitions visible on first failure.
 4. **Capture the completion events on the PE.** A run that
@@ -227,7 +225,7 @@ Steps the agent should walk the user through:
 > **Performance harness routing.** For *throughput / latency
 > measurement* on the configured EC context (or for cross-library
 > comparison against the other DOCA crypto primitives), route the
-> user to [`doca-bench TASKS.md ## test`](../../tools/doca-bench/TASKS.md#test)
+> user to `doca-bench TASKS.md ## test` (`doca-bench/TASKS.md#test`)
 > — `doca-bench` is the cross-library performance harness with
 > documented warm-up / steady-state / outlier semantics, and it
 > explicitly supports Erasure-Coding. The iteration loop below stays
@@ -332,7 +330,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 Loop termination: stop iterating once two consecutive iterations
 of the same kind don't change anything — that means the cause is
 below DOCA Erasure Coding. Escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured cap-query snapshot + recover smoke diff as
 evidence.
 
@@ -343,7 +341,7 @@ program produces no completion event), narrow the cause to a
 specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending EC-specific
 fixes. This skill's overlay names the EC-specific manifestation
@@ -407,12 +405,12 @@ at layers 5 (runtime) and 6 (program):
 
 Once the layer is identified, route to the matching debug verb
 on the matching skill: install / build / link / driver to
-[`doca-setup ## debug`](../../doca-setup/TASKS.md#debug); version
-to [`doca-version ## debug`](../../doca-version/TASKS.md#debug);
+`doca-setup ## debug` (`doca-setup/TASKS.md#debug`); version
+to `doca-version ## debug` (`doca-version/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 ## Deferred task verbs
 
@@ -422,14 +420,13 @@ so the agent does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification, `pkg-config` wiring — defer to
-  [`doca-setup`](../../doca-setup/SKILL.md) and to the
+  `doca-setup/SKILL.md` and to the
   install-tree layout in
-  [doca-public-knowledge-map ## Layout of an installed DOCA package](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  doca-public-knowledge-map ## Layout of an installed DOCA package (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA is already installed.
 - **deploy.** Deploying EC-using applications at scale (storage
   daemons running create / recover / update on many nodes,
-  rebuild workers, Kubernetes operator workflows) — out of
-  scope for Phase 1 and reserved for a future platform skill.
+  rebuild workers, Kubernetes operator workflows) — out of scope for this skill.
   For single-host first-run testing, the right verb in this
   skill is `## run`; do not invent a "deploy" workflow.
 - **rollback.** Coordinated rollback of EC-using applications
@@ -450,7 +447,7 @@ so the agent does not invent guidance:
   (`DOCA_ERROR_DRIVER` from an EC submit, repeated accelerator
   errors in `dmesg`), the fix is via `mlxconfig` /
   `mlxfwreset` / re-imaging the BFB, all of which belong to
-  [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5.
 
 ## Command appendix
@@ -463,7 +460,7 @@ unprivileged user unless noted. Sudo is called out per row.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -477,24 +474,24 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the row.
    Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-erasure-coding` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA EC version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
-| `pkg-config --cflags --libs doca-erasure-coding` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `pkg-config --modversion doca-erasure-coding` | `## configure` step 1; `## build` slot 4 | What is the build-time DOCA EC version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
+| `pkg-config --cflags --libs doca-erasure-coding` | `## build` | What include + link flags does the linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `doca_caps --list-devs` | `## configure` step 2; `## run` step 1 | Which devices on this host can be used as a `doca_dev` for EC? | One row per visible device with PCIe address and capability flags; the agent must still run `doca_ec_cap_*` per-device to confirm per-task and matrix-type support |
 | `doca_caps --version` | `## configure` step 1; `## test` step 1 | What is the *runtime* DOCA version on this host? | A semver string matching `pkg-config --modversion doca-erasure-coding` |
 | `ls /opt/mellanox/doca/samples/doca_erasure_coding/` | `## modify` slot 1 | Which EC samples ship in this install, and which is the closest starting point? | A list of sample directories named after the task direction they demonstrate (create / recover / update) |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 1; `## debug` layer 1 | What does the install tree itself claim its version is? | A semver string matching the other two version sources |
-| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last EC call? | Empty or recent benign messages. Repeated mlx5 / accelerator errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
+| `dmesg | tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last EC call? | Empty or recent benign messages. Repeated mlx5 / accelerator errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the EC-specific rows on top.

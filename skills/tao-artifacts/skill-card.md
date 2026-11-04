@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to validate spec-bundles before job submission, write and read job records, resolve results directory layouts, and consume AutoML best_rec artifacts in NVIDIA TAO’s SDK-free execution pipeline. <br>
+Developers and engineers use this skill to validate spec-bundles before job submission, write and read job records, resolve results directory layouts, and consume AutoML best_rec artifacts in NVIDIA TAO's SDK-free execution pipeline. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -44,7 +44,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive), 1 attempt per task, evaluated in isolated k8s-sandbox pods. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,7 +59,7 @@ Underlying evaluation signals used in this run: <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user’s goal was achieved. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
@@ -68,12 +68,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.4% | 75.7% |
+| Overall | 98.6% | 75.7% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 0.0% → 100.0% (+100.0 points) |
 | Discoverability | 100.0% | 0.0% |
 | Effectiveness | 16.7% → 95.0% (+78.3 points) | 16.7% → 80.0% (+63.3 points) |
-| Efficiency | 97.0% | 99.7% → 98.5% (-1.2 points) |
+| Efficiency | 97.8% | 99.7% → 98.5% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

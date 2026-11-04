@@ -1,157 +1,116 @@
 ---
 name: holoscan-install-source
-version: "1.0.0"
-description: "Build Holoscan SDK from source via the in-tree ./run script. Use only when published packages don't meet the user's needs."
+description: "Build and verify Holoscan SDK 5.x from an explicit source ref with the repository run wrapper; use for Early Access or SDK development."
 license: Apache-2.0
 metadata:
   author: "Holoscan Team <holoscan-team@nvidia.com>"
+  version: "2.0.0"
   github-url: "https://github.com/nvidia-holoscan/holoscan-sdk"
   tags:
     - holoscan
-    - install
+    - installation
     - source
-    - build
-    - cmake
 ---
 
-# Holoscan SDK — Build from Source
+# Build Holoscan 5.x from Source
 
-## Purpose
+## Choose the source and prerequisites
 
-Build the Holoscan SDK from the `nvidia-holoscan/holoscan-sdk` source tree using its `./run` script (which builds inside a Docker container), producing a local install tree consumable as a CMake dependency.
+Use source for unpublished Early Access features, SDK changes, custom components,
+or debug builds. This workflow uses the checkout's build container with Ubuntu
+24.04 and CUDA 13, targeting x86_64 or arm64 dGPU. Check Linux, disk capacity,
+GPU/driver, Git, Docker, buildx, and NVIDIA Container Toolkit availability.
+Explain the container download and build cost before starting.
 
-## Prerequisites
-
-- Linux host with NVIDIA GPU + driver (`nvidia-smi`).
-- `git`, Docker with NVIDIA Container Toolkit (`docker run --gpus all` works), and `docker-buildx-plugin`.
-- ~20 GB free disk for the build container + build/install trees.
-- 10–30 min for a clean first build.
-
-## Limitations
-
-- Only recommended when published packages (Conda / container / apt / wheel) don't fit — debug symbols, custom CMake options, or unsupported configs.
-- Still requires Docker — the `./run` script builds inside a container; this is not a true bare-metal build.
-- Cross-compiling to aarch64 needs `qemu-user-static` on the host.
-
-## Step 0: Consult the Official Install Instructions
-
-Always fetch the "Build from Source" section of `https://docs.nvidia.com/holoscan/sdk-user-guide/sdk_installation.html` (and the linked GitHub `README.md` / `DEVELOP.md` for the chosen tag) before building. Extract: required `./run` flags for the target architecture and CUDA major, supported branches/tags, any Dockerfile patches called out for the release, and the test names recommended for verification. If the doc disagrees with anything below, the doc wins.
-
-## Step 1: Prerequisites
-
-Check that git and Docker (with GPU passthrough) are available:
+Select the explicit **5.x source ref** from the release notes or the user's
+requested development branch. Inspect an existing checkout before reusing it;
+keep its branch and local changes intact. Resolve the requested ref to its full
+commit, using the intended remote's ref for a remote branch and fetching that
+ref if necessary. From the existing repository root, compare its HEAD with the
+resolved ref before building:
 
 ```bash
-git --version
-docker --version
-docker run --rm --gpus all ubuntu:22.04 nvidia-smi
+git status --short
+git rev-parse HEAD
+git rev-parse --verify "${SDK_REF}^{commit}"
 ```
 
-- If Docker is missing → help install from https://docs.docker.com/engine/install/
-- If GPU passthrough fails → install NVIDIA Container Toolkit:
-  ```bash
-  curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
-  curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
-    | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
-    | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-  sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
-  sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker
-  ```
-- If Docker buildx is missing: `sudo apt-get install docker-buildx-plugin`
+`SDK_REF` must identify the selected tag, commit, or remote-qualified branch.
+If the ref cannot be resolved or the commits differ, stop and report the
+mismatch. Preserve the existing branch and working tree; offer a separate
+checkout at the requested ref. Report any local changes even when HEAD matches,
+and preserve them when the user requested building their modified checkout.
 
-## Step 2: Clone the Repository
-
-Clone repo to ~/holoscan/holoscan-sdk if needed
+For a new public checkout:
 
 ```bash
-mkdir -p ~/holoscan/
-git clone https://github.com/nvidia-holoscan/holoscan-sdk.git
-cd ~/holoscan/holoscan-sdk
+# SDK_REF is a confirmed published 5.x tag or development branch.
+git ls-remote --heads --tags https://github.com/nvidia-holoscan/holoscan-sdk.git
+mkdir -p ~/holoscan
+git clone --branch "$SDK_REF" https://github.com/nvidia-holoscan/holoscan-sdk.git ~/holoscan/holoscan-sdk-5x
+cd ~/holoscan/holoscan-sdk-5x
+cat VERSION
+./run --help
+./run build --help
 ```
 
-To build a specific release tag (recommended for stability):
+Verify `VERSION` is 5.x. Read this checkout's `AGENTS.md`, `DEVELOP.md`, and
+`docs/sdk_installation.mdx`; these govern an unreleased branch. In an internal
+checkout the exported source root is the directory containing `VERSION` and
+`run`; run the commands from that directory. Never assume the repository's
+default branch or a 4.x example is the requested 5.x source.
+
+## Build
 
 ```bash
-git tag | grep -E '^v[0-9]' | sort -V | tail -5   # list recent tags
-git checkout v<VERSION>                             # e.g. v4.1.0
-```
-
-## Step 3: Build
-
-The `./run build` script handles container creation, CMake configuration, compilation, and install in one step. Warn the user this takes **10–30 minutes** on first run (downloads base image + compiles).
-
-```bash
+./run check_system_deps
+./run build --dryrun
 ./run build
 ```
 
-Common options:
+The wrapper builds, configures, compiles, and installs. It enables Python,
+examples, operator testing, and optional modules by default. Useful choices:
 
-| Flag | Purpose |
-|------|---------|
-| `--type debug` | Debug build (symbols, no optimization) |
-| `--type RelWithDebInfo` | Release + debug symbols |
-| `--arch aarch64` | Cross-compile for ARM64 (needs `sudo apt install qemu-user-static`) |
-| `--gpu igpu` | iGPU build for Jetson/IGX |
-| `--dryrun` | Preview commands without executing |
+| Option | Meaning |
+| --- | --- |
+| `--type debug` / `--type rel-debug` | Debug / release with debug information |
+| `--arch arm64` | ARM64 target; consult the checkout's cross-compilation prerequisites |
+| `--buildpath build-custom` | Explicit build directory |
+| `--installprefix install-custom` | Explicit install prefix |
+| `--build-python false` | C++-only build |
+| `--config "-DHOLOSCAN_BUILD_VISION=OFF"` | Disable an optional component when supported by the checkout |
 
-If CMake cache errors occur after changing options:
+Use the same target selection for build, directory queries, and launch. The
+standard trees are `build-<arch>` and `install-<arch>`; use `./run get_build_dir`
+and `./run get_install_dir` rather than the 4.x `build-cu<N>-<arch>` naming.
+Custom paths must be passed explicitly. Start with `--reconfigure` for stale
+configuration; inspect what a cleanup command removes before using it.
 
-```bash
-./run clear_cache && ./run build
-```
+## Verify
 
-Output lands in these folders, and can be retrieved with `./run get_build_dir` and `./run get_install_dir`
-* Build dir: `build-cu<N>-<arch>/`
-* Install dir: `install-cu<N>-<arch>/`.
-
-## Step 4: Run Tests
-
-Run the following tests
-* EXAMPLE_CPP_HELLO_WORLD_TEST
-* EXAMPLE_PYTHON_HELLO_WORLD_TEST
-* EXAMPLE_CPP_TENSOR_INTEROP_TEST
-* EXAMPLE_PYTHON_TENSOR_INTEROP_TEST
-* EXAMPLE_CPP_VIDEO_REPLAYER_TEST
-* EXAMPLE_PYTHON_VIDEO_REPLAYER_TEST
+For the default build directory:
 
 ```bash
-./run test
+./run test --name 'EXAMPLE_CPP_HELLO_WORLD_TEST|EXAMPLE_CPP_HELLO_CORE_TEST|EXAMPLE_PYTHON_FIRST_PIPELINE_TEST'
 ```
 
-To run all six required tests at once, use a single-quoted regex (the `|` must be quoted to prevent bash from treating it as a pipe):
+Confirm the selected tests were found and executed, rather than treating zero
+tests as success. A C++-only build omits the Python case. For a custom directory:
 
 ```bash
-./run test --options "-R 'EXAMPLE_CPP_HELLO_WORLD_TEST|EXAMPLE_PYTHON_HELLO_WORLD_TEST|EXAMPLE_CPP_TENSOR_INTEROP_TEST|EXAMPLE_PYTHON_TENSOR_INTEROP_TEST|EXAMPLE_CPP_VIDEO_REPLAYER_TEST|EXAMPLE_PYTHON_VIDEO_REPLAYER_TEST' --output-on-failure"
+./run launch build-custom --run-cmd "ctest -N"
+./run launch build-custom --run-cmd "ctest -R 'EXAMPLE_CPP_HELLO_WORLD_TEST|EXAMPLE_CPP_HELLO_CORE_TEST|EXAMPLE_PYTHON_FIRST_PIPELINE_TEST' --output-on-failure"
 ```
 
-Run a specific test by name or regex:
+These cover greeting, bounded C++ Core execution, and the 5.x Python pipeline.
+Run additional module/GPU tests appropriate to the selected components; state
+what remains untested. Cross-compilation does not qualify execution on the
+target architecture.
 
-```bash
-./run test --name <test_name>
-./run test --options "-R '<regex>' --output-on-failure"
-./run test --verbose
-```
-
-**Important:** Always single-quote the regex string when it contains `|` — without quotes, bash interprets `|` as a pipe and the command fails with `command not found`.
-
-Expected: all tests pass. Note any failures and report them to the user before continuing.
-
-## Step 5: Point Applications at the Install Tree
-
-Once built, applications can use the install tree as a CMake dependency. Give the user this path:
-
-```
-/path/to/holoscan-sdk/install-cu<N>-<arch>/
-```
-
-They can set `Holoscan_ROOT` or `CMAKE_PREFIX_PATH` to this directory when building their own applications.
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---------|-----|
-| `bash: <TEST_NAME>: command not found` when running tests | The regex contains `\|` — wrap it in single quotes: `--options "-R '<regex>'"` |
-| CMake cache errors after option change | `./run clear_cache && ./run build` |
-| Docker buildx not found | `sudo apt-get install docker-buildx-plugin` |
-| GPU not visible inside build container | Verify NVIDIA Container Toolkit and re-run `sudo nvidia-ctk runtime configure --runtime=docker` |
-| Cross-compile fails (aarch64) | Install qemu: `sudo apt-get install qemu-user-static` |
+Use the absolute install prefix as `CMAKE_PREFIX_PATH` for consumer projects
+using `find_package(holoscan)` and `holoscan::core`. Report the source commit,
+build options, build/install directories, and test results. For GPU passthrough
+or buildx failures, report the failing command and diagnostic output, then
+resolve the prerequisite identified by the checkout's checks. If the cause
+remains unknown, stop before building and request the missing host information
+instead of retrying indefinitely or changing unrelated system settings.

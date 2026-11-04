@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "name": "isaac-cable-insertion-policy-training",
+  "objective": "Compare three task-space policies on fixed-distribution success.",
+  "training_root": "/absolute/path/to/isaac_ros_manipulation/isaaclab_training",
+  "task": "IsaacTraining-DisplayPortInsertion-Rizon4s-TaskSpace-ROS-Inference",
+  "max_completed_runs": 3,
+  "training_budget_seconds": null,
+  "evaluation_budget_seconds": null,
+  "decision_mode": "manual",
+  "evaluation": {
+    "enabled": true,
+    "seeds": [
+      35001,
+      35002,
+      35003,
+      35004
+    ],
+    "num_envs": 256,
+    "max_steps": 260,
+    "checkpoint_steps": [
+      "final"
+    ]
+  },
+  "runs": [
+    {
+      "id": "baseline",
+      "hypothesis": "Stock task-space baseline with matching rollout and reset curriculum clocks",
+      "purpose": "training",
+      "num_envs": 256,
+      "seed": 42,
+      "num_steps_per_env": 128,
+      "max_iterations": 1000,
+      "video": true,
+      "video_length": 200,
+      "video_schedule": "start_end",
+      "overrides": {}
+    }
+  ]
+}

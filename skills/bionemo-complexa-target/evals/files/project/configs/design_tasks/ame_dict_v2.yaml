@@ -1,0 +1,9 @@
+motif_target_dict_cfg:
+  existing_motif:
+    source: ame_targets
+    target_filename: existing_motif
+    ligand: L:0
+    contig_atoms: "A10: [N, CA, C]"
+    binder_length: [100]
+    hotspot_residues: [null]
+    use_bonds_from_file: true

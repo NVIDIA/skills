@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers deploying the cuOpt REST server or writing Python/curl clients against it — choosing deployment targets, mapping optimization problems (routing, LP, MILP) onto HTTP endpoints, and debugging rejected payloads. <br>
+Developers and engineers deploying the cuOpt REST server or writing Python/curl clients against it — choosing deployment targets, mapping optimization problems (routing, LP, MILP) onto HTTP endpoints, translating Python-API field names to REST, and debugging rejected payloads. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -44,7 +44,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-8 evaluation tasks (8 positive), 3 attempts per task, each in an isolated sandbox pod. <br>
+8 evaluation tasks (8 positive), 1 attempt per task, each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,15 +68,15 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.3% | 94.4% |
-| Security | 100.0% → 100.0% (±0.0 pp) | 90.9% → 100.0% (+9.1 pp) |
-| Correctness | 68.0% → 100.0% (+32.0 pp) | 67.3% → 100.0% (+32.7 pp) |
-| Discoverability | 100.0% | 94.4% |
-| Effectiveness | 47.8% → 95.2% (+47.4 pp) | 48.5% → 91.2% (+42.7 pp) |
-| Efficiency | 96.1% | 86.7% |
+| Overall | 98.3% | 95.9% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 77.5% → 100.0% (+22.5 points) | 82.5% → 100.0% (+17.5 points) |
+| Discoverability | 100.0% | 93.8% |
+| Effectiveness | 58.1% → 94.3% (+36.2 points) | 64.1% → 90.5% (+26.4 points) |
+| Efficiency | 97.1% | 95.1% |
 
 ## Skill Version(s): <br>
-26.10.00 (source: frontmatter) <br>
+26.12.00 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

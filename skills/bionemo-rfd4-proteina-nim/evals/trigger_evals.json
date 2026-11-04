@@ -1,0 +1,62 @@
+[
+  {
+    "query": "Run the public RFD4-Proteina NIM PD-1 binder example and save the designs",
+    "should_trigger": true
+  },
+  {
+    "query": "Use rfd4-proteina NIM to design a binder to this target",
+    "should_trigger": true
+  },
+  {
+    "query": "Deploy the released RFD4-Proteina NIM container using my NGC key",
+    "should_trigger": true
+  },
+  {
+    "query": "Send this annotated CIF to the NVIDIA hosted RFD4 API",
+    "should_trigger": true
+  },
+  {
+    "query": "Prepare an RFD4 condition_spec request with hotspots without submitting it",
+    "should_trigger": true
+  },
+  {
+    "query": "Use RFD4 NIM beam search to reward interchain hydrogen bonds",
+    "should_trigger": true
+  },
+  {
+    "query": "Run RFD4 inverse folding locally and export its mmCIF and sequence",
+    "should_trigger": true
+  },
+  {
+    "query": "Refine this scaffold with RFD4 NIM partial diffusion",
+    "should_trigger": true
+  },
+  {
+    "query": "Use RFD4-Proteina NIM for nanobody CDR design",
+    "should_trigger": true
+  },
+  {
+    "query": "Design a backbone with the older RFdiffusion NIM using contigs",
+    "should_trigger": false
+  },
+  {
+    "query": "Run a Proteina-Complexa MCTS binder design campaign",
+    "should_trigger": false
+  },
+  {
+    "query": "Run ProteinMPNN to design sequences for this PDB",
+    "should_trigger": false
+  },
+  {
+    "query": "Predict a complex using Boltz2",
+    "should_trigger": false
+  },
+  {
+    "query": "Train the open RFD4 model from source",
+    "should_trigger": false
+  },
+  {
+    "query": "Convert this ordinary PDB file to mmCIF",
+    "should_trigger": false
+  }
+]

@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-mine-od-images`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:273e0998e3b7f6e713f8e9a19507c191f9e6f744c515fd853c93b71367a1e0ec` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,18 +35,16 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.6% — baseline ran, but no comparable score was available; uplift unavailable | 69.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.7% — baseline ran, but no comparable score was available; uplift unavailable | 96.2% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 20.0% → 100.0% (+80.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 4.2% → 100.0% (+95.8 points) | 40.0% → 50.0% (+10.0 points) |
-| Efficiency | 97.8% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.5% (-1.2 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 27.5% → 100.0% (+72.5 points) | 40.0% → 87.5% (+47.5 points) |
+| Efficiency | 98.5% — baseline ran, but no comparable score was available; uplift unavailable | 98.5% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
-
-A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
 ## Token Usage
 
@@ -54,11 +52,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 66,682 | 871,391 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-mine-od-images-basic | 66,682 | 871,391 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 14,024 | 13,629 | +395 | +2.90% | skill 1/1; base 1/1 |
-| codex | tao-mine-od-images-basic | 14,024 | 13,629 | +395 | +2.90% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 80,706 | 885,020 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 63,596 | 341,403 | -277,807 | -81.37% | skill 1/1; base 1/1 |
+| claude-code | tao-mine-od-images-basic | 63,596 | 341,403 | -277,807 | -81.37% | skill 1/1; base 1/1 |
+| codex | All cases | 29,857 | 13,655 | +16,202 | +118.65% | skill 1/1; base 1/1 |
+| codex | tao-mine-od-images-basic | 29,857 | 13,655 | +16,202 | +118.65% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 93,453 | 355,058 | -261,605 | -73.68% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 

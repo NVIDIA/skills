@@ -1,5 +1,5 @@
 ## Description: <br>
-SegFormer for semantic segmentation. Lightweight transformer-based architecture with hierarchical feature extraction, efficient for real-time segmentation tasks. <br>
+SegFormer for semantic segmentation, a lightweight transformer-based architecture with hierarchical feature extraction that is efficient for real-time segmentation tasks. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference for SegFormer semantic segmentation models using NVIDIA TAO Toolkit. <br>
+Developers and engineers use this skill to train, evaluate, export, quantize, or run inference for SegFormer semantic segmentation models with NVIDIA TAO Toolkit containers. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) evaluated in isolated k8s-sandbox pods with 3 attempts per task. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -51,7 +51,7 @@ Reported benchmark dimensions: <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
 - Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - Effectiveness: Equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Checks tool-call productivity (50%) and token efficiency (50%). <br>
+- Efficiency: Tool-call productivity (50%) and token efficiency (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% | 95.3% |
+| Overall | 99.6% | 95.3% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 20.0% → 100.0% (+80.0 points) | 80.0% → 100.0% (+20.0 points) |
 | Discoverability | 100.0% | 95.0% |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 70.0% → 83.3% (+13.3 points) |
-| Efficiency | 72.0% | 98.3% |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 65.0% → 83.3% (+18.3 points) |
+| Efficiency | 97.8% | 98.4% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

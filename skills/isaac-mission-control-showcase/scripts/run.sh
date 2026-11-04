@@ -2,25 +2,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-set -euo pipefail
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SHOWCASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-resolve_skills_dir() {
-  local candidate="$SHOWCASE_DIR"
-  while [[ "$candidate" != "/" ]]; do
-    if [[ "$(basename "$candidate")" == "skills" ]]; then
-      printf '%s\n' "$candidate"
-      return 0
-    fi
-    candidate="$(dirname "$candidate")"
-  done
-  echo "ERROR: showcase skill is not installed beneath a skills directory" >&2
-  return 1
-}
-
-# Upstream skills are owned by their own repositories and resolved at runtime.
+# Upstream skills belong to their own repositories and are resolved at runtime.
 # The runner drives them through the parent-owned reference adapters under
 # references/<component>/scripts/run.py, never by package-relative vendored
 # paths and never by a hardcoded upstream path. Nothing here clones, fetches,
@@ -71,7 +58,7 @@ verify_dependencies() {
   fi
 }
 
-SKILLS_DIR="$(resolve_skills_dir)"
+SKILLS_DIR="$(dirname "$SHOWCASE_DIR")"
 # The adapters are the only path to an upstream component. The legacy
 # per-script overrides pointed at an upstream entrypoint directly, which
 # bypassed manifest verification, the readiness gate, and the upstream working
@@ -116,8 +103,7 @@ CLOUD_ENV_FILE=""
 CLOUD_IMAGES_FILE=""
 CLOUD_INIT_DB=""
 
-# Cloud file paths only. --stop needs these to read the compose defaults and
-# export INIT_DB_SH; it needs none of the four adapters.
+# Resolve the cloud file paths from the verified dependency manifest.
 resolve_cloud_resources() {
   (( CLOUD_RESOURCES_RESOLVED )) && return 0
   local resource_dir
@@ -385,8 +371,10 @@ initialize_work_dir() {
     } > "$STATE_FILE"
     printf '%s\n' "$SHOWCASE_WORK_DIR" > "$(current_pointer)"
     umask 022
+    trap finalize_run EXIT
     manifest_init
-    trap 'on_interrupt' INT TERM
+    trap 'on_interrupt 130' INT
+    trap 'on_interrupt 143' TERM
   fi
   echo "showcase_work_dir=$SHOWCASE_WORK_DIR"
 }
@@ -396,14 +384,18 @@ manifest_py() {
 import sys
 sys.path.insert(0, sys.argv[1])
 import run_state
-run_state.__dict__[sys.argv[2]](*sys.argv[3:])
+if sys.argv[2] == "update":
+    import json
+    run_state.update(sys.argv[3], **json.loads(sys.argv[4]))
+else:
+    run_state.__dict__[sys.argv[2]](*sys.argv[3:])
 ' "$SCRIPT_DIR" "$@"
 }
 
 manifest_init() {
   python3 - "$SCRIPT_DIR" "$SHOWCASE_WORK_DIR" "$COMPOSE_PROJECT_NAME" \
     "$NOVA_CONTAINER" "$ROBOT_NAME" "$ISAAC_PYTHON_PORT" \
-    "$SHOWCASE_ROS_DOMAIN_ID" "$NOVA_LOG_FILE" <<'PY' || true
+    "$SHOWCASE_ROS_DOMAIN_ID" "$NOVA_LOG_FILE" <<'PY'
 import sys
 sys.path.insert(0, sys.argv[1])
 import run_state
@@ -416,24 +408,53 @@ run_state.initialize(
     ports={"isaac_python_port": port},
     evidence={"ros2_log": log},
 )
-run_state.add_container(work, nova)
+run_state.update(work, carter_container=nova)
 PY
 }
 
 manifest_state() {
   [[ $DRY_RUN -eq 1 || -z "${SHOWCASE_WORK_DIR:-}" ]] && return 0
-  manifest_py set_state "$SHOWCASE_WORK_DIR" "$1" 2>/dev/null || true
+  CURRENT_PHASE="$1"
+  manifest_py set_state "$SHOWCASE_WORK_DIR" "$1"
 }
 
 on_interrupt() {
   trap - INT TERM
-  echo "" >&2
-  echo "Interrupted. Recorded run state is preserved at:" >&2
-  echo "  $SHOWCASE_WORK_DIR" >&2
-  manifest_state failed
-  echo "Stop only this run's resources with:" >&2
-  echo "  $0 --stop --work-dir $SHOWCASE_WORK_DIR" >&2
-  exit 130
+  if [[ -n "${waiter_pid:-}" ]]; then
+    kill "$waiter_pid" 2>/dev/null || true
+    wait "$waiter_pid" 2>/dev/null || true
+    waiter_pid=""
+  fi
+  FAILED_COMMAND="interrupted"
+  echo "Interrupted. Stop this run with: $0 --stop --work-dir $SHOWCASE_WORK_DIR" >&2
+  exit "$1"
+}
+
+finalize_run() {
+  local status=$? final_status=0 pid isaac_status
+  trap - EXIT ERR INT TERM
+  if [[ "$BASHPID" != "$RUNNER_PID" ]]; then return "$status"; fi
+  set +e
+  if [[ -n "${waiter_pid:-}" ]]; then
+    kill "$waiter_pid" 2>/dev/null
+    wait "$waiter_pid" 2>/dev/null
+  fi
+  if [[ $status -ne 0 ]]; then capture_nova_ros2_log failure; fi
+  if [[ -f "${ISAAC_PID_FILE:-}" ]]; then
+    pid="$(<"$ISAAC_PID_FILE")"
+    if ! isaac_sim_is_running; then
+      wait "$pid"
+      isaac_status=$?
+      manifest_py record_isaac_exit "$SHOWCASE_WORK_DIR" "$pid" "$isaac_status" "process exited"
+    fi
+  fi
+  local args=(--work-dir "$SHOWCASE_WORK_DIR" --exit-code "$status"
+    --phase "$CURRENT_PHASE" --failed-command "${FAILED_COMMAND:-}")
+  (( DEMO )) && args+=(--demo)
+  python3 "$SHOWCASE_HELPER" finalize "${args[@]}"
+  final_status=$?
+  if [[ $status -eq 0 ]]; then status=$final_status; fi
+  exit "$status"
 }
 
 load_recorded_state() {
@@ -486,15 +507,6 @@ capture_nova_ros2_log() {
     echo "WARNING: could not save the complete Nova Carter ROS 2 log: $log_file" >&2
   fi
   return 0
-}
-
-capture_nova_ros2_log_on_failure() {
-  local status=$?
-  trap - EXIT
-  if [[ $status -ne 0 ]]; then
-    capture_nova_ros2_log failure
-  fi
-  exit "$status"
 }
 
 container_is_ignored() {
@@ -647,6 +659,12 @@ prefetch_runtime_images() {
 }
 
 start_cloud_stack() {
+  if [[ $DRY_RUN -eq 0 ]]; then
+    local service
+    for service in mosquitto postgres mission-database mission-dispatch wpg cuopt mission-control; do
+      manifest_py add_container "$SHOWCASE_WORK_DIR" "${COMPOSE_PROJECT_NAME}-${service}-1"
+    done
+  fi
   run env \
     MC_WORKSPACE="$MC_WORKSPACE" \
     COMPOSE_PROJECT_NAME="$COMPOSE_PROJECT_NAME" \
@@ -790,6 +808,7 @@ start_isaac_sim() {
     --/exts/isaacsim.code_editor.python_server/port="$ISAAC_PYTHON_PORT" \
     >"$ISAAC_LOG_FILE" 2>&1 &
   echo $! > "$ISAAC_PID_FILE"
+  python3 "$SHOWCASE_HELPER" record-isaac --work-dir "$SHOWCASE_WORK_DIR" --pid "$(<"$ISAAC_PID_FILE")"
   echo "isaac_sim_pid=$(<"$ISAAC_PID_FILE") log=$ISAAC_LOG_FILE"
 }
 
@@ -797,7 +816,8 @@ isaac_sim_is_running() {
   local pid
   [[ -f "$ISAAC_PID_FILE" ]] || return 1
   pid="$(<"$ISAAC_PID_FILE")"
-  [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null
+  [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null &&
+    [[ "$(ps -p "$pid" -o stat=)" != Z* ]]
 }
 
 # Wait for an actual Python-server response. A published Docker port can accept
@@ -839,6 +859,9 @@ restore_isaac() {
 }
 
 start_nova_carter() {
+  if [[ $DRY_RUN -eq 0 ]]; then
+    manifest_py add_container "$SHOWCASE_WORK_DIR" "$NOVA_CONTAINER"
+  fi
   run docker run -d --name "$NOVA_CONTAINER" \
     --label com.nvidia.mission-control-showcase=true \
     --label "com.nvidia.mission-control-showcase.run=$COMPOSE_PROJECT_NAME" \
@@ -912,34 +935,58 @@ start_static_tf() {
   "
 }
 
-# Nav2 subscribes to /scan. Isaac Sim 6.1 publishes the 2D LiDAR under the
-# sensor's own namespace, so relay whatever LaserScan topic exists onto /scan
-# rather than depending on the scene graph carrying a particular topic name.
+# Nav2 subscribes to /scan. The canonical warehouse publishes its navigation
+# LiDAR on /front_2d_lidar/scan, so use that explicit source rather than topic
+# discovery, which also reports silent topics that only have subscribers.
+FRONT_SCAN_TOPIC="/front_2d_lidar/scan"
+FRONT_SCAN_FRAME="front_2d_lidar"
+
 scan_topic_probe() {
-  local wait_s="$1"
-  timeout "$2" docker exec -i "$NOVA_CONTAINER" \
-    bash -lc "$ROS_SETUP_SNIPPET; exec python3 - $wait_s" <<'PYEOF'
+  local wait_s="$1" command_timeout="$2" topic="$3"
+  timeout "$command_timeout" docker exec -i "$NOVA_CONTAINER" \
+    bash -lc "$ROS_SETUP_SNIPPET; exec python3 - $wait_s '$topic' '$FRONT_SCAN_FRAME'" <<'PYEOF'
 import sys
 import time
 
 import rclpy
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
 
 rclpy.init()
 node = rclpy.create_node("showcase_scan_topic_probe")
 deadline = time.monotonic() + float(sys.argv[1])
-topics = []
-while time.monotonic() < deadline:
-    topics = [
-        name
-        for name, types in node.get_topic_names_and_types()
-        if "sensor_msgs/msg/LaserScan" in types
-    ]
-    if topics:
-        break
-    rclpy.spin_once(node, timeout_sec=0.5)
-if not topics:
-    sys.exit(1)
-print("/scan" if "/scan" in topics else sorted(topics)[0], end="")
+topic = sys.argv[2]
+expected_frame = sys.argv[3]
+observation = {"count": 0, "frame": None, "valid": False}
+
+
+def observe(message):
+    observation["count"] += 1
+    observation["frame"] = message.header.frame_id
+    observation["valid"] = message.header.frame_id == expected_frame
+
+
+node.create_subscription(
+    LaserScan,
+    topic,
+    observe,
+    qos_profile_sensor_data,
+)
+try:
+    while time.monotonic() < deadline and not observation["valid"]:
+        remaining = max(0.0, deadline - time.monotonic())
+        rclpy.spin_once(node, timeout_sec=min(0.2, remaining))
+    if not observation["valid"]:
+        print(
+            f"No {expected_frame} LaserScan received on {topic}; "
+            f"messages={observation['count']} last_frame={observation['frame']!r}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    print(topic, end="")
+finally:
+    node.destroy_node()
+    rclpy.shutdown()
 PYEOF
 }
 
@@ -949,17 +996,17 @@ ensure_scan_topic() {
     return 0
   fi
 
-  local source_topic
-  if ! source_topic="$(scan_topic_probe 90 120)"; then
-    echo "ERROR: no sensor_msgs/msg/LaserScan topic is being published." >&2
+  if scan_topic_probe 5 10 /scan >/dev/null 2>&1; then
+    echo "scan_topic=/scan (no relay needed)"
+    return 0
+  fi
+
+  local source_topic="$FRONT_SCAN_TOPIC"
+  if ! scan_topic_probe 90 120 "$source_topic" >/dev/null; then
+    echo "ERROR: no live $FRONT_SCAN_FRAME LaserScan was received on $source_topic." >&2
     echo "       The Isaac 2D LiDAR render product is not enabled; check the" >&2
     echo "       set_graph_attr lines in the restore_isaac output." >&2
     return 1
-  fi
-
-  if [[ "$source_topic" == "/scan" ]]; then
-    echo "scan_topic=/scan (no relay needed)"
-    return 0
   fi
 
   echo "scan_topic=$source_topic relaying to /scan"
@@ -984,7 +1031,7 @@ RELAYEOF
     "$ROS_SETUP_SNIPPET; exec python3 /tmp/showcase_scan_relay.py '$source_topic' /scan"
 
   local relayed
-  if ! relayed="$(scan_topic_probe 30 60)" || [[ "$relayed" != "/scan" ]]; then
+  if ! relayed="$(scan_topic_probe 30 60 /scan)" || [[ "$relayed" != "/scan" ]]; then
     echo "ERROR: relay from $source_topic to /scan did not come up" >&2
     return 1
   fi
@@ -1252,52 +1299,20 @@ wait_mc_robot() {
 # mission. A ros2 launch parent can remain alive after cgroup OOM kills its
 # children, so container-running status alone is not a health signal.
 require_nova_carter_healthy() {
-  local quiet="${1:-0}"
-  local oom_killed
   if [[ $DRY_RUN -eq 1 ]]; then
-    echo "+ verify Carter SIL has no OOM event and required Nav2 processes are alive"
+    echo "+ verify Isaac liveness, Carter processes, and cgroup OOM events"
     return 0
   fi
-  if ! container_is_running "$NOVA_CONTAINER"; then
-    echo "ERROR: Carter SIL container is not running: $NOVA_CONTAINER" >&2
-    docker logs --tail 120 "$NOVA_CONTAINER" >&2 || true
-    return 1
-  fi
-  oom_killed="$(docker inspect -f '{{.State.OOMKilled}}' "$NOVA_CONTAINER")"
-  if [[ "$oom_killed" == "true" ]]; then
-    echo "ERROR: Carter SIL recorded a cgroup OOM kill: $NOVA_CONTAINER" >&2
-    docker logs --tail 120 "$NOVA_CONTAINER" >&2 || true
-    return 1
-  fi
-  if ! docker exec "$NOVA_CONTAINER" bash -lc '
-    required=(
-      "^/opt/ros/humble/lib/nav2_map_server/map_server "
-      "^/opt/ros/humble/lib/nav2_amcl/amcl "
-      "^/opt/ros/humble/lib/nav2_controller/controller_server "
-      "^/opt/ros/humble/lib/nav2_planner/planner_server "
-      "^/opt/ros/humble/lib/nav2_bt_navigator/bt_navigator "
-      "^/opt/ros/humble/lib/isaac_ros_vda5050_nav2_client/vda5050_nav2_client "
-    )
-    for pattern in "${required[@]}"; do
-      if ! pgrep -f -- "$pattern" >/dev/null; then
-        echo "missing_required_process=$pattern" >&2
-        exit 1
-      fi
-    done
-  '; then
-    echo "ERROR: Carter SIL is missing a required navigation process" >&2
-    docker logs --tail 120 "$NOVA_CONTAINER" >&2 || true
-    return 1
-  fi
-  if [[ "$quiet" != "1" ]]; then
-    echo "Carter SIL healthy: no OOM event and required Nav2 processes are alive."
-  fi
+  python3 "$SHOWCASE_HELPER" check-health --work-dir "$SHOWCASE_WORK_DIR"
 }
 
 # Submit the known-good Mission Control route mission for Carter.
 submit_known_good_mission() {
   require_nova_carter_healthy
   DEMO_MISSION_ID="showcase-${COMPOSE_PROJECT_NAME}-$(date -u +%Y%m%dT%H%M%SZ)"
+  if [[ $DRY_RUN -eq 0 ]]; then
+    manifest_py update "$SHOWCASE_WORK_DIR" "{\"mission_id\":\"$DEMO_MISSION_ID\"}"
+  fi
   run python3 "$SHOWCASE_HELPER" submit-mission \
     --robot-name "$ROBOT_NAME" \
     --mission-id "$DEMO_MISSION_ID" \
@@ -1306,21 +1321,21 @@ submit_known_good_mission() {
 
 # Wait until the demo mission runs and Carter returns to idle.
 wait_demo_complete() {
-  local waiter_pid
+  waiter_pid=""
   if [[ $DRY_RUN -eq 1 ]]; then
-    run python3 "$SHOWCASE_HELPER" wait-demo-complete \
+    run python3 "$SHOWCASE_HELPER" wait-demo-complete --work-dir "$SHOWCASE_WORK_DIR" \
       --robot-name "$ROBOT_NAME" \
       --mission-id "$DEMO_MISSION_ID" \
       --database-controller-port "$DATABASE_CONTROLLER_PORT" \
       --timeout 900
     return 0
   fi
-  print_command python3 "$SHOWCASE_HELPER" wait-demo-complete \
+  print_command python3 "$SHOWCASE_HELPER" wait-demo-complete --work-dir "$SHOWCASE_WORK_DIR" \
     --robot-name "$ROBOT_NAME" \
     --mission-id "$DEMO_MISSION_ID" \
     --database-controller-port "$DATABASE_CONTROLLER_PORT" \
     --timeout 900
-  python3 "$SHOWCASE_HELPER" wait-demo-complete \
+  python3 "$SHOWCASE_HELPER" wait-demo-complete --work-dir "$SHOWCASE_WORK_DIR" \
     --robot-name "$ROBOT_NAME" \
     --mission-id "$DEMO_MISSION_ID" \
     --database-controller-port "$DATABASE_CONTROLLER_PORT" \
@@ -1330,74 +1345,62 @@ wait_demo_complete() {
     if ! require_nova_carter_healthy 1; then
       kill "$waiter_pid" 2>/dev/null || true
       wait "$waiter_pid" 2>/dev/null || true
-      echo "ERROR: demo aborted because Carter SIL became unhealthy" >&2
+      waiter_pid=""
+      echo "ERROR: demo aborted because Isaac Sim or Carter SIL became unhealthy" >&2
       return 1
     fi
     sleep 3
   done
-  if ! wait "$waiter_pid"; then
+  if wait "$waiter_pid"; then
+    waiter_pid=""
+  else
+    waiter_pid=""
     return 1
   fi
   require_nova_carter_healthy
 }
 
 stop_recorded_showcase() {
-  local name pid
   load_recorded_state
-  trap capture_nova_ros2_log_on_failure EXIT
-  for name in "$NOVA_CONTAINER"; do
-    if docker inspect "$name" >/dev/null 2>&1 && container_is_running "$name"; then
-      run docker stop "$name"
-    fi
-  done
+  local args=(--work-dir "$SHOWCASE_WORK_DIR")
+  (( DRY_RUN )) && args+=(--dry-run)
+  python3 "$SHOWCASE_HELPER" stop-recorded "${args[@]}"
   capture_nova_ros2_log --stop
-
-  # Isaac Sim is a local process now; SIGTERM lets Kit shut down cleanly.
-  if [[ -n "${ISAAC_PID_FILE:-}" && -f "$ISAAC_PID_FILE" ]]; then
-    pid="$(<"$ISAAC_PID_FILE")"
-    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
-      run kill -TERM "$pid"
-      echo "Sent SIGTERM to Isaac Sim pid $pid."
-    fi
-  fi
-
-  export CONFIG_DIR="$MC_WORKSPACE/app/config"
-  if (( CLOUD_RESOURCES_RESOLVED )); then
-    load_cloud_defaults
-    export INIT_DB_SH="$CLOUD_INIT_DB"
-  fi
-  if (( CLOUD_RESOURCES_RESOLVED )) &&
-     [[ -f "$MC_WORKSPACE/docker-compose/bringup_services.yaml" ]]; then
-    run docker compose \
-      -p "$COMPOSE_PROJECT_NAME" \
-      -f "$MC_WORKSPACE/docker-compose/bringup_services.yaml" \
-      --profile enable_mission_control \
-      stop
-  fi
-  echo "Stopped showcase resources recorded in $SHOWCASE_WORK_DIR; files and containers remain recoverable."
+  echo "Stopped resources recorded in $SHOWCASE_WORK_DIR; logs and verdict remain."
 }
 
-# These three ship with this package, so they are checked unconditionally.
-require_file "$RESTORE_ISAAC"
+RUNNER_PID="$BASHPID"
+CURRENT_PHASE=initializing
+FAILED_COMMAND=""
+waiter_pid=""
+trap 'FAILED_COMMAND="${FAILED_COMMAND:-$BASH_COMMAND}"' ERR
 require_file "$SHOWCASE_HELPER"
-require_file "$DOCTOR"
 
-# --stop resolves only the cloud file paths, and tolerates failure: a run whose
-# upstream checkout moved must still be able to stop what it recorded. Every
-# other path needs the adapters and fails loudly without them.
-if [[ $STOP -eq 1 ]]; then
-  if ! resolve_cloud_resources; then
-    echo "WARNING: could not resolve bring-up-cloud-stack resources." >&2
-    echo "         Stopping the resources this run recorded anyway; the compose" >&2
-    echo "         teardown will be skipped." >&2
-  fi
-else
-  resolve_runtime_entrypoints || exit 1
+if [[ $STOP -eq 0 && $PREFLIGHT -eq 0 && $DRY_RUN -eq 0 ]]; then
+  initialize_work_dir
+fi
+if [[ $STOP -eq 0 ]]; then
+  require_file "$RESTORE_ISAAC"
+  require_file "$DOCTOR"
+  resolve_runtime_entrypoints
   load_cloud_defaults
-
   if [[ "$MQTT_TRANSPORT" != "websockets" ]]; then
     echo "ERROR: the packaged showcase requires websocket MQTT" >&2
     exit 1
+  fi
+  if [[ $PREFLIGHT -eq 0 && $DRY_RUN -eq 0 ]]; then
+    python3 - "$SCRIPT_DIR" "$SHOWCASE_WORK_DIR" "$WAREHOUSE_USD_URI" "$MAP_ID" <<'PYCONFIG'
+import os, sys
+sys.path.insert(0, sys.argv[1])
+import run_state
+run_state.update(sys.argv[2],
+    ports={key: int(os.environ[var]) for key, var in {
+        "mqtt_tcp_port": "MQTT_PORT_TCP", "mqtt_websocket_port": "MQTT_PORT_WEBSOCKET",
+        "postgres_port": "POSTGRES_DATABASE_PORT", "database_api_port": "DATABASE_API_PORT",
+        "database_controller_port": "DATABASE_CONTROLLER_PORT", "cuopt_port": "CUOPT_PORT",
+        "mission_control_port": "MC_PORT",
+    }.items()}, map={"warehouse_uri": sys.argv[3], "map_id": sys.argv[4]})
+PYCONFIG
   fi
 fi
 
@@ -1451,16 +1454,18 @@ if [[ $DRY_RUN -eq 1 ]]; then
   exit 0
 fi
 
+manifest_state preflight
 run_doctor
 check_no_running_containers
 prefetch_runtime_images
-initialize_work_dir
-trap capture_nova_ros2_log_on_failure EXIT
 prepare_runtime
+manifest_state starting-cloud
 start_cloud_stack
+manifest_state starting-isaac
 start_isaac_sim
 restore_isaac
 wait_cloud_ready
+manifest_state starting-carter
 start_nova_carter
 verify_active_map_consumers
 start_static_tf
@@ -1469,6 +1474,7 @@ wait_nav2_ready 240
 probe_runtime_consistency
 require_nova_carter_healthy
 wait_mc_robot
+manifest_state ready
 
 if [[ $DEMO -eq 1 ]]; then
   manifest_state mission-running

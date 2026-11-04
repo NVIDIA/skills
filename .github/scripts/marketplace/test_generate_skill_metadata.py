@@ -21,6 +21,9 @@ Properties under test:
      about -- a genuinely unbuildable new skill must fail the run.
   4. A published skill that cannot be rebuilt is recovered byte-identically
      from the checked-in metadata.json rather than silently delisted.
+  5. A run that fails validation reports the per-skill enrichment reason, in
+     the log and in the structured warnings file CI reads, alongside the
+     summary line naming the skills that produced no entry.
 
 Run:
     python3 .github/scripts/marketplace/test_generate_skill_metadata.py
@@ -32,6 +35,7 @@ from __future__ import annotations
 import contextlib
 import importlib.util
 import io
+import json
 import sys
 from pathlib import Path
 
@@ -259,6 +263,37 @@ def main() -> int:
             f"rc={rc_no_ai}")
     r.check("unenrichable new skill with AI available -> fails the run", rc_with_ai == 1,
             f"rc={rc_with_ai}")
+
+    # --- 6. the failing run reports WHY, not just which skill ------------
+    # The case above asserts only the exit code, and case 3 asserts only that
+    # the warning is collected -- neither checks that the reason is emitted.
+    # That gap let the failing path return before the reporting block, so the
+    # tracking issue carried the summary line ("no entry could be built for
+    # these skills") with no indication of which field failed enrichment.
+    reason = "AI returned UNRESOLVED for `discovery.activity_tags`"
+
+    def unresolved_api(*_args, **_kwargs):
+        raise gen.EnrichmentError(reason)
+
+    warnings_file = Path("/tmp/skill-warnings.json")
+    if warnings_file.exists():
+        warnings_file.unlink()
+    _, log_unresolved = run_for(["--check"], unresolved_api)
+
+    r.check("failing run -> per-skill reason reaches the log", reason in log_unresolved)
+    r.check(
+        "failing run -> summary line still present",
+        "no entry could be built" in log_unresolved,
+    )
+    r.check("failing run -> warnings file written for the issue body", warnings_file.exists())
+    r.check(
+        "failing run -> warnings file carries the reason",
+        warnings_file.exists()
+        and any(
+            reason in w
+            for w in json.loads(warnings_file.read_text()).get("stale_skills", [])
+        ),
+    )
 
     return r.report()
 

@@ -28,14 +28,14 @@ Routing for nearby "install" questions:
 
 - *"The binary isn't there — do I need to install something?"* →
   yes. Route to
-  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   for the DOCA install with the appropriate package profile, or
-  to [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+  to `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
   for the public NGC DOCA container path when the user has no
   install yet.
 - *"I want a structured probe before installing"* → the
   detect → prefer → fall back → report contract per
-  [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+  `doca-structured-tools-contract/SKILL.md`
   is the right surface; the structured helpers it documents
   (`doca-env --json` for version + libraries + drivers in one
   shot) are the cheapest pre-install reconnaissance.
@@ -58,10 +58,10 @@ the canonical Flow-tune failure mode.
 Steps the agent should walk the user through, in order:
 
 1. **Confirm DOCA is installed and the Flow library is present.**
-   Run [`doca-setup ## test`](../../doca-setup/TASKS.md#test) and
+   Run `doca-setup ## test` (`doca-setup/TASKS.md#test`) and
    confirm `pkg-config --modversion doca-flow` resolves. If the
    user has no install yet, route to
-   [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    before any tune discussion. The tool has nothing to do if
    `doca-flow` is not present.
 2. **Confirm a `doca-flow` application is running (online modes)
@@ -69,12 +69,12 @@ Steps the agent should walk the user through, in order:
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    operating-modes table; offline mode consumes a captured JSON
    only, online mode requires the application.
-3. **Decide tune vs perf.** Per the *tune-vs-perf* boundary in
+3. **Capture the baseline first.** Per the *measure, then tune*
+   rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes);
    if the user's question is *"what is the baseline number"*,
-   route to [`doca-flow-perf`](../doca-flow-perf/SKILL.md) or
-   [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md) instead
-   of this skill. Tune does not produce a primary baseline number.
+   answer it with a monitor-mode capture (and its CSV export)
+   before any recommendation.
 4. **Axis 1 — pick the tuning axis.** Per the three-axis table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    commit explicitly to which class of change is being explored
@@ -86,8 +86,8 @@ Steps the agent should walk the user through, in order:
    the tuning axis; the agent should quote *why* it picked the
    measurement so the user can challenge the framing.
 6. **Axis 3 — pick the scope.** Confirm the PCI address set and
-   the `flow_port_id` set the session will look at. The shipped
-   `flow_tune_cfg_public.json` template documents the
+   the `flow_port_id` set the session will look at. The guide's
+   configuration-file example documents the
    `monitor.hardware.pci_addresses` and
    `monitor.software[*].flow_port_id` fields as the scope-naming
    knobs; confirm against the live application's port set.
@@ -97,17 +97,16 @@ Steps the agent should walk the user through, in order:
    The state-changing mode is high-stakes; the agent must surface
    the [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
    rules before recommending it.
-8. **Populate the JSON config file.** Start from the shipped
-   `flow_tune_cfg_public.json` template on the user's install (or
-   `flow_tune_cfg_hardware_only.json` /
-   `flow_tune_cfg_software_only.json` for the subset variants);
+8. **Populate the JSON config file.** Start from the configuration-file example in the public DOCA Flow Tune guide
+   (`flow_tune_cfg.json`; remove the `hardware` or `software`
+   section to disable that part);
    set `outputs_directory`, the `network.server_uds` socket path,
    the `dumper` / `analyze` / `visualize` / `monitor` sections
-   per the chosen scope and mode. The shipped templates are the
+   per the chosen scope and mode. The guide's example and `--help` are the
    schema source of truth on the user's installed version; do
    not invent field names from prose memory.
 9. **Sanity check before any invocation.** Confirm with the user:
-   what is the question (tune vs perf)? Which pipeline? Which
+   what is the question (baseline or recommendation)? Which pipeline? Which
    tuning axis? Which measurement? Which mode? If any answer is
    unclear, stop and ask — do NOT run the tune binary against a
    fuzzy posture.
@@ -131,14 +130,14 @@ Routing for nearby "build" questions:
   re-install) DOCA with the right package profile.
 - *"I want to build my own DOCA Flow tuning analyzer."* → not a
   `doca_flow_tune` question. Route to
-  [`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build)
+  `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
   for the cross-library build pattern and to
-  [`doca-flow TASKS.md ## build`](../../libs/doca-flow/TASKS.md#build)
+  `doca-flow TASKS.md ## build` (`doca-flow/TASKS.md#build`)
   for the Flow-specific build overlay; the tune binary is the
   shipped harness, a bespoke analyzer is a different artifact.
 - *"I want the trace-build flavor of `doca-flow` so the tune
   attach role works."* → the trace-flavor question belongs to
-  [`doca-flow TASKS.md ## build`](../../libs/doca-flow/TASKS.md#build);
+  `doca-flow TASKS.md ## build` (`doca-flow/TASKS.md#build`);
   this skill does not duplicate the Flow build recipe.
 
 The `## What this skill deliberately does not ship` block in
@@ -165,7 +164,7 @@ The pattern:
    provenance of the recommendation.
 2. **Translate the recommendation into a Flow-program change
    proposal.** Per
-   [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify),
+   `doca-flow TASKS.md ## modify` (`doca-flow/TASKS.md#modify`),
    identify which Flow API call in the program is the lever the
    recommendation moves (a pipe attribute, a resource-hint
    parameter, a steering-mode selection). If the recommendation
@@ -182,7 +181,7 @@ The pattern:
    program. Confirmation of one recommendation does not cover
    another; without confirmation, stop at the proposal.
 4. **Apply the minimum diff.** Walk
-   [`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify)
+   `doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`)
    for the cross-library minimum-diff modification pattern; the
    shipped DOCA Flow samples on disk are the verified source of
    truth, the tune recommendation is the *direction* of the diff
@@ -200,9 +199,8 @@ Routing for nearby "modify" questions:
   contributor question, not an external-consumer question.
 - *"Can I edit the dumper CSV format?"* → no; the documented
   CSV format is the documented format. If the user wants a
-  different post-processing surface, the right answer is *"read
-  the shipped `hw_counters_csv_analyzer.py` and adapt the
-  parsing for your downstream tool"*, but even the adapter is
+  different post-processing surface, the right answer is *"parse
+  the documented CSV in your downstream tool"*, but even the adapter is
   out of scope per
   [`SKILL.md ## What this skill deliberately does not ship`](SKILL.md#what-this-skill-deliberately-does-not-ship).
 
@@ -219,7 +217,7 @@ command lines (per
    consistent.** Per [`## configure`](#configure) steps 1-8.
    Quote `pkg-config --modversion doca-flow` and the tune
    binary's `--version` against
-   [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test)
+   `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`)
    so the four-way match is anchored before invocation.
 2. **Smoke run — offline first.** When a captured pipeline-
    description JSON is on hand, run the offline analyze /
@@ -229,8 +227,7 @@ command lines (per
    a usable recommendation; it is a precondition check.
 3. **Online read-only snapshot.** When a live application is
    available, attach via the documented IPC channel (per the
-   `network.server_uds` field on the user's installed
-   templates), run the dumper / monitor for the configured
+   `network.server_uds` field of the JSON config), run the dumper / monitor for the configured
    duration, and capture the CSV + JSON + mermaid outputs into
    the directory named by `outputs_directory`. This is the
    *online-mode read-only smoke* per
@@ -256,10 +253,9 @@ command lines (per
 7. **For the exact, current invocation surface — mode flag
    names, JSON config field names, dumper CSV columns,
    analyze JSON schema, visualize mermaid format — read
-   `--help`** on the installed binary and the shipped
-   `flow_tune_cfg*.json` templates plus the public DOCA Flow
+   `--help`** on the installed binary plus the public DOCA Flow
    Tune guide via
-   [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+   `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
    Do **not** invent any of these.
 
 When recording the run for downstream consumers, write down: the
@@ -291,7 +287,7 @@ The smoke-before-bulk shape:
    binary's `--version`, the application-side
    `pkg-config --modversion doca-flow`, and the host package
    version per
-   [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test).
+   `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`).
    A measurement under a partial install is not a measurement of
    anything the operator can defend.
 3. **Confirm, then apply the recommendation via
@@ -302,17 +298,16 @@ The smoke-before-bulk shape:
 4. **Capture a post-change snapshot.** Re-run step 1 against the
    redeployed application; the resulting outputs are the
    *after* leg.
-5. **Diff the two legs.** Use the shipped `flow_json_diff.py` /
-   `flow_mermaid_diff.py` helpers under the tool's `scripts/`
-   directory for the structural and counter diff; quote the diff
-   the script produced, do not paraphrase it.
+5. **Diff the two legs.** Compare the two analyze JSON files and
+   dump files field by field for the structural and counter diff;
+   quote the values, do not paraphrase them.
 6. **Only after steps 1-5 read clean** may the agent declare the
    tuning iteration converged on a real change. If the after-leg
    measurement does not move in the direction the recommendation
    predicted, reselect exactly one of the three axes and run one
    new confirmed recommendation. If that second attempt is also
    non-green, restore the pre-change snapshot via
-   [`doca-flow TASKS.md ## rollback`](../../libs/doca-flow/TASKS.md#rollback),
+   `doca-flow TASKS.md ## rollback` (`doca-flow/TASKS.md#rollback`),
    report both diffs, and escalate the unresolved gap. Do not
    start a third tuning attempt.
 
@@ -323,8 +318,8 @@ Eval-loop overlay (rows apply to every tune session):
 | Smoke completed; analyze recommendation does not match the question | Could be the wrong tuning axis was selected, the wrong measurement was selected, or the scope is wrong | Reselect exactly one axis in [`## configure`](#configure), obtain fresh per-recommendation confirmation, and run once. If that second attempt is non-green, roll back and escalate; do not reselect another axis. |
 | Online attach fails on a known-good Flow app | Attach-failed layer per [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy) layer 2; not a measurement-soundness issue | Walk [`## debug`](#debug) layer 2; do not loop on the dumper expecting different output |
 | Before / after diff is empty when a Flow-program change shipped | Either the change did not deploy, or the captured before-leg snapshot was already the post-change state | Re-confirm the Flow application's running version, re-capture the before leg from a known-pre-change state |
-| Recommendation says *"increase table size"* but the Flow program hard-codes the value | Recommendation-unactionable layer 5; not a tune bug | Modify the Flow program per [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify) to expose the knob, then re-run the tune session |
-| After-leg measurement is in the opposite direction from the prediction | Could be a real regression the recommendation introduced, or could be a different workload running on the device | Re-confirm workload stability, quote the diff, then reselect one axis and retry once with fresh confirmation. On a second non-green result, restore the pre-change snapshot and escalate through [`doca-debug ## debug`](../../doca-debug/SKILL.md); no third attempt. |
+| Recommendation says *"increase table size"* but the Flow program hard-codes the value | Recommendation-unactionable layer 5; not a tune bug | Modify the Flow program per `doca-flow TASKS.md ## modify` (`doca-flow/TASKS.md#modify`) to expose the knob, then re-run the tune session |
+| After-leg measurement is in the opposite direction from the prediction | Could be a real regression the recommendation introduced, or could be a different workload running on the device | Re-confirm workload stability, quote the diff, then reselect one axis and retry once with fresh confirmation. On a second non-green result, restore the pre-change snapshot and escalate through `doca-debug ## debug` (`doca-debug/SKILL.md`); no third attempt. |
 
 This skill does **not** ship a "test fixture" or pre-recorded
 expected output. The expected output is install-, device-,
@@ -340,20 +335,20 @@ disagrees with the Flow application's own view, walk the
 layers in order:
 
 1. **Config-syntax.** Invocation / JSON config does not parse.
-   Confirm flag / field exists on the installed binary and the
-   shipped `flow_tune_cfg*.json` templates; confirm units /
+   Confirm flag / field exists on the installed binary and in
+   the configuration-file example in the public DOCA Flow Tune guide; confirm units /
    values are in the documented form. Do not infer from generic
    CLI / JSON intuition.
 2. **Attach-failed (online mode).** Confirm the live Flow
    application is up via
-   [`doca-flow TASKS.md ## test`](../../libs/doca-flow/TASKS.md#test);
+   `doca-flow TASKS.md ## test` (`doca-flow/TASKS.md#test`);
    confirm the `network.server_uds` path matches the
    application's actual setting; confirm filesystem permissions
    and namespace boundary. Re-attempt only after the application
    is on the snapshot.
 3. **Pipe-not-found.** Confirm the pipe set against the Flow
    application's own view per
-   [`doca-flow TASKS.md ## modify`](../../libs/doca-flow/TASKS.md#modify);
+   `doca-flow TASKS.md ## modify` (`doca-flow/TASKS.md#modify`);
    if the pipe is genuinely not created, the next move is the
    Flow program, not the tune binary.
 4. **Measurement-unsound.** Walk the three sub-layers per
@@ -366,14 +361,14 @@ layers in order:
    do not loop on tune trying to find a knob the program does
    not expose.
 6. **Version.** Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end with the four-way match captured. Common
    tune-specific symptom is a tune binary from a different DOCA
    train than the Flow application's linked library.
 7. **Cross-cutting.** Hand off to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md) for the
+   `doca-debug ## debug` (`doca-debug/SKILL.md`) for the
    cross-cutting debug ladder and
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) for
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) for
    the env-side layers.
 
 In every case: **quote what the tool reported.** Do not
@@ -409,7 +404,7 @@ The pattern:
    the *quote, do not paraphrase* rule, the agent compares the
    captured tune session against the live Flow application's
    own counter / inspector surface per
-   [`doca-flow CAPABILITIES.md ## Observability`](../../libs/doca-flow/CAPABILITIES.md#observability)
+   `doca-flow CAPABILITIES.md ## Observability` (`doca-flow/CAPABILITIES.md#observability`)
    when both are available. Disagreement is signal — it routes
    to [`## debug`](#debug) layer 6 (version) first.
 4. **Route to [`## modify`](#modify) only after the agent
@@ -419,12 +414,12 @@ The pattern:
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
    layer 5; the right next step is a Flow-program proposal, not
    a tune re-run.
-5. **Save the tune session alongside the perf baseline.** The
-   tune recommendation is downstream of the perf baseline per
+5. **Save the tune session alongside the monitor-mode baseline.** The
+   tune recommendation is downstream of the monitor-mode baseline per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
-   tune-vs-perf table; quoting the recommendation without the
+   measure-then-tune table; quoting the recommendation without the
    baseline is half the picture and the
-   [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    ladder cannot pick up where the agent left off without both.
 
 ## Deferred task verbs
@@ -433,20 +428,16 @@ The verbs below are not `doca_flow_tune` work and should be
 routed out before the agent does any of them under this skill's
 name.
 
-- **measure a Flow pipeline baseline** ⇒
-  [`doca-flow-perf`](../doca-flow-perf/SKILL.md) (host-side) or
-  [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md) (DPA-
-  offloaded). Tune does not produce a primary baseline number.
 - **write a doca-flow application** ⇒
-  [`doca-flow`](../../libs/doca-flow/SKILL.md), layered on
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-flow/SKILL.md`, layered on
+  `doca-programming-guide/SKILL.md`.
   Tune observes pipelines the program created; it does not
   create them.
 - **install DOCA** ⇒
-  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
-  and [`## no-install`](../../doca-setup/TASKS.md#no-install).
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
+  and `## no-install` (`doca-setup/TASKS.md#no-install`).
 - **library-internal pipe / counter / inspector deep dive** ⇒
-  [`doca-flow`](../../libs/doca-flow/SKILL.md). Tune transports
+  `doca-flow/SKILL.md`. Tune transports
   the data the Flow library exposes programmatically; the deeper
   per-pipe semantics belong to the library.
 - **streaming telemetry export of Flow KPIs to a production
@@ -454,20 +445,19 @@ name.
   positioned as a production telemetry surface. The DOCA
   Telemetry Service (DTS) is the documented telemetry surface;
   routing belongs in
-  [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
+  `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 
 ## Command appendix
 
 `doca_flow_tune`-specific invocation classes the verbs above
 reach for. Every row is a CLASS — the agent must not invent
 flags, JSON field names, or recommendation identifiers beyond
-`--help` on the installed binary, the shipped
-`flow_tune_cfg*.json` templates, and the public DOCA Flow Tune
+`--help` on the installed binary and the public DOCA Flow Tune
 guide.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -481,42 +471,37 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
 | Discover the documented flag surface | `doca_flow_tune --help` plus the public DOCA Flow Tune guide for long-form documentation | [`## configure`](#configure) step 4-7; [`## debug`](#debug) layer 1 | Prints the documented mode-flag inventory; the agent uses `--help` as the only source of truth for mode / scope flag names. |
-| Read the shipped JSON config templates | Read `flow_tune_cfg_public.json`, `flow_tune_cfg_hardware_only.json`, `flow_tune_cfg_software_only.json` on the user's install | [`## configure`](#configure) step 8 | The templates' field set is the schema source of truth for the JSON the operator writes; do not infer fields not present in the templates. |
-| Confirm the Flow library version on the application side | `pkg-config --modversion doca-flow` on the side the Flow app runs | [`## configure`](#configure) step 1; [`## test`](#test) step 2; [`## debug`](#debug) layer 6 | Matches the version reported by the tune binary's `--version`; disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2). |
+| Read the JSON config schema | Read the configuration-file example in the public DOCA Flow Tune guide (`flow_tune_cfg.json`) and `--help` | [`## configure`](#configure) step 8 | The documented field set is the schema source of truth for the JSON the operator writes; do not infer fields not present there. |
+| Confirm the Flow library version on the application side | `pkg-config --modversion doca-flow` on the side the Flow app runs | [`## configure`](#configure) step 1; [`## test`](#test) step 2; [`## debug`](#debug) layer 6 | Matches the version reported by the tune binary's `--version`; disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2). |
 | Run offline analyze / visualize against a captured config | The documented offline-mode invocation against a captured pipeline-description JSON | [`## run`](#run) step 2 | The analyze JSON and visualize mermaid render without error; the captured config is the only input. |
 | Snapshot a live Flow pipeline (online read-only) | The documented online-mode invocation against a JSON config naming `network.server_uds` and the scope | [`## run`](#run) step 3 | The dumper CSV, analyze JSON, and visualize mermaid land in the `outputs_directory`; live Flow state is not changed. |
-| Diff two captured tune sessions | `scripts/flow_json_diff.py` and `scripts/flow_mermaid_diff.py` from the shipped `scripts/` directory | [`## test`](#test) step 5 | The diff scripts produce a structural and counter diff that the agent quotes verbatim; never paraphrased. |
-| Post-process the dumper CSV | `scripts/hw_counters_csv_analyzer.py` from the shipped `scripts/` directory | [`## run`](#run) step 5 | The analyzer reports per-counter statistics over the captured CSV; the agent quotes the analyzer's output. |
-| Save a session snapshot for debug | Capture the full `outputs_directory` (CSV + JSON + mermaid + log files) plus the four-tuple of (cmd line, JSON config, DOCA version, device, env) | [`## test`](#test) step 1 + [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug) | The saved bundle is consumed by the cross-cutting debug ladder as the Flow-side evidence pair. |
+| Diff two captured tune sessions | Compare the two analyze JSON files and dump files | [`## test`](#test) step 5 | The agent quotes the differing fields verbatim; never paraphrased. |
+| Save a session snapshot for debug | Capture the full `outputs_directory` (CSV + JSON + mermaid + log files) plus the four-tuple of (cmd line, JSON config, DOCA version, device, env) | [`## test`](#test) step 1 + `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`) | The saved bundle is consumed by the cross-cutting debug ladder as the Flow-side evidence pair. |
 
 Three cross-cutting rules for this appendix:
 
 - **Never invent a `doca_flow_tune` flag, mode name, JSON
   config field name, or recommendation identifier.** `--help` on
   the installed binary plus the public DOCA Flow Tune guide via
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)
-  plus the shipped `flow_tune_cfg*.json` templates on the user's
-  install are the joint contract.
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
+  are the joint contract.
 - **Smoke before bulk.** Every row presumes the offline smoke or
   the online read-only smoke succeeded first; a state-changing
   application of a recommendation without the smoke is the
   canonical dataplane-disruption failure mode.
 - **Cross-link instead of duplicate.** Cross-cutting commands
   (`pkg-config --modversion`, `doca_caps --list-devs`, `dmesg`)
-  live in [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md);
+  live in `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md`);
   Flow-application-side build / port / pipe commands live in
-  [`doca-flow TASKS.md ## Command appendix`](../../libs/doca-flow/TASKS.md);
-  the perf-side measurement commands live in
-  [`doca-flow-perf`](../doca-flow-perf/SKILL.md) and
-  [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md); this
-  appendix names only `doca_flow_tune`-specific invocations on
+  `doca-flow TASKS.md ## Command appendix` (`doca-flow/TASKS.md`);
+  this appendix names only `doca_flow_tune`-specific invocations on
   top.
 
 ## Cross-cutting
@@ -526,10 +511,9 @@ here so they are visible at the point of action and not buried
 in [`SKILL.md`](SKILL.md):
 
 - The **public DOCA Flow Tune guide** plus the installed
-  `--help` plus the shipped `flow_tune_cfg*.json` templates are
-  the joint source of truth. When they disagree (e.g. a field
+  `--help` are the joint source of truth. When they disagree (e.g. a field
   landed in a release this skill was not written against), the
-  *installed* templates win for the user's actual session.
+  *installed* `--help` wins for the user's actual session.
 - `doca_flow_tune` *is* one binary with two internal roles.
   The agent must say which role a session uses (offline /
   online read-only / online state-changing) before invocation
@@ -549,10 +533,7 @@ in [`SKILL.md`](SKILL.md):
   NGC DOCA container) and a working `doca-flow` application
   (or a captured configuration of one). If either is in doubt,
   route to
-  [`doca-setup`](../../doca-setup/SKILL.md) and
-  [`doca-flow`](../../libs/doca-flow/SKILL.md) before running
-  anything else here. For baselines that the recommendations
-  optimize on top of, load
-  [`doca-flow-perf`](../doca-flow-perf/SKILL.md) and / or
-  [`doca-flow-dpa-perf`](../doca-flow-dpa-perf/SKILL.md)
-  alongside.
+  `doca-setup/SKILL.md` and
+  `doca-flow/SKILL.md` before running
+  anything else here. Capture the monitor-mode baseline before
+  any recommendation.

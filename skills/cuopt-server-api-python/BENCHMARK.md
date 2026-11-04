@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `cuopt-server-api-python`
-- Evaluation date: 2026-09-15
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 8 evaluation tasks (8 positive)
-- Dataset digest: `sha256:89ad304517df359a8c33a1f67da3ad9df8aeae5ec234d2adbed1593bf49c4ebc` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Dataset digest: `sha256:c54a53a22db535b2e2101bfcd2c43a8cdfef342f5c166ba343b8fdba517c741d` (skill-evaluator-dataset-snapshot/1)
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 90.9% → 100.0% (+9.1 points) |
-| Correctness | 68.0% → 100.0% (+32.0 points) | 67.3% → 100.0% (+32.7 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 47.8% → 95.2% (+47.4 points) | 48.5% → 91.2% (+42.7 points) |
-| Efficiency | 96.1% — baseline ran, but no comparable score was available; uplift unavailable | 86.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 95.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 77.5% → 100.0% (+22.5 points) | 82.5% → 100.0% (+17.5 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 58.1% → 94.3% (+36.2 points) | 64.1% → 90.5% (+26.4 points) |
+| Efficiency | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.1% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -52,25 +52,25 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 990,844 | 2,338,962 | N/A | N/A | skill 8/8; base 10/10 |
-| claude-code | srv-py-eval-001-rest-routing-workflow | 61,737 | 31,761 | +29,976 | +94.38% | skill 1/1; base 1/1 |
-| claude-code | srv-py-eval-002-rest-lp-payload-fields | 159,833 | 224,737 | -64,904 | -28.88% | skill 1/1; base 1/1 |
-| claude-code | srv-py-eval-003-rest-milp-vs-lp | 258,072 | 30,448 | +227,624 | +747.58% | skill 1/1; base 1/1 |
-| claude-code | srv-py-eval-004-qp-not-supported-over-rest | 61,254 | 366,123 | -304,869 | -83.27% | skill 1/1; base 1/1 |
-| claude-code | srv-py-eval-005-debug-422-field-names | 61,453 | 30,853 | +30,600 | +99.18% | skill 1/1; base 1/1 |
-| claude-code | srv-py-eval-006-docker-deployment | 61,610 | 155,592 | -93,982 | -60.40% | skill 1/1; base 1/1 |
-| claude-code | srv-py-eval-007-client-hardening | 197,723 | 30,615 | +167,108 | +545.84% | skill 1/1; base 1/1 |
-| claude-code | srv-py-eval-008-runnable-assets | 129,162 | 1,468,833 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 378,610 | 1,697,844 | N/A | N/A | skill 8/8; base 11/11 |
-| codex | srv-py-eval-001-rest-routing-workflow | 45,986 | 193,794 | -147,808 | -76.27% | skill 1/1; base 1/1 |
-| codex | srv-py-eval-002-rest-lp-payload-fields | 45,220 | 47,739 | -2,519 | -5.28% | skill 1/1; base 1/1 |
-| codex | srv-py-eval-003-rest-milp-vs-lp | 46,076 | 42,547 | +3,529 | +8.29% | skill 1/1; base 1/1 |
-| codex | srv-py-eval-004-qp-not-supported-over-rest | 78,889 | 576,772 | N/A | N/A | skill 1/1; base 2/2 |
-| codex | srv-py-eval-005-debug-422-field-names | 28,843 | 118,005 | -89,162 | -75.56% | skill 1/1; base 1/1 |
-| codex | srv-py-eval-006-docker-deployment | 41,121 | 25,518 | +15,603 | +61.15% | skill 1/1; base 1/1 |
-| codex | srv-py-eval-007-client-hardening | 29,126 | 25,289 | +3,837 | +15.17% | skill 1/1; base 1/1 |
-| codex | srv-py-eval-008-runnable-assets | 63,349 | 668,180 | N/A | N/A | skill 1/1; base 3/3 |
-| ALL AGENTS | Dataset aggregate | 1,369,454 | 4,036,806 | N/A | N/A | skill 16/16; base 21/21 |
+| claude-code | All cases | 885,077 | 597,044 | +288,033 | +48.24% | skill 8/8; base 8/8 |
+| claude-code | srv-py-eval-001-rest-routing-workflow | 61,314 | 29,004 | +32,310 | +111.40% | skill 1/1; base 1/1 |
+| claude-code | srv-py-eval-002-rest-lp-payload-fields | 158,831 | 29,008 | +129,823 | +447.54% | skill 1/1; base 1/1 |
+| claude-code | srv-py-eval-003-rest-milp-vs-lp | 159,973 | 28,976 | +130,997 | +452.09% | skill 1/1; base 1/1 |
+| claude-code | srv-py-eval-004-qp-not-supported-over-rest | 60,627 | 59,196 | +1,431 | +2.42% | skill 1/1; base 1/1 |
+| claude-code | srv-py-eval-005-debug-422-field-names | 60,837 | 29,007 | +31,830 | +109.73% | skill 1/1; base 1/1 |
+| claude-code | srv-py-eval-006-docker-deployment | 60,693 | 28,988 | +31,705 | +109.37% | skill 1/1; base 1/1 |
+| claude-code | srv-py-eval-007-client-hardening | 162,999 | 28,980 | +134,019 | +462.45% | skill 1/1; base 1/1 |
+| claude-code | srv-py-eval-008-runnable-assets | 159,803 | 363,885 | -204,082 | -56.08% | skill 1/1; base 1/1 |
+| codex | All cases | 388,941 | 481,460 | -92,519 | -19.22% | skill 8/8; base 8/8 |
+| codex | srv-py-eval-001-rest-routing-workflow | 45,413 | 92,911 | -47,498 | -51.12% | skill 1/1; base 1/1 |
+| codex | srv-py-eval-002-rest-lp-payload-fields | 45,088 | 46,097 | -1,009 | -2.19% | skill 1/1; base 1/1 |
+| codex | srv-py-eval-003-rest-milp-vs-lp | 45,998 | 30,983 | +15,015 | +48.46% | skill 1/1; base 1/1 |
+| codex | srv-py-eval-004-qp-not-supported-over-rest | 28,544 | 46,936 | -18,392 | -39.19% | skill 1/1; base 1/1 |
+| codex | srv-py-eval-005-debug-422-field-names | 28,579 | 61,511 | -32,932 | -53.54% | skill 1/1; base 1/1 |
+| codex | srv-py-eval-006-docker-deployment | 35,800 | 32,176 | +3,624 | +11.26% | skill 1/1; base 1/1 |
+| codex | srv-py-eval-007-client-hardening | 79,361 | 27,750 | +51,611 | +185.99% | skill 1/1; base 1/1 |
+| codex | srv-py-eval-008-runnable-assets | 80,158 | 143,096 | -62,938 | -43.98% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,274,018 | 1,078,504 | +195,514 | +18.13% | skill 16/16; base 16/16 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -88,8 +88,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/cuopt-server-api-python/SKILL.md`)
-- **MEDIUM** SECURITY/Unknown (LP3): MCP Least Privilege: Without declared permissions the skill's intent is opaque and cannot be validated. (`SKILL.md:1`)
-- **MEDIUM** SECURITY/Unknown (RP1): MCP Rug Pull: The Docker run command references `nvidia/cuopt:latest-cu13` (a mutable floating tag) without pinning to an immutable di (`SKILL.md:55`)
+- **MEDIUM** SECURITY/Unknown (LP3): MCP Least Privilege: The skill demonstrates network-capable code (HTTP requests via `requests`, Docker networking) but declares no tool scope (`SKILL.md:1`)
+- **MEDIUM** SECURITY/Unknown (RP1): MCP Rug Pull: The Docker run command uses `nvidia/cuopt:latest-cu13` (a floating/mutable tag). The skill itself acknowledges this risk (`SKILL.md:55`)
 - **MEDIUM** SECURITY/External Transmission (E1): Data Exfiltration: requests.post(f"{SERVER}/cuopt/request", json= (`SKILL.md:88`)
 - **MEDIUM** SECURITY/Tainted flow: 'req_id' from requests.post (line 81, network input) → requests.get (network output) (TT2): Data Flow:         response = requests.get(
             f"{server}/cuopt/solution/{req_id}",

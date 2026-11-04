@@ -1,0 +1,46 @@
+scenario: custom
+prompt_key: custom_healthcare_agent
+tool_name: custom_healthcare_tool
+expected_final_status: saved
+expected_result_id_field: custom_healthcare_request_id
+test_conversations:
+  - name: ask_for_remaining_required_detail
+    history:
+      - role: user
+        content: "I need help with the developer-defined healthcare workflow."
+      - role: assistant
+        content: "Please share the required details for this request."
+      - role: user
+        content: "Here are some, but not all, required details."
+    expected_next_message_content: >-
+      Ask for the remaining required detail or details. Do not say the request
+      was saved, submitted, recorded, or assigned an ID. If the response
+      includes a calendar date, format it like Oct 6th 1994 with an abbreviated
+      month, ordinal day, four-digit year, and no comma between day and year.
+    expected_tool_call: false
+
+  - name: save_completed_custom_request
+    history:
+      - role: user
+        content: "I need help with the developer-defined healthcare workflow."
+      - role: assistant
+        content: "Please share the required details for this request."
+      - role: user
+        content: "Here are the first required details."
+      - role: assistant
+        content: "Please share the remaining required detail."
+      - role: user
+        content: "Here is the final missing required detail."
+    expected_next_message_content: >-
+      After the tool returns saved, tell the user the request was saved and
+      include the returned scenario-specific ID. If the response includes a
+      calendar date, format it like Oct 6th 1994 with no comma.
+    expected_tool_call: true
+    expected_tool_arguments:
+      required_field_one: "example value one"
+      required_field_two: "example value two"
+      required_field_three: "example value three"
+handoff_note: >-
+  Replace these histories with developer-approved custom histories that prove
+  the tool is called only after all required fields are known and that any
+  user-facing dates use the Oct 6th 1994 format without a comma.

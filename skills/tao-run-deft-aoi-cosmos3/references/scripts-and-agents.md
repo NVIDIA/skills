@@ -7,7 +7,7 @@ Set `PYTHON=$(bash scripts/deft_python.sh)`, then run host Python scripts with
 
 | Script | Purpose |
 |---|---|
-| `init_deft_state.py` | Initialize version-5 Cosmos3 state once; freeze Benchmark hash, bare mode, media root, and immutable execution policy. |
+| `init_deft_state.py` | Initialize version-6 Cosmos3 Framework state once; freeze Benchmark hash, bare mode, media root, and immutable execution policy. |
 | `deft_context.py` | Re-read state and print the deterministic next stage plus network/Python policy; reject a requested-stage mismatch. |
 | `deft_exec.py` | Enforce state-backed offline/no-install/no-pull policy for external commands. |
 | `commit_stage.py` | Validate one stage's inputs and atomically update state. AnomalyGen skip requires an empty recorded false-accept array; terminal commits require reason/report evidence. |
@@ -16,7 +16,11 @@ Set `PYTHON=$(bash scripts/deft_python.sh)`, then run host Python scripts with
 | `validate_sharegpt.py` | Enforce two-image, exact bare OK/NG ShareGPT records. |
 | `validate_split_contract.py` | Enforce split isolation, monotonic generated-Train lineage, and Benchmark hash. |
 | `check_annotations.py` | Per-role field-contract check over all three workspace annotation files. `ROLE_CONTRACT` is the authoritative field list. |
-| `patch_eval_image_cap.py` | Source-classifies the selected image's evaluation cap, raises a recognized undersized literal, and returns the read-only mount only when required. |
+| `render_cfw_sft.py` | Render native Framework SFT TOML with an optional previous DCP. |
+| `submit_cfw_train.py` | Compose and execute recorded Framework Train submission. |
+| `render_cfw_evaluate.py` | Render native bare-label Framework evaluation TOML. |
+| `submit_cfw_evaluate.py` | Compose and execute recorded Framework Evaluate submission. |
+| `submit_cfw_inference.py` | Compose and execute recorded Framework Inference submission. |
 | `analyze_gaps.py` | Proxy RCCA artifacts or Benchmark aggregate metric evidence. |
 | `emit_sdg_sharegpt.py` | Resolve documented or PAIDF 1.0.1 SDG path forms and emit bare `NG` ShareGPT records. |
 | `filter_mined_by_cosine.py` | Recompute max cosine to Proxy targets and enforce the floor. |
@@ -40,10 +44,22 @@ Before every stage, call `deft_context.py --state <deft_state.json> --stage
 <deft_state.json> -- <command>`; the selected remote platform must enforce the
 same policy when it constructs a job.
 
-Train, Proxy evaluate, and Benchmark evaluate reuse the current
-`tao-finetune-cosmos-reason` action commands. Mining reuses
+Train, Proxy evaluate, and Benchmark evaluate use the application-owned native
+Framework render and submit scripts. Mining reuses
 `tao-mine-aoi-images`. The application owns only the DEFT-specific state,
 isolation, OK/NG analysis, filtering, and assembly scripts.
+
+## Stage references
+
+| Stage | Producer | Read first |
+|---|---|---|
+| Train | `tao-finetune-cosmos-reason` train, `automl_policy: off` | `cosmos-reason.md`, `cosmos_framework_sft_full.toml` |
+| Proxy / Benchmark evaluate | `tao-finetune-cosmos-reason` evaluate | `cosmos-reason.md` |
+| Proxy RCCA / Benchmark metric | bundled `analyze_gaps.py` | `gap-analysis.md` |
+| Routing / mining | Proxy gaps + `tao-mine-aoi-images` | `tao-mine-aoi-images.md` |
+| AnomalyGen | `tao-generate-anomalies`, `mode=inference_only` | `tao-generate-anomalies.md` |
+| Assemble / validate | bundled bare ShareGPT scripts | `aoi-annotation.md` |
+| State/report | bundled state commit + deterministic report hook | this file |
 
 ## Automatic report hook
 
@@ -73,4 +89,9 @@ command and contains no HTML-generation logic.
 - Train checkpoints are under `${RESULTS_DIR}/<label>/train`.
 - Proxy artifacts never contain Benchmark paths.
 - Mining, routing, and assembly never consume Benchmark per-sample errors.
-- User data is never mounted over the cosmos-rl `/workspace` package root.
+- User/model identity paths are mounted read-only; only the stage result and
+  action-model directories are writable.
+
+Framework submit scripts reject stale packaged specs and use only public console
+entrypoints. Check credential presence only (`SET`/`UNSET`); never read or print
+credential values.

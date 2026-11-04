@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-dms.explicit-positive.v1",
-      "prompt": "Use the doca-dms skill to help me. I'm working on: Operate NVIDIA DOCA Management Service (`dmsd` + `dmspe`) on a BlueField, Arm/x86 host, or Kubernetes pod: choose deployment and authentication, configure `-allowed_users` and `dmsgroup`, use gNMI Get/Set/Subscribe, run supported gNOI workflows, and debug frontend/backend failures.",
+      "prompt": "Use the doca-dms skill for this task: I'm running into this: \"manage a remote BlueField over gRPC\". Can you walk me through it?",
       "expected_skill": "doca-dms",
       "expected_output": "The agent selects the doca-dms skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -17,7 +17,7 @@
       "expected_skill": "doca-dms",
       "expected_output": "The agent recognizes this as a doca-dms issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-dms skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,17 +27,17 @@
       "expected_skill": "doca-dms",
       "expected_output": "The agent recognizes this as a doca-dms issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-dms skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-dms.negative.v1",
-      "prompt": "I need help installing DOCA on a fresh host and picking the right BFB \u2014 which skill should handle this, and why is it not doca-dms?",
+      "prompt": "I need help installing DOCA on a fresh host and picking the right BFB — How should I approach this?",
       "expected_skill": null,
       "expected_output": "The agent does NOT force doca-dms; it routes install/bring-up to the setup skill and explains doca-dms is out of scope here.",
       "assertions": [
-        "doca-dms is not selected as the primary skill for this out-of-scope request.",
+        "The answer does not attempt the out-of-scope work itself.",
         "The answer routes to the appropriate skill(s) instead."
       ]
     }

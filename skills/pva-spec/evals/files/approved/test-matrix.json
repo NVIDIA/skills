@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "schema_authority": "skill_workflow",
+  "operator": "MatMul2x2",
+  "specification": "operator-spec.json",
+  "execution_policy": {
+    "emulator": "optional",
+    "hardware": "required"
+  },
+  "correctness_cases": [
+    {
+      "id": "MATMUL-1",
+      "requirement_ids": [
+        "REQ-MATMUL"
+      ],
+      "input": {
+        "A": [
+          [
+            1,
+            2
+          ],
+          [
+            3,
+            4
+          ]
+        ],
+        "B": [
+          [
+            5,
+            6
+          ],
+          [
+            7,
+            8
+          ]
+        ]
+      },
+      "expected": [
+        [
+          19,
+          22
+        ],
+        [
+          43,
+          50
+        ]
+      ],
+      "tolerance": 0
+    }
+  ],
+  "performance_cases": [],
+  "coverage": {
+    "requirement_ids": [
+      "REQ-MATMUL"
+    ],
+    "uncovered_requirement_ids": [],
+    "unresolved_cases": []
+  }
+}

@@ -106,8 +106,8 @@ julia --project=julia/ julia/test/runtests.jl
 # Run a single test file directly
 julia --project=julia/ julia/test/test_<op>.jl
 
-# With IR debug logging (compilation issues)
-CUDA_TILE_LOGS=CUTILEIR julia --project=julia/ julia/test/test_<op>.jl 2>&1 | head -100
+# Dump emitted Tile IR bytecode (compilation issues); disassemble with tileirdisasm
+JULIA_CUTILE_DUMP_BYTECODE=/tmp/julia_tiles julia --project=julia/ julia/test/test_<op>.jl
 ```
 
 ---
@@ -134,8 +134,9 @@ grep "ct.Constant\[" source.py                 # → ::Int or ::Float32 params, 
 grep "\.shape\[" source.py                     # → size(arr, dim+1)
 grep "ct.gather\|ct.scatter" source.py         # → same API, check index type
 grep "order=" source.py                        # → ct.load with order: index positions must follow remapped dims!
-grep "ct.rsqrt" source.py                      # → rsqrt.(t) or map(ct.rsqrt, t)
-grep "ct.bitwise" source.py                    # → a .⊻ b, a .>> n, a .& mask, etc.
+grep "ct.rsqrt" source.py                      # → ct.rsqrt.(t) (must be qualified)
+grep "ct.bitwise" source.py                    # → xor.(a, b), a .>> n, a .& mask, etc.
+grep "ct.cat" source.py                        # → cat(a, b; dims=axis+1) / vcat / hcat / [a; b]
 ```
 
 **Action items based on findings:**
@@ -143,7 +144,7 @@ grep "ct.bitwise" source.py                    # → a .⊻ b, a .>> n, a .& mas
 | Finding | Action |
 |---------|--------|
 | `@ct.kernel` count | Each becomes a `function ... end` |
-| `for ... in range(...)` | Use `for k in Int32(1):n` (native for loops supported in 0.2) |
+| `for ... in range(...)` | Use `for k in Int32(1):n` (native for loops supported) |
 | `ct.where` | Use `ifelse.(cond, x, y)` |
 | `.astype(ct.X)` | Use `convert(ct.Tile{X}, tile)` |
 | `ct.mma(a, b, acc=acc)` | Use `muladd(a, b, acc)` |
@@ -151,8 +152,9 @@ grep "ct.bitwise" source.py                    # → a .⊻ b, a .>> n, a .& mas
 | `.shape[N]` | `size(arr, N+1)` |
 | Reductions `ct.sum/max/min` | `sum/maximum/minimum(tile; dims=axis+1)`, keeps dims |
 | `ct.maximum/minimum(a, b)` | `max.(a, b)` / `min.(a, b)` — MUST use broadcast dot |
-| `ct.rsqrt` | `rsqrt.(tile)` — cuTile.jl exports rsqrt; `map(ct.rsqrt, tile)` also works |
-| `ct.bitwise_*` | `a .⊻ b`, `a .& mask`, `a .\| b`, `a .>> n`, `a .<< n` |
+| `ct.rsqrt` | `ct.rsqrt.(tile)` — not exported, always qualify with `ct.` |
+| `ct.bitwise_*` | `xor.(a, b)`, `a .& mask`, `a .\| b`, `a .>> n`, `a .<< n` |
+| `ct.cat((a, b), axis=k)` | `cat(a, b; dims=k+1)` — `ct.cat` was removed in cuTile.jl 1.0 |
 | `order=` in `ct.load` | **⚠️ Critical**: `order` remaps both shape AND index (Rule 16) |
 | Atomics | Same API but `;` for kwargs: `memory_order=` → `; memory_order=` |
 
@@ -180,6 +182,7 @@ The Julia file lives in `julia/kernels/<op>.jl` and contains:
 #
 
 using CUDA
+using cuTile: cuTile   # bare `cuTile` name for `@cuda backend=cuTile`
 import cuTile as ct
 
 # Helpers (@inline, no decorator)
@@ -197,14 +200,12 @@ function my_kernel(output::ct.TileArray{T, 2}, input::ct.TileArray{T, 2},
 end
 
 # === Host harness function ===
-# Accepts CuArrays directly, launches kernel, synchronizes
+# Accepts CuArrays directly and launches the kernel (asynchronously)
 function my_op(input::CuArray{T, 2}, output::CuArray{T, 2}) where {T}
-    M, N = size(input)
+    N, M = size(input)  # Python's row-major (M, N), dims reversed (Step 4)
 
-    grid_size = M  # one block per row (example)
-    ct.launch(my_kernel, grid_size, output, input, ct.Constant(N))
-
-    CUDA.synchronize()
+    grid_size = M  # one block per column = per Python row (example)
+    @cuda backend=cuTile blocks=grid_size my_kernel(output, input, ct.Constant(N))
     return nothing
 end
 ```
@@ -212,8 +213,8 @@ end
 **Key points:**
 - Host harness accepts `CuArray` directly (no raw pointer wrapping needed for standalone use)
 - If interop with external callers is needed, accept `Int` pointers and use `unsafe_wrap(CuArray, ptr, shape; own=false)`
-- MUST call `CUDA.synchronize()` after kernel launch
-- Column-major: Julia interprets `(M, N)` as col-major — consider layout when porting from row-major Python
+- Do NOT call `CUDA.synchronize()` in the harness: launches are ordered on the task-bound stream, and reading the result (`Array(output)`) waits for it. Synchronize only where a caller needs it (e.g. timing)
+- Column-major: reverse Python's dimension order so the contiguous axis stays contiguous (Step 4)
 
 ### Step 2: Convert Kernel Signature
 
@@ -244,7 +245,13 @@ end
 ### Step 3: Convert Kernel Body (apply in order)
 
 Full API mapping → [`references/api-mapping.md`](../references/api-mapping.md)
-Full critical rules (17) → [`references/critical-rules.md`](../references/critical-rules.md)
+Full critical rules (18) → [`references/critical-rules.md`](../references/critical-rules.md)
+
+The axis rows below (`axis=k` → `dims=k+1`, `shape[k]` → `size(A, k+1)`) assume the same
+dimension order on both sides. When you reverse a row-major tensor's dims for layout (Step 4 —
+the default for per-row/per-vector kernels), map Python axis `k` of a rank-`r` tensor to Julia
+dim `r - k` instead, and reverse `index`/`shape` tuples: e.g. on Python `(M, N)` → Julia `(N, M)`,
+`ct.max(t, axis=1)` → `maximum(t; dims=1)` and `shape=(1, TILE)` → `shape=(TILE, 1)`.
 
 | # | Python cuTile | Julia cuTile.jl | Check |
 |---|--------------|-----------------|-------|
@@ -270,12 +277,12 @@ Full critical rules (17) → [`references/critical-rules.md`](../references/crit
 | 19 | `ct.exp(t)` | `exp.(t)` | ☐ |
 | 20 | `ct.log(t)` | `log.(t)` | ☐ |
 | 21 | `ct.sqrt(t)` | `sqrt.(t)` | ☐ |
-| 22 | `ct.rsqrt(t)` | `rsqrt.(t)` (cuTile.jl exports rsqrt) | ☐ |
+| 22 | `ct.rsqrt(t)` | `ct.rsqrt.(t)` (not exported — qualify) | ☐ |
 | 23 | `ct.permute(t, (0,2,1))` | `permutedims(t, (1,3,2))` | ☐ |
 | 24 | `ct.transpose(t)` | `transpose(t)` | ☐ |
 | 25 | `ct.reshape(t, shape)` | `reshape(t, shape)` | ☐ |
 | 26 | `ct.extract(t, index=(...), shape=(...))` | `ct.extract(t, (...), (...))` | ☐ |
-| 27 | `ct.cat((a,b), axis=0)` | `ct.cat((a,b), 1)` | ☐ |
+| 27 | `ct.cat((a,b), axis=0)` | `cat(a, b; dims=1)` / `vcat(a, b)` / `[a; b]` | ☐ |
 | 28 | `for k in range(n):` | `for k in Int32(1):n` — native for loops supported | ☐ |
 | 29 | `a + b` (different shapes) | `a .+ b` | ☐ |
 | 30 | `a * b` (element-wise) | `a .* b` | ☐ |
@@ -287,19 +294,19 @@ Full critical rules (17) → [`references/critical-rules.md`](../references/crit
 
 ### Step 4: Memory Layout Considerations
 
-Python uses **row-major** (C-order), Julia uses **column-major** (Fortran-order).
+Python uses **row-major** (C-order), Julia uses **column-major** (Fortran-order). This is **not**
+transparent for performance: cuTile computes correct results for any strides, but tiles laid
+along a strided axis lose most of the memory bandwidth.
 
-For **2D arrays**, cuTile handles this via strides — usually transparent.
+**Reverse the dimension order** (required, not optional, for any kernel that reduces or tiles
+along Python's last axis):
+- Python `(M, N)`, work per row → Julia `(N, M)`, work per column (`dims=1`, `shape=(TILE, 1)`)
+- Python `(Batch, M, K)` → Julia `(K, M, Batch)` — batch last
+- Matmul is the exception: keep standard Julia `A(M, K) * B(K, N) → C(M, N)`
 
-For **batched operations (3D+)**:
-- Python: `(Batch, M, K)` — batch is outermost in row-major
-- Julia: `(M, K, Batch)` — batch should be outermost in column-major
-
-**Options:**
-1. **Transpose layout** (recommended for perf): change array shapes, adjust kernel indexing
-2. **Keep layout**: accept potentially suboptimal memory access
-
-For batched operations, use batch-last ordering in Julia (e.g., `(M, K, Batch)` instead of Python's `(Batch, M, K)`).
+Measured on B200 (softmax, Float32, 16384×4096): keeping Python's `(M, N)` and reducing over
+`dims=2` took 0.68 ms (TMA) / 1.17 ms (chunked) vs 0.21 ms / 0.15 ms with `(N, M)` — 3.2× / 7.8×
+slower. Reference implementation: `julia/kernels/softmax.jl`.
 
 ---
 
@@ -319,6 +326,10 @@ This checks for common anti-patterns:
 - Lambda grids
 - `ct.cdiv(` instead of `cld(`
 - `ct.launch(stream, ...)` with Python-style stream argument
+- `ct.cat(` (removed in cuTile.jl 1.0 — use `cat(...; dims=...)`)
+- Unqualified `rsqrt` (not exported — use `ct.rsqrt.(tile)`)
+- `max.(t, k)` / `min.(t, k)` with an integer literal (warning: may be a `ct.max`/`ct.min` reduction — use `maximum`/`minimum(t; dims=...)`)
+- `@cuda backend=cuTile` without `using cuTile: cuTile` in scope
 
 Fix any reported errors before proceeding.
 
@@ -385,7 +396,7 @@ Julia Kernel (julia/kernels/<op>.jl):
  [ ] All indices converted from 0-based to 1-based
  [ ] for loops use Int32 ranges (for k in Int32(1):n)
  [ ] Broadcasting uses .+ .* etc. for different-shape tiles
- [ ] cuTile-specific math (rsqrt) uses rsqrt.(tile) — cuTile.jl exports rsqrt
+ [ ] cuTile-specific math (rsqrt) uses ct.rsqrt.(tile) — not exported
  [ ] ct.Constant parameters wrapped at launch site (not in signature)
  [ ] Reduction dims shifted by +1 (axis=0 → dims=1)
  [ ] ct.mma → muladd, ct.matmul → *
@@ -393,13 +404,12 @@ Julia Kernel (julia/kernels/<op>.jl):
  [ ] ct.where → ifelse.(cond, x, y)
  [ ] fill/zeros/ones use Julia types (ct.full doesn't exist; use fill, zeros, ones)
  [ ] Kernel returns nothing
- [ ] Column-major layout considered
- [ ] ct.launch arg order matches kernel signature
+ [ ] Column-major layout: Python dims reversed so the reduced/tiled axis is dim 1 (contiguous)
+ [ ] Launched with @cuda backend=cuTile blocks=grid kernel(...); arg order matches kernel signature
  [ ] Element-wise max/min uses max.(a,b) not max(a,b)
  [ ] No Int32()/Float32() casts on runtime kernel values
  [ ] ct.arange/ct.full shape args use ct.Constant parameters (no @eval needed)
  [ ] Host harness accepts CuArray directly
- [ ] Host harness calls CUDA.synchronize() after launch
  [ ] validate_cutile_jl.py passes
 
 Julia Test (julia/test/test_<op>.jl):

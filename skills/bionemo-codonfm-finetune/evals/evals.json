@@ -1,0 +1,60 @@
+{
+  "skill_name": "codonfm-finetune",
+  "evals": [
+    {
+      "id": "codonfm-finetune-001",
+      "prompt": "Prepare a LoRA fine-tuning run for public Encodon 80M using the supplied RiboNN sample. Use mean_te as the translation-efficiency label. Create a labeled coding-sequence CSV, validate it, and provide the training command. Preserve the source fold groups when choosing train, validation, and test splits. The public source and checkpoint metadata are supplied.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json",
+        "files/ribonn_smoke.tsv",
+        "files/ribonn_smoke.provenance.json"
+      ],
+      "expected_output": "A validated 12-row coding-sequence dataset with original mean_te labels and non-empty splits that preserve source fold groups, plus a public Encodon LoRA regression command. The response distinguishes input checks from training results.",
+      "assertions": [
+        "The agent reads the tab-separated RiboNN sample and extracts CDS using utr5_size and cds_size instead of using the entire transcript",
+        "The output has id/ref_seq/value/split, preserves all 12 valid rows and the original mean_te labels, and reports non-empty splits without dividing a source fold across splits",
+        "The training command uses --pretrained_ckpt_path, lora, regression, --use_downstream_head, an explicit --lr, and a validation frequency compatible with the planned training run",
+        "Batch sizes fit the prepared splits, warmup is shorter than the training budget, and checkpoint/output paths are clearly specified",
+        "The agent validates the prepared CSV and accurately reports what was checked; it does not present preparation as completed training"
+      ],
+      "expected_skill": "codonfm-finetune",
+      "expected_script": "prepare_ribonn.py"
+    },
+    {
+      "id": "codonfm-finetune-002",
+      "prompt": "Validate the supplied variants_labeled.csv and prepare a public Encodon fine-tuning command using a standard binary classification head. These are synthetic examples for checking the workflow; their label values are not measured biological effects. Explain the required preprocessing and data splits. Use the supplied public source and checkpoint metadata.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json",
+        "files/variants_labeled.csv",
+        "files/variants_labeled.provenance.json"
+      ],
+      "expected_output": "A validated labeled-variant dataset and a public MutationDataset classification command with viable splits. The response identifies the synthetic nature of the labels and does not claim a trained model.",
+      "assertions": [
+        "The command uses MutationDataset, mutation_pred_mlm, --label_col label, --mask_mutation, and --extract-seq",
+        "The command uses --pretrained_ckpt_path, classification, --num_classes 2, --use_downstream_head, an explicit --lr, and a validation frequency compatible with the planned training run",
+        "The agent validates reference codons against zero-based CDS positions and binary labels, and checks that the selected training and validation splits are non-empty; a held-out test split is optional for this preparation task",
+        "The agent avoids reusing unrelated train_idx.npy, val_idx.npy, or test_idx.npy files when preparing the variant CSV",
+        "The agent does not use MissenseDataset or missense_synom_agg, claim training occurred, or interpret the synthetic labels as biological observations"
+      ],
+      "expected_skill": "codonfm-finetune",
+      "expected_script": null
+    },
+    {
+      "id": "codonfm-finetune-003",
+      "prompt": "Does public CodonFM support fine-tuning Decodon with missense_synom_agg? Check the supplied source and explain whether this workflow is available.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json"
+      ],
+      "expected_output": "The agent identifies both features as unavailable in the supplied public implementation and explains the compatibility limitation.",
+      "assertions": [
+        "The agent identifies Decodon and missense_synom_agg as unavailable in the supplied public source and cites the inspected files",
+        "The agent answers the compatibility question without inventing an executable command, downloading an undocumented model, or implementing the missing features"
+      ],
+      "expected_skill": "codonfm-finetune",
+      "expected_script": null
+    }
+  ]
+}

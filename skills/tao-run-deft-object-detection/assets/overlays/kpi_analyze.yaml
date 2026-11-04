@@ -18,11 +18,14 @@ visualize.platform: local      # TAO: local. Pinned so a loop stage cannot acqui
                                # a wandb credential dependency.
 
 kpi.iou_threshold: 0.5         # TAO: 0.5
-kpi.num_recall_points: 11      # TAO: 11. 11-point interpolated AP (VOC); 101
-                               # selects COCO-style and shifts every reported AP.
-kpi.ignore_sqwidth: 40         # TAO: 0. Excludes boxes below this square-width
-                               # from scoring; 0 scores small boxes the reference
-                               # set excludes.
+kpi.num_recall_points: 101     # TAO: 11. 101-point interpolation, COCO-style, rather
+                               # than the 11-point VOC curve. Every reported AP moves
+                               # with this, so a run scored at 11 is not comparable to
+                               # one scored here.
+kpi.ignore_sqwidth: 0          # TAO: 0. Score every box, including small ones. Raising
+                               # it drops boxes below that square-width from scoring
+                               # entirely, which flatters AP by removing the hardest
+                               # detections rather than by detecting them.
 kpi.filter: false              # TAO: false
 kpi.is_internal: false         # TAO: false. True keeps only `person` and appends
                                # a Summary row, changing what the report means

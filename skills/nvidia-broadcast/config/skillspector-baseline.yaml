@@ -1,0 +1,111 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+version: 2
+# Reviewed false positives — No content removed.
+rules:
+  - id: AE1
+    path: SKILL.md
+    message: "references/connection.md (partial)"
+    reason: "Temporary exception for bundled reference; awaiting scanner fix."
+
+  - id: AE1
+    path: SKILL.md
+    message: "references/installation.md (partial)"
+    reason: "Temporary exception for bundled reference; awaiting scanner fix."
+
+  - id: AE1
+    path: SKILL.md
+    message: "references/troubleshooting.md (partial)"
+    reason: "Temporary exception for bundled reference; awaiting scanner fix."
+
+  - id: AE1
+    path: SKILL.md
+    message: "references/mcp-tool-contract.md (partial)"
+    reason: "Temporary exception for bundled reference; awaiting scanner fix."
+
+  - id: EA2
+    path: SKILL.md
+    message: "*do not ask the user*"
+    reason: "Refers only to launching the locally installed Broadcast app (rule 1), not to installs or destructive actions."
+
+  - id: EA1
+    path: SKILL.md
+    message: "*run any code*"
+    reason: "Matched text is inside a prohibition: never write, generate, or run any code that speaks MCP/HTTP to the gateway."
+
+  - id: EA2
+    path: SKILL.md
+    message: "*without asking*"
+    reason: "Matched text is a prohibition: never install Broadcast without asking the user."
+
+  - id: EA2
+    path: SKILL.md
+    message: "*without checking*"
+    reason: "Matched text warns against acting without checking; the skill requires the version check first."
+
+  - id: EA2
+    path: SKILL.md
+    message: "*no consent*"
+    reason: "Describes the MCP tool lacking a consent flag and the no-consent stop path; the skill requires explicit user consent."
+
+  - id: EA2
+    path: references/mcp-tool-contract.md
+    message: "*no consent*"
+    reason: "States the MCP tool has no consent flag, so the agent must obtain an explicit yes before resuming the queue."
+
+  - id: EA2
+    path: references/connection.md
+    message: "*Never ask the user*"
+    reason: "Prohibition against asking the user to weaken gateway loopback guards; it restricts agency, it does not grant it."
+
+  - id: RP1
+    path: SKILL.md
+    message: "*npx commands without a version suffix*"
+    reason: "npx @modelcontextprotocol/cli is listed as a forbidden command; the skill never installs or runs it."
+
+  - id: RP1
+    path: SKILL.md
+    message: "*pip install without ==version*"
+    reason: "pip install mcp[cli] is listed as a forbidden command; the skill never installs or runs it."
+
+  - id: SSD-2
+    path: SKILL.md
+    message: "*base64*"
+    reason: "Not printing gateway.json contents is a deliberate secret-hygiene instruction; the decoded port is what the agent uses."
+
+  - id: SSD-1
+    path: SKILL.md
+    message: "*prohibitions out of your commands*"
+    reason: "Keeps rule text out of shell commands so prohibitions are not misread as network activity; the rules still apply."
+
+  - id: SQP-2
+    path: references/file-processing.md
+    message: "*output*"
+    reason: "Output paths are user-chosen local folders validated by Broadcast; the gateway is loopback-only and the user drives the request."
+
+  - id: SSD-2
+    path: references/file-processing.md
+    message: "*default*"
+    reason: "Clarifies the default output folder is not a sandbox; writes still go only to the user-requested local path."
+
+  - id: SQP-2
+    path: scripts/launch_broadcast.ps1
+    message: "*hidden*"
+    reason: "Launches the user's own installed NVIDIA Broadcast in its supported --launch-hidden tray mode; nothing is concealed from the user."
+
+  - id: SSD-4
+    path: scripts/launch_broadcast.ps1
+    message: "*security-policy fallback*"
+    reason: "The fallback is defined in SKILL.md rule 1 under Hard rules, which the comment references."

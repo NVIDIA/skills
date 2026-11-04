@@ -1,0 +1,69 @@
+{
+  "skill_name": "ethos-orchestrate",
+  "evals": [
+    {
+      "id": "orchestrate-explicit-new-ethos",
+      "prompt": "Use ethos-orchestrate to help me write an ETHOS.md for the support agent in /workspace/input/router-help.",
+      "expected_output": "Finds no existing ETHOS.md under /workspace/input/router-help and routes to ethos-explore. Opens with the four-step path-ahead checklist (explore the agent, confirm intent, review the draft, save and validate) as literal '- [ ]' checkboxes with the first step marked 'We're here', ends with 'Ready to start?', and waits. No ETHOS.md is written.",
+      "assertions": [
+        "Reports that no ETHOS.md exists yet for router-help.",
+        "Routes the request to ethos-explore rather than writing the file directly.",
+        "Shows the four-step checklist with literal '- [ ]' checkboxes and marks the first step 'We're here'.",
+        "Ends with 'Ready to start?' and waits instead of asking intent questions or drafting sections.",
+        "Does not create an ETHOS.md or modify any file under /workspace/input/router-help."
+      ],
+      "expected_skill": "ethos-orchestrate",
+      "files": [
+        "files/router-help/README.md",
+        "files/router-help/agent.yaml"
+      ]
+    },
+    {
+      "id": "orchestrate-implicit-existing-status",
+      "prompt": "Does the agent repo in /workspace/input/router-help already have an ETHOS.md? If so, tell me whether it is valid, what it says the agent is for, and what is still missing. Don't change anything.",
+      "expected_output": "Reports /workspace/input/router-help/ETHOS.md and leads with whether it validates: front matter with schema_version 1 and all fourteen required sections are present (or says the bundled validator was not run). Then summarizes what the file says the agent is for (answering Acme RT-200/RT-300 router setup, firmware, and connectivity questions to resolve conversations without a ticket), then the gaps: Vision is _(none)_ and RT-400 support is an open question. Offers a next route (ethos-write for specific edits, ethos-explore to revisit intent) without starting to write.",
+      "assertions": [
+        "Identifies /workspace/input/router-help/ETHOS.md as the agent's ETHOS.md.",
+        "Leads with whether the file is structurally valid, and says so plainly if the bundled validator was not run.",
+        "Summarizes the Role or Purpose as Acme RT-200/RT-300 router support resolved in chat.",
+        "Names gaps from the file, such as Vision being _(none)_ or the open RT-400 question.",
+        "Offers a next step without starting an interview or editing the file.",
+        "Leaves ETHOS.md byte-for-byte unchanged."
+      ],
+      "expected_skill": "ethos-orchestrate",
+      "files": [
+        "files/router-help/README.md",
+        "files/router-help/agent.yaml",
+        "files/router-help/ETHOS.md"
+      ]
+    },
+    {
+      "id": "orchestrate-resume-interview",
+      "prompt": "Resume our interrupted Ethos conversation through ethos-orchestrate for router-help in /workspace/input/router-help. We selected ETHOS.md in that directory. Our earlier source review found that README.md and agent.yaml describe RT-200/RT-300 router support, kb_search, create_ticket, and the internal gateway. These are my replies from that conversation: when asked whether ticket deflection was the intended outcome, I answered that the mission is working Wi-Fi without waiting for support, with a 70% ticket-free resolution target owned by support operations. When asked how to handle uncertain or destructive fixes, I answered to warn before reset instructions and escalate uncertain hardware faults. These are my explicit answers, not source inferences. We still need to discuss Vision, Constraints, and Trade-offs before reviewing a draft. Continue with the next question.",
+      "expected_output": "Routes to ethos-explore using the supplied repository, agent, source findings, and prior user replies. Continues with exactly one Vision question and waits. Counts the two supported earlier answers without repeating them, the opening, or Ready to start. Does not write ETHOS.md or present the full draft before the interview is complete.",
+      "assertions": [
+        "Uses ethos-explore as the sub-flow for the unfinished interview.",
+        "Asks exactly one question about Vision, allowing an explicit none or unknown answer.",
+        "Does not ask Purpose & Outcomes or Principles again, and does not require three new answers in this session.",
+        "Does not repeat a four-step checklist, Ready to start, or repository/agent selection.",
+        "Does not write ETHOS.md or present a full draft while remaining intent topics are unresolved."
+      ],
+      "expected_skill": "ethos-orchestrate",
+      "files": [
+        "files/router-help/README.md",
+        "files/router-help/agent.yaml"
+      ]
+    },
+    {
+      "id": "orchestrate-negative",
+      "prompt": "Write a one-line conventional commit message for a change that fixes a typo in README.md. Reply with the message only.",
+      "expected_output": "A single conventional commit subject such as 'docs: fix typo in README'.",
+      "assertions": [
+        "Replies with one line that is a conventional commit message for a README typo fix.",
+        "Does not start an ethos workflow or create files."
+      ],
+      "expected_skill": null,
+      "files": []
+    }
+  ]
+}

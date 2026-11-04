@@ -1,0 +1,65 @@
+{
+  "skill_name": "boltz2-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to predict the structure of insulin using Boltz2. The sequence is MALWMRLLPLLALLALWGPDPAAAFVNQHLCGSHLVEALYLVCGERGFFYTPKTRREAEDLQVGQVELGGGPGAGSLQPLALEGSLQKRGIVEQCCTSICSLYQLENYCN. Use the hosted NVIDIA API. Create and execute the request now using NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted Boltz2 request using NGC_API_KEY as a Bearer token, submitting the insulin sequence as a protein polymer, plus the actual confidence score and returned mmCIF structure artifact.",
+      "files": [],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived confidence values and the saved .cif path",
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL (health.api.nvidia.com): Script contains 'health.api.nvidia.com/v1/biology/mit/boltz2/predict'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from environment variable: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[protein-molecule-type] Polymer payload sets molecule_type to 'protein': Script contains 'molecule_type' and 'protein'",
+        "[saves-cif-output] Saves the returned structure to a .cif file: Script writes structure content to a file with .cif extension",
+        "[reports-confidence-score] Prints or displays the confidence_scores from the response: Script references 'confidence_scores' from the response",
+        "[api-key-from-env] Reads NGC_API_KEY from environment, not hardcoded: Script uses os.environ or os.getenv to read NGC_API_KEY"
+      ]
+    }
+  ],
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "I have a protein target (sequence: MTEYKLVVVGACGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVID) and I want to dock aspirin (SMILES: CC(=O)OC1=CC=CC=C1C(=O)O) to it and get a binding affinity score. Use the hosted API. My NGC_API_KEY is already set in my environment.",
+      "expected_output": "A working Python script that submits a protein+ligand request with predict_affinity=true on the ligand, saves the structure, and prints pIC50, log IC50, and binding probability from the affinities response.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/mit/boltz2/predict'",
+        "[smiles-in-ligand] Includes ligand with the aspirin SMILES string: Script contains 'smiles' and 'CC(=O)OC1=CC=CC=C1C(=O)O'",
+        "[predict-affinity-flag] Sets predict_affinity=True on the ligand: Script contains 'predict_affinity' and 'True'",
+        "[affinity-output-pic50] Reads and reports affinity_pic50 from response: Script references 'affinity_pic50' or 'affinities'",
+        "[affinity-output-pred-value] Reads and reports affinity_pred_value (log IC50): Script references 'affinity_pred_value'",
+        "[affinity-output-binary-prob] Reads and reports affinity_probability_binary: Script references 'affinity_probability_binary'"
+      ]
+    },
+    {
+      "todo": "Waiting on local Docker setup in Harbor before enabling this eval.",
+      "id": "3",
+      "prompt": "Help me set up the Boltz2 NIM locally with Docker. I have an A100 GPU and my NGC_API_KEY is set. Once it's running, predict the structure of this short peptide: ACDEFGHIKLMNPQRSTVWY",
+      "expected_output": "Step-by-step Docker setup commands that use shell env first and optional repo-root .env overrides, require NGC_API_KEY or NVIDIA_API_KEY fallback plus LOCAL_NIM_CACHE, run health checks, then send a no Authorization local request to localhost:8000 and save the output .cif file.",
+      "files": [],
+      "assertions": [
+        "[docker-login-nvcr] Includes docker login command for nvcr.io with $oauthtoken: Output contains 'docker login nvcr.io' and 'oauthtoken'",
+        "[docker-run-gpus] docker run command includes --gpus flag: Output contains 'docker run' and '--gpus'",
+        "[env-contract-and-cache] Local setup uses the repo env contract and LOCAL_NIM_CACHE: Output sources repo-root .env only if present, supports NVIDIA_API_KEY fallback to NGC_API_KEY, requires LOCAL_NIM_CACHE, and mounts LOCAL_NIM_CACHE into the container",
+        "[docker-image-tag] References the correct container image nvcr.io/nim/mit/boltz2: Output contains 'nvcr.io/nim/mit/boltz2'",
+        "[health-check-loop] Includes a health check before submitting the prediction: Output contains health check against localhost:8000/v1/health/ready",
+        "[local-endpoint-url] Prediction uses local endpoint without hosted auth: Script contains 'localhost:8000/biology/mit/boltz2/predict' and the local request uses no Authorization header"
+      ]
+    },
+    {
+      "id": "4",
+      "prompt": "I want to predict a protein-DNA complex with Boltz2, and I already generated an A3M alignment with MSA-Search for the protein. Protein chain A: MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPT. DNA chain B: ATCGATCGATCG. Show me how to include the precomputed A3M in the hosted API request, save the mmCIF, and print the confidence score. My NGC_API_KEY is already set.",
+      "expected_output": "A Python script that calls the hosted Boltz2 endpoint with Bearer auth and submits a multi-polymer protein-DNA payload where the protein polymer contains an MSA dict whose A3M record uses alignment, format, and rank fields, not the stale data field. The script saves the returned mmCIF and prints confidence_scores.",
+      "files": [],
+      "assertions": [
+        "[hosted-endpoint-url] Uses the correct hosted endpoint URL: Script contains 'health.api.nvidia.com/v1/biology/mit/boltz2/predict'",
+        "[bearer-auth-header] Sets Authorization header with Bearer token from environment variable: Script contains 'Authorization' and 'Bearer' and 'NGC_API_KEY'",
+        "[protein-dna-polymers] Payload includes both protein and DNA polymers: Script payload contains both a protein polymer and a dna polymer",
+        "[msa-record-shape] Uses the validated Boltz2 MSA record shape on the protein polymer: Script nests an msa dict under the protein polymer and the A3M record contains 'alignment', 'format', and 'rank'",
+        "[no-stale-data-field] Does not use the stale MSA data field: Script does not use {'data': ...} or a 'data' field inside the MSA record",
+        "[saves-cif-and-confidence] Saves the returned structure and reports confidence_scores: Script writes structure content to a .cif file and references 'confidence_scores' from the response"
+      ]
+    }
+  ]
+}

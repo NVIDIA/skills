@@ -22,12 +22,12 @@ conf_threshold: 0.0
 min_area: 0
 
 # Per-class AP50 gates. An image is weak if ANY listed class falls below its gate.
-# Reference ITS defaults: `car` is abundant and already well learned so it is held
-# to a strict gate; the loop exists to lift the rare classes, which get looser ones.
-weak_thresholds:
-  car: {ap50: 0.99}
-  bicycle: {ap50: 0.7}
-  person: {ap50: 0.7}
+# Mandatory, because they belong to the run: prepare_thresholds_for_gap_analysis.py
+# writes one entry per target class from config.ap50_thresholds, and the spec build
+# sets this block from that file. Any value here would be a gate nobody chose that
+# the stage uses without complaint -- and the weak set sizes the mining budget. The
+# reference ITS values init falls back to live in init_deft_state.py.
+weak_thresholds: ???
 
 # Gates every class NOT listed in weak_thresholds above. TAO defaults this to 0.5,
 # which marks images weak on classes the run never targeted and inflates both the

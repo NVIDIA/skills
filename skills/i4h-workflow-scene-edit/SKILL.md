@@ -5,6 +5,7 @@ license: Apache-2.0
 metadata:
   author: "Isaac for Healthcare Team <isaac-for-healthcare-support@nvidia.com>"
   version: "0.8.0"
+  verification-request: "2026-09-21"
   tags:
     - isaac-for-healthcare
     - i4h
@@ -29,6 +30,8 @@ Iterate on an existing Scene in one live simulator session, and persist the conf
 
 ## Resolve and inspect
 
+Before resolving the checkout, use the maintained repository below or an alternative already selected by the user or trusted project configuration. Check an existing checkout's origin and working-tree changes before executing its scripts; an inherited environment variable alone does not establish trust in an alternative source. Honor any requested revision and preserve local changes. If the source is unexpected, stop and resolve it before cloning or launching.
+
 ```bash
 export I4H_WORKFLOWS_REPO_URL="${I4H_WORKFLOWS_REPO_URL:-https://github.com/isaac-for-healthcare/i4h-workflows}"
 I4H_REPO_DIR_NAME="${I4H_WORKFLOWS_REPO_URL%/}"
@@ -39,10 +42,11 @@ I4H_REPO_DIR_NAME="${I4H_REPO_DIR_NAME%.git}"
 ROOT="${I4H_WORKFLOWS:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 if [ ! -d "$ROOT/workflows/i4h_workflows" ]; then
   ROOT="${I4H_WORKFLOWS:-$HOME/$I4H_REPO_DIR_NAME}"
-  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT"
+  [ -d "$ROOT/workflows/i4h_workflows" ] || git clone "$I4H_WORKFLOWS_REPO_URL" "$ROOT" || exit 2
 fi
+[ -d "$ROOT/workflows/i4h_workflows" ] && [ -x "$ROOT/run.sh" ] || { echo "Incomplete workflow checkout: $ROOT" >&2; exit 2; }
 export I4H_WORKFLOWS="$ROOT"
-cd "$ROOT"
+cd "$ROOT" || exit 2
 ./run.sh list
 ./run.sh show <workflow>
 ```
@@ -72,7 +76,8 @@ fi
 
 The fallback `./run.sh <workflow> --live` must run through the host agent's persistent/yieldable foreground-session mechanism. Never launch that fallback as an ordinary blocking shell call and wait for it to exit before editing.
 
-`--live` resolves the workflow's declared `idle` mode, enables `isaacsim.code_editor.python_server` on port 8226, and keeps the simulator open until explicitly stopped. Wait for port 8226, then use the pinned upstream `isaac-sim-remote` client to inspect and modify the running stage. Keep every ordinary edit only in that live stage; do not change owning source yet. Accumulate later edit prompts in the same session. Only “bake,” “save,” or “persist” authorizes writing the confirmed live values into source. After baking, restart through `run.sh`, verify the persisted result matches the live stage, and stop when requested. An offline source edit followed by a reopen is not live authoring.
+`--live` resolves the workflow's declared `idle` mode, enables `isaacsim.code_editor.python_server` on port 8226, and keeps the simulator open until explicitly stopped. Wait for port 8226 for at most `${I4H_AGENT_BRIDGE_TIMEOUT:-900}` seconds (matching the bridge startup default), stopping sooner if the launcher exits. On timeout, report the run log and bridge blocker, stop only this failed session, and use the documented offline fallback only for work already authorized; source persistence still requires bake/save/persist.
+Once ready, use the pinned upstream `isaac-sim-remote` client to inspect and modify the running stage. Keep every ordinary edit only in that live stage; do not change owning source yet. Accumulate later edit prompts in the same session. Only “bake,” “save,” or “persist” authorizes writing the confirmed live values into source. After baking, restart through `run.sh`, verify the persisted result matches the live stage, and stop when requested. An offline source edit followed by a reopen is not live authoring.
 
 ## Preserve the live interpreter experience
 
@@ -124,8 +129,8 @@ Send a short progress update while the scene visibly changes. Do not spend exten
 
 ## Session lifecycle
 
-- On the first “edit scene” prompt, use `local-agent/bridge.sh` only when `I4H_LOCAL_AGENT=1`; otherwise launch `./run.sh <workflow> --live` through a persistent/yieldable host session. Wait for port 8226.
-- On every later scene prompt, detect and reuse the open bridge session; do not reset or relaunch the Scene unless the requested change requires it.
+- On the first “edit scene” prompt, use `local-agent/bridge.sh` only when `I4H_LOCAL_AGENT=1`; otherwise launch `./run.sh <workflow> --live` through a persistent/yieldable host session. Use the bounded readiness wait above.
+- On every later scene prompt, use `./local-agent/bridge.sh status <workflow>` and `rundir <workflow>` for a managed Local Agent session, or the retained host session and run directory for a foreground launch. Verify it is the intended workflow; a listening port alone is insufficient. Reuse that session; do not reset or relaunch the Scene unless the requested change requires it.
 - Apply each add/move/rotate/scale/material/camera operation separately to the same live stage, select the affected prim, advance the viewport, and verify it before continuing.
 - After adding a robot, verify every camera declared by its authoring preset. For G1, require the live `Robot/Asset/head_link/RobotHeadCam` preview and bake with a registered G1 embodiment whose `robot_head_cam` sensor is exposed through the `head` alias.
 - Return control to the user after each prompt while leaving the simulator and bridge running.
@@ -158,7 +163,7 @@ arena/.venv/bin/python scripts/authoring_info.py snapshot \
 
 `export-scene` records every helper-managed asset, primitive, robot, and camera with its confirmed transform and camera optics. Keep that snapshot in the run directory as authoring evidence. Pass a previous run snapshot through `--baseline` only when a later live export needs to merge it: existing prims are re-read from the current stage, newly tagged prims are added, and removed prims are omitted. `authoring_info.py` is read-only; it validates the snapshot and returns code-ready catalog metadata and derived manifest capabilities immediately. It never generates or edits workflow code.
 
-The coding agent then patches the existing asset, Scene, and manifest templates using the closest maintained source pattern. Commit only those owning sources; do not commit the exported authoring snapshot or treat it as a second Scene contract. Never copy a reusable USD path, canonical scale, mass, embodiment registry name, action contract, attached camera, or camera alias from memory: query `authoring_info.py asset <preset>` or the complete snapshot report, then use the catalog from owning source. Scene-specific names, placement, camera optics, and explicit overrides come from the snapshot.
+The coding agent then patches the existing asset, Scene, and manifest templates using the closest maintained source pattern. When committing is within the user's request, inspect `git diff -- <owning-files>` and stage only this task's changes, preserving unrelated edits. Commit only those owning sources; do not commit the exported authoring snapshot or treat it as a second Scene contract. Never copy a reusable USD path, canonical scale, mass, embodiment registry name, action contract, attached camera, or camera alias from memory: query `authoring_info.py asset <preset>` or the complete snapshot report, then use the catalog from owning source. Scene-specific names, placement, camera optics, and explicit overrides come from the snapshot.
 
 Write only to the owning layer:
 
@@ -179,18 +184,19 @@ For a camera based on the current perspective, treat the viewport pose as an ini
 ./run.sh show <workflow> --mode <affected-mode>
 ./run.sh lint <workflow> --mode <affected-mode>
 ./run.sh lint --all
-uvx ruff check --config pyproject.toml <changed-python-files...>
+uvx ruff==0.5.2 check --config pyproject.toml <changed-python-files...>
 ```
 
-Run focused tests through each affected component's uv project. After the coding agent's static validation, reopen once with `./run.sh <workflow> --live`, compare every requested visual change and declared camera against the exported snapshot, then stop when requested. Do not add extra restarts between export, source editing, and this persisted-visible check. Run affected dynamic modes when physics, reset, actuation, policy observations, task behavior, or success changed. Idle is insufficient for those changes.
+The Ruff version above matches the maintained checkout's `.pre-commit-config.yaml`; if its pin changes, use that exact pinned version. Run focused tests through each affected component's uv project. After the coding agent's static validation, reopen once with `./run.sh <workflow> --live`, compare every requested visual change and declared camera against the exported snapshot, then stop when requested. Do not add extra restarts between export, source editing, and this persisted-visible check. Compare the persisted transforms, world bounds, and camera views with the live snapshot; static lint cannot catch a wrong quaternion convention.
+Select dynamic modes from `run.sh list` and `run.sh show` that actually consume the changed Scene, Task, camera, observation, or success contract. Run those modes when physics, reset, actuation, policy observations, task behavior, or success changed. Idle is insufficient for those changes.
 
 When success excludes collision, dynamic validation must include a forced-contact negative case and a fresh-reset recovery case from `references/g1-reach-and-contact.md`. Do not call the success rule validated if its configured contact signal has only ever returned false.
 
-Stop leftovers with `./stop.sh all`.
+When cleanup is needed, stop the managed session with `./local-agent/bridge.sh stop <workflow>` or interrupt its retained foreground session and verify its children exit. `./stop.sh all` affects other runs in this checkout; use it only when all those runs are within the requested cleanup scope.
 
 ## Troubleshooting
 
-Fix manifest/workflow lint before launch. If the rendered result differs, compare the baseline, authored prims, bounds, cameras, and owning source before retrying.
+Fix manifest/workflow lint before launch. If the rendered result differs, compare the baseline, authored prims, bounds, cameras, and owning source. Make one focused correction and revalidate; if the same mismatch remains, preserve the snapshot and report the unresolved difference instead of looping or claiming validation.
 
 ## Prerequisites
 

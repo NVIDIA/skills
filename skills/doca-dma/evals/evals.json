@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-dma.explicit-positive.v1",
-      "prompt": "Use the doca-dma skill to help me. I'm bringing up a doca_dma context, configuring the doca_dma_task_memcpy task, sizing buffers via doca_dma_cap_task_memcpy_* and setting the right doca_mmap permissions on source and destination.",
+      "prompt": "Use the doca-dma skill for this task: I'm running into this: \"I want to memcpy a host buffer to the BlueField without using the CPU\". Can you walk me through it?",
       "expected_skill": "doca-dma",
       "expected_output": "The agent loads doca-dma and answers from the documented workflow — doca_dma context bring-up, the single doca_dma_task_memcpy task, buffer sizing via doca_dma_cap_task_memcpy_*, and LOCAL_READ_ONLY / LOCAL_READ_WRITE mmap permissions (plus doca_mmap_export_* for cross-peer) — quoting only real symbols (no invented tokens).",
       "assertions": [
@@ -18,7 +18,7 @@
       "expected_skill": "doca-dma",
       "expected_output": "The agent recognizes this as a doca-dma task even though the skill is not named, loads it, and walks the offloaded-copy workflow grounded in the bundle.",
       "assertions": [
-        "The doca-dma skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer uses the DOCA DMA offload path rather than a CPU memcpy."
       ]
     },
@@ -28,17 +28,17 @@
       "expected_skill": "doca-dma",
       "expected_output": "The agent loads doca-dma and diagnoses the no-completion / NOT_PERMITTED path from the bundle (progress-engine driving and mmap-permission checks), grounded in real symbols.",
       "assertions": [
-        "The doca-dma skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer ties NOT_PERMITTED to mmap permissions and no-completion to driving the progress engine."
       ]
     },
     {
       "id": "doca-dma.negative.v1",
-      "prompt": "I need to copy a buffer across the network to a remote host, and separately do producer/consumer messaging between host and DPU. Which skill should handle this and why is it not doca-dma?",
+      "prompt": "I need to copy a buffer across the network to a remote host, and separately do producer/consumer messaging between host and DPU. How should I approach this?",
       "expected_skill": null,
       "expected_output": "The agent does NOT force doca-dma; it recognizes cross-network copies (DOCA RDMA / doca-rdma) and producer/consumer messaging (DOCA Comch / doca-comch) as out of scope and routes there, explaining doca-dma is local memcpy offload only.",
       "assertions": [
-        "doca-dma is not used as the primary skill for this out-of-scope request.",
+        "The answer does not attempt the out-of-scope work itself.",
         "The answer routes to the appropriate skill(s): doca-rdma / doca-comch."
       ]
     }

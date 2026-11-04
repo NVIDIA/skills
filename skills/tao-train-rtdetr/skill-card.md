@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) against the skill-evaluator-dataset-snapshot/1 dataset, run in isolated k8s-sandbox pods with 3 attempts per task. <br>
+1 evaluation task (1 positive) against the skill-evaluator-dataset-snapshot/1 dataset, run in isolated k8s-sandbox pods with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -56,10 +56,10 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.9% | 94.9% |
+| Overall | 94.3% | 71.4% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% | 95.0% |
-| Effectiveness | 5.6% → 100.0% (+94.4 points) | 70.0% → 83.3% (+13.3 points) |
-| Efficiency | 79.5% | 96.3% |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 10.0% → 100.0% (+90.0 points) | 70.0% → 58.3% (-11.7 points) |
+| Efficiency | 71.7% | 99.5% → 98.4% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

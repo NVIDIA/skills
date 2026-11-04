@@ -1,0 +1,16 @@
+[
+  {
+    "id": "prepare-fn-driven-inputs",
+    "question": "Identify the skill and outline how it prepares normalized OD false negatives for AnomalyGenNext embeddings. Do not run commands, scripts, or web searches.",
+    "expected_skill": "tao-prepare-anomalygennext-inputs",
+    "ground_truth": "Select this skill, require explicit dataset/type/mask identity plus a defect spec and existing checkpoint/recipe, preserve box-level FN identity and two masks per FN, and leave embedding execution and AMP to later actions.",
+    "expected_behavior": [
+      "Select tao-prepare-anomalygennext-inputs",
+      "Require normalized identity rather than path inference",
+      "Describe the two emitted embedding specs",
+      "Keep embedding execution and AMP separate",
+      "Require the fine-tuned checkpoint, matching recipe, and text placement prompts"
+    ],
+    "expected_script": "scripts/prepare_anomalygennext_inputs.py"
+  }
+]

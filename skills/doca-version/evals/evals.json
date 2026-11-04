@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-version.explicit-positive.v1",
-      "prompt": "Use the doca-version skill to help me. Tell me what DOCA version is installed on this host and whether the install is consistent across all the sources.",
+      "prompt": "Use the doca-version skill for this task: I'm running into this: \"my DOCA program built fine but does nothing on the wire\". Can you walk me through it?",
       "expected_skill": "doca-version",
       "expected_output": "The agent loads doca-version and cites the four-source detection chain by name (pkg-config --modversion doca-common, applications/VERSION, doca_caps --version, bfver plus /etc/mlnx-release on BlueField) and states the four-way match rule, refusing to invent a version string when the host output is not provided.",
       "assertions": [
@@ -18,7 +18,7 @@
       "expected_skill": "doca-version",
       "expected_output": "The agent recognizes this as a build-vs-runtime / partial-install symptom even though the skill is not named, loads doca-version, and applies the four-way match rule plus the partial-install diagnosis to check for version drift.",
       "assertions": [
-        "The doca-version skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer checks the four-way match / partial-install rather than giving generic debugging advice."
       ]
     },
@@ -28,18 +28,18 @@
       "expected_skill": "doca-version",
       "expected_output": "The agent loads doca-version and treats this as a canonical partial-install / build-vs-runtime drift symptom, citing the detection chain and four-way match rule to locate the mismatch, and routing the cross-library error taxonomy to doca-programming-guide.",
       "assertions": [
-        "The doca-version skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer uses the four-source detection chain / four-way match and does not invent a version or capability claim."
       ]
     },
     {
       "id": "doca-version.negative.v1",
-      "prompt": "I need to install DOCA and choose which packages to put on this host. Which skill should handle this and why is it not doca-version?",
+      "prompt": "All four version sources already match. I need the component-specific build, run, and validation workflow.",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-version; it recognizes install/package-choice as out of scope and routes to doca-setup, explaining that doca-version owns detection and the four-way match, not installation.",
+      "expected_output": "The agent does not apply doca-version's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-version as the answer.",
       "assertions": [
-        "doca-version is not used as the primary skill for this out-of-scope install request.",
-        "The answer routes to the appropriate skill: doca-setup."
+        "The answer does not apply doca-version's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

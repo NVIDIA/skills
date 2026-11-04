@@ -276,7 +276,7 @@ class CosmosReportRenderingTests(unittest.TestCase):
                 ],
             }
             state = {
-                "version": 5,
+                "version": 6,
                 "workflow": "tao-run-deft-aoi-cosmos3",
                 "started_at": "2026-08-04T00:00:00+00:00",
                 "status": "complete",
@@ -471,6 +471,61 @@ class CosmosReportRenderingTests(unittest.TestCase):
                 rows,
             )
 
+    def test_sdg_report_preserves_allocation_and_generation_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            sdg = root / "iter1/anomalygen/sdg/SDG_result.csv"
+            sdg.parent.mkdir(parents=True)
+            sdg.write_text(
+                "defect_type,reconstructed_image\n"
+                "bridge,reconstructed_image/bridge_0.png\n"
+                "bridge,reconstructed_image/bridge_1.png\n",
+                encoding="utf-8",
+            )
+            allocation = sdg.parent / "allocation.json"
+            allocation.write_text(json.dumps({"bridge": 2}), encoding="utf-8")
+            mining = root / "iter1/mining_summary.json"
+            mining.write_text(
+                json.dumps({"input_rows": 13, "kept_rows": 8}),
+                encoding="utf-8",
+            )
+            assemble = root / "iter1/assemble_summary.json"
+            assemble.write_text(
+                json.dumps(
+                    {
+                        "output_records": 10,
+                        "unique_target_images": {"new_after_dedup": 10},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            state = {
+                "config": {"anomalygen": {"num_SDG": 20}},
+                "iterations": {
+                    "iter1": {
+                        "anomalygen_sdg_csv": str(sdg),
+                        "anomalygen_allocation_json": str(allocation),
+                        "anomalygen_amp_allocated": 2,
+                        "mining_summary": str(mining),
+                        "mining_mined_count": 8,
+                        "assemble_summary": str(assemble),
+                    }
+                },
+                "events": [{"stage": "anomalygen", "duration_sec": 15}],
+            }
 
+            rows = render_report._augmentation_rows(state)
+            self.assertIn(
+                '<strong>Iter1</strong></td><td class="num">20</td>'
+                '<td class="num">2</td><td class="num">2</td>'
+                '<td>bridge: 2</td><td class="num">13</td>'
+                '<td class="num">8</td><td class="num">10</td>'
+                '<td class="num">10</td>',
+                rows,
+            )
+            self.assertEqual(
+                render_report._sdg_summary_html(state, state["events"]),
+                "2 images/iter · 2 total · 15s avg SDG time/iter",
+            )
 if __name__ == "__main__":
     unittest.main()

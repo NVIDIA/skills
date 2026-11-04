@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to extract FP/FN failure cases from VLM binary-classification predictions for downstream DEFT root-cause analysis on a binary-classification VLM workflow. <br>
+Developers and engineers use this skill to compare VLM yes/no predictions against ground truth and extract FP/FN failure cases that downstream DEFT root-cause analysis stages consume on a binary-classification VLM workflow. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -31,10 +31,10 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Files] <br>
-**Output Format:** [JSONL gap records and plain-text summary report] <br>
+**Output Type(s):** [Analysis, Files, Shell commands] <br>
+**Output Format:** [JSONL gap records (kpi_gaps.jsonl) and plain-text summary report (kpi_gaps_report.txt)] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [No files are written when no gaps are found; samples with ambiguous yes/no responses or ground truth are skipped with a warning.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -43,36 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox isolated pods. <br>
+1 evaluation task (1 positive), 1 attempt per task, each run in an isolated sandbox pod in a `k8s-sandbox` environment (evaluator version `1.5.6`, evaluated 2026-10-16). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Checks whether the user's goal was achieved and expected workflow behavior was followed. <br>
-- Efficiency: Checks tool-call productivity and actual uncached token usage. <br>
+- Security: Is it safe to use? Scored from the `security` signal. <br>
+- Correctness: Is the answer correct? Scored from the `accuracy` signal. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` and `behavior_check`. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% `skill_efficiency` plus 50% `token_efficiency`. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | 95.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 13.3% → 100.0% (+86.7 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 0.0% → 100.0% (+100.0 points) | 16.7% → 83.3% (+66.6 points) |
-| Efficiency | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 98.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 26.7% → 83.3% (+56.6 points) |
+| Efficiency | 73.1% — baseline ran, but no comparable score was available; uplift unavailable | 98.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

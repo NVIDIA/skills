@@ -1,0 +1,51 @@
+{
+  "skill_name": "evo2-nim",
+  "evals": [
+    {
+      "id": "1",
+      "prompt": "I want to use Evo 2 from the hosted NVIDIA API to extend this DNA promoter-like sequence: ACTGACTGACTGACTG. Generate 64 bases, keep the request reproducible for development, and save the generated sequence so I can inspect it later. Create and execute the request now using NGC_API_KEY from the environment, save the requested artifacts, and report values from the actual response; do not stop after writing the script.",
+      "expected_output": "A successfully executed hosted Evo 2 generation request with Bearer auth and exact request fields, plus actual response-derived DNA, sampled probabilities, elapsed timing, and saved JSON and FASTA artifacts.",
+      "files": [],
+      "assertions": [
+        "[hosted-request-executed] Executes the hosted request instead of only writing code: Trajectory shows successful execution of the hosted request, and the final response reports actual response-derived DNA, elapsed timing, and saved artifact paths",
+        "[hosted-endpoint-url] Uses the correct hosted Evo2 generation endpoint: Script contains 'https://health.api.nvidia.com/v1/biology/arc/evo2-40b/generate'",
+        "[bearer-auth-header] Sets hosted Authorization header from NGC_API_KEY: Script contains 'Authorization', 'Bearer', and 'NGC_API_KEY'",
+        "[generate-fields] Uses exact Evo2 generation request field names: Script contains 'sequence', 'num_tokens', 'temperature', 'top_k', 'top_p', and 'random_seed'",
+        "[sampled-probs-field] Requests or handles sampled probabilities using the correct field: Script contains 'enable_sampled_probs' and handles 'sampled_probs'",
+        "[dna-validation] Validates generated DNA alphabet before claiming success: Script checks generated sequence characters against A/C/G/T or an explicitly documented DNA alphabet",
+        "[save-json-fasta] Saves response JSON and generated FASTA output: Script writes a .json file and a .fa or .fasta file"
+      ]
+    }
+  ],
+  "todo": "Waiting on local Docker setup in Harbor before enabling the deferred evals below.",
+  "deferred_evals": [
+    {
+      "id": "2",
+      "prompt": "Run Evo 2 locally with Docker and then do a quick DNA generation smoke test against localhost. My NGC_API_KEY and LOCAL_NIM_CACHE are already configured; use the default model unless I set NIM_VARIANT=7b. Please warn me if my GPU is not compatible.",
+      "expected_output": "Docker startup and health-check commands using the Evo2 image, repo env contract, FP8-capable GPU guidance, optional NIM_VARIANT, local no-auth inference, and an EVO2_NIM_URL-aware generation request with a localhost fallback.",
+      "files": [],
+      "assertions": [
+        "[env-contract] Uses repo env contract including .env, NGC_API_KEY/NVIDIA_API_KEY fallback, and LOCAL_NIM_CACHE: Output mentions '.env', 'NGC_API_KEY', 'NVIDIA_API_KEY', and 'LOCAL_NIM_CACHE'",
+        "[docker-image] Uses the correct Evo2 Docker image: Output contains 'nvcr.io/nim/arc/evo2:2'",
+        "[cache-mount] Mounts local cache to the documented container cache target: Output contains '/opt/nim/.cache' and 'LOCAL_NIM_CACHE'",
+        "[variant-gpu-guidance] Documents optional NIM_VARIANT=7b, GPU selection, FP8-compatible hardware, and 40B memory requirements: Output contains 'NIM_VARIANT', 'NIM_TEST_GPUS', 'FP8', 40B guidance for 2x H100 80GB or 1x H200 141GB, and 7B fallback guidance such as H100, H200, RTX 6000 Ada, or L40S; it must not present A100 as compatible for local Evo2",
+        "[health-check] Polls local readiness before inference: Output builds the readiness URL from EVO2_NIM_URL with localhost:8000 only as a fallback",
+        "[local-no-auth-endpoint] Uses local generation endpoint with no Authorization header: Script builds the local generation endpoint from EVO2_NIM_URL and does not send 'Authorization' to local inference"
+      ]
+    },
+    {
+      "id": "3",
+      "prompt": "I have a local Evo 2 NIM running. I need to capture output_layer and decoder.layers.3.self_attention for ACTGACTGACTG, save the tensors, and print a quick summary of the arrays.",
+      "expected_output": "A local Python script that calls the Evo2 forward endpoint, decodes the base64 NPZ response with numpy, saves it, and prints tensor names, shapes, dtypes, and finite-value summaries.",
+      "files": [],
+      "assertions": [
+        "[local-forward-endpoint] Uses the correct local forward endpoint: Script builds the local forward endpoint from EVO2_NIM_URL with localhost:8000 only as a fallback",
+        "[forward-fields] Uses exact forward request fields: Script contains 'sequence' and 'output_layers'",
+        "[requested-layers] Requests the user-specified Evo2 layer names: Script contains 'output_layer' and 'decoder.layers.3.self_attention'",
+        "[base64-npz-decode] Decodes base64 NPZ response data: Script contains 'base64' and 'np.load' or 'numpy.load'",
+        "[save-npz] Saves decoded tensor artifacts as NPZ: Script writes a .npz file",
+        "[finite-summary] Checks or reports tensor shape, dtype, and finite numeric values: Script reports 'shape' and 'dtype' and checks 'isfinite' or prints numeric summaries"
+      ]
+    }
+  ]
+}

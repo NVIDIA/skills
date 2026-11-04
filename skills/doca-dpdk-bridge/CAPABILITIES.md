@@ -11,11 +11,11 @@ Read this file when the loader sent you here from
 (the verbs `configure / build / modify / run / test / debug`),
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers a bridge overlay
-on top of, see [`doca-version`](../../doca-version/SKILL.md).
+on top of, see `doca-version/SKILL.md`.
 For the start-fresh alternative (no DPDK in the picture), defer
-to [`doca-eth`](../doca-eth/SKILL.md); for the steering library
+to `doca-eth/SKILL.md`; for the steering library
 the bridge most commonly composes with, defer to
-[`doca-flow`](../doca-flow/SKILL.md).
+`doca-flow/SKILL.md`.
 
 ## Pattern overview
 
@@ -40,7 +40,7 @@ Two cross-cutting rules that apply to *every* pattern above:
   user already has a working DPDK app is almost always the
   wrong tradeoff. Recommending the bridge for a fresh project
   with no DPDK code is also wrong — that user wants
-  [`doca-eth`](../doca-eth/SKILL.md).
+  `doca-eth/SKILL.md`.
 - **DPDK and DOCA are a matched pair, not independent
   installs.** The bridge is the layer that reads both versions
   and assumes a compatibility window the user did not pick.
@@ -64,9 +64,9 @@ asking *"how do I do packet I/O with DOCA?"*.
 
 | Path | When it fits | When it does NOT fit | Owning skill |
 | --- | --- | --- | --- |
-| `doca-dpdk-bridge` (this skill) | The user has an EXISTING DPDK app and wants to reach DOCA libraries (most commonly DOCA Flow for HW steering) WITHOUT rewriting the data-plane. The DPDK port and EAL stay owned by DPDK; the bridge surfaces the port to DOCA. | The user is starting fresh; or the user is host-only and DPDK alone meets their needs; or the user only wants DOCA libraries and has no DPDK lock-in. | This skill (interop overlay on top of [`doca-eth`](../doca-eth/SKILL.md) and [`doca-flow`](../doca-flow/SKILL.md)) |
-| Native `doca-eth` | The user is starting fresh, has no DPDK code yet, and wants line-rate raw packet I/O against DOCA queues directly. | The user already has a working DPDK app and migrating it to `doca-eth` is a multi-week rewrite for a feature (HW steering) that the bridge can deliver without it. | [`doca-eth`](../doca-eth/SKILL.md) |
-| Pure DPDK, no DOCA | Host-only line-rate packet processing with no DOCA library in the picture. | Any DOCA library is needed (Flow / Compress / AES-GCM / Telemetry / …). | Out of scope for this bundle; defer to upstream DPDK docs reachable via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md). |
+| `doca-dpdk-bridge` (this skill) | The user has an EXISTING DPDK app and wants to reach DOCA libraries (most commonly DOCA Flow for HW steering) WITHOUT rewriting the data-plane. The DPDK port and EAL stay owned by DPDK; the bridge surfaces the port to DOCA. | The user is starting fresh; or the user is host-only and DPDK alone meets their needs; or the user only wants DOCA libraries and has no DPDK lock-in. | This skill (interop overlay on top of `doca-eth/SKILL.md` and `doca-flow/SKILL.md`) |
+| Native `doca-eth` | The user is starting fresh, has no DPDK code yet, and wants line-rate raw packet I/O against DOCA queues directly. | The user already has a working DPDK app and migrating it to `doca-eth` is a multi-week rewrite for a feature (HW steering) that the bridge can deliver without it. | `doca-eth/SKILL.md` |
+| Pure DPDK, no DOCA | Host-only line-rate packet processing with no DOCA library in the picture. | Any DOCA library is needed (Flow / Compress / AES-GCM / Telemetry / …). | Out of scope for this bundle; defer to upstream DPDK docs reachable via `doca-public-knowledge-map/SKILL.md`. |
 
 The agent's rule on this axis: **ask the user whether DPDK is
 already in their codebase before recommending a path**. The
@@ -144,7 +144,7 @@ DPDK port id is bound to that `doca_dev` via
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body lives
+`doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The bridge-specific overlay** is:
@@ -160,16 +160,16 @@ there; this skill does not duplicate it.
   before any code change. Do not quote a DPDK version pin from
   agent memory; do not assume *"the latest DPDK works"*; read
   the host. Per the cross-cutting headers-win rule in
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility),
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`),
   the bridge's installed headers are the authoritative
   statement of which DPDK it expects.
 - **`doca-dpdk-bridge.pc` and `doca-common.pc` must both match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   Use `pkg-config --modversion doca-dpdk-bridge` as the
   build-time anchor; disagreement with `doca_caps --version` is
   a partial-install hazard and must be routed to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any bridge-layer diagnosis. If
   `pkg-config --exists doca-dpdk-bridge` returns failure, the
   bridge is either not installed on this DOCA, or the module
@@ -181,7 +181,7 @@ there; this skill does not duplicate it.
 
 Bridge-specific overlays on the cross-library `DOCA_ERROR_*`
 taxonomy. The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *bridge surface* meaning that the
 agent must disambiguate before falling back to the cross-
 library response.
@@ -191,9 +191,9 @@ library response.
 | `DOCA_ERROR_BAD_STATE` | Any bridge call before the underlying DPDK port is started, before `rte_eal_init` returned, or before `doca_ctx_start()` on the bridge-using DOCA context; also returned after teardown of either the DPDK port or the DOCA context | Lifecycle violation that crosses the DPDK ↔ DOCA seam. Walk the bridge's lifecycle order in [TASKS.md ## configure](TASKS.md#configure); the most common case is registering the DPDK port with the bridge before `rte_eth_dev_start` — DPDK has to be live first. |
 | `DOCA_ERROR_NOT_FOUND` | Port-registration / handle-acquire calls on a DPDK port id that the bridge does not see | The DPDK port id is wrong (typo, wrong port index), the port is not bound under DPDK on this host, or the port id is from a different EAL instance. Confirm the user's `rte_eth_dev_get_port_by_name` / DPDK port enumeration first; do not modify the bridge call. |
 | `DOCA_ERROR_INVALID_VALUE` (or `DOCA_ERROR_NO_MEMORY`) | `doca_dpdk_mempool_mbuf_to_buf()` conversion calls | The `rte_mbuf` does not represent memory from the originating `rte_mempool` that this `doca_dpdk_mempool` was created from (mbufs from external memory or a different pool are not convertible), or the supplied `doca_buf_inventory` has no free elements (`DOCA_ERROR_NO_MEMORY`). Walk the conversion's preconditions in [`## Capabilities and modes`](#capabilities-and-modes); the fix is at the mempool / inventory layer, not the inner-loop call. |
-| `DOCA_ERROR_NOT_PERMITTED` | Bridge create / open calls when the process lacks DPDK-side privileges (no hugepage access, no PCIe port access) OR DOCA-side privileges (cannot open `doca_dev`) | The bridge inherits both privilege sets. Confirm `id` for group membership AND that DPDK's standard preconditions (`dpdk-devbind.py`, hugepages mounted) are met; route to [`doca-setup`](../../doca-setup/SKILL.md) for the env-side fix. |
+| `DOCA_ERROR_NOT_PERMITTED` | Bridge create / open calls when the process lacks DPDK-side privileges (no hugepage access, no PCIe port access) OR DOCA-side privileges (cannot open `doca_dev`) | The bridge inherits both privilege sets. Confirm `id` for group membership AND that DPDK's standard preconditions (`dpdk-devbind.py`, hugepages mounted) are met; route to `doca-setup/SKILL.md` for the env-side fix. |
 | `DOCA_ERROR_NOT_SUPPORTED` | Representors requested in `doca_dpdk_port_probe()` on a device that does not support them, OR DPDK ↔ DOCA version mismatch surfacing as a runtime miss | Re-run `doca_dpdk_cap_is_rep_port_supported()` against the active `doca_devinfo`. If it says false, that is the answer. If it says true but the call still fails, suspect the DPDK ↔ DOCA matched-pair window per [`## Version compatibility`](#version-compatibility) before any code change. |
-| `DOCA_ERROR_DRIVER` | Any bridge call that crosses into the kernel mlx5 driver | The layer below DOCA + DPDK reported failure. Capture state (`dmesg | tail`, `mlxconfig -d <pcie> q`) and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the bridge program. |
+| `DOCA_ERROR_DRIVER` | Any bridge call that crosses into the kernel mlx5 driver | The layer below DOCA + DPDK reported failure. Capture state (`dmesg | tail`, `mlxconfig -d <pcie> q`) and route to env-class debug (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the bridge program. |
 
 The agent's rule: **never recommend a retry loop on a bridge
 `DOCA_ERROR_*` without first identifying which of the rows
@@ -202,7 +202,7 @@ above is the cause**. None of the bridge-class errors above are
 permission, or version errors. And *"my DPDK app sees packets
 but my DOCA Flow rules don't apply"* is not a `DOCA_ERROR_*` —
 it is a steering / port-attachment gap; route to
-[`doca-flow`](../doca-flow/SKILL.md), not to the bridge error
+`doca-flow/SKILL.md`, not to the bridge error
 taxonomy.
 
 ## Observability
@@ -222,7 +222,7 @@ Three primary signals the agent should reach for:
    DPDK counters BEFORE diagnosing any bridge symptom.
 2. **DOCA-side progress engine events for any bridge-using
    context.** The DOCA Core PE
-   ([`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes))
+   (`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`))
    surfaces task completions for the DOCA libraries that
    operate on the `doca_dev` bound to the DPDK port (DOCA Flow
    rule installs, DOCA accelerator submissions, …). Absence of completions on a
@@ -241,14 +241,14 @@ Three primary signals the agent should reach for:
 For the cross-library debug-time observability
 (`DOCA_LOG_LEVEL=trace`, `--sdk-log-level`, the trace build
 flavor) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For DPDK's own logging surface (`rte_log`, `--log-level`), the
 upstream DPDK documentation is the authority — route via
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 DOCA DPDK Bridge's safety surface is **matched-pair version
 coupling, lifecycle ordering across the DPDK ↔ DOCA seam, and
@@ -259,9 +259,9 @@ bridge setup:
 
 | Precondition | What must be true before the first bridge call | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
-| DOCA + DPDK matched pair | `pkg-config --modversion doca-dpdk-bridge` agrees with `doca_caps --version`; `pkg-config --modversion libdpdk` falls within the window the bridge's installed headers / docs declare; `pkg-config --exists doca-dpdk-bridge` succeeds | The three pkg-config queries above; if the bridge module name differs in this release, `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep -i dpdk` to find it | [`doca-version`](../../doca-version/SKILL.md) for the canonical four-way match; reinstall the matched pair if it does not hold — do not patch around it |
-| DPDK runtime preconditions met | The user has hugepages mounted, the target PCIe port is bound under DPDK (e.g. via `dpdk-devbind.py`), `rte_eal_init` is called by the user's app, `rte_eth_dev_start` succeeded on the target port id | DPDK's own diagnostics (`dpdk-devbind.py --status`, hugepage `cat /proc/meminfo | grep Huge`); the agent does NOT walk DPDK setup itself — defer to upstream DPDK docs via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) | Upstream DPDK documentation; [`doca-setup`](../../doca-setup/SKILL.md) for the hugepage / `mlx5` env preconditions DOCA shares with DPDK |
-| DOCA-side device access | A `doca_dev` opens against the same physical device DPDK is using (typically requires sudo or `mlnx`-group membership) | `id` for group membership; the open call failing with `DOCA_ERROR_NOT_PERMITTED` is the runtime symptom | [`doca-setup`](../../doca-setup/SKILL.md) for the env-side; do not modify the bridge program |
+| DOCA + DPDK matched pair | `pkg-config --modversion doca-dpdk-bridge` agrees with `doca_caps --version`; `pkg-config --modversion libdpdk` falls within the window the bridge's installed headers / docs declare; `pkg-config --exists doca-dpdk-bridge` succeeds | The three pkg-config queries above; if the bridge module name differs in this release, `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep -i dpdk` to find it | `doca-version/SKILL.md` for the canonical four-way match; reinstall the matched pair if it does not hold — do not patch around it |
+| DPDK runtime preconditions met | The user has hugepages mounted, the target PCIe port is bound under DPDK (e.g. via `dpdk-devbind.py`), `rte_eal_init` is called by the user's app, `rte_eth_dev_start` succeeded on the target port id | DPDK's own diagnostics (`dpdk-devbind.py --status`, hugepage `cat /proc/meminfo | grep Huge`); the agent does NOT walk DPDK setup itself — defer to upstream DPDK docs via `doca-public-knowledge-map/SKILL.md` | Upstream DPDK documentation; `doca-setup/SKILL.md` for the hugepage / `mlx5` env preconditions DOCA shares with DPDK |
+| DOCA-side device access | A `doca_dev` opens against the same physical device DPDK is using (typically requires sudo or `mlnx`-group membership) | `id` for group membership; the open call failing with `DOCA_ERROR_NOT_PERMITTED` is the runtime symptom | `doca-setup/SKILL.md` for the env-side; do not modify the bridge program |
 
 **Lifecycle order across the DPDK ↔ DOCA seam.** The bridge
 inherits from BOTH lifecycles; the agent must keep the order

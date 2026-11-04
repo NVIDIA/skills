@@ -230,13 +230,15 @@ class NewMoEModel(nn.Module):
 
 ### Gate bias update
 
-MoE models with trainable gate bias need a `update_moe_gate_bias()` method:
+MoE models with adaptive router correction-bias buffers need an
+`update_moe_gate_bias()` method. The update must honor a zero
+`gate_bias_update_factor`, including when PEFT freezes bias adaptation:
 
 ```python
 def update_moe_gate_bias(self) -> None:
     with torch.no_grad():
         for _, block in self.layers.named_children():
-            if isinstance(block.mlp, MoE):
+            if isinstance(block.mlp, MoE) and block.mlp.gate.bias_update_factor > 0:
                 block.mlp.gate.update_bias()
 ```
 
@@ -297,7 +299,7 @@ class NewMoEForCausalLM(HFCheckpointingMixin, nn.Module, MoEFSDPSyncMixin):
     def update_moe_gate_bias(self) -> None:
         with torch.no_grad():
             for _, block in self.model.layers.named_children():
-                if isinstance(block.mlp, MoE):
+                if isinstance(block.mlp, MoE) and block.mlp.gate.bias_update_factor > 0:
                     block.mlp.gate.update_bias()
 
     @torch.no_grad()
@@ -403,6 +405,37 @@ from nemo_automodel.components.moe.experts import GroupedExperts
 ```
 
 LoRA on MoE typically targets the gate/up/down projections within experts, as well as attention projections (q, k, v, o).
+
+### Preserve router state during LoRA
+
+LoRA trains adapter weights while freezing the base model's parameters. Some
+MoE routers also update correction-bias buffers outside the optimizer; freezing
+parameters does not stop those updates.
+
+NeMo AutoModel's PEFT checkpoints save only adapter weights, so reloading the
+base model plus adapters would lose any bias changes. Keep these pretrained
+biases fixed during LoRA training. For the shared `Gate` with a pretrained
+`e_score_correction_bias`, use:
+
+```yaml
+model:
+  moe_overrides:
+    gate_bias_update_factor: 0.0
+    force_e_score_correction_bias: true
+```
+
+Do not add a correction bias to architectures whose base checkpoint has none.
+Keep full-training defaults unchanged. See the
+[checkpointing guide](../../docs/guides/checkpointing.mdx#router-correction-biases-in-moe-models)
+for checkpoint limitations.
+
+Before advertising MoE PEFT support, verify:
+
+- Both backbone and outer-model update hooks honor disabled adaptation.
+- With real routing and nonzero pretrained biases, adapters change while the
+  biases stay fixed; fake balanced routing can hide this failure.
+- Actual adapter checkpoint save/reload/resume matches uninterrupted losses,
+  model parameters and buffers, and optimizer state.
 
 ---
 

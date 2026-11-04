@@ -1,0 +1,23 @@
+{"appointment_type":"Adult physicals","duration_minutes":60,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Pediatric physicals","duration_minutes":60,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Follow-up appointments","duration_minutes":30,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Sick visits","duration_minutes":30,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Flu shots","duration_minutes":15,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Other vaccinations","duration_minutes":15,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Allergy shots","duration_minutes":15,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"B12 injections","duration_minutes":15,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Diabetes management","duration_minutes":45,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Hypertension management","duration_minutes":45,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Asthma management","duration_minutes":45,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Chronic pain management","duration_minutes":45,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Initial mental health consultations","duration_minutes":60,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Follow-up mental health appointments","duration_minutes":45,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Therapy sessions","duration_minutes":60,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Blood draws","duration_minutes":15,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Urine tests","duration_minutes":15,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"EKGs","duration_minutes":30,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Biopsies","duration_minutes":45,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Medication management","duration_minutes":30,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Wart removals","duration_minutes":30,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Skin tag removals","duration_minutes":30,"slot_times":["09:00:00","14:00:00"]}
+{"appointment_type":"Ear wax removals","duration_minutes":30,"slot_times":["09:00:00","14:00:00"]}

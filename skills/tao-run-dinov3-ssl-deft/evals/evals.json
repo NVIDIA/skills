@@ -1,0 +1,63 @@
+[
+  {
+    "id": "tao-run-dinov3-ssl-deft-benchmark-isolation",
+    "question": "My held-out benchmark has copies in the unlabeled source pool under different sample IDs. I am not enabling evaluation yet. Can I safely mine and train? Explain the required inputs and failure behavior without running commands.",
+    "expected_skill": "tao-run-dinov3-ssl-deft",
+    "expected_script": null,
+    "ground_truth": "Require a benchmark_acquisition_units sidecar with sample_id, acquisition units and content_sha256 (also carried by targets, source and inherited manifests), which an image with the DS fix enforces independent of evaluation by excluding matches and failing closed, without detecting undeclared near-duplicates.",
+    "expected_behavior": [
+      "Does not rely on sample ID inequality to prove disjointness",
+      "Requires the benchmark identity sidecar even with evaluation disabled",
+      "Requires acquisition-unit and content-hash metadata for the claimed protection",
+      "Explains fail-closed handling of missing identities and contaminated parent history",
+      "Distinguishes data isolation checks from training-quality evaluation",
+      "Does not run commands"
+    ]
+  },
+  {
+    "id": "tao-run-dinov3-ssl-deft-layered-interface",
+    "question": "Use the DINOv3 SSL DEFT workflow with my unlabeled AOI targets. Explain the user interfaces and the two shipped strategies without running anything.",
+    "expected_skill": "tao-run-dinov3-ssl-deft",
+    "expected_script": null,
+    "ground_truth": "Select tao-run-dinov3-ssl-deft, describe the conversational skill, YAML/CLI, and bare Python layers, and identify GRIT-score and multi-task round-robin as the two strategies over one concrete controller. GRIT-score has a built-in scorer; multi-task round-robin needs the user's own score adapter because DS ships none.",
+    "expected_behavior": [
+      "Identifies tao-run-dinov3-ssl-deft",
+      "Describes conversational, config/CLI, and Python interfaces",
+      "States that all interfaces call one concrete controller",
+      "Names grit_score and multi_task_round_robin",
+      "States that multi_task_round_robin needs a user-supplied score adapter",
+      "Does not claim GRIT is calibrated uncertainty",
+      "Does not run commands"
+    ]
+  },
+  {
+    "id": "tao-run-dinov3-ssl-deft-traceability",
+    "question": "How does a DINOv3 SSL DEFT run resume and how do I trace a selected image? Read only the skill documentation and do not run commands.",
+    "expected_skill": "tao-run-dinov3-ssl-deft",
+    "expected_script": null,
+    "ground_truth": "The concrete controller resumes from locked state.json and append-only events.jsonl, validates immutable artifact outputs, preserves selection provenance in Parquet manifests, and never relies on agent memory or hand-edited state.",
+    "expected_behavior": [
+      "Treats disk-backed controller state as authoritative",
+      "Mentions append-only events and immutable manifests",
+      "Does not instruct the agent to edit state.json",
+      "Does not run commands"
+    ]
+  },
+  {
+    "id": "tao-run-dinov3-ssl-deft-approval-monitoring",
+    "question": "Explain a proposed weighted multi-task DINOv3 DEFT run using only documentation. Do not execute commands or call tools. Segmentation should receive twice the preference. Tell me exactly what data is materialized and cached, how sampling and stopping work, and then monitor it to completion after approval.",
+    "expected_skill": "tao-run-dinov3-ssl-deft",
+    "expected_script": null,
+    "ground_truth": "The approval contract keeps targets_per_round fixed, resolves positive task_weights into integer quotas, describes the full loop and cumulative locator-only training manifest, distinguishes read-only data/embedding caches from per-run artifacts, states rounds/resources/stops, and remains attached after launch until terminal state. Before approval it confirms the user's own score adapter command and its implementation_files, because DS ships no multi-task scorer.",
+    "expected_behavior": [
+      "Keeps a fixed targets_per_round budget while giving segmentation weight 2",
+      "Confirms the user's score adapter command and implementation_files before approval",
+      "Shows resolved integer task quotas before approval",
+      "Explains cumulative deduplicated locator-only training manifests",
+      "States source images and embeddings are reused read-only without image copies or symlinks",
+      "States sampling radius, neighbor count, rounds, resources, and stop conditions",
+      "Does not launch before approval",
+      "After approval, monitors stage and round transitions through terminal state"
+    ]
+  }
+]

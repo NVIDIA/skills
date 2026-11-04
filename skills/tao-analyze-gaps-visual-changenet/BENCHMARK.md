@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-analyze-gaps-visual-changenet`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:ae84a6a3fa64e143c6bed275bc0db66b4be02dc112bc310fce577d286399c2d4` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 73.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 75.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 100.0% (+80.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 22.2% → 100.0% (+77.8 points) | 48.3% → 70.0% (+21.7 points) |
-| Efficiency | 71.9% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.6% (-1.1 points) |
+| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 80.0% (+31.7 points) |
+| Efficiency | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.4% (-1.3 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 101,993 | 312,456 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-analyze-gaps-visual-changenet-basic | 101,993 | 312,456 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 13,769 | 13,608 | +161 | +1.18% | skill 1/1; base 1/1 |
-| codex | tao-analyze-gaps-visual-changenet-basic | 13,769 | 13,608 | +161 | +1.18% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 115,762 | 326,064 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 68,656 | 182,896 | -114,240 | -62.46% | skill 1/1; base 1/1 |
+| claude-code | tao-analyze-gaps-visual-changenet-basic | 68,656 | 182,896 | -114,240 | -62.46% | skill 1/1; base 1/1 |
+| codex | All cases | 14,040 | 13,562 | +478 | +3.52% | skill 1/1; base 1/1 |
+| codex | tao-analyze-gaps-visual-changenet-basic | 14,040 | 13,562 | +478 | +3.52% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 82,696 | 196,458 | -113,762 | -57.91% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -66,7 +66,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 41 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 40 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
@@ -82,7 +82,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/data/tao-analyze-gaps-visual-changenet/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-analyze-gaps-visual-changenet`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/data/tao-analyze-gaps-visual-changenet/SKILL.md`)
-- 37 additional finding(s) are available in the full evaluation artifacts.
+- 36 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

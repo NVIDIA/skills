@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.nvidia.com/tao/schemas/pas-job-binding-v1.json",
+  "title": "PAS DEFT prepared-action job binding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow",
+    "platform",
+    "request_path",
+    "request_sha256",
+    "job_record_path",
+    "job_id",
+    "job_identity_sha256",
+    "results_scope",
+    "staging_receipt_sha256",
+    "bound_at",
+    "binding_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "workflow": {"const": "tao-run-deft-pas"},
+    "platform": {
+      "enum": ["docker", "slurm", "kubernetes", "brev", "virtualenv"]
+    },
+    "request_path": {"type": "string", "pattern": "^/"},
+    "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "job_record_path": {"type": "string", "pattern": "^/"},
+    "job_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+    "job_identity_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "results_scope": {"type": "string", "minLength": 2},
+    "staging_receipt_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "bound_at": {"type": "string", "minLength": 1},
+    "binding_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

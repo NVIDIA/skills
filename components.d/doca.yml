@@ -13,8 +13,6 @@ skills:
     catalog_dir: doca-bf3-deployment
   - path: skills/doca-bf4-deployment/
     catalog_dir: doca-bf4-deployment
-  - path: skills/doca-collectx-deployment/
-    catalog_dir: doca-collectx-deployment
   - path: skills/doca-container-deployment/
     catalog_dir: doca-container-deployment
   - path: skills/doca-debug/
@@ -57,22 +55,14 @@ skills:
     catalog_dir: doca-eth
   - path: skills/libs/doca-flow/
     catalog_dir: doca-flow
-  - path: skills/libs/doca-flow-dpa-provider/
-    catalog_dir: doca-flow-dpa-provider
-  - path: skills/libs/doca-gpi/
-    catalog_dir: doca-gpi
   - path: skills/libs/doca-gpunetio/
     catalog_dir: doca-gpunetio
   - path: skills/libs/doca-mgmt/
     catalog_dir: doca-mgmt
   - path: skills/libs/doca-pcc/
     catalog_dir: doca-pcc
-  - path: skills/libs/doca-pcc-ztr-rttcc-algo/
-    catalog_dir: doca-pcc-ztr-rttcc-algo
   - path: skills/libs/doca-rdma/
     catalog_dir: doca-rdma
-  - path: skills/libs/doca-rdmi/
-    catalog_dir: doca-rdmi
   - path: skills/libs/doca-rmax/
     catalog_dir: doca-rmax
   - path: skills/libs/doca-sha/
@@ -91,40 +81,36 @@ skills:
     catalog_dir: doca-argus
   - path: skills/services/doca-dms/
     catalog_dir: doca-dms
+  - path: skills/services/doca-dts/
+    catalog_dir: doca-dts
   - path: skills/services/doca-firefly/
     catalog_dir: doca-firefly
   - path: skills/services/doca-urom-svc/
     catalog_dir: doca-urom-svc
   - path: skills/tools/doca-bench/
     catalog_dir: doca-bench
-  - path: skills/tools/doca-bench-extension/
-    catalog_dir: doca-bench-extension
   - path: skills/tools/doca-caps/
     catalog_dir: doca-caps
   - path: skills/tools/doca-comm-channel-admin/
     catalog_dir: doca-comm-channel-admin
-  - path: skills/tools/doca-dpa-hl-tracer/
-    catalog_dir: doca-dpa-hl-tracer
-  - path: skills/tools/doca-flow-dpa-perf/
-    catalog_dir: doca-flow-dpa-perf
-  - path: skills/tools/doca-flow-grpc-server/
-    catalog_dir: doca-flow-grpc-server
-  - path: skills/tools/doca-flow-perf/
-    catalog_dir: doca-flow-perf
   - path: skills/tools/doca-flow-tune/
     catalog_dir: doca-flow-tune
-  - path: skills/tools/doca-gpunetio-ib-write-bw/
-    catalog_dir: doca-gpunetio-ib-write-bw
-  - path: skills/tools/doca-gpunetio-ib-write-lat/
-    catalog_dir: doca-gpunetio-ib-write-lat
+  - path: skills/tools/doca-ngauge/
+    catalog_dir: doca-ngauge
   - path: skills/tools/doca-pcc-counters/
     catalog_dir: doca-pcc-counters
+  - path: skills/tools/doca-perftest/
+    catalog_dir: doca-perftest
+  - path: skills/tools/doca-pipeline-language-developer-tools/
+    catalog_dir: doca-pipeline-language-developer-tools
   - path: skills/tools/doca-sha-offload-engine/
     catalog_dir: doca-sha-offload-engine
   - path: skills/tools/doca-socket-relay/
     catalog_dir: doca-socket-relay
   - path: skills/tools/doca-spcx-cc/
     catalog_dir: doca-spcx-cc
+  - path: skills/tools/doca-telemetry-traceback-application/
+    catalog_dir: doca-telemetry-traceback-application
   - path: skills/tools/doca-telemetry-utils/
     catalog_dir: doca-telemetry-utils
 links:

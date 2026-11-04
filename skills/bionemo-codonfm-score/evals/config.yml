@@ -1,0 +1,6 @@
+schema_version: 1
+
+harbor:
+  agents:
+    claude-code:
+      model: aws/anthropic/bedrock-claude-opus-5

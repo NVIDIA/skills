@@ -16,7 +16,7 @@ For the meta-policy surface (the change classes in scope, the failure
 modes the discipline prevents, the observability gate), see
 [CAPABILITIES.md](CAPABILITIES.md). For the JSON schemas the agent
 prefers when present, see
-[`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md).
+`doca-structured-tools-contract/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a copy-
 paste recipe. The per-artifact skill names the specific change; this
@@ -47,12 +47,12 @@ Steps the agent should walk the operator through:
    BlueField), `mlxconfig`-class configuration snapshot, and host-side
    env snapshot. Prefer the structured one-shot via the
    `collect-host-state` and `collect-dpu-state` schemas in
-   [`doca-structured-tools-contract ## Schemas`](../doca-structured-tools-contract/SKILL.md#schemas)
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`)
    when the host has them; otherwise walk the manual command chain
    the same schema section names. Record every captured value in the
    session — the rollback path will quote them.
 3. **Record the four-way version anchor for the session.** Per
-   [`doca-version ## configure`](../doca-version/TASKS.md#configure),
+   `doca-version ## configure` (`doca-version/TASKS.md#configure`),
    capture `pkg-config --modversion doca-common`,
    `cat /opt/mellanox/doca/applications/VERSION`, `doca_caps --version`,
    and (on BlueField hosts) the BFB version. The pre-change state of
@@ -60,7 +60,7 @@ Steps the agent should walk the operator through:
    moves any of these anchors must be re-verified in
    [`## run`](#run) before any workload moves.
 4. **Confirm the env-class preconditions hold.** Per
-   [`doca-setup ## configure`](../doca-setup/TASKS.md#configure),
+   `doca-setup ## configure` (`doca-setup/TASKS.md#configure`),
    confirm `pkg-config` resolves, hugepages are mounted, the
    `mlx5_*` modules are loaded, and the representors the change
    touches are visible. An env-class problem before the change is an
@@ -105,14 +105,14 @@ step here is closed.
 
 ## build
 
-> **Anchor exists for lint compliance.** Hardware-touching changes do
+> **Routing anchor.** Hardware-touching changes do
 > not produce build artifacts; there is no compile-time output of a
 > firmware burn, an `mlxconfig` write, a BFB reflash, or a kernel-boot-
 > parameter change. The build-side discipline for DOCA-consuming
 > applications lives at
-> [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build);
+> `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`);
 > the env-side discipline for the build host lives at
-> [`doca-setup ## build`](../doca-setup/TASKS.md#build). This anchor is
+> `doca-setup ## build` (`doca-setup/TASKS.md#build`). This anchor is
 > a routing stub.
 
 The one hardware-safety overlay on the build side is the
@@ -122,7 +122,7 @@ must be in the same DOCA-version band as production, so the binary
 the operator smoke-tests on the replica is the same binary they will
 re-run after the production change. The mechanics of confirming the
 build host's DOCA version live in
-[`doca-version ## build`](../doca-version/TASKS.md#build); this skill
+`doca-version ## build` (`doca-version/TASKS.md#build`); this skill
 only surfaces that the replica and production must agree on it.
 
 ## modify
@@ -173,13 +173,13 @@ Steps the agent should walk the operator through (in order):
      agent quotes the tool's own documented completion criterion.
    - BFB reflash: the BFB's documented post-flash boot + BlueField
      cold reboot; every hosted service container is re-deployed per
-     [`doca-container-deployment ## run`](../doca-container-deployment/TASKS.md#run).
+     `doca-container-deployment ## run` (`doca-container-deployment/TASKS.md#run`).
    - BlueField mode flip: cold power cycle + post-reboot
      verification of the new personality per the matching per-
      artifact skill.
    - Kernel boot parameter change: a **host reboot**. Confirm the
      post-reboot env-class state per
-     [`doca-setup ## debug`](../doca-setup/TASKS.md#debug); a
+     `doca-setup ## debug` (`doca-setup/TASKS.md#debug`); a
      runtime helper alone is not sufficient.
    - Link state change / PCIe rescan / function rebind: the
      operator's documented procedure; the affected function will
@@ -211,7 +211,7 @@ formality.
 Three runtime checks the agent walks in order:
 
 1. **Post-change four-way match.** Per
-   [`doca-version ## test`](../doca-version/TASKS.md#test), confirm
+   `doca-version ## test` (`doca-version/TASKS.md#test`), confirm
    `pkg-config --modversion doca-common`,
    `cat /opt/mellanox/doca/applications/VERSION`, `doca_caps --version`,
    and the BFB version (on BlueField) all agree on the post-change
@@ -231,7 +231,7 @@ Three runtime checks the agent walks in order:
    reachable. For the program-side cross-library observability
    (`--sdk-log-level`, the `doca-<library>-trace` build flavor,
    `DOCA_LOG_LEVEL`), see
-   [`doca-debug ## configure`](../doca-debug/TASKS.md#configure). The
+   `doca-debug ## configure` (`doca-debug/TASKS.md#configure`). The
    agent does not declare the deployment "ready to carry workload"
    until the observability path is proven end-to-end on the post-
    change state.
@@ -330,13 +330,13 @@ skill.
      not invent a firmware version.
    - BFB reflash → reflash to the previously-captured BFB level and
      re-deploy every hosted service container per
-     [`doca-container-deployment ## run`](../doca-container-deployment/TASKS.md#run).
+     `doca-container-deployment ## run` (`doca-container-deployment/TASKS.md#run`).
      The captured baseline names the BFB level; the agent does not
      invent it.
    - Kernel boot parameter change → revert the host's kernel
      command line to the captured baseline and reboot. Confirm the
      post-reboot env-class state per
-     [`doca-setup ## debug`](../doca-setup/TASKS.md#debug).
+     `doca-setup ## debug` (`doca-setup/TASKS.md#debug`).
    - Mode flip / emulation-slot enable → flip back to the captured
      personality, cold-power-cycle. Confirm the host-visible
      representor topology returns to the captured baseline.
@@ -344,7 +344,7 @@ skill.
      documented restore procedure for the affected function.
 3. **Re-verify against the captured baseline.** After the rollback,
    re-run the inventory probe and the four-way match per
-   [`doca-version ## debug`](../doca-version/TASKS.md#debug). The
+   `doca-version ## debug` (`doca-version/TASKS.md#debug`). The
    ladder is not done until the inventory matches the baseline AND
    the four-way match is clean.
    If rollback or verification used a shell script, enforce the
@@ -354,7 +354,7 @@ skill.
 4. **If the residual symptom is at a software layer, hand off.**
    Once the rollback has restored the captured hardware state and a
    symptom still remains, the symptom now lives at a software layer.
-   Hand off to [`doca-debug ## debug`](../doca-debug/TASKS.md#debug)
+   Hand off to `doca-debug ## debug` (`doca-debug/TASKS.md#debug`)
    with the captured state as evidence; that ladder owns install /
    version / build / link / runtime / program / driver-below
    symptoms once the hardware state is known-good.
@@ -372,7 +372,7 @@ Developer Forum at
 the public escalation channel; for vendor-specific recovery (BMC,
 RShim, BFB recovery image), the operator's NVIDIA support contact
 or the deployment's vendor support is the right path. Per
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md),
+`doca-public-knowledge-map/SKILL.md`,
 the public forum is the right *public* surface; vendor-specific
 recovery is operator-specific and never invented.
 
@@ -388,7 +388,7 @@ asked in the same conversations. Route them as follows so the agent
 does not invent guidance:
 
 - **install / first-time setup.** Owned by
-  [`doca-setup`](../doca-setup/SKILL.md). This skill assumes a working
+  `doca-setup/SKILL.md`. This skill assumes a working
   install is in place and a hardware-touching change is being
   contemplated on top of it.
 - **per-artifact specifics** (which exact firmware slot to flip,
@@ -398,8 +398,8 @@ does not invent guidance:
   discipline; the per-artifact skill names the specific change.
 - **program-side debug** (lifecycle order, `DOCA_ERROR_*`
   interpretation, capability discovery). Owned by
-  [`doca-programming-guide ## debug`](../doca-programming-guide/TASKS.md#debug)
-  and [`doca-debug ## debug`](../doca-debug/TASKS.md#debug). Once the
+  `doca-programming-guide ## debug` (`doca-programming-guide/TASKS.md#debug`)
+  and `doca-debug ## debug` (`doca-debug/TASKS.md#debug`). Once the
   hardware state is known-good (the rollback returned the inventory
   to the captured baseline), symptoms at the software layer hand off
   to those skills.

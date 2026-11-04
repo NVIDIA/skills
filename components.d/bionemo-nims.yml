@@ -12,6 +12,8 @@ links:
   discussions: false
   security: true
 skills:
+  - path: skills/bionemo-agent-toolkit/skills/drug-discovery-pipeline/
+    catalog_dir: bionemo-drug-discovery-pipeline
   - path: skills/bionemo-agent-toolkit/skills/msa-structure-prediction-pipeline/
     catalog_dir: bionemo-msa-structure-prediction-pipeline
   - path: skills/bionemo-agent-toolkit/skills/openfold2-nim/
@@ -20,3 +22,19 @@ skills:
     catalog_dir: bionemo-molmim-nim
   - path: skills/bionemo-agent-toolkit/skills/diffdock-nim/
     catalog_dir: bionemo-diffdock-nim
+  - path: skills/bionemo-agent-toolkit/skills/genmol-nim/
+    catalog_dir: bionemo-genmol-nim
+  - path: skills/bionemo-agent-toolkit/skills/evo2-nim/
+    catalog_dir: bionemo-evo2-nim
+  - path: skills/bionemo-agent-toolkit/skills/rfdiffusion-nim/
+    catalog_dir: bionemo-rfdiffusion-nim
+  - path: skills/bionemo-agent-toolkit/skills/rfd4-proteina-nim/
+    catalog_dir: bionemo-rfd4-proteina-nim
+  - path: skills/bionemo-agent-toolkit/skills/openfold3-nim/
+    catalog_dir: bionemo-openfold3-nim
+  - path: skills/bionemo-agent-toolkit/skills/proteinmpnn-nim/
+    catalog_dir: bionemo-proteinmpnn-nim
+  - path: skills/bionemo-agent-toolkit/skills/msa-search-nim/
+    catalog_dir: bionemo-msa-search-nim
+  - path: skills/bionemo-agent-toolkit/skills/boltz2-nim/
+    catalog_dir: bionemo-boltz2-nim

@@ -1,0 +1,215 @@
+scenario: appointment-making
+prompt_key: appointment_making_healthcare
+tool_names:
+  - find_available_appointments
+  - book_appointment
+current_datetime: "2026-08-17T09:00:00-07:00"
+current_timezone: "America/Los_Angeles"
+database_start_date: "2026-08-17"
+test_conversations:
+  - name: welcome_and_ask_appointment_type
+    history:
+      - role: user
+        content: "Please introduce yourself to the user."
+    expected_next_message_content: >-
+      Say exactly: Hello and welcome to the appointment making agent. Let's get
+      started. First, could you please tell me what type of appointment you're
+      looking for? Do not call a tool or add any other text.
+    expected_tool_call: false
+
+  - name: ask_for_date_and_time_window
+    history:
+      - role: user
+        content: "Please introduce yourself to the user."
+      - role: assistant
+        content: "Hello and welcome to the appointment making agent. Let's get started. First, could you please tell me what type of appointment you're looking for?"
+      - role: user
+        content: "I need a flu shot."
+    expected_next_message_content: >-
+      Ask one scheduling-preference question covering the preferred date or
+      date range and whether the user wants morning or afternoon. Do not ask
+      for patient name, date of birth, or visit reason, and do not call a tool.
+      This behavior must apply whenever any appointment type becomes known.
+    expected_tool_call: false
+
+  - name: sick_visit_must_ask_for_scheduling_preference
+    history:
+      - role: user
+        content: "Please introduce yourself to the user."
+      - role: assistant
+        content: "Hello and welcome to the appointment making agent. Let's get started. First, could you please tell me what type of appointment you're looking for?"
+      - role: user
+        content: "I'm looking for a sick visit."
+    expected_next_message_content: >-
+      Ask only what date or date range the user prefers and whether they want
+      morning or afternoon. Do not call a tool, invent a date or date range,
+      default to the next seven days, use any time as a preference, or present
+      appointment options yet. Apply the same rule to every appointment type,
+      not only sick visits.
+    expected_tool_call: false
+
+  - name: ask_for_missing_time_window
+    history:
+      - role: user
+        content: "I need a flu shot."
+      - role: assistant
+        content: "What date would you prefer, and would you like a morning or afternoon appointment?"
+      - role: user
+        content: "Next Monday."
+    expected_next_message_content: >-
+      Ask only whether the user prefers morning or afternoon because the date
+      is already known. Do not ask for patient details and do not call a tool.
+    expected_tool_call: false
+
+  - name: lookup_available_next_monday_morning
+    history:
+      - role: user
+        content: "Please introduce yourself to the user."
+      - role: assistant
+        content: "Hello and welcome to the appointment making agent. Let's get started. First, could you please tell me what type of appointment you're looking for?"
+      - role: user
+        content: "I need a flu shot."
+      - role: assistant
+        content: "What date would you prefer, and would you like a morning or afternoon appointment?"
+      - role: user
+        content: "Next Monday morning."
+    expected_next_message_content: >-
+      After the availability lookup returns, summarize available slot options
+      for Aug 24th 2026 as speech-friendly phrases such as Aug 24th 2026 at
+      9:00 AM with Dr. Maya Johnson, and ask only which option the user wants.
+      Every user-facing date must use an abbreviated month, ordinal day, and
+      four-digit year with no comma between the day and year. Present no more
+      than three options in one plain-text sentence. Do not ask for patient
+      details yet, use bullets or slot IDs, or book the appointment.
+    expected_tool_call: true
+    expected_tool_name: find_available_appointments
+    expected_final_status: found
+    expected_tool_arguments:
+      appointment_type: "Flu shots"
+      start_date: "2026-08-24"
+      end_date: "2026-08-24"
+      time_window: "morning"
+
+  - name: greeting_after_options_does_not_replay_list
+    history:
+      - role: user
+        content: "I'm looking for a sick visit."
+      - role: assistant
+        content: "What date or date range would you prefer, and would you like morning or afternoon?"
+      - role: user
+        content: "September 1st through September 3rd in the afternoon."
+      - role: assistant
+        content: "I found Sep 1st 2026 at 2:00 PM with Dr. Priya Shah and Sep 2nd 2026 at 2:00 PM with Dr. Avery Chen. Which option works best for you?"
+      - role: user
+        content: "Hello."
+    expected_next_message_content: >-
+      Briefly acknowledge the greeting and ask which previously offered option
+      works. Do not call a tool and do not repeat the appointment option list
+      unless the user asks to hear it again.
+    expected_tool_call: false
+
+  - name: ask_for_patient_name_after_slot_selection
+    history:
+      - role: user
+        content: "I need a flu shot."
+      - role: assistant
+        content: "What date would you prefer, and would you like a morning or afternoon appointment?"
+      - role: user
+        content: "Next Monday morning."
+      - role: assistant
+        content: "I found Aug 24th 2026 at 9:00 AM with Dr. Maya Johnson. Which option would you like?"
+      - role: user
+        content: "The 9:00 AM appointment works."
+    expected_next_message_content: >-
+      Ask only for the patient's name. Do not ask for date of birth or visit
+      reason in the same turn, do not call book_appointment, and do not claim
+      the appointment was booked.
+    expected_tool_call: false
+
+  - name: ask_for_date_of_birth_after_name
+    history:
+      - role: user
+        content: "I need a flu shot."
+      - role: assistant
+        content: "I found Aug 24th 2026 at 9:00 AM with Dr. Maya Johnson. Which option would you like?"
+      - role: user
+        content: "The 9:00 AM appointment works."
+      - role: assistant
+        content: "What is the patient's full name?"
+      - role: user
+        content: "Jordan Patel."
+    expected_next_message_content: >-
+      Ask only for the patient's date of birth. Do not ask for visit reason in
+      the same turn, do not call book_appointment, and do not claim the
+      appointment was booked.
+    expected_tool_call: false
+
+  - name: ask_for_visit_reason_after_date_of_birth
+    history:
+      - role: user
+        content: "I need a flu shot."
+      - role: assistant
+        content: "I found Aug 24th 2026 at 9:00 AM with Dr. Maya Johnson. Which option would you like?"
+      - role: user
+        content: "The 9:00 AM appointment works."
+      - role: assistant
+        content: "What is the patient's full name?"
+      - role: user
+        content: "Jordan Patel."
+      - role: assistant
+        content: "What is the patient's date of birth?"
+      - role: user
+        content: "1979-09-24."
+    expected_next_message_content: >-
+      Ask only for the visit reason. Do not treat the appointment type as the
+      visit reason, do not call book_appointment, and do not claim the
+      appointment was booked.
+    expected_tool_call: false
+
+  - name: book_after_visit_reason
+    history:
+      - role: user
+        content: "I need a flu shot."
+      - role: assistant
+        content: "I found Aug 24th 2026 at 9:00 AM with Dr. Maya Johnson. Which option would you like?"
+      - role: user
+        content: "The 9:00 AM appointment works."
+      - role: assistant
+        content: "What is the patient's full name?"
+      - role: user
+        content: "Jordan Patel."
+      - role: assistant
+        content: "What is the patient's date of birth?"
+      - role: user
+        content: "1979-09-24."
+      - role: assistant
+        content: "What is the reason for the visit?"
+      - role: user
+        content: "I want to receive my annual flu shot."
+    expected_next_message_content: >-
+      Call book_appointment now that the selected slot, patient name, date of
+      birth, and explicit visit reason are known. After it returns booked, tell
+      the user the demo booking was saved, include the returned booking ID, and
+      say it should be verified in the clinic scheduling system. Do not promise
+      clinic confirmation.
+    expected_tool_call: true
+    expected_tool_name: book_appointment
+    expected_final_status: booked
+    expected_result_id_field: booking_id
+    expected_tool_arguments:
+      appointment_type: "Flu shots"
+      appointment_datetime: "2026-08-24 09:00:00"
+      patient_name: "Jordan Patel"
+      date_of_birth: "1979-09-24"
+    expected_tool_argument_substrings:
+      visit_reason:
+        - "annual"
+        - "flu shot"
+handoff_note: >-
+  The assistant should welcome the user and ask for appointment type, ask for
+  date and morning-or-afternoon preference, look up and present slots, then ask
+  for patient name, date of birth, and visit reason in three separate turns.
+  It must call book_appointment only after all three explicit booking answers
+  are present, resolve relative dates against the injected datetime context,
+  format every user-facing date like Oct 6th 1994 without a comma, and write
+  bookings to the host-visible SQLite demo database.

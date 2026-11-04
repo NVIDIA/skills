@@ -45,8 +45,8 @@ Schema keys can rename between data-services releases (the RCA skill saw `infere
 Use the pinned TAO data-services URI below, then confirm Docker, the NVIDIA container toolkit, and a GPU are present before doing anything else. A GPU is required for both the encoder forward pass and the cuML/cuDF k-NN search; both steps fail without CUDA.
 
 ```bash
-# Pinned TAO data-services container URI (stamped from the release manifest)
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+# Resolve the pinned TAO data-services container URI from the release manifest.
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 echo "DS_IMAGE=$DS_IMAGE"
 
 docker info > /dev/null && echo "OK: docker"

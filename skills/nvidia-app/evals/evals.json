@@ -1,0 +1,451 @@
+{
+  "skill_name": "nvidia-app",
+  "evals": [
+    {
+      "id": "nvidia-app-record-start-001",
+      "prompt": "Use the nvidia-app skill to start recording my gameplay.",
+      "expected_output": "The agent invokes nvapp_overlay_capture once with action toggle_recording and enable true, then reports only what the returned result establishes.",
+      "assertions": [
+        "The agent reads the nvidia-app SKILL.md before acting",
+        "The agent calls nvapp_overlay_capture with { action: \"toggle_recording\", enable: true }",
+        "The agent does not call nvapp_overlay_get_status before or after an explicit start request",
+        "The agent uses standard access and does not request consent for nvapp_overlay_capture",
+        "The agent does not invoke an unrelated capture application or out-of-scope Overlay action"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-record-stop-002",
+      "prompt": "Stop the NVIDIA gameplay recording and save it.",
+      "expected_output": "The agent invokes nvapp_overlay_capture once with action toggle_recording and enable false, recognizing that stopping an active recording also saves it.",
+      "assertions": [
+        "The agent calls nvapp_overlay_capture with { action: \"toggle_recording\", enable: false }",
+        "The agent does not invent a second save-recording action",
+        "The agent reports the returned mutation message if no recording is active",
+        "The agent does not add unsupported output-path or file-name arguments"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-instant-replay-enable-003",
+      "prompt": "Turn on NVIDIA Instant Replay.",
+      "expected_output": "The agent invokes nvapp_overlay_capture with action toggle_instant_replay and enable true.",
+      "assertions": [
+        "The agent calls nvapp_overlay_capture with { action: \"toggle_instant_replay\", enable: true }",
+        "The agent does not call nvapp_overlay_get_status first because the target state is explicit",
+        "The agent reports the returned mutation message without a redundant verification call"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-instant-replay-toggle-004",
+      "prompt": "Toggle Instant Replay for me.",
+      "expected_output": "The agent calls nvapp_overlay_get_status once. If instantReplayEnabled is present, it invokes nvapp_overlay_capture with action toggle_instant_replay and enable set to the opposite Boolean; if the field is absent, it asks whether to enable or disable and makes no mutation call.",
+      "assertions": [
+        "The agent calls nvapp_overlay_get_status with {} before resolving the true toggle",
+        "The agent uses only instantReplayEnabled and does not infer from another field",
+        "The agent passes the opposite Boolean to toggle_instant_replay when the field is present",
+        "The agent asks instead of guessing when instantReplayEnabled is missing",
+        "The agent does not issue a follow-up status verification"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-instant-replay-save-005",
+      "prompt": "Save the Instant Replay buffer.",
+      "expected_output": "The agent invokes nvapp_overlay_capture with only action save_instant_replay and does not pass enable or a duration.",
+      "assertions": [
+        "The agent calls nvapp_overlay_capture with { action: \"save_instant_replay\" }",
+        "The agent does not pass enable",
+        "The agent does not call nvapp_overlay_get_status first",
+        "If the returned message says Instant Replay is disabled, the agent reports it and asks before enabling Instant Replay"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-screenshot-006",
+      "prompt": "Take a screenshot of my game right now.",
+      "expected_output": "The agent invokes nvapp_overlay_capture with only action capture_screenshot and reports the returned mutation message.",
+      "assertions": [
+        "The agent calls nvapp_overlay_capture with { action: \"capture_screenshot\" }",
+        "The agent does not pass enable, path, format, or resolution",
+        "The agent surfaces a supported-game or Desktop Capture condition without enabling Desktop Capture"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-stats-007",
+      "prompt": "Hide the NVIDIA performance statistics overlay.",
+      "expected_output": "The agent invokes nvapp_overlay_configure_stats with enable false.",
+      "assertions": [
+        "The agent calls nvapp_overlay_configure_stats with exactly { enable: false }",
+        "The agent does not add position, layout, opacity, logging, or metric fields",
+        "The agent does not call nvapp_overlay_get_status for an explicit target state or verification"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-current-game-008",
+      "prompt": "Which game does NVIDIA Overlay see running right now?",
+      "expected_output": "The agent invokes nvapp_overlay_get_current_game_info with an empty argument object and reports running, gameName, processId, and fullscreen only when returned.",
+      "assertions": [
+        "The agent calls nvapp_overlay_get_current_game_info with {}",
+        "The agent does not substitute nvapp_overlay_get_status because status does not return game identity",
+        "The agent reports fullscreen only when returned",
+        "When running is false, the agent does not invent a game name, process ID, or fullscreen state"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-status-009",
+      "prompt": "Give me the current status of every NVIDIA Overlay feature you can read.",
+      "expected_output": "The agent invokes nvapp_overlay_get_status with {} and reports only fields present in the response, distinguishing omitted fields from false.",
+      "assertions": [
+        "The agent calls nvapp_overlay_get_status with {}",
+        "The agent reports status for present capture, statistics, audio, notification, and filter fields",
+        "The agent does not interpret a missing field as false",
+        "The agent does not invoke any mutation tool",
+        "The agent does not treat readable Desktop Capture or excluded filter state as permission to change them"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-compound-010",
+      "prompt": "Tell me what game is running, show the stats overlay, and start recording it.",
+      "expected_output": "The agent makes three calls in request order: nvapp_overlay_get_current_game_info with {}, nvapp_overlay_configure_stats with enable true, and nvapp_overlay_capture with action toggle_recording and enable true.",
+      "assertions": [
+        "The agent uses the three appropriate tools with exact arguments",
+        "The agent preserves the user's requested order",
+        "The agent does not call nvapp_overlay_get_status because every target state is explicit",
+        "The agent does not combine multiple operations into an unsupported action array"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-unsupported-qualifier-011",
+      "prompt": "Take a PNG screenshot and save it in D:\\Shots.",
+      "expected_output": "The agent explains that format and destination are unsupported and asks whether to capture to the Overlay gallery. It makes no call before confirmation; after confirmation it calls nvapp_overlay_capture with only action capture_screenshot.",
+      "assertions": [
+        "The agent does not silently discard the PNG or destination requirements",
+        "The agent makes no state-changing call before confirmation",
+        "After confirmation the agent passes no path, format, or enable argument"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-connection-default-012",
+      "prompt": "How should I connect an MCP client to NVIDIA App using this skill on the current default build?",
+      "expected_output": "The agent recommends HTTP at http://127.0.0.1:13508/mcp or the installed stdio bridge and does not request or invent a token.",
+      "assertions": [
+        "The agent gives the default port 13508 and path /mcp",
+        "The agent gives the installed NvAppMcpServer.exe stdio path",
+        "The agent does not reuse NVIDIA Broadcast gateway.json, port range, endpoint path, or startup flow"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-highlights-enable-014",
+      "prompt": "Turn on NVIDIA Highlights for this game.",
+      "expected_output": "The agent invokes nvapp_overlay_capture with action toggle_highlights and enable true, then reports the returned message.",
+      "assertions": [
+        "The agent activates the nvidia-app skill for a Highlights mutation",
+        "The agent calls nvapp_overlay_capture with { action: \"toggle_highlights\", enable: true }",
+        "The agent does not call nvapp_overlay_get_status before or after the explicit enable request",
+        "The agent does not request consent for nvapp_overlay_capture",
+        "The agent reports the returned human-readable message and does not add unreturned fields such as highlightsEnabled"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-negative-desktop-capture-015",
+      "prompt": "Enable NVIDIA Desktop Capture so I can record my desktop.",
+      "expected_output": "The NVIDIA App Overlay workflow is not selected and does not invoke toggle_desktop_capture.",
+      "assertions": [
+        "The agent does not activate the nvidia-app skill for a Desktop Capture mutation",
+        "The agent does not call nvapp_overlay_capture with action toggle_desktop_capture"
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "should_trigger": false
+    },
+    {
+      "id": "nvidia-app-negative-broadcast-016",
+      "prompt": "Use NVIDIA Broadcast to remove keyboard noise from my microphone.",
+      "expected_output": "The agent does not select the NVIDIA App skill and does not invoke any nvapp_overlay tool.",
+      "assertions": [
+        "The agent does not activate the nvidia-app skill",
+        "The agent distinguishes NVIDIA Broadcast from NVIDIA App In-Game Overlay",
+        "The agent does not invoke any nvapp_overlay tool"
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "should_trigger": false
+    },
+    {
+      "id": "nvidia-app-negative-obs-017",
+      "prompt": "Configure OBS to record a window and save it as an MKV.",
+      "expected_output": "The agent treats this as an OBS request and does not select the NVIDIA App skill.",
+      "assertions": [
+        "The agent does not activate the nvidia-app skill",
+        "The agent does not call any nvapp_overlay tool",
+        "The agent does not reinterpret the request as NVIDIA gameplay recording"
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "should_trigger": false
+    },
+    {
+      "id": "nvidia-app-driver-discovery-018",
+      "prompt": "Check whether my NVIDIA graphics driver needs an update.",
+      "expected_output": "The agent selects the nvidia-app skill and calls nvapp_client_get_driver_status with an empty argument object when advertised.",
+      "assertions": [
+        "The agent activates the nvidia-app skill",
+        "The agent confirms nvapp_client_get_driver_status is advertised",
+        "The agent calls nvapp_client_get_driver_status with {}",
+        "The agent reports installed and recommended driver update fields literally",
+        "The agent does not invoke any nvapp_overlay tool"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-game-optimization-discovery-019",
+      "prompt": "Optimize the graphics settings for every game in my NVIDIA library.",
+      "expected_output": "The agent selects the nvidia-app skill and inspects the live tool catalog and schemas before determining whether bulk game optimization is supported and what user input or confirmation is required.",
+      "assertions": [
+        "The agent activates the nvidia-app skill",
+        "The agent does not infer that one advertised per-game tool supports an unadvertised bulk operation",
+        "The agent follows the selected live schema and asks for required input that cannot be inferred safely",
+        "The agent does not invoke any nvapp_overlay tool"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-highlights-disable-020",
+      "prompt": "Turn off NVIDIA Highlights for this game.",
+      "expected_output": "The agent invokes nvapp_overlay_capture with action toggle_highlights and enable false, then reports the returned message.",
+      "assertions": [
+        "The agent activates the nvidia-app skill for a Highlights mutation",
+        "The agent calls nvapp_overlay_capture with { action: \"toggle_highlights\", enable: false }",
+        "The agent does not call nvapp_overlay_get_status before or after the explicit disable request",
+        "The agent reports the returned human-readable message and does not add unreturned fields such as highlightsEnabled"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-rtx-dvc-enable-021",
+      "prompt": "Enable NVIDIA RTX Dynamic Vibrance.",
+      "expected_output": "The agent invokes nvapp_overlay_configure_filters with filter rtx_dvc and enable true, then reports the returned message.",
+      "assertions": [
+        "The agent calls nvapp_overlay_configure_filters with exactly { filter: \"rtx_dvc\", enable: true }",
+        "The agent does not call nvapp_overlay_get_status because the target state is explicit",
+        "The agent does not use another filter value or configure RTX HDR, sharpening, or Freestyle",
+        "The agent does not issue a follow-up verification read"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-rtx-dvc-toggle-022",
+      "prompt": "Toggle RTX Dynamic Vibrance.",
+      "expected_output": "The agent calls nvapp_overlay_get_status once. If rtxDvc is present, it invokes nvapp_overlay_configure_filters with filter rtx_dvc and enable set to the opposite Boolean; if the field is absent, it asks for the target state and makes no mutation call.",
+      "assertions": [
+        "The agent calls nvapp_overlay_get_status with {} before resolving the true toggle",
+        "The agent uses only rtxDvc and does not infer state from rtxHdr, sharpening, or freestyle",
+        "The agent passes filter rtx_dvc and the opposite Boolean when rtxDvc is present",
+        "The agent asks instead of guessing when rtxDvc is missing",
+        "The agent does not issue a follow-up verification read"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-instant-replay-disable-023",
+      "prompt": "Turn off NVIDIA Instant Replay.",
+      "expected_output": "The agent invokes nvapp_overlay_capture with action toggle_instant_replay and enable false.",
+      "assertions": [
+        "The agent calls nvapp_overlay_capture with { action: \"toggle_instant_replay\", enable: false }",
+        "The agent does not call nvapp_overlay_get_status first because the target state is explicit",
+        "The agent reports the returned mutation message without a redundant verification call"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-applications-list-024",
+      "prompt": "List the applications NVIDIA App knows about and show whether each supports optimization.",
+      "expected_output": "The agent calls nvapp_client_get_applications with {} and reports only returned application and optimization fields.",
+      "assertions": [
+        "The agent calls nvapp_client_get_applications with {}",
+        "The agent reports exact game identifiers and opsSupported",
+        "The agent distinguishes omitted optimization profiles from unsupported optimization",
+        "The agent does not invoke a mutation"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-launch-025",
+      "prompt": "Launch Cyberpunk 2077 from my NVIDIA App library.",
+      "expected_output": "The agent resolves the exact catalog game and calls nvapp_client_launch_application with that exact value.",
+      "assertions": [
+        "The agent uses nvapp_client_get_applications to resolve Cyberpunk 2077 unless a fresh exact game value is already established",
+        "The agent calls nvapp_client_launch_application with { game: \"Cyberpunk 2077\" } only after an exact match",
+        "The agent does not pass a path, executable, command line, or guessed display name",
+        "The agent reports the server mutation response literally"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-driver-release-notes-026",
+      "prompt": "Show the release notes for my installed NVIDIA driver.",
+      "expected_output": "The agent calls nvapp_client_get_driver_release_notes with driver INSTALLED and reports its version and available highlights.",
+      "assertions": [
+        "The agent calls nvapp_client_get_driver_release_notes with { driver: \"INSTALLED\" }",
+        "The agent reports driver and version",
+        "The agent accepts an empty highlights array as a valid result",
+        "The agent does not invent release-note items"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-game-optimization-027",
+      "prompt": "Apply the Recommended optimization preset to Cyberpunk 2077 for AC power.",
+      "expected_output": "The agent validates the exact game, optimization support, and AC preset availability, then calls nvapp_client_set_game_optimization with exact arguments if advertised.",
+      "assertions": [
+        "The agent resolves Cyberpunk 2077 with nvapp_client_get_applications",
+        "The agent checks opsSupported and the AC availablePresets",
+        "The agent calls nvapp_client_set_game_optimization with { game: \"Cyberpunk 2077\", preset: \"Recommended\", powerSource: \"AC\" }",
+        "The agent reports the tool as unavailable when it is absent from tools/list"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-laptop-global-read-028",
+      "prompt": "Show my global NVIDIA Battery Boost and Whisper Mode settings.",
+      "expected_output": "The agent calls nvapp_client_get_laptop_features with {} and reports support and only returned global values.",
+      "assertions": [
+        "The agent calls nvapp_client_get_laptop_features with {}",
+        "The agent reports supported for both features",
+        "The agent does not invent enabled, frameRate, fanVolume, or useGlobal when omitted",
+        "The agent does not invoke a mutation"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-laptop-global-set-029",
+      "prompt": "Enable global NVIDIA Battery Boost.",
+      "expected_output": "The agent reads support and calls nvapp_client_set_laptop_feature with exactly one global batteryBoost object if supported.",
+      "assertions": [
+        "The agent reads global laptop features first",
+        "The agent calls nvapp_client_set_laptop_feature with { batteryBoost: { enabled: true } } only when supported",
+        "The agent omits game and useGlobal",
+        "The agent does not include whisperMode"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-game-optimization-default-ac-030",
+      "prompt": "Apply the Recommended optimization preset to Cyberpunk 2077.",
+      "expected_output": "The agent validates the exact game and optimization support, then calls nvapp_client_set_game_optimization without inventing a power source; NVIDIA App defaults the request to AC.",
+      "assertions": [
+        "The agent resolves Cyberpunk 2077 with nvapp_client_get_applications",
+        "The agent checks opsSupported and Recommended preset availability",
+        "The agent calls nvapp_client_set_game_optimization with { game: \"Cyberpunk 2077\", preset: \"Recommended\" }",
+        "The agent does not add powerSource unless the user requests AC or Battery"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-game-optimization-battery-031",
+      "prompt": "Apply the Recommended optimization preset to Cyberpunk 2077 while I am running on battery power.",
+      "expected_output": "The agent validates the exact game, optimization support, and Battery preset availability, then calls nvapp_client_set_game_optimization with Battery as the power source.",
+      "assertions": [
+        "The agent resolves Cyberpunk 2077 with nvapp_client_get_applications",
+        "The agent checks opsSupported and the Battery availablePresets",
+        "The agent calls nvapp_client_set_game_optimization with { game: \"Cyberpunk 2077\", preset: \"Recommended\", powerSource: \"Battery\" }",
+        "The agent uses Battery as the powerSource value"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-game-optimization-resolution-prerequisite-032",
+      "prompt": "Optimize Cyberpunk 2077 for Quality. Its AC profile reports unavailableReason: Presets cannot be applied until the desktop resolution is changed to 2560x1440.",
+      "expected_output": "The agent does not call the optimization setter, reports the returned unavailableReason including desktop resolution 2560x1440, and does not change the display resolution implicitly.",
+      "assertions": [
+        "The agent interprets unavailableReason as a blocking prerequisite",
+        "The agent reports the returned reason including 2560x1440",
+        "The agent does not call nvapp_client_set_game_optimization",
+        "The agent does not change the desktop resolution implicitly",
+        "The agent does not describe the game as lacking OPS support"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    },
+    {
+      "id": "nvidia-app-game-optimization-configuration-prerequisite-033",
+      "prompt": "Revert Cyberpunk 2077 optimization. Its AC profile reports unavailableReason: Presets cannot be applied because the current game configuration is unavailable. Start and close the game or app, or edit its settings, then try again.",
+      "expected_output": "The agent does not call the optimization setter and tells the user to start and then close the game or app, or edit its settings, before refreshing application details and retrying.",
+      "assertions": [
+        "The agent interprets unavailableReason as a blocking prerequisite",
+        "The agent does not call nvapp_client_set_game_optimization even for Revert",
+        "The agent gives the start-and-close or edit-settings recovery guidance",
+        "The agent recommends refreshing nvapp_client_get_applications before retrying",
+        "The agent does not report a successful Revert"
+      ],
+      "expected_skill": "nvidia-app",
+      "expected_script": null,
+      "should_trigger": true
+    }
+  ]
+}

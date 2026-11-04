@@ -7,7 +7,11 @@ This repository is a catalog of NVIDIA-verified agent skills. Skills are maintai
 
 To contribute to a skill or propose a new one, use the contributing guidelines in the relevant source repo. See the [Skill Catalog](README.md#skill-catalog) and [Getting Help & Contributing](README.md#getting-help--contributing) sections in the README for links.
 
-For changes to the catalog itself (fixing links, adding a new product listing), open a [pull request](../../pulls). For catalog-level bug reports, feature proposals, or documentation problems, file an [issue](../../issues/new/choose) using one of the catalog issue templates (Bug Report, Feature Request, Documentation Request or Correction). Questions and general discussion belong in [Discussions](../../discussions); security vulnerabilities follow the disclosure process in [SECURITY.md](SECURITY.md).
+For changes to the catalog itself (fixing links, adding a new product listing), fork the repository and open a [pull request](../../pulls) from your fork. For catalog-level bug reports, feature proposals, or documentation problems, file an [issue](../../issues/new/choose) using one of the catalog issue templates (Bug Report, Feature Request, Documentation Request or Correction). Questions and general discussion belong in [Discussions](../../discussions); security vulnerabilities follow the disclosure process in [SECURITY.md](SECURITY.md).
+
+**Fork-based skill contributions:** Make skill changes in the owning source repository. That repository must have fork support enabled by the NVSkills CI maintainers and use the [latest NVSkills request workflow](https://github.com/NVIDIA/skills/blob/main/.github/workflows/request-nvskills-ci.yml). Grant `svc-nvskills-signing` write access to your fork and ensure the collaborator invitation is accepted, then ask a maintainer/admin of the base repository to comment `/nvskills-ci` on your PR. No App installation or secrets are needed in the fork.
+
+Catalog-only changes, such as documentation, links, or product listings, do not require this signing setup.
 
 ## Recommended Skill Directory Path
 

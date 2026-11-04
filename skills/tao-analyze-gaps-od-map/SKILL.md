@@ -87,16 +87,22 @@ SPEC="$RESULTS_DIR/object_detection.yaml"        # spec lives beside its outputs
 RUN_ROOT=/absolute/path/that/contains/annotations/images/and/results
 GPU_COUNT=1
 
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
+
+RUNTIME_HOME="$RUN_ROOT/.tao-runtime/home"
+mkdir -p "$RUNTIME_HOME/.cache"
 
 docker run --rm --gpus "$GPU_COUNT" --shm-size=8g --network=host \
+  --user "$(id -u):$(id -g)" \
+  -e USER="$(id -un)" -e LOGNAME="$(id -un)" \
+  -e HOME="$RUNTIME_HOME" -e XDG_CACHE_HOME="$RUNTIME_HOME/.cache" \
   -v "$RUN_ROOT:$RUN_ROOT" \
   -w "$RUN_ROOT" \
   "$DS_IMAGE" \
   gap_analysis object_detection -e "$SPEC"
 ```
 
-Do not pass `--user $(id -u):$(id -g)`; some TAO DS images call `getpass.getuser()` at startup and fail when the UID is not in `/etc/passwd`.
+Keep `--user` and the identity env block above. TAO DS images call `getpass.getuser()` at startup; without `USER`/`LOGNAME` they fail with `KeyError: 'getpwuid(): uid not found: <uid>'` because the UID has no `/etc/passwd` entry. Do not work around it by running the container as root; that leaves root-owned outputs. This follows the launch contract in `tao-run-on-docker`.
 
 ## Preflight
 
@@ -109,7 +115,7 @@ docker info > /dev/null
 2. Resolve and pull the data-services image if needed:
 
 ```bash
-DS_IMAGE=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+DS_IMAGE="$(scripts/resolve_versions_key.py images.tao_toolkit.data_services)"
 docker image inspect "$DS_IMAGE" > /dev/null || docker pull "$DS_IMAGE"
 ```
 
@@ -136,4 +142,4 @@ All four artifacts are always written, even when no gaps are found.
 
 **`weak_images.parquet` is empty**: all class metrics are above their thresholds. Lower `default_recall_threshold` / `default_ap50_threshold` or add per-class entries to `weak_thresholds`.
 
-**Output directory not writable after Docker exits**: the container writes as root. Chown back with `docker run --rm -v "$RUN_ROOT:$RUN_ROOT" alpine chown -R "$(id -u):$(id -g)" "$RESULTS_DIR"`.
+**Output directory not writable after Docker exits**: the container ran without `--user`, so it wrote as root. Relaunch with the `--user` and identity env block shown above.

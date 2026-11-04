@@ -1083,10 +1083,29 @@ def main(argv: list[str] | None = None) -> int:
         skipped_paths = {s.path for s in skills_now if s.path not in {e["path"] for e in entries}}
         validate_inventory_round_trip(skills_now, metadata_obj, skills_sh_obj, errors, skipped_paths=skipped_paths)
 
+    # Written before the error gate below. The per-skill reasons are needed
+    # most on the runs that fail validation, but that path used to return
+    # before reaching the reporting block, so the only thing reaching the log
+    # and the tracking issue was the summary line naming which skills had no
+    # entry -- never which field failed enrichment or why. The recovered case
+    # (a published skill kept from the baseline) does not set `errors` and so
+    # always reported correctly, which is why the gap stayed hidden.
+    if skill_warnings:
+        # Structured warnings file for CI to surface in issue bodies.
+        warnings_path = Path("/tmp/skill-warnings.json")
+        warnings_path.write_text(
+            json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
     if errors:
         print("VALIDATION FAILED:", file=sys.stderr)
         for e in errors:
             print(f"  - {e}", file=sys.stderr)
+        if skill_warnings:
+            print("\nPer-skill reasons:", file=sys.stderr)
+            for w in skill_warnings:
+                print(f"  - {w}", file=sys.stderr)
         _print_classification(cls, stream=sys.stderr)
         return 1
 
@@ -1109,12 +1128,6 @@ def main(argv: list[str] | None = None) -> int:
         )
         for w in skill_warnings:
             print(f"  - {w}", file=sys.stderr)
-        # Write a structured warnings file for CI to surface in issue bodies.
-        warnings_path = Path("/tmp/skill-warnings.json")
-        warnings_path.write_text(
-            json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
-            encoding="utf-8",
-        )
     # A skill that could not be built has to fail the run, in both --check and
     # write mode, so CI cannot read a partial success as a pass. Outputs are
     # still rendered first, so the catalog does not lose a skill either way.

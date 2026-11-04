@@ -1,0 +1,22 @@
+[
+  {"query": "Predict the structure of this protein sequence using Boltz2: MTEYKLVVVGACGVGKSALTIQLIQNHFVDE", "should_trigger": true},
+  {"query": "I want to run Boltz2 to get the binding affinity of a small molecule against a kinase", "should_trigger": true},
+  {"query": "Use the Boltz2 NIM to predict a protein-ligand complex with this SMILES: CC(=O)Oc1ccccc1C(=O)O", "should_trigger": true},
+  {"query": "How do I run structure prediction with the Boltz2 microservice on NVIDIA's API?", "should_trigger": true},
+  {"query": "Predict a protein-DNA complex structure using Boltz2", "should_trigger": true},
+  {"query": "Get binding affinity scores for my compound against KRAS G12C using Boltz2 NIM", "should_trigger": true},
+  {"query": "I need to predict biomolecular structure from sequence, can Boltz2 handle RNA too?", "should_trigger": true},
+  {"query": "Run Boltz2 locally with Docker and predict an mmCIF structure for my protein", "should_trigger": true},
+  {"query": "I want to fold a multi-chain protein complex and score binding affinity using BioNeMo", "should_trigger": true},
+  {"query": "Use the hosted NVIDIA Boltz2 API to predict pIC50 for a series of drug candidates", "should_trigger": true},
+  {"query": "Predict protein structure with Boltz2 and save the mmCIF output file", "should_trigger": true},
+  {"query": "I have a protein sequence and a SMILES ligand — predict their complex structure using Boltz2", "should_trigger": true},
+  {"query": "How do I parse a PDB file in Python to extract backbone coordinates?", "should_trigger": false},
+  {"query": "I want to visualize my protein structure in PyMOL — how do I load a CIF file?", "should_trigger": false},
+  {"query": "Design a protein sequence that folds into this backbone PDB structure", "should_trigger": false},
+  {"query": "Run BLAST to find homologs for this protein sequence", "should_trigger": false},
+  {"query": "Generate drug-like molecules with a scaffold similar to ibuprofen", "should_trigger": false},
+  {"query": "Dock a ligand to a protein receptor and find the best binding pose", "should_trigger": false},
+  {"query": "Perform multiple sequence alignment for these 10 protein sequences", "should_trigger": false},
+  {"query": "I want to calculate the molecular weight of aspirin in Python", "should_trigger": false}
+]

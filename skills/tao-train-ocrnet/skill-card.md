@@ -1,5 +1,5 @@
 ## Description: <br>
-Trains, evaluates, exports, prunes, quantizes, retrains, and runs inference for NVIDIA TAO OCRNet scene text recognition models, supporting CTC and attention-based decoders on cropped text-region images. <br>
+OCRNet for scene text recognition that recognizes text content from cropped text-region images, supports CTC and attention-based decoders, and is used when training, evaluating, exporting, pruning, quantizing, retraining, or running inference for a TAO OCRNet model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, and deploying OCRNet scene text recognition models using NVIDIA TAO Toolkit for automated optical character recognition workflows. <br>
+Developers and engineers use this skill to train, evaluate, prune, quantize, retrain, export, and deploy NVIDIA TAO OCRNet scene text recognition models on cropped text-region images using Docker-based TAO containers and TensorRT deploy flows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,15 +25,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TAO Deploy OCRNet](references/tao-deploy-ocrnet.md) <br>
-- [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
+- [OCRNet Deploy (references/tao-deploy-ocrnet.md)](references/tao-deploy-ocrnet.md) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
+- [Schema manifest](schemas/manifest.json) <br>
+- [Train spec template](references/spec_template_train.yaml) <br>
+- [TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks and nested YAML spec files] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Model artifacts (checkpoints, ONNX, TensorRT engines, LMDB datasets) are written to the job-record results directory.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -42,15 +45,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1, each attempt in an isolated sandbox pod. <br>
+1 evaluation task (1 positive), 1 attempt per task, run in isolated k8s-sandbox pods with and without the skill (evaluator version 1.5.6). <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Checks whether the final answer is correct against the reference answer. <br>
-- Discoverability: Checks whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Checks whether the skill helped the agent complete the user's goal and expected workflow. <br>
-- Efficiency: Checks whether wasted tool calls and token usage were avoided. <br>
+- Security: Is it safe to use? <br>
+- Correctness: Is the answer correct? <br>
+- Discoverability: Was the right skill loaded when needed? <br>
+- Effectiveness: Did the skill help complete the task? (goal completion and expected workflow adherence) <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
@@ -59,19 +62,19 @@ Underlying evaluation signals used in this run: <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.4% | 79.7% |
-| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 0.0% → 100.0% (+100.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 0.0% → 100.0% (+100.0 pts) | 70.0% → 100.0% (+30.0 pts) |
-| Efficiency | 97.0% | 99.5% → 98.4% (-1.1 pts) |
+| Overall | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 71.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 75.0% → 58.3% (-16.7 points) |
+| Efficiency | 71.9% — baseline ran, but no comparable score was available; uplift unavailable | 99.6% → 98.4% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

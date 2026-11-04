@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+<package format="3">
+  <name>isaac_cable_insertion_policy_deployment_skill</name>
+  <version>0.1.0</version>
+  <description>ROS dependency inventory for packaged simulation deployment helpers.</description>
+  <maintainer email="info@nvidia.com">NVIDIA Isaac Team</maintainer>
+  <license>Apache-2.0</license>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>isaac_ros_deploy_interfaces</exec_depend>
+  <exec_depend>isaac_ros_deploy_reference_applications</exec_depend>
+  <exec_depend>rmw_fastrtps_cpp</exec_depend>
+</package>

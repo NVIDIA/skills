@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodonFM Setup"
+  short_description: "Set up public CodonFM and Encodon checkpoints"
+  default_prompt: "Use $codonfm-setup to configure the public CodonFM environment and download an Encodon checkpoint."

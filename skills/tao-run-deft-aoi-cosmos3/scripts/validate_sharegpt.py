@@ -115,9 +115,9 @@ def validate_records(
         if resolved in pairs:
             duplicate_pairs.append(list(resolved))
         pairs.add(resolved)
-        # cosmos-rl-evaluate hard-indexes item["id"] and reuses it as the
-        # per-sample output filename, so evaluation splits need a unique,
-        # filesystem-safe id. Training never reads it.
+        # Framework evaluation writes per-sample artifacts keyed by ``id``, so
+        # evaluation splits need a unique filesystem-safe value. Training does
+        # not consume this field.
         record_id = record.get("id")
         if require_id or record_id is not None:
             if not isinstance(record_id, str) or not record_id.strip():
@@ -170,8 +170,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--require-id",
         action="store_true",
-        help="Require a unique, filesystem-safe id per record. Use for the "
-        "Proxy and Benchmark splits: cosmos-rl-evaluate hard-indexes it.",
+        help="Require a unique, filesystem-safe id per record for Framework "
+        "Proxy and Benchmark evaluation.",
     )
     parser.add_argument("--summary", type=pathlib.Path)
     args = parser.parse_args(argv)

@@ -26,13 +26,13 @@
   },
   {
     "id": "tao-finetune-huggingface-model-dedicated-routing-non-cosmos",
-    "question": "A user asks to fine-tune the Hugging Face model nvidia/nv-tesseract-forecasting. Decide whether to use this generic Hugging Face workflow or a dedicated TAO model skill. Do not execute anything.",
-    "expected_skill": "tao-finetune-nv-tesseract-forecasting",
+    "question": "A user asks to fine-tune the Hugging Face model nvidia/Kumo-Forecast. Decide whether to use this generic Hugging Face workflow or a dedicated TAO model skill. Do not execute anything.",
+    "expected_skill": "tao-finetune-kumo-forecast",
     "expected_script": null,
-    "ground_truth": "Do not use the generic Hugging Face workflow. The packaged ownership registry maps nvidia/nv-tesseract-forecasting to tao-finetune-nv-tesseract-forecasting, whose documented uv execution environment remains authoritative.",
+    "ground_truth": "Do not use the generic Hugging Face workflow. The packaged ownership registry maps nvidia/Kumo-Forecast to tao-finetune-kumo-forecast, whose documented uv execution environment remains authoritative.",
     "expected_behavior": [
       "Applies the ownership gate generically rather than special-casing Cosmos",
-      "Routes nvidia/nv-tesseract-forecasting to tao-finetune-nv-tesseract-forecasting",
+      "Routes nvidia/Kumo-Forecast to tao-finetune-kumo-forecast",
       "Uses the dedicated model skill's declared execution environment instead of creating the generic NGC workflow"
     ]
   },

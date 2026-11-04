@@ -15,7 +15,7 @@ compatibility: Requires docker + nvidia-container-toolkit and one or more CUDA G
 metadata:
   author: NVIDIA Corporation
   version: "0.1.0"
-allowed-tools: Read Skill Task Bash Write
+allowed-tools: Read Skill Bash Write
 tags:
 - application
 - workflow
@@ -100,7 +100,13 @@ inputs; Pre-Flight validates them and `init_deft_state.py` pins them, so a run c
 
 ## Launch Intake
 
-After the user confirms they want to run this workflow, ask which supported platform they intend to run on. Discover the execution platforms from the installed platform skills (tao-run-on-docker / -slurm / -kubernetes / -brev). After platform selection, read the chosen platform skill's `## Credentials` section.
+**Do not ask which platform to run on.** This workflow supports one: every stage launches
+with `docker run`, and its `compatibility` line requires docker plus the
+nvidia-container-toolkit. The bank's rule in `AGENTS.md` is to treat a single supported
+platform as the selection and only ask when an application supports several — asking here
+would offer a choice that nothing downstream can act on.
+
+Read `tao-run-on-docker`'s `## Credentials` section.
 
 Never ask for or read credential values. Check only whether the required environment variable is set; if unset, tell the user which variable to export.
 
@@ -121,13 +127,13 @@ Never ask for or read credential values. Check only whether the required environ
 Full detail in `references/pipeline-and-state.md`.
 
 1. **Pre-Flight.** Run every check in `references/preflight.md`. Resolve workspace, specs, annotations, the zero-shot checkpoint, the source-pool embedding parquet, and container images. Hard stop only on missing input you cannot resolve yourself.
-2. **Prep (once, before baseline).** If the source pool is not already labeled and embedded, pseudo-label it with Co-DETR, fold the predictions onto the user's target classes, convert KITTI→COCO→ODVG, and embed the pool. Idempotent — each artifact is skipped when it already exists. See `references/prep-source-pool.md`.
+2. **Prep (once, before baseline).** If the source pool is not already labeled and embedded, pseudo-label it with Co-DETR, fold the predictions onto the user's target classes, convert KITTI→COCO→ODVG, and embed the pool. Skip any step whose output already exists — no script does this for you, so check before each step. See `references/prep-source-pool.md`.
 3. **Baseline (iter_0) — no training.** Run `inference` with the supplied zero-shot / pretrained checkpoint, then `kpi_analyze`. Seed `train_grounding_dino.yaml` from the user's template for later iterations to extend.
 4. **Iterate.** For each iteration 1..`max_iterations`, run the seven stages in order:
    `gap_analysis` → `embed` → `mine` → `stage` → `train` → `inference` → `kpi_analyze`.
    Each iteration's `gap_analysis` consumes the **previous** phase's inference labels. Between stages run the audit and follow its one-line disk-backed next action.
 5. **Stop** when `max_iterations` is reached or a hard-stop gate fires. mAP is reported, not gated — the loop does not early-exit on a metric target.
-6. **Render** `results/DEFT_Loop_Report.md` after each completed iteration and once more at loop end by spawning the `reporter` subagent (`agents/reporter.md`). Never render inline.
+6. **The report renders itself.** `results/DEFT_Loop_Report.md` is written by `init_deft_state.py` and re-rendered by every accepted `commit_stage.py` call. Do not spawn a subagent for it and do not compose it by hand; to refresh it out of band, run `scripts/render_report.py --results-dir "${RESULTS_DIR}"`.
 
 All stages run inline in the parent context. Prefer invoking the underlying `tao-skill-bank:*` skills via the Skill tool, layering loop conventions on top via the matching `references/*.md` overlay.
 
@@ -141,7 +147,9 @@ Each stage maps to one underlying skill or to bundled glue. **Read only the curr
 
 The overlays are written against two loop variables that Pre-Flight sets and every stage uses: `N`, the current iteration number, and `PHASE`, which is `baseline` or `iter${N}`. They are stated here because a stage overlay is read on its own — see `references/preflight.md` for the full set.
 
-If an *overlay* is missing, stop and ask the user to reinstall the plugin — the loop cannot run a stage whose settings it does not have. If a mapped *skill* is unavailable, do not stop and do not improvise: fall back to the overlay's documented `docker run` as described in `references/scripts-and-agents.md`, and record `execution_path=direct-container`. The overlay carries everything the invocation needs, so the fallback produces the same artifacts.
+If an *overlay* is missing, stop and ask the user to reinstall the plugin — the loop cannot run a stage whose settings it does not have. If a mapped *skill* is unavailable, do not stop and do not improvise: fall back to the overlay's documented `docker run` as described in `references/scripts-and-agents.md`, and commit that stage with `--execution-path direct-container` instead of the documented `skill`. The overlay carries everything the invocation needs, so the fallback produces the same artifacts.
+
+On a runtime without a Skill tool (Codex, for example), the mapped skills are still on disk under the plugin root: read `skills/<layer>/<name>/SKILL.md` there for the invocation contract, then run it through the direct-container fallback above, committing the stage with `--execution-path direct-container`. On such a runtime that fallback is the expected route for every stage, not an exception.
 
 | Stage | Overlay | Underlying skill |
 |---|---|---|
@@ -163,7 +171,7 @@ If an *overlay* is missing, stop and ask the user to reinstall the plugin — th
 | One-time source-pool prep (pseudo-label, remap, convert, embed) | `references/prep-source-pool.md` |
 | Pre-Flight checks, defaults, Summary template | `references/preflight.md` |
 | Pipeline stages, state schema, loop-end sequence | `references/pipeline-and-state.md` |
-| Bundled scripts, glue, reporter agent, stage table | `references/scripts-and-agents.md` |
+| Bundled scripts, glue, the report renderer, stage table | `references/scripts-and-agents.md` |
 
 **`max_iterations` defaults to `1`** — one mine, train and score pass, the smallest run that yields a comparison against the baseline. Confirm it with the user when they have not said how many iterations they want; an unattended run takes the default rather than stopping to ask.
 

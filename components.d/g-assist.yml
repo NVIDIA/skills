@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: G-Assist
+repo: NVIDIA/G-Assist
+ref: main
+description: >-
+  Check or change a machine's NVIDIA display and GPU settings such as resolution,
+  refresh rate, V-Sync, G-SYNC, brightness, color, and GPU performance, via the
+  G-Assist MCP server.
+skills:
+  - path: skills/g-assist-mcp-skill/
+    catalog_dir: g-assist-mcp-skill

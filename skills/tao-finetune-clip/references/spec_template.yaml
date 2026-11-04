@@ -80,6 +80,28 @@ train:
   grad_checkpointing: false
   grad_clip_norm: null
   distributed_strategy: ddp
+peft:
+  enabled: false
+  method: lora
+  vision:
+    enabled: false
+    target_modules: [q_proj, k_proj, v_proj, out_proj]
+    num_last_blocks: 3
+    rank: 8
+    alpha: 16
+    dropout: 0.05
+  text:
+    enabled: false
+    target_modules: [q_proj, k_proj, v_proj, out_proj]
+    num_last_blocks: 3
+    rank: 8
+    alpha: 16
+    dropout: 0.05
+regularization:
+  enabled: false
+  embedding_mse_weight: 0.05
+  cosine_weight: 0.05
+  similarity_weight: 0.10
 evaluate:
   checkpoint: null
   trt_engine: null

@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to route ambiguous NVFLARE requests to the appropriate specific workflow skill after inspecting project evidence. <br>
+Developers and engineers use this skill to route ambiguous NVFLARE federated learning requests to the appropriate workflow skill based on automated project inspection evidence. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -27,6 +27,7 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Orientation Routing Reference](references/orientation-routing.md) <br>
 - [NVIDIA FLARE Documentation](https://nvflare.readthedocs.io/en/main) <br>
+- [NVIDIA FLARE Paper](https://arxiv.org/abs/2210.13291) <br>
 
 
 ## Skill Output: <br>
@@ -42,35 +43,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 6 tasks (6 positive) in isolated sandbox pods, each exercising orientation routing and evidence-based skill selection. <br>
+6 evaluation tasks (6 positive) per agent, each in an isolated sandbox pod. Three-tier evaluation: static validation, semantic deduplication, and live agent execution. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helps complete the user's goal and follows expected workflow behavior. <br>
-- Efficiency: Whether the skill avoids wasted tool or skill usage through quality routing. <br>
+- Security: Checks whether the skill is safe to use, covering unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks whether the final answer is correct against the reference answer. <br>
+- Discoverability: Checks whether the right skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Checks whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
+- `skill_execution`: Verifies the expected skill was selected and the workflow executed correctly. <br>
+- `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
+- `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Verifies tool-call productivity; routing is scored under Discoverability. <br>
+- `token_efficiency`: Verifies actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 55% → 80% (+25 points) | 57% → 85% (+28 points) |
-| Security | 92% → 100% (+8 points) | 100% → 100% (±0 points) |
-| Correctness | 60% → 93% (+33 points) | 57% → 93% (+37 points) |
-| Discoverability | 42% → 66% (+25 points) | 33% → 79% (+46 points) |
-| Effectiveness | 54% → 80% (+26 points) | 61% → 66% (+5 points) |
-| Efficiency | 25% → 59% (+33 points) | 35% → 85% (+50 points) |
+| Overall | 82.1% | 87.4% |
+| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Correctness | 73.3% → 73.3% (±0.0 pts) | 73.3% → 90.0% (+16.7 pts) |
+| Discoverability | 80.0% | 84.2% |
+| Effectiveness | 62.9% → 70.1% (+7.2 pts) | 48.6% → 76.9% (+28.3 pts) |
+| Efficiency | 87.1% | 86.1% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

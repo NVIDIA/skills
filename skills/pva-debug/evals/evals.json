@@ -1,0 +1,61 @@
+{
+  "skill_name": "pva-debug",
+  "evals": [
+    {
+      "id": "debug-missing-evidence",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use pva-debug: my GEN2 PVA operator crashes. SDK 2.10.0~rc3, NVVPU, L4T. No source, Doctor report, failing command, log, or reproducer is available. Use /workspace/debug-missing as the report work directory. Do not guess a cause, change code, or ask questions; report the missing evidence.",
+      "expected_skill": "pva-debug",
+      "expected_script": null,
+      "expected_output": "BLOCKED with the missing failure evidence identified. No diagnosis is presented as proved and no repair is claimed.",
+      "assertions": [
+        "Identifies missing source identity, command, log, reproducer, and Doctor evidence.",
+        "Returns BLOCKED before any repair.",
+        "Does not claim REPAIRED or invent a demonstrated cause.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": []
+    },
+    {
+      "id": "debug-exhausted-budget",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. OpGen requests pva-debug attempt 4 with maximum attempts 3. Work directory: /workspace/debug-budget. There are no source or evidence files available in this request. Report whether this repair attempt is permitted. Do not reset the count, modify code, invoke another skill, or ask questions.",
+      "expected_skill": "pva-debug",
+      "expected_script": null,
+      "expected_output": "BLOCKED because attempt 4 exceeds maximum 3; missing evidence may also be reported. No repair attempt is executed.",
+      "assertions": [
+        "Identifies that attempt 4 exceeds the maximum of 3.",
+        "Does not reset, decrement, or disregard the attempt number.",
+        "Does not edit source or invoke OpGen or Build-Test.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": []
+    },
+    {
+      "id": "debug-unverified-corpus",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use pva-debug to assess the reported PVA numerical failure in /workspace/input/unverified/failure.md. The accompanying doctor-report.md states that SDK reference verification was not performed; no source or runnable reproducer is supplied. Use /workspace/debug-unverified as the report work directory. Preserve the supplied failure evidence. Do not run Doctor, invent a repair, or ask questions.",
+      "expected_skill": "pva-debug",
+      "expected_script": null,
+      "expected_output": "BLOCKED because the verified technical basis and required reproducer/source evidence are absent. The recorded tolerance and expected result stay unchanged.",
+      "assertions": [
+        "Identifies missing verified SDK references and executable failure evidence.",
+        "Does not claim a reproduced cause or REPAIRED result.",
+        "Preserves the supplied expected result and tolerance without weakening the check.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/unverified"
+      ]
+    },
+    {
+      "id": "debug-negative",
+      "prompt": "Explain absolute versus relative numerical error with one simple example. This is not a software failure report; do not inspect or change code.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "A correct explanation of absolute and relative error without starting a PVA repair.",
+      "assertions": [
+        "Explains absolute and relative error correctly.",
+        "Does not invoke pva-debug or modify code."
+      ],
+      "files": []
+    }
+  ]
+}

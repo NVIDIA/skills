@@ -1,0 +1,6 @@
+{
+  "purpose": "Synthetic schema fixture for input validation only",
+  "rows": 20,
+  "labels": "Arbitrary binary labels; not measured variant effects, not a scientific training dataset",
+  "splitting": "0.8/0.1/0.1 yields 16/2/2 rows; repeated sequence contexts make this unsuitable for performance evaluation"
+}

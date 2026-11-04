@@ -25,11 +25,30 @@ The following table lists the `Fabric` methods and when to use each:
 | `plan(config, *, base_dir=...)` | No | You need the selected adapter, capability routing, and runtime capabilities before running. | `RunPlan` |
 | `doctor(config, *, base_dir=...)` | Yes | You need preflight diagnostics for adapter resolution, capability routing, declared requirements, and environment assumptions. | `DoctorReport` |
 | `run(config, *, base_dir=..., input=... \| request=...)` | Yes | You need one complete start, invoke, result, and stop cycle. | `RunResult` |
-| `start_runtime(config, *, base_dir=..., overrides=..., streaming=False)` | Yes | You need state across multiple ordered invocations. Pass `streaming=True` with NVIDIA NeMo Relay enabled only to provision `invoke_stream(...)`. | `Runtime` |
+| `start_runtime(config, *, base_dir=..., overrides=..., streaming=False, launch_collector=None, completion_wait_timeout=1.0)` | Yes | You need state across multiple ordered invocations. Pass `streaming=True` with NVIDIA NeMo Relay enabled only to provision `invoke_stream(...)`. | `Runtime` |
+| `prepare_environment(config, *, base_dir=...)` | Yes | Prepare an environment independently of a runtime; preparation depends on provider support. | `EnvironmentHandle` |
+| `attach_environment(config, reference, *, base_dir=...)` | Yes | Verify a caller-owned resource with a typed `EnvironmentReference` when the provider supports attachment. | `EnvironmentHandle` |
+| `start_runtime_in(config, environment, *, base_dir=..., overrides=..., streaming=False)` | Yes | Start a runtime in a typed environment when the selected runtime provider supports it. | `Runtime` |
+| `release_environment(environment)` | Yes | Release the environment separately after runtime stop; local release preserves files. | `None` |
 
 `input` and `request` on `run(...)` are mutually exclusive. Use `input=...` for
 the common case; use `request=RunRequest(...)` when the invocation needs a
 caller-owned `request_id`, `context`, or overrides.
+
+The public `inspect_adapter(config, descriptor)` helper returns an immutable
+`AdapterCapabilityProfile` for standalone host admission without harness SDKs.
+Both `run()` and `start_runtime()` accept optional
+`expected_descriptor_sha256` to verify the task plan's descriptor before startup.
+The profile is configuration-dependent for telemetry and excludes workflow
+targets and attached services. It is not observed execution provenance.
+
+OpenShell environments use `start_runtime_in` with a prepared or attached
+handle. They support buffered invocation and multiple independent bridge
+runtime IDs per sandbox. Invocations for different runtime IDs can proceed
+independently. The task SDK owns each runtime ID and normalized result. Declared
+files become host paths under the configured artifact destination; a failed SDK
+result still carries its output, error, and artifacts. Lost responses are not
+replayed. See the [OpenShell provider guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/environment-providers/openshell/README.md).
 
 ## Runtime Methods
 
@@ -40,6 +59,7 @@ The following table lists the `Runtime` members for driving a stateful runtime.
 | `invoke(*, input=... \| request=...)` | Yes | One turn on an active runtime. One active invocation at a time; overlap raises `FabricStateError`. |
 | `invoke_openai_stream(*, input=... \| request=...)` | No | Start exactly one descriptor-gated native invocation and return an async `OpenAIInvokeStream` of `chat.completion.chunk` mappings. Await `stream.result()` for the separate terminal `RunResult`. |
 | `invoke_stream(*, input=... \| request=...)` | No | Start one NeMo Relay turn and return an async `InvokeStream` of raw ATOF records. Await `stream.result()` for the terminal `RunResult`. |
+| `resource_snapshot()` | Yes | Timestamped memory, process count, and CPU time of the local adapter host and its descendants. Does not wait for an active invocation. |
 | `stop()` | Yes | Stop the runtime. Called automatically by `async with`. |
 | `status` | No | `RuntimeStatus`: `ACTIVE`, `STOPPED`, or `FAILED`. |
 | `supports_openai_streaming` | No | `True` when the selected descriptor declares `capabilities.streaming` for native OpenAI Chat Completions chunks. |

@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to validate Isaac for Healthcare simulation workflows by running policy or rule-based rollouts and verifying simulator success for evaluation, checkpoints, or local controllers. <br>
+Developers and engineers use this skill to evaluate Isaac for Healthcare simulation workflows by running policy or rule-based rollout modes and inspecting recorded episodes for simulator success. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -30,7 +30,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Analysis] <br>
+**Output Type(s):** [Analysis, Shell commands] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -42,35 +42,35 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-20 evaluation tasks (20 positive), each run in an isolated sandbox pod. <br>
+Evaluated against 20 internal evaluation tasks (20 positive), each running in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Is the answer correct? Measures final-answer correctness against the reference answer. <br>
-- Discoverability: Was the right skill loaded when needed? Checks whether the expected skill was found and executed. <br>
-- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Did it avoid wasted tool or skill usage? Measures routing quality, workspace-aware skill reads, and productive tool use. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Checks whether the skill helped complete the user's goal and followed the expected workflow. <br>
+- Efficiency: Checks tool-call productivity and token efficiency to avoid wasted usage. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `skill_efficiency`: Tool-call productivity measured against expected tool-use patterns. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 38% → 66% (+28 points) | Not available |
-| Security | 95% → 40% (-55 points) | Not available |
-| Correctness | 7% → 91% (+84 points) | Not available |
-| Discoverability | 48% → 83% (+36 points) | Not available |
-| Effectiveness | 4% → 31% (+27 points) | Not available |
-| Efficiency | 37% → 86% (+50 points) | Not available |
+| Overall | 73.0% — uplift unavailable | 58.3% — uplift unavailable |
+| Security | 90.0% → 80.0% (-10.0 points) | 25.0% → 22.5% (-2.5 points) |
+| Correctness | 4.0% → 88.0% (+84.0 points) | 63.0% → 91.0% (+28.0 points) |
+| Discoverability | 94.8% — uplift unavailable | 80.0% — uplift unavailable |
+| Effectiveness | 2.7% → 26.2% (+23.5 points) | 24.4% → 42.8% (+18.4 points) |
+| Efficiency | 75.9% — uplift unavailable | 55.1% — uplift unavailable |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

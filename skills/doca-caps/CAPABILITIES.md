@@ -72,7 +72,7 @@ public DOCA Capabilities Print Tool guide:
    available logger names of DOCA libraries. Useful when configuring
    `doca_log_*` filters.
 
-The flags the binary registers in `tools/caps/main.c` are
+The documented flags are
 `--list-devs`, `--list-rep-devs`, `--list-libs`, `--list-loggers`,
 `--pci-addr` (scope to a single PCIe address), and `--lib`. Any of
 the `--list-*` flags above can be combined with `--pci-addr` /
@@ -90,13 +90,13 @@ not assume legacy generic-CLI flags work.
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see [`doca-version`](../../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The doca_caps-specific overlay** is:
 
-- **`doca_caps` is available since DOCA 2.6.0.** On older installs the binary is not present; the right answer for *"I can't find doca_caps"* is to confirm the installed version per [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure) and, if `< 2.6.0`, route to [`doca-setup`](../../doca-setup/SKILL.md) for an upgrade rather than recommending alternative tools.
+- **`doca_caps` is available since DOCA 2.6.0.** On older installs the binary is not present; the right answer for *"I can't find doca_caps"* is to confirm the installed version per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`) and, if `< 2.6.0`, route to `doca-setup/SKILL.md` for an upgrade rather than recommending alternative tools.
 - **Where it runs:** on the x86 / Arm host that has DOCA installed, *or* on the BlueField Arm side. Same binary, same flags; the set of devices it sees differs by execution context.
-- **Output format stability:** the documented capability families (the five listed in [`## Capabilities and modes`](#capabilities-and-modes)) are stable across the recent DOCA train. The exact textual / column layout of the output is **not** contractually frozen — agents that need to consume the output programmatically should prefer the structured `doca-capability-snapshot` helper per [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md#schemas) when present, and re-verify the textual layout against the user's installed version when absent.
+- **Output format stability:** the documented capability families (the five listed in [`## Capabilities and modes`](#capabilities-and-modes)) are stable across the recent DOCA train. The exact textual / column layout of the output is **not** contractually frozen — agents that need to consume the output programmatically should prefer the structured `doca-capability-snapshot` helper per `doca-structured-tools-contract/SKILL.md#schemas` when present, and re-verify the textual layout against the user's installed version when absent.
 - **Per-OS library support:** capability family 3 ("DOCA library list") explicitly varies with the OS the install runs on; do not copy a library-availability claim from one host to another.
 
 ## Error taxonomy
@@ -111,7 +111,7 @@ the agent should distinguish, in escalating order:
    - (a) DOCA is not installed on this host at all — `pkg-config
      --modversion doca-common` errors with `Package 'doca-common' was
      not found`. Routing: full install via
-     [`doca-setup ## install`](../../doca-setup/TASKS.md#configure).
+     `doca-setup ## install` (`doca-setup/TASKS.md#configure`).
    - (b) The install is < DOCA 2.6.0 (the first release that ships
      `doca_caps`). `pkg-config --modversion doca-common` returns
      `2.5.x` or earlier. Routing: upgrade to ≥ 2.6.0, or use the
@@ -126,12 +126,14 @@ the agent should distinguish, in escalating order:
      `doca-common`. This is the most common cause on lab boxes and
      CI containers that pinned a minimal install. Confirm via:
      `pkg-config --modversion doca-common` succeeds AND `ls
-     /opt/mellanox/doca/tools/doca_caps` errors. Routing: confirm
-     the package name with `apt-cache policy doca-caps` FIRST, then
-     run `apt install doca-caps` (or, on older releases, the legacy
-     `apt install doca-tools`) — NOT a full `doca-all` reinstall,
-     and NOT a version downgrade. See
-     [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)
+     /opt/mellanox/doca/tools/doca_caps` errors. Routing: this
+     skill does not install packages — hand off to
+     `doca-setup/SKILL.md` with that evidence. The fix there is the
+     single missing tools package (`doca-caps`, or the legacy
+     `doca-tools` on older releases; confirm the name with
+     `apt-cache policy doca-caps`), NOT a full `doca-all`
+     reinstall and NOT a version downgrade. See
+     `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)
      partial-install table.
    - (c2) **Package installed, binary off-PATH (DOCA 3.3+ default).**
      `dpkg -l doca-caps` shows the package as `ii` AND
@@ -162,8 +164,8 @@ the agent should distinguish, in escalating order:
    the user expected is excluded by the chosen `--pci-addr` scope.
    This is a *capability-snapshot finding*, not a tool failure —
    route the answer to the consumer of the snapshot
-   ([`doca-setup ## test`](../../doca-setup/TASKS.md#test) or
-   [`doca-programming-guide ## debug`](../../doca-programming-guide/TASKS.md#debug)).
+   (`doca-setup ## test` (`doca-setup/TASKS.md#test`) or
+   `doca-programming-guide ## debug` (`doca-programming-guide/TASKS.md#debug`)).
 4. **Library-capability mismatch.** Tool runs successfully and prints
    capabilities, but the user is asking *"why does library X say it
    doesn't support feature Y on my device?"*. That question belongs
@@ -175,7 +177,7 @@ the agent should distinguish, in escalating order:
 `DOCA_ERROR_*` taxonomy that DOCA libraries return through their C
 API; it is a CLI, not a library call. For that taxonomy and the
 program-side debug order, see
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 
 ## Observability
 
@@ -184,15 +186,15 @@ the bundle — it is *what other skills load to observe* the install
 and the hardware before doing anything that changes state.
 Specifically:
 
-- [`doca-setup ## test`](../../doca-setup/TASKS.md#test) prescribes
+- `doca-setup ## test` (`doca-setup/TASKS.md#test`) prescribes
   running `doca_caps --list-devs` (and `--list-rep-devs` where
   representors are in scope) as the documented install smoke-test.
-- [`doca-programming-guide ## debug`](../../doca-programming-guide/TASKS.md#debug)
+- `doca-programming-guide ## debug` (`doca-programming-guide/TASKS.md#debug`)
   prescribes running `doca_caps` early and **preserving its output
   as a capability snapshot** so subsequent debug steps have ground
   truth instead of guesses.
 - The matching `libs/<library>` skills (e.g.
-  [`doca-flow CAPABILITIES.md ## Capabilities and modes`](../../libs/doca-flow/CAPABILITIES.md#capabilities-and-modes))
+  `doca-flow CAPABILITIES.md ## Capabilities and modes` (`doca-flow/CAPABILITIES.md#capabilities-and-modes`))
   point back at `doca_caps` as the documented source of *coarse*
   per-device per-library capability claims, while reserving
   fine-grained library-internal capability checks for the library's
@@ -201,11 +203,11 @@ Specifically:
 The tool does not emit metrics, traces, or logs of its own beyond
 the printed output. For the program-side observability surface (DOCA
 log levels, `doca_log_*`, `DOCA_LOGGER_*` env vars) see
-[`doca-programming-guide CAPABILITIES.md ## Observability`](../../doca-programming-guide/CAPABILITIES.md#observability).
+`doca-programming-guide CAPABILITIES.md ## Observability` (`doca-programming-guide/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 `doca_caps` is the **safest tool the bundle prescribes**:
 
@@ -238,6 +240,6 @@ log levels, `doca_log_*`, `DOCA_LOGGER_*` env vars) see
 The single canonical public source for `doca_caps` is the **DOCA
 Capabilities Print Tool** page on `docs.nvidia.com`, reachable
 through
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 Do not invent flags, output formats, or capability families beyond
 what that page documents.

@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models, iterating through baseline evaluation, root-cause analysis, synthetic defect generation, data mining, and retraining until a customer-defined quality metric meets its deployment target. <br>
+Developers and engineers use this skill to run the full DEFT AOI improvement loop for NVIDIA TAO VisualChangeNet / ChangeNet PCB inspection models, iterating through baseline evaluation, root-cause analysis, synthetic defect generation, data mining, and retraining until a customer-defined quality metric meets its deployment target, including air-gapped runs with pre-staged assets. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -33,13 +33,18 @@ Mitigation: Review and scan skill before deployment. <br>
 - [data-layout.md](references/data-layout.md) <br>
 - [scripts-and-agents.md](references/scripts-and-agents.md) <br>
 - [air-gap.md](references/air-gap.md) <br>
+- [network-bootstrap.md](references/network-bootstrap.md) <br>
+- [tao-analyze-gaps-visual-changenet.md](references/tao-analyze-gaps-visual-changenet.md) <br>
+- [tao-generate-anomalies.md](references/tao-generate-anomalies.md) <br>
+- [tao-mine-aoi-images.md](references/tao-mine-aoi-images.md) <br>
+- [tao-route-visual-changenet-samples.md](references/tao-route-visual-changenet-samples.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions, Analysis, Files] <br>
 **Output Format:** [Markdown with inline bash code blocks and HTML report] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces DEFT_Loop_Report.html and deployment-gating artifacts under the results directory] <br>
+**Other Properties Related to Output:** [Produces deft_state.json, DEFT_Loop_Report.html, and deployment-gating artifacts under the results directory] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -48,7 +53,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks (3 positive), each with 3 attempts per task in isolated k8s-sandbox pods. <br>
+3 evaluation tasks (3 positive), 1 attempt per task, each attempt in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -72,12 +77,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.2% | 83.8% |
-| Security | 71.4% → 100.0% (+28.6 points) | 83.3% → 100.0% (+16.7 points) |
-| Correctness | 8.6% → 100.0% (+91.4 points) | 26.7% → 93.3% (+66.6 points) |
-| Discoverability | 93.3% | 58.3% |
-| Effectiveness | 23.7% → 92.8% (+69.1 points) | 41.3% → 69.5% (+28.2 points) |
-| Efficiency | 94.9% | 97.7% |
+| Overall | 96.2% | 89.9% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 40.0% → 100.0% (+60.0 points) | 40.0% → 86.7% (+46.7 points) |
+| Discoverability | 98.3% | 85.0% |
+| Effectiveness | 40.6% → 90.0% (+49.4 points) | 52.5% → 88.3% (+35.8 points) |
+| Efficiency | 92.5% | 89.4% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

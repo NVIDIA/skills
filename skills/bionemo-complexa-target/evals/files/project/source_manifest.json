@@ -1,0 +1,14 @@
+{
+  "source_revision": "94009ea7fb683f33f18730553663c0052d484808",
+  "scope": "Supplemental unmodified source snapshots for read-only inspection; supplied to both skill conditions. Other fixtures retain the provenance described in SNAPSHOT.md.",
+  "files": {
+    "configs/search_ligand_binder_local_pipeline.yaml": {
+      "source": "configs/search_ligand_binder_local_pipeline.yaml",
+      "sha256": "7aa3fe060efe7d25766fb0db902c2e210e1c1b1a7d4c2cf3dde05ad80286f05c"
+    },
+    "configs/pipeline/ligand_binder/ligand_binder_generate.yaml": {
+      "source": "configs/pipeline/ligand_binder/ligand_binder_generate.yaml",
+      "sha256": "9df5d517bbb758de870ff02efaaab32d082334a05c5bd031bd8f752384f273a7"
+    }
+  }
+}

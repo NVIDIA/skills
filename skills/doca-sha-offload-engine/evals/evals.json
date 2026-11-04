@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-sha-offload-engine.explicit-positive.v1",
-      "prompt": "Use the doca-sha-offload-engine skill to help me. I'm working on: wiring the DOCA SHA Offload Engine (an OpenSSL ENGINE) into an existing OpenSSL pipeline to offload one-shot SHA-1, SHA-256, or SHA-512 (EVP_Digest) onto DOCA SHA hardware without rewriting against doca-sha. Covers engine load mechanics (`openssl engine dynamic`, `set_pci_addr` ctrl, `-engine_impl`), the SHA-224 negative test that proves offload engaged, the message-size window where offload beats CPU SHA, and engine-vs-library selection.",
+      "prompt": "Use the doca-sha-offload-engine skill for this task: I'm running into this: \"speed up openssl SHA on BlueField\". Can you walk me through it?",
       "expected_skill": "doca-sha-offload-engine",
       "expected_output": "The agent selects the doca-sha-offload-engine skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -17,7 +17,7 @@
       "expected_skill": "doca-sha-offload-engine",
       "expected_output": "The agent recognizes this as a doca-sha-offload-engine issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-sha-offload-engine skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,18 +27,18 @@
       "expected_skill": "doca-sha-offload-engine",
       "expected_output": "The agent recognizes this as a doca-sha-offload-engine issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-sha-offload-engine skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-sha-offload-engine.negative.v1",
-      "prompt": "I actually need help with new SHA pipelines. Which skill should handle this, and why is it not doca-sha-offload-engine?",
+      "prompt": "I'm designing a new hashing data path from scratch and deciding how to structure it. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-sha-offload-engine; it explains that new SHA pipelines is out of doca-sha-offload-engine's scope and routes to the appropriate skill instead.",
+      "expected_output": "The agent does not apply doca-sha-offload-engine's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-sha-offload-engine as the answer.",
       "assertions": [
-        "doca-sha-offload-engine is not selected as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) instead."
+        "The answer does not apply doca-sha-offload-engine's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

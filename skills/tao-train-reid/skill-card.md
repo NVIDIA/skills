@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, and running inference on person re-identification models for cross-camera person matching using NVIDIA TAO Toolkit. <br>
+Developers and engineers training, evaluating, exporting, and running inference on person re-identification models for cross-camera person matching using NVIDIA TAO Toolkit containers. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -28,6 +28,10 @@ Mitigation: Review and scan skill before deployment. <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
+- [spec_template_train.yaml](references/spec_template_train.yaml) <br>
+- [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
+- [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
+- [spec_template_export.yaml](references/spec_template_export.yaml) <br>
 
 
 ## Skill Output: <br>
@@ -43,20 +47,20 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) against skill-evaluator-dataset-snapshot/1. Each task attempt ran in its own isolated sandbox pod. <br>
+1 evaluation task (1 positive) against skill-evaluator-dataset-snapshot/1, with 1 attempt per task. Each task attempt ran in its own isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
+- Security: Whether the skill is safe to use, avoiding unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected and the workflow executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed expected workflow behavior. <br>
+- Discoverability: Whether the right skill was loaded when needed. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and followed the expected workflow. <br>
 - Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected and decoys were avoided. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `skill_efficiency`: Tool-call productivity. <br>
@@ -67,12 +71,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% | 79.7% |
-| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 0.0% → 100.0% (+100.0 pts) | 100.0% → 100.0% (±0.0 pts) |
+| Overall | 94.4% | 67.4% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 80.0% (±0.0 points) |
 | Discoverability | 100.0% | 0.0% |
-| Effectiveness | 5.6% → 100.0% (+94.4 pts) | 75.0% → 100.0% (+25.0 pts) |
-| Efficiency | 97.7% | 99.5% → 98.4% (-1.1 pts) |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 65.0% → 58.3% (-6.7 points) |
+| Efficiency | 72.1% | 99.6% → 98.5% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

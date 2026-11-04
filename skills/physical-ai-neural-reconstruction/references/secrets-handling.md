@@ -3,7 +3,7 @@
 Every sibling skill ships a `Verifying secrets safely` block in its
 Prerequisites section. Always verify prerequisites by running
 `scripts/validate_setup.py` (where it exists) or, for skills without
-one (`ncore`, `physical-ai-datasets`, the router), use
+one (`ncore-data-conversion`, `physical-ai-datasets`, the router), use
 `hf auth whoami` or a length-only shell check. Never write ad-hoc
 bash that interpolates secret values.
 

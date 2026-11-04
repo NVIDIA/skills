@@ -1,0 +1,85 @@
+schema_version: 1
+identity_file: /opt/nvidia/dgx-oobe-customizations/customize.json
+match_semantics: all-fields-exact-case-sensitive
+
+# OEM entries are a product reference, not automatic identification rules.
+systems:
+  - id: nvidia-dgx-spark-founders-edition
+    classification: nvidia-dgx-spark-founders-edition
+    canonical_name: NVIDIA DGX Spark Founders Edition
+    vendor: NVIDIA
+    catalog_status: nvidia-product
+    aliases:
+      - NVIDIA DGX Spark
+      - DGX Spark Founders Edition
+      - DGX Spark FE
+      - DGX Spark
+    match:
+      company: NVIDIA
+      deviceType: DGX Spark
+
+  - id: acer-veriton-gn100-ud11
+    canonical_name: Acer Veriton GN100-UD11
+    vendor: Acer
+    catalog_status: partner-oem
+    aliases:
+      - Veriton GN100-UD11
+
+  - id: asus-ascent-gx10
+    canonical_name: ASUS Ascent GX10
+    vendor: ASUS
+    catalog_status: partner-oem
+    aliases:
+      - Ascent GX10
+
+  - id: dell-pro-max-with-gb10
+    canonical_name: Dell Pro Max with GB10
+    vendor: Dell Technologies
+    catalog_status: partner-oem
+    aliases:
+      - Pro Max with GB10
+
+  - id: gigabyte-atagb10-9000
+    canonical_name: GIGABYTE ATAGB10-9000
+    vendor: GIGABYTE
+    catalog_status: partner-oem
+    aliases:
+      - ATAGB10-9000
+
+  - id: h3c-linseer-megacube
+    canonical_name: H3C LinSeer MegaCube
+    vendor: H3C
+    catalog_status: partner-oem
+    aliases:
+      - H3C MegaCube
+      - LinSeer MegaCube
+      - MegaCube
+
+  - id: hp-zgx-nano-ai-station
+    canonical_name: HP ZGX Nano AI Station
+    vendor: HP
+    catalog_status: partner-oem
+    aliases:
+      - ZGX Nano AI Station
+
+  - id: lenovo-thinkstation-pgx-workstation
+    canonical_name: Lenovo ThinkStation PGX Workstation
+    vendor: Lenovo
+    catalog_status: partner-oem
+    aliases:
+      - ThinkStation PGX Workstation
+
+  - id: msi-edgexpert
+    canonical_name: MSI EdgeXpert
+    vendor: MSI
+    catalog_status: partner-oem
+    aliases:
+      - EdgeXpert
+
+  - id: xfusion-fusionxpark-gb10
+    canonical_name: xFusion FusionXpark GB10
+    vendor: xFusion
+    catalog_status: partner-oem
+    aliases:
+      - FusionXpark GB10
+      - FusionXpark

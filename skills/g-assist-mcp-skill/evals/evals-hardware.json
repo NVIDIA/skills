@@ -1,0 +1,423 @@
+{
+  "skill_name": "g-assist-mcp-skill",
+  "evals": [
+    {
+      "id": "g-assist-mcp-skill-hw-001",
+      "prompt": "Is V-Sync currently on?",
+      "expected_output": "The current V-Sync state, read back from the machine. The agent should answer with a read-only query and change nothing.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Listed the available tools before calling one",
+        "Called gassist_query_feature_status with the vsync feature",
+        "Reported the state without changing it",
+        "Did not call gassist_set_display_vsync"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-002",
+      "prompt": "Turn off V-Sync.",
+      "expected_output": "gassist_set_display_vsync is destructive and confirmation-gated, so the host asks the user to approve and the change is applied only on approval. The agent should relay the outcome from the result text.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_vsync with enable \"0\" (a string, not a boolean)",
+        "Let the host collect the user's confirmation rather than supplying one",
+        "Did not include a confirm argument in the tool call",
+        "Reported the outcome based on the text of the result"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-003",
+      "prompt": "Change my display resolution to 1920x1080.",
+      "expected_output": "The resolution change is confirmed once before it is applied and once after, because it auto-reverts in about 20 seconds unless kept. Both prompts are expected and the tool is called once.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Took the resolution value from the live tool schema rather than a remembered list",
+        "Called gassist_set_display_res exactly once",
+        "Warned the user the screen may flicker and a second keep-or-revert prompt will follow",
+        "Treated the second prompt as the expected keep-or-revert question, not an error",
+        "Did not call the tool again to finish or retry the change",
+        "Reported accurately whether the new mode was kept or reverted"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-004",
+      "prompt": "Set my refresh rate to 500 Hz.",
+      "expected_output": "No consumer panel supports 500 Hz, so either the value is absent from the live enum or the call comes back with prose saying it could not be done. Either way the agent must report failure, not success.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Checked the live refresh rate enum for the requested value",
+        "Read the text of the result rather than relying on the isError flag",
+        "Reported that the refresh rate was not changed",
+        "Offered the highest rate the panel actually supports",
+        "Did not report success because the call returned without an error"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-005",
+      "prompt": "Set this PC up for competitive shooters.",
+      "expected_output": "A short sequence: read the current V-Sync and G-SYNC state, turn V-Sync off, and raise the refresh rate to the panel's maximum. The agent should explain the gated changes before triggering the prompts.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Read current state with gassist_query_feature_status before changing anything",
+        "Used three or fewer tool calls",
+        "Told the user which changes need confirmation before triggering the prompts",
+        "Took the refresh rate value from the live enum",
+        "Summarised what is now true based on the result text"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-006",
+      "prompt": "What has my GPU temperature and utilisation been doing over the last two minutes?",
+      "expected_output": "A read-only metrics plot over the requested window. The agent should request GPU temperature and GPU utilisation for two minutes.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_graphdata with GPU_TEMP and GPU_UTIL",
+        "Set time to 2 and unit to mins",
+        "Changed no settings"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-007",
+      "prompt": "Set my external monitor's colour temperature to 6500K.",
+      "expected_output": "gassist_set_display_color_temp accepts a fixed Kelvin enum that includes 6500, and is available only when the display supports it. If the tool is present the agent should call it with kelvin 6500; if it is gated off on this display it should say so rather than invent a tool.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Checked that gassist_set_display_color_temp is present in the available tools",
+        "Called it with kelvin 6500 taken from the tool's enum, or reported it is unavailable on this display",
+        "Did not invent a tool name or a non-enum Kelvin value"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-008",
+      "prompt": "Cap my frame rate at 120 FPS.",
+      "expected_output": "A frame-rate limit set with the frame-rate limiter tool. The agent should select gassist_frl with fps 120 and must not change the refresh rate instead.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Listed the available tools before calling one",
+        "Called gassist_frl with fps 120",
+        "Did not change the refresh rate instead"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-009",
+      "prompt": "Turn on G-SYNC.",
+      "expected_output": "gassist_set_display_gsync enables G-SYNC and is confirmation-gated, so the host collects approval. The agent should call it with enable \"1\" (a string) and relay the outcome, without adding a confirm argument.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_gsync with enable \"1\" (a string, not a boolean)",
+        "Let the host collect the user's confirmation rather than supplying one",
+        "Did not enable G-SYNC Pulsar or a different tool instead"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-010",
+      "prompt": "Reduce the motion blur on my monitor.",
+      "expected_output": "Motion blur is reduced by G-SYNC Pulsar, a separate tool from G-SYNC. The agent should select gassist_set_gsync_pulsar (enabled true) on a compatible monitor, or report it is unavailable if the display does not support it - not fall back to plain G-SYNC.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Selected the G-SYNC Pulsar tool (gassist_set_gsync_pulsar) rather than plain G-SYNC",
+        "Called it to enable Pulsar, or reported it is unavailable on this display",
+        "Did not silently substitute gassist_set_display_gsync"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-011",
+      "prompt": "Make my monitor adjust its brightness to the room automatically.",
+      "expected_output": "Automatic, ambient-light brightness is Adaptive Brightness - a different tool from a fixed brightness percentage. The agent should select gassist_set_adaptive_brightness to enable it, rather than gassist_set_display_brightness.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Selected gassist_set_adaptive_brightness rather than the fixed-percentage brightness tool",
+        "Enabled adaptive brightness, or reported it is unavailable on this display",
+        "Did not set a fixed brightness percentage instead"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-012",
+      "prompt": "Make my GPU as power-efficient as possible but keep at least 60 FPS.",
+      "expected_output": "This is the max performance-per-watt mode with a target FPS, not a plain frame-rate limit. The agent should select gassist_maxppw and enable it with the 60 FPS target taken from its enum, not gassist_frl.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Selected gassist_maxppw rather than the frame-rate limiter",
+        "Enabled the mode with fps 60 taken from the tool's allowed values",
+        "Did not use gassist_frl to cap the frame rate instead"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-013",
+      "prompt": "Switch my monitor to esports mode.",
+      "expected_output": "gassist_set_monitor_preset switches the monitor image preset between DEFAULT and ESPORTS on supported monitors. The agent should call it with preset ESPORTS, or report it is unavailable if the monitor does not support presets.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_monitor_preset with preset ESPORTS",
+        "Took the preset value from the tool's enum",
+        "Reported unavailable rather than inventing a preset if the monitor lacks support"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-014",
+      "prompt": "Set my monitor brightness to 40%.",
+      "expected_output": "A fixed brightness level via gassist_set_display_brightness with percentage 40 (external monitors only; not laptop panels). The agent should call it once and report the result.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_brightness with percentage 40",
+        "Did not use adaptive brightness for a fixed value",
+        "Reported the outcome, or that it is unsupported on a laptop panel"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-015",
+      "prompt": "Reset my monitor's colours back to default.",
+      "expected_output": "gassist_restore_display_default_settings resets the requested settings; it is a change, so confirmation is collected by the host. The agent should call it with COLOR in the settings list and let the host confirm, not add a confirm argument or reset unrelated settings.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_restore_display_default_settings with COLOR in the settings list",
+        "Let the host collect confirmation rather than supplying one",
+        "Did not reset unrelated settings such as brightness or gamma"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-016",
+      "prompt": "What can G-Assist do on this machine?",
+      "expected_output": "A read-only overview from gassist_help describing the capabilities actually available on this machine. The agent should call the help tool and change nothing.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_help",
+        "Changed no settings",
+        "Summarised the capabilities from the tool result rather than from memory"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-017",
+      "prompt": "Set my monitor contrast to 75.",
+      "expected_output": "gassist_set_display_contrast takes an integer in the 50-150 range (external monitors only, not laptop panels). The agent should call it with contrast 75 as an integer and report the result.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_contrast with contrast 75 as an integer",
+        "Did not treat contrast as a percentage or a fixed enum",
+        "Reported the outcome, or that it is unsupported on a laptop panel"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-018",
+      "prompt": "Set my display gamma to 2.2.",
+      "expected_output": "gamma is a string enum and 2.2 is one of its allowed levels. The agent should call gassist_set_display_gamma with gamma \"2.2\" as a string, not the number 2.2.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_gamma with gamma \"2.2\" as a string, not a float",
+        "Took the value from the tool's enum",
+        "Reported the outcome"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-019",
+      "prompt": "Set my display gamma to 2.1.",
+      "expected_output": "2.1 is not one of the allowed gamma levels (1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6). The agent should not force a non-enum value; it should offer the nearest allowed level (2.0 or 2.2) or ask the user to choose.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Recognised 2.1 is not one of the allowed gamma levels",
+        "Did not call gassist_set_display_gamma with an out-of-enum value",
+        "Offered a valid nearby level (2.0 or 2.2) or asked the user to choose",
+        "Did not report success for an unsupported value"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-020",
+      "prompt": "Set my colour temperature to 6000K.",
+      "expected_output": "6000 is not in the Kelvin enum (4000, 5000, 6500, 7500, 8200, 9300, 10000). The agent should not send a non-enum value; it should offer the nearest allowed value (6500) or ask the user.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Recognised 6000 is not an allowed Kelvin value",
+        "Did not call gassist_set_display_color_temp with a non-enum value",
+        "Offered the nearest allowed value (e.g. 6500) or asked the user to choose",
+        "Did not report success for an unsupported value"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-021",
+      "prompt": "Increase my monitor's colour saturation to 80%.",
+      "expected_output": "gassist_set_display_color_balance accepts either a global percentage or a full 6-axis set, mutually exclusive. A single overall value maps to the global percentage form (percentage 80).",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_color_balance with percentage 80",
+        "Used the global percentage form, not per-axis",
+        "Did not mix the global percentage with per-axis arguments"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-022",
+      "prompt": "Set my monitor saturation per channel to red 60, yellow 50, green 50, cyan 50, blue 70, magenta 50.",
+      "expected_output": "This is the 6-axis form of gassist_set_display_color_balance, which requires all six channels (red, yellow, green, cyan, blue, magenta) together. The agent should send all six and not a global percentage.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_color_balance with all six axes (red, yellow, green, cyan, blue, magenta)",
+        "Used the per-axis form, not the global percentage",
+        "Did not mix the global percentage with the per-axis arguments"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-023",
+      "prompt": "Set my monitor's RGB gain to 90%.",
+      "expected_output": "gassist_set_display_rgb_gain accepts either a global percentage or per-channel red/green/blue, mutually exclusive. An overall value maps to the global percentage (percentage 90).",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_rgb_gain with percentage 90",
+        "Used the global percentage form, not per-channel",
+        "Did not mix global and per-channel arguments"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-024",
+      "prompt": "Set my monitor's RGB gain to red 80, green 75, blue 70.",
+      "expected_output": "This is the per-channel form of gassist_set_display_rgb_gain, which requires red, green, and blue together. The agent should send all three and not a global percentage.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_rgb_gain with red 80, green 75, and blue 70",
+        "Used the per-channel form with all three channels, not the global percentage",
+        "Did not mix global and per-channel arguments"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-025",
+      "prompt": "Set my monitor volume to 30%.",
+      "expected_output": "gassist_set_display_volume sets monitor or system volume as an integer percentage (0-100). The agent should call it with percentage 30.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_volume with percentage 30",
+        "Reported the outcome"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-026",
+      "prompt": "Make my monitor adjust its colour temperature to the room automatically.",
+      "expected_output": "Automatic, ambient-light colour is Adaptive Color, a different tool from a fixed Kelvin value. The agent should select gassist_set_adaptive_color with enable_color true, not gassist_set_display_color_temp.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Selected gassist_set_adaptive_color rather than the fixed colour-temperature tool",
+        "Enabled adaptive colour with enable_color true (a boolean), or reported it is unavailable on this display",
+        "Did not set a fixed Kelvin value instead"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-027",
+      "prompt": "Reset my monitor's RGB gain and colour balance back to default.",
+      "expected_output": "gassist_restore_display_default_settings only supports the keys COLOR, BRIGHTNESS, CONTRAST, GAMMA, and PRESET. There are no restore keys for RGB gain or colour balance, so the agent should say those specific resets are not available rather than invent keys.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Recognised RGB gain and colour balance are not valid restore keys",
+        "Did not invent settings keys or exceed the five allowed values",
+        "Told the user those specific resets are not available (only COLOR, BRIGHTNESS, CONTRAST, GAMMA, PRESET)",
+        "Did not call the tool with unsupported keys"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-028",
+      "prompt": "Remove my frame rate cap.",
+      "expected_output": "gassist_frl uses fps 0 to mean unlimited. The agent should call gassist_frl with fps 0 to remove the cap, not disable it via another tool.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_frl with fps 0 to remove the cap",
+        "Did not use a different tool to remove the limit",
+        "Reported the outcome"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-029",
+      "prompt": "Turn off the power-efficiency mode.",
+      "expected_output": "gassist_maxppw toggles max performance-per-watt mode; enable and fps are both required string values. To turn it off the agent should call gassist_maxppw with enable \"0\" and a valid fps string, not gassist_frl.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_maxppw with enable \"0\" (a string, not a boolean)",
+        "Supplied the required fps argument as one of the allowed strings (\"0\", \"30\", \"60\", \"120\", \"144\")",
+        "Did not use gassist_frl instead",
+        "Reported the outcome"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-030",
+      "prompt": "Show my CPU utilisation for the last 30 seconds.",
+      "expected_output": "A read-only metrics plot via gassist_graphdata. The agent should request the CPU_UTIL metric with time \"30\" (a string) and unit secs, and change nothing.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_graphdata with the CPU_UTIL metric",
+        "Set time to \"30\" as a string and unit to secs",
+        "Changed no settings"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    },
+    {
+      "id": "g-assist-mcp-skill-hw-031",
+      "prompt": "Reset my display resolution back to the default.",
+      "expected_output": "gassist_set_display_res accepts the special value DEFAULT to restore the default resolution. It is a display-mode change, so the same flicker and keep-or-revert behaviour applies.",
+      "assertions": [
+        "Read g-assist-mcp-skill/SKILL.md",
+        "Called gassist_set_display_res with the DEFAULT value",
+        "Called gassist_set_display_res exactly once",
+        "Warned the user the screen may flicker and a keep-or-revert prompt will follow",
+        "Did not call the tool again to keep, revert, or retry the mode change",
+        "Did not compute or guess a numeric resolution",
+        "Reported whether the mode was kept or reverted"
+      ],
+      "expected_skill": "g-assist-mcp-skill",
+      "expected_script": null
+    }
+  ]
+}

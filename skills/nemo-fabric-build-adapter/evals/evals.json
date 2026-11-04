@@ -80,19 +80,41 @@
   },
   {
     "id": "nemo-fabric-build-adapter-006-relay-request-correlation",
-    "question": "Our in-process third-party adapter uses the common Fabric host and owns the invocation-level NeMo Relay Agent scope. Propagate each Fabric request ID into Relay while preserving useful correlation for both UUID and non-UUID request IDs. Explain the boundary and validation.",
+    "question": "Our in-process third-party adapter uses the common Fabric host and owns the invocation-level NeMo Relay Agent scope. Propagate each Fabric request ID into Relay while preserving useful correlation for both UUID and non-UUID request IDs, and let a caller group invocations into one Relay session. Explain the boundary and validation.",
     "expected_skill": "nemo-fabric-build-adapter",
     "expected_script": null,
-    "ground_truth": "The agent wraps the adapter-owned invocation-level Agent scope with nemo_fabric_adapters.common.utils.relay_request_context(context.request_id). A UUID request ID becomes Relay's propagated root, while every request ID is also emitted as nemo_fabric_request_id metadata; non-UUID values remain metadata only. The adapter does not apply this pattern to an external Relay gateway or an upstream integration that creates an isolated scope unless that boundary accepts a per-turn propagation context. Tests cover UUID and non-UUID IDs, metadata, scope cleanup, and the unsupported boundary without leaking scope state.",
+    "ground_truth": "The agent wraps the adapter-owned invocation-level Agent scope with relay_request_context(context.request_id, request.relay_session_root) from nemo_fabric_adapters.common.utils. A UUID request ID becomes Relay's propagated root, while every request ID is also emitted as nemo_fabric_request_id metadata; non-UUID values remain metadata only. A typed AgentRunRequest.relay_session_root UUID that Relay accepts becomes the root instead, with a UUID request ID as parent (otherwise the session root is also the parent) and nemo_fabric_session_root in the metadata; unusable session roots fall back to a usable UUID request root, otherwise the helper returns nullcontext() without setting propagation. Context keys do not control propagation. The adapter does not apply this pattern to an external Relay gateway or an upstream integration that creates an isolated scope unless that boundary accepts a per-turn propagation context. Tests cover UUID and non-UUID IDs, valid and unusable session roots, metadata, scope cleanup, and the unsupported boundary without leaking scope state.",
     "expected_behavior": [
       "Routes to nemo-fabric-build-adapter",
       "Uses relay_request_context with RuntimeContext.request_id",
       "Uses a UUID request ID as Relay's propagated root",
       "Always preserves the original value as nemo_fabric_request_id metadata",
       "Keeps non-UUID request IDs in metadata without treating them as propagated UUID roots",
+      "Passes request.relay_session_root so its typed UUID becomes the propagated root, with a UUID request ID as parent and the session root as parent otherwise",
+      "Falls back to the request root for a missing or unusable session root",
       "Applies the helper only when the adapter owns the invocation-level Agent scope",
       "Does not claim the same behavior for external gateways or isolated upstream scope boundaries",
-      "Tests UUID and non-UUID correlation plus scope cleanup"
+      "Tests UUID and non-UUID correlation, valid and unusable session roots, plus scope cleanup"
+    ]
+  },
+  {
+    "id": "nemo-fabric-build-adapter-007-warm-session-continuation",
+    "question": "Our custom-agent harness has no durable resume support, but sequential invocations on one live Fabric runtime must retain conversation context. Add warm continuation without inventing a cold-resume API or a shared transcript service. What state belongs where, and how should we test it?",
+    "expected_skill": "nemo-fabric-build-adapter",
+    "expected_script": null,
+    "ground_truth": "The adapter creates and retains a target-native session with suitable deployment retention semantics or adapter-owned history on its per-runtime instance during start. It does not substitute a framework's development-only in-memory checkpointer in a production adapter. Each invoke appends the new request to that live state while resetting invocation-only timeout, counters, results, usage, and telemetry. Retained history has a deliberate bound; if consumers control it, the adapter publishes a typed setting with explicit units, defaults, validation bounds, and overflow behavior rather than overloading runtime.max_turns. Stop discards the state, and independent runtimes never share it. The implementation does not add durable resume, a Fabric-owned transcript store, or generic adapter-common history utilities. Tests require a second result that depends on the first turn without caller replay, direct evidence that prior context reaches the target, a history-bound case, and separate-runtime isolation.",
+    "expected_behavior": [
+      "Routes to nemo-fabric-build-adapter",
+      "Uses the existing start, ordered invoke, and stop lifecycle",
+      "Retains target-native or adapter-owned context on the per-runtime instance",
+      "Avoids framework checkpointers that are documented only for development or testing",
+      "Bounds retained history and documents any consumer-controlled setting and overflow behavior",
+      "Separates retained session state from invocation-only state",
+      "Does not introduce cold resume, durable storage, or a new resume method",
+      "Does not put framework-specific conversation history in adapter-common",
+      "Tests a context-dependent second invocation without caller replay",
+      "Tests that prior context reaches the target and that the history bound is enforced",
+      "Tests isolation between independent runtimes and cleanup at stop"
     ]
   }
 ]

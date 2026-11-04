@@ -23,7 +23,7 @@ The annotation file root is one JSON array, not JSONL. `images` is always
 This skill does not accept rich answers, reasoning tags, captions,
 multiple-choice fan-out, or label-derived prose.
 
-`id` is **required on the Proxy and Benchmark splits**: `cosmos-rl-evaluate`
+`id` is **required on the Proxy and Benchmark splits**: Framework Evaluate
 hard-indexes `item["id"]` and reuses it as the per-sample output filename, so a
 record without one fails the evaluator with `KeyError: 'id'` — the first GPU job
 the workflow submits. It must be unique within the file and filesystem-safe. A
@@ -108,7 +108,9 @@ combined training JSON.
 "$PYTHON" "$SKILL_ROOT/scripts/validate_split_contract.py" \
   --workspace "$WORKSPACE" \
   --synthetic "$RESULTS_DIR/$LABEL/anomalygen/sdg_sharegpt.json" \
-  --train "$RESULTS_DIR/$LABEL/assemble/train_iter_${ITERATION}.json"
+  --train "$RESULTS_DIR/$LABEL/assemble/train_iter_${ITERATION}.json" \
+  --manifest "$RESULTS_DIR/manifests/benchmark_manifest.json" \
+  --summary "$RESULTS_DIR/$LABEL/validate/split_contract_summary.json"
 ```
 
 For N>1, also pass
@@ -118,12 +120,13 @@ current iteration skipped AnomalyGen.
 
 `--validation-report` is the `validate_sharegpt.py --summary` output; keep the
 `validate_split_contract.py --summary` beside it as a sibling artifact. Their
-shapes differ — only the first has a top-level `mode` and an integer `records`,
-which is what the committed validation stage records.
+shapes differ — only the first has top-level `mode`, integer `records`, `labels`,
+`unique_target_images`, and `require_files`, which is what the committed
+validation stage records.
 
-The iteration cannot train until this report records
-`mode=bare_okng`, a positive record count, exact labels, unique targets, and
-existing files. The split validator must also prove that every generated Train
+The iteration cannot train until this report records `mode=bare_okng`, a
+positive record count, exact OK/NG label counts summing to that count,
+`require_files=true`, and one `unique_target_images` entry per record. The split validator must also prove that every generated Train
 target comes from Mining, the immediate `--previous-train` seed, or the current
 iteration's `--synthetic` output. It verifies that the new Train retains every
 preceding record and that none of these targets overlap Proxy or Benchmark.

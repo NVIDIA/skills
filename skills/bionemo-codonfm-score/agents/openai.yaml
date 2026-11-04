@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodonFM Variant Scoring"
+  short_description: "Score coding variants with public Encodon models"
+  default_prompt: "Use $codonfm-score to validate and score coding variants with a public Encodon checkpoint."

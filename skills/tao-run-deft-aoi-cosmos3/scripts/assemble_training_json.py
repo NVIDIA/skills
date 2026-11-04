@@ -139,7 +139,13 @@ def _build_parser() -> argparse.ArgumentParser:
         type=pathlib.Path,
         help="Previous iteration training JSON. Omit for iter1.",
     )
-    parser.add_argument("--new-json", action="append", default=[], type=pathlib.Path)
+    parser.add_argument(
+        "--new-json",
+        action="append",
+        default=[],
+        type=pathlib.Path,
+        help="Current real Mining or synthetic AnomalyGen records; repeat for each producer.",
+    )
     parser.add_argument("--output", required=True, type=pathlib.Path)
     parser.add_argument("--summary", default=None, type=pathlib.Path)
     parser.add_argument("--dedupe", action="store_true")

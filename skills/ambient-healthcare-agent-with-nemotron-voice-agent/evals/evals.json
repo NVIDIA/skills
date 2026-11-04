@@ -1,0 +1,55 @@
+{
+  "skill_name": "ambient-healthcare-agent-with-nemotron-voice-agent",
+  "evals": [
+    {
+      "id": "nva-ambient-explicit-welcome",
+      "prompt": "Use $ambient-healthcare-agent-with-nemotron-voice-agent to customize NVA Generic into an appointment-making healthcare voice agent. If that named skill is unavailable, state that it is unavailable and stop; do not search for or install it.",
+      "expected_output": "The final assistant message is exactly the following three lines after line-ending normalization, with no extra text: Welcome to the NVIDIA Nemotron Voice Agent (NVA for short). We will customize NVA for creating ambient healthcare agents.\nNow I will make a fresh clone of the Nemotron Voice Agent repository, and this will be the directory we work out of. Where would you like me to clone the repo to? Please provide a path.\nIf you already have a clone of the repository somewhere, please point me to the path. The assistant then waits and makes no operational tool call.",
+      "assertions": [
+        "The final assistant message equals these three lines byte-for-byte after line-ending normalization: Welcome to the NVIDIA Nemotron Voice Agent (NVA for short). We will customize NVA for creating ambient healthcare agents.\nNow I will make a fresh clone of the Nemotron Voice Agent repository, and this will be the directory we work out of. Where would you like me to clone the repo to? Please provide a path.\nIf you already have a clone of the repository somewhere, please point me to the path.",
+        "Apart from invoking the named Skill loader, no filesystem, shell, network, repository-inspection, or mutation tool call is made before the user supplies or confirms an NVA path."
+      ],
+      "files": [],
+      "expected_skill": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "expected_script": null
+    },
+    {
+      "id": "nva-ambient-public-endpoint-env-disclosure",
+      "prompt": "Continue this skill workflow. The user selected the NVA checkout at /workspace/nva-clinic. Its markers and compatibility checks passed, and /workspace/nva-clinic/.env was created from .env.example. The inspected Generic defaults are public NVIDIA AI Endpoints. Present the runtime choices to me now. Do not run inference or apply an overlay.",
+      "expected_output": "The assistant offers public NVIDIA endpoints as the default alongside local NIM, existing NIM, and mixed choices. In the same message it tells the user to fill in NVIDIA_API_KEY in /workspace/nva-clinic/.env if they choose public endpoints, explains that the key authenticates public endpoint access, and does not request the secret in chat.",
+      "assertions": [
+        "The response offers public NVIDIA endpoints, NVA-managed local NIMs, existing NIM endpoints, and a mixed layout.",
+        "The response gives the exact /workspace/nva-clinic/.env path and instructs the user to fill in NVIDIA_API_KEY there for public endpoints.",
+        "The response explains why the key is needed, keeps the secret out of chat, and makes no inference or overlay tool call."
+      ],
+      "files": [],
+      "expected_skill": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "expected_script": null
+    },
+    {
+      "id": "nva-ambient-scenario-disclosure",
+      "prompt": "Continue this skill workflow. Repository compatibility and disposable Docker Compose startup passed. I selected public NVIDIA endpoints, but the Generic app has not been started. Resolved LLM destination: NVIDIA Llama 3.3 Nemotron Super 49B at https://integrate.api.nvidia.com/v1. Ask me which preset or custom workflow to create, but do not apply anything yet. If the matching installed skill is unavailable, state that and stop; do not search for or install one.",
+      "expected_output": "The assistant asks the required scenario question, presents all three choices, names the actual LLM destination, discloses both fictional example datasets with names and dates of birth, and waits without applying an overlay.",
+      "assertions": [
+        "The response contains the appointment-making, patient-intake, and custom choices.",
+        "The response names the resolved endpoint and discloses the specific fictional patient identities packaged with both examples.",
+        "No overlay or live conversation is run before the user selects a scenario."
+      ],
+      "files": [],
+      "expected_skill": "ambient-healthcare-agent-with-nemotron-voice-agent",
+      "expected_script": null
+    },
+    {
+      "id": "nva-ambient-negative-ordinary-deploy",
+      "prompt": "Explain how to deploy the stock Nemotron Voice Agent Generic example without healthcare customization and how to select its standard ASR and TTS services. Give guidance only; do not run commands or modify files.",
+      "expected_output": "The target skill does not activate. The assistant routes to the public NVA deployment and configuration documentation without emitting the healthcare welcome.",
+      "assertions": [
+        "The target skill's Required Welcome is absent.",
+        "The response does not claim that healthcare customization is needed."
+      ],
+      "files": [],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

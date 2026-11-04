@@ -1,0 +1,97 @@
+# Render with scripts/render_cfw_sft.py. This profile is capped at five steps.
+[job]
+task = "vlm"
+experiment = "tao_cr3_aoi"
+project = "deft_cr3_aoi"
+group = "train"
+name = "__TAO_CR3_RUN_NAME__"
+wandb_mode = "disabled"
+
+[model]
+attn_implementation = "cosmos"
+precision = "bfloat16"
+lora_enabled = true
+lora_rank = 16
+lora_alpha = 32
+lora_dropout = 0.05
+lora_target_modules = "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj"
+lora_bias = "none"
+lora_use_rslora = false
+lora_modules_to_save = ""
+lora_precision = "bfloat16"
+qwen3_vl_patch_embed = "auto"
+
+[model.backbone]
+model_name = "__TAO_CR3_MODEL__"
+safetensors_path = "__TAO_CR3_MODEL__"
+
+[model.ema]
+enabled = false
+
+[model.parallelism]
+data_parallel_shard_degree = -1
+data_parallel_replicate_degree = 1
+context_parallel_shard_degree = 1
+cfg_parallel_shard_degree = 1
+
+[model.compile]
+enabled = false
+compile_dynamic = true
+
+[model.activation_checkpointing]
+mode = "full"
+save_ops_regex = ["fmha"]
+preserve_rng_state = true
+determinism_check = "default"
+
+[optimizer]
+betas = [0.9, 0.999]
+fused = true
+keys_to_select = ["lora_"]
+lr = 1.0e-4
+weight_decay = 0.01
+
+[scheduler]
+cycle_lengths = [5]
+f_max = [1.0]
+f_min = [0.5]
+f_start = [0.05]
+warm_up_steps = [1]
+
+[trainer]
+distributed_parallelism = "fsdp"
+grad_accum_iter = 1
+logging_iter = 1
+max_iter = 5
+run_validation = false
+
+[trainer.callbacks.grad_clip]
+clip_norm = 1.0
+force_finite = false
+
+[trainer.callbacks.tao]
+enabled = true
+status_file_path = "/tao/results/status.json"
+experiment_name = "deft_cr3_aoi_train"
+logging_interval = 1
+
+[checkpoint]
+keys_to_skip_loading = []
+load_path = "__TAO_CR3_RESUME__"
+save_iter = 5
+save_freq_in_epoch = 0
+dcp_async_mode_enabled = false
+
+[dataloader_train]
+max_samples_per_batch = 1
+max_sequence_length = 40960
+seed = 42
+
+[custom]
+annotation_path = "__TAO_CR3_TRAIN_ANNOTATION__"
+media_root = "__TAO_CR3_MEDIA_ROOT__"
+seed = 42
+fsdp_master_dtype = "bfloat16"
+model_max_length = 40960
+annotation_mode = "bare_okng"
+images_per_record = 2

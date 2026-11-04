@@ -61,8 +61,8 @@ The resulting `kpi:` block:
 kpi:
   iou_threshold: 0.5
   conf_threshold: 0.0        # from state; the run's own setting — see below
-  num_recall_points: 11      # 11-point interpolated AP; 101 selects COCO-style
-  ignore_sqwidth: 40         # TAO emits 0, which scores smaller boxes
+  num_recall_points: 101     # COCO-style interpolation; 11 selects the VOC curve
+  ignore_sqwidth: 0          # score every box, including small ones
   filter: false
   is_internal: false
 ```
@@ -79,8 +79,8 @@ say so once, at init, and have every phase honour it.
 
 ### These values are the leaf skill's defaults too
 
-`tao-analyze-detection-kpi` ships the same `conf_threshold: 0.0`, `num_recall_points: 11`
-and `ignore_sqwidth: 40`, so delegating to it and applying this overlay agree by default.
+`tao-analyze-detection-kpi` ships the same `conf_threshold: 0.0`, `num_recall_points: 101`
+and `ignore_sqwidth: 0`, so delegating to it and applying this overlay agree by default.
 They stop agreeing on `conf_threshold` as soon as a run sets its own, which is why this
 stage passes it explicitly rather than relying on the leaf's default. Apply the overlay
 and the `--set` anyway: the agreement is a fact about the current versions, not a
@@ -205,9 +205,17 @@ stray row and a quietly wrong mean. Pass `--expect-classes` either way.
 ```bash
 <skill_root>/scripts/deft_python.sh <skill_root>/scripts/commit_stage.py \
   --results-dir "${RESULTS_DIR}" --iter-label "<phase>" --stage kpi_analyze \
+  --execution-path skill \
   --kpi-csv "${RESULTS_DIR}/<phase>/kpi/kpi_calc.csv" \
   --kpi-log "${RESULTS_DIR}/<phase>/kpi/kpi_analyze.log" \
   --map-value "$MAP_VALUE" \
   --duration-sec "$(( SECONDS - started ))" \
   --summary "kpi: mAP=<value>"
 ```
+
+`--map-value` is required on an `ok` commit. The per-phase mAP is the loop's result, so a
+phase scored without one has not succeeded, and the commit is refused rather than letting
+the loop advance past a missing point in the trend. If `kpi_analyze` printed `mAP: nan`, a
+target class has no ground truth in the KPI set; that holds for every phase, since all of
+them score the same set, so commit the stage with `--status error` and fix the KPI mapping
+or the class set.

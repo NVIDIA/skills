@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "PVA Build-Test"
+  short_description: "Build and test a PVA operator on Tegra"
+  default_prompt: "Use $pva-build-test to build this PVA operator, run optional EMU checks when available, and verify it on my directly connected Tegra."

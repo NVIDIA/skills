@@ -1,7 +1,7 @@
 name: video-clip-deploy
 type: model
 network_arch: video-clip
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-deploy  # versions-key: images.tao_toolkit.deploy
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-deploy  # versions-key: images.tao_toolkit.deploy
 data_format: vadr1_chunks
 actions:
   gen_trt_engine:

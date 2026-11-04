@@ -1,0 +1,54 @@
+{
+  "skill_name": "codonfm-setup",
+  "evals": [
+    {
+      "id": "codonfm-setup-001",
+      "prompt": "Prepare instructions for setting up public CodonFM in its development container and downloading Encodon 80M. Use the supplied source and checkpoint metadata. Explain the prerequisites, host directories, and checkpoint location inside the container.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json"
+      ],
+      "expected_output": "Setup and download instructions using the original public Encodon 80M checkpoint, its configuration file, and the checked-in container launcher, with accurate prerequisites and mount paths.",
+      "assertions": [
+        "The download command uses nvidia/NV-CodonFM-Encodon-80M-v1, the supplied revision, NV-CodonFM-Encodon-80M-v1.safetensors, and config.json",
+        "The launcher command uses run_dev.sh with explicit host data/checkpoint directories and explains the /data/checkpoints mount",
+        "The agent explains existing-container replacement behavior before any proposed launch",
+        "The response explains Docker and GPU requirements for model execution and does not claim that setup instructions prove a working environment"
+      ],
+      "expected_skill": "codonfm-setup",
+      "expected_script": null
+    },
+    {
+      "id": "codonfm-setup-002",
+      "prompt": "Can I use the public CodonFM repository for Decodon sequence generation? Check the supplied source before recommending a setup procedure.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json"
+      ],
+      "expected_output": "The agent identifies Decodon generation as unavailable in the supplied public implementation and does not invent a checkpoint or setup procedure.",
+      "assertions": [
+        "The agent identifies Decodon as unavailable in the provided public model configuration",
+        "The agent does not recommend an undocumented Decodon download or implement the missing feature"
+      ],
+      "expected_skill": "codonfm-setup",
+      "expected_script": null
+    },
+    {
+      "id": "codonfm-setup-003",
+      "prompt": "Prepare instructions for installing public CodonFM directly on a CUDA host where Docker is unavailable. Use the supplied source and checkpoint metadata. Include environment setup, checkpoint paths, and checks to run before model execution.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json"
+      ],
+      "expected_output": "Direct-host setup instructions using the public dependencies, a Python 3.11 virtual environment, writable cache, and CUDA verification, with user-chosen checkpoint paths.",
+      "assertions": [
+        "The instructions use python3.11 -m venv and python -m pip install -r requirements.txt",
+        "The instructions set MPLCONFIGDIR to a writable location and provide torch.cuda.is_available verification",
+        "The agent uses the direct-host path without requiring Docker",
+        "The response clearly identifies verification still needed before claiming the environment is ready for model execution"
+      ],
+      "expected_skill": "codonfm-setup",
+      "expected_script": null
+    }
+  ]
+}

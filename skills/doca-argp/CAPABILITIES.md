@@ -12,7 +12,7 @@ Read this file when the loader sent you here from
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers an Arg-Parser
 overlay on top of, see
-[`doca-version`](../../doca-version/SKILL.md).
+`doca-version/SKILL.md`.
 
 ## Pattern overview
 
@@ -78,23 +78,27 @@ validation and JSON-config validation Just Work. The enum has
 | `DOCA_ARGP_TYPE_STRING` | `--my-flag VALUE` | `"my-flag": "VALUE"` | File paths, free-form strings |
 | `DOCA_ARGP_TYPE_INT` | `--my-flag 1234` | `"my-flag": 1234` | Queue depth, message size cap, max-num-tasks |
 | `DOCA_ARGP_TYPE_BOOLEAN` | `--my-flag` (presence sets true) | `"my-flag": true` | Enable a code path that is off by default |
-| `DOCA_ARGP_TYPE_DEVICE` | `--my-flag <PCI>` | `"my-flag": "<PCI>"` | A PCIe-address-bearing flag whose value the Arg Parser opens as a `doca_dev` for you (e.g. `--device 0000:03:00.0`) — preferred over hand-rolling the device open via `DOCA_ARGP_TYPE_STRING` |
-| `DOCA_ARGP_TYPE_DEVICE_REP` | `--my-flag <rep>` | `"my-flag": "<rep>"` | A representor-name-bearing flag whose value the Arg Parser opens as a `doca_dev_rep` for you (e.g. `--representor pf0vf0`) — DPU-side counterpart to `_TYPE_DEVICE` |
+| `DOCA_ARGP_TYPE_DEVICE` | `--my-flag pci/<BDF>[,devargs]` | `"my-flag": {"type": "pci", "identifier": "<BDF>"}` (optional `"devargs"`) | A device flag whose value the Arg Parser opens as a `doca_dev` for you (e.g. `--device pci/0000:03:00.0`) — preferred over hand-rolling the device open via `DOCA_ARGP_TYPE_STRING` |
+| `DOCA_ARGP_TYPE_DEVICE_REP` | `--my-flag pci/<BDF>,<rep>[,devargs]` | `"my-flag": {"type": "pci", "identifier": "<BDF>,<rep>"}` (optional `"devargs"`) | A representor flag whose value the Arg Parser opens as a `doca_dev_rep` for you (e.g. `--representor pci/08:00.0,pf0vf1`) — DPU-side counterpart to `_TYPE_DEVICE` |
 | `DOCA_ARGP_TYPE_DOUBLE` | `--my-flag 12.5` | `"my-flag": 12.5` | Floating-point knobs (e.g. timeouts in seconds, fractional caps) |
 | JSON config file *(special, not a type)* | `--json /path/to/file.json` (or `-j`) | n/a (this IS the JSON file) | Drive any of the above from a file instead of expanding argv. The real flag is `--json` / `-j`, NOT `--json-config` — do not invent the longer name. |
 
-**The standard DOCA CLI surface.** Every shipped sample already
-registers these (via `doca_argp_init` and a small set of
-default params) so the user learns ONE CLI for all of DOCA.
+**The standard DOCA CLI surface.** `doca_argp_init` registers a fixed
+set of built-in DOCA flags (printed under "DOCA Flags" by `--help`) so
+the user learns ONE CLI for all of DOCA. Device / representor flags
+(e.g. `--device`, `--representor`) are NOT built-in: each program
+registers its own, typically as `DOCA_ARGP_TYPE_DEVICE` / `_DEVICE_REP`
+(syntax `pci/<BDF>[,devargs]`; representor `pci/<BDF>,pf0vf1`).
 Modifications must preserve this surface.
 
 | Flag | Value type | Meaning |
 | --- | --- | --- |
-| `--device <PCI>` | String (PCIe address, e.g. `0000:03:00.0`) | Which `doca_dev` the program opens |
-| `--representor <name>` | String (representor name, e.g. `pf0vf0`) | Which `doca_dev_rep` the DPU side opens (Comch and similar libraries) |
-| `--rep-list` | Bool flag | Print the visible representors and exit (DPU-side discovery) |
-| `--json <path>` / `-j <path>` | String (path to a JSON file) | Read parameter values from a JSON file instead of expanding argv. The flag is registered as `--json` (`-j`) by `doca_argp.cpp::register_param` (the internal static helper; the public entry point is `doca_argp_register_param`); the bundle previously called this `--json-config`, which is not the real flag. |
-| `--sdk-log-level <level>` | String (one of the DOCA Log level names) | Set the SDK-side DOCA Log threshold for this run |
+| `-h` / `--help` | Bool flag | Print the help synopsis (DOCA Flags + Program Flags) and exit |
+| `-v` / `--version` | Bool flag | Print program version information and exit |
+| `-l <N>` / `--log-level <N>` | Numeric level: 10=DISABLE, 20=CRITICAL, 30=ERROR, 40=WARNING, 50=INFO, 60=DEBUG, 70=TRACE | Set the program (app-side) DOCA Log level for this run |
+| `--json <path>` / `-j <path>` | String (path to a JSON file) | Read parameter values from a JSON file instead of expanding argv. The flag is registered as `--json` (`-j`) by the library itself (the public registration entry point is `doca_argp_register_param`); there is no `--json-config` flag. |
+| `--sdk-log-level <N>` | Numeric level, same 10-70 scale (e.g. `60` = DEBUG) | Set the SDK-side DOCA Log threshold for this run |
+| `--log-filter <list>` | String (comma-separated module names) | Filter logs from specific modules |
 
 **JSON-config integration.** The `--json <path>` flag (also
 short-form `-j <path>`; the long name is `--json`, NOT
@@ -121,7 +125,7 @@ before recommending the Arg Parser path.
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body lives
+`doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The Arg-Parser-specific overlay** is:
@@ -132,19 +136,19 @@ there; this skill does not duplicate it.
   every package profile. Use `pkg-config --exists doca-argp`
   for the presence check FIRST, then `pkg-config --modversion
   doca-argp` for the version. Per the cross-cutting rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the build-time `pkg-config` value is the authority for *"is
   this library available for me to link against?"*.
 - **`doca-argp.pc` and `doca-common.pc` must both match
   `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   A common partial-install pattern after a DOCA upgrade is
   that `doca-argp.pc` lingers from the previous release; route
-  to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any Arg-Parser-layer diagnosis.
 - **Headers in $(pkg-config --variable=includedir doca-common)
   win over public docs.** Per the headers-win-over-docs rule
-  in [`doca-version`](../../doca-version/SKILL.md), if a
+  in `doca-version/SKILL.md`, if a
   public Arg Parser doc page mentions a `doca_argp_*` symbol
   that is not in the installed `doca_argp.h`, the headers
   describe what *this* install can call; the docs describe
@@ -156,7 +160,7 @@ there; this skill does not duplicate it.
 Arg-Parser-specific overlays on the cross-library
 `DOCA_ERROR_*` taxonomy. The cross-library taxonomy itself
 lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *Arg Parser surface* meaning that the
 agent must disambiguate before falling back to the
 cross-library response.
@@ -165,7 +169,7 @@ cross-library response.
 | --- | --- | --- |
 | `DOCA_ERROR_BAD_STATE` | `doca_argp_register_param` after `doca_argp_start`; a second `doca_argp_start` in the same process; any `doca_argp_*` call after `doca_argp_destroy` | Lifecycle violation. Walk the lifecycle table in [`## Capabilities and modes`](#capabilities-and-modes); the most common case is the program registering an extra param inside the value-callback of another param (i.e. during `_start`, not before). |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_argp_start` when an argv value (or JSON-config value) does not match the registered param's declared type | Type mismatch. Re-check the registered type vs. the value the user is passing (e.g. param declared as `int` but operator wrote `--my-flag 0x40`). The fix is on the declaration side OR the operator side, not a retry. |
-| `DOCA_ERROR_NOT_SUPPORTED` | `doca_argp_start` when a JSON-config key is not the long name of any registered param (pedantic parsing rejects the unknown field — see `doca_argp.cpp::json_keys_validation`) | The JSON file references a flag the program never registered. Either the key is a typo, or the program is older than the JSON config it is being fed. Diff the registered long names against the JSON keys. |
+| `DOCA_ERROR_NOT_SUPPORTED` | `doca_argp_start` when a JSON-config key is not the long name of any registered param (pedantic parsing rejects the unknown field) | The JSON file references a flag the program never registered. Either the key is a typo, or the program is older than the JSON config it is being fed. Diff the registered long names against the JSON keys. |
 | `DOCA_ERROR_IO_FAILED` | `doca_argp_start` when `--json <path>` (or `-j <path>`) points at a file the process cannot open or read | File-system failure (missing path, wrong permission, JSON syntax error). Resolve at the OS layer (`ls -l <path>`; `cat <path> \| jq .`) before any code change. |
 | `DOCA_ERROR_NOT_SUPPORTED` (operator-side) | `doca_argp_start` against argv containing an unknown long / short name (an unsupported program flag, per the `doca_argp_start` doc in `doca_argp.h`) | The operator passed a flag the program never registered. The fix is on the operator side; the program may surface its own `--help` listing all registered params via the per-param descriptions. |
 
@@ -203,18 +207,18 @@ Three primary signals the agent should reach for:
    cross-cutting observability primitives
    (`DOCA_LOG_LEVEL=trace`, `--sdk-log-level`, the trace build
    flavor) in
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability),
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`),
    the Arg Parser routes its own messages through DOCA Log; a
    trace-level run shows the per-param parse calls and the
    JSON-config file read.
 
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The Arg Parser's safety surface is **lower-stakes than most DOCA
 libraries** for string, integer, boolean, and double parameters: that
@@ -276,21 +280,21 @@ elsewhere:
   layered on top if a feature is genuinely required.
 - **DOCA Core context, progress engine, and `doca_mmap`
   internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   Arg Parser is upstream of the Core context (it parses the
   CLI that selects which device the Core context will open);
   it does not redefine the Core context.
 - **DOCA Log internals** (registry names, per-source level
   filters) — owned by the public DOCA Log guide reachable
   through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
   Arg Parser registers `--sdk-log-level` as a default flag but
   does not own the log layer it configures.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the Arg Parser overlay, not the taxonomy
   itself.
 - **Cross-cutting debug ladder** (install / version / build /
   link / runtime / program / driver) — owned by
-  [`doca-debug ## debug`](../../doca-debug/TASKS.md#debug).
+  `doca-debug ## debug` (`doca-debug/TASKS.md#debug`).
   This skill's `## debug` overlays the program layer.

@@ -10,7 +10,7 @@ Read this file when the loader sent you here from
 (the verbs `configure / build / modify / run / test / debug`),
 jump to [TASKS.md](TASKS.md). For the canonical DOCA
 version-handling rules that this skill layers an EC overlay on
-top of, see [`doca-version`](../../doca-version/SKILL.md).
+top of, see `doca-version/SKILL.md`.
 
 ## Pattern overview
 
@@ -52,7 +52,7 @@ Two cross-cutting rules that apply to *every* pattern above:
 DOCA Erasure Coding is a **DOCA Core Context**. Every `doca_ec`
 instance follows the universal `cfg-create → cfg-set-* → init →
 start → use → stop → destroy` lifecycle (see
-[`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)).
+`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`)).
 On top of that lifecycle, DOCA Erasure Coding layers its own task
 model with three independent task types and a matrix-type +
 N + K + block-size configuration surface.
@@ -158,7 +158,7 @@ matching `doca_ec_cap_*` query against the active `doca_devinfo`:
 | Create task supported | `doca_ec_cap_task_create_is_supported(devinfo)` | Create is the baseline encode task; if false, the device has no EC accelerator in encode-capable mode and the user must fall back to CPU EC |
 | Recover task supported | `doca_ec_cap_task_recover_is_supported(devinfo)` | Recover is independently capability-gated; agent must not silently assume "create is on => recover is on" |
 | Update task supported | `doca_ec_cap_task_update_is_supported(devinfo)` | Update is independently capability-gated. If a user needs the cheap single-block-change path and update is false, they must either upgrade the device / DOCA install or fall back to re-encoding via create |
-| Galois-multiply task supported | `doca_ec_cap_task_galois_mul_is_supported(devinfo)` | The 4th public task on the EC accelerator — used by the matrix-builder fast path. Independently capability-gated; the bundle previously omitted this row. |
+| Galois-multiply task supported | `doca_ec_cap_task_galois_mul_is_supported(devinfo)` | The 4th public task on the EC accelerator — used by the matrix-builder fast path. Independently capability-gated. |
 | Maximum block size | `doca_ec_cap_get_max_block_size(devinfo)` | Hardware-bound ceiling on per-block size; block sizes larger than this return `DOCA_ERROR_INVALID_VALUE` at submit |
 | Maximum total blocks in one task (`N + K`) | `doca_ec_cap_get_max_buf_list_len(devinfo, &max_buf_list_len)` | Hardware-bound ceiling on the per-task buf-list length, which is the real upper bound on the total `N + K` block count in a single task; layouts with `N + K > max_buf_list_len` return `DOCA_ERROR_INVALID_VALUE` at configure / submit. **There is no `doca_ec_cap_get_max_num_blocks` symbol in the public header — do not invent one.** |
 | Supported matrix variants | *(no public cap query)* | The public header does NOT ship a `doca_ec_cap_get_matrix_*` family. Matrix-variant discovery is done by attempting `doca_ec_matrix_create()` / `doca_ec_matrix_create_from_raw()` against the active device for each variant the user wants to use; treat constructor failure as "variant not supported on this device." |
@@ -179,7 +179,7 @@ coming from the library; query the active capability values via
 
 For the canonical DOCA version-detection chain, the four-way match
 rule, NGC container semantics, and the headers-win-over-docs rule,
-see [`doca-version`](../../doca-version/SKILL.md). The body lives
+see `doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The EC-specific overlay** is:
@@ -192,7 +192,7 @@ there; this skill does not duplicate it.
   `_task_recover_is_supported(devinfo)` /
   `_task_update_is_supported(devinfo)` against the active device.
   Per the cross-cutting cap-query rule in
-  [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability),
+  `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
   the cap query is the runtime authority — never quote any of
   the three task types as available from agent memory.
 - **Matrix-type support is device-bound, not version-bound.** The
@@ -206,12 +206,12 @@ there; this skill does not duplicate it.
   failure mode; the runtime query is the authority.
 - **`doca-erasure-coding.pc` plus `doca-common.pc` must both
   match `doca_caps --version`** at the four-way-match check (per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)).
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)).
   A common partial-install pattern on hosts where the EC package
   was installed separately from the rest of DOCA is that
   `doca-erasure-coding.pc` reports release *X* while
   `doca-common.pc` reports release *Y*; route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before any EC-layer diagnosis.
 - **`doca_ec_task_update` is the youngest of the three task
   types.** When the user reports *"the update API I'm reading
@@ -219,7 +219,7 @@ there; this skill does not duplicate it.
   install pre-dates update support. Confirm via
   `doca_ec_cap_task_update_is_supported(devinfo)`; if false,
   route to
-  [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   before invoking the update codepath, and fall back to recompute
   via `doca_ec_task_create` in the meantime — flag the cost
   difference so the user understands the workaround is not
@@ -229,18 +229,18 @@ there; this skill does not duplicate it.
 
 EC-specific overlays on the cross-library `DOCA_ERROR_*` taxonomy.
 The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *EC surface* meaning that the agent must
 disambiguate before falling back to the cross-library response.
 
 | Error | EC context where it shows up | EC-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; destroying the source or destination `doca_mmap` before `doca_ctx_destroy()`; submitting any task before the matching `set_conf` ran | Lifecycle violation. Walk the call sequence against the lifecycle in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes); the most common case is releasing a source / destination mmap underneath a still-running context. |
+| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; destroying the source or destination `doca_mmap` before `doca_ctx_destroy()`; submitting any task before the matching `set_conf` ran | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing a source / destination mmap underneath a still-running context. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_ec_task_create_allocate_init`, `_recover_allocate_init`, `_update_allocate_init`, `_galois_mul_allocate_init`; submit time | One of: block size > `doca_ec_cap_get_max_block_size(devinfo)`; total block count > `doca_ec_cap_get_max_buf_list_len(devinfo, &max)`; mismatched block sizes between source / destination buffers within a single task; recover with more than K missing blocks; matrix type configured does not match the matrix type associated with the buffers being recovered. Re-run the matching cap query and re-check that EVERY block in the task is the same size. |
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_ec_task_*_set_conf`; matrix-type selection; first submit | The requested task type is not in this device's accelerator (any of create / recover / update / galois_mul can be independently unsupported), OR the matrix variant the user is trying to construct via `doca_ec_matrix_create()` is not supported on this device, OR the user is asking for a coding scheme outside the public Reed-Solomon surface. Re-run the matching `doca_ec_cap_task_*_is_supported` and re-attempt `doca_ec_matrix_create()` for the variant; if either fails, that is the answer — fall back to CPU EC, change matrix variant, or change N + K. |
 | `DOCA_ERROR_NOT_PERMITTED` | First task submission | One or more source mmaps do not have `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY` (or a stronger flag that supersedes it), OR one or more destination mmaps are missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`. Re-check the matrix in [`## Safety policy`](#safety-policy) against EVERY source and destination buffer (EC tasks have multiple buffers on both sides; a missing permission on one block of a 12-block layout is enough to trip this). |
 | `DOCA_ERROR_AGAIN` | `doca_task_submit` on any EC task type | The task queue is full. This is *not* a hardware error; the program must drain completions via `doca_pe_progress()` before re-submitting. Same as the cross-library *"would-block, retry after progress"* pattern. |
-| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure (driver / firmware / accelerator). Capture state and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the EC program. |
+| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure (driver / firmware / accelerator). Capture state and route to env-class debug (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the EC program. |
 
 The agent's rule: **never recommend a retry loop on `DOCA_ERROR_*`
 without first identifying which of the rows above is the cause**.
@@ -285,14 +285,14 @@ Three primary signals the agent should reach for:
 For cross-cutting observability primitives (`--sdk-log-level`,
 the `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env
 var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package
 layout) defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 DOCA Erasure Coding's safety surface is **buffer-permission
 discipline plus path-selection discipline**. The library reads
@@ -389,11 +389,11 @@ elsewhere:
   coding and is asking *how to express it through the DOCA EC
   API*.
 - **DOCA Core context and progress engine internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   This skill *uses* the Core context lifecycle; it does not
   redefine it.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the EC overlay, not the taxonomy itself.
 - **Storage stack design** (how the user's distributed file
   system or object store should layer replication on top of EC,
@@ -408,7 +408,7 @@ elsewhere:
   them; the deep per-library substance lives in the matching
   skill.
 - **Cross-library `doca_caps` invocation patterns** — owned by
-  the cross-library [`doca-caps`](../../tools/doca-caps/SKILL.md)
+  the cross-library `doca-caps/SKILL.md`
   tool skill. This skill references the *EC capability query
   family* (`doca_ec_cap_*`), which is per-library; the
   *cross-library capability snapshot tool* (`doca_caps

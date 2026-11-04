@@ -43,15 +43,16 @@ user’s optional branch/tag to an immutable commit and snapshots that commit to
 runtime checkpoint area. Cosmos3 Nano Omni inputs use the packaged
 `Qwen/Qwen3-VL-8B-Instruct` architecture mapping and the already selected
 backend runtime; the planner resolves both Hub identities to immutable commits.
-The selected image invokes the TAO-owned
-`cosmos_rl.model_preparation.vlm_safetensors` entrypoint. Cosmos-RL packages an
-isolated Framework converter environment pinned by the Framework repository's
-`uv.lock`; Cosmos Framework uses its native environment behind the same
-entrypoint. Its baked `/opt/tao/framework-converter-runtime.json` must attest
+The selected image invokes its backend-owned entrypoint. Cosmos Framework uses
+`cosmos_framework.scripts.convert_model_to_vlm_safetensors` directly in its
+native environment, without importing Cosmos-RL. Cosmos-RL uses the TAO-owned
+`cosmos_rl.model_preparation.vlm_safetensors` wrapper and packages an isolated
+Framework converter environment pinned by the Framework repository's `uv.lock`.
+For Cosmos-RL, the baked `/opt/tao/framework-converter-runtime.json` must attest
 `validation_mode=imported_converter_module`, which proves that the converter
 and its transitive dependencies imported in the isolated interpreter during
-the image build. Reject an existing SQSH before submit if either implementation
-or this import-level attestation is absent.
+the image build. Reject an existing SQSH before submit if the selected
+backend's entrypoint, or Cosmos-RL's import-level attestation, is absent.
 Do not ask a Cosmos-RL user for a donor checkpoint, a second backend image, or
 a second SQSH. The conversion manifest proves the common source model and
 fingerprints the prepared representation. Framework DCP evaluation uses the

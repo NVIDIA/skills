@@ -114,7 +114,13 @@
       "additionalProperties": false,
       "properties": {
         "spec_key": { "type": "string", "minLength": 1 },
-        "type": { "enum": ["file", "folder"] }
+        "type": { "enum": ["file", "folder"] },
+        "relative_path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))\\S+$",
+          "description": "Optional exact path below results_dir for a logical output name. Omit only when the legacy spec_key path is the actual output path."
+        }
       }
     },
     "executionContract": {

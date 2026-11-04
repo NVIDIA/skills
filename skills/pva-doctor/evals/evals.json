@@ -1,0 +1,81 @@
+{
+  "skill_name": "pva-doctor",
+  "evals": [
+    {
+      "id": "doctor-missing-sdk",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use pva-doctor to check readiness for Spec only. PVA_SDK_ROOT is /workspace/input/sdk-not-installed; that SDK is not installed. Target SDK is 2.10.0~rc3, GEN2. No project or target is in scope; EMU is optional. Use /workspace/doctor-check as the work directory. Do not install anything or ask interactive questions.",
+      "expected_skill": "pva-doctor",
+      "expected_script": null,
+      "expected_output": "A NOT_READY report identifies the missing required SDK and unverified reference corpus. It does not claim compilation or hardware checks passed.",
+      "assertions": [
+        "Inspects the supplied SDK path and reports the missing required SDK.",
+        "Writes /workspace/doctor-check/reports/doctor-report.md with a NOT_READY verdict and evidence.",
+        "Does not mark public-reference-corpus PASS or invent a verified reference-lock hash.",
+        "Recommends user-invoked pva-setup for missing installation components without calling it automatically.",
+        "Does not create or repair generated SDK references; recommends user-invoked pva-setup to prepare missing references.",
+        "Does not install software or contact a board.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": []
+    },
+    {
+      "id": "doctor-scoped-prerequisites",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. I only need to prepare a PVA operator specification, not compile or deploy it. Check this host for SDK 2.10.0~rc3, GEN2, with SDK root /workspace/input/sdk-not-installed and work directory /workspace/spec-readiness. There is no SDK at that path. I have no board, no ASIP license, and no emulator; emulation is optional. Do not install software or ask questions.",
+      "expected_skill": "pva-doctor",
+      "expected_script": null,
+      "expected_output": "A readiness report identifies the absent SDK as a required failure. Board, compiler license, and emulator availability do not become required failures for the requested Spec-only task.",
+      "assertions": [
+        "Reports the absent SDK as a required failure and returns NOT_READY.",
+        "Keeps target access and L4T compilation outside the requested scope.",
+        "Does not require an ASIP license or passwordless sudo for Spec-only work.",
+        "Does not classify missing optional emulation as a required failure.",
+        "Does not require PVA Solutions when no Solutions project was requested.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": []
+    },
+    {
+      "id": "doctor-overlapping-output",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use the reference-maintenance part of pva-doctor to check this proposed SDK-reference sync. The test SDK root is /workspace/input/overlap/sdk; its only supplied documentation is a VERSION fixture. The proposed output is /workspace/input/overlap/sdk/share/doc/generated, inside that documentation tree. Use the bundled manifest and materialize_sdk_references.py to check whether this destination is allowed. Keep all input files unchanged; do not choose another output or install anything. This is a path-validation test, not a real SDK readiness check.",
+      "expected_skill": "pva-doctor",
+      "expected_script": "scripts/materialize_sdk_references.py",
+      "expected_output": "The proposed sync is rejected because its output overlaps the SDK documentation tree. The VERSION file remains unchanged and the generated directory is not created.",
+      "assertions": [
+        "Identifies the SDK documentation/output overlap as the reason for rejection.",
+        "Does not create the proposed output or replace SDK documentation.",
+        "Does not claim that the fixture proves SDK readiness.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/overlap"
+      ]
+    },
+    {
+      "id": "doctor-missing-solutions-source",
+      "prompt": "Use pva-doctor for Spec with PVA Solutions selected. Work directory: /workspace/solutions-check. No project path was supplied, and /workspace/solutions-check/source does not exist. SDK root: /workspace/sdk-not-installed; that SDK is also absent. GEN2; optional EMU; no board or compilation. This CI environment has Python only. Check local state and write the Doctor report. Do not install anything, clone, fetch, restore files, use the network, contact a board, or ask questions.",
+      "expected_skill": "pva-doctor",
+      "expected_script": null,
+      "expected_output": "A NOT_READY report includes a required pva-solutions-source FAIL at /workspace/solutions-check/source as well as the missing SDK. It recommends user-invoked Setup without downloading anything.",
+      "assertions": [
+        "Checks /workspace/solutions-check/source as the default Solutions project path.",
+        "Records pva-solutions-source as required FAIL for the missing source even though the SDK is also missing.",
+        "Writes /workspace/solutions-check/reports/doctor-report.md with NOT_READY and evidence for the missing source.",
+        "Recommends user-invoked pva-setup to obtain the source without invoking it automatically.",
+        "Does not install, clone, fetch, restore files, use the network, or contact a board."
+      ],
+      "files": []
+    },
+    {
+      "id": "doctor-negative",
+      "prompt": "Explain what a matrix transpose does, using a two-by-two numeric example. This is a math question; do not check my development environment or create files.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "A correct explanation and example of matrix transposition, without a PVA environment check.",
+      "assertions": [
+        "Explains transposition with a correct numeric example.",
+        "Does not invoke pva-doctor or run environment probes."
+      ],
+      "files": []
+    }
+  ]
+}

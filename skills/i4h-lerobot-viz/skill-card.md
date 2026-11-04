@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to visually verify converted LeRobot datasets by inspecting episode videos, state/action timelines, and metadata in a browser. <br>
+Developers and engineers use this skill to serve and visually inspect converted LeRobot datasets in a browser, verifying episode videos, state/action timelines, and metadata integrity. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,11 +26,10 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Isaac for Healthcare Workflows](https://github.com/isaac-for-healthcare/i4h-workflows) <br>
-- [Skill Benchmark Report](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Shell commands, Analysis] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -42,35 +41,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive), each run in an isolated sandbox pod. <br>
+Evaluated against 2 tasks (2 positive) in isolated k8s-sandbox pods with 3 attempts per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and behavior adherence). <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage through quality routing and productive tool use. <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Measures final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed? Checks whether the expected skill was selected and the workflow executed. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Combines tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 52% → 86% (+34 points) | Not available |
-| Security | 100% → 100% (±0 points) | Not available |
-| Correctness | 60% → 100% (+40 points) | Not available |
-| Discoverability | 49% → 94% (+45 points) | Not available |
-| Effectiveness | 5% → 34% (+29 points) | Not available |
-| Efficiency | 46% → 100% (+54 points) | Not available |
+| Overall | 81.7% — baseline ran, but no comparable score was available; uplift unavailable | 74.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 66.7% (-33.3 points) |
+| Correctness | 35.0% → 100.0% (+65.0 points) | 45.0% → 100.0% (+55.0 points) |
+| Discoverability | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 6.3% → 16.3% (+10.0 points) | 2.5% → 23.3% (+20.8 points) |
+| Efficiency | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 87.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

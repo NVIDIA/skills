@@ -1,6 +1,0 @@
-interface:
-  display_name: "PAIDF Orchestration Environment Setup"
-  short_description: "Audit, prepare, or deploy the PAIDF Orchestration Kubernetes controller and GPU cluster"
-
-policy:
-  allow_implicit_invocation: false

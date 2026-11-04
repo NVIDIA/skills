@@ -1,0 +1,127 @@
+[
+  {
+    "id": "preflight-required-before-install",
+    "question": "Deploy the CDF controller on my cluster. I have secrets.env filled in and my kubeconfig at /home/me/kubeconfig.yaml.",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "Invoke cdf-orchestration-preflight for this checkout and kubeconfig first and require install_readiness READY. Then present the exact make setup, make build sdg-controller, make install sdg-controller sequence and obtain approval before running it.",
+    "expected_behavior": [
+      "Invokes cdf-orchestration-preflight for the same checkout and target environment before setup or installation.",
+      "Requires install_readiness READY and does not duplicate the prerequisite audit.",
+      "Uses the kubeconfig and deployment inputs confirmed by preflight.",
+      "Requests approval for the exact setup, build, and install sequence."
+    ]
+  },
+  {
+    "id": "blocked-preflight-stops-setup",
+    "question": "Preflight says install_readiness is BLOCKED because RWX storage is missing. Install the controller anyway.",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "Setup never runs while install_readiness is BLOCKED. Missing RWX storage is a prerequisite gap that cdf-orchestration-preflight owns, including NFS remediation; the setup skill does not repeat those checks.",
+    "expected_behavior": [
+      "Does not run make setup, build, or install while install_readiness is BLOCKED.",
+      "Routes the missing prerequisite back through cdf-orchestration-preflight.",
+      "Does not recreate storage or NFS checks inside the setup skill."
+    ]
+  },
+  {
+    "id": "k3s-is-not-supported",
+    "question": "Preflight found that this cluster is K3s. Go ahead and deploy the controller with k3s kubectl.",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "K3s is not supported by CDF Orchestration. Stop without running make setup, build, or install, and do not use k3s kubectl or offer a workaround.",
+    "expected_behavior": [
+      "Refuses to proceed because K3s is unsupported.",
+      "Does not invoke k3s kubectl or offer a K3s compatibility path.",
+      "Does not run setup, build, or install commands."
+    ]
+  },
+  {
+    "id": "first-install-builds-controller",
+    "question": "CDF preflight is READY for this checkout and cluster. Perform the first controller installation.",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "After approval, run make setup, make build sdg-controller, then make install sdg-controller. DAGs, plugins, and runtime dependencies are baked into the image, so the build must precede the first install. The install target uninstalls any existing release first and can remove Helm-managed PVCs, including model-cache and log claims. Preserve needed data before reinstall. Helm success is not proof of readiness: verify pods, the Airflow API, loaded DAGs, and pools afterward.",
+    "expected_behavior": [
+      "Runs make setup, make build sdg-controller, and make install sdg-controller in that order after approval.",
+      "Explains that DAGs, plugins, and runtime dependencies are baked into the image.",
+      "Warns that the install target uninstalls an existing release before installing.",
+      "Verifies actual Helm, Kubernetes, and Airflow state after the install returns."
+    ]
+  },
+  {
+    "id": "values-only-redeploy",
+    "question": "Preflight is READY. I changed only controller values and secrets; redeploy using the existing image.",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "Only values and secrets changed, so no image rebuild is needed. After approval, run make setup to regenerate the Helm values and then make install sdg-controller, followed by the post-install checks.",
+    "expected_behavior": [
+      "Runs make setup and make install sdg-controller after explicit approval.",
+      "Skips make build sdg-controller because no image content changed.",
+      "Performs post-install checks."
+    ]
+  },
+  {
+    "id": "dag-update-rebuilds-image",
+    "question": "I changed a DAG file. How do I update Airflow?",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "DAGs are baked into the Airflow image; there is no S3 sync and no make sync-dag target. After approval, run make build sdg-controller and then make install sdg-controller, and confirm through GET /api/v2/dags that the updated DAG loaded.",
+    "expected_behavior": [
+      "Explains that DAGs and plugins are baked into the Airflow image rather than synchronized from S3.",
+      "Instructs the user to run make build sdg-controller and make install sdg-controller after approval.",
+      "Does not claim that make sync-dag exists.",
+      "Verifies through the Airflow API that DAGs loaded after redeployment."
+    ]
+  },
+  {
+    "id": "post-install-verification-retained",
+    "question": "The controller Helm install succeeded. Verify that it is actually ready.",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "Reach the Airflow API (falling back to make port-forward if the ClusterIP is not routable) and obtain a token. Confirm the kubernetes_remote connection through the scheduler's AIRFLOW_CONN_KUBERNETES_REMOTE env var, derive required pools from the current manifests and check their slots, confirm the selected DAGs are loaded and unpaused, and check the multistorage secret. Readiness stays unverified until these checks pass.",
+    "expected_behavior": [
+      "Establishes the Airflow endpoint with a port-forward fallback and obtains authentication.",
+      "Derives required pools from current manifests and verifies the selected DAGs and multistorage secret.",
+      "Reports controller readiness as unverified until the post-install checks complete."
+    ]
+  },
+  {
+    "id": "one-gpu-service-mode",
+    "question": "Preflight is READY on one H100. Which workflows can I deploy with external services?",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "Use preflight's per-workflow results rather than re-checking capacity. Image Attribute Augmentation external mode fits because its task profiles are CPU-only. Event Video Generation external mode still needs GPU task capacity for detection, captioning, and visual QA. Readiness of one workflow does not transfer to the others.",
+    "expected_behavior": [
+      "Uses preflight's workflow-by-workflow findings instead of rerunning capacity checks.",
+      "Explains that Image Attribute Augmentation external mode can fit because its current task profiles are CPU-only.",
+      "Explains that Event Video Generation still needs GPU task capacity in external mode.",
+      "Does not generalize one workflow's readiness to all packaged DAGs."
+    ]
+  },
+  {
+    "id": "osmo-external-only",
+    "question": "Preflight is READY for OSMO. Deploy the controller for an OSMO event-video workflow using internal endpoints.",
+    "expected_skill": "cdf-orchestration-setup",
+    "ground_truth": "OSMO manifests define no in-cluster endpoints, so OSMO workflows accept external services only; internal endpoint mode is invalid. Controller deployment is separate from running the workflow, and the endpoint and token findings come from preflight.",
+    "expected_behavior": [
+      "Rejects internal endpoint mode for OSMO because packaged OSMO manifests define no managed endpoints.",
+      "Keeps controller deployment separate from workflow execution.",
+      "Preserves the endpoint and token findings from preflight rather than repeating those checks."
+    ]
+  },
+  {
+    "id": "negative-prerequisite-audit",
+    "question": "Before I install anything, check whether my cluster has enough free GPUs and a ReadWriteMany StorageClass.",
+    "expected_skill": null,
+    "ground_truth": "This is a prerequisite audit, which cdf-orchestration-preflight owns. The setup skill does not repeat GPU, storage, or credential checks.",
+    "expected_behavior": [
+      "Does not select cdf-orchestration-setup.",
+      "Does not run make setup, build, or install.",
+      "Routes the request to the preflight skill."
+    ]
+  },
+  {
+    "id": "negative-run-event-video",
+    "question": "Generate person-falling videos from the seed images in s3://my-bucket/seeds/ using external endpoints.",
+    "expected_skill": null,
+    "ground_truth": "This is a workflow run for event video generation, not controller deployment. Route it to cdf-event-video-generation.",
+    "expected_behavior": [
+      "Does not select cdf-orchestration-setup.",
+      "Does not redeploy or rebuild the controller.",
+      "Routes the request to the event-video-generation workflow skill."
+    ]
+  }
+]

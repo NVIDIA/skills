@@ -16,3 +16,6 @@ rules:
   - id: "LP1"
     path: "references/tests/test_virtualenv_runner.py"
     reason: "Reviewed FP (#67): MCP least-privilege rule applied to a non-MCP skill. The TAO skill schema declares tooling via allowed-tools and has no permissions field, so the capability cannot be declared."
+  - id: "E2"
+    path: "references/virtualenv_group_supervisor.py"
+    reason: "Reviewed FP (#67): os.environ copy used to build a child-process environment inside the skill's own scripts; the environment stays in-process and is not transmitted."

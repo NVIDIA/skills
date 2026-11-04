@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: NVIDIA App
+repo: NVIDIA/nvidia-app-skills
+ref: main
+
+description: >-
+ NVIDIA App MCP: drivers, games, laptops, overlay. Check drivers, manage and optimize games, configure laptop features.
+skills:
+  - path: skills/nvidia-app/
+    catalog_dir: nvidia-app
+links:
+  contributing: false
+  discussions: false

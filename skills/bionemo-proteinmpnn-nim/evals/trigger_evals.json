@@ -1,0 +1,22 @@
+[
+  {"query": "Design sequences that will fold into this backbone PDB structure using ProteinMPNN", "should_trigger": true},
+  {"query": "I want to run inverse protein folding with the ProteinMPNN NIM microservice", "should_trigger": true},
+  {"query": "Use ProteinMPNN NIM to generate 10 sequence variants for my protein backbone", "should_trigger": true},
+  {"query": "Run the ProteinMPNN NIM locally with Docker to design sequences for my structure", "should_trigger": true},
+  {"query": "How do I run ProteinMPNN via the hosted NVIDIA API and get a FASTA output?", "should_trigger": true},
+  {"query": "I need to redesign protein chains while keeping specific residues fixed using ProteinMPNN", "should_trigger": true},
+  {"query": "Run ProteinMPNN with the soluble model variant to design a water-soluble protein", "should_trigger": true},
+  {"query": "Use ProteinMPNN to design sequences with sampling temperature 0.1 for low diversity", "should_trigger": true},
+  {"query": "I have a PDB backbone from RFDiffusion — run ProteinMPNN to get designed sequences", "should_trigger": true},
+  {"query": "Run ProteinMPNN inverse folding on a multi-chain protein and exclude cysteines", "should_trigger": true},
+  {"query": "Design protein sequences for a binder backbone and score them with ProteinMPNN", "should_trigger": true},
+  {"query": "Use the ProteinMPNN NIM to generate multi-FASTA sequence designs from a PDB file", "should_trigger": true},
+  {"query": "Run Boltz2 to predict structure and binding affinity for a protein-ligand complex", "should_trigger": false},
+  {"query": "Generate drug-like molecules using GenMol with scaffold decoration", "should_trigger": false},
+  {"query": "Run DiffDock to predict binding poses of a small molecule against a receptor", "should_trigger": false},
+  {"query": "Design a protein backbone de novo using RFDiffusion and diffusion steps", "should_trigger": false},
+  {"query": "Generate a multiple sequence alignment using MSA-Search NIM for AlphaFold input", "should_trigger": false},
+  {"query": "I want to mutate residues in a protein sequence to improve thermostability", "should_trigger": false},
+  {"query": "Find the best naturally occurring sequence for this protein fold using BLAST", "should_trigger": false},
+  {"query": "Predict protein structure from sequence using OpenFold3 NIM", "should_trigger": false}
+]

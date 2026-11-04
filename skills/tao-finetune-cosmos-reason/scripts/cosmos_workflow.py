@@ -926,6 +926,9 @@ MODEL_PREPARATION_SQSH_ENTRIES = (
     "cosmos_framework/scripts/convert_model_to_vlm_safetensors.py",
     "opt/tao/framework-converter-runtime.json",
 )
+FRAMEWORK_MODEL_PREPARATION_SQSH_ENTRIES = (
+    "cosmos_framework/scripts/convert_model_to_vlm_safetensors.py",
+)
 MODEL_PREPARATION_RUNTIME_ENTRY = "opt/tao/framework-converter-runtime.json"
 MODEL_PREPARATION_RUNTIME_VALIDATION_MODE = "imported_converter_module"
 MODEL_PREPARATION_RUNTIME_ATTESTATION = (
@@ -2734,6 +2737,8 @@ def _model_preparation(
         args.cache_dir,
         "--runtime-image",
         preparation_image,
+        "--backend",
+        backend,
     ]
     if args.base_model_revision:
         command.extend(["--base-model-revision", args.base_model_revision])
@@ -2787,6 +2792,8 @@ def _model_preparation(
             args.container_cache_dir,
             "--runtime-image",
             preparation_sqsh,
+            "--backend",
+            backend,
         ]
         if args.base_model_revision:
             container_command.extend(
@@ -2854,13 +2861,6 @@ def _preflight_contract(
     )
     imports = [
         "import torch",
-        "from cosmos_rl.model_preparation.vlm_safetensors import inspect_converter_runtime",
-        "converter_runtime=inspect_converter_runtime()",
-        (
-            "assert converter_runtime['module'] == "
-            "'cosmos_framework.scripts.convert_model_to_vlm_safetensors', "
-            "'TAO_PREFLIGHT_ASSERTION_FAILED:model_preparation_runtime'"
-        ),
         "assert torch.cuda.is_available(), 'TAO_PREFLIGHT_ASSERTION_FAILED:cuda_available'",
         (
             f"assert torch.cuda.device_count() == {args.gpus_per_node}, "
@@ -2874,6 +2874,8 @@ def _preflight_contract(
             )
         imports.extend(
             [
+                "from cosmos_framework.scripts import convert_model_to_vlm_safetensors as converter_module",
+                "assert converter_module.__file__, 'TAO_PREFLIGHT_ASSERTION_FAILED:model_preparation_runtime'",
                 "import cosmos_framework",
                 "import inspect",
                 "import os",
@@ -3027,6 +3029,13 @@ def _preflight_contract(
     else:
         imports.extend(
             [
+                "from cosmos_rl.model_preparation.vlm_safetensors import inspect_converter_runtime",
+                "converter_runtime=inspect_converter_runtime()",
+                (
+                    "assert converter_runtime['module'] == "
+                    "'cosmos_framework.scripts.convert_model_to_vlm_safetensors', "
+                    "'TAO_PREFLIGHT_ASSERTION_FAILED:model_preparation_runtime'"
+                ),
                 "import cosmos_rl",
                 "import av",
                 "import inspect",
@@ -5565,6 +5574,11 @@ def local_preflight(
                     args,
                     path=preparation_sqsh,
                     host=inspection_host,
+                    entries=(
+                        FRAMEWORK_MODEL_PREPARATION_SQSH_ENTRIES
+                        if plan["backend"] == "cosmos-framework"
+                        else MODEL_PREPARATION_SQSH_ENTRIES
+                    ),
                 )
             except WorkflowError as exc:
                 errors.append(str(exc))

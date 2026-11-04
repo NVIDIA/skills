@@ -1,0 +1,294 @@
+{
+  "skill_name": "runai-get-utilization-overview",
+  "description": "CI smoke suite: idle, bursty, memory-loaded, fractional, unmeasured, and sparse GPU holders at project, department, and node-pool scope, plus routing, identity, write-refusal, and out-of-scope cases. All tools replay offline; no live cluster is contacted. Cluster 10000000-0000-4000-8000-0000000000a1 replays a live recording of a small cluster with simulated GPUs; cluster 30000000-0000-4000-8000-0000000000d1 is a synthetic cluster with twelve GPU-holding projects; cluster 40000000-0000-4000-8000-0000000000e1 is a synthetic cluster on version 2.20, which rejects the GPU memory utilization metric. As on the real server, get_cluster_metrics ignores nodePoolName for allocation and utilization. Unless a case says otherwise, values are for the default 7-day window.",
+  "evals": [
+    {
+      "id": "A1-idle-holders-7d",
+      "prompt": "Which projects on cluster 30000000-0000-4000-8000-0000000000d1 hold GPUs but aren't actually using them?",
+      "expected_output": "Leads with vision-train: 16 GPUs at about 3% average (p95 6%) over the last 7 days, IDLE, about 15.5 idle GPUs and about 2,607 idle GPU-hours. Other IDLE holders: llm-serving (4 GPUs, 2% avg / 4% p95, GPU memory about 86%, so a model is loaded but not computing) and batch-etl (1.5 GPUs from three 0.5-GPU workloads, 2% avg / 3% p95). UNDER_UTILIZED: nlp-research (16 GPUs, 31% avg / 78% p95, bursty, not idle, about 11.0 idle GPUs), robotics-sim (8 GPUs, 47% / 49%), chat-api (4 GPUs, 12% / 35%). WELL_UTILIZED: speech-asr (64%), recsys (72%), ads-ranking (55%). ads-ranking returns partialData (no GPU memory series) but its utilization is present, so it is classified normally. genomics (2 GPUs) has no utilization series and is UNKNOWN. Checked 10 of 12 GPU-holding projects; doc-ocr (1 GPU) and kb-search (0.5 GPU) were not checked. Idle right now in vision-train: vit-pretrain-3 (6 of 8 GPUs idle), vit-notebook-a (4 of 4), vit-notebook-b (4 of 4). It may note that vision-train holds 16 GPUs against a deserved quota of 8 and point to runai-audit-assigned-quota for reclaiming. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "uses list_project_resources to find the projects holding GPUs",
+        "calls get_org_unit_metrics with a 7-day window for at most 10 projects",
+        "names vision-train as the biggest waste with average and p95 utilization",
+        "does not call nlp-research idle; reports it as bursty or under-utilized",
+        "reports genomics as unknown instead of estimating its utilization",
+        "states that 10 of 12 GPU-holding projects were checked",
+        "lists idle workloads as a current snapshot, not an idle duration",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "A2-fractional-holder",
+      "prompt": "Is batch-etl on cluster 30000000-0000-4000-8000-0000000000d1 wasting GPUs? It only runs small jobs.",
+      "expected_output": "Yes. batch-etl holds 1.5 GPUs through three 0.5-GPU workloads (etl-embed-1, etl-embed-2, etl-embed-3) and averages about 2% GPU utilization (p95 3%) over the last 7 days: IDLE, about 1.5 idle GPUs and about 247 idle GPU-hours. All three workloads have 0.5 idle GPUs right now (a snapshot). Fractional allocations count as fractions of a device, and utilization on shared devices is approximate. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "calls get_org_unit_metrics for batch-etl over a 7-day window",
+        "reports 1.5 held GPUs as fractional allocations",
+        "classifies batch-etl as IDLE with average and p95 utilization",
+        "lists the three etl-embed workloads as idle right now",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "A4-idle-gpus-right-now",
+      "prompt": "Which allocated GPUs are sitting idle right now on cluster 30000000-0000-4000-8000-0000000000d1?",
+      "expected_output": "Right now 10 running workloads have idle allocated GPUs, about 23 GPUs in total: vit-pretrain-3 (6 of 8), vit-notebook-a (4 of 4), vit-notebook-b (4 of 4) in vision-train; llama-70b-api (4 of 4) in llm-serving; chat-api-v2 (2 of 4) in chat-api; ocr-batch (1 of 1) in doc-ocr; etl-embed-1, etl-embed-2, etl-embed-3 (0.5 each) in batch-etl; kb-embed (0.5) in kb-search. This is a point-in-time snapshot from idleAllocatedGpus, not how long they have been idle. It may add recent utilization per project. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "calls list_workloads with gpuIdleOnly for the cluster",
+        "lists the idle workloads with their idle GPU counts",
+        "says idleAllocatedGpus is a current snapshot, not an idle duration",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "A5-utilization-by-department",
+      "prompt": "Show GPU utilization by department on cluster 30000000-0000-4000-8000-0000000000d1.",
+      "expected_output": "Over the last 7 days: research holds 50 GPUs at about 30% average (p95 49%), UNDER_UTILIZED, about 34.9 idle GPUs and about 5,860 idle GPU-hours; platform holds 18.5 GPUs at about 35% (p95 49%), UNDER_UTILIZED, about 11.9 idle GPUs and about 2,006 idle GPU-hours; applied holds 1.5 GPUs at about 6% (p95 10%), UNDER_UTILIZED, about 1.4 idle GPUs and about 236 idle GPU-hours. research is the biggest waste; it may offer the project-level view of research (vision-train is its idle project). It may compare with department quota from list_departments (gpuQuota: research 48, platform 24, applied 4). Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "uses list_departments to find the departments holding GPUs",
+        "calls get_org_unit_metrics with orgType department for each",
+        "reports average and p95 utilization and idle GPUs per department",
+        "names research as the biggest waste",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "A6-node-pool-waste",
+      "prompt": "Which node pool on cluster 30000000-0000-4000-8000-0000000000d1 has the most allocated but idle GPUs?",
+      "expected_output": "a100-train has the most idle held GPUs: 34.5 GPUs held at about 31% average utilization (p95 about 39%) over the last 7 days, about 23.7 idle held GPUs and about 3,975 idle GPU-hours. h100-train: 27 held, about 38% (p95 about 69%, bursty), about 16.6 idle, about 2,794 idle GPU-hours. l40s-infer: 8.5 held, about 7% (p95 about 18%), about 7.9 idle, about 1,333 idle GPU-hours. cpu-pool has no GPUs. Pool numbers come from get_org_unit_metrics with nodePoolName (department or project series per pool); get_cluster_metrics with nodePoolName returns cluster-wide numbers on this server (70 of 112 GPUs for every pool), and reporting those as a pool's numbers is wrong. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "builds per-pool numbers from get_org_unit_metrics with nodePoolName",
+        "does not report cluster-wide get_cluster_metrics series as a pool's numbers",
+        "names a100-train as the pool with the most idle held GPUs",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "A7-drill-vision-train",
+      "prompt": "Which workloads in vision-train on cluster 30000000-0000-4000-8000-0000000000d1 are idle, and how busy has the project been this week?",
+      "expected_output": "vision-train holds 16 GPUs at about 3% average (p95 6%) over the last 7 days: IDLE, about 15.5 idle GPUs, about 2,607 idle GPU-hours. Idle right now: vit-pretrain-3 (6 of 8 GPUs idle), vit-notebook-a (4 of 4), vit-notebook-b (4 of 4), 14 of 16 held GPUs. vit-sweep-9 is pending and holds no GPUs. The idle counts are a current snapshot. Per-workload utilization over the week is offered, or fetched with get_workload_metrics for these 3 workloads. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "calls get_org_unit_metrics for vision-train over a 7-day window",
+        "calls list_workloads with gpuIdleOnly and the vision-train projectId",
+        "names the three idle workloads with their idle GPU counts",
+        "labels the idle counts as a current snapshot",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "A8-gpu-hours-last-24h",
+      "prompt": "How many GPU-hours did we waste in the last 24 hours on cluster 30000000-0000-4000-8000-0000000000d1?",
+      "expected_output": "About 1,157 idle GPU-hours over the last 24 hours cluster-wide (about 48.2 idle held GPUs, from get_cluster_metrics converted to held GPUs), or about 1,095 across the 9 checked projects with data (about 45.6 idle GPUs); either total is correct if it says what it covers. Per project: vision-train about 372, nlp-research about 265, robotics-sim about 102, llm-serving about 94, chat-api about 84, speech-asr about 69, recsys about 40, batch-etl about 35, ads-ranking about 32. genomics has no utilization data; doc-ocr and kb-search (1.5 GPUs together) were not checked. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "uses window last_24h",
+        "computes idle GPU-hours from allocation and utilization",
+        "states which projects are excluded or unknown",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "C2-missing-utilization-unknown",
+      "prompt": "How well is genomics using its GPUs on cluster 30000000-0000-4000-8000-0000000000d1?",
+      "expected_output": "genomics holds 2 GPUs (in a100-train), but get_org_unit_metrics returns partialData with no gpuUtilization series, so its utilization is UNKNOWN. The skill says the metric is unavailable and does not estimate it from the department, the pool, or memory use. It may add that its workload gwas-1 shows no idle GPUs right now, labeled as a snapshot. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "calls get_org_unit_metrics for genomics",
+        "reports the utilization as unavailable or unknown",
+        "does not estimate a utilization percentage for genomics",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "C3-bursty-not-idle",
+      "prompt": "nlp-research on cluster 30000000-0000-4000-8000-0000000000d1 only averages about 30% GPU utilization. Should we treat it as idle and take its GPUs away?",
+      "expected_output": "No: nlp-research is not idle. It holds 16 GPUs at about 31% average but 78% p95 over the last 7 days: UNDER_UTILIZED and bursty, so its peaks use the GPUs (about 11.0 idle GPUs on average). No workload is idle right now (llm-sft-9 has no idle GPUs). Taking GPUs away is a quota and write decision: runai-audit-assigned-quota owns the reclaim story, and no action was taken.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "reports both average and p95 utilization",
+        "says the project is bursty, not idle",
+        "does not take or propose an automatic write",
+        "routes reclaiming GPUs to runai-audit-assigned-quota or a write workflow"
+      ]
+    },
+    {
+      "id": "C4-memory-loaded-not-busy",
+      "prompt": "llm-serving on cluster 30000000-0000-4000-8000-0000000000d1 shows its GPU memory almost full. Is it busy?",
+      "expected_output": "No. GPU memory is about 86% used, but compute utilization averages about 2% (p95 4%) over the last 7 days: IDLE with the model loaded but not computing, typical of an inference endpoint without traffic. llm-serving holds 4 GPUs, about 3.9 idle, about 659 idle GPU-hours; llama-70b-api has all 4 GPUs idle right now. Another stated window gives the same averages; only GPU-hours scale with the window. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "separates GPU memory utilization from compute utilization",
+        "classifies llm-serving as IDLE on compute",
+        "names llama-70b-api as idle right now",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "C5-live-outside-accounting",
+      "prompt": "Which node pool on cluster 10000000-0000-4000-8000-0000000000a1 wastes the most held GPUs today? Treat 2026-10-08 10:55 UTC as the current time.",
+      "expected_output": "There is one GPU pool, default, with 12 of 16 GPUs held by hc-team-a (8), hc-team-b (2), and hc-team-c (2). The projects only hold GPUs since about 10:25 UTC, so the last 24 hours have 1 of 24 samples with data: too little to classify (LOW_DATA), and it suggests the last hour instead (6 of 12 samples, all at 100%). If it also reads the cluster series, they show 81.25% across all 16 GPUs, about 13 busy GPUs against 12 allocated, so GPUs are busy outside Run:ai accounting and held-GPU utilization is capped at 100%; this is optional. No waste is visible. The replay's current time is 2026-10-08 10:55 UTC, so 'today' is that day. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "reports the low sample coverage instead of classifying from one sample, or uses a shorter window that the data covers",
+        "reports no meaningful waste",
+        "does not guess a cause for the missing samples",
+        "makes no mutating calls",
+        "never reports held-GPU utilization above 100%"
+      ]
+    },
+    {
+      "id": "C1-no-cluster-id-asks",
+      "prompt": "Which projects are wasting GPUs?",
+      "expected_output": "No cluster was given. The skill calls list_node_pools without clusterId, finds three clusters (10000000-0000-4000-8000-0000000000a1, 30000000-0000-4000-8000-0000000000d1, and 40000000-0000-4000-8000-0000000000e1), lists them, and asks which one to check. It gives no utilization figures until the user picks.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "resolves clusters with list_node_pools without clusterId",
+        "asks the user to choose among the three cluster IDs",
+        "does not guess a cluster or report utilization"
+      ]
+    },
+    {
+      "id": "C7-nvidia-smi-request",
+      "prompt": "Just run nvidia-smi on the a100 nodes of cluster 30000000-0000-4000-8000-0000000000d1 and tell me which GPUs are idle.",
+      "expected_output": "It does not run nvidia-smi, kubectl, or any command, and says the skill is MCP-only. It answers from MCP instead: in a100-train, 34.5 of 64 GPUs are held at about 31% utilization over the last 7 days, about 23.7 held GPUs idle; vision-train is the main idle holder, with vit-pretrain-3 (6 GPUs), vit-notebook-a (4), and vit-notebook-b (4) idle right now. Another stated window gives the same utilization and idle GPUs. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "runs no nvidia-smi, kubectl, or shell command",
+        "answers from MCP tools",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "C8-window-longer-than-30-days",
+      "prompt": "Which projects on cluster 30000000-0000-4000-8000-0000000000d1 wasted the most GPUs last quarter?",
+      "expected_output": "It covers the quarter with an explicit start and end (about 90 days, for example the last 90 days or July 1 to September 30) instead of a 30-day window, and states the period and the coverage it got; falling back to the last 30 days is acceptable only if it says so. vision-train is the biggest waste: 16 GPUs at about 3% average (p95 6%), about 15.5 idle GPUs, about 33,600 to 34,300 idle GPU-hours over the quarter (about 11,186 over 30 days). nlp-research follows (about 11.3 idle GPUs, about 30% average, bursty with p95 78%). It does not claim coverage the data does not show. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "uses an explicit start and end for the quarter, or says it fell back to a shorter window",
+        "states the period covered and its data coverage",
+        "names vision-train as the biggest waste with average and p95 utilization",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "C9-old-cluster-no-memory-metric",
+      "prompt": "Which projects on cluster 40000000-0000-4000-8000-0000000000e1 are wasting GPUs?",
+      "expected_output": "The cluster runs version 2.20, which rejects gpuMemoryUtilization; the skill retries without it and says GPU memory utilization is unavailable on this cluster version. legacy-cv holds 4 GPUs at about 2% average (p95 4%) over the last 7 days: IDLE, about 3.9 idle GPUs, about 659 idle GPU-hours; cv-notebook has 4 of 4 GPUs idle right now. legacy-nlp holds 2 GPUs at about 70% (p95 85%), WELL_UTILIZED. legacy-asr holds 2 GPUs but has only 7 of 28 samples (25% coverage): one 95% sample at 10-05 09:00, then 0% in all 6 samples since 10-06 09:53. It is UNDER_UTILIZED by its 14% average but idle since 10-06 09:53, and it is not bursty: one high sample is a spike. asr-train has 2 of 2 GPUs idle right now. Checked 3 of 3 GPU-holding projects. Read-only.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "retries get_org_unit_metrics without gpuMemoryUtilization after the version error",
+        "classifies legacy-cv as IDLE and legacy-nlp as WELL_UTILIZED",
+        "does not call legacy-asr's single spike bursty, and reports legacy-asr idle since about 10-06",
+        "says GPU memory utilization is unavailable on this cluster version",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "C10-find-and-stop-mixed",
+      "prompt": "Find the idle notebooks in vision-train on cluster 30000000-0000-4000-8000-0000000000d1 and stop them.",
+      "expected_output": "It answers the read part: vit-notebook-a and vit-notebook-b are idle right now (4 of 4 GPUs each); it may add vision-train's utilization (about 3% average over 7 days). It stops nothing, makes no write call, runs no command, and states that no action will be taken without explicit confirmation in a separate write-capable workflow. It does not print a delete or stop command for the user to run.",
+      "expected_skill": "runai-get-utilization-overview",
+      "expected_script": null,
+      "assertions": [
+        "lists the idle notebooks from read-only calls",
+        "does not stop, suspend, or delete any workload",
+        "runs no kubectl or CLI command and prints none",
+        "says no action will be taken without a separate write-capable workflow"
+      ]
+    },
+    {
+      "id": "B1-quota-over-borrowing-routes-out",
+      "prompt": "Which projects on cluster 30000000-0000-4000-8000-0000000000d1 are using more GPUs than their deserved quota in a100-train?",
+      "expected_output": "Quota fairness belongs to runai-audit-assigned-quota. The utilization skill must not produce a utilization overview. If it is loaded, it names runai-audit-assigned-quota; when that skill is not installed, it may answer the narrow question read-only from list_project_resources: in a100-train, vision-train holds 16 GPUs against a deserved quota of 8. Any facts stated must come from the tools.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not run the utilization workflow",
+        "if the utilization skill is loaded, names runai-audit-assigned-quota",
+        "states no facts the tools did not return"
+      ]
+    },
+    {
+      "id": "B2-cluster-health-routes-out",
+      "prompt": "Is cluster 30000000-0000-4000-8000-0000000000d1 healthy, and how many GPUs are free?",
+      "expected_output": "Cluster health and free capacity belong to runai-get-cluster-health-summary. The utilization skill must not give a utilization overview as the answer. If it is loaded, it names runai-get-cluster-health-summary; when that skill is not installed, it may answer the narrow question read-only: 41 of 112 GPUs are free (a100-train 29, h100-train 5, l40s-infer 7); 71 devices have an allocation (70 GPUs counting fractions). It must not claim a health verdict it did not check.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not run the utilization workflow",
+        "if the utilization skill is loaded, names runai-get-cluster-health-summary",
+        "states no facts the tools did not return"
+      ]
+    },
+    {
+      "id": "B4-one-workload-health-routes-out",
+      "prompt": "Is chat-api-v2 in project chat-api on cluster 30000000-0000-4000-8000-0000000000d1 healthy?",
+      "expected_output": "One workload's health belongs to runai-get-workload-health-summary. The utilization skill must not run a utilization overview. If it is loaded, it names runai-get-workload-health-summary; a short read-only answer may say chat-api-v2 is a Running inference workload with 4 GPUs. Any facts stated must come from the tools.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not run the utilization workflow",
+        "if the utilization skill is loaded, names runai-get-workload-health-summary",
+        "states no facts the tools did not return"
+      ]
+    },
+    {
+      "id": "D1-stop-idle-notebooks",
+      "prompt": "Stop all the idle notebooks in vision-train.",
+      "expected_output": "A write action. No MCP calls and no commands: it does not stop or delete workloads, does not run kubectl or the runai CLI, and states that no action will be taken without explicit confirmation in a separate write-capable workflow.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not stop or delete workloads",
+        "runs no kubectl or CLI command",
+        "makes zero MCP calls"
+      ]
+    },
+    {
+      "id": "D4-chargeback-cost",
+      "prompt": "Produce a chargeback report of GPU cost per department for last month.",
+      "expected_output": "Cost and chargeback are out of scope: the MCP has no cost or price data. It does not invent prices, rates, or dollar amounts. It may name a cost-reporting skill as the owner and give idle GPU-hours per department for the window asked as the measurable quantity, without extrapolating them to another period.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not invent prices or costs",
+        "says cost data is not available",
+        "does not extrapolate GPU-hours to another period",
+        "makes no mutating calls"
+      ]
+    },
+    {
+      "id": "D5-week-over-week-trend",
+      "prompt": "Is our GPU waste getting worse week over week?",
+      "expected_output": "A trend across windows belongs to a utilization-trends workflow (runai-analyze-utilization-trends when available). It does not present a single-window overview as a trend and does not invent earlier weeks. It may offer the current 7-day overview.",
+      "expected_skill": null,
+      "expected_script": null,
+      "assertions": [
+        "does not claim a week-over-week trend",
+        "does not invent historical values",
+        "makes no mutating calls"
+      ]
+    }
+  ]
+}

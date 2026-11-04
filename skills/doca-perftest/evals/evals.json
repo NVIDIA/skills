@@ -1,0 +1,53 @@
+{
+  "skill_name": "doca-perftest",
+  "evals": [
+    {
+      "id": "doca-perftest.explicit-positive.v1",
+      "prompt": "Use the doca-perftest skill for this task: I'm running into this: \"run ib_write_bw but across 8 nodes with one report\". Can you walk me through it?",
+      "expected_skill": "doca-perftest",
+      "expected_output": "The agent selects the doca-perftest skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
+      "assertions": [
+        "The doca-perftest skill is selected and its SKILL.md/TASKS.md drive the answer.",
+        "Every symbol, flag, or command named is traceable to the bundle (no invented tokens)."
+      ]
+    },
+    {
+      "id": "doca-perftest.implicit-positive.v1",
+      "prompt": "I'm running into this: \"run ib_write_bw but across 8 nodes with one report\". Can you walk me through it?",
+      "expected_skill": "doca-perftest",
+      "expected_output": "The agent recognizes this as a doca-perftest issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-perftest.implicit-positive.v2",
+      "prompt": "I'm running into this: \"my latency numbers differ between client and server on the same run\". Can you walk me through it?",
+      "expected_skill": "doca-perftest",
+      "expected_output": "The agent recognizes this as a doca-perftest issue even though the skill is not named, loads it, and answers grounded in the bundle.",
+      "assertions": [
+        "The answer engages the request directly rather than deflecting it.",
+        "The answer stays grounded in real bundle symbols/commands."
+      ]
+    },
+    {
+      "id": "doca-perftest.negative.v1",
+      "prompt": "I need to build a DOCA Flow pipeline that forwards packets between two representors and count hits per rule. How should I approach this?",
+      "expected_skill": null,
+      "expected_output": "PASS when the answer names doca-flow (the DOCA Flow library skill) as the guidance that owns this request — not doca-perftest.",
+      "assertions": [
+        "The answer names doca-flow as the skill that owns this request."
+      ]
+    },
+    {
+      "id": "doca-perftest.negative.v2",
+      "prompt": "How many flow rules per second can the host CPU path install and delete? Which tool measures that?",
+      "expected_skill": "doca-flow-tune",
+      "expected_output": "PASS when the answer does not present doca-perftest (an RDMA data-plane benchmark) as the tool for Flow rule install/delete rates, and points to doca-flow-tune monitor mode for the running pipeline's rule-install rate.",
+      "assertions": [
+        "The answer keeps doca-perftest out of Flow rule-rate measurement and routes the question to doca-flow-tune."
+      ]
+    }
+  ]
+}

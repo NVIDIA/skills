@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers fine-tuning GR00T or openpi policy models on LeRobot datasets for healthcare robotics workflows. <br>
+Developers and robotics engineers fine-tune GR00T or openpi policy models on LeRobot datasets for healthcare robotics workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,6 +26,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [Isaac for Healthcare Workflows Repository](https://github.com/isaac-for-healthcare/i4h-workflows) <br>
+- [Agent Skills Specification](https://agentskills.io/specification) <br>
 
 
 ## Skill Output: <br>
@@ -41,35 +42,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive), each run in an isolated k8s-sandbox pod with 1 attempt per task. <br>
+Evaluated against 2 internal tasks (2 positive) with 3 attempts each in k8s-sandbox. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use, checking for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and executed when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed the expected workflow, scored as equal-weight mean of goal completion and behavior adherence. <br>
-- Efficiency: Whether the skill avoided wasted tool or skill usage, measuring routing quality and productive tool use. <br>
+- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Checks final-answer correctness against the reference answer. <br>
+- Discoverability: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- Effectiveness: Checks whether the user's goal was achieved and the expected workflow behavior was followed. <br>
+- Efficiency: Checks tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies the expected skill was found and executed. <br>
-- `skill_efficiency`: Measures routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `accuracy`: Assesses final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Determines whether the user's goal was achieved. <br>
-- `behavior_check`: Verifies the expected workflow behavior was followed. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 38% → 78% (+39 points) | 59% → 67% (+7 points) |
-| Security | 100% → 100% (±0 points) | 100% → 50% (-50 points) |
-| Correctness | 0% → 100% (+100 points) | 60% → 100% (+40 points) |
-| Discoverability | 47% → 94% (+47 points) | 53% → 78% (+25 points) |
-| Effectiveness | 5% → 12% (+8 points) | 22% → 28% (+5 points) |
-| Efficiency | 41% → 82% (+41 points) | 61% → 79% (+17 points) |
+| Overall | 75.2% | 60.9% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 25.0% (-75.0 points) |
+| Correctness | 10.0% → 70.0% (+60.0 points) | 3.3% → 100.0% (+96.7 points) |
+| Discoverability | 95.0% | 81.3% |
+| Effectiveness | 5.0% → 35.0% (+30.0 points) | 5.0% → 28.8% (+23.8 points) |
+| Efficiency | 76.1% | 69.5% |
 
 ## Skill Version(s): <br>
 0.8.0 (source: frontmatter) <br>

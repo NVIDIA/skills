@@ -1,0 +1,15 @@
+schema_version: 1
+harbor:
+  task_source: evals_json
+  n_attempts: 1
+  stop_on_pass: false
+  n_concurrent: 1
+  runtime_env:
+    PVA_OPERATOR_MAX_DEBUG_ATTEMPTS: "0"
+grading:
+  mode: default
+# OpGen needs Build-Test discovery even when input validation stops the run.
+skill_workspace:
+  mode: group
+  include:
+    - ../pva-build-test

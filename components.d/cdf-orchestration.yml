@@ -1,0 +1,22 @@
+name: Cosmos Data Factory Orchestration
+repo: NVIDIA/cdf-orchestration
+description: Build, run and monitor Cosmos Data Factory pipelines for image and video generation and transformation.
+skills:
+  - path: skills/cdf-orchestration-preflight/
+    catalog_dir: cdf-orchestration-preflight
+  - path: skills/cdf-orchestration-setup/
+    catalog_dir: cdf-orchestration-setup
+  - path: skills/cdf-orchestration-write-dag/
+    catalog_dir: cdf-orchestration-write-dag
+  - path: skills/cdf-autonomous-vehicle-dataset-generation/
+    catalog_dir: cdf-autonomous-vehicle-dataset-generation
+  - path: skills/cdf-defect-image-generation/
+    catalog_dir: cdf-defect-image-generation
+  - path: skills/cdf-event-video-generation/
+    catalog_dir: cdf-event-video-generation
+  - path: skills/cdf-image-attribute-augmentation/
+    catalog_dir: cdf-image-attribute-augmentation
+  - path: skills/cdf-video-data-augmentation/
+    catalog_dir: cdf-video-data-augmentation
+links:
+  discussions: false

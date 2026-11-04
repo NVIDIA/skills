@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# SOP report overlay — bind-mounts the SOP video_analytics patch (tools.py + sop_tools.py) and the
+# adapted VA-MCP config over the stock agent package inside vss-va-mcp, WITHOUT rebuilding the image.
+# These image-internal mounts are the one thing the generic compose patches cannot express. This file
+# is the SHIPPED template for a DIRECT one-off apply; the composed build emits the equivalent
+# `patches/vss-va-mcp.yml` folded into `resolved.yml` (the deploy uses `resolved.yml` only). For the
+# direct one-off path:
+#
+#   docker compose --env-file <generated.env> \
+#     -f <BUILD_DIR>/compose.yml \
+#     -f <staged>/sop-report-override.yml \
+#     up -d vss-va-mcp
+# (target the service directly — never invent a COMPOSE_PROFILES entry)
+#
+# The patch adds the SOP tools (get_sop_status / get_sop_report /
+# get_sop_as_incidents / get_sop_as_incident) to the `video_analytics` group; they
+# only register when the va_mcp config's `include:` lists them (the adapted VA-MCP
+# config, from the downloaded SOP release config — see ../../sop.md § Patch specifics).
+#
+# build-vision-ai's deploy flow stages the ADAPTED patch files (produced by DOWNLOADING
+# the SOP release patch from NVIDIA's public repo and adapting per ../../sop.md § Patch
+# specifics — NOT shipped in this repo, the release tools.py is NOT copied verbatim) to
+#   ${SOP_STAGE_DIR}/video_analytics/{tools,sop_tools}.py
+# (${SOP_STAGE_DIR} == an absolute path under _builds/<name>/sop-report — BUILD-LOCAL; never
+#  under the tracked deploy/docker/ tree).
+#
+# ${VSS_AGENT_SITE_PACKAGES} defaults to /vss-agent/.venv/lib/python3.13/site-packages and
+# ${VSS_AGENT_PKG} to the image's video-analytics package (vss_agents on develop; a published
+# image may differ) — resolve both against the image (../../sop.md § Patch specifics step 1).
+
+services:
+  vss-va-mcp:
+    volumes:
+    # Guarded so an unset var fails `docker compose config` LOUDLY instead of collapsing to an
+    # empty path and bind-mounting an empty dir over the module (vss-va-mcp would crash-loop with
+    # "Unknown included functions"). SOP_STAGE_DIR + VSS_AGENT_PKG have no safe default (both are
+    # resolved at build time — see ../../sop.md § Patch specifics step 1); VSS_AGENT_SITE_PACKAGES does.
+    - ${SOP_STAGE_DIR:?set SOP_STAGE_DIR to the build-local staging dir (_builds/<name>/sop-report)}/video_analytics/tools.py:${VSS_AGENT_SITE_PACKAGES:-/vss-agent/.venv/lib/python3.13/site-packages}/${VSS_AGENT_PKG:?resolve from the image — see ../../sop.md § Patch specifics step 1}/video_analytics/tools.py:ro
+    - ${SOP_STAGE_DIR:?set SOP_STAGE_DIR to the build-local staging dir (_builds/<name>/sop-report)}/video_analytics/sop_tools.py:${VSS_AGENT_SITE_PACKAGES:-/vss-agent/.venv/lib/python3.13/site-packages}/${VSS_AGENT_PKG:?resolve from the image — see ../../sop.md § Patch specifics step 1}/video_analytics/sop_tools.py:ro
+    # The adapted VA-MCP config — its `include:` list is what REGISTERS the get_sop_* tools. SOURCE is
+    # the build-local staged config; TARGET is the in-container ${VSS_VA_MCP_CONFIG_FILE} that vss-va-mcp
+    # reads via `--config_file`. Without this mount that path does not exist in the container, so the
+    # config never loads and get_sop_* never register (the stock compose only mounts VSS_APPS_DIR).
+    - ${SOP_STAGE_DIR:?set SOP_STAGE_DIR to the build-local staging dir (_builds/<name>/sop-report)}/configs/va_mcp_server_config.yml:${VSS_VA_MCP_CONFIG_FILE:?set VSS_VA_MCP_CONFIG_FILE to the in-container config path — see ../../sop.md § Patch specifics}:ro

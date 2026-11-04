@@ -14,6 +14,18 @@ It owns the integration and coordinates five upstream skills that it resolves
 at runtime rather than vendoring. Resolve those dependencies once with
 `python3 "$SKILL_DIR/scripts/doctor.py" dependencies --prepare` before the first run.
 
+## Host swap safety
+
+Never create, resize, enable, or remove host swap without the user's explicit
+approval of the specific operation, device or file path, and size. For example,
+"Create an 8 GB swap file at /swapfile" identifies all three. A general request
+to run the showcase, make preflight pass, or fix a memory shortfall does not
+authorize any swap change. If memory preflight fails, report the shortfall and
+suggest freeing memory or using a larger host. Ask for the specific swap
+approval only if the user wants that option; do not provide swap-changing
+commands or perform the change before approval. Swap changes can persist after
+the showcase.
+
 ## Locate bundled resources
 
 Before running any command, set `SKILL_DIR` to the absolute path of the
@@ -96,7 +108,14 @@ first run that is still populating shader and asset caches.
 
 1. Check whether the user already specified a different map, robot platform,
    simulator, or mission objective in the conversation; if not, use the
-   canonical default without asking.
+   canonical default without asking. Before preflight, tell the user the exact
+   warehouse URI, robot ID `carter01`, all five waypoint coordinates in order,
+   route-only mission type, and mission timeout `900` seconds from
+   [Canonical default](#canonical-default) and
+   [Deterministic route](#deterministic-route). State that the default demo
+   command `bash "$SKILL_DIR/scripts/run.sh" --demo` uses those values without
+   scenario overrides. This announcement is required even if preflight later
+   blocks the run.
 2. Apply [Runtime selection](#runtime-selection) without changing any detected
    installation. Resolve any user choice or installation handoff, then run the
    read-only preflight:

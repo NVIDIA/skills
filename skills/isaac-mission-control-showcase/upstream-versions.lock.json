@@ -27,9 +27,6 @@
         "up": "scripts/up.sh",
         "preflight": "scripts/preflight.sh"
       },
-      "runner_env": {
-        "up": "BRING_UP_CLOUD"
-      },
       "resources": [
         "resources/docker-compose/bringup_services.yaml",
         "resources/docker-compose/.env",
@@ -45,9 +42,6 @@
       "entrypoints": {
         "set_map": "scripts/set_map.py"
       },
-      "runner_env": {
-        "set_map": "CHANGE_MAP"
-      },
       "resources": [
         "resources/app/config/defaults.yaml"
       ],
@@ -59,9 +53,6 @@
       "path_env": "CHANGE_FLEET_COMPOSITION_SKILL_DIR",
       "entrypoints": {
         "set_fleet": "scripts/set_fleet.py"
-      },
-      "runner_env": {
-        "set_fleet": "CHANGE_FLEET"
       },
       "resources": [
         "resources/app/config/defaults.yaml",
@@ -75,9 +66,6 @@
       "path_env": "ISAAC_SIM_REMOTE_SKILL_DIR",
       "entrypoints": {
         "send": "scripts/isaacsim_send.py"
-      },
-      "runner_env": {
-        "send": "ISAAC_SEND"
       },
       "adapter": "references/isaac-sim-remote/scripts/run.py",
       "primary_entrypoint": "send"

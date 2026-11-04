@@ -1,12 +1,21 @@
 name: tao-train-sparse4d
 network_arch: sparse4d
 automl_enabled: true
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.pyt
 data_format: ovpkl
 gpu_spec_key: train.num_gpus
+schema_excluded_fields:
+  - model.sv_aux_head
+  - model.sv_scene_keywords
+  - model.head.loose_to_tight.sv_depth_weight
+  - model.head.loose_to_tight.sv_size_weight
+  - model.head.loose_to_tight.sv_yaw_weight
+  - dataset.resize_to_canonical_2d
+  - dataset.canonical_2d_height
+  - dataset.canonical_2d_width
 actions:
   dataset_convert:
-    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+    container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services  # versions-key: images.tao_toolkit.data_services
     command: annotations convert -e {config_path}
     config_format: yaml
     mode: config
@@ -31,14 +40,32 @@ actions:
         type: file
       dataset.train_dataset.ann_file:
         type: file
+        description: >-
+          For lazy_load=true, stage the split parent directory with its matching
+          <split>_lazy_index.pkl and optional _pkl_cam_counts.pkl, then point this
+          field at the split inside that staged directory. Stage referenced PKLs
+          and images as well. Fetching this file alone is insufficient.
       dataset.val_dataset.ann_file:
-        type: file
-      dataset.test_dataset.ann_file:
         type: file
       train.pretrained_model_path:
         type: file
         optional: true
       train.resume_training_checkpoint_path:
+        type: file
+        optional: true
+      model.head.loose_to_tight.mlp_ckpt:
+        type: file
+        optional: true
+      dataset.ltt_2dgt_sidecar_dir:
+        type: folder
+        optional: true
+      dataset.rtdetr_2d_cache_dir:
+        type: folder
+        optional: true
+      dataset.rtdetr_2d_cache_path:
+        type: file
+        optional: true
+      dataset.pkl_cam_counts_path:
         type: file
         optional: true
     outputs:
@@ -53,17 +80,16 @@ actions:
     inputs:
       dataset.data_root:
         type: folder
+        optional: true
         container_path: /data/aicity_root/train
       model.head.instance_bank.anchor:
         type: file
-      dataset.train_dataset.ann_file:
-        type: file
-      dataset.val_dataset.ann_file:
-        type: file
       dataset.test_dataset.ann_file:
         type: file
+        optional: true
       dataset.quant_calibration_dataset.images_dir:
         type: folder
+        optional: true
       quantize.model_path:
         type: file
     outputs:
@@ -80,10 +106,6 @@ actions:
         type: folder
         container_path: /data/aicity_root/val
       model.head.instance_bank.anchor:
-        type: file
-      dataset.train_dataset.ann_file:
-        type: file
-      dataset.val_dataset.ann_file:
         type: file
       dataset.test_dataset.ann_file:
         type: file
@@ -120,10 +142,6 @@ actions:
         container_path: /data/aicity_root/test
       model.head.instance_bank.anchor:
         type: file
-      dataset.train_dataset.ann_file:
-        type: file
-      dataset.val_dataset.ann_file:
-        type: file
       dataset.test_dataset.ann_file:
         type: file
       inference.checkpoint:
@@ -142,33 +160,18 @@ data_sources:
     dataset.data_root:
       source: train_datasets
       path: ''
-    model.head.instance_bank.anchor:
-      source: train_datasets
-      path: anchor_init.npy
     dataset.train_dataset.ann_file:
       source: train_datasets
       path: ''
     dataset.val_dataset.ann_file:
       source: eval_dataset
-      path: ''
-    dataset.test_dataset.ann_file:
-      source: inference_dataset
       path: ''
   quantize:
     dataset.data_root:
       source: train_datasets
       path: ''
-    model.head.instance_bank.anchor:
-      source: train_datasets
-      path: anchor_init.npy
-    dataset.train_dataset.ann_file:
-      source: train_datasets
-      path: ''
-    dataset.val_dataset.ann_file:
-      source: eval_dataset
-      path: ''
     dataset.test_dataset.ann_file:
-      source: inference_dataset
+      source: calibration_dataset
       path: ''
     dataset.quant_calibration_dataset.images_dir:
       source: calibration_dataset
@@ -177,34 +180,13 @@ data_sources:
     dataset.data_root:
       source: eval_dataset
       path: ''
-    model.head.instance_bank.anchor:
-      source: train_datasets
-      path: anchor_init.npy
-    dataset.train_dataset.ann_file:
-      source: train_datasets
-      path: ''
-    dataset.val_dataset.ann_file:
+    dataset.test_dataset.ann_file:
       source: eval_dataset
       path: ''
-    dataset.test_dataset.ann_file:
-      source: inference_dataset
-      path: ''
-  export:
-    model.head.instance_bank.anchor:
-      source: train_datasets
-      path: anchor_init.npy
+  export: {}
   inference:
     dataset.data_root:
       source: inference_dataset
-      path: ''
-    model.head.instance_bank.anchor:
-      source: train_datasets
-      path: anchor_init.npy
-    dataset.train_dataset.ann_file:
-      source: train_datasets
-      path: ''
-    dataset.val_dataset.ann_file:
-      source: eval_dataset
       path: ''
     dataset.test_dataset.ann_file:
       source: inference_dataset

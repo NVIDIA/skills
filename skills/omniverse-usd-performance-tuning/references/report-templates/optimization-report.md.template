@@ -1,7 +1,7 @@
 # USD Performance Tuning Report - {{ asset_name }}
 
-**Stage Optimization Score:** {{ optimization_score }}/10 ({{ score_label }})
-**Verdict:** {{ verdict }}
+**Completion:** {{ completion }}
+**Overall verdict:** {{ verdict_label }}
 **Generated:** {{ timestamp }}
 **Output:** `{{ output_path }}`
 
@@ -10,9 +10,9 @@
 {% if safety_gate %}
 ## Correctness Safety Gate
 
-The Phase-2c correctness precondition. A status outside
+Required composition, metadata and binding checks. A status outside
 `resolved | clear | none | passed | not_required` means the run carries a known
-defect; the run-scoring oracle zeroes it.
+defect; it cannot be reported as a successful optimization.
 
 | Field | Value |
 |---|---|
@@ -21,7 +21,24 @@ defect; the run-scoring oracle zeroes it.
 | Notes | {{ safety_gate.notes }} |
 {% endif %}
 
-## Reasoning
+{% if execution_summary %}
+{{ execution_summary.native_definition_count }} geometry definitions processed in {{ execution_summary.native_job_count }} native worker jobs; {{ execution_summary.assembly_definition_count }} geometry-free assemblies; {{ execution_summary.reused_definition_count }} definitions reused from existing libraries. Within-scene occurrences are listed per asset below.
+{% endif %}
+{% if report_summary %}
+## What was checked
+
+{% for check in report_summary.checks %}
+- {{ check }}
+{% endfor %}
+
+## Measurement limits
+
+{% for limit in report_summary.limitations %}
+- {{ limit }}
+{% endfor %}
+{% endif %}
+
+## What changed
 
 {{ reasoning }}
 
@@ -43,18 +60,6 @@ defect; the run-scoring oracle zeroes it.
 | usd-validation-nvidia | {{ runtime_context.assetValidator.package }} {{ runtime_context.assetValidator.version }} (via {{ runtime_context.assetValidator.source }}) |
 {% endif %}
 
-## Stage Impact Areas
-
-| Area | Score | Status | Notes |
-|---|---:|---|---|
-{% for group in metric_groups %}
-| {{ group.display_name }} | {{ group.score_display }} | {{ group.status }} | {{ group.summary }} |
-{% endfor %}
-
-> Runtime performance metrics such as RAM, VRAM, FPS, frame time, shader cost,
-> and renderer activity belong in Omniperf or an equivalent runtime profiling
-> dashboard. They are not included in the Stage Optimization Score.
-
 {% if runtime_profiling_items %}
 ## Runtime Profiling
 
@@ -70,22 +75,21 @@ defect; the run-scoring oracle zeroes it.
 | Metric | Before | After | Change | Evidence | Verdict |
 |---|---:|---:|---:|---|---|
 {% for metric in metrics %}
-| {{ metric.display_name }} | {{ metric.before }} {{ metric.unit }} | {{ metric.after }} {{ metric.unit }} | {{ metric.change_pct }}% | {{ metric.evidence_type }} | {{ metric.verdict }} |
+| {{ metric.display_name }} | {{ metric.before_display }} | {{ metric.after_display }} | {{ metric.change_display }} | {{ metric.evidence_type }} | {{ metric.verdict }} |
 {% endfor %}
 
 {% if footprint %}
 ## Storage Footprint (repack-normalized)
 
-A USDC/crate repack is the free re-encode any export achieves, not the
-optimization. The structural win is measured against the repack-normalized
-baseline, never the raw input.
+Delivery size is compared with the original used layers re-encoded to USDC.
+This separates encoding savings from the measured optimization result.
 
 | Footprint | Value |
 |---|---:|
-| Raw input | {{ footprint.raw_input_bytes }} bytes |
-| Repack-normalized baseline | {{ footprint.repack_normalized_baseline_bytes }} bytes ({{ footprint.repack_delta_pct }}% re-encode, free) |
-| Optimized | {{ footprint.optimized_bytes }} bytes |
-| Structural win (vs normalized baseline) | {{ footprint.structural_delta_pct }}% |
+| Raw input | {{ footprint.raw_input_bytes }} |
+| Repack-normalized baseline | {{ footprint.repack_normalized_baseline_bytes }} ({{ footprint.repack_delta_pct }}% encoding change) |
+| Optimized | {{ footprint.optimized_bytes }} |
+| Delivery-size change (vs normalized baseline) | {{ footprint.structural_delta_pct }}% |
 | Total raw → optimized | {{ footprint.raw_delta_pct }}% |
 {% endif %}
 
@@ -99,6 +103,94 @@ baseline, never the raw input.
 {% endfor %}
 {% endif %}
 
+{% if assets %}
+## Results by asset
+
+One entry per unique definition. Counts cover its own geometry; child assets are reported separately. Operation time excludes other phases.
+
+{% for asset in assets %}
+### {{ asset.name }} — {{ asset.semantic_category }} / {{ asset.structural_type }}
+
+Source prim: `{{ asset.source_prim_path }}` · Definition: `{{ asset.definition_id }}`
+
+**Outcome:** {{ asset.disposition }} · **Occurrences:** {{ asset.occurrence_count }}
+
+**Boundary decision:** {{ asset.boundary_reason }}
+
+{% if asset.equipment_family %}**Equipment family:** {{ asset.equipment_family }}
+
+{% endif %}**Structure:** {{ asset.structure_reason }}
+
+**Independent use:** {{ asset.independent_use }}
+
+{% if asset.reused_from_library %}
+Reused from an existing library. Prior optimization history is shown separately below.
+{% endif %}
+{% if asset.child_names %}
+Child assets (reported separately):
+
+{% for name in asset.child_names %}
+- {{ name }}
+{% endfor %}
+{% endif %}
+
+| Own geometry | Before | After |
+|---|---:|---:|
+{% for metric in asset.metrics %}
+| {{ metric.name }} | {{ metric.before }} | {{ metric.after }} |
+{% endfor %}
+
+Native operation time in this run: {{ asset.operation_seconds }}
+
+{% if asset.operation_groups %}
+| Operation (execution order) | Outcomes |
+|---|---|
+{% for group in asset.operation_groups %}
+| {{ group.name }} | {{ group.outcomes }} |
+{% endfor %}
+{% else %}
+No native geometry operations recorded in this run.
+{% endif %}
+
+{% if asset.prior_operations %}
+<details><summary>Prior optimization history — not executed in this run</summary>
+
+| # | Operation | Outcome | Prior time | Recorded reason |
+|---|---|---|---:|---|
+{% for op in asset.prior_operations %}
+| {{ op.order }} | {{ op.name }} | {{ op.status }} | {{ op.seconds_display }} | {{ op.reason }} |
+{% endfor %}
+
+</details>
+{% endif %}
+
+{% for retained in asset.retained_geometry %}
+- {{ retained.category }}: {{ retained.reason }}
+{% endfor %}
+
+<details><summary>Occurrences and operation details</summary>
+
+{% for path in asset.occurrences %}
+- `{{ path }}`
+{% endfor %}
+
+| # | Operation | Outcome | Time | Recorded reason |
+|---|---|---|---:|---|
+{% for op in asset.operations %}
+| {{ op.order }} | {{ op.name }} | {{ op.status }} | {{ op.seconds_display }} | {{ op.reason }} |
+{% endfor %}
+
+</details>
+
+{% endfor %}
+{% if shared_operations %}
+### Shared material library operations
+
+{% for op in shared_operations %}
+- {{ op.name }}: {{ op.result }}
+{% endfor %}
+{% endif %}
+{% else %}
 ## Operations
 
 | # | Operation | Method | Result |
@@ -106,6 +198,17 @@ baseline, never the raw input.
 {% for op in operations %}
 | {{ op.order }} | {{ op.name }} | {{ op.method }} | {{ op.result }} |
 {% endfor %}
+
+{% endif %}
+## Next-run instructions
+
+{% if next_run_text %}
+Suggestions from recorded findings; edit before using them in another run.
+
+{{ next_run_text }}
+{% else %}
+No next-run instructions recorded. This does not establish that no further optimization is possible.
+{% endif %}
 
 ## Validators
 

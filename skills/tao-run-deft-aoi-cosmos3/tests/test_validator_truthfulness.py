@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
 import pathlib
@@ -157,6 +158,78 @@ class SyntheticSplitTruthfulnessTests(unittest.TestCase):
 
             self.assertEqual(summary["records"]["synthetic"], 2)
             self.assertEqual(summary["roles"]["synthetic"], "anomalygen_sdg")
+
+
+class BenchmarkManifestTruthfulnessTests(unittest.TestCase):
+    @staticmethod
+    def _workspace(root: pathlib.Path) -> tuple[pathlib.Path, pathlib.Path]:
+        annotations = root / "annotations"
+        for role, filename in validate_split_contract.ROLE_PATHS.items():
+            _write_json(
+                annotations / filename[-1],
+                [_record(f"images/{role}.png", "OK")],
+            )
+        benchmark = annotations / "benchmark_kpi.json"
+        manifest = root / "manifests/benchmark_manifest.json"
+        return benchmark, manifest
+
+    def test_matching_manifest_verifies_recomputed_benchmark_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            benchmark, manifest = self._workspace(root)
+            expected = hashlib.sha256(benchmark.read_bytes()).hexdigest()
+            _write_json(
+                manifest,
+                {"evaluation_contract": {"benchmark": {"annotations_sha256": expected}}},
+            )
+            summary_path = root / "summary.json"
+
+            self.assertEqual(
+                validate_split_contract.main(
+                    [
+                        "--workspace", str(root),
+                        "--manifest", str(manifest),
+                        "--summary", str(summary_path),
+                    ]
+                ),
+                0,
+            )
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            self.assertEqual(summary["benchmark_sha256"], expected)
+            self.assertTrue(summary["benchmark_hash_verified"])
+
+    def test_mismatching_manifest_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            _, manifest = self._workspace(root)
+            _write_json(
+                manifest,
+                {"evaluation_contract": {"benchmark": {"annotations_sha256": "0" * 64}}},
+            )
+            stderr = io.StringIO()
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = validate_split_contract.main(
+                    ["--workspace", str(root), "--manifest", str(manifest)]
+                )
+
+            self.assertEqual(exit_code, 2)
+            self.assertIn("frozen Benchmark annotation hash mismatch", stderr.getvalue())
+
+    def test_no_manifest_leaves_benchmark_hash_unverified(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = pathlib.Path(temporary)
+            self._workspace(root)
+            summary_path = root / "summary.json"
+
+            self.assertEqual(
+                validate_split_contract.main(
+                    ["--workspace", str(root), "--summary", str(summary_path)]
+                ),
+                0,
+            )
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            self.assertFalse(summary["benchmark_hash_verified"])
 
 
 if __name__ == "__main__":

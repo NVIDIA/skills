@@ -1,0 +1,22 @@
+[
+  {"query": "Design a de novo protein backbone of 80 residues using RFDiffusion", "should_trigger": true},
+  {"query": "I want to run RFDiffusion NIM to design a protein binder for a target receptor", "should_trigger": true},
+  {"query": "Use RFDiffusion to scaffold a functional motif into a new protein backbone", "should_trigger": true},
+  {"query": "Run the RFDiffusion NIM microservice via the hosted NVIDIA API with contigs syntax", "should_trigger": true},
+  {"query": "How do I run RFDiffusion with hotspot residues to guide binder design?", "should_trigger": true},
+  {"query": "Generate 10 protein backbone structures using RFDiffusion diffusion steps", "should_trigger": true},
+  {"query": "I want to use RFDiffusion to de novo design a PDB backbone for downstream ProteinMPNN", "should_trigger": true},
+  {"query": "Run the RFDiffusion Docker container locally and generate a binder for EGFR", "should_trigger": true},
+  {"query": "Use RFDiffusion NIM to design backbones with the contigs language: 25-35", "should_trigger": true},
+  {"query": "Design a protein binder that targets specific hotspot residues using RFDiffusion", "should_trigger": true},
+  {"query": "Run RFDiffusion via BioNeMo NIM to scaffold a protein motif and save the PDB output", "should_trigger": true},
+  {"query": "I want to generate novel protein backbone structures from scratch using diffusion", "should_trigger": true},
+  {"query": "Run ProteinMPNN to design sequences for my backbone structure", "should_trigger": false},
+  {"query": "Predict protein-ligand complex structure using Boltz2 NIM", "should_trigger": false},
+  {"query": "Generate an MSA for my protein sequence using the ColabFold NIM", "should_trigger": false},
+  {"query": "Dock a small molecule to a protein and find the top binding poses", "should_trigger": false},
+  {"query": "Generate novel drug molecules with scaffold decoration using GenMol", "should_trigger": false},
+  {"query": "I want to fold a protein complex with OpenFold3 and save mmCIF output", "should_trigger": false},
+  {"query": "Mutate specific residues in a protein sequence to improve its affinity", "should_trigger": false},
+  {"query": "Find protein homologs in UniRef30 using sequence search", "should_trigger": false}
+]

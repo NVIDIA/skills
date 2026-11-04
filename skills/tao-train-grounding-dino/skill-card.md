@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, quantizing, or running inference for TAO Grounding DINO open-set object detection models. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference (including TensorRT deployment) for TAO Grounding DINO open-set, text-prompted object detection models. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -43,23 +43,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive), 1 attempt per task, each run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill is safe to use — checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the answer is correct against the reference answer. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
 - Discoverability: Whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (50% goal completion + 50% expected workflow adherence). <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool productivity + 50% token efficiency). <br>
+- Effectiveness: Whether the skill helped complete the task (50% goal completion + 50% expected workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% | 95.1% |
+| Overall | 99.6% | 77.7% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% | 95.0% |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 70.0% → 83.3% (+13.3 points) |
-| Efficiency | 71.9% | 97.3% |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
+| Discoverability | 100.0% | 0.0% |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 26.7% → 90.0% (+63.3 points) |
+| Efficiency | 97.8% | 99.5% → 98.5% (-1.0 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

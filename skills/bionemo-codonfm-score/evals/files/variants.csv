@@ -1,0 +1,3 @@
+id,ref_seq,ref_codon,alt_codon,codon_position
+variant_00,ATGGCTGAATTTCCGTAA,GCT,GCC,1
+variant_01,ATGGCTGAATTTCCGTAA,GAA,GAG,2

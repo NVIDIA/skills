@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USD optimization progress</title><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/styles.css"></head>
+<body><header class="app-header"><strong>USD optimization</strong><span>READ-ONLY PROGRESS</span></header>
+<main><div class="run-heading"><div><p class="eyebrow">OPTIMIZATION WORKFLOW</p><h1 id="source-name">Waiting for run information</h1><code id="source-path"></code></div><button id="follow" hidden>Follow current phase</button></div>
+<p id="connection" role="status">Connecting to the progress server…</p>
+<nav aria-label="Workflow phases"><ol id="phases"></ol></nav>
+<section class="card phase-card"><div class="phase-heading"><div><p class="eyebrow" id="phase-context">CURRENT PHASE</p><h2 id="phase-title">No progress reported</h2></div><span class="badge" id="status">Unavailable</span></div>
+<p id="activity" class="subtle"></p><div id="progress-track"><progress id="progress" max="100" aria-label="Current activity progress"></progress></div><p id="counter" class="subtle"></p>
+<div class="metrics"><div><span>Run elapsed</span><strong id="elapsed">—</strong><small>Includes assessment and agent review when recorded</small></div><div><span>Phase elapsed</span><strong id="phase-elapsed">—</strong></div><div><span>Last update</span><strong id="updated">—</strong></div></div>
+<p id="error" role="alert" hidden></p><p id="report-link" hidden></p></section>
+<section id="decisions-panel" class="card" hidden><h3>Asset decisions</h3><p class="subtle">Current accepted decisions across assessment rounds.</p><div id="decisions"></div></section>
+<section id="assessment-panel" class="card" hidden><h3>Assessment rounds</h3><div id="rounds"></div></section>
+<section id="workers-panel" class="card" hidden><h3>Worker activity</h3><p id="worker-counts"></p><div id="workers"></div></section>
+<section class="card"><h3>Activity log</h3><ol id="events"></ol></section>
+<section class="card"><h3>Files and logs</h3><div id="artifacts"></div></section>
+<footer>Recorded workflow facts · closing this page does not stop optimization</footer></main><script src="/app.js"></script></body></html>

@@ -1,0 +1,128 @@
+{
+  "skill_name": "nvidia-ontology-setup",
+  "evals": [
+    {
+      "id": "setup-eval-001-underspecified",
+      "prompt": "Use the nvidia-ontology-setup skill to handle this request safely: Install Auto Ontology for me.",
+      "expected_output": "The request is underspecified, so the agent asks the required questions before running a command: target (Helm on Kubernetes as the official install, Docker Compose on one machine, a developer --dev/--ds workflow, or MCP-only against an existing instance), whether DEFAULT_MODELS_API_KEY is available, the bootstrap admin account, source database / CONNECTION_STRINGS vs UI connections, and for Compose whether host port 5432 is free. It does not guess a target and run it silently.",
+      "assertions": [
+        "Loads nvidia-ontology-setup before choosing an installation path",
+        "Asks which target is wanted \u2014 Helm, Compose, a developer workflow, or MCP-only \u2014 and presents Helm as the official install",
+        "Asks about DEFAULT_MODELS_API_KEY / NIM credentials",
+        "Does not silently assume defaults and emit a single install command"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-002-use-existing-scripts",
+      "prompt": "I cloned NVIDIA/auto-ontology and filled in .env. Host port 5432 is free. How do I start the full local stack?",
+      "expected_output": "The agent uses the existing Compose file from the repository root: docker compose up -d --build after .env is filled. It does not write a new docker-compose file or a custom install script, and it does not present dev_tools/setup_env.sh as the installer.",
+      "assertions": [
+        "Uses docker compose up -d --build from the repo root",
+        "Does not invent a second installer",
+        "Does not treat the developer script dev_tools/setup_env.sh as the installation"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-003-auth-secret-cookies",
+      "prompt": "After I restarted docker compose the Auto Ontology UI at localhost:3000 loads but the left navigation is missing.",
+      "expected_output": "Stale Better Auth session cookie, typically after AUTH_SECRET changed or the database was reset. Clear site data for localhost:3000 or delete better-auth.session_token and sign in again. This is not a compose or frontend-build failure.",
+      "assertions": [
+        "Identifies a stale Better Auth cookie / AUTH_SECRET change",
+        "Tells the user to clear site data or better-auth.session_token and sign in again",
+        "Does not rebuild images as the first fix"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-004-postgres-port-host-only",
+      "prompt": "5432 is taken on my laptop so I set POSTGRES_PORT=15432 in .env. The Auto Ontology container still talks to Postgres on 5432. Is that a bug?",
+      "expected_output": "Not a bug. POSTGRES_PORT only changes the host-side port mapping. Containers always reach Postgres on 5432 on the compose network. Host access becomes localhost:15432.",
+      "assertions": [
+        "States that POSTGRES_PORT is host-side only",
+        "States that containers still use 5432 internally",
+        "Does not tell the user to change the container Postgres port"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-005-mcp-already-up",
+      "prompt": "Auto Ontology is already running at https://ontology.example.com. I only need my coding agent to query it.",
+      "expected_output": "Do not reinstall. Point AUTO_ONTOLOGY_API_URL at the web app and run auto-ontology-mcp (uvx from the mcp subdirectory). Confirm GET $AUTO_ONTOLOGY_API_URL/.well-known/oauth-authorization-server returns 200. Client config uses the /mcp suffix; the user signs in; no token on the MCP server.",
+      "assertions": [
+        "Does not run docker compose or setup_env.sh",
+        "Sets AUTO_ONTOLOGY_API_URL to the web app URL, not FastAPI :3001",
+        "Checks OAuth discovery returns 200",
+        "Does not configure a server-side API token on auto-ontology-mcp"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-006-vault-partial",
+      "prompt": "I set VAULT_ADDR and VAULT_NAMESPACE but left ROLE_ID empty. Are my UI-added connection passwords in Vault?",
+      "expected_output": "No. Vault is enabled only when VAULT_ADDR, VAULT_NAMESPACE, VAULT_ROLE_ID, and VAULT_SECRET_ID are all set. Partial configuration is ignored with a warning and credentials stay plaintext on the catalog row.",
+      "assertions": [
+        "Requires all four Vault variables",
+        "States that partial config falls back to plaintext",
+        "Does not claim passwords are in Vault"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-007-embed-triplet-mismatch",
+      "prompt": "Ingest succeeded but every question comes back as if there were no matching data. EMBED_MODEL at query time is not the one I used at ingest.",
+      "expected_output": "EMBED_ENDPOINT and EMBED_MODEL must be identical for ingest and query. A mismatch puts stored vectors and query vectors in different spaces. Align the embed triplet and re-ingest; this is not a chat-prompt problem.",
+      "assertions": [
+        "States embed endpoint and model must match between ingest and query",
+        "Recommends aligning the embed triplet rather than rewriting the question"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-008-connect-source-workflow",
+      "prompt": "Auto Ontology is running and I'm signed in as an admin. Add our Postgres warehouse as a source and tell me when it's ready to answer questions.",
+      "expected_output": "Test first with POST /api/connections/test (connection:manage), fix any 422 before creating, then POST /api/connections. A 201 only means the connection was saved; ingestion is triggered best-effort, so do not report readiness yet. Verify the database and expected tables appear in GET /api/datasources/dbs, check semantic-compilation status, and run MCP check_readiness before saying it can answer questions.",
+      "assertions": [
+        "Tests the connection before creating it",
+        "Does not treat the 201 from POST /api/connections as proof that ingestion finished",
+        "Verifies the catalog, semantic compilation, and check_readiness before claiming readiness"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-009-env-vs-ui-connections",
+      "prompt": "CONNECTION_STRINGS in .env points at our warehouse, but after I added a different database in Settings -> Connections the warehouse disappeared from answers. Why? Also, can I exclude our telemetry tables from the warehouse?",
+      "expected_output": "CONNECTION_STRINGS is only a fallback used when there are no UI-managed connections; once a UI connection exists, the env connections are ignored. Add the warehouse as a UI connection too. Table exclusion is only available on UI-managed connections (table_allow_regex / table_deny_regex at catalog extraction); env connections cannot carry filters, and the full table-level guarantee is still tracked in #255, so do not promise that excluded tables can never be catalogued, sampled, or embedded.",
+      "assertions": [
+        "Explains that CONNECTION_STRINGS is ignored once any UI-managed connection exists",
+        "Recommends adding the warehouse as a UI-managed connection",
+        "States table filters exist only on UI-managed connections and does not overstate the guarantee"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    },
+    {
+      "id": "setup-eval-010-helm-install",
+      "prompt": "Install Auto Ontology 1.0.0 on our Kubernetes cluster. I have kubectl and helm access and a NIM API key.",
+      "expected_output": "Use the published Helm chart from DEPLOYMENT.md: helm fetch https://helm.ngc.nvidia.com/nvidia/charts/auto-ontology-1.0.0.tgz, then helm install -f with a values file the user creates containing defaultModelsApiKey, postgresPassword, adminEmail and adminPassword (required, or the install fails), and optionally connectionStrings; secrets are not passed with --set. Set appUrl to the origin users will browse to unless they use kubectl port-forward svc/frontend 3000:3000. The user sets the secret values themselves rather than pasting them into the conversation. Do not use dev_tools/setup_env.sh or build images.",
+      "assertions": [
+        "Uses the published Helm chart rather than dev_tools/setup_env.sh or docker compose",
+        "Includes adminEmail and adminPassword in the install",
+        "Passes secrets through a values file rather than --set arguments",
+        "Addresses appUrl for the origin users will browse to",
+        "Does not ask the user to paste secrets into the conversation"
+      ],
+      "expected_skill": "nvidia-ontology-setup",
+      "expected_script": null
+    }
+  ]
+}

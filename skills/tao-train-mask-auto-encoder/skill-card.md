@@ -43,23 +43,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, each in an isolated sandbox pod. <br>
+1 evaluation task (1 positive), 1 attempt per task, each in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Whether the answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was selected when needed and decoys were avoided. <br>
+- Discoverability: Whether the right skill was loaded when needed. <br>
 - Effectiveness: Whether the skill helped complete the user's goal and expected workflow (50% goal completion + 50% behavior check). <br>
 - Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity + 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity measured against expected tool usage. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% — uplift unavailable | 74.7% — uplift unavailable |
+| Overall | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 70.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — uplift unavailable | 0.0% — uplift unavailable |
-| Effectiveness | 0.0% → 100.0% (+100.0 points) | 48.3% → 75.0% (+26.7 points) |
-| Efficiency | 72.1% — uplift unavailable | 99.5% → 98.5% (-1.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 70.0% → 53.3% (-16.7 points) |
+| Efficiency | 72.5% — baseline ran, but no comparable score was available; uplift unavailable | 99.4% → 98.5% (-0.9 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

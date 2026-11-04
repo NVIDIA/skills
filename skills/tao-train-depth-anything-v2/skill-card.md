@@ -1,5 +1,5 @@
 ## Description: <br>
-Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures, predicting per-pixel depth from single RGB images for training, evaluating, exporting, or running inference with TAO. <br>
+Monocular depth estimation using Metric Depth Anything v2 or Relative Depth Anything architectures, predicting per-pixel depth from single RGB images when training, evaluating, exporting, or running inference for a TAO monocular depth model. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to train, evaluate, export, or run inference for monocular depth estimation models using the NVIDIA TAO toolkit with Docker-based GPU workflows. <br>
+Developers and engineers who need to train, evaluate, export, quantize, or run inference for TAO monocular depth estimation models (Metric or Relative Depth Anything) using Docker-based NVIDIA GPU workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -36,7 +36,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline bash and YAML code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -47,36 +47,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task (1 positive) with 3 attempts per task in isolated sandbox pods. Evaluator version 1.5.6. <br>
+Evaluated against 1 task (1 positive) with 1 attempt per task, each in an isolated sandbox pod (k8s-sandbox environment). Evaluator version 1.5.6. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal (50% goal_accuracy + 50% behavior_check). <br>
-- Efficiency: Tool-call productivity and token efficiency (50% skill_efficiency + 50% token_efficiency). <br>
+- Security: Is it safe to use? Scored from the security signal. <br>
+- Correctness: Is the answer correct? Scored from the accuracy signal. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the skill_execution signal. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal_accuracy and behavior_check. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% skill_efficiency plus 50% token_efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (routing scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.3% | 70.4% |
+| Overall | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 73.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 5.6% → 100.0% (+94.4 points) | 31.7% → 53.3% (+21.6 points) |
-| Efficiency | 71.4% | 99.5% → 98.5% (-1.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 36.7% → 68.3% (+31.6 points) |
+| Efficiency | 71.9% — baseline ran, but no comparable score was available; uplift unavailable | 99.5% → 98.4% (-1.1 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

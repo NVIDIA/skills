@@ -15,21 +15,32 @@ This record identifies the persistent change that the recovery steps undo:
 - Created: `{{created-at}}`
 - Workspace: `{{workspace-path}}`
 - Planned command: `nemo-relay install codex`
+- Relay release: `{{relay-release}}`
+- Provider identity after setup: `{{provider-identity}}`
 - Setup thread ID: `{{thread-id-or-unknown}}`
 
 ## Why Threads May Appear Missing
 
-Persistent NeMo Relay setup changes the active Codex provider to
-`nemo-relay-openai`. Due to an open Codex Desktop provider-filtering bug, threads
-associated with another provider can disappear from the sidebar after restart.
-The thread data has not been deleted.
+Legacy NeMo Relay installations may select the `nemo-relay-openai` provider
+alias. In affected Codex Desktop versions, switching provider identity can hide
+threads associated with another provider after restart. The thread data has
+not been deleted.
+
+The currently documented `nemo-relay install codex` preserves the built-in
+`openai` provider identity and retains the alias only to resume sessions created
+by earlier Relay versions. Confirm the installed release's behavior in its
+Codex integration guide and the setup record above before diagnosing a provider
+visibility issue.
 
 Do not inspect, copy, delete, or edit Codex session storage or SQLite state to
 repair sidebar visibility.
 
 ## Restore Normal Codex Desktop Visibility
 
-Use these steps to restore the original provider configuration:
+For an affected legacy alias setup, confirm that the installed release's guide
+recommends uninstalling to restore the original provider configuration before
+using these steps. A setup that preserves `openai` does not require uninstall
+merely because this recovery file exists.
 
 1. Fully quit Codex Desktop.
 2. Open a terminal and run:
@@ -69,7 +80,8 @@ provider, but it remains available through `resume --all`.
 
 ## Prompt For A New Codex Task
 
-Paste this into a new Codex task if you want an agent to perform the recovery:
+After confirming an affected legacy alias setup, paste this into a new Codex
+task if you want an agent to perform the recovery:
 
 > I enabled persistent NeMo Relay integration for Codex and need to restore
 > normal Codex Desktop history visibility. Run `nemo-relay uninstall codex`,
@@ -87,6 +99,6 @@ Paste this into a new Codex task if you want an agent to perform the recovery:
 Use these references for the upstream issue and supported Relay workflows:
 
 - [Codex Desktop provider-filter bug](https://github.com/openai/codex/issues/24648)
-- [Relay Codex integration](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/codex)
-- [Relay plugin installation and uninstall](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/plugin-installation)
-- [Relay transparent run](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/basic-usage#transparent-run)
+- [Relay Codex integration](https://docs.nvidia.com/nemo/relay/latest/nemo-relay-cli/codex)
+- [Relay plugin installation and uninstall](https://docs.nvidia.com/nemo/relay/latest/nemo-relay-cli/plugin-installation)
+- [Relay transparent run](https://docs.nvidia.com/nemo/relay/latest/nemo-relay-cli/basic-usage#transparent-run)

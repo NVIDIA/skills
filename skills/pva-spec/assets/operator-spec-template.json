@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "schema_authority": "skill_workflow",
+  "status": null,
+  "operator": {
+    "name": null,
+    "purpose": null,
+    "task_mode": null,
+    "public_api": {
+      "language": [],
+      "headers": [],
+      "symbols": []
+    }
+  },
+  "platform": {
+    "pva_sdk_version": null,
+    "pva_generations": [],
+    "operating_systems": [],
+    "emulator": {
+      "policy": "optional"
+    },
+    "safety": {
+      "required": false,
+      "standard": null,
+      "constraints": []
+    },
+    "interoperability": []
+  },
+  "requirements": [],
+  "resources": {
+    "inputs": [],
+    "outputs": []
+  },
+  "parameters": [],
+  "behavior": {
+    "border": {
+      "modes": [],
+      "constant_value": null,
+      "halo": null
+    },
+    "arithmetic": {
+      "rounding": null,
+      "saturation": null,
+      "overflow": null,
+      "nan": null,
+      "infinity": null
+    },
+    "aliasing": {
+      "in_place": null,
+      "permitted_pairs": [],
+      "prohibited_pairs": []
+    },
+    "execution": {
+      "asynchronous": null,
+      "stream_rules": null,
+      "fence_rules": null,
+      "repeated_submission": null
+    },
+    "errors": []
+  },
+  "design_constraints": [],
+  "correctness_contracts": [],
+  "performance_contract": {
+    "acceptance": "not_set",
+    "target_source": null,
+    "sol_model": {
+      "required": false,
+      "assumptions": [],
+      "limiting_resource": null,
+      "predicted_time_or_cycles": null,
+      "acceptance_rule": null
+    }
+  },
+  "unresolved_requirements": []
+}

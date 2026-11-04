@@ -1,0 +1,28 @@
+{
+  "$comment": "Copy of tao-data-services:nvidia_tao_ds/mining/dinov3/workflow/schemas/metrics.schema.yaml; source handoff enforces semantic parity.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.nvidia.com/tao/dinov3-ssl-deft/metrics-1.0.schema.json",
+  "title": "Customer DINOv3 Evaluation Metrics",
+  "type": "object",
+  "required": ["schema_version", "metrics"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["task", "name", "value", "higher_is_better", "sample_count"],
+        "properties": {
+          "task": {"type": "string", "minLength": 1},
+          "name": {"type": "string", "minLength": 1},
+          "value": {"type": "number"},
+          "higher_is_better": {"type": "boolean"},
+          "sample_count": {"type": "integer", "minimum": 1}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

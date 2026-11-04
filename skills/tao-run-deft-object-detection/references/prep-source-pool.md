@@ -18,6 +18,8 @@ mkdir -p "$PREP_DIR"
 
 export CLASSES_YAML="<path to the run's classes.yaml>"
 export POOL_IMAGES="<config.pool_images>"   # the raw images this prep labels
+export CODETR_CHECKPOINT="<config.codetr_checkpoint>"  # the pseudo-labeller's weights
+export CODETR_CLASSMAP="<config.codetr_classmap>"     # its own vocabulary, one per line
 export CODETR_SPEC="${PREP_DIR}/codetr_inference.yaml"
 ```
 
@@ -38,9 +40,9 @@ against the same pool reuses them.
 
 **Prep is idempotent.** Skip any step whose output already exists. A user arriving with a pool that is already labeled and embedded pays nothing; a user with raw images pays for the whole chain once. Never re-label or re-embed a pool that already has current artifacts.
 
-**A pre-supplied pool still needs its report.** `class_stratified` mining requires
-`pool_report.json`, and `init_deft_state.py` refuses without one on a pool it is not
-about to build. A pool prepared before that file existed, or by anything other than
+**A pre-supplied pool still needs its report.** `init_deft_state.py` refuses a pool it
+is not about to build unless it has `pool_report.json`, under every allocation policy:
+it is the only check that the pool holds annotations for the run's target classes. A pool prepared before that file existed, or by anything other than
 this skill, will not have it — generate one from the pool's own COCO rather than
 re-labelling:
 
@@ -49,6 +51,8 @@ re-labelling:
   --coco "<pool>/coco.json" --classes "<classes.yaml>" \
   --record target_classes="<comma-separated target classes>" \
   --record source="<where this pool came from>" \
+  --record embedding_model="<SigLIP or CLIP, the family that embedded this pool>" \
+  --record embedding_model_path="<the encoder snapshot or id that embedded this pool>" \
   --report-json "<pool>/pool_report.json"
 ```
 
@@ -336,6 +340,8 @@ Do not read that as "the image survives to training". It does not: this step ski
   --record      target_classes="<comma-separated target classes>" \
   --record      codetr_checkpoint="$CODETR_CHECKPOINT" \
   --record      pyt_image="$TAO_PYT_IMAGE" \
+  --record      embedding_model="$EMBEDDING_MODEL" \
+  --record      embedding_model_path="$EMBEDDING_MODEL_PATH" \
   --report-json "${PREP_DIR}/pool_report.json"
 ```
 
@@ -420,7 +426,7 @@ docker run --rm --name "deft_prep_embed" --gpus all --shm-size=8g --user "$(id -
   embedding image_embeddings -e "$EMBED_SPEC"
 ```
 
-The encoder is whatever Pre-Flight check 9 resolved, and it must be the same one every
+The encoder is whatever Pre-Flight check 10 resolved, and it must be the same one every
 iteration uses: mining compares an iteration's embeddings against this pool parquet, so
 two encoders produce vectors that are not comparable and the failure is silent — mining
 succeeds and returns confidently wrong neighbours.
@@ -459,6 +465,11 @@ prep. Omitting the flag leaves the field unset and `mine` refuses.
 
 Hard-stop before the baseline when any of these hold:
 
+- `$CODETR_CHECKPOINT` is unset or not on disk. Pre-Flight check 7 resolves it — the
+  user's own path, or a verified fetch — so this
+  gate catches a run that skipped Pre-Flight or had the file removed since. It is listed
+  first because it is the cheapest to check and the most expensive to discover late: the
+  Co-DETR pass is the longest stage in the workflow and it is the first thing prep does.
 - Co-DETR is unavailable in the resolved image. Probe **both** forms — the bare `codetr`
   console script *and* `python3 -m nvidia_tao_pytorch.cv.codetr.entrypoint.codetr` (step 1).
   A failing `codetr --help` on its own is not this gate: it fails in every image checked so

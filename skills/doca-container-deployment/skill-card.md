@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides agents through hands-on deployment of in-bundle DOCA service containers (Argus, DMS, Firefly, or UROM service) on a BlueField using kubelet standalone mode, covering pod-spec drop, status verification, smoke-before-bulk workflow, and the layered error taxonomy. <br>
+Operates the cross-cutting DOCA container-deployment runtime on a BlueField — dropping YAML pod specs into the kubelet-standalone static-pod manifests directory, inspecting pod status, ENTRYPOINT logs, and per-service liveness, and diagnosing deployment failures across an eight-layer error taxonomy for the in-bundle DOCA services (Argus, DMS, Firefly, and UROM service). <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 AND CC-BY-4.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and platform operators deploying DOCA service containers on BlueField DPUs, diagnosing container lifecycle issues, and verifying service readiness through the kubelet standalone deployment pattern. <br>
+External operators and platform teams use this skill to deploy and operate DOCA service containers on a BlueField target running kubelet in standalone mode — configuring, running, smoke-testing, and debugging the shared container-deployment runtime that every in-bundle DOCA service uses to come up. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,56 +25,60 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework](https://github.com/NVIDIA/doca-platform) <br>
-- [Deployment Details](references/details.md) <br>
+- [details.md](references/details.md) <br>
+- [Capabilities companion](CAPABILITIES.md) <br>
+- [Tasks companion](TASKS.md) <br>
+- [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [NVIDIA-DOCA/doca-samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [NVIDIA/doca-platform](https://github.com/NVIDIA/doca-platform) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Format:** [Markdown with inline YAML and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 3 evaluation tasks in a k8s-sandbox environment with 1 attempt per task and a 50% pass threshold. <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each attempt run in its own isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed, with decoys avoided and the workflow executed. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% tool-call productivity and 50% token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 3 | 100% (+0%) | 100% (+0%) |
-| Correctness | 3 | 100% (+33%) | 100% (+20%) |
-| Discoverability | 3 | 100% (+33%) | 94% (+44%) |
-| Effectiveness | 3 | 100% (+84%) | 93% (+76%) |
-| Efficiency | 3 | 100% (+33%) | 96% (+62%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 97.8% (uplift unavailable) | 91.2% (uplift unavailable) |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 70.0% → 100.0% (+30.0 points) | 80.0% → 90.0% (+10.0 points) |
+| Discoverability | 100.0% (uplift unavailable) | 90.0% (uplift unavailable) |
+| Effectiveness | 64.6% → 100.0% (+35.4 points) | 87.5% → 100.0% (+12.5 points) |
+| Efficiency | 88.8% (uplift unavailable) | 76.1% (uplift unavailable) |
 
 ## Skill Version(s): <br>
-d33a8af (source: git SHA, committed 2026-07-26) <br>
+c98e456 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

@@ -26,7 +26,7 @@ every DOCA library bench can drive, not just one.
 | --- | --- | --- |
 | 1. Pick the target library | Cross-library — bench can drive AES-GCM, Comch, Compress, DMA, EC, Eth, RDMA, SHA, GPUNetIO. Picking the target library is axis 1 of the three-axis configuration. | [`## Capabilities and modes`](#capabilities-and-modes) cross-library table + [TASKS.md ## configure](TASKS.md#configure) step 1 |
 | 2. Pick the workload shape | The pipeline-of-steps model is axis 2 — what *operation* is the device being asked to do on each iteration (e.g. compress vs decompress, send vs receive, encrypt vs decrypt), with the data provider, batching, and remote-memory choices that go with it. | [`## Capabilities and modes`](#capabilities-and-modes) workload-shape rules + [TASKS.md ## configure](TASKS.md#configure) step 3 |
-| 3. Pick the measurement axis | Throughput vs bulk-latency vs precision-latency vs max-bandwidth is axis 3 — the shipped `doca_bench` binary defines FOUR benchmark modes in `tools/bench/doca_bench/configuration.hpp`. The public guide documents the modes as **not interchangeable**; a single number reported without naming the mode is ambiguous and the agent must surface that. | [`## Capabilities and modes`](#capabilities-and-modes) measurement-axis table + [TASKS.md ## configure](TASKS.md#configure) step 4 |
+| 3. Pick the measurement axis | Throughput vs bulk-latency vs precision-latency is axis 3 — the public guide documents three modes (`throughput`, `bulk-latency`, `precision-latency`); confirm the list with `--help`. The public guide documents the modes as **not interchangeable**; a single number reported without naming the mode is ambiguous and the agent must surface that. | [`## Capabilities and modes`](#capabilities-and-modes) measurement-axis table + [TASKS.md ## configure](TASKS.md#configure) step 4 |
 | 4. Smoke-before-bulk | Confirm the bench can talk to the target device with a trivial workload before a long run; predeclare the workload's acceptable run-to-run tolerance, then require two consecutive runs within it before calling the result stable | [TASKS.md ## configure](TASKS.md#configure) tolerance step + [TASKS.md ## run](TASKS.md#run) smoke flow + [TASKS.md ## test](TASKS.md#test) eval-loop overlay |
 | 5. Diagnose a bench failure | Walk the layered error taxonomy in [`## Error taxonomy`](#error-taxonomy) — config-syntax / device-binding / library-precondition / workload-precondition / measurement-soundness / version / cross-cutting — instead of guessing at causes from a stack trace. | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 | 6. Interpret a bench number | A bench number is only meaningful with the (command line + DOCA version + device + as-deployed environment) four-tuple. Quoting one without the other three is the cross-version regression-hunt failure mode. | [`## Observability`](#observability) + [TASKS.md ## test](TASKS.md#test) baseline-capture rule |
@@ -68,7 +68,7 @@ omitting any axis produces an ambiguous result.
 | --- | --- | --- |
 | 1. Target library | Which DOCA library is the unit under test (AES-GCM / Comch / Compress / DMA / EC / Eth / RDMA / SHA / GPUNetIO per the public guide's documented surface). | The cross-library scope is the bench's defining feature; an answer that picks one library and never names the others has silently narrowed the bench to a single-library tool. |
 | 2. Workload shape | The pipeline-of-steps the device runs each iteration — direction (e.g. send vs receive for RDMA / Eth, encrypt vs decrypt for AES-GCM, compress vs decompress for COMPRESS), the data provider (file / file-set / random-data per the public guide), batching, and whether remote-memory input / output is in play. | Two runs against the *same* library can report wildly different numbers if the workload shape differs; quoting "DOCA Compress throughput" without naming compress-vs-decompress, the data provider, and the buffer sizing is ambiguous. |
-| 3. Measurement axis | Throughput vs bulk-latency vs precision-latency vs max-bandwidth per the four documented operating modes (the shipped binary's `benchmark_mode` enum has four values; the public guide enumerates them). | The modes are explicitly **not interchangeable** — precision-latency disables batching, bulk-latency uses bucketing, throughput maximizes pipeline occupancy, max-bandwidth holds the pipeline at the saturation point. Comparing a precision-latency number to a throughput-mode number (or a max-bandwidth number to either) is the cross-mode apples-to-oranges failure. |
+| 3. Measurement axis | Throughput vs bulk-latency vs precision-latency per the operating modes (the public guide documents three: `throughput`, `bulk-latency`, `precision-latency`; confirm the list with `--help`). | The modes are explicitly **not interchangeable** — precision-latency disables batching, bulk-latency uses bucketing, throughput maximizes pipeline occupancy. Comparing a precision-latency number to a throughput-mode number is the cross-mode apples-to-oranges failure. |
 
 **Cross-library scope — what bench can drive.** The public DOCA
 Bench guide enumerates the supported DOCA libraries explicitly;
@@ -78,6 +78,21 @@ the bench's own built-in query system reports which subset is
 install is the intersection of "documented by bench" and
 "installed by this DOCA package selection" — the agent must
 probe, not assume.
+
+**GPUNetIO benchmarks — extra prerequisites.** When the target is
+GPUNetIO (task submission and processing offloaded to a GPU), the
+DOCA Bench guide lists three requirements beyond `doca_bench`
+itself: DOCA GPUNetIO, the **DOCA Bench Extension** package (it
+installs `libdoca_bench_cuda_impl`), and the NVIDIA GDRCopy
+library, with `GDRCOPY_PATH_L` set. Documented limits: both
+`doca_bench` and `doca_bench_companion` run as root, only
+throughput testing is supported (duration by time, job count or
+byte limit), one CPU core, and no multi-step tests. GPU device
+capabilities are queried with
+`doca_bench --gpu <pci-addr> --query device-capabilities`. A
+`DOCA_ERROR_NOT_SUPPORTED` when GPU acceleration initializes is a
+known issue keyed to `libdoca_bench_cuda_impl` — check the
+release notes before debugging the workload.
 
 **Pipeline of steps — the workload primitive.** Bench expresses
 a workload as a pipeline of steps, where each step is a
@@ -98,14 +113,13 @@ own jobs pool. The number of cores / threads and their NUMA
 placement is part of axis 2 (workload shape) for any number a
 later run is going to be compared against.
 
-**Operating modes.** Per the public guide:
+**Operating modes.** The public guide documents three modes (`throughput`, `bulk-latency`, `precision-latency`); confirm the full list on the installed binary with `--help`:
 
 | Mode | What it optimizes for | What it sacrifices |
 | --- | --- | --- |
 | `throughput` (default) | Maximum pipeline occupancy and aggregate bandwidth / op-rate | Per-job latency precision; results are aggregate, not per-job |
 | `bulk-latency` | A balance — submits batches, measures the time from first-submit to last-complete per batch, uses bucketing to report latency distribution | Per-job precision; latency is per-batch + bucketed, not per-job |
 | `precision-latency` | Per-job latency precision (min / max / median / percentiles) by submitting one job at a time | Throughput; the pipeline is deliberately serialized and capacity is wasted by design |
-| `max-bandwidth` | Pushes the workload at maximum sustainable bandwidth — separate operating mode from `throughput` in the parser (`tools/bench/doca_bench/configuration.hpp` defines four `benchmark_mode` enum values: `throughput`, `bulk_latency`, `precision_latency`, **`max_bandwidth`**; the CLI parser at `tools/bench/doca_bench/impl/configuration_parser.cpp` accepts the kebab-case spelling `max-bandwidth`). Use when the question is about the achievable bandwidth ceiling rather than aggregate op-rate. | Per-job latency precision; bandwidth-pinned runs deliberately hold the pipeline at the saturation point. |
 
 **Built-in query system.** Bench ships a documented query
 surface that reports which DOCA libraries are *installed* on
@@ -126,7 +140,7 @@ on its own.
 
 For the canonical DOCA version-detection chain, the four-way
 match rule, NGC container semantics, and the headers-win-over-docs
-rule, see [`doca-version`](../../doca-version/SKILL.md). The body
+rule, see `doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The `doca_bench`-specific overlay** is:
@@ -135,9 +149,9 @@ lives there; this skill does not duplicate it.
   DOCA Bench guide's prerequisites section. On older installs
   the binary is not present; the right answer for *"I can't
   find doca_bench"* is to confirm the installed version per
-  [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure)
+  `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)
   and, if `< 2.7.0`, route to
-  [`doca-setup`](../../doca-setup/SKILL.md) for an upgrade
+  `doca-setup/SKILL.md` for an upgrade
   rather than recommending alternative tools.
 - **Granular build means the *available library* set is
   install-specific.** The public guide documents granular build
@@ -151,14 +165,14 @@ lives there; this skill does not duplicate it.
   and the companion app are shipped together; mixing a bench
   binary from one DOCA version with a companion app from
   another is unsupported and falls into the partial-install
-  layer of [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+  layer of `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
 - **Output format stability is not contractually frozen.** The
   documented operating modes are stable; the exact textual
   layout of stdout, the CSV column order, and the screen-mode
   histogram rendering can shift across releases. Agents that
   need to consume bench output programmatically should prefer
   the structured helper per
-  [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md#schemas)
+  `doca-structured-tools-contract/SKILL.md#schemas`
   when present and re-verify the textual layout against the
   user's installed version when absent.
 - **Per-platform support matrix per the public guide.** The
@@ -167,7 +181,7 @@ lives there; this skill does not duplicate it.
   but not BlueField-2). Do not copy a library-availability
   claim from one BlueField generation to another; re-read the
   public matrix per
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 
 ## Error taxonomy
 
@@ -185,7 +199,7 @@ in escalating order:
    (often a flag taken from prose / blog / older release).
    Routing: re-read `--help` on the installed binary, and the
    public DOCA Bench guide via
-   [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools);
+   `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`);
    do not guess.
 2. **Device-binding.** Invocation parses; bench cannot bind the
    target device. Cause: device PCIe address / IB name /
@@ -193,8 +207,8 @@ in escalating order:
    of the chosen cores is wrong, or the underlying driver stack
    (`mlx5_core`, IB stack, etc.) is not loaded. Routing: first
    verify the device is visible to DOCA at all via
-   [`doca-caps ## run`](../doca-caps/TASKS.md#run) and
-   [`doca-setup ## test`](../../doca-setup/TASKS.md#test); only
+   `doca-caps ## run` (`doca-caps/TASKS.md#run`) and
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`); only
    re-attempt the bench invocation once the device is on the
    capability snapshot.
 3. **Library-precondition.** Device bound; bench refuses to
@@ -207,8 +221,8 @@ in escalating order:
    public guide's per-platform support matrix. Routing: bench's
    own query system per [`TASKS.md ## configure`](TASKS.md#configure)
    step 2 + the per-library skill (e.g.
-   [`doca-comch`](../../libs/doca-comch/SKILL.md),
-   [`doca-compress`](../../libs/doca-compress/SKILL.md)) for
+   `doca-comch/SKILL.md`,
+   `doca-compress/SKILL.md`) for
    the library-internal capability rules.
 4. **Workload-precondition.** Library exercisable; the workload
    shape is invalid for the library. Cause: a data provider
@@ -243,13 +257,13 @@ in escalating order:
       precision-latency percentile breakdown) alongside any
       single number.
 6. **Version.** Cross-cutting partial-install / mixed-version
-   layer per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   layer per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
    Symptoms: bench binary version disagrees with `doca_caps
    --version` or `pkg-config --modversion doca-common`,
    companion-app version disagrees with the bench-host version,
    public guide version the operator is reading disagrees with
    the install. Routing: walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    before any further investigation.
 7. **Cross-cutting.** The cause is below DOCA — driver /
    firmware / NUMA / hugepages / OS. Symptoms that do not fit
@@ -257,8 +271,8 @@ in escalating order:
    on one NUMA node, latency spikes correlated with kernel-
    thread scheduling, throughput tied to firmware version
    independent of DOCA version). Routing: hand off to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md) and
-   [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug);
+   `doca-debug ## debug` (`doca-debug/SKILL.md`) and
+   `doca-setup ## debug` (`doca-setup/TASKS.md#debug`);
    the bench surface has reached its limit.
 
 `doca_bench` does not *itself* participate in the cross-library
@@ -266,7 +280,7 @@ in escalating order:
 C API; bench is a CLI driving libraries, not a library call. For
 the cross-library `DOCA_ERROR_*` taxonomy and the program-side
 debug order, see
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 
 ## Observability
 
@@ -306,14 +320,14 @@ itself**, plus the built-in query system. Specifically:
 
 For the cross-cutting env-side observability primitives
 (representor enumeration, `devlink dev show`, `mlxconfig`) see
-[`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 For the program-side observability surface (DOCA log levels,
 `DOCA_LOG_LEVEL`, `--sdk-log-level`) see
-[`doca-programming-guide CAPABILITIES.md ## Observability`](../../doca-programming-guide/CAPABILITIES.md#observability).
+`doca-programming-guide CAPABILITIES.md ## Observability` (`doca-programming-guide/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 `doca_bench` is a measurement tool and a more powerful surface
 than `doca_caps`; it *does* allocate buffers, bind devices, and
@@ -362,7 +376,7 @@ out-of-band channel. The safety rules:
 
 The single canonical public source for `doca_bench` is the
 **DOCA Bench** page on `docs.nvidia.com`, reachable through
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 Do not invent flags, scenario names, attribute names, metric
 names, or supported library entries beyond what that page
 documents — and re-verify against `--help` on the user's

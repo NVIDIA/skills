@@ -1,0 +1,22 @@
+[
+  {"query": "Use Evo2 to generate a DNA continuation from this promoter sequence", "should_trigger": true},
+  {"query": "Run the Evo 2 NIM hosted API for genomic sequence generation", "should_trigger": true},
+  {"query": "Call arc evo2-40b generate with sampled probabilities", "should_trigger": true},
+  {"query": "I need logits from Evo2 for a nucleotide sequence", "should_trigger": true},
+  {"query": "Use the Evo 2 local Docker container to generate DNA", "should_trigger": true},
+  {"query": "Capture Evo2 output_layer and decoder layer tensors with the forward endpoint", "should_trigger": true},
+  {"query": "Decode base64 NPZ outputs from the Evo 2 forward pass", "should_trigger": true},
+  {"query": "Generate nucleotide sequence using a BioNeMo genomic foundation model NIM", "should_trigger": true},
+  {"query": "Help me set NIM_VARIANT=7b for the Evo2 NIM", "should_trigger": true},
+  {"query": "Validate an Evo 2 generated DNA sequence for GC and low complexity", "should_trigger": true},
+  {"query": "Use local Docker for /biology/arc/evo2/generate", "should_trigger": true},
+  {"query": "Use Evo2 sampled_probs and elapsed_ms_per_token for a DNA generation run", "should_trigger": true},
+  {"query": "Predict a protein structure from FASTA using OpenFold3", "should_trigger": false},
+  {"query": "Generate drug-like molecules with SAFE notation using GenMol", "should_trigger": false},
+  {"query": "Dock a ligand to a protein receptor and return binding poses", "should_trigger": false},
+  {"query": "Design protein sequences for this backbone with ProteinMPNN", "should_trigger": false},
+  {"query": "Search UniRef30 and build an MSA for AlphaFold", "should_trigger": false},
+  {"query": "Create a protein backbone for binder design using RFDiffusion", "should_trigger": false},
+  {"query": "Calculate GC content of this DNA string with plain Python", "should_trigger": false},
+  {"query": "Summarize the Evo 2 publication without calling a NIM endpoint", "should_trigger": false}
+]

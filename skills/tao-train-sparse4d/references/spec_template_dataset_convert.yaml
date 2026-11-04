@@ -1,56 +1,72 @@
-aicity:
-  anchor_init_config:
-    detection_range: -1.0
-    num_anchor: 900
-    output_file_name: anchor_init.npy
-    sample_ratio: -1
-  camera_grouping_mode: random
-  class_config:
-    ATTRIBUTE_DICT:
-      AgilityDigit: agility_digit.moving
-      FourierGR1T2: fourier_gr1_t2.moving
-      Person: person.moving
-      Transporter: transporter.moving
-    CLASS_LIST:
-    - Person
-    - FourierGR1T2
-    - AgilityDigit
-    - Transporter
-    CLASS_RANGE_DICT:
-      AgilityDigit: 40
-      FourierGR1T2: 40
-      Person: 40
-      Transporter: 40
-    MAP_CLASS_NAMES:
-      AgilityDigit: AgilityDigit
-      FourierGR1T2: FourierGR1T2
-      Person: Person
-      Transporter: Transporter
-    SUB_CLASS_DICT: {}
-  depth_format: h5
-  num_frames: 9000
-  recentering: true
-  rgb_format: mp4
-  root: ???
-  split: train
-  version: '2025'
-coco:
-  add_background: false
-  ann_file: <specify path to annotation file>
-  refine_box: false
-  use_all_categories: false
 data:
   input_format: AICITY
   output_format: OVPKL
 kitti:
   image_dir: <specify image directory>
   label_dir: <specify labels directory>
+  project: annotations
   mapping: ''
   no_skip: false
   preserve_hierarchy: false
-  project: annotations
+coco:
+  ann_file: <specify path to annotation file>
+  refine_box: false
+  use_all_categories: false
+  add_background: false
 odvg:
   ann_file: <specify path to annotation file>
   labelmap_file: <specify path to labelmap file>
+aicity:
+  root: ???
+  version: '2025'
+  split: train
+  class_config:
+    CLASS_LIST:
+    - Person
+    - FourierGR1T2
+    - AgilityDigit
+    - Transporter
+    SUB_CLASS_DICT: {}
+    MAP_CLASS_NAMES:
+      Person: Person
+      FourierGR1T2: FourierGR1T2
+      AgilityDigit: AgilityDigit
+      Transporter: Transporter
+    ATTRIBUTE_DICT:
+      Person: person.moving
+      FourierGR1T2: fourier_gr1_t2.moving
+      AgilityDigit: agility_digit.moving
+      Transporter: transporter.moving
+    CLASS_RANGE_DICT:
+      Person: 40
+      FourierGR1T2: 40
+      AgilityDigit: 40
+      Transporter: 40
+  recentering: true
+  rgb_format: mp4
+  depth_format: h5
+  camera_grouping_mode: random
+  anchor_init_config:
+    num_anchor: 900
+    detection_range: -1.0
+    sample_ratio: -1
+    output_file_name: anchor_init.npy
+  num_frames: 9000
+  load_annotations: true
+  fps: 30.0
+nvidia_pas:
+  root: <specify NVIDIA_PAS root>
+  use_symlinks: true
+  only_natural_and_original: false
+  exclude_natural_from_aug: false
+  val_sample_fraction: 0.1
+  include_test: false
+  clean_output: false
+nvidia_paidf_pas:
+  raw_output_dir: <specify PAIDF PAS SDG output root>
+  attribute_vocab_path: <specify TAO-FT attribute vocabulary>
+  input_layout: split_dataset
+  caption_policy: all
+  overwrite: false
 results_dir: ''
 verbose: false

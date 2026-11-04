@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers creating, migrating, reviewing, or maintaining third-party adapters that integrate external agent runtimes with NVIDIA NeMo Fabric through the published southbound adapter contract. <br>
+Developers and engineers creating, migrating, reviewing, or maintaining third-party adapters that integrate external agent harnesses or custom-agent runtimes with NVIDIA NeMo Fabric through the published southbound adapter contract. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -44,38 +44,39 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-6 evaluation tasks (4 positive, 2 negative) executed in isolated sandbox pods with 1 attempt per task. <br>
+7 evaluation tasks (5 positive, 2 negative) executed in isolated sandbox pods with 1 attempt per task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the skill produces correct answers against the reference answer. <br>
-- Discoverability: Whether the expected skill was found and executed when needed. <br>
-- Effectiveness: Whether the skill helps the agent complete the user's goal and expected workflow (equal-weight mean of goal completion and workflow adherence). <br>
-- Efficiency: Whether the skill avoids wasted tool or skill usage through quality routing and productive tool use. <br>
+- Security: Is it safe to use? Scored from the `security` signal. <br>
+- Correctness: Is the answer correct? Scored from the `accuracy` signal. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from the `skill_execution` signal. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` and `behavior_check`. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? 50% `skill_efficiency` plus 50% `token_efficiency`. <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | Not available | 52% → 79% (+27 points) |
-| Security | Not available | 83% → 50% (-33 points) |
-| Correctness | Not available | 30% → 87% (+57 points) |
-| Discoverability | Not available | 58% → 86% (+28 points) |
-| Effectiveness | Not available | 27% → 81% (+54 points) |
-| Efficiency | Not available | 61% → 90% (+30 points) |
+| Overall | Not available | 78.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | Not available | 57.1% → 85.7% (+28.6 points) |
+| Correctness | Not available | 71.4% → 82.9% (+11.5 points) |
+| Discoverability | Not available | 82.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | Not available | 52.1% → 70.2% (+18.1 points) |
+| Efficiency | Not available | 70.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-ae47327 (source: git SHA, committed 2026-09-02) <br>
+ac263cc (source: git SHA, committed 2026-10-08) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

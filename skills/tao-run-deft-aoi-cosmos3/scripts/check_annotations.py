@@ -20,7 +20,7 @@ import sys
 from validate_sharegpt import load_records, validate_records
 
 
-# Required/optional per role. `id` is required only where cosmos-rl-evaluate
+# Required/optional per role. `id` is required only where Framework evaluation
 # reads it: it hard-indexes item["id"] and reuses it as the per-sample output
 # filename. The training loader reads media with .get(), so Mining and the
 # generated Train file do not need one — though carrying it is harmless and
@@ -30,22 +30,25 @@ ROLE_CONTRACT = {
         "filename": "proxy_kpi.json",
         "required": ("images", "conversations", "id"),
         "optional": ("video_fps",),
-        "consumer": "cosmos-rl-evaluate (RCCA source)",
+        "consumer": "cosmos-framework-evaluate (RCCA source)",
     },
     "benchmark": {
         "filename": "benchmark_kpi.json",
         "required": ("images", "conversations", "id"),
         "optional": ("video_fps",),
-        "consumer": "cosmos-rl-evaluate (frozen stop gate)",
+        "consumer": "cosmos-framework-evaluate (frozen stop gate)",
     },
     "mining": {
         "filename": "mining_pool.json",
         "required": ("images", "conversations"),
         "optional": ("id", "video_fps"),
-        "consumer": "emit_mined_sharegpt.py -> tao_sft_example.py",
+        "consumer": (
+            "emit_mined_sharegpt.py -> cfw_cr3_aoi_adapter.py -> "
+            "cosmos-framework-train"
+        ),
     },
 }
-ALWAYS = "images is [AOI, golden_reference]; final assistant value is exactly OK or NG"
+ALWAYS = "images contains exactly [AOI, golden_reference]; final assistant value is exactly OK or NG"
 
 
 def _print_contract() -> None:

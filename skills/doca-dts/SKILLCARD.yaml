@@ -1,0 +1,45 @@
+# SKILLCARD.yaml — skill identity and routing metadata (canonical card: skill-card.md)
+# Schema: https://github.com/NVIDIA/skills/blob/main/docs/skill-cards.mdx
+
+schema_version: "1"
+
+identity:
+  name: "doca-dts"
+  artifact_id: "doca-dts"
+  kind: "service"
+  version: "TBD-at-sign-time"          # NVCARPS fills from the source ref
+  signature: "TBD-at-sign-time"        # NVCARPS-generated SHA + ed25519 sig
+  signed_by: "TBD-at-sign-time"        # NVCARPS identity (NVIDIA-PSIRT signing key)
+
+description: "Use this skill for deploying and configuring the NVIDIA DOCA\nTelemetry Service (DTS) as deployed — first deciding the deployment\nshape, then following that shape's column: (A) BlueField DPU built-in\nkubelet static pod (`/etc/kubelet.d/doca_telemetry_standalone.yaml`,\n`crictl` inspection, per-version yaml from the NGC container page),\n(B) host x86_64/aarch64 docker container from NGC (`-host` image tag,\none-shot `telemetry-init.sh` then `telemetry-run.sh`, host-namespace\nflags and config/ipc_sockets/data/log mounts), or (C) DPF `DPUService`\nbacked by the `doca-telemetry` helm chart (`configMapData.providers` /\n`general` / `fluent`, `key=value` -> `key: value` mapping, `kubectl\napply`, `dpfctl describe`, level labels via `DPUFlavorTemplate`).\nShared layer: `dts_config.ini` sampling (`update`), providers\n(`enable-provider` / `disable-provider`), exporters (Prometheus pull on\n`prometheus=`, Fluent Bit / OpenTelemetry / Prometheus Remote Write\npush, storage `output=/data`), level and device labels, HFT HTTP API.\nTrigger even without \"DTS\" — implicit forms: \"prometheus on my\nBlueField returns nothing on 9100\", \"the doca_telemetry docker\ncontainer on my host exits right after start\", \"add ethtool counters\nto the telemetry DPUService in my DPF cluster\". Refuse and route for\nDOCA install / BFB / BSP, the `doca-telemetry` and\n`doca-telemetry-exporter` library API (`doca_telemetry_exporter_*`),\ninstalling the DPF cluster itself, and Grafana / Prometheus server\nsetup or dashboard / PromQL authoring."
+
+source:
+  repo: "NVIDIA-DOCA/doca-skills"
+  path: "skills/services/doca-dts/SKILL.md"
+  branch: "main"
+  license: "Apache-2.0 AND CC-BY-4.0"
+
+provenance:
+  scan_run_id: "TBD-at-sign-time"      # NVCARPS scan run UUID
+  signed_at:   "TBD-at-sign-time"      # ISO-8601 timestamp from NVCARPS
+  upstream_catalog: "https://github.com/NVIDIA/skills"
+  upstream_component: "doca"
+
+quality:
+  canonical_card: "skill-card.md"     # signed card with evaluation results
+  benchmark: "BENCHMARK.md"
+
+behavior_boundaries:
+  documentation_only: true             # bundle ships no runnable code
+  hardware_touching_changes_routed_to: "skills/doca-hardware-safety/"
+  version_policy_routed_to: "skills/doca-version/"
+  external_productized_software_routed_to: "skills/doca-public-knowledge-map/"
+  see_also:
+    - "AGENTS.md"                       # universal rules
+    - "BENCHMARK.md"                    # how this skill is graded
+    - "SECURITY.md"                     # safety-bug intake
+
+contact:
+  bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues"
+  safety_bug_intake: "https://github.com/NVIDIA-DOCA/doca-skills/issues/new?labels=safety-bug"
+  security:   "https://www.nvidia.com/en-us/security/"

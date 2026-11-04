@@ -1,0 +1,68 @@
+#usda 1.0
+(
+    defaultPrim = "Looks"
+)
+
+def Scope "Looks"
+{
+    def Material "Steel"
+    {
+        token outputs:surface.connect = </Looks/Steel/Shader.outputs:surface>
+
+        def Shader "Shader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.45, 0.48, 0.52)
+            float inputs:metallic = 1
+            float inputs:opacity = 1
+            float inputs:roughness = 0.35
+            token outputs:surface
+        }
+    }
+
+    def Material "Wood"
+    {
+        token outputs:surface.connect = </Looks/Wood/Shader.outputs:surface>
+
+        def Shader "Shader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.35, 0.16, 0.06)
+            float inputs:metallic = 0
+            float inputs:opacity = 1
+            float inputs:roughness = 0.35
+            token outputs:surface
+        }
+    }
+
+    def Material "Glass"
+    {
+        token outputs:surface.connect = </Looks/Glass/Shader.outputs:surface>
+
+        def Shader "Shader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.18, 0.5, 0.75)
+            float inputs:metallic = 0
+            float inputs:opacity = 0.25
+            float inputs:roughness = 0.35
+            token outputs:surface
+        }
+    }
+
+    def Material "Paint"
+    {
+        token outputs:surface.connect = </Looks/Paint/Shader.outputs:surface>
+
+        def Shader "Shader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.08, 0.25, 0.65)
+            float inputs:metallic = 0
+            float inputs:opacity = 1
+            float inputs:roughness = 0.35
+            token outputs:surface
+        }
+    }
+}
+

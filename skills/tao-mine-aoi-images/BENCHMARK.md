@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-mine-aoi-images`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:2f6b99a4a594874f43e0be6c3915392736c3f9b703a55e95ada6d1a02662b36a` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 71.1% — baseline ran, but no comparable score was available; uplift unavailable | 74.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 76.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 26.7% → 100.0% (+73.3 points) |
-| Discoverability | 0.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 5.6% → 58.3% (+52.7 points) | 16.7% → 75.0% (+58.3 points) |
-| Efficiency | 94.6% → 97.1% (+2.5 points) | 99.5% → 98.6% (-0.9 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 16.7% → 85.0% (+68.3 points) |
+| Efficiency | 72.3% — baseline ran, but no comparable score was available; uplift unavailable | 99.5% → 98.5% (-1.0 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 34,429 | 644,156 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-mine-aoi-images-basic | 34,429 | 644,156 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 13,725 | 41,985 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | tao-mine-aoi-images-basic | 13,725 | 41,985 | N/A | N/A | skill 1/1; base 3/3 |
-| ALL AGENTS | Dataset aggregate | 48,154 | 686,141 | N/A | N/A | skill 2/2; base 6/6 |
+| claude-code | All cases | 98,756 | 248,548 | -149,792 | -60.27% | skill 1/1; base 1/1 |
+| claude-code | tao-mine-aoi-images-basic | 98,756 | 248,548 | -149,792 | -60.27% | skill 1/1; base 1/1 |
+| codex | All cases | 13,867 | 13,954 | -87 | -0.62% | skill 1/1; base 1/1 |
+| codex | tao-mine-aoi-images-basic | 13,867 | 13,954 | -87 | -0.62% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 112,623 | 262,502 | -149,879 | -57.10% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -66,7 +66,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 56 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 40 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
@@ -80,7 +80,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/data/tao-mine-aoi-images/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/data/tao-mine-aoi-images/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/data/tao-mine-aoi-images`)
-- 51 additional finding(s) are available in the full evaluation artifacts.
+- 35 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
@@ -108,6 +108,7 @@ Signals present in this run:
 
 - `security` (Security): unsafe operations, secret leakage, and unauthorized access.
 - `skill_execution` (Skill Execution): whether the expected skill was selected, decoys were avoided, and the workflow executed.
+- `skill_efficiency` (Tool Productivity): tool-call productivity (legacy wire id; routing is scored under Discoverability).
 - `accuracy` (Accuracy): final-answer correctness against the reference answer.
 - `goal_accuracy` (Goal Accuracy): whether the user's goal was achieved.
 - `behavior_check` (Behavior Check): whether the expected workflow behavior was followed.

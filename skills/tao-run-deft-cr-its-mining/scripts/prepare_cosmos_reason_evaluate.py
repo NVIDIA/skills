@@ -18,6 +18,7 @@ from workflow_common import (
     load_toml,
     load_yaml,
     path_in_workspace,
+    prepared_baseline_checkpoint,
     require_mapping,
     require_string,
 )
@@ -143,16 +144,9 @@ def main() -> int:
     path_in_workspace(workflow_yaml, workspace, "workflow YAML")
     path_in_workspace(run_dir, workspace, "run directory")
 
-    config = load_yaml(workflow_yaml)
-    cosmos_reason = require_mapping(config, "cosmos_reason")
     if args.iteration is None:
         output_dir = run_dir / "baseline" / "evaluate"
-        checkpoint_path = existing_absolute_path(
-            require_string(cosmos_reason, "cosmos_reason.baseline_model_path"),
-            workspace,
-            "cosmos_reason.baseline_model_path",
-            "path",
-        )
+        checkpoint_path = prepared_baseline_checkpoint(run_dir, workspace)
     else:
         if args.iteration < 1:
             raise ValueError("iteration must be >= 1")

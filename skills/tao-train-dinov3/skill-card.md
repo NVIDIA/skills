@@ -1,5 +1,5 @@
 ## Description: <br>
-Domain-adapts public DINOv3 ViT backbones on unlabeled images via teacher-student self-distillation (DINO + iBOT + KoLeo, optional Gram anchoring) and converts the EMA teacher into a timm-format backbone for downstream tasks. <br>
+DINOv3 continual self-supervised pre-training that domain-adapts public DINOv3 ViT backbones on unlabeled images via teacher-student self-distillation (DINO + iBOT + KoLeo, optional Gram anchoring) and converts the EMA teacher into a timm-format backbone for downstream tasks. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to domain-adapt DINOv3 vision transformer backbones on unlabeled images for downstream computer vision tasks such as classification, detection, segmentation, or depth estimation. <br>
+Developers and engineers use this skill to continue self-supervised training of DINOv3 backbones on unlabeled domain images with NVIDIA TAO Toolkit containers, then convert, export, or run inference with selected teacher checkpoints. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -27,20 +27,15 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [DINOv3 method and configuration](references/dinov3-method.md) <br>
 - [DINOv3 tuning and evaluation](references/dinov3-recipes.md) <br>
-- [Skill info](references/skill_info.yaml) <br>
-- [Train spec template](references/spec_template_train.yaml) <br>
-- [High-resolution train spec template](references/spec_template_train_highres.yaml) <br>
-- [Convert spec template](references/spec_template_convert.yaml) <br>
-- [Export spec template](references/spec_template_export.yaml) <br>
-- [Inference spec template](references/spec_template_inference.yaml) <br>
+- [skill_info.yaml](references/skill_info.yaml) <br>
 - [TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash and YAML code blocks; YAML spec files] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Training writes full, teacher, and student checkpoints to the configured results directory.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -49,23 +44,23 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-2 evaluation tasks (2 positive), 3 attempts per task, each in an isolated k8s-sandbox pod. Evaluator version 1.5.6. <br>
+2 positive evaluation tasks (tao-train-dinov3-basic, tao-train-dinov3-checkpoint-selection), 1 attempt per task, each in an isolated k8s sandbox pod, compared against a no-skill baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Measures final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected, decoys avoided, and workflow executed. <br>
-- Effectiveness: Equal-weight mean of goal completion (goal_accuracy) and expected workflow adherence (behavior_check). <br>
-- Efficiency: 50% tool-call productivity (skill_efficiency) and 50% token efficiency. <br>
+- Security: Is it safe to use? Scored from the security signal. <br>
+- Correctness: Is the answer correct? Scored from final-answer accuracy. <br>
+- Discoverability: Was the right skill loaded when needed? Scored from skill execution. <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal accuracy and behavior check. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of tool productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -73,12 +68,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.0% | 87.2% |
+| Overall | 93.3% — no comparable baseline; uplift unavailable | 95.7% — no comparable baseline; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 3.3% → 100.0% (+96.7 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% | 47.5% |
-| Effectiveness | 8.8% → 100.0% (+91.2 points) | 60.0% → 90.0% (+30.0 points) |
-| Efficiency | 84.8% | 98.5% |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — no comparable baseline; uplift unavailable | 95.0% — no comparable baseline; uplift unavailable |
+| Effectiveness | 12.5% → 93.8% (+81.3 points) | 70.0% → 85.0% (+15.0 points) |
+| Efficiency | 73.0% — no comparable baseline; uplift unavailable | 98.5% — no comparable baseline; uplift unavailable |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

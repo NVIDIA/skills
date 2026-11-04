@@ -11,7 +11,7 @@ schema → per-device probe → exporter ship → collector
 receive), `## debug` (layered diagnosis), and `## use`
 (hand the validated counter set off to the
 developer-side
-[`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+`doca-telemetry/SKILL.md`
 collector / exporter pipeline). The two routing-stub
 verbs (`build`, `modify`) are kept because the agent's
 task-verb contract is uniform across the bundle and
@@ -34,20 +34,20 @@ The operator-side install path:
 
 1. **Confirm DOCA is installed with the Telemetry
    component.** If the binary is missing, route to
-   [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+   `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
    to install or repair the host-side DOCA package
    selection; confirm the version per
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 2. **Confirm the BlueField the operator is targeting
    is visible to DOCA.** Walk
-   [`doca-setup ## test`](../../doca-setup/TASKS.md#test)
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`)
    for the device-visibility check; the per-device
    support probe (per
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes))
    requires the device to be visible to DOCA on the
    PCI address the operator passes.
 3. **Confirm the developer-side
-   [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+   `doca-telemetry/SKILL.md`
    library is installed at the matching DOCA
    version** if the operator intends to consume the
    resolved Data IDs from a collector application on
@@ -130,9 +130,9 @@ the user through, in order:
 For the canonical DOCA universal lifecycle on the
 developer-side collector / exporter this tool
 informs, see
-[`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure)
+`doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`)
 and
-[`doca-telemetry TASKS.md ## configure`](../../libs/doca-telemetry/TASKS.md#configure).
+`doca-telemetry TASKS.md ## configure` (`doca-telemetry/TASKS.md#configure`).
 This skill is concerned with the *operator-side*
 configuration of the support-tool invocation.
 
@@ -150,13 +150,13 @@ Routing for nearby "build" questions:
 
 - *"The binary isn't there — do I need to build it?"*
   → no. Route to
-  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   to install / repair the host-side DOCA package
   selection that includes the Telemetry component.
 - *"I want to build my own collector app that
   consumes the resolved Data IDs."* → not a
   `doca_telemetry_utils` question. Route to
-  [`doca-telemetry TASKS.md ## build`](../../libs/doca-telemetry/TASKS.md#build)
+  `doca-telemetry TASKS.md ## build` (`doca-telemetry/TASKS.md#build`)
   for the collector-side build pattern.
 - *"I want to extend the tool with a new
   invocation class."* → out of scope here; this
@@ -202,7 +202,7 @@ Routing for nearby "modify" questions:
 - *"I want a JSON output from the tool."* → not
   supported on the documented surface; route
   through the
-  [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+  `doca-structured-tools-contract/SKILL.md`
   preamble when a structured helper is present, or
   write a parser against the documented text
   output on the installed version per
@@ -216,11 +216,9 @@ Routing for nearby "modify" questions:
 The three documented invocations — every
 `doca_telemetry_utils` session uses one or more of
 them. The full invocation surface lives in the
-public DOCA Telemetry guide and the shipped README
-at `/opt/mellanox/doca/tools/telemetry_utils/README.md`;
-this section names the *shape* of the flow, not
-verbatim command lines beyond what the README
-documents.
+public DOCA Telemetry Utils guide; this section names
+the *shape* of the flow, not verbatim command lines
+beyond what the guide documents.
 
 1. **Confirm prerequisites.** Per [`## install`](#install)
    and [`## configure`](#configure): binary
@@ -243,7 +241,7 @@ documents.
     - Run `doca_telemetry_utils <name>
       <property-values>` to resolve the Data ID
       with the chosen property values. The output
-      tuple per the shipped README:
+      tuple:
       `Data ID: 0x...`, `Name: ...`, `Unit: ...`,
       property-axis values.
     - Capture the resolved tuple as evidence per
@@ -300,19 +298,19 @@ collector config is rolled forward).**
    resolved Data IDs.** The exporter ships Data
    IDs, not names. Per the developer-side library
    ownership in
-   [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md),
+   `doca-telemetry/SKILL.md`,
    the exporter side is owned by the publisher
    library + the user's exporter code, not by
    this tool.
 3. **Stand up the collector / downstream
    consumer.** Per
-   [`doca-telemetry TASKS.md ## configure`](../../libs/doca-telemetry/TASKS.md#configure)
-   and [`## run`](../../libs/doca-telemetry/TASKS.md#run);
+   `doca-telemetry TASKS.md ## configure` (`doca-telemetry/TASKS.md#configure`)
+   and `## run` (`doca-telemetry/TASKS.md#run`);
    confirm the collector is up and ready to
    receive events.
 4. **Run a single-event smoke from the exporter.**
    Per
-   [`doca-telemetry TASKS.md ## test`](../../libs/doca-telemetry/TASKS.md#test):
+   `doca-telemetry TASKS.md ## test` (`doca-telemetry/TASKS.md#test`):
    one event for one of the resolved counters; the
    collector must receive the event with the
    correct Data ID + correct property values.
@@ -332,7 +330,7 @@ rotation):
 | --- | --- | --- |
 | `get-counters` lists a counter the operator wants, but the per-device probe reports *"not supported"* | Schema-vs-device support gap | Pick a different counter, or pick a different device class; do NOT commit the unsupported counter. |
 | Forward resolve prints a Data ID, but reverse-resolve on a different DOCA version produces a different name | DOCA version skew — the counter was renamed or its property axes changed | Walk [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility); re-resolve against the version the exporter is actually targeting. |
-| Exporter ships a Data ID, collector receives nothing | Downstream pipeline issue; the schema-discovery tool's role ends here | Hand off to [`doca-telemetry TASKS.md ## debug`](../../libs/doca-telemetry/TASKS.md#debug) for the collector-side ladder; this tool already confirmed the schema half of the contract. |
+| Exporter ships a Data ID, collector receives nothing | Downstream pipeline issue; the schema-discovery tool's role ends here | Hand off to `doca-telemetry TASKS.md ## debug` (`doca-telemetry/TASKS.md#debug`) for the collector-side ladder; this tool already confirmed the schema half of the contract. |
 | Same DOCA version, two different BlueField generations, same counter — one supports, one does not | Per-device support is install + firmware versioned | Resolve / probe separately per device class; the exporter config may need to be parameterised per device. |
 | Operator passes a property value the documented set does not accept | Property-value-out-of-range error | Re-run `doca_telemetry_utils <name>` without properties to print the documented options; re-run with a valid value. |
 
@@ -368,10 +366,9 @@ in order. The shape of the diagnosis:
 1. **Install.** Confirm the binary exists, the
    Telemetry component is installed, and DOCA is
    at a known version per
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 2. **Parse.** Re-read `--help` on the installed
-   binary and the shipped README at
-   `/opt/mellanox/doca/tools/telemetry_utils/README.md`;
+   binary and the public DOCA Telemetry Utils guide;
    confirm the invocation matches one of the
    three documented classes; confirm the Data ID
    format (the documented form is `0x`-prefixed
@@ -396,9 +393,9 @@ in order. The shape of the diagnosis:
    DOCA Telemetry guide; pick a different counter
    or a different device class.
 7. **Version.** Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end; the tool ↔
-   [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+   `doca-telemetry/SKILL.md`
    library schema-version pairing is the common
    mismatch failure.
 8. **Cross-cutting (downstream).** If the tool
@@ -406,9 +403,9 @@ in order. The shape of the diagnosis:
    pipeline still fails, the cause is in the
    downstream pipeline, not in this tool. Hand
    off to
-   [`doca-telemetry TASKS.md ## debug`](../../libs/doca-telemetry/TASKS.md#debug)
+   `doca-telemetry TASKS.md ## debug` (`doca-telemetry/TASKS.md#debug`)
    and
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md).
+   `doca-debug ## debug` (`doca-debug/SKILL.md`).
 
 In every case: **quote what the tool reported.** Do
 not paraphrase the resolved tuple, do not invent a
@@ -424,7 +421,7 @@ The agent's hand-off:
 1. **Author / update the exporter config with the
    resolved Data IDs**, per the developer-side
    ownership in
-   [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+   `doca-telemetry/SKILL.md`
    (collector) plus the publisher-side library
    that emits the IDs.
 2. **Stand up the collector** per
@@ -448,7 +445,7 @@ The agent's hand-off:
 
 The agent's rule: this tool produces the validated
 counter set; the
-[`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+`doca-telemetry/SKILL.md`
 library (and the publisher-side library) consumes
 it. Conflating the two surfaces is the most common
 telemetry first-touch error.
@@ -461,18 +458,18 @@ of them under this skill's name.
 
 - **Developer-side collector / exporter
   programming** →
-  [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+  `doca-telemetry/SKILL.md`
   (collector library) + the publisher-library
   skill referenced from
-  [`doca-telemetry ## Related skills`](../../libs/doca-telemetry/SKILL.md#related-skills).
+  `doca-telemetry ## Related skills` (`doca-telemetry/SKILL.md#related-skills`).
   This tool informs those skills; it does not
   redefine them.
 - **DTS deployment / configuration** → separate
   DOCA service with its own public guide; route
   via
-  [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
+  `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 - **DOCA install / repair / upgrade** → route to
-  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure).
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`).
 - **Cross-cutting Telemetry pipeline observability
   (Prometheus / OpenTelemetry / fluentd
   integration)** → operator-owned downstream
@@ -486,14 +483,13 @@ of them under this skill's name.
 the verbs above reach for. Every row is a CLASS —
 the agent must not invent flags, counter names,
 property values, or Data IDs beyond `--help` on
-the installed binary, the shipped README at
-`/opt/mellanox/doca/tools/telemetry_utils/README.md`,
-and the public DOCA Telemetry page.
+the installed binary and the public DOCA Telemetry
+Utils page.
 
 **Infra-aware preamble (every row below).** Per
 the bundle's detect → prefer → fall back → report
 contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST
@@ -509,22 +505,22 @@ the agent should:
    command in the row.
 4. The schemas the structured tools emit are
    defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas).
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`).
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
-| Print help banner / documented flag surface | `doca_telemetry_utils` (no args) + the shipped README + the public DOCA Telemetry page | [`## configure`](#configure); [`## debug`](#debug) layer 2 | Prints the documented inventory of subcommands and option shapes. |
+| Print help banner / documented flag surface | `doca_telemetry_utils` (no args) + the public DOCA Telemetry Utils page | [`## configure`](#configure); [`## debug`](#debug) layer 2 | Prints the documented inventory of subcommands and option shapes. |
 | Enumerate the diagnostic-counter schema | `doca_telemetry_utils get-counters` | [`## run`](#run) step 2 | Prints every counter name DOCA understands on this install; the agent captures the output as the canonical catalog. |
-| Resolve a name to a Data ID with properties | `doca_telemetry_utils <name> <property-values>` (re-run `doca_telemetry_utils <name>` first if property options are unknown) | [`## run`](#run) step 3 | Prints the (Data ID, Name, Unit, property-values) tuple per the shipped README's worked example. |
+| Resolve a name to a Data ID with properties | `doca_telemetry_utils <name> <property-values>` (re-run `doca_telemetry_utils <name>` first if property options are unknown) | [`## run`](#run) step 3 | Prints the (Data ID, Name, Unit, property-values) tuple. |
 | Run a per-device support probe | `doca_telemetry_utils <device PCI> <name> <property-values>` | [`## run`](#run) step 4 | Reports the resolved tuple + a *"supported"* / *"not supported"* answer for this device. |
-| Reverse-resolve a Data ID | `doca_telemetry_utils <DATA_ID>` (`0x`-prefixed hex per the shipped README's worked example) | [`## run`](#run) step 5 | Prints the counter name + unit + property values that the Data ID encodes. |
+| Reverse-resolve a Data ID | `doca_telemetry_utils <DATA_ID>` (`0x`-prefixed hex) | [`## run`](#run) step 5 | Prints the counter name + unit + property values that the Data ID encodes. |
 
 Three cross-cutting rules for this appendix:
 
 - **Never invent a counter name, property value,
   or Data ID.** `--help` on the installed binary,
-  the shipped README, and the public DOCA
-  Telemetry page are the joint contract.
+  and the public DOCA Telemetry Utils page are the
+  joint contract.
 - **Round-trip before commit.** Every counter
   committed to an exporter config is first run
   through name → ID → per-device probe → exporter
@@ -535,8 +531,8 @@ Three cross-cutting rules for this appendix:
   cutting commands (`pkg-config --modversion
   doca-telemetry`, `doca_caps --list-devs`,
   `lspci` for the BlueField PCI address) live in
-  [`doca-debug ## debug`](../../doca-debug/SKILL.md) and
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug);
+  `doca-debug ## debug` (`doca-debug/SKILL.md`) and
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`);
   this appendix names only
   `doca_telemetry_utils`-specific invocation
   classes.
@@ -549,8 +545,7 @@ point of action and not buried in
 [`SKILL.md`](SKILL.md):
 
 - The **public DOCA Telemetry page** plus the
-  installed `--help` and the shipped README are
-  the joint source of truth. When they disagree,
+  installed `--help` are the joint source of truth. When they disagree,
   the *installed* output wins for the user's
   actual run.
 - **Exporters ship Data IDs, not names.** Every
@@ -573,5 +568,5 @@ point of action and not buried in
 - This skill **assumes a healthy DOCA install**
   with the Telemetry component and a BlueField
   visible to DOCA. If either is in doubt, route
-  to [`doca-setup`](../../doca-setup/SKILL.md)
+  to `doca-setup/SKILL.md`
   before running anything else here.

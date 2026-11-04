@@ -1,0 +1,73 @@
+{
+  "skill_name": "codonfm-embed",
+  "evals": [
+    {
+      "id": "codonfm-embed-001",
+      "prompt": "Validate the supplied sequences.csv and prepare a public Encodon embedding-extraction command. Explain which rows will be processed and how to associate the output embeddings with sequence IDs. Use the supplied public source and checkpoint metadata.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json",
+        "files/sequences.csv"
+      ],
+      "expected_output": "Two validated test rows and a public embedding_prediction command with the correct embedding/ID output contract.",
+      "assertions": [
+        "The command uses embedding_prediction, codon_sequence, and CodonBertDataset",
+        "The command specifies --checkpoint_path and output/prediction paths appropriate to the chosen working directory",
+        "The agent validates both sequence rows, including value and split=test, and explains that evaluation processes the test split",
+        "The response identifies embeddings_merged.npy and ids_merged.npy and explains their row alignment without fabricating embeddings"
+      ],
+      "expected_skill": "codonfm-embed",
+      "expected_script": null
+    },
+    {
+      "id": "codonfm-embed-002",
+      "prompt": "Does the public CodonFM implementation support extracting Decodon embeddings? Check the supplied source and explain the limitation, if any.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json"
+      ],
+      "expected_output": "The agent identifies the absence of a public Decodon model and inference implementation.",
+      "assertions": [
+        "The agent explains that the supplied public source has no Decodon model/inference implementation and cites inspected files",
+        "The agent does not invent a Decodon command or attempt to implement the missing model"
+      ],
+      "expected_skill": "codonfm-embed",
+      "expected_script": null
+    },
+    {
+      "id": "codonfm-embed-003",
+      "prompt": "Validate sequences_edge_cases.csv before running Encodon embedding extraction. Some rows look unusual — confirm whether each will process successfully, and if not, say exactly what happens and how to fix it.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json",
+        "files/sequences_edge_cases.csv"
+      ],
+      "expected_output": "A per-row verdict: row 1 (row_normal) processes normally; row 2 (row_blank_split) is silently excluded from the test split, not an error, and should be set to split=test to be included; row 3 shares its id with row 1, which the agent should flag as a duplicate that will make ids_merged.npy ambiguous; row 4 (row_oversized, 2050 codons) exceeds the context-length codon limit and will be truncated rather than embedded in full.",
+      "assertions": [
+        "The agent correctly identifies that the row with a blank split value will be silently excluded from extraction because the eval path filters strictly on split=='test', not treated as an error or crash",
+        "The agent flags the duplicate id across two rows and explains the consequence for mapping ids_merged.npy back to source rows",
+        "The agent identifies that the oversized sequence exceeds context_length - 2 codons and will be truncated rather than rejected, and explains what information is lost",
+        "The agent does not claim all four rows will process identically, and does not fabricate output values"
+      ],
+      "expected_skill": "codonfm-embed",
+      "expected_script": null
+    },
+    {
+      "id": "codonfm-embed-004",
+      "prompt": "We want the most reliable embeddings for training a translation-efficiency regressor on a small (~200-sequence) labeled set. Which public Encodon checkpoint should we use, and what correlation with ground truth should we expect? Justify the choice.",
+      "files": [
+        "files/codonfm_source.zip",
+        "files/encodon_checkpoint.json"
+      ],
+      "expected_output": "A recommendation for the largest available public checkpoint (1B, or 1B-Cdwt for codon-frequency-weighted masking), citing the CodonFM preprint's reported translation-efficiency correlation advantage over smaller checkpoints, with an explicit caveat that a published benchmark correlation is not a performance guarantee on this specific 200-sequence dataset.",
+      "assertions": [
+        "The agent recommends a specific public checkpoint size rather than declining to answer",
+        "The agent cites the preprint/published benchmarks as the source of its performance claim, not the supplied source code (which contains no benchmark numbers at all)",
+        "The agent distinguishes the published benchmark result from a guarantee on the user's own small labeled set",
+        "The agent does not claim access to internal-only benchmark numbers beyond what the public preprint documents"
+      ],
+      "expected_skill": "codonfm-embed",
+      "expected_script": null
+    }
+  ]
+}

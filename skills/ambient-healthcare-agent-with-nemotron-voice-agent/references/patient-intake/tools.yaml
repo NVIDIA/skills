@@ -1,0 +1,80 @@
+review_patient_intake:
+  type: function
+  function:
+    name: review_patient_intake
+    description: >-
+      Prepare a natural spoken review of the completed intake without saving
+      anything. Call this exactly once after all five intake fields are known,
+      and this tool must be called again after any correction; never narrate a
+      corrected review directly. After the review is spoken, wait for the user
+      to confirm or correct it. Do not call record_patient_intake
+      in the same turn. Do not call this again when the assistant's most recent
+      message reviewed all five fields, asked whether they are correct, and the
+      user has just answered yes or otherwise explicitly confirmed them.
+    parameters:
+      type: object
+      properties:
+        patient_name:
+          type: string
+          description: Patient full name.
+        date_of_birth:
+          type: string
+          description: Patient date of birth in year-month-day order.
+        symptoms:
+          type: string
+          description: Patient's current symptoms or visit reason.
+        current_medications:
+          type: string
+          description: Patient's current medications, including none when applicable.
+        current_pharmacy:
+          type: string
+          description: Patient's current or preferred pharmacy.
+      required:
+        - patient_name
+        - date_of_birth
+        - symptoms
+        - current_medications
+        - current_pharmacy
+
+record_patient_intake:
+  type: function
+  function:
+    name: record_patient_intake
+    description: >-
+      Save a reviewed lightweight patient intake record. Call this only after
+      review_patient_intake has presented all five fields and the user has
+      explicitly confirmed that the most recent review is correct. Never call
+      this merely because all fields are known, after a correction that has not
+      been reviewed, or in the same turn as review_patient_intake. When the
+      assistant's most recent message reviewed all five fields and asked whether
+      they are correct, an immediate yes from the user authorizes this call.
+    parameters:
+      type: object
+      properties:
+        patient_name:
+          type: string
+          description: Patient full name.
+        date_of_birth:
+          type: string
+          description: Patient date of birth, preferably in year-month-date order.
+        symptoms:
+          type: string
+          description: Patient's current symptoms or visit reason.
+        current_medications:
+          type: string
+          description: Patient's current medications, including none when applicable.
+        current_pharmacy:
+          type: string
+          description: Patient's current or preferred pharmacy.
+        patient_confirmed:
+          type: boolean
+          description: >-
+            Must be true only when the user explicitly confirmed the most
+            recent spoken review without making a correction.
+      required:
+        - patient_name
+        - date_of_birth
+        - symptoms
+        - current_medications
+        - current_pharmacy
+        - patient_confirmed

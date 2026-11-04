@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: Physical AI
+repo: NVIDIA-Omniverse/ovnewton
+description: Physical AI skills for simulation, synthetic data generation, training, validation and deployment and more.
+ref: main
+skills:
+  - path: skills/physical-ai-physics-selection/
+    catalog_dir: physical-ai-physics-selection
+links:
+  primary: false
+  contributing: README.md#contributing
+  discussions: false

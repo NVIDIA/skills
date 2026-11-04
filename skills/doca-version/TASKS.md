@@ -13,7 +13,7 @@ four-way match rule, NGC semantics, error taxonomy, observability,
 and per-library overlay pattern, see
 [CAPABILITIES.md](CAPABILITIES.md). For the JSON schemas of the
 structured-tools helpers the agent prefers when present, see
-[`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md).
+`doca-structured-tools-contract/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through the
@@ -30,7 +30,7 @@ Steps the agent should walk the user through:
 
 1. **Probe for the structured helper first.** Run `command -v
    doca-env` (per
-   [`doca-structured-tools-contract ## The agent behavior contract`](../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract)).
+   `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`)).
    If present, run `doca-env --json` and read `version.consistent`
    — one line, four-way match pre-computed. Report *"using
    structured `doca-env`"* per the contract's report rule.
@@ -73,7 +73,7 @@ link against matches the runtime DOCA version on the build host.
 
 The build pattern for any DOCA C/C++ consumer uses `pkg-config` for
 include + link flags — fully documented in
-[`doca-programming-guide TASKS.md ## build`](../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 This skill carries only the *version-side* overlay:
 
 | Slot | Value | Why it matters |
@@ -100,11 +100,11 @@ Three concrete shapes the modify workflow handles:
 | --- | --- | --- |
 | 1. Update a build-manifest `pkg-config` minimum | The minimum DOCA version the project requires (e.g. `dependency('doca-common', version: '>=2.6.0')` in `meson.build`) | Confirm via the version-matrix that 2.6.0 is in fact when the user's needed capability landed; over-pinning excludes users whose install is older but supports the capability via a different path |
 | 2. Update a per-library skill's `## Version compatibility` overlay | The 3-5 line redirect + the one library-specific overlay rule | Per the overlay pattern in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), the overlay MUST cross-link this skill and MUST add at most one library-specific rule; if you find yourself writing more, the content belongs here instead |
-| 3. Bump the version-matrix when a new DOCA release ships | Append rows to `version-matrix.json` for newly-available capabilities, set `max_doca_version` on rows the new release removes | The schema is locked in [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md#schemas); follow it. The source-quote field MUST be derived from a public docs URL, never agent memory |
+| 3. Bump the version-matrix when a new DOCA release ships | Append rows to `version-matrix.json` for newly-available capabilities, set `max_doca_version` on rows the new release removes | The schema is locked in `doca-structured-tools-contract/SKILL.md#schemas`; follow it. The source-quote field MUST be derived from a public docs URL, never agent memory |
 
 Each modify intent produces a *minimum diff*; never expand scope
 to "while we're here". A version-only modify that also re-flows
-prose in adjacent sections is a lint regression in disguise.
+prose in adjacent sections is a scope creep in disguise.
 
 ## run
 
@@ -153,9 +153,9 @@ Iteration shape:
 2. **Version-matrix lookup.** For each capability the user's
    program / question depends on: look up
    `version-matrix.json` (per
-   [`doca-structured-tools-contract ## version-matrix.json schema`](../doca-structured-tools-contract/SKILL.md#schemas))
+   `doca-structured-tools-contract ## version-matrix.json schema` (`doca-structured-tools-contract/SKILL.md#schemas`))
    if present; otherwise fetch the matching per-library docs
-   page via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+   page via `doca-public-knowledge-map/SKILL.md`
    and extract the *"available since"* prose. Compare the
    minimum DOCA version against the installed version.
 3. **Per-library capability query.** For each capability the
@@ -188,7 +188,7 @@ evidence-backed correction changes the captured version state, run it
 one more time. Stop after that second sweep regardless of outcome. If
 it is still inconsistent or reveals another required correction, the
 cause is below version handling; escalate to
-[`doca-debug ## debug`](../doca-debug/TASKS.md#debug) with both
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`) with both
 captures as evidence.
 
 ## debug
@@ -198,7 +198,7 @@ cause, diagnose it through the layered ladder below before any
 other layer is considered.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver. This skill OWNS *layer 2 (version)*;
 the other layers redirect.
@@ -211,7 +211,7 @@ the other layers redirect.
    - `pkg-config doca-common` ≠ `cat applications/VERSION` →
      install scripts and `*.pc` files are from different
      releases. Re-install consistently via
-     [`doca-setup`](../doca-setup/SKILL.md).
+     `doca-setup/SKILL.md`.
    - `pkg-config doca-common` ≠ `doca_caps --version` → build-time
      and runtime are from different releases. Check
      `LD_LIBRARY_PATH` and `ldconfig -p | grep doca`; the
@@ -220,7 +220,7 @@ the other layers redirect.
      individual library `.pc` file is from a different release.
      The user installed `doca-<library>` from a different
      package than `doca-common`; route to
-     [`doca-setup`](../doca-setup/SKILL.md) for a consistent
+     `doca-setup/SKILL.md` for a consistent
      reinstall.
    - BFB version differs from host package version → cross-host
      compatibility-window question. Cite the [DOCA Compatibility
@@ -263,7 +263,7 @@ is wide and confusing:
 This anchor is the **agent's precheck** for any host that has DOCA
 installed AND is about to receive any subsequent `apt install` /
 `apt upgrade` invocation. It runs BEFORE
-[`doca-setup ## configure`](../doca-setup/TASKS.md#configure) and is
+`doca-setup ## configure` (`doca-setup/TASKS.md#configure`) and is
 referenced from the cross-cutting precondition step there.
 
 1. **Capture the configured DOCA apt source(s).** On Debian / Ubuntu:
@@ -281,9 +281,9 @@ referenced from the cross-cutting precondition step there.
     - **Local file-repo form** — `file:/usr/share/doca-host-<full-build-id>/repo ./`,
       dropped on disk by the `doca-host` meta-package on Ubuntu /
       Debian hosts that installed via the offline `.deb` bundle.
-      Observed in the wild on real DOCA 3.3 installs (the build-id
-      embeds the release: e.g. `doca-host-3.3.0-088910-26.01-ubuntu2204`
-      is DOCA 3.3.0 host build 088910, OFED 26.01, on Ubuntu 22.04).
+      The build-id embeds the release: e.g.
+      `doca-host-3.3.0-088000-26.01-ubuntu2204` is DOCA 3.3.0 host
+      build 088000, OFED 26.01, on Ubuntu 22.04.
       The release channel is the `X.Y.Z` inside the build-id; it
       is **already pinned** by the bundle and cannot drift across
       `apt upgrade` unless `doca-host` itself is upgraded.
@@ -326,7 +326,7 @@ referenced from the cross-cutting precondition step there.
     - Prefer pinning the apt source to the explicit `X.Y.Z` URL
       form documented in the DOCA Installation Guide (reached
       through
-      [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points))
+      `doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`)
       for any controlled upgrade — `latest` channels are for fresh
       installs, NOT for landing on a known target release.
     - When the source channel and installed version genuinely
@@ -349,7 +349,7 @@ referenced from the cross-cutting precondition step there.
    (e.g. rolled the BF back to `3.1.0105`) but did NOT
    simultaneously reconfigure the host's apt source to match. This
    is exactly the
-   [`doca-bare-metal-deployment ## bluefield-state-classifier`](../doca-bare-metal-deployment/TASKS.md#bluefield-state-classifier)
+   `doca-bare-metal-deployment ## bluefield-state-classifier` (`doca-bare-metal-deployment/TASKS.md#bluefield-state-classifier`)
    state `host-bf-version-mismatch`; the apt-source precheck above
    is the *host-side cause* of that state.
 
@@ -367,17 +367,15 @@ the agent does not invent guidance:
 
 - **install.** Installing DOCA, choosing packages, post-install
   verification — defer to
-  [`doca-setup`](../doca-setup/SKILL.md). This skill assumes
+  `doca-setup/SKILL.md`. This skill assumes
   something is installed; version handling is *what was installed
   and is it consistent*.
 - **deploy.** Deploying DOCA-using applications at scale across
-  multiple hosts / DPUs, Kubernetes operator workflows — out of
-  scope for Phase 1. The multi-host *version match* is handled in
+  multiple hosts / DPUs, Kubernetes operator workflows — out of scope for this skill. The multi-host *version match* is handled in
   this skill's [`## test`](#test) cross-host check; the *deploy
   mechanics* are not.
 - **rollback.** Coordinated rollback of a DOCA release across
-  multiple hosts / DPUs — out of scope for Phase 1 and reserved
-  for a future platform skill. For single-host version rollback,
+  multiple hosts / DPUs — out of scope for this skill. For single-host version rollback,
   the right verb is reinstalling the previous release via
   `doca-setup`; this skill does not own the rollback procedure.
 - **firmware burn / BFB re-image.** Burning new ConnectX firmware
@@ -395,7 +393,7 @@ unprivileged user unless noted. Rows that need elevated privileges call that out
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| Read `version.consistent` from `doca-env --json` if present per [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md#schemas); else walk the manual chain below | `## configure` step 1 | What is the installed DOCA version and is it consistent? | Single semver matching across all sources (structured) OR four matching semver strings from the manual chain |
+| Read `version.consistent` from `doca-env --json` if present per `doca-structured-tools-contract/SKILL.md#schemas`; else walk the manual chain below | `## configure` step 1 | What is the installed DOCA version and is it consistent? | Single semver matching across all sources (structured) OR four matching semver strings from the manual chain |
 | `pkg-config --modversion doca-common` | `## configure` step 2; `## build` slot 1 | What is the build-time DOCA version? | A semver string matching `doca_caps --version` |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 2 | What does the install tree itself claim? | A semver string matching the other sources |
 | `"$DOCA_CAPS" --version` after resolving `DOCA_CAPS` in `## configure` step 2 (the canonical `doca_caps --version` leg) | `## configure` step 2; `## run` step 1 | What is the runtime DOCA version without assuming the tool is on `PATH`? | A semver string matching `pkg-config --modversion doca-common` |
@@ -403,4 +401,4 @@ unprivileged user unless noted. Rows that need elevated privileges call that out
 | `grep -RHn 'DOCA_VERSION_' $(pkg-config --variable=includedir doca-common)/doca_version.h` | `## configure` step 2; `## build` slot 2 | What macros does this install expose for compile-time version checks? | A `DOCA_VERSION_MAJOR / MINOR / PATCH` triple matching the runtime version |
 | `ldconfig -p | grep doca` | `## run` step 2; `## debug` layer 2 | Which DOCA `*.so` files does the runtime linker see? | One install's set of `*.so` files; multiple installs visible = the runtime might resolve to the wrong one |
 | `ls "$(dirname "$(find /opt/mellanox/doca -name doca-common.pc -print -quit)")"` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/` on DOCA 3.3+, OR `/opt/mellanox/doca/infrastructure/lib/pkgconfig/` on legacy / split-profile installs) | `## debug` layer 2 | Which `*.pc` files does this install ship? | One `*.pc` per installed library; `doca-common.pc` MUST be present |
-| Look up capability in `version-matrix.json` if present per [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md#schemas); else fetch the matching per-library docs page via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md) and extract the *"available since"* prose | `## test` step 2 | Is capability X available on the user's installed version? | Min-version row (structured) OR quoted prose (manual) — both saying *"available since DOCA Y.Z.W"* |
+| Look up capability in `version-matrix.json` if present per `doca-structured-tools-contract/SKILL.md#schemas`; else fetch the matching per-library docs page via `doca-public-knowledge-map/SKILL.md` and extract the *"available since"* prose | `## test` step 2 | Is capability X available on the user's installed version? | Min-version row (structured) OR quoted prose (manual) — both saying *"available since DOCA Y.Z.W"* |

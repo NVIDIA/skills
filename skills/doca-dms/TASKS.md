@@ -23,9 +23,9 @@ Preparing the management endpoint and choosing a deployment shape.
 1. **Confirm the env is healthy first.** This skill expects DOCA to be
    installed at the management endpoint (host, BlueField Arm, or pod
    image base). If that has not been verified, run
-   [`doca-setup ## test`](../../doca-setup/TASKS.md#test) first. If
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`) first. If
    the user has no install yet, route to
-   [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    for the public NGC DOCA container path. Do not return until the
    `doca-setup ## test` install/version, capability, and smoke checks
    are green for the management endpoint; run that check once. If it
@@ -40,11 +40,8 @@ Preparing the management endpoint and choosing a deployment shape.
    before any further step.
 3. **Identify the management protocol scope.** Confirm whether the
    user needs gNMI (data configuration), gNOI (system operations), or
-   both. gNMI Subscribe streaming IS supported (`STREAM` with `SAMPLE`
-   1s–60s and `ONCE`; only `POLL` / `Aggregation` are Unimplemented per
-   `gnxi/gnmi/server.go`). For a turnkey, productized
-   telemetry-aggregation surface separate from DMS's own gNMI
-   Subscribe, route to the DOCA Telemetry Service (DTS) instead.
+   both. DMS does not support gNMI `Subscribe`; for telemetry
+   streaming route to the DOCA Telemetry Service (`doca-dts/SKILL.md`).
 4. **Plan the authentication mode.** Choose one of the four
    documented modes (localhost-only / PAM / credentials / mTLS) and
    read the *Security Best Practices* subsection before committing.
@@ -55,8 +52,7 @@ Preparing the management endpoint and choosing a deployment shape.
    with the matching documented recipe.
 5. **Plan user authorization.** Identify the human/service users who
    will issue DMS commands over gRPC and ensure they are in the
-   `-allowed_users` list (default `root`; enforced by `isUserAllowed`
-   in `gnxi/utils/credentials/credentials.go`). The `dmsgroup` Unix
+   `-allowed_users` list (default `root`). The `dmsgroup` Unix
    group is a separate, `dmspe`-only gate — add a user to it only if
    they also need to invoke the `dmspe` privileged helper directly on
    the endpoint.
@@ -82,7 +78,7 @@ language, the right routing is:
 If the user is instead asking about building **a DOCA application** in
 the general sense (linking against `libdoca-*`), that is *not* a DMS
 question — route them to
-[`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build)
+`doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
 and the matching `libs/<library>` skill.
 
 ## modify
@@ -123,9 +119,15 @@ Bringing up `dmsd` and exercising it.
    Method / Security flag families. Quote flags from the live guide;
    do not infer flags from generic gRPC knowledge.
 3. **Verify the daemon is reachable.** Use a documented gNMI `Get`
-   against a known-supported State path as a connectivity probe.
-   "Documented" matters: a `Get` against an unsupported path returns
-   an error from `dmsd` regardless of whether the daemon is healthy.
+   against a known-supported State path as a connectivity probe, and
+   give the operator that command. "Documented" matters: a `Get`
+   against an unsupported path returns an error from `dmsd`
+   regardless of whether the daemon is healthy.
+
+   When the probe fails, name where to look rather than closing with
+   "check the logs": report the gRPC status code it returned, then
+   `journalctl -u dmsd` for frontend transport and auth failures, or
+   the `dmspe` backend log for tool-execution failures.
 4. **Verify authorization works as expected.** Confirm a user in the
    `-allowed_users` list can issue gRPC commands and a user outside it
    cannot. If the test fails, the failure is at the authorization
@@ -235,16 +237,15 @@ without clearing the layer above.
 2. **Authentication / authorization layer.** Symptoms:
    `UNAUTHENTICATED`, `PERMISSION_DENIED`, "user not authorized".
    Causes: wrong credentials, user not in the `-allowed_users` list
-   (applies to ALL auth modes, enforced by `isUserAllowed`),
+   (applies to ALL auth modes),
    certificate issuer not trusted by `dmsd`. Resolution: walk the
    documented authentication-mode troubleshooting in the public guide
    for the specific mode in use.
 3. **Path / operation layer.** Symptoms: `INVALID_ARGUMENT`, "path
    not found", "operation not supported". Causes: the path is not in
    the DMS-supported set, the operation is not in the documented
-   gNOI list, or an unsupported gNMI Subscribe MODE was attempted
-   (`POLL` / `Aggregation` are Unimplemented; `STREAM` / `SAMPLE`
-   1s–60s and `ONCE` ARE supported).
+   gNOI list, or a gNMI `Subscribe` was attempted (DMS does not
+   support it).
    Resolution: re-read the supported-paths reference and the gNOI
    operation list in `CAPABILITIES.md`. If the path or operation is
    genuinely not in the public set, the answer is "not supported" —
@@ -270,7 +271,7 @@ without clearing the layer above.
 6. **Library-level errors.** If DMS is acting as a thin wrapper over
    a DOCA library call and that library returned `DOCA_ERROR_*`, the
    relevant cross-library taxonomy lives in
-   [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+   `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
    The library-specific overlay (e.g. for Flow) lives in the
    matching `libs/<library>` skill.
 
@@ -287,7 +288,7 @@ SystemD unit file, not prose recall.
 | Daemon lifecycle (SystemD) | `systemctl status dmsd` / `start` / `stop` / `restart` | [`## run`](#run) | `active (running)` with no recent restart loops. |
 | Daemon launch (manual) | `dmsd --help` first, then the documented flag set | [`## run`](#run) | Daemon binds the documented listener and emits the expected startup banner. |
 | Daemon logs (frontend) | `journalctl -u dmsd --since "5 min ago"` or the documented log file | [`## debug`](#debug) layer Transport/Auth | Lines present for the request window; no auth-rejection storm. |
-| Daemon logs (backend) | The documented `dmspe` log destination | [`## debug`](#debug) layer Backend | Backend execution lines present; tool stderr captured. |
+| Daemon logs (backend) | `journalctl -u dmspe --since "5 min ago"`, or the `dmspe` log file the launch flags set | [`## debug`](#debug) layer Backend | Backend execution lines present; tool stderr captured. |
 | Sanity gNMI Get | A gNMI `Get` on a path copied verbatim from the installed/public DMS guide for this release; do not substitute a generic OpenConfig example | [`## test`](#test) step 1 | Returns the expected typed value. |
 | Sanity gNMI Set | A gNMI `Set` on a documented, reversible path selected by the operator on a test-only interface/instance; snapshot first, then restore and verify as in test step 3 | [`## test`](#test) step 3 | Returns success; subsequent `Get` reflects the test value, then the restored snapshot. |
 | gNOI sanity (read-only) | A gNOI `System.Time` (or equivalent read-only op the guide lists) | [`## test`](#test) step 1 | Returns the expected time / status. |
@@ -308,29 +309,26 @@ Three cross-cutting rules for this appendix:
   backend.
 - **Cross-link instead of duplicate.** Cross-cutting commands (the
   read-only triple, `dmesg`, `mlxconfig -d <pcie> q`) live in
-  [`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+  `doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
   this appendix names only the DMS-specific ones.
 
 ## Deferred task verbs
 
 - **Installing DOCA on the management endpoint** — out of scope here.
-  Route to [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+  Route to `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   for env preparation and
-  [`doca-setup ## test`](../../doca-setup/TASKS.md#test) for install
+  `doca-setup ## test` (`doca-setup/TASKS.md#test`) for install
   health verification, or
-  [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+  `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
   for the public NGC DOCA container Path 0 if there is no DOCA install
   yet.
 - **Building a custom DOCA application** — not a DMS question. Route
-  to [`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build)
+  to `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
   for the canonical build pattern, plus the matching `libs/<library>`
   skill for the API surface.
-- **Turnkey telemetry aggregation** — out of scope for DMS. DMS's own
-  gNMI Subscribe DOES stream (`STREAM` / `SAMPLE` 1s–60s and `ONCE`;
-  only `POLL` / `Aggregation` are Unimplemented); for a productized
-  telemetry-aggregation surface, route to the DOCA Telemetry Service
-  (DTS), discoverable through
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+- **Telemetry streaming and aggregation** — out of scope for DMS,
+  which does not support gNMI `Subscribe`. Route to the DOCA
+  Telemetry Service: `doca-dts/SKILL.md`.
 - **Library-internal API questions** (Flow pipe construction, RDMA
   queue setup, …) — outside DMS. Route to the matching
   `libs/<library>` skill.
@@ -347,4 +345,4 @@ Three cross-cutting rules for this appendix:
 - All operational guidance must preserve the documented two-process
   separation (`dmsd` low-priv frontend, `dmspe` privileged backend).
 - For URL routing to the DMS guide and other public DOCA documentation,
-  see [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services).
+  see doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`).

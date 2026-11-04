@@ -21,6 +21,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import virtualenv_runner as vr  # noqa: E402
+import virtualenv_group_supervisor as vgs  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -135,7 +136,7 @@ def test_placeholders_render_and_env_lands_in_script(capsys, venv, job_dir, tmp_
         rc, sub = run_verb(
             capsys, "submit", "--job-dir", str(job_dir), "--venv", str(venv),
             "--script", str(script), "--job-id", "jid-42",
-            "--config-path", "/tmp/spec.yaml",
+            "--config-path", "/tmp/spec.yaml",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
             "--arg", "{results_dir}/dump.json", "--arg=-e", "--arg", "{config_path}",
             "--gpu-ids", "0,1", "-e", "TAO_TEST_TOKEN",
         )
@@ -144,7 +145,7 @@ def test_placeholders_render_and_env_lands_in_script(capsys, venv, job_dir, tmp_
     assert rc == 0, sub
     assert wait_terminal(capsys, job_dir)["status"] == "COMPLETE"
     dump = json.loads((job_dir / "dump.json").read_text())
-    assert dump["argv"] == [str(job_dir / "dump.json"), "-e", "/tmp/spec.yaml"]
+    assert dump["argv"] == [str(job_dir / "dump.json"), "-e", "/tmp/spec.yaml"]  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
     assert dump["cuda"] == "0,1"
     assert dump["venv"] == str(job_dir.parent.parent / "venv")
     assert dump["job_id"] == "jid-42"
@@ -237,11 +238,15 @@ def test_wrapper_honors_cancel_before_start_gate(venv, tmp_path):
     job.mkdir()
     wrapper = job / "launch_job.py"
     wrapper.write_text(vr.JOB_WRAPPER_SOURCE, encoding="utf-8")
+    supervisor = job / "supervise_group.py"
+    supervisor.write_bytes(vr.SUPERVISOR_SOURCE_PATH.read_bytes())
     exit_p, launch_p = job / "exit.json", job / "launcher.json"
     gate_p, cancel_p = job / "gate", job / "cancel"
+    guardian_release = job / "guardian-release"
     proc = subprocess.Popen(
         [str(venv / "bin" / "python"), str(wrapper), str(exit_p), str(launch_p),
-         str(gate_p), str(cancel_p), str(venv / "bin" / "python"), "-c", "print('nope')"],
+         str(gate_p), str(cancel_p), str(supervisor), str(guardian_release),
+         str(venv / "bin" / "python"), "-c", "print('nope')"],
         start_new_session=True,
     )
     assert wait_for(launch_p.exists)          # durable identity written immediately
@@ -270,11 +275,20 @@ def test_leaked_background_child_is_cleaned_up(capsys, venv, job_dir, tmp_path):
     final = wait_terminal(capsys, job_dir)
     assert final["status"] == "COMPLETE", final  # cleanup succeeded, exit stays 0
     child_pid = int((job_dir / "child.pid").read_text())
-    assert wait_for(lambda: not _pid_alive(child_pid), timeout=5), \
+    assert wait_for(lambda: not _pid_active(child_pid), timeout=5), \
         "background child leaked past job completion"
 
 
-def _pid_alive(pid):
+def _pid_active(pid):
+    """Whether a process can still execute (an unreaped zombie cannot)."""
+    try:
+        stat = Path(f"/proc/{pid}/stat").read_text(encoding="utf-8")
+        fields = stat[stat.rfind(")") + 2:].split()
+        return fields[0] != "Z"
+    except FileNotFoundError:
+        return False
+    except (OSError, IndexError):
+        pass
     try:
         os.kill(pid, 0)
         return True
@@ -295,8 +309,8 @@ def test_pid_reuse_is_not_treated_as_running(capsys, venv, job_dir):
         "pid": os.getpid(), "process_start_marker": "bogus-marker",
     })
     rc, status = run_verb(capsys, "status", "--job-dir", str(job_dir))
-    assert status["status"] == "ERROR"
-    assert "durable exit status" in status["message"]
+    assert status["status"] == "UNKNOWN"
+    assert "ownership is indeterminate" in status["message"]
 
 
 def test_marker_mismatch_rejects_group_leader(capsys, venv, job_dir):
@@ -314,13 +328,225 @@ def test_marker_mismatch_rejects_group_leader(capsys, venv, job_dir):
             "pid": foreign.pid, "process_start_marker": "definitely-wrong",
         })
         rc, status = run_verb(capsys, "status", "--job-dir", str(job_dir))
-        assert status["status"] == "ERROR"
+        assert status["status"] == "UNKNOWN"
         # And cancel must refuse to signal it: the foreign process survives.
         run_verb(capsys, "cancel", "--job-dir", str(job_dir))
         assert foreign.poll() is None, "cancel killed an innocent process"
     finally:
         foreign.kill()
         foreign.wait()
+
+
+@pytest.mark.skipif(
+    not Path("/proc").is_dir(), reason="deterministic zombie state needs /proc"
+)
+def test_pidfd_supervisor_treats_unreaped_zombie_as_dead(tmp_path):
+    """A zombie child is not a target while its guardian anchors the PGID."""
+    child_path = tmp_path / "child.pid"
+    guardian_script = write_script(tmp_path, "zombie_guardian.py", (
+        "import os, pathlib, time\n"
+        "child = os.fork()\n"
+        "if child == 0: os._exit(0)\n"
+        f"pathlib.Path({str(child_path)!r}).write_text(str(child))\n"
+        "time.sleep(300)\n"
+    ))
+    guardian = subprocess.Popen(
+        [sys.executable, str(guardian_script)], start_new_session=True
+    )
+    try:
+        assert wait_for(child_path.exists)
+        child_pid = int(child_path.read_text())
+        marker = vr._process_start_marker(guardian.pid)
+        assert marker is not None
+        assert wait_for(lambda: not _pid_active(child_pid)), \
+            "child did not reach zombie state"
+        result = vgs.supervise(
+            pgid=guardian.pid,
+            guardian_pid=guardian.pid,
+            guardian_marker=marker,
+            excludes={},  # guardian exclusion is enforced by the abstraction
+            term_timeout=0.1,
+            kill_timeout=0.2,
+        )
+        assert result["result"] in {"empty", "terminated"}
+        assert guardian.poll() is None
+    finally:
+        guardian.kill()
+        guardian.wait(timeout=5)
+
+
+def _guardian_with_child(tmp_path, child_source):
+    child_path = tmp_path / "child.pid"
+    ready = tmp_path / "child.ready"
+    script = write_script(tmp_path, "guardian.py", (
+        "import os, pathlib, sys, time\n"
+        "child = os.fork()\n"
+        "if child == 0:\n"
+        f"    os.execv(sys.executable, [sys.executable, '-c', {child_source!r}])\n"
+        f"pathlib.Path({str(child_path)!r}).write_text(str(child))\n"
+        f"pathlib.Path({str(ready)!r}).touch()\n"
+        "time.sleep(300)\n"
+    ))
+    guardian = subprocess.Popen([sys.executable, str(script)], start_new_session=True)
+    assert wait_for(ready.exists)
+    return guardian, int(child_path.read_text())
+
+
+def test_pidfd_supervisor_escalates_for_live_sigterm_ignorer(tmp_path):
+    guardian, child_pid = _guardian_with_child(
+        tmp_path,
+        "import signal,time; signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(300)",
+    )
+    try:
+        marker = vr._process_start_marker(guardian.pid)
+        assert marker is not None
+        result = vgs.supervise(
+            pgid=guardian.pid,
+            guardian_pid=guardian.pid,
+            guardian_marker=marker,
+            excludes={guardian.pid: marker},
+            term_timeout=0.1,
+            kill_timeout=1.0,
+        )
+        assert result["result"] == "terminated"
+        assert wait_for(lambda: not _pid_active(child_pid))
+        assert guardian.poll() is None
+    finally:
+        guardian.kill()
+        guardian.wait()
+
+
+def test_pidfd_permission_error_with_live_member_is_not_success(
+    monkeypatch, tmp_path,
+):
+    guardian, child_pid = _guardian_with_child(tmp_path, "import time; time.sleep(300)")
+    marker = vr._process_start_marker(guardian.pid)
+    assert marker is not None
+    monkeypatch.setattr(
+        vgs.signal,
+        "pidfd_send_signal",
+        lambda *_args: (_ for _ in ()).throw(PermissionError("not signalable")),
+    )
+    try:
+        with pytest.raises(vgs.SupervisionError, match="permission denied"):
+            vgs.supervise(
+                pgid=guardian.pid,
+                guardian_pid=guardian.pid,
+                guardian_marker=marker,
+                excludes={guardian.pid: marker},
+                term_timeout=0,
+                kill_timeout=0,
+            )
+        assert _pid_active(child_pid)
+    finally:
+        os.kill(child_pid, signal.SIGKILL)
+        guardian.kill()
+        guardian.wait()
+
+
+def test_pidfd_open_rejects_identity_change_before_any_signal(monkeypatch):
+    before = vgs.ProcFact(75, "S", 75, "old-start")
+    after = vgs.ProcFact(75, "S", 75, "reused-start")
+    fd = os.open("/dev/null", os.O_RDONLY)
+    monkeypatch.setattr(vgs, "_pidfd_capable", lambda: True)
+    monkeypatch.setattr(vgs, "_pidfd_open", lambda _pid: fd)
+    monkeypatch.setattr(vgs, "_pidfd_dead", lambda _fd: False)
+    monkeypatch.setattr(vgs, "_proc_fact", lambda _pid: after)
+    with pytest.raises(vgs.OwnershipError, match="changed identity"):
+        vgs._open_verified_pidfd(before)
+
+
+def test_pidfd_open_accepts_normal_process_state_transition(monkeypatch):
+    before = vgs.ProcFact(75, "R", 75, "same-start")
+    after = vgs.ProcFact(75, "S", 75, "same-start")
+    fd = os.open("/dev/null", os.O_RDONLY)
+    monkeypatch.setattr(vgs, "_pidfd_capable", lambda: True)
+    monkeypatch.setattr(vgs, "_pidfd_open", lambda _pid: fd)
+    monkeypatch.setattr(vgs, "_pidfd_dead", lambda _fd: False)
+    monkeypatch.setattr(vgs, "_proc_fact", lambda _pid: after)
+    opened = vgs._open_verified_pidfd(before)
+    assert opened == fd
+    os.close(opened)
+
+
+@pytest.mark.parametrize("failure", ["malformed", "unreadable"])
+def test_relevant_proc_probe_failure_is_indeterminate(
+    monkeypatch, tmp_path, failure,
+):
+    proc_root = tmp_path / "proc"
+    entry = proc_root / "76"
+    entry.mkdir(parents=True)
+    stat_path = entry / "stat"
+    stat_path.write_text("not a proc stat", encoding="utf-8")
+    monkeypatch.setattr(vgs.os, "getpgid", lambda _pid: 76)
+    if failure == "unreadable":
+        real_read_text = Path.read_text
+
+        def denied(path, *args, **kwargs):
+            if path == stat_path:
+                raise PermissionError("hidden proc entry")
+            return real_read_text(path, *args, **kwargs)
+
+        monkeypatch.setattr(Path, "read_text", denied)
+
+    with pytest.raises(vgs.SupervisionError):
+        vgs.group_facts(76, proc_root=proc_root)
+    assert vr._active_process_group_members(76, proc_root=proc_root) is None
+
+
+def test_irrelevant_unreadable_proc_entry_does_not_poison_group_probe(
+    monkeypatch, tmp_path,
+):
+    proc_root = tmp_path / "proc"
+    entry = proc_root / "77"
+    entry.mkdir(parents=True)
+    stat_path = entry / "stat"
+    stat_path.write_text("not a proc stat", encoding="utf-8")
+    monkeypatch.setattr(vgs.os, "getpgid", lambda _pid: 999)
+
+    assert vgs.group_facts(76, proc_root=proc_root) == []
+    assert vr._active_process_group_members(76, proc_root=proc_root) == []
+
+
+def test_fallback_group_probe_failure_is_indeterminate(monkeypatch):
+    monkeypatch.setattr(
+        vgs.subprocess,
+        "run",
+        lambda *_args, **_kwargs: subprocess.CompletedProcess([], 2, "", "denied"),
+    )
+    with pytest.raises(vgs.SupervisionError, match="pgrep failed"):
+        vgs._fallback_group_facts(76)
+
+
+def test_fallback_process_state_probe_failure_is_indeterminate(monkeypatch):
+    probes = iter((
+        subprocess.CompletedProcess([], 0, "77\n", ""),
+        subprocess.CompletedProcess([], 2, "", "denied"),
+    ))
+    monkeypatch.setattr(
+        vgs.subprocess, "run", lambda *_args, **_kwargs: next(probes),
+    )
+    monkeypatch.setattr(vgs.os, "getpgid", lambda _pid: 76)
+
+    with pytest.raises(vgs.SupervisionError, match="indeterminate"):
+        vgs._fallback_group_facts(76)
+
+
+def test_active_non_pidfd_group_is_never_signaled_by_number(monkeypatch):
+    guardian = vgs.ProcFact(76, "S", 76, "guardian-start")
+    workload = vgs.ProcFact(77, "S", 76, "workload-start")
+    monkeypatch.setattr(vgs, "group_facts", lambda _pgid: [guardian, workload])
+    monkeypatch.setattr(vgs, "_pidfd_capable", lambda: False)
+
+    with pytest.raises(vgs.SupervisionError, match="require Linux pidfd"):
+        vgs.supervise(
+            pgid=76,
+            guardian_pid=76,
+            guardian_marker="guardian-start",
+            excludes={},
+            term_timeout=0,
+            kill_timeout=0,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -341,6 +567,23 @@ def test_orphaned_pending_grace_then_error(capsys, job_dir):
 def test_status_unknown_on_empty_dir(capsys, job_dir):
     _, payload = run_verb(capsys, "status", "--job-dir", str(job_dir))
     assert payload["status"] == "UNKNOWN"
+
+    rc, canceled = run_verb(capsys, "cancel", "--job-dir", str(job_dir))
+    assert rc == 1
+    assert canceled["result"] == "error" and canceled["status"] == "UNKNOWN"
+
+
+def test_late_cancel_marker_does_not_relabel_natural_exit(capsys, job_dir):
+    paths = vr.RunnerPaths(job_dir)
+    paths.runner_dir.mkdir(parents=True)
+    vr._atomic_write_json(paths.exit_status, {
+        "return_code": 0,
+        "canceled": False,
+    })
+    vr._atomic_write_json(paths.cancel_marker, {"timeout": 1.0})
+
+    _, status = run_verb(capsys, "status", "--job-dir", str(job_dir))
+    assert status["status"] == "COMPLETE"
 
 
 def test_double_submit_is_refused(capsys, venv, job_dir, tmp_path):
@@ -411,13 +654,22 @@ def test_orphaned_script_group_reports_running_and_cancel_kills_it(
                        "--script", str(script))
     assert rc == 0
     wrapper_pid = sub["pid"]
-    # Wait until the script child exists inside the group, then kill ONLY the wrapper.
-    def script_child():
-        return [p for p in vr._group_members(wrapper_pid, str(script)) if p != wrapper_pid]
-    assert wait_for(lambda: len(script_child()) > 0), "script child never appeared"
-    children = script_child()
+    paths = vr.RunnerPaths(job_dir)
+
+    def durable_workload():
+        record = vr._read_json(paths.launcher_status) or {}
+        return (
+            record.get("workload_pid"),
+            record.get("workload_start_marker"),
+        )
+
+    assert wait_for(lambda: all(durable_workload())), \
+        "direct workload identity was not persisted"
+    workload_pid, workload_marker = durable_workload()
+    assert vr._identity_matches(workload_pid, workload_marker, wrapper_pid) is True
     os.kill(wrapper_pid, signal.SIGKILL)
-    assert wait_for(lambda: not _pid_alive(wrapper_pid) or True, timeout=2)
+    assert wait_for(lambda: not _pid_active(wrapper_pid), timeout=2), \
+        "killed wrapper remained active"
 
     _, status = run_verb(capsys, "status", "--job-dir", str(job_dir))
     assert status["status"] == "RUNNING", status
@@ -425,11 +677,52 @@ def test_orphaned_script_group_reports_running_and_cancel_kills_it(
 
     rc, cancel = run_verb(capsys, "cancel", "--job-dir", str(job_dir))
     assert rc == 0 and cancel["result"] == "canceled", cancel
-    for child in children:
-        assert wait_for(lambda: not _pid_alive(child), timeout=5), \
-            f"orphaned child {child} survived cancel"
+    assert wait_for(lambda: not _pid_active(workload_pid), timeout=5), \
+        f"orphaned workload {workload_pid} survived cancel"
     _, after = run_verb(capsys, "status", "--job-dir", str(job_dir))
     assert after["status"] == "CANCELED", after
+
+
+def test_exec_replaced_workload_remains_owned_after_wrapper_death(
+    capsys, venv, job_dir, tmp_path,
+):
+    """The persisted start identity, not submitted cmdline text, binds execve."""
+    ready = tmp_path / "replacement.ready"
+    replacement = (
+        "import pathlib,time; "
+        f"pathlib.Path({str(ready)!r}).touch(); "
+        "time.sleep(300)"
+    )
+    script = write_script(tmp_path, "replace.py", (
+        "import os, sys\n"
+        f"os.execv(sys.executable, [sys.executable, '-c', {replacement!r}])\n"
+    ))
+    rc, submitted = run_verb(
+        capsys, "submit", "--job-dir", str(job_dir), "--venv", str(venv),
+        "--script", str(script),
+    )
+    assert rc == 0
+    wrapper_pid = submitted["pid"]
+    paths = vr.RunnerPaths(job_dir)
+    assert wait_for(ready.exists), "exec-replaced workload never became ready"
+    launch = vr._read_json(paths.launcher_status)
+    workload_pid = launch["workload_pid"]
+    workload_marker = launch["workload_start_marker"]
+    cmdline = Path(f"/proc/{workload_pid}/cmdline").read_bytes().split(b"\0")
+    assert os.fsencode(str(script)) not in cmdline, "workload did not exec-replace"
+    assert vr._identity_matches(workload_pid, workload_marker, wrapper_pid) is True
+
+    os.kill(wrapper_pid, signal.SIGKILL)
+    assert wait_for(lambda: not _pid_active(wrapper_pid), timeout=2)
+    _, orphaned = run_verb(capsys, "status", "--job-dir", str(job_dir))
+    assert orphaned["status"] == "RUNNING" and orphaned["orphaned"] is True
+
+    rc, canceled = run_verb(capsys, "cancel", "--job-dir", str(job_dir))
+    assert rc == 0 and canceled["result"] == "canceled", canceled
+    assert wait_for(lambda: not _pid_active(workload_pid), timeout=5)
+    assert wait_for(
+        lambda: not _pid_active(launch["guardian_pid"]), timeout=5,
+    ), "durable guardian did not release after cancellation"
 
 
 def test_wrapper_gate_timeout_writes_durable_error(venv, tmp_path):
@@ -438,11 +731,15 @@ def test_wrapper_gate_timeout_writes_durable_error(venv, tmp_path):
     job.mkdir()
     wrapper = job / "launch_job.py"
     wrapper.write_text(vr.JOB_WRAPPER_SOURCE, encoding="utf-8")
+    supervisor = job / "supervise_group.py"
+    supervisor.write_bytes(vr.SUPERVISOR_SOURCE_PATH.read_bytes())
     exit_p, launch_p = job / "exit.json", job / "launcher.json"
+    guardian_release = job / "guardian-release"
     env = {**os.environ, "TAO_RUNNER_GATE_TIMEOUT": "1"}
     proc = subprocess.Popen(
         [str(venv / "bin" / "python"), str(wrapper), str(exit_p), str(launch_p),
          str(job / "gate"), str(job / "cancel"),
+         str(supervisor), str(guardian_release),
          str(venv / "bin" / "python"), "-c", "print('never runs')"],
         start_new_session=True, env=env,
     )

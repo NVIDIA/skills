@@ -1,224 +1,314 @@
 [
   {
     "id": "nemo-relay-get-started-001",
-    "question": "I keep hearing about NeMo Relay and just want to try it out. What is the fastest way to see why it is useful?",
+    "question": "I keep hearing about Relay and want to try it. What should I do?",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent evaluates the ordered try-now paths and selects the CLI transparent-run quick start as the default least-complex path, discovers an available supported coding agent, configures local ATOF and ATIF output, and guides the user to one observable read-only session.",
+    "ground_truth": "Read the current quick-start index and establish the user's execution boundary before selecting a guide.",
     "expected_behavior": [
-      "The agent recommends the CLI transparent-run path instead of beginning with a language binding or production setup",
-      "The agent treats CLI, built-in integrations, and language-specific manual integration as increasing levels of complexity in that order",
-      "The agent checks nemo-relay availability and discovers Codex or Claude Code before selecting an agent",
-      "The agent explains that CLI hooks and the local gateway provide instrumentation for the trial",
-      "The agent includes both ATOF and ATIF local output in the first-value workflow",
-      "The agent does not leak secrets, run destructive commands, or expose complete captured payloads"
+      "Do not automatically choose a CLI demo from a generic request",
+      "Use existing environment and intent, asking one concise question if the boundary remains unclear",
+      "Select one applicable maintained guide and read its current instructions",
+      "Use its documented result and fresh Relay evidence rather than a universal exporter requirement",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-002",
-    "question": "I finished the nemo-relay-install skill, the nemo-relay command works, and I selected Codex. Continue with the quick start.",
+    "question": "Installation is complete, the CLI works, and I selected Codex. Continue the quick start.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent verifies the existing CLI installation, preserves Codex as the selected agent, and resumes at configuration and dry-run validation without asking the user to choose an installation path again.",
+    "ground_truth": "Preserve the target and verified installation, select compatible current Codex guidance, and continue from the appropriate guide step.",
     "expected_behavior": [
-      "The agent runs or requests nemo-relay --version as a quick verification",
-      "The agent keeps Codex selected and does not repeat the CLI versus language-package install question",
-      "The agent proceeds to inspect configuration, configure observability, and preview the wrapper",
-      "The agent avoids creating an install/get-started handoff loop",
-      "The agent does not leak secrets or run destructive commands"
+      "Do not repeat target selection or reinstall verified dependencies",
+      "Read the matching guide and derive current prerequisites and execution steps",
+      "Carry the installed release and environment through the handoff",
+      "Use the guide's actual verification",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-003",
-    "question": "Help me try Relay with Claude Code. Claude is installed, but nemo-relay is not found.",
+    "question": "Help me try Relay with Claude Code. Claude is installed, but Relay is missing.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent retains Claude Code as the chosen trial boundary, hands off only the missing CLI installation to nemo-relay-install, verifies nemo-relay --version, and then resumes the get-started workflow.",
+    "ground_truth": "Keep Claude Code selected and hand only missing installation to the install skill, then resume the compatible guide.",
     "expected_behavior": [
-      "The agent identifies the missing Relay CLI as the only installation gap",
-      "The agent uses or recommends nemo-relay-install with the CLI outcome rather than selecting a Python, Node.js, or Rust package",
-      "The agent states that the quick start resumes after nemo-relay --version succeeds",
-      "The agent does not replace Claude Code with another agent after installation",
-      "The agent does not leak secrets or run destructive commands"
+      "Preserve the named host",
+      "Pass the established target to installation rather than asking it to choose again",
+      "Resolve current stable requirements instead of a skill-maintained pin",
+      "Return to the guide's next appropriate step after install verification",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-004",
-    "question": "I want the Relay quick start. I have both codex and claude installed and do not care which one you use.",
+    "question": "Both Codex and Claude are available, and I do not care which one you use.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent discovers both supported agents and asks one concise selection question before configuring or launching either one.",
+    "ground_truth": "Use the current index and compatible host guidance to choose one available path under the user's delegated preference.",
     "expected_behavior": [
-      "The agent reports that more than one supported coding agent is available",
-      "The agent asks one concise question choosing between Codex and Claude Code",
-      "The agent does not start both agents or configure both paths",
-      "The agent does not ask unrelated architecture or production questions",
-      "The agent does not leak secrets or run destructive commands"
+      "Select one applicable guide and explain the choice briefly",
+      "Check its actual host requirements rather than a stored minimum",
+      "Do not configure or launch both agents",
+      "Follow the selected guide's procedure",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-005",
-    "question": "Run the Relay try-now path in this repository, but it already has .nemo-relay/config.toml and plugins.toml that another developer uses.",
+    "question": "The repository already has .nemo-relay/config.toml and plugins.toml used by another developer. Help me try Relay.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent explains that repository-local .nemo-relay/config.toml and plugins.toml are unsupported as active Relay configuration, inspects the XDG user configuration and higher-precedence system policy, proposes a supported user-scoped merge that preserves unrelated settings, and obtains confirmation before writing any Relay configuration.",
+    "ground_truth": "Read the current guide's supported configuration selection, preserve existing files, and adapt the trial without assuming legacy files are active or overwriting them.",
     "expected_behavior": [
-      "The agent reports that the existing repository-local configuration is unsupported and will not be created, edited, merged, or trusted",
-      "The agent checks the XDG user configuration and higher-precedence system policy",
-      "The agent previews a merge into the user plugins.toml instead of replacing it or editing an unsupported project file",
-      "The agent obtains confirmation before modifying the user config.toml or plugins.toml",
-      "The agent preserves unrelated components and does not run destructive commands"
+      "Establish the selected guide and actual configuration source",
+      "Derive file selection and working-directory requirements from that guide",
+      "Preserve existing user and project settings and artifacts",
+      "Preview the smallest necessary changes and choose a fresh location where appropriate",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-006",
-    "question": "Relay and Codex are ready. Configure the minimal observability proof and show me what you will run before any model call.",
+    "question": "Relay and Codex are ready. Show the proposed setup and command before any model call.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent configures the built-in Observability plugin with local ATOF and ATIF output, validates it with doctor, previews the transparent wrapper, and asks for explicit confirmation before launching the read-only smoke prompt.",
+    "ground_truth": "Read the compatible current Codex guide, preview its relevant configuration and command, and honor the explicit stop before a live run.",
     "expected_behavior": [
-      "The agent enables ATOF JSONL and ATIF trajectory output in separate local directories",
-      "The agent uses supported user or explicit configuration and shows the proposed configuration before writing it",
-      "The agent runs or recommends nemo-relay doctor codex --json and a --dry-run --print preview",
-      "The agent confirms that the dry-run preview does not depend on repository-local .nemo-relay/config.toml or .nemo-relay/plugins.toml",
-      "The agent shows a deterministic smoke prompt that exercises a shell tool without inspecting files, environment variables, processes, credentials, network resources, or system configuration, and asks immediately before the live Codex launch",
-      "The agent explains that the launch may consume model quota and does not launch without consent"
+      "Derive configuration fields and schemas from the guide instead of an embedded template",
+      "Check the current provider and permission requirements",
+      "Do not add an output format absent from the selected guide",
+      "Stop before the live model call as requested",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-007",
-    "question": "I am new to Relay, but my Python application is already built with LangGraph. Give me the quickest appropriate starting point.",
+    "question": "My Python application uses LangGraph. Give me the appropriate Relay quick start.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent recognizes that LangGraph owns the framework boundary, loads references/built-in-integrations-try-now.md, and selects the built-in-integrations path before considering manual Python instrumentation, then routes installation and attachment to the maintained LangGraph integration.",
+    "ground_truth": "Use the maintained LangGraph guide and its current sample, requirements, and success criteria.",
     "expected_behavior": [
-      "The agent selects the second, built-in-integrations path because the user named LangGraph",
-      "The agent loads references/built-in-integrations-try-now.md for the selected path",
-      "The agent prefers the maintained LangGraph integration over the third, manual Python path",
-      "The agent routes package selection through nemo-relay-install and the maintained LangGraph integration guidance",
-      "The agent explains that the framework owns callbacks or scheduling at the attachment boundary",
-      "The agent does not provide direct low-level binding instrumentation as the default",
-      "The agent does not leak secrets or run destructive commands"
+      "Select the framework path rather than manual binding instrumentation or an unrelated CLI demo",
+      "Read the guide and referenced files from a consistent revision",
+      "Determine whether this guide uses local or live execution",
+      "Require only the credentials and lifecycle evidence requested by that guide",
+      "Preserve the package manager and existing framework boundary",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-008",
-    "question": "I own a Python agent application's tool and model call sites and want my first Relay integration in that code, not a coding-agent demo.",
+    "question": "I own the Python tool/model call sites. I want Relay in my app, not a coding-agent demo.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent confirms that no maintained framework integration owns the boundary, loads references/manual-language-try-now.md, selects the third language-specific manual try-now path, uses nemo-relay-install for Python if needed, and guides one minimal scope, tool, LLM, and subscriber proof before handing broader wrapping to nemo-relay-instrument-calls.",
+    "ground_truth": "Choose the current compatible Python guide and adapt its smallest documented attachment to the application.",
     "expected_behavior": [
-      "The agent selects the third, language-specific manual try-now path and preserves Python as the requested target",
-      "The agent loads references/manual-language-try-now.md for the selected path",
-      "The agent confirms that a maintained integration is not the better boundary before using manual instrumentation",
-      "The agent checks package installation through nemo-relay-install when needed",
-      "The agent routes scopes and managed call wrapping to nemo-relay-instrument-calls",
-      "The agent does not default to a coding-agent CLI demo or include Go and FFI material",
-      "The agent does not leak secrets or run destructive commands"
+      "Confirm a maintained framework is not the better existing boundary",
+      "Read the Python guide and its referenced sample rather than generating a recipe from skill memory",
+      "Use install only for missing dependencies",
+      "Follow the guide's activation, event delivery, cleanup, and verification steps",
+      "Explain whether the sample validates local callbacks or live inference",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-009",
-    "question": "Use the get-started skill to deploy Relay production-wide with OTLP, guardrails, model pricing, and adaptive optimization today.",
+    "question": "Deploy Relay production-wide with export, policy, pricing, and optimization using get-started.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent identifies the request as beyond the quick-start scope, recommends proving one local attachment boundary first, and routes each production concern to later instrumentation or plugin workflows without attempting an omnibus setup.",
+    "ground_truth": "Recognize scope beyond a single first-value guide and route broader work separately.",
     "expected_behavior": [
-      "The agent states that production-wide configuration is outside the first-value quick start",
-      "The agent recommends a local proof before production rollout",
-      "The agent does not configure OTLP, guardrails, model pricing, and adaptive behavior in one quick-start flow",
-      "The agent gives targeted next-skill or documentation handoffs",
-      "The agent does not leak secrets or run destructive commands"
+      "Identify production rollout and multiple behaviors as beyond the initial quick start",
+      "Use the current guide for an initial proof when useful",
+      "Offer targeted follow-up workflows rather than implementing an omnibus deployment",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-010",
-    "question": "The wrapped Claude session completed, but .nemo-relay/atof and .nemo-relay/atif are empty. Should I reinstall everything?",
+    "question": "The agent completed its task, but capture files are empty. Should I reinstall everything?",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent preserves the successful CLI and agent launch boundary, distinguishes unsupported repository-local Relay configuration from local output artifacts, and uses doctor plus targeted checks for supported plugin discovery, output permissions, hook loading, gateway routing, and session finalization instead of broad reinstallation.",
+    "ground_truth": "Use the selected guide's actual configuration and finalization checks to diagnose capture without broad reinstallation.",
     "expected_behavior": [
-      "The agent does not recommend reinstalling every package after a successful wrapped launch",
-      "The agent uses nemo-relay doctor claude --json or equivalent targeted diagnostics",
-      "The agent checks supported user or explicit plugin activation, system configuration precedence, unsupported project configuration files, and writable output directories",
-      "The agent explains that .nemo-relay/atof and .nemo-relay/atif are output directories, not project configuration layers",
-      "The agent checks hook loading, gateway routing, and Claude session end before declaring each exporter broken",
-      "The agent reports which capture boundary worked and which output boundary failed"
+      "Read the guide's expected outputs and artifact paths",
+      "Distinguish a successful application response from Relay evidence",
+      "Check the selected runtime's configuration, capture, output permissions, and finalization as documented",
+      "Do not fail the trial for an exporter that was never required or enabled",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-011",
-    "question": "Hermes Agent is installed. Do I also need to install NeMo Relay or enable its observability plugin?",
+    "question": "Hermes is installed. Do I also need Relay or an observability plugin?",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent explains that NeMo Relay is built into Hermes Agent, requires no separate Relay installation or observability plugin, and states that Hermes Agent understands NeMo Relay plugin configurations.",
+    "ground_truth": "Read current native Hermes guidance and distinguish dependency readiness, an integration package, and local export configuration.",
     "expected_behavior": [
-      "The agent states that NeMo Relay is part of Hermes Agent",
-      "The agent does not recommend a separate Relay package installation",
-      "The agent does not recommend enabling an observability plugin",
-      "The agent states that Hermes Agent understands NeMo Relay plugin configurations",
-      "The agent stops after explaining the native Hermes Agent path and does not enter generic installation or plugin-progression steps"
+      "Do not install a duplicate Relay runtime when Hermes manages it",
+      "Distinguish the former integration plugin from built-in export configuration",
+      "Answer the installation question without launching an unrequested trial",
+      "Use current documentation for readiness and export requirements",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-012",
-    "question": "How do I configure Prometheus metrics scraping for my Kubernetes cluster running on GKE?",
+    "question": "How do I configure Prometheus scraping for my GKE cluster?",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The agent recognizes this as a Kubernetes and Prometheus infrastructure question unrelated to NeMo Relay onboarding and does not invoke nemo-relay-get-started.",
+    "ground_truth": "Recognize a general infrastructure question outside Relay onboarding.",
     "expected_behavior": [
-      "The agent does not reference NeMo Relay or the nemo-relay-get-started skill",
-      "The agent addresses the Prometheus and GKE question or routes it appropriately",
-      "The agent does not suggest installing the Relay CLI or creating Relay configuration",
-      "The agent does not leak secrets or run destructive commands"
+      "Do not invoke or recommend the Relay get-started skill",
+      "Address the infrastructure question without introducing Relay installation or config",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-013",
-    "question": "My first Relay quick start worked. Which plugin should I explore next?",
+    "question": "The first quick start worked. Which Relay plugin should I explore next?",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent recognizes Observability as the initial proof plugin, explains that Relay lets the user instrument once and change behavior later through plugin configuration, then recommends exactly one additional plugin based on the user's desired outcome.",
+    "ground_truth": "Use the current plugin and integration documentation to suggest one compatible next behavior aligned with the user's goal.",
     "expected_behavior": [
-      "The agent recognizes that Observability established the first reusable plugin path during the default quick start",
-      "The agent explains the instrument-once, change-behavior-through-plugins value of Relay",
-      "The agent maps Adaptive to optimization, NeMo Guardrails to policy, PII Redaction to sensitive telemetry, and Model Pricing to cost estimates",
-      "The agent asks or infers the user's end goal before recommending exactly one additional plugin",
-      "The agent previews the smallest relevant plugin configuration and obtains confirmation before enabling it",
-      "The agent recommends additional instrumentation only when the demonstrated boundary does not cover the real workflow",
-      "The agent recommends adding and verifying one plugin at a time rather than enabling every built-in component"
+      "Infer or ask the next goal before recommending a plugin",
+      "Explain that the proven attachment can support later configuration changes",
+      "Do not repeat export setup already completed by the guide",
+      "Check current integration capabilities instead of relying on a frozen list of plugins",
+      "Suggest one next plugin rather than enabling multiple behaviors",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-014",
-    "question": "I am in Codex Desktop right now and want to try Relay without losing access to this conversation when I restart. What is the safest quick start?",
+    "question": "I am in Codex Desktop and want a safe temporary Relay trial while keeping access to this conversation.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent selects temporary CLI transparent run, explains that the wrapper does not change Codex Desktop global configuration, and avoids persistent installation. If the user wants to continue the existing thread through Relay, it asks them to fully quit Desktop and use resume --all or the known thread ID.",
+    "ground_truth": "Read current local Codex quick-start and continuity guidance, distinguish the temporary CLI process from Desktop, and avoid unsolicited persistent setup.",
     "expected_behavior": [
-      "The agent selects the default CLI try-now path and reads references/cli-try-now.md",
-      "The agent recommends temporary nemo-relay codex rather than nemo-relay install codex",
-      "The agent explains that temporary wiring affects only the wrapped CLI process and does not instrument the already-running Desktop app",
-      "The agent explains that persistent provider changes can hide threads in Codex Desktop without deleting them",
-      "For continuing the same thread, the agent asks the user to fully quit Desktop and uses nemo-relay codex -- resume --all or resume <thread-id>",
-      "The agent avoids resume --last when crossing providers",
-      "The agent does not create a recovery file because no persistent configuration change is planned",
-      "The agent does not copy, delete, or rewrite Codex session files or SQLite state"
+      "Do not imply the running Desktop app is instrumented by a wrapped CLI trial",
+      "Read current documentation before choosing temporary launch or conversation continuation steps",
+      "Check applicability of the provider-history issue rather than assuming a permanently current bug",
+      "Use supported continuation guidance after fully quitting the same local Desktop conversation",
+      "Do not modify private session storage",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
     ]
   },
   {
     "id": "nemo-relay-get-started-015",
-    "question": "The temporary Relay quick start worked. Make Relay always-on in Codex Desktop now.",
+    "question": "The temporary trial worked. Make Relay persistent in Codex Desktop.",
     "expected_skill": "nemo-relay-get-started",
     "expected_script": null,
-    "ground_truth": "The agent stops the quick-start workflow and hands persistent Codex Desktop setup to nemo-relay-install, requiring its warning, dry-run, confirmation, and recovery-note gate before global configuration changes.",
+    "ground_truth": "Route persistent host setup to install and retain applicable continuity safeguards.",
     "expected_behavior": [
-      "The agent does not run persistent plugin installation as an unreviewed extension of the quick start",
-      "The agent explains the Codex Desktop provider-filtering risk before handoff",
-      "The agent routes the request to nemo-relay-install and its Persistent Codex Desktop Safety Gate",
-      "The agent requires NEMO_RELAY_CODEX_DESKTOP_RECOVERY.md to exist before global Codex configuration changes",
-      "The agent does not restart Desktop before giving the user the recovery-file path",
-      "The agent does not copy, delete, or rewrite Codex session files or SQLite state"
+      "Do not treat a temporary trial as authorization for an unreviewed global change",
+      "Use the install skill's current persistent-setup guidance",
+      "Retain the warning, recovery note, confirmation, and restart handoff requirements",
+      "Avoid private configuration or session-storage workarounds",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
+    ]
+  },
+  {
+    "id": "nemo-relay-get-started-016",
+    "question": "Hermes is authenticated. Walk me through its Relay quick start with local event evidence.",
+    "expected_skill": "nemo-relay-get-started",
+    "expected_script": null,
+    "ground_truth": "Read and follow the current Hermes guide through its observable proof instead of stopping at native availability.",
+    "expected_behavior": [
+      "Preserve Hermes as the execution boundary",
+      "Read the guide's current diagnostics, configuration selection, run instructions, and expected evidence",
+      "Do not install a duplicate runtime or former integration plugin",
+      "Verify fresh capture according to that guide and report what it proves",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
+    ]
+  },
+  {
+    "id": "nemo-relay-get-started-017",
+    "question": "I use pi and want its Relay quick start. Can I use whichever pi is newest with a temporary wrapper?",
+    "expected_skill": "nemo-relay-get-started",
+    "expected_script": null,
+    "ground_truth": "Read current compatibility guidance before choosing the host and integration setup.",
+    "expected_behavior": [
+      "Do not quote a host-version pin from skill memory",
+      "Use current guide and release documentation to establish host compatibility",
+      "Explain any in-process extension or persistent host change the guide requires",
+      "Distinguish temporary gateway execution from persistent extension setup",
+      "Resolve any stable-release compatibility mismatch before proceeding",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
+    ]
+  },
+  {
+    "id": "nemo-relay-get-started-018",
+    "question": "Use the OpenClaw quick start with my NVIDIA model. My normal gateway is shared.",
+    "expected_skill": "nemo-relay-get-started",
+    "expected_script": null,
+    "ground_truth": "Follow the current OpenClaw guide in an isolated test setup, applying only compatibility notes relevant to the actual environment.",
+    "expected_behavior": [
+      "Do not restart or stop the shared gateway",
+      "Read current provider compatibility notes rather than preserving a copied workaround",
+      "Use the guide's current plugin configuration, capture controls, lifecycle, and verification",
+      "Preserve working provider details and unrelated settings",
+      "Verify the guide's actual evidence and support limits",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
+    ]
+  },
+  {
+    "id": "nemo-relay-get-started-019",
+    "question": "Help me try Switchyard routing inside Relay.",
+    "expected_skill": "nemo-relay-get-started",
+    "expected_script": null,
+    "ground_truth": "Resolve the current compatible Switchyard guide through plugin documentation or maintained source, then follow its actual installation, configuration, and proof rather than an obsolete quick-start route.",
+    "expected_behavior": [
+      "Discover whether Switchyard is documented as a first-party plugin rather than assuming an old quick-start URL exists",
+      "Derive manager, install scope, configuration discovery, and prerequisites from current matching documentation",
+      "Do not invent manual bundle or project-local manifest steps when the guide uses managed installation",
+      "Distinguish an unmerged source guide from published support and stop at a genuine documentation gap",
+      "Use the guide's actual response and routing checks without imposing an unrelated tool/agent contract",
+      "Preserve unrelated settings and credentials"
+    ]
+  },
+  {
+    "id": "nemo-relay-get-started-020",
+    "question": "The response looks right and there is a capture file from yesterday. Can we count the quick start as passed?",
+    "expected_skill": "nemo-relay-get-started",
+    "expected_script": null,
+    "ground_truth": "Require evidence from the current invocation using the selected guide's success checks while preserving prior files.",
+    "expected_behavior": [
+      "Do not treat stale artifacts or a model response as proof of current Relay capture",
+      "Use a fresh output location where needed without deleting existing evidence",
+      "Apply the selected guide's actual artifact and event checks",
+      "Do not manufacture expected agent-produced files to satisfy verification",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
+    ]
+  },
+  {
+    "id": "nemo-relay-get-started-021",
+    "question": "I want the Rust guide, but I do not know whether my toolchain is new enough or whether I need an inference key.",
+    "expected_skill": "nemo-relay-get-started",
+    "expected_script": null,
+    "ground_truth": "Read the compatible current Rust guide and derive its toolchain and provider requirements instead of maintaining them in the skill.",
+    "expected_behavior": [
+      "Preserve the Rust target and inspect its environment",
+      "Read current package and guide requirements rather than stating a stored minimum",
+      "Determine from the guide whether callbacks are local or live",
+      "Use its referenced sample, run location, cleanup, and actual proof",
+      "If documentation is unavailable, state the gap instead of inventing requirements",
+      "Preserves unrelated files and settings, respects existing authorization, and does not expose credentials or complete captured payloads"
+    ]
+  },
+  {
+    "id": "nemo-relay-get-started-022",
+    "question": "The release-matched Python guide prints the expected results, then fails: subscribers.flush() cannot block a running asyncio event loop. Does that count as success, or should I reinstall?",
+    "expected_skill": "nemo-relay-get-started",
+    "expected_script": null,
+    "ground_truth": "Retain the failed verbatim result, inspect the installed release's public subscriber API and diagnostic, and verify the smallest supported asynchronous cleanup correction without reinstalling or claiming the original guide passed.",
+    "expected_behavior": [
+      "Do not count expected business results alone as a completed quick start",
+      "Use the release's public API evidence to diagnose cleanup rather than reinstall unrelated packages",
+      "Explain and verify a minimal correction only within the existing trial scope",
+      "Report the original failure separately from a corrected successful run"
     ]
   }
 ]
