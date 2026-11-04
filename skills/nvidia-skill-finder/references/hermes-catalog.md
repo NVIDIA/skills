@@ -1,18 +1,30 @@
-# Hermes Catalog Recovery
+# Hermes Agent: Catalog Lookup and Install
 
-Read this when `hermes skills search <keyword> --source nvidia --json` returns
-nothing useful, or when you are unsure whether the identifier you are about to
-install is the trusted one.
+Follow this instead of the `npx` commands in SKILL.md when you are running in
+Hermes Agent. Hermes has a built-in catalog that is already security scanned and
+profile-aware, so `npx` is both unnecessary and far more expensive in context.
 
-## Why single keywords work and phrases do not
+## Catalog lookup
+
+```bash
+hermes skills search <keyword> --source nvidia --json
+```
+
+Search one broad keyword at a time — `jetson`, `usd`, `dynamo`, `pandas`,
+`cuda`. `--json` returns each candidate's full description; read the
+descriptions and choose the match yourself. The search ranks lexically, so it
+narrows the catalog but does not do the matching for you. Do not assume the
+first row is the answer.
+
+## Why single keywords, not phrases
 
 Hermes matches a query as a plain case-insensitive substring against each
 entry's name, description, tags, identifier, and provider joined together. It
 does not tokenize, so a multi-word query only matches when those exact words
 appear consecutively in that order.
 
-The practical effect is that descriptive phrases collapse to zero results while
-the obvious keyword works:
+Descriptive phrases therefore collapse to zero results while the obvious
+keyword works:
 
 | Query | Result |
 | --- | --- |
@@ -21,18 +33,12 @@ the obvious keyword works:
 | `OpenUSD` | returns only this finder |
 | `usd` | returns the Omniverse and USD skills |
 
-## Search strategy
-
-Run two or three separate single-keyword searches rather than one phrase, and
-widen by one step each time:
+Run two or three separate single-keyword searches, widening by one step each
+time:
 
 1. The product name as users say it — `jetson`, `dynamo`, `cuopt`.
 2. The product family — `omniverse`, `rapids`, `nemo`, `holoscan`.
 3. The taxonomy lane — `usd`, `routing`, `inference`, `genomics`.
-
-`--json` returns each candidate's full description. Read the descriptions and
-choose the match yourself; do not assume the first row is the answer. The search
-ranks lexically, so it narrows the catalog but does not do the matching for you.
 
 ## Full-catalog fallback
 
@@ -44,26 +50,31 @@ curl -sL https://raw.githubusercontent.com/NVIDIA/skills/main/.github/scripts/ma
   | jq -r '.skills[] | "\(.name): \(.description)"'
 ```
 
-Do not use `hermes skills browse` for this. It costs more context than the full
-catalog listing above and truncates both names and descriptions, so it is the
-one option that is worse on both accuracy and cost.
+Do not use `hermes skills browse` for this. It costs more context than the
+listing above and truncates both names and descriptions, so it is the one
+option that is worse on both accuracy and cost.
 
-## Confirming the identifier before install
-
-Confirm the skill you picked before installing it:
+## Install
 
 ```bash
-hermes skills inspect <identifier>
+hermes skills install NVIDIA/skills/<skill-name>
 ```
-
-Prefer the `Identifier` from the search result, copied verbatim, over assembling
-one by hand. It may be a longer path such as `NVIDIA/skills/skills/<skill-name>`;
-that form and the short `NVIDIA/skills/<skill-name>` both resolve to the same
-trusted skill with the same scan hash.
 
 Casing is what determines trust, not the number of path segments. `NVIDIA/...`
 resolves to the trusted first-party source; `nvidia/...` resolves to a
 community-trust mirror with a placeholder description. Always use `NVIDIA`.
+
+Prefer the `Identifier` from the search result, copied verbatim, over
+assembling one by hand. It may be a longer path such as
+`NVIDIA/skills/skills/<skill-name>`; that form and the short
+`NVIDIA/skills/<skill-name>` both resolve to the same trusted skill with the
+same scan hash.
+
+Confirm an identifier you are unsure about before installing it:
+
+```bash
+hermes skills inspect <identifier>
+```
 
 Hermes prompts for confirmation itself, so do not pass `--yes` on the user's
 behalf.
