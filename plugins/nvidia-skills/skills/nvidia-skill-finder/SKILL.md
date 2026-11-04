@@ -180,7 +180,6 @@ retry lookup, or continue with general help.
 ## When No Skills are Found
 
 Say that no strong NVIDIA catalog match was found, then either:
-1. search the broader ecosystem with `npx skills find <query>`, or in Hermes
-   `hermes skills search <query>` without `--source`, or
+1. search the broader ecosystem with npx skills find <query>, or
 2. offer to help directly without a skill, or
 3. suggest creating a new skill if the workflow is recurring.
