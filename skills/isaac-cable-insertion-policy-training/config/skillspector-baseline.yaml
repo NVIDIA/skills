@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+version: 2
+rules:
+  - id: "YR1"
+    path: "tests/test_launch_environment.py"
+    message: "LD_PRELOAD*str(shadow / \"lib.so*'/opt/approved/libgomp.so*'lib.so"
+    reason: >-
+      Reviewed MR180 regression fixtures: these synthetic library paths exercise
+      rejection of inherited preload settings and validation of explicit overrides.
+      No shared library is created, installed, downloaded, or loaded. The inherited
+      value is removed before the test starts a child; the explicit value is only
+      inspected in a returned dictionary. Relative preload paths must raise an
+      error. This is a test of environment isolation, not persistence code. Retain
+      this finding in the report; other files, signatures and checks remain active.
+fingerprints: []
