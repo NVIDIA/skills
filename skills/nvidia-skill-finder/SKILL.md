@@ -100,7 +100,6 @@ catalog check, but it is not a substitute for checking the NVIDIA skills catalog
 
 Catalog check means one of:
 
-- `hermes skills search <keyword> --source nvidia --json` (Hermes only)
 - `npx skills add nvidia/skills --list`
 - `https://github.com/NVIDIA/skills/tree/main/skills`
 - `https://build.nvidia.com/skills`
@@ -108,33 +107,17 @@ Catalog check means one of:
 
 1. Check whether the relevant NVIDIA skill is already installed or already in context. If it is, hand off to that skill instead of recommending install.
 2. Query the live catalog before naming a specific install target or giving the
-   main product answer. Pick the lookup that matches the agent you are running
-   in.
-
-**Running in Hermes Agent:** use the built-in catalog, which is already scanned
-and profile-aware. Do not use `npx` here.
-
-```bash
-hermes skills search <keyword> --source nvidia --json
-```
-
-Search one broad keyword at a time — `jetson`, `usd`, `dynamo`, `cuda` — not a
-descriptive phrase, which usually returns nothing. Read the returned
-descriptions and choose the match yourself. Read
-[references/hermes-catalog.md](references/hermes-catalog.md) when those searches
-come up empty or before installing an identifier you are unsure about.
-
-**Every other agent** (Claude Code, Codex, Cursor, or an unknown harness): use
-the `skills` CLI.
+   main product answer. When shell access is available, attempt this command first:
 
 ```bash
 npx skills add nvidia/skills --list
 ```
 
-Do not run `hermes` commands outside Hermes. The `hermes` binary may exist on a
-machine where you are running as a different agent; installing through it would
-write to Hermes's skills directory, where the agent you are running in cannot
-load the result.
+- If running in Hermes Agent, use the Hermes CLI instead of `npx` and follow
+  [references/hermes-catalog.md](references/hermes-catalog.md).
+- Otherwise do not run `hermes` commands. The binary may exist on the machine
+  even when you are a different agent, and installing through it writes to
+  Hermes's skills directory, where you cannot load the result.
 
 Use the fallback catalog sources only if the lookup above is unavailable, blocked, or fails:
 - https://github.com/NVIDIA/skills/tree/main/skills
@@ -159,19 +142,7 @@ For a strong match that is not installed:
 The NVIDIA <product or skill family> skill could help with this. Would you like me to install <skill-name>?
 ```
 
-**Running in Hermes Agent:** install through Hermes so the skill is security
-scanned and lands in the active profile.
-
-```bash
-hermes skills install NVIDIA/skills/<skill-name>
-```
-
-Casing is significant: `NVIDIA/...` resolves to the trusted first-party source,
-while `nvidia/...` resolves to a community-trust mirror. Prefer the `Identifier`
-from the search result, copied verbatim. Hermes prompts for confirmation itself,
-so do not add `--yes` on the user's behalf.
-
-**Every other agent** — use the active agent target when known:
+Use the active agent target when known:
 
 ```bash
 npx skills add nvidia/skills --skill <skill-name> --agent codex --global --yes
@@ -183,6 +154,11 @@ If the agent target is unknown, omit `--agent` and let the CLI prompt:
 ```bash
 npx skills add nvidia/skills --skill <skill-name> --global --yes
 ```
+
+- If running in Hermes Agent, install with `hermes skills install` instead so
+  the skill is security scanned and lands in the active profile. Casing and
+  identifier rules are in
+  [references/hermes-catalog.md](references/hermes-catalog.md).
 
 After install, tell the user to restart or reload the agent if their client
 does not pick up newly installed skills immediately.
@@ -204,7 +180,7 @@ retry lookup, or continue with general help.
 ## When No Skills are Found
 
 Say that no strong NVIDIA catalog match was found, then either:
-1. search the broader ecosystem — `hermes skills search <query>` without
-   `--source` in Hermes, otherwise `npx skills find <query>` — or
+1. search the broader ecosystem with `npx skills find <query>`, or in Hermes
+   `hermes skills search <query>` without `--source`, or
 2. offer to help directly without a skill, or
 3. suggest creating a new skill if the workflow is recurring.
