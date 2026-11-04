@@ -1,0 +1,58 @@
+{
+  "skill_name": "isaac-cable-insertion-policy-deployment",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Export the DisplayPort task-space checkpoint I provide, using its originating params/env.yaml and params/agent.yaml, and run it in Isaac Sim 6.0 through ROS Deploy. Use Docker containers and record insertion. Ask for any required input paths I have not supplied.",
+      "expected_output": "Request missing required input paths before execution. With the required inputs supplied: fresh validated LEAPP bundle, verified training assets, complete video, measured success or honest failure, exact commands, stopped owned processes.",
+      "files": [],
+      "assertions": [
+        "Request a missing training root, explicit checkpoint or originating parameters; discover or pull the documented default images instead of inventing paths or selecting the newest checkpoint.",
+        "Describe a fresh LEAPP export with numerical validation in the verified training environment, followed by ROS Deploy in Docker and Isaac Sim 6.0 in a separate Docker container.",
+        "Require training asset parity checks, a complete recorded video, and measured results before claiming insertion success.",
+        "Record exact commands and evidence, preserve failures, and stop owned processes at completion.",
+        "Use the same Isaac Sim image for compatibility checking and insertion recording, with a separate Isaac ROS container.",
+        "Use --install-sim-runtime for ffmpeg in the default simulator image; do not require a host simulator directory or host ffmpeg.",
+        "Record both immutable image IDs and stop both owned containers on completion or failure.",
+        "Synchronize simulation with the matching ROS action at every 30 Hz policy boundary, retain timing evidence, and invalidate a timeout or mismatched command instead of relying on render speed or fixed sleeps."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Deploy a checkpoint with no originating env.yaml or agent.yaml.",
+      "expected_output": "Fail before export or simulator startup and request originating parameters.",
+      "files": [],
+      "assertions": [
+        "Do not export the checkpoint or launch simulation without its originating params/env.yaml and params/agent.yaml.",
+        "Request both originating parameter files instead of reconstructing them from current task defaults or unrelated runs.",
+        "Do not claim a successful export or deployment."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Use the provided Isaac Sim 6.1 image for this skill's simulation test.",
+      "expected_output": "Reject the unsupported deployment version and require the Isaac Sim 6.0.0 Docker image; do not claim a 6.0 test.",
+      "files": [],
+      "assertions": [
+        "Identify Isaac Sim 6.1 as unsupported for this skill's deployment simulation and require the Isaac Sim 6.0.0 Docker image.",
+        "Distinguish the training/export simulator version from the Isaac Sim 6.0 deployment runtime.",
+        "Do not launch the provided 6.1 runtime for deployment or describe it as a verified 6.0 test."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Plan only; do not execute commands. Deploy the checkpoint from the cable training skill's recorded manipulation repository. Its .venv passed training with GPU ONNX 1.26.0, but LEAPP is absent and there is no root VERSION file. The training plan records private uv/cache paths. Explain how to prepare export without replacing the training installation.",
+      "expected_output": "Reuse the recorded training_root and plan. Add locked LEAPP 0.6.1 from NVIDIA's Python index with --locked --inexact --group sim --group leapp --no-install-package onnxruntime after reviewing a dry run. Keep GPU ONNX only; record the reviewed provider substitution, verify dependencies/provenance, use native actor/critic export overrides, and run fresh numerical export validation. Keep the release-r1 branch default without pinning a checkout commit. Use sanitized child environments and absolute venv Python; do not require a source checkout VERSION, modify upstream files, install both providers, or claim raw pip check is conflict-free. ROS Deploy comes from APT in the NGC image. An export-only test does not prove deployment or insertion success.",
+      "files": [],
+      "assertions": [
+        "No commands are executed.",
+        "Reuse the recorded training root, .venv, and training plan's private uv/cache configuration; do not require a source IsaacLab checkout or root VERSION file.",
+        "Review a dry run before adding locked LEAPP 0.6.1 from NVIDIA's Python index with --locked --inexact --group sim --group leapp --no-install-package onnxruntime.",
+        "Keep only GPU ONNX 1.26.0, record the reviewed provider substitution, and verify dependencies and provenance without claiming raw pip check is conflict-free.",
+        "Use native actor/critic export overrides and fresh numerical validation; do not modify upstream project files or pin the release-r1 checkout to a commit.",
+        "Use the sanitized child environment and absolute venv Python, with ROS Deploy installed through APT in the NGC image.",
+        "Explain that export-only validation does not establish deployment or insertion success."
+      ]
+    }
+  ]
+}

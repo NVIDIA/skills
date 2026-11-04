@@ -1,0 +1,154 @@
+{
+  "skill_name": "isaac-cable-insertion-policy-training",
+  "evals": [
+    {
+      "id": "isaac-cable-insertion-policy-training-plan-default",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. Suppose /work/validation/isaaclab_training is the standalone package from NVIDIA-ISAAC-ROS/isaac_ros_manipulation at release-r1 with its locked sim environment installed. No source IsaacLab checkout exists. Show the preflight, default task-space command, logging, and three-run tuning plan with video.",
+      "expected_output": "A task-space training plan entirely from the standalone package, checking the wheel-builder dependency and video, with unique logs and one tuning group per run.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "The working directory and training_root are /work/validation/isaaclab_training; Git metadata comes from its parent repository.",
+        "The task is IsaacTraining-DisplayPortInsertion-Rizon4s-TaskSpace-ROS-Inference with 128-step rollouts, 1000 updates and a 333-update anneal by default.",
+        "The command uses uv run --no-sync isaaclab train, --viz kit, and --video with length and interval; it does not use --viz none.",
+        "Preflight checks the venv, editable training location, installed Isaac Lab Git commit against pyproject.toml and uv.lock, simulator, GPU, TensorBoard and video.",
+        "No separate source IsaacLab clone, source install skill, or personal training fork is required.",
+        "The plan defaults to three runs, logs before launch, and changes one supported hyperparameter group at a time."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-plan-short-run",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. A hypothetical 100-iteration run uses 64 PPO steps per environment, but the DisplayPort reset curriculum still divides the environment step counter by 512 and anneals from 0.8 to 0 over 500 iterations. It reports high success early and low terminal success on approach starts. Explain the mismatch and the next time-bounded experiment.",
+      "expected_output": "The agent calculates that the curriculum advances about 12.5 iterations and retains roughly 78% near-goal resets, aligns its step divisor to 64, chooses a deliberate short-run anneal schedule, and checks contact before later tuning groups.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "The explanation computes 100 × 64 ÷ 512 = 12.5 curriculum iterations and approximately 78% near-goal resets at the end.",
+        "The proposed next run sets the curriculum's num_steps_per_env to 64 and logs its anneal schedule explicitly.",
+        "The plan checks asset/contact quality and compares terminal success at a matched reset distribution before reward tuning."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-plan-physx-retry",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. A hypothetical 256-environment task-space training run failed with `PxGpuDynamicsMemoryConfig::collisionStackSize buffer overflow detected`. Explain what to record and how you would retry, including what to report as exports.",
+      "expected_output": "The failed run receives a log entry; the agent proposes increasing the collision stack from 2**30 toward 2**31 with a GPU-memory check, a distinct retry identity, and reporting only outputs actually produced.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "The failure, exact error, run parameters, and exit status are preserved in the invocation log.",
+        "The proposed retry increases gpu_collision_stack_size toward 2**31 while checking GPU memory and uses a distinct run name.",
+        "The final report lists only checkpoints, videos, or exported policies that exist."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-plan-missing-exit-marker",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. A three-run DisplayPort series uses a background supervisor. The first trainer prints its final iteration and training time, writes the expected TensorBoard samples, final checkpoint, and videos, then disappears without writing its .exit marker. The supervisor is still waiting. Explain recovery and how the user gets a final report after all runs.",
+      "expected_output": "The agent diagnoses the marker-only wait, verifies process state and final artifacts from the correct namespace, records exit code as unavailable, resumes from the final checkpoint without duplicating the completed run, and arranges a user-facing report when the series completes.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "The plan does not wait indefinitely for a missing marker and checks process state from the correct namespace.",
+        "The plan requires the expected final TensorBoard step, final checkpoint, final training log, and decodable videos before adopting the run.",
+        "The process exit code is marked unavailable rather than reported as zero.",
+        "Continuation is restartable and does not duplicate a completed run.",
+        "A final report is delivered to the user after the series finishes, not only written to disk."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-setup-fresh",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. On a supported Linux NVIDIA workstation with sufficient resources, I authorize installation and training under /work/validation. That path is absent; the public repository is reachable over HTTPS and GitHub CLI is not installed. Git and system Python are available, but uv, Isaac Sim, and IsaacLabTraining are absent. There is no EULA acceptance receipt. Explain setup through verified task-space training with video.",
+      "expected_output": "Clone the official manipulation release, obtain explicit EULA acceptance, sync the standalone sim group, verify supplemental video and run a bounded task smoke before the campaign.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "The clone is NVIDIA-ISAAC-ROS/isaac_ros_manipulation at release-r1; training_root is /work/validation/isaaclab_training.",
+        "Explicit EULA acceptance is required before installing or launching Isaac Sim; installation authorization alone is not consent.",
+        "Setup uses uv sync --locked --group sim --no-install-package onnxruntime in the package root to install the project and pinned Isaac Lab wheel-builder dependency; no separate source checkout is installed.",
+        "Supplemental video packages must preserve locked dependencies; later launches use uv run --no-sync.",
+        "Setup commands and failures are logged; preflight and a bounded task/video smoke must pass, and smoke GPU time counts against a total GPU budget."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-setup-repair",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. /work/validation/isaaclab_training has an existing standalone .venv from the official manipulation release. The parent repo has local task modifications. EULA acceptance is recorded. I authorize repairing missing video dependencies and starting training afterward. Explain the repair without replacing the repository or environment.",
+      "expected_output": "Preserve changes and the environment, repair video with locked dependency constraints, then verify encoding and the task before training.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "Preserve local changes, branch, and .venv; do not reset, reclone, or switch refs.",
+        "Use a reviewed supplemental video installation; if sync is necessary use --locked --inexact --group sim --no-install-package onnxruntime to retain supplemental packages.",
+        "Verify the editable package points to this training_root and Isaac Lab matches the wheel-builder commit in the project and lockfile.",
+        "Reuse valid EULA acceptance; do not change reset IK or task physics to fix dependencies.",
+        "Require encode/decode and bounded task/video verification before long training."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-setup-blocked",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. I request task-space cable training and suggest /work/IsaacLab, an existing dirty source checkout on develop. The driver is below the pinned simulator minimum and I decline the Isaac Sim EULA. What happens?",
+      "expected_output": "Preserve the source checkout, identify a separate standalone destination and driver/consent blockers, and stop before simulator installation or launch.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "The dirty source checkout remains untouched; it is not reused as training_root.",
+        "The future setup uses the official manipulation repo and its isaaclab_training subdirectory.",
+        "Do not upgrade drivers unattended or choose a different physics backend to hide the blocker.",
+        "Do not record acceptance, set acceptance variables, install Isaac Sim or launch simulation after refusal.",
+        "Report the blockers without claiming successful installation or training."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-setup-no-path",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. Train a task-space cable insertion policy with video. I have no IsaacLab install and have not supplied a path. Assume a supported Linux workstation, sufficient resources, valid GitHub access, a writable home, and no ~/isaac_ros_manipulation directory. I authorize needed installation and already accepted the EULA. What happens next?",
+      "expected_output": "Choose and announce the unused default manipulation-repository destination, reuse access and consent, and proceed with the standalone workflow without requiring source IsaacLab.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "Choose and announce ~/isaac_ros_manipulation without another approval gate for this already authorized setup.",
+        "Clone the official manipulation release and use its isaaclab_training directory as the absolute training_root.",
+        "Install with uv sync --locked --group sim --no-install-package onnxruntime, add compatible video support, and verify the locked dependency and bounded task smoke.",
+        "Do not ask the user to supply or install a source IsaacLab checkout."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-setup-path-collision",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. I authorize installation and training without specifying a path. ~/isaac_ros_manipulation is an unrelated nonempty directory, and ~/isaac_ros_manipulation-2 is free. The current directory is a dirty IsaacLab develop checkout. Describe the destination and how the plan changes if I specify /mnt/fast/cable-validation.",
+      "expected_output": "Preserve existing directories, choose the unused suffixed validation destination, and honor an explicit destination with training_root beneath it.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "Preserve the occupied default and dirty current checkout.",
+        "Choose the unused suffixed manipulation-repository destination and announce it.",
+        "If /mnt/fast/cable-validation is selected, clone there and use /mnt/fast/cable-validation/isaaclab_training as training_root.",
+        "Never use a source IsaacLab installation or its venv as the training runtime."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-setup-public-access",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. GitHub CLI is not installed and I have no GitHub login. A public repository check fails inside the restricted sandbox. Explain how to check access to NVIDIA-ISAAC-ROS/isaac_ros_manipulation at release-r1 without changing the training source.",
+      "expected_output": "Use public HTTPS Git access without requiring GitHub CLI or login. Recheck branch reachability from the authorized host context before declaring a network blocker; never substitute a personal repo.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed.",
+        "Use git ls-remote over public HTTPS for release-r1; a sandbox network failure should be rechecked from the authorized host context.",
+        "Do not ask for tokens in chat or print credentials.",
+        "Do not require gh or GitHub login for the public repository; stop with the precise network or branch-access blocker if it remains unavailable.",
+        "Do not fall back to a personal fork or source IsaacLab install."
+      ]
+    },
+    {
+      "id": "isaac-cable-insertion-policy-training-standalone-dependency-conflicts",
+      "prompt": "Plan only. You may use read-only tools to read the installed skill and its bundled references. Do not install packages, modify files or environments, authenticate, or launch training or simulation; describe those operational commands without executing them. The official standalone release passes uv sync --locked --group sim --dry-run. Published installed-package requirements report missing ipywidgets and onnxruntime-gpu, while CPU onnxruntime is already locked. Isaac Sim requires torchvision==0.26.0 but the lock has 0.29.0 and the project overrides torchvision>=0.25. Is this conflict-free, and how should video be added? Do not change the training project.",
+      "expected_output": "Keep upstream source and dependency files unchanged; use the release-specific skill-managed supplements and CPU ONNX installation exclusion, then validate all actual installed requirements without waiving missing dependencies.",
+      "files": [],
+      "assertions": [
+        "No installation, mutation, authentication, training, or simulation commands are executed; read-only inspection of the installed skill and its references is allowed. No installation is claimed conflict-free.",
+        "The torchvision mismatch may be recorded as an explicit project override, but this is not proof of runtime compatibility.",
+        "Missing dependencies block preflight; do not treat an override as permission to ignore missing packages.",
+        "Omit CPU onnxruntime with --no-install-package onnxruntime, install the pinned GPU and ipywidgets supplements under exported constraints, and leave LEAPP out for training alone; deployment may add the locked export group with its documented GPU-provider substitution.",
+        "Export the selected locked sim environment as constraints and apply them to both dry-run and actual supplemental video install.",
+        "Use uv run --no-sync for launches and --locked --inexact --group sim --no-install-package onnxruntime for a necessary repair; do not repin NumPy or use a source IsaacLab environment.",
+        "Do not edit project files or installed package metadata; no uv add or lockfile regeneration. Verify unchanged project hashes and run dependency/import/task smoke checks."
+      ]
+    }
+  ]
+}

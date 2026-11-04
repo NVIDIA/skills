@@ -18,6 +18,8 @@ components:
     description: Physical AI skills for simulation, synthetic data generation, training, validation and deployment and more.
     catalog_dirs:
       - isaac-humanoid-cloud-control
+      - isaac-cable-insertion-policy-deployment
+      - isaac-cable-insertion-policy-training
       - isaac-mission-control-showcase
       - omniverse-cad-to-simready
       - omniverse-content-services

@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+[tool.poetry]
+name = "isaac-cable-insertion-policy-deployment-dependencies"
+version = "0.1.0"
+description = "Dependency inventory for the Isaac cable insertion policy deployment skill"
+authors = ["NVIDIA Isaac Team <info@nvidia.com>"]
+license = "Apache-2.0"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+PyYAML = "6.0.3"
+numpy = "2.5.4"
+scipy = "1.18.1"
+usd-core = "26.8"
+torch = "2.12.0"
+
+# Inventory only: use product-managed versions in IsaacLab, Isaac Sim and ROS.
+# ROS packages are distributed through apt; see package.xml and references/dependencies.md.
