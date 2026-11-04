@@ -407,6 +407,7 @@
       "description": "Develop, tune, profile, and integrate GPU kernels and accelerated code, including CUDA-adjacent workflows, autotuning, low-level performance work, and framework integration.",
       "skills": [
         "compute-sanitizer-diagnose-cuda-bugs",
+        "cudf-query-engine-builder",
         "genomics-workflow-acceleration",
         "holoscan-module-lifecycle",
         "hsb-ip-create-top",

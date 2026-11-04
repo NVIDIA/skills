@@ -637,6 +637,18 @@
       }
     },
     {
+      "path": "skills/cudf-query-engine-builder",
+      "name": "cudf-query-engine-builder",
+      "description": "Build the first native, single-GPU cuDF path in a query engine, or complete its initial adapter. Use for libcudf C++ or cuDF Java implementation, buffer ownership, worker readiness and CPU/reference comparison, including identifying missing POC inputs. Excludes standalone dataframe analysis, cuDF mainline changes, production integration and distributed or multi-GPU execution. Bundled maintainer evaluations use CPU simulations and source review; they do not run CUDA.",
+      "metadata": {
+        "product.primary": "cuDF",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,data_engineer,hpc_developer,platform_engineer",
+        "discovery.activity_tags": "integrate,extend,validate,test,compare"
+      }
+    },
+    {
       "path": "skills/cuml",
       "name": "cuml",
       "description": "Use when writing, running, debugging or upgrading Python code that uses NVIDIA cuML (GPU machine learning), cuml.accel (zero-code-change GPU acceleration of scikit-learn, umap-learn and hdbscan), or GPU UMAP/HDBSCAN/RandomForest/KMeans/SVC, including through libraries that wrap cuML (BERTopic, rapids-singlecell). Covers APIs removed or renamed in 2025-2026 releases, verifying code really ran on the GPU, large-data UMAP/HDBSCAN memory recipes, and exporting trained models. Not for cuDF-only dataframe work, PyTorch or XGBoost.",
