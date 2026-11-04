@@ -118,26 +118,11 @@ and profile-aware. Do not use `npx` here.
 hermes skills search <keyword> --source nvidia --json
 ```
 
-Search requires every word in the query to match, so query one broad product,
-family, or lane keyword at a time: `jetson`, `usd`, `dynamo`, `pandas`, `cuda`.
-Descriptive phrases usually return nothing — `jetson pinmux` returns no rows
-even though `jetson-customize-pinmux` exists, while `jetson` returns it. Run two
-or three separate single-keyword searches (product name, product family,
-taxonomy lane) instead of one phrase.
-
-`--json` returns each candidate's full description. Read them and choose the
-match yourself; do not assume the first row is the answer. This search ranks
-lexically, so it narrows the catalog but does not do the matching for you.
-
-If several single-keyword searches return nothing, list the whole catalog and
-choose from it before giving up:
-
-```bash
-curl -sL https://raw.githubusercontent.com/NVIDIA/skills/main/.github/scripts/marketplace/metadata.json | jq -r '.skills[] | "\(.name): \(.description)"'
-```
-
-Confirm the skill you picked with `hermes skills inspect <identifier>`, then
-install it through Hermes.
+Search one broad keyword at a time — `jetson`, `usd`, `dynamo`, `cuda` — not a
+descriptive phrase, which usually returns nothing. Read the returned
+descriptions and choose the match yourself. Read
+[references/hermes-catalog.md](references/hermes-catalog.md) when those searches
+come up empty or before installing an identifier you are unsure about.
 
 **Every other agent** (Claude Code, Codex, Cursor, or an unknown harness): use
 the `skills` CLI.
@@ -181,11 +166,9 @@ scanned and lands in the active profile.
 hermes skills install NVIDIA/skills/<skill-name>
 ```
 
-Prefer the `Identifier` from the `hermes skills search` result, copied verbatim,
-over assembling one by hand; it may be a longer path such as
-`NVIDIA/skills/skills/<skill-name>`. Both resolve, but casing is significant:
-`NVIDIA/...` resolves to the trusted first-party source, while `nvidia/...`
-resolves to a community-trust mirror. Hermes prompts for confirmation itself,
+Casing is significant: `NVIDIA/...` resolves to the trusted first-party source,
+while `nvidia/...` resolves to a community-trust mirror. Prefer the `Identifier`
+from the search result, copied verbatim. Hermes prompts for confirmation itself,
 so do not add `--yes` on the user's behalf.
 
 **Every other agent** — use the active agent target when known:
