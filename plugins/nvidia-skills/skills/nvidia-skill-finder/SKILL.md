@@ -100,7 +100,7 @@ catalog check, but it is not a substitute for checking the NVIDIA skills catalog
 
 Catalog check means one of:
 
-- `hermes skills search <query> --source nvidia` (Hermes only)
+- `hermes skills search <keyword> --source nvidia --json` (Hermes only)
 - `npx skills add nvidia/skills --list`
 - `https://github.com/NVIDIA/skills/tree/main/skills`
 - `https://build.nvidia.com/skills`
@@ -115,15 +115,29 @@ Catalog check means one of:
 and profile-aware. Do not use `npx` here.
 
 ```bash
-hermes skills search <query> --source nvidia
+hermes skills search <keyword> --source nvidia --json
 ```
 
-Add `--json` for full, untruncated identifiers, and `--limit` to cap results.
-Search matches all the words in the query, so use one or two keywords
-(`cuda`, `jetson`, `vehicle routing`) rather than a sentence — a long
-natural-language phrase such as `cuda kernel optimization` returns nothing.
-Run `hermes skills browse` to page through everything. If `--source nvidia`
-returns no rows for several distinct keywords, fall back to the sources below.
+Search requires every word in the query to match, so query one broad product,
+family, or lane keyword at a time: `jetson`, `usd`, `dynamo`, `pandas`, `cuda`.
+Descriptive phrases usually return nothing — `jetson pinmux` returns no rows
+even though `jetson-customize-pinmux` exists, while `jetson` returns it. Run two
+or three separate single-keyword searches (product name, product family,
+taxonomy lane) instead of one phrase.
+
+`--json` returns each candidate's full description. Read them and choose the
+match yourself; do not assume the first row is the answer. This search ranks
+lexically, so it narrows the catalog but does not do the matching for you.
+
+If several single-keyword searches return nothing, list the whole catalog and
+choose from it before giving up:
+
+```bash
+curl -sL https://raw.githubusercontent.com/NVIDIA/skills/main/.github/scripts/marketplace/metadata.json | jq -r '.skills[] | "\(.name): \(.description)"'
+```
+
+Confirm the skill you picked with `hermes skills inspect <identifier>`, then
+install it through Hermes.
 
 **Every other agent** (Claude Code, Codex, Cursor, or an unknown harness): use
 the `skills` CLI.
