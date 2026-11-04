@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 431,
-  "result_row_count": 4059,
+  "skill_count": 433,
+  "result_row_count": 4074,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -3518,6 +3518,46 @@
       "average_uplift_pct": 23.57
     },
     {
+      "skill": "isaac-cable-insertion-policy-deployment",
+      "evaluation_date": "2026-11-04",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.6",
+      "dataset_digest": "sha256:2f5515bfa36727033168340fdad8907c890de788cfcf97dddd419c78540d50d6",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "has_results": true,
+      "average_uplift_pct": 18.87
+    },
+    {
+      "skill": "isaac-cable-insertion-policy-training",
+      "evaluation_date": "2026-11-04",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.6",
+      "dataset_digest": "sha256:6b39d6615f27b196d7e789fac463b897743bdb4790de0b766a0bd345819b45a5",
+      "validation_status": "passed",
+      "tasks": 11,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "isaac-cable-insertion-policy-training",
+      "component": "Physical AI",
+      "has_results": true,
+      "average_uplift_pct": 16.23
+    },
+    {
       "skill": "isaac-humanoid-cloud-control",
       "evaluation_date": "2026-10-22",
       "environment": "k8s-sandbox",
@@ -6261,13 +6301,13 @@
     },
     {
       "skill": "physical-ai-neural-reconstruction",
-      "evaluation_date": "2026-09-15",
+      "evaluation_date": "2026-11-04",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:be81cdb0740b0f4d42cef1ea2512c5ce39842d5218a9e6cb9d87a601834fadc4",
-      "validation_status": null,
+      "evaluator_version": "1.6.6",
+      "dataset_digest": "sha256:49c2655474f42be968d68e23c8bf6a745d5e19db4893ecb71cc769ac2ee5b636",
+      "validation_status": "passed",
       "tasks": 4,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6277,7 +6317,7 @@
       "catalog_dir": "physical-ai-neural-reconstruction",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 24.72
+      "average_uplift_pct": 16.57
     },
     {
       "skill": "physical-ai-physics-selection",
@@ -23485,6 +23525,141 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 45.0
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 65.0,
+      "uplift_pct": 24.1
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 45.0,
+      "uplift_pct": 4.1
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-deployment",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-training",
+      "component": "Physical AI",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-training",
+      "component": "Physical AI",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.5,
+      "uplift_pct": 29.1
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-training",
+      "component": "Physical AI",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-training",
+      "component": "Physical AI",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 56.1,
+      "uplift_pct": 19.6
+    },
+    {
+      "catalog_dir": "isaac-cable-insertion-policy-training",
+      "component": "Physical AI",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.2,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "dimension": "Security",
@@ -34983,8 +35158,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 61.7
+      "score_pct": 85.0,
+      "uplift_pct": 45.0
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -34992,8 +35167,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 5.0
+      "score_pct": 85.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -35010,7 +35185,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 91.7,
       "uplift_pct": null
     },
     {
@@ -35019,8 +35194,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 79.4,
-      "uplift_pct": 57.2
+      "score_pct": 64.4,
+      "uplift_pct": 44.4
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -35028,8 +35203,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 69.4,
-      "uplift_pct": 24.4
+      "score_pct": 49.4,
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "physical-ai-neural-reconstruction",
@@ -35037,7 +35212,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.4,
+      "score_pct": 97.7,
       "uplift_pct": null
     },
     {
@@ -35046,7 +35221,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.5,
+      "score_pct": 72.0,
       "uplift_pct": null
     },
     {
