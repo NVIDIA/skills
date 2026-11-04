@@ -14,7 +14,7 @@ What it runs depends on the agent it is running in.
 
 **In Hermes**, it uses the built-in skills catalog and never calls `npx`:
 
-- **Catalog lookup.** `hermes skills search <query> --source nvidia` (or `hermes skills browse`), which reads the catalog Hermes already ships.
+- **Catalog lookup.** `hermes skills search <keyword> --source nvidia --json`, which reads the catalog Hermes already ships. That search needs every word in the query to match, so the finder queries one broad keyword at a time. If several keywords come back empty it reads the full catalog listing from `raw.githubusercontent.com` and picks from that, so a narrow search term can't hide a skill that exists.
 - **Installs only with approval.** `hermes skills install NVIDIA/skills/<skill-name>`, which runs Hermes's own security scan and installs into the active profile. Hermes prompts for confirmation itself; the finder does not pass `--yes`.
 
 **In every other agent** (Claude Code, Codex, Cursor):
