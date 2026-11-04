@@ -373,6 +373,13 @@
       "last_modified": "2026-09-12"
     },
     {
+      "name": "cudf-query-engine-builder",
+      "path": "skills/cudf-query-engine-builder",
+      "content_digest": "sha256:e886e1e88fbe0d05b419286d9cb33e272c43ce6483425f9b3f7450f48d29bb39",
+      "last_commit": "6ada1cdb3dddf3386cfdde655e4dd7de6b1cc82e",
+      "last_modified": "2026-11-04"
+    },
+    {
       "name": "cuml",
       "path": "skills/cuml",
       "content_digest": "sha256:6e24a9698c1c8b9140b0a1746e4f16692595d4ddd0ce624d5a45f4131760e1e6",
