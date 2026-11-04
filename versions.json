@@ -1234,6 +1234,20 @@
       "last_modified": "2026-10-01"
     },
     {
+      "name": "isaac-cable-insertion-policy-deployment",
+      "path": "skills/isaac-cable-insertion-policy-deployment",
+      "content_digest": "sha256:94edb3036c5b781ecd08e1031d68ab3e494f73fb97399070ead17feeba922660",
+      "last_commit": "7f57e8c80c0fda019092ae249fc05229dc070ed7",
+      "last_modified": "2026-11-03"
+    },
+    {
+      "name": "isaac-cable-insertion-policy-training",
+      "path": "skills/isaac-cable-insertion-policy-training",
+      "content_digest": "sha256:bd29cefc1fc753d7193a2c290e8cf076f8fc5ec339e59dadd54df9333ed06bd4",
+      "last_commit": "7f57e8c80c0fda019092ae249fc05229dc070ed7",
+      "last_modified": "2026-11-03"
+    },
+    {
       "name": "isaac-humanoid-cloud-control",
       "path": "skills/isaac-humanoid-cloud-control",
       "content_digest": "sha256:4259cb2ee5498c7862925d1b34e37753196b7aeb8e414e3c79fdae006ed236b5",
@@ -2196,15 +2210,15 @@
       "name": "physical-ai-infrastructure-setup-and-resilient-scaling",
       "path": "skills/physical-ai-infrastructure-setup-and-resilient-scaling",
       "content_digest": "sha256:cffb0f4e223df78d64823f6f31bee1b78e312c61feec804bb69c51ccb44b88d8",
-      "last_commit": "6c6fc092703624a6ce66af814d9ec91d20930885",
-      "last_modified": "2026-05-29"
+      "last_commit": "1d91e024242c03a167c1f8bd07905676c1d1175f",
+      "last_modified": "2026-11-03"
     },
     {
       "name": "physical-ai-neural-reconstruction",
       "path": "skills/physical-ai-neural-reconstruction",
-      "content_digest": "sha256:be55a248effc47dcea5beb5ed36d09467463f6fccadc8d35947c68799882d3d8",
-      "last_commit": "fa2ad210b810c36675136798ac9b23625da4b92f",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:e45be9cbfa48e262a144b14d3587f33987501ca86bdf4ae15b9fceefcb6a48c9",
+      "last_commit": "93b7638e14ac071337d17aa262251427bcf274ee",
+      "last_modified": "2026-11-03"
     },
     {
       "name": "physical-ai-physics-selection",

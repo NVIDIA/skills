@@ -2113,6 +2113,30 @@
       }
     },
     {
+      "path": "skills/isaac-cable-insertion-policy-deployment",
+      "name": "isaac-cable-insertion-policy-deployment",
+      "description": "Export a trained Isaac Lab DisplayPort task-space checkpoint with LEAPP, run it through Isaac ROS Deploy and Isaac Sim 6.0 in separate Docker containers, verify training asset parity, and record insertion video and measured results. Use for post-training simulation deployment and testing of cable insertion policies.",
+      "metadata": {
+        "product.primary": "Isaac ROS",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics-simulation",
+        "audience": "robotics_developer,simulation_engineer,ml_engineer,developer",
+        "discovery.activity_tags": "deploy,validate,test,measure,package"
+      }
+    },
+    {
+      "path": "skills/isaac-cable-insertion-policy-training",
+      "name": "isaac-cable-insertion-policy-training",
+      "description": "Set up the standalone IsaacLabTraining package from NVIDIA-ISAAC-ROS/isaac_ros_manipulation, then launch, monitor, resume, evaluate, and tune DisplayPort insertion policies without a separate Isaac Lab source installation. Use for setup and campaign planning, dependency repair, curriculum or PhysX troubleshooting, video evidence, and long GPU runs.",
+      "metadata": {
+        "product.primary": "Isaac Lab",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "robotics-simulation",
+        "audience": "robotics_developer,simulation_engineer,ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "train,configure,monitor,evaluate,troubleshoot"
+      }
+    },
+    {
       "path": "skills/isaac-humanoid-cloud-control",
       "name": "isaac-humanoid-cloud-control",
       "description": "Run streamed Unitree G1 cloud-navigation demos in Isaac Sim with guarded gantry release. Use for demo, destination, Mission Control, or cleanup requests.",
