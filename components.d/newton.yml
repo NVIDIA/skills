@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Newton
+repo: NVIDIA/newton-skills
+ref: main
+description: Agent skills for setting up and debugging Newton physics simulations using public documentation and examples packaged in the Python wheel.
+skills:
+  - path: skills/newton-usage/
+    catalog_dir: newton-usage
+links:
+  discussions: false
