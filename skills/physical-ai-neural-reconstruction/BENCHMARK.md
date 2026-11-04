@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `physical-ai-neural-reconstruction`
-- Evaluation date: 2026-09-15
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-04
+- Evaluator version: `1.6.6`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
-- Dataset digest: `sha256:be81cdb0740b0f4d42cef1ea2512c5ce39842d5218a9e6cb9d87a601834fadc4` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Dataset digest: `sha256:49c2655474f42be968d68e23c8bf6a745d5e19db4893ecb71cc769ac2ee5b636` (skill-evaluator-dataset-snapshot/1)
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| physical-ai-neural-reconstruction | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.3` | nondeterministic / provider_defaults |
+| physical-ai-neural-reconstruction | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.3` | nondeterministic / provider_defaults |
+| physical-ai-neural-reconstruction | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.3` | nondeterministic / provider_defaults |
+| physical-ai-neural-reconstruction | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.3` | nondeterministic / provider_defaults |
+| physical-ai-neural-reconstruction | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.3` | nondeterministic / provider_defaults |
+
+- Controls for `physical-ai-neural-reconstruction`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.8% — baseline ran, but no comparable score was available; uplift unavailable | 89.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 89.4% — baseline ran, but no comparable score was available; uplift unavailable | 79.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 33.3% → 95.0% (+61.7 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 22.2% → 79.4% (+57.2 points) | 45.0% → 69.4% (+24.4 points) |
-| Efficiency | 94.4% — baseline ran, but no comparable score was available; uplift unavailable | 83.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 40.0% → 85.0% (+45.0 points) | 85.0% → 85.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 20.0% → 64.4% (+44.4 points) | 39.4% → 49.4% (+10.0 points) |
+| Efficiency | 97.7% — baseline ran, but no comparable score was available; uplift unavailable | 72.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,32 +63,43 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.2% → 95.3% (-2.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 85.2% → 84.0% (-1.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 451,620 | 1,463,474 | N/A | N/A | skill 4/4; base 9/9 |
-| claude-code | physical-ai-neural-reconstruction-001 | 66,335 | 788,632 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | physical-ai-neural-reconstruction-002 | 107,586 | 289,036 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | physical-ai-neural-reconstruction-003 | 245,994 | 321,538 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | physical-ai-neural-reconstruction-004 | 31,705 | 64,268 | -32,563 | -50.67% | skill 1/1; base 1/1 |
-| codex | All cases | 202,055 | 278,817 | -76,762 | -27.53% | skill 4/4; base 4/4 |
-| codex | physical-ai-neural-reconstruction-001 | 30,190 | 90,319 | -60,129 | -66.57% | skill 1/1; base 1/1 |
-| codex | physical-ai-neural-reconstruction-002 | 49,519 | 25,569 | +23,950 | +93.67% | skill 1/1; base 1/1 |
-| codex | physical-ai-neural-reconstruction-003 | 85,744 | 121,851 | -36,107 | -29.63% | skill 1/1; base 1/1 |
-| codex | physical-ai-neural-reconstruction-004 | 36,602 | 41,078 | -4,476 | -10.90% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 653,675 | 1,742,291 | N/A | N/A | skill 8/8; base 13/13 |
+| claude-code | All cases | 408,933 | 503,226 | -94,293 | -18.74% | skill 4/4; base 4/4 |
+| claude-code | physical-ai-neural-reconstruction-001 | 77,574 | 142,810 | -65,236 | -45.68% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-neural-reconstruction-002 | 123,485 | 144,491 | -21,006 | -14.54% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-neural-reconstruction-003 | 170,836 | 108,357 | +62,479 | +57.66% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-neural-reconstruction-004 | 37,038 | 107,568 | -70,530 | -65.57% | skill 1/1; base 1/1 |
+| codex | All cases | 268,101 | 194,079 | +74,022 | +38.14% | skill 4/4; base 4/4 |
+| codex | physical-ai-neural-reconstruction-001 | 29,823 | 63,116 | -33,293 | -52.75% | skill 1/1; base 1/1 |
+| codex | physical-ai-neural-reconstruction-002 | 85,792 | 34,049 | +51,743 | +151.97% | skill 1/1; base 1/1 |
+| codex | physical-ai-neural-reconstruction-003 | 112,937 | 57,910 | +55,027 | +95.02% | skill 1/1; base 1/1 |
+| codex | physical-ai-neural-reconstruction-004 | 39,549 | 39,004 | +545 | +1.40% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 677,034 | 697,305 | -20,271 | -2.91% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -81,12 +107,15 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/upstream-fetch.md:
+  "## Locate and fetch the upstream skills" in SKILL.md (lines 142-184)
+  vs "# Locating and Fetching Upstream Skills" in references/upstream-fetch.md (lines 1-13)
+  vs "## Where to look on the local disk" in references/upstream-fetch.md (lines 26-52) (`SKILL.md:142`)
 - **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in prerequisites.md (`skills/physical-ai-neural-reconstruction/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
-- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'upstream_clone_path' is not kebab-case (`skills/physical-ai-neural-reconstruction/SKILL.md`)
-- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'upstream_override_env' is not kebab-case (`skills/physical-ai-neural-reconstruction/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
-- 14 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/physical-ai-neural-reconstruction/SKILL.md`)
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
