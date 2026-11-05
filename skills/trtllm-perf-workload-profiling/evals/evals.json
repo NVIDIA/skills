@@ -1,0 +1,91 @@
+{
+  "skill_name": "perf-workload-profiling",
+  "evals": [
+    {
+      "id": "wprof-op-benchmark-cuda-events",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. My RMSNorm benchmark in /workspace/input/wprof-naive-bench/bench_rmsnorm.py gives numbers that jump around from run to run, and I don't trust them. Rewrite it into /workspace/out/bench_rmsnorm.py so that it measures the op's GPU time properly and reports per-iteration statistics I can put in a perf report. Briefly explain what was wrong with the original.",
+      "expected_skill": "perf-workload-profiling",
+      "expected_script": null,
+      "expected_output": "A rewritten benchmark that pre-allocates inputs once, runs ~50 warmup iterations and synchronizes, times ~100 iterations with per-iteration torch.cuda.Event pairs recorded asynchronously, synchronizes once after the loop, and reports mean/median/std/min/max with shape, dtype and device. The explanation names the original anti-patterns: no warmup, perf_counter for GPU time, sync before and after every iteration, allocation inside the loop, mean-only reporting.",
+      "assertions": [
+        "Runs warmup iterations of the op (the skill's default is 50) and synchronizes before any timing starts.",
+        "Times the GPU work with CUDA events (torch.cuda.Event(enable_timing=True) and elapsed_time) instead of time.perf_counter().",
+        "Does not call torch.cuda.synchronize() inside the timed loop; events are recorded asynchronously and the code synchronizes once after the loop before reading elapsed times.",
+        "Allocates the input/weight tensors (and the events) once before the timing loop instead of on every iteration.",
+        "Reports distribution statistics (mean plus median/std/min/max) over a reasonable number of iterations (around 100), not only the mean.",
+        "Does not present measured latency numbers as if the script had been run, and does not install packages."
+      ],
+      "files": [
+        "files/wprof-naive-bench"
+      ]
+    },
+    {
+      "id": "wprof-training-loop-throughput-and-data-time",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. Instrument the training loop in /workspace/input/wprof-train-loop/train.py so that it prints per-iteration latency, samples per second and the time spent waiting on the DataLoader, ignoring the startup iterations, plus an average at the end. Write the result to /workspace/out/train_timed.py and tell me how to decide from the output whether data loading is my bottleneck.",
+      "expected_skill": "perf-workload-profiling",
+      "expected_script": null,
+      "expected_output": "The loop body is bracketed with torch.cuda.synchronize() + time.perf_counter(); the first few (e.g. 5) iterations are excluded; data time is measured from the end of the previous iteration to the arrival of the next batch; per-iteration lines print iter ms and fps = 32 / iter_seconds, with an average at the end. If data time / iteration time exceeds about 0.2, data loading is the bottleneck.",
+      "assertions": [
+        "Brackets the existing loop body with torch.cuda.synchronize() + time.perf_counter() before and after to measure per-iteration latency.",
+        "Excludes a warmup window (the first few iterations) from the reported statistics.",
+        "Measures data-loading time separately, as the gap between the end of the previous iteration and the arrival of the next batch from the DataLoader.",
+        "Reports throughput in samples/sec derived from the batch size (32) and the measured iteration time, with per-iteration output and a final average.",
+        "Explains the decision rule: if data time / iteration time is above roughly 0.2, data loading is a bottleneck.",
+        "Leaves the model, loss and optimizer logic unchanged and does not install packages."
+      ],
+      "files": [
+        "files/wprof-train-loop"
+      ]
+    },
+    {
+      "id": "wprof-nvtx-phase-annotation",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. Add NVTX annotations to /workspace/input/wprof-train-loop/train.py so that the Nsight Systems timeline clearly shows the data-loading, forward, backward and optimizer phases of every step, and so I can tell which step number each range belongs to. Write the annotated script to /workspace/out/train_nvtx.py. I will run the profiler myself later.",
+      "expected_skill": "perf-workload-profiling",
+      "expected_script": null,
+      "expected_output": "train_nvtx.py wraps data loading, forward, backward and optimizer step in `with nvtx.annotate(...)` ranges (or decorated functions), passes the step index via payload= instead of per-step f-string names, avoids the legacy range_push/range_pop API, keeps annotation at phase granularity and leaves the training logic unchanged; it notes that the nvtx package must be installed on the user's machine.",
+      "assertions": [
+        "Uses the nvtx package's nvtx.annotate (as a with-block context manager and/or a decorator) for the phase ranges rather than the legacy range_push/range_pop API (torch.cuda.nvtx or nvtx).",
+        "Annotates data loading, forward, backward and the optimizer step as separate ranges.",
+        "Attaches the step index through the payload= argument instead of building a new range name per step with an f-string such as f\"step_{step}\".",
+        "Keeps annotations at phase granularity (no per-op ranges) and does not use the NVTX ranges as the timing mechanism.",
+        "Leaves the model, loss and optimizer logic unchanged.",
+        "Does not run pip install or a profiler in the sandbox (it may tell the user to install the nvtx package)."
+      ],
+      "files": [
+        "files/wprof-train-loop"
+      ]
+    },
+    {
+      "id": "wprof-profiler-api-and-peak-bandwidth",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. /workspace/input/wprof-profiler-bw/profile_attention.py is supposed to print the top GPU ops from torch.profiler and the softmax bandwidth as a fraction of the GPU's peak, but on PyTorch 2.5 it dies with AttributeError, and I suspect the bandwidth math is off too. Fix it and write the corrected script to /workspace/out/profile_attention.py, listing each change.",
+      "expected_skill": "perf-workload-profiling",
+      "expected_script": null,
+      "expected_output": "Profiler attributes and sort keys move from cuda_* to device_* names (self_device_time_total, device_time_total); device properties use total_memory, memory_clock_rate and memory_bus_width; peak bandwidth is 2 * memory_clock_rate * 1e3 * memory_bus_width / 8 / 1e9 GB/s; and achieved bandwidth converts the profiler's microsecond device time to seconds before dividing.",
+      "assertions": [
+        "Replaces self_cuda_time_total with self_device_time_total in both the table sort_by key and the attribute access.",
+        "Replaces cuda_time_total with device_time_total.",
+        "Uses the correct device-property names: total_memory (not total_mem), memory_clock_rate (not mem_clock_rate) and memory_bus_width (not bus_width).",
+        "Computes peak bandwidth as 2 * (memory_clock_rate * 1e3) * (memory_bus_width / 8) / 1e9 GB/s, i.e. converts the kHz clock to Hz.",
+        "Converts the profiler's device time from microseconds to seconds when computing the achieved softmax bandwidth.",
+        "Does not claim to have run the script or report bandwidth numbers from a run, and does not install packages."
+      ],
+      "files": [
+        "files/wprof-profiler-bw"
+      ]
+    },
+    {
+      "id": "wprof-negative-nsys-kernel-summary",
+      "prompt": "Here is the cuda_gpu_kern_sum section from an Nsight Systems report of our inference server. Which kernel should we optimize first, and why?\n\n Time (%)  Total Time (ms)  Instances  Avg (us)  Name\n     41.3          2,064.0    114,688      18.0  void at::native::vectorized_elementwise_kernel<4, SiluMulFunctor...>\n     22.6          1,129.4      2,048     551.5  sm90_xmma_gemm_bf16bf16_bf16f32_f32_tn_n_tilesize128x256x64_...\n     14.9            744.7     57,344      13.0  void at::native::(anonymous namespace)::vectorized_layer_norm_kernel<...>\n      9.8            489.6         40  12,240.0  void flash::flash_fwd_splitkv_kernel<...>\n     11.4            569.8     98,304       5.8  [42 other kernels]",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Prioritize the SiLU*mul elementwise kernel: it has the largest total GPU time (41.3%, 114,688 tiny launches of ~18 us), so fusing it (e.g. into the GEMM epilogue or a fused activation kernel) or reducing launches has the most headroom; the flash kernel has the highest per-call average but only 9.8% of total time. The answer comes from reading the table, not from writing timing code.",
+      "assertions": [
+        "The perf-workload-profiling skill is not loaded or applied.",
+        "Picks the SiLU*mul elementwise kernel (41.3% of total GPU time) as the first target, reasoning from total time share rather than from the largest per-instance average (the 12,240 us flash kernel is only 9.8%).",
+        "Answers from the supplied table without making new timing or instrumentation code the main deliverable."
+      ],
+      "files": []
+    }
+  ]
+}

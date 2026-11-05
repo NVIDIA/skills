@@ -1,0 +1,24 @@
+# Current trtllm-serve config: DeepSeek-R1-0528 (FP8) on 8x B200
+max_batch_size: 512
+max_num_tokens: 8448
+max_seq_len: 9216
+tensor_parallel_size: 8
+moe_expert_parallel_size: 8
+enable_attention_dp: true
+attention_dp_config:
+  enable_balance: true
+  batching_wait_iters: 0
+  timeout_iters: 60
+trust_remote_code: true
+kv_cache_config:
+  dtype: fp8
+  free_gpu_memory_fraction: 0.8
+cuda_graph_config:
+  enable_padding: true
+  max_batch_size: 256
+moe_config:
+  backend: TRTLLM
+speculative_config:
+  decoding_type: MTP
+  max_draft_len: 3
+stream_interval: 10

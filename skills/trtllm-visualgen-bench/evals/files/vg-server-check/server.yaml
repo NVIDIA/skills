@@ -1,0 +1,8 @@
+# --visual_gen_args config the server was launched with (synthetic example).
+# Checkpoint: /models/Wan2.2-T2V-A14B-Diffusers (BF16 base, quantized to FP8 at load).
+attention_config: {backend: TRTLLM}
+parallel_config: {cfg_size: 2, ulysses_size: 4, async_ulysses: true}
+quant_config: {quant_algo: FP8}
+compilation_config:
+  resolutions: [[720, 1280]]
+  num_frames: [81]

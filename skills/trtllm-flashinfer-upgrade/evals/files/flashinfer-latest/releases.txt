@@ -1,0 +1,13 @@
+# Offline snapshot of https://github.com/flashinfer-ai/flashinfer/releases (newest first).
+# Use this file instead of the network.
+# tag                    published    kind
+v0.7.0.dev20261020       2026-10-20   pre-release
+v0.7.0.dev20261006       2026-10-06   pre-release
+v0.6.8                   2026-09-29   stable
+v0.6.7.post3             2026-09-02   stable
+v0.6.7.post2             2026-08-21   stable
+v0.6.7.post1             2026-08-08   stable
+v0.6.7                   2026-07-30   stable
+v0.6.6                   2026-07-01   stable
+v0.6.5                   2026-06-10   stable
+v0.6.4                   2026-05-19   stable

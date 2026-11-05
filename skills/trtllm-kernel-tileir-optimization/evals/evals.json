@@ -1,0 +1,90 @@
+{
+  "skill_name": "kernel-tileir-optimization",
+  "evals": [
+    {
+      "id": "tileir-norm-kernel-occupancy-configs",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and Triton is not installed here. That is expected: the code will be validated and benchmarked later on our B200 nodes with nvtriton. Produce the optimized source and the report; do not try to install, run, validate or benchmark anything here. Optimize our existing Triton RMSNorm kernel in /workspace/input/tileir-rmsnorm/rmsnorm.py for the TileIR backend on B200 (Blackwell). Write the TileIR-ready version to /workspace/out/rmsnorm_tileir.py and give me a short optimization report.",
+      "expected_skill": "kernel-tileir-optimization",
+      "expected_script": null,
+      "expected_output": "Classified as norm-like (row reduction + normalization, no tl.dot), so the strategy is high occupancy without TMA: TileIR configs that set occupancy (1, 2, 4) with num_warps 4/8, appended to the existing PTX configs only when torch.cuda.get_device_capability()[0] >= 10, keeping plain `import triton`. The report states that ENABLE_TILE=0/1 validation and the PTX-vs-TileIR benchmark are still pending.",
+      "assertions": [
+        "Classifies the kernel as norm-like (reduction + normalization, no tl.dot) and chooses the high-occupancy strategy with no TMA descriptors.",
+        "Adds TileIR configs that set occupancy as a triton.Config kwarg (values such as 1, 2, 4) combined with num_warps 4/8, rather than only sweeping num_warps.",
+        "States that the TileIR backend ignores num_warps (the compiler decides), so occupancy is the parameter that matters.",
+        "Keeps PTX-compatible baseline configs and adds the TileIR-specific configs only when torch.cuda.get_device_capability()[0] >= 10.",
+        "Keeps the standard `import triton` / `triton.language` imports; TileIR is enabled at run time with ENABLE_TILE=1, not by changing imports.",
+        "Reports ENABLE_TILE=0/1 validation and the PTX-vs-TileIR benchmark as not yet run (no GPU here) instead of fabricating max-difference or speedup numbers."
+      ],
+      "files": [
+        "files/tileir-rmsnorm"
+      ]
+    },
+    {
+      "id": "tileir-persistent-gemm-tma-2cta",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and Triton is not installed here. That is expected: the code will be validated and benchmarked later on our B200 nodes with nvtriton. Produce the optimized source and the report; do not try to install, run, validate or benchmark anything here. Convert our persistent fp16 GEMM in /workspace/input/tileir-persistent-gemm/matmul.py for the TileIR backend on B200, using whatever Blackwell-specific features TileIR needs for dot kernels to perform well. Write the result to /workspace/out/matmul_tileir.py and summarize every transformation.",
+      "expected_skill": "kernel-tileir-optimization",
+      "expected_script": null,
+      "expected_output": "Dot-related kernel: A/B/C pointer arithmetic is replaced by TMA TensorDescriptors created in the wrapper with dummy [1, 1] blocks, a pre-hook sets each descriptor's block_shape from BLOCK_SIZE_M/N/K and divides NUM_SMS by the CTA count for 2CTA configs, the config helper accepts pre_hook and is called with it, configs add num_ctas=2, occupancy 1/2/4, num_stages 4/6 and 256x256 / 256x128 tiles behind a capability >= 10 gate, and B is passed as b.T.contiguous() with tl.dot(a, b.T, acc) in the kernel.",
+      "assertions": [
+        "Classifies the kernel as dot-related (it uses tl.dot) and applies the TMA + 2CTA + occupancy strategy.",
+        "Replaces the pointer-arithmetic loads/stores of A, B and C with TMA tensor descriptors: TensorDescriptor.from_tensor(...) in the wrapper (with a dummy block shape such as [1, 1]) and descriptor .load()/.store() calls in the kernel.",
+        "Adds a pre-hook (e.g. tma_set_block_size_hook) that sets each descriptor's block_shape from BLOCK_SIZE_M/N/K, and passes it into config generation (the config helper accepts pre_hook=None and is called with pre_hook=...).",
+        "Adds 2CTA configs (num_ctas=2) and guards SM oversubscription in the pre-hook by dividing NUM_SMS by the number of CTAs.",
+        "Adds occupancy values (1, 2, 4), num_stages 4 and 6, and larger tiles (256x256 / 256x128), with the TileIR-specific configs gated behind torch.cuda.get_device_capability()[0] >= 10.",
+        "Handles B's layout consistently with its descriptor, e.g. passing b.T.contiguous() (N x K) with a [BLOCK_SIZE_N, BLOCK_SIZE_K] block and computing tl.dot(a, b.T, acc) in the kernel."
+      ],
+      "files": [
+        "files/tileir-persistent-gemm"
+      ]
+    },
+    {
+      "id": "tileir-elementwise-num-warps-sweep-pushback",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and Triton is not installed here. That is expected: the code will be validated and benchmarked later on our B200 nodes with nvtriton. Produce the optimized source and the report; do not try to install, run, validate or benchmark anything here. For TileIR on B200 I want to sweep num_warps from 1 to 32 in the autotune configs of /workspace/input/tileir-silu/silu_mul.py, since that is what worked for us on Hopper. Do that, or tell me what to do instead, write the TileIR version to /workspace/out/silu_mul_tileir.py, and give me the benchmark plan for when the B200s are available.",
+      "expected_skill": "kernel-tileir-optimization",
+      "expected_script": null,
+      "expected_output": "Pushes back: TileIR ignores num_warps, so tune occupancy instead. Element-wise kernel: configs over occupancy (1, 2, 4, 16) and num_stages (2, 3, 4) including extreme small-input configs, gated on capability >= 10; tl.sigmoid replaced by 1/(1+tl.exp(-g)); plan: verify with ENABLE_TILE=0 and 1, then compare PTX vs TileIR with triton.testing.do_bench across small/medium/large sizes (e.g. 128, 1024, 8192).",
+      "assertions": [
+        "Pushes back on the num_warps sweep, explaining that the TileIR backend ignores num_warps and that occupancy is the parameter to tune.",
+        "Classifies the kernel as element-wise and adds configs over occupancy (including high values such as 4 and 16) and num_stages 2-4, with extreme configurations for small inputs.",
+        "Replaces tl.sigmoid(g) with 1.0 / (1.0 + tl.exp(-g)), noting tl.sigmoid is missing in some Triton/nvtriton builds.",
+        "Gates the TileIR-specific configs behind torch.cuda.get_device_capability()[0] >= 10 and keeps the plain `import triton`.",
+        "The benchmark plan verifies correctness under ENABLE_TILE=0 and ENABLE_TILE=1 and then compares PTX vs TileIR with triton.testing.do_bench across several input sizes (small, medium and large, e.g. 128, 1024, 8192).",
+        "Does not claim validation or benchmark results from the sandbox."
+      ],
+      "files": [
+        "files/tileir-silu"
+      ]
+    },
+    {
+      "id": "tileir-env-check-pre-blackwell",
+      "prompt": "We only have H100 GPUs right now; B200s arrive next quarter. On an H100 node, the TileIR availability check printed the JSON in /workspace/input/tileir-envcheck/tileir_check_h100.json. What does it mean, what do we need for TileIR to actually run, is it worth adding TileIR configs to our Triton kernels now, and what must we avoid doing on the H100s? This sandbox has no GPU, Triton or network access; do not install or modify any packages here.",
+      "expected_skill": "kernel-tileir-optimization",
+      "expected_script": null,
+      "expected_output": "Standard Triton is installed, nvtriton is not, TileIR is inactive and the GPU is sm_90 (not Blackwell). TileIR needs nvtriton (installed as the `triton` package, replacing pytorch-triton/triton), an sm_100+ GPU and ENABLE_TILE=1, with no import changes. Add TileIR configs now for future deployment, gated on capability >= 10, but skip ENABLE_TILE=1 validation and benchmarking until Blackwell; never let TMA/2CTA TileIR configs run on the H100s.",
+      "assertions": [
+        "Reads the JSON correctly: standard Triton is installed but nvtriton is not, TileIR is not active, and the GPU is not Blackwell (compute capability [9, 0]).",
+        "Explains that running TileIR needs nvtriton (which installs as the `triton` package and replaces pytorch-triton/triton; only one triton package at a time), a Blackwell sm_100+ GPU, and ENABLE_TILE=1 at run time, with no change to `import triton` in the kernels.",
+        "Recommends adding TileIR configs now for future deployment, gated with torch.cuda.get_device_capability()[0] >= 10, while skipping ENABLE_TILE=1 validation and PTX-vs-TileIR benchmarking until Blackwell hardware is available.",
+        "Warns that TileIR-specific TMA/2CTA configs must not run on the pre-Blackwell H100s because they cause runtime crashes there, which is why the capability gate is required.",
+        "Does not install nvtriton or modify packages in the sandbox."
+      ],
+      "files": [
+        "files/tileir-envcheck"
+      ]
+    },
+    {
+      "id": "tileir-negative-new-triton-kernel-hopper",
+      "prompt": "Write a new Triton kernel from scratch that applies rotary position embeddings (RoPE, GPT-NeoX style half rotation) to bf16 query and key tensors of shape [tokens, heads, 128], given cos/sin caches. Our target is H100; we are not using TileIR.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A standard @triton.jit RoPE kernel with masked loads/stores and fp32 math cast back to bf16, plus a wrapper; no TileIR-specific configs (occupancy kwargs, num_ctas=2, TMA conversion, ENABLE_TILE).",
+      "assertions": [
+        "The kernel-tileir-optimization skill is not loaded or applied.",
+        "Writes a standard Triton kernel (@triton.jit with masked tl.load/tl.store) that implements the RoPE rotation.",
+        "Does not add TileIR-specific elements (occupancy config kwargs, num_ctas=2 / 2CTA, ENABLE_TILE, nvtriton installation)."
+      ],
+      "files": []
+    }
+  ]
+}

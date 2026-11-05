@@ -1,0 +1,85 @@
+{
+  "skill_name": "perf-optimization",
+  "evals": [
+    {
+      "id": "po-tileir-new-kernel-pipeline",
+      "prompt": "We are deploying on B200 and need a TileIR kernel for fused SiLU-mul (SwiGLU: out = silu(x[:, :N]) * x[:, N:], bf16). No kernel exists for it yet. The specialist agents are not available in this sandbox (no GPU, no network, and nothing should be installed), so lay out exactly how you would coordinate this: who does what, in what order, and how the result gets validated. Do not create files.",
+      "expected_skill": "perf-optimization",
+      "expected_script": null,
+      "expected_output": "Uses the TileIR two-step pipeline: kernel-triton-specialist writes and verifies the base Triton SwiGLU kernel, then kernel-tileir-specialist applies TileIR optimizations to that kernel for Blackwell; benchmarking and correctness are in the specialists' task scope and perf-profiling-specialist measures before/after. The coordinator writes no kernel code itself and claims no results.",
+      "assertions": [
+        "Uses the two-step pipeline: kernel-triton-specialist first writes the base Triton kernel, then kernel-tileir-specialist applies TileIR optimizations to that kernel.",
+        "Does not hand new-kernel generation to kernel-tileir-specialist alone, and does not route the TileIR work to kernel-cute-specialist (TileIR is the Triton backend, unrelated to CuTe DSL).",
+        "Does not write the Triton or TileIR kernel code itself; implementation stays with the specialists.",
+        "Includes correctness verification and benchmarking in the specialists' task scope and plans a baseline/after measurement via perf-profiling-specialist.",
+        "Does not claim any measured speedup."
+      ],
+      "files": []
+    },
+    {
+      "id": "po-existing-triton-to-tileir",
+      "prompt": "Here is our existing Triton kernel: /workspace/input/existing-triton-kernel/fused_gelu.py. Make it run well on Blackwell (B200) with TileIR. The specialist agents cannot run in this sandbox and there is no GPU or network (do not install anything) - give me the coordination plan and the exact delegation messages you would send.",
+      "expected_skill": "perf-optimization",
+      "expected_script": null,
+      "expected_output": "Because the Triton kernel already exists, routes directly to kernel-tileir-specialist (no regeneration by kernel-triton-specialist), with benchmarking/correctness in its scope. Follows the safe-modification workflow: baseline first, backup_file(fused_gelu.py) before changes, validate performance and correctness, revert_file on >5% slowdown or correctness failure. The coordinator does not edit the kernel itself.",
+      "assertions": [
+        "Routes the work directly to kernel-tileir-specialist because the Triton kernel already exists, without first asking kernel-triton-specialist to regenerate it.",
+        "Measures a baseline before the change (via perf-profiling-specialist or within the specialist's benchmarking scope).",
+        "Plans `backup_file` on fused_gelu.py before any modification and `revert_file` if validation fails.",
+        "Uses the rollback criterion of more than 5% slowdown or a correctness issue (e.g. the existing tests/test_fused_gelu.py comparison failing).",
+        "Does not modify fused_gelu.py itself; implementation is delegated."
+      ],
+      "files": [
+        "files/existing-triton-kernel"
+      ]
+    },
+    {
+      "id": "po-autopilot-prioritize-route",
+      "prompt": "Our perf-analysis step produced /workspace/input/analysis-recommendations/recommendations.md for a 1.3B-parameter training job on 8x H100. Run this in autopilot mode: decide the order in which to apply the recommendations, which specialist handles each one, and how each step is validated. The specialists cannot be invoked from this sandbox (no GPU, no network, nothing to install), so produce the plan and the summary template you will fill in - do not invent results.",
+      "expected_skill": "perf-optimization",
+      "expected_script": null,
+      "expected_output": "Orders by impact, risk, dependencies and interactions (low-risk reversible CUDA Graph capture before the accuracy-risky FP8 change); routes CUDA Graph -> perf-torch-cuda-graph-specialist, FlashAttention (kernel category) -> perf-profiling-specialist per the routing table, custom Triton fusion -> kernel-triton-specialist, FP8 gated on accuracy; one change at a time with baseline, backup_file, validation and revert_file on >5% slowdown or correctness issues; provides the autopilot Optimization Summary template with results left blank.",
+      "assertions": [
+        "Maps CUDA Graph capture to perf-torch-cuda-graph-specialist, the custom bias+GeLU+dropout Triton kernel to kernel-triton-specialist, and 'Enable FlashAttention' to the specialist the skill's category table lists for kernel optimizations (perf-profiling-specialist).",
+        "Applies one optimization at a time, with a baseline measurement before the first change and performance plus correctness validation after each change.",
+        "Orders a low-risk, reversible change such as CUDA Graph capture ahead of the FP8 precision change, and gates FP8 on accuracy validation.",
+        "States the rollback trigger as more than 5% slowdown or a correctness issue, with backup_file before each change and revert_file on failure.",
+        "Provides the autopilot summary structure (Goal, Starting Point, Optimizations Applied in order with status, Cumulative Results, Remaining Opportunities) and leaves results unfilled instead of inventing numbers."
+      ],
+      "files": [
+        "files/analysis-recommendations"
+      ]
+    },
+    {
+      "id": "po-rollback-cuda-graph-regression",
+      "prompt": "The CUDA Graph optimization our specialist applied has now been measured; details are in /workspace/input/cuda-graph-ab-result/result.md. Decide what to do with the change and write up the result in the standard format. There is no GPU or network in this sandbox; do not run or install anything.",
+      "expected_skill": "perf-optimization",
+      "expected_script": null,
+      "expected_output": "Throughput fell 7.8% (1,520 -> 1,402 tok/s) and p50 latency rose 8.1%, exceeding the 5% regression threshold, so the change is rolled back with revert_file('serve_decode.py'). The write-up uses the single-optimization format with a Before/After/Change validation table and a failed/rolled-back result; investigation of the 32-size-graph padding is delegated to the CUDA graph / profiling specialists.",
+      "assertions": [
+        "Computes the throughput change as about -7.8% (1,520 to 1,402 tok/s) and the p50 latency change as about +8.1%.",
+        "Decides to roll back because the slowdown exceeds the 5% regression threshold, restoring the file with `revert_file(\"serve_decode.py\")` (the backup taken before the change).",
+        "The write-up follows the single-optimization format: an 'Optimization Applied' heading, Prerequisites Checked, Implementation (specialist and changes), a Validation table with Metric / Before / After / Change columns, and Result.",
+        "The Result marks the optimization as failed / rolled back, not SUCCESS.",
+        "Any follow-up investigation (e.g. 18-20-request batches padding to the 32-size graph) is delegated to perf-torch-cuda-graph-specialist or perf-profiling-specialist rather than done by editing code directly."
+      ],
+      "files": [
+        "files/cuda-graph-ab-result"
+      ]
+    },
+    {
+      "id": "po-negative",
+      "prompt": "Nsight Compute metrics for our attention kernel: SM throughput 23% of peak, DRAM throughput 88% of peak, achieved occupancy 62%, L2 hit rate 31%. I only want a diagnosis of what bounds this kernel - please do not propose or apply any optimizations or code changes.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A diagnosis that the kernel is DRAM-bandwidth (memory) bound, based on 88% DRAM vs 23% SM throughput, with no optimization plan, routing or code changes.",
+      "assertions": [
+        "The perf-optimization skill is not loaded or applied.",
+        "Identifies the kernel as memory (DRAM-bandwidth) bound based on 88% DRAM throughput versus 23% SM throughput.",
+        "Does not produce an optimization plan, specialist routing, or code changes."
+      ],
+      "files": []
+    }
+  ]
+}

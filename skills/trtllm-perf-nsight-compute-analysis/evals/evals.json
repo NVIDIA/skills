@@ -1,0 +1,86 @@
+{
+  "skill_name": "perf-nsight-compute-analysis",
+  "evals": [
+    {
+      "id": "ncu-memory-bound-uncoalesced-transpose",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver, no ncu binary and no network access; work only from what is supplied and do not install anything. I profiled my custom transpose+GELU CUDA kernel on an H100 with Nsight Compute. The ncu output and the kernel source are in /workspace/input/ncu-transpose-l2/ncu_details.txt. It takes 412 us for an 8192x8192 fp32 matrix, which seems slow. Classify the bottleneck from the ncu numbers, explain what is actually limiting the kernel, and tell me exactly what to profile next and what to change in the kernel.",
+      "expected_skill": "perf-nsight-compute-analysis",
+      "expected_script": null,
+      "expected_output": "Memory-bound (Memory Throughput 91.24% > 60%, Compute (SM) Throughput 14.83% < 40%), with L2 as the saturated unit (L2 Cache Throughput 91.24% vs DRAM Throughput 54.31%) because global loads are uncoalesced: 32 sectors/request versus the ideal 4 for 4-byte loads, while stores are already ideal at 4. Fix with a coalesced, shared-memory tiled transpose; confirm with a targeted SourceCounters run and re-profile SpeedOfLight to validate.",
+      "assertions": [
+        "Classifies the kernel as memory-bound, citing Memory Throughput 91.24% (>60%) and Compute (SM) Throughput 14.83% (<40%) from the supplied output.",
+        "Identifies L2 as the saturated memory unit (L2 Cache Throughput 91.24% matches Memory Throughput / Mem Busy) while DRAM Throughput is only 54.31%, rather than calling the kernel DRAM-bandwidth-bound.",
+        "Diagnoses uncoalesced global loads by comparing the load sectors-per-request ratio (32.00) with the ideal of 4 sectors/request for 4-byte loads, and notes that stores (4.00) are already ideal.",
+        "Traces the cause to lanes of a warp reading x[(size_t)j * N + i] with an N*4-byte stride and recommends a coalesced access pattern such as a shared-memory tiled transpose (padding the tile to avoid bank conflicts).",
+        "Recommends a targeted next ncu step, e.g. --section SourceCounters (source page, -lineinfo for CUDA-line mapping) to find the instruction with excess sectors, and re-profiling with --section SpeedOfLight after the fix, instead of --set full.",
+        "Does not run or install ncu and does not cite metric values that are absent from the supplied output."
+      ],
+      "files": [
+        "files/ncu-transpose-l2"
+      ]
+    },
+    {
+      "id": "ncu-instruction-bound-warp-divergence",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver, no ncu binary and no network access; work only from what is supplied and do not install anything. Nsight Compute output for our sampling-penalty kernel on a B200 is in /workspace/input/ncu-penalty-divergence/ncu_details.txt (kernel source is at the bottom of the file). A teammate says it is latency-bound and wants to raise occupancy by cutting registers with --maxrregcount. Classify the bottleneck from the numbers, say whether occupancy tuning will help, and recommend the next ncu sections to collect and the code change to make.",
+      "expected_skill": "perf-nsight-compute-analysis",
+      "expected_script": null,
+      "expected_output": "Both throughputs are below 40% (Compute 31.68%, Memory 7.42%) but theoretical occupancy is 100% and achieved occupancy is 82.17%, so occupancy is not the limiter and cutting registers will not help. Both <40% with occupancy >50% indicates an instruction-bound kernel; the divergence ratio of 9.74 active threads per instruction (ideal 32) points to the per-lane variable trip-count loop. Next: InstructionStats (and SourceCounters); fix by giving lanes uniform work or using predication.",
+      "assertions": [
+        "Notes that both Compute (SM) Throughput (31.68%) and Memory Throughput (7.42%) are below 40%, citing the values from the supplied output.",
+        "Rules out occupancy as the limiter: Theoretical Occupancy is 100% and Achieved Occupancy is 82.17% (>50%), and registers (32/thread, Block Limit Registers 8) are not limiting, so cutting registers with --maxrregcount is not recommended.",
+        "Classifies the kernel as instruction-bound (both throughputs <40% while occupancy is >50%) and names InstructionStats as the next section to collect (SourceCounters or WarpStateStats may be added).",
+        "Cites smsp__thread_inst_executed_per_inst_executed.ratio = 9.74 versus the ideal of 32 as heavy warp divergence and ties it to the per-lane variable trip-count loop / data-dependent branch in the kernel source.",
+        "Recommends divergence-reducing changes (reorganize work so the lanes of a warp do uniform work, use predication instead of branches, or simplify control flow) rather than occupancy or register tuning.",
+        "Does not run or install ncu and does not fabricate metrics that are not in the supplied output."
+      ],
+      "files": [
+        "files/ncu-penalty-divergence"
+      ]
+    },
+    {
+      "id": "ncu-triton-autotune-steady-state-capture",
+      "prompt": "I want Nsight Compute data for my Triton fused RMSNorm kernel (rmsnorm_fwd_kernel, decorated with @triton.autotune over 8 configs), but only for steady-state launches, not the JIT compilation or the autotuning trials. Show me the minimal changes to my Python benchmark script and the exact ncu command line to classify its bottleneck. I will run it on my GPU box; this sandbox has no GPU and no ncu, so do not try to run or install anything.",
+      "expected_skill": "perf-nsight-compute-analysis",
+      "expected_script": null,
+      "expected_output": "Warm up the kernel a few times (JIT + autotuning), call torch.cuda.synchronize(), bracket a few steady-state calls with torch.cuda.cudart().cudaProfilerStart()/cudaProfilerStop(), and run `ncu --profile-from-start off --section SpeedOfLight --csv --kernel-name regex:rmsnorm_fwd_kernel --launch-count 3 -- python bench.py`, then add targeted sections based on the classification.",
+      "assertions": [
+        "Adds warmup calls (a few iterations) that complete JIT compilation and autotuning, followed by torch.cuda.synchronize(), before the profiled region.",
+        "Brackets the steady-state kernel calls with torch.cuda.cudart().cudaProfilerStart() and torch.cuda.cudart().cudaProfilerStop().",
+        "The ncu command uses --profile-from-start off so that only the marked region is profiled.",
+        "The ncu command uses targeted collection (--section SpeedOfLight, optionally --csv) together with --kernel-name regex:... and --launch-count, rather than --set full.",
+        "Does not rely solely on --launch-skip to get past autotuning; if --launch-skip is mentioned, it is flagged as unreliable for Triton autotune (or paired with a check of the profiled grid/block against the chosen config).",
+        "Does not attempt to run or install ncu in the sandbox."
+      ],
+      "files": []
+    },
+    {
+      "id": "ncu-nccl-multiprocess-hang",
+      "prompt": "On a 2-GPU NVLink node I run `torchrun --nproc_per_node=2 allreduce_bench.py` and want Nsight Compute metrics for the NCCL all-reduce kernels. Wrapping it with plain `ncu -k regex:nccl -o nccl_rep torchrun ...` hangs forever at the first NCCL kernel, and on another attempt kernel replay failed with `Failed to save memory for replay`. What is going on, and what exact ncu command(s) and environment settings should I use? This sandbox has no GPUs, ncu or torchrun, so just give me the commands; do not try to run or install anything.",
+      "expected_skill": "perf-nsight-compute-analysis",
+      "expected_script": null,
+      "expected_output": "The profiled NCCL kernel waits on the peer rank, which is not launched in lockstep, so it hangs. Use an ncu communicator: `ncu --communicator shmem --communicator-shmem-num-peers 2 -k regex:nccl -o nccl_rep torchrun --nnodes=1 --nproc_per_node=2 allreduce_bench.py` (one ncu over the node), or per-rank `--communicator=tcp --communicator-tcp-num-peers=2 --lockstep-kernel-launch`. The replay failure comes from NCCL NVLS buffers: set NCCL_NVLS_ENABLE=0 for the profiling run or use --replay-mode application.",
+      "assertions": [
+        "Explains the hang: the profiled NCCL kernel depends on the other rank, which ncu is not launching in lockstep, so the collective never completes.",
+        "Recommends synchronizing ranks with an ncu communicator: a single ncu over the node with --communicator shmem --communicator-shmem-num-peers 2 wrapping torchrun, and/or per-rank --communicator=tcp --communicator-tcp-num-peers=2 --lockstep-kernel-launch.",
+        "The recommended command keeps an NCCL kernel filter (-k / --kernel-name regex:nccl) and writes a report with -o.",
+        "Attributes 'Failed to save memory for replay' to NCCL NVLS (NVLink SHARP) buffers and recommends NCCL_NVLS_ENABLE=0 for the profiling run (or --replay-mode application).",
+        "Does not attempt to run ncu or torchrun, or to install packages, in the sandbox."
+      ],
+      "files": []
+    },
+    {
+      "id": "ncu-negative-nsys-timeline",
+      "prompt": "My PyTorch DDP training loop on 8 GPUs shows the GPUs sitting idle for long stretches between iterations. I want to capture a CPU/GPU timeline to see whether the DataLoader, cudaStreamSynchronize calls or NCCL waits cause the gaps. What should I run? Just give me the commands; there is nothing to run in this environment.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Recommends system-level timeline profiling with Nsight Systems (e.g. nsys profile with cuda,nvtx,osrt tracing over a steady-state capture range, then nsys stats / nsys analyze for GPU gaps and sync calls), not Nsight Compute kernel-level profiling.",
+      "assertions": [
+        "The perf-nsight-compute-analysis skill is not loaded or applied.",
+        "Recommends a system-level timeline profiler (Nsight Systems / nsys, or a PyTorch profiler trace) to locate the idle gaps.",
+        "Does not propose ncu SOL%/section kernel profiling as the way to diagnose the inter-iteration gaps."
+      ],
+      "files": []
+    }
+  ]
+}

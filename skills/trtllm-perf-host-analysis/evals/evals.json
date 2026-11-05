@@ -1,0 +1,88 @@
+{
+  "skill_name": "perf-host-analysis",
+  "evals": [
+    {
+      "id": "pha-detect-generation-only-sqlite",
+      "prompt": "Environment note: this sandbox has Python 3 only - no GPU, no CUDA, no nsys, no TensorRT-LLM install or checkout, and no network. Do not install packages or download anything.\n\nWe captured an nsys trace of a TensorRT-LLM trtllm-serve run (Llama-3.1-8B, TP=1, H100). The SQLite export was dumped to SQL text so it could be attached: /workspace/input/host-trace-gen/trace.sql, and the run details are in /workspace/input/host-trace-gen/run_info.md. The team thinks the run is GPU-bound because overall GPU idle is only about 20%. Is host overhead the bottleneck or not? Give me a verdict with the metric evidence and tell me what to do next.",
+      "expected_skill": "perf-host-analysis",
+      "expected_script": "scripts/detect_host_overhead.py",
+      "expected_output": "Restores the dump into SQLite and runs the detection metrics (e.g. the skill's detect_host_overhead.py). Aggregate GPU idle ~0.20 / utilization ~0.80 and the 3 context iterations cross nothing, but the 24 generation-only iterations have GPU idle ~0.23 and utilization ~0.77, crossing the tighter generation thresholds (>0.15 idle, <0.80 utilization), so the overall verdict is YES. Generation steps launch eagerly (no cudaGraphLaunch; decode batch 16 vs captured batch sizes [1, 2, 4, 8]), so CUDA graph replay is the first thing to fix; host-prep sub-metrics are N/A.",
+      "assertions": [
+        "Computes the detection metrics from the trace data in trace.sql (for example by restoring it into SQLite with Python's sqlite3 and running the skill's detection script) rather than estimating them from the run notes.",
+        "Reports an aggregate GPU idle ratio of about 0.20 and GPU utilization of about 0.80, which do not cross the aggregate thresholds (idle > 0.30, utilization < 0.60), so the aggregate verdict alone is NO.",
+        "Classifies iterations by the `[Executor] _forward_step N: X ctx reqs, Y gen reqs` NVTX text into context (3) and generation-only (24) phases and applies the tighter generation-phase thresholds (idle > 0.15, utilization < 0.80): generation idle of about 0.23 and utilization of about 0.77 cross both, so the generation phase verdict is YES.",
+        "Gives an overall verdict of YES because a per-phase YES elevates the overall verdict even when the aggregate verdict is NO, explicitly contradicting the team's 'GPU-bound' conclusion.",
+        "Attributes the generation-phase overhead to CUDA graphs not replaying (generation kernels are launched with cudaLaunchKernel and there is no cudaGraphLaunch; e.g. the 16-request decode batch exceeds the captured batch_sizes [1, 2, 4, 8]) and recommends investigating CUDA graph capture/coverage as part of the next steps.",
+        "Reports the host-prep sub-metrics (exposed ratio, perf impact, idle attribution) as not applicable because the trace has no `_prepare_tp_inputs`/`_prepare_inputs` NVTX ranges, instead of inventing values for them."
+      ],
+      "files": [
+        "files/host-trace-gen"
+      ]
+    },
+    {
+      "id": "pha-nccl-confounded-verdict",
+      "prompt": "We want to start host-side optimization of `_prepare_tp_inputs` for our TP=8 Llama-3.1-70B TensorRT-LLM deployment because GPU idle is 36%. Before we commit engineering time, check whether host overhead is really the bottleneck using the base measurements in /workspace/input/nccl-host-metrics/metrics.md. There is no GPU, nsys, TensorRT-LLM checkout or network here - work from the file and do not install anything.",
+      "expected_skill": "perf-host-analysis",
+      "expected_script": null,
+      "expected_output": "Computes GPU idle 0.36, utilization 0.64, launch ratio 0.022, host-prep exposed ratio 0.40, perf impact 0.073, idle attribution 0.20 and NCCL ratio 0.39. Only GPU idle and perf impact cross (2 of 6), so detection says YES, but host prep is not confirmed (attribution 0.20 < 0.50) and the NCCL caveat applies: communication stalls are the dominant idle cause, so communication should be prioritized over `_prepare_tp_inputs` work.",
+      "assertions": [
+        "Computes the ratios from the base measurements: GPU idle about 0.36, GPU utilization about 0.64, cudaLaunchKernel overhead about 0.022, host-prep exposed ratio about 0.40, host-prep perf impact (exposed / total window) about 0.073, host-prep idle attribution (exposed / GPU idle time) about 0.20, and NCCL ratio (NCCL / GPU active time) about 0.39.",
+        "Applies the skill's thresholds and finds that only GPU idle ratio (> 0.30) and host-prep perf impact (> 0.05) cross, i.e. 2 of 6 metrics.",
+        "States that host prep is NOT a confirmed bottleneck because confirmation requires both perf impact and idle attribution to cross, and idle attribution (~0.20) is below 0.50.",
+        "Raises the NCCL caveat (NCCL is ~39% of GPU active time, above the 0.20 caveat threshold) and concludes that communication stalls, not host prep, are the main cause of GPU idle, so communication should be prioritized before optimizing `_prepare_tp_inputs`.",
+        "Presents the evidence as a metric table with value, threshold and crossed status for each metric."
+      ],
+      "files": [
+        "files/nccl-host-metrics"
+      ]
+    },
+    {
+      "id": "pha-nvtx-two-version-root-cause",
+      "prompt": "Our Llama-3.1-8B TP=2 TensorRT-LLM throughput regressed about 18% from v1.2 to main. Extracts from both nsys traces are in /workspace/input/nvtx-two-version/breakdown.md (the raw traces are not available, and there is no GPU or network in this environment - do not install anything). Root-cause the regression and prepare the hand-off for whoever does the optimization work.",
+      "expected_skill": "perf-host-analysis",
+      "expected_script": null,
+      "expected_output": "Discards the kernel-density window (elementwise/reduce burst with no GEMM/attention = JIT warmup, not inference) and uses the allreduce-grouped steady-state steps. GPU kernel time is unchanged; per-step wall time +19.3% comes from host request management/bookkeeping: _update_requests +334, broadcast_requests +247 (new), _fetch_new_requests +243, prepare_resources +162, _write_finish_reasons +128 us/step, plus 3.3x more individually launched kernels. Emits an optimization hand-off block with top regressing ops, source functions, first target and baseline metrics.",
+      "assertions": [
+        "Rejects the teammate's kernel-density window because a window of elementwise/reduce kernels with zero GEMM/attention kernels is JIT/warmup activity (e.g. flashinfer JIT), not inference, and bases the analysis on the allreduce-grouped (66 per step) steady-state iterations instead.",
+        "Concludes that GPU execution is unchanged (about 2.21 ms of kernel time per step in both builds) and that the regression is host-side, in request management and bookkeeping around the forward step.",
+        "Ranks the regressing operations by absolute per-step delta: _update_requests (+334 us), broadcast_requests (+247 us, new), _fetch_new_requests (+243 us), prepare_resources (+162 us), _write_finish_reasons (+128 us, new).",
+        "Flags the increase in individually launched kernels per step (6.4 to 20.8) as added kernel-launch overhead from work that is no longer fused or graph-captured.",
+        "Provides a structured hand-off for perf-host-optimization that lists the top regressing ops with NVTX name, delta in us/step and source function (e.g. PyExecutor._update_requests), a recommended first target, and baseline numbers (wall time per step 4,071 us, inter-step gap P50 2,642 us, kernels per step 20.8)."
+      ],
+      "files": [
+        "files/nvtx-two-version"
+      ]
+    },
+    {
+      "id": "pha-kernel-gap-graph-drilldown",
+      "prompt": "Detection already says our DeepSeek-V3 MTP decode on 8x B200 (TensorRT-LLM, piecewise CUDA graphs) is host-bound. The kernel-level extract is in /workspace/input/kernel-gap-drilldown/gaps.md. Which overhead sources dominate, how do they map to fixes, and in what order should the optimization work go? No GPU, nsys or network in this environment - reason from the file only and do not install anything.",
+      "expected_skill": "perf-host-analysis",
+      "expected_script": null,
+      "expected_output": "The 50-100 us bucket (~36.5% of gap time) is piecewise CUDA-graph segment replay dispatch; >5 ms gaps are host-device syncs and cudaEventCreate; 1-5 ms gaps are Python overhead in the eager MTP tail. Graph coverage is ~61%; attention custom ops are eager by design, but the cumsum in mtp.py poisons the partition so 234 capturable MTP kernels run eagerly -> GRAPH_EXPAND. Work is ordered by total time and handed to perf-host-optimization with pattern mappings.",
+      "assertions": [
+        "Identifies the 50-100 us bucket (about 975 ms, ~36.5%, the largest total) as piecewise CUDA-graph segment replay/dispatch overhead between graph segments.",
+        "Attributes the > 5 ms gaps to host-device synchronization (cudaStreamSynchronize after small D2H copies, i.e. .item()-style syncs) and runtime object creation (cudaEventCreateWithFlags), and the 1-5 ms gaps to Python overhead in the eager MTP path, rather than to slow kernels.",
+        "Computes graph coverage of about 61% (2,904 of 4,762 kernels per step) and states that the eager attention custom-op kernels are expected to stay eager while the eager GEMM/RMSNorm/allreduce/MoE kernels in the MTP path should be graph-capturable.",
+        "Diagnoses the `torch.cumsum` at mtp.py:987 as partition poisoning (one non-capturable op sets stop_partition and kills capture of all later MTP ops) and maps it to the GRAPH_EXPAND fix (e.g. hoist the cumsum out of the compiled region or exclude it and continue partitioning).",
+        "Maps the sync gaps to the SYNC/HOIST patterns (pre-compute on CPU or move the sync to step level) and prioritizes the work by total time (count x gap size) rather than by individual gap size, handing off to perf-host-optimization."
+      ],
+      "files": [
+        "files/kernel-gap-drilldown"
+      ]
+    },
+    {
+      "id": "pha-negative",
+      "prompt": "After a CUTLASS upgrade, our FP8 GEMM kernel (same shapes, M=8192, N=7168, K=2048 on H100) went from 338 us to 412 us per call. Nsight Compute shows SM throughput dropped from 71% to 58% and the top warp stall reason is now 'long scoreboard'. Why might this single kernel have slowed down, and how should I compare the two kernel versions?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A kernel-level explanation grounded in Nsight Compute metrics (memory latency exposure, pipeline stages, tile/occupancy changes) and a plan to diff the two ncu reports, without host-overhead or nsys GPU-idle analysis.",
+      "assertions": [
+        "The perf-host-analysis skill is not loaded or applied.",
+        "Treats the problem as an individual-kernel regression to be analyzed with kernel-level Nsight Compute metrics, not as host overhead or GPU-idle analysis.",
+        "Interprets the shift to long-scoreboard stalls as exposed memory latency (e.g. fewer pipeline stages, a different tile shape, or reduced occupancy) and suggests comparing the two kernels' ncu reports (launch configuration, occupancy, memory throughput, source-level stalls)."
+      ],
+      "files": []
+    }
+  ]
+}

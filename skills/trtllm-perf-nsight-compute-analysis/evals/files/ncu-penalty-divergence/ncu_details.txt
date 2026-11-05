@@ -1,0 +1,85 @@
+$ ncu --section SpeedOfLight --section LaunchStats --section Occupancy \
+      --metrics smsp__thread_inst_executed_per_inst_executed.ratio,smsp__inst_executed_pipe_cbu.avg.pct_of_peak_sustained_elapsed,smsp__inst_executed.sum \
+      --kernel-name regex:"sampling_penalty" --launch-skip 20 --launch-count 1 \
+      -- python serve_bench.py --batch 8 --vocab 151552
+==PROF== Connected to process 22981 (/usr/bin/python3.12)
+==PROF== Profiling "sampling_penalty_kernel" - 20: 0%....50%....100% - 10 passes
+==PROF== Disconnected from process 22981
+[22981] python3.12@localhost
+  sampling_penalty_kernel(float *, const int *, const int *, const float *, int, int) (592, 8, 1)x(256, 1, 1), Context 1, Stream 13, Device 0, CC 10.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz         3.99
+    SM Frequency                    Ghz         1.92
+    Elapsed Cycles                cycle       93,350
+    Memory Throughput                 %         7.42
+    DRAM Throughput                   %         1.13
+    Duration                         us        48.62
+    L1/TEX Cache Throughput           %         7.42
+    L2 Cache Throughput               %         2.86
+    SM Active Cycles              cycle    90,187.15
+    Compute (SM) Throughput           %        31.68
+    ----------------------- ----------- ------------
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                  4,736
+    Registers Per Thread             register/thread              32
+    Shared Memory Configuration Size           Kbyte           32.77
+    Driver Shared Memory Per Block       Kbyte/block            1.02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM             148
+    Threads                                   thread       1,212,416
+    Waves Per SM                                                   4
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           32
+    Block Limit Registers                 block            8
+    Block Limit Shared Mem                block           32
+    Block Limit Warps                     block            8
+    Theoretical Active Warps per SM        warp           64
+    Theoretical Occupancy                     %          100
+    Achieved Occupancy                        %        82.17
+    Achieved Active Warps Per SM           warp        52.59
+    ------------------------------- ----------- ------------
+
+    Section: Command line profiler metrics
+    -------------------------------------------------------------- ----------- ------------
+    Metric Name                                                    Metric Unit Metric Value
+    -------------------------------------------------------------- ----------- ------------
+    smsp__inst_executed.sum                                        inst          31,406,208
+    smsp__inst_executed_pipe_cbu.avg.pct_of_peak_sustained_elapsed %                  21.37
+    smsp__thread_inst_executed_per_inst_executed.ratio                                 9.74
+    -------------------------------------------------------------- ----------- ------------
+
+---------------------------------------------------------------------------------------------------
+Context (from the kernel author)
+---------------------------------------------------------------------------------------------------
+GPU: NVIDIA B200 (148 SMs). Nsight Compute 2026.3.1. Decode step, batch 8, vocab 151552.
+Most vocab entries have 0 occurrences in the generated history; a few frequent tokens have hundreds.
+
+// One thread per vocab entry; occurrences of token v in the history are stored CSR-style.
+__global__ void sampling_penalty_kernel(float* logits, const int* occ_offsets, const int* occ_pos,
+                                        const float* decay, int vocab, int batch) {
+  int b = blockIdx.y;
+  int v = blockIdx.x * blockDim.x + threadIdx.x;
+  if (v >= vocab) return;
+  const int* off = occ_offsets + (size_t)b * (vocab + 1);
+  float acc = 0.f;
+  for (int k = off[v]; k < off[v + 1]; ++k) {        // trip count = #occurrences of token v
+    int p = occ_pos[k];
+    acc += (p < 64) ? decay[p] : decay[63] * 0.5f;   // data-dependent branch
+  }
+  if (acc > 0.f) logits[(size_t)b * vocab + v] -= acc;
+}

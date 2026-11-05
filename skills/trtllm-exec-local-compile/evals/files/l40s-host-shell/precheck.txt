@@ -1,0 +1,22 @@
+# Pre-build checks run on the L40S machine before compiling TensorRT-LLM
+
+$ nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+NVIDIA L40S, 46068 MiB
+NVIDIA L40S, 46068 MiB
+NVIDIA L40S, 46068 MiB
+NVIDIA L40S, 46068 MiB
+
+$ ls -d /usr/local/tensorrt
+ls: cannot access '/usr/local/tensorrt': No such file or directory
+
+$ test -f /.dockerenv && echo "inside container" || echo "not in a container"
+not in a container
+
+$ head -2 /etc/os-release
+PRETTY_NAME="Ubuntu 22.04.4 LTS"
+NAME="Ubuntu"
+
+$ pwd
+/path/to/TensorRT-LLM
+$ git rev-parse --abbrev-ref HEAD
+main

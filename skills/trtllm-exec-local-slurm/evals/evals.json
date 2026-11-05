@@ -1,0 +1,86 @@
+{
+  "skill_name": "exec-local-slurm",
+  "evals": [
+    {
+      "id": "localslurm-reuse-persistent-allocation",
+      "prompt": "Run the local Slurm job in /workspace/input/slurm-reuse/job_spec.json on our cluster in persistent-allocation mode. A copy of the allocation state file (<repo_root>/work_dirs/.slurm_alloc.json) is at /workspace/input/slurm-reuse/slurm_alloc.json, and squeue output for that allocation is in squeue.txt next to it. This sandbox has no Slurm, so don't execute Slurm commands: decide whether to reuse or reallocate, and give me the exact commands you'd run next.",
+      "expected_skill": "exec-local-slurm",
+      "expected_script": null,
+      "expected_output": "Reuse allocation 4818221: it is RUNNING with 2:41:10 left (more than 5 minutes), partition and docker_image match, and 2 allocated nodes cover the 1 requested; container_name matches, so no re-import or reinstall. Export SLURM_JOB_ID=4818221 and the related SLURM_* variables and run `bash <script_path> 2>&1 | tee <work_dir>/llama_pytest.log` in the background, with no new salloc and no scancel.",
+      "assertions": [
+        "Decides to reuse allocation 4818221 because it is RUNNING with more than 5 minutes left and the partition and docker_image match.",
+        "Treats the 2-node allocation as compatible with the 1-node request (allocated nodes >= requested nodes).",
+        "Does not issue a new salloc, re-import the container, or rerun the install, since the state file's container_name matches the job spec's.",
+        "Runs the .slurm script with `bash` (not sbatch) after exporting SLURM_JOB_ID=4818221 and the related SLURM_* node/task variables, tee'ing output to `<work_dir>/llama_pytest.log`.",
+        "Does not run scancel on the allocation."
+      ],
+      "files": [
+        "files/slurm-reuse"
+      ]
+    },
+    {
+      "id": "localslurm-expiring-allocation-realloc",
+      "prompt": "Same persistent-allocation workflow, different job: /workspace/input/slurm-expiring/job_spec.json. The state file copy is slurm_alloc.json and the squeue output is squeue.txt in that folder. No Slurm in this sandbox, so don't execute anything; tell me the decision and the exact command sequence through to running the script.",
+      "expected_skill": "exec-local-slurm",
+      "expected_script": null,
+      "expected_output": "Only 3:42 remains (5 minutes or less), so warn the user, scancel 4822719, delete the state file, and allocate fresh with `nohup salloc --partition=batch --account=team_llm --nodes=1 --time=04:00:00 --job-name=team_llm-trtllm.persistent sleep 14400 > <repo_root>/work_dirs/.salloc.log 2>&1 &`; poll until RUNNING, import the container with `srun --jobid=<id> -N 1 --ntasks-per-node=1 --container-image=<image> --container-name=llama_auto_test true`, warm the mounts, check GPUs, install with --container-writable, write a new state file, then run the script via bash with SLURM_* exported.",
+      "assertions": [
+        "Rejects reuse because only 3:42 remains (5 minutes or less): warns the user, cancels job 4822719, and deletes the state file.",
+        "Allocates with `nohup salloc` using `--job-name=team_llm-trtllm.persistent` and `--time=04:00:00`, running `sleep 14400` in the background with output redirected to `<repo_root>/work_dirs/.salloc.log`.",
+        "Imports the container on the new allocation with `--container-image=<docker_image>` and `--container-name=llama_auto_test`, matching the name used in the .slurm script.",
+        "Passes `-N <nodes>` on every `srun --jobid=...` call.",
+        "Runs the install step with `--container-writable` and writes a new `.slurm_alloc.json` before executing the script."
+      ],
+      "files": [
+        "files/slurm-expiring"
+      ]
+    },
+    {
+      "id": "localslurm-orphan-allocation-cleanup",
+      "prompt": "I wiped work_dirs/ by accident, so the persistent-allocation state file for our local Slurm runs is gone. I need to run /workspace/input/slurm-orphan/job_spec.json in persistent mode. My current jobs are listed in /workspace/input/slurm-orphan/squeue_user.txt. This sandbox has no Slurm, so don't execute anything; tell me exactly which jobs you'd cancel (if any) and the commands up to the new allocation.",
+      "expected_skill": "exec-local-slurm",
+      "expected_script": null,
+      "expected_output": "Only 4830001, named team_llm-trtllm.persistent, is an orphaned persistent allocation: scancel it and log that it was released because the state file was missing. Leave 4829876 and 4831102 alone, log why a new allocation is needed, allocate with `nohup salloc ... --job-name=team_llm-trtllm.persistent ... sleep 14400`, and recreate the state file.",
+      "assertions": [
+        "Identifies job 4830001 (job name `team_llm-trtllm.persistent`) as the orphaned persistent allocation and cancels only that job.",
+        "Does not cancel 4829876 or 4831102, which were not created by the persistent-allocation workflow.",
+        "Logs or reports that the orphaned allocation was released because the state file was missing.",
+        "Then allocates a new persistent allocation with `nohup salloc ... --job-name=team_llm-trtllm.persistent ... sleep <seconds>` and recreates the state file."
+      ],
+      "files": [
+        "files/slurm-orphan"
+      ]
+    },
+    {
+      "id": "localslurm-persistent-hang-cancel-step",
+      "prompt": "A persistent-mode run of /workspace/input/slurm-persistent-hang/job_spec.json is still going, but its log (copied to /workspace/input/slurm-persistent-hang/llama_pytest.log) shows a hang. The active steps for the allocation are in squeue_steps.txt and the allocation state file copy is slurm_alloc.json. This sandbox has no Slurm, so don't execute anything. What exactly do you cancel, and what do you report?",
+      "expected_skill": "exec-local-slurm",
+      "expected_script": null,
+      "expected_output": "Cancel only the running step (`scancel 4840555.4`), not the allocation, so the persistent allocation and its state file remain for later runs; report Status HANG_DETECTED with the hang context from the end of the log.",
+      "assertions": [
+        "Cancels only the active step (`scancel 4840555.4`), not the whole allocation (`scancel 4840555`).",
+        "Keeps the persistent allocation and its state file for future runs (does not release the allocation or delete .slurm_alloc.json).",
+        "Reports `Status: HANG_DETECTED`.",
+        "Includes the hang context from the end of the log (the 'Hang detected' message and the last log lines) in the report."
+      ],
+      "files": [
+        "files/slurm-persistent-hang"
+      ]
+    },
+    {
+      "id": "localslurm-negative",
+      "prompt": "I administer a small Slurm cluster and just added nodes with 8 GPUs each. What do I need in slurm.conf and gres.conf so jobs can request them with --gres=gpu:8, and how do I apply the change? Just show the config and commands; don't run anything.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Shows the slurm.conf changes (GresTypes=gpu, a NodeName line with Gres=gpu:8, the partition definition) and a gres.conf entry (Name=gpu with device files or AutoDetect=nvml), then restarting or reconfiguring slurmctld/slurmd, without loading the job-execution skill.",
+      "assertions": [
+        "The exec-local-slurm skill is not loaded or applied.",
+        "Includes `GresTypes=gpu` and a node definition with `Gres=gpu:8` in slurm.conf.",
+        "Provides a gres.conf entry for the GPUs (device files such as /dev/nvidia[0-7] or AutoDetect=nvml).",
+        "Explains applying the change (restarting slurmd/slurmctld or `scontrol reconfigure`) without running commands in the sandbox."
+      ],
+      "files": []
+    }
+  ]
+}

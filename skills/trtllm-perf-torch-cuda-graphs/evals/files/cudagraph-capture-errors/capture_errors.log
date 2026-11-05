@@ -1,0 +1,45 @@
+===== Run 1: single GPU, full fwd+bwd capture  (python train_graph.py --mode single) =====
+warmup: 3 iterations on side stream ... done
+DataLoader iterator created (num_workers=4, pin_memory=True); prefetch running
+capturing graph ...
+Exception in thread Thread-3 (_pin_memory_loop):
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/data/_utils/pin_memory.py", line 55, in _pin_memory_loop
+    do_one_step()
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/data/_utils/pin_memory.py", line 32, in do_one_step
+    data = pin_memory(data, device)
+RuntimeError: CUDA error: operation not permitted when stream is capturing
+Traceback (most recent call last):
+  File "train_graph.py", line 33, in capture
+    with torch.cuda.graph(g):
+  File "/usr/local/lib/python3.12/dist-packages/torch/cuda/graphs.py", line 186, in __exit__
+    self.cuda_graph.capture_end()
+RuntimeError: CUDA error: operation failed due to a previous error during capture
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+
+===== Run 2: 8-GPU DDP  (torchrun --nproc_per_node=8 train_graph.py --mode ddp) =====
+[rank0] DDP constructed; warmup: 3 iterations on side stream ... done
+[rank0] capturing graph ...
+Traceback (most recent call last):
+  File "train_graph.py", line 35, in capture
+    static_loss.backward()
+  File "/usr/local/lib/python3.12/dist-packages/torch/_tensor.py", line 581, in backward
+    torch.autograd.backward(
+  File "/usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py", line 825, in _engine_run_backward
+    return Variable._execution_engine.run_backward(
+RuntimeError: CUDA error: operation would make the legacy stream depend on a capturing blocking stream
+[rank3] (same error on all 8 ranks)
+
+===== Run 3: single GPU, EMA update on an auxiliary stream inside the capture  (--mode single --ema) =====
+(pin_memory=False for this run)
+warmup: 3 iterations on side stream ... done
+capturing graph ...
+Traceback (most recent call last):
+  File "train_graph.py", line 33, in capture
+    with torch.cuda.graph(g):
+  File "/usr/local/lib/python3.12/dist-packages/torch/cuda/graphs.py", line 186, in __exit__
+    self.cuda_graph.capture_end()
+RuntimeError: CUDA error: capturing stream has unjoined work

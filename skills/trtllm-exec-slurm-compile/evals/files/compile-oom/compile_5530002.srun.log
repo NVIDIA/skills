@@ -1,0 +1,56 @@
+# tail -60 /shared/users/jdoe/workspace/tensorrt_llm_scripts/log/compile_5530002.srun.log
+[52%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_00.cu.o
+[52%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_01.cu.o
+[52%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_02.cu.o
+[52%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_03.cu.o
+[52%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_04.cu.o
+[53%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_05.cu.o
+[53%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_06.cu.o
+[53%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_07.cu.o
+[53%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_08.cu.o
+[53%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_09.cu.o
+[54%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_10.cu.o
+[54%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_11.cu.o
+[54%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_12.cu.o
+[54%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_13.cu.o
+[54%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_14.cu.o
+[55%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_15.cu.o
+[55%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_16.cu.o
+[55%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_17.cu.o
+[55%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_18.cu.o
+[55%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_19.cu.o
+[56%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_20.cu.o
+[56%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_21.cu.o
+[56%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_22.cu.o
+[56%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_23.cu.o
+[56%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_24.cu.o
+[57%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_25.cu.o
+[57%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_26.cu.o
+[57%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_27.cu.o
+[57%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_28.cu.o
+[57%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_29.cu.o
+[58%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_30.cu.o
+[58%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_31.cu.o
+[58%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_32.cu.o
+[58%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_33.cu.o
+[58%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_34.cu.o
+[59%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_35.cu.o
+[59%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_36.cu.o
+[59%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_37.cu.o
+[59%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_38.cu.o
+[59%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_39.cu.o
+[60%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_40.cu.o
+[60%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_41.cu.o
+[60%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_42.cu.o
+[60%] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_43.cu.o
+c++: fatal error: Killed signal terminated program cc1plus
+compilation terminated.
+nvcc error   : 'cicc' died due to signal 9 (Kill signal)
+gmake[2]: *** [tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/build.make:5120: tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/cutlass_kernels/moe_gemm/moe_gemm_kernels_fp8_17.cu.o] Error 9
+c++: fatal error: Killed signal terminated program cc1plus
+compilation terminated.
+gmake[1]: *** [CMakeFiles/Makefile2:2214: tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/all] Error 2
+gmake: *** [Makefile:156: all] Error 2
+subprocess.CalledProcessError: Command 'cmake --build . --config Release --parallel 144 --target build_wheel_targets' returned non-zero exit status 2.
+slurmstepd: error: Detected 1 oom_kill event in StepId=5530002.0. Some of the step tasks have been OOM Killed.
+srun: error: node044: task 0: Out Of Memory

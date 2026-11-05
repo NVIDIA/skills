@@ -1,0 +1,83 @@
+{
+  "skill_name": "exec-local-compile",
+  "evals": [
+    {
+      "id": "localcompile-h200-dev-build",
+      "prompt": "I'm inside the TensorRT-LLM dev container on a compute node with 8x H200 (nvidia-smi works and /usr/local/tensorrt is present). The repo is at /path/to/TensorRT-LLM. Give me the exact command sequence to build TensorRT-LLM from source for day-to-day development, install it, and confirm it works. This sandbox has no GPU or TensorRT-LLM checkout, so don't run the build here.",
+      "expected_skill": "exec-local-compile",
+      "expected_script": null,
+      "expected_output": "From the repo, run an incremental dev build `./scripts/build_wheel.py --use_ccache -a \"90\" -f --nvtx` (no clean), install with `pip install -e .[devel]`, and verify with `python3 -c \"import tensorrt_llm; print(tensorrt_llm.__version__)\"`.",
+      "assertions": [
+        "Uses `-a \"90\"` (Hopper) as the architecture for H200.",
+        "The build command is `./scripts/build_wheel.py` with `--use_ccache`, `-f` (fast build) and `--nvtx`.",
+        "Does not include `-c`/`--clean` (incremental build by default).",
+        "Installs with `pip install -e .[devel]` rather than pip-installing a built wheel file.",
+        "Verifies the install with a Python import of tensorrt_llm that prints `tensorrt_llm.__version__`."
+      ],
+      "files": []
+    },
+    {
+      "id": "localcompile-tot-multiarch",
+      "prompt": "I'm on a compute node in the TRT-LLM dev container (GPUs visible, repo at /path/to/TensorRT-LLM). Compile ToT; the build has to run on both our H100 and B200 nodes. What exact commands should I run, from updating the source through verifying the install? Don't execute anything here: this sandbox has no GPU or repo.",
+      "expected_skill": "exec-local-compile",
+      "expected_script": null,
+      "expected_output": "Update to top of tree with `git checkout main && git pull`, build with `./scripts/build_wheel.py --use_ccache -a \"90;100\" -f --nvtx`, install with `pip install -e .[devel]`, and verify by importing tensorrt_llm and printing its version.",
+      "assertions": [
+        "Updates to top-of-tree with `git checkout main && git pull` before building.",
+        "Passes both architectures in a single flag: `-a \"90;100\"`.",
+        "Keeps the dev build flags `--use_ccache`, `-f` and `--nvtx` on `./scripts/build_wheel.py`.",
+        "Follows the build with `pip install -e .[devel]` and a `tensorrt_llm.__version__` import check."
+      ],
+      "files": []
+    },
+    {
+      "id": "localcompile-linker-error-clean-rebuild",
+      "prompt": "My incremental TRT-LLM build on a B200 compute node (inside the dev container) just failed; the GPU check and the tail of the build output are in /workspace/input/incremental-link-failure/build_tail.log. What should I run next? Give me the exact command(s). Don't run anything here: there's no GPU or repo in this sandbox.",
+      "expected_skill": "exec-local-compile",
+      "expected_script": null,
+      "expected_output": "The incremental build failed at link time (undefined references, `ld returned 1 exit status`), which calls for a clean build: re-run `./scripts/build_wheel.py --use_ccache -a \"100\" -f --nvtx -c`, then `pip install -e .[devel]` and the import/version check.",
+      "assertions": [
+        "Identifies the failure as a link-stage error (undefined reference / `ld returned 1 exit status`) in the incremental build.",
+        "Recommends re-running build_wheel.py with `-c`/`--clean` added.",
+        "Keeps `-a \"100\"` for B200 and the dev flags `--use_ccache`, `-f` and `--nvtx` in the rebuild command.",
+        "Follows the rebuild with `pip install -e .[devel]` and the tensorrt_llm import/version check.",
+        "Does not execute `rm -rf` or other destructive cleanup in the sandbox."
+      ],
+      "files": [
+        "files/incremental-link-failure"
+      ]
+    },
+    {
+      "id": "localcompile-missing-tensorrt-prereq",
+      "prompt": "I'm about to compile TensorRT-LLM on this L40S machine; my pre-build checks are in /workspace/input/l40s-host-shell/precheck.txt. Am I ready to run the build? If yes, give me the build command; if not, tell me what to fix first and what the build command will be afterward. Don't run anything here: this sandbox has no GPU or repo.",
+      "expected_skill": "exec-local-compile",
+      "expected_script": null,
+      "expected_output": "Not ready: /usr/local/tensorrt is missing and the shell is on the host rather than inside the TRT-LLM dev container, so the prerequisites are not met. Enter the dev container on the compute node first, then build with `./scripts/build_wheel.py --use_ccache -a \"89\" -f --nvtx`, install with `pip install -e .[devel]`, and verify.",
+      "assertions": [
+        "States the build prerequisites are not met because `/usr/local/tensorrt` is missing.",
+        "Says to run the build from inside the TensorRT-LLM Docker/dev container (the check shows a host shell) before compiling.",
+        "Uses `-a \"89\"` (Ada) for L40S in the eventual build command.",
+        "The eventual build command is `./scripts/build_wheel.py` with `--use_ccache`, `-f` and `--nvtx` and without `-c`.",
+        "Does not attempt to install TensorRT or other packages in the sandbox."
+      ],
+      "files": [
+        "files/l40s-host-shell"
+      ]
+    },
+    {
+      "id": "localcompile-negative",
+      "prompt": "I'm on our Slurm cluster's login node (no GPUs here) and want to compile TensorRT-LLM from /shared/users/jdoe/TensorRT-LLM using a .sqsh container image, without tying up an interactive session. How should I submit the build as a batch job? Outline the approach and the key commands; don't run anything.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Outlines submitting the build as a Slurm batch job that runs build_wheel.py inside the container on a compute node (sbatch with partition, account, time limit, container image and mounts) and monitoring it with squeue/sacct, without applying the compute-node local-compile skill or building on the login node.",
+      "assertions": [
+        "The exec-local-compile skill is not loaded or applied.",
+        "Recommends running the build on a compute node through a Slurm batch job (sbatch with the container image), not directly on the login node.",
+        "Includes a way to monitor the job (e.g., squeue/sacct or the job log).",
+        "Does not run sbatch, srun, or build commands in the sandbox."
+      ],
+      "files": []
+    }
+  ]
+}

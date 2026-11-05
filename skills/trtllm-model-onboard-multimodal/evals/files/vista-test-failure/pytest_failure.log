@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+collected 3 items
+
+tests/unittest/_torch/modeling/test_modeling_vista_vl.py::TestVistaVL::test_all_scenarios[image] FAILED
+tests/unittest/_torch/modeling/test_modeling_vista_vl.py::TestVistaVL::test_all_scenarios[mixture_text_image] FAILED
+tests/unittest/_torch/modeling/test_modeling_vista_vl.py::TestVistaVL::test_all_scenarios[text] FAILED
+
+=================================== FAILURES ===================================
+__________________ TestVistaVL.test_all_scenarios[image] _______________________
+----------------------------- Captured stdout call -----------------------------
+tokenizer: acme/Vista-VL-7B  len(tokenizer)=151669
+chat-template special tokens in prompt: <|im_start|>(151644) x3, <|im_end|>(151645) x1, <|vision_start|>(151652) x1, <|vision_end|>(151653) x1
+image placeholder tokens (id 151655) in prompt: 1024
+image embeddings produced by the encoder: 1024
+------------------------------ Traceback (short) -------------------------------
+tensorrt_llm/_torch/models/modeling_multimodal_utils.py: in fuse_input_embeds
+E   ValueError: found 1030 image tokens but received 1024 image embeddings
+
+_____________ TestVistaVL.test_all_scenarios[mixture_text_image] _______________
+tensorrt_llm/_torch/models/modeling_multimodal_utils.py: in fuse_input_embeds
+E   ValueError: found 1030 image tokens but received 1024 image embeddings
+
+__________________ TestVistaVL.test_all_scenarios[text] ________________________
+tensorrt_llm/_torch/attention/rotary_embedding.py: in MRotaryEmbedding.forward
+    (head_dim=64, partial_rotary_factor=1.0, mrope_section=[24, 20, 20])
+E   RuntimeError: The size of tensor a (32) must match the size of tensor b (64) at non-singleton dimension 2
+
+=========================== short test summary info ============================
+FAILED tests/unittest/_torch/modeling/test_modeling_vista_vl.py::TestVistaVL::test_all_scenarios[image]
+FAILED tests/unittest/_torch/modeling/test_modeling_vista_vl.py::TestVistaVL::test_all_scenarios[mixture_text_image]
+FAILED tests/unittest/_torch/modeling/test_modeling_vista_vl.py::TestVistaVL::test_all_scenarios[text]
+============================== 3 failed in 41.27s ==============================

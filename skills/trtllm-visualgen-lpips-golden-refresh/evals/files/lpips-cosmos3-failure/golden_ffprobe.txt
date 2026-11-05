@@ -1,0 +1,17 @@
+$ ffprobe -v error -show_streams cosmos3_nano_t2av_lpips_golden.mp4   (trimmed)
+[STREAM]
+index=0
+codec_name=h264
+codec_type=video
+width=1280
+height=720
+r_frame_rate=24/1
+nb_frames=189
+[/STREAM]
+[STREAM]
+index=1
+codec_name=aac
+codec_type=audio
+sample_rate=48000
+channels=2
+[/STREAM]

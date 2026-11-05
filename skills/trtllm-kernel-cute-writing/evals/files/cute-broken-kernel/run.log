@@ -1,0 +1,22 @@
+$ python scripts/verify_kernel.py kernel.py --rtol 1e-3 --atol 1e-3
+cutlass.base_dsl.common.DSLAstPreprocessorError: `return` is not supported inside dynamic control flow
+  in function 'scaled_sigmoid_kernel', file "kernel.py", line 20:
+        if idx >= m * n:
+            return
+            ^~~~~~
+
+# after temporarily deleting the bounds check to get further:
+$ python scripts/verify_kernel.py kernel.py --rtol 1e-3 --atol 1e-3
+AttributeError: module 'cutlass.cute.math' has no attribute 'sigmoid'
+
+# after temporarily using torch-style math to get further:
+$ python scripts/verify_kernel.py kernel.py --rtol 1e-3 --atol 1e-3
+cutlass.base_dsl.common.DSLRuntimeError: type mismatch on store: cannot store a value of element type
+  Float32 into tensor with element type Float16 (kernel.py, line 23)
+
+# teammate's unit test (tests/test_tile.py::test_single_tile):
+RuntimeError: An MLIR function requires a Context
+
+# notes from the previous version of this kernel (out = x + x, same host code and kernel_fn; it compiled and ran):
+#  - nsys: every kernel_fn call spends ~31 ms on the host before the kernel launches
+#  - ncu source view: global loads are scalar LDG.E.U16 instead of 128-bit LDG.E.128

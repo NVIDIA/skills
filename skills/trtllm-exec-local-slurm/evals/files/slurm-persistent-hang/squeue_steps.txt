@@ -1,0 +1,7 @@
+$ squeue -j 4840555 -h -o "%T %L"
+RUNNING 54:19
+
+$ squeue -s -j 4840555
+         STEPID     NAME PARTITION     USER      TIME NODELIST
+      4840555.4     bash     batch     jdoe     52:18 node021
+ 4840555.extern   extern     batch     jdoe   3:05:41 node021

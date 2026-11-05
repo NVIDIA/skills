@@ -1,0 +1,87 @@
+{
+  "skill_name": "perf-analysis",
+  "evals": [
+    {
+      "id": "pa-delegate-bmm-mfu",
+      "prompt": "I need MFU and % of speed-of-light for the batched GEMM in /workspace/input/bmm-workload/bmm_workload.py on our H100 SXM (BF16). This sandbox has Python but no GPU, CUDA, nsys, ncu or nvidia-smi, and no network - do not install anything. The measurements will be taken later by a separate profiling agent on the GPU machine. Prepare exactly what you would hand to that profiling agent, and explain what you will do with its results.",
+      "expected_skill": "perf-analysis",
+      "expected_script": null,
+      "expected_output": "Does not try to profile locally. Writes a delegation for perf-profiling-specialist that states the desired outcome: the workload file and its cudaProfilerStart/Stop region, shapes B=16, M=1024, N=4096, K=4096, BF16, ~549.8 GFLOP per bmm call (2*B*M*N*K), and the metrics wanted (SOL%, MFU vs H100 BF16 peak, achieved TFLOP/s, bandwidth, occupancy, bottleneck classification) - with no tool flags, commands, fallbacks or output paths. Explains it will classify the bottleneck from the returned numbers and write a Summary/Metrics/Findings/Recommendations report; reports no MFU now.",
+      "assertions": [
+        "Does not attempt to run nsys, ncu, nvidia-smi or the workload, and does not install packages; profiling is delegated.",
+        "Addresses the profiling request to perf-profiling-specialist.",
+        "The request states the problem context: B=16, M=1024, N=4096, K=4096, BF16, and about 549.8 GFLOP (0.55 TFLOP) per bmm call computed as 2*B*M*N*K.",
+        "The request names the workload file and says the region of interest is bracketed by cudaProfilerStart/cudaProfilerStop.",
+        "The request lists desired outcomes (e.g. SOL%, MFU against the H100 BF16 tensor-core peak, achieved TFLOP/s, memory bandwidth, occupancy, bottleneck classification) without prescribing tool flags or command lines (no `--set=full`, `--section ...`, or `ncu ...` invocations), fallback strategies, or output file paths.",
+        "Does not report any MFU or %SOL value as a result, because nothing has been measured yet."
+      ],
+      "files": [
+        "files/bmm-workload"
+      ]
+    },
+    {
+      "id": "pa-classify-launch-vs-sync",
+      "prompt": "Our profiling agent returned measurements for two workloads in /workspace/input/two-workload-profiles/profiles.md. Both have low GPU utilization. For each workload, classify the primary bottleneck and write the performance analysis report. There is no GPU or network here; work only from the file and do not install anything.",
+      "expected_skill": "perf-analysis",
+      "expected_script": null,
+      "expected_output": "Workload A is launch-overhead bound (1,184 kernels of ~3.5 us, 7.9 ms of cudaLaunchKernel host time vs 4.1 ms GPU busy). Workload B is sync-bound (64 cudaStreamSynchronize per iteration from .item(), 4.1 ms host blocking, idle gaps after each sync) rather than launch-bound (only 224 launches, 0.6 ms). Each gets a Summary / Metrics / Findings / Recommendations report using only the supplied numbers.",
+      "assertions": [
+        "Classifies workload A as launch-overhead bound, citing many tiny kernels (1,184 per iteration, ~3.5 us each) and cudaLaunchKernel host time (7.9 ms) exceeding GPU busy time (4.1 ms), rather than memory- or compute-bound.",
+        "Classifies workload B as sync-bound, citing 64 cudaStreamSynchronize calls per iteration from `.item()` (4.1 ms of host blocking) followed by GPU idle gaps, and distinguishes it from launch overhead (only 224 launches, 0.6 ms launch time).",
+        "Each report contains the four sections Summary, Metrics, Findings and Recommendations.",
+        "Every number in the Metrics sections comes from the file or is computed directly from its values; no MFU, %SOL, throughput or other figures are invented.",
+        "Recommendations target each classified bottleneck (e.g. CUDA graphs / kernel fusion for A; removing, batching or deferring the per-layer `.item()` syncs for B) and do not present projected gains as measured results."
+      ],
+      "files": [
+        "files/two-workload-profiles"
+      ]
+    },
+    {
+      "id": "pa-tp8-comm-bound-report",
+      "prompt": "The profiling agent sent back a per-step breakdown for our Llama-3.1-70B TP=8 decode deployment: /workspace/input/tp8-decode-breakdown/breakdown.md. The GPU is 94% busy, so we assume we are compute-bound. Classify the bottleneck, give me the MFU, and write the analysis report with recommendations. Work only from the file - no GPU, no network, and do not install anything.",
+      "expected_skill": "perf-analysis",
+      "expected_script": null,
+      "expected_output": "Classifies the step as communication-bound (NCCL AllReduce 8.1 ms, 44% of the 18.4 ms step) despite 94% GPU busy, writes a Summary / Metrics / Findings / Recommendations report from the supplied numbers, does not fabricate MFU (FLOP counts and achieved TFLOP/s were not collected - request them from the profiling specialist), and sources recommendations from the perf-optimization-casebook precedents for communication-bound TP decode without quoting expected gains as results.",
+      "assertions": [
+        "Classifies the primary bottleneck as communication-bound (NCCL AllReduce ~8.1 ms, ~44% of the 18.4 ms step) and explains why 94% GPU busy does not make it compute-bound.",
+        "The report contains the four sections Summary, Metrics, Findings and Recommendations.",
+        "Does not state an MFU value derived from assumed model FLOPs or assumed peak TFLOP/s; reports MFU as not available from the supplied measurements and asks the profiling specialist (perf-profiling-specialist) to measure/compute it.",
+        "Refers to the perf-optimization-casebook (prior-art precedents for the classified bottleneck) as the source for candidate optimizations.",
+        "Any expected effect of a recommendation is labeled as expected/unmeasured, and all numbers in the report are traceable to the supplied file."
+      ],
+      "files": [
+        "files/tp8-decode-breakdown"
+      ]
+    },
+    {
+      "id": "pa-remote-slurm-delegation",
+      "prompt": "We need a timeline-level profile plus kernel-level metrics for our TensorRT-LLM decode benchmark script at /lustre/projects/llm-team/bench_decode.py, to find out what bounds it. The GPUs are on a remote SLURM cluster: I connect with `ssh -o BatchMode=yes cluster-login` and run jobs with `srun -A myacct -p batch -N1 --gpus-per-node=8 --container-image=nvcr.io/nvidia/tensorrt-llm/release:1.2.0 --container-mounts=/lustre:/lustre`. Nothing can be run from this sandbox (no network, no GPU) and nothing should be installed. Prepare the hand-off to the profiling agent, and tell me which extra skills it needs for the remote part.",
+      "expected_skill": "perf-analysis",
+      "expected_script": null,
+      "expected_output": "Delegates to perf-profiling-specialist with a Remote Execution Context block containing the SSH + srun wrapper (cluster-login, account, partition, container image, mounts) that the specialist prefixes to its nsys/ncu/nvidia-smi commands; states the specialist does not need the exec-remote-slurm skill because the block provides everything; describes the desired outcome (per-iteration timeline breakdown, kernel metrics, bottleneck classification) without tool flags or output paths; does not contact the cluster.",
+      "assertions": [
+        "Delegates the profiling to perf-profiling-specialist rather than running anything itself.",
+        "Includes a Remote Execution Context block in the delegation with the SSH + srun wrapper (cluster-login, -A myacct, -p batch, the container image and the /lustre mount) and tells the specialist to prefix its profiling commands (nsys, ncu, nvidia-smi) with it.",
+        "States that the profiling specialist does not need the exec-remote-slurm skill because the context block provides what it needs.",
+        "Describes the desired outcome (e.g. per-iteration timeline breakdown, kernel-level metrics, bottleneck classification) without prescribing profiler flags, output file paths or fallback steps.",
+        "Does not attempt to ssh, srun or otherwise contact the cluster from the sandbox."
+      ],
+      "files": []
+    },
+    {
+      "id": "pa-negative",
+      "prompt": "Write a Triton kernel that fuses SiLU and elementwise multiply (SwiGLU): the input x has shape [M, 2*N] in bf16 and the output is silu(x[:, :N]) * x[:, N:] with shape [M, N]. Include a small PyTorch reference check for correctness. No profiling or performance analysis is needed.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A @triton.jit kernel plus launch wrapper computing silu(x1) * x2 with a torch reference comparison; no bottleneck classification or performance-analysis report.",
+      "assertions": [
+        "The perf-analysis skill is not loaded or applied.",
+        "Provides a `@triton.jit` kernel and a Python launch wrapper that compute silu(x[:, :N]) * x[:, N:] for bf16 input.",
+        "Includes a correctness check against a PyTorch reference (e.g. torch.testing.assert_close or torch.allclose with a tolerance).",
+        "Does not produce a bottleneck classification or a Summary/Metrics/Findings/Recommendations performance report."
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "skill_name": "perf-nsight-systems",
+  "evals": [
+    {
+      "id": "nsys-gpu-starved-sync-and-pageable-memcpy",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver, no nsys binary and no network access; work only from what is supplied and do not install anything. Our ViT training job on one H100 only reaches about 44% GPU utilization. I already captured a steady-state profile and ran nsys stats and nsys analyze on it; the output is in /workspace/input/nsys-idle-gaps/nsys_report_summary.txt. Explain why the GPU is idle, which findings in the output prove it, what code changes to make, and what nsys command(s) I should run next.",
+      "expected_skill": "perf-nsight-systems",
+      "expected_script": null,
+      "expected_output": "The GPU is starved by the host: kernel queue times are near zero (QAvg about 1-2 us) and gpu_time_util reports 41-45% in-use regions. Causes: 77 MB host-to-device copies from pageable memory (~10 ms each, flagged by cuda_memcpy_async) and 412 cudaStreamSynchronize calls (~41 per iteration, 75.5% of CUDA API time) each after an 8-byte device-to-host copy, i.e. per-step .item()-style reads. Fix with pinned memory + non_blocking transfers and by removing/deferring the per-step syncs; then re-profile with sync attribution and re-run nsys analyze.",
+      "assertions": [
+        "Concludes that the GPU is starved by the host rather than GPU-bound, citing the near-zero queue times in cuda_kern_exec_sum (QAvg about 1-2 us) and/or the 41-45% in-use regions reported by gpu_time_util.",
+        "Identifies the cuda_memcpy_async finding (77 MB host-to-device copies from pageable memory taking about 10 ms each) and recommends pinned host memory (DataLoader pin_memory=True or .pin_memory()) together with non_blocking=True transfers.",
+        "Identifies over-synchronization: 412 cudaStreamSynchronize calls (about 41 per iteration, 75.5% of CUDA API time), each preceded by an 8-byte device-to-host copy, consistent with per-step .item()/.cpu() reads, and recommends removing, deferring or batching them.",
+        "Every number it cites can be traced to the supplied nsys stats/analyze output; it does not invent timings or utilization figures.",
+        "Recommends a concrete nsys follow-up, such as re-profiling with attribution of the sync calls to source (CUDA or Python backtraces, or NVTX via --pytorch=autograd-nvtx with nvtx_kern_sum) and re-running nsys analyze (cuda_memcpy_async, cuda_api_sync, gpu_gaps/gpu_time_util) to confirm the fix.",
+        "Does not attempt to run or install nsys in the sandbox."
+      ],
+      "files": [
+        "files/nsys-idle-gaps"
+      ]
+    },
+    {
+      "id": "nsys-steady-state-capture-range-instrumentation",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver, no nsys binary and no network access; work only from what is supplied and do not install anything. I want an Nsight Systems profile of /workspace/input/nsys-train-script/train.py that covers only training iterations 50 through 59 (no startup, warmup or cuDNN autotuning), and I need to tell cuDNN time apart from cuBLAS time. Write an instrumented copy of the script to /workspace/out/train_profiled.py, then give me the exact nsys profile command and the post-processing commands to summarize the result. I will run them on the GPU node.",
+      "expected_skill": "perf-nsight-systems",
+      "expected_script": null,
+      "expected_output": "train_profiled.py starts the capture with torch.cuda.cudart().cudaProfilerStart() at iteration 50 and stops it with cudaProfilerStop() after iteration 59. Profile with `nsys profile -c cudaProfilerApi -t cuda,nvtx,cudnn,cublas --pytorch=autograd-nvtx -o train_profile -- python train_profiled.py`, then run `nsys stats -r cuda_gpu_kern_sum,cuda_api_sum,cuda_gpu_mem_time_sum`, `nsys stats -r cudnn_api_sum,cublas_api_sum` and `nsys analyze -r all` on the report.",
+      "assertions": [
+        "/workspace/out/train_profiled.py calls torch.cuda.cudart().cudaProfilerStart() when the loop reaches iteration 50 and torch.cuda.cudart().cudaProfilerStop() once iteration 59 has run, leaving the rest of the training logic intact.",
+        "The nsys profile command uses the cudaProfilerApi capture range (-c cudaProfilerApi or --capture-range=cudaProfilerApi) instead of time-based --delay/--duration windows.",
+        "The trace list (-t/--trace) includes cuda, nvtx, cudnn and cublas so library API calls are traced (--pytorch=autograd-nvtx may be added).",
+        "Summarizes with targeted nsys stats -r reports that include cuda_gpu_kern_sum plus the library reports cudnn_api_sum and cublas_api_sum, and runs nsys analyze to detect anti-patterns.",
+        "Does not attempt to run nsys or the training script, or to install packages, in the sandbox."
+      ],
+      "files": [
+        "files/nsys-train-script"
+      ]
+    },
+    {
+      "id": "nsys-nvtx-gpu-projection-and-outliers",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver, no nsys binary and no network access; work only from what is supplied and do not install anything. I annotated my fine-tuning loop with NVTX ranges and ran nsys stats on the profile; the output is in /workspace/input/nsys-nvtx-projection/nvtx_stats.txt. Which phases are wasting GPU time, why are some iterations so much slower than others, and which nsys reports or recipes should I run next to dig in?",
+      "expected_skill": "perf-nsight-systems",
+      "expected_script": null,
+      "expected_output": "forward (1,022 ms projected of 2,812 ms) and optimizer_step (178 of 1,968.2 ms) leave the GPU idle most of the range, consistent with host/launch-bound phases issuing ~1,412 and ~966 GPU ops per call; backward is GPU-dense (4,014 of 4,406 ms). Slow iterations are outliers (train_step StdDev 25.31 ms, Max 314.6 ms vs median 46.3 ms) that line up with data_loading spikes (Max 268.1 ms). Next: nvtx_pushpop_trace / nsys recipe nvtx_pace for the outliers and nvtx_kern_sum for the kernels in the idle-heavy ranges.",
+      "assertions": [
+        "Flags forward and optimizer_step as ranges where the GPU is idle most of the time, citing Projected much smaller than Original duration (about 1,022 vs 2,812 ms and 178 vs 1,968.2 ms in total, or 5.11 vs 14.06 ms and 0.89 vs 9.84 ms per instance).",
+        "Identifies backward as GPU-dense (4,014 ms projected of 4,406 ms) and therefore not the first optimization target.",
+        "Explains the slow iterations as outliers: train_step has StdDev 25.31 ms and Max 314.60 ms against a 46.30 ms median, which lines up with the data_loading Max of 268.10 ms (data-loading stalls).",
+        "Recommends nvtx_pushpop_trace (or nvtx_gpu_proj_trace) and/or `nsys recipe nvtx_pace` to locate the outlier iterations over time.",
+        "Recommends nvtx_kern_sum (kernels grouped by enclosing NVTX range) to see what the forward and optimizer_step ranges launch.",
+        "Cites only values that appear in the supplied output and does not attempt to run or install nsys."
+      ],
+      "files": [
+        "files/nsys-nvtx-projection"
+      ]
+    },
+    {
+      "id": "nsys-distributed-nccl-overlap-stragglers",
+      "prompt": "Our 8x H100 DDP job (torchrun --nproc_per_node=8 train.py, NCCL backend) scales poorly: 8 GPUs give only 5.1x the single-GPU throughput. Using Nsight Systems, how do I collect per-rank profiles of a few steady-state iterations, check whether the NCCL all-reduces overlap with backward compute, and find a straggler rank? Give me the exact commands; I will run them on the cluster. Nothing can be run in this environment and nothing should be installed.",
+      "expected_skill": "perf-nsight-systems",
+      "expected_script": null,
+      "expected_output": "Collect one report per rank over a steady-state capture range, e.g. nsys profile -c cudaProfilerApi -t cuda,nvtx --pytorch=autograd-nvtx -o profile_%q{RANK} around the training processes, then run `nsys recipe nccl_gpu_overlap_trace -- profile_*.nsys-rep`, `nsys recipe nccl_gpu_time_util_map -- ...` and `nsys recipe cuda_gpu_time_util_map -- ...`, and compare per-rank cuda_gpu_kern_sum to spot the straggler.",
+      "assertions": [
+        "Produces one report per rank using an output name that expands per rank (e.g. -o profile_%q{RANK}).",
+        "Restricts collection to a few steady-state iterations (e.g. cudaProfilerStart/Stop markers with -c cudaProfilerApi) instead of profiling the whole run.",
+        "Uses `nsys recipe nccl_gpu_overlap_trace` over the per-rank reports to measure NCCL/compute overlap.",
+        "Uses `nsys recipe nccl_gpu_time_util_map` and/or `nsys recipe cuda_gpu_time_util_map` across the rank reports to compare communication and compute utilization per rank.",
+        "Identifies stragglers by comparing per-rank kernel summaries (e.g. nsys stats -r cuda_gpu_kern_sum per rank, or nccl_sum) to find the rank whose compute runs longer while the others wait in NCCL.",
+        "Does not attempt to run nsys or torchrun, or to install packages, in the sandbox."
+      ],
+      "files": []
+    },
+    {
+      "id": "nsys-negative-ncu-kernel-metrics",
+      "prompt": "Nsight Compute reports this for my cuBLAS GEMM kernel nvjet_sm100_hsh_128x256_64x6_2x2f_2cta_h_bz_NNT on a B200: Compute (SM) Throughput 77.1%, Memory Throughput 38.4%, Duration 97.6 us. Is the kernel compute-bound or memory-bound, and which ncu section should I collect next to see whether the tensor cores are well used?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "The kernel is compute-bound (77.1% compute vs 38.4% memory). Next, collect a kernel-level ncu section such as ComputeWorkloadAnalysis to inspect tensor-pipe utilization; this is Nsight Compute work, not an Nsight Systems timeline task.",
+      "assertions": [
+        "The perf-nsight-systems skill is not loaded or applied.",
+        "Classifies the kernel as compute-bound from the supplied numbers (77.1% compute vs 38.4% memory).",
+        "Recommends a kernel-level ncu follow-up such as the ComputeWorkloadAnalysis section (tensor pipe utilization) rather than an nsys timeline capture."
+      ],
+      "files": []
+    }
+  ]
+}

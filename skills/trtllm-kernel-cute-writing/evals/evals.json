@@ -1,0 +1,84 @@
+{
+  "skill_name": "kernel-cute-writing",
+  "evals": [
+    {
+      "id": "cute-elementwise-silu-fp16",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and nvidia-cutlass-dsl/torch are not installed. Do not install anything, do not try to download the CUTLASS examples, and do not try to compile or run the kernel here; I will validate it on our H100 node. Write a CuTe DSL (CUTLASS 4.x Python) kernel that computes out = x * sigmoid(x) (SiLU) for 2-D fp16 tensors of shape [8192, 14336] on an H100. Put it in /workspace/cute_silu/kernel.py with everything our verify/benchmark harness needs. It runs on every decode step, so keep the per-call host overhead low.",
+      "expected_skill": "kernel-cute-writing",
+      "expected_script": null,
+      "expected_output": "A @cute.kernel launched from a @cute.jit host function: from_dlpack(..., assumed_align=16), vec_size derived from element_type.width, cute.zipped_divide tiling, a cutlass.dynamic_expr bounds guard with no early return, sigmoid as 1/(1+cute.math.exp(-x)), a store that keeps the fp16 element type, a single cute.compile with mark_layout_dynamic() so kernel_fn only converts tensors and calls the compiled kernel, plus kernel_fn / reference_fn / get_inputs exports.",
+      "assertions": [
+        "Defines the device code with @cute.kernel and launches it from a @cute.jit host function via .launch(grid=..., block=...), never calling the @cute.kernel function directly from Python.",
+        "Wraps tensors with from_dlpack(..., assumed_align=16), derives the vector width from the element type (e.g. 16 // (mA.element_type.width // 8)) and tiles with cute.zipped_divide.",
+        "Guards out-of-range threads with `if cutlass.dynamic_expr(idx < total):` (predicated body) and has no early return inside the @cute.kernel.",
+        "Computes the sigmoid as 1.0 / (1.0 + cute.math.exp(-x)) instead of calling cute.math.sigmoid, and stores a value of the output's fp16 element type (e.g. an explicit .to(cutlass.Float16) where scalar math would promote to Float32).",
+        "Pre-compiles once with cute.compile(...) (with mark_layout_dynamic() or a shape-keyed cache) and kernel_fn calls the compiled object rather than the @cute.jit function on every call; the file exports kernel_fn, reference_fn and get_inputs().",
+        "Does not claim the kernel was compiled, verified or benchmarked in the sandbox and does not install nvidia-cutlass-dsl."
+      ],
+      "files": []
+    },
+    {
+      "id": "cute-rmsnorm-fp32-reduction",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and nvidia-cutlass-dsl/torch are not installed. Do not install anything, do not try to download the CUTLASS examples, and do not try to compile or run the kernel here; I will validate it on our H100 node. Write a CuTe DSL RMSNorm forward kernel for an H100 (SM90): x is fp32 [M, 4096], weight is fp32 [4096], eps = 1e-6, and out = x * rsqrt(mean(x^2) + eps) * weight. Put it in /workspace/cute_rmsnorm/kernel.py with kernel_fn, reference_fn and get_inputs.",
+      "expected_skill": "kernel-cute-writing",
+      "expected_script": null,
+      "expected_output": "One CTA per row (grid (M, 1, 1), e.g. 256 threads); each thread accumulates x*x over a strided scalar loop gX[(row, col)]; warp reduction with cute.arch.warp_reduction_sum, cross-warp reduction through a (NUM_WARPS + 1)-slot shared buffer with sync_threads and a broadcast slot; rstd = cute.math.rsqrt(sum / N + eps); a second pass writes x * rstd * weight; cute.compile is cached by column count. No zipped_divide and no adaptation of the fp16-vectorized cta_norm example.",
+      "assertions": [
+        "Launches one CTA per row (grid (M, 1, 1)) with a fixed thread count (e.g. 256), and each thread loops over columns with a stride equal to the thread count using scalar element access gX[(row, col)].",
+        "Does not use cute.zipped_divide / vectorized element-wise tiling for the reduction, and does not adapt the fp16-oriented vectorized cta_norm.py layout for this fp32 kernel.",
+        "Reduces within each warp with cute.arch.warp_reduction_sum (or a shuffle_sync_bfly butterfly, not warp_redux_sync), then combines warps through shared memory (one slot per warp plus a broadcast slot) separated by cute.arch.sync_threads().",
+        "Computes rstd with cute.math.rsqrt(sum_sq / N + eps) in fp32 and writes x * rstd * weight in a second pass over the row.",
+        "Pre-compiles with cute.compile cached by column count (or uses dynamic layouts) so kernel_fn does not recompile per call, and exports kernel_fn, reference_fn and get_inputs().",
+        "Does not claim the kernel was compiled, verified or benchmarked in the sandbox."
+      ],
+      "files": []
+    },
+    {
+      "id": "cute-hopper-gemm-bias-epilogue-stop",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and nvidia-cutlass-dsl/torch are not installed. Do not install anything, do not try to download the CUTLASS examples, and do not try to compile or run the kernel here; I will validate it on our H100 node. I need a CuTe DSL GEMM for H100 (SM90) that computes relu(A @ B + bias) for fp16 A [M, K], B [K, N] and an fp16 bias vector [N], using TMA and WGMMA like the CUTLASS Hopper examples, with the bias add and ReLU fused into the GEMM epilogue. Please implement it.",
+      "expected_skill": "kernel-cute-writing",
+      "expected_script": null,
+      "expected_output": "Declines to fuse an extra bias tensor into the SM90 TMA/WGMMA epilogue because those examples move all data through TMA descriptors and adding a tensor means reworking the descriptor setup. Proposes two kernels instead: the plain GEMM adapted from the CUTLASS CuTe DSL hopper/dense_gemm.py example (A x B -> C, scalar alpha/beta allowed) followed by a separate element-wise bias + ReLU kernel.",
+      "assertions": [
+        "Does not attempt to implement the fused TMA/WGMMA GEMM with a bias tensor in the epilogue, explaining that the SM90 examples move all data through TMA descriptors and adding an extra epilogue tensor would require reworking the descriptor setup.",
+        "Proposes the two-kernel approach: a plain GEMM (A x B -> C, optionally with scalar alpha/beta) followed by a separate element-wise CuTe kernel that applies the bias add and ReLU.",
+        "Points to the CUTLASS CuTe DSL Hopper dense GEMM example (hopper/dense_gemm.py or its persistent variant) as the starting point for the GEMM, to be adapted rather than copied verbatim.",
+        "Does not present a fabricated fused SM90 GEMM implementation or claim that one was compiled or tested.",
+        "Does not try to download files or install packages in the sandbox."
+      ],
+      "files": []
+    },
+    {
+      "id": "cute-debug-broken-elementwise-kernel",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and nvidia-cutlass-dsl/torch are not installed. Do not install anything, do not try to download the CUTLASS examples, and do not try to compile or run the kernel here; I will validate it on our H100 node. Our CuTe DSL kernel /workspace/input/cute-broken-kernel/kernel.py does not work: the errors and performance notes are in /workspace/input/cute-broken-kernel/run.log. Fix every problem and write the corrected file to /workspace/out/kernel.py, explaining each fix in one line.",
+      "expected_skill": "kernel-cute-writing",
+      "expected_script": null,
+      "expected_output": "Fixes: the early return becomes `if cutlass.dynamic_expr(idx < m * n):`; cute.math.sigmoid becomes 1/(1+cute.math.exp(-a)); `s * 2` becomes `s + s` or is cast with .to(cutlass.Float16); the direct @cute.kernel call in debug_single_tile goes through the @cute.jit host; from_dlpack gets assumed_align=16 for 128-bit loads; and the host function is pre-compiled once with cute.compile (with mark_layout_dynamic) so kernel_fn stops recompiling every call.",
+      "assertions": [
+        "Replaces the early `return` in the @cute.kernel with a predicated body such as `if cutlass.dynamic_expr(idx < m * n):`.",
+        "Replaces cute.math.sigmoid with 1.0 / (1.0 + cute.math.exp(-a)).",
+        "Fixes the store type mismatch caused by `s * 2` promoting Float16 to Float32, by using `s + s` or an explicit .to(cutlass.Float16) cast before storing.",
+        "Explains that a @cute.kernel cannot be called directly from Python ('An MLIR function requires a Context') and routes debug_single_tile through the @cute.jit host function.",
+        "Adds assumed_align=16 to the from_dlpack calls to get 128-bit vector loads instead of scalar LDG.E.U16.",
+        "Pre-compiles the host function once with cute.compile(...) (e.g. with mark_layout_dynamic() or a shape-keyed cache) so kernel_fn no longer pays ~31 ms of JIT compilation on every call."
+      ],
+      "files": [
+        "files/cute-broken-kernel"
+      ]
+    },
+    {
+      "id": "cute-negative-triton-kernel",
+      "prompt": "Write a Triton kernel (@triton.jit) that fuses residual add + RMSNorm for bf16 activations with hidden size 4096: out = rmsnorm(x + residual) * weight, also returning the updated residual. Include a Python wrapper.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A Triton kernel using @triton.jit and triton.language (one program per row, masked tl.load/tl.store, fp32 reduction) with a Python wrapper; no CuTe DSL code.",
+      "assertions": [
+        "The kernel-cute-writing skill is not loaded or applied.",
+        "Produces a Triton kernel built with @triton.jit and triton.language operations (tl.load/tl.store), not CuTe DSL (@cute.kernel/@cute.jit).",
+        "Computes the RMSNorm reduction in fp32 and returns both the normalized output and the updated residual."
+      ],
+      "files": []
+    }
+  ]
+}

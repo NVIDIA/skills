@@ -1,0 +1,10 @@
+# Commands run while verifying the onboarding of acme/Vista-VL-7B (synthetic record).
+
+# 1) Quickstart smoke test: passed, coherent description of the image.
+python examples/llm-api/quickstart_multimodal.py --model_dir acme/Vista-VL-7B --modality image --media <local-image.png>
+
+# 2) Aggregated serving with a deliberately small token budget so one image's prefill spans several chunks.
+trtllm-serve acme/Vista-VL-7B --backend pytorch --max_num_tokens 1024 --port 8000 > server.log 2>&1
+
+# 3) Sent the same chat completion (one 1280x960 image + a question) twice.
+#    Both responses were coherent and returned HTTP 200.

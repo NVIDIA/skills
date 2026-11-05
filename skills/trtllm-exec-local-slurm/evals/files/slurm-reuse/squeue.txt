@@ -1,0 +1,2 @@
+$ squeue -j 4818221 -h -o "%T %L"
+RUNNING 2:41:10

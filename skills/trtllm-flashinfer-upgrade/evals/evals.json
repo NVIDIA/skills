@@ -1,0 +1,86 @@
+{
+  "skill_name": "trtllm-flashinfer-upgrade",
+  "evals": [
+    {
+      "id": "fi-upgrade-stable-bump",
+      "prompt": "Bump flashinfer-python in the TensorRT-LLM checkout at /workspace/input/flashinfer-repo to the newest stable release. This is an offline dry run: there is no network and no gh/GitHub access, so use releases.txt (GitHub releases) and pypi_versions.txt (PyPI) in that directory instead of fetching anything, skip the GitHub prerequisite checks and the commit/push/PR step (I'll do those myself later), and do not install packages or run pip. My answers to your usual questions: stable releases only; take the latest stable; do not update security_scanning/poetry.lock. Make the edits, then give me the summary.",
+      "expected_skill": "trtllm-flashinfer-upgrade",
+      "expected_script": null,
+      "expected_output": "Selects 0.6.8 (latest stable newer than 0.6.6), updates requirements.txt, security_scanning/pyproject.toml and ATTRIBUTIONS-Python.md, leaves poetry.lock and the non-pin files untouched, confirms the >= \"0.6.4\" gate in speculative/interface.py still holds, and summarizes old -> new with modified files plus reminders to reinstall requirements and run the FlashInfer unit tests.",
+      "assertions": [
+        "Selects 0.6.8 as the target: the newest stable release in releases.txt that is newer than the current pin 0.6.6, ignoring the v0.7.0.dev pre-releases.",
+        "Updates the three always-updated pins to 0.6.8: requirements.txt (flashinfer-python==0.6.8), security_scanning/pyproject.toml (\"flashinfer-python (==0.6.8)\"), and ATTRIBUTIONS-Python.md (## flashinfer-python (0.6.8)).",
+        "Leaves security_scanning/poetry.lock unmodified because the user opted out, and makes no version edits to setup.py, the root pyproject.toml, or .pre-commit-config.yaml.",
+        "Checks the version-gated code in tensorrt_llm/_torch/speculative/interface.py and reports that its >= \"0.6.4\" gate still holds for 0.6.8, so no code change is needed.",
+        "Ends with a summary of old -> new version and the modified files, and reminds the user to run pip install -r requirements.txt and the FlashInfer unit tests (tests/unittest/_torch/flashinfer/ and tests/unittest/_torch/attention/test_flashinfer_attention.py).",
+        "Does not run pip, curl or other network fetches, git push, or gh commands."
+      ],
+      "files": [
+        "files/flashinfer-repo"
+      ]
+    },
+    {
+      "id": "fi-upgrade-already-latest",
+      "prompt": "Routine dependency duty: please upgrade flashinfer-python in the TensorRT-LLM checkout at /workspace/input/flashinfer-latest to the newest release. This is an offline dry run: there is no network or gh access (use releases.txt and pypi_versions.txt in that directory instead of GitHub and PyPI), skip the GitHub prerequisite checks and the commit/push/PR step, and don't install anything.",
+      "expected_skill": "trtllm-flashinfer-upgrade",
+      "expected_script": null,
+      "expected_output": "Finds the current pin 0.6.8 is already the newest stable release, asks whether nightly/dev releases should be considered (recommending stable only) rather than jumping to a v0.7.0.dev tag, and makes no edits: with stable-only there is nothing to upgrade, so it informs the user and stops.",
+      "assertions": [
+        "Reads the current pin from requirements.txt (flashinfer-python==0.6.8) and identifies it as already the newest stable release in releases.txt.",
+        "Asks whether nightly/dev releases should be considered (recommending stable only) instead of silently bumping to a v0.7.0.dev pre-release.",
+        "Makes no file edits before the user decides, and for the stable-only choice reports that no upgrade is needed and stops.",
+        "Does not run pip, curl, or other network commands."
+      ],
+      "files": [
+        "files/flashinfer-latest"
+      ]
+    },
+    {
+      "id": "fi-upgrade-nightly-not-on-pypi",
+      "prompt": "In the TensorRT-LLM checkout at /workspace/input/flashinfer-repo, move flashinfer-python to the nightly v0.7.0.dev20261020, and yes, I want security_scanning/poetry.lock updated too. This is an offline dry run: there's no network or gh access (releases.txt stands in for the GitHub releases page and pypi_versions.txt lists every version published on PyPI), skip the GitHub prerequisite checks and the commit/push/PR step, and don't install anything. Tell me what you'll do and make the edits you can.",
+      "expected_skill": "trtllm-flashinfer-upgrade",
+      "expected_script": null,
+      "expected_output": "Checks pypi_versions.txt, finds 0.7.0.dev20261020 is not on PyPI, and therefore refuses to fabricate poetry.lock hashes, warning and leaving a TODO to update them once published. Offers the git+https pin form for requirements.txt and asks the user to choose between a PyPI pin and a git pin, and confirms the >= \"0.6.4\" version gate still holds.",
+      "assertions": [
+        "Checks pypi_versions.txt and determines that 0.7.0.dev20261020 is not published on PyPI.",
+        "Does not invent or reuse sha256 hashes for the nightly in security_scanning/poetry.lock; warns that the lockfile hashes cannot be updated until the version is on PyPI, leaving or proposing a `# TODO: update hashes when published to PyPI` comment.",
+        "Offers the git pin for requirements.txt in the form flashinfer-python @ git+https://github.com/flashinfer-ai/flashinfer.git@v0.7.0.dev20261020#egg=flashinfer-python and asks the user to choose between a PyPI pin and the git pin.",
+        "Checks the >= \"0.6.4\" gate in tensorrt_llm/_torch/speculative/interface.py and reports that it still holds for 0.7.0.dev20261020.",
+        "Does not run pip, curl or other network fetches, git push, or gh commands."
+      ],
+      "files": [
+        "files/flashinfer-repo"
+      ]
+    },
+    {
+      "id": "fi-upgrade-pr-commands",
+      "prompt": "I've already bumped flashinfer-python from 0.6.7 to 0.6.7.post3 in my TensorRT-LLM checkout (requirements.txt, security_scanning/pyproject.toml and ATTRIBUTIONS-Python.md; I skipped security_scanning/poetry.lock). Give me the exact command sequence to verify my GitHub setup, move the change onto a fresh branch from upstream main, commit it, push it to my fork, and open the PR. My GitHub username is jdoe-gh and my fork remote is named fork. There's no repository or network in this environment, so write the commands out; don't run them.",
+      "expected_skill": "trtllm-flashinfer-upgrade",
+      "expected_script": null,
+      "expected_output": "A command sequence that checks gh auth status and the fork remote, stashes the three changed files, syncs main from NVIDIA/TensorRT-LLM, creates jdoe-gh/update_flashinfer_0.6.7.post3, commits with -s and the subject `[None][chore] Update flashinfer-python from 0.6.7 to 0.6.7.post3` (poetry.lock excluded), pushes to the fork remote, and runs gh pr create against NVIDIA/TensorRT-LLM main with a FlashInfer test plan, without executing anything.",
+      "assertions": [
+        "Starts by verifying the prerequisites: gh auth status (logged in with repo scope) and that a fork remote for jdoe-gh/TensorRT-LLM exists (git remote -v).",
+        "Stashes only the changed files, syncs main from upstream (git pull --rebase https://github.com/NVIDIA/TensorRT-LLM.git main), creates the branch jdoe-gh/update_flashinfer_0.6.7.post3, and pops the stash.",
+        "Commits with DCO sign-off (git commit -s) using the subject `[None][chore] Update flashinfer-python from 0.6.7 to 0.6.7.post3`, adding requirements.txt, security_scanning/pyproject.toml and ATTRIBUTIONS-Python.md but not security_scanning/poetry.lock.",
+        "Pushes with git push -u fork jdoe-gh/update_flashinfer_0.6.7.post3.",
+        "Opens the PR with gh pr create --repo NVIDIA/TensorRT-LLM --base main --head jdoe-gh:jdoe-gh/update_flashinfer_0.6.7.post3 and the same [None][chore] title, with a test plan that includes pytest tests/unittest/_torch/flashinfer/ and tests/unittest/_torch/attention/test_flashinfer_attention.py.",
+        "Does not execute the git or gh commands in this environment."
+      ],
+      "files": []
+    },
+    {
+      "id": "fi-upgrade-negative",
+      "prompt": "Conceptually, how does FlashInfer's paged KV-cache attention differ from FlashAttention-2, and when would an inference engine prefer one over the other?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A conceptual comparison of FlashInfer and FlashAttention-2 for LLM inference, without loading the upgrade skill, editing files, or proposing a dependency bump.",
+      "assertions": [
+        "The trtllm-flashinfer-upgrade skill is not loaded or applied.",
+        "Gives a conceptual comparison (e.g., FlashInfer as a kernel library for LLM serving with paged/ragged KV-cache layouts and customizable attention variants, versus FlashAttention-2's fused exact-attention kernels).",
+        "Does not edit files or propose bumping a flashinfer-python version pin."
+      ],
+      "files": []
+    }
+  ]
+}

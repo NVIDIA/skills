@@ -1,0 +1,45 @@
+{
+  "user": "jdoe",
+  "default_account": "team_llm",
+  "accounts": [
+    "team_llm"
+  ],
+  "default_partition": "batch",
+  "partitions": [
+    {
+      "name": "batch",
+      "state": "up",
+      "time_limit": "04:00:00",
+      "nodes": "32",
+      "arch": "x86_64",
+      "gres": "gpu:4",
+      "gpus_per_node": 4,
+      "requires_gres": true
+    },
+    {
+      "name": "cpu",
+      "state": "up",
+      "time_limit": "1-00:00:00",
+      "nodes": "4",
+      "arch": "x86_64",
+      "gres": "(null)",
+      "gpus_per_node": null,
+      "requires_gres": false
+    }
+  ],
+  "pmix": {
+    "available": [
+      "pmix",
+      "pmix_v4",
+      "pmix_v5"
+    ],
+    "preferred": "pmix_v5"
+  },
+  "errors": [],
+  "cluster_name": null,
+  "mounts": null,
+  "ssh_host": null,
+  "slurm_user": null,
+  "remote_cwd": null,
+  "mfa_style": null
+}

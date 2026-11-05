@@ -1,0 +1,88 @@
+{
+  "skill_name": "trtllm-visualgen-lpips-golden-refresh",
+  "evals": [
+    {
+      "id": "lpips-triage-missing-audio",
+      "prompt": "Our post-merge CI started failing the Cosmos3 t2av VisualGen LPIPS test in TensorRT-LLM. Everything I have is in /workspace/input/lpips-cosmos3-failure/. Please refresh the golden so CI goes green again. There's no GPU, container, network, or TensorRT-LLM checkout in this environment, so don't install anything or try to regenerate media.",
+      "expected_skill": "trtllm-visualgen-lpips-golden-refresh",
+      "expected_script": null,
+      "expected_output": "Triages before touching media: records the failing node, LPIPS 0.412 vs threshold 0.100, the cosmos3 audio-enabled t2av workload and B200 hardware; finds from the ffprobe outputs that the candidate lost the audio stream the golden has; notes the window has only a muxing refactor and no dependency/checkpoint/container change. Declines to refresh, recommends a regression investigation, and leaves the golden JSON, zip and waives untouched.",
+      "assertions": [
+        "Records the triage facts from the CI log: the failing pytest node (test_cosmos3_nano_t2av_lpips[bf16]), LPIPS 0.412 versus threshold 0.100, the cosmos3 family / audio-enabled t2av workload, and the B200 hardware.",
+        "Compares the candidate and golden ffprobe output, identifies that the candidate has no audio stream although the golden (feature_flags.enable_audio: true) has one, and on that basis refuses to refresh the golden.",
+        "Notes that the window contains no dependency, checkpoint, or container change (only a muxing refactor and unrelated commits), so there is no plausible intentional output change, and treats the failure as a regression investigation (e.g., starting from the MP4-muxing refactor commit a91c2e7).",
+        "Does not modify or propose new values for the golden JSON (sha256, tensorrt_llm_commit), the cosmos3 media zip, or waives.txt."
+      ],
+      "files": [
+        "files/lpips-cosmos3-failure"
+      ]
+    },
+    {
+      "id": "lpips-diffusers-bump-plan",
+      "prompt": "After our TensorRT-LLM container bumped diffusers from 0.36.0 to 0.37.0, three VisualGen LPIPS tests started failing. The CI details are in /workspace/input/lpips-diffusers-bump/ci_failures.txt. Plan the golden refresh end to end: which goldens and archives change, how to generate and check the candidates, what metadata to update, how to validate, and how to structure the commits. There's no GPU, container, network, or TensorRT-LLM checkout here, so don't install, download, or modify anything; just give me the plan.",
+      "expected_skill": "trtllm-visualgen-lpips-golden-refresh",
+      "expected_script": null,
+      "expected_output": "Links the failures to the intentional diffusers change and limits the refresh to the three failing goldens; maps wan22_* to visual_gen_lpips_golden_media_wan.zip and flux2_* to visual_gen_lpips_golden_media_flux.zip; regenerates candidates by running the affected nodes in the new container on B200 with a persistent --basetemp and inspects them; updates sha256 and the generation tensorrt_llm_commit only for regenerated media; reruns the affected tests and only then unwaives validated tests, in separate signed-off commits.",
+      "assertions": [
+        "Ties the failures to the intentional diffusers 0.36.0 -> 0.37.0 change before refreshing and scopes the refresh to exactly the three failing goldens (wan22_ti2v_5b_t2v, wan22_t2v_a14b_fp8, flux2_dev_t2i), not the passing tests or other members of the same archives.",
+        "Maps the media to the per-family archives: wan22_* to visual_gen_lpips_golden_media_wan.zip and flux2_* to visual_gen_lpips_golden_media_flux.zip.",
+        "Generates candidates by running the affected pytest nodes in the intended (new) container on the matching GPU class (B200) with a persistent --basetemp scratch directory, and inspects each candidate before accepting it (for the videos, e.g., ffprobe to confirm it decodes with the expected resolution and frame count).",
+        "Updates each refreshed JSON's sha256 to the SHA-256 of the new media bytes and sets tensorrt_llm_commit to the commit that generated them (only for regenerated media), keeping archive member names equal to the JSON image/video values with relative paths.",
+        "Reruns every affected test after the JSON and zip are updated, and only then removes the waives for tests that pass, keeping waives for anything still failing or not validated.",
+        "Proposes separate, signed-off commits for any zip layout change, the regenerated media plus JSON checksum/provenance updates, and the waive-list change."
+      ],
+      "files": [
+        "files/lpips-diffusers-bump"
+      ]
+    },
+    {
+      "id": "lpips-apply-wan-refresh",
+      "prompt": "Apply the accepted VisualGen LPIPS golden refresh described in /workspace/input/lpips-refresh-wan/NOTES.txt for TensorRT-LLM. Write the updated golden JSON files and the rebuilt family media archive into /workspace/out/visual_gen_lpips/, leave /workspace/input untouched, and verify what you produced. Python is available, but there is no GPU, network, or TensorRT-LLM checkout, and you must not install anything.",
+      "expected_skill": "trtllm-visualgen-lpips-golden-refresh",
+      "expected_script": null,
+      "expected_output": "Writes the wan22 JSON with sha256 d2e021e0ba4949e32d5ceba3816bab0750748048a210bdfb4eaa8f4d80909285 and tensorrt_llm_commit 4be1f0c2d9a7e6b5c4d3e2f1a0b9c8d7e6f5a4b3 (the generation commit, not the rebased HEAD), leaves the wan21 JSON unchanged, and builds visual_gen_lpips_golden_media_wan.zip with exactly the two media members at the archive root (new wan22 bytes, unchanged wan21 bytes), then verifies the archive and both JSON files.",
+      "assertions": [
+        "Sets the wan22 JSON's sha256 to d2e021e0ba4949e32d5ceba3816bab0750748048a210bdfb4eaa8f4d80909285, the SHA-256 of the candidate bytes.",
+        "Sets the wan22 JSON's tensorrt_llm_commit to the generation commit 4be1f0c2d9a7e6b5c4d3e2f1a0b9c8d7e6f5a4b3, not the rebased HEAD 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b.",
+        "Leaves the wan21 JSON's sha256 and tensorrt_llm_commit unchanged even though its media is repacked into the new archive.",
+        "Writes the archive as visual_gen_lpips_golden_media_wan.zip whose members are exactly wan22_ti2v_5b_t2v_lpips_golden.mp4 (new bytes) and wan21_t2v_1_3b_lpips_golden.mp4 (unchanged bytes), with relative names and no directory prefix, absolute path, or '..' component.",
+        "Verifies the result, e.g., python -m zipfile -t plus a member listing or hash check for the archive, and a JSON parse of both golden files.",
+        "Does not modify anything under /workspace/input."
+      ],
+      "files": [
+        "files/lpips-refresh-wan"
+      ]
+    },
+    {
+      "id": "lpips-waive-update",
+      "prompt": "We refreshed the TensorRT-LLM VisualGen LPIPS goldens after the diffusers bump and reran validation. The results are in /workspace/input/lpips-waives/validation_results.txt and the current waive list is waives.txt in the same directory. Write the updated waive list to /workspace/out/waives.txt, tell me what to do about anything still failing, and give me the commit plan with messages. There's no GPU, repo, or network here; don't install anything.",
+      "expected_skill": "trtllm-visualgen-lpips-golden-refresh",
+      "expected_script": null,
+      "expected_output": "Removes only the two validated-passing LPIPS waives (wan22_ti2v_5b_t2v and flux2_dev_t2i), keeps the still-failing fp8 waive, the not-validated ltx2 waive and the unrelated entries; records the fp8 candidate and log paths and investigates rather than overwriting the golden again; and puts the waive change in its own signed-off commit separate from the media/JSON commit, with messages that say whether media bytes changed, after a changed-files pre-commit run.",
+      "assertions": [
+        "Removes the waive entries only for test_wan22_ti2v_5b_t2v_lpips[bf16] and test_flux2_dev_t2i_lpips[bf16], the two tests that passed validation after the refresh.",
+        "Keeps the waives for test_wan22_t2v_a14b_lpips[fp8] (still failing), test_ltx2_t2v_lpips[bf16] (not validated), and the unrelated non-LPIPS entries.",
+        "For the still-failing fp8 test, records its preserved candidate and log paths in the task notes and investigates, instead of regenerating and overwriting the golden again blindly.",
+        "Puts the waive-list change in its own commit, separate from the regenerated media plus JSON commit, with signed-off commit messages that state whether media bytes changed.",
+        "Recommends the changed-files pre-commit run (e.g., SKIP=type-check,clang-format,ruff-legacy pre-commit run) rather than pre-commit run -a unless a full-tree check is requested."
+      ],
+      "files": [
+        "files/lpips-waives"
+      ]
+    },
+    {
+      "id": "lpips-negative",
+      "prompt": "In my diffusion research code, how do I compute LPIPS between two generated images in Python, and how does it differ from SSIM?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Shows how to compute LPIPS with the lpips package and contrasts it with SSIM, without loading the TensorRT-LLM golden-refresh skill or discussing golden archives, checksums, or waive lists.",
+      "assertions": [
+        "The trtllm-visualgen-lpips-golden-refresh skill is not loaded or applied.",
+        "Shows LPIPS computation with the lpips package (e.g., lpips.LPIPS(net='alex') on image tensors scaled to [-1, 1]) and notes that a lower LPIPS means more perceptually similar.",
+        "Contrasts it with SSIM (a hand-crafted luminance/contrast/structure similarity where higher means more similar) and does not discuss golden archives, sha256 metadata, or waive lists."
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "skill_name": "trtllm-case-executor",
+  "evals": [
+    {
+      "id": "caseexec-device-count-sizing",
+      "prompt": "I'm queueing three TensorRT-LLM runs through the case executor (account: team_llm). For each one, give the workflow type, required_devices, total_required_devices, required_devices_per_node, node_count, and the Slurm job_name the executor will use:\n(A) test_cmd: pytest tests/integration/defs/perf/test_perf_sanity.py -v \"test_e2e[aggr-gpt_oss-gpt_oss_tp4ep4pp2_mtp1]\" with perf_config_yaml=/workspace/input/perf-sanity-config/gpt_oss_120b_fp4.yaml\n(B) bench_cmd: trtllm-bench --model /models/Llama-3.1-70B prepare-dataset --output /tmp/ds.json token-norm-dist --num-requests 512 --input-mean 1024 --output-mean 1024 --input-stdev 0 --output-stdev 0 && trtllm-bench --model /models/Llama-3.1-70B throughput --dataset /tmp/ds.json --tp 4 --pp 2\n(C) custom_cmd: python3 examples/llm-api/quickstart_advanced.py --model_dir /models/Llama-3.1-8B --tp_size 2 (no required_devices given)\nThis sandbox has no GPU, Slurm, or TRT-LLM checkout; just work it out and don't execute the commands.",
+      "expected_skill": "trtllm-case-executor",
+      "expected_script": null,
+      "expected_output": "(A) pytest/perf-sanity: matches server config gpt_oss_tp4ep4pp2_mtp1, so required = total = 8 (tp 4 x pp 2), per-node 4 from hardware.gpus_per_node, node_count 2. (B) bench: tp 4 x pp 2 from the last trtllm-bench invocation gives 8/8/8 with node_count 1 and job_name team_llm.bench. (C) custom: required_devices defaults to 1 because custom commands aren't parsed, giving 1/1/1, node_count 1 and job_name team_llm.custom.",
+      "assertions": [
+        "For (A), matches the test-ID suffix `gpt_oss_tp4ep4pp2_mtp1` to that server_configs entry and computes required_devices = total_required_devices = 8 (tensor_parallel_size 4 x pipeline_parallel_size 2).",
+        "For (A), takes required_devices_per_node = 4 from the YAML's `hardware.gpus_per_node` and computes node_count = ceil(8/4) = 2.",
+        "For (B), parses `--tp 4 --pp 2` from the last trtllm-bench invocation for 8 devices on a single node (per-node 8, node_count 1).",
+        "For (C), classifies it as the custom workflow and states the executor uses the default required_devices = 1 (custom commands are not parsed for --tp_size), optionally recommending an explicit required_devices=2.",
+        "Forms job names with the `<account>.<detail>` convention, e.g. `team_llm.bench` for (B) and `team_llm.custom` for (C)."
+      ],
+      "files": [
+        "files/perf-sanity-config"
+      ]
+    },
+    {
+      "id": "caseexec-route-device-mismatch",
+      "prompt": "Run this TensorRT-LLM test on GB200: test_cmd `pytest tests/unittest/_torch/multi_gpu/test_allreduce.py -v`, required_devices=4, device_type=GB200, no slurm_cluster given. The environment check result for this workstation and a copy of the repo's jenkins/current_image_tags.properties are in /workspace/input/route-gb200/. This sandbox has no GPU, Docker, Slurm, or network, so don't execute anything. Tell me which execution scenario you'd route to and why, which container image goes into job_spec.json, and what has to happen before the script builder runs.",
+      "expected_skill": "trtllm-case-executor",
+      "expected_script": null,
+      "expected_output": "Although the workstation is `satisfied, local, docker` with 8 H100s, the requested device_type GB200 doesn't match, so route to remote_slurm with cluster auto-select (forwarding device_type GB200, total 4, per-node 4, node_count 1). GB* means aarch64, so use LLM_SBSA_DOCKER_IMAGE stored verbatim without the enroot '#' rewrite. Step 2.5 must run detect_slurm_env.sh on the target cluster over SSH (via an exec-remote-slurm preflight) and validate account/partition before trtllm-test-script-builder is invoked.",
+      "assertions": [
+        "Routes to `remote_slurm` with cluster auto-select because the requested device_type GB200 does not match the local H100s, even though the local env check is `satisfied, local, docker`.",
+        "Forwards device_type GB200 with total_required_devices 4 and required_devices_per_node 4 (node_count 1) for cluster selection.",
+        "Picks `LLM_SBSA_DOCKER_IMAGE` (aarch64, since the device type starts with GB) from current_image_tags.properties and stores it verbatim, without the enroot `#` rewrite.",
+        "States that Step 2.5 (running detect_slurm_env.sh on the cluster over SSH, e.g., via an exec-remote-slurm preflight) must complete and validate account/partition before the script builder is invoked.",
+        "Does not run the test locally on the H100 workstation."
+      ],
+      "files": [
+        "files/route-gb200"
+      ]
+    },
+    {
+      "id": "caseexec-partition-validation",
+      "prompt": "We're on the login node of our local Slurm cluster (env-check returned `satisfied, slurm, local`). I want to run `trtllm-eval --model /models/Llama-3.1-8B-Instruct --tp_size 4 gsm8k` on partition gpu_large; I didn't specify an account. The SLURM detection output for this cluster is in /workspace/input/slurm-env-validate/slurm_env.json. This sandbox has no Slurm, so don't run sinfo or sbatch. What account and partition go into the job spec, and can you go ahead and build the script?",
+      "expected_skill": "trtllm-case-executor",
+      "expected_script": null,
+      "expected_output": "Account resolves to the default_account team_llm. The requested partition gpu_large is not among the detected partitions (batch, batch_short, cpu), so surface the mismatch, list the available partitions, and ask the user before continuing; don't invoke the script builder with an unvalidated partition or silently fall back to batch. The eval needs 4 GPUs (tp_size 4 x pp_size 1) on one node.",
+      "assertions": [
+        "Resolves the account to `team_llm` from default_account in slurm_env.json since none was supplied.",
+        "Flags that partition `gpu_large` is not among the detected partitions and lists the available ones (batch, batch_short, cpu).",
+        "Stops and asks the user to choose or confirm a partition instead of proceeding with gpu_large or silently substituting the default partition.",
+        "Does not invoke the script builder or generate a .slurm script before the partition is validated.",
+        "Derives required_devices = 4 from `--tp_size 4` (pp_size defaulting to 1)."
+      ],
+      "files": [
+        "files/slurm-env-validate"
+      ]
+    },
+    {
+      "id": "caseexec-local-direct-jobspec",
+      "prompt": "On a GPU box without Docker (env-check returned `satisfied, local, direct` with 2 GPUs), run custom_cmd `python3 examples/llm-api/quickstart_example.py` with custom_env `TLLM_LOG_LEVEL=INFO`, model_name quickstart, and monitor_timeout 90m. Treat /workspace/trtllm as the repo root (create it if it doesn't exist; there is no checkout here). Set up the work directory and job_spec.json exactly as the case executor would for this scenario, and show the exact command line you'd use to run it with the timeout and hang monitoring, but don't run the workload: there's no GPU or TRT-LLM in this sandbox.",
+      "expected_skill": "trtllm-case-executor",
+      "expected_script": null,
+      "expected_output": "Creates /workspace/trtllm/work_dirs/quickstart_<YYYYmmdd_HHMMSS>/ and writes a minimal job_spec.json (scenario local_direct, direct_cmd, custom_env, monitor_timeout_seconds 5400, work_dir, log_file, model_name, workflow_type custom, success/failure patterns), skips the script builder, and shows `timeout --kill-after=30s 5400s bash -c '<cmd>' 2>&1 | tee <log_file>` with exit codes 124/137 mapped to TIMEOUT and a background grep for 'hang detected'.",
+      "assertions": [
+        "Creates the work directory as `/workspace/trtllm/work_dirs/quickstart_<YYYYmmdd_HHMMSS>`.",
+        "Writes job_spec.json with `scenario` set to `local_direct`, the raw command as `direct_cmd`, the custom_env value, and `monitor_timeout_seconds` = 5400.",
+        "job_spec.json also includes work_dir, log_file, model_name, workflow_type, success_patterns and failure_patterns.",
+        "Skips the script builder for local_direct: no .slurm script or docker_cmd.sh is generated.",
+        "Shows the run wrapped in `timeout --kill-after=30s` with a 5400-second limit and output tee'd to the log file (e.g., `timeout --kill-after=30s 5400s bash -c '<cmd>' 2>&1 | tee <log_file>`), and maps exit code 124 (or 137) to TIMEOUT.",
+        "Does not execute the workload command."
+      ],
+      "files": []
+    },
+    {
+      "id": "caseexec-negative",
+      "prompt": "What trtllm-bench commands should I use to measure offline throughput for Llama-3.1-8B-Instruct in FP8 at TP2 with 1024 input and 1024 output tokens? Just write the dataset-prep and throughput commands; don't run anything.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A `trtllm-bench ... prepare-dataset` command generating synthetic requests with 1024 input and 1024 output tokens and a `trtllm-bench ... throughput` command with --tp 2 on an FP8 checkpoint, without loading the case-executor skill or setting up work directories or job specs.",
+      "assertions": [
+        "The trtllm-case-executor skill is not loaded or applied.",
+        "Provides a dataset-preparation step with 1024-token input and output lengths (e.g., `prepare-dataset ... token-norm-dist --input-mean 1024 --output-mean 1024`).",
+        "Provides a `trtllm-bench ... throughput` command with `--tp 2` that uses the prepared dataset.",
+        "Does not create work_dirs or a job_spec.json and does not attempt to run the benchmark."
+      ],
+      "files": []
+    }
+  ]
+}

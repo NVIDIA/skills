@@ -1,0 +1,7 @@
+$ ls /path/to/TensorRT-LLM/work_dirs/.slurm_alloc.json
+ls: cannot access '/path/to/TensorRT-LLM/work_dirs/.slurm_alloc.json': No such file or directory
+
+$ squeue -u jdoe -h -o "%i %T %j"
+4830001 RUNNING team_llm-trtllm.persistent
+4829876 RUNNING jdoe_finetune_run
+4831102 PENDING team_llm.eval

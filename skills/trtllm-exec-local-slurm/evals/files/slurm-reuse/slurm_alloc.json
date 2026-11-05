@@ -1,0 +1,14 @@
+{
+  "job_id": "4818221",
+  "container_name": "llama_auto_test",
+  "nodelist": "node[012-013]",
+  "partition": "batch",
+  "account": "team_llm",
+  "nodes": 2,
+  "gpus_per_node": 4,
+  "docker_image": "registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901",
+  "container_mounts": "/home/jdoe:/home/jdoe,/path/to/TensorRT-LLM:/path/to/TensorRT-LLM,/data/llm-models:/models",
+  "allocated_at": "2026-11-04T09:36:40-08:00",
+  "time_limit": "04:00:00",
+  "installed": true
+}

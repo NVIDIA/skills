@@ -1,0 +1,13 @@
+Post-refresh validation (synthetic record prepared for an evaluation exercise)
+
+Context: VisualGen LPIPS goldens were refreshed after the diffusers 0.36.0 -> 0.37.0 container bump
+(BUG-0201). Golden JSON + media updates for wan22_ti2v_5b_t2v, wan22_t2v_a14b_fp8 and flux2_dev_t2i
+are staged in a separate commit. Validation ran in container <registry>/tensorrt-llm-dev:2026-10-28
+on 1x B200 with the updated JSON and zip files.
+
+PASSED  examples/visual_gen/test_visual_gen.py::test_wan22_ti2v_5b_t2v_lpips[bf16]   LPIPS 0.004 < 0.050
+PASSED  examples/visual_gen/test_visual_gen.py::test_flux2_dev_t2i_lpips[bf16]       LPIPS 0.006 < 0.050
+FAILED  examples/visual_gen/test_visual_gen.py::test_wan22_t2v_a14b_lpips[fp8]       LPIPS 0.071 > 0.050
+        candidate: <scratch>/visualgen_lpips_refresh_tmp/lpips_failure_artifacts/wan22_t2v_a14b_fp8_candidate.mp4
+        log:       <scratch>/visualgen_lpips_refresh_tmp/logs/test_wan22_t2v_a14b_lpips_fp8.log
+NOT RUN examples/visual_gen/test_visual_gen.py::test_ltx2_t2v_lpips[bf16]            (separate issue BUG-0188; not part of this refresh)

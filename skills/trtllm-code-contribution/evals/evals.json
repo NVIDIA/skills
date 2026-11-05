@@ -1,0 +1,92 @@
+{
+  "skill_name": "trtllm-code-contribution",
+  "evals": [
+    {
+      "id": "contrib-pr-readiness-review",
+      "prompt": "I'm about to open a pull request against NVIDIA/TensorRT-LLM. The draft title, description, commit list, and diff stat are in /workspace/input/pr-draft/pr_draft.md. There is no git repository and no network in this environment, so don't try to run git, push, or open the PR. Review it for contribution-process and review-readiness problems and tell me exactly what to fix, including a corrected PR title and the commands I should run locally.",
+      "expected_skill": "trtllm-code-contribution",
+      "expected_script": null,
+      "expected_output": "Lists the blocking process issues: commits authored with an @nvidia.com address and missing DCO Signed-off-by trailers, fix-on-fix and add-then-revert commits to squash with an interactive rebase onto the merge base, and a formatting-only commit that running pre-commit before each commit would have avoided. Proposes a Conventional Commits title prefixed with TRTLLM-6021 and a description with background, summary and impact, and gives local commands without executing any push or PR creation.",
+      "assertions": [
+        "Flags that the commits use an NVIDIA internal (@nvidia.com) email and states that commits and sign-offs must not use it.",
+        "Flags that no commit carries a DCO Signed-off-by trailer and requires every commit to be signed off (e.g., git commit -s, or git rebase --signoff for the existing commits).",
+        "Recommends squashing the fix-on-fix and add-then-revert commits (e.g., git rebase -i $(git merge-base HEAD main)) into a few logical commits such as core implementation, tests, and optional refactoring.",
+        "Flags the formatting-only commit and recommends running pre-commit run --all-files before every commit so formatting lands together with the code it belongs to.",
+        "Proposes a PR title with a Conventional Commits type (e.g., perf or feat) prefixed with the JIRA ID TRTLLM-6021, and asks for a description covering background/motivation, a summary of the change, and an impact assessment.",
+        "Does not itself run git push, a force-push, or a PR-creation command in this environment."
+      ],
+      "files": [
+        "files/pr-draft"
+      ]
+    },
+    {
+      "id": "contrib-design-review-guards",
+      "prompt": "Before I implement it, review my design for a new short-sequence MHA path in TensorRT-LLM's PyTorch backend: /workspace/input/short-mha-design/design.md. There is no GPU, no TensorRT-LLM checkout, and no network here; don't clone or install anything. What should change in the design before I write the code?",
+      "expected_skill": "trtllm-code-contribution",
+      "expected_script": null,
+      "expected_output": "Recommends gating on total packed context tokens rather than the longest sequence, handling context parallelism (cp_size == 1 guard) and checking TP/PP/EP, dispatching through forward_context() so cached-KV/chunked contexts are handled, testing or gating the cached/chunked path per SM version (SM90 vs SM100+), shipping the path disabled by default behind an env-var opt-in, and reusing self.mha with an updated assertion instead of a parallel _short_seq_mha attribute.",
+      "assertions": [
+        "Points out that the guard checks the longest single sequence (max_ctx_seq_len) while the cost of the dense path scales with the total packed context tokens, so the threshold should be compared against total tokens.",
+        "Requires handling context parallelism (e.g., a mapping.cp_size == 1 guard) because under CP the sequence is split across ranks and not all tokens are local, and asks for TP/PP/EP to be checked as well.",
+        "Recommends calling the forward_context() dispatcher instead of forward_context_default(), which handles only fresh prefill and silently ignores cached KV tokens in chunked context.",
+        "Flags the hardware assumption: cached-KV/chunked-prefill numerics differ between SM90 (Hopper) and SM100+ (Blackwell), so the path must be tested on both or gated (e.g., get_sm_version() >= 100) rather than validated on B200 only.",
+        "Recommends shipping the optimization disabled by default (threshold 0) with an environment-variable opt-in instead of enabling it with threshold 10240.",
+        "Recommends reusing self.mha for DSA models and updating the `assert self.mha is None` invariant (e.g., to assert self.mqa is not None) instead of adding a parallel self._short_seq_mha attribute."
+      ],
+      "files": [
+        "files/short-mha-design"
+      ]
+    },
+    {
+      "id": "contrib-unit-test-gotchas",
+      "prompt": "Here's the unit test I wrote for a new short-sequence MHA path in TensorRT-LLM's PyTorch backend: /workspace/input/test-review/test_short_mha.py. On the GPU machine it's unreliable: the A/B outputs sometimes mismatch, and pytest's thread-leak check complains after the test. There's no GPU or TensorRT-LLM install here, so just review the file (don't run it and don't install anything) and tell me what to fix.",
+      "expected_skill": "trtllm-code-contribution",
+      "expected_script": null,
+      "expected_output": "Identifies the TensorRT-LLM test gotchas: non-nn.Module children such as the DSA indexer are neither moved by .to('cuda') nor copied via named_parameters(); cache managers spawn threads that need pytestmark = pytest.mark.threadleak(enabled=False); weights must be initialized in TRT-LLM's loaded layout rather than HF layout; AttentionMetadata should come from existing test helpers; and the 21 parametrizations should be consolidated to distinct code paths.",
+      "assertions": [
+        "Points out that model.to(device) does not move parameters held by non-nn.Module children (e.g., the DSATrtllmAttention indexer), so they must be moved explicitly.",
+        "Points out that copying weights via named_parameters() misses parameters of non-Module children (e.g., the indexer weights), so the A/B modules are not actually identical and those parameters must be copied explicitly.",
+        "Recommends adding pytestmark = pytest.mark.threadleak(enabled=False) at module level because DSACacheManager-style cache managers start background ThreadPoolExecutor threads that outlive the test.",
+        "Recommends initializing test weights in TensorRT-LLM's loaded layout (as produced by the load functions in modeling_*.py) instead of the HuggingFace checkpoint layout.",
+        "Recommends building AttentionMetadata with the existing helpers/fixtures under tests/unittest/_torch/attention/ instead of constructing it by hand.",
+        "Recommends consolidating the 21 parametrized cases (7 seq_len x 3 batch, all below the threshold) down to cases that each exercise a distinct code path."
+      ],
+      "files": [
+        "files/test-review"
+      ]
+    },
+    {
+      "id": "contrib-coding-guidelines-review",
+      "prompt": "Before I send these two new files to TensorRT-LLM code review, check them against the project's coding guidelines: /workspace/input/style-review/ contains a C++ runtime helper and a Python user-facing options class. There's no repo checkout, no network, and no linters here; don't install any. List each guideline violation and give corrected versions of both files.",
+      "expected_skill": "trtllm-code-contribution",
+      "expected_script": null,
+      "expected_output": "Fixes the C++ violations (K&R braces and 2-space indent to Allman with 4 spaces; PascalCase type, camelCase methods, m-prefixed members, k-prefixed constant; C-style casts and reinterpret_cast to static_cast; raw malloc'd pointer to a smart pointer/RAII container; Doxygen comments) and the Python violations (snake_case file, function and field names; UPPER_SNAKE_CASE constant; narrow except; user-facing config as a Pydantic StrictBaseModel without a custom __init__; Google-style docstrings), with corrected files.",
+      "assertions": [
+        "Rewrites the C++ in Allman brace style with 4-space indentation.",
+        "Applies the C++ naming rules: PascalCase type name (e.g., MoeStatsLogger), camelCase methods and variables, m-prefixed members (e.g., mExpertCounts, mMaxExperts), and a k-prefixed constant (e.g., kMaxLogLines).",
+        "Replaces the C-style casts and the reinterpret_cast with static_cast, and replaces the malloc/free raw pointer with a smart pointer or RAII container (e.g., std::unique_ptr or std::vector).",
+        "Converts the user-facing Python options class to a Pydantic StrictBaseModel with typed fields and no custom __init__.",
+        "Fixes the Python naming (snake_case file name, function and field names; UPPER_SNAKE_CASE constant) and replaces the bare except: with a narrow exception type (e.g., FileNotFoundError or json.JSONDecodeError).",
+        "Adds Doxygen-style comments for the C++ API and Google-style docstrings for the Python code."
+      ],
+      "files": [
+        "files/style-review"
+      ]
+    },
+    {
+      "id": "contrib-negative",
+      "prompt": "For my personal Rust CLI project on GitHub, write a Conventional Commits message for a change that adds a --verbose flag, and show me how to GPG-sign that commit.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A Conventional Commits message such as `feat: add --verbose flag` and instructions for GPG-signing with git commit -S, without loading the TensorRT-LLM contribution skill or imposing its project-specific rules.",
+      "assertions": [
+        "The trtllm-code-contribution skill is not loaded or applied.",
+        "Provides a Conventional Commits message such as `feat: add --verbose flag` (optionally with a scope such as feat(cli)).",
+        "Shows GPG signing with git commit -S (with a configured signing key) rather than treating the DCO sign-off flag -s as GPG signing.",
+        "Does not impose TensorRT-LLM-specific rules such as JIRA/NVBUG title prefixes, mandatory DCO sign-off, or NVIDIA email restrictions."
+      ],
+      "files": []
+    }
+  ]
+}

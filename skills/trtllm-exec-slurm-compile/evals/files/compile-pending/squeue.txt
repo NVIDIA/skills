@@ -1,0 +1,10 @@
+# Submitted at 15:00:31 with:
+$ sbatch --nodes=1 --ntasks=1 --ntasks-per-node=1 --gres=gpu:4 --partition=batch --account=team_llm --job-name=trtllm-compile.jdoe --time=02:00:00 /shared/users/jdoe/workspace/tensorrt_llm_scripts/compile.slurm /shared/users/jdoe/images/trtllm-dev.sqsh /shared/users /shared/users/jdoe/workspace/tensorrt_llm_scripts /shared/users/jdoe/TensorRT-LLM -a "100"
+Submitted batch job 5520417
+
+$ date
+Wed Nov  4 15:12:40 PST 2026
+
+$ squeue -j 5520417 -o "%.18i %.9P %.30j %.8u %.2t %.10M %.6D %R"
+             JOBID PARTITION                           NAME     USER ST       TIME  NODES NODELIST(REASON)
+           5520417     batch            trtllm-compile.jdoe     jdoe PD       0:00      1 (QOSGrpNodeLimit)

@@ -1,0 +1,53 @@
+# Perf-sanity benchmark config (synthetic example for evaluation)
+metadata:
+  model_name: gpt_oss_120b_fp4
+  supported_gpus:
+    - B200
+    - GB200
+hardware:
+  gpus_per_node: 4
+server_configs:
+  - name: "gpt_oss_tp4ep4pp1"
+    model_name: "gpt_oss_120b_fp4"
+    tensor_parallel_size: 4
+    moe_expert_parallel_size: 4
+    pipeline_parallel_size: 1
+    max_batch_size: 512
+    max_num_tokens: 8192
+    kv_cache_config:
+      free_gpu_memory_fraction: 0.85
+    client_configs:
+      - name: "con64_isl1k_osl1k"
+        concurrency: 64
+        iterations: 5
+        isl: 1024
+        osl: 1024
+  - name: "gpt_oss_tp4ep4pp2_mtp1"
+    model_name: "gpt_oss_120b_fp4"
+    tensor_parallel_size: 4
+    moe_expert_parallel_size: 4
+    pipeline_parallel_size: 2
+    max_batch_size: 256
+    max_num_tokens: 8192
+    speculative_config:
+      decoding_type: MTP
+      num_nextn_predict_layers: 1
+    client_configs:
+      - name: "con32_isl1k_osl1k"
+        concurrency: 32
+        iterations: 5
+        isl: 1024
+        osl: 1024
+  - name: "gpt_oss_tp8ep8pp1"
+    model_name: "gpt_oss_120b_fp4"
+    tensor_parallel_size: 8
+    moe_expert_parallel_size: 8
+    pipeline_parallel_size: 1
+    max_batch_size: 512
+    max_num_tokens: 8192
+    client_configs:
+      - name: "con128_isl1k_osl1k"
+        concurrency: 128
+        iterations: 5
+        isl: 1024
+        osl: 1024

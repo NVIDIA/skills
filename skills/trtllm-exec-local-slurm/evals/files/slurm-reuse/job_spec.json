@@ -1,0 +1,33 @@
+{
+  "execution_scenario": "local_slurm",
+  "workflow_type": "pytest",
+  "model_name": "llama",
+  "repo_root": "/path/to/TensorRT-LLM",
+  "work_dir": "/path/to/TensorRT-LLM/work_dirs/llama_20261104_105500",
+  "script_path": "/path/to/TensorRT-LLM/work_dirs/llama_20261104_105500/llama_auto_test.slurm",
+  "script_name": "llama_auto_test.slurm",
+  "log_file_pattern": "llama_auto_test_%j.out",
+  "success_patterns": [
+    "passed"
+  ],
+  "failure_patterns": [
+    "FAILED",
+    "ERROR"
+  ],
+  "docker_image": "registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901",
+  "persistent_mode": true,
+  "container_name": "llama_auto_test",
+  "container_mounts": "/home/jdoe:/home/jdoe,/path/to/TensorRT-LLM:/path/to/TensorRT-LLM,/data/llm-models:/models",
+  "build_project": false,
+  "monitor_timeout_seconds": 3600,
+  "slurm_params": {
+    "partition": "batch",
+    "account": "team_llm",
+    "time_limit": "01:00:00",
+    "nodes": 1,
+    "ntasks": 1,
+    "ntasks_per_node": 1,
+    "gpus_per_node": 4,
+    "gres": "gpu:4"
+  }
+}

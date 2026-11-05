@@ -1,0 +1,67 @@
+$ ncu --section SpeedOfLight --section MemoryWorkloadAnalysis \
+      --metrics l1tex__average_t_sectors_per_request_pipe_lsu_mem_global_op_ld.ratio,l1tex__average_t_sectors_per_request_pipe_lsu_mem_global_op_st.ratio,l1tex__t_sector_hit_rate.pct,lts__t_sector_hit_rate.pct,dram__throughput.avg.pct_of_peak_sustained_elapsed \
+      --kernel-name regex:"transpose_gelu" --launch-skip 5 --launch-count 1 \
+      -- python bench_transpose_gelu.py --m 8192 --n 8192 --dtype fp32
+==PROF== Connected to process 41872 (/usr/bin/python3.12)
+==PROF== Profiling "transpose_gelu_kernel" - 5: 0%....50%....100% - 11 passes
+==PROF== Disconnected from process 41872
+[41872] python3.12@localhost
+  transpose_gelu_kernel(const float *, float *, int, int) (256, 256, 1)x(32, 8, 1), Context 1, Stream 7, Device 0, CC 9.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz         2.62
+    SM Frequency                    Ghz         1.98
+    Elapsed Cycles                cycle      816,453
+    Memory Throughput                 %        91.24
+    DRAM Throughput                   %        54.31
+    Duration                         us       412.35
+    L1/TEX Cache Throughput           %        37.86
+    L2 Cache Throughput               %        91.24
+    SM Active Cycles              cycle   801,947.62
+    Compute (SM) Throughput           %        14.83
+    ----------------------- ----------- ------------
+
+    Section: Memory Workload Analysis
+    ----------------- ----------- ------------
+    Metric Name       Metric Unit Metric Value
+    ----------------- ----------- ------------
+    Memory Throughput     Tbyte/s         1.82
+    L1/TEX Hit Rate             %         0.41
+    L2 Hit Rate                 %        71.26
+    Mem Busy                    %        91.24
+    Max Bandwidth               %        62.37
+    Mem Pipes Busy              %        11.92
+    ----------------- ----------- ------------
+
+    Section: Command line profiler metrics
+    -------------------------------------------------------------------- -------------- ------------
+    Metric Name                                                          Metric Unit    Metric Value
+    -------------------------------------------------------------------- -------------- ------------
+    dram__throughput.avg.pct_of_peak_sustained_elapsed                   %                     54.31
+    l1tex__average_t_sectors_per_request_pipe_lsu_mem_global_op_ld.ratio sector/request        32.00
+    l1tex__average_t_sectors_per_request_pipe_lsu_mem_global_op_st.ratio sector/request         4.00
+    l1tex__t_sector_hit_rate.pct                                         %                      0.41
+    lts__t_sector_hit_rate.pct                                           %                     71.26
+    -------------------------------------------------------------------- -------------- ------------
+
+---------------------------------------------------------------------------------------------------
+Context (from the kernel author)
+---------------------------------------------------------------------------------------------------
+GPU: NVIDIA H100 80GB HBM3 (SXM5, 132 SMs). Nsight Compute 2026.3.1, default clock control.
+Problem: x is an 8192 x 8192 fp32 matrix (row-major). The kernel writes out = gelu(x^T).
+
+// out is [N, M] row-major, x is [M, N] row-major; out[i][j] = gelu(x[j][i])
+__global__ void transpose_gelu_kernel(const float* __restrict__ x,
+                                      float* __restrict__ out, int M, int N) {
+  int j  = blockIdx.x * 32 + threadIdx.x;   // output column (contiguous in out)
+  int i0 = blockIdx.y * 32 + threadIdx.y;   // first output row handled by this thread
+  for (int k = 0; k < 32; k += 8) {
+    int i = i0 + k;
+    if (i < N && j < M) {
+      float v = x[(size_t)j * N + i];        // lanes of a warp differ in j
+      out[(size_t)i * M + j] = 0.5f * v * (1.0f + erff(v * 0.70710678f));
+    }
+  }
+}

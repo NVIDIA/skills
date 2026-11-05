@@ -1,0 +1,90 @@
+{
+  "skill_name": "perf-regression-cookbook",
+  "evals": [
+    {
+      "id": "prc-stopwords-implicit-sync",
+      "prompt": "Our Qwen3-8B TensorRT-LLM serving throughput fell from about 9.9k to about 4.0k tok/s between two nightly builds. Everything we know is in /workspace/input/stopwords-sync-regression/symptoms.md. What is the most likely failure mode, how do we confirm it, and how should it be fixed? No TensorRT-LLM checkout, GPU or network is available in this sandbox - do not install or fetch anything; tell us what to check on our side.",
+      "expected_skill": "perf-regression-cookbook",
+      "expected_script": null,
+      "expected_output": "Matches pattern-per-step-sync-added / the stop-words implicit D2H sync precedent: the new stop-word check derives a host-visible boolean from device data (torch.equal-style) once per request per step inside sample_async, and that sync collapses overlap-scheduler pipelining (hence ~2.5x loss with overlap on, ~7% with it off). Confirm via grep for torch.equal in the sampler and the cudaStreamSynchronize-in-sample_async signature; fix by keeping the comparison device-resident with pinned non_blocking lengths and no host early exit. Ends with a REGRESSION-COOKBOOK trace line.",
+      "assertions": [
+        "Matches the per-step-sync-added pattern and the stop-words implicit device-to-host sync precedent (case `sampler-stop-words-implicit-d2h-sync`).",
+        "Explains that a host-visible boolean derived from device data in the stop-word check (e.g. `torch.equal`, `bool(tensor)`, `.item()`, iterating a CUDA tensor) forces a cudaStreamSynchronize per request per step inside `sample_async`, collapsing overlap-scheduler pipelining - which is why the loss is ~2.5x with overlap on but only ~7% with it off.",
+        "Proposes the precedent fix: keep the stop-word comparison device-resident (e.g. accumulate `(seq == word).all()` on the GPU, move stop-word lengths through pinned memory with non_blocking copies) with no host-side early exit, rather than restoring a short-circuit or only reverting the feature.",
+        "Gives a concrete localization check, e.g. `git grep -n \"torch.equal\"` in the sampler code, or cudaStreamSynchronize calls inside the `sample_async` NVTX range whose idle time scales with batch size x number of stop words.",
+        "Presents the matched precedent as a hypothesis to confirm on their build, not as a proven diagnosis.",
+        "Ends with exactly one trace line of the form `REGRESSION-COOKBOOK: matched=<family>/sampler-stop-words-implicit-d2h-sync confidence=<high|medium|low> adapted=\"...\"`."
+      ],
+      "files": [
+        "files/stopwords-sync-regression"
+      ]
+    },
+    {
+      "id": "prc-kv-pool-startup-residency",
+      "prompt": "trtllm-bench throughput for Qwen3.5-9B dropped 7.8% from TensorRT-LLM 1.3.0rc19 to 1.3.0rc21 on H100, while per-step device time is flat. The data is in /workspace/input/kv-pool-shrink/symptoms.md. What regressed, and what should we do about it? There is no TensorRT-LLM checkout, GPU or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-regression-cookbook",
+      "expected_script": null,
+      "expected_output": "Classifies it as unaccounted startup residency: the KV pool (sized from free memory) shrank 54.04 -> 52.56 GiB because memory is genuinely resident before the probe, pushing the run below the 544-request capacity threshold (549 -> 534) - not an estimator bug or kernel slowdown. Two terms: +0.93 GiB inside torch from the vision encoder built for a text-only run (ConditionalGeneration checkpoint now resolves to the VL wrapper; skip it, e.g. disable_mm_encoder) and +0.55 GiB outside torch from an import-time CUDA context (make it lazy; guard that import creates no context). Track kv_cache_size across builds. Ends with a REGRESSION-COOKBOOK trace line.",
+      "assertions": [
+        "Classifies the regression as memory genuinely resident before the KV pool is sized (unaccounted startup residency) rather than an estimator/capacity-accounting bug or a kernel slowdown, citing the smaller KV pool (54.04 to 52.56 GiB) with flat device step time and the capacity threshold (549 vs 534 full-length requests against 544 in flight).",
+        "Attributes the +0.93 GiB inside-torch growth to the multimodal/vision encoder being built for a text-only benchmark because the `Qwen3_5ForConditionalGeneration` checkpoint now resolves to the VL model after the VL-support commit, and recommends skipping the encoder for text-only runs (e.g. `disable_mm_encoder`).",
+        "Attributes the +0.55 GiB outside-torch growth to a separate import-time CUDA context (the 548 MiB held after `import tensorrt_llm`, e.g. a module-level DeepGEMM PDL initialization) and recommends deferring that initialization until after device selection and/or a guard test that importing tensorrt_llm creates no CUDA context.",
+        "Recommends tracking KV pool size (kv_cache_size) across builds because a sub-GiB loss only shows up as a large throughput drop near a capacity threshold.",
+        "Ends with exactly one `REGRESSION-COOKBOOK: matched=...` trace line naming `vlm-vision-tower-loaded-for-text-only-bench` or `deepgemm-pdl-import-time-cuda-context`."
+      ],
+      "files": [
+        "files/kv-pool-shrink"
+      ]
+    },
+    {
+      "id": "prc-startup-fd-handshake-stall",
+      "prompt": "Our nightly TensorRT-LLM perf QA flagged 14 multi-GPU cases with -31% to -100% throughput; the details are in /workspace/input/bench-startup-stall/symptoms.md. Our plan is to bisect the two kernel commits in the range first. Is that the right move, and what is actually going on? There is no checkout, GPU or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-regression-cookbook",
+      "expected_script": null,
+      "expected_output": "Not a compute regression: the server never reached ready (silent hang after 'start MpiSession', workers at 0% GPU/4 MiB, SIGKILL at the 1800 s stall timeout), so bisecting kernels is the wrong first move. Matches the startup-handshake-fd-not-inherited pattern / IPC HMAC-key-via-fd case: Popen's default close_fds=True drops the fd advertised via an env var and the child's blocking read waits forever. Fix per precedent: revert the fd transport (Python-only, no rebuild) or pass_fds at every hop with a non-blocking read/timeout and an end-to-end launcher test. The baseline serve wheel that also contains the commit hanging the same way confirms it is not a perf delta. Ends with a REGRESSION-COOKBOOK trace line.",
+      "assertions": [
+        "Recognizes that the runs never reached a ready state (silent hang after `start MpiSession`, workers at 0% GPU and 4 MiB, killed by the stall timeout), so this is a measurement artifact / startup deadlock rather than a compute slowdown, and advises against bisecting the kernel commits first.",
+        "Identifies the `Pass IPC HMAC key through file descriptor` commit as the prime suspect, matching the startup-handshake-fd-not-inherited pattern.",
+        "Explains the mechanism: `subprocess.Popen` defaults to `close_fds=True`, so without `pass_fds` the file descriptor advertised to the child through an environment variable does not survive the launch chain, and a blocking read on it waits forever.",
+        "Recommends the precedent fix - revert the fd-based key transport (a Python-only change, no rebuild needed) - and/or passing `pass_fds` at every launcher hop with a non-blocking read or timeout so it fails loudly instead of hanging.",
+        "Uses the fact that the serve-case baseline wheel (built after the fd commit) hangs the same way as evidence that this is not a candidate-vs-baseline performance delta.",
+        "Ends with exactly one `REGRESSION-COOKBOOK: matched=...` trace line naming `ipc-hmac-key-via-fd-breaks-bench`."
+      ],
+      "files": [
+        "files/bench-startup-stall"
+      ]
+    },
+    {
+      "id": "prc-piecewise-ceiling-overshoot",
+      "prompt": "After upgrading TensorRT-LLM from 1.3.0rc14 to 1.3.0rc15, QPS dropped about 13% and TTFT doubled for our MoE serving deployment even though our YAML did not change. The data is in /workspace/input/piecewise-ceiling/symptoms.md. Diagnose it, recommend the fix, and tell us how to prove it. There is no checkout, GPU or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-regression-cookbook",
+      "expected_script": null,
+      "expected_output": "rc15 appends the reachable ceiling 65536 to capture_num_tokens, so every context iteration between 13,914 and 65,536 tokens pads to the 65,536-token piecewise graph (device time flat ~360-370 ms vs 118-352 ms true-size on rc14), which also stalls decode (TPOT up). Matches pattern-padding-bucket-overshoot / the piecewise far-ceiling-append case, a side effect of the broader-capture fix. Fix: clamp oversized candidates to the ceiling and never invent capture sizes beyond the user list; pinning the list in YAML does not protect because the engine appends; verify with the effective list and an A/B in both directions. Ends with a REGRESSION-COOKBOOK trace line.",
+      "assertions": [
+        "Diagnoses that rc15 appends the reachable ceiling (65536) to the capture list, so every context iteration with more than 13,914 and up to 65,536 tokens is padded to the 65,536-token piecewise graph, evidenced by device time flat at ~360-370 ms versus 118-352 ms true-size times on rc14.",
+        "Matches the padding-bucket-overshoot pattern (piecewise CUDA-graph far-ceiling append) and links it to the 'Broader capture of piecewise cudagraph' change as a side effect of a prior fix.",
+        "Proposes the precedent fix: clamp oversized capture candidates to the reachable ceiling and never append a capture size beyond the user-supplied list, rather than disabling piecewise CUDA graphs globally or simply adding more buckets.",
+        "Notes that pinning an explicit capture_num_tokens list in the YAML does not protect against this because the engine appended to the configured list, and recommends checking the effective list the engine keeps.",
+        "Proposes A/B confirmation in both directions: add the far ceiling to the rc14 list to reproduce the drop, and neutralize the appended entry on rc15 to recover.",
+        "Ends with exactly one `REGRESSION-COOKBOOK: matched=...` trace line naming `piecewise-cudagraph-far-ceiling-append`."
+      ],
+      "files": [
+        "files/piecewise-ceiling"
+      ]
+    },
+    {
+      "id": "prc-negative",
+      "prompt": "We are deploying Llama-3.3-70B-Instruct FP8 on 8x H100 with TensorRT-LLM for the first time. Nothing regressed - there is no previous build to compare against. We want higher decode throughput at concurrency 64. Which optimizations should we try first, and how should we measure each one?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Forward-looking optimization advice (e.g. CUDA graphs with padding, batch/token limits, FP8 KV cache, fusions, parallelism choice), each evaluated one change at a time against a measured baseline; no regression triage or cookbook trace line.",
+      "assertions": [
+        "The perf-regression-cookbook skill is not loaded or applied.",
+        "Does not emit a `REGRESSION-COOKBOOK:` trace line or frame the request as regression triage or bisection.",
+        "Proposes concrete throughput levers to evaluate (e.g. CUDA graphs with padding, max_batch_size / max_num_tokens tuning, FP8 KV cache, kernel fusions, TP/EP choice) and recommends measuring each change one at a time against a baseline."
+      ],
+      "files": []
+    }
+  ]
+}

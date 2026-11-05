@@ -1,0 +1,44 @@
+Timer unit: 1e-06 s
+
+Total time: 43.2 s
+File: /code/tensorrt_llm/tensorrt_llm/_torch/pyexecutor/model_engine.py
+Function: _prepare_tp_inputs at line 1540
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+  1540                                           def _prepare_tp_inputs(self, scheduled_requests, kv_cache_manager, attn_metadata,
+  1541                                                                  spec_metadata=None, new_tensors_device=None,
+  1542                                                                  cache_indirection_buffer=None):
+  1548      4100       3690.0      0.9      0.0      _use_beam_search = self.max_beam_width > 1
+  1549      4100      12300.0      3.0      0.0      input_ids, position_ids, request_ids = [], [], []
+  1550                                               # ---- context requests ----
+  1551     16400      21320.0      1.3      0.0      for request in scheduled_requests.context_requests:
+  1552     12300    2349300.0    191.0      5.4          input_ids.extend(request.get_tokens(0))
+  1553     12300    1107000.0     90.0      2.6          position_ids.extend(range(request.context_current_position, request.context_chunk_end))
+  1568                                               # ---- generation requests (categorization loop) ----
+  1569    282900     370600.0      1.3      0.9      for request in scheduled_requests.generation_requests:
+  1570    278800    1505520.0      5.4      3.5          if self.mapping.has_cp_helix():
+  1571                                                       position_ids.append(request.helix_position())
+  1572                                                       continue
+  1575    278800      86430.0      0.3      0.2          request_ids.append(request.py_request_id)
+  1576    278800     479540.0      1.7      1.1          state = LlmRequestState(request.state_value)
+  1577    278800    3011040.0     10.8      7.0          input_ids.append(request.get_last_tokens(0))
+  1578    278800    1617040.0      5.8      3.7          position_ids.append(request.max_beam_num_tokens - 1)
+  1580    278800    1421880.0      5.1      3.3          beam_width = request.sampling_config.beam_width
+  1581    557600     641240.0      1.2      1.5          for beam in range(beam_width):
+  1582    278800     362440.0      1.3      0.8              first_beam = 0
+  1583    278800     334560.0      1.2      0.8              if beam == first_beam:
+  1584    278800     390320.0      1.4      0.9                  gen_request_seq_slots.append(request.py_seq_slot)
+  1586    278800    3122560.0     11.2      7.2          mm_params = MultimodalParams(multimodal_data=request.py_multimodal_data)
+  1587    278800    2676480.0      9.6      6.2          mm_params.strip_for_generation()
+  1588    278800    2007360.0      7.2      4.6          if mm_params.has_content():
+  1589                                                       multimodal_params_list.append(mm_params)
+  1597                                               # ---- incremental-update check: second pass over the same requests ----
+  1598      4100    4739600.0   1156.0     11.0      previous_state = [(r.py_request_id, r.get_last_tokens(0), r.max_beam_num_tokens - 1) for r in scheduled_requests.generation_requests]
+  1599      4100    1263900.0    308.3      2.9      can_use_incremental = self._can_use_incremental_update(previous_state)
+  1612      4100     623200.0    152.0      1.4      input_ids_t = torch.tensor(input_ids, dtype=torch.int, pin_memory=True)
+  1613      4100     578100.0    141.0      1.3      position_ids_t = torch.tensor(position_ids, dtype=torch.int, pin_memory=True)
+  1615      4100     237800.0     58.0      0.6      self.input_ids_cuda[:len(input_ids)].copy_(input_ids_t, non_blocking=True)
+  1616      4100     225500.0     55.0      0.5      self.position_ids_cuda[:len(position_ids)].copy_(position_ids_t, non_blocking=True)
+  1620      4100    3911400.0    954.0      9.1      attn_metadata.prepare()
+# [excerpt: 41 further lines, each < 1.0% of the total, omitted; they sum to 10.100 s]

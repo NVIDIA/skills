@@ -1,0 +1,40 @@
+{
+  "execution_scenario": "remote_slurm",
+  "workflow_type": "pytest",
+  "model_name": "qwen3_moe",
+  "work_dir": "/path/to/TensorRT-LLM/work_dirs/qwen3_moe_20261104_113000",
+  "script_path": "/path/to/TensorRT-LLM/work_dirs/qwen3_moe_20261104_113000/qwen3_moe_auto_test.slurm",
+  "script_name": "qwen3_moe_auto_test.slurm",
+  "log_file_pattern": "qwen3_moe_auto_test_%j.out",
+  "success_patterns": [
+    "passed"
+  ],
+  "failure_patterns": [
+    "FAILED",
+    "ERROR"
+  ],
+  "ssh_host": "jdoe@login.example.com",
+  "slurm_user": "jdoe",
+  "remote_cwd": "/shared/users/jdoe",
+  "default_user_root_dir": "/shared/users/jdoe",
+  "remote_repo_path": "/shared/users/jdoe/TensorRT-LLM",
+  "remote_work_dir": "/shared/users/jdoe/TensorRT-LLM/work_dirs/qwen3_moe_20261104_113000",
+  "partition": "batch",
+  "account": "team_llm",
+  "job_name": "team_llm.pytest",
+  "node_count": 1,
+  "total_required_devices": 4,
+  "required_devices_per_node": 4,
+  "gpus_per_node": 4,
+  "mounts": [
+    "/shared/users/jdoe:/shared/users/jdoe",
+    "/shared/llm-models:/models"
+  ],
+  "repo_url": "git@github.com:example-org/TensorRT-LLM.git",
+  "repo_branch": "feature/fp8-kv",
+  "build_project": true,
+  "monitor_timeout_seconds": 3600,
+  "mfa_style": false,
+  "device_type": "GB300",
+  "container_image": "registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-aarch64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901"
+}

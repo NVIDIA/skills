@@ -1,0 +1,54 @@
+# Synthetic, simplified diff prepared for a review exercise. It adds per-expert
+# activation pre-scales to the NVFP4 fused-MoE quantization method in TensorRT-LLM.
+# Hunk line numbers are illustrative.
+#
+# CI status reported by the author: all unit tests passed, including
+# test_configurable_moe_multi_gpu_eplb on a single 8-GPU node.
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/quantization.py b/tensorrt_llm/_torch/moe/fused_moe/quantization.py
+--- a/tensorrt_llm/_torch/moe/fused_moe/quantization.py
++++ b/tensorrt_llm/_torch/moe/fused_moe/quantization.py
+@@ -1510,6 +1510,17 @@ class NVFP4FusedMoEMethod(FusedMoEMethodBase):
+     def create_weights(self, module, weight_dtype, weight_vec_size, block_scales_dtype,
+                        block_scales_vec_size, scaling_vector_size=16):
+         ...
++        # Per-expert activation pre-scales for the new smoothing path (read by the kernel).
++        module.register_parameter(
++            "fc31_act_prescale",
++            nn.Parameter(torch.ones(module.expert_size_per_partition, dtype=torch.float32),
++                         requires_grad=False))
++        module.register_parameter(
++            "fc2_act_prescale",
++            nn.Parameter(torch.ones(module.expert_size_per_partition, dtype=torch.float32),
++                         requires_grad=False))
++
+@@ -1602,6 +1613,18 @@ class NVFP4FusedMoEMethod(FusedMoEMethodBase):
+     def load_quant_scales(self, module, weights):
+         ...
++        for expert_idx, expert_id in enumerate(module.initial_local_expert_ids):
++            module.fc31_act_prescale.data[expert_idx] = weights[f"{expert_id}.w1.act_prescale"]
++            module.fc2_act_prescale.data[expert_idx] = weights[f"{expert_id}.w2.act_prescale"]
++
++        self._tmp_shared_fc31_act_prescale = {}
++        if self.need_load_shared_weights(module):
++            local_shared_load_expert_ids = module.layer_load_balancer.get_load_expert_ids()
++            for expert_idx, expert_id in enumerate(local_shared_load_expert_ids):
++                self._tmp_shared_fc31_act_prescale[expert_idx] = \
++                    weights[f"{expert_id}.w1.act_prescale"]
++
+@@ -1688,6 +1711,10 @@ class NVFP4FusedMoEMethod(FusedMoEMethodBase):
+     def process_weights_after_loading(self, module):
+         ...
++        # Reconcile the shared copies of the fc31 pre-scale.
++        for expert_idx, value in self._tmp_shared_fc31_act_prescale.items():
++            module.fc31_act_prescale.data[expert_idx] = value
++
+         weight_fns = {
+             "w3_w1_weight": module.local_shared_w3_w1_tensors,
+             "w2_weight": module.local_shared_w2_tensors,
+             "w3_w1_weight_scale": module.local_shared_w3_w1_scale_tensors,
+             "w2_weight_scale": module.local_shared_w2_scale_tensors,
+             "fc31_alpha": shared_fc31_alpha,
+             "fc2_alpha": shared_fc2_alpha,
+         }
+         module.register_all_parameter_slot_and_to_fix_weight_fns(weight_fns)

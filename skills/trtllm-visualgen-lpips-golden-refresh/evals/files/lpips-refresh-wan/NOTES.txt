@@ -1,0 +1,18 @@
+Refresh notes (synthetic fixture prepared for an evaluation exercise)
+
+Layout of this fixture (mirrors tests/integration/defs/examples/visual_gen/golden/ in TensorRT-LLM):
+  golden/visual_gen_lpips/*.json          current golden JSON files
+  golden/visual_gen_lpips/extracted_wan/  the members of the current family media archive for
+                                          these two goldens, already extracted (the binary archive
+                                          itself is omitted from this fixture)
+  candidates/                             the accepted regenerated media
+
+- Accepted drift: the container bump changed diffusers 0.36.0 -> 0.37.0 (FlowMatch scheduler sigmas
+  are now computed in float64). The regenerated Wan2.2-TI2V-5B t2v candidate was inspected: it decodes,
+  is 1280x704 with 121 frames, and no audio is expected for this workload. It was accepted.
+- The candidate was generated on a B200 in container <registry>/tensorrt-llm-dev:2026-10-28
+  (diffusers 0.37.0) at TensorRT-LLM commit 4be1f0c2d9a7e6b5c4d3e2f1a0b9c8d7e6f5a4b3.
+- The branch was later rebased onto main; its current HEAD is 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b.
+- Only wan22_ti2v_5b_t2v was regenerated. wan21_t2v_1_3b passed unchanged and was not regenerated.
+- All media files in this fixture are small synthetic placeholder bytes, not real video.
+  Treat them as opaque bytes.

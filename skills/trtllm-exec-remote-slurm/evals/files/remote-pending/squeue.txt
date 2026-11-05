@@ -1,0 +1,15 @@
+# Allocation started with the tmux + salloc flow:
+$ ssh -o ControlPath=/tmp/ssh-trtllm-%r@%h:%p jdoe@login.example.com "tmux new-session -d -s trtllm-nsys 'salloc -A team_llm -p batch -N 1 -J team_llm.nsys -t 08:00:00'"
+
+# About 30 seconds later:
+$ ssh -o ControlPath=/tmp/ssh-trtllm-%r@%h:%p jdoe@login.example.com "squeue -u jdoe -h -o '%i %T %S' --state=RUNNING,PENDING"
+7712345 PENDING 2026-11-04T18:40:00
+
+$ ssh -o ControlPath=/tmp/ssh-trtllm-%r@%h:%p jdoe@login.example.com "date"
+Wed Nov  4 14:05:12 PST 2026
+
+$ ssh -o ControlPath=/tmp/ssh-trtllm-%r@%h:%p jdoe@login.example.com "sinfo -s"
+PARTITION AVAIL  TIMELIMIT   NODES(A/I/O/T) NODELIST
+batch*       up    8:00:00   118/0/2/120    node[001-120]
+backfill     up    4:00:00   118/0/2/120    node[001-120]
+cpu          up 1-00:00:00       3/5/0/8    cpu[01-08]

@@ -1,0 +1,9 @@
+# Benchmark config for a TensorRT-LLM model test (synthetic example).
+test_type: benchmark
+model_name: meta-llama/Llama-3.1-8B-Instruct
+tp_size: 2
+bench_subcommand: throughput
+num_requests: 512
+input_mean: 1024
+output_mean: 1024
+num_gpus: 8

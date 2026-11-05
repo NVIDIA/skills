@@ -1,0 +1,88 @@
+{
+  "skill_name": "perf-torch-sync-free",
+  "evals": [
+    {
+      "id": "syncfree-training-step-rewrite",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. Our training step in /workspace/input/syncfree-train-step/train_step.py keeps the CPU waiting on the GPU (nsys shows many cudaStreamSynchronize calls per iteration). Find every host-device synchronization in it, say for each one whether the CPU really needs the GPU value, and rewrite the step to be as sync-free as possible without changing what it computes. Write the result to /workspace/out/train_step_syncfree.py and tell me how to verify that the syncs are gone.",
+      "expected_skill": "perf-torch-sync-free",
+      "expected_script": null,
+      "expected_output": "Lists the syncs: blocking .cuda() copies, torch.tensor(list, device='cuda'), boolean-mask indexing (per_tok[valid], preds[valid], flat_labels[valid]), the debug loss.item(), the isnan/isinf branch, int(valid.sum()) and the three returned .item() calls. Classifies logging reads as false dependencies and the bad-gradient branch as a true dependency; rewrites with non_blocking copies, a hoisted weight tensor, fixed-shape masked arithmetic, GPU-side handling or deferral of the skip decision, and one coalesced device-to-host transfer of the metrics; verifies with torch.cuda.set_sync_debug_mode('error').",
+      "assertions": [
+        "Flags the blocking .cuda() copies of the (pinned) batch tensors and replaces them with .to('cuda', non_blocking=True).",
+        "Flags torch.tensor(class_weights, device='cuda') as a sync (Python data copied to the GPU every step) and hoists it out of the step or builds it on the CPU and moves it with non_blocking=True.",
+        "Flags the boolean-mask indexing (per_tok[valid], preds[valid], flat_labels[valid]) as dynamic-shape syncs and replaces it with fixed-shape masked arithmetic, e.g. torch.where(valid, per_tok, 0).sum() / valid.sum().",
+        "Treats the debug print(loss.item()) and the returned .item()/int() metrics as false dependencies: removes or defers them and coalesces the remaining values into a single device-to-host transfer (e.g. torch.stack([...]).cpu() or one non_blocking copy).",
+        "Classifies the `if torch.isnan(grad_norm) or torch.isinf(grad_norm)` branch as a true dependency (control flow on a GPU value) and restructures it (GPU-side torch.where/masking of the update, or deferring the check) instead of silently deleting the safeguard.",
+        "Recommends verifying the rewrite with torch.cuda.set_sync_debug_mode('error') (or 'warn') around the step, and/or re-profiling with nsys to confirm no sync calls remain."
+      ],
+      "files": [
+        "files/syncfree-train-step"
+      ]
+    },
+    {
+      "id": "syncfree-line-by-line-sync-quiz",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. For each numbered line L1-L16 in /workspace/input/syncfree-quiz/sync_quiz.py, tell me whether it forces the CPU to wait for the GPU (a host-device synchronization) or not, and for every line that does, give a sync-free replacement that keeps the computation on the GPU. Answer as a table.",
+      "expected_skill": "perf-torch-sync-free",
+      "expected_script": null,
+      "expected_output": "Syncing: L2 (Python-list index), L4 (one-argument torch.where -> nonzero), L7 (slice with CUDA-tensor bounds), L8 (.type(torch.LongTensor) creates a CPU tensor), L10 (Python max), L12 (repeat_interleave without output_size), L14 (torch.unique), L16 (event.synchronize). Sync-free: L1, L3, L5, L6, L9, L11, L13, L15. Replacements: GPU index tensors, three-argument torch.where, torch.arange/index_select instead of tensor slice bounds, .type(torch.long), torch.max, output_size=, avoid unique in the hot path, and event.wait() instead of event.synchronize().",
+      "assertions": [
+        "Marks L4 torch.where(mask_gpu) (one-argument form, dynamic output shape) as syncing while marking L3 three-argument torch.where(mask_gpu, x_gpu, 0) as sync-free.",
+        "Marks L8 x_gpu.type(torch.LongTensor) as syncing (it produces a CPU tensor) and L9 x_gpu.type(torch.long) as sync-free, recommending the dtype form.",
+        "Marks L2 (indexing with a Python list) and L7 (slicing with CUDA-tensor bounds) as syncing, with fixes that keep the index on the GPU (a CUDA index tensor; torch.arange(...)/index_select instead of tensor slice bounds).",
+        "Marks L12 repeat_interleave without output_size and L14 torch.unique as syncing, and L13 (output_size=4096 given) as sync-free.",
+        "Marks L10 Python max() and L16 ev.synchronize() as host-blocking, and L11 torch.max and L15 ev.wait() (GPU-side stream ordering) as not blocking the host.",
+        "Marks L1 torch.zeros(..., device='cuda'), L5 indexing with a CUDA index tensor and L6 masked_fill_ as sync-free."
+      ],
+      "files": [
+        "files/syncfree-quiz"
+      ]
+    },
+    {
+      "id": "syncfree-nonblocking-d2h-correctness",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. Please review /workspace/input/syncfree-nonblocking/postprocess.py. A colleague made the GPU-to-CPU copies non_blocking to remove synchronizations; latency improved, but every few thousand requests we now return nonsense token ids and probabilities. Explain what is going on and give me a corrected version that keeps the synchronization cost as low as possible.",
+      "expected_skill": "perf-torch-sync-free",
+      "expected_script": null,
+      "expected_output": "non_blocking=True on a GPU-to-CPU copy returns before the data has arrived, and the code immediately reads ids_cpu/probs_cpu with .tolist(), so it sometimes reads incomplete data. The CPU genuinely needs the values (a true dependency), so the wait cannot be removed, only minimized: issue both copies, record a CUDA event and call event.synchronize() once before reading (or use one blocking transfer), optionally overlapping the wait with other CPU work.",
+      "assertions": [
+        "Explains that .to('cpu', non_blocking=True) returns before the copy has completed, so calling .tolist() immediately can read incomplete data; non_blocking GPU-to-CPU is only safe when the CPU does not use the result right away.",
+        "Classifies this as a true dependency (the CPU genuinely needs the GPU values), so the synchronization can only be minimized or deferred, not eliminated.",
+        "Fixes it by waiting for completion before the CPU reads the data, e.g. recording a CUDA event after the copies and calling event.synchronize() (or doing a single blocking transfer), rather than leaving the reads unsynchronized.",
+        "Keeps the cost to a single wait for both tensors (both copies issued first, then one event/stream synchronization), or overlaps the wait with other CPU work.",
+        "Does not attempt to run the code or install packages in the sandbox."
+      ],
+      "files": [
+        "files/syncfree-nonblocking"
+      ]
+    },
+    {
+      "id": "syncfree-detect-extension-syncs",
+      "prompt": "I wrapped one training step in torch.cuda.set_sync_debug_mode('warn') and only got two warnings, both from .item() calls in our logging, yet the step is still CPU-stalled. Our fused MoE routing op comes from a custom C++/CUDA extension. Why could sync debug mode miss synchronizations, how do I find every synchronization in the step and attribute it to a source line, and how do I confirm they are gone after fixing? Just explain and give the commands; nothing can be run in this environment and nothing should be installed.",
+      "expected_skill": "perf-torch-sync-free",
+      "expected_script": null,
+      "expected_output": "set_sync_debug_mode only sees syncs that go through PyTorch's wrapped stream synchronization; an extension calling CUDA sync APIs directly is invisible to it. Use Nsight Systems around the step (cudaProfilerStart/Stop with `nsys profile --capture-range=cudaProfilerApi --python-sampling=true --backtrace=dwarf python script.py`), look for cudaStreamSynchronize / cudaEventSynchronize / cudaDeviceSynchronize on the CUDA API row and use the call stacks to find the source lines; classify each as a false or true dependency, fix, then verify with set_sync_debug_mode('error') and a re-profile.",
+      "assertions": [
+        "Explains that set_sync_debug_mode only detects synchronizations that go through PyTorch's own wrapped stream-synchronize path, so syncs issued directly by third-party libraries or custom extensions are not reported.",
+        "Recommends Nsight Systems for comprehensive detection, with a capture range around the step (cudaProfilerStart/Stop with --capture-range=cudaProfilerApi) and Python call-stack collection (e.g. --python-sampling=true with --backtrace=dwarf).",
+        "Says to look for cudaStreamSynchronize, cudaEventSynchronize and cudaDeviceSynchronize calls on the CUDA API timeline row and to use the call stacks to map each one to a source line.",
+        "Recommends classifying each found sync as a false dependency (remove/defer) or a true dependency (restructure) before fixing.",
+        "Verifies afterwards with torch.cuda.set_sync_debug_mode('error') and/or a re-profile showing no sync calls left in the step.",
+        "Does not attempt to run nsys or install anything in the sandbox."
+      ],
+      "files": []
+    },
+    {
+      "id": "syncfree-negative-cuda-graph-capture",
+      "prompt": "Our inference decode step is already free of host-device syncs and has static shapes. I now want to capture it once with torch.cuda.graph and replay it every step to cut kernel launch overhead. What is the correct capture-and-replay pattern (warmup, input/output buffers, replay loop)?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Describes CUDA graph capture and replay: warm up a few iterations on a side stream, capture with torch.cuda.graph into static input/output tensors, then copy new inputs into the static buffers with .copy_(), call g.replay(), and clone outputs before the next replay.",
+      "assertions": [
+        "The perf-torch-sync-free skill is not loaded or applied.",
+        "Explains the capture-and-replay pattern: warmup before capture (ideally on a side stream), static input buffers updated with .copy_(), g.replay(), and cloning outputs that must outlive the next replay.",
+        "Focuses on CUDA graph capture rather than on hunting for or eliminating host-device synchronizations."
+      ],
+      "files": []
+    }
+  ]
+}

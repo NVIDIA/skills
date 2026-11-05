@@ -1,0 +1,9 @@
+Last passing post-merge build: #48172 (same container image <registry>/tensorrt-llm-dev:2026-10-28, same GPU class)
+First failing post-merge build: #48190
+
+Commits between the last pass and the first failure:
+  a91c2e7 [None][refactor] Move MP4 muxing into visual_gen/utils/encode_video.py helper
+  5d03f1b [None][test] Rename LPIPS test ids for cosmos3
+  e7b2c40 [TRTLLM-0000][feat] Add LoRA support to the Flux2 pipeline
+
+No dependency, checkpoint, or container changes in this window.

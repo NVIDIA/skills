@@ -1,0 +1,83 @@
+{
+  "skill_name": "kernel-triton-writing",
+  "evals": [
+    {
+      "id": "triton-fused-swiglu-bf16",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and triton/torch may not be importable. Do not install anything and do not try to compile, verify or benchmark here; I will run it on our H100 node. Write a Triton kernel that computes out = silu(gate) * up for two bf16 tensors of shape [num_tokens, 11008] (LLaMA MLP activation), with a Python wrapper. Put it in /workspace/swiglu/kernel.py so our standard verify/benchmark harness can import it, and tell me how to check it on the GPU node.",
+      "expected_skill": "kernel-triton-writing",
+      "expected_script": null,
+      "expected_output": "kernel.py contains a masked element-wise @triton.jit kernel that upcasts gate (and up) to fp32, computes sigmoid as 1/(1+tl.exp(-g)), multiplies, casts back to bf16 before tl.store, launches with a triton.cdiv grid (lambda over meta if autotuned), and exports kernel_fn, reference_fn (F.silu(gate) * up) and get_inputs(); the user is told to run scripts/verify_kernel.py with bf16 tolerances (~1e-2) on the GPU before benchmarking.",
+      "assertions": [
+        "/workspace/swiglu/kernel.py defines a @triton.jit kernel whose tl.load and tl.store calls are masked (e.g. mask = offsets < n_elements).",
+        "Upcasts to tl.float32 before the transcendental math (tl.exp) and casts the result back to the input dtype (bf16) before tl.store.",
+        "Implements the sigmoid as 1.0 / (1.0 + tl.exp(-x)) on the fp32 value instead of calling tl.sigmoid.",
+        "Uses a power-of-2 BLOCK_SIZE declared as tl.constexpr and a triton.cdiv-based grid; if @triton.autotune is used it is the outermost decorator and the grid is a lambda over meta['BLOCK_SIZE'] returning a tuple.",
+        "Exports the fixed contract names kernel_fn (alias of the wrapper), reference_fn (PyTorch silu(gate) * up with the same signature) and get_inputs() returning CUDA bf16 tensors.",
+        "Does not claim the kernel was compiled, verified or benchmarked in the sandbox (e.g. does not present verify_kernel.py --mock output as a real result) and gives bf16-appropriate tolerances (about rtol=atol=1e-2) for checking it on a GPU."
+      ],
+      "files": []
+    },
+    {
+      "id": "triton-review-buggy-kernels",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and triton/torch may not be importable. Do not install anything and do not try to compile, verify or benchmark here; I will run it on our H100 node. Review the Triton kernels in /workspace/input/triton-buggy-kernels/kernels.py. The docstring lists what users are reporting. Find every bug or anti-pattern, explain each one briefly, and write a corrected version of the whole file to /workspace/out/kernels_fixed.py.",
+      "expected_skill": "kernel-triton-writing",
+      "expected_script": null,
+      "expected_output": "Fixes: BLOCK_SIZE as tl.constexpr with a power-of-2 size and masked loads/stores in bias_gelu; fp32 upcast for tl.exp with a cast back before the store; no .item() for the dropout seed (e.g. x.data_ptr() % 2**31) and a tuple-returning grid lambda; @triton.autotune outermost, an fp32 accumulator and reset_to_zero=['c_ptr'] for the atomic split-K GEMM; and a non-negative modulo in roll because Triton // and % use C truncation semantics.",
+      "assertions": [
+        "In bias_gelu, declares BLOCK_SIZE as tl.constexpr and replaces the block size of 1000 with a power of 2 (tl.arange requires one).",
+        "Adds masks (offsets < n_elements) to the loads and the store in bias_gelu_kernel so tails that are not a multiple of the block are handled.",
+        "Upcasts to tl.float32 before the tl.exp-based tanh-GELU math and casts the result back to the output dtype (fp16) before tl.store.",
+        "Removes the .item() call used for the dropout seed (e.g. derives the seed from x.data_ptr() % (2**31) or takes it as an argument) and makes the grid lambda return a tuple (triton.cdiv(n, meta['BLOCK_SIZE']),).",
+        "For the split-K GEMM: places @triton.autotune above @triton.jit, uses a tl.float32 accumulator, and adds reset_to_zero=['c_ptr'] because the kernel accumulates into C with tl.atomic_add across autotuning trials.",
+        "Fixes roll_kernel's index computation for offs < shift, explaining that Triton's % follows C (truncation) semantics, e.g. src = ((offs - shift) % n + n) % n or an equivalent non-negative index."
+      ],
+      "files": [
+        "files/triton-buggy-kernels"
+      ]
+    },
+    {
+      "id": "triton-operator-routing-decisions",
+      "prompt": "We are deciding where custom Triton kernels are worth it in our fp16 model. For each of these, should we write a Triton kernel or not, and what should we use instead when the answer is no? (1) torch.matmul(a, b) with 4096x4096 fp16 matrices; (2) F.relu(x) on activations; (3) F.gelu(F.linear(x, w, b)) in the MLP block. Just give me the decisions and reasons, no code yet.",
+      "expected_skill": "kernel-triton-writing",
+      "expected_script": null,
+      "expected_output": "(1) Skip: a standalone matmul is already served by cuBLAS. (2) Skip: a single element-wise op has nothing to fuse and PyTorch's kernel is already a single memory-bound pass. (3) Use Triton: a matmul with an element-wise epilogue; fusing bias + GELU into the GEMM epilogue avoids an extra full read and write of the output tensor.",
+      "assertions": [
+        "Recommends against a custom Triton kernel for the standalone fp16 matmul and defers to cuBLAS (torch.matmul).",
+        "Recommends against a custom Triton kernel for the single element-wise ReLU because there is nothing to fuse and PyTorch's kernel is already a single memory-bound pass.",
+        "Recommends Triton for linear + GELU as a matmul with an element-wise epilogue, explaining that fusing bias/GELU into the GEMM epilogue avoids an extra full read and write of the intermediate tensor.",
+        "Does not start writing Triton kernels for the two ops it recommends skipping."
+      ],
+      "files": []
+    },
+    {
+      "id": "triton-linear-bias-gelu-autotuned-gemm",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and triton/torch may not be importable. Do not install anything and do not try to compile, verify or benchmark here; I will run it on our H100 node. Write an autotuned Triton kernel for out = gelu(x @ w.T + b) with exact (erf) GELU, where x is fp16 [M, K], w is fp16 [N, K] in nn.Linear layout, b is fp16 [N], M is up to 16384 and N = K = 4096. Put it in /workspace/linear_gelu/kernel.py so our verify/benchmark harness can import it.",
+      "expected_skill": "kernel-triton-writing",
+      "expected_script": null,
+      "expected_output": "A tiled GEMM with @triton.autotune (outermost, several triton.Config entries, key=['M', 'N', 'K']), a 1-D grid lambda with grouped GROUP_SIZE_M ordering, masked K-loop loads into a tl.float32 accumulator via tl.dot (default precision), an fp32 epilogue that adds the bias and applies erf-GELU before casting to the output dtype for a masked store, and the kernel_fn / reference_fn / get_inputs exports.",
+      "assertions": [
+        "@triton.autotune is the outermost decorator above @triton.jit, with several triton.Config entries and a key that includes M, N and K.",
+        "The launch grid is a lambda over meta returning a tuple (e.g. (triton.cdiv(M, meta['BLOCK_M']) * triton.cdiv(N, meta['BLOCK_N']),)) and program ids use grouped ordering (GROUP_SIZE_M) for L2 locality.",
+        "Accumulates tl.dot results in a tl.float32 accumulator (tl.zeros(..., dtype=tl.float32)) with masked M/N/K loads (other=0.0), and does not pass input_precision=\"ieee\" to tl.dot.",
+        "Applies the bias add and erf-GELU in fp32 in the epilogue after the K loop and casts to the output dtype (e.g. c_ptr.dtype.element_ty) before a masked tl.store.",
+        "Exports kernel_fn, reference_fn (e.g. F.gelu(F.linear(x, w, b))) and get_inputs() returning fresh CUDA fp16 tensors.",
+        "Does not claim verification or benchmark results from the sandbox and does not install Triton."
+      ],
+      "files": []
+    },
+    {
+      "id": "triton-negative-ncu-profiling",
+      "prompt": "My Triton softmax kernel (softmax_kernel, with @triton.autotune) is slower than expected on an H100. Which Nsight Compute command should I run to profile only its steady-state launches (not the autotuning trials) and see whether it is memory-bound? I don't want to change the kernel yet.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "An Nsight Compute recipe: warm up so autotuning finishes, mark the steady-state region (cudaProfilerStart/Stop with --profile-from-start off, or skip launches), filter with --kernel-name regex:softmax_kernel and --launch-count, and collect SpeedOfLight (then MemoryWorkloadAnalysis) to compare memory vs compute throughput. No kernel rewrite.",
+      "assertions": [
+        "The kernel-triton-writing skill is not loaded or applied.",
+        "Provides an Nsight Compute (ncu) command that targets the kernel (e.g. --kernel-name/-k regex:softmax) and excludes the autotuning launches (profiler start/stop markers with --profile-from-start off, or --launch-skip/--launch-count).",
+        "Does not rewrite or generate a new version of the Triton kernel as part of the answer."
+      ],
+      "files": []
+    }
+  ]
+}

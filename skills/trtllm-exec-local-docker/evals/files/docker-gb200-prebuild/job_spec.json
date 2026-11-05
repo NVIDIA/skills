@@ -1,0 +1,18 @@
+{
+  "execution_scenario": "local_docker",
+  "workflow_type": "pytest",
+  "model_name": "deepseek_v3_lite",
+  "work_dir": "/path/to/TensorRT-LLM/work_dirs/deepseek_v3_lite_20261104_103000",
+  "log_file": "/path/to/TensorRT-LLM/work_dirs/deepseek_v3_lite_20261104_103000/deepseek_v3_lite_local.log",
+  "repo_root": "/path/to/TensorRT-LLM",
+  "build_project": true,
+  "docker_cmd": "docker run --rm --net=host --runtime=nvidia --ipc=host --mount type=bind,source=/path/to/TensorRT-LLM,target=/path/to/TensorRT-LLM --mount type=bind,source=/data/llm-models,target=/models --env LLM_MODELS_ROOT=/models --name deepseek_v3_lite_auto_test registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-aarch64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901 bash -c 'cd /path/to/TensorRT-LLM && pytest tests/unittest/_torch/modeling/test_modeling_deepseek.py -v'",
+  "success_patterns": [
+    "passed"
+  ],
+  "failure_patterns": [
+    "FAILED",
+    "ERROR"
+  ],
+  "monitor_timeout_seconds": 3600
+}

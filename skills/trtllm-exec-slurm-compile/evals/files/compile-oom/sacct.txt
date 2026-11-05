@@ -1,0 +1,7 @@
+$ sacct -j 5530002 --format=JobID,State,ExitCode,Elapsed,MaxRSS
+JobID             State ExitCode    Elapsed     MaxRSS
+------------ ---------- -------- ---------- ----------
+5530002          FAILED      1:0   00:41:17
+5530002.batch    FAILED      1:0   00:41:17      9.8G
+5530002.extern COMPLETED     0:0   00:41:17          0
+5530002.0    OUT_OF_ME+    0:125   00:41:12    503.2G

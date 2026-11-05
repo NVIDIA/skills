@@ -1,0 +1,44 @@
+$ nvidia-smi --query-gpu=name --format=csv,noheader
+NVIDIA B200
+NVIDIA B200
+NVIDIA B200
+NVIDIA B200
+NVIDIA B200
+NVIDIA B200
+NVIDIA B200
+NVIDIA B200
+
+$ ./scripts/build_wheel.py --use_ccache -a "100" -f --nvtx
+-- Using ccache: /usr/bin/ccache
+-- CMAKE_CUDA_ARCHITECTURES: 100-real
+-- FAST_BUILD: ON
+-- NVTX: ON
+-- Configuring done (2.9s)
+-- Generating done (1.1s)
+-- Build files have been written to: /path/to/TensorRT-LLM/cpp/build
+[396/412] Building CXX object tensorrt_llm/runtime/CMakeFiles/runtime_src.dir/gptDecoder.cpp.o
+[397/412] Building CXX object tensorrt_llm/runtime/CMakeFiles/runtime_src.dir/bufferManager.cpp.o
+[398/412] Building CXX object tensorrt_llm/batch_manager/CMakeFiles/batch_manager_src.dir/kvCacheManager.cpp.o
+[399/412] Building CXX object tensorrt_llm/batch_manager/CMakeFiles/batch_manager_src.dir/microBatchScheduler.cpp.o
+[400/412] Building CXX object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/fmhaDispatcher.cpp.o
+[401/412] Building CUDA object tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/samplingTopKKernels.cu.o
+[402/412] Building CXX object tensorrt_llm/thop/CMakeFiles/th_common.dir/attentionOp.cpp.o
+[403/412] Building CXX object tensorrt_llm/thop/CMakeFiles/th_common.dir/moeOp.cpp.o
+[404/412] Linking CXX static library tensorrt_llm/kernels/libkernels_src.a
+[405/412] Linking CXX shared library tensorrt_llm/libtensorrt_llm.so
+FAILED: tensorrt_llm/libtensorrt_llm.so
+: && /usr/bin/c++ -fPIC -O3 -DNDEBUG -shared -Wl,-soname,libtensorrt_llm.so -o tensorrt_llm/libtensorrt_llm.so @CMakeFiles/tensorrt_llm.rsp && :
+/usr/bin/ld: tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/fmhaDispatcher.cpp.o: in function `tensorrt_llm::kernels::FmhaDispatcher::run(tensorrt_llm::kernels::MHARunnerParams const&)':
+fmhaDispatcher.cpp:(.text+0x5a1): undefined reference to `tensorrt_llm::kernels::TllmGenFmhaRunner::run(tensorrt_llm::kernels::TllmGenFmhaRunnerParams const&) const'
+/usr/bin/ld: tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/fmhaDispatcher.cpp.o: in function `tensorrt_llm::kernels::FmhaDispatcher::isSupported()':
+fmhaDispatcher.cpp:(.text+0x8c2): undefined reference to `tensorrt_llm::kernels::TllmGenFmhaRunner::isSupported(tensorrt_llm::kernels::TllmGenFmhaRunnerParams const&) const'
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
+Traceback (most recent call last):
+  File "/path/to/TensorRT-LLM/./scripts/build_wheel.py", line 1012, in <module>
+    main(**vars(args))
+  File "/path/to/TensorRT-LLM/./scripts/build_wheel.py", line 611, in main
+    build_run(
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command 'cmake --build . --config Release --parallel 64 --target build_wheel_targets' returned non-zero exit status 1.

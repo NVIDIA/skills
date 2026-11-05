@@ -1,0 +1,17 @@
+# Probe output captured on the Slurm login node for a TensorRT-LLM benchmark
+# that needs required_devices=8.
+
+$ timeout 5 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+bash: nvidia-smi: command not found
+$ echo $?
+127
+
+$ which squeue && squeue --version
+/usr/bin/squeue
+slurm 23.11.4
+
+$ hostname -f
+login-01.cluster.example.com
+
+$ ls -d skills/internal-env-info
+ls: cannot access 'skills/internal-env-info': No such file or directory

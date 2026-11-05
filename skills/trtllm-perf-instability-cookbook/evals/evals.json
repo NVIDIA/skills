@@ -1,0 +1,87 @@
+{
+  "skill_name": "perf-instability-cookbook",
+  "evals": [
+    {
+      "id": "pic-gc-gen0-threshold-unforwarded",
+      "prompt": "Throughput of our model served through TensorRT-LLM's AutoDeploy backend varies by almost 20% between identical runs, and ITL p99 jumps around. The measurements and traces we collected are summarized in /workspace/input/gc-decode-stalls/symptoms.md. What is causing the variance and how should we fix it properly? There is no TensorRT-LLM checkout, GPU or network in this sandbox - do not install anything; tell us what to change and check.",
+      "expected_skill": "perf-instability-cookbook",
+      "expected_script": null,
+      "expected_output": "Matches pattern-gc-pause-on-decode-path / the AutoDeploy gen-0 threshold case: periodic 0.5-1 s decode stalls with the host in gc.collect, and gc.get_threshold() of (700, 10, 10) on AutoDeploy vs (20000, 10, 10) on the PyTorch path show garbage_collection_gen0_threshold is not forwarded to PyExecutor on the AutoDeploy construction path, so the GC tuning is a silent no-op. Fix: forward the field; guard with a test asserting it is forwarded / audit all PyExecutor( sites / log effective thresholds; verify mean and spread. Ends with an INSTABILITY-COOKBOOK trace line.",
+      "assertions": [
+        "Characterizes the variance (rep-to-rep spread plus periodic 0.5-1.0 s decode stalls with no GPU work while the host is in `gc.collect`) as a host-side GC pause on the decode path rather than a host-bound / TP-scaling problem.",
+        "Uses `gc.get_threshold()` = (700, 10, 10) on AutoDeploy versus (20000, 10, 10) on the PyTorch backend to conclude that the gen-0 threshold knob (`garbage_collection_gen0_threshold`, default 20000) is not forwarded on the AutoDeploy executor construction path, so the PyExecutor GC tuning silently becomes a no-op.",
+        "Proposes the precedent fix: forward the configured `garbage_collection_gen0_threshold` into the AutoDeploy `PyExecutor(...)` construction, rather than only raising run counts or tolerances or disabling GC globally.",
+        "Proposes a guard: a test that asserts the threshold is actually forwarded (not merely accepted by a mock), and/or auditing every `PyExecutor(` construction site, or logging the effective GC thresholds at startup.",
+        "Verifies the fix by measuring both the mean and the spread (rep-to-rep tok/s/user and ITL p99), not the mean alone.",
+        "Ends with exactly one trace line of the form `INSTABILITY-COOKBOOK: matched=<family>/autodeploy-gc-gen0-threshold-unforwarded confidence=<high|medium|low> adapted=\"...\"`."
+      ],
+      "files": [
+        "files/gc-decode-stalls"
+      ]
+    },
+    {
+      "id": "pic-ignore-eos-spec-acceptance",
+      "prompt": "One of our TensorRT-LLM spec-decoding perf-sanity cases keeps flaking: throughput swings ~25% between reps on the same commit. Data and the harness command are in /workspace/input/spec-acceptance-variance/symptoms.md, along with a teammate's proposed fix. What is the source of the variance, and is the proposed fix acceptable? No checkout, GPU or network here; do not install anything.",
+      "expected_skill": "perf-instability-cookbook",
+      "expected_script": null,
+      "expected_output": "Matches pattern-metric-with-hidden-rng / the ignore-eos-with-spec-decoding case: --ignore-eos forces generation far past the natural EOS (~640 of 2,048 tokens), where draft agreement is arbitrary, so acceptance length (and throughput) varies while step time is stable. Fix: emit --ignore-eos only when spec decoding is off and record the flag in the perf DB match keys; reject raising CV tolerance / run_count because it dilutes rather than removes the variance. Ends with an INSTABILITY-COOKBOOK trace line.",
+      "assertions": [
+        "Attributes the acceptance-length spread to `--ignore-eos` forcing generation far past the natural EOS (~640 of 2,048 tokens) while spec decoding is on, which makes draft-target agreement, and therefore acceptance length and throughput, arbitrary (a metric with a hidden randomness source).",
+        "Recommends emitting `--ignore-eos` only when spec decoding is disabled (gating it in the harness on a spec-decoding flag), rather than removing it suite-wide.",
+        "Recommends recording the ignore-eos setting in the perf database match keys so results measured with and without it are never compared.",
+        "Rejects raising the CV tolerance and run_count (or waiving the case) because that dilutes the variance instead of removing its source.",
+        "Ends with exactly one `INSTABILITY-COOKBOOK: matched=...` trace line naming `ignore-eos-with-spec-decoding`."
+      ],
+      "files": [
+        "files/spec-acceptance-variance"
+      ]
+    },
+    {
+      "id": "pic-gen-only-log-flush-sentinel",
+      "prompt": "The gating metric of our disaggregated gen_only perf-sanity cases in TensorRT-LLM moves between reps without any code change. Details, the current parser logic and a teammate's proposal are in /workspace/input/gen-only-truncated-parse/symptoms.md. What is going on, and what is the right fix? No checkout, cluster, GPU or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-instability-cookbook",
+      "expected_script": null,
+      "expected_output": "Matches pattern-cross-node-log-flush-race / the gen-only log-flush sentinel case (round 2 of the prev_device_step_time race): low values coincide with truncated parses (1,140 and 870 of 2,000 iterations), so the mean is over a partial prefix. The settle-poll is unsound because the srun aggregate fd over NFS can pause mid-flush; replace it with a writer-side end-of-write sentinel (touch gen_server_{i}.done after the srun is reaped) that the parser waits for, check row counts, clear stale sentinels; do not just raise settle_timeout. Ends with an INSTABILITY-COOKBOOK trace line.",
+      "assertions": [
+        "Identifies that the low values coincide with truncated parses (1,140 and 870 of 2,000 iterations), i.e. the metric is averaged over a partial log prefix - a measurement race, not a product slowdown.",
+        "Explains why the settle-poll fails: all TP ranks write through one srun-owned aggregate file descriptor to a log on NFS that is read from another node, so a pause in arriving lines is not evidence of end-of-write and the poll can latch onto a mid-flush prefix, turning a loud failure into a silent bias.",
+        "Recommends a writer-side end-of-write signal, e.g. touching `gen_server_{i}.done` after the gen srun is reaped, which the parser waits for (bounded by the test timeout), instead of increasing settle_timeout / poll_interval.",
+        "Recommends checking completeness by row count (parsed iterations versus the expected 2,000) rather than by the metric value, and removing stale sentinels from reused output directories.",
+        "Ends with exactly one `INSTABILITY-COOKBOOK: matched=...` trace line naming `gen-only-log-flush-sentinel`."
+      ],
+      "files": [
+        "files/gen-only-truncated-parse"
+      ]
+    },
+    {
+      "id": "pic-once-per-process-compile-routing",
+      "prompt": "Our DeepSeek-V3 TensorRT-LLM deployment has a spiky P99 TTFT that the team calls 'unstable'. The data is in /workspace/input/first-request-compile/symptoms.md. Which instability pattern is this, and how do we stabilize it? There is no checkout, GPU or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-instability-cookbook",
+      "expected_script": null,
+      "expected_output": "Pushes back on the framing: the maybe_compiled_cat torch.compile is paid exactly once per server process at the same iteration in every rep and the rep-to-rep spread is <2%, so it is a deterministic first-use compile (a warmup-coverage gap that moves the tail/mean), which the cookbook routes to regression triage - the MLA chunked-prefill maybe_compiled_cat precedent was moved to perf-regression-cookbook. Recommends warming the chunked-prefill branch before serving instead of diluting the metric, and emits an INSTABILITY-COOKBOOK no-match trace line.",
+      "assertions": [
+        "Determines that the 3.7 s compile is paid exactly once per server process, at the same point in every rep, with under 2% rep-to-rep spread - a deterministic first-use cost that shifts the tail/mean, not run-to-run variance.",
+        "Concludes that this belongs to regression triage (the MLA chunked-prefill `maybe_compiled_cat` warmup-gap precedent lives in perf-regression-cookbook) rather than matching it to an instability pattern such as JIT-on-hot-path.",
+        "Recommends making warmup exercise the chunked-prefill branch so the compile happens before serving, rather than diluting the metric (more reps, wider tolerance, or dropping the first requests).",
+        "Ends with exactly one `INSTABILITY-COOKBOOK:` trace line, and it is a `no-match` line rather than a claimed match to an instability case."
+      ],
+      "files": [
+        "files/first-request-compile"
+      ]
+    },
+    {
+      "id": "pic-negative",
+      "prompt": "After upgrading TensorRT-LLM from 1.2.0 to 1.3.0rc2, Llama-3.1-8B throughput on H100 dropped about 11% on every run: five reps per build gave 4,410 / 4,402 / 4,415 / 4,399 / 4,408 tok/s on 1.3.0rc2 versus 4,960 / 4,955 / 4,971 / 4,949 / 4,962 tok/s on 1.2.0, with under 0.3% spread in both builds. How do we find what caused the drop?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Treats it as a consistent known-good to bad regression (level shift with negligible spread) and proposes regression triage: compare profiles of the two builds and bisect the commit range. No instability-cookbook consultation or trace line.",
+      "assertions": [
+        "The perf-instability-cookbook skill is not loaded or applied.",
+        "Does not emit an `INSTABILITY-COOKBOOK:` trace line and does not treat the drop as run-to-run variance (the spread is under 0.3%; it is a consistent level shift).",
+        "Recommends regression triage, e.g. comparing profiles of the two builds (host vs device time per step, kernel differences) and/or bisecting the commit range between 1.2.0 and 1.3.0rc2."
+      ],
+      "files": []
+    }
+  ]
+}

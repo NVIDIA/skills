@@ -1,0 +1,7 @@
+# Synthetic, trimmed excerpt of the root pyproject.toml.
+[tool.codespell]
+skip = "./3rdparty,./tensorrt_llm/_torch/attention_backend/flashinfer.py,*.lock"
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["tensorrt_llm/_torch/attention_backend/flashinfer.py"]

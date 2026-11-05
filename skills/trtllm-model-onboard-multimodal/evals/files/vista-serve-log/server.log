@@ -1,0 +1,19 @@
+[11/02/2026-14:03:11] [TRT-LLM] [I] Loading model acme/Vista-VL-7B with the PyTorch backend
+[11/02/2026-14:05:40] [TRT-LLM] [I] max_num_tokens=1024, enable_chunked_prefill=True, kv_cache_config.enable_block_reuse=True
+[11/02/2026-14:05:52] [TRT-LLM] [I] Application startup complete.
+[11/02/2026-14:06:30] [TRT-LLM] [W] Multimodal hashing failed: cannot hash item 0 of modality 'image'; the request will run without multimodal hashes.
+[11/02/2026-14:06:30] [TRT-LLM] [D] mm encoder forward: 1 request(s), 1 item(s), 4800 patches
+[11/02/2026-14:06:30] [TRT-LLM] [W] Multimodal runtime data missing or incomplete, will not cache embeddings.
+[11/02/2026-14:06:31] [TRT-LLM] [D] mm encoder forward: 1 request(s), 1 item(s), 4800 patches
+[11/02/2026-14:06:31] [TRT-LLM] [W] Multimodal runtime data missing or incomplete, will not cache embeddings.
+[11/02/2026-14:06:31] [TRT-LLM] [D] mm encoder forward: 1 request(s), 1 item(s), 4800 patches
+[11/02/2026-14:06:31] [TRT-LLM] [W] Multimodal runtime data missing or incomplete, will not cache embeddings.
+INFO:     127.0.0.1:51234 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+[11/02/2026-14:06:44] [TRT-LLM] [W] Multimodal hashing failed: cannot hash item 0 of modality 'image'; the request will run without multimodal hashes.
+[11/02/2026-14:06:44] [TRT-LLM] [D] mm encoder forward: 1 request(s), 1 item(s), 4800 patches
+[11/02/2026-14:06:44] [TRT-LLM] [W] Multimodal runtime data missing or incomplete, will not cache embeddings.
+[11/02/2026-14:06:45] [TRT-LLM] [D] mm encoder forward: 1 request(s), 1 item(s), 4800 patches
+[11/02/2026-14:06:45] [TRT-LLM] [W] Multimodal runtime data missing or incomplete, will not cache embeddings.
+[11/02/2026-14:06:45] [TRT-LLM] [D] mm encoder forward: 1 request(s), 1 item(s), 4800 patches
+[11/02/2026-14:06:45] [TRT-LLM] [W] Multimodal runtime data missing or incomplete, will not cache embeddings.
+INFO:     127.0.0.1:51240 - "POST /v1/chat/completions HTTP/1.1" 200 OK

@@ -1,0 +1,30 @@
+# Probe output captured on the target machine for a TensorRT-LLM run
+# that needs required_devices=4.
+
+$ timeout 5 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+NVIDIA B200, 183359 MiB
+NVIDIA B200, 183359 MiB
+NVIDIA B200, 183359 MiB
+NVIDIA B200, 183359 MiB
+$ echo $?
+0
+
+$ command -v docker
+/usr/bin/docker
+$ timeout 3 docker info
+Client:
+ Version:    27.3.1
+ Context:    default
+ Debug Mode: false
+
+Server:
+permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.47/info": dial unix /var/run/docker.sock: connect: permission denied
+$ echo $?
+1
+
+$ id -nG
+jdoe users
+
+$ which squeue && squeue --version
+/usr/bin/squeue
+slurm 23.11.4

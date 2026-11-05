@@ -1,0 +1,2 @@
+$ sbatch --nodes=1 --ntasks=1 --ntasks-per-node=1 --gres=gpu:4 --partition=batch --account=team_llm --job-name=trtllm-compile.jdoe --time=02:00:00 /shared/users/jdoe/workspace/tensorrt_llm_scripts/compile.slurm /shared/users/jdoe/images/trtllm-dev.sqsh /shared/users /shared/users/jdoe/workspace/tensorrt_llm_scripts /shared/users/jdoe/TensorRT-LLM -a "100"
+Submitted batch job 5530002

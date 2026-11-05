@@ -1,0 +1,87 @@
+{
+  "skill_name": "exec-local-docker",
+  "evals": [
+    {
+      "id": "localdocker-launch-without-daemon",
+      "prompt": "Run the local Docker job described in /workspace/input/docker-pytest-job/job_spec.json (build_project is false, so skip the build), monitor it, and report the result the way our orchestrator expects. Create the work directory if it doesn't exist. Note: this sandbox has Python but no GPU and no Docker daemon, so the launch may fail; treat that as the job outcome. Do not install Docker or any other package, and do not contact remote hosts.",
+      "expected_skill": "exec-local-docker",
+      "expected_script": null,
+      "expected_output": "Launches the job spec's docker_cmd in the background with output tee'd to its log_file, sees it fail almost immediately because Docker is unavailable, reads the log, and returns the structured report (Status ERROR or FAILED, exit code, log file, work directory, summary, errors) without installing anything.",
+      "assertions": [
+        "Executes the docker_cmd from the job spec with combined output piped through `tee` to the job spec's log_file (e.g., `<docker_cmd> 2>&1 | tee <log_file>`).",
+        "Returns a structured report with Status, Exit code, Log file, Work directory, Summary and Errors fields.",
+        "Reports a non-PASSED status (ERROR or FAILED) and quotes the launch error captured in the log (e.g., docker not found or cannot connect to the Docker daemon).",
+        "Attributes the failure to Docker/image availability rather than to the pytest test itself.",
+        "Does not install Docker, start a Docker daemon, or install other packages."
+      ],
+      "files": [
+        "files/docker-pytest-job"
+      ]
+    },
+    {
+      "id": "localdocker-hang-detected-report",
+      "prompt": "Our local Docker eval run of a TRT-LLM model just ended. The job spec is /workspace/input/docker-hang/job_spec.json and a copy of its log file is /workspace/input/docker-hang/run.log. The background docker command exited with code 137 right after the hang-monitor loop printed the line in /workspace/input/docker-hang/monitor.out. Produce the final executor report for the orchestrator. There's no Docker or GPU in this sandbox, so don't try to rerun anything.",
+      "expected_skill": "exec-local-docker",
+      "expected_script": null,
+      "expected_output": "Status HANG_DETECTED (not FAILED or OOM) with exit code 137, the log file and work directory from the job spec, a summary noting the eval never printed an accuracy line, and the 'hang detected' message plus the final log lines as error context, read with tail/head rather than dumping the whole log.",
+      "assertions": [
+        "Reports `Status: HANG_DETECTED` rather than FAILED, ERROR, or an out-of-memory diagnosis.",
+        "Cites the 'Hang detected' line from the log as the reason the container was killed (exit code 137).",
+        "Includes the log file path and work directory from the job spec in the report.",
+        "Notes that no `accuracy:`/`score:` result line was produced.",
+        "Reads the log with tail/head or offset-limited reads (e.g., the last 100 lines) instead of dumping the entire file at once."
+      ],
+      "files": [
+        "files/docker-hang"
+      ]
+    },
+    {
+      "id": "localdocker-build-failed-no-launch",
+      "prompt": "The orchestrator asked you to run the local Docker job in /workspace/input/docker-build-failure/job_spec.json, which has build_project set to true. The build step already ran on the GPU node and its output is in /workspace/input/docker-build-failure/compile.log. Based on that, what happens next and what do you report back? This sandbox has no Docker or GPU, so don't execute the docker command.",
+      "expected_skill": "exec-local-docker",
+      "expected_script": null,
+      "expected_output": "The compile step failed, so the workload is not launched; report `BUILD_FAILED` with the last 100 lines of the compile log, which show the nvcc error in the MoE kernel source.",
+      "assertions": [
+        "Reports the outcome as `BUILD_FAILED`.",
+        "Does not launch the job's docker_cmd (and does not recommend launching it) after the failed build.",
+        "Includes the tail of the compile log (the last 100 lines, or at least the error lines from it) in the report.",
+        "Identifies the concrete compile error from the log (moe_kernels.cu: identifier `kMaxTopKPerToken` is undefined)."
+      ],
+      "files": [
+        "files/docker-build-failure"
+      ]
+    },
+    {
+      "id": "localdocker-gb200-prebuild-resolution",
+      "prompt": "Before running the local Docker job in /workspace/input/docker-gb200-prebuild/job_spec.json (build_project is true; the spec has no container_image or gpu_type field), work out the build inputs. The host probe output is in host_probe.txt and a copy of the repo's jenkins/current_image_tags.properties is in the same folder. Tell me which container image and build architecture you'd use, and the sequence of steps through to launching the workload. This sandbox has no Docker, GPU, or TRT-LLM repo, so don't run anything.",
+      "expected_skill": "exec-local-docker",
+      "expected_script": null,
+      "expected_output": "The host is aarch64 with GB200 GPUs, so use the aarch64 (SBSA) image tag from current_image_tags.properties and build arch 100; compile through the local compile step (repo dir, image, arch) first, report BUILD_FAILED without launching if it fails, otherwise launch docker_cmd in the background tee'd to the log file with the hang monitor.",
+      "assertions": [
+        "Maps the GB200 GPUs to build architecture 100 (`-a \"100\"`).",
+        "Selects the image tag whose CPU-arch flavor is aarch64 (the `LLM_SBSA_DOCKER_IMAGE` entry) because `uname -m` reports aarch64.",
+        "Runs the build through the local compile step (exec-local-compile with repo dir, image and arch) before launching the workload.",
+        "States that a failed build is reported as BUILD_FAILED and the workload is not launched.",
+        "Launches the workload with the job spec's docker_cmd in the background, tee'd to the log file, with a 'hang detected' monitor."
+      ],
+      "files": [
+        "files/docker-gb200-prebuild"
+      ]
+    },
+    {
+      "id": "localdocker-negative",
+      "prompt": "Write a Dockerfile that starts from our TensorRT-LLM release image (registry.example.com/trtllm/tensorrt-llm:release) and adds the Python packages listed in requirements-extra.txt, plus the docker build and push commands to publish it as registry.example.com/team/trtllm-extra:latest. Don't build or run anything.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A Dockerfile (FROM the TRT-LLM release image, COPY requirements-extra.txt, pip install -r it) and docker build/push commands with the requested tag, without loading the Docker execution/monitoring skill or running containers.",
+      "assertions": [
+        "The exec-local-docker skill is not loaded or applied.",
+        "Provides a Dockerfile with `FROM registry.example.com/trtllm/tensorrt-llm:release` that copies and pip-installs requirements-extra.txt.",
+        "Gives `docker build -t registry.example.com/team/trtllm-extra:latest ...` and `docker push registry.example.com/team/trtllm-extra:latest` commands.",
+        "Does not run docker commands in the sandbox."
+      ],
+      "files": []
+    }
+  ]
+}

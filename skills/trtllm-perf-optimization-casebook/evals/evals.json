@@ -1,0 +1,87 @@
+{
+  "skill_name": "perf-optimization-casebook",
+  "evals": [
+    {
+      "id": "poc-relaxed-mtp-vs-attention-dp",
+      "prompt": "We serve DeepSeek-R1-0528 on 8x B200 with TensorRT-LLM and MTP speculative decoding, but acceptance is low on our reasoning-heavy traffic. The current config and metrics are in /workspace/input/r1-mtp-low-acceptance/. Which optimization does prior art suggest, can we simply enable it in this config, and what has to be in place before we adopt it? There is no GPU, TensorRT-LLM checkout or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-optimization-casebook",
+      "expected_script": null,
+      "expected_output": "Matches the relaxed MTP acceptance precedent (use_relaxed_acceptance_for_thinking + relaxed_topk / relaxed_delta, thinking phase only) but flags that it cannot be combined with attention DP, which this config enables, so it cannot just be flipped on. It is lossy: needs an accuracy record (strict vs relaxed on the existing GSM8K/GPQA baseline) and a rollback criterion (use_relaxed_acceptance_for_thinking=False). One change at a time, measure acceptance length and tokens/s, no claimed speedup. Ends with a CASEBOOK trace line.",
+      "assertions": [
+        "Matches the relaxed MTP acceptance precedent: `use_relaxed_acceptance_for_thinking` with `relaxed_topk` / `relaxed_delta` in the MTP speculative_config, applied only inside the thinking phase.",
+        "Flags that relaxed acceptance cannot be enabled together with attention DP, so it cannot simply be switched on in this config (`enable_attention_dp: true`); adopting it means giving up attention DP (and re-measuring) or not using it.",
+        "Classifies it as lossy (it accepts non-top-1 draft tokens) and requires an accuracy record comparing strict and relaxed acceptance (e.g. against the existing GSM8K/GPQA baseline) plus a rollback criterion (`use_relaxed_acceptance_for_thinking=False`) before promoting it.",
+        "Does not state an achieved or numeric speedup; acceptance length and tokens/s are to be measured.",
+        "Recommends one change at a time (e.g. measure the attention-DP change and the relaxed-acceptance change separately).",
+        "Ends with exactly one trace line of the form `CASEBOOK: matched=runtime-execution/relaxed-mtp-acceptance confidence=<high|medium|low> adapted=\"...\"`."
+      ],
+      "files": [
+        "files/r1-mtp-low-acceptance"
+      ]
+    },
+    {
+      "id": "poc-pdl-on-a100",
+      "prompt": "Llama-3.1-70B BF16 on 4x A100-80GB SXM (TP=4) with TensorRT-LLM's PyTorch backend: decode at concurrency 4 is launch-bound - nsys shows ~2,900 kernels per 31 ms step, most under 10 us, with exposed launch gaps between back-to-back dependent kernels (RMSNorm -> GEMM, AllReduce -> add -> RMSNorm) adding up to ~22% of the step. CUDA graphs are currently disabled in our YAML (`cuda_graph_config: null`). A teammate wants to set TRTLLM_ENABLE_PDL=1 to hide that latency. Should we? What does prior art suggest instead? There is no GPU, checkout or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-optimization-casebook",
+      "expected_script": null,
+      "expected_output": "PDL is SM90+-only, so it does nothing on A100 (SM80); even on Hopper/Blackwell it is treated as lossy per kernel (NaN/accuracy regressions) and needs an accuracy check vs TRTLLM_ENABLE_PDL=0. Instead apply SM80-eligible launch-bound precedents: enable CUDA graphs for decode (with padding to captured buckets) and/or fuse the AllReduce + residual + RMSNorm epilogue, one change at a time with measurement and no promised number. Ends with a CASEBOOK trace line.",
+      "assertions": [
+        "States that PDL does not apply on A100 because it is gated to SM90+ (Hopper/Blackwell), so setting TRTLLM_ENABLE_PDL on SM80 has no effect.",
+        "Notes that even on SM90+ PDL is treated as lossy/risky per kernel (it has caused NaN/accuracy regressions), requiring an accuracy check against TRTLLM_ENABLE_PDL=0 and per-kernel rollback.",
+        "Recommends an SM80-eligible launch-bound precedent instead, e.g. enabling CUDA graphs for decode (currently disabled) with padding to captured batch sizes, and/or fusing the AllReduce + residual-add + RMSNorm epilogue.",
+        "Recommends applying one change at a time and measuring it (step time, inter-kernel gaps), without quoting a speedup number.",
+        "Ends with exactly one `CASEBOOK:` trace line in the mandated format (`matched=<family>/<case-slug> confidence=<high|medium|low> adapted=\"...\"` or `no-match query=\"...\"`)."
+      ],
+      "files": []
+    },
+    {
+      "id": "poc-gpu-bound-moe-backend",
+      "prompt": "Our DeepSeek-R1 NVFP4 decode on 8x B200 with TensorRT-LLM needs more throughput. Measurements and the team's current ideas are in /workspace/input/gpu-bound-moe/measurements.md. Which of the team's ideas are worth pursuing, and what does prior art suggest we try instead? There is no GPU, checkout or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-optimization-casebook",
+      "expected_script": null,
+      "expected_output": "The host-overhead ideas (overlap scheduler tuning, moving bookkeeping to C++, prefill piecewise graphs) will not move a GPU-bound loop (GPU idle 3.8%, verdict NO). The 57% CUTLASS MoE grouped-GEMM share on sm_100 with NVFP4 matches the trtllm-gen FP4 MoE backend precedent (moe_backend TRTLLM). Gate it on an accuracy comparison vs CUTLASS with rollback to CUTLASS, verify grouped-GEMM time and throughput by measurement, claim no number. Ends with a CASEBOOK trace line.",
+      "assertions": [
+        "Rejects the host-overhead levers (overlap-scheduler tuning, moving bookkeeping into a C++ op, piecewise CUDA graphs as a host-overhead fix) for this workload because it is GPU-bound (GPU idle 3.8%, host-overhead verdict NO); such levers only help when the executor loop is host-bound.",
+        "Matches the compute-bound MoE grouped-GEMM signal (57% of the step on the CUTLASS backend) to the trtllm-gen FP4 MoE backend precedent: switch the MoE backend from CUTLASS to TRTLLM on sm_100 with NVFP4 weights.",
+        "Requires an accuracy comparison against the CUTLASS baseline (e.g. MMLU or task accuracy) before adopting it, with rollback to the CUTLASS backend if accuracy regresses or a needed cubin variant is missing.",
+        "Requires verification by measurement (grouped-GEMM kernel time in nsys, end-to-end throughput) and does not claim a numeric gain.",
+        "Ends with exactly one trace line of the form `CASEBOOK: matched=kernel-and-fusion/trtllm-gen-fp4-moe-backend confidence=<high|medium|low> adapted=\"...\"`."
+      ],
+      "files": [
+        "files/gpu-bound-moe"
+      ]
+    },
+    {
+      "id": "poc-fuse-ar-epilogue",
+      "prompt": "Our Llama-3.1-70B FP8 TP=4 decode on H100 (TensorRT-LLM) spends about a quarter of each step in a chain of small kernels after every AllReduce; the per-layer kernel sequence is in /workspace/input/tp4-ar-epilogue/kernel_sequence.md. What does prior art say we should do, how do we turn it on, and what are the risks? There is no GPU, checkout or network in this sandbox; do not install anything.",
+      "expected_skill": "perf-optimization-casebook",
+      "expected_script": null,
+      "expected_output": "Matches the fuse-the-TP-AR-epilogue precedent: fold residual-add + RMSNorm + FP8 quant into the AllReduce kernel via the torch.compile AllReduce-fusion rewrite (register_ar_fusions / AllReduceFusionOp, e.g. RESIDUAL_RMS_NORM_QUANT_FP8), which requires turning torch.compile on. Eligible: TP>1, BF16 activations, AllReduce strategy not UserBuffers. Risk is mixed (AR+residual+norm lossless, FP8 quant epilogue lossy) -> parity/accuracy check, rollback by disabling torch.compile or restricting to RESIDUAL_RMS_NORM; verify kernel counts in nsys; no claimed number. Ends with a CASEBOOK trace line.",
+      "assertions": [
+        "Matches the fuse-the-TP-collective-epilogue precedent: fold residual-add + RMSNorm + FP8 quantization into the AllReduce kernel's epilogue.",
+        "States that it is applied by enabling torch.compile so the AllReduce-fusion pattern rewrite registers (e.g. `register_ar_fusions` / an `AllReduceFusionOp` such as `RESIDUAL_RMS_NORM_QUANT_FP8`), since torch.compile is currently off.",
+        "Checks eligibility: TP > 1, BF16/FP16 activations, and an AllReduce strategy other than UserBuffers (the UB-backed variant is a separate precedent).",
+        "Classifies the risk as mixed: the AllReduce + residual + RMSNorm part is lossless, the FP8 quant epilogue is lossy, so it needs an accuracy/parity check against the unfused path, with rollback by disabling torch.compile or restricting the fusion to RESIDUAL_RMS_NORM.",
+        "Verifies via the per-layer kernel count/time in nsys and does not quote a numeric gain.",
+        "Ends with exactly one trace line of the form `CASEBOOK: matched=kernel-and-fusion/fuse-ar-epilogue confidence=<high|medium|low> adapted=\"...\"`."
+      ],
+      "files": [
+        "files/tp4-ar-epilogue"
+      ]
+    },
+    {
+      "id": "poc-negative",
+      "prompt": "Our TensorRT-LLM perf CI bar for a DeepSeek-R1 case keeps flaking: same commit, same nodes, and throughput ranges from 7,900 to 9,400 tok/s across reps. We are not trying to make it faster - we need the measurement to be stable. How should we track down the source of the variance?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A variance-triage approach (which axis varies, warmup/JIT/compile in measured iterations, harness/measurement issues, comparing spread before and after a mitigation), without recommending a speed optimization or emitting a casebook trace line.",
+      "assertions": [
+        "The perf-optimization-casebook skill is not loaded or applied.",
+        "Does not emit a `CASEBOOK:` trace line and does not recommend a performance optimization to apply.",
+        "Approaches it as variance triage: characterizes which axis varies (rep-to-rep, iteration, rank), checks for warmup/JIT/compile work landing in measured iterations and for harness/measurement issues, and compares the spread before and after any mitigation."
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "skill_name": "exec-remote-slurm",
+  "evals": [
+    {
+      "id": "remoteslurm-mfa-controlmaster",
+      "prompt": "I need to run the remote Slurm job described in /workspace/input/remote-mfa/job_spec.json on our cluster over SSH. The internal-env-info skill isn't installed, so use the fields in the job spec. First step is getting a working SSH connection: what do you do? This sandbox has no network route to the cluster, so don't open any SSH connection; give me the exact instructions and commands.",
+      "expected_skill": "exec-remote-slurm",
+      "expected_script": null,
+      "expected_output": "Because the job spec sets mfa_style: true, go straight to the MFA path: if no ControlMaster is live, ask the user to run `ssh -fNM -o ControlMaster=auto -o ControlPath=/tmp/ssh-trtllm-%r@%h:%p -o ControlPersist=24h jdoe@login.example.com` in their own terminal and complete the MFA prompt, then verify with `ssh -o ControlPath=/tmp/ssh-trtllm-%r@%h:%p -O check jdoe@login.example.com` and reuse that ControlPath for all later ssh/scp commands.",
+      "assertions": [
+        "Chooses the MFA path because the job spec has `mfa_style: true`, instead of probing a direct connection and reacting to the error.",
+        "Asks the user to run `ssh -fNM -o ControlMaster=auto -o ControlPath=/tmp/ssh-trtllm-%r@%h:%p -o ControlPersist=24h jdoe@login.example.com` in their own terminal and complete MFA there.",
+        "Verifies the master afterwards with `-O check` against the `/tmp/ssh-trtllm-%r@%h:%p` ControlPath before continuing.",
+        "States that subsequent ssh/scp commands reuse the socket via `-o ControlPath=/tmp/ssh-trtllm-%r@%h:%p`.",
+        "Does not try to complete MFA on the user's behalf (no collecting the password or PIN, no sshpass/expect) and opens no SSH connection from the sandbox."
+      ],
+      "files": [
+        "files/remote-mfa"
+      ]
+    },
+    {
+      "id": "remoteslurm-sync-local-changes",
+      "prompt": "Before submitting the remote job in /workspace/input/remote-sync/job_spec.json, my local edits need to reach the cluster checkout. My local repo state is in /workspace/input/remote-sync/git_status.txt; the remote clone already exists at the job spec's remote_repo_path, and the SSH ControlMaster is already up. Give me the exact command sequence that gets both my modified tracked files and my new untracked files onto the cluster. This sandbox has no repo and no network, so don't run git push or ssh here.",
+      "expected_skill": "exec-remote-slurm",
+      "expected_script": null,
+      "expected_output": "Two-mechanism sync: create temp branch `jdoe_llama3_8b_<YYYYmmddHHMMSS>`, `git add -u`, `git commit --allow-empty`, and push it to origin; on the remote, stash leftovers, `git fetch origin --prune`, `git checkout -B <temp> origin/<temp>`, and `rm -rf cpp/ && git checkout HEAD -- cpp/`; ship the two untracked files with `git ls-files --others --exclude-standard -z | tar ... | ssh ... \"tar -C <remote_repo_path> -xf -\"`; then restore feature/fp8-kv locally and delete the temp branch locally and on origin.",
+      "assertions": [
+        "Creates a temporary branch named `jdoe_llama3_8b_<timestamp>` and commits tracked edits with `git add -u` (not `git add -A` or `git add .`) and `git commit --allow-empty`.",
+        "Pushes the temp branch to origin and, on the remote, runs `git fetch origin --prune` and `git checkout -B <temp> origin/<temp>` rather than checking out `feature/fp8-kv`.",
+        "Re-materializes cpp/ on the remote with `rm -rf cpp/ && git checkout HEAD -- cpp/` after the checkout.",
+        "Transfers the untracked files via `git ls-files --others --exclude-standard` piped through tar over SSH, not rsync, sshfs, or a commit.",
+        "Afterwards checks out feature/fp8-kv locally and deletes the temp branch both locally and on origin.",
+        "Does not run git push or ssh from the sandbox."
+      ],
+      "files": [
+        "files/remote-sync"
+      ]
+    },
+    {
+      "id": "remoteslurm-remote-build-job",
+      "prompt": "Code is synced to the cluster for /workspace/input/remote-build/job_spec.json. Next is the remote TensorRT-LLM build before I submit the actual test job. The internal-env-info skill isn't installed. Give me the exact commands to stage the build scripts, submit the build job, monitor it, and decide whether it succeeded. No network in this sandbox, so don't ssh anywhere.",
+      "expected_skill": "exec-remote-slurm",
+      "expected_script": null,
+      "expected_output": "Copy build.slurm and build.sh over ssh into /shared/users/jdoe/trtllm-build-scripts (with log/), submit `sbatch --nodes=1 --ntasks=1 --ntasks-per-node=1 --partition=batch --account=team_llm --job-name=team_llm-trtllm.build --time=02:00:00 --gpus-per-node=4 .../build.slurm <container_image as given> /shared/users/jdoe /shared/users/jdoe/trtllm-build-scripts /shared/users/jdoe/TensorRT-LLM -a \"103\" --nvtx`, poll squeue and tail build_<jobid>.srun.log, accept only sacct ExitCode 0:0, and on failure report the last 100 log lines and stop before submitting the test job.",
+      "assertions": [
+        "Uses build architecture `-a \"103\"` for the GB300 device_type.",
+        "Submits build.slurm with sbatch using `--job-name=team_llm-trtllm.build`, `--time=02:00:00`, one node/one task, and `--gpus-per-node=4` (gpus_per_node is set).",
+        "Passes build.slurm's positional arguments in order: image, `/shared/users/jdoe`, the remote scripts directory, `/shared/users/jdoe/TensorRT-LLM`, followed by `-a \"103\" --nvtx`.",
+        "Uses the job spec's container_image unchanged (no `#` registry rewrite) because internal-env-info is not installed.",
+        "Treats only sacct ExitCode `0:0` as success, and on failure reports the last 100 lines of the build log and does not submit the test job."
+      ],
+      "files": [
+        "files/remote-build"
+      ]
+    },
+    {
+      "id": "remoteslurm-walltime-negotiation",
+      "prompt": "I started a dev allocation on our remote cluster for a quick nsys profiling session (about 30 minutes of actual work) using the tmux + salloc flow at the partition's max walltime of 08:00:00. It's still pending; what I ran and the scheduler output are in /workspace/input/remote-pending/squeue.txt. What should I do? Give me the exact commands. No network in this sandbox, so don't ssh anywhere.",
+      "expected_skill": "exec-remote-slurm",
+      "expected_script": null,
+      "expected_output": "The estimated start (18:40) is far more than 10 minutes after now (14:05), so shrink the walltime in place to what the session needs (30 minutes rounded up to 01:00:00) with `scontrol update JobId=7712345 TimeLimit=01:00:00`, tell the user it was reduced from 8h to 1h, re-check the start estimate after about 15 seconds, and if it is still more than 10 minutes away suggest alternatives such as the backfill partition or fewer nodes.",
+      "assertions": [
+        "Determines that the estimated start (18:40) is more than 10 minutes after the current time (14:05), which triggers walltime negotiation.",
+        "Reduces the pending job's walltime in place with `scontrol update JobId=7712345 TimeLimit=01:00:00` (30 minutes of work rounded up to the next hour) rather than cancelling and resubmitting.",
+        "Tells the user the walltime was reduced from 8h to 1h, so the allocation will have less time.",
+        "Re-checks the start estimate (e.g., `squeue -j 7712345 -h -o '%i %T %S'`) and, if still more than 10 minutes away, suggests alternatives such as a backfill partition or fewer nodes.",
+        "Does not scancel the pending job and opens no SSH connection from the sandbox."
+      ],
+      "files": [
+        "files/remote-pending"
+      ]
+    },
+    {
+      "id": "remoteslurm-negative",
+      "prompt": "I want to reach my personal dev VM (10.0.5.20, user jdoe) through our bastion host bastion.example.com with a single `ssh devvm` command. Write the ~/.ssh/config entries using ProxyJump and my key ~/.ssh/id_ed25519. Just show the config; don't connect anywhere.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "An ~/.ssh/config with a bastion Host entry and a `Host devvm` entry (HostName 10.0.5.20, User jdoe, ProxyJump to the bastion, IdentityFile ~/.ssh/id_ed25519), without loading the remote Slurm skill.",
+      "assertions": [
+        "The exec-remote-slurm skill is not loaded or applied.",
+        "Provides a `Host devvm` entry with `HostName 10.0.5.20`, `User jdoe`, `ProxyJump` to the bastion, and `IdentityFile ~/.ssh/id_ed25519`.",
+        "Does not add Slurm, salloc/tmux allocation, or cluster-job steps to the answer.",
+        "Does not attempt to connect to any host."
+      ],
+      "files": []
+    }
+  ]
+}

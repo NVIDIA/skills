@@ -1,0 +1,23 @@
+{
+  "video": "cosmos3_nano_t2av_lpips_golden.mp4",
+  "sha256": "5d1f0c9a7e3b2d4f6a8c0e1b3d5f7a9c2e4b6d8f0a1c3e5b7d9f1a2c4e6b8d0f",
+  "lpips_threshold": 0.1,
+  "model": "nvidia/Cosmos3-Nano",
+  "prompt_file": "cosmos3-t2av.json",
+  "width": 1280,
+  "height": 720,
+  "num_frames": 189,
+  "frame_rate": 24.0,
+  "num_inference_steps": 35,
+  "guidance_scale": 6.0,
+  "seed": 42,
+  "feature_flags": {
+    "enable_audio": true
+  },
+  "package_versions": {
+    "diffusers": "0.37.0",
+    "torch": "2.9.0"
+  },
+  "container_image": "<registry>/tensorrt-llm-dev:2026-10-28",
+  "tensorrt_llm_commit": "8b2e4d6f0a1c3e5b7d9f2a4c6e8b0d1f3a5c7e9b"
+}

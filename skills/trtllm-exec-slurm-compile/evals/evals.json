@@ -1,0 +1,84 @@
+{
+  "skill_name": "exec-slurm-compile",
+  "evals": [
+    {
+      "id": "slurmcompile-gb300-submit",
+      "prompt": "Compile TensorRT-LLM on our Slurm cluster (GB300 nodes). I already have the container as a .sqsh at /shared/users/jdoe/images/trtllm-dev.sqsh. Repo: /shared/users/jdoe/TensorRT-LLM; mount root: /shared/users; partition: batch; account: team_llm; username: jdoe. Give me the exact commands to stage the scripts, submit the build, and monitor it to completion. There's no Slurm in this sandbox, so don't run sbatch.",
+      "expected_skill": "exec-slurm-compile",
+      "expected_script": null,
+      "expected_output": "Copy compile.sh and compile.slurm into /shared/users/jdoe/workspace/tensorrt_llm_scripts (with a log/ dir, chmod +x), submit `sbatch --nodes=1 --ntasks=1 --ntasks-per-node=1 --gres=gpu:4 --partition=batch --account=team_llm --job-name=trtllm-compile.jdoe --time=02:00:00 <scripts_dir>/compile.slurm /shared/users/jdoe/images/trtllm-dev.sqsh /shared/users <scripts_dir> /shared/users/jdoe/TensorRT-LLM -a \"103\" ...`, report the job ID, poll `squeue -j <id>` every 30-60 s, `tail -30 <scripts_dir>/log/compile_<id>.srun.log`, and finish with sacct and `tail -50` of the log.",
+      "assertions": [
+        "Stages compile.sh and compile.slurm (plus a log/ directory) under the mounted root, e.g. `/shared/users/jdoe/workspace/tensorrt_llm_scripts`, so they are visible inside the container.",
+        "Submits `<scripts_dir>/compile.slurm` with positional arguments in order: the .sqsh image, `/shared/users`, the scripts directory, `/shared/users/jdoe/TensorRT-LLM`.",
+        "Appends `-a \"103\"` (GB300) as extra build_wheel.py arguments after the repo path.",
+        "Uses the skill's defaults: `--gres=gpu:4`, `--time=02:00:00`, job name `trtllm-compile.jdoe`, and `--nodes=1 --ntasks=1 --ntasks-per-node=1`.",
+        "Monitors by polling `squeue -j <job_id>` and running `tail -30` (not `tail -f`) on `<scripts_dir>/log/compile_<job_id>.srun.log`, then checks sacct for the exit code."
+      ],
+      "files": []
+    },
+    {
+      "id": "slurmcompile-enroot-import-image",
+      "prompt": "I want to compile TensorRT-LLM on our Slurm cluster (x86_64 H100 nodes; our CPU-only partition is called cpu), but I don't have a .sqsh image yet. A copy of the repo's jenkins/current_image_tags.properties is at /workspace/input/image-tags/current_image_tags.properties. How do I get the container image ready for the compile job? Give the exact commands. No Slurm or registry access in this sandbox, so don't run them.",
+      "expected_skill": "exec-slurm-compile",
+      "expected_script": null,
+      "expected_output": "Take the x86_64 image (LLM_DOCKER_IMAGE) from the properties file, rewrite the first '/' after the registry host to '#', and pre-dump it with the bundled enroot-import script on the CPU partition, e.g. `cd <sqsh dir> && <scripts_dir>/enroot-import --partition cpu --debug 'registry.example.com#trtllm/tensorrt-llm:<x86_64 tag>'`; the script prints the import job ID, wait on it with `squeue -j <id>`, and use the resulting .sqsh as container_image for the compile sbatch.",
+      "assertions": [
+        "Takes the x86_64 image tag from current_image_tags.properties.",
+        "Replaces the first `/` after the registry host with `#` (e.g., `registry.example.com#trtllm/tensorrt-llm:<tag>`) and does not prefix the URL with `https://` or `docker://`.",
+        "Pre-dumps the image with the skill's `enroot-import` script on the CPU partition with debug output (e.g., `enroot-import --partition cpu --debug <image>`).",
+        "Runs the import from the directory where the .sqsh should live (or passes `-o <file>.sqsh`), waits for the import job with `squeue -j <job_id>`, and uses the resulting .sqsh path as the compile job's container_image."
+      ],
+      "files": [
+        "files/image-tags"
+      ]
+    },
+    {
+      "id": "slurmcompile-pending-qosgrpnodelimit",
+      "prompt": "I submitted the TensorRT-LLM compile job to Slurm 12 minutes ago and it still isn't running. The submit command and squeue output are in /workspace/input/compile-pending/squeue.txt. Should I change anything? Tell me what you'd do and the exact monitoring commands through completion. No Slurm in this sandbox, so don't run anything.",
+      "expected_skill": "exec-slurm-compile",
+      "expected_script": null,
+      "expected_output": "QOSGrpNodeLimit is not a blocker: leave the job alone and keep polling `squeue -j 5520417` every 30-60 s; once it is running, follow progress with `tail -30 /shared/users/jdoe/workspace/tensorrt_llm_scripts/log/compile_5520417.srun.log` (not tail -f); when it leaves the queue, verify with `sacct -j 5520417 --format=JobID,State,ExitCode,Elapsed` and `tail -50` of the log.",
+      "assertions": [
+        "States that the `QOSGrpNodeLimit` reason is not a blocker and the job just needs to wait to be scheduled.",
+        "Does not cancel or resubmit the job or change its partition/QOS because of this reason.",
+        "Keeps polling `squeue -j 5520417` at a 30-60 second interval.",
+        "Once running, follows progress with `tail -30` (not `tail -f`) on `/shared/users/jdoe/workspace/tensorrt_llm_scripts/log/compile_5520417.srun.log`.",
+        "After the job leaves the queue, verifies the result with `sacct -j 5520417` (State/ExitCode) and the end of the build log."
+      ],
+      "files": [
+        "files/compile-pending"
+      ]
+    },
+    {
+      "id": "slurmcompile-oom-resubmit",
+      "prompt": "My Slurm compile job for TensorRT-LLM failed after 41 minutes. The sacct output, the tail of the build log, and the sbatch command I used are in /workspace/input/compile-oom/. What went wrong, and what exact command should I resubmit with? No Slurm in this sandbox, so don't run anything.",
+      "expected_skill": "exec-slurm-compile",
+      "expected_script": null,
+      "expected_output": "The build was killed for running out of memory (cc1plus/cicc killed by signal 9, slurmstepd oom_kill), so reduce build parallelism: resubmit the same compile.slurm command with `-j <N>` appended to the build_wheel.py arguments after the repo path (keeping `-a \"100\"`), then monitor as before.",
+      "assertions": [
+        "Diagnoses an out-of-memory kill during compilation (cc1plus/cicc killed by signal 9 and the slurmstepd oom_kill event).",
+        "Recommends reducing build parallelism with build_wheel.py's `-j <N>` option.",
+        "Adds `-j <N>` as an extra build argument after the repo path in the compile.slurm submission, keeping `-a \"100\"`.",
+        "Keeps the same compile.slurm positional arguments (image, user_root_dir, scripts_dir, repo_dir) in the resubmission."
+      ],
+      "files": [
+        "files/compile-oom"
+      ]
+    },
+    {
+      "id": "slurmcompile-negative",
+      "prompt": "I'm inside the TensorRT-LLM dev container on a compute node; nvidia-smi shows 8x H100 and the repo is at /code/tensorrt_llm. Give me the commands to build and install TRT-LLM right here on this node. Don't run them: this sandbox has no GPU.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Direct local build commands (scripts/build_wheel.py targeting Hopper, then pip install) on the current node, with no Slurm job submission and without loading the Slurm compile skill.",
+      "assertions": [
+        "The exec-slurm-compile skill is not loaded or applied.",
+        "Builds directly on the current node with `scripts/build_wheel.py` (no sbatch/srun submission or enroot import).",
+        "Targets the Hopper architecture (90) for the H100s.",
+        "Does not run build or Slurm commands in the sandbox."
+      ],
+      "files": []
+    }
+  ]
+}

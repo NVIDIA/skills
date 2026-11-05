@@ -1,0 +1,9 @@
+[11/03/2026-10:02:11] [TRT-LLM] [I] Starting trtllm-serve (VisualGen) for /models/Wan2.2-T2V-A14B-Diffusers on 0.0.0.0:8000
+[11/03/2026-10:02:15] [TRT-LLM] [I] World size: 8
+[11/03/2026-10:02:15] [TRT-LLM] [I] Attention backend: VANILLA
+[11/03/2026-10:04:40] [TRT-LLM] [I] Loaded transformer, transformer_2, text_encoder and vae weights
+[11/03/2026-10:05:02] [TRT-LLM] [I] Running warmup for WanPipeline: 1 shape(s) [480x832x81]
+[11/03/2026-10:06:31] [TRT-LLM] [I] Warmup completed in 89.3s
+[11/03/2026-10:06:31] [TRT-LLM] [I] Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:40122 - "GET /health HTTP/1.1" 200 OK

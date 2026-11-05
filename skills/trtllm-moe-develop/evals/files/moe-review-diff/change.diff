@@ -1,0 +1,95 @@
+# Synthetic, simplified diff prepared for a review exercise. It adds an MXFP8 CUTLASS
+# MoE leaf to TensorRT-LLM. Helper and enum names are abbreviated; hunk line numbers
+# are illustrative.
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/cutlass/mxfp8.py b/tensorrt_llm/_torch/moe/fused_moe/cutlass/mxfp8.py
+new file mode 100644
+--- /dev/null
++++ b/tensorrt_llm/_torch/moe/fused_moe/cutlass/mxfp8.py
+@@ -0,0 +1,30 @@
++import os
++
++from ....utils import get_sm_version
++from ..impl_contract import MoEEligibility, MoERejectReason
++from ..quantization import MXFP8FusedMoEMethod
++from .base import CutlassFusedMoEBase
++
++
++class CutlassMxfp8FusedMoE(CutlassFusedMoEBase):
++    """CUTLASS grouped GEMM with MXFP8 weights and activations."""
++
++    @classmethod
++    def can_implement(cls, p, d):
++        if p.quant_format != "mxfp8":
++            return MoEEligibility.reject(MoERejectReason.QUANT, "not MXFP8")
++        if get_sm_version() < 100:
++            return MoEEligibility.reject(MoERejectReason.HARDWARE, "needs SM100+")
++        if os.environ.get("TRTLLM_DISABLE_MXFP8_MOE", "0") == "1":
++            return MoEEligibility.reject(MoERejectReason.ENVIRONMENT, "disabled by env var")
++        try:
++            import mxfp8_grouped_gemm  # noqa: F401
++        except ImportError:
++            return MoEEligibility.reject(MoERejectReason.ENVIRONMENT, "kernel package missing")
++        return MoEEligibility.ok()
++
++    def _get_quant_method(self):
++        return MXFP8FusedMoEMethod()
++
++    def run_moe(self, x, token_selected_experts, token_final_scales, **kwargs):
++        return self._run_fused_moe_op(x, token_selected_experts, token_final_scales, **kwargs)
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py b/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py
+--- a/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py
++++ b/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py
+@@ -412,6 +412,17 @@ class ConfigurableMoE(MoE):
+     def forward_impl(self, x, router_logits, **kwargs):
++        if isinstance(self.backend, CutlassMxfp8FusedMoE):
++            # MXFP8 needs smaller chunks and collects EPLB statistics per chunk.
++            num_chunks = max(1, x.shape[0] // 4096)
++            outputs = []
++            for x_chunk, logits_chunk in zip(x.chunk(num_chunks), router_logits.chunk(num_chunks)):
++                if self.layer_load_balancer is not None:
++                    self._load_balancer_update_statistic(logits_chunk)
++                outputs.append(self.backend.run_moe(x_chunk, logits_chunk, **kwargs))
++            self.repeat_idx = (self.repeat_idx + 1) % self.repeat_count
++            return torch.cat(outputs)
+         output = self.scheduler.forward(x, router_logits, **kwargs)
+         self.repeat_idx = (self.repeat_idx + 1) % self.repeat_count
+         return output
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/moe_scheduler.py b/tensorrt_llm/_torch/moe/fused_moe/moe_scheduler.py
+--- a/tensorrt_llm/_torch/moe/fused_moe/moe_scheduler.py
++++ b/tensorrt_llm/_torch/moe/fused_moe/moe_scheduler.py
+@@ -188,6 +188,11 @@ class ExternalCommMoEScheduler(MoEScheduler):
+     def forward(self, x, router_logits, **kwargs):
++        if self.moe.comm is None and os.environ.get("TRTLLM_MOE_FORCE_ONE_SIDED") == "1":
++            self.moe.comm = NVLinkOneSided(self.moe.mapping)
++        # keep repeat_idx in sync for multi-pass MXFP8
++        self.moe.repeat_idx += 1
+         chunks = self._split_into_chunks(x, router_logits)
+         ...
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/create_moe.py b/tensorrt_llm/_torch/moe/fused_moe/create_moe.py
+--- a/tensorrt_llm/_torch/moe/fused_moe/create_moe.py
++++ b/tensorrt_llm/_torch/moe/fused_moe/create_moe.py
+@@ -96,7 +96,7 @@ def create_moe_backend(impl_cls, model_config, **kwargs):
+-    if issubclass(impl_cls, CutlassFusedMoEBase):
++    if impl_cls in (CutlassFusedMoE, CutlassMxfp8FusedMoE):
+         return impl_cls(model_config=model_config, **kwargs)
+
+diff --git a/tests/unittest/_torch/moe/test_mxfp8_cutlass.py b/tests/unittest/_torch/moe/test_mxfp8_cutlass.py
+new file mode 100644
+--- /dev/null
++++ b/tests/unittest/_torch/moe/test_mxfp8_cutlass.py
+@@ -0,0 +1,11 @@
++import pytest
++import torch
++
++from tensorrt_llm._torch.utils import get_sm_version
++
++
++@pytest.mark.skipif(get_sm_version() < 100, reason="skip")
++def test_mxfp8_cutlass_smoke():
++    moe = build_moe(backend="CUTLASS", quant="mxfp8", num_experts=8, top_k=2)
++    out = moe(torch.randn(16, 1024, device="cuda"), torch.randn(16, 8, device="cuda"))
++    assert out.shape == (16, 1024)

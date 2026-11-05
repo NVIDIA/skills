@@ -1,0 +1,156 @@
+[11/04/2026-09:15:41] [TRT-LLM] [I] Starting TensorRT-LLM init.
+[11/04/2026-09:15:43] [TRT-LLM] [I] TensorRT-LLM inited.
+[TensorRT-LLM] TensorRT-LLM version: 1.2.0
+[11/04/2026-09:15:44] [TRT-LLM] [I] Using LLM with PyTorch backend
+[11/04/2026-09:15:45] [TRT-LLM] [I] Launching 2 MPI workers (tp_size=2)
+[11/04/2026-09:15:58] [TRT-LLM] [RANK 0] [I] Loading model from /models/Llama-3.1-8B-Instruct
+[11/04/2026-09:15:58] [TRT-LLM] [RANK 1] [I] Loading model from /models/Llama-3.1-8B-Instruct
+Loading safetensors weights in parallel: 100%|##########| 4/4 [00:04<00:00,  1.02s/it]
+[11/04/2026-09:16:09] [TRT-LLM] [RANK 0] [I] Memory used after loading model weights: 7.52 GiB
+[11/04/2026-09:16:09] [TRT-LLM] [RANK 1] [I] Memory used after loading model weights: 7.52 GiB
+[11/04/2026-09:16:21] [TRT-LLM] [RANK 0] [I] Capturing CUDA graphs for batch sizes [1, 2, 4, 8, 16, 32, 64, 128]
+[11/04/2026-09:16:29] [TRT-LLM] [RANK 0] [I] KV cache: allocated 61.3 GiB for 501760 tokens
+[11/04/2026-09:16:31] [TRT-LLM] [I] max_seq_len=8192, max_num_requests=512, max_num_tokens=8192
+[11/04/2026-09:16:32] [TRT-LLM] [I] gsm8k: loaded 1319 samples, num_fewshot=5
+[11/04/2026-09:16:32] [TRT-LLM] [I] Submitting 1319 requests ...
+Processed requests:   0%|          | 6/1319 [00:01<--:--, 6.1it/s]
+Processed requests:   0%|          | 13/1319 [00:02<--:--, 6.1it/s]
+Processed requests:   1%|          | 20/1319 [00:03<--:--, 6.1it/s]
+Processed requests:   1%|          | 26/1319 [00:04<--:--, 6.1it/s]
+Processed requests:   2%|          | 33/1319 [00:05<--:--, 6.1it/s]
+Processed requests:   3%|          | 40/1319 [00:06<--:--, 6.1it/s]
+Processed requests:   3%|          | 47/1319 [00:07<--:--, 6.1it/s]
+Processed requests:   4%|          | 53/1319 [00:08<--:--, 6.1it/s]
+Processed requests:   4%|          | 60/1319 [00:09<--:--, 6.1it/s]
+Processed requests:   5%|          | 67/1319 [00:11<--:--, 6.1it/s]
+Processed requests:   5%|          | 74/1319 [00:12<--:--, 6.1it/s]
+Processed requests:   6%|          | 80/1319 [00:13<--:--, 6.1it/s]
+Processed requests:   6%|          | 87/1319 [00:14<--:--, 6.1it/s]
+Processed requests:   7%|          | 94/1319 [00:15<--:--, 6.1it/s]
+Processed requests:   7%|          | 100/1319 [00:16<--:--, 6.1it/s]
+Processed requests:   8%|          | 107/1319 [00:17<--:--, 6.1it/s]
+Processed requests:   8%|          | 114/1319 [00:18<--:--, 6.1it/s]
+Processed requests:   9%|          | 121/1319 [00:19<--:--, 6.1it/s]
+Processed requests:   9%|          | 127/1319 [00:20<--:--, 6.1it/s]
+Processed requests:  10%|#         | 134/1319 [00:22<--:--, 6.1it/s]
+Processed requests:  10%|#         | 141/1319 [00:23<--:--, 6.1it/s]
+Processed requests:  11%|#         | 148/1319 [00:24<--:--, 6.1it/s]
+Processed requests:  11%|#         | 154/1319 [00:25<--:--, 6.1it/s]
+Processed requests:  12%|#         | 161/1319 [00:26<--:--, 6.1it/s]
+Processed requests:  12%|#         | 168/1319 [00:27<--:--, 6.1it/s]
+Processed requests:  13%|#         | 174/1319 [00:28<--:--, 6.1it/s]
+Processed requests:  13%|#         | 181/1319 [00:29<--:--, 6.1it/s]
+Processed requests:  14%|#         | 188/1319 [00:30<--:--, 6.1it/s]
+Processed requests:  14%|#         | 195/1319 [00:31<--:--, 6.1it/s]
+Processed requests:  15%|#         | 201/1319 [00:33<--:--, 6.1it/s]
+Processed requests:  15%|#         | 208/1319 [00:34<--:--, 6.1it/s]
+Processed requests:  16%|#         | 215/1319 [00:35<--:--, 6.1it/s]
+Processed requests:  16%|#         | 222/1319 [00:36<--:--, 6.1it/s]
+Processed requests:  17%|#         | 228/1319 [00:37<--:--, 6.1it/s]
+Processed requests:  17%|#         | 235/1319 [00:38<--:--, 6.1it/s]
+Processed requests:  18%|#         | 242/1319 [00:39<--:--, 6.1it/s]
+Processed requests:  18%|#         | 249/1319 [00:40<--:--, 6.1it/s]
+Processed requests:  19%|#         | 255/1319 [00:41<--:--, 6.1it/s]
+Processed requests:  19%|#         | 262/1319 [00:42<--:--, 6.1it/s]
+Processed requests:  20%|##        | 269/1319 [00:44<--:--, 6.1it/s]
+Processed requests:  20%|##        | 275/1319 [00:45<--:--, 6.1it/s]
+Processed requests:  21%|##        | 282/1319 [00:46<--:--, 6.1it/s]
+Processed requests:  21%|##        | 289/1319 [00:47<--:--, 6.1it/s]
+Processed requests:  22%|##        | 296/1319 [00:48<--:--, 6.1it/s]
+Processed requests:  22%|##        | 302/1319 [00:49<--:--, 6.1it/s]
+Processed requests:  23%|##        | 309/1319 [00:50<--:--, 6.1it/s]
+Processed requests:  23%|##        | 316/1319 [00:51<--:--, 6.1it/s]
+Processed requests:  24%|##        | 323/1319 [00:52<--:--, 6.1it/s]
+Processed requests:  24%|##        | 329/1319 [00:53<--:--, 6.1it/s]
+Processed requests:  25%|##        | 336/1319 [00:55<--:--, 6.1it/s]
+Processed requests:  26%|##        | 343/1319 [00:56<--:--, 6.1it/s]
+Processed requests:  26%|##        | 349/1319 [00:57<--:--, 6.1it/s]
+Processed requests:  26%|##        | 356/1319 [00:58<--:--, 6.1it/s]
+Processed requests:  27%|##        | 363/1319 [00:59<--:--, 6.1it/s]
+Processed requests:  28%|##        | 370/1319 [01:00<--:--, 6.1it/s]
+Processed requests:  28%|##        | 376/1319 [01:01<--:--, 6.1it/s]
+Processed requests:  29%|##        | 383/1319 [01:02<--:--, 6.1it/s]
+Processed requests:  29%|##        | 390/1319 [01:03<--:--, 6.1it/s]
+Processed requests:  30%|###       | 397/1319 [01:04<--:--, 6.1it/s]
+Processed requests:  30%|###       | 403/1319 [01:06<--:--, 6.1it/s]
+Processed requests:  31%|###       | 410/1319 [01:07<--:--, 6.1it/s]
+Processed requests:  31%|###       | 417/1319 [01:08<--:--, 6.1it/s]
+Processed requests:  32%|###       | 423/1319 [01:09<--:--, 6.1it/s]
+Processed requests:  32%|###       | 430/1319 [01:10<--:--, 6.1it/s]
+Processed requests:  33%|###       | 437/1319 [01:11<--:--, 6.1it/s]
+Processed requests:  33%|###       | 444/1319 [01:12<--:--, 6.1it/s]
+Processed requests:  34%|###       | 450/1319 [01:13<--:--, 6.1it/s]
+Processed requests:  34%|###       | 457/1319 [01:14<--:--, 6.1it/s]
+Processed requests:  35%|###       | 464/1319 [01:15<--:--, 6.1it/s]
+Processed requests:  35%|###       | 471/1319 [01:17<--:--, 6.1it/s]
+Processed requests:  36%|###       | 477/1319 [01:18<--:--, 6.1it/s]
+Processed requests:  36%|###       | 484/1319 [01:19<--:--, 6.1it/s]
+Processed requests:  37%|###       | 491/1319 [01:20<--:--, 6.1it/s]
+Processed requests:  37%|###       | 498/1319 [01:21<--:--, 6.1it/s]
+Processed requests:  38%|###       | 504/1319 [01:22<--:--, 6.1it/s]
+Processed requests:  38%|###       | 511/1319 [01:23<--:--, 6.1it/s]
+Processed requests:  39%|###       | 518/1319 [01:24<--:--, 6.1it/s]
+Processed requests:  39%|###       | 524/1319 [01:25<--:--, 6.1it/s]
+Processed requests:  40%|####      | 531/1319 [01:26<--:--, 6.1it/s]
+Processed requests:  40%|####      | 538/1319 [01:28<--:--, 6.1it/s]
+Processed requests:  41%|####      | 545/1319 [01:29<--:--, 6.1it/s]
+Processed requests:  41%|####      | 551/1319 [01:30<--:--, 6.1it/s]
+Processed requests:  42%|####      | 558/1319 [01:31<--:--, 6.1it/s]
+Processed requests:  42%|####      | 565/1319 [01:32<--:--, 6.1it/s]
+Processed requests:  43%|####      | 572/1319 [01:33<--:--, 6.1it/s]
+Processed requests:  43%|####      | 578/1319 [01:34<--:--, 6.1it/s]
+Processed requests:  44%|####      | 585/1319 [01:35<--:--, 6.1it/s]
+Processed requests:  44%|####      | 592/1319 [01:36<--:--, 6.1it/s]
+Processed requests:  45%|####      | 598/1319 [01:37<--:--, 6.1it/s]
+Processed requests:  45%|####      | 605/1319 [01:39<--:--, 6.1it/s]
+Processed requests:  46%|####      | 612/1319 [01:40<--:--, 6.1it/s]
+Processed requests:  46%|####      | 619/1319 [01:41<--:--, 6.1it/s]
+Processed requests:  47%|####      | 625/1319 [01:42<--:--, 6.1it/s]
+Processed requests:  47%|####      | 632/1319 [01:43<--:--, 6.1it/s]
+Processed requests:  48%|####      | 639/1319 [01:44<--:--, 6.1it/s]
+Processed requests:  48%|####      | 646/1319 [01:45<--:--, 6.1it/s]
+Processed requests:  49%|####      | 652/1319 [01:46<--:--, 6.1it/s]
+Processed requests:  49%|####      | 659/1319 [01:47<--:--, 6.1it/s]
+Processed requests:  50%|#####     | 666/1319 [01:48<--:--, 6.1it/s]
+Processed requests:  51%|#####     | 673/1319 [01:50<--:--, 6.1it/s]
+[11/04/2026-09:18:40] [TRT-LLM] [RANK 1] [W] Executor loop iteration 18234 took 61.2 s (expected < 1 s)
+[11/04/2026-09:19:41] [TRT-LLM] [RANK 1] [W] Executor loop iteration 18234 still running after 122.4 s
+[11/04/2026-09:21:43] [TRT-LLM] [RANK 1] [W] Executor loop iteration 18234 still running after 244.8 s
+[11/04/2026-09:22:44] [TRT-LLM] [RANK 1] [E] Hang detected: no forward progress on rank 1 for 300 s; dumping Python stack traces for all threads.
+[RANK 0] Thread 0x00007f3a1c2b5740 (MainThread) (most recent call first):
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _executor_loop
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _forward_step
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", in forward
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/distributed/ops.py", in allreduce
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/torch/_ops.py", in __call__
+[RANK 0] Thread 0x00007f39e7fff640 (executor_loop) (most recent call first):
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _executor_loop
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _forward_step
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", in forward
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/distributed/ops.py", in allreduce
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/torch/_ops.py", in __call__
+[RANK 0] Thread 0x00007f39e77fe640 (await_responses) (most recent call first):
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _executor_loop
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _forward_step
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", in forward
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/distributed/ops.py", in allreduce
+[RANK 0]   File "/usr/local/lib/python3.12/dist-packages/torch/_ops.py", in __call__
+[RANK 1] Thread 0x00007f3a1c2b5740 (MainThread) (most recent call first):
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _executor_loop
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _forward_step
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", in forward
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/distributed/ops.py", in allreduce
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/torch/_ops.py", in __call__
+[RANK 1] Thread 0x00007f39e7fff640 (executor_loop) (most recent call first):
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _executor_loop
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _forward_step
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", in forward
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/distributed/ops.py", in allreduce
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/torch/_ops.py", in __call__
+[RANK 1] Thread 0x00007f39e77fe640 (await_responses) (most recent call first):
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _executor_loop
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/py_executor.py", in _forward_step
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/pyexecutor/model_engine.py", in forward
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/tensorrt_llm/_torch/distributed/ops.py", in allreduce
+[RANK 1]   File "/usr/local/lib/python3.12/dist-packages/torch/_ops.py", in __call__
+[11/04/2026-09:22:45] [TRT-LLM] [RANK 1] [E] Stack dump complete; waiting for external termination.

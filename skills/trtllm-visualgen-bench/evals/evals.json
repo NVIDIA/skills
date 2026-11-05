@@ -1,0 +1,80 @@
+{
+  "skill_name": "trtllm-visualgen-bench",
+  "evals": [
+    {
+      "id": "vg-bench-bare-model-name",
+      "prompt": "Benchmark nvidia/Cosmos3-Super on TensorRT-LLM VisualGen for me. There are no GPUs, no TensorRT-LLM install, and no network in this environment, so don't launch servers, install packages, or download anything; get as far as you can.",
+      "expected_skill": "trtllm-visualgen-bench",
+      "expected_script": null,
+      "expected_output": "Does not pick a workload: replies that Cosmos3-Super has three bundled workloads (cosmos3-super-t2v, cosmos3-super-i2v, cosmos3-super-t2av), each a different measurement (i2v adds an image reference, t2av turns on audio via extra_params.enable_audio on the same shape), and asks which one to run, without launching anything.",
+      "assertions": [
+        "Does not choose a workload on the user's behalf; asks which workload to benchmark.",
+        "Lists the three bundled Cosmos3-Super workloads: cosmos3-super-t2v, cosmos3-super-i2v, and cosmos3-super-t2av.",
+        "Explains that they are different measurements: i2v conditions on an image reference and t2av enables the audio tower via extra_params.enable_audio, on the same pinned shape as t2v.",
+        "Does not launch trtllm-serve, run the benchmark client, install packages, or download a checkpoint."
+      ],
+      "files": []
+    },
+    {
+      "id": "vg-bench-ti2v-5b-workload",
+      "prompt": "Which request YAML should I use to benchmark Wan2.2-TI2V-5B text-to-video with TensorRT-LLM VisualGen, and which generation params does it pin? I want two runs I compare to do exactly the same work. Information only: there are no GPUs and no network here, so don't launch anything, install packages, or download anything.",
+      "expected_skill": "trtllm-visualgen-bench",
+      "expected_script": null,
+      "expected_output": "Points to the bundled wan22-ti2v-5b-t2v.yaml (backend openai-videos; 1280x704, 121 frames at 24 fps, 50 steps, guidance 5.0, max_sequence_length 512, seed 42) and explains why fields are pinned: the shape sets the work, guidance_scale > 1.0 gates CFG, the tokenizer pads to max_sequence_length, and the default seed is None. Advises keeping comparable benchmarks in the workload file copied into the run directory and comparing at --max-concurrency 1.",
+      "assertions": [
+        "Points to the bundled workload wan22-ti2v-5b-t2v.yaml with backend openai-videos and reproduces its pinned values: width 1280, height 704, num_frames 121, frame_rate 24, num_inference_steps 50, guidance_scale 5.0, max_sequence_length 512, seed 42.",
+        "Explains that guidance_scale is pinned because it gates CFG (guidance_scale > 1.0 means two transformer calls per step), so a drifting default would change the executed work.",
+        "Explains at least one other pinning reason: the pipeline's default seed is None (not reproducible), or the tokenizer pads to max_sequence_length so it fixes the text-encoder work.",
+        "Advises keeping a benchmark meant for comparison in the workload file (copied into the run directory as the record) rather than one-off CLI flags, and running comparisons at --max-concurrency 1."
+      ],
+      "files": []
+    },
+    {
+      "id": "vg-bench-wan-nvfp4-serve-plan",
+      "prompt": "Plan a TensorRT-LLM VisualGen benchmark of Wan2.2-T2V-A14B NVFP4 on one 8-GPU node using the bundled t2v workload. The checkpoint is pre-quantized at /models/Wan2.2-T2V-A14B-Diffusers-NVFP4. I've decided on cfg_size 2, ulysses_size 4, and the TRTLLM attention backend. This environment has no GPUs, no network, and no TensorRT-LLM install, and nothing is serving on port 8000, so don't launch anything, install packages, or download anything: write the server config YAML and the exact launch, readiness-check, benchmark, and shutdown commands you would run.",
+      "expected_skill": "trtllm-visualgen-bench",
+      "expected_script": null,
+      "expected_output": "A --visual_gen_args config with attention_config {backend: TRTLLM}, parallel_config {cfg_size: 2, ulysses_size: 4, async_ulysses: true} (n_workers 8), compilation_config resolutions [[720, 1280]] and num_frames [81] derived from the workload, and no quant_config; then a single setsid trtllm-serve launch, serve_wait.py readiness check, benchmark_visual_gen with --max-concurrency 1 --save-result --save-detailed --num-gpus 8 --output-media-dir --format mp4, and a process-group shutdown that checks GPUs and the port are free.",
+      "assertions": [
+        "Writes compilation_config derived from the workload, resolutions [[720, 1280]] in (height, width) order and num_frames [81], e.g., via scripts/serve_check.py --warmup-from, rather than relying on the pipeline's default warmup.",
+        "Writes parallel_config with cfg_size 2 and ulysses_size 4 (n_workers = 8) plus async_ulysses: true for Wan, and attention_config with backend TRTLLM; omits quant_config because the checkpoint is already NVFP4-quantized.",
+        "Launches a single trtllm-serve <checkpoint> --visual_gen_args <config> process under setsid (no torchrun or srun --ntasks wrapper on one node), logging to a server.log in the run directory.",
+        "Waits for readiness with scripts/serve_wait.py (--log, --config, --port, --pid) rather than polling the port.",
+        "Runs python -m tensorrt_llm.serve.scripts.benchmark_visual_gen with --max-concurrency 1, --save-result --save-detailed, --num-gpus 8, --output-media-dir, and --format mp4 for the openai-videos workload.",
+        "Shuts down by signalling the server's process group (kill -TERM -$SERVER_PID, escalating to -KILL if needed) and checks that the GPUs and the port are free, rather than a plain kill of the PID or pkill."
+      ],
+      "files": []
+    },
+    {
+      "id": "vg-bench-verify-server-log",
+      "prompt": "My TensorRT-LLM VisualGen server for Wan2.2-T2V-A14B is up and /health returns 200. Before I start benchmarking, check whether it actually came up the way I configured it. The --visual_gen_args config and the server log are in /workspace/input/vg-server-check/. There are no GPUs or TensorRT-LLM install in this environment; don't install anything and don't send requests to any server.",
+      "expected_skill": "trtllm-visualgen-bench",
+      "expected_script": null,
+      "expected_output": "Compares the log with the config: world size 8 matches cfg 2 x ulysses 4; FP8 was requested but there is no 'Quantization:' line, so the server runs BF16; the attention backend is VANILLA instead of TRTLLM; and only 480x832x81 was warmed instead of 720x1280x81, so workload-shape requests would compile inside the measured latency. Concludes the server must be relaunched and re-verified before benchmarking.",
+      "assertions": [
+        "Confirms the world size matches: the log reports 8 and parallel_config implies cfg_size 2 x ulysses_size 4 = 8.",
+        "Flags that the config requests FP8 (quant_config.quant_algo) but the log has no 'Quantization:' line, meaning the server loaded BF16.",
+        "Flags that the log's attention backend (VANILLA) differs from the configured TRTLLM backend.",
+        "Flags that the server warmed only 480x832x81 while the config asks for 720x1280x81, so requests at the workload's shape would compile inside the measured latency.",
+        "Concludes the server should not be benchmarked as-is (relaunch with the intended config and re-verify, e.g., with scripts/serve_wait.py) and does not send requests or start a benchmark."
+      ],
+      "files": [
+        "files/vg-server-check"
+      ]
+    },
+    {
+      "id": "vg-bench-negative",
+      "prompt": "I want to benchmark Llama-3.1-8B-Instruct text-generation throughput with TensorRT-LLM on one H100. Which tool and commands should I use? (No GPU here; just tell me.)",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Recommends an LLM benchmarking path (e.g., trtllm-bench with a prepared dataset and the throughput subcommand, or trtllm-serve plus an LLM serving benchmark) without loading the VisualGen benchmark skill or using VisualGen tooling.",
+      "assertions": [
+        "The trtllm-visualgen-bench skill is not loaded or applied.",
+        "Does not use VisualGen tooling such as benchmark_visual_gen, --visual_gen_args, or VisualGen workload YAMLs.",
+        "Recommends an LLM benchmarking path such as trtllm-bench (prepare a dataset, then the throughput subcommand) or trtllm-serve with an LLM serving benchmark client."
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "skill_name": "trtllm-moe-develop",
+  "evals": [
+    {
+      "id": "moe-review-mxfp8-leaf",
+      "prompt": "Please review this TensorRT-LLM MoE change before I open the PR: /workspace/input/moe-review-diff/change.diff (a synthetic, simplified diff that adds an MXFP8 CUTLASS MoE leaf). There's no TensorRT-LLM checkout, GPU, or network here, so review from the diff only and don't clone or install anything.",
+      "expected_skill": "trtllm-moe-develop",
+      "expected_script": null,
+      "expected_output": "A severity-ordered review with file references: the MXFP8 branch in ConfigurableMoE.forward_impl breaks owner boundaries; the scheduler double-advances repeat_idx and creates/assigns moe.comm; can_implement probes SM, env vars and imports instead of reading p/d; create_moe_backend matches with `in (...)` instead of issubclass; the test should move into the unified MoE tests with capability-mapped skips. Followed by Architecture Fit, Guide Alignment and Coverage sections.",
+      "assertions": [
+        "Flags the MXFP8-specific branch in ConfigurableMoE.forward_impl (chunking, EPLB statistics, direct run_moe calls) as an owner-boundary violation: forward-time policy belongs in MoEScheduler and backend-specific wrapper constraints belong in validate_configurable_moe, not in forward branches.",
+        "Flags that the scheduler advances repeat_idx (ConfigurableMoE owns advancing it once per forward_impl, so it is now double-advanced) and creates/assigns moe.comm itself, whereas a scheduler may change moe.comm only through determine_communication_method and strategy creation/forcing belongs in communication_factory.py.",
+        "Flags can_implement as impure because it calls get_sm_version(), reads os.environ, and uses an import as a presence test; gates must read only the problem/deployment descriptors (p, d), with probing done in impl_environment.collect_moe_environment.",
+        "Flags `impl_cls in (CutlassFusedMoE, CutlassMxfp8FusedMoE)` in create_moe_backend: family membership must be matched with issubclass/isinstance so one branch admits every leaf of the family.",
+        "Says the new test belongs in the unified MoE tests (e.g., test_moe_impl.py for selection/identity, test_moe_backend.py or test_moe_module.py for behavior) with skips mapped to a can_implement or environment reason rather than a broad local skipif(reason=\"skip\").",
+        "Presents the review in the skill's format: a Findings list with [High]/[Medium]/[Low] severities and file references, followed by Architecture Fit, Guide Alignment, and Coverage sections."
+      ],
+      "files": [
+        "files/moe-review-diff"
+      ]
+    },
+    {
+      "id": "moe-eplb-per-expert-param",
+      "prompt": "Review this change to the NVFP4 fused-MoE quantization method in TensorRT-LLM: /workspace/input/moe-eplb-diff/change.diff (synthetic, simplified). It adds per-expert activation pre-scales. CI passed, including test_configurable_moe_multi_gpu_eplb on one 8-GPU node. Is it correct under online EPLB? There's no GPU, TensorRT-LLM checkout, or network here; review from the diff and don't install anything.",
+      "expected_skill": "trtllm-moe-develop",
+      "expected_script": null,
+      "expected_output": "Not correct under online EPLB: the new per-expert Parameters have no CPU shared staging buffers in weight_fns, so they go stale after the first migration; the reconcile loop writes staging-space indices into the routed-space Parameter (out of bounds on multi-node, silent overwrite on one node); fc31/fc2 handling is asymmetric. Fix with num_shared-sized shared_* buffers passed as explicit destinations and registered in weight_fns, plus a CPU-only test that calls the reconcile helper with a crafted staging dict, since the single-node EPLB test cannot reach this case.",
+      "assertions": [
+        "Flags that the new per-expert Parameters (fc31_act_prescale / fc2_act_prescale) get no CPU shared staging buffer in the weight_fns dict passed to register_all_parameter_slot_and_to_fix_weight_fns, so they go stale after the first EPLB migration.",
+        "Flags that process_weights_after_loading writes module.fc31_act_prescale.data[expert_idx] with expert_idx taken from enumerate(local_shared_load_expert_ids) (staging space, num_shared) into a Parameter sized expert_size_per_partition (routed space): an out-of-bounds write on multi-node setups and a silent overwrite of routed slots on a single node.",
+        "Recommends allocating separate CPU shared_* buffers sized num_shared, filling them from the temp dict under need_load_shared_weights(module), passing them as explicit destinations to a reconcile helper parameterized on the destination tensor, and adding them to weight_fns.",
+        "Flags the asymmetry within the fc31/fc2 pair: fc2_act_prescale gets no shared copy at all while fc31_act_prescale gets one, so migration would leave half the state stale.",
+        "Explains that the passing single-node EPLB test cannot catch this because shared_size == local_size forces num_shared <= expert_size_per_partition, and recommends a CPU-only test that calls the reconcile helper directly with a crafted staging dict and an oversized index range."
+      ],
+      "files": [
+        "files/moe-eplb-diff"
+      ]
+    },
+    {
+      "id": "moe-design-gate-new-leaf",
+      "prompt": "I'm planning to add a new TensorRT-LLM MoE implementation: an MXFP8 grouped-GEMM leaf that wraps an upstream CuTe DSL kernel (mxfp8_grouped_gemm from an external repo). It should be selected when the layer's quant format is MXFP8 on SM100+, and I don't know yet whether it works with EPLB. There's no TensorRT-LLM checkout, GPU, or network here; don't clone or install anything. Before any code, write the design gate and list the registrations, guide updates, and tests this needs.",
+      "expected_skill": "trtllm-moe-develop",
+      "expected_script": null,
+      "expected_output": "A filled-in MoE Design Gate for a single-format leaf: a pure can_implement reading p/d, identity registration and IMPL_PRIORITY/BACKEND_FAMILY ranking, issubclass dispatch in create_moe_backend, an explicit EPLB status with d.eplb_enabled declined, one quant method, kernel-ABI-derived layouts and scales validated against upstream invocation dumps, MOE_DEVELOPER_GUIDE.md updates, and coverage in the unified MoE tests and helpers.",
+      "assertions": [
+        "Produces a 'MoE Design Gate' that fills in the template fields: change area, owner boundary, main API touched, selection impact, reference pattern, guide sections used, guide update needed, refactor needed, and test plan.",
+        "Selection impact: a pure can_implement(p, d) that declines on quant format and on SM/kernel availability read from the deployment/environment descriptors (not probed inside the gate), a registered implementation identity, ranking in IMPL_PRIORITY within its BACKEND_FAMILY, and admission by create_moe_backend through issubclass.",
+        "EPLB: makes the status explicit (e.g., NOT_VERIFIED or NOT_SUPPORTED via eplb_support_status) and declines d.eplb_enabled in can_implement through capabilities.supports_eplb, rather than relying on _supports_load_balancer().",
+        "Treats the leaf as one quantization format: _get_quant_method returns a single MXFP8 method (reusing an existing method/base if layout and scale semantics match) without branching on quant_config.",
+        "For the imported kernel, derives weight shape/stride/layout and scale/alpha semantics from the kernel entrypoint and its consumption points rather than docs or parameter names, and validates parity against upstream invocation dumps.",
+        "Lists MOE_DEVELOPER_GUIDE.md updates (File Map, Backend Capability Matrix, Canonical Examples) and tests: identity/selection tests in test_moe_impl.py (adding the leaf to _SINGLE_FORMAT_IMPLS if single-format), test_moe_backend.py/test_moe_module.py coverage, and quant params/skip logic in moe_test_utils.py and quantize_utils.py."
+      ],
+      "files": []
+    },
+    {
+      "id": "moe-comm-contract-review",
+      "prompt": "Review this TensorRT-LLM MoE change that adds a ring all-to-all communication strategy and wires up a fused-communication MoE implementation: /workspace/input/moe-comm-diff/change.diff (synthetic, simplified). There's no TensorRT-LLM checkout, GPU, or network here; review from the diff and don't install anything.",
+      "expected_skill": "trtllm-moe-develop",
+      "expected_script": null,
+      "expected_output": "Flags PyExecutor's concrete isinstance checks and private _workspace access (implement CheckpointableCommunication and override checkpoint_blocked_reason()), strategy selection added to ConfigurableMoE instead of communication_factory.py, run_moe raising NotImplementedError while the wrapper calls a private fused helper, and the wrapper isinstance branch instead of declaring FUSED_COMM via scheduler_kind; recommends test_moe_comm.py and module/multi-GPU tests.",
+      "assertions": [
+        "Flags that PyExecutor discovers the strategy through concrete isinstance(..., NvlinkRingComm) checks and touches the private _workspace; the strategy should implement the CheckpointableCommunication protocol for sleep/wakeup and override checkpoint_blocked_reason() to reject sleep_config when needed.",
+        "Flags the env-var strategy selection added to ConfigurableMoE._create_comm_strategy_auto: strategy selection and forced-method behavior belong in communication_factory.py.",
+        "Flags that MegaMoEImpl.run_moe raises NotImplementedError while the wrapper calls the private _fused_dispatch_gemm_combine directly: run_moe must be the single compute entrypoint the scheduler reaches, with backend-specific helpers called from inside it.",
+        "Flags the isinstance(self.backend, MegaMoEImpl) branch in forward_impl: cross-rank exchange ownership should be declared through scheduler_kind (FUSED_COMM, handled by FusedCommMoEScheduler) rather than wrapper isinstance checks.",
+        "Recommends communication tests (pytest tests/unittest/_torch/moe/test_moe_comm.py -k <strategy>) plus module-level or multi-GPU tests (test_moe_module.py, multi_gpu/test_nvlink_one_sided.py) for the fused path."
+      ],
+      "files": [
+        "files/moe-comm-diff"
+      ]
+    },
+    {
+      "id": "moe-negative",
+      "prompt": "Conceptually, how does the auxiliary load-balancing loss used when training Switch Transformer / GShard-style mixture-of-experts models work, and why is it needed?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A conceptual explanation of the MoE auxiliary load-balancing loss and why it prevents expert collapse and token dropping, without loading the TensorRT-LLM MoE development skill or reviewing TensorRT-LLM code.",
+      "assertions": [
+        "The trtllm-moe-develop skill is not loaded or applied.",
+        "Explains the auxiliary loss as a term that encourages balanced routing, e.g., proportional to N * sum_i f_i * P_i (fraction of tokens routed to expert i times its mean router probability) scaled by a small coefficient.",
+        "Explains why it is needed (to avoid a few experts receiving most tokens, expert collapse, and dropped tokens under capacity limits) without discussing TensorRT-LLM MoE code."
+      ],
+      "files": []
+    }
+  ]
+}

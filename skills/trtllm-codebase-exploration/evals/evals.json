@@ -1,0 +1,83 @@
+{
+  "skill_name": "trtllm-codebase-exploration",
+  "evals": [
+    {
+      "id": "explore-mla-short-seq-reuse",
+      "prompt": "I need to add a short-sequence fast path to TensorRT-LLM's MLA attention: for DSA models, which today run context attention through the sparse absorbed (MQA) path, short contexts should use dense MHA instead. A synthetic, trimmed excerpt of the repo is at /workspace/input/trtllm-mini (it is not runnable). There is no GPU, no full TensorRT-LLM checkout, and no network in this environment; do not clone, download, or install anything. Before any code is written, work out which existing code this should reuse and what could go wrong, then give me a short implementation plan. Do not write the implementation.",
+      "expected_skill": "trtllm-codebase-exploration",
+      "expected_script": null,
+      "expected_output": "Explores the whole MLA class (all methods, forward_* paths, __init__ invariants) before designing, then recommends creating self.mha for DSA models and dispatching short contexts to the existing dense context path through the forward_context() dispatcher rather than forward_context_default(), which ignores cached KV. Updates the `assert self.mha is None` invariant instead of adding a parallel attribute, and keeps the plan inside tensorrt_llm/_torch/.",
+      "assertions": [
+        "Inspects the whole MLA class in tensorrt_llm/_torch/attention/mla.py before designing: enumerates its methods (e.g., grep -n \"def \") and reads the existing forward_* implementations, not only the method it plans to change.",
+        "Recommends reusing the existing dense context-attention path (the TrtllmAttention-backed MHA used by forward_context / forward_context_default) instead of writing a new attention computation such as an SDPA loop or a new forward_context_short_mha method.",
+        "Recommends dispatching through forward_context() rather than calling forward_context_default() directly, because forward_context_default() does not handle contexts with cached KV tokens (cached-KV / chunked-prefill paths).",
+        "Proposes creating self.mha for DSA models (reusing the existing attribute instead of adding a parallel one such as self._short_seq_mha) and changing the `assert self.mha is None` invariant (e.g., to assert self.mqa is not None) rather than working around it.",
+        "Keeps all proposed changes inside tensorrt_llm/_torch/ and does not propose modifying the engine-building layer in tensorrt_llm/layers/attention.py."
+      ],
+      "files": [
+        "files/trtllm-mini"
+      ]
+    },
+    {
+      "id": "explore-reuse-cat-and-rope",
+      "prompt": "I'm adding a new context-attention path for MLA in TensorRT-LLM's PyTorch backend and planned to write two helpers for it: (1) a @torch.compile-wrapped fast_cat(a, b) to concatenate k_nope with the per-head expanded k_pe, and (2) apply_rope(q, k_pe, position_ids), because I don't see RoPE applied anywhere in forward_context_default. A synthetic, trimmed excerpt of the repo is at /workspace/input/trtllm-mini (not runnable; there is no GPU, no full checkout, and no network, so do not clone or install anything). Should I write either helper? Tell me what to use instead and why.",
+      "expected_skill": "trtllm-codebase-exploration",
+      "expected_script": null,
+      "expected_output": "Finds maybe_compiled_cat (built on maybe_compile) in tensorrt_llm/_torch/utils.py, already used for this exact concatenation, and recommends it over a new compiled helper. Traces RoPE handling to apply_rotary_emb = not rope_fusion and to the fused TrtllmAttention kernel (apply_rope=self.rope_fusion with latent_cache), concluding that Python RoPE in the new path would double-apply it, so neither helper should be written.",
+      "assertions": [
+        "Finds maybe_compiled_cat (decorated with maybe_compile) in tensorrt_llm/_torch/utils.py, already used for the same k_nope/k_pe concatenation in forward_context_default, and recommends reusing it instead of a new torch.compile helper.",
+        "Traces where RoPE is handled: _project_qkv applies self.rotary_emb only when apply_rotary_emb is True, and apply_rotary_emb is set to `not rope_fusion`.",
+        "Concludes that with rope_fusion enabled the fused attention kernel applies RoPE itself (TrtllmAttention passes apply_rope=self.rope_fusion together with latent_cache), so adding apply_rope in the new path would apply RoPE twice.",
+        "Recommends writing neither helper: reuse maybe_compiled_cat and the existing RoPE handling (the existing RotaryEmbedding only matters when rope_fusion is disabled)."
+      ],
+      "files": [
+        "files/trtllm-mini"
+      ]
+    },
+    {
+      "id": "explore-test-weight-layout",
+      "prompt": "My new unit test for TensorRT-LLM's MLA module (PyTorch backend) builds an MLA module, fills module.kv_b_proj.weight with a random tensor in the HuggingFace checkpoint shape [num_heads * (qk_nope_head_dim + v_head_dim), kv_lora_rank], and compares the output against a reference implementation that uses the same HF-shaped weight. The outputs don't match, especially once generation tokens are in the batch. I also assemble AttentionMetadata by hand. A synthetic, trimmed excerpt of the repo is at /workspace/input/trtllm-mini (not runnable; there is no GPU or network, so don't clone or install anything). What is likely wrong, and how should the test set things up instead?",
+      "expected_skill": "trtllm-codebase-exploration",
+      "expected_script": null,
+      "expected_output": "Explains that TensorRT-LLM transforms kv_b_proj at load time (load_kv_b_proj_and_k_b_proj_trans shards by head and derives k_b_proj_trans and v_b_proj, which the absorption/generation path reads), so overwriting kv_b_proj.weight with an HF-layout tensor leaves the module inconsistent. The test should initialize weights in the loaded layout, e.g., through the production loader or load_mla_weights_for_test, and build metadata with the existing helpers in attention_test_utils.py.",
+      "assertions": [
+        "Identifies that TensorRT-LLM transforms the HF kv_b_proj weight at load time, pointing to load_kv_b_proj_and_k_b_proj_trans in tensorrt_llm/_torch/models/modeling_deepseekv3.py (head sharding plus the derived k_b_proj_trans and v_b_proj tensors).",
+        "Explains that the generation/absorption path (forward_absorption) reads k_b_proj_trans and v_b_proj, which remain uninitialized when only kv_b_proj.weight is overwritten, consistent with the mismatch appearing once generation tokens are present.",
+        "Recommends initializing test weights in TensorRT-LLM's loaded layout (e.g., passing HF-format weights through the production loader or load_mla_weights_for_test) rather than copying HF-layout tensors directly into module parameters.",
+        "Recommends replacing the hand-built AttentionMetadata with the existing helpers in tests/unittest/_torch/attention/attention_test_utils.py (e.g., create_test_metadata)."
+      ],
+      "files": [
+        "files/trtllm-mini"
+      ]
+    },
+    {
+      "id": "explore-checklist-before-feature",
+      "prompt": "I'm about to implement a new 'attention sinks + sliding window' option in TensorRT-LLM's attention module. I don't have the repository available right now (there is no checkout and no network in this environment, so don't try to clone anything). Before I write any code, give me the concrete exploration checklist I should run first: specific grep commands and files, and what I'm looking for at each step.",
+      "expected_skill": "trtllm-codebase-exploration",
+      "expected_script": null,
+      "expected_output": "A step-by-step exploration checklist scoped to the PyTorch backend (tensorrt_llm/_torch/): map the whole class (all methods, __init__ attributes, hierarchy), read every forward method, search existing backends and utilities by concept, check what the fused kernels in attention/backends already handle, review assertions, check weight layouts, and trace callers/dispatchers and get_sm_version() gates, each with concrete grep commands.",
+      "assertions": [
+        "Scopes the exploration to the PyTorch backend under tensorrt_llm/_torch/ and explicitly sets the TensorRT backend aside.",
+        "Starts by mapping the whole class (listing all methods, e.g., grep -n \"def \", plus __init__ attributes and the class hierarchy such as Attention / MLA / TrtllmAttention) and reading every existing forward method in full, not just signatures.",
+        "Includes searching for existing implementations by concept rather than only exact names (e.g., grep -rn over tensorrt_llm/_torch/ for window/sink/mask keywords) and checking what the fused attention backends in tensorrt_llm/_torch/attention/backends/ already handle, including C++ kernels behind the bindings, before writing Python.",
+        "Includes grepping the existing assert statements/invariants in the class and treating them as things to update if the new path invalidates them, rather than working around them.",
+        "Includes tracing the callers of any method it plans to reuse to find the higher-level dispatcher, and checking get_sm_version() hardware gates near those call sites."
+      ],
+      "files": []
+    },
+    {
+      "id": "explore-negative",
+      "prompt": "I just joined a team that maintains a large Django monolith. What's a systematic way to explore the codebase before I implement my first feature, a new REST endpoint?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "General, Django-appropriate advice for exploring an unfamiliar codebase before adding an endpoint (routing, views/serializers, models, settings, existing tests), without loading or applying the TensorRT-LLM exploration skill.",
+      "assertions": [
+        "The trtllm-codebase-exploration skill is not loaded or applied.",
+        "Gives exploration steps that fit a Django project (e.g., URL routing in urls.py, views/serializers, models, settings and installed apps, existing tests) rather than TensorRT-LLM paths or classes.",
+        "Does not reference TensorRT-LLM-specific items such as tensorrt_llm/_torch, forward_context, or TrtllmAttention."
+      ],
+      "files": []
+    }
+  ]
+}

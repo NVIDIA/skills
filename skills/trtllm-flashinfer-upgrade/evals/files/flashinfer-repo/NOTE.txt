@@ -1,0 +1,7 @@
+Synthetic, trimmed excerpt of a TensorRT-LLM checkout prepared for an evaluation
+exercise. It is not a git repository and only contains files relevant to the
+flashinfer-python dependency pin. Package hashes are placeholders.
+
+Offline stand-ins (this environment has no network access):
+  releases.txt       - snapshot of https://github.com/flashinfer-ai/flashinfer/releases
+  pypi_versions.txt  - every flashinfer-python version published on PyPI

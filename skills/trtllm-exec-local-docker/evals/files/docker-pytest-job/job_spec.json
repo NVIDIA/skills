@@ -1,0 +1,18 @@
+{
+  "execution_scenario": "local_docker",
+  "workflow_type": "pytest",
+  "model_name": "llama_7b",
+  "work_dir": "/workspace/work_dirs/llama_7b_20261104_101500",
+  "log_file": "/workspace/work_dirs/llama_7b_20261104_101500/llama_7b_local.log",
+  "docker_image": "registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901",
+  "docker_cmd": "docker run --rm --net=host --runtime=nvidia --ipc=host --cap-add=SYS_PTRACE --mount type=bind,source=/path/to/TensorRT-LLM,target=/path/to/TensorRT-LLM --mount type=bind,source=/data/llm-models,target=/models --env LLM_MODELS_ROOT=/models --name llama_7b_auto_test registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901 bash -c 'cd /path/to/TensorRT-LLM && pytest tests/unittest/llmapi/test_llm_args.py -v'",
+  "success_patterns": [
+    "passed"
+  ],
+  "failure_patterns": [
+    "FAILED",
+    "ERROR"
+  ],
+  "monitor_timeout_seconds": 3600,
+  "build_project": false
+}

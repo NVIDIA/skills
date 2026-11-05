@@ -1,0 +1,12 @@
+Synthetic CI excerpt prepared for an evaluation exercise.
+
+Job: post-merge / B200-PyTorch-VisualGen-1 (build #48190)
+Container: <registry>/tensorrt-llm-dev:2026-10-28
+GPU: 1x NVIDIA B200
+TensorRT-LLM commit under test: 3f9a1c7e2b
+
+FAILED tests/integration/defs/examples/visual_gen/test_visual_gen.py::test_cosmos3_nano_t2av_lpips[bf16]
+E   AssertionError: LPIPS 0.412 exceeds threshold 0.100 against golden cosmos3_nano_t2av_lpips_golden.mp4
+E   Generated candidate preserved at: <scratch>/lpips_failure_artifacts/cosmos3_nano_t2av_candidate.mp4
+
+1 failed, 37 passed in 2817.44s

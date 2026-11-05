@@ -1,0 +1,25 @@
+# Probe output captured on the target workstation for a TensorRT-LLM run
+# that needs required_devices=4.
+
+$ hostname -f
+gpu-ws-07.example.com
+
+$ timeout 5 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+$ echo $?
+0
+
+$ command -v docker
+/usr/bin/docker
+$ timeout 3 docker info >/dev/null 2>&1; echo $?
+0
+
+$ which squeue; echo $?
+1

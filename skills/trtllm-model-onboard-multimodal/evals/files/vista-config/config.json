@@ -1,0 +1,47 @@
+{
+  "_comment": "Synthetic HF config for an evaluation exercise; acme/Vista-VL-7B is a fictional model. The repo also ships preprocessor_config.json and chat_template.json (not included here).",
+  "architectures": [
+    "VistaVLForConditionalGeneration"
+  ],
+  "model_type": "vista_vl",
+  "image_token_id": 151655,
+  "video_token_id": 151656,
+  "vision_start_token_id": 151652,
+  "vision_end_token_id": 151653,
+  "text_config": {
+    "architectures": [
+      "Qwen3ForCausalLM"
+    ],
+    "model_type": "qwen3",
+    "hidden_size": 4096,
+    "intermediate_size": 12288,
+    "num_hidden_layers": 36,
+    "num_attention_heads": 32,
+    "num_key_value_heads": 8,
+    "head_dim": 128,
+    "vocab_size": 151936,
+    "rope_theta": 1000000.0,
+    "rope_scaling": {
+      "rope_type": "default",
+      "mrope_section": [
+        24,
+        20,
+        20
+      ],
+      "mrope_interleaved": true
+    }
+  },
+  "vision_config": {
+    "model_type": "vista_vl_vision",
+    "depth": 27,
+    "hidden_size": 1152,
+    "intermediate_size": 4304,
+    "num_heads": 16,
+    "patch_size": 16,
+    "spatial_merge_size": 2,
+    "temporal_patch_size": 2,
+    "out_hidden_size": 4096,
+    "hidden_act": "gelu_pytorch_tanh"
+  },
+  "torch_dtype": "bfloat16"
+}

@@ -1,0 +1,86 @@
+{
+  "skill_name": "exec-env-check",
+  "evals": [
+    {
+      "id": "envcheck-live-sandbox-no-resources",
+      "prompt": "Before I launch a TensorRT-LLM test that needs 2 GPUs, check this machine's execution environment (GPUs, Docker, Slurm) and tell me which execution scenario applies, in the result format our test orchestrator consumes. Run the checks here, but do not install drivers or packages, change system configuration, or contact any other host.",
+      "expected_skill": "exec-env-check",
+      "expected_script": null,
+      "expected_output": "Runs the bounded nvidia-smi probe and the Slurm check, finds no GPUs and no Slurm client, and returns `scenario: not_satisfied` with `available_gpus: 0` and null device_type/cluster_name in the skill's key: value result block.",
+      "assertions": [
+        "Probes GPUs with nvidia-smi wrapped in a timeout (e.g., `timeout 5 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader`) rather than an unbounded nvidia-smi call.",
+        "After finding no usable local GPUs, checks for Slurm client availability (e.g., `which squeue` / `squeue --version`).",
+        "Reports `scenario: not_satisfied` using the skill's scenario token rather than a free-form verdict.",
+        "Reports `available_gpus: 0` with `device_type` and `cluster_name` set to null rather than guessed values.",
+        "Does not install drivers or packages or modify system configuration (no apt/dpkg/pip installs, systemctl, or usermod)."
+      ],
+      "files": []
+    },
+    {
+      "id": "envcheck-local-docker-h100",
+      "prompt": "I captured probe output on the workstation where I want to run a 4-GPU TensorRT-LLM test: /workspace/input/h100-docker-host/probe.txt. Classify the execution scenario from that capture and give me the result block for our orchestrator. This sandbox is not that machine (no GPUs, Docker daemon, or Slurm here), so don't probe locally and don't install anything.",
+      "expected_skill": "exec-env-check",
+      "expected_script": null,
+      "expected_output": "Eight H100 GPUs satisfy the 4-GPU requirement and `docker info` succeeds, so the result is `scenario: satisfied, local, docker` with `available_gpus: 8`; the local result block omits device_type.",
+      "assertions": [
+        "Classifies the host as `satisfied, local, docker`.",
+        "Reports `available_gpus: 8`, counted from the nvidia-smi lines.",
+        "Bases the Docker decision on `docker info` succeeding (CLI present and daemon responding), not merely on the docker binary existing.",
+        "The structured result block contains the scenario and available_gpus but no `device_type` field (local results omit it)."
+      ],
+      "files": [
+        "files/h100-docker-host"
+      ]
+    },
+    {
+      "id": "envcheck-docker-permission-denied",
+      "prompt": "Here's probe output from a B200 box where I want to run a 4-GPU TensorRT-LLM job: /workspace/input/b200-no-docker-perm/probe.txt. Which execution scenario is it? If something on the box needs fixing, tell me, but don't change anything. This sandbox has no GPUs, Docker daemon, or Slurm, so classify from the capture rather than probing here.",
+      "expected_skill": "exec-env-check",
+      "expected_script": null,
+      "expected_output": "Four B200 GPUs meet the requirement; the docker CLI exists but `docker info` fails with permission denied, so the scenario is `satisfied, local, direct` with `available_gpus: 4`. Slurm being present does not change the result because the local GPUs already suffice.",
+      "assertions": [
+        "Classifies the host as `satisfied, local, direct`.",
+        "Treats the `docker info` permission-denied failure as Docker being unavailable rather than reporting `satisfied, local, docker`.",
+        "Does not route to the Slurm scenario even though squeue is present, because the 4 local GPUs already satisfy the 4-GPU requirement.",
+        "Reports `available_gpus: 4`.",
+        "Does not execute system-modifying commands (e.g., usermod, chmod on the Docker socket, package installs) in the sandbox."
+      ],
+      "files": [
+        "files/b200-no-docker-perm"
+      ]
+    },
+    {
+      "id": "envcheck-login-node-missing-env-info",
+      "prompt": "I'm on our Slurm login node and need 8 GPUs for a TensorRT-LLM benchmark. The probe output is in /workspace/input/slurm-login-node/probe.txt; the toolkit's internal-env-info skill is not installed here. Determine the execution scenario and fill in all the result fields. This sandbox has no Slurm or cluster access: work from the capture, and don't run srun/sbatch or contact any host.",
+      "expected_skill": "exec-env-check",
+      "expected_script": null,
+      "expected_output": "No local GPUs; Slurm is present, but because internal-env-info is not installed the cluster and GPU type cannot be resolved from the hostname, so the result falls back to `scenario: not_satisfied` with available_gpus 0 and device_type, gpus_per_node, cluster_name, default_models_repo and default_user_root_dir all null, reported as a normal result without srun probing.",
+      "assertions": [
+        "Returns `scenario: not_satisfied` (not `satisfied, slurm, local`) because internal-env-info is not installed.",
+        "Sets `available_gpus: 0` and reports device_type, gpus_per_node and cluster_name as null.",
+        "Does not infer a GPU type or cluster name from the hostname `login-01.cluster.example.com`.",
+        "Does not propose or run an srun/sbatch probe of compute nodes to discover the GPU type.",
+        "Does not describe the missing internal-env-info skill as an error or a failure of the check."
+      ],
+      "files": [
+        "files/slurm-login-node"
+      ]
+    },
+    {
+      "id": "envcheck-negative",
+      "prompt": "Our Ubuntu 22.04 server with 8 H100s is on the 535 driver, and I need CUDA 12.8 for a new TensorRT-LLM build. Write out the steps to move to the 570 driver branch and install the CUDA 12.8 toolkit, including how to verify afterward. Just give me the steps; don't run anything here.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Step-by-step driver and toolkit upgrade instructions (replace the 535 driver with the 570 branch, install CUDA 12.8, reboot, verify with nvidia-smi and nvcc --version) without loading the environment-check skill or producing an execution-scenario verdict.",
+      "assertions": [
+        "The exec-env-check skill is not loaded or applied.",
+        "Gives upgrade steps targeting the 570 driver branch and the CUDA 12.8 toolkit, including a reboot or driver reload.",
+        "Includes verification commands such as `nvidia-smi` and `nvcc --version`.",
+        "Does not output an execution-scenario verdict (e.g., `satisfied, local, docker` or `not_satisfied`).",
+        "Does not execute package-manager or driver-install commands in the sandbox."
+      ],
+      "files": []
+    }
+  ]
+}

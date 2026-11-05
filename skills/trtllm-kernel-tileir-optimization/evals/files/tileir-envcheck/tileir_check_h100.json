@@ -1,0 +1,11 @@
+{
+  "nvtriton_installed": false,
+  "tileir_active": false,
+  "blackwell_gpu": false,
+  "triton_installed": true,
+  "gpu_capability": [
+    9,
+    0
+  ],
+  "recommendation": "Install nvtriton (replaces triton package) for TileIR support; current configs will be ignored by standard triton"
+}

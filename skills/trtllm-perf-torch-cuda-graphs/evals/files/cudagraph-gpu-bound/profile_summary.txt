@@ -1,0 +1,20 @@
+Workload: Llama-style 8B model, full fine-tuning step (fwd + bwd + fused AdamW), 1x H100 80GB HBM3,
+micro-batch 4 x 4096 tokens, bf16 autocast, FlashAttention-2. PyTorch 2.5, eager mode.
+Capture: nsys profile -c cudaProfilerApi -t cuda,nvtx -o step -- python finetune.py   (iterations 30-39)
+
+Steady-state iteration time (mean of 10):            1,412.6 ms
+GPU time utilization over the captured range:          97.8 %   (nsys analyze gpu_time_util: no regions below 50%)
+Kernels launched per iteration:                         2,904
+Kernel duration per launch:   median 92 us, p10 38 us, p90 1,940 us
+Host time spent issuing work per iteration (CPU):       ~118 ms
+
+cuda_kern_exec_sum (top kernels, abridged):
+  Count  AAvg (us)  QAvg (us)  KAvg (us)  Kernel Name
+ ------  ---------  ---------  ---------  -----------------------------------------------------------------
+  6,720        4.6    1,204.3    1,021.8  sm90_xmma_gemm_bf16bf16_bf16f32_f32_tn_n_tilesize128x256x64_...
+    640        5.3    1,311.9    2,388.4  pytorch_flash::flash_bwd_dq_dk_dv_loop_seqk_parallel_kernel<...>
+    640        5.0    1,280.7      942.1  pytorch_flash::flash_fwd_kernel<...>
+  5,120        4.2    1,198.6       84.7  at::native::vectorized_layer_norm_kernel<c10::BFloat16, float>
+  9,600        4.1    1,187.2       61.3  at::native::vectorized_elementwise_kernel<4, SiluMulFunctor ...>
+
+cuda_api_sum: cudaLaunchKernel avg 4.3 us; no cudaStreamSynchronize / cudaDeviceSynchronize inside the step.

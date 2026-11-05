@@ -1,0 +1,21 @@
+{
+  "video": "wan21_t2v_1_3b_lpips_golden.mp4",
+  "sha256": "8de77cdef9e9a3b2d6fa9b9958243450088e1d5f086a0fb4f4d3ad3b623dcf13",
+  "lpips_threshold": 0.05,
+  "model": "Wan-AI/Wan2.1-T2V-1.3B-Diffusers",
+  "prompt": "A cute cat playing piano",
+  "width": 832,
+  "height": 480,
+  "num_frames": 81,
+  "frame_rate": 16.0,
+  "num_inference_steps": 50,
+  "guidance_scale": 5.0,
+  "seed": 42,
+  "feature_flags": {},
+  "package_versions": {
+    "diffusers": "0.36.0",
+    "torch": "2.9.0"
+  },
+  "container_image": "<registry>/tensorrt-llm-dev:2026-09-15",
+  "tensorrt_llm_commit": "0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e"
+}

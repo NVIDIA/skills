@@ -1,0 +1,12 @@
+# Synthetic, trimmed excerpt of .pre-commit-config.yaml.
+exclude: |
+  (?x)^(
+    tensorrt_llm/_torch/attention_backend/flashinfer.py|
+    3rdparty/.*
+  )$
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer

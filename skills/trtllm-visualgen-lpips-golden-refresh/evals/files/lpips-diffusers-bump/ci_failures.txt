@@ -1,0 +1,31 @@
+Synthetic CI excerpt prepared for an evaluation exercise.
+
+Change under test: container bump <registry>/tensorrt-llm-dev:2026-09-15 -> <registry>/tensorrt-llm-dev:2026-10-28
+  The only Python package change in the bump: diffusers 0.36.0 -> 0.37.0
+  diffusers 0.37.0 release note (excerpt): "FlowMatchEulerDiscreteScheduler now computes sigmas
+  in float64; expect small numerical differences in generated outputs."
+
+Job: post-merge / B200-PyTorch-VisualGen-1 (build #48213), GPU: 1x NVIDIA B200
+
+FAILED examples/visual_gen/test_visual_gen.py::test_wan22_ti2v_5b_t2v_lpips[bf16]
+       LPIPS 0.083 > threshold 0.050   golden: wan22_ti2v_5b_t2v_lpips_golden.json
+FAILED examples/visual_gen/test_visual_gen.py::test_wan22_t2v_a14b_lpips[fp8]
+       LPIPS 0.071 > threshold 0.050   golden: wan22_t2v_a14b_fp8_lpips_golden.json
+FAILED examples/visual_gen/test_visual_gen.py::test_flux2_dev_t2i_lpips[bf16]
+       LPIPS 0.064 > threshold 0.050   golden: flux2_dev_t2i_lpips_golden.json
+PASSED examples/visual_gen/test_visual_gen.py::test_wan21_t2v_1_3b_lpips[bf16]
+PASSED examples/visual_gen/test_visual_gen.py::test_flux1_dev_t2i_lpips[bf16]
+PASSED examples/visual_gen/test_visual_gen.py::test_qwenimage_t2i_lpips[bf16]
+PASSED examples/visual_gen/test_visual_gen.py::test_ltx2_t2v_lpips[bf16]
+
+Golden JSON files in tests/integration/defs/examples/visual_gen/golden/visual_gen_lpips/:
+  flux1_dev_t2i_lpips_golden.json          (image: flux1_dev_t2i_lpips_golden.png)
+  flux2_dev_t2i_lpips_golden.json          (image: flux2_dev_t2i_lpips_golden.png)
+  ltx2_t2v_lpips_golden.json               (video: ltx2_t2v_lpips_golden.mp4)
+  qwenimage_t2i_lpips_golden.json          (image: qwenimage_t2i_lpips_golden.png)
+  wan21_t2v_1_3b_lpips_golden.json         (video: wan21_t2v_1_3b_lpips_golden.mp4)
+  wan22_t2v_a14b_fp8_lpips_golden.json     (video: wan22_t2v_a14b_fp8_lpips_golden.mp4)
+  wan22_ti2v_5b_t2v_lpips_golden.json      (video: wan22_ti2v_5b_t2v_lpips_golden.mp4)
+
+The three failing tests were added to tests/integration/test_lists/waives.txt when the
+failure was first reported.

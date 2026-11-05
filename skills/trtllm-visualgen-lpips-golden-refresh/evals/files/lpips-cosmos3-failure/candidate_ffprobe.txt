@@ -1,0 +1,10 @@
+$ ffprobe -v error -show_streams cosmos3_nano_t2av_candidate.mp4   (trimmed)
+[STREAM]
+index=0
+codec_name=h264
+codec_type=video
+width=1280
+height=720
+r_frame_rate=24/1
+nb_frames=189
+[/STREAM]

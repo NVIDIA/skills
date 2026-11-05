@@ -1,0 +1,10 @@
+# Offline snapshot: every version of flashinfer-python published on PyPI
+# (stand-in for https://pypi.org/pypi/flashinfer-python/<VERSION>/json lookups).
+0.6.4
+0.6.5
+0.6.6
+0.6.7
+0.6.7.post1
+0.6.7.post2
+0.6.7.post3
+0.6.8

@@ -1,0 +1,38 @@
+Timer unit: 1e-06 s
+
+Total time: 59.9717 s
+File: /code/tensorrt_llm/tensorrt_llm/_torch/pyexecutor/py_executor.py
+Function: _forward_step at line 2831
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+  2831                                           def _forward_step(self, scheduled_requests, new_tensors_device=None):
+  2832      4100       9020.0      2.2      0.0      ExpertStatistic.set_iter(self.model_engine.iter_counter)
+  2833      4100      12710.0      3.1      0.0      batch_size = scheduled_requests.batch_size
+  2834      4100     402300.0     98.1      0.7      self.resource_manager.prepare_resources_for_step(scheduled_requests)
+  2848      4100   59200000.0  14439.0     98.7      outputs = self.model_engine.forward(
+  2849                                                   scheduled_requests, self.resource_manager,
+  2850                                                   new_tensors_device, gather_context_logits=self.gather_context_logits)
+  2851      4100     347680.0     84.8      0.6      self._maybe_record_iteration_stats(outputs)
+
+Total time: 6.12028 s
+File: /code/tensorrt_llm/tensorrt_llm/_torch/pyexecutor/py_executor.py
+Function: _sample_async at line 3012
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+  3012                                           def _sample_async(self, scheduled_batch, batch_outputs):
+  3013      4100      11480.0      2.8      0.2      if batch_outputs is None:
+  3014                                                   return None
+  3015      4100    5862000.0   1429.8     95.8      sample_state = self.sampler.sample_async(scheduled_batch, batch_outputs, self.num_micro_batches)
+  3016      4100     246800.0     60.2      4.0      self._record_sample_state(sample_state)
+
+Total time: 4.31376 s
+File: /code/tensorrt_llm/tensorrt_llm/_torch/pyexecutor/py_executor.py
+Function: _update_requests at line 3088
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+  3088                                           def _update_requests(self, sample_state, resource_manager=None):
+  3089      4100    4198300.0   1024.0     97.3      self.sampler.update_requests(sample_state, resource_manager)
+  3090      4100     115460.0     28.2      2.7      self._log_finished_requests(sample_state)

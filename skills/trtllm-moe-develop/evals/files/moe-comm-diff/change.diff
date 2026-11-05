@@ -1,0 +1,68 @@
+# Synthetic, simplified diff prepared for a review exercise. It adds a new MoE
+# communication strategy and wires a fused-communication MoE implementation into
+# TensorRT-LLM. Helper names are abbreviated; hunk line numbers are illustrative.
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/communication/nvlink_ring.py b/tensorrt_llm/_torch/moe/fused_moe/communication/nvlink_ring.py
+new file mode 100644
+--- /dev/null
++++ b/tensorrt_llm/_torch/moe/fused_moe/communication/nvlink_ring.py
+@@ -0,0 +1,22 @@
++from .base import Communication
++
++
++class NvlinkRingComm(Communication):
++    """Ring-based all-to-all over NVLink with a persistent native workspace."""
++
++    def __init__(self, mapping, max_num_tokens, hidden_size):
++        super().__init__(mapping)
++        self._workspace = allocate_ring_workspace(mapping, max_num_tokens, hidden_size)
++
++    def supports_post_quant_dispatch(self):
++        return True
++
++    def dispatch(self, hidden_states, token_selected_experts, token_final_scales, **kwargs):
++        return ring_dispatch(self._workspace, hidden_states, token_selected_experts,
++                             token_final_scales)
++
++    def combine(self, final_hidden_states, **kwargs):
++        return ring_combine(self._workspace, final_hidden_states)
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py b/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py
+--- a/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py
++++ b/tensorrt_llm/_torch/moe/fused_moe/configurable_moe.py
+@@ -233,6 +233,9 @@ class ConfigurableMoE(MoE):
+     def _create_comm_strategy_auto(self):
++        if self.mapping.moe_ep_size >= 8 and os.environ.get("TRTLLM_MOE_RING") == "1":
++            return NvlinkRingComm(self.mapping, self.max_num_tokens, self.hidden_size)
+         return CommunicationFactory.create_strategy(self, ...)
+@@ -412,6 +415,9 @@ class ConfigurableMoE(MoE):
+     def forward_impl(self, x, router_logits, **kwargs):
++        if isinstance(self.backend, MegaMoEImpl):
++            # this backend owns dispatch + GEMM + combine in one kernel
++            return self.backend._fused_dispatch_gemm_combine(x, router_logits, **kwargs)
+         output = self.scheduler.forward(x, router_logits, **kwargs)
+
+diff --git a/tensorrt_llm/_torch/moe/fused_moe/mega_moe/impl.py b/tensorrt_llm/_torch/moe/fused_moe/mega_moe/impl.py
+--- a/tensorrt_llm/_torch/moe/fused_moe/mega_moe/impl.py
++++ b/tensorrt_llm/_torch/moe/fused_moe/mega_moe/impl.py
+@@ -140,6 +140,9 @@ class MegaMoEImpl(MoEImplBase):
++    def run_moe(self, *args, **kwargs):
++        raise NotImplementedError("call _fused_dispatch_gemm_combine instead")
++
+
+diff --git a/tensorrt_llm/_torch/pyexecutor/py_executor.py b/tensorrt_llm/_torch/pyexecutor/py_executor.py
+--- a/tensorrt_llm/_torch/pyexecutor/py_executor.py
++++ b/tensorrt_llm/_torch/pyexecutor/py_executor.py
+@@ -301,6 +301,10 @@ class PyExecutor:
+     def __init__(self, ...):
+         ...
++        for layer in self.model.moe_layers():
++            if isinstance(layer.comm, NvlinkRingComm) and self.sleep_config is not None:
++                raise ValueError("sleep_config is not supported with NvlinkRingComm")
++
+@@ -912,6 +916,9 @@ class PyExecutor:
+     def wakeup(self, tags):
+         ...
++        for layer in self.model.moe_layers():
++            if isinstance(layer.comm, NvlinkRingComm):
++                layer.comm._workspace.rebind()

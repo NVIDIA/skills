@@ -1,0 +1,86 @@
+{
+  "skill_name": "perf-torch-cuda-graphs",
+  "evals": [
+    {
+      "id": "cudagraph-decode-loop-capture-fix",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. We tried to speed up the token-by-token decode loop in /workspace/input/cudagraph-decode-step/decode_step.py with a manual torch.cuda.graph capture. It runs, but the generated tokens are wrong, and with stop_on_eos=True the capture fails. Make it correct and CUDA-graph compatible (keep manual torch.cuda.graph capture), write the result to /workspace/out/decode_step_graphed.py, and explain each change.",
+      "expected_skill": "perf-torch-cuda-graphs",
+      "expected_script": null,
+      "expected_output": "The fixed loop warms up the step on a side stream before capture, captures with autocast(cache_enabled=False), moves the .item() EOS check out of the graph (or keeps a GPU-side mask), feeds tokens through a pre-allocated static buffer updated with .copy_(), keeps temperature in a GPU tensor updated with .fill_(), and clones the static output after every replay.",
+      "assertions": [
+        "Warms up the decode step (at least 3 iterations) on a side stream (torch.cuda.Stream with torch.cuda.stream(s)) and calls torch.cuda.current_stream().wait_stream(s) before capturing.",
+        "Removes the .item() EOS check from the captured region (checks after replay outside the graph, or keeps a GPU-side finished mask with torch.where), explaining that host-device syncs are not allowed during capture.",
+        "Feeds the sampled token back through a pre-allocated static input buffer updated in place with .copy_() before each g.replay(), instead of rebinding the Python variable tokens.",
+        "Turns temperature into a GPU tensor used inside the graph and updated with .fill_() (or .copy_()) before replay, explaining that a Python float is baked in at capture time.",
+        "Clones the static output (e.g. next_tok.clone()) before appending it, because every replay overwrites the same output buffer.",
+        "Uses torch.autocast(..., cache_enabled=False) inside the captured region."
+      ],
+      "files": [
+        "files/cudagraph-decode-step"
+      ]
+    },
+    {
+      "id": "cudagraph-capture-error-triage",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. Our manual full-step CUDA graph capture fails in three different ways. The relevant code is in /workspace/input/cudagraph-capture-errors/train_graph.py and the three failing runs are in /workspace/input/cudagraph-capture-errors/capture_errors.log. For each run, tell me which stream-capture error it is, the root cause, and the exact code change that fixes it.",
+      "expected_skill": "perf-torch-cuda-graphs",
+      "expected_script": null,
+      "expected_output": "Run 1 is cudaErrorStreamCaptureInvalidated (901): the DataLoader pin_memory thread makes CUDA calls during global-mode capture; use capture_error_mode=\"thread_local\" (or pin_memory=False / pin before capture). Run 2 is StreamCaptureImplicit (906): DDP/AccumulateGrad set up on the default stream; build DDP inside the side-stream context, warm up 11 iterations there and set TORCH_NCCL_ASYNC_ERROR_HANDLING=0. Run 3 is StreamCaptureUnjoined (904): the aux EMA stream is never joined back; add torch.cuda.current_stream().wait_stream(aux) before the capture ends.",
+      "assertions": [
+        "Run 1: identifies 'operation failed due to a previous error during capture' as cudaErrorStreamCaptureInvalidated (901) caused by the DataLoader pin_memory background thread, and fixes it with torch.cuda.graph(..., capture_error_mode=\"thread_local\") (or by disabling/avoiding pinned-memory allocation during capture).",
+        "Run 2: identifies 'operation would make the legacy stream depend on a capturing blocking stream' as StreamCaptureImplicit (906) caused by DDP/AccumulateGrad being set up on the default stream, and fixes it by constructing DDP inside the side-stream context and warming up there before capture.",
+        "For the DDP case, specifies 11 warmup iterations (instead of 3) and setting TORCH_NCCL_ASYNC_ERROR_HANDLING=0 before init_process_group.",
+        "Run 3: identifies 'capturing stream has unjoined work' as StreamCaptureUnjoined (904) caused by the aux EMA stream never rejoining, and fixes it with torch.cuda.current_stream().wait_stream(aux) (capture stream waits on the side stream) before the capture block ends.",
+        "Does not attempt to run the script or install packages in the sandbox."
+      ],
+      "files": [
+        "files/cudagraph-capture-errors"
+      ]
+    },
+    {
+      "id": "cudagraph-gpu-bound-will-not-help",
+      "prompt": "Sandbox note: this environment has Python but no GPU, no CUDA driver and no network access, and torch may not be importable; do not install anything and do not try to execute the GPU code. My manager wants us to add CUDA Graphs to our 8B fine-tuning step to cut kernel launch overhead. A steady-state profile summary is in /workspace/input/cudagraph-gpu-bound/profile_summary.txt. Will CUDA Graphs give us a meaningful speedup here? If yes, which API should we use; if not, say why and what we should do instead.",
+      "expected_skill": "perf-torch-cuda-graphs",
+      "expected_script": null,
+      "expected_output": "No meaningful speedup is expected: GPU time utilization is already 97.8% (>95%), kernels are long (median 92 us, many ~1-2 ms) and queue times of ~1.2 ms show the host stays far ahead of the GPU, so launch overhead is not the bottleneck. Effort should go into the GPU-side work (kernel-level profiling and optimization of the GEMM/attention kernels) rather than a CUDA-graph capture project.",
+      "assertions": [
+        "Concludes that CUDA Graphs are unlikely to give a meaningful speedup because GPU time utilization is already about 97.8% (above the ~95% level where graphs stop helping).",
+        "Supports the conclusion with the profile evidence: kernels are long (median 92 us, many around 1-2 ms, not the <50 us small kernels graphs target) and kernel queue times of about 1.2 ms show the host is not the bottleneck.",
+        "Recommends redirecting effort to the GPU-side work (e.g. kernel-level profiling/optimization of the dominant GEMM and attention kernels) instead of a graph-capture project.",
+        "Does not recommend investing in a manual or full-iteration CUDA graph implementation for this workload (at most a cheap experiment with explicitly low expectations)."
+      ],
+      "files": [
+        "files/cudagraph-gpu-bound"
+      ]
+    },
+    {
+      "id": "cudagraph-megatron-fp8-full-iteration",
+      "prompt": "We pretrain a GPT model with Megatron-LM (Megatron Core 0.14) using FP8 through Transformer Engine, pipeline parallel size 4 and tensor parallel size 2, with a fixed sequence length and micro-batch size. Nsight Systems shows kernel launch gaps between layers. We want the maximum speedup from CUDA Graphs. Which CUDA graph approach should we use, which exact flags do we need, and what in a typical training loop will break capture? Please answer from what you know; nothing needs to be run.",
+      "expected_skill": "perf-torch-cuda-graphs",
+      "expected_script": null,
+      "expected_output": "Use Megatron Core's FullCudaGraphWrapper for full-iteration capture: --enable-cuda-graph --cuda-graph-scope full_iteration --cuda-graph-warmup-steps 1 --te-rng-tracker --no-check-for-nan-in-loss-and-grad. TE RNG keeps RNG state in device tensors (the standard RNG uses CPU scalars), and the NaN check calls .item(), which is forbidden during capture. Forward+backward for all micro-batches becomes one graph (plus one for validation), the optimizer stays eager by default, and per-layer CudaGraphManager is the fallback.",
+      "assertions": [
+        "Recommends Megatron Core's FullCudaGraphWrapper (full-iteration capture via --cuda-graph-scope full_iteration) as the maximum-performance option for this static workload.",
+        "Lists the enabling flags --enable-cuda-graph, --cuda-graph-scope full_iteration, a --cuda-graph-warmup-steps value, --te-rng-tracker and --no-check-for-nan-in-loss-and-grad.",
+        "Explains that --te-rng-tracker is required because the standard RNG uses CPU scalars that cannot be captured, whereas TE's RNG tracker keeps its state in device tensors.",
+        "Explains that --no-check-for-nan-in-loss-and-grad is required because the NaN check calls .item(), a host-device sync that is forbidden during capture.",
+        "Mentions per-layer CudaGraphManager (--enable-cuda-graph with --cuda-graph-num-warmup-steps) as the fallback if full-iteration capture is not feasible, with FP8 and pipeline-parallel interleaving handled automatically by the MCore APIs.",
+        "Notes that the optimizer step stays in eager mode by default and can optionally be moved inside the graph for extra performance."
+      ],
+      "files": []
+    },
+    {
+      "id": "cudagraph-negative-sync-only",
+      "prompt": "Our PyTorch training step calls loss.item() for logging on every iteration and does `if torch.isnan(grad_norm): skip_step()` before optimizer.step(), and nsys shows the CPU stalling on cudaStreamSynchronize there. We are NOT using CUDA Graphs and do not plan to. How do we get rid of these host-device synchronizations?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Sync-elimination advice without CUDA Graphs: defer or batch the loss logging (log every N steps or after optimizer.step(), stacking metrics into one transfer), and keep the NaN/skip decision on the GPU (e.g. torch.where-based masking of the update) or check it less often.",
+      "assertions": [
+        "The perf-torch-cuda-graphs skill is not loaded or applied.",
+        "Proposes sync-elimination techniques: defer/batch the .item() logging and keep the NaN/skip decision on the GPU (e.g. torch.where) or evaluate it less often.",
+        "Does not propose CUDA graph capture as the solution."
+      ],
+      "files": []
+    }
+  ]
+}

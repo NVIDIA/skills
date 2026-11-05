@@ -1,0 +1,20 @@
+{
+  "execution_scenario": "local_docker",
+  "workflow_type": "pytest",
+  "model_name": "mixtral_8x7b",
+  "work_dir": "/path/to/TensorRT-LLM/work_dirs/mixtral_8x7b_20261104_111500",
+  "log_file": "/path/to/TensorRT-LLM/work_dirs/mixtral_8x7b_20261104_111500/mixtral_8x7b_local.log",
+  "repo_root": "/path/to/TensorRT-LLM",
+  "build_project": true,
+  "gpu_type": "B300",
+  "container_image": "registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901",
+  "docker_cmd": "docker run --rm --net=host --runtime=nvidia --ipc=host --mount type=bind,source=/path/to/TensorRT-LLM,target=/path/to/TensorRT-LLM --name mixtral_8x7b_auto_test registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901 bash -c 'cd /path/to/TensorRT-LLM && pytest tests/unittest/_torch/modules/test_fused_moe.py -v'",
+  "success_patterns": [
+    "passed"
+  ],
+  "failure_patterns": [
+    "FAILED",
+    "ERROR"
+  ],
+  "monitor_timeout_seconds": 3600
+}

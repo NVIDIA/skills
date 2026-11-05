@@ -1,0 +1,19 @@
+{
+  "execution_scenario": "local_docker",
+  "workflow_type": "eval",
+  "model_name": "llama31_8b_instruct",
+  "work_dir": "/path/to/TensorRT-LLM/work_dirs/llama31_8b_instruct_20261104_091500",
+  "log_file": "/path/to/TensorRT-LLM/work_dirs/llama31_8b_instruct_20261104_091500/llama31_8b_instruct_local.log",
+  "docker_image": "registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901",
+  "docker_cmd": "docker run --rm --net=host --runtime=nvidia --ipc=host --mount type=bind,source=/path/to/TensorRT-LLM,target=/path/to/TensorRT-LLM --mount type=bind,source=/data/llm-models,target=/models --name llama31_8b_instruct_auto_test registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901 bash -c 'cd /path/to/TensorRT-LLM && trtllm-eval --model /models/Llama-3.1-8B-Instruct --tp_size 2 gsm8k'",
+  "success_patterns": [
+    "accuracy:",
+    "score:"
+  ],
+  "failure_patterns": [
+    "AssertionError",
+    "Error"
+  ],
+  "monitor_timeout_seconds": 3600,
+  "build_project": false
+}

@@ -1,0 +1,12 @@
+$ uname -m
+aarch64
+
+$ nvidia-smi --query-gpu=name --format=csv,noheader
+NVIDIA GB200
+NVIDIA GB200
+NVIDIA GB200
+NVIDIA GB200
+
+$ command -v docker && timeout 3 docker info >/dev/null 2>&1; echo $?
+/usr/bin/docker
+0

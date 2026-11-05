@@ -1,0 +1,20 @@
+# exec-env-check result captured on this workstation (required_devices=4)
+scenario: satisfied, local, docker
+available_gpus: 8
+
+# Supporting probe output from the same workstation
+$ timeout 5 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+NVIDIA H100 80GB HBM3, 81559 MiB
+
+$ uname -m
+x86_64
+
+$ which squeue; echo $?
+1

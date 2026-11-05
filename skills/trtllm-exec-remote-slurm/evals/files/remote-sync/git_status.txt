@@ -1,0 +1,14 @@
+$ git -C /path/to/TensorRT-LLM rev-parse --abbrev-ref HEAD
+feature/fp8-kv
+
+$ git -C /path/to/TensorRT-LLM status --porcelain
+ M tensorrt_llm/_torch/attention_backend/trtllm.py
+ M tests/unittest/_torch/attention/test_attention_fp8_kv.py
+?? examples/llm-api/fp8_kv_smoke.py
+?? configs/fp8_kv_cache.yaml
+
+$ git -C /path/to/TensorRT-LLM ls-remote --heads origin feature/fp8-kv
+(no output: feature/fp8-kv has never been pushed to origin)
+
+$ git -C /path/to/TensorRT-LLM remote get-url origin
+git@github.com:example-org/TensorRT-LLM.git

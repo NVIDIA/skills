@@ -1,0 +1,18 @@
+Timer unit: 1e-06 s
+
+Total time: 31.1004 s
+File: /code/tensorrt_llm/tensorrt_llm/_torch/pyexecutor/model_engine.py
+Function: _prepare_tp_inputs at line 1540
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+# [excerpt: only the generation-request loop is shown; other lines are unchanged between rounds 2 and 3]
+  1569    282900     370600.0      1.3      1.2      for request in scheduled_requests.generation_requests:
+  1570    278800    1505520.0      5.4      4.8          if self.mapping.has_cp_helix():
+  1571                                                       position_ids.append(request.helix_position())
+  1572                                                       continue
+  1580    278800    1421880.0      5.1      4.6          beam_width = request.sampling_config.beam_width
+  1581    557600     641240.0      1.2      2.1          for beam in range(beam_width):
+  1582    278800     362440.0      1.3      1.2              first_beam = 0
+  1583    278800     334560.0      1.2      1.1              if beam == first_beam:
+  1584    278800     390320.0      1.4      1.3                  gen_request_seq_slots.append(request.py_seq_slot)

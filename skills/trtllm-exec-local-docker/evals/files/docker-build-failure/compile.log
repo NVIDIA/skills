@@ -1,0 +1,144 @@
+[exec-local-compile] repo_dir=/path/to/TensorRT-LLM arch=103
+[exec-local-compile] image=registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901
+$ ./scripts/build_wheel.py --use_ccache -a "103" -f --nvtx
+-- Using ccache: /usr/bin/ccache
+-- CMAKE_CUDA_ARCHITECTURES: 103-real
+-- FAST_BUILD: ON
+-- Configuring done (3.4s)
+-- Generating done (1.3s)
+-- Build files have been written to: /path/to/TensorRT-LLM/cpp/build
+[1201/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_0.o
+[1202/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_1.o
+[1203/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_2.o
+[1204/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_3.o
+[1205/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_4.o
+[1206/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_5.o
+[1207/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_6.o
+[1208/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_7.o
+[1209/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_8.o
+[1210/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_9.o
+[1211/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_10.o
+[1212/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_11.o
+[1213/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_12.o
+[1214/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_13.o
+[1215/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_14.o
+[1216/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_15.o
+[1217/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_16.o
+[1218/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_17.o
+[1219/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_18.o
+[1220/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_19.o
+[1221/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_20.o
+[1222/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_21.o
+[1223/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_22.o
+[1224/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_23.o
+[1225/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_24.o
+[1226/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_25.o
+[1227/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_26.o
+[1228/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_27.o
+[1229/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_28.o
+[1230/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_29.o
+[1231/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_30.o
+[1232/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_31.o
+[1233/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_32.o
+[1234/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_33.o
+[1235/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_34.o
+[1236/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_35.o
+[1237/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_36.o
+[1238/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_37.o
+[1239/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_38.o
+[1240/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_39.o
+[1241/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_40.o
+[1242/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_41.o
+[1243/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_42.o
+[1244/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_43.o
+[1245/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_44.o
+[1246/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_45.o
+[1247/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_46.o
+[1248/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_47.o
+[1249/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_48.o
+[1250/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_49.o
+[1251/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_50.o
+[1252/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_51.o
+[1253/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_52.o
+[1254/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_53.o
+[1255/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_54.o
+[1256/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_55.o
+[1257/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_56.o
+[1258/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_57.o
+[1259/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_58.o
+[1260/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_59.o
+[1261/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_60.o
+[1262/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_61.o
+[1263/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_62.o
+[1264/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_63.o
+[1265/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_64.o
+[1266/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_65.o
+[1267/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_66.o
+[1268/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_67.o
+[1269/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_68.o
+[1270/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_69.o
+[1271/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_70.o
+[1272/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_71.o
+[1273/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_72.o
+[1274/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_73.o
+[1275/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_74.o
+[1276/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_75.o
+[1277/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_76.o
+[1278/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_77.o
+[1279/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_78.o
+[1280/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_79.o
+[1281/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_80.o
+[1282/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_81.o
+[1283/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_82.o
+[1284/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_83.o
+[1285/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_84.o
+[1286/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_85.o
+[1287/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_86.o
+[1288/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_87.o
+[1289/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_88.o
+[1290/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_89.o
+[1291/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_90.o
+[1292/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_91.o
+[1293/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_92.o
+[1294/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_93.o
+[1295/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_94.o
+[1296/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_95.o
+[1297/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_96.o
+[1298/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_97.o
+[1299/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_98.o
+[1300/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_99.o
+[1301/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_100.o
+[1302/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_101.o
+[1303/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_102.o
+[1304/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_103.o
+[1305/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_104.o
+[1306/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_105.o
+[1307/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_106.o
+[1308/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_107.o
+[1309/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_108.o
+[1310/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_109.o
+[1311/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_110.o
+[1312/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_111.o
+[1313/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/batch_manager_kvCacheManager_112.o
+[1314/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/runtime_gptDecoder_113.o
+[1315/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_samplingTopKKernels_114.o
+[1316/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_quantization_115.o
+[1317/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_customAllReduceKernels_116.o
+[1318/2873] Building CXX object tensorrt_llm/CMakeFiles/src.dir/thop_attentionOp_117.o
+[1319/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_mixtureOfExperts_moe_align_kernels_118.o
+[1320/2873] Building CUDA object tensorrt_llm/CMakeFiles/src.dir/kernels_decodingKernels_119.o
+FAILED: tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/mixtureOfExperts/moe_kernels.cu.o
+/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -O3 -DNDEBUG --generate-code=arch=compute_103,code=[sm_103] -c /path/to/TensorRT-LLM/cpp/tensorrt_llm/kernels/mixtureOfExperts/moe_kernels.cu -o tensorrt_llm/kernels/CMakeFiles/kernels_src.dir/mixtureOfExperts/moe_kernels.cu.o
+/path/to/TensorRT-LLM/cpp/tensorrt_llm/kernels/mixtureOfExperts/moe_kernels.cu(1432): error: identifier "kMaxTopKPerToken" is undefined
+      static_assert(TOP_K <= kMaxTopKPerToken, "top-k too large");
+                             ^
+
+1 error detected in the compilation of "/path/to/TensorRT-LLM/cpp/tensorrt_llm/kernels/mixtureOfExperts/moe_kernels.cu".
+ninja: build stopped: subcommand failed.
+Traceback (most recent call last):
+  File "/path/to/TensorRT-LLM/./scripts/build_wheel.py", line 1012, in <module>
+    main(**vars(args))
+  File "/path/to/TensorRT-LLM/./scripts/build_wheel.py", line 611, in main
+    build_run(
+subprocess.CalledProcessError: Command 'cmake --build . --config Release --parallel 64 --target build_wheel_targets' returned non-zero exit status 1.
+[exec-local-compile] build exited with status 1

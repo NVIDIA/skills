@@ -1,0 +1,88 @@
+{
+  "skill_name": "trtllm-test-script-builder",
+  "evals": [
+    {
+      "id": "scriptbuilder-bench-local-slurm",
+      "prompt": "Generate the Slurm script and job_spec.json for this TensorRT-LLM bench run (execution_scenario local_slurm; persistent_mode left at its default):\n- workflow_type: bench\n- bench_cmd: trtllm-bench --model /models/Llama-3.1-8B prepare-dataset --output /tmp/ds.json token-norm-dist --num-requests 256 --input-mean 1024 --output-mean 1024 --input-stdev 0 --output-stdev 0 && trtllm-bench --model /models/Llama-3.1-8B throughput --dataset /tmp/ds.json --tp 4\n- model_name: llama31_8b\n- work_dir: /workspace/out/work_dirs/llama31_8b_20261104_101500 (create it if needed)\n- repo_root: /workspace/trtllm (placeholder path; there is no checkout here)\n- container_image: registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901\n- partition: batch, account: team_llm (both validated upstream)\n- slurm_env_file: /workspace/input/bench-local-slurm/slurm_env.json\n- models_path: /data/llm-models; llm_models_root: /models\nThis sandbox has Python but no Slurm, GPU, or TRT-LLM install. Generate the files only; don't submit or run anything.",
+      "expected_skill": "trtllm-test-script-builder",
+      "expected_script": "scripts/build_slurm_script.py",
+      "expected_output": "Runs the skill's build_slurm_script.py bench with --nodes 1 --ntasks 4 --ntasks-per-node 4 --gres gpu:8 and the given image, mounts and project path, writing <work_dir>/llama31_8b_bench.slurm in which the throughput step is prefixed with trtllm-llmapi-launch under a pmix srun and dataset prep runs with --ntasks=1; writes job_spec.json with the bench log/success/failure patterns, slurm_params, the embedded slurm_env, and persistent_mode fields. Nothing is submitted.",
+      "assertions": [
+        "Generates `/workspace/out/work_dirs/llama31_8b_20261104_101500/llama31_8b_bench.slurm` by running the skill's `build_slurm_script.py bench` rather than hand-writing the script.",
+        "The script header has `--nodes=1`, `--ntasks=4`, `--ntasks-per-node=4` and `#SBATCH --gres=gpu:8` (partition batch reports gpu GRES with 8 GPUs per node).",
+        "In the script, the throughput step runs as `trtllm-llmapi-launch trtllm-bench ... throughput ...` under an srun with a pmix MPI plugin, and the prepare-dataset srun uses `--ntasks=1`.",
+        "The container mounts include `/workspace/trtllm:/workspace/trtllm` and `/data/llm-models:/models` (models_path mapped to llm_models_root).",
+        "job_spec.json records workflow_type bench, log_file_pattern `llama31_8b_bench_%j.out`, success_patterns `token/s` and `throughput`, failure_patterns `Error` and `Traceback`, slurm_params (partition batch, account team_llm, 1 node, 4 tasks, gres gpu:8), and the embedded slurm_env.",
+        "job_spec.json includes `persistent_mode: true` with container_name and container_mounts (local_slurm default), and nothing is submitted or executed."
+      ],
+      "files": [
+        "files/bench-local-slurm"
+      ]
+    },
+    {
+      "id": "scriptbuilder-pytest-exceeds-node-gpus",
+      "prompt": "Build the Slurm script for this pytest run (execution_scenario local_slurm): test_cmd `pytest /workspace/input/pytest-8gpu/test_llama_tp8.py::test_llama_70b_tp8 -v`, model_name llama70b, partition batch, account team_llm (both validated upstream), slurm_env_file /workspace/input/pytest-8gpu/slurm_env.json, container_image registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901, repo_root /workspace/trtllm (placeholder; no checkout here), work_dir /workspace/out/work_dirs/llama70b_20261104_120000, models_path /data/llm-models, llm_models_root /models. This sandbox has Python but no Slurm or GPU. Generate the files only if the request is valid; don't submit anything.",
+      "expected_skill": "trtllm-test-script-builder",
+      "expected_script": null,
+      "expected_output": "The test's `skip_less_device(8)` marker means required_devices is 8, but partition batch has 4 GPUs per node and non-perf pytest is single-node only, so the builder stops with an error and generates no script or job_spec.json.",
+      "assertions": [
+        "Derives required_devices = 8 from the test's `skip_less_device(8)` marker.",
+        "Compares it with gpus_per_node = 4 for partition batch from slurm_env.json.",
+        "Stops with an error because pytest is single-node only, rather than producing a multi-node (2-node) pytest script.",
+        "Does not write a .slurm script or job_spec.json for this request."
+      ],
+      "files": [
+        "files/pytest-8gpu"
+      ]
+    },
+    {
+      "id": "scriptbuilder-remote-pytest-no-gres",
+      "prompt": "Generate the Slurm script and job_spec.json for a remote_slurm pytest run:\n- test_cmd: pytest tests/unittest/llmapi/test_llm_args.py -v (required_devices 1; the test lives in the remote checkout, there is no local checkout here)\n- model_name: qwen\n- local work_dir: /workspace/out/work_dirs/qwen_20261104_130000 (create it if needed)\n- remote_repo_path: /shared/users/jdoe/TensorRT-LLM\n- remote_work_dir: /shared/users/jdoe/TensorRT-LLM/work_dirs/qwen_20261104_130000\n- partition: gpu, account: team_llm (both validated upstream)\n- container_image: registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-aarch64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901\n- slurm_env_file: /workspace/input/remote-pytest/slurm_env.json (already merged with the cluster's mounts and connection fields)\n- llm_models_root: /models\nThis sandbox has Python but no Slurm, GPU, or network. Generate the files only; don't transfer or submit anything.",
+      "expected_skill": "trtllm-test-script-builder",
+      "expected_script": "scripts/build_slurm_script.py",
+      "expected_output": "Runs build_slurm_script.py pytest with remote paths (--project-path /shared/users/jdoe/TensorRT-LLM and --log-dir set to remote_work_dir) plus --local-log-dir pointing at the local work_dir, no --gres because partition gpu reports (null), and mounts that reuse slurm_env.mounts verbatim; writes <work_dir>/qwen_auto_test.slurm and a job_spec.json with the local script_path, remote_repo_path, remote_work_dir, log pattern qwen_auto_test_%j.out, and no persistent-mode fields.",
+      "assertions": [
+        "Generates `/workspace/out/work_dirs/qwen_20261104_130000/qwen_auto_test.slurm` with the skill's `build_slurm_script.py pytest`.",
+        "The script contains no `#SBATCH --gres` line, because partition `gpu` reports gres `(null)`.",
+        "The script uses remote paths: `#SBATCH --output`/`--error` under `/shared/users/jdoe/TensorRT-LLM/work_dirs/qwen_20261104_130000` and `--container-workdir=/shared/users/jdoe/TensorRT-LLM`, with `--local-log-dir` set to the local work_dir.",
+        "The container mounts include the slurm_env mounts verbatim (`/shared/llm-models:/models` and `/shared/datasets:/datasets`) and no separately constructed models mount.",
+        "job_spec.json records the local script_path, `remote_repo_path`, `remote_work_dir` and log_file_pattern `qwen_auto_test_%j.out`, and omits persistent_mode/container_name/container_mounts.",
+        "Does not transfer or submit the script."
+      ],
+      "files": [
+        "files/remote-pytest"
+      ]
+    },
+    {
+      "id": "scriptbuilder-eval-multinode-fallback",
+      "prompt": "Generate the Slurm script for this accuracy eval (execution_scenario local_slurm): eval_cmd `trtllm-eval --model /models/DeepSeek-R1 --tp_size 8 --pp_size 2 gsm8k`, model_name deepseek_r1, partition batch, account team_llm (both validated upstream), slurm_env_file /workspace/input/eval-tp16/slurm_env.json, container_image registry.example.com/trtllm/tensorrt-llm:pytorch-25.12-py3-x86_64-ubuntu24.04-trt10.14.1.48-skip-tritondevel-202602011118-10901, repo_root /workspace/trtllm (placeholder; no checkout here), work_dir /workspace/out/work_dirs/deepseek_r1_20261104_140000, models_path /data/llm-models, llm_models_root /models. This sandbox has Python but no Slurm, GPU, or TRT-LLM checkout; don't submit anything.",
+      "expected_skill": "trtllm-test-script-builder",
+      "expected_script": null,
+      "expected_output": "world_size = 8 x 2 = 16 exceeds the 8 GPUs per node on batch and trtllm-eval is single-node only, so no Category 5 eval script is generated; the run has to go through the perf-sanity path instead (a benchmark config with accuracy.enable_accuracy_test: true submitted via the repo's jenkins/scripts/perf/local/submit.py), which can't be produced here without a TRT-LLM checkout.",
+      "assertions": [
+        "Computes world_size = 16 (tp_size 8 x pp_size 2) and compares it with gpus_per_node = 8 for partition batch.",
+        "Does not generate a trtllm-eval (Category 5) script, such as deepseek_r1_eval.slurm, because trtllm-eval is single-node only.",
+        "Routes the request to the perf-sanity path (Category 4): a benchmark config with `accuracy.enable_accuracy_test: true` submitted through `jenkins/scripts/perf/local/submit.py`.",
+        "Does not fabricate submit.py output; reports that it needs the TRT-LLM checkout to run."
+      ],
+      "files": [
+        "files/eval-tp16"
+      ]
+    },
+    {
+      "id": "scriptbuilder-negative",
+      "prompt": "My TRT-LLM Slurm job 812345 has been PENDING for 40 minutes. How do I find out why it isn't starting, and what are my options? Just explain and give the commands; don't run anything (there's no Slurm here).",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Explains checking the pending reason and estimated start (`squeue -j 812345 -o '%i %T %r %S'`, `scontrol show job 812345`), common reasons (Priority, Resources, QOS or association limits), and options (wait, shorter walltime, another partition or backfill, fewer nodes), without loading the script-builder skill or regenerating a script.",
+      "assertions": [
+        "The trtllm-test-script-builder skill is not loaded or applied.",
+        "Shows how to see the pending reason and estimated start (e.g., `squeue -j 812345 -o '%i %T %r %S'` or `scontrol show job 812345`).",
+        "Explains common pending reasons such as Priority, Resources, or QOS/association limits.",
+        "Does not generate a new Slurm script or job_spec.json."
+      ],
+      "files": []
+    }
+  ]
+}

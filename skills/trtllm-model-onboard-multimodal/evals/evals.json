@@ -1,0 +1,89 @@
+{
+  "skill_name": "trtllm-model-onboard-multimodal",
+  "evals": [
+    {
+      "id": "mm-onboard-plan",
+      "prompt": "We want to onboard the HuggingFace VLM acme/Vista-VL-7B (image + video + text) to the TensorRT-LLM PyTorch backend. Its config.json is at /workspace/input/vista-config/config.json. There's no TensorRT-LLM checkout, GPU, or network in this environment, so don't clone, download, or install anything. Give me the onboarding plan: every file and class to add or change, the registrations, and the tests and docs needed before the PR.",
+      "expected_skill": "trtllm-model-onboard-multimodal",
+      "expected_script": null,
+      "expected_output": "A plan for tensorrt_llm/_torch/models/modeling_vista_vl.py with a MultimodalModelMixin wrapper that builds the inner Qwen3 LLM from text_config via TensorRT-LLM's AutoModelForCausalLM, a vision encoder ported to _torch modules, an input processor plus dummy-inputs builder, the register_vision_encoder / register_auto_model / register_input_processor stack, mRoPE handling, a weight mapper under checkpoints/hf/, a TestModelingMultimodal unit test, an MMMU accuracy test wired into the test-db, and support-matrix doc rows.",
+      "assertions": [
+        "Plans tensorrt_llm/_torch/models/modeling_vista_vl.py with a wrapper class inheriting MultimodalModelMixin that builds the inner LLM from text_config via TensorRT-LLM's AutoModelForCausalLM.from_config (tensorrt_llm._torch.models.modeling_auto, not transformers'), relying on the registered Qwen3 text model.",
+        "Specifies the decorator stack with @register_vision_encoder above @register_auto_model(\"VistaVLForConditionalGeneration\") above @register_input_processor(..., model_type=\"vista_vl\", placeholder_metadata=...), with @support_multimodal_disaggregated only as an optional outermost decorator.",
+        "Plans an input processor that subclasses both BaseMultimodalInputProcessor and BaseMultimodalDummyInputsBuilder and implements call_with_text_prompt (not __call__) plus get_mm_item_metadata, get_mm_max_tokens_per_item and get_dummy_mm_data.",
+        "Requires the vision encoder to be ported to TensorRT-LLM _torch modules (Linear, Attention, MLP/GatedMLP, norms) with no imports of modules or helper functions from transformers.models.*, and weight surgery through a mapper under _torch/models/checkpoints/hf/ that inherits from a related mapper (e.g., a Qwen-VL mapper).",
+        "Handles mRoPE (text_config.rope_scaling.mrope_section): MRotaryEmbedding / init_mrope_embedding on the LLM side, with mrope_config computed on CPU in the input processor once per request rather than per layer.",
+        "Lists the tests and docs: tests/unittest/_torch/modeling/test_modeling_vista_vl.py subclassing TestModelingMultimodal, an MMMU accuracy test in tests/integration/defs/accuracy/test_llm_api_pytorch_multimodal.py wired into an l0_<gpu>.yml test list, and rows in the Supported Models table and Multimodal Feature Support Matrix of docs/source/models/supported-models.md."
+      ],
+      "files": [
+        "files/vista-config"
+      ]
+    },
+    {
+      "id": "mm-review-draft-contracts",
+      "prompt": "Please review my first draft of the TensorRT-LLM PyTorch-backend modeling file for our VLM before I go further: /workspace/input/vista-draft/modeling_vista_vl.py. There's no GPU, TensorRT-LLM checkout, or network here; review the code only and don't install anything. What has to change?",
+      "expected_skill": "trtllm-model-onboard-multimodal",
+      "expected_script": null,
+      "expected_output": "Flags the CPU-GPU syncs in forward (.item(), torch.nonzero, value-dependent branch, torch.tensor from a Python list on cuda), the per-request encoder loop, the transformers.models.qwen2_vl import and raw nn.Linear/nn.LayerNorm, the __call__ override with synchronous PIL decoding and .cuda() in preprocessing, the missing or misordered registrations and dummy-inputs builder, and the missing MultimodalModelMixin, with concrete fixes for each.",
+      "assertions": [
+        "Flags the CPU-GPU synchronizations in forward (.item(), torch.nonzero, the value-dependent `if num_image_tokens == 0` branch, and torch.tensor([...], device=\"cuda\") built from a Python list) as violations of the zero-sync rule, and recommends a static graph plus a torch.cuda.set_sync_debug_mode(\"warn\") audit.",
+        "Flags the per-request encoder loop and requires a single batched encoder call across requests (concatenated pixel_values/grid_thw with one attn_metadata preserving item boundaries) through encode_multimodal_inputs.",
+        "Flags the transformers.models.qwen2_vl import and the raw nn.Linear / nn.LayerNorm layers, requiring the encoder and projector to be ported to TensorRT-LLM _torch modules.",
+        "Flags overriding __call__ in the input processor (implement call_with_text_prompt instead) and the synchronous PIL.Image.open plus .cuda() in preprocessing (use the async loaders, keep preprocessing on CPU, and declare multimodal_data_device_paths).",
+        "Flags the registration problems: missing @register_vision_encoder, @register_input_processor placed above @register_auto_model instead of innermost, missing placeholder_metadata, and no BaseMultimodalDummyInputsBuilder subclass.",
+        "Flags that the model should inherit MultimodalModelMixin (going through prepare_multimodal_inputs) and must not take raw multimodal tensors such as pixel_values as forward arguments."
+      ],
+      "files": [
+        "files/vista-draft"
+      ]
+    },
+    {
+      "id": "mm-unit-test-config-coupling",
+      "prompt": "My new per-model unit test (a TestModelingMultimodal subclass) for a VLM I'm onboarding to TensorRT-LLM fails. The test excerpt with its synthetic config and the failure log are in /workspace/input/vista-test-failure/. I'm planning to raise get_tolerance from the default 0.4/0.4 to 0.6/0.6 to get past it. There's no GPU, TensorRT-LLM install, or network here (don't install or download anything, including the tokenizer); diagnose from the files and tell me what to change.",
+      "expected_skill": "trtllm-model-onboard-multimodal",
+      "expected_script": null,
+      "expected_output": "Explains that the synthetic vocab_size (151643) is below the real tokenizer's size (151669), so the six chat-template special tokens with ids >= vocab_size are counted as image tokens by fuse_input_embeds' OOV filter (1030 vs 1024), fixed by matching vocab_size to the real tokenizer. Also flags the mRoPE coupling (64 x 1.0 / 2 = 32, but mrope_section sums to 64) and deepstack indexes [2, 5, 8] with depth 6, and advises against loosening the tolerance.",
+      "assertions": [
+        "Explains the image-token mismatch: the synthetic text_config.vocab_size (151643) is smaller than the real tokenizer loaded via _name_or_path (151669), so chat-template special tokens with ids >= vocab_size are misclassified as multimodal tokens by fuse_input_embeds' OOV filter, making the count off by exactly the number of those specials (6: 1030 vs 1024).",
+        "Fixes it by setting the test config's vocab_size to the real tokenizer's vocabulary size (or by not loading the real tokenizer).",
+        "Identifies the violated mRoPE coupling head_dim x partial_rotary_factor / 2 == sum(mrope_section) (64 x 1.0 / 2 = 32, but [24, 20, 20] sums to 64) and says head_dim cannot be shrunk without adjusting mrope_section to match.",
+        "Identifies that deepstack_visual_indexes [2, 5, 8] require a vision depth greater than 8, but the config sets depth 6.",
+        "Advises against loosening the tolerance: the default 0.4/0.4 is already wide enough to mask argmax-changing bugs; once the test passes, keep atol at 0.4 and tighten rtol toward 0.1 (not below 0.05 without cross-SKU validation)."
+      ],
+      "files": [
+        "files/vista-test-failure"
+      ]
+    },
+    {
+      "id": "mm-serve-chunked-prefill-log",
+      "prompt": "I'm finishing the TensorRT-LLM onboarding of our VLM (acme/Vista-VL-7B, image + text). The quickstart passed and trtllm-serve returns coherent answers, so I'm about to mark Chunked Prefill and KV Cache Reuse as 'Yes' in the Multimodal Feature Support Matrix and open the PR. The commands I ran and the server log are in /workspace/input/vista-serve-log/. Is anything blocking? (No GPU, TensorRT-LLM install, or network here; don't install, download, or run anything.)",
+      "expected_skill": "trtllm-model-onboard-multimodal",
+      "expected_script": null,
+      "expected_output": "Treats both warnings as blocking silent performance cliffs: 'Multimodal hashing failed:' means hashing fell back so KV-cache reuse for repeated images is broken, and 'Multimodal runtime data missing or incomplete, will not cache embeddings.' means the encoder-output cache is skipped and the encoder reruns every chunk (encoder output length vs placeholder count). Advises not marking those features Yes until fixed and re-verified, and lists the remaining PR requirements.",
+      "assertions": [
+        "Identifies the `Multimodal hashing failed:` warning as the input processor's hashing path falling back, which breaks KV-cache reuse across requests that send the same image.",
+        "Identifies `Multimodal runtime data missing or incomplete, will not cache embeddings.` as the encoder-output cache being skipped, so the encoder re-runs on every chunked-prefill iteration (the repeated encoder forwards in the log), and ties it to the encoder's output length not matching the multimodal placeholder count.",
+        "States that these are silent performance cliffs that must be fixed before the model is declared done, even though the responses look correct.",
+        "Advises not marking Chunked Prefill or KV Cache Reuse as Yes in the Multimodal Feature Support Matrix until they are fixed and re-verified with a clean low-max_num_tokens server log.",
+        "Notes the remaining PR requirements: a title of the form [JIRA/NVBUG/None][type] description, git commit -s, a PR body with a verbatim multimodal prompt and output, reproduction commands and pytest output, and triggering CI with /bot run."
+      ],
+      "files": [
+        "files/vista-serve-log"
+      ]
+    },
+    {
+      "id": "mm-negative",
+      "prompt": "How do I serve Qwen2.5-VL-7B-Instruct with vLLM's OpenAI-compatible server and send it a chat request that includes an image?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A vLLM answer: start the OpenAI-compatible server for the model and send a chat completion whose content includes an image_url part, without loading the TensorRT-LLM onboarding skill or describing TensorRT-LLM modeling work.",
+      "assertions": [
+        "The trtllm-model-onboard-multimodal skill is not loaded or applied.",
+        "Gives a vLLM serving command (e.g., vllm serve Qwen/Qwen2.5-VL-7B-Instruct) and an OpenAI-style chat request whose message content includes an image_url part.",
+        "Does not describe TensorRT-LLM model-onboarding work such as modeling files, register_auto_model, or input processors."
+      ],
+      "files": []
+    }
+  ]
+}

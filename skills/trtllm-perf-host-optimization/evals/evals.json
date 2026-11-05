@@ -1,0 +1,88 @@
+{
+  "skill_name": "perf-host-optimization",
+  "evals": [
+    {
+      "id": "pho-drilldown-profiler-setup",
+      "prompt": "We are trying to cut host/CPU overhead in the TensorRT-LLM PyTorch executor (GPU utilization is only ~55% during decode). Our first line_profiler run is in /workspace/input/lp-forward-step/profile_round0_baseline.txt and the run settings are in /workspace/input/lp-forward-step/run.md. What is the next step to find the actual host hotspot, and exactly how should I configure the next profiling run? This sandbox has no GPU, no TensorRT-LLM checkout or install, and no network - do not install anything; give me the settings/commands to run on our machine.",
+      "expected_skill": "perf-host-optimization",
+      "expected_script": null,
+      "expected_output": "Notes that 98.7% of _forward_step (59.2 s, far more than _sample_async's 6.1 s total) sits in the single unprofiled model_engine.forward() call, so the next step is drill-down: add tensorrt_llm._torch.pyexecutor.model_engine.PyTorchModelEngine._prepare_tp_inputs (and/or PyTorchModelEngine.forward) to TLLM_LINE_PROFILER_FUNCTIONS, keep TLLM_LINE_PROFILER_ENABLED=True with a new TLLM_LINE_PROFILER_PATH, rerun the identical workload under a new EXTRA_SUFFIX with the same numactl affinity, and analyze the inner hotspots before changing code.",
+      "assertions": [
+        "Identifies that about 98.7% of `_forward_step` time is the single `self.model_engine.forward(...)` call to a function that is not profiled, and that the next step is drill-down profiling into it rather than optimizing `_forward_step`'s own lines; prioritizes it over `_sample_async` by absolute time (59.2 s vs about 6.1 s for `_sample_async`).",
+        "Adds the sub-function to `TLLM_LINE_PROFILER_FUNCTIONS` using the dotted class-method format, e.g. `tensorrt_llm._torch.pyexecutor.model_engine.PyTorchModelEngine._prepare_tp_inputs` (optionally also `...PyTorchModelEngine.forward`).",
+        "Keeps `TLLM_LINE_PROFILER_ENABLED=True` and sets a new `TLLM_LINE_PROFILER_PATH` for the drill-down output.",
+        "Reruns the identical workload under a new round suffix (e.g. `EXTRA_SUFFIX=round0_drilldown`) and keeps the same CPU affinity (`numactl --cpunodebind=0 --membind=0`) as the baseline so the runs are comparable.",
+        "Does not propose a specific code change before the drill-down profile exists, and does not try to run the profiler or install packages in the sandbox."
+      ],
+      "files": [
+        "files/lp-forward-step"
+      ]
+    },
+    {
+      "id": "pho-round1-classify-and-plan",
+      "prompt": "Here is the drill-down line_profiler output for PyTorchModelEngine._prepare_tp_inputs from our TensorRT-LLM host-overhead work: /workspace/input/lp-prepare-tp-inputs/profile_round0_drilldown.txt (run details in /workspace/input/lp-prepare-tp-inputs/run.md). Plan optimization round 1: classify the hotspots, lay out the options, pick what to do this round, and say how it will be validated. The TensorRT-LLM source is not in this sandbox and there is no GPU or network, so do not try to edit or run anything - describe the change precisely.",
+      "expected_skill": "perf-host-optimization",
+      "expected_script": null,
+      "expected_output": "Ranks hotspots by absolute time and classifies them with the skill taxonomy: MultimodalParams construct/strip/has_content on a text-only model = DEAD_WORK (~7.8 s), the previous_state comprehension re-walking generation_requests = REDUNDANT_ITER (~4.7 s), has_cp_helix() in the loop = FUNCALL (~1.5 s), LlmRequestState(...) at ~1.7 us/hit = ENUM_CONSTRUCT, get_last_tokens/torch.tensor = COMPUTE. Presents a 2-4 option table with savings/risk/complexity, applies one zero-risk change this round (e.g. guard MultimodalParams with `if request.py_multimodal_data:`), validates with test_model_engine.py (rollback via git checkout on failure), and re-profiles with a round1 suffix comparing hotspot, function total and throughput/TPOT.",
+      "assertions": [
+        "Ranks hotspots by absolute Time rather than % or Per Hit, treating the three MultimodalParams lines (~7.8 s combined) and the `previous_state` comprehension (~4.7 s) as the two largest optimizable hotspots.",
+        "Classifies the MultimodalParams construction/strip/has_content lines on a text-only model as DEAD_WORK and the `previous_state` list comprehension (a second pass over generation_requests that the categorization loop already walks) as REDUNDANT_ITER.",
+        "Classifies `self.mapping.has_cp_helix()` inside the loop as FUNCALL (cacheable invariant) and the `LlmRequestState(request.state_value)` line (~1.7 us per hit) as ENUM_CONSTRUCT.",
+        "Presents an options table of 2-4 options with estimated savings, risk and complexity, and selects a zero/low-risk option for this round following zero-risk-first ordering.",
+        "Applies only one optimization in round 1 and defers the others to later rounds with re-profiling, because the bottleneck landscape shifts after each change.",
+        "Validation plan runs the related unit tests (tests/unittest/_torch/pyexecutor/test_model_engine.py) with rollback via `git checkout` on failure, then re-profiles the identical workload with a round1 suffix comparing hotspot time, function total time and benchmark throughput/TPOT, without claiming any improvement yet."
+      ],
+      "files": [
+        "files/lp-prepare-tp-inputs"
+      ]
+    },
+    {
+      "id": "pho-cpython-ternary-rollback",
+      "prompt": "Round 3 of our TensorRT-LLM host-optimization loop on _prepare_tp_inputs made things worse even though every change looked like it should save time. The before/after line profiles and benchmark numbers are in /workspace/input/lp-round3-regression/. What went wrong and what should we do next? There is no source checkout, GPU or network in this sandbox - describe the actions, do not install anything.",
+      "expected_skill": "perf-host-optimization",
+      "expected_script": null,
+      "expected_output": "The has_cp_helix hoist (1.5 s -> ~0.09 s) and first_beam removal helped, but rewriting beam_width as a ternary raised that line from 5.1 to 14.3 us per hit (+2.56 s) - the documented CPython pitfall where a conditional expression is slower than a plain attribute chain. Roll back (git checkout -- model_engine.py), apply option B without the ternary, rerun UTs, re-profile with a new suffix, and judge by throughput/TPOT; round 3 is not a win.",
+      "assertions": [
+        "Pinpoints the regression to line 1580 rewritten as a conditional expression (`... if _use_beam_search else 1`), whose Per Hit rose from about 5.1 us to about 14.3 us, and identifies it as the CPython pitfall that a ternary can be slower than a plain attribute-chain access.",
+        "Recognizes that hoisting `has_cp_helix()` (about 1.5 s down to under 0.1 s) and dropping the `first_beam` assignment did reduce time and should be kept.",
+        "Recommends rolling back the round-3 change (e.g. `git checkout -- .../model_engine.py`) and re-applying the next-best option without the ternary (option B), followed by the unit tests.",
+        "Requires re-profiling with the identical workload under a new round suffix and judges the round by benchmark throughput/TPOT rather than line_profiler time alone.",
+        "Does not describe round 3 as an improvement."
+      ],
+      "files": [
+        "files/lp-round3-regression"
+      ]
+    },
+    {
+      "id": "pho-stop-and-final-summary",
+      "prompt": "We have now run five rounds of host-overhead optimization on TensorRT-LLM's _prepare_tp_inputs; the log is in /workspace/input/optimization-rounds/rounds.md. Should we run a sixth round? If not, write the final summary for the team. Work only from the file - no GPU, source checkout or network here, and do not install anything.",
+      "expected_skill": "perf-host-optimization",
+      "expected_script": null,
+      "expected_output": "Stops: the last two rounds gave -1.4% and -0.9% (< 5%), the remaining lines are COMPUTE, and the only remaining idea is an architectural struct-of-arrays/Cython rewrite. Final summary: 5 rounds; _prepare_tp_inputs 43.2 s -> 28.65 s (-33.7%); throughput 3,200 -> 3,786 tok/s (+18.3%), TPOT 37.4 -> 31.5 ms, ITL 37.1 -> 31.3 ms, E2EL 39.6 -> 33.4 s; per-round changes with file:line and class; the reverted ternary under failed attempts; remaining hotspots with class; recommendation to treat the rewrite as a separate architectural project.",
+      "assertions": [
+        "Decides to stop the loop, citing diminishing returns (the last two rounds improved less than 5%: -1.4% and -0.9%) and that the remaining hotspots are COMPUTE or need architectural changes (struct-of-arrays / Cython).",
+        "Reports the cumulative reduction of `_prepare_tp_inputs` from 43.2 s to 28.65 s (about -33.7%) and output throughput from 3,200 to 3,786 tok/s (about +18.3%).",
+        "The final summary contains rounds executed, a before/after benchmark table with TPOT, throughput, ITL and E2EL, the optimizations applied with file:line and hotspot classification, failed attempts, remaining hotspots with classification, and recommendations.",
+        "Lists the reverted round-3 ternary change under failed attempts together with the reason (slower conditional expression / CPython pitfall).",
+        "Treats benchmark throughput as the primary success metric (line_profiler reductions as leading indicators) and does not introduce numbers that are not in the log."
+      ],
+      "files": [
+        "files/optimization-rounds"
+      ]
+    },
+    {
+      "id": "pho-negative",
+      "prompt": "During DeepSeek-R1 decode on 8x B200 the GPU is about 97% busy, and Nsight Compute shows our MoE grouped-GEMM kernel reaching only about 41% of speed-of-light. How should we approach making that kernel faster?",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "Treats this as GPU-bound kernel optimization: use Nsight Compute evidence (memory vs compute limiter, occupancy, tile/stage configuration, backend or precision choice) to guide kernel-level changes; no host-side line_profiler work.",
+      "assertions": [
+        "The perf-host-optimization skill is not loaded or applied.",
+        "Treats the problem as GPU-bound kernel optimization guided by kernel-level metrics (e.g. limiter, occupancy, tile/pipeline configuration, kernel backend or precision choice).",
+        "Does not propose host/CPU-side line_profiler profiling (`TLLM_LINE_PROFILER_*`) or PyExecutor host-overhead work as the way to speed up this kernel."
+      ],
+      "files": []
+    }
+  ]
+}

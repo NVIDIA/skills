@@ -1,0 +1,83 @@
+{
+  "skill_name": "trtllm-test-specialist",
+  "evals": [
+    {
+      "id": "test-spec-perf-sanity-derive",
+      "prompt": "Run this TensorRT-LLM perf test for me: `pytest tests/integration/defs/perf/test_perf_sanity.py::test_e2e[disagg_upload-gb200_deepseek-v32-fp4_8k1k_ctx1_gen1_dep16_mtp3] -v`. This environment has no GPUs, no cluster access, no network, and no TensorRT-LLM checkout, so do not execute it or install anything; take it as far as you can and stop where you would need my confirmation or the hardware.",
+      "expected_skill": "trtllm-test-specialist",
+      "expected_script": null,
+      "expected_output": "Classifies the command as a pre-built perf-sanity benchmark (test_perf_sanity.py with a test_e2e[ selector), derives device_type GB200 and model_name deepseek_v32 from the test ID, sets required_devices to 1 without applying the module-test GPU limit, prints the resolved-parameter table with sources, and pauses for confirmation before delegating anything.",
+      "assertions": [
+        "Classifies the command as a perf-sanity benchmark test on the pre-built perf-sanity path (it targets test_perf_sanity.py with a test_e2e[ selector), not as a generic module test.",
+        "Derives device_type = GB200 from the gb200 token in the test ID (not B200).",
+        "Derives model_name = deepseek_v32 from the token after the device token, converting the hyphen to an underscore.",
+        "Uses required_devices = 1 (the pytest orchestrator process) and does not apply the 8-GPU module-test limit or try to size nodes itself.",
+        "Shows a resolved-parameter table with a Source column (e.g., user_input for the test command, derived for device_type and model_name) and asks the user to confirm before proceeding, without executing the test."
+      ],
+      "files": []
+    },
+    {
+      "id": "test-spec-config-precedence",
+      "prompt": "Benchmark Llama 3.1 8B with TensorRT-LLM using my config file /workspace/input/bench-config/llama_bench.yaml, but use tp 4 and concurrency 64 for this run. There are no GPUs, no TensorRT-LLM install, and no network here, so don't install packages or run benchmarks; take it as far as you can.",
+      "expected_skill": "trtllm-test-specialist",
+      "expected_script": null,
+      "expected_output": "Warns that because a config file was given, the directly specified tp 4 and concurrency 64 are dropped; uses only the file's values; reports the unrecognized num_gpus key as ignored; and stops because the benchmark-required checkpoint_path is missing, asking the user to add it to the config file and re-run.",
+      "assertions": [
+        "Warns that because a config file was provided, the directly specified parameters are dropped, naming tp_size (4) and concurrency (64) as ignored.",
+        "Treats the config file as the sole parameter source and does not merge the prompt's tp 4 or concurrency 64 into the resolved parameters (tp_size comes from the file).",
+        "Reports that the unrecognized config key num_gpus is ignored.",
+        "Detects that checkpoint_path, required for a benchmark test, is missing from the config and stops, telling the user to add it to the config file and re-run.",
+        "Does not build or launch a trtllm-bench or perf-sanity command."
+      ],
+      "files": [
+        "files/bench-config"
+      ]
+    },
+    {
+      "id": "test-spec-module-gpu-limit",
+      "prompt": "Please run this module test for the fused MoE module (class FusedMoE): `pytest tests/unittest/_torch/modules/test_moe_ep_scaling.py::TestMoeEpScaling::test_ep16_nvfp4 -v`. The repo root is /workspace/input/module-test, which contains the test file. There are no GPUs or TensorRT-LLM install here; don't install anything or try to run the test on hardware.",
+      "expected_skill": "trtllm-test-specialist",
+      "expected_script": null,
+      "expected_output": "Classifies it as a module test run verbatim, derives required_devices 16 (function-level skip_less_device(16)) and device_type Blackwell (B200/GB200) from the class-level skip_pre_blackwell marker, e.g., with scripts/extract_test_markers.py, and stops because 16 exceeds the 8-GPU single-node limit for pytest/module tests, without delegating execution.",
+      "assertions": [
+        "Classifies the request as a module test (a test command that is not a perf-sanity command) and keeps the user's command verbatim, without writing or modifying tests.",
+        "Derives required_devices = 16 from the function-level skip_less_device(16) marker (function-level markers take precedence over class-level ones), e.g., via scripts/extract_test_markers.py.",
+        "Derives device_type as Blackwell (B200/GB200) from the class-level skip_pre_blackwell marker.",
+        "Stops because required_devices = 16 exceeds the 8-GPU maximum for pytest/module tests (single node only), suggests reducing parallelism or splitting the test, and does not delegate execution.",
+        "Does not run pytest or install packages."
+      ],
+      "files": [
+        "files/module-test"
+      ]
+    },
+    {
+      "id": "test-spec-eval-commands",
+      "prompt": "I want an accuracy evaluation of my local checkpoint /models/Qwen3-8B with TensorRT-LLM on gsm8k and mmlu, tp 2, on a single 8-GPU B200 node. For mmlu, check accuracy against a threshold of 70 using 5-shot, and apply the chat template for both tasks. There are no GPUs and no TensorRT-LLM install here, so don't install or run anything; I just need the exact commands you'd hand off for execution and which path you chose.",
+      "expected_skill": "trtllm-test-specialist",
+      "expected_script": null,
+      "expected_output": "Classifies it as an evaluation test on the single-node trtllm-eval path (tp 2 fits one node) and produces one trtllm-eval invocation per task joined with &&: global options (--model /models/Qwen3-8B, --tp_size 2) before the task, --apply_chat_template after each task, and --check_accuracy --accuracy_threshold 70 --num_fewshot 5 only on mmlu, e.g., via scripts/build_test_command.py --type eval.",
+      "assertions": [
+        "Classifies it as an evaluation test and selects the single-node trtllm-eval path (tp 2 x pp 1 = 2 GPUs fits on one 8-GPU node), not the perf-sanity fallback.",
+        "Produces one trtllm-eval invocation per task (gsm8k and mmlu) joined with &&, rather than passing both tasks to a single invocation.",
+        "Places global options (--model, --tp_size 2) before the task name and per-task options (--apply_chat_template) after each task name.",
+        "Appends --check_accuracy, --accuracy_threshold 70 (or 70.0), and --num_fewshot 5 only to the mmlu invocation, not to gsm8k.",
+        "Passes the local checkpoint path /models/Qwen3-8B as --model so the tokenizer resolves locally, rather than a short model label."
+      ],
+      "files": []
+    },
+    {
+      "id": "test-spec-negative",
+      "prompt": "In my own PyTorch library, how should I mark pytest tests that need at least 2 GPUs so they're skipped automatically on single-GPU CI runners? Show a small example.",
+      "expected_skill": null,
+      "should_trigger": false,
+      "expected_script": null,
+      "expected_output": "A small pytest example that skips multi-GPU tests based on torch.cuda.device_count() (skipif or a custom marker in conftest.py), without loading the TensorRT-LLM test specialist skill or applying its workflow.",
+      "assertions": [
+        "The trtllm-test-specialist skill is not loaded or applied.",
+        "Shows a pytest skip based on the visible GPU count, e.g., @pytest.mark.skipif(torch.cuda.device_count() < 2, reason=...) or a custom marker handled in conftest.py.",
+        "Does not apply the TensorRT-LLM test workflow (no parameter-confirmation table, no trtllm-case-executor delegation, no TensorRT-LLM-specific markers such as skip_less_device)."
+      ],
+      "files": []
+    }
+  ]
+}
