@@ -1,367 +1,213 @@
 # AOV Switching
 
-## Triggers
+Use this reference to display color, HDR, normals, distance, or segmentation
+outputs in a local or streamed viewer. The renderer produces the selected
+output; the presentation shell continues to display the same image surface or
+video track.
 
-Use this skill for requests mentioning `AOV`, `render var`, `changeAOVRequest`, `activeAOVState`, `availableAOVsResult`, `HdrColor`, `NormalSD`, `segmentation view`, or `display render output`.
-
-Use this when the Omniverse Realtime Viewer needs to stream something other than `LdrColor`, such as HDR color, normals, instance segmentation, or semantic segmentation.
-
-Keep one WebRTC video stream. AOV selection changes which ovrtx render var is
-copied into a persistent CUDA BGRA8 stream buffer before calling
-`ovstream.stream_video()`.
-
-For ovrtx AOV, RenderVar tensor, mapping, or release-specific behavior not
-covered here, read `references/dependencies` for acquisition guidance and
-supplemental dependency documentation.
-
-Before copying a RenderVar name, frame-output field, map call, DLPack layout, or
-conversion assumption from this reference, inspect the current upstream ovrtx
-`AGENTS.md`, relevant `skills/`, matching examples, and public API documentation
-or headers. Treat the detailed values below as validation targets and expose only
-outputs verified with the installed runtime.
-
-## Architecture
+## Frame path
 
 ```text
-composite USDA orderedVars
-    -> ovrtx frame_output.render_vars
-    -> runtime displayable-AOV discovery
-    -> selected AOV maps on CUDA
-    -> Warp converts named tensor dtype/shape to BGRA8
-    -> ovstream VideoFrame.from_cuda_array
-    -> React dropdown state from data-channel events
+RenderProduct orderedVars
+  -> rendered output identified by full RenderVar path
+  -> selected output mapped on a supported device
+  -> display conversion into an app-owned image buffer
+  -> local presentation or the existing ovstream video track
 ```
 
-Do not create a separate stream per AOV. The browser receives the same video track; only the server-side source render var changes.
+Snapshot the selected product and RenderVar once at the start of a frame. Use
+that snapshot for pick enqueue, rendering, output lookup, and conversion so a UI
+change cannot switch identities halfway through the frame. Picking remains a
+native OVRTX query, independent of the displayed AOV.
 
-## Server State
+Separate the choices the UI offers from the outputs requested for this frame.
+For a single-image viewer, request the active beauty output (`LdrColor` or
+`HdrColor`) and retain any non-color outputs used by other features. Publish
+changes to the existing product's `orderedVars` through the runtime owner;
+changing display mode does not require another product or scene replacement.
+When a workflow needs both beauty outputs, validate feedback in the one actually
+displayed rather than assuming all outputs contain identical overlays.
 
-Keep display state on the server, not only in React. The server is authoritative because it knows which render vars ovrtx actually produced on recent frames.
-
-```python
-# Displayable AOVs requested by the composite stage, in preferred display order.
-# Only AOVs that ovrtx actually produces full-resolution data for are included.
-DISPLAY_AOVS = (
-    "LdrColor",                 # uint8  RGBA [H,W,4]
-    "HdrColor",                 # uint16 RGBA [H,W,4], fp16 packed as uint16
-    "NormalSD",                 # uint32 RGBA [H,W,4], packed float bits
-    "InstanceSegmentationSD",   # uint32 [H,W,1], display/debug instance IDs
-    "SemanticSegmentationSD",   # uint32 [H,W,1], display/debug semantic IDs
-    "DepthSD",                  # uint32 [H,W,1], float32 bits packed as uint32
-    "DiffuseAlbedoSD",          # uint8  RGBA [H,W,4]
-)
-
-self._active_aov: str = "LdrColor"
-self._available_aovs: Set[str] = {"LdrColor"}
-self._aov_error: Optional[str] = None
-```
-
-Runtime discovery should filter `frame_output.render_vars` through `DISPLAY_AOVS`. Do not expose every reported key; many requested render vars currently map to empty tensors or fail when mapped.
-
-```python
-def _update_available_aovs(self, render_vars: Any, notify: bool = False) -> None:
-    names = set(render_vars.keys()) if hasattr(render_vars, "keys") else set(render_vars)
-    available = {name for name in DISPLAY_AOVS if name in names}
-    if not available:
-        available = {"LdrColor"}
-
-    changed = available != self._available_aovs
-    self._available_aovs = available
-
-    if self._active_aov not in self._available_aovs:
-        self._active_aov = "LdrColor"
-        changed = True
-
-    if notify and changed and self._stream_server:
-        available_payload = self.get_available_aovs()
-        self._message_handler.send_message(
-            "availableAOVsResult",
-            {"aovs": available_payload, "available": available_payload},
-        )
-        self._message_handler.send_message("activeAOVState", self.get_active_aov_state())
-```
-
-## Composite Stage
-
-Request all candidate render vars in the composite stage so future ovrtx support can surface without changing the stage wrapper again. The UI should still expose only `DISPLAY_AOVS`.
+For example, add a distance RenderVar to a viewer that exposes a depth view:
 
 ```usda
-def RenderProduct "ViewportTexture0"
+def RenderVar "DistanceToImagePlane"
 {
-    rel camera = </OVCamera>
-    rel orderedVars = [
-        </Render/Vars/LdrColor>,
-        </Render/Vars/HdrColor>,
-        </Render/Vars/Depth>,
-        </Render/Vars/Normal>,
-        </Render/Vars/InstanceSeg>,
-        </Render/Vars/SemanticSeg>,
-        </Render/Vars/Metallic>,
-        </Render/Vars/Roughness>,
-        </Render/Vars/Emissive>,
-        </Render/Vars/Diffuse>,
-        </Render/Vars/Specular>,
-        </Render/Vars/AO>,
-        </Render/Vars/DirectDiffuse>,
-        </Render/Vars/DirectSpecular>,
-        </Render/Vars/IndirectDiffuse>,
-        </Render/Vars/IndirectSpecular>,
-        </Render/Vars/MotionVectors>,
-    ]
-}
-
-def RenderVar "Normal"
-{
-    uniform string sourceName = "NormalSD"
-}
-def RenderVar "InstanceSeg"
-{
-    uniform string sourceName = "InstanceSegmentationSD"
+    uniform string sourceName = "DistanceToImagePlaneSD"
 }
 ```
 
-The keys in `frame_output.render_vars` are source names such as `NormalSD`, not necessarily the `RenderVar` prim names such as `Normal`.
+Reference its full path in the RenderProduct's `orderedVars`. Enable any
+required rendering passes on that product using
+[render-settings](../render-settings/README.md) and the selected SDK's AOV
+contract. Avoid enabling unrelated passes for discovery.
 
-`InstanceSegmentationSD` is a display/debug AOV in this skill. Do not use it as
-the required picking path for current viewers; use native OVRTX pick queries and
-resolve pick-hit path IDs through the renderer path dictionary.
+## Output identity and availability
 
-## Message Protocol
+OVRTX keys `frame.render_vars` by the full RenderVar prim path. Its
+`source_name` selects the conversion and display label; it is not necessarily a
+unique ID. For multiple products, identify a choice by `(product_path,
+render_var_path)`.
 
-Use the standard data-channel envelope:
+Keep available choices and the active choice on the runtime owner. A choice
+becomes available only after mapping and conversion succeed at the expected
+resolution. Keep copied metadata in this cache, not output handles or mapped
+tensors. Rebuild it after scene replacement, layout/capability changes, or
+resize. Switching among already-validated choices need not rediscover all of
+them; keep the capability cache separate from the current `orderedVars` subset.
+
+This app-side helper chooses among already-validated outputs. `available` maps
+`(product_path, render_var_path)` to copied source-name strings:
+
+```python
+def choose_output(available, requested=None, current=None):
+    if requested in available:
+        return requested
+    if current in available:
+        return current
+    return next(
+        (key for key, source in available.items() if source == "LdrColor"),
+        next(iter(available), None),
+    )
+```
+
+An invalid user request should return an error without silently changing a
+working selection. Use the helper to preserve the current choice or select a
+valid default when availability changes. If none is available, retain the last
+displayed frame, disable the selector, and show the load/output error.
+
+## Map and convert
+
+Allocate display buffers for the transport's resolution and ownership contract.
+Each frame acquires a buffer that is free for writing; it must not overwrite
+one still being read by an encoder or display consumer. Local and streamed
+handoff lifetimes are described in [ovrtx-rendering](../ovrtx-rendering/README.md)
+and [streaming-server](../streaming-server/README.md).
+
+Prefer CUDA mapping when the selected output supports it. Discover mapping
+devices from the selected release's output contract and a focused probe; do not
+infer support from beauty or generalize one runtime's restriction to every
+release. For an explicitly supported host path, wait, copy into owned storage
+inside the mapping scope, then convert/upload into the transport's owned buffer.
+Report the transfer path and measured cost. Reject unsupported choices rather
+than silently claiming GPU-only or zero-copy delivery.
+
+For a single-tensor CUDA-mappable AOV, the mapping is itself the DLPack producer:
+
+```python
+# product_path and var_path came from the frame's selection snapshot.
+product = products[product_path]
+for frame in product.frames:
+    output = frame.render_vars[var_path]
+    with output.map(device=Device.CUDA) as mapped:
+        mapped.wait()
+        source = wp.from_dlpack(mapped)
+        # App conversion: validate source_name/dtype/shape, then write the
+        # acquired display buffer using the rules below.
+        convert_display(output.source_name, source, display_buffer, stream)
+        wp.synchronize_stream(stream)
+    # Conversion completed; the display/transport may now consume its buffer.
+```
+
+`convert_display` is an app-owned dispatcher, not an SDK API. Reject empty or
+unexpected dimensions and unsupported dtype/source combinations. For
+multi-tensor outputs, use the tensor name specified by that RenderVar's
+contract (`mapped[tensor_name]`); do not guess names after failed conversions.
+
+The example waits synchronously. To overlap GPU work, use
+`mapped.wait_on(stream.cuda_stream)` and record consumer completion with
+`mapped.unmap(stream=stream.cuda_stream)` before releasing the source, then
+honor the destination consumer's readiness contract. See the rendering
+reference for the full lifetime sequence.
+
+## Display conversion
+
+Image tensors are channel-last `[H,W,C]`; scalar images use `[H,W,1]`. Dispatch
+on source name as well as dtype and shape: integer distance bit patterns are
+not segmentation IDs. For ovstream, every conversion ends in BGRA8
+`uint8 [H,W,4]`; use the local surface's required channel order for desktop UI.
+
+| Source | Display conversion |
+| --- | --- |
+| `LdrColor` | RGBA8 to BGRA8 by swapping red and blue. |
+| `HdrColor` | Decode linear floating-point values, apply exposure, tone mapping, and display transfer, then clamp to 8-bit. |
+| `NormalSD` | Decode floating-point components; map `[-1,1]` to `[0,1]` for RGB display. |
+| `DistanceToImagePlaneSD` | Axial distance visualization with a labeled distance range. |
+| `DistanceToCameraSD` | Radial distance visualization with a labeled distance range. |
+| `InstanceSegmentationSD` / `SemanticSegmentationSD` | Deterministic colors from integer IDs; preserve the original IDs for any data inspection. |
+| `DiffuseAlbedoSD` | Use the RGBA8 path for 8-bit output, or apply a display transfer to linear floating-point color. |
+
+When HDR is exposed as `uint16` containing fp16 bits, reinterpret those bits as
+half floats before tone mapping. Likewise, normals or distances exposed as
+packed `uint32` need float-bit reinterpretation. Numeric integer conversion or
+scaling the integer value is not a decoder. Follow the selected output's
+reported layout and SDK contract; prefer GPU conversion in the interactive
+path when the output supports it.
+
+Keep exposure and distance ranges stable while viewing an AOV so animation or
+camera motion does not make the visualization flicker. Expose manual/automatic
+range choices when users need them, and label axial versus radial depth
+accurately. On conversion failure, keep the last valid image and report the
+failed choice; use a validated fallback only with matching active-state UI.
+
+## Lighting-contribution views
+
+For diffuse, glossy, transmission, caustic, or custom light-path views, first read
+OVRTX's current [LPE documentation](https://github.com/NVIDIA-Omniverse/ovrtx/blob/main/docs/sensors/cameras/light_path_expressions.rst)
+and linked examples. Upstream owns expression syntax, output limits, supported
+render modes, and completeness constraints such as radiance-cache contributions.
+Request only the needed outputs and present them through this same AOV path.
+
+Treat LPE outputs as linear HDR radiance in the reported rendering color space.
+Reuse a stable, declared exposure/tone/display transform; retain unmodified
+floating-point values for numerical comparisons. A scene with no matching paths
+can legitimately produce a black contribution image. Validate with a scene known
+to exercise the requested transport, not solely with changed menu state.
+
+## UI and messages
+
+Use the standard [streaming envelope](../streaming-messages/README.md):
 
 ```json
 {"event_type":"changeAOVRequest","payload":{"aov":"NormalSD"}}
 ```
 
-| Flow | Client sends | Server sends |
-|---|---|---|
-| Change active AOV | `changeAOVRequest {aov}` | `activeAOVState {active,available,result?,previous?,requested?,reason?}` plus `availableAOVsResult` |
-| Query AOVs | `getAvailableAOVs {}` | `availableAOVsResult {aovs,available}` |
-| State push | none | `activeAOVState {active,available}` on connect, stage load, or discovery change |
-| Legacy segmentation toggle | `toggleSegView {enabled?}` | `segViewState {enabled}` and AOV state |
+Source-name IDs are convenient for a single product with unique source names.
+For duplicate sources or multiple products, extend the app protocol to carry
+the full product/RenderVar identity instead of collapsing those outputs.
 
-The server sends both `aovs` and `available` in `availableAOVsResult` for compatibility. Frontends should accept either field.
+| Event | Behavior |
+| --- | --- |
+| `getAvailableAOVs` → `availableAOVsResult` | Return validated choices with IDs and labels. |
+| `changeAOVRequest` → `activeAOVState` | Validate the requested choice; acknowledge the applied state or report rejection. |
+| Initial connection, scene load, availability change | Push available choices and authoritative active state. |
 
-```python
-self._handlers = {
-    "changeAOVRequest": self._handle_change_aov,
-    "getAvailableAOVs": self._handle_get_available_aovs,
-    "toggleSegView": self._handle_toggle_seg_view,
-}
-```
+Keep a requested choice pending until its matching output has been rendered,
+mapped and converted successfully into an owned display buffer. Then commit the
+active mode and image together and settle that exact request ID. Keep status
+broadcasts separate from request completion. Fence replies by scene and request
+identity so superseded choices cannot overwrite newer intent.
 
-```python
-def _handle_change_aov(self, payload: Dict[str, Any]) -> None:
-    requested = payload.get("aov") or payload.get("name")
-    if not isinstance(requested, str) or not requested:
-        self._send_aov_state({"result": "error", "reason": "Missing AOV name"})
-        return
+On failure or timeout, reject the matching request and preserve the accepted
+mode/image; conversion into scratch storage must not corrupt the last good
+buffer. Settle pending requests on scene replacement or disconnect too. Apply
+empty availability lists so stale choices disappear, and update the label when
+an explicit fallback is accepted. Preserve camera and selection state across
+AOV changes.
 
-    previous = getattr(self.server, "_active_aov", "LdrColor")
-    if self.server.set_active_aov(requested):
-        self._send_aov_state({"result": "success", "previous": previous})
-        return
+## Verify the feature
 
-    self._send_aov_state({
-        "result": "error",
-        "requested": requested,
-        "reason": "AOV is not available for the current render product",
-    })
-```
+Switch among the requested views while orbiting and selecting objects. Check
+channel order, normals, distance labels/ranges, and readable HDR highlights.
+Switch scenes and reconnect the browser: removed outputs must disappear, the
+active choice must match the displayed image, and the same video track should
+continue. A failed map/conversion must not submit uninitialized pixels.
 
-## Conversion Pipeline
+## Processed GPU outputs
 
-Allocate one long-lived BGRA8 CUDA buffer and copy/convert each selected AOV into it. This keeps ovstream frame handoff stable even when the selected AOV has a different dtype.
-
-```python
-def _ensure_stream_buffer(self, height: int, width: int) -> bool:
-    if self._stream_buf is None:
-        self._stream_buf = wp.zeros((height, width, 4), dtype=wp.uint8, device="cuda:0")
-        return True
-    return self._stream_buf.shape[0] == height and self._stream_buf.shape[1] == width
-```
-
-Map the selected render var on CUDA, choose the tensor to display, wrap it with Warp via DLPack, and dispatch by dtype and shape. Most display AOVs are single-tensor outputs, so the mapped render var itself is the DLPack producer. Multi-tensor render vars must be addressed by tensor name; do not use older single-tensor convenience access in new code.
-
-```python
-def _display_tensor(mapped: Any, preferred: tuple[str, ...] = ("Color", "color", "data")) -> Any:
-    try:
-        return wp.from_dlpack(mapped)
-    except TypeError:
-        for name in preferred:
-            try:
-                return wp.from_dlpack(mapped[name])
-            except (KeyError, TypeError):
-                pass
-        raise
-
-with fout.render_vars[aov_name].map(device=Device.CUDA) as rv:
-    src = _display_tensor(rv)
-    shape = tuple(int(dim) for dim in src.shape)
-    height, width = shape[0], shape[1]
-    channels = shape[2] if len(shape) >= 3 else 1
-    dtype = src.dtype
-    dim = (width, height)
-
-    if dtype == wp.uint8 and len(shape) == 3 and channels == 4:
-        wp.copy(self._stream_buf, src)
-        wp.launch(_swap_rb, dim=dim, inputs=[self._stream_buf], device="cuda:0")
-        return True
-
-    if dtype == wp.uint32 and len(shape) == 3 and channels == 1:
-        wp.launch(_colorize_seg_3d, dim=dim, inputs=[src, self._stream_buf], device="cuda:0")
-        return True
-```
-
-Always fall back to `LdrColor` if the active AOV cannot be copied. If that also fails, keep streaming the last good buffer instead of sending an invalid frame.
-
-```python
-copied = self._copy_aov_to_stream_buffer(fout, self._active_aov)
-if not copied and self._active_aov != "LdrColor":
-    copied = self._copy_aov_to_stream_buffer(fout, "LdrColor")
-```
-
-## Production Display Conversion Rules
-
-Before calling `stream_video()`, the selected AOV must be visualization-ready BGRA8 in the server-owned CUDA stream buffer. Use these conversions:
-
-| AOV | Expected behavior |
-|---|---|
-| `LdrColor` | Direct RGBA8 copy followed by R/B channel swap to BGRA8. |
-| `HdrColor` | Tone map linear HDR for display. Use exposure/Reinhard-style compression plus gamma/sRGB correction, clamp to `[0,255]`, and output BGRA8. For fp16-packed `uint16` HDR, normalize around fp16 `1.0` and apply Reinhard. |
-| `DepthSD` | Convert float depth, or `uint32` packed float bits, to normalized grayscale. Inverse-distance visualization is useful for interactive inspection because near objects stay bright and far objects fade. |
-| `NormalSD` | Convert float normals or `uint32` packed float bits to RGB by remapping each component from `[-1,1]` to `[0,1]`, then BGRA8. |
-| `InstanceSegmentationSD` | Display/debug only. Convert `uint32` IDs to deterministic hashed colors. ID `0` is black/background. |
-| `SemanticSegmentationSD` | Use the same deterministic ID colorization as instance segmentation. |
-| `DiffuseAlbedoSD` | Convert linear float RGB through gamma/sRGB correction, or use the RGBA8 channel-swap path when ovrtx already returns `uint8 [H,W,4]`. |
-
-Dispatch by AOV name, dtype, shape, and channel count. Image outputs are channel-last `[H,W,C]`; scalar AOVs are expected as `[H,W,1]`. Do not assume that all `uint32 [H,W,1]` values are segmentation; `DepthSD` uses the same shape but needs depth visualization.
-
-## Warp Kernels
-
-| Kernel | Input | Use |
-|---|---|---|
-| `_swap_rb` | `uint8 [H,W,4]` | `LdrColor` RGBA8 to ovstream BGRA8 |
-| `_rgb8_to_bgra` | `uint8 [H,W,3]` | Generic 8-bit RGB AOVs |
-| `_gray8_3d_to_bgra` | `uint8 [H,W,1]` | Generic 8-bit scalar AOVs |
-| `_colorize_seg_3d` | `uint32 [H,W,1]` | Instance/semantic segmentation ID visualization |
-| `_uint16_rgba_hdr_to_bgra` | `uint16 [H,W,4]` | `HdrColor` approximate fp16 tonemap |
-| `_uint32_normals_to_bgra` | `uint32 [H,W,4]` | `NormalSD` packed-normal visualization |
-| `_float32_rgb_to_bgra`, `_float16_rgb_to_bgra` | float RGB | Future float color/normal AOVs |
-| `_float32_gray3d_to_bgra` | float scalar `[H,W,1]` | Future scalar AOVs |
-| `_float16_gray3d_to_bgra` | fp16 scalar `[H,W,1]` | Future scalar AOVs |
-| `_depth_to_bgra_3d` | float depth `[H,W,1]` | Future depth if ovrtx maps it |
-
-Warp does not provide a simple bit-cast path in these kernels. The current `HdrColor` and `NormalSD` conversions are visualization approximations, not numerically exact decoders.
-
-## Frontend Wiring
-
-React keeps local UI state, but the server event stream corrects it whenever discovery changes or a requested AOV is rejected.
-
-```typescript
-case 'activeAOVState': {
-  const payload = event.payload as ActiveAOVStatePayload;
-  if (Array.isArray(payload.available) && payload.available.length > 0) {
-    setAvailableAOVs(payload.available);
-  }
-  setActiveAOV(payload.active || 'LdrColor');
-  break;
-}
-case 'availableAOVsResult': {
-  const payload = event.payload as AvailableAOVsResultPayload;
-  const names = payload.aovs || payload.available || [];
-  if (names.length > 0) {
-    setAvailableAOVs(names);
-  }
-  break;
-}
-```
-
-```typescript
-sendMessage({
-  event_type: 'changeAOVRequest',
-  payload: { aov: selectedAOV },
-});
-```
-
-## ovrtx Findings
-
-The composite stage requests 17 render vars. In this implementation, ovrtx reports them, but only the listed render vars currently produce useful full-resolution data in the streaming path:
-
-| AOV | Observed tensor | Stream behavior |
-|---|---|---|
-| `LdrColor` | `uint8 [H,W,4]` | Works, swap RGBA to BGRA |
-| `HdrColor` | `uint16 [H,W,4]` | Works with approximate Reinhard tonemap |
-| `NormalSD` | `uint32 [H,W,4]` | Works as packed-normal visualization |
-| `InstanceSegmentationSD` | `uint32 [H,W,1]` | Works as display/debug, hash IDs to colors |
-| `SemanticSegmentationSD` | `uint32 [H,W,1]` | Works, hash IDs to colors |
-| `DepthSD` | `uint32 [H,W,1]` | Works, float32 bits packed as uint32, inverse-distance viz |
-| `DiffuseAlbedoSD` | `uint8 [H,W,4]` | Works, same RGBA→BGRA path as LdrColor |
-
-## Enabling Additional AOVs via Path-Tracing Flags
-
-Many AOVs produce empty tensors by default because the RTX path-tracing AOV passes are disabled. To unlock `DepthSD`, `DiffuseAlbedoSD`, and potentially more:
-
-### 1. Add API schemas to the RenderProduct
-
-```usda
-def RenderProduct "ViewportTexture0" (
-    prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1"]
-)
-{
-    token omni:rtx:rendermode = "RealTimePathTracing"
-    ...
-}
-```
-
-### 2. Enable PT AOV flags
-
-```usda
-bool omni:rtx:pt:diAOV = 1
-bool omni:rtx:pt:giAOV = 1
-bool omni:rtx:pt:diffuseFilterAOV = 1
-bool omni:rtx:pt:reflectionsAOV = 1
-bool omni:rtx:pt:refractionFilterAOV = 1
-bool omni:rtx:pt:refractionsAOV = 1
-bool omni:rtx:pt:selfIllumAOV = 1
-bool omni:rtx:pt:volumesAOV = 1
-bool omni:rtx:pt:worldNormalsAOV = 1
-bool omni:rtx:pt:worldPosAOV = 1
-bool omni:rtx:pt:zDepthAOV = 1
-bool omni:rtx:pt:denoising:optix:denoiseAOVs = 1
-float omni:rtx:pt:zDepthMin = 0.1
-float omni:rtx:pt:zDepthMax = 10000
-```
-
-### 3. Use correct source names
-
-Some AOV source names differ from intuitive guesses:
-
-| Wrong name | Correct sourceName |
-|---|---|
-| `Depth` | `DepthSD` |
-| `Diffuse` | `DiffuseAlbedoSD` |
-
-Using the wrong `sourceName` causes `map()` failures or empty tensors even when the render pass is enabled.
-
-### Current status with PT flags
-
-- *Working (7):* LdrColor, HdrColor, NormalSD, InstanceSegmentationSD, SemanticSegmentationSD, DepthSD, DiffuseAlbedoSD
-- *Still empty (needs investigation):* DirectDiffuse, DirectSpecular, IndirectDiffuse, IndirectSpecular, Emissive, Specular, AmbientOcclusion, Metallic, MotionVectors
-- *Still fails to map:* Roughness
-
-The lighting decomposition AOVs may need more PT convergence samples or a different configuration. See `docs/ovrtx_aov_deep_dive.md` for the full investigation.
-
-## Gotchas
-
-- Keep picking independent of display AOV. Use ovrtx pick queries for selection and treat `InstanceSegmentationSD` as a visualization/debug output.
-- Reset `_active_aov` and `_available_aovs` on stage load. AOV availability is render-product/runtime state, not global app state.
-- Send AOV state after initial client connection. A browser can connect after startup and miss the stage-open response.
-- Do not trust a render var just because it appears in `fout.render_vars`; mapping can still fail or yield empty data.
-- `HdrColor` is half-float data exposed as `uint16`; the current conversion is for display only.
-- `NormalSD` is float bit-pattern data exposed as `uint32`; exact decoding needs a real bit-cast path.
-- ovstream expects BGRA8. Every displayable AOV must end in a `uint8 [H,W,4]` buffer.
-- Scalar render outputs are channel-last `[H,W,1]`. Keep old `[H,W]` kernel paths only as compatibility fallbacks for legacy builds with older scalar tensor shapes.
-
-See also: `ovrtx-rendering`, `streaming-server`, `streaming-messages`, `render-settings`, `object-selection`.
+For custom post-processing, chained resources or lens sampling, read
+[SPG processing](../spg-processing/README.md). For stylized image passes,
+technical/X-Ray geometry strokes or explicit full wireframe, continue to
+[stylized visualization](../stylized-visualization/README.md). Present the actual
+published processed output through this viewer's existing owner and transport;
+a menu selection or display conversion alone does not implement the effect.

@@ -1,71 +1,79 @@
 # ovstage Population
 
-Use this reference for loading a user USD scene, composing viewer-owned camera
-and render setup, switching scenes, additive assets, references, variants, or
-USD time updates.
+Use this reference to load composed USD, add or remove assets, and play USD
+animation in an application-owned OVStage.
 
-## Authoring versus runtime
+## Choose the operation
 
-Keep the user asset immutable. Build a composed USD source that layers or
-references the asset with viewer-owned camera, RenderProduct, RenderVar, and
-RenderSettings data. Populate that composition once into the application-owned
-stage. USD remains the authoring/composition boundary; ovstage is the runtime
-representation consumed by the application and libraries.
+Keep the user asset unchanged. Compose it with viewer-owned cameras, render
+products, render vars, and settings in a wrapper/session source. Register RTX
+schemas with `ovrtx.register_schema_paths()` before constructing or populating
+OVStage so USD schema fallbacks are available on the first load.
 
-For ovrtx viewer apps, use OVStage population as the default load path:
+| Intent | Operation |
+| --- | --- |
+| Open, replace, or fully reload a scene | Populate a fresh Stage with `open_usd()` or `open_usd_from_string()`, then switch attachments using [stage-management](../stage-management/README.md). |
+| Add an asset to the current scene | `add_usd_reference*()` at a unique target path; retain the returned handle. |
+| Remove an added asset | `remove_usd(stage, handle)`. |
+| Clear the current USD source | `reset_usd(stage)`. This preserves application-authored runtime data. |
+| Play time-sampled USD | `update_from_usd_time(stage, ordinal=N, time=seconds)`. |
+| Restore selected attributes from the retained USD composition | `repopulate_usd_with_desc(stage, ordinal, time, descs)`. |
 
-- `population.open_usd(stage, path, ordinal=N, domains=PopulationDomain.RENDERING)` for file/URL-backed wrapper stages.
-- `population.open_usd_from_string(stage, usda, ordinal=N, domains=PopulationDomain.RENDERING)` for generated inline wrapper/session USDA.
-- `population.add_usd_reference*()` / `remove_usd()` / `reset_usd()` for source edits after a root stage is open, followed by `population.apply_usd_changes(stage, ordinal=N)`.
-- `population.update_from_usd_time(stage, ordinal=N, time_code=seconds_value)` for time-sampled USD playback.
+`open_usd*` overlays populated data; it does not remove runtime prims or columns
+absent from the new source. A fresh Stage gives complete scene replacement a
+clear lifetime boundary. Repopulation retains source/session edits and reference
+handles; use it for restoring selected runtime values, not replacing a scene.
 
-After each population operation, wait for completion and call
-`stage.advance_write_floor(N).wait()` before queries, attached renderer updates,
-or `renderer.step(..., ordinal=N)`.
+## Populate and publish
 
-### Populate, then COMMIT — a reference add/remove is not live until committed
+```python
+from ovstage import PopulationDomain, population
 
-`population.add_usd_reference_from_string(...)` (and `add_usd_reference*` /
-`remove_usd`) stage a source edit; they **do not take effect until you commit
-them** with `population.apply_usd_changes(stage, ordinal=N)` followed by
-`stage.advance_write_floor(N).wait()`. A reference added without that commit
-**silently never populates into Fabric** — no error, the prim simply is not
-there, so any later toggle or query against it no-ops. This is load-bearing for
-incremental scene edits (e.g. adding a context asset behind a visibility toggle,
-or swapping a geometry subtree):
+population.open_usd(
+    stage, composite_path, ordinal=ordinal,
+    domains=PopulationDomain.RENDERING,
+)
+stage.advance_write_floor(ordinal).wait()
+```
+
+For generated root USDA, use `open_usd_from_string(stage, usda, ordinal=ordinal,
+domains=PopulationDomain.RENDERING)`. Blocking population calls complete before
+returning; `_async` variants return an operation to poll or wait on. Publish the
+write floor only after the operation completes. Queries and renderer steps then
+consume that committed ordinal.
+
+## Edit the composition
+
+Reference add/remove and source reset change the USD composition. Apply those
+changes before publishing:
 
 ```python
 handle = population.add_usd_reference_from_string(stage, usda, prim_path)
 ordinal = current_ordinal + 1
-population.apply_usd_changes(stage, ordinal=ordinal)   # <- without this, the ref is a no-op
+population.apply_usd_changes(stage, ordinal=ordinal)
 stage.advance_write_floor(ordinal).wait()
-current_ordinal = ordinal                              # then queries / step @ordinal
+current_ordinal = ordinal
 ```
 
-Symmetrically, a `remove_usd` also needs `apply_usd_changes` + `advance_write_floor`
-to actually drop the reference. Contrast with `omni:xform` and other data-plane
-attribute writes, which take effect on their own write floor without
-`apply_usd_changes` — the commit step is specific to **structural** (reference /
-source) edits.
+Removal follows the same apply/publish sequence after
+`population.remove_usd(stage, handle)`. Direct runtime attribute writes use the
+[OVStage data plane](../ovstage-data-plane/README.md) and publish their ordinal
+without `apply_usd_changes()`.
 
-## Load and switch workflow
+## USD playback
 
-1. Stop accepting commands that depend on the old generation.
-2. Clear selection, hierarchy caches, animation bases, and pending picks.
-3. Allocate a new ordinal and apply the population/reset/reference operation.
-4. Wait, advance the write floor, then rebuild query handles and derived DTOs.
-5. Publish the new generation only after the first committed render is ready.
+`time=` is absolute time in seconds, converted using the source stage's
+`timeCodesPerSecond`. For population APIs with an optional time, the default is
+`population.DEFAULT_TIME` (USD default time), distinct from numeric zero.
 
-Do not use renderer reset/load calls as a scene-management mechanism in attached
-OVStage apps. Treat a stage switch as a generation change: all path tokens,
-query results, maps, renderer pick IDs, and asynchronous responses from the
-prior generation are invalid. If the app replaces the entire `ovstage.Stage`
-instance, detach the renderer before destroying the old instance and attach the
-newly populated instance after publication.
+USD sampling time and renderer animation time are separate clocks. Populate at
+the desired absolute USD time; pass elapsed seconds as `renderer.step`
+`delta_time` for renderer-driven video, MDL animation, and animated splat/NuRec
+content. A USD time change with zero step delta leaves that renderer animation
+frozen. On seek, use the selected renderer reset/time contract when appropriate;
+reset discards temporal history. See [attached timing](https://github.com/NVIDIA-Omniverse/ovrtx/blob/main/docs/core/ovstage_integration.rst).
+Publish each playback update before rendering it.
 
-## Generated-application checks
-
-A reconstructed viewer must demonstrate: a user USD remains unchanged; the
-viewer camera/render configuration comes from the composed source; scene switch
-clears stale selection; and the first frame is rendered from a committed stage
-publication.
+See [OVStage + OVRTX integration](../ovstage-ovrtx-integration/README.md) for
+attachment and frame scheduling, and [stage management](../stage-management/README.md)
+for scene-switch UX and generation lifetime.

@@ -8,7 +8,26 @@ remote-video, StreamingContext, VITE_SERVER_HOST, frontend no video, or
 object-fit contain.
 
 Use this for the browser side of a WebRTC Omniverse Realtime Viewer backed by
-standalone `ovstream`. For Brev, OKAS, or another session orchestrator, the browser WebRTC client profile remains standalone `ovstream` Direct mode. For NVCF self-hosted deployment, first read `cloud-deployment/nvcf-self-hosted.md` and follow the upstream workflow for the exposed media and browser connection model; do not guess a client profile.
+standalone `ovstream`. For standalone ovstream hosted on Brev, OKAS, or another session orchestrator, use the Direct profile when the exposed transport is standalone Direct signaling. For NVCF self-hosted deployment, first read `cloud-deployment/nvcf-self-hosted.md` and follow the upstream workflow for the exposed media and browser connection model; do not guess a client profile.
+
+## NVCF Browser Handoff
+
+For NVCF, read [the deployment handoff](../cloud-deployment/nvcf-self-hosted.md)
+before using the Direct example below. Follow upstream deployment skills and
+[the browser SDK's NVCF configuration guidance](https://docs.omniverse.nvidia.com/ov-web-sdk/latest/web-streaming-library/overview.html#configure-nvcf),
+checking the documentation/types/examples shipped with the selected released
+package. Use its supported NVCF profile and the signaling/session routes
+provided by that deployment. Record whether session creation is handled by the
+application proxy or by the SDK; do not enable a session REST operation without
+a backend that implements it. Keep credentials in the deployment's supported
+credential boundary rather than embedding service keys in browser assets.
+
+Changing a transport profile requires a fresh SDK stream instance or a fresh
+page; verify the effective configuration rather than reusing a cached stream.
+Prove decoded frames through NVCF before integrating the full UI. A hosting
+provider's HTTPS endpoint alone does not determine the browser profile or prove
+UDP media reachability. See also
+[network diagnostics](../cloud-deployment/webrtc-network-diagnostics.md).
 
 ## AppStreamer Direct API
 
@@ -18,26 +37,7 @@ current `ovstream` WebRTC browser client example as the reference:
 <https://github.com/NVIDIA-Omniverse/ovstream/tree/main/examples/webrtc_client>
 
 ```typescript
-import { AppStreamer, StreamType, type DirectConfig } from '@nvidia/ov-web-rtc';
-
-async function preflightEmbeddedH264(video: HTMLVideoElement) {
-  const embedded = (() => { try { return window.top !== window.self; } catch { return true; } })();
-  const mediaCapabilities = navigator.mediaCapabilities;
-  let decodingInfo: MediaCapabilitiesDecodingInfo | undefined;
-  try {
-    if (mediaCapabilities?.decodingInfo) {
-      decodingInfo = await mediaCapabilities.decodingInfo({
-        type: "webrtc",
-        video: { contentType: "video/H264; codecs=avc1.42E01E", width: 1920, height: 1080, bitrate: 8_000_000, framerate: 60 },
-      });
-    }
-  } catch (error) {
-    console.warn("H264 media-capability probe failed", error);
-  }
-  const result = { embedded, mediaCapabilities: Boolean(mediaCapabilities?.decodingInfo), decodingInfo, canPlay: video.canPlayType("video/mp4; codecs=avc1.42E01E") };
-  console.info("WebRTC H264 preflight", result);
-  return result;
-}
+import { AppStreamer, StreamType, EventStatus, VideoCodec, type DirectConfig } from '@nvidia/ov-web-rtc';
 
 async function waitForDecodedFrame(video: HTMLVideoElement, timeoutMs = 15_000) {
   const initial = video.getVideoPlaybackQuality?.().totalVideoFrames ?? 0;
@@ -51,66 +51,129 @@ async function waitForDecodedFrame(video: HTMLVideoElement, timeoutMs = 15_000) 
 }
 
 const video = document.getElementById("remote-video") as HTMLVideoElement;
-await preflightEmbeddedH264(video);
+video.tabIndex = -1;
+const focusVideo = () => video.focus();
+video.addEventListener("mouseenter", focusVideo);
+// Provider teardown removes this listener and terminates its connection.
 
+const streamer = new AppStreamer(); // Retain this instance for the session.
+let commandsReady = false;
 const config: DirectConfig = {
   videoElementId: 'remote-video',
   audioElementId: 'remote-audio',
-  server: 'localhost',
+  signalingServer: 'localhost',
   signalingPort: 49100,
   width: 1920,
   height: 1080,
-  codec: 'H264',
+  codec: VideoCodec.H264,
   codecList: ['H264'],
   nativeTouchEvents: true,
   fps: 60,
   maxReconnects: 5,
   reconnectDelay: 3000,
-  onStart: msg => {},
+  onStart: msg => {
+    if (msg.status === EventStatus.ERROR || msg.status === EventStatus.CANCELED) {
+      commandsReady = false; // Surface failure and reject pending work.
+    }
+    if (msg.status === EventStatus.SUCCESS) {
+      commandsReady = true; // Query server state here; do not wait for a scene frame.
+      video.focus();
+    }
+  },
   onUpdate: msg => {},
   onCustomEvent: msg => {},
-  onStop: msg => {},
-  onTerminate: msg => {},
+  onStop: msg => { commandsReady = false; },
+  onTerminate: msg => { commandsReady = false; },
 };
 
-await AppStreamer.connect({ streamSource: StreamType.DIRECT, streamConfig: config });
+const start = await streamer.connect({ streamSource: StreamType.DIRECT, streamConfig: config });
+if (start.status === EventStatus.ERROR || start.status === EventStatus.CANCELED) {
+  throw new Error('Stream startup failed');
+}
 await waitForDecodedFrame(video);
 ```
 
-Treat the resolved `AppStreamer.connect(...)` Promise as the app-command/data
-channel readiness signal. `onStart` means video has begun decoding, not that it
-is safe to send the first app message. Do not gate `openStageRequest`,
-`setViewportInputActive`, or other app commands on `onStart`; doing so can
-deadlock idle servers that wait for the client command before rendering a real
-stage frame.
+`connect()` may resolve with `EventStatus.IN_PROGRESS`; resolution alone is not
+command readiness. Follow the selected SDK's confirmed start-success event
+(`onStart` with `EventStatus.SUCCESS`) before querying state or sending app
+commands. Handle error/canceled events and clear readiness on stop/terminate.
+Success is a transport signal; prove decoded frames separately and do not wait
+for a scene frame before sending the command that loads that scene. The SDK
+forwards application messages; the viewer server must implement their handlers.
+
+Make the video focusable and activate it after stream start and on viewport
+entry. This lets the SDK capture native input after page controls release focus.
+Keep text fields and other DOM controls outside viewport input ownership; see
+[viewer input routing](../viewer-input-routing/README.md).
 
 `onCustomEvent` receives parsed app JSON. Mouse, keyboard, wheel, and touch events are forwarded by the streaming library automatically in native mode. Use the documented `mouseInput` fallback only after the explicit native-callback failure diagnostic.
 
-## DirectConfig Gotchas
+## React Media Ownership
 
-- Use `streamSource: StreamType.DIRECT` with `server` and `signalingPort` for
+The browser SDK wraps and reparents the video element to capture input. Give
+React a stable, empty media host and create the video/audio children imperatively
+before connecting. React controls loading indicators and toolbars as siblings of
+that host; the SDK controls everything inside it. A JSX-owned video beside a
+conditional overlay can make React target a child the SDK has already moved.
+
+```tsx
+import { useCallback } from 'react';
+
+function StreamMedia() {
+  const attach = useCallback((host: HTMLDivElement | null) => {
+    if (!host || host.querySelector('#remote-video')) return;
+    const video = document.createElement('video');
+    video.id = 'remote-video';
+    video.autoplay = true;
+    video.playsInline = true;
+    video.muted = true;
+    video.tabIndex = -1;
+    const audio = document.createElement('audio');
+    audio.id = 'remote-audio';
+    audio.autoplay = true;
+    host.append(video, audio);
+  }, []);
+  return <div className="stream-media" ref={attach} />;
+}
+
+// Keep the host mounted while connecting, disconnected, and reconnecting.
+<main className="viewport">
+  <StreamMedia />
+  {!videoReady && <ConnectionOverlay status={status} />}
+</main>
+```
+
+The ref is idempotent across development reattachment and leaves SDK wrappers
+intact. Keep element IDs unique to the provider's session. Terminate the owned
+connection during actual provider teardown; ordinary status changes must not
+remove or recreate its media elements. Verify producer-only restart with the
+same browser page: the overlay appears, frames resume, and pointer input works.
+
+## Connection Ownership
+
+- Use `streamSource: StreamType.DIRECT` with `signalingServer` and `signalingPort` for
   the standalone `ovstream` server.
-- Set an explicit fixed `width`, `height`, `codec: 'H264'`, and
+- Set an explicit fixed `width`, `height`, `codec: VideoCodec.H264`, and
   `codecList: ['H264']` unless a verified deployment profile selects another
   codec. Do not rely on a default codec value for first-frame validation.
-- For standalone `ovstream` Direct deployments, do not use connection profiles or fields intended for a different streaming product. If an orchestrator launches the session, map its exposed endpoint to `server` and `signalingPort`. For NVCF self-hosted deployment, follow `cloud-deployment/nvcf-self-hosted.md` instead.
+- For standalone `ovstream` Direct deployments, do not use connection profiles or fields intended for a different streaming product. If an orchestrator launches the session, map its exposed endpoint to `signalingServer` and `signalingPort`. For NVCF self-hosted deployment, follow `cloud-deployment/nvcf-self-hosted.md` instead.
 - Do not set `mediaServer` or `mediaPort`; SDP discovers the UDP media endpoint. Setting `mediaPort: 49100` sends media to the TCP signaling port and causes connected-with-no-video failures.
 - Do not construct a sign-in URL, append a custom signaling path, or add
   auth/session fields to `DirectConfig`. Portal auth and session lifecycle
   belong outside the browser WebRTC client config.
 - The `<video id="remote-video">` element must exist in the DOM before `connect()`.
-- Before `connect()`, run an embedded-host H264 preflight: record whether the viewer is framed, whether `navigator.mediaCapabilities.decodingInfo` is exposed, and the advisory H264 result. Missing or failed capability APIs are diagnostics, not proof that H264/WebRTC is unsupported; keep the explicit H264 DirectConfig and continue to decoded-frame validation.
-- After `connect()` resolves, prove video separately: the video element reaches `HAVE_CURRENT_DATA` and decoded-frame count (or `currentTime` where frame counters are unavailable) advances.
+- After confirmed start success, prove video separately: the video element reaches `HAVE_CURRENT_DATA` and decoded-frame count (or `currentTime` where frame counters are unavailable) advances.
 - Tune reconnects to avoid log storms: `maxReconnects: 5`, `reconnectDelay: 3000`.
-- Keep the React effect that calls `AppStreamer.connect()` stable. It should depend only on immutable connection config, not on stateful message routers that change when app messages arrive.
-- Avoid `React.StrictMode` for the first direct-streaming scaffold unless the connect effect explicitly guards double mount/connect. StrictMode can intentionally mount, cleanup, and remount effects in development.
-- `AppStreamer.sendMessage()` returns a Promise. Treat app messages as fire-and-forget during reconnect windows and catch rejected sends so transient disconnects do not surface as unhandled browser errors.
+- Keep the React effect that calls `streamer.connect()` stable. It should depend only on immutable connection config, not on stateful message routers that change when app messages arrive.
+- Make connection setup and teardown tolerate React development remounts without overlapping sessions.
+- `streamer.sendMessage()` returns a Promise. Handle rejection and settle the pending UI action; a transport send is not confirmation that the server applied it.
 
 ```tsx
-function sendMessage(message: StreamMessage) {
-  if (!connectedRef.current) return;
-  void AppStreamer.sendMessage(message).catch(() => undefined);
+async function sendMessage(message: StreamMessage) {
+  if (!connectedRef.current) throw new Error("Viewer disconnected");
+  await streamer.sendMessage(message);
 }
+// The action handler catches errors and clears its pending indicator.
 ```
 
 ## StreamingContext Pattern
@@ -125,32 +188,22 @@ Wrap AppStreamer in React context:
 const { status, sendMessage, onCustomEvent, errorMessage } = useStreaming();
 ```
 
-The provider should own exactly one `AppStreamer.connect()` call for a given host/port pair. Keep `onCustomEvent` routing behind a stable callback or a ref-backed dispatcher so state updates from server events do not recreate the connection effect and trigger cleanup.
+The provider should own one stable `AppStreamer` instance for a given host/port pair. Keep `onCustomEvent` routing behind a stable callback or a ref-backed dispatcher so state updates from server events do not recreate the connection effect and trigger cleanup.
 
 The hook should expose:
 
 | Field | Purpose |
 |---|---|
-| `status` | `'connecting' | 'connected' | 'failed'`; `connected` means `AppStreamer.connect()` resolved and app commands may be sent. |
-| `sendMessage` | send `{event_type, payload}`; no-op if disconnected |
+| `status` | `'connecting' | 'connected' | 'failed'`; `connected` means confirmed start success and app commands may be sent. |
+| `sendMessage` | send `{event_type, payload}`; reject when unavailable so the UI can recover |
 | `onCustomEvent` | subscribe to server messages; returns cleanup |
 | `errorMessage` | failure detail |
 
-On connect, prefer the server's `push_initial_state` when a stage is already loaded; it should send `openStageResult`, root `getChildrenResult`, AOV state, and any overlay state after the data channel opens. If the server starts idle and the app has bundled samples, auto-open the first sample once after `status === 'connected'`, not after `onStart`. Send later `openStageRequest` messages only when the user switches scenes, opens a file, or resets/reloads.
-
-```tsx
-const openedInitial = useRef(false);
-
-useEffect(() => {
-  if (status !== 'connected' || openedInitial.current) return;
-  openedInitial.current = true;
-  sendMessage({ event_type: 'openStageRequest', payload: { url: sampleAssets[0].url } });
-}, [status, sendMessage]);
-
-function handleSelectAsset(url: string) {
-  sendMessage({ event_type: 'openStageRequest', payload: { url } });
-}
-```
+On connect, request current server state before selecting a scene. Restore the
+loaded stage, hierarchy, and AOV state; open a bundled default once only if the
+server reports idle. Keep later opens tied to user actions. Follow
+[streaming lifecycle](../streaming-lifecycle/README.md) for this handshake and
+reconnect behavior.
 
 Clean up handlers:
 
@@ -161,11 +214,11 @@ useEffect(() => {
 }, [onCustomEvent]);
 ```
 
-Do not call `AppStreamer.terminate()` from ordinary message-handler cleanup. Only terminate when the provider is truly unmounting or the user intentionally disconnects. A common failure is: connect, receive `openStageResult`, rerender, effect cleanup calls terminate, video shows one frame, then goes black.
+Before reconnecting or replacing the session, await `streamer.terminate()` and confirm successful termination. A resolved `IN_PROGRESS` result leaves teardown pending; preserve the owner and follow the selected SDK's lifecycle guidance before starting another session. Do not terminate from ordinary message-handler cleanup. Only terminate when the provider is truly unmounting or the user intentionally disconnects. A common failure is: connect, receive `openStageResult`, rerender, effect cleanup calls terminate, video shows one frame, then goes black.
 
 ## Video Layout
 
-Browser-streamed Omniverse Realtime Viewer apps use a fixed server render resolution, typically 1920x1080. Let the page resize the video element with preserve-aspect containment:
+The default browser-streamed Omniverse Realtime Viewer uses a fixed server render resolution, typically 1920x1080. Let the page resize the video element with preserve-aspect containment:
 
 ```css
 #remote-video {
@@ -176,7 +229,11 @@ Browser-streamed Omniverse Realtime Viewer apps use a fixed server render resolu
 }
 ```
 
-Do not send viewport-size messages when CSS layout changes. NVST handles letterbox coordinate mapping for native stream input when the video is contained inside a differently shaped DOM box. Native input is the default. Use JSON `mouseInput` only when `viewer-input-routing`'s explicit diagnostic proves that the data channel works but native `on_input` callbacks do not; it is a mutually-exclusive fallback, not a second input path.
+CSS layout changes do not need viewport-size messages. NVST maps native input
+through the contained video, including letterboxing. For an explicit change to
+rendered resolution, use [viewport resize](../viewport-resize/README.md). Keep
+native input as the single gesture path; the diagnostic fallback belongs in
+[viewer input routing](../viewer-input-routing/README.md).
 
 For React shells with sidebars, top bars, or inspectors, keep the stream surface
 layout-stable while UI state changes:
@@ -196,6 +253,11 @@ layout-stable while UI state changes:
 
 .viewport {
   position: relative;
+}
+
+.stream-media {
+  position: absolute;
+  inset: 0;
 }
 
 #remote-video {
@@ -220,10 +282,10 @@ chrome:
 
 ```tsx
 function setViewportInputActive(active: boolean) {
-  sendMessage({
+  void sendMessage({
     event_type: 'setViewportInputActive',
     payload: { active },
-  });
+  }).catch(reportStreamError);
 }
 
 <aside
@@ -240,7 +302,7 @@ function setViewportInputActive(active: boolean) {
   onPointerDown={() => setViewportInputActive(true)}
   onPointerLeave={() => setViewportInputActive(false)}
 >
-  <video id="remote-video" muted autoPlay playsInline />
+  <StreamMedia />
 </main>
 ```
 
@@ -258,16 +320,37 @@ Map the CSS pointer position to the visible, letterbox-corrected video rectangle
 
 ## Config Resolution
 
-Use this priority:
+Resolve the signaling host and port independently, before connecting, in this
+priority order:
 
 1. URL params: `?server=192.168.1.50&signalingport=49100`
-2. Env vars: `VITE_SERVER_HOST`, `VITE_SIGNALING_PORT`
-3. Defaults: `window.location.hostname`, port `49100`
+2. Vite build-time env vars: `VITE_SERVER_HOST`, `VITE_SIGNALING_PORT`
+3. Runtime [`stream.config.json`](../streaming-viewer-recipe/client-protocol.md#production-streamconfigjson):
+   `signalingServer`, `signalingPort`
+4. Defaults: `window.location.hostname`, port `49100`
+
+Treat an absent or empty value as unspecified and continue to the next source
+for that field. Validate the selected host as a nonempty hostname/IP without a
+scheme or path, and convert URL/env port strings to an integer in `1..65535`.
+Surface malformed selected values as configuration errors before connecting.
+Fetch the runtime JSON before resolution; a missing optional file uses defaults,
+while malformed JSON or a failed fetch other than a missing file should surface
+a configuration error. Map only the resolved host and port to
+`DirectConfig.signalingServer` and `DirectConfig.signalingPort`; the URL parameter
+`server` is an app input name, not the deprecated SDK `server` field. Retain the
+other settings from the Direct example and omit `mediaServer`/`mediaPort`.
 
 ```bash
 VITE_SERVER_HOST=192.168.1.100
 VITE_SIGNALING_PORT=49100
 ```
+
+Vite replaces `import.meta.env.VITE_*` at build time, including production builds.
+Changing these variables in a container after the static bundle is built has no
+effect. Runtime JSON changes require no rebuild and take effect at the next app
+startup; ensure the file is fetched fresh and the field is not overridden by a
+URL parameter or an embedded build-time value. Leave build-time target values
+unset when runtime JSON should control the deployment target.
 
 ## Component Layout
 
@@ -275,7 +358,8 @@ VITE_SIGNALING_PORT=49100
 App.tsx
   StreamingProvider
     AppContent
-      video#remote-video
+      StreamMedia (empty React host; SDK owns media children)
+      connection/loading overlay
       stage selector
       StageTree recursive tree
       Inspector selected-prim panel
@@ -317,14 +401,14 @@ Adapter implementation rules:
 - Add timeouts to promises so dropped data-channel responses do not hang UI components permanently.
 - Cache latest children per `prim_path` and return cached rows if a request times out.
 - Subscribe to `stageSelectionChanged` and call every selection subscriber with the canonical server path list.
-- On `getChildrenResult`, make returned child paths selectable by sending `makePrimsSelectable {paths}`.
+- Treat `getChildrenResult` as a hierarchy read: update the tree/cache and settle its request. Pickability belongs to the runtime scene policy, independently of which branches the client has expanded.
 - Accept the current property event name `getPropertiesResponse`; handle `getPropertiesResult` only as a compatibility alias.
 - For selected-prim panels, keep the latest selected path in a `useRef` and
   compare `getPropertiesResponse.prim_path` against that ref. Do not compare
   against a `selectedPath` value captured in the React message callback closure;
   fast server responses can otherwise be dropped after a valid
   `stageSelectionChanged` event.
-- Route AppStreamer lifecycle through `EventAction` and `EventStatus`: `EventAction.START` plus `EventStatus.SUCCESS` means connected; `EventStatus.ERROR`, `onStop`, and `onTerminate` update failed/connecting state and reject relevant pending work.
+- Keep command readiness tied to confirmed start success and video readiness tied to decoded frames. `EventStatus.ERROR`, `onStop`, and `onTerminate` update session status and reject relevant pending work.
 - Keep optional feature commands behind the shared `ViewerBackend` capability
   extension instead of sending library-specific calls from React components.
 
@@ -343,7 +427,6 @@ case 'getChildrenResult': {
   const children = normalizeChildren(payload.children || []);
   treeCache.current.set(key, children);
   resolveBucket(childResolvers.current, key, children);
-  sendMessage({ event_type: 'makePrimsSelectable', payload: { paths: children.map((c) => c.path) } });
   break;
 }
 case 'getPropertiesResponse':
@@ -359,7 +442,7 @@ case 'getVariantsResponse': {
 }
 ```
 
-Track the server-provided root path. `openStageResult` includes `root_prim_path`; use it for the initial hierarchy query, top-level `makePrimsSelectable`, and shared backend `getStageTree()` defaults.
+Track the server-provided root path. `openStageResult` includes `root_prim_path`; use it for the initial hierarchy query and shared backend `getStageTree()` defaults.
 
 ```tsx
 const rootPrimPathRef = useRef('/World');
@@ -379,10 +462,6 @@ case 'getChildrenResult': {
   const children = (payload.children || []).map(normalizePrim);
   if (payload.prim_path === rootPrimPathRef.current) setPrims(children);
   else setPrims(prev => updatePrimChildren(prev, payload.prim_path, children));
-  const paths = children.map(child => child.path).filter(Boolean);
-  if (paths.length > 0) {
-    sendMessage({ event_type: 'makePrimsSelectable', payload: { paths } });
-  }
   break;
 }
 ```
@@ -438,7 +517,7 @@ Omniverse Realtime Viewer:
 
 - Auto-open the first sample stage once the stream connects when the server has not already pushed a loaded stage.
 - Honor server `push_initial_state` on reconnect: do not require a fresh user action to leave loading state.
-- Populate the AOV `<select>` from `availableAOVsResult` or `activeAOVState.available`; do not hardcode only `LdrColor`, `NormalSD`, and `DepthSD`.
+- Populate the AOV `<select>` from `availableAOVsResult` or `activeAOVState.available`; do not hardcode only `LdrColor`, `NormalSD`, or deprecated `DepthSD`.
 - Display prim count from `getPrimCountResult`.
 - Display connection status, FPS from video playback quality when available, and latency when WebRTC stats expose it.
 - Stage tree supports lazy expansion, search/filter, selected-row state, and prim type icons.
@@ -446,7 +525,7 @@ Omniverse Realtime Viewer:
 - Inspector tracks selected prims from `stageSelectionChanged` and fetches properties with `getPropertiesRequest`.
 - Inspector ignores stale property responses by matching `prim_path` to a
   ref-backed current selection, not to closure-captured React state.
-- Keep `#remote-video { object-fit: contain; }`, pin it inside a stable viewport container, and put DOM controls above the video with explicit `z-index`.
+- Keep `#remote-video { object-fit: contain; }` inside the SDK-owned media host, and put React controls in sibling overlays with explicit `z-index`.
 - DOM controls disable viewport input with `setViewportInputActive {active:false}`;
   the viewport enables it while the pointer is over the stream.
 

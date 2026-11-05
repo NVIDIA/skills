@@ -34,7 +34,8 @@ Direct download URL, no auth required:
 https://d4i3qtqj3r0z5.cloudfront.net/omni.usd_viewer.samples-106.3.3.zip
 ```
 
-The zip is about 38 MB total and contains `samples_data/` with `stage01.usd`, `stage02.usd`, `materials/`, `textures/`, and referenced sub-USD files.
+Archive size can vary; check the download response rather than assuming a small
+fixture. The archive contains `samples_data/` with `stage01.usd`, `stage02.usd`, `materials/`, `textures/`, and referenced sub-USD files.
 
 Download and unzip:
 
@@ -55,10 +56,9 @@ $USD_ASSET_ROOT/usd_viewer_samples/samples_data/stage02.usd
 
 This is the recommended source for agents needing the official viewer default sample scenes.
 
-When these samples are wrapped for ovrtx without the OmniGraph runtime, inspect
-whether their materials contain compatible `EffectLayer` shader paths. If they
-do, add the `inputs:Fader = 0` override described in `stage-loading` so the
-sample loads in a clean non-highlighted state.
+Preserve the samples' authored material values when composing viewer prims.
+For interactive material effects, use [prim-pick-effects](../prim-pick-effects/README.md)
+and restore only values the viewer changed.
 
 ## NVIDIA Omniverse Downloadable Packs
 

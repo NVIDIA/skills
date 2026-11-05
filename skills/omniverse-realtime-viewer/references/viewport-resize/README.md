@@ -1,207 +1,87 @@
 # Viewport Resize
 
-## Triggers
+Use this reference when an app needs to change rendered resolution. Ordinary
+browser panel resizing only needs a fixed-resolution stream displayed with
+`object-fit: contain`; it avoids renderer and encoder reallocations during layout
+changes. Choose stream resolution at startup, or offer an explicit reconnect to
+apply another size.
 
-Use this skill for dynamic viewport resize, responsive viewport, resizeViewport, dynamic resolution, browser resize, video letterboxing, or stream resolution changes.
+## Choose The Delivery Contract
 
-Use this when a browser-streamed USD viewer should render at the current viewport size instead of a fixed stream resolution. The browser still displays a video stream; it never renders USD or 3D geometry.
+For application-controlled live resize, read the selected ovstream release's
+`resizable-streams` skill and example through
+[dependency guidance](../dependencies/ovstream.md). Start with
+`webrtc_resizable=True`; configured width/height reserve the maximum and each
+submitted frame selects the active dimensions. Register `on_resize_request`
+before start when using the SDK's browser resize negotiation. An app-owned
+`resizeViewport` command can instead feed the same runtime queue.
 
-## End-To-End Contract
+This mode changes buffer ownership: the encoder can read a submitted buffer
+after `stream_video()` returns. Use persistent maximum-size plain CUDA allocations
+(`wp.ScopedMempool(device, False)` for Warp), preserving row pitch when rendering
+into a smaller view. A rotating ring or producer CUDA event alone does not prove
+encoder completion. Use the selected SDK's supported reuse protocol; if it does
+not establish safe reuse for the application, retain fixed-resolution streaming.
 
-Dynamic resize must update all resolution-dependent state together:
+## Apply One Resize Transaction
 
-1. Frontend observes the video container's CSS layout size with `ResizeObserver`.
-2. Frontend debounces and sends `resizeViewport {width,height}` over the data channel after connection.
-3. Server validates, clamps, and rounds dimensions to encoder-safe even values.
-4. Server serializes the resize with renderer stage mutation; do not resize while `renderer.step()` is active.
-5. Server updates the ovrtx RenderProduct `resolution`.
-6. Server updates camera aspect ratio, usually by keeping `horizontalAperture` fixed and recomputing `verticalAperture`.
-7. Server recreates CUDA/Warp stream buffers for the new `[height,width,4]` shape.
-8. Server resizes the ovstream encoder/output path when the API is available, otherwise reconnects or restarts through an explicit path.
-9. Server sends `resizeViewportResult` with the effective dimensions after clamping.
+Coalesce layout requests and retain only the latest pending size. Validate
+against the transport's minimum, maximum, and alignment requirements before
+queuing the change. Keep the configured maximum realistic for the GPU's memory
+budget.
 
-Do not treat CSS video resizing alone as a renderer resize. CSS scaling can make the video fill the panel, but ovrtx, ovstream, picking, and camera projection still need the same effective dimensions.
+The render/runtime owner applies the change between frames:
 
-## Frontend Pattern
+1. Update the displayed RenderProduct's `resolution` and camera aspect at one
+   publication ordinal. Keep horizontal aperture and derive vertical aperture
+   as `horizontal_aperture * height / width`.
+2. Step that product at the published ordinal and check the actual mapped output
+   dimensions before conversion and submission.
+3. Update camera/input dimensions and acknowledge the effective size after the
+   matching frame is produced. The browser confirms `videoWidth`/`videoHeight`
+   before treating the new size as displayed.
 
-Observe the element that defines the viewport layout, usually the parent of `video#remote-video`. Use CSS pixels, not `devicePixelRatio`-scaled pixels; the server render resolution is being matched to the browser layout box.
-
-```tsx
-useEffect(() => {
-  if (status !== 'connected') return;
-
-  const videoEl = document.getElementById('remote-video');
-  const container = videoEl?.parentElement;
-  if (!container) return;
-
-  let last = { width: 0, height: 0 };
-  let debounceTimer: ReturnType<typeof setTimeout> | undefined;
-
-  const observer = new ResizeObserver(entries => {
-    const entry = entries[0];
-    if (!entry) return;
-    if (debounceTimer) clearTimeout(debounceTimer);
-
-    debounceTimer = setTimeout(() => {
-      const width = Math.round(entry.contentRect.width) & ~1;
-      const height = Math.round(entry.contentRect.height) & ~1;
-      if (width <= 0 || height <= 0) return;
-      if (width === last.width && height === last.height) return;
-      last = { width, height };
-      sendMessage({ event_type: 'resizeViewport', payload: { width, height } });
-    }, 200);
-  });
-
-  observer.observe(container);
-  return () => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    observer.disconnect();
-  };
-}, [status, sendMessage]);
-```
-
-Video CSS should match the chosen server policy:
-
-```css
-.viewport video {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-}
-```
-
-Use `object-fit: fill` only when the server keeps render resolution and camera aspect synchronized with the container. If the server uses fixed render resolution, use preserve-aspect display and keep letterbox coordinate mapping.
-
-## Message Protocol
-
-Add a normal app data-channel message:
-
-```json
-{"event_type":"resizeViewport","payload":{"width":1280,"height":720}}
-```
-
-Recommended response:
-
-```json
-{"event_type":"resizeViewportResult","payload":{"width":1280,"height":720,"result":"success"}}
-```
-
-The response dimensions are the effective server values after clamping and even alignment. The frontend can use them for diagnostics; normal rendering does not need to wait for every response before sending a later debounced resize.
-
-## Server Handler
-
-Keep the message callback small. Validate and enqueue resize work for the render thread, or take the same lock used to serialize stage mutation and rendering.
+For an attached OVStage, the following writes target queries selecting one
+existing product and camera. `ordinal` comes from the runtime owner's clock:
 
 ```python
-def _handle_resize_viewport(self, payload: dict) -> None:
-    width = payload.get("width")
-    height = payload.get("height")
-    if not isinstance(width, int) or not isinstance(height, int):
-        logger.warning("resizeViewport: invalid payload %s", payload)
-        return
+import numpy as np
+import ovstage
 
-    width = max(320, min(3840, width)) & ~1
-    height = max(240, min(2160, height)) & ~1
-    self.server.enqueue_resize_viewport(width, height)
+
+def commit_resize(stage, product_query, camera_query, width, height,
+                  horizontal_aperture, ordinal):
+    dimensions = np.array([[width, height]], dtype=np.int32)
+    dtype = ovstage.numpy_to_dldatatype(dimensions.dtype, lanes=2)
+    resolution = ovstage.make_dltensor(
+        dimensions, dtype=dtype, shape=[1], ndim=1,
+    )
+    stage.write_attribute(
+        product_query, "resolution", ordinal, resolution, is_array=False,
+    ).wait()
+    aperture = np.array(
+        [horizontal_aperture * height / width], dtype=np.float32,
+    )
+    stage.write_attribute(
+        camera_query, "verticalAperture", ordinal, aperture, is_array=False,
+    ).wait()
+    stage.advance_write_floor(ordinal).wait()
 ```
 
-Use bounds appropriate for the target GPU and codec. Reject or clamp hostile values; data-channel payloads are client input.
+Use this runtime write path or publish authored changes through the population
+owner; editing an unrelated OpenUSD stage does not update the attached renderer.
+Retain the effective size when rebuilding viewer camera/product state during
+scene switches.
 
-## Render Thread Resize
+## Keep Interaction Aligned
 
-Resize under the same ownership rules as scene loading:
+Map input to the displayed product, including letterboxing when aspect ratios
+differ. Native mouse MOVE events supply their coordinate extent in `data` and
+`data2`; use it when normalizing resized input. Route picks to the same product
+and publication as the displayed frame. Resize overlays and conversion targets
+with that frame; no segmentation ID map is needed for native picking.
 
-```python
-def resize_viewport(self, width: int, height: int) -> None:
-    if width == self.width and height == self.height:
-        return
-
-    with self.stage_lock:
-        self.width = width
-        self.height = height
-        self.camera.width = width
-        self.camera.height = height
-
-        self.resize_render_product(width, height)
-        self.update_camera_aspect(width, height)
-        self.recreate_stream_buffer(width, height)
-
-        if hasattr(self.stream_server, "resize"):
-            self.stream_server.resize(width, height)
-        else:
-            self.request_stream_reconnect("resize requires stream restart")
-
-    self.send_message("resizeViewportResult", {
-        "width": width,
-        "height": height,
-        "result": "success",
-    })
-```
-
-If the active ovstream build does not expose live resize, do not silently keep streaming old-size frames. Use an explicit reconnect/restart path and make the frontend reconnect.
-
-## ovrtx Render Product
-
-Update the viewer-owned RenderProduct `resolution` in the session/composite stage. Use the actual render product path passed to `renderer.step()`.
-
-```python
-from pxr import Gf
-
-def resize_render_product(stage, render_product_path: str, width: int, height: int) -> None:
-    prim = stage.GetPrimAtPath(render_product_path)
-    if not prim or not prim.IsValid():
-        raise RuntimeError(f"Missing RenderProduct: {render_product_path}")
-    attr = prim.GetAttribute("resolution")
-    if not attr:
-        raise RuntimeError(f"RenderProduct has no resolution: {render_product_path}")
-    attr.Set(Gf.Vec2i(width, height))
-```
-
-When direct `pxr` access is isolated in a worker process, apply the same edit through the owner of the session/composite layer or rebuild the viewer wrapper through the render thread.
-
-## Camera Aspect
-
-Keep horizontal field of view stable and derive vertical aperture from the new aspect:
-
-```python
-def update_camera_aspect(stage, camera_path: str, width: int, height: int) -> None:
-    cam = stage.GetPrimAtPath(camera_path)
-    h_attr = cam.GetAttribute("horizontalAperture")
-    v_attr = cam.GetAttribute("verticalAperture")
-    h_aperture = float(h_attr.Get() or 20.955)
-    v_attr.Set(h_aperture * float(height) / float(width))
-```
-
-If the app copies an authored stage camera, preserve that camera's horizontal aperture and recompute only the vertical aperture for viewport size changes.
-
-## Buffers And Coordinates
-
-Every buffer or coordinate transform that depends on render size must update with the resize:
-
-- BGRA stream buffer: recreate as `wp.uint8 [height,width,4]`.
-- AOV conversion buffers: recreate or validate shape before copy.
-- Pick buffers and ID maps: treat the next frame after resize as the source of truth.
-- Camera/input state: store current viewport width and height for drag normalization.
-- DOM mapping: with `object-fit: fill`, CSS coordinates map linearly to render pixels after even rounding; with preserve-aspect display, keep letterbox correction.
-- Server-side overlays: call their resize hook or rebuild their render target.
-
-Synchronize CUDA work before freeing/replacing a buffer if the previous frame may still be in use.
-
-```python
-if self.stream_buf is None or self.stream_buf.shape[:2] != (height, width):
-    wp.synchronize()
-    self.stream_buf = wp.zeros((height, width, 4), dtype=wp.uint8, device="cuda:0")
-```
-
-## Validation
-
-Check these after implementation:
-
-- Resize the browser pane and confirm decoded frame size changes in `chrome://webrtc-internals`.
-- Confirm the video has no letterboxing when using `object-fit: fill`.
-- Confirm camera orbit and click picking remain aligned after resize.
-- Confirm object shapes do not stretch; if they do, camera aperture/aspect was not updated.
-- Confirm scene switching after resize uses the latest viewport size when rebuilding session/composite data.
-- Confirm no `renderer.step()` runs concurrently with render product or stream buffer resize.
-
-See also: `streaming-client`, `streaming-server`, `streaming-messages`, `streaming-lifecycle`, `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `camera-controls`, `object-selection`, `render-settings`.
+Validate shrinking and expanding, advancing decoded frames, stable object
+proportions, and camera/picking at viewport edges. Include scene switching and
+sustained streaming under the intended load to verify buffer reuse and memory
+behavior.

@@ -33,6 +33,28 @@ pinned OVStage read APIs, validate the active stage generation, and return
 copied DTO values before data crosses UI, transport, reload, or process
 boundaries.
 
+## Read ranges and decoding
+
+Serialize reads with the runtime owner after the intended publication completes.
+For current values use `OrdinalRange.latest((1 << 64) - 1)` (`UINT64_MAX` in C).
+A finite end ordinal bounds the read: changes above the write floor at or before
+that end can report `WRITE_FLOOR_VIOLATION`; retained changes after the end can
+report `OUT_OF_RANGE`, even if unsealed. Report/retry against the intended
+publication rather than silently substituting another state. These ranges do
+not promise historical payload snapshots; success below the retained-history
+boundary cannot guarantee earlier state. Follow the selected upstream
+[read contract](https://github.com/NVIDIA-Omniverse/ovstage/blob/main/CHANGELOG.md).
+
+Decode inspector values using dtype, shape, and semantic metadata. Read/map
+outputs use scalar lanes and explicit component axes/strides, including
+`[N,3]` vectors and `[N,4,4]` matrices. Selected scalar strings use UTF-8 byte
+arrays with STRING semantic; other strings may remain interned IDs. Decode
+relationship paths with the owning Stage path dictionary; CPU connection values
+are path/attribute-token pairs. Discover the selected release's property-specific
+[population mapping](https://github.com/NVIDIA-Omniverse/ovstage/blob/main/include/ovstage/ovstage_population.h)
+before adding these inspector types; do not apply token decoding universally or
+promise unsupported GPU connection reads.
+
 ## Scalar Reads
 
 Scalar/fixed-shape reads return one value per prim. Convert runtime values to a

@@ -34,14 +34,32 @@ Every render-visible write follows the runtime publication protocol: write at
 on a stage-generation change.
 
 For `omni:xform`, use row-major `float64` matrices with translation in row
-`[3][0..2]`. OVStage DLPack storage is one 16-lane element per prim
-(`shape=[N]`, lanes `16`, `AttributeSemantic.MATRIX`), while older standalone
-ovrtx Python compatibility snippets may show `(N, 4, 4)` NumPy matrices.
+`[3][0..2]`. OVStage write inputs and map-creation dtypes use one 16-lane
+element per prim (`shape=[N]`, lanes `16`, `AttributeSemantic.MATRIX`).
+Read/map outputs instead use scalar lanes and explicit component axes:
+vectors `[N,3]`, matrices `[N,4,4]`, with explicit strides. Honor the returned
+shape and strides; do not reuse an output descriptor as a write descriptor
+without the selected runtime's tensor-to-write conversion helper.
 
 Use `PrimMode.UPSERT` for app-owned runtime attributes unless the feature
 requires insert-only behavior. Use session/composite USD for persistent
 non-destructive authored state; never silently author transform, material, or
 viewer-setting state back into the user's USD asset.
+
+## Device-produced updates
+
+For a CUDA or other device producer, read OVStage's current
+[device-placement guidance](https://github.com/NVIDIA-Omniverse/ovstage/blob/main/docs/scene/device_placement.rst)
+and owning upstream skills before choosing APIs. Probe the selected runtime's
+supported operations, placements, dtypes, and shapes; fixed-shape transform
+support does not imply array-valued mesh support. Upstream owns placement,
+stream/event, map/commit, and completion mechanics.
+
+The application still owns the producer clock and runtime publication. Retain
+producer buffers until the supported completion boundary, publish completed
+updates before the renderer consumes them, and arbitrate manual/animation writes
+through the same transform model. A procedural GPU oscillator demonstrates a
+producer handoff; it does not establish physics-solver correctness.
 
 ## Tensor lifetime
 

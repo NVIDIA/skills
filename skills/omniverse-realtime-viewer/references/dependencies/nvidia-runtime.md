@@ -1,331 +1,250 @@
-# NVIDIA Runtime Dependency Source Of Truth
+# NVIDIA Runtime Dependencies
 
-This file is the single source of truth for NVIDIA runtime dependency
-acquisition in this skill package. Downstream skills may name the runtime they use
-and document API behavior, but they should not repeat package URLs, release
-URLs, workflow artifact links, registry paths, or fallback install locations.
+Use this reference to find the libraries selected for the viewer. Package
+metadata and the corresponding upstream release guidance own compatibility and
+installation; the viewer references own application integration.
 
-## Primary NVIDIA Dependencies
+## Select A Compatible Set
 
-| Dependency | Acquisition path | Used by | Guidance |
-|---|---|---|---|
-| `ovrtx` | NVIDIA Python package index | Local and streaming RTX USD rendering | Resolve the latest available package from this location. |
-| `ovstage` | PyPI package | Runtime stage substrate shared by renderer, physics, sensors, and app code | Resolve with the selected `ovrtx` package and verify attached-stage flow. |
-| `ovphysx` | NVIDIA Python package index | Physics simulation workers and attached-stage experiments | Resolve with the selected `ovstage`/`ovrtx` package set and verify the bridge ABI. |
-| `ovstorage` | [NVIDIA-Omniverse/ovstorage](https://github.com/NVIDIA-Omniverse/ovstorage) | Cloud asset discovery, transfer, and cache integration | Start with the upstream `AGENTS.md` and `skills/`; select the current compatible package or project integration from that guidance. |
-| `ovui` | PyPI package | Native local UI and server-side/headless overlay UI | Resolve the latest available package from this location. |
-| `ovstream` | PyPI package | WebRTC and SHM streaming server/runtime | Resolve the latest available package from this location. |
-| `ov-web-rtc client` (`@nvidia/ov-web-rtc`) | NVIDIA npm package | Browser-side WebRTC client for standalone `ovstream` Direct connections | Use the package guidance below. |
+For an existing app, start from its manifest/lockfile. For a new app or requested
+upgrade, resolve the current public supported package set for its OS,
+architecture, Python/native runtime and delivery path from upstream release and
+package metadata. Do not select an older cohort just because its examples are
+easier; report an unavailable or incompatible current set rather than silently
+downgrading. Resolve OVRTX and OVStage together. Add UI, transport,
+storage, or simulation packages only when the app uses them.
 
-## Version Selection Rule
+Check the selected release's metadata, migration notes, and relevant upstream
+examples before implementation. Record resolved versions in the generated app's
+manifest. A successful import or experimental ABI probe does not establish a
+vendor-supported combination.
 
-For new generated viewer apps, first inspect each selected dependency repository's current `AGENTS.md`, `skills/` (when present), README and API documentation, examples, release notes, and package metadata. Then install or integrate the latest available compatible `ovrtx`, `ovstage`, `ovphysx` when physics is selected, `ovstorage` when cloud assets are selected, `ovui`, and `ovstream` from the acquisition locations in this file. Do not copy a resolved version number into downstream skills, templates, or setup recipes. Apply the dependency freshness policy in `dependencies/README.md`; do not treat a repository clone, installed package, or cache as current solely because it is present on disk.
+## Package And Documentation Sources
 
-If the host project already has a manifest or lockfile with an explicit runtime
-pin, respect that pin unless the user asks to update it. If compatibility
-requires a pin, keep it in the project manifest with a short reason rather than
-in this dependency source of truth.
-
-For generated apps that select `ovui`, resolve the Python interpreter from the
-current `ovui` supplemental repository before creating the virtual environment.
-Read the current `NVIDIA-Omniverse/ovui` `README.md`, `AGENTS.md`, relevant
-`skills/omniverse-ui-*` references, and available package metadata. Do not copy
-a fixed interpreter version into downstream setup recipes. `No matching
-distribution found for ovui` usually means the interpreter, OS, architecture, or
-selected companion package set does not match the currently available `ovui`
-package files. Fix the interpreter or selected package set before changing local
-UI code.
-
-## Supplemental Dependency Documentation
-
-These links centralize dependency documentation and examples. Use them for
-dependency-specific API behavior that is not covered by the selected viewer
-skills.
-
-| Dependency | Current documentation pointer | Use for |
+| Library | Package source | Upstream guidance |
 |---|---|---|
-| `ovrtx` | <https://github.com/nvidia-omniverse/ovrtx> | Renderer API behavior, Python/C API notes, stage composition, render-var/AOV behavior, picking/selection behavior, and release notes. |
-| `ovstage` | <https://github.com/NVIDIA-Omniverse/ovstage> | Runtime stage lifetime, population, queries, ordinals, DLPack, path dictionaries, write floors, and release notes. |
-| `ovphysx` | <https://github.com/NVIDIA-Omniverse/PhysX/tree/main/ovphysx> | Physics tensor APIs, stage attach behavior, worker examples, binding shapes, and release notes. |
-| `ovstorage` | <https://github.com/NVIDIA-Omniverse/ovstorage> | Upstream `AGENTS.md`, the `skills/` catalog, storage client setup, resolver and asset-management patterns, examples, and release notes. |
-| `ovui` | <https://github.com/NVIDIA-Omniverse/ovui> | Current Python/setup guidance, widget behavior, `ovwidgets`, `omni.ui`, headless overlay behavior, and native UI conventions. |
-| `ovstream` | <https://github.com/NVIDIA-Omniverse/ovstream> | Library-specific `skills/`, sample servers, WebRTC lifecycle, SHM/client behavior, native input, examples, and package release notes. |
+| OVRTX | [PyPI](https://pypi.org/project/ovrtx/) | [OVRTX](https://github.com/nvidia-omniverse/ovrtx): renderer configuration, outputs, picking, native API, release notes |
+| OVStage | [PyPI](https://pypi.org/project/ovstage/) | [OVStage](https://github.com/NVIDIA-Omniverse/ovstage): population, schemas, data plane, publication, attachment |
+| ovstream | [PyPI](https://pypi.org/project/ovstream/) | [ovstream](https://github.com/NVIDIA-Omniverse/ovstream): server/client skills, native artifacts, frame submission, examples |
+| ovui | [PyPI](https://pypi.org/project/ovui/) | [ovui](https://github.com/NVIDIA-Omniverse/ovui): supported Python/platforms, companion packages, widgets and presentation |
+| ovstorage | [PyPI](https://pypi.org/project/ovstorage/) | [ovstorage](https://github.com/NVIDIA-Omniverse/ovstorage): `AGENTS.md`, skills, storage adapters, authentication, resolver/cache integration |
+| OVPhysX | [PyPI](https://pypi.org/project/ovphysx/) | [OVPhysX](https://github.com/NVIDIA-Omniverse/PhysX/tree/main/ovphysx): supported OVStage pair, schemas, attachment, simulation and tensor APIs |
+| ovnewton | [PyPI](https://pypi.org/project/ovnewton/) | Selected wheel's metadata and examples: bridge compatibility, lifecycle and output types |
+| Newton | [PyPI](https://pypi.org/project/newton/) | [Newton](https://github.com/newton-physics/newton) and [documentation](https://newton-physics.github.io/newton/stable/): model building, importers, solvers and its agent skills |
+| OVXR | [PyPI](https://pypi.org/project/ovxr/) for Python; matching native SDK through `ovxr.md` | [OVXR](https://github.com/NVIDIA-Omniverse/ovxr): README, library skills, release manifest, headers, bindings and minimal examples |
+| CloudXR runtime SDK | Separately supplied runtime SDK | [CloudXR](https://docs.nvidia.com/cloudxr-sdk/): service hosting and opaque-channel contracts; see `ovxr.md` for the runtime-adapter route |
+| Warp | `warp-lang` Python package | [Warp](https://nvidia.github.io/warp/stable/): arrays, CUDA streams, DLPack and kernels |
 
-Use this table only as supplemental documentation when the selected references do
-not contain enough detail for dependency-specific API behavior.
+Use the upstream guidance matching the package being installed. Read its agent
+instructions and relevant skills when available; fetch only the API/build detail
+needed for the chosen integration. Reuse a known matching local checkout rather
+than cloning the same dependency for every feature.
 
-For `ovstorage`, begin with its upstream `AGENTS.md`, then read the relevant
-upstream `skills/` guidance before designing cloud-asset access, caching,
-resolver behavior, or transfers. This viewer package routes storage-related
-work; the upstream repository owns the current storage API and integration
-contract.
+## OVRTX And OVStage
 
-For `ovstream`, always check the supplemental repository when the task needs
-library-specific behavior, newer transport examples, native input details, or
-implementation patterns beyond this viewer skill package. That repository owns
-additional `skills/` and samples for the streaming library itself.
+Create the renderer and attached stage with a compatible release pair and
+register required schemas before population. Follow
+`references/ovstage-ovrtx-integration/README.md` for the viewer-owned loop and
+`references/ovstage-population/README.md` for loading and schema handling.
 
-## Package-Index Dependencies
+For native apps, match headers and libraries to the selected SDK. Keep USD
+metadata/query workers isolated unless the selected in-process OpenUSD import
+path is supported; choose the worker's USD package from its own requirements.
 
-### ovrtx
+For an existing OVRTX application upgrade, discover the selected release's
+upstream migration skills, including
+[the 0.5-to-0.6 source/data upgrade guide](https://github.com/NVIDIA-Omniverse/ovrtx/blob/main/skills/update-0-5-to-0-6/SKILL.md)
+when that transition applies. Use the matching tag/package guidance and its
+linked OVStage contracts; upstream owns callback ABI, sensor, and raw-data
+migrations. Review renderer-setting changes separately.
 
-Use the NVIDIA Python package index for `ovrtx`.
+## ovstream
 
-Current supplemental repository pointer:
-<https://github.com/nvidia-omniverse/ovrtx>
-
-```bash
-python3 -m pip install --upgrade ovrtx --index-url https://pypi.nvidia.com --extra-index-url https://pypi.org/simple
-```
-
-If a project provides `server/requirements.txt`, prefer that project manifest
-over an ad hoc direct install. Preserve existing pins in that manifest unless the
-user asks to update them.
-
-For ovrtx API behavior, renderer configuration, render vars, picking, selection,
-stage composition, or release-specific behavior not covered in this skill package,
-use the supplemental documentation pointer above.
+Use the selected release's Python installation path for Python producers and its
+native SDK for C/C++/Rust consumers. Build native readers against matching headers
+and runtime libraries. Refer to `ovstream.md` for the viewer's transport and frame
+ownership contract; upstream owns packaging and loader setup.
 
 ### ov-web-rtc client
 
-Use the released `@nvidia/ov-web-rtc` package for the browser client that
-connects to standalone `ovstream` WebRTC servers in Direct mode. This skill
-package targets `ovstream` plus `ovrtx` viewer services. Those services may be
-containerized and launched by OKAS, Kubernetes, or another GPU session
-orchestrator. For standalone `ovstream` Direct deployments, do not use connection profiles or fields intended for a different streaming product; after orchestration resolves an endpoint, the frontend uses Direct mode against the exposed `ovstream` signaling host and port. For NVCF self-hosted deployment, read `cloud-deployment/nvcf-self-hosted.md` and follow the upstream workflow before selecting a browser connection model.
-
-Use the current released package. Do not copy resolved client version numbers
-into skills, templates, or setup recipes:
+For a browser connected directly to a standalone ovstream server, use
+`@nvidia/ov-web-rtc` and the compatible client version identified by the upstream
+[WebRTC client example](https://github.com/NVIDIA-Omniverse/ovstream/tree/main/examples/webrtc_client).
+Use the package's supported registry configuration:
 
 ```text
 registry=https://registry.npmjs.org/
 @nvidia:registry=https://edge.urm.nvidia.com/artifactory/api/npm/omniverse-client-npm/
 ```
 
-```bash
-npm install @nvidia/ov-web-rtc
-```
+Resolve and lock the client dependency in the generated app. After orchestration
+provides an endpoint, the client uses the standalone server's Direct connection
+configuration. For NVCF self-hosted deployment, read
+`references/cloud-deployment/nvcf-self-hosted.md` before selecting the connection
+model.
 
-For the `ovstream`-compatible Direct connection shape, use the current
-`ovstream` WebRTC browser client example as the reference pattern:
-<https://github.com/NVIDIA-Omniverse/ovstream/tree/main/examples/webrtc_client>
+## ovui
 
-Use `@nvidia/ov-web-rtc` for new browser clients. Do not document alternate
-browser streaming package names, legacy package names, or connection profiles intended for a different streaming product for generated Omniverse Realtime Viewer apps.
+Choose the Python interpreter and companion UI packages from the selected ovui
+release's supported platform set before creating the environment. If no matching
+wheel is available, check Python, OS, architecture, and companion package
+requirements before changing application UI code. Follow `local-openusd-gpu.md`
+and the chosen native delivery reference for viewer integration.
 
-## Centralized Dependencies
+For a new app, begin at the upstream [ovui repository](https://github.com/NVIDIA-Omniverse/ovui).
+Read its current `AGENTS.md` and discover the application, widget, UI API, and
+styling skills it routes to. Consult the latest public release and package
+metadata to resolve a supported set for the chosen platform. Use documentation
+matching that resolved set when implementing; development-branch APIs may not
+be present in published packages.
 
-### GitHub Asset Retrieval
+Resolve the UI, widget, and adapter distributions as one compatible set using
+upstream dependency constraints. Check current public package indexes and
+release assets for availability. Record the resolved set in the generated app's
+manifest and verify it with `python -m pip check`.
 
-Use the package URLs and release selectors listed below. If direct browser,
-`curl`, or GitHub API access cannot retrieve a listed release or artifact, check
-whether GitHub CLI is authenticated and use `gh` for access:
+The application and provider packages currently use `ovui-widgets-*` and
+`ovui-data-adapters-*` distribution names, with `ovui_widgets` and
+`ovui_data_adapters` Python namespaces; core UI imports use `omni.ui` and
+`omni.ui_scene`. Confirm names, extras, supported interpreters, and provider
+requirements in current upstream metadata before installing. For an OpenUSD
+editor, use the provider's supported OpenUSD runtime and choose its standalone
+extra only when that runtime is not already supplied. Resolve OVRTX compatibility
+from that provider's contract. Resolve the native OVStage provider's runtime
+cohort separately; support for one provider does not establish the other's ABI
+compatibility. Follow the selected provider's bootstrap and import order.
 
-```bash
-gh auth status
-```
+Discover bundled agent guidance through the installed package's documented skill
+entry points when available. Before adding panels or editing features, run the
+upstream minimal application with a real USD scene and capture a nonblank OVRTX
+frame through the intended delivery path.
 
-For release assets, use `gh release view` and `gh release download`. For
-Actions artifacts, list artifacts through the API and download the named
-artifact:
+For native C++ UI integration, discover the selected package's SDK contents,
+build manifests, and CMake exports through the upstream native SDK documentation.
+Confirm header/library identity, compiler and Python development requirements,
+and ImGui ABI before linking. Preserve the documented package layout. Continue
+using the OVRTX SDK for USD rendering and the viewer runtime for stage ownership.
 
-```bash
-gh api repos/OWNER/REPO/actions/runs/RUN_ID/artifacts \
-  --jq '.artifacts[] | [.name, .expired, .archive_download_url] | @tsv'
+## ovstorage
 
-gh run download RUN_ID \
-  -R OWNER/REPO \
-  -n ARTIFACT_NAME \
-  -D vendor/ARTIFACT_NAME
-```
+Follow its upstream `AGENTS.md` and selected storage skills for connection,
+authentication, plugins, resolver behavior, and transfers. The viewer-side
+contract is in `references/cloud-assets/README.md`: background preparation,
+cache identity/freshness, progress, and handoff to the runtime owner. Storage
+provider installation and SDK source builds belong to their upstream projects.
 
-If `gh auth status` is not authenticated or the token cannot access the listed
-repository, report the dependency retrieval failure. Do not use alternate wheel
-or tarball locations.
+## ovxr
 
+Begin at [NVIDIA-Omniverse/ovxr](https://github.com/NVIDIA-Omniverse/ovxr) and
+follow [the OVXR library route](ovxr.md) for its current README, skill index,
+release artifacts, examples and manifest. Resolve OVXR together with its matching
+OVRTX and OVStage packages. Use matching distributed headers, bindings and native
+artifacts, record build identity, and prove native, runtime and client readiness
+separately. For Python, use the public [ovxr PyPI package](https://pypi.org/project/ovxr/)
+and honor its declared OVRTX/OVStage requirements instead of upgrading those
+libraries independently. Select supported Python/platform tags from the current
+wheel metadata. CloudXR is a separately licensed OpenXR runtime.
 
-### ovstream
+## ovphysx
 
-Keep the current `ovstream` package source here rather than in streaming
-skills, templates, or setup recipes.
-
-Current supplemental repository pointer:
-<https://github.com/NVIDIA-Omniverse/ovstream>
-
-Current Python package:
-<https://pypi.org/project/ovstream/>
-
-NVIDIA Python package index mirror:
-<https://pypi.nvidia.com/ovstream/>
-
-Install the latest available wheel into the app virtual environment:
-
-```bash
-python3 -m pip install --upgrade ovstream
-```
-
-The current Python wheels bundle the native ovstream library, StreamSDK,
-GStreamer, the bundled `gstnvenc` plugin, CUDA runtime pieces, and
-`ovstream_utils`; no separate runtime zip is needed for normal Python apps.
-
-If an environment must route NVIDIA packages through NVIDIA's package index,
-use the mirror with PyPI as the fallback:
-
-```bash
-python3 -m pip install --upgrade ovstream \
-  --index-url https://pypi.nvidia.com \
-  --extra-index-url https://pypi.org/simple
-```
-
-Use the C/CMake platform zips from the same release only for native C/C++
-integrations. Set `OVSTREAM_LIB_PATH` only when running from an extracted
-runtime artifact layout, or when explicitly debugging native library discovery.
-
-Rules:
-
-- Use the PyPI package and install instructions from this section for Python
-  apps.
-- Install the latest available `ovstream` version unless the project manifest
-  already pins a compatible version.
-- Do not repeat wheel filenames, direct wheel URLs, or alternate package
-  locations in app-specific setup notes.
-- Do not point app-specific setup notes at unrelated local cache paths.
-- Runtime guidance may still document API usage such as `ovstream.Server`,
-  callback ordering, `OVSTREAM_LIB_PATH`, and video frame submission.
-- For ovstream API or SHM behavior not covered in this skill package, downstream
-  skills should ask agents to inspect the current supplemental repository
-  pointer's `skills/`, samples, and release notes.
-
-### ovui
-
-Keep the current `ovui` package source here rather than in local-viewer,
-overlay, or Windows setup skills.
-
-Current supplemental repository pointer:
-<https://github.com/NVIDIA-Omniverse/ovui>
-
-Current Python package:
-<https://pypi.org/project/ovui/>
-
-NVIDIA Python package index mirror:
-<https://pypi.nvidia.com/ovui/>
-
-Install the latest available wheel into the app virtual environment:
+Read the selected release's upstream `AGENTS.md`, `SKILLS.md`, and
+[basic workflow](https://github.com/NVIDIA-Omniverse/PhysX/blob/main/ovphysx/skills/basic-workflow/SKILL.md).
+For Python first-run setup, install both `physx-usd-schemas` and
+`newton-usd-schemas` from public PyPI alongside OVPhysX, as required by the
+upstream basic workflow:
 
 ```bash
-python3 -m pip install --upgrade ovui
+python -m pip install ovphysx physx-usd-schemas newton-usd-schemas
 ```
 
-Use the wheel matching the selected Python version, OS, and architecture.
-Select that Python version by checking the current `ovui` supplemental repo docs
-and package metadata instead of hard-coding a version in generated setup notes.
-
-If an environment must route NVIDIA packages through NVIDIA's package index,
-use the mirror with PyPI as the fallback:
+The OVPhysX wheel and SDK do not bundle these schema resources. Follow upstream
+[Physics Schemas](https://github.com/NVIDIA-Omniverse/PhysX/blob/main/ovphysx/docs/physics_schemas.md)
+for metadata-based resource discovery, native provisioning, and registration of
+both PhysX and deformable resource directories before the first population or
+export. Avoid importing the provider's stock-USD bindings in the viewer process.
+The upstream `hello_world` sample always calls `ovphysx.newton_schema_root()`,
+so it needs the Newton provider even when the application scene has no
+`newton:*` attributes. After resolving the compatible package set, run:
 
 ```bash
-python3 -m pip install --upgrade ovui \
-  --index-url https://pypi.nvidia.com \
-  --extra-index-url https://pypi.org/simple
+python -m ovphysx.samples.python_samples.hello_world
 ```
 
-Rules:
+Require successful simulation stepping and cleanup. For application code,
+include Newton resources in the same registration call when the scene authors
+`newton:*`; installing the provider alone does not register it. Record the
+resolved provider versions with the app's runtime packages; resource discovery
+alone does not establish semantic compatibility.
 
-- Use the PyPI package and install instructions from this section for Python
-  apps.
-- Install the latest available `ovui` version unless the project manifest already
-  pins a compatible version.
-- Keep `ovui`, `ovui-data-adapters`, `ovwidgets`, and related local UI
-  companion packages on one compatible package set.
-- Keep direct wheel URLs, wheel filenames, and alternate install commands out of
-  app-specific setup notes.
-- Runtime guidance may still document API usage such as `omni.ui`,
-  `omni.ui_scene`, headless overlay contracts, `PYTHONPATH`, and display setup.
-- For ovui widget, `ovwidgets`, editor shell, or headless overlay behavior not
-  covered in this skill package, use the supplemental documentation pointer above.
+For an existing application, inspect the selected release's
+[migration guide](https://github.com/NVIDIA-Omniverse/PhysX/blob/main/ovphysx/docs/migrating_0_6_to_0_7.md)
+before reusing lifecycle, session, configuration, or joint-authoring code. Rebuild
+native consumers against the matching headers and SDK.
 
-### ovstage
+Resolve OVPhysX against its declared OVStage requirements. For in-process shared
+stages, confirm the supported attachment and schema initialization sequence from
+the selected release before attaching either consumer. If the required package
+sets cannot share a process, use the explicit worker architecture in
+`references/physics-simulation/README.md`, with independent environments and
+copied pose/state messages. An ABI error is a compatibility problem to diagnose,
+not a reason to guess another population API in the renderer process.
 
-Keep the current `ovstage` package source here rather than in renderer, scene,
-or interaction references.
+## ovnewton and Newton
 
-Current supplemental repository pointer:
-<https://github.com/NVIDIA-Omniverse/ovstage>
+Newton owns simulation; ovnewton bridges model state into OVStage. Begin with
+its current [support guide](https://github.com/NVIDIA-Omniverse/ovnewton/blob/main/docs/site/support.md)
+and [using-ovnewton skill](https://github.com/NVIDIA-Omniverse/ovnewton/blob/main/skills/using-ovnewton/SKILL.md),
+then use the selected wheel's metadata and bundled examples. Resolve the bridge's
+OVStage requirement and the examples' OVRTX requirements together with the app's
+other consumers. Include the selected example's extras, schema providers, and
+assets; account for USD dependencies introduced by optional Newton importers
+when choosing process boundaries.
 
-Current Python package:
-<https://pypi.org/project/ovstage/>
+Recheck public releases before declaring the bridge unavailable for a runtime
+cohort. If no compatible set exists, keep simulation controls unavailable and
+explain the missing bridge; do not bypass requirements with `--no-deps` or widen
+them locally. A thread does not isolate native dependencies. A worker with a
+copied-state adapter needs its own implementation and validation.
 
-Install the latest available package into the application environment:
+Run the selected release's bounded simulation example, then validate an OVRTX
+frame and the intended viewer interactions separately. Package compatibility or
+a CPU-only simulation does not qualify GPU, viewer, or XR behavior. Use
+`references/newton-physics/README.md` and
+`references/realtime-sim-integration/README.md` for the viewer-owned simulation
+clock, publication, and interaction path.
 
-```bash
-python3 -m pip install --upgrade ovstage
-```
+## Warp and CUDA compatibility
 
-For ovstage-specific behavior beyond this viewer skill package, agents must
-inspect the current supplemental repository before inventing an implementation.
-Read its `AGENTS.md`, `README.md`, `OVERVIEW.md`, `CHANGELOG.md`, relevant
-`skills/`, public API headers or Python bindings, examples, and release notes.
-Use those sources to confirm population, query, DLPack, path-dictionary,
-operation-lifetime, and synchronization details for the selected package.
+Resolve two separate constraints: the packages must accept each other's versions,
+and each GPU library build must support the host GPU and NVIDIA driver. A
+successful dependency resolution or import establishes neither GPU execution nor
+cross-library interoperability.
 
-`ovstage` is pre-release. Resolve it together with the latest `ovrtx` package,
-validate the attached-stage flow against upstream examples, and keep an
-application-specific pin in that application manifest rather than copying a
-fixed version into downstream skills.
+Distinguish the host driver, a locally installed CUDA Toolkit, and the CUDA
+runtime/toolkit used to build each wheel or SDK. The CUDA version displayed by
+`nvidia-smi` describes driver capability; it does not identify the installed
+Toolkit or the build used by Warp. Prebuilt GPU packages can bring their own
+runtime libraries, so installing another local Toolkit does not repair an
+unsupported wheel/driver combination. Follow each selected library's upstream
+compatibility requirements; matching every CUDA version string is not a policy.
 
-When a viewer uses both `ovstage` and `ovrtx`, the parent viewer runtime owns the
-stage lifetime, ordinal clock, write floor, renderer attachment, and render-loop
-publication state. UI, transport, USD-query workers, and physics workers should
-cross that boundary with structured DTOs such as paths, matrices, settings, and
-diagnostics rather than borrowed stage handles, path tokens, mapped buffers, or
-DLPack objects.
+Select a Warp build compatible with the GPU and driver as well as every selected
+package's declared version constraints. The default PyPI build can require a
+newer CUDA driver than OVPhysX itself. Use the selected Warp release's
+[compatibility guidance](https://nvidia.github.io/warp/stable/user_guide/compatibility.html)
+for supported CUDA builds. Resolve optional extras and test tools with the app's
+constraints; do not bypass incompatible bounds or add another USD runtime to the
+viewer process. Record package/build identities and the driver in app evidence.
 
-Rules:
+Verify CUDA device discovery, an allocation and small kernel with synchronization,
+then the app's actual consumer path, such as physics reads or streaming buffer
+conversion. Keep readiness evidence for renderer, simulation, and transport
+separate. A passing CPU simulation or successful import does not validate GPU
+execution, and a Warp kernel alone does not validate shared buffers or streams.
 
-- Do not duplicate ovstage package URLs or version pins in feature references.
-- Do not assume old renderer-owned USD load/query/write APIs remain current;
-  consult the supplemental repo when code needs exact API calls.
-- When cloning the supplemental repo for a task, inspect its `skills/` directory
-  and examples before implementing a runtime workflow.
+## Verify Setup
 
-### ovphysx
-
-Keep the current `ovphysx` package source here rather than in physics,
-interaction, or delivery references.
-
-Current supplemental repository pointer:
-<https://github.com/NVIDIA-Omniverse/PhysX/tree/main/ovphysx>
-
-Install the latest available package into the physics worker or verified
-attached-stage test environment:
-
-```bash
-python3 -m pip install --upgrade ovphysx \
-  --index-url https://pypi.nvidia.com \
-  --extra-index-url https://pypi.org/simple
-```
-
-For OVPhysX tensor APIs, binding shapes, simulation stepping, and release-specific
-behavior, inspect the supplemental repository pointer above. For viewer-side
-integration, read `references/physics-simulation`.
-
-Default runtime boundary:
-
-- The parent viewer process owns `ovrtx.Renderer`, live `ovstage` stage state,
-  ordinals, and render publication.
-- Use `PhysX.attach_ovstage(stage, read_ordinal=...)` only after a probe verifies the exact installed
-  OVStage/OVPhysX ABI and bridge symbols.
-- If `attach_ovstage` is missing, reports missing OVStage bridge symbols, or has
-  not been verified, run OVPhysX in a bounded child process only when its worker
-  API is verified against the installed package. Otherwise report the compatibility
-  block; do not guess an OVPhysX population fallback.
-- Return pose samples, binding diagnostics, and worker status as structured JSON
-  and write accepted transforms through the parent viewer's OVStage/session path
-  at monotonic ordinals.
-
-Rules:
-
-- Do not duplicate ovphysx package URLs or version pins in feature references.
-- Do not treat an unverified OVPhysX population path as equivalent to a verified
-  `attach_ovstage(stage, read_ordinal=...)` bridge; it can create competing USD
-  population in the process that owns OVRTX/OVStage and crash native code.
+Run the selected upstream minimal example, then render a real frame through the
+app's intended delivery path before adding features. Capture exact versions and
+build identities in the app's validation evidence. See
+`environment-validation.md` for environment checks and diagnostics.

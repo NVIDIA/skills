@@ -6,180 +6,88 @@ Use this skill for stream to browser, WebRTC server, ovstream server, stream_vid
 
 Use this for the Python server that renders with ovrtx and streams frames through ovstream.
 
-## GPU Requirement
+## Runtime Ownership
 
-ovrtx requires an NVIDIA GPU. Build and document the ovrtx server path as the only rendering path; do not add CPU rendering, WebGL, Three.js, Babylon.js, glTF viewer, or other client-side rendering substitutes.
+The server owns the live OVStage, publication clock, and OVRTX renderer. Browser
+callbacks and query workers exchange commands and structured results; mapped GPU
+buffers and live stage handles stay with their owner. Establish the renderer
+owner before construction: initialization, initial load, warmup, frame stepping
+and teardown share that execution context. Use one runtime queue for scene,
+camera, selection, and simulation changes.
 
-## Native Library Setup
+Read [dependency guidance](../dependencies/README.md) for runtime setup and
+[ovstream's transport contract](../dependencies/ovstream.md) before selecting
+frame delivery. A headless streaming server has no inherent X11 requirement;
+windowed UI backends have their own display setup.
 
-Read `references/dependencies` before installing or locating `ovstream`.
-`references/dependencies/nvidia-runtime.md` is the source of truth for
-the current package source. For ovstream server, SHM, native input, or
-release-specific behavior not covered here, read the supplemental dependency
-documentation referenced by `references/dependencies`.
+## Startup
 
-For ovrtx Python/C API behavior or release-specific server integration details
-not covered here, read `references/dependencies` for acquisition guidance and
-supplemental dependency documentation.
+1. Set `OVRTX_SKIP_USD_CHECK=1` before import and start the runtime owner. On
+   that owner, register schema paths before population and construct the runtime.
+   Follow [stage loading](../stage-loading/README.md) to create the viewer-owned
+   stage and attach its renderer.
+2. Initialize the camera and render configuration, publish the initial ordinal,
+   and warm up the displayed product. Discover only the AOVs the app exposes.
+3. Prepare a valid BGRA8 CUDA frame before marking renderer readiness; retain
+   an app-owned loading/last-good frame for idle startup or blocking scene work.
+4. Initialize ovstream and register app, input, and connection callbacks before
+   starting the server.
+5. Continue stepping and applying queued mutations on that same owner. It
+   converts and submits frames, or hands app-owned frames to a serialized
+   submission loop when blocking scene work needs to run independently.
 
-For OVStage-backed apps, the Python server runtime owns the live OVStage stage,
-ordinal clock, write floor, and OVRTX renderer attachment. USD query workers,
-physics workers, and the browser client must exchange structured data such as
-paths, matrices, settings, and diagnostics; do not pass live stage handles,
-mapped buffers, or DLPack objects across process or transport boundaries.
+Startup reports success or the original error to its caller. On shutdown or
+owner failure, withdraw readiness, stop accepting runtime work and stop frame
+submissions. Join any separate submission worker before releasing its buffers.
+Finish in-flight native work,
+detach and destroy on the owner, attempting remaining cleanup after an earlier
+cleanup failure. Propagate owner exit/failure to the process supervisor so a
+stopped render loop cannot leave an apparently ready server.
 
-If the installed runtime cannot locate native libraries automatically, set:
-
-```bash
-export OVSTREAM_LIB_PATH=/path/to/ovstream/lib/   # directory with .so/.dll files
-```
-
-### Bundled Native Library
-
-The ovstream Python wheel bundles its own `libovstream.so`. Do **not** override
-it by placing a separate `libovstream.so` on `LD_LIBRARY_PATH` or in
-`OVSTREAM_LIB_PATH` unless you are deliberately using a different version for a
-specific transport (e.g., a newer SHM transport build). Overriding with a
-mismatched `.so` causes symbol errors or silent protocol failures.
-
-### Display Requirement
-
-ovrtx requires an X11 display for GPU rendering, even in headless deployments.
-Use Xvfb when no physical display is available:
-
-```bash
-Xvfb :99 -screen 0 1920x1080x24 &
-export DISPLAY=:99
-```
-
-Without a display, ovrtx initialization will fail with EGL/GLX errors.
-
-## Canonical Startup Sequence
-
-The reference WebRTC server starts in this order. Keep the ordering when generating `server/ov_web_viewer_server.py` or equivalent runtime shells:
-
-1. Set `OVRTX_SKIP_USD_CHECK=1` before importing `ovrtx` or any module that can import `pxr`.
-2. Import `ovrtx`, construct the renderer from current OVRTX guidance, and
-   attach it to the viewer-owned OVStage path when the selected architecture uses
-   OVStage. Use native stage queries for basic prim discovery; keep a
-   `pxr_worker.py` subprocess for USD features that still require OpenUSD unless
-   the exact in-process import path is verified.
-3. Import and initialize CUDA helpers such as `warp` for frame conversion.
-4. Load the initial stage if one is configured: populate the runtime stage or
-   build one inline root USDA string that sublayers the user file and authors
-   viewer camera/render-product/render-var data, call the current OVRTX open or
-   attach API, write the camera `omni:xform`, initialize native selection
-   outline styles, and cache `current_stage_root_path`.
-5. Warm up the renderer before starting ovstream: commit the initial stage
-   publication when OVStage is present, step several frames against the
-   canonical render product, update camera transforms, probe render vars,
-   allocate the persistent BGRA stream buffer, and discover the currently
-   available display AOVs.
-6. Initialize ovstream, create `ovstream.Server(ovstream.ServerType.WEBRTC)`, register `on_connection`, `on_message`, `on_input`, and `on_unicode` callbacks where needed, then call `server.start(ServerConfig(...))`.
-7. Start the `/healthz` endpoint before or alongside server startup. It must return `503 not ready` until the renderer has produced and copied one valid display frame into the app-owned stream buffer, then `200 ok` after that.
-8. Start exactly one render loop thread. That thread owns `renderer.step()`, frame conversion, native pick-query enqueue/result decoding, selection-outline state writes, animation updates, and `stream_video()`.
-
-Skeleton:
+A fixed-resolution WebRTC server using Warp-owned output buffers:
 
 ```python
-import os
-os.environ["OVRTX_SKIP_USD_CHECK"] = "1"
-
-from ovrtx import Renderer, RendererConfig, Device, PrimMode
 import ovstream
 import warp as wp
 
-from healthz import HealthServer
-from message_handler import MessageHandler
 
-wp.init()
-renderer = Renderer(config=RendererConfig(sync_mode=True, selection_outline_enabled=True))
-
-health = HealthServer()
-health.start()
-
-load_initial_stage(renderer)
-warm_up_renderer(renderer, render_product="/Render/OVServer/ViewportTexture0")
-
-ovstream.initialize(log_fn=stream_log, log_min_severity=ovstream.LogLevel.VERBOSE)
-stream = ovstream.Server(ovstream.ServerType.WEBRTC)
-handler = MessageHandler(server_runtime)
-stream.on_connection = handler.on_connection
-stream.on_message = handler.on_message
-stream.on_input = handler.on_input
-if hasattr(handler, "on_unicode"):
-    stream.on_unicode = handler.on_unicode
-config = ovstream.ServerConfig(width=1920, height=1080, video_input=ovstream.VideoInput.CUDA)
-config.webrtc_signal_port = 49100
-config.webrtc_public_ip = public_ip or "127.0.0.1"
-stream.start(config)
-
-threading.Thread(target=render_loop, daemon=True).start()
-```
-
-## Lifecycle
-
-```python
-import ovstream
-from ovstream import LogLevel, ServerType, ServerConfig, VideoFrame
-
-# LogLevel enum values: DEFAULT, ERROR, INFO, NONE, VERBOSE, WARNING
-# Note: there is no WARN variant — use WARNING.
-ovstream.initialize(
-    log_fn=lambda level, channel, msg, timestamp: print(f"[{level.name}] {channel}: {msg}"),
-    log_min_severity=LogLevel.WARNING,
-)
-server = ovstream.Server(ServerType.WEBRTC)
-server.on_connection = on_connection
-server.on_input = on_input
-server.on_message = on_message
-# Optional for composed text input:
-# server.on_unicode = on_unicode
-server.start(ServerConfig(
-    width=1920,
-    height=1080,
-    target_fps=60,
-    stream_port=0,
-    video_input=ovstream.VideoInput.CUDA,
-    webrtc_signal_port=0,
-))
-try:
-    while running:
-        cuda_buffer = render_bgra8_cuda_frame()
-        server.stream_video(VideoFrame(buffer=cuda_buffer, width=1920, height=1080, pitch_bytes=1920 * 4))
-finally:
-    server.stop()
-    server.close()
-# In a one-shot process, call ovstream.shutdown() from the top-level process
-# exit path after the final server is closed. Do not call it from a same-process
-# stop/restart path.
-```
-
-`initialize()` is ref-counted; every process-lifetime initialization needs a matching top-level `shutdown()`. Register callbacks before `start()` so initial connection/input/message events cannot race past handlers.
-
-Generated servers that support same-process restart should call `server.stop()`
-and `server.close()` for each server instance, but should not call
-`ovstream.shutdown()` between `Server.start()` attempts in the same Python
-process. Treat `ovstream.shutdown()` as a process-exit cleanup or isolate
-restart validation in a fresh subprocess.
-
-Guard server sends and frame submission against disconnect races. A client can disconnect between `is_client_connected` and `send_message()`, or during `stream_video()`. Those transient failures should not crash the render loop:
-
-```python
-def send_event(server, event_type: str, payload: dict) -> None:
-    if not server.is_client_connected:
-        return
+def start_stream(width, height, on_connection, on_app_message, on_input):
+    # Call after process-level ovstream.initialize() and wp.init().
+    server = ovstream.Server(ovstream.ServerType.WEBRTC)
+    server.on_connection = on_connection
+    server.on_app_message = on_app_message
+    server.on_input = on_input
+    config = ovstream.ServerConfig(
+        width=width, height=height,
+        video_input=ovstream.VideoInput.CUDA,
+        cuda_device=0, cuda_context=int(wp.get_device("cuda:0").context),
+        webrtc_resizable=False,
+        webrtc_signal_port=49100,
+    )
     try:
-        server.send_message(json.dumps({"event_type": event_type, "payload": payload}, default=str))
+        server.start(config)
     except Exception:
-        logger.debug("Dropping event during disconnect: %s", event_type, exc_info=True)
-
-def stream_frame(server, frame: ovstream.VideoFrame) -> None:
-    try:
-        server.stream_video(frame)
-    except Exception:
-        logger.debug("Dropping frame during disconnect", exc_info=True)
+        server.close()
+        raise
+    return server
 ```
+
+The device and context must match the BGRA allocation. Leave endpoint and network
+configuration to the deployment; for local loopback the public address can be
+set to `127.0.0.1`. Register `on_unicode` as well when composed text input is needed.
+
+## Transport Lifecycle
+
+Initialize ovstream for the process lifetime. Register callbacks before starting
+each server, submit frames from one loop, and stop/join that loop before
+`server.stop()` and `server.close()`. Call `ovstream.shutdown()` after the final
+server closes. See [streaming lifecycle](../streaming-lifecycle/README.md) for
+connection state, reconnects, and restoring app state.
+
+Use the [app-message adapter](../streaming-messages/server-handler-map.md) for
+request/reply traffic. Classify disconnect failures separately from persistent
+encoding errors: transient disconnects must not kill the renderer, while
+persistent failures should move the session into a visible error state.
 
 ## Frame Loop And Continuity
 
@@ -187,7 +95,7 @@ Detailed frame-source, fixed-resolution, and stage-load continuity guidance live
 
 ## Readiness Health Gate
 
-Expose readiness separately from process liveness. Orchestrators and load balancers must not send clients to the service until the renderer has produced and converted a valid frame.
+Expose readiness separately from process liveness. Orchestrators and load balancers must not send clients to the service until the renderer has produced a valid BGRA8 CUDA mapping or completed the required conversion into the app-owned BGRA stream buffer.
 
 ```python
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -207,53 +115,57 @@ httpd = HTTPServer(("0.0.0.0", 8081), HealthHandler)
 httpd.ready_event = ready
 Thread(target=httpd.serve_forever, daemon=True).start()
 
-# In the render loop, after the first successful render-var map, copy,
-# and RGBA-to-BGRA conversion into the app-owned stream buffer:
+# In the render loop, after the first valid BGRA mapping or completion
+# of the required conversion into the app-owned stream buffer:
 ready.set()
 ```
 
-Do not mark readiness when the process starts, when ovstream starts, or when a stage-load operation returns. Mark it only after a valid frame path has succeeded.
-
-Readiness must not depend on an active browser client or on `server.stream_video()`
-succeeding. Before any client connects, `stream_video()` may be a no-op or may
-raise a transient no-client/disconnect error depending on the selected ovstream
-build. A server that has already rendered and converted a valid frame should
-report ready even while no client is attached.
-
-Generated viewers should log the first converted frame before entering normal
-streaming, for example `First BGRA frame ready: WIDTHxHEIGHT`. Use that log line
-to separate renderer/camera/frame-conversion failures from browser/WebRTC
-negotiation failures.
+Readiness follows a valid BGRA mapping or completed required conversion, independently of client
+connection or submission. Clear readiness when the owner stops or fails. Log
+the first valid frame to distinguish startup from transport negotiation.
 
 ## RGBA To BGRA
 
-ovrtx outputs RGBA8. ovstream expects BGRA8. Without conversion, red/blue channels swap.
+ovstream expects BGRA8. An RGBA8 render output needs the conversion below;
+an already-BGRA output must not be swizzled again. The paired
+[OVRTX streaming example](https://github.com/NVIDIA-Omniverse/ovstream/tree/main/examples/python/ovrtx_stream)
+authors a `BgraColor` RenderVar with an SPG swizzle and submits its CUDA mapping
+directly. For fixed-resolution streaming, follow its `CudaSync` producer-wait
+and mapping lifetime: keep the mapping valid until `stream_video()` has staged the frame, then unmap. Use an
+app-owned buffer when retaining a frame beyond that mapping's lifetime.
+Resizable mode has different encoder lifetimes; follow
+[frame ownership](../dependencies/ovstream.md#frame-ownership).
 
 ```python
 import warp as wp
 
 @wp.kernel
-def swap_rb(img: wp.array3d(dtype=wp.uint8)):
-    i, j, k = wp.tid()
-    if k == 0 or k == 2:
-        r = img[i, j, 0]
-        b = img[i, j, 2]
-        img[i, j, 0] = b
-        img[i, j, 2] = r
+def rgba_to_bgra(src: wp.array3d(dtype=wp.uint8), dst: wp.array3d(dtype=wp.uint8)):
+    i, j = wp.tid()  # Exactly one thread owns each destination pixel.
+    dst[i, j, 0] = src[i, j, 2]
+    dst[i, j, 1] = src[i, j, 1]
+    dst[i, j, 2] = src[i, j, 0]
+    dst[i, j, 3] = src[i, j, 3]
 ```
 
 ```python
-with frame.render_vars["LdrColor"].map(device=ovrtx.Device.CUDA) as var:
+# Index render outputs by their full authored RenderVar prim path. Keep
+# `source_name` only for UI-facing AOV classification.
+# Allocate stream_bgra_buffer once: uint8 [h, w, 4] on cuda:0.
+# This example uses fixed-resolution streaming (webrtc_resizable=False).
+with frame.render_vars["/Session/Render/Vars/LdrColor"].map(device=ovrtx.Device.CUDA) as var:
+    var.wait()  # Renderer producer must finish before Warp reads the mapping.
     wp_array = wp.from_dlpack(var)
-    wp.launch(swap_rb, dim=(h, w, 4), inputs=[wp_array])
-    server.stream_video(ovstream.VideoFrame.from_cuda_array(wp_array))
+    wp.launch(rgba_to_bgra, dim=(h, w), inputs=[wp_array, stream_bgra_buffer], device="cuda:0")
+    wp.synchronize_device("cuda:0")  # Finish source reads and destination writes.
+server.stream_video(ovstream.VideoFrame.from_cuda_array(stream_bgra_buffer))
 ```
 
 No CPU round trip is needed.
 
 ## Production AOV Conversion Before `stream_video()`
 
-Every displayed render var must be converted into a persistent CUDA `uint8 [H,W,4]` BGRA buffer before creating `ovstream.VideoFrame`. Keep `LdrColor` as the fallback if the active AOV cannot be copied.
+Outputs that are not already BGRA8 need conversion into an owned CUDA `uint8 [H,W,4]` BGRA buffer before creating `ovstream.VideoFrame`. Preserve the accepted frame if a requested output cannot be copied; an explicit fallback must update the active-state UI too.
 
 Current ovrtx render vars can be single-tensor or multi-tensor outputs. For a
 single-tensor render var, consume the mapped object directly with DLPack. For a
@@ -266,20 +178,16 @@ use old `.tensor` access in new generated code.
 |---|---|---|
 | `LdrColor` | `uint8 [H,W,4]` RGBA | Copy to the stream buffer and swap R/B to BGRA. |
 | `HdrColor` | `uint16 [H,W,4]` or float RGB/RGBA | Apply exposure/Reinhard tonemapping, gamma/sRGB display correction, clamp, output BGRA8. |
-| `DepthSD` | `float32 [H,W]` or `uint32 [H,W]` packed float bits | Normalize to a useful grayscale visualization, usually inverse-distance or min/max normalized, output BGRA8. |
+| `DistanceToImagePlaneSD` / `DistanceToCameraSD` | verify against the installed output | Normalize to a useful grayscale visualization, usually inverse-distance or min/max normalized, output BGRA8. |
 | `NormalSD` | float RGB/RGBA or `uint32 [H,W,4]` packed float bits | Remap normal components from `[-1, 1]` to `[0, 255]`, output BGRA8. |
 | `InstanceSegmentationSD` | `uint32 [H,W]` or `[H,W,1]` | Debug visualization only: hash each non-zero ID to a deterministic color; ID `0` is black/background. Native picking does not require this AOV. |
 | `SemanticSegmentationSD` | `uint32 [H,W]` or `[H,W,1]` | Use the same deterministic colorization as instance segmentation. |
 | `DiffuseAlbedoSD` | float RGB/RGBA or `uint8 [H,W,4]` | Gamma-correct linear albedo when needed, clamp, output BGRA8. |
 
-```python
-copied = copy_aov_to_stream_buffer(fout, active_aov)
-if not copied and active_aov != "LdrColor":
-    copied = copy_aov_to_stream_buffer(fout, "LdrColor")
-if copied:
-    video_frame = ovstream.VideoFrame.from_cuda_array(stream_bgra_buffer)
-    stream_server.stream_video(video_frame)
-```
+Use [AOV switching](../aov-switching/README.md) for capability discovery,
+active output requests, scratch-buffer conversion and correlated completion.
+Only hand a successfully converted buffer to `stream_video()`; do not commit a
+new mode or overwrite the last good image before that conversion succeeds.
 
 Pick queries are independent of the displayed AOV. Do not update a
 segmentation-derived pick buffer in new generated apps.
@@ -301,30 +209,13 @@ Configure selection outlines at renderer creation with `RendererConfig(selection
 
 Do not create legacy segmentation picker modules, CPU ray fallback picker modules, segmentation ID maps, isolation ID discovery, or Warp outline compositors for new generated apps.
 
-## Optional Runtime Feature Commands
+## Runtime Feature Commands
 
-Keep the WebRTC protocol extensible instead of baking one app shape into the
-streaming server. Camera, selection, hierarchy, AOVs, and settings are the common
-baseline. Runtime transforms, pick effects, physics impulses, and similar
-features should be advertised through backend capabilities and handled as
-bounded commands on the same render/runtime queue.
-
-Examples:
-
-- `runtimeTransformRequest {request_id?, paths, matrix|translation|rotation|scale, mode?}` writes live transforms through OVStage/session state or the current OVRTX live-write path.
-- `pickEffectRequest {request_id?, paths, effect, value?}` applies a verified visibility/material/effect change after selection.
-- `physicsImpulseRequest {request_id?, path, impulse, angular_impulse?, steps?, dt?}` queues a bounded OVPhysX worker and applies returned pose samples through the parent OVStage/session path.
-
-Rules:
-
-- Reject unsupported feature names or payload fields with a normal error/result
-  message; do not silently mutate renderer state.
-- Do not populate OVPhysX in the already-running viewer process as a
-  fallback for a failed or unverified `PhysX.attach_ovstage(stage, read_ordinal=...)`.
-- Preserve the single render/runtime owner: callbacks enqueue commands, and the
-  render loop applies accepted state changes.
-- Keep long-running physics or USD work outside ovstream callback threads and
-  outside the parent renderer mutation path.
+Advertise optional capabilities before showing their UI controls. Camera,
+selection, scene, and render settings commands share the runtime queue; physics
+commands target the configured simulator owner. Use the
+[message protocol](../streaming-messages/README.md) for transport-neutral command
+shapes and request/result correlation.
 
 ## Operation Status And Errors
 
@@ -390,7 +281,7 @@ release is seen without a matching press and click picking never queues.
 | `rtsp_pipeline`, `rtsp_mount_point` | RTSP custom pipeline/path |
 | `shm_stream_name`, `shm_slot_count` | SHM stream identifier and ring depth for local shared-memory transport |
 
-`ServerType.WEBRTC` is for browser streaming, `RTSP` for VLC/ffplay, `NATIVE` for native clients, and `SHM` for same-machine shared-memory readers. WebRTC supports one connected client at a time; guard `send_message` with `server.is_client_connected`. Multiple network servers in one process need explicit unique ports; ovstream does not auto-increment conflicting defaults.
+`ServerType.WEBRTC` is for browser streaming, `RTSP` for VLC/ffplay, `NATIVE` for native clients, and `SHM` for same-machine shared-memory readers. WebRTC supports one connected client at a time; guard unsolicited app messages with `server.is_client_connected`. Multiple network servers in one process need explicit unique ports; ovstream does not auto-increment conflicting defaults.
 
 ## Ports
 
@@ -403,18 +294,20 @@ default media port. Do not conflate these in frontend config.
 - [ ] `main()` sets `OVRTX_SKIP_USD_CHECK=1` before ovrtx imports.
 - [ ] `OVWebViewerServer.start()` or equivalent constructs `Renderer(RendererConfig(sync_mode=True, selection_outline_enabled=True))` when selection feedback is needed.
 - [ ] `PxrWorkerClient.start()` is optional and used only for USD queries not covered by ovrtx native stage APIs.
-- [ ] Initial stage load uses `renderer.open_usd_from_string()` with an inline root USDA when viewer render config must be injected.
+- [ ] Initial stage load calls `ovrtx.register_schema_paths()`, then uses OVStage
+      `population.open_usd_from_string()` with an inline root USDA, commits its
+      ordinal, and attaches the renderer when viewer render config must be injected.
 - [ ] Renderer warmup steps before `ovstream.Server.start()`.
-- [ ] `MessageHandler.on_message` is registered for JSON app messages.
+- [ ] `on_app_message` routes unwrapped WebRTC JSON app messages to the message handler.
 - [ ] `MessageHandler.on_input` is registered for raw ovstream input events.
 - [ ] `MessageHandler.on_unicode` is registered when composed text input matters.
 - [ ] `/healthz` returns `503` before first successful frame and `200` afterward.
-- [ ] Render loop is the only owner of `renderer.step()`.
+- [ ] One runtime owner serializes `renderer.step()` and stage mutation.
 - [ ] Render loop enqueues/decodes native pick queries and updates native selection outline groups.
-- [ ] AOV conversion writes a persistent CUDA BGRA8 buffer before `stream_video()`.
+- [ ] Submission uses valid BGRA8 with producer synchronization and buffer lifetime preserved; non-BGRA AOVs use the conversion buffer.
 - [ ] The render loop streams a fallback or last-good frame while connected,
       even when idle or loading.
-- [ ] Disconnect races around `send_message()` and `stream_video()` are caught and debug-logged.
+- [ ] Disconnects preserve renderer state; persistent submission errors reach session status.
 - [ ] Same-process server restarts stop and close the server without calling
       `ovstream.shutdown()` until process exit.
 

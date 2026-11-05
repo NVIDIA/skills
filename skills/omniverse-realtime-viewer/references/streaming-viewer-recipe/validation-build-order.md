@@ -3,7 +3,9 @@
 ## 15. Validate The Omniverse Realtime Viewer
 
 Use this as a routine smoke checklist. Add focused proof only for features the
-viewer actually exposes or for demo-critical claims.
+viewer actually exposes or for demo-critical claims. Message names illustrate the
+example protocol; apply tree, variants, settings and persistence checks only when
+those capabilities are exposed by the requested app.
 
 Validate in this order:
 
@@ -21,12 +23,12 @@ Validate in this order:
    parent-process OVPhysX population as an acceptable fallback.
 6. Start the server with no client and confirm it initializes ovstream, constructs ovrtx, loads or waits for a scene, and exits cleanly on interrupt.
 7. Wait for `/healthz` to return `200 ok`, or capture the server log and failing readiness command.
-8. Confirm the server logs the first valid converted frame, for example `First BGRA frame ready: 1280x720`.
+8. Confirm the server logs the first valid BGRA8 CUDA mapping or completed required conversion into the app-owned BGRA stream buffer, for example `First BGRA frame ready: 1280x720`. Already-BGRA8 output must not be swizzled again.
 9. Before the frontend connects, record the H264 embedded-host preflight: iframe status, `MediaCapabilities.decodingInfo` availability/result when present, and the explicit H264 DirectConfig. In an embed, missing MediaCapabilities is diagnostic only, not a reason to reject H264.
 10. Start the frontend and confirm the browser connects to the signaling port.
 11. Confirm video appears and continues updating: after `connect()` resolves, the video element reaches `HAVE_CURRENT_DATA` and decoded-frame count (or `currentTime` when frame counters are unavailable) advances. If the server starts idle,
    confirm the connection stays alive on fallback frames long enough for the
-   frontend to send `openStageRequest` after `AppStreamer.connect()` resolves.
+   frontend to send `openStageRequest` after confirmed SDK start success (see [client readiness](../streaming-client/README.md#appstreamer-direct-api)).
 12. Confirm colors are correct with a scene containing obvious red and blue objects.
 13. Confirm `openStageRequest` loads a scene and returns `openStageResult`.
 14. Confirm initial-state push works by loading a scene before connecting the browser, then refreshing the browser.
@@ -58,7 +60,7 @@ Use these failure checks:
 - Video has swapped colors: verify CUDA RGBA-to-BGRA conversion.
 - Black frame: verify render product path, camera path, render var source, resolution, and camera transform.
 - Scene load works once but fails after switching: verify renderer reset/load serialization, inline sublayer paths, and operation error handling.
-- Messages do nothing: verify browser envelope unwrapping, exact `event_type` names, data-channel readiness, and send guard.
+- Messages do nothing: verify `on_app_message` receives inner JSON, exact `event_type` names, data-channel readiness, and early-request reply handling.
 - Camera moves incorrectly: verify row-major camera matrix layout, world-up convention, finite state, input button mapping, viewport ownership, and letterbox transform. If the data channel works but native `on_input` receives no pointer/button/wheel events during an explicit test, record that evidence and validate the mutually exclusive `mouseInput` fallback from `viewer-input-routing`.
 - Picking fails: verify native pick query enqueue/step/result handling, input routing, pick coordinate transform, RenderProduct GPU pinning when required by the active ovrtx build, and no picking during load/reset.
 - UI stays loading after refresh: verify server pushes initial `openStageResult` and root `getChildrenResult` after connection.
@@ -75,16 +77,17 @@ Follow this sequence when implementing from scratch:
 3. Build server config, ovstream lifecycle, and render-loop shell with no scene features.
 4. Add ovrtx renderer construction and a minimal user-provided or generated validation stage load.
 5. Add inline root/session setup with `LdrColor` and confirm one streamed frame path.
-6. Add CUDA RGBA-to-BGRA conversion and continuous frame streaming.
-7. Build the React streaming provider and video viewport.
+6. Add required CUDA format conversion and continuous frame streaming; do not swizzle already-BGRA8 output.
+7. Build the selected frontend connection owner and video viewport (React
+   provider is one example).
 8. Connect browser to server and validate live video before adding UI panels.
-9. Add message router with envelope unwrapping and guarded sends.
+9. Add an app-message router with SDK envelope handling and guards for unsolicited sends.
 10. Add `openStageRequest`, loading state, and initial-state push.
 11. Add normalized input routing, camera handling, and live camera writes.
-12. Add hierarchy and properties queries.
-13. Add selection and native selection outline feedback.
+12. Add requested property queries and, if requested, hierarchy.
+13. Add requested selection; add native outlines when the app exposes them.
 14. Add scene picker and scene switching.
-15. Add render settings capabilities, immediate apply paths, and persistence only for validated settings.
+15. If requested, add render settings capabilities, immediate apply paths and persistence for validated settings.
 16. Run the validation checklist and fix failures before adding deployment or optional overlays.
 
 Do not skip the live-video milestone. If the first implementation includes every feature before video is proven, failures become hard to isolate.

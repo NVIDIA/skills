@@ -85,12 +85,12 @@ Do this:
 - Construct a single application runtime object that owns the renderer runtime,
   OVStage/session state when selected, scene manager, stream server, message
   router, input router, settings store, and command queue.
-- Follow the canonical startup order: set env, construct an ovrtx renderer with
-  native selection outline support when needed, create/populate/attach the
-  selected runtime stage path or load the initial stage through the current OVRTX
-  open API, warm up the renderer, initialize ovstream, register callbacks, start
-  readiness health, then start the render loop.
-- Initialize ovstream once, create a WebRTC server, register `on_connection`, `on_message`, and `on_input`, then start the server.
+- Set the environment before import; use
+  [ovstage-ovrtx-integration](../ovstage-ovrtx-integration/README.md) and the
+  selected upstream runtime example for schema registration, renderer/stage
+  initialization, and attachment. Publish the initial scene, warm up the
+  renderer, then initialize ovstream and register callbacks before starting it.
+- Initialize ovstream once, create a WebRTC server, register `on_connection`, `on_app_message`, and `on_input`, then start the server.
 - Enter one render loop that drains queued commands, updates camera/selection/settings state, steps ovrtx when a scene is loaded, converts the frame to BGRA, and submits video to ovstream.
 - While a client is connected, submit a fallback or last-good BGRA frame on every
   tick even when no scene is loaded or a stage load lock is held.
@@ -98,29 +98,32 @@ Do this:
   `ovstream.shutdown()` only from the top-level process-exit path after the
   final server is closed; do not call it between same-process restarts.
 
-Canonical startup sequence:
+Log elapsed time before and after renderer creation, schema registration,
+stage creation/attachment, population/publication, first step, and output copy.
+If a phase stalls, follow [startup diagnostics](../troubleshooting/scenario-playbooks.md#server-startup)
+before adding transport or attributing the failure to the host. Keep server
+frame readiness separate from data-channel readiness and browser decoded video.
+
+Startup sequence (runtime initialization follows the selected SDK example):
 
 ```text
-set OVRTX_SKIP_USD_CHECK=1
-import ovrtx and construct the current renderer/runtime
-load initial stage:
-  populate OVStage or build an inline root USDA that sublayers the user stage and authors viewer render config
-  attach/open with the current OVRTX API
-  write /OVCamera omni:xform through the runtime owner
-  initialize native selection outline styles and clear outline groups
-warm up renderer:
-  commit the initial OVStage publication when present
-  write camera transform
-  step /Render/OVServer/ViewportTexture0 several frames
-  probe render vars and allocate persistent BGRA stream buffer
-initialize ovstream and register callbacks:
-  on_connection -> push_initial_state
-  on_message -> JSON app protocol
-  on_input -> raw mouse/keyboard input routed through viewer-input-routing
-start /healthz:
-  503 until first valid frame
-  200 after first successful converted frame
-start render loop thread
+set OVRTX_SKIP_USD_CHECK=1 before import
+start health endpoint with readiness false
+start runtime owner:
+  initialize renderer and stage with schemas registered before USD consumers
+  populate and attach initial stage with viewer render configuration
+  initialize camera and native selection policy/styles
+  commit initial publication and warm up the displayed product
+  validate outputs and copy a valid frame into owned display storage
+  initialize transport and register connection/message/input callbacks
+  start transport; report startup success and mark ready
+  continue queued mutations, rendering and frame handoff on this owner
+on stop or owner failure:
+  withdraw readiness and stop accepting work
+  stop submissions; join any separate submission worker
+  release output buffers only after their consumers finish
+  finish native operations; detach and destroy on the owner
+  propagate completion or original failure to the supervising caller
 ```
 
 Critical contracts:
@@ -128,10 +131,10 @@ Critical contracts:
 - Register callbacks before `server.start()`.
 - Keep callbacks fast. They may be called from StreamSDK internal threads.
 - Do not call renderer load/reset/step/write APIs directly from ovstream callbacks. Enqueue work for the render loop.
-- Do not call USD or physics population APIs directly from ovstream callbacks.
-  Queue USD query work to a worker and OVPhysX work to a bounded child process
-  unless a verified attached-stage bridge is active.
-- Guard `send_message` with the connected-client state.
+- Callbacks enqueue commands. The runtime owner applies stage changes and the
+  configured physics owner runs simulation; USD-only queries can use a worker.
+- Use the app-message adapter from `streaming-messages`; restore viewer state
+  on reconnect using `streaming-lifecycle`.
 - Maintain explicit runtime states: starting, idle/no scene, loading, streaming, error, shutting down.
 - Keep the most recent loaded stage URL, root hierarchy summary, selection, render settings, and loading state in server memory so a newly connected browser can receive initial state.
 - Readiness is not liveness: `/healthz` must return `503 not ready` until the render loop has produced and copied the first valid frame, then `200 ok`.
@@ -178,11 +181,15 @@ Critical contracts:
   tensors are channel-last (`H x W x C`), not channel-first.
 - Map CUDA buffers for streaming. Avoid CPU round trips in the normal streaming path.
 - Keep mapped or converted frame buffers alive until `stream_video()` returns.
-- Use `write_attribute` for live camera transforms and other live state. Write `omni:xform`, not authored `xformOp:*`, for interactive updates.
-- Use the correct transform semantic and create-new prim mode for attributes that may not already exist in Fabric.
-- For OVStage-backed runtimes, prefer publishing live transform and effect
-  changes through OVStage/session state at monotonic ordinals, then let OVRTX
-  render the committed publication.
+- Write live camera and object transforms through the application-owned
+  OVStage runtime adapter using local `omni:xform` values. Wait for writes,
+  advance the write floor, then render the committed ordinal. See
+  `references/prim-transform-safety` for the shared transform/publication flow.
+- Direct `renderer.write_attribute` and renderer bindings are only for an
+  explicitly standalone renderer-owned compatibility path. Follow
+  `references/ovrtx-rendering` for its semantic and create-new prim mode; do not
+  mix those writes with an attached OVStage. Keep native picking and selection
+  outline groups on OVRTX.
 
 Decision points:
 
@@ -219,12 +226,19 @@ Critical contracts:
 - The viewer camera path must be the same path used by camera controls when writing `omni:xform`.
 - Do not inject lights unless the user explicitly asks for viewer-controlled lighting. User stages usually own their lighting.
 - Include segmentation render vars only for explicit debug/AOV display modes, not for picking.
-- Prefer `renderer.open_usd_from_string()` for inline roots that sublayer the user USD and author viewer render config. This avoids temporary file lifetime issues while preserving relative asset resolution through the sublayer path.
-- Do not call reference or layer-add APIs after a stage is already loaded unless the renderer has been reset to an empty stage and the operation is part of the serialized load path.
+- Prefer OVStage `population.open_usd_from_string()` for inline roots that
+  sublayer the user USD and author viewer render config. Commit its ordinal
+  before the attached renderer consumes it; this preserves relative asset
+  resolution without falling back to a renderer-owned stage.
+- Do not call renderer-owned reference or layer-add APIs in an attached viewer.
+  Use OVStage population reference operations through the serialized runtime
+  path.
 
 Decision points:
 
 - Use a single inline root USDA string with `subLayers = [@user_scene@]` when the user file needs viewer camera/render-product/render-var data.
+  Copy source `upAxis` and `metersPerUnit` onto that root as described in
+  [stage-loading](../stage-loading/README.md#compose-viewer-owned-prims).
 - If the user stage has an authored camera and the requested policy is `stage-camera`, copy its focal length, apertures, clipping range, and transform into the viewer camera.
 - If the user requests persistent camera across scene switches, keep camera state but sanitize and refit only when the old state is invalid for the new bounds.
 - If the user requests viewer lighting controls, add explicit viewer-owned light prims only with a verified live apply path or an explicit reload/profile workflow; otherwise leave lighting untouched and omit live lighting controls.
@@ -246,7 +260,7 @@ Do this in `server/stream_server.py` and `server/frame_converter.py`:
 - For each rendered frame, map `LdrColor` on CUDA, convert RGBA8 to BGRA8 on CUDA, wrap the CUDA buffer as an ovstream video frame, and submit it.
 - Pace the render loop to target FPS while allowing command queue work to run between frames.
 - Send loading and error state messages even when video frames are temporarily unavailable.
-- Log the first valid converted BGRA frame and set readiness before depending on browser connection state. This lets validation distinguish renderer/frame-conversion failures from WebRTC negotiation failures.
+- Log the first valid BGRA8 CUDA mapping or completed required conversion into the app-owned BGRA stream buffer and set readiness before depending on browser connection state. This lets validation distinguish renderer/frame-conversion failures from WebRTC negotiation failures.
 
 Critical contracts:
 
@@ -254,7 +268,7 @@ Critical contracts:
 - Avoid CPU readback in the normal path. CPU readback is acceptable only for debugging screenshots or tests.
 - `stream_video()` does not own a deep copy of the source buffer. Keep the buffer alive until the call returns.
 - `stream_video()` can fail during disconnect races. Catch and debug-log transient failures; do not crash the render loop.
-- First-frame readiness should be set after render-var mapping and RGBA-to-BGRA conversion into the persistent app-owned stream buffer. Do not wait for an attached browser client.
+- First-frame readiness follows a valid BGRA8 CUDA mapping or completed required conversion into the persistent app-owned BGRA stream buffer. The `LdrColor` path above requires RGBA-to-BGRA conversion; already-BGRA8 output must not be swizzled again. Preserve producer synchronization and mapping/buffer lifetime as described in [streaming-server](../streaming-server/README.md#rgba-to-bgra). Do not wait for an attached browser client.
 - Stream width, height, frame pitch, RenderProduct resolution, and camera aspect must agree for the fixed stream size.
 - The WebRTC signaling port is not the media port. The browser discovers media endpoints through SDP.
 - For local WebRTC development, set the server public IP to `127.0.0.1` when ICE discovery otherwise hangs.

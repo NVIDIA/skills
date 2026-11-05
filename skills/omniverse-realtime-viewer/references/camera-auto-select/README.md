@@ -118,7 +118,8 @@ def _is_top_down(stage: Usd.Stage, cam_prim) -> bool:
 
 ### Bbox-Fit Fallback
 
-When no authored camera exists, compute a fit-all orbit:
+When no authored camera exists, compute a fit-all orbit. Pass the smaller of
+the horizontal and vertical field of view so portrait viewports also fit:
 
 ```python
 def compute_bbox_fit_camera(stage: Usd.Stage, fov_deg: float = 60.0):
@@ -129,11 +130,11 @@ def compute_bbox_fit_camera(stage: Usd.Stage, fov_deg: float = 60.0):
 
     center = (bbox_range.GetMin() + bbox_range.GetMax()) / 2.0
     size = bbox_range.GetMax() - bbox_range.GetMin()
-    max_dim = max(size[0], size[1], size[2])
+    radius = math.sqrt(sum(float(component) ** 2 for component in size)) / 2.0
 
     # Distance to fit the bounding sphere in view
     half_fov = math.radians(fov_deg / 2.0)
-    distance = (max_dim / 2.0) / math.tan(half_fov) * 1.2  # 20% padding
+    distance = max(radius, 1e-3) / math.sin(half_fov) * 1.2  # 20% padding
 
     # Default orbit angles: slight elevation, 3/4 azimuth
     elevation = math.radians(25.0)

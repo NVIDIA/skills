@@ -1,279 +1,179 @@
 # Prim Transform Safety
 
-## Triggers
+Use this reference for live object transforms, gizmo drags, animation, and
+restoring temporary edits without changing the user's USD asset.
 
-Use this skill for OVStage transform writes, row-major `omni:xform` matrices, write-floor transform publication, standalone `bind_attribute` `PrimMode.CREATE_NEW` safety, zero-scale discovery, selection animation, transform restore, or prims jump to the origin.
+## Transform ownership and coordinate space
 
-Use this whenever a viewer writes live `omni:xform` attributes for scene prims. The risky operations are selection animation, hide/show discovery, zero-scale isolation, and any runtime transform manipulation.
+Keep one application-owned transform model. Read the current OVStage value for
+an already-edited prim, or capture its authored local transform before creating
+a runtime override. Write `omni:xform` through OVStage, publish the ordinal, then
+render it. Standalone renderer bindings are for renderer-owned applications.
 
-For OVStage transform data-plane or ovrtx standalone compatibility behavior not
-covered here, read `references/dependencies` for acquisition guidance and
-supplemental dependency documentation.
+`omni:xform` is a **local transform**. Matrices are row-major `float64`, with
+translation in row 3. Writing a world transform as local applies the parent
+transform again and moves nested objects incorrectly.
 
-## Core Rule
+For row-vector matrices, world `W = L @ P`, where `L` is local and `P` is the
+current parent-to-world transform. Convert a desired world transform back with
+`L = W @ inverse(P)`. Account for USD reset-xform-stack behavior when resolving
+`P`; a reset stack has no inherited parent transform. Reject singular parents
+for world-space manipulation rather than substituting identity.
 
-For new ovrtx viewers, write runtime transforms through OVStage, not direct
-renderer bindings. Snapshot authored or current runtime transforms before
-creating or replacing any live `omni:xform` column, write the intended matrix at
-a new ordinal, wait, advance the write floor, then render that committed
-ordinal. If the app writes identity as a fallback or renders above the write
-floor, prims can jump to the origin or appear stale.
+## Resolve current world transforms
 
-Safe sequence:
+Use the same runtime transform adapter for the inspector, gizmo, and animation.
+Read copied `omni:xform` and `omni:resetXformStack` values for the prim and its
+ancestors at one published floor. Compose locals from the prim upward, stopping
+after the first reset-stack prim; its descendants still inherit from it.
+For a reset-stack target, its effective parent matrix is identity.
 
-1. Query world transforms from USD before binding.
-2. Create or reuse an OVStage query for the prim paths that will move.
-3. Write each saved world transform to `omni:xform` at a new ordinal before any render step that can show the new runtime column.
-4. Perform temporary edits, such as zero-scale isolation or selection animation.
-5. Restore from the saved world transform or the app's live-transform cache, not from an uninitialized runtime value.
+Batch the required ancestry reads and reuse the snapshot within the owner's
+tick. Invalidate descendant world caches when an ancestor changes. Authored
+`pxr` transforms cannot reflect later OVStage-only edits, and a cached world
+matrix for only the edited path leaves its descendants stale. If using runtime
+derived `omni:fabric:worldMatrix` outputs instead, finish direct local/reset-stack
+writes at `N`, then call `stage.compute_hierarchy(input_ordinal=N,
+output_ordinal=N, model=model)` before advancing the floor. Select a supported
+model using `stage.get_hierarchy_computation_models()` and ensure the derived
+output rows exist through population/setup. Wait for async computation if used.
+See the upstream [transform contract](https://github.com/NVIDIA-Omniverse/ovstage/blob/main/docs/scene/transforms.rst).
+This explicit step is for consumers requiring computed world outputs after direct
+input writes; composing copied locals yourself does not require it. USD changes
+processed through `RENDERING` population (including `ALL`) already compute their
+derived transforms; population without the rendering domain needs explicit
+hierarchy computation before consumers read derived world outputs.
 
-For standalone compatibility, `renderer.bind_attribute(...,
-prim_mode=PrimMode.CREATE_NEW)` creates a Fabric attribute if one does not
-already exist. For `omni:xform`, that new attribute initializes to identity. If
-the app renders before writing the real transform, the prim can jump to the
-origin and lose its authored placement in the rendered stage.
+## Capture a baseline
 
-## Query World Transforms First
-
-Use `pxr` directly or through a worker process, depending on the viewer's import isolation.
+If metadata comes from `pxr`, run this in the USD worker and return copied
+arrays. Use the selected playback time when working with animated assets:
 
 ```python
 from pxr import Usd, UsdGeom
 import numpy as np
 
-def get_world_transforms(stage: Usd.Stage, prim_paths: list[str]) -> dict[str, np.ndarray]:
+def get_local_transforms(stage, prim_paths, time=Usd.TimeCode.Default()):
     result = {}
     for path in prim_paths:
         prim = stage.GetPrimAtPath(path)
-        if not prim or not prim.IsValid() or not prim.IsA(UsdGeom.Xformable):
+        if not prim or not prim.IsA(UsdGeom.Xformable):
             continue
-        mat = UsdGeom.Xformable(prim).ComputeLocalToWorldTransform(Usd.TimeCode.Default())
-        xform = np.array(mat, dtype=np.float64).reshape(4, 4)
-        if np.isfinite(xform).all():
-            result[path] = xform
+        local = UsdGeom.Xformable(prim).GetLocalTransformation(time)
+        matrix = np.array(local, dtype=np.float64).reshape(4, 4)
+        if np.isfinite(matrix).all():
+            result[path] = matrix
     return result
 ```
 
-Do this before creating a live OVStage `omni:xform` value or standalone
-`bind_attribute`. Reading a newly-created runtime value is not a safe
-substitute; it may already be identity.
+Keep baseline values separate from animation output. Starting a drag snapshots
+the current live transform; ending a temporary animation restores its captured
+baseline. If a valid baseline is unavailable, leave the prim unchanged.
 
-## OVStage Write And Publish
+## Batch writes and publication
 
-Use an OVStage query for the target prims. Matrix values are row-major
-`float64`, with translation in row `[3][0..2]`. In OVStage DLPack form,
-`omni:xform` is one 16-lane element per prim (`shape=[N]`, lanes `16`), not an
-`N x 4 x 4` tensor of one-lane elements.
+OVStage transform write inputs use one 16-lane element per prim (`shape=[N]`,
+lanes `16`). Read/map outputs use scalar lanes and shape `[N,4,4]` with explicit
+strides; map-creation dtypes remain lane-based. Match the matrix rows to
+the query's actual prim order; a sorted UI selection is not necessarily that
+order.
 
 ```python
 import numpy as np
-from ovstage import (
-    AttributeSemantic,
-    DLDataType,
-    DLDataTypeCode,
-    PrimMode,
-    make_dltensor,
-)
+from ovstage import AttributeSemantic, DLDataType, DLDataTypeCode, PrimMode, make_dltensor
 
-def publish_xforms(stage, query, matrices_by_path, ordered_paths, ordinal):
+def write_local_transforms(stage, query, ordered_paths, matrices_by_path, ordinal):
     matrices = np.stack([matrices_by_path[path] for path in ordered_paths])
-    xform_tensor = make_dltensor(
+    tensor = make_dltensor(
         matrices.reshape(len(ordered_paths), 16).astype(np.float64),
         dtype=DLDataType(code=DLDataTypeCode.kDLFloat, bits=64, lanes=16),
         shape=[len(ordered_paths)],
     )
     stage.write_attribute(
-        query,
-        "omni:xform",
-        ordinal=ordinal,
-        tensors=xform_tensor,
-        is_array=False,
-        semantic=AttributeSemantic.MATRIX,
+        query, "omni:xform", ordinal=ordinal, tensors=tensor,
+        is_array=False, semantic=AttributeSemantic.MATRIX,
         prim_mode=PrimMode.UPSERT,
     ).wait()
-    stage.advance_write_floor(ordinal).wait()
+
+# Group camera, animation, and interaction writes in one runtime tick.
+write_local_transforms(stage, query, ordered_paths, local_matrices, ordinal)
+stage.advance_write_floor(ordinal).wait()
+products = renderer.step(render_products={product_path}, delta_time=dt, ordinal=ordinal)
 ```
 
-After publishing, render with `renderer.step(..., ordinal=ordinal)`. Python
-`step(..., ordinal=...)` updates the attached renderer from OVStage before
-rendering; call `renderer.update_from_stage(ordinal)` separately only when the
-app needs renderer state updated before stepping.
+The blocking write keeps the tensor alive until consumption completes. For
+asynchronous writes, retain the source tensor until its operation completes.
+Publish once after all writes contributing to the tick have finished.
 
-## Standalone Binding Compatibility
+## Gizmos and animation
+
+The UI owns pointer interaction; the runtime owns transforms:
+
+1. Snapshot selected prims' current local transforms at drag start. Keep this
+   selection separate from descendant meshes used for outlines.
+2. Compose each update from the snapshot, not the previous frame, to avoid
+   drift. Interpret the delta in the gizmo's chosen coordinate space.
+3. Convert world-space results back to local and enqueue the resulting matrices
+   for the runtime's next publication. Preserve valid parent transforms when
+   both a parent and descendant are selected.
+4. Refresh inspector values from the live transform model. Commit the final
+   value on release or restore the snapshot on cancel.
+
+For a translation expressed in the prim's parent coordinates:
 
 ```python
-import warp as wp
-from ovrtx import Device, PrimMode
-
-bindings = {}
-base_xforms = get_world_transforms(stage, prim_paths)
-
-for path in prim_paths:
-    if path not in base_xforms:
-        continue
-    bindings[path] = renderer.bind_attribute(
-        prim_paths=[path],
-        attribute_name="omni:xform",
-        dtype="float64",
-        shape=(4, 4),
-        prim_mode=PrimMode.CREATE_NEW,
-    )
-
-for path, bind in bindings.items():
-    with bind.map(device=Device.CPU) as mapped:
-        wp.from_dlpack(mapped.tensor).numpy().reshape(1, 4, 4)[0] = base_xforms[path]
+offset = np.eye(4, dtype=np.float64)
+offset[3, :3] = offset_in_parent_coordinates
+local_matrices[path] = drag_start_local[path] @ offset
 ```
 
-In standalone compatibility mode, the second loop must run before the next
-render step. This turns the new live attribute into a faithful copy of the
-authored world transform before later code manipulates it.
+Coordinate gizmos and animations through the same model. Pause an animation
+while the user manipulates its prim, or explicitly compose its offset with the
+drag result; competing writers otherwise overwrite one another.
 
-## Safe Temporary Manipulation
+Use renderer-native picking to discover selected paths. Visibility changes
+belong to the visibility attribute, rather than zeroing transforms to infer
+segmentation IDs.
 
-For isolation-based ID discovery, hide one prim by writing a zero matrix, render
-the committed ordinal, then restore its saved transform. Prefer renderer-native
-picking for new viewers; use this pattern only when a selected capability still
-needs render-diff discovery.
+## Saving runtime edits
 
-```python
-zero_xform = np.zeros((4, 4), dtype=np.float64)
+For saving selected runtime transforms or an edited subtree, read OVStage's
+current [exporting-to-USD skill](https://github.com/NVIDIA-Omniverse/ovstage/blob/main/skills/exporting-to-usd/SKILL.md).
+It owns export selection/projection APIs, destination lifetimes, completion,
+and saving. Choose explicitly between a sparse edit overlay and a typed subtree;
+neither implies a complete scene/asset round trip.
 
-baseline_ids = render_and_read_instance_ids(renderer)
+Capture the intended selection and committed runtime snapshot on the owner.
+Choose an application-controlled destination or validated user save workflow,
+with explicit overwrite policy. Keep source assets unchanged unless editing them
+was requested. Reopen the result through a supported USD boundary and verify the
+intended world pose, parent/reset-stack semantics, and required asset references.
+An accepted export operation alone does not prove a usable saved composition.
+Do not prescribe a release-specific repair without verifying the selected
+exporter's current contract and a focused round-trip result.
 
-for path in ordered_paths:
-    ordinal = runtime.next_ordinal()
-    publish_xforms(stage, queries[path], {path: zero_xform}, [path], ordinal)
-    hidden_ids = render_and_read_instance_ids(renderer, ordinal=ordinal)
-    missing_ids = baseline_ids - hidden_ids
+## Standalone bindings
 
-    ordinal = runtime.next_ordinal()
-    publish_xforms(stage, queries[path], {path: base_xforms[path]}, [path], ordinal)
-    render_and_read_instance_ids(renderer, ordinal=ordinal)
+In a renderer-owned app, `bind_attribute(..., prim_mode=PrimMode.CREATE_NEW)`
+can create a missing `omni:xform` initialized to identity. Capture the local
+baseline before creating the binding and initialize it before the next step.
+Use `Semantic.XFORM_MAT4x4` for standalone matrix writes. Keep the binding and
+its mapped data inside the renderer's lifetime; attached apps use the OVStage
+path above instead.
 
-    for instance_id in missing_ids:
-        id_to_path[instance_id] = path
-```
+## Lifecycle and verification
 
-The same pattern applies to animation: compose offsets with `base_xforms[path]`, and restore that base transform when animation ends.
+Recreate queries and bindings after scene replacement. Refresh baselines when
+composition or playback changes the authored transform, and discard late
+commands from a previous stage generation.
 
-```python
-def write_offset(path: str, offset_xyz: np.ndarray) -> None:
-    offset_mat = np.eye(4, dtype=np.float64)
-    offset_mat[3, 0:3] = offset_xyz
-    ordinal = runtime.next_ordinal()
-    publish_xforms(stage, queries[path], {path: base_xforms[path] @ offset_mat}, [path], ordinal)
-```
+Test a prim under a translated and rotated parent, then move the parent too.
+Check numeric local/world results, cancel/restore behavior, and synchronized
+highlight/inspector updates. A visible gizmo alone does not prove the write path.
 
-## Standalone Batch Write Alternative
+See [OVStage data plane](../ovstage-data-plane/README.md),
+[selection-animation](../selection-animation/README.md), and
+[stage-management](../stage-management/README.md).
 
-If a standalone compatibility helper does not need long-lived bindings, use
-`renderer.write_attribute`, but still query transforms first and write the real
-values immediately.
-
-```python
-from ovrtx import DataAccess, PrimMode, Semantic
-
-paths = [path for path in prim_paths if path in base_xforms]
-xforms = np.stack([base_xforms[path] for path in paths]).astype(np.float64)
-
-renderer.write_attribute(
-    prim_paths=paths,
-    attribute_name="omni:xform",
-    tensor=xforms,
-    semantic=Semantic.XFORM_MAT4x4,
-    prim_mode=PrimMode.CREATE_NEW,
-    data_access=DataAccess.SYNC,
-)
-```
-
-Use standalone bound attributes for per-frame compatibility updates. Use batch
-writes for one-shot standalone initialization or reset. In attached ovrtx
-apps, use the OVStage write/publish pattern above instead.
-
-## Interactive Gizmo Drag Pattern
-
-For selected-prim transform gizmos, treat the gizmo as a UI input source and
-keep transform authority in one runtime model. Do not stop at rendering the
-handle; every drag path must call a live `omni:xform` write.
-
-Safe drag lifecycle:
-
-1. On selection, keep the selected path list separate from the mesh paths used
-   for highlight outlines.
-2. On drag start, snapshot each selected prim's current transform. Prefer the
-   app's live-transform cache when the prim has already moved; otherwise query
-   USD world transform before creating a live `omni:xform`.
-3. On drag move, compose the drag delta from the drag-start snapshot rather
-   than incrementally reading back a newly-created `omni:xform`.
-4. Write the composed transform through OVStage at a new ordinal, wait, advance
-   the write floor, and render or update the renderer with that ordinal.
-5. In standalone compatibility code only, use `Semantic.XFORM_MAT4x4`,
-   `PrimMode.CREATE_NEW`, and `DataAccess.SYNC`.
-6. On drag end, clear the snapshot and refresh selected-prim telemetry from the
-   live-transform cache.
-
-```python
-class TransformDragModel:
-    def __init__(self, runtime):
-        self.runtime = runtime
-        self.selected_paths = []
-        self.start_xforms = {}
-
-    def on_drag_start(self):
-        self.start_xforms = {}
-        for path in self.selected_paths:
-            xform = self.runtime.get_live_or_usd_world_transform(path)
-            if xform is not None:
-                self.start_xforms[path] = xform
-
-    def on_drag_moved(self, delta_matrix):
-        for path, base in self.start_xforms.items():
-            self.runtime.write_live_xform(path, base @ delta_matrix)
-
-    def on_drag_ended(self):
-        self.start_xforms.clear()
-```
-
-Validation must assert a numeric transform delta for a known prim. A screenshot
-showing a visible gizmo is not enough; the selected prim must move and the
-highlight/inspector must follow the live transform.
-
-## Scene Lifecycle
-
-- Recompute world transforms after every scene load, reload, variant change, or selectable-set rebuild.
-- Recreate OVStage queries/maps and standalone bindings after stage replacement,
-  OVStage reset, or standalone renderer reset.
-- Do not keep transform queries, maps, path IDs, or bindings across scenes.
-- Do not call `renderer.step()` concurrently with transform discovery,
-  OVStage population/write-floor work, or scene reset.
-- If a prim is missing a valid world transform, skip writing it instead of falling back to identity.
-
-## Anti-Patterns
-
-```python
-# Wrong: CREATE_NEW may read back identity, not the authored transform.
-bind = renderer.bind_attribute(..., attribute_name="omni:xform", prim_mode=PrimMode.CREATE_NEW)
-with bind.map(device=Device.CPU) as mapped:
-    original = wp.from_dlpack(mapped.tensor).numpy().reshape(1, 4, 4)[0].copy()
-
-# Wrong: identity fallback silently moves a prim to the origin.
-original_xforms[path] = np.eye(4, dtype=np.float64)
-
-# Wrong: authored USD xform ops are not the live ovrtx update path.
-renderer.write_attribute(..., attribute_name="xformOp:transform")
-
-# Wrong: direct renderer writes become the scene truth while an OVStage is attached.
-renderer.write_attribute(..., attribute_name="omni:xform")
-```
-
-## Gotchas
-
-- Standalone `PrimMode.EXISTING_ONLY` can skip missing live attributes; use it only when inline session data already created them. OVStage examples use OVStage `PrimMode.UPSERT` for app-owned runtime transforms.
-- `omni:xform` matrices are `float64`, row-major, with translation in row 3 in the viewer patterns used here. OVStage DLPack writes use one 16-lane element per prim; standalone ovrtx Python compatibility writes may use `(N, 4, 4)` NumPy matrices.
-- A zero-scale or zero matrix hide operation must always have a known restore matrix.
-- Multi-mesh or instanceable assets can produce several segmentation IDs for one selected path; preserve path-to-many-ID behavior when needed.
-- Transform-safe discovery should use the baseline, hide, diff, restore pattern
-  above; never discover IDs by reading a newly-created `omni:xform` value or
-  leaving a prim hidden across frames.
-
-See also: `ovstage-data-plane`, `object-selection`, `selection-animation`, `ovrtx-rendering`, `stage-hierarchy`, `stage-management`.
+For XR, let OVXR consume the committed edit through its normal frame path;
+do not add an application-owned `renderer.step()` to apply the transform.

@@ -2,14 +2,14 @@
 
 ## Triggers
 
-Use this skill for UI brief, UX, viewer UI workflow, viewer layout, app shell, panels, toolbar, inspector, form controls, status UI, redesign, React frontend, ovui UI, ovwidgets editor UI, Dear ImGui UI, or viewer interface routing.
+Use this skill for UI brief, UX, viewer UI workflow, viewer layout, app shell, panels, toolbar, inspector, form controls, status UI, redesign, React frontend, ovui UI, ovui_widgets editor UI, Dear ImGui UI, or viewer interface routing.
 
 Use this after delivery-path routing when the request changes the user-facing interface of an Omniverse Realtime Viewer. It complements `usd-viewer-app`, `viewer-backend-interface`, `streaming-client`, `tauri-local-viewer`, `electron-shm-viewer`, `ovui-local-viewer-recipe`, `cpp-native-viewer`, and `ovwidgets-editor-shell`.
 
 ## Ground Rules
 
 - The user-facing UI does not render USD or 3D geometry. It displays an `ovrtx` output surface and manages UI around it.
-- Favor the existing app's component system and styling conventions. If none exists in a web frontend, build plain React components with semantic HTML and predictable CSS before adding a new UI dependency. For native `ovui`, `ovwidgets`, or Dear ImGui apps, translate the same interaction intent into the toolkit's existing primitives.
+- Favor the existing app's component system and styling conventions. If none exists in a web frontend, build plain React components with semantic HTML and predictable CSS before adding a new UI dependency. For native `ovui`, `ovui_widgets`, or Dear ImGui apps, translate the same interaction intent into the toolkit's existing primitives.
 - Treat the UI as part of the product, not a mockup. Implement reachable states, handlers, disabled/loading behavior, and validation evidence.
 - Keep transport-specific code behind `ViewerBackend` or the selected delivery adapter. Panels should not call raw WebRTC, Tauri, Electron, or server APIs directly unless a narrower skill requires it.
 
@@ -31,6 +31,12 @@ Use this after delivery-path routing when the request changes the user-facing in
 | Toolbars, actions, forms, sliders, confirmations | `viewer-control-patterns` |
 | Stage tree, asset grid, property inspector, JSON display | `viewer-data-view-patterns` |
 | Loading, errors, stream health, destructive-action warnings | `viewer-feedback-status` |
+| Headset panels, toolbelt, spatial controls and visual polish | [XR experience quality](../ovxr-composition-ui/experience-quality.md), then [composition UI](../ovxr-composition-ui/README.md) |
+
+For XR, reuse the information hierarchy, semantic actions and state feedback
+below, not desktop-specific CSS, viewport mouse capture or orbit-camera rules.
+The spatial references own physical placement, ray/gesture capture and headset
+proof. A React companion shell is optional and does not supply headset widgets.
 
 3. Declare the layout before writing component code.
    - Name regions by purpose: Viewport Panel, Outliner Panel, Properties Panel, Asset Browser, Render Settings.
@@ -44,7 +50,7 @@ Use this after delivery-path routing when the request changes the user-facing in
    - Do not bake transport details into a promoted UI component. Pass data and callbacks through typed props or `ViewerBackend`.
 
 5. Implement with stable spatial contracts.
-   - Use CSS grid/flex tracks with `min-height: 0`, constrained overflow, and stable viewport dimensions.
+   - For web shells, use CSS grid/flex tracks with `min-height: 0`, constrained overflow, and stable viewport dimensions. XR surfaces instead follow their declared physical size, anchor and raster contracts.
    - Do not let tree expansion, inspector contents, or status banners resize the rendered surface unless the user explicitly asked for an adaptive layout.
    - Provide explicit empty states for selection-driven panels instead of showing stale data or blank panes.
 

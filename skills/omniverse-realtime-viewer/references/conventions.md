@@ -17,6 +17,11 @@ of inventing a local rule.
 
 ## Mouse And Input
 
+These mouse bindings apply to desktop/browser viewports. XR uses
+[spatial input](xr-spatial-input/README.md) and its capture/activation policies;
+do not translate a hand pinch into desktop mouse orbit or force every XR node
+to activate on release.
+
 - Left mouse button drag: orbit.
 - Middle mouse button drag: pan.
 - Right mouse button drag: dolly/zoom.
@@ -65,12 +70,23 @@ of inventing a local rule.
 - NVST maps pointer coordinates between the contained video and intrinsic stream
   resolution. Local apps use the visible image content rect for the same
   letterbox mapping.
-- Every stream frame handed to ovstream is BGRA8. Convert or colorize AOVs on
-  the server before `stream_video()`.
+- Standard ovstream consumers expect BGRA8; convert or colorize AOVs on the
+  producer. An explicitly application-controlled XR SHM mirror may instead
+  preserve RGBA with a matching consumer and generation-bound frame metadata,
+  as specified in [XR mirror](xr-desktop-mirror/README.md). This exception is
+  not compatible with stock SHM consumers; never swizzle twice or infer order.
 - Shader bake/compile can take time on first load. Complete warmup before
   accepting client connections when startup latency matters.
 
+For client-gated XR runtimes, renderer warmup and listener/client readiness are
+separate: follow [XR bring-up](ovxr-library-runtime/library-only.md). Do not wait
+for a client-bound XR context before allowing that client to connect.
+
 ## Camera
+
+These camera controls concern application-owned desktop/browser cameras. OVXR
+owns headset eye cameras and their frame schedule. Apply navigation through
+the XR anchor contract; a desktop companion must not orbit the headset eyes.
 
 - The camera is a USD prim, updated by writing `omni:xform`.
 - Camera matrices are row-major: row 0 = right, row 1 = up, row 2 = `-forward`,
@@ -87,17 +103,20 @@ of inventing a local rule.
   live in a session layer or composite wrapper.
 - Clear selection, hover, temporary effects, and any viewer-authored runtime
   overrides on every stage load.
-- Do not call `renderer.step()` while `reset_stage()`, `add_usd()`, or a
-  session/composite rebuild is mutating the renderer.
+- Serialize population, scene attachment/replacement, runtime writes, and
+  `renderer.step()` through the runtime owner; see `stage-management/README.md`.
 - Detect the scene root dynamically on the server and pass `root_prim_path` to
   clients instead of hardcoding `/World`.
 
 ## Physics And Runtime Simulation
 
-- Keep OVPhysX USD population out of the process that already owns `ovrtx.Renderer` and live OVStage unless a verified `PhysX.attach_ovstage(stage, read_ordinal=...)` bridge is available for the exact installed OVStage/OVPhysX ABI.
-- If `attach_ovstage` is unavailable or reports missing OVStage bridge symbols, run OVPhysX in a bounded child process and hand pose samples back to the parent as structured JSON. The parent writes transforms through OVStage/session state.
-- User or hero USD files remain unmodified. If a visual hero stage lacks physics APIs, generate a temporary child-only physics overlay/copy and map returned transforms back to the live prim paths.
-- Parent viewer debug state should distinguish `parent_inprocess_attach_ovstage_used` from `bounded_worker_used`; a valid subprocess handoff has parent false and child true.
+- Choose a supported shared-stage integration or an explicit worker boundary
+  using `physics-simulation/README.md` or `newton-physics/README.md`.
+- The application owns the simulation clock and publication. Give each animated
+  transform one writer; camera/UI commands and physics updates meet at the
+  runtime owner rather than racing independent stage mutations.
+- Keep generated physics overlays and transient state separate from user USD.
+  Worker boundaries carry copied poses/status, not borrowed native handles.
 
 ## Streaming Protocol
 
@@ -106,13 +125,20 @@ of inventing a local rule.
   or hosting environment requires them.
 - App messages travel over the data channel as JSON with
   `{ "event_type": "...", "payload": {...} }`.
-- AppStreamer client messages may be wrapped by the streaming library; unwrap
-  before dispatching on the server.
+- Receive application JSON through ovstream `on_app_message`; the transport
+  removes its envelope before app dispatch. Native pointer/key input uses
+  `on_input`. See `streaming-messages/README.md` for the shared app protocol.
 
 ## Environment
 
 - Set `OVRTX_SKIP_USD_CHECK=1` before importing or constructing `ovrtx`.
+- For a stage-first attached renderer, call `ovrtx.register_schema_paths()`
+  after importing `ovrtx` but before constructing or first populating OVStage,
+  and before any other OpenUSD consumer initializes. Importing `ovrtx` alone
+  does not register those paths unless its explicit auto-registration option was
+  enabled before import.
 - Import/setup order for streaming servers is:
-  environment variables -> `ovrtx`/renderer -> streaming helpers -> `pxr` only
-  behind the chosen isolation boundary.
+  environment variables -> `ovrtx` + schema registration -> `ovstage` create /
+  population -> renderer attachment -> streaming helpers -> `pxr` only behind
+  the chosen isolation boundary.
 - Keep `renderer.step()` ownership on one render thread or UI loop.

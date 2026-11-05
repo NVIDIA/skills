@@ -51,7 +51,8 @@ The one pattern to internalize for a *live* CAE viewer: **a UI control (slider, 
 message) maps either to a cheap data-plane array/attribute write OR to a structural rebuild —
 and you must decide which.** A camera move, an emitter drag, a timeline scrub, or a colormap
 tweak is a cheap in-place write of `points` / `displayColor` / `omni:xform` / timeline on an
-existing prim; a representation swap or a new dataset changes topology and needs a rebuild.
+existing prim, including changed mesh connectivity. A change in prim type or
+composition needs structural replacement; a new dataset follows scene replacement.
 The full decision table and the end-to-end control → message → server op → OVStage write →
 render path live in **[driving-cae-viz-via-ovstage.md](driving-cae-viz-via-ovstage.md)** —
 read it before wiring any interactive control. It is the generalized version of the same
@@ -103,9 +104,8 @@ authored directly against `ovrtx`; one serialized loop owns every OVStage write 
    `warp_simdata.Dataset` (SIDS from `.npz`/CGNS arrays, field attach) and run the
    operators; read back geometry + fields.
 2. **[cae-data-ingestion.md](cae-data-ingestion.md)** — read **native** CAE files
-   library-only: EnSight Gold `.case`/`.geo` (C-Binary parser) and CGNS `.cgns`
-   (`warp_simdata.io.cgns` + the h5py transient workaround), NODE vs ELEMENT association.
-   Prefer the library-direct readers — `cae-openusd-plugins` may be absent.
+   through CAE OpenUSD Plugins and Warp SimData USD adapters: dataset/field
+   selection, explicit time samples, and NODE vs ELEMENT association.
 3. **[usd-authoring-and-materials.md](usd-authoring-and-materials.md)** — turn operator
    output into a colored, lit USD prim (Mesh/Points/BasisCurves + colormap material). A
    path tracer renders unlit geometry **black** — author lights. Covers MDL beauty materials
@@ -128,9 +128,10 @@ authored directly against `ovrtx`; one serialized loop owns every OVStage write 
 
 10. **[driving-cae-viz-via-ovstage.md](driving-cae-viz-via-ovstage.md)** — the core pattern:
     turning a control (slider/message) into the **correct OVStage writes** — data-plane array
-    writes (proven) vs. structural rebuild, write-floor ordering, the realtime emitter.
+    writes vs. structural replacement, consistent topology/primvar publication and
+    write-floor ordering.
 11. **[temporal-playback.md](temporal-playback.md)** — transient/time-varying playback: a
-    persistent mesh with per-frame data-plane `points`/`displayColor` writes (~1 ms/frame),
+    persistent mesh with per-frame data-plane `points`/`displayColor` writes,
     numpy-lerp field interpolation, and locked-vs-auto colormap domain; timeSamples alternative.
 12. **[emitter-and-seed-sources.md](emitter-and-seed-sources.md)** — the movable emitter sphere
     → live streamlines , and the critical point-cloud-needs-a-

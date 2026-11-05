@@ -59,10 +59,19 @@ def set_pickable(renderer, prim_path_ids: list[int], enabled: bool) -> None:
 
 C/C++:
 
+Pass one boolean per prim path. This two-prim example uses path IDs already
+resolved by the same renderer:
+
 ```c
-// Prefer the native helper when writing C/C++ integration code.
-ovrtx_set_pickable(renderer, prim_path_ids, prim_path_count, true);
+enum { prim_path_count = 2 };
+const ovx_primpath_t prim_path_ids[prim_path_count] = {
+    first_prim_path_id, second_prim_path_id
+};
+const bool pickable[prim_path_count] = {true, true};
+ovrtx_set_pickable(renderer, prim_path_ids, prim_path_count, pickable);
 ```
+
+Keep both arrays alive until the queued operation completes.
 
 When a frontend sends `makePrimsSelectable` or `makePrimsPickable`, update the
 server's canonical pickable set and write pickability for the changed prims.
@@ -75,7 +84,7 @@ Only run selection on a completed click gesture. Camera orbit/pan/zoom drags
 must not also select.
 
 ```python
-def pick_at_render_pixel(renderer, render_product_path: str, x: int, y: int, width: int, height: int) -> list[str]:
+def pick_at_render_pixel(renderer, render_product_path: str, x: int, y: int, width: int, height: int, ordinal: int) -> list[str]:
     renderer.enqueue_pick_query(
         render_product_path=render_product_path,
         left_ndc=x / width,
@@ -87,11 +96,11 @@ def pick_at_render_pixel(renderer, render_product_path: str, x: int, y: int, wid
     products = renderer.step(
         render_products={render_product_path},
         delta_time=1.0 / 60.0,
+        ordinal=ordinal,
     )
 
-    with products as ctx:
-        frame = ctx[render_product_path].frames[0]
-        return resolve_pick_hit_paths(renderer, frame)
+    frame = products[render_product_path].frames[0]
+    return resolve_pick_hit_paths(renderer, frame)
 ```
 
 Keep UI coordinate conversion outside the picker:
@@ -107,7 +116,7 @@ Keep UI coordinate conversion outside the picker:
 Drag selection uses the same native API with a larger rectangle:
 
 ```python
-def marquee_pick(renderer, render_product_path: str, x0: int, y0: int, x1: int, y1: int, width: int, height: int) -> list[str]:
+def marquee_pick(renderer, render_product_path: str, x0: int, y0: int, x1: int, y1: int, width: int, height: int, ordinal: int) -> list[str]:
     left = min(x0, x1)
     top = min(y0, y1)
     right = max(x0, x1) + 1
@@ -124,15 +133,19 @@ def marquee_pick(renderer, render_product_path: str, x0: int, y0: int, x1: int, 
     products = renderer.step(
         render_products={render_product_path},
         delta_time=1.0 / 60.0,
+        ordinal=ordinal,
     )
 
-    with products as ctx:
-        frame = ctx[render_product_path].frames[0]
-        return resolve_pick_hit_paths(renderer, frame)
+    frame = products[render_product_path].frames[0]
+    return resolve_pick_hit_paths(renderer, frame)
 ```
 
 For additive or subtractive marquee modes, apply modifier keys after resolving
 the hit paths and before broadcasting the canonical selection state.
+
+In attached-stage viewers, these helpers run inside the sole render owner. Pass
+the latest committed ordinal already chosen for that frame; a picker must not
+call an un-ordinaled or competing `renderer.step()`.
 
 ## Decode Pick Hits
 
@@ -168,9 +181,9 @@ def resolve_pick_hit_paths(renderer: ovrtx.Renderer, frame) -> list[str]:
     return paths
 ```
 
-If the app needs world-space hit data for gizmos or labels, also read
-`worldPositionM`, `worldNormal`, `objectType`, and `geometryInstanceId` from the
-same pick-hit render var after validating the schema.
+If the app needs world-space hit data for gizmos or labels, follow
+[native pick decoding](../native-picking-selection/README.md#decode-pick-results)
+for the required query flag and validated result access.
 
 ## Selection State
 

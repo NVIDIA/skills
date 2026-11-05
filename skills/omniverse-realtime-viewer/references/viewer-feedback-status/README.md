@@ -77,7 +77,9 @@ Dialog content should include:
 - Cancel action and confirm action.
 - Destructive styling for irreversible confirm actions.
 
-If a "do not warn again" option is added for degraded stream states, scope it to the current degraded state and clear it when the stream returns to Live.
+Users may dismiss the current stream-degradation notice until the stream
+returns to Live. Keep the current stream status visible, and retain confirmation
+dialogs for destructive actions even while that notice is dismissed.
 
 ## Disabled State Rules
 

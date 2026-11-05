@@ -7,7 +7,7 @@ Use this skill for ovui window shell, standalone viewport shell, simple ovui app
 For a complete local desktop viewer, read `ovui-local-viewer-recipe` first and use
 this as the focused shell/display skill. Use this for a small single-window
 viewer: header, RTX viewport, optional sidebar, and inline controls. Do not use
-`ovui.app.Application`; that starts the full OvGear editor with docking, menus,
+`ovui_widgets.app.application.Application`; that starts the full USD Viewer editor with docking, menus,
 property panels, transform gizmos, and status bars.
 
 For mouse button normalization, click-vs-drag handling, and dispatch to camera
@@ -39,6 +39,7 @@ import os
 os.environ.setdefault("OVRTX_SKIP_USD_CHECK", "1")
 
 import ovrtx
+ovrtx.register_schema_paths()
 import omni.ui as ui
 ```
 
@@ -63,9 +64,9 @@ If `renderer.step()` hangs after a crash, use `nvidia-smi` and kill only stale P
 
 Use this as the canonical standalone `ovui` bootstrap for generated lightweight
 local viewers in this skill package: initialize once, create one fill-window
-`ui.Window`, paint through one provider, then pass an awaitable render loop to
-`ui.run(...)`. Do not generate `hasattr(ui, "get_app")` or alternate bootstrap
-branches unless a targeted compatibility validation proves the selected wheel
+`ui.Window`, paint through one provider, then run the update coroutine alongside
+`ui.run_async()` in an application-owned asyncio loop. Do not generate
+`hasattr(ui, "get_app")` or alternate bootstrap branches unless a targeted compatibility validation proves the selected wheel
 changed the standalone contract.
 
 Use `fill_app_window=True`; without it the GLFW window can resize while the UI frame remains stuck at the initial dimensions.
@@ -119,18 +120,39 @@ provider.set_data_array(synthetic_rgba(640, 360), [640, 360])
 
 async def render_loop():
     while True:
-        # Advance viewer state here; ui.run owns presentation.
+        # Advance viewer state here; ui.run_async owns presentation.
         await asyncio.sleep(1.0 / 120.0)
 
 
-ui.run(render_loop())
+async def run_until_closed(update, presentation):
+    tasks = [asyncio.create_task(update), asyncio.create_task(presentation)]
+    try:
+        done, _ = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        for task in done:
+            task.result()  # propagate update or presentation failures
+    finally:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+
+try:
+    asyncio.run(run_until_closed(render_loop(), ui.run_async()))
+finally:
+    # Stop and join the render owner here once a runtime is connected.
+    window.destroy()
+    ui.shutdown()
 ```
 
 Keep the surface focused: black header, large viewport, white/sidebar utility area, green `#76b900` accents. Avoid editor-only affordances unless requested.
 
-`ui.init(...)` returns `None`; `ui.run(...)` owns presentation and expects an awaitable coroutine. Returning from the coroutine ends the app, so long-running viewers should yield with `await asyncio.sleep(1.0 / 120.0)` after each state update. Validate this exact bootstrap
-before adding renderer or USD code; if a newer `ovui` wheel changes the contract,
-update this snippet instead of generating defensive bootstrap branches.
+`ui.init(...)` returns `None`. `ui.run_async()` presents frames until the native
+window closes. When either task finishes, cancel and await the other before
+stopping the render owner, destroying the window, and calling `ui.shutdown()`.
+The update coroutine should yield after each state update. This gives its
+`finally` blocks time to run before the event loop and native backend disappear.
+Validate this bootstrap before adding renderer or USD code.
 
 ## Header And Load Controls
 
@@ -155,8 +177,8 @@ the path-field loader usable.
 ## Image Display
 
 Use the app's local image bridge helper when a plain image widget is enough.
-For projects using the `ovwidgets` helper, import
-`ovwidgets.viewport.image_bridge.ImageBridge`; otherwise use
+For projects using the `ovui_widgets` helper, import
+`ovui_widgets.viewport.image_bridge.ImageBridge`; otherwise use
 `ui.ByteImageProvider` directly. The renderer may stay at fixed resolution while
 `ImageWithProvider` stretches with preserve-aspect letterboxing.
 
@@ -176,20 +198,17 @@ image = ui.ImageWithProvider(provider, fill_policy=ui.IwpFillPolicy.IWP_PRESERVE
 provider.set_data_array(arr, [arr.shape[1], arr.shape[0]])
 ```
 
-Use ovui integer style colors as `0xAARRGGBB`. Swapping the byte order can turn
-an intended dark background into light red or brown and make a blank viewport
-look like a renderer failure.
+Use `ui.color("#76b900")` or `ui.color(r, g, b, a)` for style colors. The helper
+packs ovui's integer `0xAABBGGRR` format; image-provider pixels remain RGBA bytes.
 
 Read `LdrColor` inside the map context and copy before returning:
 
 ```python
-with products as ctx:
-    rv = ctx[RENDER_PRODUCT_PATH].frames[0].render_vars["LdrColor"]
-    with rv.map(device=ovrtx.Device.CPU) as mapping:
-        try:
-            frame = np.from_dlpack(mapping).copy()
-        except Exception:
-            frame = np.from_dlpack(mapping).copy()
+# products is the mapping-like result of the render owner's renderer.step().
+# RenderVar output maps use the full authored prim path.
+rv = products[RENDER_PRODUCT_PATH].frames[0].render_vars["/Session/Render/Vars/LdrColor"]
+with rv.map(device=ovrtx.Device.CPU) as mapping:
+    frame = np.from_dlpack(mapping).copy()  # owned pixels for UI presentation
 ```
 
 ## Display Smoke Test And Blank-Viewport Triage
@@ -260,6 +279,10 @@ def image_content_rect(widget_w, widget_h, image_w, image_h):
     return 0.0, (widget_h - draw_w / image_aspect) * 0.5, draw_w, draw_w / image_aspect
 ```
 
+The ovui wheel callback is `(delta_x, delta_y, modifiers)`. Use `delta_y` for
+vertical zoom, preserve the modifier bitmask, and take cursor position from
+pointer events.
+
 ## Mouse Capture Surface
 
 Attach callbacks to a transparent top-level `ui.Rectangle` over the image. Wrap callbacks; unguarded ovui callback exceptions can tear down the app loop.
@@ -302,50 +325,37 @@ still orbit. Do not let a gizmo drag also enqueue a pick on release.
 
 ## Local Transform Gizmo Wiring
 
-A drawn transform gizmo is not sufficient. The generated app must prove that a
-drag changes the selected prim in the ovrtx runtime stage. For a lightweight
-local app, prefer this contract:
+Use one transform adapter for the gizmo, Inspector and operation commands.
+The UI owns pointer gestures; the runtime owner reads and writes scene state.
+For attached apps, write local `omni:xform` values through OVStage and publish
+before the renderer consumes them. Follow
+[prim transform safety](../prim-transform-safety/README.md) for current ancestry,
+reset stacks, typed matrix writes and publication. Its standalone-binding path
+applies only when the renderer owns the scene.
 
-1. Selection state owns the selected prim paths and notifies the gizmo model.
-2. On transform-drag start, read and store each selected prim's current world
-   transform from USD or from the app's latest live-transform cache.
-3. On each drag delta, compose a delta matrix from the drag movement and the
-   stored start transform, then write `omni:xform` through `renderer.write_attribute`.
-4. Use `Semantic.XFORM_MAT4x4`, `PrimMode.CREATE_NEW`, and `DataAccess.SYNC`
-   for these live writes.
-5. On release, clear drag state and rebuild/refresh any selected-prim info
-   panel from the same live-transform cache.
+1. At drag start, capture the selected paths, active scene generation and current
+   live local/world transforms through that adapter. Keep selected prims
+   separate from descendant meshes used for outlines.
+2. Give the gizmo first refusal on the pointer gesture. Use
+   [transform manipulator](../transform-manipulator/README.md) for hit testing,
+   projection and drag math; suppress camera movement and click-picking while
+   the drag owns the pointer.
+3. Compose each target from the drag-start snapshot in the chosen coordinate
+   space and queue that intent to the runtime owner.
+4. The owner checks generation and edit ownership, then converts a world target
+   `W` to local `L = W @ inverse(P)` using the current effective parent-to-world
+   matrix `P`. Reset stacks and simultaneous parent/child edits follow the
+   canonical transform model. Apply the local matrices and publish with the
+   other writes for that tick. Authored USD values are baselines, not replacements
+   for current runtime transforms after live edits.
+5. Refresh the gizmo and Inspector from the same live state. On release, commit
+   the final drag value; on cancel, restore the captured baseline through the
+   same owner path. Retire the drag when its scene is replaced.
 
-If a reusable `omni.ui_scene` / `ovwidgets` transform manipulator only renders
-the handles in a minimal shell, add an app-owned fallback path: when LMB starts
-near the selected pivot/handle, enter a transform-drag mode and convert pointer
-motion into camera-plane world deltas. This keeps direct manipulation working
-even if lower-level handle gestures are not firing in the active standalone
-ovui build.
-
-```python
-def on_gizmo_drag_start(selected_paths):
-    drag_start = {
-        path: runtime.get_live_or_usd_world_transform(path)
-        for path in selected_paths
-    }
-
-def on_gizmo_drag_delta(dx_px: float, dy_px: float):
-    right, up, _forward = camera.basis()
-    scale = max(0.001, camera.distance * 0.0018)
-    delta_world = right * (dx_px * scale) - up * (dy_px * scale)
-    delta = np.eye(4, dtype=np.float64)
-    delta[3, :3] = delta_world
-    for path, base in drag_start.items():
-        runtime.write_live_xform(path, base @ delta)
-```
-
-Validation for gizmos must include both evidence types:
-
-- A programmatic transform write test that moves a known prim and verifies the
-  pivot/transform changed by the expected delta.
-- A windowed or screenshot/manual note that grabbing near the selected
-  gizmo/pivot moves the highlighted prim, not only the handle.
+Verify numeric local/world results under a transformed parent, cancel/restore,
+and actual window input that moves the selected prim with its handle. A moving
+handle alone does not prove scene publication. Keep renderer output verification
+separate from transform readback.
 
 ## Context Menu (Right-Click)
 

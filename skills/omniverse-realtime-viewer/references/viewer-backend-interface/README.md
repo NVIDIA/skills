@@ -110,7 +110,7 @@ Method contract:
 |---|---|
 | `connect()` | Establish the transport, register event/frame listeners, and resolve when commands can be sent. Guard duplicate calls from React remounts. |
 | `disconnect()` | Remove listeners, stop frame pumps, close transport handles, and reject or clear pending resolvers. Make cleanup safe to call more than once. |
-| `loadStage(path)` | Ask the backend to load a USD stage by URL/path. Clear stale tree, property, selection, progress, AOV, and pending-pick state. Resolve after the backend accepts or completes the load according to that transport's normal semantics. |
+| `loadStage(path)` | Resolve when the runtime has produced the new scene's first valid frame and published its matching scene state. Reject failure, cancellation, or supersession; transport acceptance alone is not completion. Preserve the active scene during download and invalidate scene-local UI at renderer handoff. Track decoded-video readiness separately. |
 | `resize?(width, height)` | Resize a backend-owned dynamic render target when supported. Fixed-resolution video and fixed render-product transports should implement a no-op or omit this method. |
 | `sendRenderScale?(scale)` | Request a render-scale change when the backend supports adaptive scaling. Clamp to supported values and publish the effective scale through frame or stats updates when possible. |
 | `setCamera(params)` | Set camera state directly for backends that own explicit camera parameters. Native-input transports may resolve without action if camera motion is driven by pointer messages. |
@@ -134,7 +134,11 @@ Method contract:
 
 `pick(x, y)`, `cameraMouseButton(input)`, and `cameraMouseMove(x, y)` use viewport-element-local CSS pixel coordinates, not window coordinates.
 
-Callers starting from DOM events must subtract the viewport element rect:
+For a local adapter that owns DOM gestures, subtract the viewport element rect.
+WebRTC/AppStreamer owns native viewport input: subscribe to its resulting
+selection events instead of forwarding a second DOM camera/pick path. The local
+release handler below assumes its adapter also received the matching press and
+motion events:
 
 ```typescript
 function toViewportPoint(event: React.PointerEvent, viewport: HTMLElement) {
@@ -407,41 +411,36 @@ Transport notes:
    React components required by the app.
 2. Implement a backend hook for the chosen transport: `useWebRTCBackend`, `useShmBackend`, `useTauriBackend`, or a new hook.
 3. Mount the transport viewport surface: `<video>`, `<canvas>`, or a native pixel-presenting component.
-4. Convert pointer events to viewport-local CSS pixels before calling camera or pick methods.
+4. Give the viewport one input owner. WebRTC uses AppStreamer native input; local DOM adapters convert coordinates before calling camera/pick methods.
 5. Subscribe to backend selection and frame/stat events in React effects.
 6. Render shared UI components against the backend rather than raw transport APIs.
 7. Keep transport-specific message names and native handles inside the backend hook.
 
-Skeleton:
+WebRTC skeleton (the backend hook owns AppStreamer input and connection state):
 
 ```tsx
 function ViewerApp() {
-  const backend = useWebRTCBackend(config);
+  const backend = useWebRTCBackend(config); // stable identity for this endpoint
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [selectedPaths, setSelectedPaths] = useState<string[]>([]);
 
   useEffect(() => {
-    void backend.connect();
-    return () => backend.disconnect();
+    let active = true;
+    void backend.connect().catch(error => {
+      if (active) setConnectionError(String(error));
+    });
+    return () => { active = false; backend.disconnect(); };
   }, [backend]);
 
   useEffect(() => backend.onSelectionChanged(setSelectedPaths), [backend]);
 
-  async function handlePointerUp(event: React.PointerEvent) {
-    const viewport = event.currentTarget as HTMLElement;
-    const rect = viewport.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    const clicked = await backend.cameraMouseButton({ x, y, button: event.button, pressed: false });
-    if (!clicked) return;
-    const picked = await backend.pick(x, y);
-    await backend.selectPrims(picked ? [picked] : []);
-  }
 
   return (
     <>
       <PrimIconSprite />
+      {connectionError && <div role="alert">{connectionError}</div>}
       <main className="viewer-shell">
-        <section className="viewport" onPointerUp={handlePointerUp}>
+        <section className="viewport">
           <video id="remote-video" />
         </section>
         <aside className="sidebar">

@@ -2,7 +2,7 @@
 
 ## Renderer Setup
 
-Create the renderer once with sync mode and native selection outlines enabled.
+Create the renderer on its owner thread with sync mode and native selection outlines enabled. Register schema paths before any OVStage/OpenUSD initialization.
 The C API uses typed `ovrtx_config_entry_t` arrays, not JSON strings.
 
 ```cpp
@@ -21,6 +21,10 @@ static ovrtx_renderer_t* createRenderer()
         sizeof(configEntries) / sizeof(configEntries[0]),
     };
 
+    if (!ok(ovrtx_register_schema_paths(&config))) {
+        printLastOvrtxError("Failed to register RTX schema paths");
+        return nullptr;
+    }
     ovrtx_renderer_t* renderer = nullptr;
     const ovrtx_result_t result = ovrtx_create_renderer(&config, &renderer);
     if (!ok(result) || !renderer) {
@@ -36,96 +40,118 @@ Available config entries include `ovrtx_config_entry_sync_mode(true)`,
 `ovrtx_config_entry_selection_outline_enabled(true)`, and
 `ovrtx_create_renderer(...)`.
 
+For a stage-first attached C/C++ viewer, call
+`ovrtx_register_schema_paths(&config)` before the first OVStage initialization
+or population (and before another OpenUSD consumer initializes). It publishes
+the RTX schema definitions that OVStage needs to resolve populated fallbacks.
+One live renderer may attach to an OVStage instance; detach before reassigning
+that stage.
+
 ## Session Layer Pattern
 
 Load an inline root USDA with the user stage as a sublayer plus viewer-owned
 camera, render product, render vars, and render settings. The render var names
-must map to real OVRTX source names. `LdrColor` drives display, and
+must map to real OVRTX source names, while output lookup uses the full authored
+RenderVar path. `LdrColor` drives display, and
 `ovrtx_pick_hit` is consumed only after a pick query.
 
+Author the composite with USD layer authoring so source asset paths and
+relationship targets are serialized correctly. Choose one app-owned set of
+prim paths and use it consistently for definitions, camera/render relationships,
+step requests and output lookup. A minimal layout is:
+
+| Prim | Authored state |
+|---|---|
+| `/OVCamera` | Perspective camera, aperture matching the output aspect, clipping range and initial transform derived from scene bounds/units/up-axis |
+| `/OVRenderProduct` | Camera relationship to `/OVCamera`, requested resolution, `uint[] deviceIds = [0]`, ordered var `/OVRenderProduct/LdrColor` |
+| `/OVRenderProduct/LdrColor` | RenderVar with `sourceName = "LdrColor"` |
+| `/OVRenderSettings` | Products relationship to `/OVRenderProduct` |
+
+The composite sublayers the requested scene; it does not add lighting unless
+viewer-controlled lights were requested. Keep composition and optional metadata
+preparation outside the active UI/render loop. A C++ authoring helper or optional
+isolated worker can prepare the layer; follow the selected dependency's OpenUSD
+ABI boundary. No Python process is required by the native renderer.
+
+## Populate And Attach
+
+Initialize OVStage with `ovstage_initialize()`, then create an app-owned instance
+with `ovstage_create_instance()`. Use the matched C package and the same loader
+model as OVRTX, as described in `project-build.md`. Populate the composite into
+that instance at an explicit ordinal; population and data-plane operations use
+separate wait APIs:
+
 ```cpp
-#include <sstream>
-#include <string>
+#include <ovstage/ovstage.h>
+#include <iostream>
 
-struct SessionLayerDesc {
-    std::string stagePath;
-    std::string cameraPath = "/OVCamera";
-    std::string renderProductPath = "/OVRenderProduct";
-    int width = 1280;
-    int height = 720;
-};
-
-static std::string buildCompositeLayer(const SessionLayerDesc& desc)
+static bool waitStageOperation(
+    ovstage_instance_t* stage, ovstage_enqueue_result_t op)
 {
-    const int width = desc.width > 0 ? desc.width : 1;
-    const int height = desc.height > 0 ? desc.height : 1;
-    const double horizontalAperture = 20.955;
-    const double verticalAperture =
-        horizontalAperture * static_cast<double>(height) / static_cast<double>(width);
+    if (op.status != OVSTAGE_OK) return false;
+    ovstage_op_wait_result_t result{};
+    const auto status = ovstage_wait_op(
+        stage, op.op_index, OVSTAGE_TIMEOUT_INFINITE, &result);
+    const bool success = status == OVSTAGE_OK && result.error_op_id_count == 0;
+    for (size_t i = 0; i < result.error_op_id_count; ++i)
+        std::cerr << fromOvxString(ovstage_get_last_op_error(stage, result.error_op_ids[i])) << "\n";
+    ovstage_release_op(stage, op.op_index);
+    return success;
+}
 
-    std::ostringstream usda;
-    usda
-        << "#usda 1.0\n"
-        << "(\n"
-        << "    subLayers = [@" << desc.stagePath << "@]\n"
-        << ")\n\n"
-        << "def Camera \"OVCamera\"\n"
-        << "{\n"
-        << "    float2 clippingRange = (1, 100000)\n"
-        << "    float focalLength = 18.15\n"
-        << "    float horizontalAperture = " << horizontalAperture << "\n"
-        << "    float verticalAperture = " << verticalAperture << "\n"
-        << "    token projection = \"perspective\"\n"
-        << "    matrix4d xformOp:transform = ("
-        << "(1, 0, 0, 0), "
-        << "(0, 1, 0, 0), "
-        << "(0, 0, 1, 0), "
-        << "(0, 0, 0, 1))\n"
-        << "    uniform token[] xformOpOrder = [\"xformOp:transform\"]\n"
-        << "}\n\n"
-        << "def RenderProduct \"OVRenderProduct\"\n"
-        << "{\n"
-        << "    rel camera = <" << desc.cameraPath << ">\n"
-        << "    int2 resolution = (" << width << ", " << height << ")\n"
-        << "    uint[] deviceIds = [0]\n"
-        << "    token productType = \"raster\"\n"
-        << "    rel orderedVars = [\n"
-        << "        <" << desc.renderProductPath << "/LdrColor>\n"
-        << "    ]\n\n"
-        << "    def RenderVar \"LdrColor\"\n"
-        << "    {\n"
-        << "        uniform string sourceName = \"LdrColor\"\n"
-        << "    }\n"
-        << "}\n\n"
-        << "def RenderSettings \"OVRenderSettings\"\n"
-        << "{\n"
-        << "    rel products = [<" << desc.renderProductPath << ">]\n"
-        << "}\n";
-    return usda.str();
+static bool publishStage(ovstage_instance_t* stage, ovstage_ordinal_t ordinal)
+{
+    ovstage_write_floor_desc_t floor{};
+    floor.ordinal = ordinal;
+    floor.scope = OVSTAGE_SCOPE_ALL;
+    return waitStageOperation(stage, ovstage_advance_write_floor(stage, &floor));
+}
+
+static bool populateComposite(
+    ovstage_instance_t* stage, const std::string& usda,
+    ovstage_ordinal_t ordinal)
+{
+    const auto op = ovstage_population_open_usd_from_string(
+        stage, toOvxString(usda), ordinal, 0.0,
+        OVSTAGE_POPULATION_DOMAIN_RENDERING);
+    if (op.status != OVSTAGE_OK) return false;
+    ovstage_population_op_wait_result_t result{};
+    const auto status = ovstage_population_wait_op(
+        stage, op.op_index, OVSTAGE_TIMEOUT_INFINITE, &result);
+    for (size_t i = 0; i < result.error_op_id_count; ++i)
+        std::cerr << fromOvxString(ovstage_population_get_last_op_error(result.error_op_ids[i])) << "\n";
+    return status == OVSTAGE_OK && result.error_op_id_count == 0
+        && publishStage(stage, ordinal);
 }
 ```
 
-Open the generated layer directly:
+These helpers return failures to the owner, which publishes an error snapshot
+and unwinds owned resources. Read operation diagnostics before releasing their
+records. Keep the population string and write tensors alive until their waits
+complete. After successful population/publication, attach with
+`ovrtx_attach_ovstage(renderer, stage)` and check its result. Initialize the
+camera and any app-owned runtime attributes through OVStage at the next ordinal
+(strictly above the sealed write floor) before the first
+published frame. Native frame ordering is in `presentation-loop.md`.
 
-```cpp
-static bool loadStage(
-    ovrtx_renderer_t* renderer,
-    const std::string& stagePath,
-    int width,
-    int height)
-{
-    SessionLayerDesc session;
-    session.stagePath = stagePath;
-    session.width = width;
-    session.height = height;
+## Replace And Close
 
-    const std::string compositeUsda = buildCompositeLayer(session);
-    const ovrtx_enqueue_result_t load =
-        ovrtx_open_usd_from_string(renderer, toOvxString(compositeUsda));
-    return waitForOperation(renderer, load, "Failed to load inline composite stage");
-}
-```
+Prepare a candidate composite and metadata with a request generation. Keep the
+active scene usable during preparation; only the latest requested candidate may
+activate. At the owner-thread frame boundary, finish outstanding operations,
+release maps/results/queries, detach the old stage, then attach the prepared
+replacement. Clear stale picks, selected paths, bindings, and metadata on an
+ordinary scene switch. For same-scene variant/visibility recomposition, preserve
+only valid app-owned camera, accepted edits, and selection intent; reapply native
+selection after the renderer has consumed the new population.
 
-On scene switch, stop rendering, call `ovrtx_reset_stage()` or replace the root
-with `ovrtx_open_usd_from_string()`, clear selection state, rebuild scene UI
-state, and write the first camera transform before stepping.
+Keep the old stage until activation succeeds when implementing rollback. A
+failed detach leaves the renderer unusable except for destruction. Follow
+`ovstage-ovrtx-integration` and `stage-management` for lifetime and replacement
+semantics; renderer reset is not scene replacement.
+
+On close, stop accepting commands, cancel owned preparation work, finish the
+owner's in-flight operation, release outputs and queries, detach, destroy the
+renderer and stage, then shut down OVStage. Join the owner before destroying its
+shared state. Release presentation resources and close the selected toolkit on
+its required UI thread (for example, GL textures and GLFW/ImGui in the worked example).
