@@ -25,7 +25,8 @@ visibility, or effect attributes are legacy/pre-OVStage patterns.
    viewer-owned state changes.
 6. Publish the write at a monotonic ordinal and let the renderer consume it in
    the normal render loop.
-7. Clear or reset effect attributes on deselect and scene switch.
+7. Restore values changed by the viewer on deselect; discard saved targets on scene
+   replacement and capture new baselines before the next effect.
 
 ```text
 pick hit
@@ -62,7 +63,7 @@ def write_runtime_attr(runtime, paths, attr_name, values, *, prim_mode="existing
 
 Use `prim_mode="existing"` when the composite/session layer already authored
 the attribute. Use `prim_mode="create_new"` only for deliberate viewer-owned
-runtime attributes and load-time resets. Never silently create material inputs
+runtime attributes. Never silently create material inputs
 with invented names.
 
 For repeated writes to the same target set, cache target path lists and value
@@ -142,16 +143,18 @@ def write_fader(effect_layer_path: str, value: float) -> int | None:
     )
 ```
 
-Load-time reset:
+Initialize app-created effect targets to their neutral value. For scene-owned
+inputs, save the current value before the first viewer write and restore it on
+deselect. Keep these baselines scoped to the stage generation.
 
 ```python
-layers = sorted(set(prim_to_effect_layer.values()))
+layers = sorted(viewer_owned_effect_layers)
 write_runtime_attr(
     runtime,
     layers,
     "inputs:Fader",
     np.zeros((len(layers),), dtype=np.float32),
-    prim_mode="create_new",
+    prim_mode="existing",
 )
 ```
 
@@ -207,7 +210,7 @@ names.
 
 - Rebuild prim-to-material/effect maps after every scene load, reload, variant
   change, or material-map invalidation.
-- Reset app-owned effect attributes to neutral values on stage load.
+- On scene replacement, discard saved effect baselines along with target maps.
 - Clear active target state on selection clear and scene switch.
 - Serialize writes through the OVStage runtime owner; do not write while scene
   loading, reset, or generation replacement is active.

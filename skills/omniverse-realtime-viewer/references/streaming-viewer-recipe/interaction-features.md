@@ -7,12 +7,16 @@ viewport ownership, wheel deltas, and click-vs-drag dispatch. Then implement
 camera math in `server/input_router.py` and `server/camera_controller.py`:
 
 - Track mouse press, movement, release, buttons, wheel, keyboard modifiers, and viewport dimensions from ovstream `InputEvent` callbacks.
-- Convert browser input coordinates into render-image coordinates, accounting for letterboxing or scaling.
+- Native NVST coordinates are already mapped to render-image pixels. Pass
+  them through unchanged; only app-owned DOM/fallback coordinates need the
+  documented letterbox/scale transform.
 - Use drag thresholding so a short left press/release selects and a left drag orbits.
 - Support orbit, pan, dolly/zoom, wheel zoom, fit-to-stage, and optional WASD fly mode when requested.
 - Set camera aspect from the fixed RenderProduct resolution; keep horizontal aperture stable and derive vertical aperture from `height / width`.
 - Sanitize camera state before input handling and before writing matrices.
-- Write the viewer camera transform to the camera prim through ovrtx live attributes.
+- Enqueue the viewer camera's local `omni:xform` through the OVStage runtime
+  adapter, then publish it before rendering the committed ordinal. Use direct
+  renderer writes only for an explicitly standalone compatibility path.
 
 Critical contracts:
 
@@ -49,21 +53,27 @@ Read for depth: see `references/viewer-input-routing`, `references/camera-contro
 Do this in `server/selection_controller.py`; the completed click gesture should
 come from `references/viewer-input-routing`:
 
-- On left mouse release after a click gesture, map the visible image coordinate to the render pixel coordinate and enqueue a native ovrtx pick query.
+- On completed click release, take the native render-pixel coordinate (or
+  map DOM/fallback coordinates once), then normalize the query rectangle for
+  the OVRTX pick API as in `native-picking-selection`.
 - After the next render step, read the synthetic `ovrtx_pick_hit` render var, validate its params, resolve `primPath` ids to USD prim paths, and deduplicate the result.
 - Maintain selected prim paths in server state.
 - Send `stageSelectionChanged` whenever selection changes.
 - Support `selectPrimsRequest` from the frontend for tree-driven selection.
 - Clear selection on `selectPrimsRequest` with an empty path list, scene reset, or scene switch.
-- Apply visual selection feedback by writing native selection outline group attributes on the runtime stage, not by permanently editing the user USD.
+- Apply selection groups through the renderer-owned OVRTX native helpers,
+  including while attached to OVStage; do not author outline attributes in USD.
 
 Critical contracts:
 
-- The pick query rectangle uses render-product pixel space after letterbox/scaling correction.
-- Picking coordinates must use render-pixel space after letterbox/scaling correction.
+- Native input arrives in render pixels; Python pick query rectangles use
+  normalized coordinates (`left_ndc`, `top_ndc`, etc.). Normalize once using
+  the fixed render size. Do not apply a second letterbox transform to native
+  NVST coordinates.
 - Selection state is server-authoritative. The frontend mirrors it from `stageSelectionChanged`.
 - Enable selection outlines at renderer creation and set per-group outline/fill colors with `Renderer.set_selection_group_styles(...)`.
-- Clear previous outlines by writing group `0`; assign selected prims to a non-zero group such as `1`.
+- Use renderer selection helpers to clear group `0` and assign selected prims
+  to a non-zero group such as `1`.
 - Do not let selection picking run while the scene is loading or the renderer is resetting.
 - Check operation status for the stage load, render step, and pick query before changing selection. An empty or failed pick should not corrupt the previous selected state.
 
@@ -90,7 +100,10 @@ Do this in `server/scene_manager.py`, `server/assets.py`, and `frontend/src/comp
 - Build a server-side scene registry from configured local sample paths or an allowed asset root.
 - Expose scene choices to the frontend through a message or static config that does not leak arbitrary server filesystem paths.
 - When the user selects a scene, send `openStageRequest` with the scene URL or registry id.
-- In the server render loop, enter loading state, stop stepping the old scene, reset renderer stage state, create the new inline root/session data, load the new stage, restore persistent settings, fit or restore camera, clear selection, and resume streaming.
+- Prepare the new composite, then serialize activation through the runtime
+  owner: finish old operations, release scene resources, detach/replace the
+  OVStage and publish the new scene. Clear stale state and resume streaming.
+  Use `stage-management`; renderer reset is not attached-stage replacement.
 - Send loading progress/activity events during long loads.
 - Send `openStageResult` after load success or failure.
 - Send root hierarchy after successful load or when the frontend requests it.

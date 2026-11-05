@@ -162,22 +162,36 @@ gestures, click picking, viewport input ownership, or transport button ids.
 ## Streaming Loop Skeleton
 
 ```python
+import os
+os.environ.setdefault("OVRTX_SKIP_USD_CHECK", "1")
+import ovrtx
+ovrtx.register_schema_paths()
+import ovstage
+from ovstage import PopulationDomain, population
+
+stage = ovstage.Stage("viewer")
+# Populate the viewer-owned composite, wait, then publish ordinal 1.
+population.open_usd_from_string(stage, composite_usda, ordinal=1, domains=PopulationDomain.RENDERING)
+stage.advance_write_floor(1).wait()
 renderer = ovrtx.Renderer(...)
+renderer.attach_ovstage(stage)
 server = ovstream.Server()
 server.on_message = handle_message
 server.on_input = handle_input
 server.start(config)
 while running:
-    products = renderer.step(render_products={render_product}, delta_time=dt)
-    with products as ctx:
-        stream_ldr_color(ctx[render_product])
+    products = renderer.step(render_products={render_product}, delta_time=dt, ordinal=runtime.current_committed_ordinal)
+    stream_ldr_color(products[render_product])  # helper maps/copies before returning
 ```
 
 Keep shared code below the shell boundary: stage resolution, storage sync, USD metadata queries, camera math, and renderer setup. Keep UI state, input routing, and lifecycle in the chosen shell.
 
 ## Gotchas
 
-- Local import order: set `OVRTX_SKIP_USD_CHECK=1`, import `pxr`, then import ovrtx/ovui as the selected local skill describes.
+- Local import order: set `OVRTX_SKIP_USD_CHECK=1`, import `ovrtx`, call
+  `ovrtx.register_schema_paths()`, then create/populate OVStage. Keep `pxr`
+  behind the selected isolation boundary; do not let another OpenUSD consumer
+  initialize before schema registration.
 - Streaming import order can differ, especially when `pxr` is isolated in a worker.
 - `LdrColor` casing is required in all paths.
 - Browser media ports are negotiated by WebRTC; do not manually invent frontend media-port settings.

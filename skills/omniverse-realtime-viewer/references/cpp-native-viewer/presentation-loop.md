@@ -1,93 +1,70 @@
 # C++ Presentation And Render Loop
 
-## OpenGL Texture Upload
+## Owned Frame Transfer
 
-Display `LdrColor` by copying mapped CPU pixels into an owned RGBA buffer and
-uploading with `glTexSubImage2D()`.
+The runtime owner CPU-maps `LdrColor`, copies its pixels, unmaps, and destroys
+the step result before publishing the owned frame. It never calls OpenGL.
+Respect the DLPack byte offset and strides; mapped pointers never cross the
+thread boundary.
 
 ```cpp
-#include <GLFW/glfw3.h>
-#include <algorithm>
 #include <cstdint>
 #include <vector>
 
-struct TextureState {
-    GLuint texture = 0;
+struct DisplayFrame {
     int width = 0;
     int height = 0;
     std::vector<std::uint8_t> rgba;
 };
 
-static void ensureTexture(TextureState& tex, int width, int height)
+static bool copyRgba(DisplayFrame& frame, const DLTensor& tensor)
 {
-    if (tex.texture == 0) {
-        glGenTextures(1, &tex.texture);
-        glBindTexture(GL_TEXTURE_2D, tex.texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
-
-    glBindTexture(GL_TEXTURE_2D, tex.texture);
-    if (tex.width != width || tex.height != height) {
-        tex.width = width;
-        tex.height = height;
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    }
-}
-
-static bool copyBgraOrRgbaToTexture(TextureState& tex, const DLTensor& tensor, bool sourceIsBgra)
-{
-    if (!tensor.data || tensor.ndim != 3 || !tensor.shape) return false;
-    if (tensor.dtype.code != static_cast<std::uint8_t>(kDLUInt) ||
-        tensor.dtype.bits != 8 || tensor.shape[2] < 4) {
+    if (!tensor.data || tensor.device.device_type != kDLCPU ||
+        tensor.ndim != 3 || !tensor.shape || tensor.dtype.code != kDLUInt ||
+        tensor.dtype.bits != 8 || tensor.dtype.lanes != 1 ||
+        tensor.shape[0] <= 0 || tensor.shape[1] <= 0 || tensor.shape[2] != 4)
         return false;
-    }
-
     const int height = static_cast<int>(tensor.shape[0]);
     const int width = static_cast<int>(tensor.shape[1]);
-    if (width <= 0 || height <= 0) return false;
-
-    const auto* base =
-        static_cast<const std::uint8_t*>(tensor.data) + tensor.byte_offset;
-    const int64_t rowStride = tensor.strides ? tensor.strides[0] : width * tensor.shape[2];
-    const int64_t pixelStride = tensor.strides ? tensor.strides[1] : tensor.shape[2];
-    const int64_t channelStride = tensor.strides ? tensor.strides[2] : 1;
-    if (channelStride != 1 || pixelStride < 4) return false;
-
-    tex.rgba.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 4);
-    for (int y = 0; y < height; ++y) {
-        const auto* srcRow = base + static_cast<size_t>(y) * static_cast<size_t>(rowStride);
-        auto* dstRow = tex.rgba.data() + static_cast<size_t>(y) * static_cast<size_t>(width) * 4;
-        for (int x = 0; x < width; ++x) {
-            const auto* src = srcRow + static_cast<size_t>(x) * static_cast<size_t>(pixelStride);
-            auto* dst = dstRow + static_cast<size_t>(x) * 4;
-            dst[0] = sourceIsBgra ? src[2] : src[0];
-            dst[1] = src[1];
-            dst[2] = sourceIsBgra ? src[0] : src[2];
-            dst[3] = src[3];
-        }
-    }
-
-    ensureTexture(tex, width, height);
-    glBindTexture(GL_TEXTURE_2D, tex.texture);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-        GL_RGBA, GL_UNSIGNED_BYTE, tex.rgba.data());
+    const int64_t row = tensor.strides ? tensor.strides[0] : width * 4;
+    const int64_t pixel = tensor.strides ? tensor.strides[1] : 4;
+    const int64_t channel = tensor.strides ? tensor.strides[2] : 1;
+    if (row <= 0 || pixel <= 0 || channel <= 0) return false;
+    const auto* source = static_cast<const std::uint8_t*>(tensor.data) + tensor.byte_offset;
+    frame.width = width;
+    frame.height = height;
+    frame.rgba.resize(static_cast<size_t>(width) * height * 4);
+    for (int y = 0; y < height; ++y)
+        for (int x = 0; x < width; ++x)
+            for (int c = 0; c < 4; ++c)
+                frame.rgba[(static_cast<size_t>(y) * width + x) * 4 + c] =
+                    source[y * row + x * pixel + c * channel];
     return true;
 }
 ```
 
-For GL display, normalize the mapped data to RGBA before upload. If your OVRTX
-build maps `LdrColor` as BGRA, swap channels as above. Do not send BGRA data to
-`ImGui::Image()` through a `GL_RGBA` upload.
+Publish only a successfully copied complete frame, with its stage generation
+and dimensions, into a single latest-frame slot. The UI takes shared ownership
+or moves that buffer under a short lock, then releases the lock before upload.
 
-## Render Loop
+## Native Frame Order
 
-The core order is camera writes, animation writes, optional pick enqueue, step,
-map display and pick outputs, then ImGui presentation.
+For each changed scene state, write through OVStage at ordinal `N`, wait for
+writes, and advance/wait the write floor to `N`. Before rendering, call and wait
+`ovrtx_update_from_stage(renderer, N)`. The C function
+`ovrtx_step_with_stage()` requires this update; unlike Python `Renderer.step()`,
+it does not supply the high-level wrapper's automatic update.
+
+After the update, apply dirty native outline/pickability state, then enqueue a
+pending pick. Population can recreate renderer-owned prim state, so retained
+selection must be dirty after a same-scene replacement and applied here, once
+the new population is visible. A pick decoded after this frame updates selection
+intent for the next frame.
+
+The helper below assumes the update has completed and optional renderer-native
+commands have been enqueued. It performs one step and maps the display output;
+decode `OVRTX_RENDER_VAR_PICK_HIT` in this same result iteration when a query was
+queued (see `interaction-features.md`).
 
 ```cpp
 static bool sameString(ovx_string_t value, const char* literal)
@@ -104,30 +81,33 @@ static const DLTensor* firstTensor(const ovrtx_render_var_output_t& output)
     return output.tensors[0].dl;
 }
 
-static void stepRenderAndUpload(
+static bool stepRenderAndCopy(
     ovrtx_renderer_t* renderer,
     const std::string& renderProductPath,
     double deltaSeconds,
-    TextureState& texture)
+    ovstage_ordinal_t ordinal,
+    DisplayFrame& frameCopy)
 {
+    frameCopy = {};
+    bool copied = false;
     const ovx_string_t productPath = toOvxString(renderProductPath);
     const ovrtx_render_product_set_t products = {&productPath, 1};
 
     ovrtx_step_result_handle_t stepHandle = OVRTX_INVALID_HANDLE;
     const ovrtx_enqueue_result_t step =
-        ovrtx_step(renderer, products, deltaSeconds, &stepHandle);
+        ovrtx_step_with_stage(renderer, products, deltaSeconds, ordinal, &stepHandle);
     if (!ok(step) || stepHandle == OVRTX_INVALID_HANDLE) {
         printLastOvrtxError("Failed to step OVRTX");
-        return;
+        return false;
     }
 
     ovrtx_render_product_set_outputs_t outputs = {};
     const ovrtx_result_t results =
         ovrtx_fetch_results(renderer, stepHandle, ovrtx_timeout_infinite, &outputs);
-    if (!ok(results) || outputs.status == OVRTX_EVENT_FAILURE) {
+    if (!ok(results) || outputs.status != OVRTX_EVENT_COMPLETED) {
         printLastOvrtxError("Failed to fetch OVRTX results");
         ovrtx_destroy_results(renderer, stepHandle);
-        return;
+        return false;
     }
 
     for (size_t productIndex = 0; productIndex < outputs.output_count; ++productIndex) {
@@ -136,15 +116,19 @@ static void stepRenderAndUpload(
             const auto& frame = product.output_frames[frameIndex];
             for (size_t varIndex = 0; varIndex < frame.render_var_count; ++varIndex) {
                 const auto& var = frame.output_render_vars[varIndex];
-                if (!sameString(var.render_var_name, "LdrColor")) continue;
+                // Compare output identity with the full authored RenderVar path.
+                // `source_name` classifies the AOV; it is not the map key.
+                if (!sameString(var.render_var_path, (renderProductPath + "/LdrColor").c_str())) continue;
 
+                ovrtx_map_output_description_t mapDesc = {};
+                mapDesc.device_type = OVRTX_MAP_DEVICE_TYPE_CPU;
                 ovrtx_render_var_output_t mapped = {};
                 const ovrtx_result_t map =
                     ovrtx_map_render_var_output(renderer, var.output_handle,
-                        ovrtx_timeout_infinite, &mapped);
+                        &mapDesc, ovrtx_timeout_infinite, &mapped);
                 if (ok(map) && mapped.status == OVRTX_EVENT_COMPLETED) {
                     if (const DLTensor* tensor = firstTensor(mapped)) {
-                        copyBgraOrRgbaToTexture(texture, *tensor, true);
+                        copied = copyRgba(frameCopy, *tensor);
                     }
                 }
                 if (mapped.map_handle != OVRTX_INVALID_HANDLE) {
@@ -155,101 +139,41 @@ static void stepRenderAndUpload(
     }
 
     ovrtx_destroy_results(renderer, stepHandle);
+    return copied;
 }
 ```
 
-Ownership rule: map, copy, and unmap render var outputs before calling
-`ovrtx_destroy_results()`. Do not hold mapped references across step boundaries.
+Use scope guards in the app to unmap and destroy results on error/exception
+paths as well. Publish an error if fetch/map/copy fails instead of reporting a
+new ready frame. Never step twice just to decode the pick for a displayed frame.
 
-ImGui presentation is normal OpenGL backend usage:
+## UI Presentation And Input
 
-```cpp
-ImGui_ImplOpenGL3_NewFrame();
-ImGui_ImplGlfw_NewFrame();
-ImGui::NewFrame();
+Use the selected toolkit's event loop and pixel/image presentation API to show
+the latest complete owned frame independently of SDK progress. Keep toolkit
+objects on their required thread; copy pixels before releasing the SDK map.
+The viewport's actual displayed image rectangle owns coordinate conversion,
+including aspect ratio, letterboxing and display scaling. Toolkit choice does
+not change native picking or renderer ownership.
 
-ImGui::Begin("Viewport");
-ImVec2 available = ImGui::GetContentRegionAvail();
-if (texture.texture != 0) {
-    ImGui::Image(
-        reinterpret_cast<ImTextureID>(static_cast<intptr_t>(texture.texture)),
-        available,
-        ImVec2(0.0f, 0.0f),
-        ImVec2(1.0f, 1.0f));
-}
-ImGui::End();
+For the GLFW/ImGui example, poll GLFW, build ImGui controls, and present the
+latest frame. Create
+and resize the GL texture on this thread, set `GL_UNPACK_ALIGNMENT` to `1`, and
+upload the packed RGBA buffer with `glTexSubImage2D(..., GL_RGBA,
+GL_UNSIGNED_BYTE, frame.rgba.data())`. `LdrColor` is RGBA; do not swap red/blue.
 
-ImGui::Render();
-glViewport(0, 0, framebufferWidth, framebufferHeight);
-glClear(GL_COLOR_BUFFER_BIT);
-ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-glfwSwapBuffers(window);
-```
+In that example, fit `ImGui::Image()` inside the available content rect while preserving the
+rendered aspect ratio. Retain that actual image rectangle for picking and
+camera input. Reject letterbox clicks; convert accepted image coordinates into
+the render product's normalized coordinates. Use the same top-left orientation
+for display and input, and account for GLFW window versus framebuffer scaling.
 
-For picking, compute the actual image rect inside the viewport if you preserve
-aspect ratio or crop. Convert mouse coordinates to render product pixels before
-enqueuing the pick query.
+Route input through the viewport only when the image owns it. Text editing and
+modal controls consume their events, and gizmo handles get first refusal before
+camera or picking. Track a pressed drag until release even outside the image;
+clear drag state when focus is lost. See `viewer-input-routing`.
 
-## Main Loop Skeleton
-
-This is the minimal control flow. Keep details such as sidebars and property
-panels outside the OVRTX frame path.
-
-```cpp
-int main(int argc, char** argv)
-{
-    if (argc < 2) return EXIT_FAILURE;
-
-#if defined(_WIN32)
-    _putenv_s("OVRTX_SKIP_USD_CHECK", "1");
-#else
-    setenv("OVRTX_SKIP_USD_CHECK", "1", 0);
-#endif
-
-    const int renderWidth = 1280;
-    const int renderHeight = 720;
-    GLFWwindow* window = createGlfwWindow(renderWidth, renderHeight);
-    initDearImGui(window);
-
-    ovrtx_renderer_t* renderer = createRenderer(renderWidth, renderHeight);
-    if (!renderer) return EXIT_FAILURE;
-    if (!loadStage(renderer, argv[1], renderWidth, renderHeight)) {
-        ovrtx_destroy_renderer(renderer);
-        return EXIT_FAILURE;
-    }
-
-    OrbitCamera camera;
-    TextureState texture;
-    PendingPick pendingPick;
-    std::string selectedPath;
-    std::vector<PrimAnimation> animations;
-
-    auto lastTime = std::chrono::steady_clock::now();
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-
-        const auto now = std::chrono::steady_clock::now();
-        const double dt = std::chrono::duration<double>(now - lastTime).count();
-        lastTime = now;
-
-        writeMat4Attribute(renderer, "/OVCamera", "omni:xform", camera.cameraToWorld());
-        updateSelectionAnimation(renderer, animations, dt);
-
-        const bool pickQueued = enqueuePick(renderer, "/OVRenderProduct", pendingPick);
-        stepRenderAndUpload(renderer, "/OVRenderProduct", dt, texture);
-        // If pickQueued, decode OVRTX_RENDER_VAR_PICK_HIT from the same step
-        // and call selectPrim(renderer, selectedPath, animations, pickedPath).
-
-        drawDearImGuiUi(texture, selectedPath, pendingPick);
-    }
-
-    if (texture.texture) glDeleteTextures(1, &texture.texture);
-    ovrtx_destroy_renderer(renderer);
-    shutdownDearImGuiAndGlfw(window);
-    return EXIT_SUCCESS;
-}
-```
-
-The pick decode belongs inside the same result iteration that maps `LdrColor`.
-Do not step once for display and a second time for the pick unless the UI is
-designed for one-frame-later selection.
+Mark readiness only after the first successfully rendered owned frame has been uploaded and
+swapped while the UI can accept input. During scene preparation continue to
+present the active scene and loading/error status. An SDK wait remains on the
+runtime owner; UI polling and normal-close intent remain responsive.

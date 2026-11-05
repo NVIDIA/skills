@@ -70,8 +70,9 @@ details and `ovrtx-rendering` for frame extraction and live write contracts.
 
 ## SHM Server Contract
 
-Use ovstream's SHM server type for local shared memory. Exact class and enum
-names may vary by binding version; preserve these roles:
+Use ovstream's SHM server type for local shared memory. Check the selected
+release through [the ovstream dependency route](../dependencies/ovstream.md).
+`Server.start()` takes a `ServerConfig` object; a dictionary is not accepted:
 
 ```python
 import os
@@ -82,7 +83,9 @@ import ovstream
 ovstream.initialize()
 server = ovstream.Server(server_type=ovstream.ServerType.SHM)
 server.on_message = on_message
-server.start({"name": shm_name, "width": width, "height": height})
+server.start(ovstream.ServerConfig(
+    shm_stream_name=shm_name, width=width, height=height,
+))
 ```
 
 Requirements:
@@ -106,7 +109,8 @@ Do not scrape logs for connection data. Keep logs on stderr or structured files.
 
 ## Frame Header And Pixels
 
-Each frame starts with a fixed 16-byte little-endian header:
+The app-owned frontend IPC payload starts with a 16-byte little-endian header.
+This is not `ovstream_frame_t` or an SDK wire-layout definition:
 
 ```text
 byte 0..3    uint32 width

@@ -86,7 +86,10 @@ Critical contracts:
 - The transparent mouse surface must be above the image and marked as receiving mouse events.
 - Header, tree, info, and settings widgets must not intercept viewport gestures unless the pointer is actually over those controls.
 - The app loop must call runtime tick/update work from one predictable place.
-- If a selected-prim transform gizmo is visible, dragging it must write the selected prim's live `omni:xform` through the serialized renderer runtime; a visual-only handle is not complete.
+- If a selected-prim transform gizmo is visible, enqueue local `omni:xform`
+  updates through the application-owned transform adapter. The serialized
+  runtime writes OVStage, waits for completion, advances the write floor, and
+  renders the committed ordinal; a visual-only handle is not complete.
 
 Decision points:
 
@@ -101,7 +104,10 @@ Common failure modes:
 - Without `fill_app_window=True`, the OS window resizes but the UI frame stays at the initial dimensions.
 - If the hit surface is behind the image or not opaque to mouse events, orbit, pan, zoom, and picking never receive input.
 - A separate `OPEN` button can be worse than no button if the native dialog is not implemented or cannot appear under the target display stack. Keep the path-field `LOAD` path reliable and make dialogs secondary.
-- A selected-prim gizmo that appears but does not move the prim usually means handle input is being consumed by camera/orbit logic or the manipulator is not connected to `renderer.write_attribute`.
+- A selected-prim gizmo that appears but does not move the prim usually means
+  camera/orbit consumed the gesture, or the transform adapter did not write and
+  publish the selected prim's local `omni:xform` before the render step. See
+  `references/prim-transform-safety` for parent transforms and animation coordination.
 - Uncaught callback exceptions can stop the app loop or leave drag state stuck.
 - DOM-style browser assumptions do not apply; input comes from ovui callbacks in the desktop process.
 
@@ -116,8 +122,10 @@ Do this in `local_app/renderer_runtime.py`:
 - Store the active render product path, render width, render height, current frame index, and whether a valid stage is loaded.
 - Expose render-loop-only operations for loading a scene, resetting the stage, stepping a frame, mapping render vars, enqueueing and decoding native pick queries, writing native selection outline groups, and writing live attributes.
 - Keep renderer mutations serialized with scene loading, scene reset, settings changes, and camera writes.
-- For OVStage-backed runtimes, publish runtime mutations through OVStage/session
-  state at monotonic ordinals and render only committed publications.
+- Use an application-owned OVStage for scene data and attach the renderer to
+  it. Publish runtime mutations through OVStage/session state at monotonic
+  ordinals and render only committed publications. Keep native picking and
+  selection outline groups on OVRTX.
 
 Critical contracts:
 
@@ -125,11 +133,13 @@ Critical contracts:
 - Pass the exact viewer RenderProduct path to every step call.
 - Extract `LdrColor` for local image display. It is RGBA8 from ovrtx.
 - For local UI display, copy CPU-mapped pixel data inside the map context before returning it to the widget.
-- Use `write_attribute` for live camera transforms and other live state when
-  using direct OVRTX writes. Write `omni:xform`, not authored `xformOp:*`, for
-  interactive updates. For OVStage-backed paths, use the current OVStage/OVRTX
-  integration guidance for published live writes.
-- Use the correct transform semantic and create-new prim mode for attributes that may not already exist in Fabric.
+- Write live camera and object transforms through the OVStage runtime adapter,
+  using local `omni:xform` values and the publication flow in
+  `references/prim-transform-safety`.
+- Direct `renderer.write_attribute` and renderer bindings are only for an
+  explicitly standalone renderer-owned compatibility path. Follow
+  `references/ovrtx-rendering` for its semantic and create-new prim mode; do not
+  mix those writes with an attached OVStage.
 
 Decision points:
 
@@ -166,12 +176,17 @@ Critical contracts:
 - The viewer camera path must be the same path used by camera controls when writing `omni:xform`.
 - Do not inject lights unless the user explicitly asks for viewer-controlled lighting.
 - Include segmentation render vars only for explicit debug/AOV display modes, not for picking.
-- Prefer `renderer.open_usd_from_string()` for inline roots that sublayer the user USD and author viewer render config.
-- Do not call reference or layer-add APIs after a stage is already loaded unless the renderer has been reset to an empty stage and the operation is part of the serialized load path.
+- Prefer OVStage `population.open_usd_from_string()` for inline roots that
+  sublayer the user USD and author viewer render config. Publish the ordinal
+  before the attached renderer consumes it.
+- Do not call renderer-owned reference or layer-add APIs in an attached viewer;
+  use OVStage population operations through the serialized runtime path.
 
 Decision points:
 
 - Use a single inline root USDA string with `subLayers = [@user_scene@]` when the user file needs viewer camera/render-product/render-var data.
+  Copy source `upAxis` and `metersPerUnit` onto that root as described in
+  [stage-loading](../stage-loading/README.md#compose-viewer-owned-prims).
 - If the user stage has an authored camera and the requested policy is `stage-camera`, copy its focal length, apertures, clipping range, and transform into the viewer camera.
 - If the user requests persistent camera across scene switches, keep camera state but sanitize and refit only when the old state is invalid for the new bounds.
 - If the user requests viewer lighting controls, add explicit viewer-owned light prims only with a verified live apply path or an explicit reload/profile workflow; otherwise leave lighting untouched and omit live lighting controls.
@@ -226,7 +241,7 @@ Common failure modes:
 - Ignoring letterboxing makes picks offset and camera drag speed inconsistent.
 - Recreating the image bridge on every frame causes flicker, memory churn, or UI stalls.
 - Changing render resolution without updating viewport math and pick query coordinates causes selection to drift.
-- A solid red, brown, or unexpectedly light background can be a style-color byte
-  order problem. ovui integer colors are `0xAARRGGBB`.
+- A wrong background color can be a style-color packing problem. Use
+  `ui.color("#76b900")` or `ui.color(r, g, b, a)` rather than hand-packed integers.
 
 Read for depth: see `references/local-viewer`, `references/ovrtx-rendering`, and `references/object-selection` for image bridge, frame extraction, and coordinate mapping details.

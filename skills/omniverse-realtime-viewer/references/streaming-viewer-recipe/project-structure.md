@@ -19,18 +19,26 @@ channel, and UI input follows the selected transport's input channel.
 - *NEVER use WebGL, Three.js, Babylon.js, or any client-side 3D renderer.* All USD rendering is done server-side by `ovrtx`. The browser receives a WebRTC video stream; it displays `<video>`, not `<canvas>` with a 3D scene graph. ovrtx requires an NVIDIA GPU. Do NOT substitute a browser renderer.
 - For deployment work, read `references/cloud-deployment` and use the supported
   paths documented there, such as OKAS 1 or Brev.
-- Keep the streaming app split into a Python server process and a React browser client. The server owns USD, ovrtx, ovstream, picking, camera state, and scene mutations. The browser owns DOM UI, connection state, and app-level message sends.
+- Keep the streaming app split into a Python server process and a browser client. The server owns USD, ovrtx, ovstream, picking, camera state, and scene mutations. The browser owns DOM UI, connection state, and app-level message sends.
 - Do not send rendered pixels through the JSON data channel. Only stream video through ovstream and use JSON messages for app state and commands.
 - Do not forward mouse, keyboard, wheel, or touch input manually as JSON in the normal path. The WebRTC browser library forwards input through NVST's native input channel as binary `InputEvent` structs; handle them on the server through the ovstream input callback. A browser-only `mouseInput` fallback is allowed only after `viewer-input-routing` proves native callbacks are absent while the data channel works, and it replaces native input. For SHM Python clients, use `ovstream.Client(ovstream.ClientType.SHM, stream_name="...").send_input_event(event)`; C clients use `ovstream_client_send_input_event(client, event)`. Use `viewer-input-routing` for button normalization, viewport ownership, and click-vs-drag dispatch.
-- Make one render thread the sole owner of `renderer.step()`, `open_usd()`, `open_usd_from_string()`, reference add/remove APIs, `reset_stage()`, native pick queries, selection outline writes, and live `write_attribute()` calls. Other callbacks enqueue work for that render thread.
+- One runtime owner serializes OVStage population, writes/publication, stage
+  replacement, renderer stepping, native picks and selection. Callbacks enqueue
+  intent. Use `references/ovstage-ovrtx-integration/README.md`; renderer-owned
+  load/reset/query APIs belong only to an explicit standalone compatibility path.
 - Register all ovstream callbacks before starting the server. Early connection and data-channel events can otherwise be dropped.
-- Set `OVRTX_SKIP_USD_CHECK=1` before any ovrtx work. Keep import order disciplined: initialize ovrtx first in the streaming server process. Use ovrtx `query_prims` for basic runtime prim discovery; import `pxr` only for USD features not covered by native ovrtx queries.
+- Set `OVRTX_SKIP_USD_CHECK=1` before OVRTX work and follow the selected SDK
+  initialization order. Query live state through the owning OVStage adapter;
+  isolate additional OpenUSD queries in a worker unless the exact in-process
+  ABI/import path is supported.
 - Treat stream resolution as a server-renderer contract. Use a fixed server render size, typically 1920x1080, and display the browser video with `object-fit: contain`; NVST handles letterbox coordinate mapping.
 - Never modify the user USD file when adding viewer camera, render products, render vars, settings, selection metadata, or inline session data.
 
-## 1. Create The Project Skeleton
+## 1. Optional React Project Example
 
-Create a two-process project with a server package and a frontend app. Use this structure unless the host repo already has an equivalent convention:
+For a larger React viewer, this layout illustrates ownership boundaries. A small
+viewer can keep these responsibilities in a few files; do not create unused
+modules or choose React just to match the tree:
 
 ```text
 streaming-usd-viewer/
@@ -85,12 +93,12 @@ streaming-usd-viewer/
 
 Do this:
 
-- Create the server and frontend files above directly in the generated app.
+- Create only the files needed by the requested app.
 - Keep all renderer and USD state in `server/`. Keep React state and browser UI in `frontend/src/`.
 - Put sample USD files under `assets/samples/` or accept an absolute configured asset root. Do not hard-code developer machine paths.
-- Persist cross-scene viewer settings under `data/viewer-settings.json` or a user-configurable settings path.
+- If persistent settings are requested, use an app-owned configurable settings path.
 
-Critical contracts:
+Responsibilities in this example (combine modules when useful):
 
 - `server/ov_web_viewer_server.py` is the process entry point only. It parses config, constructs runtime objects, starts ovstream, enters the render loop, and shuts down cleanly. If a generated project uses a different entry-point name, update deployment commands and templates consistently.
 - `server/renderer_runtime.py` owns the ovrtx renderer, current render product path, frame stepping, frame extraction, and live attribute writes.

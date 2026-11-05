@@ -1,332 +1,111 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# Driving CAE Visualization Through OVStage (Control → Correct Writes)
+# Driving CAE Visualization Through OVStage
 
-## Triggers
+Use this reference to turn a field, iso-value, slice, colormap, timeline or
+emitter control into a live visualization update. Choose the publication path
+from the prims and attributes that change, rather than from the control's name.
 
-Use this reference when a UI control on a CAE/CFD viewer — a `setStreamlineSeed`
-message, an iso-value or slice slider, a field/representation/dataset picker, a
-colormap choice, an emitter drag, or an orbit-camera move — must be turned into
-the **correct** OVStage writes that update the rendered visualization. It answers
-the judgment question: *given this control changed, do I do a cheap live
-attribute write, or must I re-author geometry?* — and it draws a hard line
-between stable API contracts and application-specific optimization. The persistent stage, the emitter-marker
-`omni:xform` write, and in-place data-plane array writes of live geometry are
-patterns to validate against the current OVStage API before relying on them in a
-generated app.
+Read `references/dependencies` for the selected public runtime contracts,
+[data-and-operators.md](data-and-operators.md) for scientific computation, and
+`references/ovstage-data-plane/README.md` for typed writes and tensor lifetime.
+The viewer owns the live OVStage; UI callbacks and scientific workers return
+intent or copied results to that owner.
 
-This is the write-classification recipe. For the mechanics it builds on, read
-`ovstage-render-and-camera.md` (the full camera data-plane block, frame
-extraction, camera-jump fix), `references/ovstage-runtime/README.md` (ordinals,
-write floor, single owner), `references/ovstage-data-plane/README.md` (queries,
-tensor lifetime), `references/ovstage-population/README.md` (publication /
-reference-swap APIs), and `references/prim-transform-safety/README.md` (snapshot
-before a live `omni:xform`; never fall back to identity). Follow
-`references/conventions.md` for camera-matrix layout and renderer ownership.
-The examples below are self-contained patterns. Adapt them to the current
-upstream OVStage contracts rather than importing unpublished local projects.
+## Choose the publication path
 
-## What This Doc Delivers
+| Change | Publication |
+|---|---|
+| Camera or seed-marker pose | Write the existing prim's local `omni:xform`. |
+| Colormap or display range | Recolor the current field and write `primvars:displayColor`; keep geometry and camera. |
+| Timeline sample, field, iso-value or slice position on an existing Mesh/Points prim | Compute the new arrays, then update points, topology and primvars that changed. |
+| Streamline seeds on an existing BasisCurves prim | Update points, curve counts, colors and other length-dependent arrays. |
+| Representation that changes prim type, adds/removes prims, or changes composition | Replace the affected geometry subtree or reference. |
+| New dataset requiring a new scene | Use the scene-replacement flow in `references/stage-management/README.md`. |
 
-A single decision — *how does a control become the right OVStage write* — plus
-the loop that carries it. Every control follows one path and every write is
-classified by cost. The UI callback never touches OVStage or the renderer.
+A different vertex count or connectivity does not by itself require a new
+Mesh prim. Mesh face counts and indices are array attributes too. Conversely,
+a Mesh-to-Points change cannot be implemented by merely writing differently
+shaped arrays to the Mesh. A representation change that still produces the
+same prim type can use array updates.
 
-Although the examples here are CAE/CFD (iso-value, slice, streamline emitter,
-colormap, dataset), **the decision and the loop are general**: any realtime viewer
-that edits live geometry or attributes from a control faces the same
-data-plane-write-vs-structural-rebuild choice. The generic local and streaming
-viewer recipes (`references/ovui-local-viewer-recipe/README.md`,
-`references/streaming-viewer-recipe/README.md`) point here for that pattern — read
-it as the reusable "control → correct write" recipe, with CAE operators as the
-worked example.
+## Compute away from the renderer owner
 
-## The Loop: Control → Correct Writes (One Serialized Owner)
+Controls enqueue typed intent. Merge compatible rapid edits into the latest
+requested configuration, then let the scientific worker compute that state.
+Keep dataset replacement and Reset as explicit intent boundaries. The owner
+continues rendering and camera interaction while the worker is busy; it accepts
+only results for the active scene generation and current request.
 
-Exactly one thread ever populates the stage, writes an attribute, or calls
-`renderer.step`. A control (an ovui callback, an ovstream `on_message`, a raw
-input event) does **one** of two things and nothing else:
+Return copied geometry, scalar values, field association and display metadata.
+Keep source datasets and pending array buffers alive until their consumers
+finish. Source ingestion and field/time selection follow
+[cae-data-ingestion.md](cae-data-ingestion.md); UI draft handling follows
+[ovui-controls.md](ovui-controls.md) or
+[streaming-cae-viewer.md](streaming-cae-viewer.md).
 
-- mutate local, numpy-only input/camera state (through an `InputController`), or
-- **enqueue** a typed command on a thread-safe queue.
+## Publish an internally consistent array set
 
-The owning loop drains that queue, decides what kind of write each change needs,
-performs it, advances the write floor, and only then steps the renderer.
+Author the geometry prim, material binding and primvar interpolation once.
+For each accepted update, prepare the arrays required by its existing type:
 
-```
-control message  ─┐
-slider drag      ─┤─►  validate + ENQUEUE(kind, payload)      # UI thread, no OV
-raw input event  ─┘
+| Prim | Geometry arrays | Related values |
+|---|---|---|
+| Mesh | `points`, changed `faceVertexCounts` and `faceVertexIndices` | Colors/scalars consistent with vertex, uniform or face-varying interpolation |
+| BasisCurves | `points`, `curveVertexCounts` | Colors/scalars and widths consistent with curve interpolation |
+| Points | `points` | Colors/scalars and widths consistent with point interpolation |
 
-owning loop tick:                                             # the ONLY OV lane
-    drain queue        # last-wins coalesce per kind (see below)
-    if a rebuild-affecting kind changed:
-        recompute the warp-simdata operator (surface/iso/slice/streamlines)
-        author the new geometry into OVStage at a NEW ordinal
-    ordinal = commit_camera_pose(...)   # omni:xform write @N (data-plane)
-    advance_write_floor(N).wait()       # never render above the floor
-    rgba = renderer.step(ordinal=N)     # frame now reflects the control
-    viewport.set_frame(rgba)
-```
+Use OVStage `write_attribute` with `is_array=True`, the attribute's declared
+dtype/lanes and semantic, and a query for the actual target prim. Follow the
+selected SDK's DLPack shape contract and keep each source buffer alive until
+its write completes. Local transforms remain fixed-size matrix attributes;
+use `references/prim-transform-safety/README.md` for their coordinate space.
 
-The invariant is simple: UI callbacks enqueue; the loop owns every write and
-every `step`.
+Batch all writes for one result at one new ordinal above the current write
+floor. Wait for them, advance the floor once, and render that committed ordinal.
+No frame may observe new points with old connectivity or an old-length color
+array. Validate finite coordinates, index bounds, counts and field lengths
+before publication. Reuse cached topology only when connectivity and ordering
+are unchanged, not merely when the number of vertices matches.
 
-## Classify Every Write By Cost (The Key Judgment)
+For an empty operator result, publish a consistent empty geometry/field set
+instead of retaining the previous surface. The next nonempty result must update
+all dependent arrays. A constant width needs one value; a vertex width must
+track the new point count. Choose constant interpolation only when a constant
+quantity is intended, not as a substitute for missing field data.
 
-The central decision. When a control changes, ask *what actually changed in the
-scene* — a transform/scalar, or the geometry topology — and pick the cheapest
-correct write.
+Retain camera and selection identity when the same prim survives. A colormap
+edit uses the existing field values and does not require refitting or reloading
+the scene. Keep scientific values and their data range separate from the chosen
+color domain. [usd-authoring-and-materials.md](usd-authoring-and-materials.md)
+describes interpolation and material setup.
 
-| Control that changed | What actually changes | Write class | Proven? |
-| --- | --- | --- | --- |
-| Orbit/pan/dolly camera | camera `omni:xform` | **Data plane** (matrix) | **Yes** — use the standard matrix-write helper |
-| Emitter seed-sphere **position** (marker prim) | that prim's `omni:xform` | **Data plane** (matrix) | **Yes** — persistent unit sphere moved and scaled by an `omni:xform` write |
-| Emitter drag (streamlines it emits) | same curves prim, new `points`/`curveVertexCounts`/`displayColor` arrays | **Data plane** (variable-length array) | **Yes** — in-place array writes to a persistent `BasisCurves` |
-| Colormap / scalar-range tweak | material LUT / `displayColor` primvar values | **Data plane** (array/scalar), in principle | Use a structural rebuild until the selected OVStage version supports the attribute update you need |
-| Representation swap (surface↔iso↔slice↔streamlines↔points) | new geometry **prim/topology class** | **Structural swap** (persistent stage) | **Yes** — incremental geometry-reference swap (~2.9× vs full rebuild) |
-| Field swap / iso-value / slice-position (mesh/points reps) | operator recompute → new points/counts arrays | **Structural swap** (today) / geometry-array write (goal) | Ref-swap proven; array write for these reps is the remaining frontier |
-| Dataset / preset load | whole scene + bbox + camera refit | **Structural rebuild** | Yes (rebuild path) |
+## Replace structure when structure changes
 
-Rule of thumb: **a transform or a scalar/array value on an existing prim is a
-data-plane write; a change in topology (vertex/curve counts, connectivity, prim
-set) is a structural change.** Reach for the cheap path first; only rebuild when
-the topology genuinely changed.
+For added/removed prims, a new prim type or changed composition, keep the viewer
+camera, RenderProduct and other persistent state while replacing the affected
+geometry reference or subtree. Use the public population operations in
+`references/ovstage-population/README.md`, wait for completion, and publish the
+new ordinal. Rebuild queries and feature state for replaced prims; update
+selection according to which paths still exist.
 
-### Data-plane writes (cheap, live, no rebuild)
+A whole-dataset replacement follows `references/stage-management/README.md`,
+including preparation, generation invalidation, attachment and first-frame
+completion. Preserve the live camera on field/representation changes unless
+the user requests Fit; apply the selected camera policy for a new dataset.
+Structural replacement and attribute publication both remain serialized with
+render stepping on the runtime owner.
 
-The validated in the selected application data-plane write is the camera `omni:xform` commit: one 16-lane
-`float64` matrix, `AttributeSemantic.MATRIX`, `PrimMode.UPSERT`, at a new
-ordinal. The full lifecycle (path-dictionary → query → write → release handles →
-keep the buffer alive until `op.wait()`) lives in `ovstage-render-and-camera.md`;
-the load-bearing call is:
+## Keep interaction responsive
 
-```python
-# Application pattern — adapt to the current OVStage API
-data   = np.ascontiguousarray(m.reshape(1, 16), dtype=np.float64)   # one prim, 16 lanes
-tensor = make_dltensor(data,
-                       dtype=DLDataType(code=DLDataTypeCode.kDLFloat, bits=64, lanes=16),
-                       shape=[1])
-pd = ovstage.PathDictionary(stage)
-with pd:
-    path_list = pd.create_path_list_from_strings([camera_path])
-    try:
-        query = stage.query_from_path_list(path_list)
-        try:
-            op = stage.write_attribute(query, "omni:xform", ordinal, tensor,
-                                       is_array=False,
-                                       semantic=AttributeSemantic.MATRIX,
-                                       prim_mode=PrimMode.UPSERT)
-            op.wait()
-            if not op.ok:
-                raise RuntimeError(op.error_message())
-        finally:
-            stage.release_query(query)
-    finally:
-        pd.destroy_path_list(path_list)
-del data                                    # backing buffer alive through the write
-stage.advance_write_floor(ordinal).wait()   # then render @ordinal
-```
+Bound pending work and coalesce compatible edits before dispatch. A continuous
+drag can use fewer streamline seeds or integration steps, followed by a full
+quality result when it settles. Both results use the same publication path;
+label any approximate preview that changes what the visualization means.
 
-**Any prim's `omni:xform` uses this exact pattern** — so the emitter *seed-sphere
-marker* is a persistent **unit** icosphere authored once at the origin and moved
-live by writing its `omni:xform` at a new ordinal (a scale-by-radius +
-translate-to-seed matrix; `_marker_xform` / `_sync_emitter_marker`). This is
-validated in the selected application — the marker never gets re-authored on a drag; only its transform
-column changes. Snapshot the prim's authored/world transform before the first
-live column (a fresh UPSERT column initializes to identity — a prim rendered
-before the real matrix lands jumps to the origin; see `prim-transform-safety`).
-
-Colormap and scalar-range tweaks are *conceptually* data-plane (write the LUT or
-`displayColor` primvar values on the standing material/geometry prim). The
-generated app should start with the conservative rebuild path when the selected data plane
-cannot update its colormap representation, so a colormap change currently takes the rebuild path
-with `refit=False` (rebuild, but preserve the camera — a colormap change must not
-reframe the view). Migrating colormap to a data-plane attribute write is a
-straightforward, high-value evolution.
-
-### Structural rebuilds (justified when topology changes)
-
-A representation, field, iso-value, slice-position, dataset, or preset change
-produces geometry with **different topology** (new vertex/curve counts, new
-connectivity). That is a genuine re-author, not a transform tweak. Recompute the
-operator (`representation` / `emitter_streamlines`) and republish the composed USDA:
-
-```python
-# Application-owned rebuild function
-surface = self._compute_surface()                 # operator recompute (new topology)
-if refit or self._build is None:                  # refit only on a NEW dataset
-    self.camera.fit(surface.bbox_min, surface.bbox_max)
-pose  = self.camera.get_camera_xform()            # thread the LIVE pose in (jump fix)
-build = scene.build_stage(surface, w, h, colormap, camera_xform=pose)
-#   → population.open_usd_from_string(stage, usda, ordinal=1, ...); advance_write_floor(1)
-```
-
-**Persistent stage + incremental geometry swap (proven).** Republishing the whole
-USDA forces a renderer detach/attach and recreates the camera prim (and its live
-`omni:xform`) every edit — which is exactly what reopens the jump risk and the
-identity-UPSERT hazard. Instead, create one **persistent `Stage`** with the
-"chrome" (camera, render product/settings, lights, material, and an empty
-`/Session/Geometry` container that carries the material binding), attach the
-renderer **once**, and swap only the geometry subtree via
-`population.add_usd_reference_from_string` / `population.remove_usd` /
-`population.apply_usd_changes(stage, ordinal=N)`, leaving the camera, lights, and
-material prims (and their live `omni:xform`) untouched. This keeps live camera state stable and avoids a renderer detach/attach for every edit. Use an
-incremental geometry-reference swap for any change that alters the prim class or topology
-(representation swap, mesh/points field/iso/slice edits), after validating its behavior against
-the current OVStage APIs.
-
-## Live Geometry As Array Writes (Proven — The Realtime Emitter Path)
-
-The highest-value pattern for a CFD viewer — treating **live geometry itself as a
-data-plane array write** — is appropriate when supported by the installed OVStage release. A dragged control updates the
-streamline arrays *in place on the same prim* with no USDA text re-author, reparse, or
-population reference swap. Validate this path with the generated app before relying on it.
-
-Keep the streamlines as a **persistent `UsdGeomBasisCurves`** prim, authored once.
-On each emitter move, recompute the operator and overwrite its arrays at a new
-ordinal — `points` (POINT), `curveVertexCounts` (int), and
-`primvars:displayColor` (COLOR). The **curve and point count may differ between
-writes: variable-length array writes are supported.**
-
-```python
-# Application pattern: in-place writes to the same persistent BasisCurves.
-# Query is built exactly like the camera commit:
-#   PathDictionary.create_path_list_from_strings → query_from_path_list.
-def _dp_write_array(stage, path, name, arr, *, lanes, code, bits, semantic, ordinal):
-    data   = np.ascontiguousarray(arr)                 # keep alive through op.wait()
-    tensor = make_dltensor(data, dtype=DLDataType(code=code, bits=bits, lanes=lanes),
-                           shape=[int(data.shape[0])])
-    pd = ovstage.PathDictionary(stage)
-    with pd:
-        path_list = pd.create_path_list_from_strings([path])
-        try:
-            query = stage.query_from_path_list(path_list)
-            try:
-                op = stage.write_attribute(query, name, ordinal, tensor,
-                                           is_array=True, semantic=semantic,
-                                           prim_mode=PrimMode.UPSERT)
-                op.wait()
-                if not op.ok:
-                    raise RuntimeError(op.error_message())
-            finally:
-                stage.release_query(query)
-        finally:
-            pd.destroy_path_list(path_list)
-    del data
-
-# Per emitter move (variable length — point/curve count may change each write):
-_dp_write_array(stage, curves_path, "points", pts_f32,   # (P, 3) float32
-                lanes=3, code=DLDataTypeCode.kDLFloat, bits=32,
-                semantic=AttributeSemantic.POINT, ordinal=N)
-_dp_write_array(stage, curves_path, "curveVertexCounts", cvc_i32,
-                lanes=1, code=DLDataTypeCode.kDLInt,   bits=32,
-                semantic=AttributeSemantic.NONE,  ordinal=N)
-_dp_write_array(stage, curves_path, "primvars:displayColor", colors_f32,  # (P, 3)
-                lanes=3, code=DLDataTypeCode.kDLFloat, bits=32,
-                semantic=AttributeSemantic.COLOR, ordinal=N)
-stage.advance_write_floor(N).wait()   # then render @N
-```
-
-Mechanics (query lifetime, tensor buffer kept alive until `op.wait()`, handle
-release) are identical to the camera commit — see `references/ovstage-data-plane/README.md`
-and `ovstage-render-and-camera.md`; don't duplicate them, reuse the same helper.
-
-> **CAVEAT — a per-vertex primvar whose length must track a changing point count
-> goes STALE if you don't also rewrite it.** If the point count changes on a drag
-> and you leave, say, a per-vertex `widths` array at its old length, RTX rejects
-> the prim (*"widths primvar is not valid / not enough data"*) and the curves
-> vanish. Two ways to stay valid: rewrite *every* per-vertex array on each move,
-> **or** author length-sensitive attributes as **`constant`** so they never need
-> resizing. The reference authors `widths` as `float[] widths = [ w ]
-> (interpolation = "constant")` — one value for the whole prim — so a changing
-> point count never invalidates it. `displayColor` is fine per-vertex here
-> *because* the data-plane write updates it (to the new length) on every move.
-> See `usd-authoring-and-materials.md` for the widths/interpolation rules.
-
-### Interactive LOD — cheap during the drag, full quality when it settles
-
-To keep a burst of emitter edits smooth, recompute the operator **cheaply** while
-the user is actively dragging and re-run at full quality once the interaction
-settles (~200 ms idle). "Cheap" means fewer seeds and fewer integration steps, and
-skipping the field probe entirely — **color by the free integration-time field**
-instead of probing the velocity field per vertex. Choose the seed count, integration steps,
-and settle timeout for the generated app's responsiveness target. The cheap and full paths
-both flow through the same in-place array write above; only the point count
-differs, which the variable-length write handles for free.
-
-### Two proven speed tiers, and when to use each
-
-| Tier | Mechanism | Use when | Cost |
-| --- | --- | --- | --- |
-| **Data-plane array write** (fastest) | overwrite `points`/`curveVertexCounts`/`displayColor` on the **same** persistent prim | same-prim geometry update — the emitter drag | Measure in the generated app |
-| **Incremental geometry swap** | `add_usd_reference_from_string` / `remove_usd` / `apply_usd_changes` on the persistent stage | structural / topology / prim-class change — representation swap, mesh-rep field/iso/slice | Measure against a full rebuild in the generated app |
-
-Measure emitter latency from command drain through a geometry frame in the generated app.
-Keep a data-plane capability flag and fall back to re-authoring only the small `BasisCurves`
-layer (not the whole scene) if a write is rejected.
-
-### Proven vs. still-frontier — be honest
-
-| Capability | Status |
-| --- | --- |
-| Camera / any-prim `omni:xform` matrix write (16-lane `float64`, MATRIX, UPSERT) | Use the standard matrix-write helper |
-| Emitter-marker `omni:xform` write (persistent unit sphere, scale+translate) | Use the same persistent-prim matrix-write pattern |
-| Operator recompute → geometry read-back (surface/iso/slice/streamlines/emitter) | Implement with the selected CAE operator library |
-| Persistent stage + incremental geometry-reference swap | Validate against the current OVStage publication APIs |
-| Live curves as variable-length `is_array=True` `points`/`curveVertexCounts`/`displayColor` writes | Validate variable-length writes against the installed OVStage release |
-| Structural rebuild via `open_usd_from_string` republication | Baseline-compatible fallback |
-| Colormap/scalar as a data-plane attribute (no rebuild) | Use structural rebuild until the selected data plane supports the update |
-| Same array-write path for **mesh/points** reps (field/iso/slice), not just curves | Frontier — curves proven; mesh/points still take the ref-swap |
-
-When generating, reach for the proven cheap path first: `omni:xform` for
-transforms, the in-place array write for same-prim geometry, the incremental
-reference swap for topology/prim-class changes, and a full rebuild only for a new
-dataset. Propose only the last two rows above as explicit next steps, not shipped
-facts.
-
-## Ordering Rules (Non-Negotiable)
-
-- **Never render above the write floor.** For every render-visible change:
-  write @ N → `advance_write_floor(N).wait()` → `renderer.step(..., ordinal=N)`.
-- **One serialized owner.** All population, all attribute writes, and all `step`
-  calls run on the same lane. Controls enqueue; they never write directly.
-- **Never `step` while (re)building.** The loop drains commands (including
-  rebuilds) *before* it steps, so a step can never observe a half-built stage.
-  Detach the prior stage before swapping so `step` never runs against a stale one.
-- **Coalesce dragged controls to one rebuild/tick.** Drain the queue **last-wins
-  per kind** so a slider drag that enqueues dozens of values triggers at most one
-  operator recompute and one publication per tick:
-
-  ```python
-  latest = {}
-  while True:
-      try:
-          kind, payload = self._commands.get_nowait()
-      except queue.Empty:
-          break
-      latest[kind] = payload          # last value per kind wins
-  # apply latest → set rebuild flags → recompute + publish ONCE
-  ```
-
-- **Avoid the camera jump on every rebuild.** A rebuild authors ordinal 1 and the
-  next tick commits `omni:xform` at ordinal 2; if those poses differ, the one
-  frame between them snaps. Fit *before* authoring and thread the **live** pose
-  into the USDA build so `ordinal 1 == ordinal 2`. Use `refit=True` only on a new
-  dataset; pass the current pose (`refit=False`) on colormap/field/iso/slice edits
-  so the view is preserved. Full analysis in `ovstage-render-and-camera.md`.
-
-## See Also
-
-- `ovstage-render-and-camera.md` — full camera data-plane block, frame
-  extraction, first-cold-step compile, and the camera-jump fix.
-- `ovui-controls.md` — the ovui shell and the callback→queue control surface.
-- `data-and-operators.md` — warp-simdata operators and geometry read-back.
-- `usd-authoring-and-materials.md` — `widths`/interpolation rules and the
-  constant-vs-vertex primvar caveat for data-plane array writes.
-- `references/ovstage-runtime/README.md` — ordinals, write floor, single owner.
-- `references/ovstage-data-plane/README.md` — queries, `omni:xform`, tensor lifetime.
-- `references/ovstage-population/README.md` — publication and reference-swap APIs.
-- `references/prim-transform-safety/README.md` — snapshot before a live
-  `omni:xform`; never fall back to identity.
+Measure from accepted intent through computation, publication and the displayed
+frame. Operator time alone does not measure interaction latency. Check actual
+rendered movement, field-color changes, empty/nonempty transitions and Reset
+alongside copied numeric values; use matched camera views so a label update or
+camera move is not mistaken for geometry publication.

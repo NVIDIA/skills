@@ -144,9 +144,13 @@ All three carry the same two field primvars (see next section):
 
 `subdivisionScheme = "none"` renders the authored triangles/polygons directly
 (no Catmull-Clark). `faceVertexCounts` is one count per face (3 per triangle);
-`faceVertexIndices` indexes into `points`. Use vertex interpolation for per-vertex values
-`utils.py`: NODE-associated fields are `vertex`, ELEMENT/cell fields are
-`uniform`.
+`faceVertexIndices` indexes into `points`. In the app's USD-authoring module,
+map NODE-associated fields to `vertex` interpolation (one value per output
+point) and ELEMENT/cell fields to `uniform` (one value per output face).
+When an operator changes topology, use its output field association and count;
+do not attach the original cell array to a triangulated or extracted mesh
+without remapping it to the output faces. See
+[data-and-operators.md](data-and-operators.md) for the geometry/field handoff.
 
 ### Point Cloud — UsdGeomPoints
 

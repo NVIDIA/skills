@@ -42,9 +42,9 @@ contract; if the wheel changed, update this reference instead.
 
 - `ui.init("...", width=W, height=H, max_fps=60)` returns `None`. There is no app
   handle to hold, and in particular there is **no `app.step_and_present()`**.
-- `ui.run(coroutine)` runs its own standalone loop, and that loop performs
-  presentation. The render-loop coroutine only advances viewer state and pushes
-  frames into the provider; `ui.run` presents them.
+- Run `ui.run_async()` alongside the update coroutine in an application-owned
+  asyncio loop. Use `run_until_closed` from `local-viewer` to cancel and await
+  both tasks before destroying the runtime, window, and backend.
 - The render-loop coroutine calls `runtime.tick(dt)` then
   `await asyncio.sleep(1.0 / 120.0)` — **not `sleep(0)`**. A busy spin (`sleep(0)`)
   pegs a CPU core and starves the OS message pump, which reads as a hung window.
@@ -96,12 +96,17 @@ async def render_loop():
             print(f"[app] render_loop error: {exc}", flush=True)
         await asyncio.sleep(1.0 / 120.0)     # NOT sleep(0)
 
-ui.run(render_loop())                        # coroutine, not a plain callback
+# Use the run_until_closed helper from local-viewer in the application.
+try:
+    asyncio.run(run_until_closed(render_loop(), ui.run_async()))
+finally:
+    runtime.close()  # app-owned cleanup: stop/join the render owner
+    window.destroy()
+    ui.shutdown()
 ```
 
-ovui integer style colors are `0xAARRGGBB`. Swapping the byte order turns an
-intended dark background into light red/brown and makes a working viewport look
-like a renderer failure.
+Use `ui.color("#76b900")` or `ui.color(r, g, b, a)` for style colors instead of
+packing integers by hand. The helper produces ovui's `0xAABBGGRR` format.
 
 ## Header Controls (ComboBoxes + FloatSliders)
 
@@ -148,30 +153,26 @@ change pipeline state.
 
 ## The Single Serialized Loop
 
-The UI thread enqueues; the loop thread drains, coalesces, rebuilds at most once,
-and renders one frame. Two triggers cause a frame:
+The UI thread enqueues intent; the owner coalesces it and dispatches bounded
+scientific work. It continues camera interaction and rendering while computation
+runs, then publishes copied results for the current request and generation.
+Classify the result with [control-to-publication routing](driving-cae-viz-via-ovstage.md):
+colors and geometry arrays update existing prims, while type/composition changes
+replace affected structure. A new dataset uses the scene-replacement path.
 
-1. A drained command (representation/field/iso/slice/colormap/load) that requires
-   a stage rebuild.
-2. The camera-dirty flag, set by input callbacks; the loop commits the pose and
-   steps.
-
-`runtime.tick(dt)` (runtime.py) is one serialized iteration:
-
-```
+```text
 tick(dt):
-    _drain_commands()          # applies coalesced commands; may rebuild stage once
-    if first build:  _build_scene_and_attach()
-    if camera dirty: clear flag; _render_current()   # commit pose @ordinal, step
+    accept and coalesce compatible UI intent
+    dispatch scientific work if its bounded slot is free
+    accept completed current-generation results
+    publish changed arrays or commit a prepared scene replacement
+    commit camera changes and render the completed publication
 ```
 
-`_drain_commands()` (runtime.py) drains the whole queue with `get_nowait()` into a
-`latest[kind] = payload` dict, so only the **last value per kind** survives
-(last-wins coalescing). This is what keeps a dragged iso/slice slider from queuing
-dozens of stage rebuilds per frame — the loop applies only the latest value, sets
-a single `rebuild` flag, and calls `_build_scene_and_attach()` at most once per
-tick. A `refit` flag distinguishes a new dataset (reframe the camera) from a
-colormap-only rebuild (preserve the user's current view).
+Keep local control drafts until the corresponding accepted state arrives; an
+intermediate result must not overwrite a newer drag target. Reset and preset
+replacement discard superseded drafts. Fit on a new dataset only when that is
+the selected camera policy; field, colormap and iso/slice edits preserve the view.
 
 `_render_current()` enforces the write-floor ordering from `conventions.md` and
 the `ovstage-*` references: get the row-major camera xform, `commit_camera_pose`
@@ -181,8 +182,10 @@ the resulting RGBA is pushed to the viewport provider.
 
 ## Camera Navigation
 
-Camera math is pure NumPy (`OrbitCamera`, camera_controller.py) so it works before
-the OV stack is installed. The `InputController` (input_controller.py) translates
+Implement pure NumPy camera math (`OrbitCamera` in the suggested `camera.py`)
+using [camera controls](../camera-controls/README.md), so it works before
+the OV stack is installed. Implement the `InputController` in the suggested
+`input.py` using [input routing](../viewer-input-routing/README.md); it translates
 ovui mouse events into camera moves and flags the runtime camera-dirty; it never
 writes OV state.
 
@@ -204,10 +207,11 @@ writes OV state.
 To reproduce a named sample scene in one click, keep a small registry of presets,
 each a dict of `{dataset, representation, field, colormap}` (optionally iso/slice
 fractions). Applying a preset is a single enqueued command that the loop drains
-and applies as one coalesced rebuild — the same path as the individual controls,
-so no preset code touches OVStage directly. A preset button's callback resolves
-the named entry and enqueues it; the loop reloads the dataset (refit) and rebuilds
-the stage once.
+and applies as one configuration through the same publication routing as the
+individual controls, so no preset code touches OVStage directly. A preset
+button resolves the named entry and enqueues it. The owner updates existing
+arrays or replaces structure according to the requested changes. A new dataset
+follows scene replacement with the selected camera policy.
 
 ```python
 # presets.py — a registry; the app is adding this module.
@@ -219,13 +223,11 @@ PRESETS = {
 }
 
 def apply_preset(runtime, name):
-    p = PRESETS[name]
-    runtime.enqueue_load(p["dataset"], field=p["field"], colormap=p["colormap"])
-    runtime.enqueue_representation(p["representation"])   # coalesced into one rebuild
+    runtime.enqueue_preset(dict(PRESETS[name]))  # app-owned typed command
 ```
 
-Because commands coalesce last-wins per kind within a tick, enqueuing several
-preset fields together still produces a single stage rebuild.
+Commit a preset as one coherent requested configuration so intermediate field
+and representation choices cannot publish into the replacement dataset.
 
 ## Gotchas
 
@@ -246,7 +248,7 @@ preset fields together still produces a single stage rebuild.
 ## Suggested Application Modules
 
 - `app.py` — ovui shell: `ui.init`/`ui.Window`, header ComboBoxes + FloatSliders,
-  ZStack image + transparent hit rect, render-loop coroutine, `ui.run`.
+  ZStack image + transparent hit rect, update/presentation task ownership.
 - `runtime.py` — serialized `ViewerRuntime`: enqueue methods, coalesced last-wins
   queue drain, tick, and write-floor commit + step.
 - `camera.py` — orbit/pan/dolly/zoom/fit and a sanitized row-major camera xform.

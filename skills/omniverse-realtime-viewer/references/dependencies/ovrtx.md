@@ -4,7 +4,7 @@
 
 Purpose: NVIDIA RTX renderer used by local and streaming Omniverse Realtime Viewers.
 
-Read `nvidia-runtime.md` for the latest-version acquisition command. This file
+Read `nvidia-runtime.md` for acquisition and compatible package selection. This file
 documents renderer environment and validation behavior.
 
 For ovrtx-owned skills, renderer samples, Python/C API examples, stage
@@ -24,8 +24,9 @@ Install through the project server requirements when available:
 python3 -m pip install -r server/requirements.txt
 ```
 
-If a project manifest pins an exact `ovrtx` version, keep that pin. Otherwise,
-use the latest available package from `nvidia-runtime.md`.
+Preserve the project manifest's compatible package set. For a new app or requested
+upgrade, resolve OVRTX together with OVStage and the selected consumers using
+`nvidia-runtime.md`; record that set before installation.
 
 Verify import:
 

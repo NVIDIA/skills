@@ -2,113 +2,41 @@
 
 ## Triggers
 
-Use this skill for install, setup, dependency verification, package cache,
-ovrtx install, OVStage/ovstage install, OVPhysX/ovphysx install, ovstorage install or integration, ovstream
-install, ovui install, NVIDIA runtime acquisition, supplemental dependency
-documentation, generated local viewer UI, OpenUSD/pxr setup, Warp, NumPy,
-React/Vite, WebRTC client packages, Electron SHM packages, Windows setup
-prerequisites, or environment troubleshooting for Omniverse Realtime Viewer apps.
+Use for viewer setup, a library upgrade, native SDK builds, or an installation
+or compatibility failure. Choose the delivery path first so setup includes only
+the libraries the app needs.
 
-This skill is the source of truth for NVIDIA runtime dependency acquisition.
-Other skills should point back here instead of repeating package URLs, release
-URLs, registry paths, wheel names, artifact locations, or
-ovrtx/ovstage/ovphysx/ovui/ovstream repository URLs. This includes the CAE/CFD
-visualization libraries (`warp-simdata`, `cae-openusd-plugins`) — their single
-acquisition source is the **CAE/CFD Visualization Libraries** section below.
+## Resolve Once For The App
 
-## How To Use
+Read `nvidia-runtime.md` for package sources, supported combination selection,
+and upstream API/build guidance. Preserve an existing manifest unless an upgrade
+is requested; write newly resolved versions into the app's manifest/lockfile.
+Keep package locations and acquisition instructions here rather than repeating
+them in feature references.
 
-Start here before writing viewer code. Choose the references that match the selected delivery path and load only those details.
-
-| Need | Read |
+| Need | Read next |
 |---|---|
-| NVIDIA runtime dependency source of truth: `ovrtx`, `ovstage`, `ovphysx`, `ovstorage`, `ovui`, `ovstream`, and the `ov-web-rtc` browser client | `nvidia-runtime.md` |
-| Baseline setup, cache paths, package matrix, global requirements | `quick-setup.md` |
-| `ovrtx` install, renderer plugin paths, GPU validation | `ovrtx.md` |
-| `ovstream`, native streaming libraries, WebRTC server setup | `ovstream.md` |
-| React/Vite client and WebRTC browser package setup | `frontend.md` |
-| Electron + shared-memory local transport dependencies | `electron-shm.md` |
-| Local `ovui`, `usd-core`/`pxr` worker isolation, Warp, NumPy | `local-openusd-gpu.md` |
-| Environment variables, verification commands, failure index | `environment-validation.md` |
+| Baseline environment setup | `quick-setup.md` |
+| Renderer setup | `ovrtx.md` |
+| Streaming/native transport contract | `ovstream.md` |
+| Browser UI dependencies | `frontend.md` |
+| Electron SHM setup | `electron-shm.md` |
+| OVXR SDK setup and upstream library guidance | `ovxr.md` |
+| Skia and Yoga for spatial UI | `skia-yoga.md` |
+| Python UI, OpenUSD workers, GPU arrays | `local-openusd-gpu.md` |
+| Environment checks and diagnostics | `environment-validation.md` |
+| Windows-specific setup | `references/windows-native-setup/README.md` |
 
-## Path Selection
+Use the selected release's upstream guidance for exact package/API requirements.
+An installed package or cached checkout is useful when it matches that release;
+it is not evidence of latest compatibility. Revisit upstream when upgrading or
+when an API fails, rather than refreshing every dependency on every prompt.
+When an API remains uncertain, inspect the matching installed signatures or
+type declarations and retain a focused probe result with the app's evidence.
 
-- For browser streaming, read `nvidia-runtime.md`, `quick-setup.md`, `ovrtx.md`, `ovstream.md`, `frontend.md`, and `environment-validation.md`.
-- For lightweight local `ovui` apps, read `nvidia-runtime.md`, `quick-setup.md`, `ovrtx.md`, `local-openusd-gpu.md`, and `environment-validation.md`.
-- For Electron + SHM apps, read `nvidia-runtime.md`, `quick-setup.md`, `ovrtx.md`, `electron-shm.md`, `frontend.md`, and `environment-validation.md`.
-- For Tauri/Rust or C++ native apps, read `nvidia-runtime.md`, `quick-setup.md`, `ovrtx.md`, and the delivery skill's own build requirements.
-- For Windows-native work, also read `windows-native-setup` after the dependency reference that matches the selected path.
-
-## Critical Rules
-
-- Do not guess install commands or package sources. Use `nvidia-runtime.md` for NVIDIA runtime acquisition.
-- Do not hard-code ovrtx, ovstage, ovphysx, ovstorage, ovui, or ovstream GitHub repository URLs in downstream
-  skills. Use `nvidia-runtime.md` so dependency locations can be
-  updated in one place.
-- Keep `ovrtx`, `ovstage`, `ovphysx`, `ovui`, `ovui-data-adapters`, and local UI companion packages on compatible revisions.
-- Set `OVRTX_SKIP_USD_CHECK=1` before importing or constructing `ovrtx` components where the selected reference requires it.
-- Keep `usd-core`/`pxr` work in a query subprocess unless the exact process import path is verified for the selected wheels.
-- Keep OVPhysX USD population in a bounded worker unless `PhysX.attach_ovstage(stage, read_ordinal=...)` is verified against the exact installed OVStage/OVPhysX ABI.
-- Let the parent viewer runtime own OVRTX, OVStage stage lifetime, ordinals, and publication state; workers exchange DTOs, not live stage handles.
-- Do not add browser 3D renderer dependencies as a fallback for missing GPU or `ovrtx` packages.
-- For generated browser-streamed viewers, dependency setup is part of completion. Attempt server runtime installation and verification before declaring the app ready unless the user explicitly opts out or the platform is unsupported.
-- Treat vendored packages and local caches as setup aids, not redistribution approval.
-
-See also: `ovstage-runtime`, `ovstage-ovrtx-integration`,
-`physics-simulation`, `ovrtx-rendering`, `ovui-local-viewer-recipe`,
-`local-viewer`, `streaming-server`, `streaming-client`,
-`electron-shm-viewer`, `stage-hierarchy`, `windows-native-setup`, and
-`cae-cfd-visualization` (which acquires the `warp-simdata` and
-`cae-openusd-plugins` libraries through the section below).
-
-## Dependency Freshness And Local Checkouts
-
-Treat installed packages, vendored files, caches, and local repository clones as
-implementation inputs, not authoritative current guidance. For an existing app,
-its manifest or lockfile is authoritative for pinned versions. For current API
-and setup guidance, the upstream repository and package metadata are authoritative.
-
-A local checkout may substitute for upstream guidance only after checking that:
-
-- its `origin` matches the supplemental repository pointer;
-- its working tree is clean, or its relevant local changes are understood;
-- its current commit and commit date are recorded; and
-- its `AGENTS.md`, `skills/`, README, examples, and release notes are present.
-
-Do not refresh a dependency checkout on every prompt. Refresh it, or consult
-upstream directly, when the user asks for latest/current/supported behavior, the
-task concerns installation or compatibility, a documented API fails against the
-installed package, the checkout is stale or dirty, the installed version differs
-from the app manifest, or the dependency is pre-release or fast-moving. Use a
-30-day age check as a warning threshold, not as an automatic upgrade rule.
-
-If refresh is unavailable, report the commit or package version used and treat
-local guidance as provisional. Never infer that an installed package or local
-clone is current solely because it is present on disk.
-
-## ovstage Supplemental Source
-
-`ovstage` follows the same supplemental-repository rule as the other NVIDIA
-runtime dependencies. Before implementing stage population, runtime data access,
-ordinals, write floors, or attached rendering, read the current `ovstage`
-repository documentation, `AGENTS.md`, `skills/`, examples, and release notes
-through the pointer in `nvidia-runtime.md`. The local ovstage references provide
-viewer-specific composition; upstream is authoritative for the current API.
-
-## OVPhysX Supplemental Source
-
-`ovphysx` acquisition and supplemental repository pointers also live in
-`nvidia-runtime.md`. Before implementing physics simulation, tensor binding, or
-attached-stage behavior, read the OVPhysX package/repo docs plus
-`physics-simulation`. Use the bounded worker handoff unless the exact installed
-OVStage/OVPhysX ABI has a verified `PhysX.attach_ovstage(stage, read_ordinal=...)` bridge.
-
-## ovstorage Supplemental Source
-
-Before adding cloud-asset discovery, transfer, caching, or resolver behavior,
-read the current upstream `AGENTS.md` and relevant `skills/` guidance through
-the `NVIDIA-Omniverse/ovstorage` pointer in `nvidia-runtime.md`. Upstream owns
-the current storage API; use this package for viewer-specific routing only.
+Before expanding the app, verify the selected renderer/stage combination and
+one displayed or decoded frame in its real shell. Keep setup diagnostics and
+resolved package identities in application evidence, not in feature skills.
 
 ## CAE/CFD Visualization Libraries
 
@@ -120,22 +48,21 @@ by role, not by URL, so the prose survives a rename or a repository move:
 - **the `warp-simdata` GPU operator library** — NVIDIA Warp kernels that build an
   in-memory `Dataset` from renderable arrays and run the visualization operators
   (`element_faces` / `iso_surface` / `slice` / `streamlines` / points /
-  voxelization). Imports Warp lazily; requires CUDA. This is the durable path the
-  CAE family builds on.
+  voxelization), with CPU and CUDA execution. The CAE family uses its dataset,
+  field and operator APIs.
 - **the `cae-openusd-plugins` USD reader/schema library** — a read-only
   `SdfFileFormat` plugin plus OmniSci (`Cae*`/`OmniSci*`) schemas that expose
   CGNS / OpenFOAM / VTK / EnSight / FLASH files as composed USD prims with
-  data-on-demand field arrays. Optional: it is frequently absent from a working
-  venv, so the CAE family always keeps a library-direct reader fallback (see
-  `cae-cfd-visualization/cae-data-ingestion.md`).
+  data-on-demand field arrays. Use it with Warp SimData's USD adapters for native
+  file ingestion; raw-array workflows can use Warp SimData without OpenUSD.
 
 > **These libraries are public on GitHub.** This section is the single source of
 > truth for their acquisition — the family docs point here rather than repeating URLs.
 
 | Library (role) | Acquisition | Guidance |
 |---|---|---|
-| `warp-simdata` (GPU operator library) | [NVIDIA/warp-simdata](https://github.com/NVIDIA/warp-simdata) | Before setup, read its current `AGENTS.md`, `skills/`, README, and installation guidance. Follow its supported acquisition and compatibility instructions rather than copying commands into this package. |
-| `cae-openusd-plugins` (USD reader/schema library) | [NVIDIA-Omniverse/cae-openusd-plugins](https://github.com/NVIDIA-Omniverse/cae-openusd-plugins) | Before setup, read its current `AGENTS.md`, `skills/`, README, build/install, plugin-registration, and compatibility guidance. It is optional; if its schemas are unavailable, use the library-direct readers in `cae-cfd-visualization/cae-data-ingestion.md`. |
+| `warp-simdata` (GPU operator library) | [NVIDIA/warp-simdata](https://github.com/NVIDIA/warp-simdata) | Discover agent guidance and skills if present; otherwise start with its README. Follow the selected release's installation guidance, changelog, and task-specific API docs. For input ownership and cache lifetime, read [datasets and fields](https://github.com/NVIDIA/warp-simdata/blob/main/docs/DatasetsAndFields.md); for native-file adapters, read the [OpenUSD API](https://github.com/NVIDIA/warp-simdata/blob/main/docs/USDAPI.md). Verify these default-branch entry points against the app's resolved release. |
+| `cae-openusd-plugins` (USD reader/schema library) | [NVIDIA-Omniverse/cae-openusd-plugins](https://github.com/NVIDIA-Omniverse/cae-openusd-plugins) | Before setup, read its current `AGENTS.md`, `skills/`, README, build/install, plugin-registration, and compatibility guidance. Use its [usage guide](https://github.com/NVIDIA-Omniverse/cae-openusd-plugins/blob/main/docs/usage.md) and [time mapping](https://github.com/NVIDIA-Omniverse/cae-openusd-plugins/blob/main/docs/file_formats/time.md) for registration and native-file reads; see `cae-cfd-visualization/cae-data-ingestion.md` for viewer integration. |
 
 Rules:
 
@@ -146,3 +73,36 @@ Rules:
   this package.
 - Let each upstream repository define its supported CUDA/Warp or USD/runtime
   compatibility set; validate the selected combination before building an app.
+
+## USD BRep: Public Solid Modeling Dependency
+
+Use [NVIDIA-Omniverse/usd-brep](https://github.com/NVIDIA-Omniverse/usd-brep)
+for exact BRep modeling, tessellation, and BrepArray USD interchange. Before
+setup or implementation, read the selected revision's `AGENTS.md`, discover its
+repo-local skills (currently `.agents/skills/`), and follow its operation router
+and docs. Start with its `README.md` and `tools/pyproject/README.md` for public
+artifacts, platform support, native prerequisites, and compatibility. Upstream
+owns installation and build procedures; do not reuse early-access archives,
+private solidmodeling checkouts, Packman paths, or fixed prerelease versions.
+
+The public distribution is [`usd-brep` on PyPI](https://pypi.org/project/usd-brep/),
+imported as `usd_brep`; operation groups
+include `primitives`, `booleans`, `fillets`, and `usd`. `_omni_solid` is the
+source-checkout API, not a drop-in spelling for the packaged API. Resolve the
+artifact against current upstream guidance and record its version and platform
+in the app manifest. Verify exports against that artifact's stubs before coding.
+
+The reviewed package requires CPython 3.12 and bundles OpenUSD without importing
+`pxr`. It exchanges stages as files. Loading a second build of the same bundled
+OpenUSD version is unsupported; different-version coexistence demonstrated by
+upstream is not proof of compatibility with OVRTX/OVStage. Use a separate worker
+when interpreter or native runtime compatibility is unverified. Do not add a
+separate OpenUSD install to the modeling environment merely to import this wheel.
+Follow upstream for validation extras and Windows runtime prerequisites.
+
+For styles with explicit feature/hidden lines, use the OVRTX SPG path in
+[SPG processing](../spg-processing/README.md) and
+[line compositor delivery](../stylized-visualization/line-compositor-delivery.md).
+This path needs no ModernGL, EGL context, or host framebuffer readback. Only
+when intentionally retaining an existing legacy ModernGL adapter, read the
+optional dependency and preflight in `local-openusd-gpu.md`.

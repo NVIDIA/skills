@@ -76,22 +76,22 @@ Detailed startup, streaming, scene, input, selection, hierarchy, and recovery pl
 | `Unable to find RenderProduct prim` | Inline/session render path missing or mismatched | Create the render pipeline and pass the exact path |
 | Black frame, no exception | Camera, RenderProduct, resolution, or RenderVar invalid | Validate stage-loading data and camera relation |
 | USD parse error near `RenderVar` inline braces | ovrtx parser rejected one-line `def RenderVar "X" { ... }` syntax | Use multi-line `RenderVar` definitions from `stage-loading` |
-| `RenderProductSetOutputs` has no attribute `get` | `renderer.step()` output was treated as a dict | Use `with products as ctx:` and index with `ctx[render_product_path]` |
-| Invalid output handle | Frame or render var view outlived its step result | Copy buffers before leaving the `RenderProductSetOutputs` context |
+| `RenderProductSetOutputs` has no attribute `get` | `renderer.step()` output was treated as a dict | Use membership checks and `products[render_product_path]`, then map individual RenderVars |
+| Invalid output handle | Renderer-backed output was retained past its valid lifetime | Return owned buffers copied inside each RenderVar map context |
 | First `renderer.step()` exceeds normal test timeout | Cold RTX shader or pipeline compilation | Use a 300s+ first-run timeout and inspect ovrtx logs |
 | Red/blue swapped | RGBA submitted as BGRA | Convert ovrtx `LdrColor` before ovstream |
 | Scene renders but appears sideways | Camera fit, orbit, or pan hard-coded Y-up for a Z-up stage | Query `UsdGeom.GetStageUpAxis` in the metadata worker, set the server camera's `world_up`, refit, and keep the source USD unchanged |
 | Stage load reports success but first frame fails | load operation status or RenderProduct path was not checked | wait/check load status, then step the exact RenderProduct |
 | `TypeError: a coroutine was expected` from `ui.run` | ovui run loop received a callback/function instead of an awaitable | Pass an async render loop coroutine and yield with `await asyncio.sleep(1.0 / 120.0)` |
 | `VIEWPORT_CAMERA_POSE_SOURCE` import failure | stale data adapters installed with newer local UI packages | Install local UI packages from the same package set |
-| `ovui-data-adapters` is not installable | selected package set lacks matching package metadata | Use a compatible package set from `references/dependencies` |
+| ovui widget/adapter dependency resolution fails | first-party versions differ or an obsolete umbrella package was requested | Resolve matching `ovui-widgets-*` and `ovui-data-adapters-*` distributions through `references/dependencies` |
 | Native UI package requires a compiler toolchain | package/build instructions require local tools | Follow the current `ovui` dependency guidance |
 | `Previous session is already running` | Old WebRTC client/session still active | Close old tab, reduce reconnect storm, restart server if stuck |
 | `Could not get encoded frame` with black video | Direct client codec default was unknown or unsupported | Set explicit `codec: 'H264'` and `codecList: ['H264']` in DirectConfig |
 | Embedded host lacks `navigator.mediaCapabilities` | Host frame does not expose the optional capability API | Record iframe/preflight state, retain explicit H264 config, and require decoded-frame validation; do not reject H264 from API absence alone |
-| `connect()` resolves but no decoded video frame | Signaling/data channel success was mistaken for media proof | Check video `readyState`, decoded-frame counter/currentTime, WebRTC internals, and host-frame policy |
+| `connect()` resolves but no decoded video frame | Startup progress was mistaken for media proof | Check video `readyState`, decoded-frame counter/currentTime, WebRTC internals, and host-frame policy |
 | Connects then disconnects in 1-2 seconds before messages arrive | Server did not stream fallback/idle frames while waiting for a stage command | Stream a valid fallback or last-good BGRA frame every connected tick |
-| Initial app messages never reach the server | Frontend gated `sendMessage()` on `onStart` instead of the `connect()` Promise | Send app commands after `AppStreamer.connect()` resolves; use `onStart` only for video-live state |
+| Initial app messages never reach the server | Frontend confused startup progress, command readiness, and scene-frame readiness | Follow [client readiness](../streaming-client/README.md#appstreamer-direct-api); send after confirmed start success, then prove decoded frames |
 | Keyboard/data-channel controls work but mouse drag, button, and wheel produce no server `on_input` events | Native browser input forwarding is unavailable in this host/embed | Verify viewport ownership and callback logs, then enable only the mutually exclusive `mouseInput` fallback in `viewer-input-routing`; do not process native and fallback events together |
 | `NVST_R_INVALID_OPERATION` on second `Server.start()` | `ovstream.shutdown()` ran in a same-process stop path | Use `server.stop()` and `server.close()` for restarts; reserve `ovstream.shutdown()` for process exit |
 | Server sees `messageType` but no `event_type` | AppStreamer envelope not unwrapped | Parse nested `data` payload before dispatch |

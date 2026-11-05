@@ -25,7 +25,8 @@ Set only when an ovstream install cannot locate SDK libraries automatically:
 export OVSTREAM_LIB_PATH=/absolute/path/to/ovstream/native/libs
 ```
 
-Set for local UI under a known display:
+Set for a selected desktop UI under a known display; headless ovui overlays
+follow their own upstream initialization and export contract:
 
 ```bash
 export DISPLAY=${DISPLAY:-:0}
@@ -54,17 +55,27 @@ Run these checks after installation:
 7. If a `pxr` worker is generated, confirm its `usd-core` release is compatible with the selected runtime package set and that it imports in the worker environment.
 8. If OVStage is selected, confirm `ovstage` imports and the app can create or
    attach the runtime stage path required by the selected viewer architecture.
-9. If OVPhysX is selected, probe `PhysX.attach_ovstage(stage, read_ordinal=...)` only in an isolated
-   compatibility check before choosing in-process attach. If the probe fails or
-   is skipped, validate the bounded worker path instead.
+9. If OVPhysX is selected, follow `nvidia-runtime.md` → ovphysx for both schema
+   providers and the unchanged `hello_world` smoke test in its intended
+   environment. Then validate the selected shared-stage or worker integration;
+   a passing upstream CPU example does not establish GPU or viewer readiness.
 10. Confirm `ovstream.initialize()` and `ovstream.shutdown()` work for streaming Omniverse Realtime Viewers.
-11. Confirm `warp` can see CUDA devices when using CUDA conversion paths.
+11. For Warp GPU paths, follow `nvidia-runtime.md` → Warp and CUDA compatibility:
+    verify a usable CUDA device, a small allocation/kernel with synchronization,
+    and the intended conversion or physics path. Record build/driver identity;
+    import or CPU-only success is insufficient.
 12. Confirm `@nvidia/ov-web-rtc` appears in `npm ls` when building a browser
     streaming frontend.
 13. If the app imports local viewer UI components, confirm
     `frontend/src/viewer-ui/` exists and exports the referenced components and
     `ViewerBackend` types.
-14. Confirm `omni.ui` imports only when building a local desktop Omniverse Realtime Viewer with prebuilt local UI packages. On Linux, if the import reports `libcudart.so.12`, discover the CUDA 12 runtime beneath `$OVRTX_BIN_PATH/plugins` and retry with that directory on the subprocess library path.
+14. If the app uses ovui, follow its selected package's bootstrap and import
+    checks for desktop UI or server-side headless overlays. For overlays, also
+    verify transparent headless export through `viewport-overlays`; an import
+    alone does not validate composition. On Linux, if the import reports
+    `libcudart.so.12`, discover the CUDA 12 runtime beneath
+    `$OVRTX_BIN_PATH/plugins` and retry with that directory on the subprocess
+    library path.
 15. Confirm `.cache/` is writable when running in containers, CI, or shared environments.
 
 For generated browser-streamed viewers, add these readiness checks before
@@ -72,19 +83,26 @@ reporting completion:
 
 1. Start the Python server from the generated run wrapper or equivalent command.
 2. Wait for `/healthz` to return `200 ok`; if it does not, capture the server log.
-3. Confirm the log contains a first-frame message after render-var mapping and
-   RGBA-to-BGRA conversion.
+3. Confirm the log contains a first-frame message after a valid BGRA8 CUDA
+   mapping or completed required conversion into the app-owned BGRA stream
+   buffer. RGBA8 outputs require RGBA-to-BGRA conversion; already-BGRA8
+   outputs must not be swizzled again.
 4. Run the frontend build and browser smoke check only after the server runtime
    proof above has passed or has produced a concrete failure report.
 
 ## Failure Mode Index
 
-- Wrong Python package index: `ovrtx` or `ovphysx` install fails or pulls
-  nothing. Use NVIDIA PyPI for those packages; use PyPI for `numpy`,
-  `warp-lang`, and worker-only `usd-core`.
+- Wrong Python package index: a runtime install fails or finds no matching
+  distribution. Use the selected package source and compatible wheel set in
+  [runtime dependencies](nvidia-runtime.md); check interpreter/platform tags
+  and resolver output before changing indexes.
 - Incorrect ovstream acquisition: use the current PyPI package source in `nvidia-runtime.md`.
 - Platform mismatch: wheel is unavailable or native import fails. Confirm OS, architecture, Python version, GPU driver, and package wheel tags.
-- Import order issue: USD registry, `_tf`, duplicate debug symbol, or MDL resolver errors. Set `OVRTX_SKIP_USD_CHECK`, construct `ovrtx.Renderer` first, and isolate `pxr` or competing USD population in a subprocess.
+- Import order issue: USD registry, `_tf`, duplicate debug symbol, or MDL
+  resolver errors. Set `OVRTX_SKIP_USD_CHECK` and follow the selected
+  [rendering import discipline](../ovrtx-rendering/README.md#import-order).
+  Attached OVStage apps register OVRTX schema paths before constructing or
+  populating the stage; isolate unverified `pxr` consumers in a subprocess.
 - OVStage/OVPhysX bridge mismatch: missing `ovstage_*` bridge symbols during
   `PhysX.attach_ovstage(stage, read_ordinal=...)`. Use the bounded OVPhysX worker path instead of
   calling OVPhysX in the parent viewer process.

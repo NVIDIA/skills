@@ -2,25 +2,16 @@
 
 ## Electron Main And N-API Addon
 
-Electron main should:
+Electron main starts the Python sidecar or attaches to an existing SHM session,
+waits for `shmReady`, and creates one native client and frame pump. The addon
+performs frame waits on a libuv worker; main remains available for window events,
+input, and shutdown. Main also forwards app messages through the preload API.
+Terminate the sidecar on quit only when the app started it.
 
-- start the Python sidecar or attach to an existing SHM session
-- wait for `shmReady`
-- load the N-API addon from the packaged app location
-- create one SHM client for the window
-- run `WaitFrame` through a native async worker
-- forward frame buffers to the renderer without blocking main
-- forward JSON app messages between preload and the native client
-- cancel pending waits before closing native handles
-- terminate the Python sidecar on quit when Electron started it
-On Windows, the sidecar launcher must use the project-local
-`.venv\Scripts\python.exe` chosen during setup. Run the App-Local Desktop
-Preflight in `windows-native-setup` before diagnosing SHM or renderer behavior.
+Use the environment selected during setup to launch the sidecar; see
+`windows-native-setup` for Windows. Package the addon for Electron's runtime ABI.
 
-
-Do not call a blocking frame wait directly on Electron main.
-
-Native addon surface:
+A compact addon interface is:
 
 ```typescript
 type NativeShmClient = {
@@ -32,20 +23,38 @@ type NativeShmClient = {
 };
 ```
 
-Addon requirements:
+## Unified Native Client And Ownership
 
-- wrap `libovstream_shm_client.so`
-- run frame waits on a libuv worker or equivalent async path
-- resolve `waitFrame()` with a `SharedArrayBuffer` containing header + pixels
-- keep mapped native memory alive for the JS frame lifetime, or copy into a
-  fixed 2-3 slot SharedArrayBuffer ring
-- never expose raw pointers, file descriptors, or native handles to JS callers
-- validate frame bounds before creating JS views
-- make `close()` cancel pending waits safely
-- rebuild the addon when Electron ABI changes
+Wrap the unified API from the matching ovstream headers and libraries:
 
-Do not allocate a fresh JS buffer every frame. Use stable mapped memory or a
-small reusable ring.
+```cpp
+ovstream_client_config_t config = {};
+config.shm.stream_name = OVSTREAM_STRING_LITERAL("viewer-stream");
+ovstream_client_t* client = nullptr;
+auto result = ovstream_create_client(OVSTREAM_CLIENT_SHM, &config, &client);
+// Check result before using client.
+```
+
+Use `ovstream_client_wait_frame`, `ovstream_client_send_message`,
+`ovstream_client_send_input_event`, and `ovstream_destroy_client` on that handle.
+Dependency acquisition and upstream API references live in
+[dependencies/ovstream](../dependencies/ovstream.md).
+
+The frame pump validates each frame's source, format, dimensions, and pitch,
+then promptly copies rows into an app-owned bounded SharedArrayBuffer ring.
+Native `ovstream_frame_t` storage is borrowed and may be recycled independently
+of the next wait; retaining a pointer does not pin it for asynchronous JS use.
+Pack padded rows before delivery. The 16-byte frontend header used by this
+recipe is an app IPC convention, not the native frame struct.
+
+Reuse a ring slot only after its JS consumer finishes reading it. Bound pending
+frames and drop stale work when presentation falls behind; a larger queue adds
+latency. Keep raw native handles and pointer arithmetic inside the addon.
+
+Use bounded wait timeouts so `close()` can stop and join the pump before
+`ovstream_destroy_client`. Destroy outside callbacks, keeping callback objects
+and user data alive until destruction completes, including deliveries already
+in flight when a callback is replaced.
 
 ## Preload API
 
@@ -127,8 +136,8 @@ Behavior:
 
 - `connect()` attaches, subscribes to messages, and starts one frame pump.
 - `disconnect()` stops the pump before closing native resources.
-- `resize()` updates UI layout unless the server implements a deliberate render
-  product reload.
+- `resize()` updates UI layout unless the server implements RenderProduct
+  resolution changes and matching frame-storage updates.
 - `onFrame()` fans out frames from the single pump to UI subscribers.
 - `pick()` sends a request id and resolves on matching response, with timeout.
 - hierarchy, properties, selection, AOVs, and settings use JSON messages.

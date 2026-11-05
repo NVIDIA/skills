@@ -85,6 +85,10 @@ Pickability is separate from selection state. A prim can be pickable without
 being selected, and selected paths should be cleared or updated independently
 when the selectable set changes.
 
+For canonical strings, use `renderer.set_pickable_strings(paths, enabled)` and
+`renderer.set_selection_outline_group_strings(paths, group)`. These remain
+renderer-owned operations when attached to OVStage.
+
 ## Single-Click Pick
 
 Convert UI coordinates to RenderProduct pixels, then normalize them to `[0, 1]`
@@ -92,17 +96,19 @@ top-left-origin RenderProduct coordinates. Enqueue the one-pixel-equivalent
 rectangle before the renderer step that should consume it:
 
 ```python
-def click_pick(renderer, render_product_path: str, x: int, y: int, width: int, height: int) -> list[str]:
+def click_pick(renderer, render_product_path: str, x: int, y: int, width: int, height: int, ordinal: int) -> list[str]:
     renderer.enqueue_pick_query(
         render_product_path=render_product_path,
         left_ndc=x / width,
         top_ndc=y / height,
         right_ndc=(x + 1) / width,
         bottom_ndc=(y + 1) / height,
+        flags=ovrtx.OVRTX_PICK_FLAG_INCLUDE_TRACKED_INFO,
     )
     products = renderer.step(
         render_products={render_product_path},
         delta_time=1.0 / 60.0,
+        ordinal=ordinal,
     )
     frame = products[render_product_path].frames[0]
     return decode_pick_paths(renderer, frame)
@@ -113,10 +119,19 @@ no result payload. `Renderer.enqueue_pick_query_async()` instead returns an
 operation whose `wait()` confirms registration. In both APIs, consume results
 from the next step that renders that RenderProduct. Do not add
 `ovrtx_pick_hit` to USD `orderedVars`: the query produces that synthetic render
-var automatically for that step.
+var automatically for that step. Look it up by the synthetic name rather than
+an authored RenderVar path.
+
+Associate each queued pick with the displayed RenderProduct and stage
+generation. Enqueue, render, and decode against that same product; discard the
+result if its scene was replaced before the UI receives it.
 
 C/C++ `ovrtx_enqueue_pick_query()` returns enqueue status; it does not return
 pick results.
+
+For an attached OVStage renderer, `ordinal` must be the render owner's latest
+committed ordinal. Queueing UI input does not create a second render loop or an
+independent pick step.
 
 ## Marquee Selection
 
@@ -160,9 +175,11 @@ def decode_pick_paths(renderer, frame) -> list[str]:
     return paths
 ```
 
-Optional hit tensors include `objectType`, `geometryInstanceId`,
-`worldPositionM`, and `worldNormal`. Resolve path IDs before displaying,
-storing, or broadcasting selection.
+The click example requests `OVRTX_PICK_FLAG_INCLUDE_TRACKED_INFO` for surface
+hit data from a one-pixel query. Path-only selection can omit the flag. Follow
+the upstream [picking skill](https://github.com/NVIDIA-Omniverse/ovrtx/blob/main/skills/picking-selection/SKILL.md)
+and [pick-result semantics](https://github.com/NVIDIA-Omniverse/ovrtx/blob/main/docs/scene/picking.rst)
+for result tensors, first-hit handling, and marquee restrictions.
 
 ## Selection Groups
 
@@ -184,8 +201,9 @@ The corresponding C/C++ calls are renderer-only, stream-ordered operations:
 ```c
 uint8_t selected_groups[selected_count];  /* fill with 1 */
 uint8_t previous_groups[previous_count];  /* fill with 0 */
-ovrtx_set_selection_outline_group(renderer, selected_path_ids, selected_count, selected_groups);
+// Clear first so prims retained in the new selection are selected again.
 ovrtx_set_selection_outline_group(renderer, previous_path_ids, previous_count, previous_groups);
+ovrtx_set_selection_outline_group(renderer, selected_path_ids, selected_count, selected_groups);
 ```
 
 Use group IDs consistently across the app:
@@ -256,12 +274,15 @@ On scene load or switch:
 
 1. Pause picking while reset/load is in progress.
 2. Clear pending pick requests and selected paths.
-3. Load the new stage and render product.
+3. Populate and publish the new stage and render product, then complete the
+   renderer update from that publication before applying native prim state.
 4. Reapply pickable flags for the new stage.
 5. Reapply selection group styles if the renderer was recreated.
 6. Clear stale selection groups with group `0` when previous prim paths are still
    valid; otherwise discard the old runtime set.
-7. Resume picking after the render product is producing valid frames.
+7. For same-scene recomposition that preserves selection intent, mark its groups
+   dirty and reapply them after the completed renderer update, before rendering.
+8. Resume picking after the render product is producing valid frames.
 
 ## Compatibility Paths
 

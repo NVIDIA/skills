@@ -167,28 +167,36 @@ Tauri command -> enqueue command to SHM reader thread -> return Ok(())
 ```
 
 Request/response operations still need correlation, but the wait belongs in the
-frontend:
+frontend. Register the pending request before sending so an immediate response
+can resolve it:
 
 ```typescript
 const pendingByRequest = new Map<string, PendingRequest>();
 
 function sendAndWait<T>(message: ShmMessage, timeoutMs = 1500): Promise<T> {
   const requestId = crypto.randomUUID();
-  backend.sendMessage({ ...message, requestId });
 
-  return new Promise((resolve, reject) => {
+  return new Promise<T>((resolve, reject) => {
     const timeout = window.setTimeout(() => {
       pendingByRequest.delete(requestId);
       reject(new Error(`Timed out waiting for ${message.type}`));
     }, timeoutMs);
 
     pendingByRequest.set(requestId, { resolve, reject, timeout });
+    Promise.resolve()
+      .then(() => backend.sendMessage({ ...message, requestId }))
+      .catch((error) => {
+        window.clearTimeout(timeout);
+        pendingByRequest.delete(requestId);
+        reject(error);
+      });
   });
 }
 ```
 
-Use this request map for discrete queries such as `getTransform`. Continuous
-drag updates should not use `sendAndWait`.
+The response handler removes the matching request and clears its timeout before
+resolving or rejecting it. Use this map for discrete queries such as
+`getTransform`. Continuous drag updates should not use `sendAndWait`.
 
 ## Server Message Contract
 
@@ -250,7 +258,7 @@ catch failures for logging but do not make pointer motion wait for a response.
 Register the Tauri `listen("shm-message", ...)` handler once. Do not re-register
 it whenever selection, camera, pending requests, or component state changes.
 Re-registration creates an unsubscribe/subscribe gap where response messages can
-be missed.
+be missed. Complete listener registration before connecting or sending queries.
 
 Use a ref for the current handler logic:
 
@@ -262,15 +270,18 @@ handleMessageRef.current = (message) => {
 };
 
 useEffect(() => {
+  let disposed = false;
   let unlisten: (() => void) | undefined;
 
   listen<ShmMessage>("shm-message", (event) => {
     handleMessageRef.current(event.payload);
   }).then((dispose) => {
-    unlisten = dispose;
+    if (disposed) dispose();
+    else unlisten = dispose;
   });
 
   return () => {
+    disposed = true;
     unlisten?.();
   };
 }, []);

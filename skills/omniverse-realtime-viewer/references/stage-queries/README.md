@@ -81,6 +81,10 @@ meshes_or_lights_with_visibility = runtime.query_prims(
 
 Omitted lists impose no constraint. An empty query matches every prim.
 
+For applied API schema membership, have the adapter issue an OVStage `CONTAINS`
+filter on `usd-schemas` with the schema token. Attribute-presence filters answer
+whether the column exists, not whether a particular schema is applied.
+
 ## Attribute Reporting
 
 Attribute filter mode controls descriptor payload size:

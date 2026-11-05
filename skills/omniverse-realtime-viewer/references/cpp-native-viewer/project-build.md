@@ -1,244 +1,73 @@
 # C++ Native Project And Build
 
-## When To Use This vs Other Paths
-
-| You want... | Use... |
-|---|---|
-| Native C++ binary, Dear ImGui UI, no Python, no React | This skill |
-| Small Python desktop viewer with ovui widgets | `local-viewer` |
-| Native desktop app with React WebView and Rust FFI | `tauri-local-viewer` |
-| Electron/React UI with a separate Python OVRTX process and SHM pixels | `electron-shm-viewer` |
-| Browser client or remote GPU host | `streaming-server` + `streaming-client` |
-| Architecture routing before choosing local vs remote | `streaming-vs-local` |
-
-Choose C++/ImGui when the app runs on the GPU workstation, should ship as a
-native executable, and does not need web UI reuse. Choose Tauri when React UI
-reuse matters. Choose Electron + SHM when an existing Python OVRTX server should
-stay isolated from the desktop shell. Choose streaming when the client is remote.
+The C++ delivery path is already selected. Select the smallest suitable native UI toolkit, keep one responsive window,
+and preserve the runtime/UI ownership boundary below. ImGui/GLFW and the file
+layout below are examples, not a required stack or project template. If delivery is still undecided,
+use `references/routing.md` before returning here.
 
 ## Architecture Overview
 
-One thread owns all mutable OVRTX state:
+Use separate UI and runtime ownership so a blocking SDK call does not stop
+window events or controls:
 
 ```text
-main thread
-  -> GLFW event callbacks update OrbitCamera and pending pick requests
-  -> ImGui builds controls and viewport
-  -> write camera omni:xform
-  -> write selection animation omni:xform
-  -> enqueue native pick query, when a click happened
-  -> ovrtx_step()
-  -> ovrtx_fetch_results()
-  -> ovrtx_map_render_var_output("LdrColor")
-  -> BGRA/RGBA normalize into owned CPU buffer
-  -> glTexSubImage2D()
-  -> ImGui::Image()
+UI thread: native events/controls -> bounded intent queue
+           latest owned RGBA frame -> toolkit pixel presentation
+Runtime owner: commands -> OVStage writes at N -> wait -> seal N
+               -> OVRTX update from N -> wait -> native selection/pick state
+               -> step with N -> fetch -> map/copy/unmap -> destroy results
+               -> latest owned frame and copied state snapshot
+Preparation worker: file/composition/metadata work -> generation-tagged result
 ```
 
-Keep `renderer`, stage load/reset, pick query enqueue, result mapping, and
-`ovrtx_write_attribute()` calls on this same owner thread. UI callbacks should
-only update app state that the render loop consumes.
+Only the runtime owner accesses the live OVStage and renderer. Keep the UI
+handoff lock short; never hold it during SDK calls. Bound the command queue,
+coalesce superseded motion, and retain only the latest complete frame. Preserve
+button-release and close intent when coalescing. Tag scene-dependent commands,
+metadata, picks, and frames with a generation and discard stale work.
+
+Prepare replacement scenes away from the UI and active render loop. Activate a
+completed candidate on the owner thread between frames, as described in
+`renderer-session.md`. When implementing requested tree/properties, use native
+OVStage queries and the property-specific decoding contract in
+`references/stage-attribute-reads/README.md`; queries describe data, they do not decode
+its values. Optional OpenUSD composition must follow the matched dependency's
+ABI or process-isolation boundary.
 
 ## Project Skeleton
 
-Use this shape for a minimal standalone viewer:
+Split by ownership, for example:
 
 ```text
-cpp-imgui-viewer/
+cpp-viewer/
   CMakeLists.txt
   src/
-    main.cpp
-    camera.h
+    main.cpp             # selected toolkit, pixel presentation and UI intent
+    runtime.cpp          # OVStage, OVRTX and owned frame publication
+    runtime.h            # bounded commands and copied snapshots
     camera.cpp
+    camera.h
     session_layer.h
     ovrtx_helpers.h
 ```
 
-`main.cpp` owns GLFW, ImGui, OVRTX lifecycle, texture upload, picking, selection,
-and the render loop. Keep the first version simple; add richer panels only after
-the frame path and input path are correct.
+The first checkpoint is one real OVRTX frame presented in the selected native window,
+with responsive events and normal close. Establish that before generic property
+reflection, broad metadata discovery or extra menus. Then add requested camera
+controls, picking, tree/details and switching one increment at a time. Use scene
+bounds/metadata as needed for correct framing, rather than building a general
+inspector before proving the pixel loop.
 
-## Build System
+## Build Setup
 
-Use CMake with `OVRTX_DIR` pointing at the OVRTX SDK root. Fetch Dear ImGui and
-GLFW when local copies are not provided.
+Use the current paired OVRTX/OVStage CMake helpers from the upstream native
+minimal example, selected through `references/dependencies/README.md`. Keep one matching
+loader model, stage both package runtimes, and rebuild when changing the pair.
+Use the selected native shell's normal build setup. Do not manually search an
+SDK layout or combine static and shared loaders.
 
-```cmake
-cmake_minimum_required(VERSION 3.20)
-
-project(cpp_imgui_ovrtx_viewer LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-include(FetchContent)
-
-find_package(OpenGL REQUIRED)
-find_package(glfw3 CONFIG QUIET)
-
-if(NOT glfw3_FOUND)
-    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-    FetchContent_Declare(
-        glfw
-        GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.4
-    )
-    FetchContent_MakeAvailable(glfw)
-endif()
-
-if(TARGET glfw)
-    set(GLFW_TARGET glfw)
-elseif(TARGET glfw3)
-    set(GLFW_TARGET glfw3)
-else()
-    message(FATAL_ERROR "GLFW target was not found")
-endif()
-
-if(NOT DEFINED IMGUI_DIR AND DEFINED ENV{IMGUI_DIR})
-    set(IMGUI_DIR "$ENV{IMGUI_DIR}")
-endif()
-
-if(IMGUI_DIR)
-    set(imgui_SOURCE_DIR "${IMGUI_DIR}")
-else()
-    FetchContent_Declare(
-        imgui
-        GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG v1.91.9b
-    )
-    FetchContent_MakeAvailable(imgui)
-endif()
-
-add_library(imgui STATIC
-    "${imgui_SOURCE_DIR}/imgui.cpp"
-    "${imgui_SOURCE_DIR}/imgui_draw.cpp"
-    "${imgui_SOURCE_DIR}/imgui_tables.cpp"
-    "${imgui_SOURCE_DIR}/imgui_widgets.cpp"
-    "${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
-    "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
-)
-target_include_directories(imgui PUBLIC
-    "${imgui_SOURCE_DIR}"
-    "${imgui_SOURCE_DIR}/backends"
-)
-target_link_libraries(imgui PUBLIC ${GLFW_TARGET} OpenGL::GL)
-
-if(NOT DEFINED OVRTX_DIR AND DEFINED ENV{OVRTX_DIR})
-    set(OVRTX_DIR "$ENV{OVRTX_DIR}")
-endif()
-if(NOT OVRTX_DIR)
-    message(FATAL_ERROR "Set OVRTX_DIR to the OVRTX SDK root")
-endif()
-
-set(OVRTX_INCLUDE_DIR "${OVRTX_DIR}/include" CACHE PATH "OVRTX include directory")
-find_library(OVRTX_LIBRARY
-    NAMES ovrtx libovrtx
-    PATHS "${OVRTX_DIR}/lib" "${OVRTX_DIR}/lib64" "${OVRTX_DIR}/bin"
-    NO_DEFAULT_PATH
-)
-if(NOT OVRTX_LIBRARY)
-    message(FATAL_ERROR "Could not find ovrtx under ${OVRTX_DIR}")
-endif()
-
-add_library(OVRTX::ovrtx UNKNOWN IMPORTED)
-set_target_properties(OVRTX::ovrtx PROPERTIES
-    IMPORTED_LOCATION "${OVRTX_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${OVRTX_INCLUDE_DIR}"
-)
-
-add_executable(cpp_imgui_ovrtx_viewer
-    src/main.cpp
-    src/camera.cpp
-    src/camera.h
-    src/session_layer.h
-    src/ovrtx_helpers.h
-)
-
-target_link_libraries(cpp_imgui_ovrtx_viewer PRIVATE
-    OVRTX::ovrtx
-    imgui
-    ${GLFW_TARGET}
-    OpenGL::GL
-)
-```
-
-Run with the OVRTX runtime libraries visible:
-
-```bash
-cmake -S . -B build -DOVRTX_DIR="$OVRTX_DIR"
-cmake --build build -j
-LD_LIBRARY_PATH="$OVRTX_DIR/lib:$OVRTX_DIR/lib64:$LD_LIBRARY_PATH" \
-  ./build/cpp_imgui_ovrtx_viewer /absolute/path/to/scene.usd
-```
-
-On Windows, add the OVRTX `bin` directory to `PATH` before launching.
-
-## Common C API Helpers
-
-Keep small helpers for string conversion, result checks, and operation waits.
-
-```cpp
-#include <ovrtx/ovrtx.h>
-#include <ovrtx/ovrtx_attributes.h>
-#include <ovrtx/ovrtx_config.h>
-#include <ovrtx/ovrtx_types.h>
-
-#include <cstdlib>
-#include <iostream>
-#include <string>
-
-static ovx_string_t toOvxString(const std::string& value)
-{
-    return {value.c_str(), value.size()};
-}
-
-static std::string fromOvxString(ovx_string_t value)
-{
-    if (!value.ptr || value.length == 0) return {};
-    return {value.ptr, value.length};
-}
-
-static bool ok(ovrtx_result_t result)
-{
-    return result.status == OVRTX_API_SUCCESS;
-}
-
-static bool ok(ovrtx_enqueue_result_t result)
-{
-    return result.status == OVRTX_API_SUCCESS;
-}
-
-static void printLastOvrtxError(const char* context)
-{
-    std::cerr << context;
-    const std::string message = fromOvxString(ovrtx_get_last_error());
-    if (!message.empty()) std::cerr << ": " << message;
-    std::cerr << "\n";
-}
-
-static bool waitForOperation(
-    ovrtx_renderer_t* renderer,
-    ovrtx_enqueue_result_t op,
-    const char* context)
-{
-    if (!ok(op)) {
-        printLastOvrtxError(context);
-        return false;
-    }
-    if (op.op_index == OVRTX_INVALID_HANDLE) {
-        return true;
-    }
-
-    ovrtx_op_wait_result_t waitResult = {};
-    const ovrtx_result_t wait =
-        ovrtx_wait_op(renderer, op.op_index, ovrtx_timeout_infinite, &waitResult);
-    if (!ok(wait) || waitResult.num_error_ops > 0) {
-        printLastOvrtxError(context);
-        return false;
-    }
-    return true;
-}
-```
+`build-details.md` contains the complete illustrative GLFW/ImGui CMake setup
+and small C API string/result/wait helpers when needed. It is an implementation
+aid, not a required file layout. Keep the owner-thread boundary above even in a
+compact project. Continue with `renderer-session.md` and `presentation-loop.md`
+to establish the first actual displayed frame.

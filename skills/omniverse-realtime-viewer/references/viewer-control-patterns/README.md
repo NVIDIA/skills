@@ -8,7 +8,7 @@ Use this with `viewer-layout-patterns` and the feature skill that owns the backe
 
 This guidance is client-agnostic. Apply the control intent and state rules to
 the selected UI toolkit: React components, Tauri/Electron web UI, lightweight
-`ovui` widgets, full-editor `ovwidgets`, or Dear ImGui controls. Transport- and
+`ovui` widgets, full-editor `ovui_widgets`, or Dear ImGui controls. Transport- and
 toolkit-specific skills still own event APIs, lifecycle, and rendering.
 
 ## Intent To Control

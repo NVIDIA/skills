@@ -74,6 +74,11 @@ handlers that the CLI calls.
 For ovstream SHM acquisition and runtime setup beyond this CLI pattern, read
 `references/dependencies`. Keep the CLI client code local to the generated app.
 
+Use the unified native client API and
+[frame ownership rules](../electron-shm-viewer/electron-client.md#unified-native-client-and-ownership).
+Copy borrowed frames before encoding or retaining them. Build the Node addon for
+Node's ABI separately from the Electron addon.
+
 ## Prerequisites
 
 - A Python OVRTX server is already running with SHM enabled, for example
@@ -256,28 +261,17 @@ selection-specific timeout.
 
 ## Building From Source
 
-Build the generated SHM client module before building the CLI. Keep the native
-addon in that local module so Electron apps, Playwright tests, and the headless
-CLI can share the same client implementation.
-
-```bash
-export LD_LIBRARY_PATH=/path/to/ovstream/lib:$LD_LIBRARY_PATH
-
-cd clients/shm-client
-npm install
-npm run native:rebuild
-npm run build
-
-cd ../../headless-client
-npm install
-npm run build
-```
+Build the shared SHM client against the selected SDK headers and libraries,
+then build the CLI using the generated project's scripts. Share the client
+implementation with desktop and test clients, while building each native addon
+for its host runtime ABI. Follow the SDK's loader setup through `dependencies`
+and package the required runtime libraries with the app.
 
 The generated local SHM client module should provide:
 
 - TypeScript types for frames, prim nodes, prim properties, input events, AOV
   state, and request options
-- a `ShmViewerClient` class with one active native connection per process
+- a `ShmViewerClient` class that owns its connection and frame pump
 - PNG encoding without requiring browser APIs
 - optional JPEG encoding through a Node dependency such as `sharp`
 - native addon loading from installed and source-tree locations
@@ -363,8 +357,6 @@ and captures a post-selection frame for visual diffing.
   client converts them to render-product pixels after reading a frame.
 - Use the fixed server render resolution for input mapping. Do not use browser
   DOM size or Electron window size in the CLI.
-- Only one active `ShmViewerClient` instance per Node process is a safer default
-  because native SHM clients often own process-global callbacks.
 - Wait for at least one frame before sending fractional input so width and
   height are known.
 - Keep JSON control messages small. Do not send frame bytes through JSON.

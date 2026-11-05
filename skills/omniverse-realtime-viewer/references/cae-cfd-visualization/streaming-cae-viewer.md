@@ -101,7 +101,8 @@ On the single render-loop thread, each tick:
    the write floor. Committing every tick (even an unchanged pose) at a fresh ordinal keeps
    frames correctly ordered. See [ovstage-render-and-camera.md](ovstage-render-and-camera.md).
 4. **Step + convert:** `renderer.step(render_products={rpp}, delta_time=dt, ordinal=N)` →
-   map `LdrColor` on CUDA (`render_vars["LdrColor"].map(device=Device.CUDA)` → `wp.from_dlpack`)
+   map `LdrColor` on CUDA through its full authored RenderVar path (for example,
+   `render_vars["/Render/Vars/LdrColor"].map(device=Device.CUDA)` → `wp.from_dlpack`)
    → copy into the persistent BGRA buffer + swap R/B → return it. `None` means no fresh frame
    this tick; the loop streams the last-good / fallback frame.
 
@@ -150,15 +151,11 @@ never sees. Three guardrails, general to any renderer + client:
    client) before declaring a render-loop fix done. The `--selftest` headless path (§5) proves
    scene + frame + swap, but confirm the live leg with an actual client.
 
-3. **Crash-isolate GPU tests in a child subprocess — native RTX asserts are modal.** An
-   `ovrtx` / `rtx.scenedb` assertion calls `abort()`, which on Windows pops a **modal dialog**
-   that blocks the process indefinitely and interrupts an interactive user. When exercising
-   crash-prone GPU paths, run them in a **child subprocess** launched with
-   `SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX)` plus
-   CRT `_set_abort_behavior(0, ...)` at process start, so an abort becomes a **silent non-zero
-   exit** you detect programmatically. Detect hangs with a **heartbeat file** the child rewrites
-   each rendered frame — no update within a timeout means a freeze (see guardrail 1). This keeps a
-   GPU crash from hard-blocking CI or the developer's session.
+3. **Crash-isolate tests of GPU failure paths in a child subprocess.** Current
+   OVRTX suppresses the legacy Windows modal assertion/error dialogs. Use exit
+   status and logs to detect crashes; use a per-frame heartbeat and bounded
+   timeout to distinguish a live render loop from a freeze. Keep this test
+   harness separate from the viewer's normal runtime ownership and cleanup.
 
 ## 3. The CAE message set
 
@@ -362,20 +359,22 @@ The generic client (provider, endpoint resolution, video element, subscriber fan
 
 Use the current `ov-web-rtc` acquisition and API guidance from the central `nvidia-runtime` dependency guide and the upstream package materials it links. Read the installed package types before choosing a connection API, event callback, config shape, or codec value. Keep this CAE guide focused on the app protocol rather than package-version behavior.
 
-Verified-shape connect config (static/`DirectConfig` form, as built against the real package):
+Direct connection shape (apply [client readiness and ownership](../streaming-client/README.md#appstreamer-direct-api)):
 
 ```ts
 import { AppStreamer, StreamType, VideoCodec, type DirectConfig } from '@nvidia/ov-web-rtc';
 
 const config: DirectConfig = {
   videoElementId: 'remote-video', audioElementId: 'remote-audio',
-  server: host, signalingPort,                 // Direct fields: server + signalingPort ONLY
+  signalingServer: host, signalingPort,
   width: 1920, height: 1080,
   codec: VideoCodec.H264, codecList: ['H264'],
   nativeTouchEvents: true, fps: 60, maxReconnects: 5, reconnectDelay: 3000,
   onStart: () => {}, onCustomEvent: dispatch, onStop: () => {},
 };
-await AppStreamer.connect({ streamSource: StreamType.DIRECT, streamConfig: config });
+const streamer = new AppStreamer(); // Retain for sendMessage and teardown.
+await streamer.connect({ streamSource: StreamType.DIRECT, streamConfig: config });
+// Resolution may be IN_PROGRESS; the provider gates sends on confirmed start success.
 ```
 
 Do **not** set a media/`mediaPort` field — media is SDP-negotiated UDP.
@@ -403,9 +402,9 @@ client wraps its own sends in the `{messageRecipient,messageType,data}` frame (�
 - The connect `useEffect` deps must be the **immutable host/port** (and the stable `dispatch`)
   only — never app state or the subscriber set. Tearing the connection down on ordinary re-renders
   is the classic one-frame-then-black bug.
-- Two readiness signals are distinct: the **resolved `connect()` Promise** means the data channel
-  is ready to send app commands (`status === 'connected'`); **`onStart`** means video is decoding
-  only. Do **not** gate the first `getSceneState` / `openStageRequest` on `onStart`.
+- Follow [client readiness](../streaming-client/README.md#appstreamer-direct-api): confirmed SDK
+  start success permits app commands; a resolved `IN_PROGRESS` result does not.
+  Send the first `getSceneState` / `openStageRequest` before waiting for a decoded scene frame.
 - Mouse / keyboard / wheel / touch are forwarded **natively** by the library — never send them as
   JSON. Only app state + commands go over the data channel. Arm/disarm native input by region:
   viewport `onPointerEnter` → `setViewportInputActive{true}`, control panels → `{false}`.

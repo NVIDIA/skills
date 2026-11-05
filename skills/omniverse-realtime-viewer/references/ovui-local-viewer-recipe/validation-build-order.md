@@ -48,7 +48,11 @@ Use these failure checks:
 - Scene load works once but fails after switching: verify renderer reset/load serialization, inline sublayer paths, and operation error handling.
 - Camera moves incorrectly: verify row-major camera matrix layout, world-up convention, finite state, ovui button mapping, and letterbox transform.
 - Picking fails: verify native pick query enqueue/step/result handling, pick coordinate transform, RenderProduct GPU pinning when required by the active ovrtx build, and no picking during load/reset.
-- Gizmo appears but prim does not move: verify the gizmo gets mouse-down priority before camera/orbit, drag release does not enqueue a pick, and drag deltas call `renderer.write_attribute` on `omni:xform` with the selected prim path.
+- Gizmo appears but prim does not move: verify mouse-down priority before
+  camera/orbit, no pick on drag release, and local `omni:xform` deltas queued
+  through the shared transform adapter for the selected prim. Confirm OVStage
+  writes finish before advancing the write floor and rendering that ordinal;
+  direct renderer writes apply only to standalone compatibility paths.
 - `OPEN` button does nothing or fails inconsistently: remove or demote the dialog control until it is validated; keep the path-field `LOAD` path as the primary stage-loading control.
 - Tree or info panel shows stale data: verify cache invalidation after scene switch, variant change, and selection clear.
 - UI freezes on large scenes: verify hierarchy traversal is lazy or moved off the UI path.
