@@ -9,7 +9,7 @@ description: >-
   development with NVIDIA GPU libraries and tools.
 links:
   contributing: CONTRIBUTING.md
-  discussions: true
+  discussions: false
   security: false
   primary: false
 skills:
