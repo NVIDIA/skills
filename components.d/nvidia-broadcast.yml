@@ -2,6 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 
 name: NVIDIA Broadcast
+product_primary: NVIDIA Broadcast
 repo: NVIDIA/Broadcast-Skills
 ref: main
 

@@ -1,4 +1,5 @@
 name: Cosmos Data Factory Orchestration
+product_primary: Cosmos Data Factory
 repo: NVIDIA/cdf-orchestration
 description: Build, run and monitor Cosmos Data Factory pipelines for image and video generation and transformation.
 skills:

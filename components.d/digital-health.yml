@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: Digital Health
+product_primary: Nemotron for Digital Health
 repo: NVIDIA/digital-health-examples
 description: Agent skills for (1) the clinical ASR evaluation flywheel — term curation, synthetic clinical-speech benchmark generation, KER (Keyword Error Rate) scoring, and fine-tune guidance; (2) the ambient healthcare agent creation with Nemotron Voice Agent.
 skills:

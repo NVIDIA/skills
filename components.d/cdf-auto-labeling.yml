@@ -1,4 +1,5 @@
 name: CDF Auto-Labeling
+product_primary: Cosmos Data Factory
 repo: NVIDIA/cdf-auto-labeling
 description: Build and run Cosmos Data Factory auto-labeling pipelines for video enhancement, tracking, captioning, and question generation.
 skills:

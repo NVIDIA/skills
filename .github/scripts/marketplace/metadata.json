@@ -485,7 +485,7 @@
       "name": "cdf-anomalygen",
       "description": "Use when running the CDF AnomalyGen pipeline over a defect dataset — mask placement, fine-tuning, synthetic defect-image generation (SDG), evaluation, quality refinement, and pseudo-labeling — even when the user names only one stage.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "ml_engineer,ai_engineer,application_developer,data_scientist,developer",
@@ -497,7 +497,7 @@
       "name": "cdf-augmentation",
       "description": "Use when authoring or validating Cosmos Data Factory (CDF) augmentation YAML configs, or running remote Cosmos Transfer (including Cosmos3 WSM controls), Cosmos Predict, image-edit, or image-to-video inference.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "ai_engineer,ml_engineer,developer,data_engineer,robotics_developer",
@@ -509,7 +509,7 @@
       "name": "cdf-auto-labeling",
       "description": "Use when a user needs to get started with CDF Auto-Labeling, plan a scenario, run or debug a shipped cookbook, author prompts or cookbooks, migrate a pipeline, configure a stage, or pull the prebuilt stage containers from NGC (nvcr.io). Confirm critical inputs (data path, output path, endpoints) and ask when any are missing. This is a router: read the matching reference instead of inventing a workflow.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "physical-ai",
         "audience": "developer,ml_engineer,ai_engineer,data_engineer,application_developer",
@@ -521,7 +521,7 @@
       "name": "cdf-autonomous-vehicle-dataset-generation",
       "description": "Prepare payloads, run and monitor the Autonomous Vehicle Dataset Generation Airflow workflow, and inspect results for driving-clip retrieval and Cosmos3-Nano variants. Existing clips with no retrieval use cdf-video-data-augmentation; seed-image event or anomaly generation uses cdf-event-video-generation.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "av-simulation",
         "audience": "data_engineer,ml_engineer,simulation_engineer,ai_engineer,developer",
@@ -533,7 +533,7 @@
       "name": "cdf-curation-and-retrieval",
       "description": "NVIDIA CDF curation and retrieval. Cosmos Curator video and image pipelines (split, dedup, shard, annotate) with filtering, captioning, and embedding. Cosmos Dataset Search ingest, search, and capability qualification. TAO data mining embeddings and neighbor matching. Ships domain event catalogs, including workplace employee conduct monitoring, which requires legal review before use. Use when a request names Cosmos Curator, Cosmos Dataset Search, CDF, or their Make and CLI surfaces. Not for model training, orchestration, or unrelated dataset questions.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "data_engineer,ml_engineer,ai_engineer,developer,production_operator",
@@ -545,7 +545,7 @@
       "name": "cdf-defect-image-generation",
       "description": "Generate synthetic PCB inspection images on Kubernetes with the SMT Defect Image Generation (DIG) DAG in CDF Orchestration. The DAG renders components in simulation, turns the renders into realistic golden images (sim2real), and uses AnomalyGen to add texture defects such as solder bridges, excess solder or missing components. Simulation can also render shift, tombstone and sideflip pose defects. Use it to build DIG payloads, pick a pipeline mode (full, simulation, sim2real or defect-only), check GPU readiness, follow a run, and match each defect image to its golden and simulated source. Not for running Simulation, Augmentation or AnomalyGen on their own.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "application_developer,simulation_engineer,ml_engineer,devops_engineer,data_scientist",
@@ -557,7 +557,7 @@
       "name": "cdf-event-video-generation",
       "description": "Run the CDF Orchestration Event Video Generation DAG on Kubernetes or OSMO - image-to-video anomaly generation, auto-labeling, and anomaly dataset generation. Select for requests about event video generation, anomaly video generation, image-to-video synthesis, Cosmos3 image2video, anomaly dataset creation, safety/surveillance SDG, or generating person-falling, person-climbing, person-running, fighting, smoking/vaping, fire/smoke, or shoplifting video clips from a seed image. Covers both event_video_generation_dag_k8s and the external-endpoints-only event_video_generation_dag_osmo. Runs environment setup first when controller readiness is unknown. Not for person-crop clothing/attribute augmentation (that is cdf-image-attribute-augmentation) and not for video style transfer.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "application_developer,ai_engineer,ml_engineer,data_engineer,platform_engineer",
@@ -569,7 +569,7 @@
       "name": "cdf-image-attribute-augmentation",
       "description": "Run the CDF Orchestration Image Attribute Augmentation DAG on Kubernetes - person-crop clothing augmentation, attribute search, and augmented dataset generation. Select for requests about image attribute augmentation, person attribute search, person re-identification data, clothing augmentation, attribute captions, augmentation payloads, run status, or result retrieval. Runs environment setup first when controller readiness is unknown. Not for video or defect-image generation.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "data_engineer,ml_engineer,ai_engineer,platform_engineer,devops_engineer",
@@ -581,7 +581,7 @@
       "name": "cdf-orchestration-preflight",
       "description": "Set up missing Linux prerequisites and audit whether a Cosmos Data Factory (CDF) Orchestration checkout and its Kubernetes or OSMO environment are ready to install the controller and run every packaged DAG. Use for prerequisite, pre-setup, Kubernetes, GPU, RWX/NFS, credential, controller-readiness, and quick-start checks. Not for deploying the controller (use cdf-orchestration-setup, which calls this audit first), authoring payloads, or running workflows.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "platform_engineer,devops_engineer,it_operations,solutions_architect,developer",
@@ -593,7 +593,7 @@
       "name": "cdf-orchestration-setup",
       "description": "Use when the user asks to deploy, install, reinstall, redeploy, upgrade, or connect to the CDF Orchestration Airflow controller. Owns the end-to-end deploy sequence and runs the cdf-orchestration-preflight audit first. Covers make setup, controller image builds, Helm installation, controller connection, port-forwarding, and post-install verification. Not for standalone prerequisite audits or remediation, K3s environments, authoring DAGs, or running workflow payloads.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "devops_engineer,platform_engineer,application_developer,solutions_architect,developer",
@@ -605,7 +605,7 @@
       "name": "cdf-orchestration-write-dag",
       "description": "Use when a user describes a custom CDF Orchestration pipeline — a specific ordered combination of stages such as augmentation only, auto-labeling only, detection+captioning only, or image attribute augmentation without full auto-labeling — that no existing DAG in airflow/dags/workflows/ covers, and asks for a new Kubernetes DAG. Also use to check that a generated or existing DAG's model/container/prompt choices match an external spec document (e.g. a CDF `launchable.md`). Not for requests that an existing DAG already covers, including payload-only changes such as different inputs, endpoints, models, or variant counts — route those to the matching workflow skill, unless the user still wants a separate DAG after being pointed to it.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "developer,platform_engineer,devops_engineer,ml_engineer,ai_engineer",
@@ -617,7 +617,7 @@
       "name": "cdf-simulation",
       "description": "Component-owned guidance for CDF Simulation requests submitted directly or through Airflow-triggered DIG Flow Catalog prompts — golden THT board, THT pin-geometry variation, good/clean SMT images, structural pose defects, and solder texture defects, from a board USD. Turns one matched prompt into one validated `cdf.CDFJob` build and its compiled JobOrder payload; it never executes a render itself. Requires a caller-supplied board USD and output root, asks for either when missing from an interactive request, and resolves optional details with fixed, documented defaults.",
       "metadata": {
-        "product.primary": "Physical AI Dataset",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "simulation_engineer,ml_engineer,data_scientist,application_developer,ai_engineer",
@@ -629,7 +629,7 @@
       "name": "cdf-video-data-augmentation",
       "description": "Run the CDF Video Data Augmentation Airflow workflow on Kubernetes or OSMO to create Cosmos video-to-video variants and auto-label both source and generated videos. Use for VDA payload authoring, preflight, execution, monitoring, output verification, or result retrieval. OSMO requires external endpoints. Standalone augmentation or auto-labeling configuration belongs to the respective component skill. Not for retrieval-driven CDF pipelines or image-to-video event generation.",
       "metadata": {
-        "product.primary": "Cosmos",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "ai_engineer,ml_engineer,data_engineer,devops_engineer,platform_engineer",
@@ -797,7 +797,7 @@
       "name": "data-designer",
       "description": "Use when the user wants to create a dataset, generate synthetic data, or build a data generation pipeline. The argument is the description of the dataset to generate.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Data Designer",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer,data_engineer",
@@ -1745,7 +1745,7 @@
       "name": "ethos-explore",
       "description": "Captures what an AI agent is supposed to do — its purpose, boundaries, and success criteria — as a durable snapshot for anyone building, evaluating, reviewing, or changing it. Explores the user's codebase and docs first, then asks one intent question at a time for what source cannot supply. Hands its answers to ethos-write, which writes ethos.md. Use over generic brainstorming when the goal is an agent's ethos.md.",
       "metadata": {
-        "product.primary": "NeMo Agent Toolkit",
+        "product.primary": "ETHOS.md",
         "classification.category.primary": "developer_tools",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,ai_engineer,ml_engineer,application_developer,hands_on_builder",
@@ -1757,7 +1757,7 @@
       "name": "ethos-orchestrate",
       "description": "Entry point for an AI agent's ETHOS.md: a durable snapshot of what the agent is for, what it must not do, and what success looks like. Routes a request to explore and capture intent (ethos-explore), or write or edit the file (ethos-write). Owns the standard every ethos sub-flow follows. Use when the user asks \"help me write an ETHOS.md\", \"does my agent have an ETHOS.md?\", \"update my agent's ETHOS.md\", or when you need to pick between the ethos sub-flows.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "ETHOS.md",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "ai_engineer,developer,application_developer",
@@ -1769,7 +1769,7 @@
       "name": "ethos-write",
       "description": "Writes an AI agent's ethos.md — a durable snapshot of its purpose, intended behavior, boundaries, and success criteria — from the answers gathered by ethos-explore. Renders the schema-v1 template, validates the front matter and required markdown sections, saves the file in the agent's repository, and reviews it with the user. Also edits an existing ethos.md. Use over generic planning skills for an agent's ethos.md.",
       "metadata": {
-        "product.primary": "NeMo Agent Toolkit",
+        "product.primary": "ETHOS.md",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "ai_engineer,developer,ml_engineer,application_developer",
@@ -1805,7 +1805,7 @@
       "name": "g-assist-mcp-skill",
       "description": "Use this skill to check or change this machine's NVIDIA display and GPU settings, such as resolution, refresh rate, V-Sync, G-SYNC, brightness, color, and GPU performance.",
       "metadata": {
-        "product.primary": "Settings",
+        "product.primary": "G-Assist",
         "classification.category.primary": "graphics_and_media",
         "catalog.subdomain": "gaming",
         "audience": "developer,hands_on_builder,it_operations,other",
@@ -2633,7 +2633,7 @@
       "name": "jetson-video-pipeline",
       "description": "Use when planning, executing, and independently validating Jetson Video Codec SDK or PyNvVideoCodec encode/decode, transcode, segmentation, container decode, AV1, or concise acceptance workflows.",
       "metadata": {
-        "product.primary": "Video Codec",
+        "product.primary": "Jetson",
         "classification.category.primary": "graphics_and_media",
         "catalog.subdomain": "gpu-development",
         "audience": "application_developer,developer,platform_engineer",
@@ -2657,7 +2657,7 @@
       "name": "jetson-video-setup",
       "description": "Use when installing, repairing, reusing, inspecting, or verifying readiness of the native NVIDIA Video Codec SDK or PyNvVideoCodec on Jetson, including the one-frame encode/decode smoke test with official samples, and when interpreting what those readiness results, including CPU-buffer and device-memory sample modes, do and do not establish.",
       "metadata": {
-        "product.primary": "Video Codec",
+        "product.primary": "Jetson",
         "classification.category.primary": "graphics_and_media",
         "catalog.subdomain": "gpu-development",
         "audience": "developer,application_developer,platform_engineer,hands_on_builder",
@@ -2741,7 +2741,7 @@
       "name": "medtech-model-evidence-export",
       "description": "Exports sanitized metadata, parameters, reproducibility details, quality metrics, and optional review artifacts from Medical AI inference runs or evidence packs to MLflow. Use after inference, including NV-Generate runs; not for live training tracking, model registration, or clinical use.",
       "metadata": {
-        "product.primary": "NIM for Healthcare",
+        "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "inference-ai",
         "audience": "ml_engineer,ai_engineer,application_developer,data_scientist,developer",
@@ -2753,7 +2753,7 @@
       "name": "nemo-automodel-distributed-training",
       "description": "Guide for selecting and configuring distributed training strategies in NeMo AutoModel, including FSDP2, Megatron FSDP, DDP, and parallelism settings.",
       "metadata": {
-        "product.primary": "NeMo Framework",
+        "product.primary": "NeMo AutoModel",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer,hpc_developer",
@@ -2765,7 +2765,7 @@
       "name": "nemo-automodel-launcher-config",
       "description": "Configure NeMo AutoModel job launches for interactive runs, Slurm clusters, and SkyPilot cloud execution.",
       "metadata": {
-        "product.primary": "NeMo Framework",
+        "product.primary": "NeMo AutoModel",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer,devops_engineer",
@@ -2777,7 +2777,7 @@
       "name": "nemo-automodel-model-onboarding",
       "description": "Guide for onboarding new model architectures into NeMo AutoModel, including architecture discovery, implementation patterns, registration, and validation.",
       "metadata": {
-        "product.primary": "NeMo Framework",
+        "product.primary": "NeMo AutoModel",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer",
@@ -2789,7 +2789,7 @@
       "name": "nemo-automodel-recipe-development",
       "description": "Create and modify NeMo AutoModel training and evaluation recipes, including YAML structure, builders, and execution flow.",
       "metadata": {
-        "product.primary": "NeMo Framework",
+        "product.primary": "NeMo AutoModel",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "developer,ai_engineer,ml_engineer",
@@ -2801,7 +2801,7 @@
       "name": "nemo-fabric-build-adapter",
       "description": "Build, migrate, review, and maintain third-party NVIDIA NeMo Fabric adapters against the public adapter contract. Use when creating adapter or target descriptors, mapping AgentConfig into an agent harness or custom-agent runtime, implementing start/invoke/stop, declaring schemas and capabilities, packaging discovery metadata, or assessing adapter conformance. Do not use for consumer applications that only call the NVIDIA NeMo Fabric SDK.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Fabric",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,application_developer,ai_engineer,platform_engineer,solutions_architect",
@@ -2813,7 +2813,7 @@
       "name": "nemo-fabric-integrate",
       "description": "Use this skill when integrating NVIDIA NeMo Fabric into a consumer application, service, evaluation harness, or platform through the typed Python SDK — translating the consumer's own application, job, or deployment config into an in-memory FabricConfig, choosing the single-invocation convenience API or an explicitly started runtime, validating with plan and doctor, and consuming normalized results, artifacts, and telemetry.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Fabric",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "application_developer,platform_engineer,ai_engineer,ml_engineer,devops_engineer",
@@ -3065,7 +3065,7 @@
       "name": "nemo-relay-debug-runtime-integration",
       "description": "Use this skill when NeMo Relay is installed or imported but application-side runtime behavior is missing or incorrect, including load failures, inactive scopes, missing events, and plugin or adaptive wiring problems.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "application_developer,ai_engineer,ml_engineer,developer,platform_engineer",
@@ -3077,7 +3077,7 @@
       "name": "nemo-relay-get-started",
       "description": "Use this skill when first-time NeMo Relay users want help selecting and following an appropriate quick-start guide or verifying their first working integration. Do not use it for production rollout or broad integration development.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "application_developer,ai_engineer,ml_engineer,platform_engineer,devops_engineer",
@@ -3089,7 +3089,7 @@
       "name": "nemo-relay-install",
       "description": "Use this skill when choosing or running NeMo Relay installation for an agent runtime, application language, framework integration, or plugin bundle, or checking a runtime's native Relay readiness. Do not use it for first-run instrumentation or export configuration.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,application_developer,ai_engineer,devops_engineer,platform_engineer",
@@ -3101,7 +3101,7 @@
       "name": "nemo-relay-instrument-calls",
       "description": "Use this skill when an application owns tool or LLM/provider call sites and needs to wrap them with NeMo Relay scopes and managed execution APIs for lifecycle events, middleware, or guardrails.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "application_developer,ai_engineer,developer,ml_engineer,platform_engineer",
@@ -3113,7 +3113,7 @@
       "name": "nemo-relay-instrument-context-isolation",
       "description": "Use this skill when concurrent requests, async tasks, threads, workers, goroutines, or agents need independent NeMo Relay scope stacks and correct ancestry propagation.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "developer_tools",
         "catalog.subdomain": "agentic-ai",
         "audience": "application_developer,ai_engineer,platform_engineer,devops_engineer,developer",
@@ -3125,7 +3125,7 @@
       "name": "nemo-relay-instrument-typed-wrappers",
       "description": "Use this skill when adding NeMo Relay typed wrappers, domain types, or provider codecs while preserving JSON middleware semantics and caller-visible behavior.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,application_developer,ai_engineer,platform_engineer",
@@ -3137,7 +3137,7 @@
       "name": "nemo-relay-migrate-from-flow",
       "description": "Use this skill when migrating applications, examples, integrations, documentation, manifests, or repository code from NeMo Flow to NeMo Relay across Python, Rust, Node.js, Go, C FFI, CLI, configuration, and observability surfaces.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "application_developer,developer,ai_engineer,platform_engineer,devops_engineer",
@@ -3149,7 +3149,7 @@
       "name": "nemo-relay-plugin-adaptive-tuning",
       "description": "Use this skill when baseline NeMo Relay instrumentation exists and the user wants to configure or evaluate adaptive plugin behavior, including telemetry, state, adaptive_hints, tool_parallelism, ACG, hint consumption, or measured rollout.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "ai_engineer,ml_engineer,developer,application_developer,platform_engineer",
@@ -3161,7 +3161,7 @@
       "name": "nemo-relay-plugin-build",
       "description": "Use this skill when building or packaging reusable NeMo Relay runtime behavior as an embedded configuration component or a manifest-backed `rust_dynamic` native or `worker` gRPC plugin, with deterministic validation and rollback-safe registration.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "developer,application_developer,platform_engineer,devops_engineer,ai_engineer",
@@ -3173,7 +3173,7 @@
       "name": "nemo-relay-plugin-observability",
       "description": "Use this skill when choosing or configuring NeMo Relay 0.6 or 0.7 observability through the built-in plugin, subscribers, or exporters, including raw ATOF events, ATIF trajectories, OpenTelemetry, OpenInference, or custom event handling.",
       "metadata": {
-        "product.primary": "NeMo",
+        "product.primary": "NeMo Relay",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "agentic-ai",
         "audience": "application_developer,ai_engineer,platform_engineer,devops_engineer,developer",
@@ -3269,7 +3269,7 @@
       "name": "nemotron-asr-finetune",
       "description": "Orchestration skill for NVIDIA Nemotron Speech (Riva) / NeMo ASR domain and language adaptation. Given a goal like \"improve/fine-tune ASR for my domain or language\", it scopes the task, picks the cheapest sufficient path (word boosting → n-gram LM → fine-tuning), delegates each stage to the right sub-skill (data generation, training, evaluation, deployment), and answers cost/time/data questions along the way.",
       "metadata": {
-        "product.primary": "Riva",
+        "product.primary": "Nemotron Speech",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "conversational-ai",
         "audience": "ml_engineer,ai_engineer,application_developer,solutions_architect,developer",
@@ -3317,7 +3317,7 @@
       "name": "nemotron-speech",
       "description": "Routes NVIDIA Nemotron Speech (Formerly Riva) NIM tasks — deploys, runs, and tests ASR, TTS, and NMT NIMs on build.nvidia.com or self-hosted.",
       "metadata": {
-        "product.primary": "Riva",
+        "product.primary": "Nemotron Speech",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "conversational-ai",
         "audience": "developer,application_developer,ai_engineer,devops_engineer",
@@ -3401,7 +3401,7 @@
       "name": "nv-reason-ct",
       "description": "Run NV-Reason-CT inference on user-provided 3D NIfTI chest or abdominal CT volumes for engineering and research workflows. Not for diagnosis, treatment, or clinical reporting.",
       "metadata": {
-        "product.primary": "NIM for Healthcare",
+        "product.primary": "MONAI",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "inference-ai",
         "audience": "application_developer,ai_engineer,ml_engineer,research_academic,research_non_academic",
@@ -3569,7 +3569,7 @@
       "name": "nvidia-app",
       "description": "NVIDIA App MCP: drivers, games, laptops, overlay. Check drivers, manage and optimize games, configure laptop features.\n",
       "metadata": {
-        "product.primary": "Client",
+        "product.primary": "NVIDIA App",
         "classification.category.primary": "graphics_and_media",
         "catalog.subdomain": "gaming",
         "audience": "developer,it_operations,hands_on_builder",
@@ -3581,7 +3581,7 @@
       "name": "nvidia-broadcast",
       "description": "Use when controlling NVIDIA Broadcast through MCP to apply effects, process local media, select devices, or change camera resolution, or when Broadcast is missing or too old to expose the gateway and the user wants it installed; not for Broadcast app settings outside the MCP gateway.",
       "metadata": {
-        "product.primary": "Maxine",
+        "product.primary": "NVIDIA Broadcast",
         "classification.category.primary": "graphics_and_media",
         "catalog.subdomain": "vision-ai",
         "audience": "application_developer,developer,ai_engineer,hands_on_builder",
@@ -3821,7 +3821,7 @@
       "name": "physical-ai-defect-image-generation",
       "description": "Use when the user wants to orchestrate defect image generation with NVIDIA Cosmos AnomalyGen (Cosmos-Predict2-derived) on OSMO for PCBA, metal surface, and glass inspection. The Day 0 path handles cold-start with USD-to-ROI, image-edit augmentation, and AnomalyGen to create initial PCBA datasets. The Day 1 path performs inference and labeling on real images. This skill helps with first-time asset setup, creation of finetuning checkpoints, and configuring deployment.\nTrigger keywords: defect image generation, dig workflow, dig pipeline, defect image detection workflow, aoi pipeline, aoi anomalygen, usd2roi anomalygen, day 0 pcba, day 1 pcba, day 1 real-photo alignment, day 1 manual roi, metal surface anomaly, glass defect, anomalygen finetune, setup_pcb, setup_metal, setup_glass, setup_pretrained, dig setup, dig datasets, dig pretrained checkpoint, dig image-edit endpoint, cosmos defect generation, cosmos-predict2 defect, cosmos-anomalygen, cosmos predict2 finetune.",
       "metadata": {
-        "product.primary": "Physical AI Dataset",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "developer,ai_engineer,ml_engineer",
@@ -3869,7 +3869,7 @@
       "name": "physical-ai-video-data-augmentation",
       "description": "Use when running video data augmentation and auto-labeling workflows on OSMO: flow selection, preflight, submit-time interpolation, monitoring, and output retrieval. Trigger keywords: video data augmentation, data enrichment, auto labeling, VDA demo, OSMO workflow, pseudo labeling.",
       "metadata": {
-        "product.primary": "Physical AI Dataset",
+        "product.primary": "Cosmos Data Factory",
         "classification.category.primary": "physical_ai",
         "catalog.subdomain": "physical-ai",
         "audience": "developer,ai_engineer,ml_engineer",
@@ -4073,7 +4073,7 @@
       "name": "runai-audit-assigned-quota",
       "description": "Audit GPU quota fairness across a Run:ai cluster — find which projects are starved and which are borrowing over their deserved quota in each node pool, and where GPUs can be reclaimed. Use when an admin asks \"who is over quota in node-pool X\", \"which projects are starved\", \"is the cluster shared fairly\", \"where can I reclaim GPUs\", \"show deserved vs allocated by project or department\", or when a team reports it can't get GPUs and you suspect unfair borrowing. This is the quota / fairness axis (deserved vs allocated). For idle-but-held GPUs use runai-get-utilization-overview; for a health/scheduling verdict use runai-get-cluster-health-summary.",
       "metadata": {
-        "product.primary": "KAI Scheduler",
+        "product.primary": "Run:ai",
         "classification.category.primary": "infrastructure",
         "catalog.subdomain": "ai-factory",
         "audience": "platform_engineer,it_operations,devops_engineer",
@@ -4085,7 +4085,7 @@
       "name": "runai-diagnose-failed-workload",
       "description": "Use to diagnose failed, crashed, stopped, OOMKilled, CrashLoopBackOff, ImagePullBackOff, init, mount, node, or policy-terminated Run:ai workloads. Investigate one workload's failure; use other skills for workload health summaries, cluster health, scheduling-only Pending, or inference latency without a confirmed failure.",
       "metadata": {
-        "product.primary": "KAI Scheduler",
+        "product.primary": "Run:ai",
         "classification.category.primary": "infrastructure",
         "catalog.subdomain": "ai-factory",
         "audience": "platform_engineer,devops_engineer,ml_engineer,it_operations,production_operator",
@@ -4097,7 +4097,7 @@
       "name": "runai-get-cluster-health-summary",
       "description": "Point-in-time Run:ai cluster and node-health check: a HEALTHY, DEGRADED, or STUCK verdict per node pool with the dominant blocker — NotReady nodes, offline or failing GPU capacity, GPU counts, allocation vs utilization, the pending backlog, and a stuck scheduler vs a full pool. Use for \"is the cluster healthy?\", \"is the scheduler stuck?\", \"any nodes down?\", \"are GPUs failing?\", \"how many GPUs are free?\", \"is the cluster saturated?\", or \"why isn't node pool X scheduling?\". Not for quota fairness, team GPU waste, one workload, failed-workload node correlation, XID errors on one node, or writes.",
       "metadata": {
-        "product.primary": "KAI Scheduler",
+        "product.primary": "Run:ai",
         "classification.category.primary": "infrastructure",
         "catalog.subdomain": "ai-factory",
         "audience": "platform_engineer,devops_engineer,it_operations,solutions_architect",
@@ -4109,7 +4109,7 @@
       "name": "runai-get-utilization-overview",
       "description": "GPU efficiency check for a Run:ai cluster: are the GPUs that projects, departments, and node pools hold actually computing? Classifies holders as WELL_UTILIZED, UNDER_UTILIZED, or IDLE from average and p95 GPU utilization over one window of any length (default 7 days), quantifies idle GPUs and GPU-hours, and names idle workloads. Use for \"which projects hold GPUs but aren't using them?\", \"GPU utilization by project or department\", \"where are we wasting GPU cycles?\", \"is llm-serving actually busy? its GPU memory is full\", \"is project X actually using its GPUs?\", \"which workloads in project X are idle?\", \"which node pool wastes the most GPUs?\", or \"idle GPU-hours per project last quarter\". For \"find the idle GPUs and stop them\" it answers the read part only. Not for quota fairness, cluster health or free capacity, one workload's status, comparing windows, forecasts, or prices.",
       "metadata": {
-        "product.primary": "KAI Scheduler",
+        "product.primary": "Run:ai",
         "classification.category.primary": "infrastructure",
         "catalog.subdomain": "ai-factory",
         "audience": "platform_engineer,devops_engineer,it_operations,ml_engineer",
@@ -4121,7 +4121,7 @@
       "name": "runai-get-workload-health-summary",
       "description": "Summarizes scoped Run:ai workload health or one workload. Not for root cause, quota, cluster health, fleet utilization, history, or mutations.",
       "metadata": {
-        "product.primary": "KAI Scheduler",
+        "product.primary": "Run:ai",
         "classification.category.primary": "infrastructure",
         "catalog.subdomain": "ai-factory",
         "audience": "platform_engineer,devops_engineer,it_operations,production_operator,developer",

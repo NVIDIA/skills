@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Run:ai
+product_primary: Run:ai
 repo: dsx-ai-factory/run-ai
 description: Diagnose failed Run:ai workloads, summarize workload and cluster health, audit GPU quota fairness, and find idle GPU capacity through the Run:ai MCP server.
 ref: main

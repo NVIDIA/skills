@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Physical AI
+product_primary: Newton Physics Engine
 repo: NVIDIA-Omniverse/ovnewton
 description: Physical AI skills for simulation, synthetic data generation, training, validation and deployment and more.
 ref: main

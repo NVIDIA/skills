@@ -2,6 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 
 name: Medical AI Skills
+product_primary: MONAI
 repo: NVIDIA-Medtech/medical-AI-skills
 ref: dev
 description: Agent-ready medical AI skills built on MONAI for DICOM handling, NVIDIA-hosted medical imaging model workflows, segmentation, synthesis, and evidence-oriented evaluation.
