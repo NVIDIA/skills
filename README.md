@@ -21,13 +21,13 @@ Skills are portable instruction sets that teach AI agents how to use NVIDIA soft
 
 ## Quickstart
 
-Install NVIDIA skills with the default [`skills` CLI](https://github.com/vercel-labs/skills) flow:
+Install NVIDIA skills with the default [`skills` CLI](https://github.com/vercel-labs/skills) flow. The NVIDIA Skill Finder skill will search this catalog and help you discover the right skill for your use case.
 
 ```bash
-npx skills add nvidia/skills
+npx skills add nvidia/skills --skill nvidia-skill-finder --yes
 ```
 
-The CLI runs through `npx` and prompts you to choose a skill and install destination. You do not need to clone this repo or copy skill folders by hand.
+This installs the skill finder, which can then find and install other skills for you. To browse the full catalog instead, run `npx skills add nvidia/skills`. You do not need to clone this repo or copy skill folders by hand.
 
 > **Requires a current `skills` CLI (v1.5.16 or newer).** Installing via `npx skills@latest add nvidia/skills` always uses the latest. On older CLIs (v1.5.15 and earlier), skills may install but not appear in Claude Code — see [Troubleshooting](docs/advanced-install.mdx#troubleshooting).
 
