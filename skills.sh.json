@@ -278,6 +278,7 @@
       "description": "Build, validate, tune, and maintain large-scale model training workflows, including distributed training, model support, training validation, performance tuning, and training-stack CI.",
       "skills": [
         "codonfm-finetune",
+        "cuequivariance",
         "dali-dynamic-mode",
         "data-designer",
         "kermt-add-cmim-pretrain",
@@ -408,6 +409,8 @@
       "skills": [
         "compute-sanitizer-diagnose-cuda-bugs",
         "cudf-query-engine-builder",
+        "cuequivariance-jax",
+        "cuequivariance-torch",
         "genomics-workflow-acceleration",
         "holoscan-module-lifecycle",
         "hsb-ip-create-top",

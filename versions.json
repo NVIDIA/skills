@@ -100,6 +100,27 @@
       "last_modified": "2026-10-21"
     },
     {
+      "name": "bionemo-cuequivariance",
+      "path": "skills/bionemo-cuequivariance",
+      "content_digest": "sha256:d8cfe1726336e40714f04d26b24a1d95f5c7986fc25a66b288b4576ad9b00bd2",
+      "last_commit": "00ce147f35ce48f84ab482b38ecb911bc93783dd",
+      "last_modified": "2026-11-04"
+    },
+    {
+      "name": "bionemo-cuequivariance-jax",
+      "path": "skills/bionemo-cuequivariance-jax",
+      "content_digest": "sha256:73d098f669ba885cf9c51a75ac3fe08a0137a7c2404096c2576c3b802ac03a7e",
+      "last_commit": "00ce147f35ce48f84ab482b38ecb911bc93783dd",
+      "last_modified": "2026-11-04"
+    },
+    {
+      "name": "bionemo-cuequivariance-torch",
+      "path": "skills/bionemo-cuequivariance-torch",
+      "content_digest": "sha256:dfe85a932a7b168e7dd829968e51e2c7a06ada544c51f78ff2e7e4137c0e6a95",
+      "last_commit": "00ce147f35ce48f84ab482b38ecb911bc93783dd",
+      "last_modified": "2026-11-04"
+    },
+    {
       "name": "bionemo-diffdock-nim",
       "path": "skills/bionemo-diffdock-nim",
       "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",
