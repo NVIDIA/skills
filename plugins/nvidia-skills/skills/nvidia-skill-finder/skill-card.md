@@ -1,5 +1,5 @@
 ## Description: <br>
-Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill. <br>
+Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill; it checks the live NVIDIA skills catalog and recommends matching skills, while staying quiet for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA products, hardware, SDKs, and services use this skill to discover, recommend, and (with explicit approval) install the most relevant NVIDIA agent skill from the live NVIDIA skills catalog for their task. <br>
+Developers and engineers working with NVIDIA products, hardware, SDKs, and services use this skill to discover, evaluate, and (with explicit approval) install relevant NVIDIA agent skills from the live catalog, including Hermes Agent catalog lookups. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,19 +25,18 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [references/taxonomy-routing.md](references/taxonomy-routing.md) <br>
-- [references/hermes-catalog.md](references/hermes-catalog.md) <br>
-- [NVIDIA Skills on GitHub](https://github.com/NVIDIA/skills/tree/main/skills) <br>
+- [Hermes Agent: Catalog Lookup and Install](references/hermes-catalog.md) <br>
+- [NVIDIA Taxonomy Routing](references/taxonomy-routing.md) <br>
+- [NVIDIA Skills catalog (GitHub)](https://github.com/NVIDIA/skills/tree/main/skills) <br>
 - [NVIDIA Skills on build.nvidia.com](https://build.nvidia.com/skills) <br>
 - [NVIDIA Skills catalog index (skills.sh.json)](https://raw.githubusercontent.com/NVIDIA/skills/main/skills.sh.json) <br>
-- [NVIDIA Skills documentation](https://docs.nvidia.com/skills) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Shell commands] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Recommends at most three catalog skills ordered by confidence; install commands are proposed only and run only after explicit user approval.] <br>
+**Other Properties Related to Output:** [Recommends at most three skills ordered by confidence; installs only after explicit user approval.] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -46,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-18 evaluation tasks (13 positive, 5 negative); 1 attempt per task, each in its own isolated sandbox pod (`k8s-sandbox`), compared against a no-skill baseline. <br>
+18 evaluation tasks (13 positive, 5 negative), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -57,13 +56,13 @@ Reported benchmark dimensions: <br>
 - Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
@@ -78,12 +77,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.1% — baseline ran, but no comparable score was available; uplift unavailable | 87.1% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 97.2% → 97.2% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 62.2% → 96.7% (+34.5 points) | 77.8% → 91.1% (+13.3 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 39.9% → 96.5% (+56.6 points) | 59.3% → 92.1% (+32.8 points) |
-| Efficiency | 80.3% — baseline ran, but no comparable score was available; uplift unavailable | 61.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.4% — baseline ran, but no comparable score was available; uplift unavailable | 87.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 97.2% (-2.8 points) | 97.2% → 91.7% (-5.5 points) |
+| Correctness | 64.4% → 96.7% (+32.3 points) | 77.8% → 91.1% (+13.3 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 37.1% → 93.8% (+56.7 points) | 58.8% → 94.2% (+35.4 points) |
+| Efficiency | 79.6% — baseline ran, but no comparable score was available; uplift unavailable | 64.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -98,15 +97,15 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.3% → 96.4% (-1.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.3% → 96.2% (-2.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 90.0% → 88.9% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 89.3% → 88.2% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 18 task(s) |
 
