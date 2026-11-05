@@ -169,6 +169,42 @@
       }
     },
     {
+      "path": "skills/bionemo-cuequivariance",
+      "name": "cuequivariance",
+      "description": "Use when defining cuEquivariance groups and irreps, building equivariant tensor products, or validating segmented polynomials with NumPy.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,research_academic,application_developer,computational_biologist",
+        "discovery.activity_tags": "configure,integrate,validate,test,generate"
+      }
+    },
+    {
+      "path": "skills/bionemo-cuequivariance-jax",
+      "name": "cuequivariance-jax",
+      "description": "Use when writing or debugging cuEquivariance JAX polynomials, irrep dictionaries, Flax NNX layers, or CPU/CUDA execution and layouts.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,ml_engineer,ai_engineer,research_academic,hpc_developer",
+        "discovery.activity_tags": "debug,generate,test,validate,configure"
+      }
+    },
+    {
+      "path": "skills/bionemo-cuequivariance-torch",
+      "name": "cuequivariance-torch",
+      "description": "Use when building or debugging cuEquivariance PyTorch tensor products or equivariant GNNs, especially CPU references, layouts, indexing, and gradients.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,ml_engineer,ai_engineer,research_academic,hpc_developer",
+        "discovery.activity_tags": "debug,integrate,test,validate,optimize"
+      }
+    },
+    {
       "path": "skills/bionemo-diffdock-nim",
       "name": "diffdock-nim",
       "description": "Run DiffDock molecular docking via NVIDIA NIM to predict small-molecule binding poses against protein targets. Use for DiffDock, molecular docking, ligand docking, blind docking, SMILES or SDF ligands, ranked poses, confidence scores, hosted NVIDIA API, or local Docker deployment.\n",
