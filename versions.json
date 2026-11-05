@@ -403,9 +403,9 @@
     {
       "name": "cuml",
       "path": "skills/cuml",
-      "content_digest": "sha256:6e24a9698c1c8b9140b0a1746e4f16692595d4ddd0ce624d5a45f4131760e1e6",
-      "last_commit": "e33b0c39cd26e885e4e7a547edb20fb058db2cb9",
-      "last_modified": "2026-11-02"
+      "content_digest": "sha256:50d4cca14b1b00bc97a8b8877401c52663ec8102bbe5369a0fefbb181d82ff4f",
+      "last_commit": "fc38e7248fff9e958ed3c17f5dc79808b3348d4f",
+      "last_modified": "2026-11-05"
     },
     {
       "name": "cuopt-developer",
@@ -501,9 +501,9 @@
     {
       "name": "deepstream-run-mv3dt",
       "path": "skills/deepstream-run-mv3dt",
-      "content_digest": "sha256:4f721aa4407f710f0cd7f69dd084ca14629e99a39aabd72f234d88919ee4d742",
-      "last_commit": "a8ca7bc1ddc433e91520892b087c5a704e34fdb2",
-      "last_modified": "2026-08-12"
+      "content_digest": "sha256:5c784650477533dd814201d82af672ca70bb6f1f5847f5f82ceba61089736ae8",
+      "last_commit": "fc38e7248fff9e958ed3c17f5dc79808b3348d4f",
+      "last_modified": "2026-11-05"
     },
     {
       "name": "deepstream-sop",
