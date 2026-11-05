@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
   "skill_count": 437,
-  "result_row_count": 4119,
+  "result_row_count": 4124,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1167,10 +1167,10 @@
     },
     {
       "skill": "cuml",
-      "evaluation_date": "2026-11-02",
+      "evaluation_date": "2026-11-04",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.6",
-      "dataset_digest": "sha256:4dad3d83e6a81208bd4d1bb359ae83e0666d9ab17ea5d4df92b5a3c1b825229f",
+      "dataset_digest": "sha256:8efd78ed52747d376b59182ebeb97a529c0cfa2167658e8a2efb1c39eb4452f4",
       "validation_status": "passed",
       "tasks": 32,
       "attempts_per_task": 1,
@@ -1183,7 +1183,7 @@
       "catalog_dir": "cuml",
       "component": "cuML",
       "has_results": true,
-      "average_uplift_pct": 5.77
+      "average_uplift_pct": 7.9
     },
     {
       "skill": "cuopt-developer",
@@ -1444,22 +1444,23 @@
     },
     {
       "skill": "deepstream-run-mv3dt",
-      "evaluation_date": "2026-07-02",
-      "environment": "local",
-      "evaluator_version": null,
-      "dataset_digest": null,
+      "evaluation_date": "2026-10-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.5.6",
+      "dataset_digest": "sha256:2944e4346697d995493b73c4f6b3fedcac029b04b99b55b4dc94838a20457537",
       "validation_status": null,
       "tasks": 4,
       "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
+        "claude-code",
         "codex"
       ],
       "catalog_dir": "deepstream-run-mv3dt",
       "component": "DeepStream",
       "has_results": true,
-      "average_uplift_pct": 13.2
+      "average_uplift_pct": 21.15
     },
     {
       "skill": "deepstream-sop",
@@ -13845,8 +13846,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.3,
-      "uplift_pct": -4.7
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "cuml",
@@ -13854,8 +13855,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.6,
-      "uplift_pct": -9.4
+      "score_pct": 93.8,
+      "uplift_pct": -6.2
     },
     {
       "catalog_dir": "cuml",
@@ -13863,7 +13864,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.6,
+      "score_pct": 98.1,
       "uplift_pct": 16.8
     },
     {
@@ -13872,8 +13873,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 1.9
+      "score_pct": 94.4,
+      "uplift_pct": 2.5
     },
     {
       "catalog_dir": "cuml",
@@ -13881,7 +13882,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.3,
+      "score_pct": 98.2,
       "uplift_pct": null
     },
     {
@@ -13890,7 +13891,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.3,
+      "score_pct": 89.1,
       "uplift_pct": null
     },
     {
@@ -13899,8 +13900,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.6,
-      "uplift_pct": 20.6
+      "score_pct": 87.4,
+      "uplift_pct": 21.1
     },
     {
       "catalog_dir": "cuml",
@@ -13908,8 +13909,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.1,
-      "uplift_pct": 9.4
+      "score_pct": 83.7,
+      "uplift_pct": 13.2
     },
     {
       "catalog_dir": "cuml",
@@ -13917,7 +13918,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 92.1,
+      "score_pct": 94.0,
       "uplift_pct": null
     },
     {
@@ -13926,7 +13927,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 57.3,
+      "score_pct": 56.8,
       "uplift_pct": null
     },
     {
@@ -15013,46 +15014,91 @@
       "catalog_dir": "deepstream-run-mv3dt",
       "component": "DeepStream",
       "dimension": "Security",
-      "num": 4,
-      "agent": "codex",
+      "num": null,
+      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
     {
       "catalog_dir": "deepstream-run-mv3dt",
       "component": "DeepStream",
-      "dimension": "Correctness",
-      "num": 4,
+      "dimension": "Security",
+      "num": null,
       "agent": "codex",
-      "score_pct": 75.0,
-      "uplift_pct": 18.0
+      "score_pct": 100.0,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 55.0
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 70.0,
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "deepstream-run-mv3dt",
       "component": "DeepStream",
       "dimension": "Discoverability",
-      "num": 4,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 71.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "codex",
-      "score_pct": 77.0,
-      "uplift_pct": 24.0
+      "score_pct": 91.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "deepstream-run-mv3dt",
       "component": "DeepStream",
       "dimension": "Effectiveness",
-      "num": 4,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 56.3,
+      "uplift_pct": 17.9
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Effectiveness",
+      "num": null,
       "agent": "codex",
-      "score_pct": 59.0,
-      "uplift_pct": 5.0
+      "score_pct": 59.9,
+      "uplift_pct": 16.5
     },
     {
       "catalog_dir": "deepstream-run-mv3dt",
       "component": "DeepStream",
       "dimension": "Efficiency",
-      "num": 4,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "deepstream-run-mv3dt",
+      "component": "DeepStream",
+      "dimension": "Efficiency",
+      "num": null,
       "agent": "codex",
-      "score_pct": 71.0,
-      "uplift_pct": 19.0
+      "score_pct": 87.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "deepstream-sop",
