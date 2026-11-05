@@ -36,3 +36,43 @@ components:
       - pva-opgen
       - pva-setup
       - pva-spec
+  # TensorRT-LLM's upstream (NVIDIA/TensorRT-LLM, .claude/skills/) is public
+  # but does not run NVSkills signing yet, so a components.d entry would have
+  # every skill dropped as unsigned. Staged here and signed on the catalog PR
+  # until signing runs at source; then move to components.d/tensorrt-llm.yml
+  # with these same catalog_dir names.
+  - name: TensorRT-LLM
+    description: LLM inference with TensorRT-LLM — build and test execution on local GPUs and Slurm, performance profiling and optimization, GPU kernel writing, model onboarding, serving configuration, and code contribution.
+    catalog_dirs:
+      - trtllm-case-executor
+      - trtllm-code-contribution
+      - trtllm-codebase-exploration
+      - trtllm-exec-env-check
+      - trtllm-exec-local-compile
+      - trtllm-exec-local-docker
+      - trtllm-exec-local-slurm
+      - trtllm-exec-remote-slurm
+      - trtllm-exec-slurm-compile
+      - trtllm-flashinfer-upgrade
+      - trtllm-kernel-cute-writing
+      - trtllm-kernel-tileir-optimization
+      - trtllm-kernel-triton-writing
+      - trtllm-model-onboard-multimodal
+      - trtllm-moe-develop
+      - trtllm-perf-analysis
+      - trtllm-perf-host-analysis
+      - trtllm-perf-host-optimization
+      - trtllm-perf-instability-cookbook
+      - trtllm-perf-nsight-compute-analysis
+      - trtllm-perf-nsight-systems
+      - trtllm-perf-optimization
+      - trtllm-perf-optimization-casebook
+      - trtllm-perf-regression-cookbook
+      - trtllm-perf-torch-cuda-graphs
+      - trtllm-perf-torch-sync-free
+      - trtllm-perf-workload-profiling
+      - trtllm-serve-config-guide
+      - trtllm-test-script-builder
+      - trtllm-test-specialist
+      - trtllm-visualgen-bench
+      - trtllm-visualgen-lpips-golden-refresh
