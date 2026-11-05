@@ -4,7 +4,7 @@
     "question": "The user asks to run the DeepStream MV3DT sample without specifying which sample dataset to use.",
     "expected_skill": "deepstream-run-mv3dt",
     "expected_script": null,
-    "ground_truth": "The agent grounds itself in deepstream-run-mv3dt SKILL.md, resolves the deepstream-tracker-3d-multi-view checkout, checks prerequisites, selects the shipped 4-camera sample by default, states PeopleNetTransformer as the default detector, detects display versus headless mode, and follows the correct run path. If display is available it uses the repo quick-start display path with OSD and live BEV. If display is not available it uses saved outputs by default, generating configs with --enable-file-output and --enable-msg-broker and starting offline BEV capture before DeepStream. It verifies App run successful and current-run artifacts rather than reporting stale files. At the end it mentions that the shipped 12-camera sample is also available as a follow-up.",
+    "ground_truth": "The agent grounds itself in deepstream-run-mv3dt SKILL.md, resolves the deepstream-tracker-3d-multi-view checkout, checks prerequisites, selects the shipped 4-camera sample by default, states PeopleNetTransformer as the default detector, detects display versus headless mode, and follows the correct run path. If display is available it generates configs and uses the skill’s non-privileged Docker launch with OSD and live BEV. If display is not available it uses saved outputs by default, generating configs with --enable-file-output and --enable-msg-broker and starting offline BEV capture before DeepStream. It verifies App run successful and current-run artifacts rather than reporting stale files. At the end it mentions that the shipped 12-camera sample is also available as a follow-up.",
     "expected_behavior": [
       "The agent identifies deepstream-run-mv3dt as the applicable skill and grounds its plan in that SKILL.md",
       "The agent selects the 4-camera sample by default when the user does not specify a sample",
@@ -41,7 +41,7 @@
       "The agent identifies the request as a custom MV3DT dataset workflow",
       "The agent validates the expected dataset shape before generating configs",
       "The agent detects missing camInfo calibration files and does not fabricate calibration data",
-      "The agent delegates missing calibration to amc-setup-calibration-stack and amc-run-video-calibration when those skills are available",
+      "The agent delegates missing calibration to amc-run-auto-calibration when that skill is available",
       "The agent asks for calibration detector/settings choices before delegation instead of silently defaulting",
       "The agent sets or preserves DETECTOR_MODEL for the MV3DT run and defaults it to PeopleNetTransformer only when the user did not choose a detector",
       "The agent normalizes AMC-exported camInfo modelInfo according to the selected detector: class ID 1 for PeopleNetTransformer, class ID 0 for PeopleNet2.6.3, or class IDs 0 through 6 for RTDETR",

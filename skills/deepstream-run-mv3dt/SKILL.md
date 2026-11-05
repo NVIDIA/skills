@@ -3,13 +3,13 @@ name: "deepstream-run-mv3dt"
 description: "Run and operate the DeepStream Multi-View 3D Tracking reference app, also known as MV3DT. Use when the user asks to set up prerequisites, run shipped MV3DT samples, run Multi-View 3D Tracking on custom synchronized MP4 datasets, import camera calibration, delegate missing calibration to AutoMagicCalib, inspect OSD or BEV visualization, consume MV3DT Kafka metadata, or clean up MV3DT run state in the DeepStream MV3DT app directory."
 metadata:
   author: "Shubham Agrawal <shuagrawal@nvidia.com>"
+  version: "1.0.0"
   tags: [deepstream, mv3dt, tracking, multi-view, 3d, kafka]
   languages: [bash, python]
   domain: computer-vision
-owner: "NVIDIA CORPORATION"
-service: "deepstream-tracker-3d-multi-view"
-version: "1.0.0"
-reviewed: "2026-06-15"
+  owner: "NVIDIA CORPORATION"
+  service: "deepstream-tracker-3d-multi-view"
+  reviewed: "2026-06-15"
 license: CC-BY-4.0 AND Apache-2.0
 ---
 
@@ -100,7 +100,7 @@ cd "${REPO_ROOT}"
 export REPO_ROOT MV3DT_REPO_ROOT="${REPO_ROOT}"
 ```
 
-If the app directory cannot be resolved, ask the user for an existing checkout path or for approval to clone `https://github.com/NVIDIA/DeepStream`. Do not clone silently.
+The shell block is a check that fails closed; it does not prompt or clone. When it exits with a missing-checkout error, the agent must ask for an existing app path or explicit clone approval, set `MV3DT_REPO_ROOT` to the verified resulting app directory, and rerun Step 0 before proceeding. In non-interactive automation, report the missing `MV3DT_REPO_ROOT`/`DEEPSTREAM_REPO_ROOT` input and stop. Do not clone without approval.
 
 ### Step 1: Select The Primary Workflow
 
@@ -108,16 +108,16 @@ Load exactly one primary reference for the user's current request:
 
 | User intent | Reference |
 |---|---|
-| Install, prepare, or verify prerequisites | `references/setup.md` |
-| Run bundled 4-camera or 12-camera sample | `references/sample-run.md` |
-| Run custom synchronized MP4s | `references/custom-dataset.md` |
-| Missing custom calibration | `references/amc-calibration-handoff.md`, then return to `references/custom-dataset.md` |
-| View OSD, BEV, screenshots, recordings, or Kafka metadata | `references/visualization-metadata.md` |
-| Stop a run, clean generated artifacts, or stop prerequisite services | `references/setup.md` |
+| Install, prepare, or verify prerequisites | [references/setup.md](references/setup.md) |
+| Run bundled 4-camera or 12-camera sample | [references/sample-run.md](references/sample-run.md) |
+| Run custom synchronized MP4s | [references/custom-dataset.md](references/custom-dataset.md) |
+| Missing custom calibration | [references/amc-calibration-handoff.md](references/amc-calibration-handoff.md), then return to [references/custom-dataset.md](references/custom-dataset.md) |
+| View OSD, BEV, screenshots, recordings, or Kafka metadata | [references/visualization-metadata.md](references/visualization-metadata.md) |
+| Stop a run, clean generated artifacts, or stop prerequisite services | [Teardown](references/teardown.md) |
 
-If setup, datasets, models, Kafka, Mosquitto, Docker GPU runtime, or the Python venv are missing, load `references/setup.md` before continuing to the user's original workflow.
+If prerequisites are missing, use the setup reference above before returning to the original workflow. Before a sample/custom launch, read [Container Networking](references/container-network.md) and establish the bridge-reachable Kafka listener; host BEV tools continue using localhost.
 
-When `sample-run.md` or `custom-dataset.md` needs to regenerate DeepStream configs, load `references/generate-configs.md` as the canonical shared config-generation reference rather than duplicating the shell logic.
+When `sample-run.md` or `custom-dataset.md` needs to regenerate DeepStream configs, load [references/generate-configs.md](references/generate-configs.md) as the canonical shared config-generation reference rather than duplicating the shell logic.
 
 ### Step 2: Follow The Run Stages
 
@@ -126,7 +126,7 @@ For every run, use this stage order:
 | Stage | Action |
 |---|---|
 | Validate | Check app directory, prerequisites, dataset shape, display/headless mode, Docker GPU support, and output-directory writability. |
-| Prepare | State the selected sample/custom dataset, detector, run mode, output directory, expected output surfaces, and the Docker security decision for `--privileged --net=host` before launch. |
+| Prepare | State the selected sample/custom dataset, detector, run mode, output directory, expected output surfaces, and NVIDIA GPU access, Docker bridge network, and verified Kafka endpoint before launch. |
 | Execute | Generate configs, start offline BEV capture first in headless mode or when saved BEV MP4 is explicitly requested, then run DeepStream or delegate missing calibration to AutoMagicCalib. |
 | Verify | Confirm functional readiness with `App run successful`, fresh MP4 artifacts when file output is enabled, Kafka offsets/messages, and BEV message/frame counts when BEV MP4 capture runs. |
 | Report | Summarize selected options, generated files, artifact paths, file sizes/counts, and any skipped or failed output surface; after a default 4-camera sample run, mention that the 12-camera sample is also available as a follow-up. |
@@ -134,12 +134,12 @@ For every run, use this stage order:
 ### Step 3: Apply Defaults Explicitly
 
 - Runtime path: DeepStream Container.
-- Display path: if a working X11/VNC display is available, use the repo quick-start path with OSD and BEV windows. The OSD window does not save MP4 by default; when the user explicitly asks to save output in display mode, regenerate configs with both `--enable-osd` and `--enable-file-output` plus `--enable-msg-broker`.
+- Display path: if a working X11/VNC display is available, use generated configs and the skill’s Docker launch with OSD and BEV windows. The OSD window does not save MP4 by default; when the user explicitly asks to save output in display mode, regenerate configs with both `--enable-osd` and `--enable-file-output` plus `--enable-msg-broker`.
 - Headless path: if no working display is available, use saved outputs by default. Generate configs with `--enable-file-output` and `--enable-msg-broker`; start offline BEV capture before DeepStream so the run produces both the tiled DeepStream MP4 and the Kafka-derived BEV MP4.
 - Sample dataset: support both shipped 4-camera and 12-camera datasets. If the user does not specify a sample, run the 4-camera sample first, then mention in the final report that the 12-camera sample is also available and can be run next.
 - Detector: `PeopleNetTransformer` unless the user asks for `RTDETR` or `PeopleNet2.6.3`; carry the selected `DETECTOR_MODEL` through config generation and AMC `camInfo` modelInfo normalization. For custom calibration handoff, ask the user to choose the AutoMagicCalib detector instead of silently defaulting.
 - Custom data source: synchronized MP4 files. Live-stream handling is outside this first-release skill.
-- Calibration handoff: use standalone AutoMagicCalib skills instead of duplicating their setup or API workflow.
+- Calibration handoff: use `amc-run-auto-calibration` instead of duplicating its setup or API workflow.
 
 ### Step 4: Preserve Idempotency And User Data
 
@@ -170,27 +170,26 @@ For every run, use this stage order:
 
 | Issue | First action |
 |---|---|
-| Setup prerequisites missing | Load `references/setup.md` and run the check-only path before setup. |
+| Setup prerequisites missing | Run the setup reference’s check-only path before setup. |
 | Docker cannot access GPU | Fix NVIDIA Container Toolkit or Docker runtime before launching samples. |
 | Display window missing | Check `DISPLAY` and `/tmp/.X11-unix`; use the headless saved-output path when no display is available. |
 | DeepStream MP4 missing | Confirm configs were generated with `--enable-file-output` and verify the artifact is newer than `RUN_STARTED_AT`. |
 | BEV MP4 missing or zero messages | Start offline BEV capture with `--from-end` before DeepStream, use a long enough `--first-message-timeout`, and verify Kafka offsets move during the run. |
 | Kafka client shows no messages | Regenerate configs with `--enable-msg-broker` and verify topic `mv3dt` exists. |
-| Custom dataset lacks calibration | Load `references/amc-calibration-handoff.md`; ask detector/settings choices before delegating. |
+| Custom dataset lacks calibration | Load [references/amc-calibration-handoff.md](references/amc-calibration-handoff.md); ask detector/settings choices before delegating. |
 | Generated files are root-owned | Report the ownership issue and ask before applying a narrow generated-directory permission fix. |
 
 ## Safety Notes
 
 - Ask before commands that use `sudo`, install packages, pull containers, download models, start or stop services, change host display access, overwrite dataset files, or clear generated state.
 - Treat deleting Kafka, Mosquitto, models, datasets, or experiment outputs as destructive cleanup. Show the exact targets and get explicit confirmation before removing anything.
-- Before running `docker run --privileged --net=host`, explicitly state that the container gets broad host, device, network, and mounted-repo access, then get user approval.
+- Launch with NVIDIA GPU access on Docker bridge networking. Use a broker whose advertised listener is reachable from the bridge; ask its owner before adding a dedicated listener or restarting it.
 - Do not silently clone repositories, change host permissions outside the repo, rename or delete user datasets, or report old artifacts as current-run success.
 - Treat custom videos, calibration, saved visualizations, and tracking metadata as potentially sensitive local data. Keep outputs local unless the user explicitly asks to move or share them.
 - If permission fixes are needed for generated outputs, propose the narrowest generated-directory-only fix and ask first; never recommend broad world-writable recursive permission changes.
 
 ## Related Skills
 
-- `amc-setup-calibration-stack` - Launch the standalone AutoMagicCalib stack when calibration is needed.
-- `amc-run-video-calibration` - Generate calibration from synchronized local MP4s before returning to MV3DT.
+- `amc-run-auto-calibration` - Launch AutoMagicCalib when needed and generate calibration from synchronized local MP4s before returning to MV3DT.
 
 <!-- signing marker -->
