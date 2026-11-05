@@ -1,0 +1,1 @@
+Use cuequivariance_torch.ChannelWiseTensorProduct on CPU for SO3 '2x0 + 2x1' and '0 + 1', filtered to l=0,1. I need different externally supplied weights for each batch item. Write and run a float64 example against the equivalent dense NumPy descriptor and demonstrate gradients through both features and weights.

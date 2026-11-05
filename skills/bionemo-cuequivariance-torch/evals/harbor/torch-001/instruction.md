@@ -1,0 +1,1 @@
+On CPU, use cuequivariance_torch.SphericalHarmonics for l=0,1,2 with normalize=False. Write and run a deterministic float64 example comparing it to the core NumPy descriptor, then run torch.autograd.gradcheck on nonzero input vectors. Do not install CUDA kernels.

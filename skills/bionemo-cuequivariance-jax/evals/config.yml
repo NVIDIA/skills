@@ -1,0 +1,62 @@
+# Prepare identical CPU dependencies for both arms before agent execution.
+# Astra's shared image currently provides Python 3.11; use its tested stack.
+schema_version: 1
+harbor:
+  base_image_mode: rebuild
+  runtime_env:
+    VIRTUAL_ENV: /workspace/.venv
+    PATH: /workspace/.venv/bin:/tmp/agent-home/.local/bin:/home/agent/.local/bin:/usr/local/share/npm-global/bin:/opt/openhands-venv/bin:/usr/local/bin:/usr/bin:/bin
+    JAX_PLATFORMS: cpu
+  pre_agent_setup:
+    - |
+      set -eu
+      cueq_root="${CUEQ_EVAL_ROOT:-/workspace}"
+      cueq_env="$cueq_root/.venv"
+      cueq_publish=false
+      if [ ! -e "$cueq_env" ] && [ ! -L "$cueq_env" ]; then
+        cueq_host_python=$(command -v python3)
+        cueq_env=$(mktemp -d "$cueq_root/.cueq-env.XXXXXX")
+        cueq_publish=true
+        "$cueq_host_python" -m venv --system-site-packages --without-pip "$cueq_env"
+        printf 'Installing CPU JAX dependencies into %s\n' "$cueq_env"
+        "$cueq_host_python" -m pip --python "$cueq_env" install \
+          --cert "${PIP_CERT:-/etc/ssl/certs/ca-certificates.crt}" \
+          --disable-pip-version-check --no-input --only-binary=:all: --no-compile \
+          --progress-bar off \
+          'cuequivariance==0.13.0' 'cuequivariance-jax==0.13.0' \
+          'jax==0.10.2' 'flax==0.12.7'
+      fi
+      printf 'Checking CPU environment: %s\n' "$cueq_env"
+      JAX_PLATFORMS=cpu "$cueq_env/bin/python" -u - <<'PY'
+      import importlib.metadata as metadata
+      import sys
+      import jax
+      import jax.numpy as jnp
+      import cuequivariance as cue
+      import cuequivariance_jax as cuex
+      from cuequivariance_jax import nnx
+
+      for package, expected in {
+          "cuequivariance": "0.13.0", "cuequivariance-jax": "0.13.0",
+          "jax": "0.10.2", "flax": "0.12.7",
+      }.items():
+          assert metadata.version(package) == expected, (package, metadata.version(package))
+      assert all(device.platform == "cpu" for device in jax.devices())
+      descriptor = cue.descriptors.spherical_harmonics(cue.SO3(1), [0, 1])
+      output = cuex.segmented_polynomial(
+          descriptor.polynomial, [jnp.ones((1, 3))],
+          [jax.ShapeDtypeStruct((1, 4), jnp.float32)], method="naive",
+      )[0]
+      assert output.shape == (1, 4) and bool(jnp.isfinite(output).all())
+      assert callable(nnx.IrrepsLinear)
+      print("CPU environment ready:", sys.executable, sys.version.split()[0], jax.devices())
+      PY
+      # Publish only after installation and the primitive compatibility check.
+      # Preserve failed environments for diagnosis; a retry uses a fresh path.
+      if [ "$cueq_publish" = true ]; then
+        ln -sT "$cueq_env" "$cueq_root/.venv"
+      fi
+skill_workspace:
+  mode: isolated
+grading:
+  mode: aces_default

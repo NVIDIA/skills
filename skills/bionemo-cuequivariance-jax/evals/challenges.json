@@ -1,0 +1,39 @@
+{
+  "skill_name": "cuequivariance-jax",
+  "evals": [
+    {
+      "id": "jax-challenge-layout-v1",
+      "expected_skill": "cuequivariance-jax",
+      "prompt": "Our JAX model receives O3 features in an older storage format: the original irreps can contain separated copies of the same irrep, and each original block is flattened in ir_mul order. We need a differentiable adapter to dictionaries keyed by cuequivariance.Irrep, with blocks shaped (..., multiplicity, irrep_dimension), plus an inverse that recovers the ORIGINAL block and channel order. Write /workspace/solution.py exposing to_blocks(irreps, flat) and from_blocks(irreps, blocks). Equal irreps must concatenate channels in their order of appearance; opposite parities must remain distinct. Support arbitrary leading batch axes and these representations: '1o + 2x0e + 2x1o + 1e + 0o' and '2x1e + 0o + 1o + 1e + 2x0e + 1o'. Use the installed cuEquivariance JAX integration on CPU and float64. Write and run checks with distinct values, both unbatched data and batch shape (2,3), exact dictionary block values and inverse values, eager/JIT agreement, and gradients through the round trip. Also check that rotation and inversion commute with the conversion. Keep these functions importable without running a demo at import time. Report the actual executed checks.",
+      "expected_output": "An executed, importable JAX adapter that preserves data and original ordering despite duplicate O3 irreps, keeps opposite parities distinct, and passes block-value, inverse, JIT, gradient, rotation, and inversion checks.",
+      "assertions": [
+        "The submitted functions use full irrep identities, preserve channel order among repeated irreps, and give correct block values; changing only irreps metadata or using a reshape-only conversion is insufficient.",
+        "The inverse reconstructs the original ungrouped flat buffer with all leading batch axes preserved, including an unbatched input.",
+        "Both conversion functions remain differentiable and usable with JIT for fixed irreps; the executed round-trip gradient agrees with a nonuniform cotangent.",
+        "The script actually runs exact value checks and nontrivial rotation and inversion checks on CPU float64, and the final claims match captured results."
+      ]
+    },
+    {
+      "id": "jax-challenge-graph-v1",
+      "expected_skill": "cuequivariance-jax",
+      "prompt": "Implement a small trainable equivariant graph layer for a CPU JAX application, using the installed cuEquivariance integration. Write /workspace/solution.py exposing apply(params, features, vectors, senders, receivers, num_dst). Input node features have SO3 irreps '2x0 + 2x1' in mul_ir layout; output destination features have '0 + 1' in mul_ir layout. Edges carry nonzero displacement vectors. The layer computes normalized spherical harmonics of degrees 0,1,2; a channelwise tensor product of each source feature and its edge harmonics, keeping output types l=0,1; a sum of messages at each destination; and a bias-free equivariant linear projection to the requested output. Use cuEquivariance's default descriptor coefficients and emitted tensor-product channel order. Parameters are a dict of float64 arrays: radial_in has shape (1,4), radial_out has shape (4,n_tp), and projection has shape (n_linear,). Here n_tp is the channelwise weight count and n_linear is the projection weight count. For each edge, the weight vector is tanh(norm(vector) @ radial_in) @ radial_out, where norm(vector) is shaped (1,). There are no other learned weights or biases. Do not initialize parameters inside apply. Support varying source/destination counts and repeated receivers, including destinations with no incoming edges. Demonstrate five source nodes, four destinations, senders=[0,1,3,0,1,4,2], receivers=[2,0,2,1,2,0,1], and deterministic nonconstant features, vectors, and parameters. Run an independent NumPy edge-loop comparison, rotation and permutation checks, eager/JIT agreement, and gradients of sum(output**2) for every parameter and both floating inputs, checked against finite differences. Execute one SGD update with learning rate 0.001 and show that the output changes while retaining reference agreement. Keep apply importable without running a demo at import time; report observed results.",
+      "expected_output": "A CPU graph layer whose values match independent NumPy descriptors and edge accumulation, with correct layouts, zero isolated destinations, stable parameters, equivariance, JIT, nonzero checked gradients, and a verified optimization update.",
+      "assertions": [
+        "The layer combines edge-dependent radial weights, normalized harmonics, the prescribed channelwise product and projection without losing descriptor output ordering or changing normalization.",
+        "Repeated receivers accumulate and isolated destinations remain zero; source relabeling and edge permutation preserve the corresponding output.",
+        "The saved implementation remains differentiable through features, edge vectors, and all three parameter arrays, and eager and compiled results agree with the independent reference.",
+        "The agent executes the numerical, rotation, gradient and update checks, preserves parameters across repeated calls, and supports the stated CPU environment without GPU dependencies."
+      ]
+    },
+    {
+      "id": "jax-challenge-routing-v1",
+      "expected_skill": null,
+      "prompt": "Fix this loss in my ordinary JAX regression model: def mse_loss(predictions, targets): return ((predictions - targets) ** 2).mean(). Predictions have shape (N,1), targets have shape (N,), and each prediction should be compared only with its own target. Write /workspace/solution.py with the corrected, importable mse_loss function. Run a small example with distinct values and check its prediction gradient and JIT behavior. Preserve the input floating dtype. Keep the change limited to the regression loss and use the existing JAX installation.",
+      "expected_output": "A standard JAX loss with correct per-example alignment and gradient, without invoking cuEquivariance or its skill.",
+      "assertions": [
+        "The scalar loss is the mean of N paired squared errors, and its prediction gradient has shape (N,1) with values 2*(prediction-target)/N.",
+        "The agent executes the loss, gradient and JIT checks, and does not import, install, or invoke cuEquivariance or load its skill."
+      ]
+    }
+  ]
+}

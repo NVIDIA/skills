@@ -1,0 +1,10 @@
+# Dependency versions below are exercised by the CPU contract checks.
+# Build the task environment with scripts/requirements.txt; do not assume
+# the shared Harbor base image contains these scientific packages.
+schema_version: 1
+harbor:
+  base_image_mode: rebuild
+skill_workspace:
+  mode: isolated
+grading:
+  mode: aces_default

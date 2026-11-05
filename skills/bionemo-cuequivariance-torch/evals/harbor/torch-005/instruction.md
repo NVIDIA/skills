@@ -1,0 +1,1 @@
+I copied a cuEquivariance PyTorch example using FullyConnectedTensorProduct and SphericalHarmonics onto a CPU-only laptop and it tries to load CUDA kernels. Explain the backend choice and write and run a small supported CPU tensor-product example. Keep my CPU PyTorch installation.
