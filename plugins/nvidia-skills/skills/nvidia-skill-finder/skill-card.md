@@ -1,5 +1,5 @@
 ## Description: <br>
-Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill; it checks the live NVIDIA skills catalog and recommends matching skills, while staying quiet for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks. <br>
+Use for NVIDIA-related requests where an NVIDIA skill might help, even if the user did not ask for a skill; it checks the live NVIDIA skills catalog and recommends matching NVIDIA skills (installing only with user approval), while staying quiet for generic non-NVIDIA route, optimize, deploy, AI, video, data, or infrastructure tasks. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers working with NVIDIA products, hardware, SDKs, and services use this skill to discover, evaluate, and (with explicit approval) install relevant NVIDIA agent skills from the live catalog, including Hermes Agent catalog lookups. <br>
+Developers and engineers using AI coding agents (such as Claude Code, Codex, or Hermes Agent) use this skill to discover, recommend, and—with explicit approval—install NVIDIA agent skills relevant to NVIDIA products, SDKs, hardware, and workflows such as CUDA, NIM, NeMo, Omniverse/OpenUSD, Isaac, Jetson, RAPIDS, cuOpt, Dynamo, Holoscan, TensorRT, DeepStream, and VSS. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -30,11 +30,13 @@ Mitigation: Review and scan skill before deployment. <br>
 - [NVIDIA Skills catalog (GitHub)](https://github.com/NVIDIA/skills/tree/main/skills) <br>
 - [NVIDIA Skills on build.nvidia.com](https://build.nvidia.com/skills) <br>
 - [NVIDIA Skills catalog index (skills.sh.json)](https://raw.githubusercontent.com/NVIDIA/skills/main/skills.sh.json) <br>
+- [NVIDIA Skills marketplace metadata (metadata.json)](https://raw.githubusercontent.com/NVIDIA/skills/main/.github/scripts/marketplace/metadata.json) <br>
+- [NVIDIA Skills documentation](https://docs.nvidia.com/skills) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Analysis, Shell commands] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Analysis, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline bash code blocks (skill recommendations with name, rationale, install command, and first prompt)] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [Recommends at most three skills ordered by confidence; installs only after explicit user approval.] <br>
 
@@ -45,7 +47,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-18 evaluation tasks (13 positive, 5 negative), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. <br>
+18 evaluation tasks (13 positive, 5 negative); 1 attempt per task, each in its own isolated sandbox pod (`k8s-sandbox` environment), with each task also run as a no-skill baseline. Evaluator version `1.6.8`; evaluation date 2026-11-05. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -77,12 +79,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.4% — baseline ran, but no comparable score was available; uplift unavailable | 87.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 97.2% (-2.8 points) | 97.2% → 91.7% (-5.5 points) |
-| Correctness | 64.4% → 96.7% (+32.3 points) | 77.8% → 91.1% (+13.3 points) |
+| Overall | 94.0% — baseline ran, but no comparable score was available; uplift unavailable | 89.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 97.2% → 100.0% (+2.8 points) | 100.0% → 94.4% (-5.6 points) |
+| Correctness | 61.1% → 94.4% (+33.3 points) | 74.4% → 93.3% (+18.9 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 37.1% → 93.8% (+56.7 points) | 58.8% → 94.2% (+35.4 points) |
-| Efficiency | 79.6% — baseline ran, but no comparable score was available; uplift unavailable | 64.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 36.5% → 96.5% (+60.0 points) | 56.5% → 100.0% (+43.5 points) |
+| Efficiency | 79.2% — baseline ran, but no comparable score was available; uplift unavailable | 63.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -97,20 +99,12 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.3% → 96.2% (-2.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.4% → 93.5% (-4.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 89.3% → 88.2% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 18 task(s) |
+| codex | Efficiency | Token-only comparison | 90.3% → 88.3% (-2.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
-0.3.0 (source: changelog, released 2025-05-21) <br>
+0.3.0 (source: changelog, released 2025-05-21; git SHA f73b929, committed 2026-11-05) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
