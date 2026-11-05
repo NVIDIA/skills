@@ -2118,8 +2118,8 @@
     {
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
-      "content_digest": "sha256:da43951c0c8c69da5622f5299055228c70bc6345273e7869f3c59acb92af8310",
-      "last_commit": "24cb45e1e1882853ba911fb661367fa20bde4615",
+      "content_digest": "sha256:b5c517e02618ea17df54fe204435adff5bcbd65716d56f4f8a5ec97eced30a0d",
+      "last_commit": "7fb950afa64022b230b843efb3558b94eea98787",
       "last_modified": "2026-11-05"
     },
     {
