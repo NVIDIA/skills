@@ -2,6 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 
 name: Holoscan Sensor Bridge
+product_primary: Holoscan
 repo: nvidia-holoscan/holoscan-sensor-bridge
 description: Agent-ready skills for Holoscan Sensor Bridge devkit workflows, including demo environment bring-up, FPGA flashing for Lattice and VB1940 hardware, example application execution, QA test-plan automation, and support for configuring and using the Holoscan Sensor Bridge FPGA intellectual property (IP) core.
 links:
