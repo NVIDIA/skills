@@ -1,4 +1,5 @@
 name: CDF Curation and Retrieval
+product_primary: Cosmos Data Factory
 repo: NVIDIA/cdf-curation-and-retrieval
 description: Author, validate, and run Cosmos Data Factory curation and retrieval pipelines.
 skills:

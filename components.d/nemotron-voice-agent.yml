@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: Nemotron Voice Agent
+product_primary: Nemotron
 repo: NVIDIA-AI-Blueprints/nemotron-voice-agent
 description: >-
   Create or refine NVIDIA voice agents (Cascaded or Omni) with Pipecat or

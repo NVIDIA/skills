@@ -1,4 +1,5 @@
 name: CDF AnomalyGen
+product_primary: Cosmos Data Factory
 repo: NVIDIA/cdf-anomalygen
 description: Run Cosmos Data Factory AnomalyGen workflows for fine-tuning, synthetic defect generation, evaluation, refinement, and pseudo-labeling.
 skills:

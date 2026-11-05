@@ -1,4 +1,5 @@
 name: Physical AI
+product_primary: Cosmos Data Factory
 repo: NVIDIA/physical-ai-data-factory
 description: Physical AI skills for simulation, synthetic data generation, training, validation and deployment and more.
 ref: paidf-26.10

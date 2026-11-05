@@ -1,4 +1,5 @@
 name: CDF Simulation
+product_primary: Cosmos Data Factory
 repo: NVIDIA/cdf-simulation
 description: Build and validate Cosmos Data Factory Simulation jobs and compiled payloads for PCB-AOI workflows.
 skills:

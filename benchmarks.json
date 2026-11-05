@@ -1361,7 +1361,7 @@
         "codex"
       ],
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "has_results": true,
       "average_uplift_pct": 11.67
     },
@@ -2914,7 +2914,7 @@
         "codex"
       ],
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "has_results": true,
       "average_uplift_pct": 13.5
     },
@@ -2934,7 +2934,7 @@
         "codex"
       ],
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "has_results": true,
       "average_uplift_pct": 16.92
     },
@@ -2954,7 +2954,7 @@
         "codex"
       ],
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "has_results": true,
       "average_uplift_pct": 27.43
     },
@@ -14652,7 +14652,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -14661,7 +14661,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -14670,7 +14670,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -14679,7 +14679,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -14688,7 +14688,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -14697,7 +14697,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -14706,7 +14706,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -14715,7 +14715,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -14724,7 +14724,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -14733,7 +14733,7 @@
     },
     {
       "catalog_dir": "data-designer",
-      "component": "Data Designer",
+      "component": "NeMo Data Designer",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -20952,7 +20952,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -20961,7 +20961,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -20970,7 +20970,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -20979,7 +20979,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -20988,7 +20988,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -20997,7 +20997,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -21006,7 +21006,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -21015,7 +21015,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -21024,7 +21024,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -21033,7 +21033,7 @@
     },
     {
       "catalog_dir": "ethos-explore",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -21042,7 +21042,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -21051,7 +21051,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -21060,7 +21060,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -21069,7 +21069,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -21078,7 +21078,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -21087,7 +21087,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -21096,7 +21096,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -21105,7 +21105,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -21114,7 +21114,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -21123,7 +21123,7 @@
     },
     {
       "catalog_dir": "ethos-orchestrate",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -21132,7 +21132,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -21141,7 +21141,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -21150,7 +21150,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -21159,7 +21159,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -21168,7 +21168,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -21177,7 +21177,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -21186,7 +21186,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -21195,7 +21195,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -21204,7 +21204,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -21213,7 +21213,7 @@
     },
     {
       "catalog_dir": "ethos-write",
-      "component": "Ethos",
+      "component": "ETHOS.md",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",

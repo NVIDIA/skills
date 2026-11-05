@@ -1,4 +1,5 @@
 name: NeMo AutoModel
+product_primary: NeMo AutoModel
 repo: NVIDIA-NeMo/Automodel
 description: NeMo AutoModel - PyTorch-native distributed training for LLMs/VLMs with Hugging Face support, recipes, launchers, and validation workflows.
 skills:
