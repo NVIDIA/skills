@@ -5758,7 +5758,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-autofl",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 16.87
     },
@@ -5778,7 +5778,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 24.5
     },
@@ -5798,7 +5798,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 25.28
     },
@@ -5818,7 +5818,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 10.1
     },
@@ -5838,7 +5838,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": -0.3
     },
@@ -5858,7 +5858,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-diagnose-job",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 15.63
     },
@@ -5878,7 +5878,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-fed-stats",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 2.9
     },
@@ -5898,7 +5898,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 8.7
     },
@@ -5918,7 +5918,7 @@
         "codex"
       ],
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "has_results": true,
       "average_uplift_pct": 10.87
     },
@@ -33011,7 +33011,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33020,7 +33020,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33029,7 +33029,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33038,7 +33038,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33047,7 +33047,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33056,7 +33056,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -33065,7 +33065,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33074,7 +33074,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -33083,7 +33083,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33092,7 +33092,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -33101,7 +33101,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33110,7 +33110,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -33119,7 +33119,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33128,7 +33128,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -33137,7 +33137,7 @@
     },
     {
       "catalog_dir": "nvflare-autofl-report",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33146,7 +33146,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -33155,7 +33155,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NVFlare",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33164,7 +33164,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NVFlare",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -33173,7 +33173,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33182,7 +33182,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NVFlare",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -33191,7 +33191,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33200,7 +33200,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NVFlare",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -33209,7 +33209,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33218,7 +33218,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NVFlare",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -33227,7 +33227,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-huggingface",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33236,7 +33236,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -33245,7 +33245,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33254,7 +33254,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -33263,7 +33263,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33272,7 +33272,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -33281,7 +33281,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33290,7 +33290,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -33299,7 +33299,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33308,7 +33308,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -33317,7 +33317,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-lightning",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33326,7 +33326,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -33335,7 +33335,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33344,7 +33344,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -33353,7 +33353,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33362,7 +33362,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -33371,7 +33371,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33380,7 +33380,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -33389,7 +33389,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33398,7 +33398,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -33407,7 +33407,7 @@
     },
     {
       "catalog_dir": "nvflare-convert-pytorch",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33416,7 +33416,7 @@
     },
     {
       "catalog_dir": "nvflare-diagnose-job",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33425,7 +33425,7 @@
     },
     {
       "catalog_dir": "nvflare-diagnose-job",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33434,7 +33434,7 @@
     },
     {
       "catalog_dir": "nvflare-diagnose-job",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33443,7 +33443,7 @@
     },
     {
       "catalog_dir": "nvflare-diagnose-job",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33452,7 +33452,7 @@
     },
     {
       "catalog_dir": "nvflare-diagnose-job",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33461,7 +33461,7 @@
     },
     {
       "catalog_dir": "nvflare-fed-stats",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33470,7 +33470,7 @@
     },
     {
       "catalog_dir": "nvflare-fed-stats",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33479,7 +33479,7 @@
     },
     {
       "catalog_dir": "nvflare-fed-stats",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33488,7 +33488,7 @@
     },
     {
       "catalog_dir": "nvflare-fed-stats",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33497,7 +33497,7 @@
     },
     {
       "catalog_dir": "nvflare-fed-stats",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33506,7 +33506,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -33515,7 +33515,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33524,7 +33524,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -33533,7 +33533,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33542,7 +33542,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -33551,7 +33551,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33560,7 +33560,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -33569,7 +33569,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33578,7 +33578,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -33587,7 +33587,7 @@
     },
     {
       "catalog_dir": "nvflare-orient",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
@@ -33596,7 +33596,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
@@ -33605,7 +33605,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Security",
       "num": null,
       "agent": "codex",
@@ -33614,7 +33614,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
@@ -33623,7 +33623,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
@@ -33632,7 +33632,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
@@ -33641,7 +33641,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
@@ -33650,7 +33650,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
@@ -33659,7 +33659,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
@@ -33668,7 +33668,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
@@ -33677,7 +33677,7 @@
     },
     {
       "catalog_dir": "nvflare-shared",
-      "component": "NV FLARE",
+      "component": "NVIDIA FLARE",
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
