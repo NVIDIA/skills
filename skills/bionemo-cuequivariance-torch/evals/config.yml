@@ -1,0 +1,13 @@
+# Prepare identical CPU dependencies for both arms before agent execution.
+schema_version: 1
+harbor:
+  # Repo-owned tasks give dependency installation its own 10-minute budget.
+  task_source: native_harbor
+  base_image_mode: rebuild
+  runtime_env:
+    VIRTUAL_ENV: /workspace/.venv
+    PATH: /workspace/.venv/bin:/tmp/agent-home/.local/bin:/home/agent/.local/bin:/usr/local/share/npm-global/bin:/opt/openhands-venv/bin:/usr/local/bin:/usr/bin:/bin
+skill_workspace:
+  mode: isolated
+grading:
+  mode: aces_default

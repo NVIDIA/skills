@@ -1,0 +1,76 @@
+{
+  "skill_name": "cuequivariance-jax",
+  "evals": [
+    {
+      "expected_skill": "cuequivariance-jax",
+      "id": "jax-001",
+      "prompt": "On CPU, use cuequivariance_jax.segmented_polynomial to execute a channelwise SO3 tensor product for '2x0 + 2x1' and '0 + 1', filtering output types to l=0,1. Use shared weights with no batch axis and inputs shaped (2,1,d1) and (1,3,d2). Write and run a deterministic float64 script comparing naive JAX and jax.jit output to the core NumPy descriptor, then check a weight gradient with central finite differences.",
+      "expected_output": "A CPU naive implementation with broadcast output shape (2,3,dout), matching NumPy/JIT results and a finite-difference gradient check.",
+      "assertions": [
+        "It explicitly uses method='naive', enables JAX x64 before making float64 arrays, and derives sizes from the polynomial.",
+        "Its ShapeDtypeStruct accounts for the (2,3) broadcast batch and output size; the weight vector has no batch dimension.",
+        "The script executes both eager and jitted computations and compares them against the NumPy descriptor with the same operands.",
+        "It differentiates a nonconstant scalar loss and verifies at least one nonzero weight derivative with a stated finite-difference tolerance.",
+        "It does not install or claim to execute CUDA kernels."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-jax",
+      "id": "jax-002",
+      "prompt": "For regrouped SO3 irreps '2x0 + 3x1', I have nonconstant batched data flattened in ir_mul order. Using cuequivariance_jax.ir_dict, write and run a script that converts it to a dictionary, checks every block shape and value, converts to mul_ir flat data, and reconstructs the original ir_mul flat data. Can dict_to_flat take a layout argument?",
+      "expected_output": "An executed conversion with explicit per-block transpose when reconstructing ir_mul, and an accurate explanation of dict_to_flat's API.",
+      "assertions": [
+        "flat_to_dict is called with layout='ir_mul' and produces (...,mul,ir.dim) blocks.",
+        "It explains that dict_to_flat has no layout argument and emits mul_ir; it does not invent an unsupported keyword.",
+        "It reconstructs ir_mul by transposing and flattening each dictionary block in irreps order, preserving batch axes.",
+        "It runs exact comparisons on distinct values and notes that duplicate irrep blocks must be regrouped before using irrep keys."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-jax",
+      "id": "jax-003",
+      "prompt": "Use cuequivariance_jax.nnx.IrrepsLinear on CPU to map SO3 '2x0 + 3x1' to '4x0 + 2x1 + 1x2'. Write and run a Flax NNX example with explicit RNGs and dict[Irrep, Array] inputs. Check output shapes, the l=2 output, the layer's normalization against an independent einsum, and equivariance under a nonzero rotation.",
+      "expected_output": "A runnable NNX layer example with zero unmatched l=2 output, normalized matching-irrep channel mixing, and passing rotation/reference checks.",
+      "assertions": [
+        "It uses Flax NNX Rngs and regrouped irreps; input blocks have (...,mul,ir.dim) shape.",
+        "Output blocks have multiplicities 4,2,1 for l=0,1,2 respectively; the unmatched l=2 block is zero.",
+        "The independent calculation includes scale/sqrt(mul_in) and does not mix inequivalent irreps.",
+        "It executes both the reference comparison and a nonzero rotation equivariance check on CPU."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-jax",
+      "id": "jax-004",
+      "prompt": "I need a CPU JAX reference for an IrDictPolynomial channelwise tensor product of SO3 '2x0 + 2x1 + 2x2' with '0 + 1 + 2 + 3', filtered to output types l=0,1,2. Write and run it through cuequivariance_jax.segmented_polynomial with method='naive'. Start from high-level (...,mul,ir.dim) dictionary blocks and compare all outputs against the core NumPy polynomial. Explain why these blocks cannot be passed unchanged to segmented_polynomial_uniform_1d.",
+      "expected_output": "Correctly ordered, transposed and flattened operands, one ShapeDtypeStruct per split output, and an executed JAX/NumPy comparison.",
+      "assertions": [
+        "It uses the descriptor's input_irreps/output_irreps to assemble operands, including weights first; no nonexistent ir_dict.equivariant_polynomial API is invented.",
+        "It transposes each mul_ir block before flattening for the descriptor and creates a shape/dtype spec for every split output.",
+        "It executes naive JAX and NumPy using identical arrays and verifies every output numerically.",
+        "It distinguishes high-level (...,mul,ir.dim) arrays from low-level uniform segmented arrays and their CUDA constraints."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-jax",
+      "id": "jax-005",
+      "prompt": "My JAX application runs on a CPU-only machine. I need equivariant linear layers and spherical harmonics, and saw examples using uniform_1d and IrrepsIndexedLinear. Recommend supported CPU routes and show a small runnable spherical-harmonics example. Do not install a GPU stack.",
+      "expected_output": "A CPU naive polynomial or NNX spherical-harmonics example and accurate backend boundaries.",
+      "assertions": [
+        "It checks or explains jax.devices() and uses an explicit naive execution path or the NNX SphericalHarmonics CPU implementation.",
+        "It recommends IrrepsLinear for ordinary CPU channel mixing and identifies indexed_linear/IrrepsIndexedLinear as a CUDA-specific route.",
+        "It runs a small CPU spherical-harmonics calculation and checks the expected l=0,1,2 output shapes.",
+        "It does not claim uniform_1d can run on CPU or install CUDA dependencies."
+      ]
+    },
+    {
+      "expected_skill": null,
+      "id": "jax-006",
+      "prompt": "Give me a standard-library Python function that counts words in a UTF-8 text file. Do not use numerical or machine-learning libraries.",
+      "expected_output": "A simple standard-library solution without the JAX/cuEquivariance skill.",
+      "assertions": [
+        "It uses standard-library file and text processing.",
+        "It does not import, install, or invoke JAX, Flax, or cuEquivariance."
+      ]
+    }
+  ]
+}

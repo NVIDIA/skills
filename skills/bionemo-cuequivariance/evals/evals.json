@@ -1,0 +1,77 @@
+{
+  "skill_name": "cuequivariance",
+  "evals": [
+    {
+      "expected_skill": "cuequivariance",
+      "id": "core-001",
+      "prompt": "Implement a frozen, hashable cue.Irrep subclass for the three complex one-dimensional irreps of Z3, labelled k=0,1,2. Use the generator exp(2j*pi*k/3), reject invalid labels and strings, and yield the trivial irrep first. Write and run a standalone CPU NumPy script that checks string round trips, the group relation, all tensor-product selection rules, and Clebsch-Gordan covariance. Do not install a GPU framework.",
+      "expected_output": "Runnable Z3 implementation and executed assertions for all three irreps and all 27 CG triples, with a clear boundary between complex mathematical representations and GPU execution support.",
+      "assertions": [
+        "The immutable dataclass stores and validates k in {0,1,2}; equal irreps are usable as dictionary keys and valid strings round-trip.",
+        "The generator has shape (1,1,1), its cube is identity, and the continuous-generator and algebra arrays have shapes (0,1,1) and (0,0,0).",
+        "Tensor products select k3=(k1+k2)%3; allowed CG arrays have shape (1,1,1,1) and disallowed arrays (0,1,1,1).",
+        "The agent executes the script and numerically checks generator covariance for every allowed coupling, rather than only displaying untested code.",
+        "It does not claim that complex Z3 representations imply support in CUDA kernels."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance",
+      "id": "core-002",
+      "prompt": "Using only cuequivariance and NumPy on CPU, build the full, unweighted SO3 tensor product of '2x0 + 1x1 + 1x2' and '1x0 + 1x1'. Give the aggregated output irreps and dimension, but preserve the descriptor's actual output order when executing it. Write and run a deterministic example with two batched inputs and verify equivariance under a nonzero rotation.",
+      "expected_output": "A full_tensor_product descriptor with two inputs, an aggregated output of 3x0 + 5x1 + 3x2 + 1x3 (dimension 40), and a passing numerical equivariance check.",
+      "assertions": [
+        "The descriptor is full_tensor_product with no trainable weight operand; both input arrays and the random seed are defined.",
+        "The aggregated output is 3x0 + 5x1 + 3x2 + 1x3 with dimension 40.",
+        "The code uses the descriptor's actual representations and layouts for input/output rotation, without interpreting a regrouped summary as the stored output order.",
+        "For row-vector batches it applies representation matrices with the appropriate transpose and executes a nontrivial equivariance comparison with a reported tolerance."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance",
+      "id": "core-003",
+      "prompt": "I have SO3 feature blocks with irreps '2x0 + 2x1 + 2x2' and edge blocks '0 + 1 + 2 + 3', each stored as (..., multiplicity, ir.dim). Use channelwise_tensor_product_ir_dict, keeping output irrep types l=0,1,2. On CPU with NumPy, write and run a check against the equivalent dense descriptor using the same nonconstant inputs and weights. Explain operand ordering, layout conversion, and what the third descriptor argument controls.",
+      "expected_output": "A valid IrDictPolynomial execution through its polynomial and a numerical match against the dense channelwise tensor product after consistent block ordering and layouts.",
+      "assertions": [
+        "It treats IrDictPolynomial as metadata and calls its .polynomial with arrays split according to input_irreps and output_irreps, with the weight group first.",
+        "Each high-level (...,mul,ir.dim) block is transposed to (...,ir.dim,mul) before flattening for ir_mul; nonconstant data makes a reshape-only bug detectable.",
+        "It respects each descriptor's actual output ordering when comparing results; any regrouping also reorders the data.",
+        "It explains that the third channelwise argument filters output irrep types and does not prescribe output multiplicities.",
+        "The NumPy reference comparison is actually run and passes; no JAX or CUDA installation is needed."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance",
+      "id": "core-004",
+      "prompt": "My NumPy features for SO3 '2x0 + 3x1' are flattened in mul_ir order, but a cue.descriptors.linear descriptor uses ir_mul. Write and run a correct per-block conversion in both directions. Use distinct values in every channel, demonstrate why reshape alone is wrong, and verify the linear operation under a nonzero SO3 rotation.",
+      "expected_output": "Executed, invertible blockwise layout conversions and an equivariance check on correctly converted data.",
+      "assertions": [
+        "The conversion slices each irrep block and swaps only multiplicity and representation axes, preserving batch axes and block order.",
+        "It tests exact round trips on nonconstant data and demonstrates a difference from reshape-only conversion for the vector block.",
+        "The linear descriptor is evaluated with matching weights and layouts, and rotations use row-vector conventions consistently.",
+        "A nontrivial numerical equivariance assertion is executed and passes."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance",
+      "id": "core-005",
+      "prompt": "I need a compatibility path for an older CPU-only deployment where cuequivariance imports but may not expose IrDictPolynomial or channelwise_tensor_product_ir_dict. That deployment cannot upgrade or install JAX or PyTorch. Show version and capability checks and a dense NumPy fallback for a channelwise tensor product. The sandbox may have a newer version; do not assume its available APIs exist in the older deployment and do not change any dependencies.",
+      "expected_output": "Capability checks and a dense NumPy fallback, without requiring the missing API or changing dependencies.",
+      "assertions": [
+        "It checks or shows checks for cue.__version__ and hasattr/getattr for the missing APIs, rather than assuming this skill's newest API is available.",
+        "It proposes cue.descriptors.channelwise_tensor_product and NumPy execution if present, making any unavailable fallback explicit.",
+        "It explains how to convert per-irrep blocks to the dense descriptor's layout and preserve operand order.",
+        "It does not install or upgrade packages, switch frameworks, or pretend the unavailable IrDictPolynomial call succeeded."
+      ]
+    },
+    {
+      "expected_skill": null,
+      "id": "core-006",
+      "prompt": "Explain how to choose a PostgreSQL index for SELECT * FROM events WHERE tenant_id = 42 AND created_at >= now() - interval '1 day' ORDER BY created_at DESC LIMIT 100. I only need database advice.",
+      "expected_output": "An answer about PostgreSQL indexing without using cuEquivariance.",
+      "assertions": [
+        "It answers the database indexing question directly.",
+        "It does not import, install, or invoke cuEquivariance or force the question into group theory or tensor products."
+      ]
+    }
+  ]
+}

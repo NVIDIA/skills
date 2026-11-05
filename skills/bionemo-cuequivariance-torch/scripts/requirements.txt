@@ -1,0 +1,6 @@
+# CPU evaluation baseline for the APIs documented in this skill.
+# Match evals/setup_cpu.sh; install the pinned wheel from torch-cpu-wheels.txt first.
+# Resolve dependencies using the project's existing package index configuration.
+cuequivariance==0.13.0
+cuequivariance-torch==0.13.0
+torch==2.14.1+cpu
