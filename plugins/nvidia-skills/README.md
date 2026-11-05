@@ -18,7 +18,7 @@ You can also get it by adding the self-hosted `nvidia-official` marketplace from
 
 Hermes ships its own scanned, profile-aware skills catalog, so the finder uses that instead and never calls `npx`. The details live in the skill's `references/hermes-catalog.md`.
 
-- **Catalog lookup.** `hermes skills search <keyword> --source nvidia --json`. That search matches the query as a plain substring, so the finder queries one broad keyword at a time; if several come back empty it falls back to the full catalog listing on `raw.githubusercontent.com`, so a narrow search term can't hide a skill that exists.
+- **Catalog lookup.** `hermes skills search <keyword> --source nvidia --json --limit 100`. That search matches the query as a plain substring, so the finder queries one broad keyword at a time; `--limit 100` raises the default of 25 so broad keywords aren't truncated. If several keywords come back empty it falls back to the full catalog listing on `raw.githubusercontent.com`, so a narrow search term can't hide a skill that exists. Requires Hermes 0.22+ for `--source`.
 - **Installs only with approval.** `hermes skills install NVIDIA/skills/<skill-name>`, which runs Hermes's own security scan and installs into the active profile. Hermes prompts for confirmation itself, so the finder does not pass `--yes`.
 
 The plugin itself contains no code, stores no credentials, and sends no telemetry. The `skills` CLI follows its own policies.

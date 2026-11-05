@@ -4,11 +4,19 @@ Follow this instead of the `npx` commands in SKILL.md when you are running in
 Hermes Agent. Hermes has a built-in catalog that is already security scanned and
 profile-aware, so `npx` is both unnecessary and far more expensive in context.
 
+`--source nvidia` requires Hermes 0.22 or newer; older versions reject the
+flag. If it is rejected, drop `--source nvidia` and filter the results for
+`NVIDIA/skills` identifiers yourself.
+
 ## Catalog lookup
 
 ```bash
-hermes skills search <keyword> --source nvidia --json
+hermes skills search <keyword> --source nvidia --json --limit 100
 ```
+
+Always pass `--limit 100`. The default is 25, which silently truncates the
+broad keywords this guidance tells you to use — `jetson` alone matches 39
+skills, so the default cuts off real results such as `jetson-quick-start`.
 
 Search one broad keyword at a time — `jetson`, `usd`, `dynamo`, `pandas`,
 `cuda`. `--json` returns each candidate's full description; read the
