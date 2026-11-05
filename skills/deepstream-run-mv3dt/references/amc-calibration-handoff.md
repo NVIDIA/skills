@@ -1,16 +1,19 @@
+<!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # AutoMagicCalib Handoff
 
 Load this reference only when a custom synchronized MP4 dataset lacks `camInfo/*.yml` calibration files.
 
 ## Principle
 
-Do not duplicate AutoMagicCalib setup or calibration logic here. Delegate to the standalone AutoMagicCalib skills, then return to `custom-dataset.md` after the MV3DT-format export is placed in the dataset.
+Do not duplicate AutoMagicCalib setup or calibration logic here. First read the [AMC skill entry point](../../amc-run-auto-calibration/SKILL.md), then load only the references it selects for this request. Delegate to that skill and return to `custom-dataset.md` after the MV3DT-format export is placed in the dataset.
 
 ## Handoff Inputs
 
-Before delegating, ask the user to choose the calibration detector (`resnet` or `transformer`) and whether they have a calibration settings JSON to apply. Settings files have no required filename convention; use an explicit user-provided path when available, and otherwise run AMC without a settings file or use the AMC UI Step 3 fallback. Do not silently calibrate with a default detector for custom datasets.
+Before delegating, ask the user to choose the AutoMagicCalib calibration detector (`resnet` or `transformer`) and whether they have a calibration settings JSON to apply. This choice controls calibration and is independent of MV3DT's `DETECTOR_MODEL` (`PeopleNetTransformer`, `RTDETR`, or `PeopleNet2.6.3`), which controls inference and exported `modelInfo` normalization. Do not derive either detector from the other's name. Settings files have no required filename convention; use an explicit user-provided path when available, and otherwise run AMC without a settings file or use the AMC UI Step 3 fallback. Do not silently calibrate with a default detector for custom datasets.
 
-AMC's video calibration workflow uploads files matching `cam_*.mp4` sorted alphabetically. If the custom dataset videos are not already named that way, do not rename user files. Create a generated staging directory with ordered `cam_NN.mp4` symlinks or copies, then pass that staging directory as the AMC videos directory:
+The AMC local-video workflow uploads files matching `cam_*.mp4` sorted alphabetically. If the custom dataset videos are not already named that way, do not rename user files. Create a generated staging directory with ordered `cam_NN.mp4` symlinks or copies, then pass that staging directory as the AMC videos directory:
 
 ```bash
 AMC_VIDEO_DIR="${AMC_VIDEO_DIR:-${EXPERIMENT_DIR}/amc_video_staging/videos_$(date +%Y%m%d_%H%M%S)}"
@@ -26,6 +29,8 @@ done < <(find "${DATASET_DIR}/videos" -maxdepth 1 -type f -name '*.mp4' | sort)
 test "$i" -gt 0 || { echo "ERROR: no MP4 files found under ${DATASET_DIR}/videos"; exit 1; }
 ```
 
+Before creating an AMC project or uploading clips, show the complete `cam_NN` to original-video to physical-camera-ID mapping and obtain confirmation that it matches the dataset's camera ordering. This gate also applies when the original filenames already match `cam_*.mp4`; lexical order alone does not prove camera identity. If the supplied task already includes an explicit approved mapping, compare every staged entry against it. Otherwise pause for confirmation; unattended runs without a verified mapping must stop. If the order is wrong, create a new staging directory in the confirmed order rather than overwriting staging links. Keep the mapping with the run outputs and verify exported `camInfo` files against it before landing them in the dataset.
+
 Pass these details to the AutoMagicCalib video calibration workflow:
 
 - Videos directory: `${DATASET_DIR}/videos` when files already match `cam_*.mp4`, otherwise `${AMC_VIDEO_DIR}`
@@ -36,7 +41,7 @@ Pass these details to the AutoMagicCalib video calibration workflow:
 
 ## AMC Compose Image Guard
 
-Treat the latest checked-out AutoMagicCalib compose file as authoritative. If the AMC checkout is not already available, delegate repo clone, checkout, and setup to `amc-setup-calibration-stack`; do not clone or substitute AMC backend images from this MV3DT skill.
+Treat the latest checked-out AutoMagicCalib compose file as authoritative. If the AMC checkout is not already available, delegate through the [AMC skill entry point](../../amc-run-auto-calibration/SKILL.md), then its [setup reference](../../amc-run-auto-calibration/references/setup.md); do not clone or substitute AMC backend images from this MV3DT skill.
 
 Before running calibration, resolve `AMC_COMPOSE_DIR`, normally `${AMC_REPO_ROOT}/compose`, from the AMC setup skill or an explicit user-provided AMC checkout. Record the compose images and refuse silent overrides:
 
@@ -67,10 +72,11 @@ if [ -s /tmp/mv3dt_amc_unapproved_images.txt ]; then
 fi
 ```
 
-Use these skills in order when needed:
+Use `amc-run-auto-calibration` when needed:
 
-1. `amc-setup-calibration-stack` if the service and UI are not already running.
-2. `amc-run-video-calibration` for local MP4 calibration.
+1. Read the [AMC skill entry point](../../amc-run-auto-calibration/SKILL.md) before following its reference workflows.
+2. Load [AMC setup](../../amc-run-auto-calibration/references/setup.md) if the service and UI are not already running.
+3. Load [AMC local-video calibration](../../amc-run-auto-calibration/references/video-files.md) for local MP4 calibration.
 
 Wait until the project reaches `project_state == COMPLETED` before fetching the MV3DT export. During the delegated calibration run, expect the AMC skill to report project ID, UI/log review locations, progress updates, completion state, and the calibration result review artifact before returning to MV3DT.
 
@@ -88,7 +94,7 @@ curl -sfL "${AMC_BASE_URL}/v1/result/${PROJECT_ID}/mv3dt_result?result_type=${RE
 unzip -l /tmp/mv3dt_output.zip
 ```
 
-Prefer `RESULT_TYPE=vggt` only when the AutoMagicCalib run completed VGGT refinement and the user wants the refined result; otherwise use `amc`. If carrying a URL from the AMC skills, normalize it to the service root here; both `http://host:8000` and `http://host:8000/v1` are accepted by the snippet above.
+Prefer `RESULT_TYPE=vggt` only when the AutoMagicCalib run completed independent VGGT calibration and the user wants the VGGT result; otherwise use `amc`. If carrying a URL from `amc-run-auto-calibration`, normalize it to the service root here; both `http://host:8000` and `http://host:8000/v1` are accepted by the snippet above.
 
 ## Land Export Into Dataset
 
