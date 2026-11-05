@@ -113,8 +113,8 @@ Catalog check means one of:
 npx skills add nvidia/skills --list
 ```
 
-- If running in Hermes Agent, use the Hermes CLI instead of `npx` and follow
-  [references/hermes-catalog.md](references/hermes-catalog.md).
+- If running in Hermes Agent, do not run `npx`. Follow
+  [references/hermes-catalog.md](references/hermes-catalog.md) instead.
 - Otherwise do not run `hermes` commands. The binary may exist on the machine
   even when you are a different agent, and installing through it writes to
   Hermes's skills directory, where you cannot load the result.
