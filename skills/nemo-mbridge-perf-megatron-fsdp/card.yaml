@@ -17,13 +17,12 @@ validation_status:
     - known_failure
 feature_meaning:
   megatron_fsdp: >
-    Megatron-Core custom FSDP path enabled through use_megatron_fsdp and
+    Megatron-Core custom FSDP path enabled through ddp.use_megatron_fsdp and
     checkpointed through fsdp_dtensor.
   torch_fsdp2: >
     Megatron-Core wrapper around PyTorch fully_shard enabled through
     use_torch_fsdp2.
 recommended_path:
-  dist.use_megatron_fsdp: true
   ddp.use_megatron_fsdp: true
   ddp.data_parallel_sharding_strategy: optim_grads_params
   checkpoint.ckpt_format: fsdp_dtensor
