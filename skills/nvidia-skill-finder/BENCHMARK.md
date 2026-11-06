@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nvidia-skill-finder`
-- Evaluation date: 2026-10-01
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-05
+- Evaluator version: `1.6.8`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 18 evaluation tasks (13 positive, 5 negative)
-- Dataset digest: `sha256:df412e229dfed3687e1112c8f5bc439a6f3695291f3d357f049002621e90845f` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Dataset digest: `sha256:75b2b97f4c0057ea5bbadcfcd92d5561919ce56e7f03a93f629cb8bdd8f01281` (skill-evaluator-dataset-snapshot/1)
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| nvidia-skill-finder | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| nvidia-skill-finder | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| nvidia-skill-finder | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| nvidia-skill-finder | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| nvidia-skill-finder | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+
+- Controls for `nvidia-skill-finder`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.0% — baseline ran, but no comparable score was available; uplift unavailable | 89.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 98.2% → 97.2% (-1.0 points) | 88.5% → 94.4% (+5.9 points) |
-| Correctness | 69.6% → 96.7% (+27.1 points) | 70.8% → 100.0% (+29.2 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 36.1% → 87.9% (+51.8 points) | 40.9% → 89.7% (+48.8 points) |
-| Efficiency | 78.4% — baseline ran, but no comparable score was available; uplift unavailable | 66.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.8% — baseline ran, but no comparable score was available; uplift unavailable | 87.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 97.2% (-2.8 points) | 94.4% → 86.1% (-8.3 points) |
+| Correctness | 65.6% → 96.7% (+31.1 points) | 76.7% → 95.6% (+18.9 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 35.1% → 96.5% (+61.4 points) | 61.6% → 97.2% (+35.6 points) |
+| Efficiency | 78.7% — baseline ran, but no comparable score was available; uplift unavailable | 63.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,59 +63,70 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.3% → 96.3% (-2.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 89.5% → 88.3% (-1.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 2,931,632 | 4,494,280 | N/A | N/A | skill 18/18; base 27/27 |
-| claude-code | nvidia-skill-finder-diff-bare-invocation | 175,571 | 151,559 | +24,012 | +15.84% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-diff-browse-no-keywords | 136,133 | 120,437 | +15,696 | +13.03% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-diff-deep-research | 170,078 | 363,184 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nvidia-skill-finder-neg-express-route | 356,710 | 483,643 | -126,933 | -26.25% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-neg-generic-kubernetes | 154,997 | 185,511 | -30,514 | -16.45% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-neg-python-refactor | 120,042 | 119,199 | +843 | +0.71% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-neg-react-optimize | 153,960 | 152,401 | +1,559 | +1.02% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-neg-video-editing | 159,058 | 154,957 | +4,101 | +2.65% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-pos-cad-to-simready | 129,524 | 162,375 | -32,851 | -20.23% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-pos-dicom | 177,291 | 157,064 | +20,227 | +12.88% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-pos-dynamo-kv | 129,903 | 376,086 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nvidia-skill-finder-pos-gpu-pandas | 130,132 | 124,405 | +5,727 | +4.60% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-pos-isaac-lab | 211,676 | 60,437 | +151,239 | +250.24% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-pos-jetson-driver-install | 167,216 | 59,583 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | nvidia-skill-finder-pos-jetson-setup | 130,190 | 335,895 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nvidia-skill-finder-pos-multigpu-training | 169,065 | 1,276,278 | -1,107,213 | -86.75% | skill 1/1; base 1/1 |
-| claude-code | nvidia-skill-finder-pos-openusd-optimization | 129,543 | 89,238 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | nvidia-skill-finder-pos-vehicle-routing | 130,543 | 122,028 | +8,515 | +6.98% | skill 1/1; base 1/1 |
-| codex | All cases | 1,642,585 | 2,128,791 | N/A | N/A | skill 18/18; base 26/26 |
-| codex | nvidia-skill-finder-diff-bare-invocation | 73,710 | 685,152 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nvidia-skill-finder-diff-browse-no-keywords | 128,756 | 240,494 | -111,738 | -46.46% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-diff-deep-research | 86,599 | 40,331 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nvidia-skill-finder-neg-express-route | 177,679 | 69,297 | +108,382 | +156.40% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-neg-generic-kubernetes | 201,213 | 213,286 | -12,073 | -5.66% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-neg-python-refactor | 41,853 | 69,141 | -27,288 | -39.47% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-neg-react-optimize | 98,985 | 127,238 | -28,253 | -22.20% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-neg-video-editing | 69,541 | 55,477 | +14,064 | +25.35% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-cad-to-simready | 74,083 | 25,338 | +48,745 | +192.38% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-dicom | 74,117 | 31,845 | +42,272 | +132.74% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-dynamo-kv | 94,291 | 307,770 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nvidia-skill-finder-pos-gpu-pandas | 71,906 | 18,127 | +53,779 | +296.68% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-isaac-lab | 85,260 | 74,373 | +10,887 | +14.64% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-jetson-driver-install | 71,998 | 18,014 | +53,984 | +299.68% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-jetson-setup | 71,193 | 66,628 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | nvidia-skill-finder-pos-multigpu-training | 74,250 | 59,276 | +14,974 | +25.26% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-openusd-optimization | 79,947 | 13,501 | +66,446 | +492.16% | skill 1/1; base 1/1 |
-| codex | nvidia-skill-finder-pos-vehicle-routing | 67,204 | 13,503 | +53,701 | +397.70% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 4,574,217 | 6,623,071 | N/A | N/A | skill 36/36; base 53/53 |
+| claude-code | All cases | 2,756,252 | 1,731,091 | +1,025,161 | +59.22% | skill 18/18; base 18/18 |
+| claude-code | nvidia-skill-finder-diff-bare-invocation | 158,059 | 107,030 | +51,029 | +47.68% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-diff-browse-no-keywords | 164,344 | 70,831 | +93,513 | +132.02% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-diff-deep-research | 194,159 | 35,239 | +158,920 | +450.98% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-neg-express-route | 187,002 | 221,909 | -34,907 | -15.73% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-neg-generic-kubernetes | 108,498 | 143,628 | -35,130 | -24.46% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-neg-python-refactor | 107,980 | 141,827 | -33,847 | -23.86% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-neg-react-optimize | 108,155 | 106,957 | +1,198 | +1.12% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-neg-video-editing | 108,223 | 107,431 | +792 | +0.74% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-cad-to-simready | 153,854 | 106,990 | +46,864 | +43.80% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-dicom | 153,851 | 35,602 | +118,249 | +332.14% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-dynamo-kv | 234,195 | 143,882 | +90,313 | +62.77% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-gpu-pandas | 153,696 | 107,250 | +46,446 | +43.31% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-isaac-lab | 154,768 | 37,091 | +117,677 | +317.27% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-jetson-driver-install | 154,068 | 35,956 | +118,112 | +328.49% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-jetson-setup | 153,631 | 107,202 | +46,429 | +43.31% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-multigpu-training | 154,932 | 151,307 | +3,625 | +2.40% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-openusd-optimization | 153,236 | 35,425 | +117,811 | +332.56% | skill 1/1; base 1/1 |
+| claude-code | nvidia-skill-finder-pos-vehicle-routing | 153,601 | 35,534 | +118,067 | +332.26% | skill 1/1; base 1/1 |
+| codex | All cases | 1,243,207 | 702,854 | +540,353 | +76.88% | skill 18/18; base 18/18 |
+| codex | nvidia-skill-finder-diff-bare-invocation | 65,133 | 39,985 | +25,148 | +62.89% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-diff-browse-no-keywords | 78,147 | 48,458 | +29,689 | +61.27% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-diff-deep-research | 102,367 | 48,821 | +53,546 | +109.68% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-neg-express-route | 41,069 | 40,479 | +590 | +1.46% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-neg-generic-kubernetes | 41,698 | 41,283 | +415 | +1.01% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-neg-python-refactor | 41,350 | 40,372 | +978 | +2.42% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-neg-react-optimize | 41,009 | 82,437 | -41,428 | -50.25% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-neg-video-editing | 40,857 | 13,264 | +27,593 | +208.03% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-cad-to-simready | 67,947 | 13,334 | +54,613 | +409.58% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-dicom | 74,682 | 30,159 | +44,523 | +147.63% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-dynamo-kv | 71,009 | 45,191 | +25,818 | +57.13% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-gpu-pandas | 68,996 | 21,810 | +47,186 | +216.35% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-isaac-lab | 146,943 | 67,402 | +79,541 | +118.01% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-jetson-driver-install | 73,345 | 17,678 | +55,667 | +314.89% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-jetson-setup | 53,502 | 17,751 | +35,751 | +201.40% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-multigpu-training | 57,962 | 30,505 | +27,457 | +90.01% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-openusd-optimization | 68,939 | 67,955 | +984 | +1.45% | skill 1/1; base 1/1 |
+| codex | nvidia-skill-finder-pos-vehicle-routing | 108,252 | 35,970 | +72,282 | +200.95% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 3,999,459 | 2,433,945 | +1,565,514 | +64.32% | skill 36/36; base 36/36 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 18 task(s) |
 
@@ -110,11 +136,11 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nvidia-skill-finder/SKILL.md`)
-- **MEDIUM** SECURITY/Unknown (SQP-1): L032 instructs activation on any "how do I do X" request where X "might be a common task that an NVIDIA skill can help w (`SKILL.md:32`)
-- **MEDIUM** SECURITY/Unknown (RP1): MCP Rug Pull: The `npx skills add nvidia/skills --list` command is invoked without a pinned package version. When npx resolves an unpi (`SKILL.md:74`)
-- **MEDIUM** SECURITY/Unknown (RP1): MCP Rug Pull: Same unpinned `npx skills` invocation as above, used as the primary catalog-check mechanism. Without a version pin, any  (`SKILL.md:103`)
-- **MEDIUM** SECURITY/Unknown (RP1): MCP Rug Pull: Another instance of the same unpinned `npx skills` pattern. The cumulative effect of multiple unpinned invocations acros (`SKILL.md:113`)
-- 14 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/MCP Rug Pull (RP1): MCP Rug Pull: npx commands without a version suffix (e.g. @1.0.0) create a rug-pull risk if the upstream server is compromised and pub (`SKILL.md:74`)
+- **MEDIUM** SECURITY/MCP Rug Pull (RP1): MCP Rug Pull: npx commands without a version suffix (e.g. @1.0.0) create a rug-pull risk if the upstream server is compromised and pub (`SKILL.md:103`)
+- **MEDIUM** SECURITY/MCP Rug Pull (RP1): MCP Rug Pull: npx commands without a version suffix (e.g. @1.0.0) create a rug-pull risk if the upstream server is compromised and pub (`SKILL.md:113`)
+- **MEDIUM** SECURITY/MCP Rug Pull (RP1): MCP Rug Pull: npx commands without a version suffix (e.g. @1.0.0) create a rug-pull risk if the upstream server is compromised and pub (`SKILL.md:135`)
+- 9 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
