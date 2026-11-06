@@ -496,8 +496,8 @@ POST /sessions {application:"ovrtx-viewer"}
   → mark ready
   → browser connects to frontend and backend Direct signaling
   → WebRTC media flows
-  → DELETE /sessions/{id}
-  → SIGTERM
+  → client requests session shutdown through the orchestrator
+  → orchestrator sends SIGTERM to the viewer process
 ```
 
 ## Related
