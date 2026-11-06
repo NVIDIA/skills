@@ -113,6 +113,8 @@ into `$ISAAC_ROS_WS/.isaac-ros-cli/config.yaml` while preserving all unrelated
 settings and existing image keys:
 
 ```yaml
+apt:
+  repository: https://isaac.download.nvidia.com/isaac-ros/release-4.6
 docker:
   image:
     additional_image_keys:
@@ -121,8 +123,13 @@ docker:
 ```
 
 This is the content for a new override file, not a command to replace an
-existing file. Lists append across CLI configuration layers: do not add a key
-again if an earlier layer already supplies it. Do not copy the entire default
+existing file. Lists replace earlier lists across CLI configuration layers.
+Read the effective inherited `additional_image_keys`, preserve their order and
+entries in the workspace override, then append only missing G1 keys. The example
+above assumes the inherited list is empty. Verify the effective list and
+`apt.repository` from inside the workspace before building: installing the CLI
+from release-4.6 does not pin its image-build repository, whose installed default
+may still be rolling release-4. Do not copy the entire default
 configuration or modify CLI-installed files. Retain these image layers for the
 G1 package dependencies while keeping camera localization disabled in the
 simulation launch.
@@ -134,6 +141,27 @@ its mode gate through the bundled adapter:
 ```bash
 python3 "$SKILL_DIR/references/isaac-ros-activate/scripts/run.py" --expected docker
 ```
+
+Before activation, make the project (including its map and this skill) and the
+resolved dependency checkouts readable at identical absolute paths inside Docker.
+Use the CLI's supported `DOCKER_ARGS_FILE`, not an `extra_mounts` YAML key.
+Inspect existing argument files first and preserve their options. In a new
+argument file, include these entries with resolved absolute host paths:
+
+```text
+--mount type=bind,src=/absolute/project,dst=/absolute/project
+--mount type=bind,src=/absolute/skill-parent,dst=/absolute/skill-parent,readonly
+--mount type=bind,src=/absolute/dependency-root,dst=/absolute/dependency-root,readonly
+--mount type=bind,src=/absolute/dependency-state,dst=/absolute/dependency-state,readonly
+```
+
+Omit redundant nested mounts when a parent mount already supplies the required
+access. Include each overridden upstream checkout outside the dependency root.
+The dependency-state directory contains the resolved manifest; mount it at the
+same path and export `HUMANOID_CLOUD_CONTROL_DEPS_MANIFEST` to that manifest in
+the activated shell. Preserve the resolver's upstream-root exports there too.
+Export `DOCKER_ARGS_FILE` to the new argument file before activation; the CLI
+also reads its standard argument files, so check for conflicting mount targets.
 
 Then follow that runtime skill for the long-lived host PTY. For
 new/changed layers, build and activate with:
@@ -147,6 +175,21 @@ use `isaac-ros activate`. Do not silently reuse a running container built withou
 the requested layers; arrange an authorized recreation if required. Verify
 `mode=docker` and `activation=active` using `isaac-ros status --output json`, or
 use the owning activation skill's environment-file fallback on older versions.
+
+Inside that shell, verify the non-root user, host networking, requested image
+identity/layers and mount sources through Docker inspection from the host, then
+check the actual paths as the activated user:
+
+```bash
+test -r "$SKILL_DIR/SKILL.md"
+test -r /absolute/path/to/occupancy_map.yaml
+test -r /absolute/path/to/the/referenced-map-image.png
+python3 "$SKILL_DIR/scripts/doctor.py" dependencies --check-only
+```
+
+Use the real selected map paths. An outer CLI exit of zero and `--build-local`
+do not establish these checks or force recreation of an existing container.
+Stop on a mismatch; recreate only the owned container with authorization.
 
 Continue with the G1 binary package and source-only Deploy extension setup in
 the release runbook. Then rerun the host `scripts/preflight.py` with the resolved

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [package]
-title = "Humanoid cloud-control autoplay"
-description = "Starts the Isaac Sim timeline once the requested stage is loaded."
-version = "1.0.0"
+title = "Humanoid cloud-control paused preparation"
+description = "Prepares G1 ROS domains and timeline settings while keeping physics paused."
+version = "1.0.1"
 category = "Simulation"
 
 [core]

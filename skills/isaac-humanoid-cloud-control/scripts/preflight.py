@@ -20,7 +20,9 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import csv
 import importlib.util
+import math
 import os
 import platform
 import subprocess
@@ -83,7 +85,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--check-streaming",
         action="store_true",
-        help="Check the browser viewer and WebRTC TCP signaling after startup",
+        help="Check viewer/signaling TCP listeners; does not verify HTTP or decoded media",
     )
     parser.add_argument(
         "--dispatch-port",
@@ -98,6 +100,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--mission-control-port", type=int, default=int(os.environ.get("MC_PORT", "8050"))
     )
     parser.add_argument("--check-cloud", action="store_true")
+    parser.add_argument(
+        "--check-encoding", action="store_true",
+        help="Encode one synthetic frame with ffmpeg h264_nvenc; requires ffmpeg",
+    )
     parser.add_argument("--timeout", type=float, default=1.5)
     return parser
 
@@ -283,6 +289,28 @@ def command_output(command: list[str]) -> tuple[bool, str]:
     return False, detail[:400] or f"exit status {result.returncode}"
 
 
+def gpu_requirements(output: str) -> list[str]:
+    """Validate every GPU exposed to this workflow against release-4.6 requirements."""
+    failures = []
+    rows = list(csv.reader(output.splitlines()))
+    if not rows:
+        return ["no GPU requirements data was returned"]
+    for index, row in enumerate(rows):
+        try:
+            name, driver, capability, memory = (value.strip() for value in row)
+            version = tuple(int(value) for value in driver.split("."))
+            compute = tuple(int(value) for value in capability.split("."))
+            if version < (595,):
+                failures.append(f"{name}: driver {driver}; release-4.6 requires 595+")
+            if compute < (8, 0):
+                failures.append(f"{name}: compute capability {capability}; Ampere or newer required")
+            if not math.isfinite(float(memory)) or float(memory) < 8192:
+                failures.append(f"{name}: {memory} MiB; at least 8 GiB GPU memory required")
+        except (ValueError, TypeError):
+            failures.append(f"GPU {index}: unreadable driver/capability/memory data")
+    return failures
+
+
 def main() -> int:
     args = build_parser().parse_args()
     args.isaac_path, args.isaac_ros_ws, args.web_viewer_context = discover_paths(args)
@@ -316,11 +344,21 @@ def main() -> int:
         platform.machine() in {"x86_64", "amd64"},
         f"x86_64 host detected ({platform.machine()})",
     )
+    try:
+        host_os = platform.freedesktop_os_release()
+    except OSError:
+        host_os = {}
+    require(
+        host_os.get("ID") == "ubuntu" and host_os.get("VERSION_ID") == "24.04",
+        "release-4.6 requires Ubuntu 24.04 "
+        f"(detected {host_os.get('ID', 'unknown')} {host_os.get('VERSION_ID', 'unknown')})",
+    )
     nvidia_smi = shutil.which("nvidia-smi")
     require(nvidia_smi is not None, "nvidia-smi is available")
     if nvidia_smi:
         gpu_ready, gpu_detail = command_output(
-            [nvidia_smi, "--query-gpu=name,driver_version", "--format=csv,noheader"]
+            [nvidia_smi, "--query-gpu=name,driver_version,compute_cap,memory.total",
+             "--format=csv,noheader,nounits"]
         )
         require(
             gpu_ready,
@@ -328,6 +366,10 @@ def main() -> int:
             + (f" ({gpu_detail.splitlines()[0]})" if gpu_ready and gpu_detail else "")
             + (f": {gpu_detail}" if not gpu_ready else ""),
         )
+        if gpu_ready:
+            gpu_failures = gpu_requirements(gpu_detail)
+            require(not gpu_failures, "release-4.6 GPU requirements"
+                    + (": " + "; ".join(gpu_failures) if gpu_failures else " satisfied"))
     require(
         shutil.which("isaac-ros") is not None,
         "isaac-ros CLI is available; if missing, follow "
@@ -357,7 +399,20 @@ def main() -> int:
             stderr=subprocess.DEVNULL,
         )
         require(compose.returncode == 0, "docker compose is available for the web viewer")
-    require(nvenc_library_available(), "NVENC runtime library is available")
+    require(nvenc_library_available(), "NVENC runtime library is present (encoding not established)")
+    if args.check_encoding:
+        ffmpeg = shutil.which("ffmpeg")
+        require(ffmpeg is not None, "ffmpeg is available for the requested encode probe")
+        if ffmpeg:
+            encoded, detail = command_output([
+                ffmpeg, "-nostdin", "-v", "error", "-f", "lavfi", "-i",
+                "color=c=black:s=640x480:r=1", "-frames:v", "1",
+                "-c:v", "h264_nvenc", "-f", "null", "-",
+            ])
+            require(encoded, "NVENC synthetic-frame encode succeeded"
+                    + (f": {detail}" if not encoded else ""))
+    else:
+        passed.append("NOTE: encode capability untested; use --check-encoding with ffmpeg")
 
     if not args.web_viewer_context:
         failures.append(
@@ -379,6 +434,14 @@ def main() -> int:
         )
     else:
         isaac_path = Path(args.isaac_path).expanduser().resolve()
+        try:
+            sim_version = (isaac_path / "VERSION").read_text(encoding="utf-8").strip()
+        except OSError:
+            sim_version = "unknown"
+        require(
+            re.match(r"^6\.0(?:\.|$)", sim_version) is not None,
+            f"Isaac Sim 6.0 runtime required (VERSION: {sim_version})",
+        )
         require(
             (isaac_path / "isaac-sim.sh").is_file(),
             f"Isaac Sim launcher exists at {isaac_path / 'isaac-sim.sh'}",
@@ -450,8 +513,8 @@ def main() -> int:
 
     if args.check_streaming:
         for port, service in (
-            (args.webrtc_signal_port, "WebRTC signaling"),
-            (args.viewer_port, "browser viewer"),
+            (args.webrtc_signal_port, "WebRTC signaling TCP listener"),
+            (args.viewer_port, "browser viewer TCP listener"),
         ):
             try:
                 with socket.create_connection(
@@ -466,7 +529,8 @@ def main() -> int:
                     f"{args.sim_host}:{port}: {exc}"
                 )
         passed.append(
-            "NOTE: WebRTC media uses UDP 47998; verify it through the live browser view"
+            "NOTE: HTTP, WebRTC UDP 47998 and decoded media are unverified; "
+            "require a connected browser showing the rendered production scene"
         )
         passed.append(
             f"LIVE VIEWER URL: http://{url_host(viewer_host)}:{args.viewer_port}/"
@@ -512,7 +576,7 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
-    print("Preflight passed.")
+    print("Selected preflight checks passed; browser media and runtime readiness remain separate gates.")
     return 0
 
 
