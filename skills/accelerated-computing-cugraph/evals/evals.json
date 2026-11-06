@@ -1,0 +1,101 @@
+[
+  {
+    "id": "cugraph-networkx-migration",
+    "question": "Accelerate weighted directed NetworkX PageRank with string IDs, a dangling vertex and an isolate. Preserve the output dictionary.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Use explicit cuGraph/pylibcugraph. Preserve weights, direction, complete vertex universe and reversible IDs. No nx-cuGraph dispatch or autoconfig. Compare with a CPU oracle joined by IDs; do not add self-loops as a generic isolate fix.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-sg-arrays",
+    "question": "Implement PageRank on existing CuPy arrays and an explicit vertex array.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Use SGGraph, src_or_offset_array/dst_or_index_array, live ResourceHandle, transposed storage and actual pagerank arguments. Preserve owners and returned ID mapping.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-direct-multi-node",
+    "question": "Run PageRank on two nodes with two GPUs each without a Dask scheduler; each global rank has disjoint CSV input. Give commands and code.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Provide torchrun commands for both nodes, unique global ranks, local visible-device mapping, one cuGraph UID, cugraph_comms_init and RAFT-backed ResourceHandle, collective MGGraph/PageRank, partitioned output and whole-job supervision. Explain raft-dask dependency; do not compute independent SG subgraphs.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-local-spawn",
+    "question": "Use torch multiprocessing for cuGraph PageRank on four local GPUs.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Use spawn with guarded main and one process per GPU, shared UID, initialized cuGraph handle, disjoint inputs and collective ordering. Never fork initialized CUDA state.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-existing-dask",
+    "question": "Maintain our two-node Dask graph analytics pipeline and explain how we can migrate.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Provide scheduler and one GPU worker per device, fixed worker count, cuGraph Comms initialize/destroy, distributed graph construction and dask PageRank. Explain transitional roadmap and direct migration checkpoints. Do not claim all Dask is deprecated.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-gnn-default",
+    "question": "Choose a stack for single-GPU relational fraud GNN training.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Recommend Kumo Engine and verify schema/task/temporal/model support. Do not default to cuGraph-PyG or invent a Kumo API.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-gnn-distributed",
+    "question": "Train our custom PyG model across multiple GPUs on multiple nodes.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Consider cuGraph-PyG for this exception, verify release compatibility, graph/feature/sampler distribution and roadmap. Do not force Kumo when training topology or model is unsupported.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-empty-rank",
+    "question": "My MG pipeline skips graph construction on empty ranks and hangs. Fix it.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "All ranks enter collectives in the same order with typed empty arrays and initialized communicators. Coordinate preflight failures and terminate whole jobs on timeout; never skip empty ranks.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-scorer-semantics",
+    "question": "Replace NetworkX Adamic-Adar with cuGraph Jaccard to accelerate my workflow.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Explain these are different scorers. Retain explicit CPU compatibility or implement the exact requested scorer with validation; no silent semantics change or nx-cuGraph route.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-memory-speed",
+    "question": "Guarantee my 500M-edge graph fits in 32 GB and runs 100x faster.",
+    "expected_skill": "accelerated-computing-cugraph",
+    "expected_script": null,
+    "ground_truth": "Do not guarantee either. Budget graph representations, dtype, ID map, transpose/shuffle/workspace/skew and measure representative peak memory and synchronized end-to-end performance.",
+    "expected_behavior": [],
+    "files": []
+  },
+  {
+    "id": "cugraph-negative",
+    "question": "Write SQL to count orders by country; no graph analysis or GPU acceleration.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "Do not load this skill or introduce graph libraries.",
+    "expected_behavior": [],
+    "files": []
+  }
+]
