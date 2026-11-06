@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: FastGen
+repo: NVlabs/FastGen
+description: Set up FastGen, prepare datasets, run inference and diffusion distillation, and extend networks, modalities, and methods.
+skills:
+  - path: skills/fastgen-add-method/
+    catalog_dir: fastgen-add-method
+  - path: skills/fastgen-add-modality/
+    catalog_dir: fastgen-add-modality
+  - path: skills/fastgen-add-network/
+    catalog_dir: fastgen-add-network
+  - path: skills/fastgen-configure/
+    catalog_dir: fastgen-configure
+  - path: skills/fastgen-dataset/
+    catalog_dir: fastgen-dataset
+  - path: skills/fastgen-develop/
+    catalog_dir: fastgen-develop
+  - path: skills/fastgen-inference/
+    catalog_dir: fastgen-inference
+  - path: skills/fastgen-runtime/
+    catalog_dir: fastgen-runtime
+  - path: skills/fastgen-setup/
+    catalog_dir: fastgen-setup
+  - path: skills/fastgen-train/
+    catalog_dir: fastgen-train
+  - path: skills/fastgen-validate/
+    catalog_dir: fastgen-validate
+links:
+  discussions: false
+  security: false
