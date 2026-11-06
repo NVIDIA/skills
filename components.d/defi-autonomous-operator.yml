@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+name: DeFi Autonomous Operator
+repo: Parmasanandgarlic/defi-autonomous-operator
+description: Bounded, zero-custody DeFi operation for AI agents — keeps observation, simulation, authorization, preparation, signing, submission, and settlement separately proven.
+skills:
+  - path: skills/defi-autonomous-operator/
+    catalog_dir: defi-autonomous-operator
