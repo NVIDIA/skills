@@ -4825,14 +4825,14 @@
     },
     {
       "skill": "nemo-mbridge-perf-megatron-fsdp",
-      "evaluation_date": "2026-06-02",
-      "environment": "local",
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
+      "evaluation_date": "2026-11-04",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.6",
+      "dataset_digest": "sha256:16192a516f7c2ea6a26939adadefb7c586f47ca060c1f0a59c72721dc0f0e393",
+      "validation_status": "passed",
       "tasks": 1,
-      "attempts_per_task": 2,
-      "pass_threshold_pct": 50.0,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
         "claude-code",
@@ -4841,7 +4841,7 @@
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 0.4
+      "average_uplift_pct": 21.93
     },
     {
       "skill": "nemo-mbridge-perf-memory-tuning",
@@ -29009,7 +29009,7 @@
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -29018,7 +29018,7 @@
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Security",
-      "num": 2,
+      "num": null,
       "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 0.0
@@ -29027,26 +29027,17 @@
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Correctness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": 2,
-      "agent": "claude-code",
       "score_pct": 100.0,
       "uplift_pct": 0.0
     },
@@ -29054,46 +29045,55 @@
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Discoverability",
-      "num": 2,
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
+      "component": "NeMo MBridge",
+      "dimension": "Discoverability",
+      "num": null,
       "agent": "codex",
-      "score_pct": 62.0,
-      "uplift_pct": 0.0
+      "score_pct": 95.0,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 91.0,
-      "uplift_pct": 1.0
+      "score_pct": 91.7,
+      "uplift_pct": 75.0
     },
     {
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Effectiveness",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 91.0,
-      "uplift_pct": 3.0
+      "score_pct": 83.3,
+      "uplift_pct": 16.6
     },
     {
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": -0.0
+      "score_pct": 98.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "dimension": "Efficiency",
-      "num": 2,
+      "num": null,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": -0.0
+      "score_pct": 70.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-mbridge-perf-memory-tuning",
