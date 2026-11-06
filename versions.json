@@ -1278,9 +1278,9 @@
     {
       "name": "isaac-humanoid-cloud-control",
       "path": "skills/isaac-humanoid-cloud-control",
-      "content_digest": "sha256:4259cb2ee5498c7862925d1b34e37753196b7aeb8e414e3c79fdae006ed236b5",
-      "last_commit": "cde6f375396b8693f0978ef03299692fa149828f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:33cf8bfe59183d5b6e5888c4b2884e29a468ea7286aa27229c7859dbd62f5db7",
+      "last_commit": "d8e732ccc2f2fe6b2216ef1a8978fa46d95157cc",
+      "last_modified": "2026-11-06"
     },
     {
       "name": "isaac-mission-control-showcase",
