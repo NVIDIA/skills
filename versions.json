@@ -1698,9 +1698,9 @@
     {
       "name": "nemo-mbridge-perf-megatron-fsdp",
       "path": "skills/nemo-mbridge-perf-megatron-fsdp",
-      "content_digest": "sha256:0bfad6cf5ca7e4acd8fdb0f835de57e08e8318617e370c4ca1fc2d011ad2ead1",
-      "last_commit": "e695a8397463bbb64d787b3cd88d3c58889be633",
-      "last_modified": "2026-06-02"
+      "content_digest": "sha256:97c14e154b5aa3c66c4a4686f6082579a8063ea94ca63e54ed1204f8bce6b0ee",
+      "last_commit": "bc0beba39212e30de490dcd0f1c7eeb8d58d03cd",
+      "last_modified": "2026-11-05"
     },
     {
       "name": "nemo-mbridge-perf-memory-tuning",
