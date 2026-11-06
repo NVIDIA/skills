@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 CC-BY-4.0 AND Apache-2.0 <br>
 ## Use Case: <br>
-Developers and robotics engineers use this skill to have an AI coding agent bring up the NVIDIA Isaac ROS release-4.6 Unitree G1 cloud-control stack (Mission Control, headless Isaac Sim with browser WebRTC streaming, and the G1 ROS launch), perform a guarded simulation-only gantry release, submit operator-approved navigation missions, and tear down demo-owned resources. <br>
+Developers and robotics engineers use this skill to have an AI coding agent bring up the NVIDIA Isaac ROS release-4.6 Unitree G1 cloud-control stack (Mission Control, headless Isaac Sim with browser WebRTC streaming, and the G1 ROS launch), perform an operator-approved, simulation-only gantry release, submit operator-approved navigation missions, and tear down demo-owned resources. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
 **Requires API Key or External Credential:** [Yes] <br>
-**Credential Type(s):** [Other [Basic auth], API key] <br>
+**Credential Type(s):** [API key, Other [MQTT broker credentials]] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -48,7 +48,7 @@ Mitigation: Review and scan skill before deployment. <br>
 **Output Type(s):** [Shell commands, Configuration instructions, API Calls, Analysis] <br>
 **Output Format:** [Markdown status report (State, Viewer, Mission, Cleanup) with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Mission submission and simulated gantry release require explicit operator approval; demo stack is kept running until an explicit teardown request.] <br>
+**Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -57,15 +57,15 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-15 evaluation tasks (15 positive), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod. Each task was also attempted without the target skill as a baseline. Evaluator version `1.6.8`; evaluation date 2026-11-05. <br>
+15 evaluation tasks (15 positive), 1 attempt per task, each attempt in its own isolated sandbox pod (`k8s-sandbox` environment); dataset digest `sha256:bbb620a371ba91241218df5a85d2791daf339409c06a2e021e1fd2f5ff2f1c09` (skill-evaluator-dataset-snapshot/1); evaluator version `1.6.9`; evaluation date 2026-11-06. Each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? Scored signals: `security` (100%). <br>
-- Correctness: Is the answer correct? Scored signals: `accuracy` (100%). <br>
-- Discoverability: Was the right skill loaded when needed? Scored signals: `skill_execution` (100%). <br>
-- Effectiveness: Did the skill help complete the task? Scored signals: `goal_accuracy` (50%) + `behavior_check` (50%). <br>
-- Efficiency: Did it avoid wasted tool calls and token usage? Scored signals: `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
@@ -89,12 +89,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 84.2% — baseline ran, but no comparable score was available; uplift unavailable | 75.2% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 93.3% (-6.7 points) | 66.7% → 76.7% (+10.0 points) |
-| Correctness | 29.3% → 88.0% (+58.7 points) | 22.7% → 81.3% (+58.6 points) |
-| Discoverability | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 89.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 26.2% → 53.0% (+26.8 points) | 28.3% → 43.0% (+14.7 points) |
-| Efficiency | 88.1% — baseline ran, but no comparable score was available; uplift unavailable | 85.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 83.8% — baseline ran, but no comparable score was available; uplift unavailable | 78.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 93.3% → 93.3% (±0.0 points) | 76.7% → 90.0% (+13.3 points) |
+| Correctness | 33.3% → 84.0% (+50.7 points) | 16.0% → 81.3% (+65.3 points) |
+| Discoverability | 96.3% — baseline ran, but no comparable score was available; uplift unavailable | 87.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 30.6% → 56.3% (+25.7 points) | 25.3% → 45.5% (+20.2 points) |
+| Efficiency | 89.0% — baseline ran, but no comparable score was available; uplift unavailable | 86.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -107,20 +107,20 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.2% → 91.5% (-5.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 91.3% (-6.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 91.2% → 87.4% (-3.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 91.6% → 87.9% (-3.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 64 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 63 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 15 task(s) |
 
 ## Skill Version(s): <br>
-27033db (source: git SHA, committed 2026-11-05) <br>
+a9576e71 (source: git SHA, committed 2026-11-06) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
