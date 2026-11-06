@@ -3771,11 +3771,11 @@
     {
       "path": "skills/omniverse-realtime-viewer",
       "name": "omniverse-realtime-viewer",
-      "description": "Use as the top-level router for Omniverse Realtime Viewer USD app requests and focused viewer reference documents.",
+      "description": "Use as the top-level router for Omniverse Realtime Viewer USD apps, XR delivery, SPG GPU processing, stylized rendering, and focused viewer reference documents.",
       "metadata": {
         "product.primary": "Omniverse",
-        "classification.category.primary": "physical_ai",
-        "catalog.subdomain": "physical-ai",
+        "classification.category.primary": "graphics_and_media",
+        "catalog.subdomain": "digital-twins",
         "audience": "developer,simulation_engineer,application_developer",
         "discovery.activity_tags": "deploy,integrate,validate,debug"
       }

@@ -79,7 +79,6 @@
         "jetson-set-target",
         "jetson-video-capability",
         "omniverse-cad-to-simready",
-        "omniverse-realtime-viewer",
         "paidf-cosmos-predict",
         "physical-ai-defect-image-generation",
         "physical-ai-infrastructure-setup-and-resilient-scaling",
@@ -256,6 +255,7 @@
       "description": "Build, simulate, connect, and operate digital representations of physical systems, environments, factories, and assets.",
       "skills": [
         "omniverse-content-services",
+        "omniverse-realtime-viewer",
         "omniverse-usd-performance-tuning"
       ]
     },
