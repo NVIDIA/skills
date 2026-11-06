@@ -2202,9 +2202,9 @@
     {
       "name": "omniverse-realtime-viewer",
       "path": "skills/omniverse-realtime-viewer",
-      "content_digest": "sha256:985cd3fe6532b1090e97120596a17899d9c1e66e37878c6f5de3c3cdc04babb1",
-      "last_commit": "964fc48cee05057c30f88e133a31c3835e461915",
-      "last_modified": "2026-08-20"
+      "content_digest": "sha256:7cd7aa9e00ced5c17d73b7173131e490f0ac5bf5a98da3fa54b1d60556ecd910",
+      "last_commit": "33fb6e24631f779dd7ef7102d3eefd1a068e3dfe",
+      "last_modified": "2026-11-06"
     },
     {
       "name": "omniverse-usd-performance-tuning",

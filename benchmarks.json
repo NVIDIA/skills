@@ -6265,12 +6265,12 @@
     },
     {
       "skill": "omniverse-realtime-viewer",
-      "evaluation_date": "2026-08-20",
-      "environment": "local",
-      "evaluator_version": "1.3.2",
-      "dataset_digest": "sha256:22c636e11cd01854316a62aa9e61948dd62ec9d8efda268d6b78487da6c55e82",
+      "evaluation_date": "2026-11-06",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:b6a6c8ae48e6631377089dd22912257405540a3a1fecd6db54bdcce1e550ee79",
       "validation_status": "passed",
-      "tasks": 7,
+      "tasks": 8,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -6281,7 +6281,7 @@
       "catalog_dir": "omniverse-realtime-viewer",
       "component": "Physical AI",
       "has_results": true,
-      "average_uplift_pct": 16.3
+      "average_uplift_pct": 20.3
     },
     {
       "skill": "omniverse-usd-performance-tuning",
@@ -35221,8 +35221,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": -7.0
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35230,8 +35230,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 7.0,
-      "uplift_pct": -43.0
+      "score_pct": 93.8,
+      "uplift_pct": -6.2
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35240,7 +35240,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 57.5
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35249,7 +35249,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 20.0
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35257,8 +35257,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 50.0
+      "score_pct": 93.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35266,8 +35266,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.0,
-      "uplift_pct": 34.0
+      "score_pct": 91.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35275,8 +35275,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 92.0,
-      "uplift_pct": 10.0
+      "score_pct": 89.1,
+      "uplift_pct": 34.9
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35284,8 +35284,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
-      "uplift_pct": 22.0
+      "score_pct": 82.3,
+      "uplift_pct": 15.6
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35293,8 +35293,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 69.0,
-      "uplift_pct": 48.0
+      "score_pct": 86.9,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "omniverse-realtime-viewer",
@@ -35302,8 +35302,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 82.0,
-      "uplift_pct": 49.0
+      "score_pct": 72.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "omniverse-usd-performance-tuning",
