@@ -20,6 +20,14 @@ public 6.0.1 runtime archive does not include the Git repository's
 plan, and EULA approval gates. Treat a matching official source checkout as a
 separate dependency and require installation authorization before acquiring it.
 
+Require Ubuntu 24.04 x86_64 and driver 595+ for the release-4.6 stack;
+the standalone Sim checker's minimum driver is not the full-stack baseline.
+`preflight.py` checks the host release, GPU requirements and runtime version.
+NVENC library presence does not prove encoding. When ffmpeg is available, use
+`--check-encoding` for a bounded synthetic-frame probe; report it as untested
+otherwise. TCP listeners do not prove viewer HTTP or rendered WebRTC media.
+Require the connected browser to show the production scene before Play.
+
 Begin with a read-only inventory. Let `preflight.py` discover conventional local
 Isaac Sim, Isaac ROS, and official web-viewer installations before asking the
 operator for paths. Use the bundled map asset so the first check is actionable:

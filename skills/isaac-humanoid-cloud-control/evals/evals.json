@@ -10,7 +10,10 @@
         "The workflow uses headless rendered Isaac Sim and provides a browser-viewer URL.",
         "The guarded gantry helper verifies pre-release and post-release stability before destinations are offered.",
         "A broad demo request does not authorize gantry release; the agent asks for explicit approval before invoking the helper.",
-        "The workflow does not claim GR00T manipulation support in Isaac Sim."
+        "The workflow does not claim GR00T manipulation support in Isaac Sim.",
+        "Physics remains paused until the production scene is rendered, scene preparation is read back, the spawn pose is measured and the ROS launch is staged; Play immediately precedes ROS launch.",
+        "With or without the bundled extension, the loopback scene preparation verifies the selected ROS domains, a 24-hour timeline and disabled looping without saving the USD.",
+        "Nav2 readiness requires the exact active lifecycle state with ID 3; inactive state ID 2 is rejected."
       ]
     },
     {
@@ -91,9 +94,11 @@
         "The CLI is installed on the host from the public release-4.6 APT repository.",
         "Existing installation authorization is reused without a redundant permission prompt.",
         "The agent initializes an unconfigured CLI with sudo isaac-ros init docker.",
-        "Workspace configuration includes realsense and gr00t_workflow, preserving unrelated settings and avoiding duplicate keys across layers.",
+        "The workspace additional_image_keys list preserves inherited entries and includes realsense and gr00t_workflow once, accounting for list replacement across layers.",
         "New image layers use isaac-ros activate --build-local and a long-lived activated shell.",
-        "The agent verifies setup and reruns preflight before demo launch."
+        "The agent verifies setup and reruns preflight before demo launch.",
+        "Workspace apt.repository is explicitly pinned to https://isaac.download.nvidia.com/isaac-ros/release-4.6 before image builds.",
+        "DOCKER_ARGS_FILE supplies required same-path mounts, and map, skill and pinned dependencies are verified from the activated non-root shell."
       ]
     },
     {

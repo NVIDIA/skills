@@ -37,6 +37,10 @@ source /opt/ros/jazzy/setup.bash
 source "${ISAAC_ROS_WS}/install/setup.bash"  # only after building Deploy
 ```
 
+After dependency installation, install the side-by-side compatible runtime and
+verify controller loading using [the Pinocchio 4.0 step](pinocchio-runtime.md).
+Preserve APT's Pinocchio version and select 4.0 in the robot launch shell.
+
 ## Isaac Sim navigation
 
 Isaac Sim supports cloud-controlled navigation only, not GR00T manipulation.
@@ -48,6 +52,8 @@ export PYTHONPATH="${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_d
 export LD_LIBRARY_PATH="${ISAAC_PATH}/exts/isaacsim.ros2.core/jazzy/lib:${LD_LIBRARY_PATH}"
 export ROS_DISTRO=jazzy
 export ROS_DOMAIN_ID=<clean-demo-domain>
+export ROS_LOCALHOST_ONLY=1
+export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 "${ISAAC_PATH}/isaac-sim.sh" \
   --ext-folder "${ISAAC_ROS_WS}/src/isaac_ros_deploy/isaac_deploy/isaac_ros_deploy_isaac_sim_extension" \
@@ -79,19 +85,14 @@ shells. Before startup, verify that the selected domain has no existing
 can make `ros2_control_node` initialize from a URDF without its `ros2_control`
 tag.
 
-For a headless end-to-end run, the skill supplies the narrowly scoped
-`humanoid_cloud_control.autoplay` extension. It starts only the simulation
-timeline after Isaac Sim loads and extends the short sample animation range to
-24 hours without looping so ROS time stays monotonic. It also applies the
-environment-selected domain to ROS 2 Context nodes in the in-memory stage
-before Play. Keep
-`isaacsim.ros2.sim_control` enabled for manual timeline control. If autoplay is
-intentionally omitted, start the timeline after staging the G1 launch with:
-
-```bash
-ros2 service call /set_simulation_state \
-  simulation_interfaces/srv/SetSimulationState "{state: {state: 1}}"
-```
+The legacy-named `humanoid_cloud_control.autoplay` extension only prepares the
+paused scene; it no longer starts physics on a timer. Whether enabled or omitted,
+follow [the ordered startup readiness gate](ordered-startup.md): run
+`scripts/prepare_simulation.py` through the loopback scene adapter and verify
+ROS Context domains, a 24-hour timeline, looping disabled and physics paused.
+After the browser renders the scene, the spawn pose is measured and the ROS
+launch is staged, use the simulation-control Play service and immediately launch
+ROS. Do not launch ROS before Play or leave physics running while preparing it.
 
 ## Policy and gantry sequence
 

@@ -27,7 +27,7 @@ import sys
 import time
 
 
-def run(command: list[str], timeout: float) -> tuple[int, str]:
+def run(command: list[str], timeout: float, *, stdout_only: bool = False) -> tuple[int, str]:
     try:
         result = subprocess.run(
             command,
@@ -36,7 +36,9 @@ def run(command: list[str], timeout: float) -> tuple[int, str]:
             timeout=timeout,
             check=False,
         )
-        return result.returncode, (result.stdout + result.stderr).strip()
+        output = (result.stdout if stdout_only and result.returncode == 0
+                  else result.stdout + result.stderr)
+        return result.returncode, output.strip()
     except subprocess.TimeoutExpired as exc:
         stdout = (
             exc.stdout.decode()
@@ -117,16 +119,16 @@ def main() -> int:
         matches = [
             node.strip()
             for node in lifecycle_nodes
-            if node.strip().endswith(suffix)
+            if node.strip().rsplit("/", 1)[-1] == suffix
         ]
-        if not matches:
-            failures.append(f"Nav2 lifecycle node is missing: *{suffix}")
+        if len(matches) != 1:
+            failures.append(f"expected one Nav2 lifecycle node for {suffix}: {matches}")
             continue
         node = matches[0]
         state_code, state = run(
-            ["ros2", "lifecycle", "get", node], args.timeout
+            ["ros2", "lifecycle", "get", node], args.timeout, stdout_only=True
         )
-        if state_code or "active" not in state.lower():
+        if state_code or re.fullmatch(r"active\s+\[3\]", state.strip()) is None:
             failures.append(f"Nav2 node is not active: {node}: {state}")
         else:
             notes.append(f"OK: {node} is active")

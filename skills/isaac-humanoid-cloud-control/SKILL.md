@@ -55,7 +55,9 @@ preflight. Missing CLI installation is a recovery step, not a terminal blocker.
 - Enable Isaac Sim's Python server only for live scene inventory. Keep it on
   loopback at 127.0.0.1:8226; it executes Python and must never be published,
   proxied, or exposed to the browser network.
-- Use an x86_64 NVIDIA GPU host and Isaac Sim 6.0 for the sample simulation.
+- Use Ubuntu 24.04 x86_64, an NVIDIA driver 595 or newer, and Isaac Sim 6.0
+  for the release-4.6 sample simulation. A passed Sim compatibility checker
+  does not establish this full-stack baseline or browser media readiness.
 - Support navigation through cloud control in Isaac Sim.
 - For Isaac Sim-only navigation, use `enable_camera_localization:=false` and
   `use_static_tf:=true`. Do not launch, configure, validate, or require Visual
@@ -145,7 +147,8 @@ for each handoff; the upstream skill remains authoritative.
 | --- | --- | --- |
 | `scripts/doctor.py` | Resolve pinned upstream scripts and write their manifest | `dependencies`; optional `--prepare`, `--check-only`, `--json` |
 | [scripts/prepare_cli_repository.py](scripts/prepare_cli_repository.py) | Stage and verify the public APT key and fixed repository source without root | No arguments |
-| `scripts/preflight.py` | Discover and validate host, cloud, streaming, and scene-server readiness | `--map`; optional installation paths and `--check-*` gates |
+| `scripts/preflight.py` | Check release-4.6 host requirements, libraries and selected connectivity probes; rendered media requires browser verification | `--map`; optional installation paths and `--check-*` gates |
+| `scripts/prepare_simulation.py` | Prepare and read back ROS domains and timeline settings while physics remains paused | Run through the loopback scene adapter with `--file` |
 | `scripts/guarded_gantry_release.py` | Set AGILE, verify stability, release the simulated gantry, and verify unsupported balance | `--allow-simulation-gantry-release`; stability limits and durations |
 | `scripts/check_runtime.py` | Verify ROS clock, sensors, TF, and Nav2 lifecycle | `--base-frame`, `--timeout` |
 | `scripts/scene_inventory.py` | Inventory live-stage objects without modifying USD | injected `output_path`, `max_objects` |

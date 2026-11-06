@@ -4,7 +4,7 @@ Treat startup timing as a hard phase gate. Complete cloud startup and prepare
 the sourced Isaac ROS launch shell, including all arguments,
 before pressing **Play** in Isaac Sim. The required order is:
 
-`cloud healthy -> browser viewer ready -> headless Isaac Sim ready and paused -> ROS launch staged -> Play in streamed UI -> immediately launch the Isaac ROS stack`
+`cloud healthy -> browser viewer ready -> headless Isaac Sim ready and paused -> scene preparation verified -> ROS launch staged -> Play -> immediately launch the Isaac ROS stack`
 
 Do not insert diagnostics, configuration work, or operator wait time between
 **Play** and the ROS launch. Leaving the scene playing without the G1 control
@@ -123,7 +123,7 @@ scene, and repeat the ordered startup.
    set `enableEventTracing=true` only when investigating stream encoding,
    latency, packet loss, or QoS, and keep the resulting traces out of the
    repository.
-   Require `app ready`, a connected browser viewport, the loopback Python
+   Require `app ready`, a connected browser viewport rendering the production scene, the loopback Python
    server at 127.0.0.1:8226, and the timeline paused. Never expose 8226 beyond
    the simulator host.
    In parallel, prepare a separate
@@ -135,6 +135,24 @@ scene, and repeat the ordered startup.
    path does not require GR00T policy assets. Do not add Visual SLAM or
    camera-localization components. Do not press
    **Play** until this command is ready to execute.
+
+   Before staging the robot launch, apply the [Pinocchio 4.0 runtime
+   step](pinocchio-runtime.md) in that activated shell, after sourcing ROS and
+   the workspace. Require the controller load check to pass before Play.
+
+   In that activated ROS launch shell, locate the installed KDL library and
+   preload it before launching the robot. This works around the VDA5050 action
+   plugin's unresolved `KDL::operator*` symbol; KDL was already installed in
+   the release-4.6 demo container.
+
+   ~~~bash
+   KDL_LIB="$(ldconfig -p | awk '$1 == "liborocos-kdl.so.1.5" {print $NF; exit}')"
+   test -r "$KDL_LIB" || { echo "KDL library not found; stop before robot launch" >&2; exit 1; }
+   export LD_PRELOAD="$KDL_LIB${LD_PRELOAD:+:$LD_PRELOAD}"
+   ~~~
+
+   Keep this setting in the robot launch shell; do not apply it to Isaac Sim
+   or global shell configuration.
 
    Configure the G1 MQTT host, port, transport, and authentication to match the
    resolved upstream broker configuration. Supply the same nonempty username
@@ -158,29 +176,37 @@ scene, and repeat the ordered startup.
      --web-viewer-context /absolute/path/to/IsaacSim/tools/docker/web-viewer \
      --sim-host <sim-host> --check-streaming --check-scene-server
    ~~~
-9. For a headless end-to-end run, enable the bundled
-   `humanoid_cloud_control.autoplay` extension. It starts only the Isaac Sim
-   timeline after startup and extends the short sample animation range to 24
-   hours without looping, which keeps ROS simulation time monotonic. Before
-   Play, it also applies `ROS_DOMAIN_ID` to authored ROS 2 Context nodes in the
-   in-memory stage so the simulator and activated shell share the selected
-   domain. It does not release the virtual gantry, set the policy gate, publish
-   velocity, or submit a mission. Start the staged G1
-   launch before the extension's startup delay elapses. Keep
-   `isaacsim.ros2.sim_control` enabled for observable, manual timeline control.
-   If autoplay is deliberately omitted, start the paused timeline through the
-   built-in ROS 2 simulation-control service, then immediately execute the
-   staged ROS launch command:
+9. Keep physics paused until the connected browser renders the production scene,
+   the measured spawn pose is recorded, and the sourced ROS launch command is
+   fully staged. The legacy-named `humanoid_cloud_control.autoplay` extension
+   now only prepares domains and timeline settings; it never presses Play.
+   With or without that extension, run the same bounded preparation/readback
+   through the loopback scene adapter:
+
+   ~~~bash
+   python3 "$SKILL_DIR/references/isaac-sim-remote/scripts/run.py" \
+     --host 127.0.0.1 --port 8226 --timeout 30 \
+     --file "$SKILL_DIR/scripts/prepare_simulation.py"
+   ~~~
+
+   Require successful execution and JSON readback showing the exact production
+   stage, the selected domain on every reported ROS Context, `playing: false`,
+   `end_time: 86400.0` and `looping: false`. The helper modifies only the live
+   in-memory stage; it does not save the USD or start physics. Do not proceed
+   when preparation or readback fails. This preparation, the rendered viewer,
+   measured pose and staged ROS command are the readiness gate for both paths.
+   Keep `isaacsim.ros2.sim_control` enabled. Once all checks are complete,
+   start the timeline and immediately execute the staged ROS launch command:
 
    ~~~bash
    ros2 service call /set_simulation_state \
      simulation_interfaces/srv/SetSimulationState "{state: {state: 1}}"
    ~~~
 
-   Require a successful result, then confirm /clock, joint state, and IMU data
-   promptly. Use the browser helper only as a fallback when this service is not
-   supplied by the selected Isaac Sim build. Neither path releases the virtual
-   gantry as a side effect.
+   Require semantic Result 1 (success), not merely a zero CLI exit code, before
+   the ROS launch. Then promptly confirm advancing /clock, joint-state and IMU
+   data. Use the browser Play helper only when this service is unavailable,
+   after the same readiness gate. Neither path releases the virtual gantry.
 10. Run the guarded helper for the simulation-only `agile_velocity` group.
    It verifies live simulation identity before enabling AGILE or publishing any
    velocity. Never run manual controller-enable or velocity commands ahead of
