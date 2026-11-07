@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: ALCHEMI Toolkit
+repo: NVIDIA/nvalchemi-toolkit
+description: GPU-accelerated atomistic simulation and machine-learned interatomic potential workflows, including batched relaxation, molecular dynamics, training and fine-tuning, and Zarr datasets.
+skills:
+  - path: skills/nvalchemi-toolkit/
+    catalog_dir: nvalchemi-toolkit
