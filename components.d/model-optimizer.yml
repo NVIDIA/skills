@@ -3,14 +3,14 @@ repo: NVIDIA/Model-Optimizer
 description: Quantize, serve, and evaluate models, search quantization recipes, and train speculative decoding draft models with NVIDIA Model Optimizer.
 skills:
   - path: plugins/modelopt/skills/ptq/
-    catalog_dir: modelopt-ptq
+    catalog_dir: ptq
   - path: plugins/modelopt/skills/deployment/
-    catalog_dir: modelopt-deployment
+    catalog_dir: deployment
   - path: plugins/modelopt/skills/evaluation/
-    catalog_dir: modelopt-evaluation
+    catalog_dir: evaluation
   - path: plugins/modelopt/skills/compare-results/
-    catalog_dir: modelopt-compare-results
+    catalog_dir: compare-results
   - path: plugins/modelopt/skills/quant-recipe-search/
-    catalog_dir: modelopt-quant-recipe-search
+    catalog_dir: quant-recipe-search
   - path: plugins/modelopt/skills/speculative-decoding/
-    catalog_dir: modelopt-speculative-decoding
+    catalog_dir: speculative-decoding
