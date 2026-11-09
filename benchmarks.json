@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 437,
-  "result_row_count": 4124,
+  "skill_count": 448,
+  "result_row_count": 4224,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -2957,6 +2957,226 @@
       "component": "ETHOS.md",
       "has_results": true,
       "average_uplift_pct": 27.43
+    },
+    {
+      "skill": "fastgen-add-method",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:8d422f5b0bdd938eaf5aa41853a359e41ae5296b8f8b8631bca20cada689c03a",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": -6.65
+    },
+    {
+      "skill": "fastgen-add-modality",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:5172254b319999310b14b73a0ebf8d1a7f907a3b9d8a11a3c33baf1644fb417a",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 5.17
+    },
+    {
+      "skill": "fastgen-add-network",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:25e94823d014ff70d5afdd4d70ad404bb02941a9919eb2189416f6e3fbbcc1cb",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 3.07
+    },
+    {
+      "skill": "fastgen-configure",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:fa41f7ff4c9b6b32daf795dd8c8782eeb54aa4fd31fccc7bfc44ee93f02ffb17",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 2.92
+    },
+    {
+      "skill": "fastgen-dataset",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:4bd6ff59531d5a6836bb88feb12342a119a19b5c43b048491a733db2ef7f31ad",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 4.27
+    },
+    {
+      "skill": "fastgen-develop",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:ac80bad88ba5e85d934c50a669435d1f00c34b26712391b2c28c6458660fb90e",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": -7.38
+    },
+    {
+      "skill": "fastgen-inference",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:61a0225359b26e8ebf9523fa6defc6c9ed2cc04fac11919720ec388bd67bd253",
+      "validation_status": "passed",
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 2.0
+    },
+    {
+      "skill": "fastgen-runtime",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:3282254b6d999b2f458dd71680a4c9fcc0362b2430610dd902ecf1776f0ce474",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 5.17
+    },
+    {
+      "skill": "fastgen-setup",
+      "evaluation_date": "2026-11-05",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:a3af299d6940deb868ee4651ee1fe40cdb4dacd84aee3284947d9581abb8f622",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 3.33
+    },
+    {
+      "skill": "fastgen-train",
+      "evaluation_date": "2026-11-06",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:7e043ed8b491331e6cc86bd56658f5379f2a64d07131805efa0254d2af3c4314",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-train",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": 1.03
+    },
+    {
+      "skill": "fastgen-validate",
+      "evaluation_date": "2026-11-06",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.8",
+      "dataset_digest": "sha256:3977b1dfe3ac9c57751dc93a1bacbfab17b31ff4c8a10f83b4428bf0237cbf55",
+      "validation_status": "passed",
+      "tasks": 4,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "fastgen-validate",
+      "component": "FastGen",
+      "has_results": true,
+      "average_uplift_pct": -7.5
     },
     {
       "skill": "foundationpose-pipeline",
@@ -21218,6 +21438,906 @@
       "num": null,
       "agent": "codex",
       "score_pct": 97.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.7,
+      "uplift_pct": -33.3
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 6.7
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.6,
+      "uplift_pct": 2.4
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.3,
+      "uplift_pct": -15.7
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-method",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 33.3
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 61.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.9,
+      "uplift_pct": 2.4
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.8,
+      "uplift_pct": -4.7
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-modality",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 71.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.7,
+      "uplift_pct": 2.8
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.7,
+      "uplift_pct": 15.6
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-add-network",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": -12.5
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.5,
+      "uplift_pct": -12.5
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 15.6
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-dataset",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.7,
+      "uplift_pct": -33.3
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.5,
+      "uplift_pct": -5.5
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.5,
+      "uplift_pct": -5.5
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-develop",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 71.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 4.0
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-inference",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.8,
+      "uplift_pct": -2.1
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 3.1
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-runtime",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.5,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-setup",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-train",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-train",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-train",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-train",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.9,
+      "uplift_pct": 3.1
+    },
+    {
+      "catalog_dir": "fastgen-train",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-validate",
+      "component": "FastGen",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": -25.0
+    },
+    {
+      "catalog_dir": "fastgen-validate",
+      "component": "FastGen",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "fastgen-validate",
+      "component": "FastGen",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 81.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "fastgen-validate",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 2.5
+    },
+    {
+      "catalog_dir": "fastgen-validate",
+      "component": "FastGen",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.8,
       "uplift_pct": null
     },
     {

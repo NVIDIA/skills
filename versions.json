@@ -1038,6 +1038,83 @@
       "last_modified": "2026-10-15"
     },
     {
+      "name": "fastgen-add-method",
+      "path": "skills/fastgen-add-method",
+      "content_digest": "sha256:b28bbaa354a665797c85f8ea9f20079c2ed508ba13b01a82be64ac309572cf9e",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-add-modality",
+      "path": "skills/fastgen-add-modality",
+      "content_digest": "sha256:be7361ae0d247f539f48370d095296d0655956f044a142644de1f74c8b18131e",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-add-network",
+      "path": "skills/fastgen-add-network",
+      "content_digest": "sha256:a30e23685b073d4dfe4f90c8359c4b5ca466ef2b101b38a81a35423c00b41fc6",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-configure",
+      "path": "skills/fastgen-configure",
+      "content_digest": "sha256:ed44454ff24fbcf48588a9ecf75b6d5ea1a28372b1e3affe169308d15b006695",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-dataset",
+      "path": "skills/fastgen-dataset",
+      "content_digest": "sha256:d038737277ab8db5ad11fbc0872e771abbb40faa35e84932ddba070f61a35895",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-develop",
+      "path": "skills/fastgen-develop",
+      "content_digest": "sha256:edf8f2720827258269b387d7b481a8c9425fb66a01ecbc507d589d3e7e51ee8d",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-inference",
+      "path": "skills/fastgen-inference",
+      "content_digest": "sha256:25598a566d5e104299531189793deffd16e4a843932f133b7022cae19380c966",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-runtime",
+      "path": "skills/fastgen-runtime",
+      "content_digest": "sha256:1f8d41a7f59a693a508ecffe31a2f374fb7638c5c4a711842a09bf7fb9312b46",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-setup",
+      "path": "skills/fastgen-setup",
+      "content_digest": "sha256:56f005aaaa93955379dd4d9fc96f705b887ab0fb23ce29868f46112c50ac6a1c",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-train",
+      "path": "skills/fastgen-train",
+      "content_digest": "sha256:40df277645c7cef5c4672ba68e2f4c1a15e5c9bb247e0c057153baff218e0729",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
+      "name": "fastgen-validate",
+      "path": "skills/fastgen-validate",
+      "content_digest": "sha256:cbf7989a03aff4b22ad3fea83b22f631e969831b37e86112822caf6b9239168f",
+      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
+      "last_modified": "2026-11-09"
+    },
+    {
       "name": "foundationpose-pipeline",
       "path": "skills/foundationpose-pipeline",
       "content_digest": "sha256:8ab51cf9ccba291b0a21a8024dbee1d229548c1534777bdec58a7183844a5ae7",
