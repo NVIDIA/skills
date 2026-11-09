@@ -1805,7 +1805,7 @@
       "name": "fastgen-add-network",
       "description": "Integrate a new diffusion or flow model, or a task variant such as I2V, editing or causal generation, into NVIDIA FastGen as a FastGenNetwork adapter with preprocessors, configs, method capabilities, reference parity and trainability. Use it whenever a model family or checkpoint is not yet supported.",
       "metadata": {
-        "product.primary": "Deep Learning",
+        "product.primary": "Research Contributions",
         "classification.category.primary": "ai_and_machine_learning",
         "catalog.subdomain": "training-ai",
         "audience": "ml_engineer,ai_engineer,developer,application_developer",
