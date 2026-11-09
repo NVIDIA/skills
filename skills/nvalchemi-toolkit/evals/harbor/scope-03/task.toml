@@ -1,0 +1,35 @@
+# Generated from evals/evals.json and evals/setup_cpu.sh; do not edit.
+schema_version = "1.3"
+artifacts = ["/workspace/nvalchemi-setup.log", "/workspace/nvalchemi-setup.status"]
+
+[task]
+name = "nvidia/skillevaluator-scope-03"
+description = "Skill evaluation task for nvalchemi-toolkit"
+
+[metadata]
+entry_id = "scope-03"
+
+[agent]
+timeout_sec = 300.0
+
+[verifier]
+timeout_sec = 300.0
+
+[[verifier.collect]]
+command = "bash -c 'set -euo pipefail\nnva_status=125\nif [ -r /workspace/nvalchemi-setup.status ]; then\n  read -r nva_status < /workspace/nvalchemi-setup.status || nva_status=125\nfi\nif [[ \"$nva_status\" =~ ^[0-9]{1,3}$ ]] && (( 10#$nva_status <= 255 )); then\n  nva_status=$((10#$nva_status))\nelse\n  nva_status=125\nfi\nif [ \"$nva_status\" -eq 0 ]; then\n  exit 0\nfi\nprintf '\"'\"'NVALCHEMI_SETUP_DIAGNOSTICS exit_code=%s (125 means setup did not finish)\\n'\"'\"' \"$nva_status\" >&2\nif [ -r /workspace/nvalchemi-setup.log ]; then\n  tail -n 12 /workspace/nvalchemi-setup.log >&2 || printf '\"'\"'Could not read the setup log.\\n'\"'\"' >&2\nelse\n  printf '\"'\"'No setup log was written.\\n'\"'\"' >&2\nfi\nexit \"$nva_status\"\n'"
+timeout_sec = 10.0
+
+[environment]
+cpus = 2
+memory_mb = 4096
+storage_mb = 6144
+workdir = "/workspace"
+network_mode = "public"
+skills_dir = "/workspace/skills"
+build_timeout_sec = 2400.0
+
+[environment.healthcheck]
+command = "bash -c 'set -euo pipefail\nprintf \"125\\n\" > /workspace/nvalchemi-setup.status\nset +e\nbash -lc '\"'\"'#!/usr/bin/env bash\n# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.\n# SPDX-License-Identifier: Apache-2.0\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this file except in compliance with the License.\n# You may obtain a copy of the License at\n#\n# http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n\n# Installs the CPU toolkit stack for the skill evaluation sandbox, in both\n# arms (with the skill and the baseline). It is for evaluation only; users\n# install nvalchemi-toolkit from PyPI as the documentation describes.\nset -euo pipefail\nnva_stage=initialize\nnva_report_failure() {\n  nva_exit=$?\n  if [ \"$nva_exit\" -ne 0 ]; then\n    printf '\"'\"'\"'\"'\"'\"'\"'\"'NVALCHEMI_SETUP_FAILED stage=%s exit_code=%s\\n'\"'\"'\"'\"'\"'\"'\"'\"' \"$nva_stage\" \"$nva_exit\" >&2\n  fi\n}\ntrap nva_report_failure EXIT\n\nnva_root=\"${NVALCHEMI_EVAL_ROOT:-/workspace}\"\nnva_env=\"$nva_root/.venv\"\nnva_publish=false\nif [ ! -e \"$nva_env\" ] && [ ! -L \"$nva_env\" ]; then\n  nva_stage=select_interpreter\n  nva_host_python=$(command -v python3)\n  nva_stage=create_environment\n  nva_env=$(mktemp -d \"$nva_root/.nvalchemi-env.XXXXXX\")\n  nva_publish=true\n  printf '\"'\"'\"'\"'\"'\"'\"'\"'Creating CPU environment: %s (host Python: %s)\\n'\"'\"'\"'\"'\"'\"'\"'\"' \"$nva_env\" \"$nva_host_python\"\n  \"$nva_host_python\" -m venv --system-site-packages --without-pip \"$nva_env\"\n  # The CPU torch wheel comes alone from the PyTorch index, so the resolver\n  # never takes the CUDA wheel from PyPI.\n  nva_stage=install_cpu_torch\n  printf '\"'\"'\"'\"'\"'\"'\"'\"'Installing CPU PyTorch into %s\\n'\"'\"'\"'\"'\"'\"'\"'\"' \"$nva_env\"\n  \"$nva_host_python\" -m pip --python \"$nva_env\" install \\\n    --cert \"${PIP_CERT:-/etc/ssl/certs/ca-certificates.crt}\" \\\n    --disable-pip-version-check --no-input --only-binary=:all: --no-compile \\\n    --progress-bar off --no-deps '\"'\"'\"'\"'\"'\"'\"'\"'torch==2.13.0+cpu'\"'\"'\"'\"'\"'\"'\"'\"' \\\n    --index-url https://download-r2.pytorch.org/whl/cpu\n  # Everything else resolves on PyPI. antlr4-python3-runtime 4.9.3 (via\n  # physicsnemo and hydra-core) ships only as a pure-Python sdist, so it is\n  # the one exception to wheels only.\n  nva_stage=install_toolkit\n  printf '\"'\"'\"'\"'\"'\"'\"'\"'Installing nvalchemi-toolkit and its dependencies into %s\\n'\"'\"'\"'\"'\"'\"'\"'\"' \"$nva_env\"\n  \"$nva_host_python\" -m pip --python \"$nva_env\" install \\\n    --cert \"${PIP_CERT:-/etc/ssl/certs/ca-certificates.crt}\" \\\n    --disable-pip-version-check --no-input --only-binary=:all: --no-compile \\\n    --progress-bar off --no-binary=antlr4-python3-runtime \\\n    '\"'\"'\"'\"'\"'\"'\"'\"'torch==2.13.0+cpu'\"'\"'\"'\"'\"'\"'\"'\"' '\"'\"'\"'\"'\"'\"'\"'\"'nvalchemi-toolkit==0.3.0'\"'\"'\"'\"'\"'\"'\"'\"' \\\n    '\"'\"'\"'\"'\"'\"'\"'\"'nvalchemi-toolkit-ops==0.5.0'\"'\"'\"'\"'\"'\"'\"'\"' '\"'\"'\"'\"'\"'\"'\"'\"'ase==3.27.0'\"'\"'\"'\"'\"'\"'\"'\"'\nfi\nnva_stage=smoke_check\nprintf '\"'\"'\"'\"'\"'\"'\"'\"'Checking CPU environment: %s\\n'\"'\"'\"'\"'\"'\"'\"'\"' \"$nva_env\"\n\"$nva_env/bin/python\" -u - <<'\"'\"'\"'\"'\"'\"'\"'\"'PY'\"'\"'\"'\"'\"'\"'\"'\"'\nimport sys\n\nprint(\"Smoke check runtime:\", sys.executable, sys.version.split()[0], flush=True)\nimport torch\nimport nvalchemi\nfrom nvalchemi.data import AtomicData, Batch\nfrom nvalchemi.models.lj import LennardJonesModelWrapper\n\nassert nvalchemi.__version__ == \"0.3.0\", nvalchemi.__version__\nassert torch.version.cuda is None, torch.__version__\ndata = AtomicData(\n    positions=torch.tensor([[0.0, 0.0, 0.0], [3.8, 0.0, 0.0]]),\n    atomic_numbers=torch.tensor([18, 18]),\n)\n# Two atoms, each the other'\"'\"'\"'\"'\"'\"'\"'\"'s only neighbor; padding uses n_atoms.\ndata.add_node_property(\"neighbor_matrix\", torch.tensor([[1, 2], [0, 2]], dtype=torch.int32))\ndata.add_node_property(\"num_neighbors\", torch.tensor([1, 1], dtype=torch.int32))\nbatch = Batch.from_data_list([data])\nmodel = LennardJonesModelWrapper(epsilon=0.0104, sigma=3.40, cutoff=8.5)\nenergy = model(batch)[\"energy\"]\nassert energy.shape[0] == 1 and bool(torch.isfinite(energy).all())\nprint(\"nvalchemi environment ready:\", sys.executable, sys.version.split()[0],\n      \"torch\", torch.__version__, \"energy\", float(energy.sum()))\nPY\n# Publish .venv only after the install and the smoke check pass. A failed\n# environment stays at its own path for diagnosis; a retry uses a fresh one.\nif [ \"$nva_publish\" = true ]; then\n  nva_stage=publish_environment\n  ln -sT \"$nva_env\" \"$nva_root/.venv\"\nfi\n'\"'\"' 2>&1 | tee /workspace/nvalchemi-setup.log\nnva_codes=(\"${PIPESTATUS[@]}\")\nset -e\nnva_status=\"${nva_codes[0]}\"\nif [ \"$nva_status\" -eq 0 ]; then nva_status=\"${nva_codes[1]}\"; fi\nprintf \"%s\\n\" \"$nva_status\" > /workspace/nvalchemi-setup.status\nexit \"$nva_status\"\n'"
+interval_sec = 5.0
+timeout_sec = 600.0
+retries = 1
