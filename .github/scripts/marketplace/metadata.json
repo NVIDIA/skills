@@ -1777,6 +1777,138 @@
       }
     },
     {
+      "path": "skills/fastgen-add-method",
+      "name": "fastgen-add-method",
+      "description": "Implement and validate a new NVIDIA FastGen training method or objective (distillation, consistency, adversarial or fine-tuning variants) from a paper or reference code: FastGenModel subclass, method config, gradients, student sampling and tests. Use it whenever an algorithm is not expressible through the existing method configs.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,research_academic,ai_engineer,developer,research_non_academic",
+        "discovery.activity_tags": "extend,train,validate,test,integrate"
+      }
+    },
+    {
+      "path": "skills/fastgen-add-modality",
+      "name": "fastgen-add-modality",
+      "description": "Extend NVIDIA FastGen to a new generated or conditioning modality beyond the existing image, video, audio, camera and text paths: representation, loader keys, model state, noise-schedule clock, losses, sampling, serialization and validation. Use it when a new signal type must cross the data, model and output interfaces.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,research_academic",
+        "discovery.activity_tags": "extend,integrate,configure,validate,test"
+      }
+    },
+    {
+      "path": "skills/fastgen-add-network",
+      "name": "fastgen-add-network",
+      "description": "Integrate a new diffusion or flow model, or a task variant such as I2V, editing or causal generation, into NVIDIA FastGen as a FastGenNetwork adapter with preprocessors, configs, method capabilities, reference parity and trainability. Use it whenever a model family or checkpoint is not yet supported.",
+      "metadata": {
+        "product.primary": "Deep Learning",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,application_developer",
+        "discovery.activity_tags": "integrate,configure,validate,train,test"
+      }
+    },
+    {
+      "path": "skills/fastgen-configure",
+      "name": "fastgen-configure",
+      "description": "Create or adapt an NVIDIA FastGen experiment config for a network, task, dataset and training objective, and pick a distillation method when none was chosen. Use it whenever a FastGen run needs a new or modified config file or non-trivial overrides.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,research_academic,research_non_academic,ai_engineer,data_scientist",
+        "discovery.activity_tags": "configure,select,train,validate,optimize"
+      }
+    },
+    {
+      "path": "skills/fastgen-dataset",
+      "name": "fastgen-dataset",
+      "description": "Prepare, register or repair datasets for NVIDIA FastGen loaders: class-conditional ZIPs, WebDataset shards of images, prompts, latents, videos, audio or camera data, and KD pairs or trajectories; then verify decoded batches. For experiment configuration over already prepared data, use fastgen-configure.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,data_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "transform,validate,convert,recover,package"
+      }
+    },
+    {
+      "path": "skills/fastgen-develop",
+      "name": "fastgen-develop",
+      "description": "Implement, refactor or review NVIDIA FastGen library code using its shared design, formatting, documentation and testing conventions. Use for source changes and code reviews; configuring or running an existing workflow alone does not need this skill.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,research_academic,ai_engineer,developer",
+        "discovery.activity_tags": "contribute,debug,test,extend,validate"
+      }
+    },
+    {
+      "path": "skills/fastgen-inference",
+      "name": "fastgen-inference",
+      "description": "Generate and inspect NVIDIA FastGen teacher or distilled-student outputs with the inference scripts or ComfyUI nodes: config, checkpoint, prompts, conditioning media, seeds and sampling settings. Use it to prepare or execute sampling; use fastgen-validate to assess existing parity or quality evidence.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,research_academic,application_developer",
+        "discovery.activity_tags": "inference,generate,configure,inspect,validate"
+      }
+    },
+    {
+      "path": "skills/fastgen-runtime",
+      "name": "fastgen-runtime",
+      "description": "Resolve the execution context for an NVIDIA FastGen command: checkout and interpreter, config path and override syntax, output/cache/data roots, run identity, and distributed launch variables. Use it when preparing or debugging execution; method selection belongs to fastgen-configure.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,ai_engineer,developer,devops_engineer",
+        "discovery.activity_tags": "configure,troubleshoot,debug,train,inference"
+      }
+    },
+    {
+      "path": "skills/fastgen-setup",
+      "name": "fastgen-setup",
+      "description": "Set up or repair an NVIDIA FastGen environment for a chosen task: Docker or Conda installation, credentials and model access, weight and dataset downloads, and an optional bounded smoke test. Use it before any FastGen command whenever the environment, access or inputs are not yet known to work.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,research_academic,ai_engineer,developer,devops_engineer",
+        "discovery.activity_tags": "configure,get_started,troubleshoot,validate,test"
+      }
+    },
+    {
+      "path": "skills/fastgen-train",
+      "name": "fastgen-train",
+      "description": "Run, resume or troubleshoot NVIDIA FastGen training: SFT or distillation with train.py, bounded smoke tests, distributed launches, checkpoints, validation and W&B evidence. Use it whenever training is executed or a training run misbehaves.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,research_academic,research_non_academic,ai_engineer,developer",
+        "discovery.activity_tags": "train,fine_tune,troubleshoot,monitor,validate"
+      }
+    },
+    {
+      "path": "skills/fastgen-validate",
+      "name": "fastgen-validate",
+      "description": "Validate NVIDIA FastGen integrations and training quality: numerical parity against reference implementations, seeded side-by-side media, gradient and trainability checks, checkpoint round trips and repository tests. Use it whenever a claim about correctness, parity or quality needs evidence.",
+      "metadata": {
+        "product.primary": "Research Contributions",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "ml_engineer,developer,ai_engineer,application_developer",
+        "discovery.activity_tags": "validate,test,compare,evaluate,benchmark"
+      }
+    },
+    {
       "path": "skills/foundationpose-pipeline",
       "name": "foundationpose-pipeline",
       "description": "Adapt BOP datasets, run the FoundationPose perception pipeline with TAO depth, and evaluate or re-score pose results. Use for dataset runs and result comparisons; environment installation belongs to foundationpose-setup.",
