@@ -2095,6 +2095,13 @@
       "last_modified": "2026-09-15"
     },
     {
+      "name": "nvalchemi-toolkit",
+      "path": "skills/nvalchemi-toolkit",
+      "content_digest": "sha256:71209b5dc5c0015bac0a61ed6f29fb11b4a8adbfe2f18bd0cd2b80e81b608639",
+      "last_commit": "3687569c216eb7e15712231e2615dfa1b79084a5",
+      "last_modified": "2026-11-09"
+    },
+    {
       "name": "nvflare-autofl",
       "path": "skills/nvflare-autofl",
       "content_digest": "sha256:56a440a829563823c6691a24d40264b68cd27bacfd654c88c33c7daa8a771930",
