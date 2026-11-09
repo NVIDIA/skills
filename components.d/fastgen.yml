@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: FastGen
+product_primary: Research Contributions
 repo: NVlabs/FastGen
 description: Set up FastGen, prepare datasets, run inference and diffusion distillation, and extend networks, modalities, and methods.
 skills:
