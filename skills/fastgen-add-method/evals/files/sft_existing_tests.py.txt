@@ -1,0 +1,107 @@
+# tests/test_sftmodel.py:25-65
+@pytest.fixture
+def get_model_data():
+    gc.collect()  # https://github.com/pytest-dev/pytest/discussions/10387
+    instance = ModelConfig()
+    opts = [
+        "-",
+        "backbone.img_resolution=8",
+        "backbone.channel_mult=[1]",
+        "backbone.channel_mult_noise=1",
+        "backbone.r_timestep=False",
+    ]
+    instance.net = override_config_with_opts(instance.net, opts)
+
+    instance.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    instance.precision = "float32"
+    instance.precision_model = "float64" if instance.device.type == "cpu" else "bfloat16"
+    instance.pretrained_model_path = None  # disable ckpt loading
+    instance.input_shape = [3, 8, 8]
+
+    # SFT-specific configurations
+    instance.cond_dropout_prob = 0.1
+    instance.cond_keys_no_dropout = []
+
+    model = SFTModel(instance)
+    model.on_train_begin()
+    model.init_optimizers()
+
+    batch_size = 1
+    # Use one-hot encoded labels as EDM network expects them
+    labels = torch.randint(0, 10, (batch_size,))
+    labels = torch.nn.functional.one_hot(labels, num_classes=10).float()
+    neg_condition = torch.zeros(batch_size, 10)
+
+    # Create mock data
+    data = {
+        "real": torch.randn(batch_size, 3, 8, 8).to(model.device, model.precision),
+        "condition": labels.to(model.device, model.precision),
+        "neg_condition": neg_condition.to(model.device, model.precision),
+    }
+
+    return model, data
+
+
+# tests/test_sftmodel.py:68-96
+def test_single_train_step(get_model_data):
+    """Test the single training step of SFT model."""
+    model, data = get_model_data
+
+    # Run the training step
+    loss_map, outputs = model.single_train_step(data, 0)
+
+    # Test loss_map structure
+    assert isinstance(loss_map, dict)
+    assert "total_loss" in loss_map
+    assert "dsm_loss" in loss_map
+    assert isinstance(loss_map["total_loss"], torch.Tensor)
+    assert isinstance(loss_map["dsm_loss"], torch.Tensor)
+    assert loss_map["total_loss"].detach().item() >= 0.0
+    assert loss_map["dsm_loss"].detach().item() >= 0.0
+    # For SFT, total_loss should equal dsm_loss
+    assert torch.allclose(loss_map["total_loss"], loss_map["dsm_loss"])
+
+    # Test outputs structure
+    assert isinstance(outputs, dict)
+    assert "gen_rand" in outputs
+    assert "input_rand" in outputs
+    assert isinstance(outputs["input_rand"], torch.Tensor)
+    assert outputs["input_rand"].shape == data["real"].shape
+    # gen_rand should be a callable (partial function)
+    assert callable(outputs["gen_rand"])
+    assert outputs["gen_rand"].keywords["neg_condition"] is data["neg_condition"]
+    assert isinstance(outputs["gen_rand_train"], torch.Tensor)
+    assert outputs["gen_rand_train"].shape == data["real"].shape
+
+
+# tests/test_sftmodel.py:99-128
+@pytest.mark.parametrize("optimize_reward", [False, True])
+@pytest.mark.parametrize("dropout_probability", [None, 0.0, 1.0])
+def test_single_train_step_applies_a_configured_reward_to_the_x0_prediction(
+    get_model_data, optimize_reward, dropout_probability
+):
+    """SFT scores its x0 prediction like the other methods; only an optimized reward joins the objective."""
+    model, data = get_model_data
+    model.config.optimize_reward = optimize_reward
+    model.config.cond_dropout_prob = dropout_probability
+    rewarded = []
+
+    def reward(gen_data, reward_data, condition_dropout_mask=None):
+        rewarded.append((gen_data, reward_data, condition_dropout_mask))
+        return {"total_loss": gen_data.mean(), "aesthetic": torch.tensor(0.5)}
+
+    model.reward = reward
+    loss_map, outputs = model.single_train_step(data, 0)
+
+    ((scored, scored_data, dropout_mask),) = rewarded
+    assert scored_data is data
+    if dropout_probability is None:
+        assert dropout_mask is None
+    else:
+        assert dropout_mask.shape == (data["real"].shape[0],) and dropout_mask.dtype == torch.bool
+        assert dropout_mask.eq(dropout_probability == 1.0).all()
+    assert scored.requires_grad == optimize_reward
+    torch.testing.assert_close(scored.detach(), outputs["gen_rand_train"])
+    torch.testing.assert_close(loss_map["aesthetic"], torch.tensor(0.5))
+    expected_total = loss_map["dsm_loss"] + loss_map["reward_loss"] if optimize_reward else loss_map["dsm_loss"]
+    torch.testing.assert_close(loss_map["total_loss"], expected_total)

@@ -1,0 +1,194 @@
+# fastgen/networks/network.py:164-203
+    def transform_output(
+        self,
+        prediction: TensorOrDict,
+        x_t: TensorOrDict,
+        t: torch.Tensor,
+        condition: Any = None,
+        fwd_pred_type: Optional[str] = None,
+        output_dtype: OutputDtype = "same",
+        apply_output_conditioning: bool = True,
+        **context: Any,
+    ) -> TensorOrDict:
+        """Turn a native prediction into the output; every ``forward`` ends with this call.
+
+        Converts it from ``net_pred_type`` to ``fwd_pred_type`` in at least ``HIGH_PRECISION``, then applies the
+        output constraint in that precision unless ``apply_output_conditioning=False``. Only then is the result
+        rounded, once, to ``output_dtype``: a dtype, or a mapping of one per modality; ``"same"`` is each modality's
+        state dtype, and ``None`` keeps the transform's precision. A forward with the default ``fwd_pred_type``,
+        ``apply_output_conditioning=False`` and ``output_dtype=None`` thus returns the native prediction unrounded.
+        Guidance requests its branches the same way but in its working dtype, and applies this once to the result.
+        ``context`` holds the forward kwargs that the conversion and the constraint read.
+        """
+        if fwd_pred_type is None:
+            fwd_pred_type = self.net_pred_type
+        elif fwd_pred_type not in NET_PRED_TYPES:
+            raise ValueError(
+                f"{type(self).__name__}.forward does not support fwd_pred_type={fwd_pred_type!r}; "
+                f"supported types are {NET_PRED_TYPES}"
+            )
+        converted = self._convert_output(prediction, x_t, t, condition, fwd_pred_type, **context)
+        # The conversion must not round: its result is at least the high precision of its inputs.
+        per_modality(
+            lambda c, p, x: assert_same(dtype=high_precision_dtype(c, p, x), converted=c), converted, prediction, x_t
+        )
+        if apply_output_conditioning and self._condition_output is not None:
+            conditioned = self._condition_output(
+                converted, x_t, t, condition=condition, fwd_pred_type=fwd_pred_type, **context
+            )
+            assert_same(dtype=True, device=True, converted=converted, conditioned=conditioned)
+            converted = conditioned
+        return cast_like(converted, x_t, output_dtype)
+
+
+# fastgen/networks/network.py:205-228
+    def _convert_output(
+        self,
+        prediction: TensorOrDict,
+        x_t: TensorOrDict,
+        t: torch.Tensor,
+        condition: Any,
+        fwd_pred_type: str,
+        **context: Any,
+    ) -> TensorOrDict:
+        """The conversion step of ``transform_output``, from ``net_pred_type`` to ``fwd_pred_type``, returned uncast
+        in at least ``HIGH_PRECISION``.
+
+        Networks whose conversion uses inputs or timestep layouts other than the caller's state and ``t``
+        override it. From ``net_pred_type`` to itself it must only cast: guidance converts its composed native
+        branches again.
+        """
+        return self.noise_scheduler.convert_model_output(
+            x_t,
+            prediction,
+            t,
+            src_pred_type=self.net_pred_type,
+            target_pred_type=fwd_pred_type,
+            output_dtype=None,
+        )
+
+
+# fastgen/networks/network.py:230-284
+    def _validate_forward_kwargs(
+        self,
+        forward_kwargs: Mapping[str, Any],
+        r: Any = None,
+        return_features_early: bool = False,
+        feature_indices: Optional[Set[int]] = None,
+        skip_layers: Any = None,
+        supports_r_timestep: bool = False,
+        supports_skip_layers: bool = False,
+        num_features: Optional[int] = None,
+    ) -> None:
+        """Reject unknown kwargs and validate optional forward controls before neural work.
+
+        Feature and skip-layer indices share the ``num_features`` range. Networks pass
+        their extraction-point count regardless of whether features are requested.
+        """
+        forward_kwargs = dict(forward_kwargs)
+        r = forward_kwargs.pop("r", r)
+        skip_layers = forward_kwargs.pop("skip_layers", skip_layers)
+        if forward_kwargs:
+            names = ", ".join(repr(name) for name in sorted(forward_kwargs))
+            raise TypeError(f"{type(self).__name__}.forward got unexpected keyword argument(s): {names}")
+
+        if r is not None and not supports_r_timestep:
+            raise NotImplementedError(f"{type(self).__name__}.forward does not support secondary r timesteps")
+
+        if feature_indices is not None and not isinstance(feature_indices, set):
+            raise TypeError(
+                f"{type(self).__name__}.forward requires feature_indices to be a set or None; "
+                f"got {type(feature_indices).__name__}"
+            )
+        if return_features_early and feature_indices is None:
+            raise ValueError(f"{type(self).__name__}.forward requires feature_indices when return_features_early=True")
+        if feature_indices is not None:
+            invalid_types = [
+                index for index in feature_indices if not isinstance(index, int) or isinstance(index, bool)
+            ]
+            if invalid_types:
+                raise TypeError(
+                    f"{type(self).__name__}.forward requires feature_indices to contain integers excluding bool; "
+                    f"got {sorted(invalid_types, key=repr)!r}"
+                )
+
+        for name, indices, supported in (
+            ("feature_indices", feature_indices, True),
+            ("skip_layers", skip_layers, supports_skip_layers),
+        ):
+            if not indices:
+                continue
+            if not supported:
+                raise NotImplementedError(f"{type(self).__name__}.forward does not support {name!r}")
+            if num_features is None:
+                reason = "requesting features" if name == "feature_indices" else f"supporting {name}"
+                raise RuntimeError(f"{type(self).__name__}.forward must provide num_features when {reason}")
+            self._validate_index_range(name, indices, num_features)
+
+
+# fastgen/networks/network.py:516-580
+    def forward(
+        self,
+        x_t: torch.Tensor,
+        t: torch.Tensor,
+        condition: Any = None,
+        r: Optional[torch.Tensor] = None,
+        return_features_early: bool = False,
+        feature_indices: Optional[Set[int]] = None,
+        return_logvar: bool = False,
+        fwd_pred_type: Optional[str] = None,
+        apply_output_conditioning: bool = True,
+        output_dtype: OutputDtype = "same",
+        **fwd_kwargs,
+    ) -> Union[torch.Tensor, List[torch.Tensor], Tuple[torch.Tensor, torch.Tensor]]:
+        """Forward pass of diffusion model.
+
+        This method performs a single forward pass through the network, predicting the denoised
+        output or noise based on the current noisy input and timestep.
+
+        Args:
+            x_t (torch.Tensor): The diffused/noisy data sample at timestep t.
+                Shape should be [batch_size, channels, ...spatial_dims].
+            t (torch.Tensor): The current timestep(s). Can be a scalar or tensor
+                with shape [batch_size].
+            condition (Any, optional): Optional conditioning information such as text embeddings, class labels,
+                or attention masks. Can be a single tensor, list of tensors, or dictionary
+                mapping condition names to tensors. Format depends on the specific network implementation.
+                Defaults to None.
+            r (Optional[torch.Tensor], optional): Additional timestep parameter,
+                primarily used by mean flow methods. Defaults to None.
+            return_features_early (bool, optional): If True, returns intermediate features
+                as soon as they are computed, without completing the full forward pass.
+                Requires feature_indices, which may be empty; an empty set returns []
+                immediately. Defaults to False.
+            feature_indices (Optional[Set[int]], optional): Set of layer indices to extract
+                features from. Any provided set includes a feature list in the return value,
+                including an empty list for an empty set. None returns only the model output.
+                Members must be integers (excluding bool) within the architecture's feature range;
+                UNets index encoder stages, and transformers index their blocks.
+            return_logvar (bool, optional): If True, returns the log-variance estimate
+                along with the main output. Defaults to False.
+            fwd_pred_type (Optional[str], optional): Override the network's prediction type
+                for this forward pass. Must be in ['x0', 'eps', 'v', 'flow'].
+                None uses the network's default net_pred_type. Defaults to None.
+            apply_output_conditioning: Apply the output constraint after the conversion. Code that composes or
+                reuses predictions, such as guidance and DMD2's shared teacher pass, disables it and constrains
+                the result once.
+            output_dtype: Dtype of the prediction, or a mapping of one per modality: ``"same"`` rounds it to each
+                modality's state dtype, and ``None`` keeps the transform's high precision. Guidance requests its
+                branches in its working dtype.
+            **fwd_kwargs: Guidance modifiers validated by the concrete network.
+
+        Returns:
+            Union[torch.Tensor, List[torch.Tensor], Tuple[torch.Tensor, torch.Tensor]]:
+                - If return_features_early=True: List of intermediate features
+                - If feature_indices is not None: List containing [output, features]
+                - If return_logvar=True: Tuple containing (output, logvar)
+                - Otherwise: Single output tensor with predictions
+
+        Raises:
+            TypeError: If feature_indices is neither a set nor None, or contains non-integer members.
+            ValueError: If fwd_pred_type is unsupported or early feature return is requested
+                without feature_indices, or a feature index is outside this architecture's range.
+            NotImplementedError: Must be implemented by concrete subclasses.
+        """

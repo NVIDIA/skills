@@ -1,0 +1,87 @@
+{
+  "skill_name": "fastgen-inference",
+  "evals": [
+    {
+      "id": "student-checkpoint-command",
+      "prompt": "Use fastgen-inference to correct /workspace/input/proposed_inference.sh for the student evaluation described in sampling_request.json. Read inference_source.md and the exact released SD15 recipe config_dmd2_sd15.py and write /workspace/output/inference.sh. Explain the checkpoint/EMA branch and which option sets the student grid. Preserve the supplied config, paths, seed and explicit model.use_ema=True override. Syntax-check the output with bash -n. This is command preparation only: do not run inference or access those deployment paths.",
+      "files": [
+        "files/proposed_inference.sh",
+        "files/sampling_request.json",
+        "files/inference_source.md",
+        "files/config_dmd2_sd15.py"
+      ],
+      "expected_skill": "fastgen-inference",
+      "expected_output": "Writes an inference command selecting the checkpoint-backed student with four grid steps and preserves the requested paths and seed. The deployment --config remains fastgen/configs/experiments/SD15/config_dmd2.py; config_dmd2_sd15.py is only the supplied fixture filename, not the deployment path.",
+      "assertions": [
+        "Selects --do_student_sampling True and --do_teacher_sampling False.",
+        "Sets model.student_grid_cfg.steps=4 after the single Hydra separator; does not use --sample_steps as the student-grid control.",
+        "Preserves the actual SD15/config_dmd2.py config path, checkpoint, prompt path, output destination, trainer.seed=42 and explicit model.use_ema=True override; bash -n succeeds.",
+        "Explains that the explicit model.use_ema=True override selects the first EMA (ema), while teacher sampling would not evaluate that checkpoint-backed student.",
+        "Reports the command as prepared, not executed or validated for sample quality."
+      ]
+    },
+    {
+      "id": "partial-checkpoint-load",
+      "prompt": "The student output seems unrelated to training, but loading says success. Diagnose /workspace/input/checkpoint.txt using inference_source.md and write /workspace/output/diagnosis.md with the correction and verification needed. Do not download weights or launch inference.",
+      "files": [
+        "files/checkpoint.txt",
+        "files/inference_source.md"
+      ],
+      "expected_skill": "fastgen-inference",
+      "expected_output": "Recognizes that a permissive load matched only an auxiliary parameter and does not establish backbone compatibility or a valid distilled student.",
+      "assertions": [
+        "Uses the missing transformer backbone keys and unexpected other-model keys as evidence of checkpoint/config incompatibility.",
+        "Explains that one matching parameter can produce the success message despite most network weights remaining unloaded.",
+        "Recommends finding the matching checkpoint/config and verifying expected key coverage before evaluating quality, rather than suppressing warnings or using strict=False again.",
+        "Does not blame the inference grid as the established root cause or claim corrected media were generated."
+      ]
+    },
+    {
+      "id": "editing-input-pairing",
+      "prompt": "Before running three image edits, inspect /workspace/input/prompts.txt and source_images.txt using input_source.md. Write /workspace/output/pairs.json describing the three prompt/source pairs that the existing FastGen list loader will produce when num=3. Explain any source reuse and what evidence would be needed to call the outputs validated. Do not open source images or run generation.",
+      "files": [
+        "files/prompts.txt",
+        "files/source_images.txt",
+        "files/input_source.md"
+      ],
+      "expected_skill": "fastgen-inference",
+      "expected_output": "Maps the final prompt to the repeated last source entry and distinguishes a prepared input manifest from actual inference validation.",
+      "assertions": [
+        "Pairs the first prompt with /data/source_a.png and the second with /data/source_b.png.",
+        "Pairs the third prompt with /data/source_b.png, identifying last-entry repetition rather than cycling or truncation.",
+        "Writes all three pairs and does not fabricate a third source image.",
+        "Does not claim inference, visual inspection or tracker uploads occurred."
+      ]
+    },
+    {
+      "id": "shared-teacher-checkpoint-provenance",
+      "prompt": "Using inference_source.md and shared_teacher_source.md, review two teacher-sampling preparations: A has a separately constructed teacher; B has SharedBaseTeacher(model.net). Both call load_checkpoint before setup_inference_modules with teacher sampling enabled. Their checkpoints contain matching net base parameters that differ from initialization, adapter weights, and configured EMA roots. The engineer claims that changing --ckpt_path cannot affect either teacher because only student roots are loaded. Write /workspace/output/teacher-provenance.md identifying the loaded roots, the network each teacher uses, and whether that claim follows from the code. Also distinguish the case where only adapter weights differ, with identical base weights and sampling settings. Cite the relevant calls or contexts and state what remains untested. This is source-based diagnosis only: do not import FastGen, download weights or run inference.",
+      "files": [
+        "files/inference_source.md",
+        "files/shared_teacher_source.md"
+      ],
+      "expected_skill": "fastgen-inference",
+      "expected_output": "A source-backed weight-provenance comparison distinguishes the separate teacher from SharedBaseTeacher over checkpoint-loaded net, including disabled adapters and the absence of numerical output evidence.",
+      "assertions": [
+        "Identifies load_checkpoint loading net and configured EMA roots, without loading a separate teacher root.",
+        "Explains that a separate teacher retains its constructor/pretrained weight source, while setup_inference_modules preserves net for SharedBaseTeacher; changing loaded net base parameters can affect the shared teacher.",
+        "Traces SharedBaseTeacher.base_net and the adapters_disabled context; does not claim teacher sampling uses the first EMA or that checkpoint adapter changes are applied in the teacher forward.",
+        "Distinguishes changed base parameters from adapter-only differences with otherwise identical base weights and settings; disabling adapters does not undo changed base weights.",
+        "Reports this as a source-based diagnosis with numerical outputs and parity untested; does not execute or fabricate inference."
+      ]
+    },
+    {
+      "id": "adjacent-parity-audit",
+      "prompt": "FastGen and upstream teacher/student samples have already been generated. I need to decide whether the numerical parity and four-step quality claims are supported by their manifests and held-out comparison results. Select the workflow that owns acceptance evidence, and identify the first artifact it should inspect. Do not generate additional samples in this routing-only task.",
+      "files": [],
+      "expected_skill": "fastgen-inference",
+      "should_trigger": false,
+      "expected_output": "Routes the acceptance decision to fastgen-validate, beginning with the frozen comparison manifest rather than running generation.",
+      "assertions": [
+        "Does not select fastgen-inference for judging already generated parity and quality evidence.",
+        "Identifies fastgen-validate and the comparison manifest/acceptance criteria.",
+        "Does not prepare or execute additional generation."
+      ]
+    }
+  ]
+}

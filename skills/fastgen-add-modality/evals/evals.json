@@ -1,0 +1,67 @@
+{
+  "skill_name": "fastgen-add-modality",
+  "evals": [
+    {
+      "id": "explicit-joint-native-export",
+      "prompt": "Use fastgen-add-modality to extend the actual save_media boundary in /workspace/input/media_utils.py.txt. A decoded batch contains video [B,3,T,H,W], audio [B,1,S] and pose [B,T,J,3] in metres, with stable sample IDs supplied by the caller. Current export produces a playable clip but loses pose. Preserve every generated modality in a lossless native tensor artifact with shape, dtype, units and sample identity, and retain the conventional media preview. Add the corresponding native reader and a concrete way for the caller to supply metadata; do not reshape pose into image/video or audio dimensions. Write /workspace/output/changes.patch against the recorded source paths, real pytest tests under /workspace/output/regressions/ and /workspace/output/validation.md. Tests must call FastGen save_media and your real reader with PyTorch tensors; codec writers may be intercepted, but native tensor I/O must run unchanged in the test. Cover joint audio/video/pose, pose-only, an existing audio/video batch, and an ordinary image tensor. Check exact values, dtype, shape, units and identity for every sample, not approximate numerical equality. Caller metadata must not replace generated tensors or their authoritative schema fields; include a conflicting-metadata regression. This runtime has source only: do not import GPU frameworks, install codecs/dependencies or claim training support. Perform available static checks and leave an exact full-environment test command.",
+      "expected_output": "A real media_utils dispatcher/native tensor I/O patch and regression tests that prevent extra modalities from disappearing, with explicit scope limits.",
+      "assertions": [
+        "Identifies save_media is_av membership detection and its video/audio-only writes as the actual silent-loss path.",
+        "Integrates native writing and reading with the actual save_media dispatcher, preserving every modality tensor value, shape and dtype plus units and stable per-sample identity.",
+        "Defines explicit metadata plumbing without allowing caller metadata to replace authoritative payload/schema fields, validates batch/ID alignment, and prevents pose-only output from falling through dimensionality-based audio/image dispatch.",
+        "Preserves conventional image/audio/video and audio-video behavior, naming/indexing and encode options; handles metadata without accidentally forwarding it into strict codec writers.",
+        "Tests call the patched save_media and actual native reader with nontrivial PyTorch tensors, exact roundtrip comparisons and conflicting metadata; only codec dependencies may be intercepted.",
+        "Covers multi-sample identity and all requested existing modes and states that serializer checks do not establish network, loss, sharding or new-modality training support.",
+        "Provides a patch, tests and truthful validation evidence instead of a standalone JSON serializer."
+      ],
+      "expected_skill": "fastgen-add-modality",
+      "should_trigger": true,
+      "files": [
+        "files/media_utils.py.txt",
+        "files/media_tree_utils.py.txt",
+        "files/media_existing_tests.py.txt",
+        "files/media_sources.json"
+      ]
+    },
+    {
+      "id": "context-independent-clocks",
+      "prompt": "Assess /workspace/input/clock_proposal.json against the supplied CompositeNoiseSchedule, SFTModel.single_train_step and model_pixel_shape source in clock_sources.json. Write /workspace/output/clock-review.md explaining whether the proposed joint video/pose configuration preserves the supplied algorithm, with citations to exact functions and the interfaces that would need implementation. Do not replace its algorithm or claim training execution.",
+      "expected_output": "A source-grounded rejection of the independent-clock shortcut and a concrete compatibility boundary.",
+      "assertions": [
+        "Cites CompositeNoiseSchedule.sample_t/grid/forward_process and SFTModel.single_train_step to show that a single timestep and primary student grid drive both modalities.",
+        "Explains why independently held video/pose timestep pairs cannot be represented by dtype casts or merely different noise curves.",
+        "Requires actual training-time, network and sampler interfaces for distinct clocks, or marks the mode unsupported pending those changes.",
+        "Does not invent video fields to satisfy model_pixel_shape or infer support from generic tree dispatch.",
+        "Separates the hypothetical model contract from facts established by the supplied FastGen source and makes no execution/parity claims."
+      ],
+      "expected_skill": "fastgen-add-modality",
+      "should_trigger": true,
+      "files": [
+        "files/composite_schedule.py.txt",
+        "files/sft_timestep.py.txt",
+        "files/model_shape.py.txt",
+        "files/clock_sources.json",
+        "files/clock_proposal.json"
+      ]
+    },
+    {
+      "id": "adjacent-existing-ltx-audio-video",
+      "prompt": "The released LTX-2 adapter already generates video plus audio. Prepare an inference invocation for its fine-tuned SFT checkpoint /models/ltx2-sft/checkpoint.pth, prompts /data/prompts.txt and negative prompts /data/negative.txt, seed 17, 30 student sampling steps, and outputs under /results/ltx2-check. Use the supplied script/config sources in ltx_inference_sources.json. Write /workspace/output/inference-command.txt and a short explanation identifying the responsible FastGen workflow. These are deployment paths, not files available in this runtime; do not execute the command or add a new modality.",
+      "expected_output": "A fastgen-inference command for the existing video/audio mode, using the student grid and provided checkpoint.",
+      "assertions": [
+        "Routes to fastgen-inference and recognizes existing LTX-2 audio-video support without starting a modality extension.",
+        "Uses scripts/inference/video_model_inference.py with the existing LTX2/config_sft.py, --ckpt_path, supplied prompt files and explicit video output directory.",
+        "Selects student sampling and no teacher sampling, sets model.student_grid_cfg.steps=30 after the single override separator, and trainer.seed=17.",
+        "Preserves audio-video output and does not confuse --sample_steps for teacher sampling with the student grid, or claim that the deployment paths were verified."
+      ],
+      "expected_skill": "fastgen-add-modality",
+      "should_trigger": false,
+      "files": [
+        "files/video_model_inference.py.txt",
+        "files/inference_common_args.py.txt",
+        "files/ltx2_sft_config.py.txt",
+        "files/ltx_inference_sources.json"
+      ]
+    }
+  ]
+}

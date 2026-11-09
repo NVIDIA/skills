@@ -1,0 +1,60 @@
+{
+  "fixture": "Authored DMD2 checkpoint/training review inventory, not results captured by this evaluation. Interpret it using training_evidence_source.md.",
+  "weight_reload": {
+    "fresh_instance": true,
+    "checkpoint_loaded_roots": [
+      "net"
+    ],
+    "same_inputs_and_noise": true,
+    "output_max_abs_error": 0.0,
+    "manifest_atol": 0.0001,
+    "call": "Checkpointer.load(model_dict=torch.nn.ModuleDict({\"net\": fresh_net}), path=checkpoint, strict=True); no optimizer/scheduler/callback arguments supplied"
+  },
+  "resume": {
+    "optimizer_loaded": false,
+    "scheduler_loaded": false,
+    "callbacks_loaded": false,
+    "iteration_loaded": false,
+    "new_process_iteration": 0,
+    "grad_scaler_loaded": false
+  },
+  "training": {
+    "iterations": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "student_update_freq": 5,
+    "student_parameters_changed": false,
+    "fake_score_parameters_changed": true,
+    "logged_loss_finite": true,
+    "pre_clip_gradients_checked": false,
+    "entrypoint": "DMD2Model.single_train_step(data, iteration)"
+  },
+  "execution": {
+    "device": "cpu",
+    "distributed_wrapper": false,
+    "generate_then_backward_test": false
+  },
+  "gallery": {
+    "teacher_student_pairs": 2,
+    "human_judgment_recorded": false,
+    "task_metric_computed": false
+  },
+  "method": "fastgen.methods.distribution_matching.dmd2.DMD2Model",
+  "resume_followup": {
+    "fixture": "A separate authored follow-up load after the weight-only check; also not executed by this evaluation.",
+    "call": "iteration = checkpointer.load(model.model_dict, optimizer_dict=model.optimizer_dict, scheduler_dict=model.scheduler_dict, path=checkpoint)",
+    "model_optimizer_scheduler_loaded": true,
+    "iteration_loaded": true,
+    "new_process_iteration": 600,
+    "checkpoint_has_callback_state": true,
+    "checkpoint_has_grad_scaler_state": true,
+    "target_has_stateful_callbacks": true,
+    "target_grad_scaler_enabled": true,
+    "callbacks_argument_supplied": false,
+    "grad_scaler_argument_supplied": false,
+    "claim": "This follow-up establishes full resume because weights, optimizer, scheduler and iteration were restored."
+  }
+}

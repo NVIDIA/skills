@@ -1,0 +1,62 @@
+# fastgen/utils/module.py:728-788
+@torch.no_grad()
+def materialize_meta_module(module: nn.Module, device: torch.device | str) -> None:
+    """Allocate meta state, restore recorded parameter ties, and rebuild deterministic buffers.
+
+    Existing real values survive placement. The root ``reset_parameters()`` hook may rebuild
+    deterministic buffers and unregistered tensors, but must preserve every registered object,
+    its metadata, and module-owner topology. Parameter ties are restored before the reset; generic
+    ``tie_weights()`` hooks are not called. Callers restore authoritative parameter and persistent
+    buffer values afterwards. Unregistered tensors are the reset hook's responsibility.
+
+    This function issues no collectives directly, but a reset hook operating on DTensors may
+    trigger collectives inside PyTorch's DTensor dispatch. Reset hooks should not draw random
+    values; advancing a global RNG state emits a ``UserWarning``.
+    """
+    operation = "meta materialization"
+    with validate_module_owners_preserved(module, operation):
+        reject_inference_state(module, operation)
+        reject_unsafe_placement(module, operation)
+        registrations = tensor_registrations(module)
+        expected_signature = registration_signature(registrations, include_device=False)
+        tied_parameters = tied_parameter_registration_groups(registrations)
+        target_device = resolve_device(device)
+
+        def place_tensor(tensor: torch.Tensor) -> torch.Tensor:
+            if local_tensor(tensor).is_meta:
+                return torch.empty_like(tensor, device=target_device)
+            return tensor.to(device=target_device)
+
+        module._apply(place_tensor)
+        # Allocation may split parameter objects. Their values have not been initialized yet,
+        # so any member can represent the original group before the reset or checkpoint copy.
+        for group in tied_parameters:
+            tensor = getattr(group[0].owner, group[0].local_name)
+            for slot in group[1:]:
+                setattr(slot.owner, slot.local_name, tensor)
+
+        reset_parameters = getattr(module, "reset_parameters", None)
+        if callable(reset_parameters):
+            with validate_module_state_preserved(module, "meta reset_parameters"), _warn_if_rng_advanced(module):
+                reset_parameters()
+        # Wrapped third-party models may have no reset hook. Their caller must overwrite all
+        # allocated state, including nonpersistent buffers, from rank 0.
+
+        actual = tensor_registrations(module)
+        signature = registration_signature(actual, include_device=False)
+        misplaced = sorted(
+            key
+            for key, entry in actual.items()
+            if entry.tensor is not None and local_tensor(entry.tensor).device != target_device
+        )
+        if signature != expected_signature or misplaced:
+            changed = sorted(
+                key
+                for key in signature.keys() | expected_signature.keys()
+                if signature.get(key) != expected_signature.get(key)
+            )
+            raise RuntimeError(
+                f"{type(module).__name__} failed validation while materializing meta tensors: registered "
+                "metadata and parameter ties must be preserved, and every tensor must finish on the requested device. "
+                f"Changed registrations (first 8): {changed[:8]}; misplaced (first 8): {misplaced[:8]}"
+            )

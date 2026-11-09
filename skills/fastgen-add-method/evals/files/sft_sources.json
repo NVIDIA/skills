@@ -1,0 +1,259 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "sft.py.txt",
+      "repository_path": "fastgen/methods/fine_tuning/sft.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/fine_tuning/sft.py",
+      "source_sha256": "c7e7b085227624247625637bea0489c3c8f643db8b9986c862543ee8c50ba2e9",
+      "line_ranges": [
+        [
+          1,
+          398
+        ]
+      ],
+      "fixture_sha256": "c7e7b085227624247625637bea0489c3c8f643db8b9986c862543ee8c50ba2e9",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "config_sft.py.txt",
+      "repository_path": "fastgen/configs/methods/config_sft.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/configs/methods/config_sft.py",
+      "source_sha256": "69c04baebbe3ea214bc3ffaeae7a498430c904235369698ea856e64c5e078bab",
+      "line_ranges": [
+        [
+          1,
+          48
+        ]
+      ],
+      "fixture_sha256": "69c04baebbe3ea214bc3ffaeae7a498430c904235369698ea856e64c5e078bab",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "flow_matching_loss.py.txt",
+      "repository_path": "fastgen/methods/common_loss.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/common_loss.py",
+      "source_sha256": "30f7d324ae496a0b8083830eb5a6877b86ebd9f9f8c8d039ffbfaecde6b12f98",
+      "line_ranges": [
+        [
+          13,
+          27
+        ],
+        [
+          30,
+          42
+        ],
+        [
+          45,
+          80
+        ],
+        [
+          83,
+          117
+        ]
+      ],
+      "fixture_sha256": "ccc725891ef5573fef8a5550b135f14ef4d5b6fcfa2a3633a3f5f565b9560a3f",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "prepare_batch.py.txt",
+      "repository_path": "fastgen/methods/model.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/model.py",
+      "source_sha256": "cd57814e23d6ed0067ad5bc533936831a3c9ad35e01263f88cdddff32ff51656",
+      "line_ranges": [
+        [
+          137,
+          202
+        ]
+      ],
+      "fixture_sha256": "bd39cac8a9a8116cce9c5a350c164a00fb2f5c27b57c62c13fc4ec333cf513b4",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "tree_dispatch.py.txt",
+      "repository_path": "fastgen/utils/tree_utils.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/utils/tree_utils.py",
+      "source_sha256": "f0e98a34ef4393dc01d39d60792f2b9a6d94166eeec81607245061065333b542",
+      "line_ranges": [
+        [
+          58,
+          91
+        ],
+        [
+          209,
+          219
+        ]
+      ],
+      "fixture_sha256": "e74ffcfa005c070d2a3c9ce599e30d3cefcb3c5dc8e113db42d39e86daef1ee6",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "sft_existing_tests.py.txt",
+      "repository_path": "tests/test_sftmodel.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/tests/test_sftmodel.py",
+      "source_sha256": "dae82744f7183582308e77c7fdd80393ebcd06967eec0181b344dffdc073f877",
+      "line_ranges": [
+        [
+          25,
+          65
+        ],
+        [
+          68,
+          96
+        ],
+        [
+          99,
+          128
+        ]
+      ],
+      "fixture_sha256": "3fea53fbc716e722d6ce8b4d59f20c11485778ad8217743714eea5ff701474f5",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "sft_multimodal_helpers.py.txt",
+      "repository_path": "tests/test_multimodal.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/tests/test_multimodal.py",
+      "source_sha256": "a1396c7faf6f61c47b9dc2579876287451c218b464a7605e5299f8238428d145",
+      "line_ranges": [
+        [
+          1,
+          2
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          12,
+          12
+        ],
+        [
+          14,
+          14
+        ],
+        [
+          15,
+          15
+        ],
+        [
+          19,
+          19
+        ],
+        [
+          22,
+          22
+        ],
+        [
+          26,
+          26
+        ],
+        [
+          29,
+          29
+        ],
+        [
+          31,
+          31
+        ],
+        [
+          32,
+          40
+        ],
+        [
+          43,
+          43
+        ],
+        [
+          44,
+          44
+        ],
+        [
+          45,
+          45
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          49,
+          49
+        ],
+        [
+          52,
+          57
+        ],
+        [
+          68,
+          76
+        ],
+        [
+          79,
+          86
+        ],
+        [
+          101,
+          105
+        ],
+        [
+          108,
+          113
+        ],
+        [
+          123,
+          125
+        ],
+        [
+          128,
+          135
+        ],
+        [
+          138,
+          248
+        ],
+        [
+          392,
+          399
+        ],
+        [
+          516,
+          521
+        ],
+        [
+          402,
+          418
+        ]
+      ],
+      "fixture_sha256": "4b7ddff60386458dec12f93553d218151277094ce5215584461f545763a7e433",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "reward_contract.py.txt",
+      "repository_path": "fastgen/methods/model.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/model.py",
+      "source_sha256": "cd57814e23d6ed0067ad5bc533936831a3c9ad35e01263f88cdddff32ff51656",
+      "line_ranges": [
+        [
+          975,
+          998
+        ]
+      ],
+      "fixture_sha256": "1433c4f1158013817acddb589bd81c2a4f1380af264b55e399ddbcc1cb06c3a0",
+      "kind": "source_excerpt"
+    }
+  ]
+}

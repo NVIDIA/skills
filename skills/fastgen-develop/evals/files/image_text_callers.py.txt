@@ -1,0 +1,30 @@
+# scripts/inference/image_model_inference.py:66-94
+from scripts.inference.inference_utils import (
+    load_source_image_for_net,
+    load_file_entries,
+    load_checkpoint,
+    default_inference_output_dir,
+    setup_inference_modules,
+    add_common_args,
+)
+
+
+def main(args, config: BaseConfig):
+    # Load prompts or set up unconditional generation
+    if args.unconditional:
+        pos_prompt_set = [None] * args.num_samples
+        prompt_name = "unconditional"
+    else:
+        pos_prompt_set = load_file_entries(args.prompt_file)
+        prompt_name = Path(args.prompt_file).stem
+
+    # One negative prompt per positive one.  Unconditional runs have no negative branch, and
+    # class-conditional runs spell out the null class vector below instead of a prompt.
+    neg_prompt_set = None
+    if args.neg_prompt_file and not args.unconditional and args.classes is None:
+        neg_prompt_set = load_file_entries(args.neg_prompt_file, num=len(pos_prompt_set))
+
+    # Optional image-editing (I2I) reference(s), aligned with the prompts (edit
+    # instructions). The complete builder resolves text for every network and,
+    # for image-edit networks, also bundles the VAE-encoded reference.
+    input_image_paths = load_file_entries(args.input_image_file, num=len(pos_prompt_set), drop_empty=True)

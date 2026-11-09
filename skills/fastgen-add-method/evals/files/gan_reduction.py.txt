@@ -1,0 +1,39 @@
+# fastgen/methods/common_loss.py:13-27
+def mean_with_loss_scale(
+    elementwise_loss: torch.Tensor,
+    loss_scale: Optional[torch.Tensor],
+) -> torch.Tensor:
+    """Scale each sample's mean loss, then average over the original batch."""
+    if loss_scale is None:
+        return elementwise_loss.mean()
+    assert elementwise_loss.ndim > 0, "A per-sample loss scale cannot be applied to a scalar loss."
+    assert_same(shape=(elementwise_loss.shape[0],), device=elementwise_loss.device, loss_scale=loss_scale)
+
+    non_batch_dims = tuple(range(1, elementwise_loss.ndim))
+    per_sample_loss = elementwise_loss.mean(dim=non_batch_dims) if non_batch_dims else elementwise_loss
+    # Per sample, so in the widest dtype, also that of a time-dependent scale.
+    per_sample_loss, loss_scale = to_high_precision(per_sample_loss, loss_scale)
+    return (per_sample_loss * loss_scale).mean()
+
+
+# fastgen/methods/common_loss.py:235-254
+def gan_loss_generator(
+    fake_logits: torch.Tensor,
+    loss_scale: Optional[torch.Tensor] = None,
+) -> torch.Tensor:
+    """
+    Compute the GAN loss for the generator
+    Args:
+        fake_logits (torch.Tensor): The logits for the fake data.
+        loss_scale (Optional[torch.Tensor]): Multiplicative scale for each
+            sample's loss before the ordinary batch mean.
+
+    Returns:
+        gan_loss (torch.Tensor): The GAN loss for the generator.
+
+    """
+
+    assert fake_logits.ndim == 2, f"fake_logits has shape {fake_logits.shape}"
+    fake_logits = to_high_precision(fake_logits)
+    gan_loss = mean_with_loss_scale(F.softplus(-fake_logits), loss_scale)
+    return gan_loss

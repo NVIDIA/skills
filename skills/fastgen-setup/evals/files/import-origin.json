@@ -1,0 +1,10 @@
+{
+  "scenario": "Recorded observations, not paths to execute in the evaluation workspace.",
+  "wanted_checkout": "/workspace/project",
+  "observed_import": "/workspace/old-project/fastgen/__init__.py",
+  "python": "/opt/task-env/bin/python",
+  "dependency_check": "matches wanted checkout",
+  "config": "fastgen/configs/experiments/SD15/config_sft.py",
+  "output_root": "/workspace/outputs",
+  "host_policy": "Accelerator imports execute only on the allocated execution host."
+}

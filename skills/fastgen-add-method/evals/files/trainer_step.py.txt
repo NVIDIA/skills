@@ -1,0 +1,56 @@
+# fastgen/trainer.py:378-432
+    def train_step(
+        self,
+        model_ddp: FastGenModel | torch.nn.parallel.DistributedDataParallel,
+        model: FastGenModel,
+        data: Dict[str, Any],
+        iteration: int,
+        grad_accum_iter: int,
+    ) -> tuple[dict[str, torch.Tensor], dict[str, torch.Tensor]]:
+        """
+        Single training step
+
+        Args:
+            model_ddp (FastGenModel | torch.nn.parallel.DistributedDataParallel): Distillation model with ddp wrapper.
+            model (FastGenModel): Distillation model.
+            data (Dict[str, Any]): Data dict for the current iteration.
+            iteration: Current training iteration
+            grad_accum_iter (int): Gradient accumulation iteration
+
+        Returns:
+            loss_map (dict[str, torch.Tensor]): Dictionary containing the loss values
+            outputs (dict[str, torch.Tensor]): Dictionary containing the network output
+        """
+        grad_accum_rounds = self.config.trainer.grad_accum_rounds
+        sync_grads = grad_accum_iter == grad_accum_rounds - 1
+
+        if not self.config.trainer.fsdp:
+            with ddp.ddp_sync_grad(model_ddp, sync_grads):
+                # forward pass
+                with model.autocast():
+                    loss_map, outputs = model_ddp.single_train_step(data, iteration)
+                # backward pass
+                self.callbacks.on_backward_begin(
+                    model, data, outputs, loss_map, iteration=iteration, accum_iter=grad_accum_iter
+                )
+                model.grad_scaler.scale(loss_map["total_loss"] / grad_accum_rounds).backward()
+        else:
+            with fsdp.fsdp_sync_grad(model, sync_grads):
+                # forward pass
+                with model.autocast():
+                    loss_map, outputs = model_ddp.single_train_step(data, iteration)
+                # backward pass
+                self.callbacks.on_backward_begin(
+                    model, data, outputs, loss_map, iteration=iteration, accum_iter=grad_accum_iter
+                )
+                model.grad_scaler.scale(loss_map["total_loss"] / grad_accum_rounds).backward()
+
+        if grad_accum_iter == grad_accum_rounds - 1:
+            # optimizer step, scheduler step, and more
+            self.callbacks.on_optimizer_step_begin(model=model, iteration=iteration)
+            model.optimizers_schedulers_step(iteration)
+            # Zero after step to free memory on active optimizers
+            model.optimizers_zero_grad(iteration)
+
+        # detach loss_map and outputs
+        return detach(loss_map), detach(outputs)

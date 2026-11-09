@@ -1,0 +1,56 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "module_precision_contract.py.txt",
+      "repository_path": "fastgen/networks/module.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/networks/module.py",
+      "source_sha256": "23b378b97774e6cca468c6ef19dadc864db870697654f4dda24be0b71b3d94cf",
+      "line_ranges": [
+        [
+          1,
+          278
+        ]
+      ],
+      "fixture_sha256": "23b378b97774e6cca468c6ef19dadc864db870697654f4dda24be0b71b3d94cf",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "meta_materialization.py.txt",
+      "repository_path": "fastgen/utils/module.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/utils/module.py",
+      "source_sha256": "9264809425a7b6ba9e4140659f0c0ab3863d68c730f07d5390cabc0c0f2b5c86",
+      "line_ranges": [
+        [
+          728,
+          788
+        ]
+      ],
+      "fixture_sha256": "c8be96efd06f3038b68efbdd77c5c8affb584f1cd5ed470a1486a4832b22e5e4",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "fsdp_precision_groups.py.txt",
+      "repository_path": "fastgen/utils/distributed/fsdp.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/utils/distributed/fsdp.py",
+      "source_sha256": "64d2f92523a2a0dfd324204f5c45d573b6d6756529adc28e8cc88036ec70e87e",
+      "line_ranges": [
+        [
+          163,
+          204
+        ],
+        [
+          207,
+          243
+        ]
+      ],
+      "fixture_sha256": "aa0b9cdec4f0e701efc12f00ee9074048e2eb77cab5677f799c30bd2499c819c",
+      "kind": "source_excerpt"
+    }
+  ]
+}

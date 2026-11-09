@@ -1,0 +1,23 @@
+{
+  "config": "fastgen/configs/experiments/SD15/config_dmd2.py",
+  "checkpoint": "/models/student/0000800.pth",
+  "prompts": "/inputs/prompts.txt",
+  "destination": "/outputs/student-check",
+  "teacher_steps": 32,
+  "student_steps": 4,
+  "seed": 42,
+  "selected_method": "DMD2",
+  "guidance": "Preserve SD15 DMD2 teacher guidance; student sampling uses the configured student branch.",
+  "supported_task": "text-to-image",
+  "available_ema": [
+    "ema"
+  ],
+  "configured_use_ema": [
+    "ema"
+  ],
+  "note": "These are requested deployment paths, not files available in this CPU evaluation.",
+  "deployment_overrides": {
+    "model.use_ema": true
+  },
+  "config_evidence": "config_dmd2_sd15.py is the exact released recipe; the explicit EMA override selects the supplied checkpoint EMA root."
+}

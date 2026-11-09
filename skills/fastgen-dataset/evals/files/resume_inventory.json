@@ -1,0 +1,34 @@
+{
+  "ordered_shards": [
+    {
+      "name": "00000.tar",
+      "keys": [
+        "a0",
+        "a1",
+        "a2"
+      ]
+    },
+    {
+      "name": "00001.tar",
+      "keys": [
+        "b0",
+        "b1"
+      ]
+    }
+  ],
+  "ignore_index": {
+    "00000.tar": [
+      "a1"
+    ]
+  },
+  "old_shard_counts": {
+    "00000.tar": 4,
+    "00001.tar": 2
+  },
+  "sampler_start_idx": 3,
+  "repeat": false,
+  "strict": true,
+  "num_workers": 1,
+  "world_size": 1,
+  "all_remaining_samples_decode": true
+}

@@ -1,0 +1,34 @@
+{
+  "key_map": {
+    "real_raw": "jpg",
+    "condition_raw": "txt"
+  },
+  "presets_map": {
+    "condition_raw": "empty_string",
+    "neg_condition_raw": "empty_string"
+  },
+  "samples": [
+    {
+      "key": "a",
+      "members": [
+        "a.jpg",
+        "a.txt"
+      ],
+      "observed_text": {"a.txt": "A red boat on a quiet lake."}
+    },
+    {
+      "key": "b",
+      "members": [
+        "b.jpg"
+      ]
+    },
+    {
+      "key": "c",
+      "members": [
+        "c.txt"
+      ],
+      "observed_text": {"c.txt": "A snowy mountain."}
+    }
+  ],
+  "requirement": "Every accepted training image must have its own nonempty caption. Member inventories do not establish whether images decode."
+}

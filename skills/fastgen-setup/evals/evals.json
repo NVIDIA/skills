@@ -1,0 +1,69 @@
+{
+  "skill_name": "fastgen-setup",
+  "evals": [
+    {
+      "id": "credential-cache-wiring",
+      "prompt": "Use fastgen-setup to repair /workspace/input/setup-launch.sh for the deployment observations in environment.json. Trace environment_source.md and package_init.py.txt, then write /workspace/output/setup-launch.sh and setup-record.json. Keep the requested Flux teacher, interpreter and supplied inputs. Preserve mounted credential files and use the already injected credentials/cache. Check shell syntax without launching FastGen. Record which setup actions are needed and why; do not install, download, contact services, print credential values, or propose another model.",
+      "expected_output": "A real FastGen inference launcher preserves absolute shared roots and bypasses stale credential-file overrides through the existing credentials_dir config field; records reused setup evidence and executes bash syntax validation. The required standalone - separates CLI arguments from Hydra overrides. An empty-string credentials_dir= override is valid and bypasses credential-file loading; a missing/empty file also leaves inherited variables intact.",
+      "assertions": [
+        "Uses the actual Flux/config_sft.py recipe, image inference CLI, teacher selection, seed and supplied paths.",
+        "Restores FASTGEN_OUTPUT_ROOT=/shared/fastgen and HF_HOME=/shared/huggingface.",
+        "Uses the existing credentials_dir setting to bypass the stale mounted directory while preserving injected HF_TOKEN/WANDB_API_KEY; does not edit or echo credentials.",
+        "Explains package .env loading preserves existing environment, while setup calls set_env_vars with file override behavior; no credential rotation or reinstall is needed.",
+        "Runs bash -n on the written launcher, records data/training smoke as unnecessary for this inference-only task, and does not claim inference ran."
+      ],
+      "expected_skill": "fastgen-setup",
+      "files": [
+        "files/environment.json",
+        "files/environment_source.md",
+        "files/package_init.py.txt",
+        "files/flux_config.py.txt",
+        "files/setup-launch.sh"
+      ]
+    },
+    {
+      "id": "repair-import-origin",
+      "prompt": "Our FastGen command imports an older checkout. Inspect /workspace/input/import-origin.json and repair /workspace/input/launch.sh into /workspace/launch-fixed.sh. Preserve the verified interpreter and output root. Do not execute the launcher or reinstall dependencies. Explain how to verify the repair on the intended execution host. The attached sd15_config.py.txt is the actual recipe. Run bash -n on the repaired launcher.",
+      "expected_output": "A corrected launcher selects the intended checkout/PYTHONPATH and keeps the known environment, with an import-origin verification plan.",
+      "assertions": [
+        "Removes or replaces the stale PYTHONPATH with the requested checkout and sets the working directory accordingly.",
+        "Preserves the supplied Python interpreter and absolute output root.",
+        "Does not reinstall or delete the older checkout.",
+        "Proposes checking fastgen.__file__ on the intended execution host and does not claim a training test."
+      ],
+      "expected_skill": "fastgen-setup",
+      "files": [
+        "files/import-origin.json",
+        "files/launch.sh",
+        "files/sd15_config.py.txt"
+      ]
+    },
+    {
+      "id": "gated-access",
+      "prompt": "FastGen inference cannot obtain the requested gated checkpoint. Review /workspace/input/access.txt and trace hf_load in environment_source.md and give the smallest setup correction. The authenticated account and model must remain the ones in the log. Do not contact any service or print credentials.",
+      "expected_output": "Distinguishes successful authentication from missing model access approval and an incomplete local cache; identifies the outstanding access step without substituting a model.",
+      "assertions": [
+        "Recognizes authentication already succeeded while model authorization remains missing.",
+        "Does not recommend rotating working credentials, changing models or using offline mode with missing weights.",
+        "Reports inference as blocked pending model access and download; does not claim weights or outputs exist."
+      ],
+      "expected_skill": "fastgen-setup",
+      "files": [
+        "files/access.txt",
+        "files/environment_source.md"
+      ]
+    },
+    {
+      "id": "route-dataset-fields",
+      "prompt": "FastGen is already installed, its imports and credentials are verified, and the existing training recipe is compatible. I need to convert captioned image records into WebDataset fields for ImageLoaderConfig: image bytes and each image's caption, keeping a missing caption from becoming empty positive conditioning. Describe the data mapping and checks; do not change the environment or launch training.",
+      "expected_output": "Routes to dataset preparation: real_raw maps to jpg, condition_raw to txt, no positive-caption empty fallback; negative fallback can remain. Does not restart setup.",
+      "assertions": [
+        "Handles the request as fastgen-dataset work using FastGen loader field names.",
+        "Does not install packages, request credentials already verified, or start setup smoke training."
+      ],
+      "expected_skill": "fastgen-setup",
+      "should_trigger": false,
+      "files": []
+    }
+  ]
+}

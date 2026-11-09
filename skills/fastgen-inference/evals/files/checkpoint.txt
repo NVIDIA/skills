@@ -1,0 +1,10 @@
+Authored diagnostic scenario for a deliberately mismatched Flux checkpoint; not a captured execution log.
+Names follow fastgen/networks/Flux/network.py and its diffusers transformer. A single auxiliary weight is the only supplied matching tensor.
+config: fastgen/configs/experiments/Flux/config_dmd2.py
+ckpt_path: /models/student/0000800.pth
+selected sampling branch: student
+configured EMA roots: []
+Model net, loading info: missing_keys=['transformer.x_embedder.weight', 'transformer.context_embedder.weight', 'transformer.proj_out.weight'], unexpected_keys=['other_model.layer0.weight']
+matched target parameters: ['transformer.logvar_linear.weight']
+Loading successfully checkpoint 800
+Evaluating student with 4 steps.

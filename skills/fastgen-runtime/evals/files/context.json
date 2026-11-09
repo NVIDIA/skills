@@ -1,0 +1,16 @@
+{
+  "scenario": "Synthetic launch recipe review; referenced project/env paths are not executable evaluation fixtures.",
+  "checkout": "/workspace/project",
+  "interpreter": "/opt/task-env/bin/python",
+  "config": "fastgen/configs/experiments/WanT2V/config_dmd2.py",
+  "output_root": "/workspace/outputs",
+  "requested_processes": 1,
+  "requested_action": "dryrun with max_iter=3",
+  "inherited_environment": {
+    "RANK": "3",
+    "LOCAL_RANK": "3",
+    "WORLD_SIZE": "4",
+    "MASTER_ADDR": "old-host",
+    "MASTER_PORT": "29500"
+  }
+}
