@@ -1,0 +1,122 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "flux_candidate.py.txt",
+      "repository_path": "fastgen/networks/Flux/network.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/networks/Flux/network.py",
+      "source_sha256": "dc3a265ad8f8f20c6ed6a29767919a3c65d476cd11b01578b78c6a41ab4bb640",
+      "line_ranges": [
+        [
+          1,
+          929
+        ]
+      ],
+      "fixture_sha256": "07e0faaace1c9c1afe98739e754a354856f36cbec5ae2a15b4d139636ae226ad",
+      "kind": "candidate_with_seeded_regressions"
+    },
+    {
+      "fixture": "network_output_contract.py.txt",
+      "repository_path": "fastgen/networks/network.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/networks/network.py",
+      "source_sha256": "217426b348a6b81e8432aacce9435ac35dedec04b9d73a47fb76ba414f0ec41d",
+      "line_ranges": [
+        [
+          164,
+          203
+        ],
+        [
+          205,
+          228
+        ],
+        [
+          230,
+          284
+        ],
+        [
+          516,
+          580
+        ]
+      ],
+      "fixture_sha256": "925166af5ec594e9d74a1741df7dd690cf3fb57c65070fc91d4aa4564d344fda",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "dmd2_feature_consumer.py.txt",
+      "repository_path": "fastgen/methods/distribution_matching/dmd2.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/distribution_matching/dmd2.py",
+      "source_sha256": "8a4175e18e4ec7d02a78d11569eb36bc1c347c553ae9f859c63a844ff1d81db0",
+      "line_ranges": [
+        [
+          516,
+          617
+        ]
+      ],
+      "fixture_sha256": "2bb2d4be4ff145ced3fc30add539e7dfd07b7fa43689c97488013157fe9c3868",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "flux_existing_test.py.txt",
+      "repository_path": "tests/test_network.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/tests/test_network.py",
+      "source_sha256": "a5cc51955f64ff62f3ab67720066d351c0e507ffc7d02c4a70f13f6dfb325c00",
+      "line_ranges": [
+        [
+          1799,
+          1894
+        ]
+      ],
+      "fixture_sha256": "6cc863e8b0b2358b787537d475e563becb5ec4bb0c14921945ba5520c810a7eb",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "flux_tiny_tests.py.txt",
+      "repository_path": "tests/test_network.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/tests/test_network.py",
+      "source_sha256": "a5cc51955f64ff62f3ab67720066d351c0e507ffc7d02c4a70f13f6dfb325c00",
+      "line_ranges": [
+        [
+          1,
+          2
+        ],
+        [
+          13,
+          13
+        ],
+        [
+          15,
+          15
+        ],
+        [
+          17,
+          17
+        ],
+        [
+          65,
+          72
+        ],
+        [
+          2292,
+          2336
+        ],
+        [
+          2339,
+          2353
+        ],
+        [
+          2356,
+          2382
+        ]
+      ],
+      "fixture_sha256": "4868cf8af3ae15c6a4657d35d0acb79d0e131b05687ac8e109371fe838cf8e25",
+      "kind": "source_excerpt"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "skill_name": "fastgen-develop",
+  "evals": [
+    {
+      "id": "shared-inference-text-decoding",
+      "prompt": "An approved FastGen bug report identifies UTF-8 text exported with a byte-order mark: the first prompt contains a stray U+FEFF, and a source-image list tries to open a path prefixed with it. Fix this in the shared inference text reader for both image and video callers. Read /workspace/input/CONTRIBUTING.md and the released source files listed in /workspace/input/inference_text_sources.json. The contract is UTF-8 with or without an initial BOM; a U+FEFF inside the text is content. Preserve the existing optional-file, empty-prompt, path-list, and count-alignment behavior. Invalid UTF-8 should raise the decoder's clear error. Write /workspace/output/changes.patch against the recorded repository paths, updating the helper and its docstring, relevant existing regression tests and a concise usage note in scripts/README.md. Include byte-written regression inputs for BOM-prefixed non-ASCII text, a BOM-prefixed empty prompt and its drop_empty path-list counterpart, an interior U+FEFF, and invalid UTF-8. Trace the supplied callers and explain the scope in a short /workspace/output/validation.md. Keep the change focused. The manifest supplies complete files for all patch targets and bounded caller excerpts, not an installed FastGen checkout: do not install dependencies, fetch a checkout or weights, import FastGen/torch, or run inference. Run available static checks, including checking the final patch against the complete recorded files mapped to their repository paths. List the real focused test command for a dependency-complete environment, and distinguish unrun checks. Tests must call the actual inference_utils.load_file_entries; do not copy the helper or stub FastGen imports to manufacture a pass.",
+      "expected_output": "A narrow source patch to FastGen's shared line reader, existing tests and usage docs, with source-backed caller analysis, verified patch applicability and honest static-validation limits.",
+      "assertions": [
+        "Changes scripts/inference/inference_utils.py::load_file_entries to decode UTF-8 with an optional initial BOM, preserving non-ASCII text and U+FEFF elsewhere in the content.",
+        "Keeps None passthrough, blank lines as empty prompts, drop_empty path-list behavior, zero-entry errors and repeat-last/truncate alignment; does not alter these contracts to hide the BOM bug.",
+        "Uses the shared reader already called by image and video inference for positive prompts, negative prompts and source/path lists; avoids duplicated front-end fixes, compatibility-only aliases or wrappers, and unnecessary keyword-only signature changes.",
+        "Lets invalid UTF-8 raise UnicodeDecodeError through normal decoding; does not add a redundant validation pass, lossy replacement or blanket error suppression.",
+        "Updates tests/test_inference_scripts.py with tests calling the real imported helper on byte-written files, covering BOM-prefixed non-ASCII text, a BOM-prefixed empty prompt versus drop_empty path input, an interior U+FEFF and invalid UTF-8. Existing alignment and None tests remain applicable.",
+        "Updates the helper's contract and scripts/README.md concisely, produces a patch applicable to the recorded source, and reports only static checks as executed while providing a focused real pytest command."
+      ],
+      "expected_skill": "fastgen-develop",
+      "should_trigger": true,
+      "files": [
+        "files/CONTRIBUTING.md",
+        "files/inference_text_sources.json",
+        "files/inference_text_reader.py.txt",
+        "files/image_text_callers.py.txt",
+        "files/video_text_callers.py.txt",
+        "files/inference_text_tests.py.txt",
+        "files/inference_usage.md.txt"
+      ]
+    },
+    {
+      "id": "review-inference-text-contract",
+      "prompt": "Review a proposed release claim: \"FastGen image and video inference accept UTF-8 prompt and source-path lists with or without a leading byte-order mark.\" Use the released source identified in /workspace/input/inference_text_sources.json and its staged callers, tests and usage documentation. Read the supplied CONTRIBUTING.md as the task policy. Write /workspace/output/inference-review.md with source-backed findings, affected call paths, a minimal correction plan and the missing regression coverage. This is a review-only request: do not change source, config, tests or documentation, and do not produce a patch. Source inspection and standard-library checks are available; FastGen/PyTorch, model weights and GPUs are unavailable. Distinguish checks you performed from framework or inference tests that remain unrun.",
+      "expected_output": "A source-backed review that identifies the shared reader's leading-BOM handling gap for both prompt and path lists, recommends a narrow fix and meaningful regressions, and leaves source files unchanged.",
+      "assertions": [
+        "Reviews the supplied released revision and authored contributor policy, rather than treating a moving main branch or an installed skill copy as authoritative source.",
+        "Identifies load_file_entries opening text without explicit BOM-aware decoding; stripping whitespace does not remove an initial U+FEFF, so the release claim is not established.",
+        "Traces the shared reader to image and video prompt, negative-prompt and source-path callers, explaining the first-prompt contamination and prefixed-path failure.",
+        "Recommends a shared optional-leading-BOM decoding fix that preserves interior U+FEFF, non-ASCII text, empty prompt versus drop_empty behavior, count alignment and clear invalid-UTF-8 errors.",
+        "Identifies missing byte-written regression coverage in tests/test_inference_scripts.py and names tests of the actual shared helper, without copying its implementation or stubbing FastGen imports.",
+        "Produces findings and a correction plan without editing source/config/tests/docs or creating a patch; reports any executed standard-library checks separately from unrun framework or model tests."
+      ],
+      "expected_skill": "fastgen-develop",
+      "should_trigger": true,
+      "files": [
+        "files/CONTRIBUTING.md",
+        "files/inference_text_sources.json",
+        "files/inference_text_reader.py.txt",
+        "files/image_text_callers.py.txt",
+        "files/video_text_callers.py.txt",
+        "files/inference_text_tests.py.txt",
+        "files/inference_usage.md.txt"
+      ]
+    },
+    {
+      "id": "adjacent-unchanged-inference-run",
+      "prompt": "The existing FastGen FLUX.1 SFT recipe and runtime have already been reviewed; pretrained weights are cached and the ordinary UTF-8 prompt file is ready. Prepare the unchanged text-to-image inference command using fastgen/configs/experiments/Flux/config_sft.py and /data/reviewed_prompts.txt. Preserve the example's documented default sampling branch. The released usage file is /workspace/input/inference_usage.md.txt. Write /workspace/output/inference.sh and syntax-check it with bash -n. Select the workflow that owns running this existing model. Read-only inspection of the supplied usage and available workflow instructions is sufficient. This is command preparation only: do not access the deployment paths, execute inference, edit library/config/test code or propose a refactor.",
+      "expected_output": "An unchanged existing-model inference command, routed to fastgen-inference, with shell syntax validation and no coding work.",
+      "assertions": [
+        "Identifies fastgen-inference as the owning workflow rather than fastgen-develop or an adapter-development task.",
+        "Writes a command invoking scripts/inference/image_model_inference.py with --config fastgen/configs/experiments/Flux/config_sft.py and --prompt_file /data/reviewed_prompts.txt, preserving the existing recipe and its documented default sampling branch (student enabled, teacher disabled).",
+        "Runs bash -n on the prepared script without running inference or accessing the deployment paths; does not change library, config or test code or claim generated samples."
+      ],
+      "expected_skill": "fastgen-develop",
+      "should_trigger": false,
+      "files": [
+        "files/inference_usage.md.txt"
+      ]
+    }
+  ]
+}

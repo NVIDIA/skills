@@ -1,0 +1,7 @@
+FastGen setup scenario: authored access observations
+Task: teacher inference from the exact requested checkpoint black-forest-labs/FLUX.1-dev
+Account: evaluation-user
+Authentication probe: success
+Model request: GatedRepoError: account is not authorized to access this model
+Local cache inventory: tokenizer present; model weights absent
+No inference process started.

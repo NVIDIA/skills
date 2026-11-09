@@ -1,0 +1,58 @@
+# fastgen/methods/fine_tuning/sft.py:167-223
+    def single_train_step(
+        self, data: Dict[str, Any], iteration: int
+    ) -> tuple[Dict[str, torch.Tensor], Dict[str, TensorOrDict | Callable]]:
+        """
+        Single training step for supervised finetuning (sft)
+
+        Args:
+            data (Dict[str, Any]): Data dict for the current iteration.
+            iteration (int): Current training iteration
+
+        Returns:
+            loss_map (dict[str, torch.Tensor]): Dictionary containing the loss values
+            outputs (dict[str, TensorOrDict | Callable]): Dictionary containing the network output
+
+        """
+        real_data = data["real"]
+        condition = data.get("condition")
+        neg_condition = data.get("neg_condition")
+        batch_size = get_batch_size(real_data)
+
+        # Perturb the data according to the underlying time sampling type
+        t = self.net.noise_scheduler.sample_t(
+            batch_size,
+            **self.config.sample_t_cfg.sample_t_kwargs(),
+            device=self.device,
+        )
+        eps = randn_like(real_data)
+
+        # replace condition with neg_condition with a probability for training
+        # but keep original condition for _get_outputs (sampling uses original condition)
+        condition_train, condition_dropout_mask = self._mix_condition(condition, neg_condition)
+
+        noisy_real_data = self.net.noise_scheduler.forward_process(real_data, eps, t)
+        net_pred = self.net(noisy_real_data, t, condition=condition_train)
+
+        # DSM loss per modality
+        dsm_loss = per_modality(
+            flow_matching_loss,
+            net_pred,
+            self.net.net_pred_type,
+            real_data,
+            eps,
+            self.net.noise_scheduler.schedules,
+            t,
+        )
+        loss_map = to_dict(dsm_loss, suffix="dsm_loss")
+        total_loss = sum(loss_map.values())
+        loss_map["total_loss"] = total_loss
+
+        x0_pred = self._to_x0_prediction(noisy_real_data, net_pred, t)
+        outputs = self._get_outputs(
+            x0_pred,
+            condition=condition,
+            neg_condition=neg_condition,
+        )
+        loss_map = self.apply_reward(x0_pred, data, loss_map, condition_dropout_mask=condition_dropout_mask)
+        return loss_map, outputs

@@ -1,0 +1,9 @@
+Proposed optimization of DMD2Model._student_update_step:
+Keep VSD and GAN enabled, keep data['real'] on every rank, and keep the registered teacher sharded and frozen.
+Rank 0 receives inputs.loss_scale=[0,0]; rank 1 receives [1,1].
+1. Immediately after gen_data_from_net, return a graph-connected zero total_loss when not inputs.loss_scale.any(), before any teacher or discriminator forward.
+2. Place the self.teacher call in that branch under torch.no_grad(), because the teacher is frozen.
+3. Compute the generator GAN term only on positive-weight samples and divide by their count.
+4. Have get_optimizers and get_lr_schedulers always return both student and auxiliary entries to reduce branching.
+The author reports a finite single-rank scalar loss and considers this equivalent for student_update_freq=5.
+Review the actual provided implementation before accepting these changes.

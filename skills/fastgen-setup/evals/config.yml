@@ -1,0 +1,7 @@
+schema_version: 1
+skill_workspace:
+  mode: group
+  include:
+    - ../fastgen-dataset
+    - ../fastgen-runtime
+    - ../fastgen-train

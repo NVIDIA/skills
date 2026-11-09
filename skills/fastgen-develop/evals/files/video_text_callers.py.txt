@@ -1,0 +1,12 @@
+# scripts/inference/video_model_inference.py:112-122
+def main(args, config: BaseConfig):
+    pos_prompt_set = load_file_entries(args.prompt_file)
+
+    # Align optional inputs with the prompts; omitted inputs remain ``None``.
+    neg_prompt_set = load_file_entries(args.neg_prompt_file, num=len(pos_prompt_set))
+    path_list_kwargs = dict(num=len(pos_prompt_set), drop_empty=True)
+    depth_latent_paths = load_file_entries(args.depth_latent_file, **path_list_kwargs)
+    source_video_paths = load_file_entries(args.source_video_file, **path_list_kwargs)
+    input_image_paths = load_file_entries(args.input_image_file, **path_list_kwargs)
+    camera_poses_paths = load_file_entries(args.camera_poses_file, **path_list_kwargs)
+    camera_source_video_paths = load_file_entries(args.camera_source_video_file, **path_list_kwargs)

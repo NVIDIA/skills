@@ -1,0 +1,2 @@
+/data/source_a.png
+/data/source_b.png

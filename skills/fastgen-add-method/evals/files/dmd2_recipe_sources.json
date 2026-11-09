@@ -1,0 +1,71 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "dmd2_cifar10_config.py.txt",
+      "repository_path": "fastgen/configs/experiments/EDM/config_dmd2_cifar10.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/configs/experiments/EDM/config_dmd2_cifar10.py",
+      "source_sha256": "de26cab38ae98e383cad1e3a10ca7704880b12279e86d7edf9d381147b284103",
+      "line_ranges": [
+        [
+          1,
+          28
+        ]
+      ],
+      "fixture_sha256": "de26cab38ae98e383cad1e3a10ca7704880b12279e86d7edf9d381147b284103",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "config_dmd2.py.txt",
+      "repository_path": "fastgen/configs/methods/config_dmd2.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/configs/methods/config_dmd2.py",
+      "source_sha256": "79554d068c68f4d26d4a13e4d140b45fac10fd81995618aed770d0d3ef06f19b",
+      "line_ranges": [
+        [
+          1,
+          130
+        ]
+      ],
+      "fixture_sha256": "79554d068c68f4d26d4a13e4d140b45fac10fd81995618aed770d0d3ef06f19b",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "dmd2_phase.py.txt",
+      "repository_path": "fastgen/methods/distribution_matching/dmd2.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/distribution_matching/dmd2.py",
+      "source_sha256": "8a4175e18e4ec7d02a78d11569eb36bc1c347c553ae9f859c63a844ff1d81db0",
+      "line_ranges": [
+        [
+          790,
+          805
+        ],
+        [
+          830,
+          840
+        ]
+      ],
+      "fixture_sha256": "06e09c6d90a94e15d5f0dab0c5ef7768025b2a0690b19e5d5575578318871c02",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "trainer_iterations.py.txt",
+      "repository_path": "fastgen/trainer.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/trainer.py",
+      "source_sha256": "f8c5c8ed11b272c7ffee7d9680fb5d05d093706aa8f84eb6f07548fe9ab81716",
+      "line_ranges": [
+        [
+          249,
+          260
+        ]
+      ],
+      "fixture_sha256": "7883fa12e7fd1093c7d8d1eb21637efefb6cc3db39e6afde7de57cff8fcfdc2d",
+      "kind": "source_excerpt"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# fastgen/trainer.py:249-260
+        if iter_start == 0 and dataloader_val is not None:
+            # validation before first training step
+            self.validate(model_ddp, model, dataloader_val, iteration=iter_start)
+
+        dataloader_train_iter = synced_iter(dataloader_train, device=model.device)
+        # ``max_iter`` is inclusive, so the final checkpoint, labelled with the last completed iteration,
+        # holds the state after ``max_iter`` optimizer iterations.
+        iter_cur = iter_start
+        for iter_cur in range(iter_start + 1, self.config.trainer.max_iter + 1):
+            self.callbacks.on_training_step_begin(model, iteration=iter_cur)
+            for grad_accum_iter in range(self.config.trainer.grad_accum_rounds):
+                data = next(dataloader_train_iter)

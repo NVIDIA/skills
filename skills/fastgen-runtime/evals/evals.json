@@ -1,0 +1,72 @@
+{
+  "skill_name": "fastgen-runtime",
+  "evals": [
+    {
+      "id": "repair-launch",
+      "prompt": "Use fastgen-runtime to repair /workspace/input/launch.sh into /workspace/launch-fixed.sh according to /workspace/input/context.json. Only edit the launcher; do not execute it, import FastGen or provision resources. Explain the corrected launch and what remains untested. Read launch_source.md and the shipped wan_config.py.txt. Run bash -n on the repaired launcher.",
+      "expected_output": "A valid single-process dry-run recipe uses a repository-relative config, the single override separator, absolute storage root, and no stale multi-process environment.",
+      "assertions": [
+        "Runs from the specified checkout with the specified interpreter.",
+        "Uses fastgen/configs/experiments/WanT2V/config_dmd2.py as a repository-relative config path.",
+        "Places --dryrun before a single standalone - introducing trainer.max_iter=3.",
+        "Clears inherited multi-rank launcher state or sets a consistent single-process configuration.",
+        "Preserves an absolute output root and does not claim distributed execution was tested."
+      ],
+      "expected_skill": "fastgen-runtime",
+      "files": [
+        "files/launch.sh",
+        "files/context.json",
+        "files/launch_source.md",
+        "files/wan_config.py.txt"
+      ]
+    },
+    {
+      "id": "dryrun-limit",
+      "prompt": "The command in /workspace/input/dryrun.json exits successfully. Read /workspace/input/setup_source.md. Does it prove the requested effective batch and distributed training are correct? Write /workspace/runtime-review.json with what is established, what remains unverified, and the expected batch calculation. Do not launch training.",
+      "expected_output": "Explains dryrun exits before distributed initialization and global-batch rounding; computes the expected effective batch for the supplied topology and identifies startup evidence required.",
+      "assertions": [
+        "Does not treat dryrun as a process-group or training test.",
+        "Computes effective global batch 16: per-rank 2 times four ranks times floor(18/8)=2 accumulation rounds.",
+        "Calls for confirming actual world size, wrapping and accumulation/effective batch in startup logs.",
+        "Preserves the requested batch as a requirement rather than silently asserting 18 was achieved."
+      ],
+      "expected_skill": "fastgen-runtime",
+      "files": [
+        "files/dryrun.json",
+        "files/setup_source.md"
+      ]
+    },
+    {
+      "id": "independent-run-identity",
+      "prompt": "A FastGen experiment resumed old weights and appended to an existing W&B run. Read identity.json and identity_source.md. Write /workspace/output/new-run-overrides.txt using real FastGen configuration keys plus identity-review.md explaining the minimum changes for a fresh experiment. Preserve shared cache and old artifacts; do not launch a job or modify existing runs.",
+      "expected_output": "Selects a new logging identity and an independent resolved checkpoint destination, explains that checkpoint resume and W&B identity are distinct, and preserves shared storage/cache.",
+      "assertions": [
+        "Selects a distinct log_config project/group/name combination for the new experiment.",
+        "Explains that trainer.resume=False alone does not reset a reused W&B identity.",
+        "Preserves previous checkpoints/wandb_id and shared cache; does not delete or overwrite them.",
+        "Does not change model, dataset or training objective to solve the run-directory collision.",
+        "Writes usable log_config.* and trainer.resume overrides; does not invent logging/output_dir config fields.",
+        "Changes trainer.checkpointer.save_dir to a run-relative path or a distinct absolute destination: the explicit shared path survives a name change. Disabling resume alone does not prevent new checkpoints from overwriting the old run."
+      ],
+      "expected_skill": "fastgen-runtime",
+      "files": [
+        "files/identity.json",
+        "files/identity_source.md"
+      ]
+    },
+    {
+      "id": "route-method-choice",
+      "prompt": "Our FastGen environment and launch command already work. For WanT2V text-to-video, we have prompts but no target videos and want a four-step student that follows the teacher's diversity. Using method_selection_source.md, help choose between the existing DMD2 and PDD methods and identify their data requirements. No launch, environment repair or new method implementation is needed.",
+      "expected_output": "Routes to fastgen-configure: explains trajectory-matching PDD versus distribution-matching DMD2, prompt-only backward simulation and GAN/conditioning-media limits. Does not invoke runtime repair.",
+      "assertions": [
+        "Treats the request as method/config selection using existing FastGen methods rather than a runtime failure.",
+        "Identifies that data-free operation needs an appropriate backward-simulation configuration and does not invent real-video GAN supervision."
+      ],
+      "expected_skill": "fastgen-runtime",
+      "should_trigger": false,
+      "files": [
+        "files/method_selection_source.md"
+      ]
+    }
+  ]
+}

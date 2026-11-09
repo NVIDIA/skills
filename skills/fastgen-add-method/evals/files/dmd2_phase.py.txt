@@ -1,0 +1,31 @@
+# fastgen/methods/distribution_matching/dmd2.py:790-805
+    def single_train_step(
+        self,
+        data: Dict[str, Any],
+        iteration: int,
+    ) -> tuple[dict[str, torch.Tensor], dict[str, TensorOrDict | Callable]]:
+        """Run one alternating student or auxiliary training step."""
+        self._setup_grad_requirements(iteration)
+
+        inputs = self._training_inputs(data, iteration)
+
+        update_step = (
+            self._student_update_step
+            if iteration % self.config.student_update_freq == 0
+            else self._auxiliary_update_step
+        )
+        return update_step(inputs, data)
+
+
+# fastgen/methods/distribution_matching/dmd2.py:830-840
+    def get_optimizers(self, iteration: int) -> list[torch.optim.Optimizer]:
+        """Return the optimizers active on this alternating iteration."""
+        if iteration % self.config.student_update_freq == 0:
+            return [self.net_optimizer]
+
+        optimizers = []
+        if self.use_vsd:
+            optimizers.append(self.fake_score_optimizer)
+        if self.use_gan:
+            optimizers.append(self.discriminator_optimizer)
+        return optimizers

@@ -1,0 +1,11 @@
+# fastgen/configs/config_utils.py:70-79
+def model_pixel_shape(model_config: Any) -> Tuple[int, ...]:
+    """``(H, W)`` or ``(T, H, W)`` of the pixels that encode to ``model_config.input_shape``.
+
+    Asks the class of ``model_config.net`` through ``pixel_shape_for``, so a config can size its loaders before any
+    network exists. A modality dict contributes its ``"video"`` entry.
+    """
+    input_shape = model_config.input_shape
+    if isinstance(input_shape, Mapping):
+        input_shape = input_shape["video"]
+    return model_config.net._target_.pixel_shape_for(input_shape)

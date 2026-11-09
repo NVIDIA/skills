@@ -1,0 +1,46 @@
+{
+  "fixture": "Authored SD15 DMD2 parity-review scenario; artifact labels and metrics are stipulated review inputs, not measurements captured by this evaluation.",
+  "acceptance": {
+    "atol": 0.001,
+    "rtol": 0.0,
+    "required_dtype": "float32"
+  },
+  "reference": {
+    "checkpoint": "same-base",
+    "prompt": "heldout-07",
+    "seed": 42,
+    "initial_noise_hash": "noise-A",
+    "time_grid": [
+      0.999,
+      0.75,
+      0.5,
+      0.25,
+      0.0
+    ],
+    "dtype": "float32",
+    "guidance_scale": 4.0,
+    "prompt_in_training_set": false
+  },
+  "candidate": {
+    "checkpoint": "same-base",
+    "prompt": "heldout-07",
+    "seed": 42,
+    "initial_noise_hash": "noise-B",
+    "time_grid": [
+      0.999,
+      0.8,
+      0.6,
+      0.4,
+      0.0
+    ],
+    "dtype": "bfloat16",
+    "guidance_scale": 4.0,
+    "prompt_in_training_set": true
+  },
+  "observed_max_abs_error": 0.0008,
+  "comparison_uses_shared_prepared_encoder": true,
+  "reference_nondeterminism_measured": false,
+  "fastgen_config": "fastgen/configs/experiments/SD15/config_dmd2.py",
+  "fastgen_entrypoint": "scripts/inference/image_model_inference.py",
+  "source_revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc"
+}

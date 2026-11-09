@@ -1,0 +1,13 @@
+schema_version: 1
+skill_workspace:
+  mode: group
+  include:
+    - ../fastgen-develop
+    - ../fastgen-add-modality
+    - ../fastgen-configure
+    - ../fastgen-inference
+    - ../fastgen-runtime
+    - ../fastgen-train
+    - ../fastgen-validate
+harbor:
+  timeout_multiplier: 3
