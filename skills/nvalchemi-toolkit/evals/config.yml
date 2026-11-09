@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# NVSkills CI runs the native Harbor tasks in evals/harbor/, one folder per
+# task. Those nine tasks are the CI set; the other tasks in evals.json run in
+# the maintainers' own evaluation. Each task runs evals/setup_cpu.sh as its
+# environment healthcheck, with a 600 s budget, in both arms (with the skill
+# and the baseline), so they see the same environment. The script installs
+# the CPU stack (CPU torch, nvalchemi-toolkit 0.3.0, ASE) into
+# /workspace/.venv; runtime_env puts that venv first on PATH. The tasks are
+# generated from evals.json and setup_cpu.sh, so edit those, not the tasks.
+schema_version: 1
+
+harbor:
+  task_source: native_harbor
+  base_image_mode: rebuild
+  n_attempts: 3
+  # 3, not 2: baseline runs on CPU are slow and should not hit the agent
+  # timeout. It scales the 300 s agent timeout in each task.toml.
+  timeout_multiplier: 3
+  # SkillEvaluator's pass@k compares its own overall (the judge dimensions)
+  # with this value. The task goal itself is gated by the custom metrics from
+  # evals/grader.py.
+  pass_threshold: 0.9
+  runtime_env:
+    BASH_DEFAULT_TIMEOUT_MS: "240000"
+    VIRTUAL_ENV: /workspace/.venv
+    PATH: /workspace/.venv/bin:/tmp/agent-home/.local/bin:/home/agent/.local/bin:/usr/local/share/npm-global/bin:/opt/openhands-venv/bin:/usr/local/bin:/usr/bin:/bin
+    OMP_NUM_THREADS: "4"
+
+# evals/grader.py runs the machine checks of each task after the judges and
+# adds the metrics batched, device_aware, loop_syncs, reuse, and outcome per
+# trial. SkillEvaluator's overall is unchanged by them.
+grading:
+  mode: default_plus_custom
+  # Metric names that evals/grader.py writes under custom_metrics.
+  custom_metrics:
+    - batched
+    - device_aware
+    - loop_syncs
+    - reuse
+    - outcome

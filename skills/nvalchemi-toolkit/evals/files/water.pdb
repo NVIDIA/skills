@@ -1,0 +1,43 @@
+REMARK   Eight waters (TIP3P geometry) in a 24 A cubic box, for a short MD test.
+CRYST1   24.000   24.000   24.000  90.00  90.00  90.00 P 1           1
+HETATM    1 O    HOH A   1      10.500  10.500  10.500  1.00  0.00           O
+HETATM    2 H1   HOH A   1      11.457  10.500  10.500  1.00  0.00           H
+HETATM    3 H2   HOH A   1      10.260  11.427  10.500  1.00  0.00           H
+TER
+HETATM    4 O    HOH A   2      10.500  10.500  13.600  1.00  0.00           O
+HETATM    5 H1   HOH A   2      11.457  10.500  13.600  1.00  0.00           H
+HETATM    6 H2   HOH A   2      10.260  11.427  13.600  1.00  0.00           H
+TER
+HETATM    7 O    HOH A   3      10.500  13.600  10.500  1.00  0.00           O
+HETATM    8 H1   HOH A   3      11.457  13.600  10.500  1.00  0.00           H
+HETATM    9 H2   HOH A   3      10.260  14.527  10.500  1.00  0.00           H
+TER
+HETATM   10 O    HOH A   4      10.500  13.600  13.600  1.00  0.00           O
+HETATM   11 H1   HOH A   4      11.457  13.600  13.600  1.00  0.00           H
+HETATM   12 H2   HOH A   4      10.260  14.527  13.600  1.00  0.00           H
+TER
+HETATM   13 O    HOH A   5      13.600  10.500  10.500  1.00  0.00           O
+HETATM   14 H1   HOH A   5      14.557  10.500  10.500  1.00  0.00           H
+HETATM   15 H2   HOH A   5      13.360  11.427  10.500  1.00  0.00           H
+TER
+HETATM   16 O    HOH A   6      13.600  10.500  13.600  1.00  0.00           O
+HETATM   17 H1   HOH A   6      14.557  10.500  13.600  1.00  0.00           H
+HETATM   18 H2   HOH A   6      13.360  11.427  13.600  1.00  0.00           H
+TER
+HETATM   19 O    HOH A   7      13.600  13.600  10.500  1.00  0.00           O
+HETATM   20 H1   HOH A   7      14.557  13.600  10.500  1.00  0.00           H
+HETATM   21 H2   HOH A   7      13.360  14.527  10.500  1.00  0.00           H
+TER
+HETATM   22 O    HOH A   8      13.600  13.600  13.600  1.00  0.00           O
+HETATM   23 H1   HOH A   8      14.557  13.600  13.600  1.00  0.00           H
+HETATM   24 H2   HOH A   8      13.360  14.527  13.600  1.00  0.00           H
+TER
+CONECT    1    2    3
+CONECT    4    5    6
+CONECT    7    8    9
+CONECT   10   11   12
+CONECT   13   14   15
+CONECT   16   17   18
+CONECT   19   20   21
+CONECT   22   23   24
+END
