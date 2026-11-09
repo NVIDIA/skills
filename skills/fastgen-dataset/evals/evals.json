@@ -1,0 +1,69 @@
+{
+  "skill_name": "fastgen-dataset",
+  "evals": [
+    {
+      "id": "write-prompt-shard",
+      "prompt": "Use fastgen-dataset to prepare a tiny prompt-only WebDataset from /workspace/input/prompts.json. Read prompt_loader_source.md and resume_source.md. Write and execute /workspace/output/build_prompts.py using only the Python standard library, producing /workspace/output/prompts/00000.tar with one UTF-8 .txt member per supplied ID, /workspace/output/shard_counts.json in the loader count format, and /workspace/output/data_config.py that imports and copies fastgen.configs.data.PromptLoaderConfig for that absolute output path and count file, rather than reconstructing its fields. Do not execute the config in this source-only environment. Reopen the tar and verify IDs and decoded prompt text against the input. No FastGen installation, fabricated latents or teacher execution; record those runtime checks as not-run.",
+      "files": [
+        "files/prompts.json",
+        "files/prompt_loader_source.md",
+        "files/resume_source.md"
+      ],
+      "expected_skill": "fastgen-dataset",
+      "expected_output": "A reproducible archive builder, three exact prompt records, raw shard-count metadata and a config importing PromptLoaderConfig with the actual WDSLoader fields.",
+      "assertions": [
+        "The tar contains exactly p001.txt, p002.txt and p003.txt with the supplied UTF-8 prompt text.",
+        "The config imports and copies fastgen.configs.data.PromptLoaderConfig, points datatags to WDS:<generated prompts directory> and shard_count_file to the generated shard_counts.json at the task workspace paths (including any runner path mapping), and retains condition_raw -> txt.",
+        "Executes build_prompts.py, reopens the tar to verify IDs and UTF-8 text, and writes raw shard counts {\"00000.tar\":3}; does not call three records an adequate distillation dataset.",
+        "Does not write placeholder real or condition tensors or claim a real FastGen loader/teacher was run."
+      ]
+    },
+    {
+      "id": "caption-fallback",
+      "prompt": "Audit /workspace/input/shard_inventory.json using prompt_loader_source.md. Which sample keys pass the configured field filter, and which should be retained under the stated caption requirement? Write /workspace/output/acceptance.json with current_accepted, usable, excluded, and proposed_presets_map. Explain the distinction between field acceptance and successful media decoding. Do not fabricate captions.",
+      "files": [
+        "files/shard_inventory.json",
+        "files/prompt_loader_source.md"
+      ],
+      "expected_skill": "fastgen-dataset",
+      "expected_output": "Identifies the positive-caption fallback accepting b, removes that fallback while preserving negative conditioning, and distinguishes usable fields from actual decode evidence.",
+      "assertions": [
+        "current_accepted contains a and b; c lacks the required image.",
+        "usable contains only a; b is excluded for its missing caption and c for its missing image.",
+        "Removes condition_raw from presets_map but preserves neg_condition_raw as empty_string.",
+        "Does not claim images decoded successfully from a member-name inventory."
+      ]
+    },
+    {
+      "id": "stale-count-resume",
+      "prompt": "A deterministic FastGen loader resumed at an unexpected record after a shard was edited. Inspect /workspace/input/resume_inventory.json and resume_source.md. Write /workspace/output/repaired-counts.json in the loader format and identify the next expected key after sampler_start_idx=3. Explain why the stale metadata can survive resume and what must remain fixed for this accounting. No data download or GPU work.",
+      "files": [
+        "files/resume_inventory.json",
+        "files/resume_source.md"
+      ],
+      "expected_skill": "fastgen-dataset",
+      "expected_output": "Rebuilds raw counts, applies ignore indices exactly once, and identifies b1 as the next sample in the stipulated stream.",
+      "assertions": [
+        "Writes raw counts {\"00000.tar\":3,\"00001.tar\":2}, without subtracting a1 in the saved file.",
+        "Identifies the filtered stream as a0,a2,b0,b1 and the next sample at offset 3 as b1.",
+        "Explains that skipped shards are not read and re-counted during resume; stale metadata must be rebuilt or omitted.",
+        "Keeps deterministic ordering, ignore indices, worker/rank selection and preprocessing acceptance aligned with the offset."
+      ]
+    },
+    {
+      "id": "adjacent-experiment-configuration",
+      "prompt": "Our FastGen image/caption WebDataset has already passed media decoding and has complete counts. Keep it unchanged. I need a four-step SD15 DMD2 experiment config with VSD plus GAN enabled, optimizer settings and checkpoint cadence. Use the attached recipe_source.md to select the owning workflow and identify the nearest repository recipe only. Do not write a config, prepare data or run training in this routing-only task.",
+      "files": [
+        "files/recipe_source.md"
+      ],
+      "expected_skill": "fastgen-dataset",
+      "should_trigger": false,
+      "expected_output": "Routes experiment configuration to fastgen-configure and the SD15 DMD2 recipe, without opening dataset preparation.",
+      "assertions": [
+        "Does not select fastgen-dataset for configuring an experiment over already prepared data.",
+        "Identifies fastgen-configure and fastgen/configs/experiments/SD15/config_dmd2.py.",
+        "Keeps the supplied dataset unchanged and does not launch training."
+      ]
+    }
+  ]
+}

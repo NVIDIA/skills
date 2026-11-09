@@ -1,0 +1,8 @@
+schema_version: 1
+skill_workspace:
+  mode: group
+  include:
+    - ../fastgen-inference
+    - ../fastgen-runtime
+harbor:
+  timeout_multiplier: 3

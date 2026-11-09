@@ -1,0 +1,70 @@
+{
+  "skill_name": "fastgen-validate",
+  "evals": [
+    {
+      "id": "explicit-preserve-acceptance",
+      "prompt": "Use fastgen-validate to write a real FastGen CPU regression test for the suspected shifted-RF reference in /workspace/input/rf-validation.json. Read noise_schedule_source.md. Write /workspace/output/test_rf_schedule.py importing ShiftedRFNoiseSchedule from fastgen.networks.noise_schedule. With the frozen tensors, shifts, dtype and tolerances, independently compute sigma(t)=s*M*t/(M+(s-1)*t) and its derivative, then check production forward_process, cond_velocity, flow_to_x0 and step(pred_type=\"flow\", sample_type=\"ode\") against that analytic path, including the clean endpoint. Include a negative-control assertion proving unscaled eps-x0 is rejected at shift=3 under the original criteria. Do not loosen tolerances, copy production methods, replace the class with a mock or obtain the reference sigma/derivative from the class under test. Execute a standard-library syntax check and write /workspace/output/validation-report.json distinguishing that result from the unrun pytest test: FastGen/PyTorch are not installed in this task. Include the repository pytest command for subsequent CPU execution. Do not claim model parity or run a model.",
+      "files": [
+        "files/rf-validation.json",
+        "files/noise_schedule_source.md"
+      ],
+      "expected_skill": "fastgen-validate",
+      "expected_output": "An executable repository-targeted pytest file exercises the real FastGen noise schedule with an independent shifted-time oracle and a failing unscaled-flow negative control. The report preserves tolerances and clearly limits completed validation to syntax.",
+      "assertions": [
+        "Imports the real ShiftedRFNoiseSchedule and calls forward_process, cond_velocity, flow_to_x0 and step with pred_type=flow and sample_type=ode; does not extract or emulate the production class.",
+        "Uses fixed CPU float64 tensors and both shift=1 and shift=3; computes reference sigma and derivative directly from the stated formula instead of schedule.sigma/sigma_prime/forward_process.",
+        "Checks forward noising, derivative flow, x0 inversion, the ODE next state and t_next=0 under unchanged atol=rtol=1e-10.",
+        "A real assertion checks that eps-x0 fails the analytic shifted-flow criterion at shift=3; no tolerance widening, swallowed assertion, xfail or skip that could hide a broken positive control.",
+        "Executes syntax checking and reports pytest/runtime as not-run, with a concrete CPU pytest command. Does not report numerical model parity, benchmark quality or GPU integration."
+      ]
+    },
+    {
+      "id": "implicit-uncontrolled-parity",
+      "prompt": "Can we accept the integration based on /workspace/input/parity-manifest.json? The engineer points to matching seeds and an error below tolerance. Write /workspace/output/parity-audit.md with your decision and a concrete controlled rerun plan. No inference should be launched.",
+      "expected_output": "Rejects this as valid parity evidence and describes how to match actual noise, grids, precision, independent components and held-out inputs before comparing intermediates.",
+      "assertions": [
+        "Identifies different actual noise despite identical seeds, different time grids, and different precision as uncontrolled comparison variables.",
+        "Does not accept parity solely because 0.0008 is below the declared tolerance.",
+        "Notes training contamination of the candidate evaluation input and the shared prepared encoder as limitations of independent evidence.",
+        "Plans comparison from normalized inputs and conditioning through denoiser, transformed predictions, sampler and decoded output; investigates the first difference.",
+        "Keeps precision variants and changed tolerances as separate recorded experiments and calls for reference nondeterminism measurement without inventing results."
+      ],
+      "expected_skill": "fastgen-validate",
+      "files": [
+        "files/parity-manifest.json"
+      ]
+    },
+    {
+      "id": "contextual-claims-audit",
+      "prompt": "The release note says: \"Training, full resume, distributed generation and four-step quality are validated.\" Audit that statement using /workspace/input/reload-evidence.json and the actual FastGen code in training_evidence_source.md. Produce /workspace/output/validation-matrix.json with a status and supporting evidence for weight reload, full resume, student learning, distributed trainability and quality. Assess full resume separately for the original weight-only check and the follow-up load in the inventory. Name the production call or update branch that supports each conclusion. Use pass/fail/not-run (or explicit insufficient evidence) appropriately. No new model tests can be run in this task.",
+      "expected_output": "Separates successful weights-only round trip from untested full resume, student updates, real distributed trainability and quality. Does not mistake four auxiliary iterations for student learning.",
+      "assertions": [
+        "Accepts only the narrowly evidenced weights-only round trip, within its CPU fixture scope.",
+        "Does not mark full resume passed when optimizer, scheduler, callback and iteration states were not loaded.",
+        "Recognizes that iterations 1-4 with frequency 5 do not exercise a student update; unchanged student weights alone are not a failed student optimizer test.",
+        "Marks distributed generation-followed-by-backward evidence absent and does not infer it from a CPU reload.",
+        "Does not call two gallery pairs without recorded judgment/metrics a quality benchmark and lists the missing checks.",
+        "Grounds weight-only versus full resume in Checkpointer.load arguments and the missing student update in DMD2Model.single_train_step/get_optimizers, rather than treating iteration count as evidence by itself.",
+        "Rejects the follow-up full-resume claim despite restored model/optimizer/scheduler/iteration: Checkpointer.load received neither the stateful callbacks nor the enabled gradient scaler. Names those missing restoration arguments without claiming a runtime test."
+      ],
+      "expected_skill": "fastgen-validate",
+      "files": [
+        "files/reload-evidence.json",
+        "files/training_evidence_source.md"
+      ]
+    },
+    {
+      "id": "adjacent-sample-generation",
+      "prompt": "Prepare a FastGen command to generate images from my existing distilled student checkpoint and prompts at four student steps. The config and checkpoint compatibility were already reviewed. I need sample files for a later comparison, not a parity or quality decision now. Select the owning workflow and its entry point; do not execute generation in this routing-only task.",
+      "files": [],
+      "expected_skill": "fastgen-validate",
+      "should_trigger": false,
+      "expected_output": "Routes generation preparation to fastgen-inference and scripts/inference/image_model_inference.py, without starting an acceptance review.",
+      "assertions": [
+        "Does not select fastgen-validate for preparing generation without an acceptance claim.",
+        "Identifies fastgen-inference and scripts/inference/image_model_inference.py.",
+        "Does not invent parity results or run generation."
+      ]
+    }
+  ]
+}

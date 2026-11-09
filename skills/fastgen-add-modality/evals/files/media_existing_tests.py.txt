@@ -1,0 +1,17 @@
+# tests/test_media_utils.py:17-32
+@pytest.mark.parametrize("channels", [1, 2])
+@pytest.mark.parametrize("as_dict", [False, True])
+def test_save_media_audio_preserves_channels_rate_and_batch(channels, as_dict, tmp_path):
+    waveform = torch.linspace(-1.5, 1.5, 240).reshape(1, 1, -1).repeat(2, channels, 1)
+    if channels == 2:
+        waveform[:, 1].neg_()
+    output = {"audio": waveform} if as_dict else waveform
+    media_utils.save_media(output, str(tmp_path / "audio.wav"), audio_sample_rate=48000, vid_format="mp4")
+    for index in range(2):
+        with wave.open(str(tmp_path / f"audio_{index:03d}.wav")) as stream:
+            assert stream.getframerate() == 48000
+            assert stream.getnchannels() == channels
+            assert stream.getnframes() == 240
+            actual = np.frombuffer(stream.readframes(240), dtype="<i2").reshape(-1, channels).T
+        expected = waveform[index].clamp(-1, 1).mul(32767).round().to(torch.int16).numpy()
+        np.testing.assert_array_equal(actual, expected)

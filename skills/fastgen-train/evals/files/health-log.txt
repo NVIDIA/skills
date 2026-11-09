@@ -1,0 +1,13 @@
+Authored WanT2V DMD2 log-review scenario; not a captured execution or a completed benchmark.
+base_config=fastgen/configs/experiments/WanT2V/config_dmd2.py
+run_directory=/runs/fastgen-example/wan_dmd2_health/review-run
+iteration=25, student_update_freq=5, global_batch=16, accumulation_rounds=2
+rank=1 accum_iter=0 pre_clip_nonfinite_gradient_elements=12
+rank=1 accum_iter=1 pre_clip_nonfinite_gradient_elements=0
+GradClipCallback: Number of parameters with non-finite gradients: 12
+optimizer update completed; post_clip_gradient_norm=0.74
+W&B scalar total_loss=0.19; logging_iter=5; sample_logging_iter=5
+iter=20 panel=student prompt="A red kite over water" seed=310
+iter=25 panel=student prompt="A striped cat on a desk" seed=377
+No fixed-input before/after gallery has been generated.
+Local files exist under media/; no online W&B query has been performed.

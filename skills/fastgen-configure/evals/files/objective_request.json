@@ -1,0 +1,14 @@
+{
+  "task": "image-conditioned video generation",
+  "method": "DMD2",
+  "backward_simulation": "staggered",
+  "gan_loss_weight_gen": 0.1,
+  "vsd_loss_weight": 1.0,
+  "data_available": [
+    "text prompts"
+  ],
+  "user_constraint": "Keep both distribution matching and the adversarial objective; do not change the task or silently remove losses.",
+  "resources": "Configuration review only; no models, media or GPUs are installed.",
+  "network": "Wan2.1 I2V 14B",
+  "base_config": "fastgen/configs/experiments/WanI2V/config_dmd2_14b.py"
+}

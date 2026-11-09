@@ -1,0 +1,6 @@
+schema_version: 1
+skill_workspace:
+  mode: group
+  include:
+    - ../fastgen-runtime
+    - ../fastgen-validate

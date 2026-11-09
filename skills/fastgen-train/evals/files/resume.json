@@ -1,0 +1,48 @@
+{
+  "fixture": "Authored WanT2V DMD2 checkpoint inventory and resolved settings for an offline resume review; not an executed run.",
+  "checkpoint": {
+    "completed_iteration": 600,
+    "format": "dcp",
+    "completion_marker_present": true,
+    "all_model_and_optimizer_shards_present": true,
+    "optimizer_scheduler_scaler_and_callback_state_present": true,
+    "completion_marker": "/runs/fastgen-example/wan_dmd2_resume/interrupted-run/checkpoints/0000600.pth",
+    "shard_directories": "Sibling 0000600.<root>_model and 0000600.<root>_optim directories described by the marker manifest; preserve every recorded root."
+  },
+  "trainer": {
+    "resume": true,
+    "max_iter": 800,
+    "fsdp": true,
+    "ddp": false,
+    "grad_accum_rounds": 2,
+    "batch_size_global": 16,
+    "validation_iter": 250
+  },
+  "dataloader_train": {
+    "batch_size": 2,
+    "sampler_start_idx": null,
+    "shards_and_ignore_indices_unchanged": true,
+    "datatags": [
+      "WDS:/data/wan/train"
+    ],
+    "deterministic": true,
+    "num_workers": 1,
+    "strict": true,
+    "train": true
+  },
+  "model": {
+    "student_update_freq": 5,
+    "backward_simulation": "staggered"
+  },
+  "world_size": 4,
+  "prior_effective_global_batch": 16,
+  "prior_world_size": 4,
+  "base_config": "fastgen/configs/experiments/WanT2V/config_dmd2.py",
+  "run_directory": "/runs/fastgen-example/wan_dmd2_resume/interrupted-run",
+  "log_config": {
+    "project": "fastgen-example",
+    "group": "wan_dmd2_resume",
+    "name": "interrupted-run"
+  },
+  "validation_loader_present": true
+}

@@ -1,0 +1,8 @@
+schema_version: 1
+skill_workspace:
+  mode: group
+  include:
+    - ../fastgen-add-method
+    - ../fastgen-add-network
+    - ../fastgen-dataset
+    - ../fastgen-train

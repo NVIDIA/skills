@@ -1,0 +1,69 @@
+{
+  "skill_name": "fastgen-configure",
+  "evals": [
+    {
+      "id": "geometry-after-override",
+      "prompt": "Use fastgen-configure to adapt the real WanT2V DMD2 recipe attached as config_dmd2_wan.py. The current proposal changes only model.input_shape on the CLI to [16,7,80,96], leaving stale loader geometry. Read resolution_source.md. Write /workspace/output/config_wan_eval.py with the normal create_config() entry point, composing fastgen.configs.experiments.WanT2V.config_dmd2.create_config. Use the requested latent shape, WDS:/data/wan/train for training and WDS:/data/wan/heldout for validation, and independent loader copies. Validation must finish: set dataloader_val.train=False and trainer.global_vars_val=[{\"MAX_VAL_STEPS\":1}]. Preserve the inherited method, model, losses, student grid and optimizer settings. Write /workspace/output/test_wan_config.py using actual FastGen imports to check both loaders, finite validation settings and repeated config construction without mutating VideoLoaderConfig or the base recipe. Syntax-check both output files using the standard library. FastGen is not installed here: report execution of those imports and a real --dryrun as not-run, and give the command to run after placing the config under fastgen/configs/experiments/WanT2V/config_eval.py in the repository. Do not instantiate a network, download weights or invent a replacement config API.",
+      "files": [
+        "files/config_dmd2_wan.py",
+        "files/resolution_source.md"
+      ],
+      "expected_skill": "fastgen-configure",
+      "expected_output": "A genuine FastGen composition config and repository-targeted test. Latent [16,7,80,96] with Wan temporal/spatial compression (4,8,8) gives pixel (T,H,W)=(25,640,768); both VideoWDSLoader configs use img_size=(W,H)=(768,640). Validation is finite, train/held-out loaders are separate and DMD2 settings are preserved. Static syntax checking is distinguished from unrun config/runtime tests.",
+      "assertions": [
+        "Imports and calls the actual WanT2V config_dmd2.create_config; writes a create_config() entry point rather than a dictionary simulator or resolve(latent_shape) surrogate.",
+        "Sets model.input_shape to [16,7,80,96] before recomputing model_pixel_shape, then sets train and validation img_size to (768,640) and sequence_length to 25, not a fabricated num_frames loader field.",
+        "Uses independent loader copies with WDS:/data/wan/train and WDS:/data/wan/heldout; preserves inherited GAN/VSD, student grid, model and optimizer settings.",
+        "Makes validation finite with dataloader_val.train=False and trainer.global_vars_val=[{\"MAX_VAL_STEPS\":1}], and asserts these settings in the generated test; copying the default repeating training loader without a bound is invalid.",
+        "The repository-targeted test calls the real config functions repeatedly and verifies neither VideoLoaderConfig nor a fresh base recipe is mutated (base geometry remains 81 frames at 832x480).",
+        "Executes a standard-library syntax check, labels FastGen import/config tests and --dryrun as not-run, and gives a valid repository-relative --config command without claiming training validation."
+      ]
+    },
+    {
+      "id": "prompt-only-objective",
+      "prompt": "Review /workspace/input/objective_request.json and objective_source.md. Can this proposed FastGen experiment meet the stated task and objective with the supplied data? Write a concise configuration decision in /workspace/output/decision.md, identifying missing inputs and the next checks. Keep the user-selected method and losses. No downloads or execution.",
+      "files": [
+        "files/objective_request.json",
+        "files/objective_source.md"
+      ],
+      "expected_skill": "fastgen-configure",
+      "expected_output": "Explains that backward simulation does not supply source images or real targets for an intended GAN objective, and identifies a blocked recipe rather than silently changing the objective.",
+      "assertions": [
+        "Identifies missing image/video inputs for WanI2V first_frame_cond; text prompts alone cannot satisfy its build/forward conditioning contract.",
+        "Explains that the real-data-dependent adversarial branches would be skipped or unavailable without real targets despite nonzero GAN weight.",
+        "Does not zero GAN weights, switch to text-only generation, or switch methods to make the configuration appear valid.",
+        "Does not ask again for the method, task, or loss preference already in the fixture."
+      ]
+    },
+    {
+      "id": "typed-override-and-dryrun",
+      "prompt": "A colleague says adding more plus signs should fix the launch in /workspace/input/failed_override.txt, and a successful dry run will prove global batch 16. Review schema_source.md and write /workspace/output/corrected-command.txt plus a brief explanation of the checks still needed. Do not launch training.",
+      "files": [
+        "files/failed_override.txt",
+        "files/schema_source.md"
+      ],
+      "expected_skill": "fastgen-configure",
+      "expected_output": "A usable command preserves the required standalone - before Hydra overrides, corrects trainer.logging_iter without extending the typed schema, and distinguishes config resolution from distributed effective-batch validation.",
+      "assertions": [
+        "Uses trainer.logging_iter=1 and removes the unsupported trainer.log_every override.",
+        "Preserves the required single standalone - before configuration overrides, with script arguments such as --dryrun before it; the parser rejects nonempty overrides without the separator.",
+        "Explains that + or ++ cannot add arbitrary undeclared fields to the typed trainer config.",
+        "Computes the fixture effective batch as 12 for four ranks with local batch 3 and requested global batch 16.",
+        "Explains that --dryrun exits before distributed initialization and accumulation rounding and does not certify an actual launch."
+      ]
+    },
+    {
+      "id": "adjacent-training-execution",
+      "prompt": "The reviewed FastGen WanT2V DMD2 config, data paths and four-GPU launch are already fixed. I need to execute that unchanged recipe for 20 iterations, check startup, and save the run logs and checkpoint. Select the workflow that owns execution, and state its first prerequisite. Do not write or change a config, and do not submit a job in this routing-only task.",
+      "files": [],
+      "expected_skill": "fastgen-configure",
+      "should_trigger": false,
+      "expected_output": "Routes execution of an unchanged recipe to fastgen-train and its runtime prerequisites; does not start fastgen-configure.",
+      "assertions": [
+        "Does not select fastgen-configure for executing an already reviewed recipe.",
+        "Identifies fastgen-train as the execution owner and checks the runtime/allocation before training.",
+        "Does not rewrite the config or submit work."
+      ]
+    }
+  ]
+}

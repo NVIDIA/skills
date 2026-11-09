@@ -1,0 +1,268 @@
+# tests/test_multimodal.py:1-2
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# tests/test_multimodal.py:6-6
+from __future__ import annotations
+
+# tests/test_multimodal.py:9-9
+from copy import deepcopy
+
+# tests/test_multimodal.py:12-12
+from typing import Any
+
+# tests/test_multimodal.py:14-14
+import pytest
+
+# tests/test_multimodal.py:15-15
+import torch
+
+# tests/test_multimodal.py:19-19
+import fastgen.methods.fine_tuning.sft as sft_module
+
+# tests/test_multimodal.py:22-22
+from fastgen.configs.config import SampleTConfig
+
+# tests/test_multimodal.py:26-26
+from fastgen.configs.methods.config_sft import ModelConfig as SFTConfig
+
+# tests/test_multimodal.py:29-29
+from fastgen.methods.fine_tuning.sft import SFTModel
+
+# tests/test_multimodal.py:31-31
+from fastgen.networks.network import FastGenNetwork
+
+# tests/test_multimodal.py:32-40
+from fastgen.networks.noise_schedule import (
+    CompositeNoiseSchedule,
+    EDMNoiseSchedule,
+    RFNoiseSchedule,
+    ShiftedRFNoiseSchedule,
+    StudentGridConfig,
+    TrigNoiseSchedule,
+    get_noise_schedule,
+)
+
+# tests/test_multimodal.py:43-43
+from fastgen.utils.tensor import expand_like, high_precision_dtype
+
+# tests/test_multimodal.py:44-44
+from fastgen.utils.tree_utils import get_batch_size, to as _tree_to
+
+# tests/test_multimodal.py:45-45
+from fastgen.utils.guidance import CFGTerm, GuidanceConfig, predict_with_guidance
+
+# tests/test_multimodal.py:48-48
+_MODALITIES = ("image", "audio", "depth")
+
+# tests/test_multimodal.py:49-49
+_EXPLICIT_GRID = (0.9, 0.6, 0.25, 0.0)
+
+# tests/test_multimodal.py:52-57
+def _explicit_grid(steps: int = 3) -> StudentGridConfig:
+    return StudentGridConfig(
+        steps=steps,
+        grid_type="explicit",
+        grid_kwargs={"timesteps": _EXPLICIT_GRID},
+    )
+
+# tests/test_multimodal.py:68-76
+def _sampling_config(grid_type: str, steps: int) -> StudentGridConfig:
+    if grid_type == "explicit":
+        return _explicit_grid(steps)
+    assert grid_type == "native"
+    return StudentGridConfig(
+        steps=steps,
+        grid_type="native",
+        grid_kwargs={"base_steps": len(_EXPLICIT_GRID) - 1, "shift": 1.35},
+    )
+
+# tests/test_multimodal.py:79-86
+def _diverse_schedule_configs(grid_type: str = "explicit") -> dict[str, dict[str, Any]]:
+    sampling = _sampling_config(grid_type, steps=3)
+    common = {"min_t": 0.002, "max_t": 0.9, "student_grid_cfg": sampling}
+    return {
+        "image": {"name": "edm", **common},
+        "audio": {"name": "shifted_rf", "shift": 2.0, "num_train_timesteps": 32, **common},
+        "depth": {"name": "trig", **common},
+    }
+
+# tests/test_multimodal.py:101-105
+def _make_schedule(configs: dict[str, dict[str, Any]], modality: str | None):
+    if modality is None:
+        return CompositeNoiseSchedule(deepcopy(configs), primary_key=_MODALITIES[0])
+    config = deepcopy(configs[modality])
+    return get_noise_schedule(config.pop("name"), **config)
+
+# tests/test_multimodal.py:108-113
+def _deterministic_noise_like(value, dtype=None, **kwargs):
+    del kwargs
+    if isinstance(value, dict):
+        return {key: _deterministic_noise_like(tensor, dtype=dtype) for key, tensor in value.items()}
+    result = torch.linspace(-0.35, 0.45, value.numel(), device=value.device, dtype=torch.float64).reshape(value.shape)
+    return result.to(dtype=dtype or value.dtype)
+
+# tests/test_multimodal.py:123-125
+def _guidance_config(modality: str | None) -> GuidanceConfig:
+    scales = dict(zip(_MODALITIES, (1.5, 2.0, 2.75)))
+    return GuidanceConfig(cfg=CFGTerm(scale=scales if modality is None else scales[modality]))
+
+# tests/test_multimodal.py:128-135
+def _condition_term(condition: Any, value: torch.Tensor) -> torch.Tensor:
+    if condition is None:
+        return torch.zeros_like(value)
+    assert isinstance(condition, torch.Tensor)
+    condition = condition.to(device=value.device, dtype=value.dtype)
+    while condition.ndim < value.ndim:
+        condition = condition.unsqueeze(-1)
+    return condition.expand_as(value)
+
+# tests/test_multimodal.py:138-248
+class _IndependentX0Network(FastGenNetwork):
+    """Tiny network whose modality branches share no parameters or computation."""
+
+    def __init__(
+        self,
+        schedule_configs: dict[str, dict[str, Any]],
+        modality: str | None = None,
+        role_offset: float = 0.0,
+    ):
+        torch.nn.Module.__init__(self)
+        self.net_pred_type = "x0"
+        self.schedule_type = "composite" if modality is None else schedule_configs[modality]["name"]
+        self.modalities = _MODALITIES if modality is None else (modality,)
+        self.noise_scheduler = _make_schedule(schedule_configs, modality)
+        self.heads = torch.nn.ModuleDict({key: torch.nn.Linear(2, 2, dtype=torch.float64) for key in self.modalities})
+        self.time_scale = {key: 0.03 * (index + 1) for index, key in enumerate(_MODALITIES)}
+
+        with torch.no_grad():
+            for index, key in enumerate(self.modalities):
+                base = index + 1 if modality is None else _MODALITIES.index(key) + 1
+                self.heads[key].weight.copy_(
+                    torch.tensor(
+                        [[0.11 * base + role_offset, -0.07], [0.05, -0.09 * base + role_offset]],
+                        dtype=torch.float64,
+                    )
+                )
+                self.heads[key].bias.copy_(torch.tensor([0.02 * base + role_offset, -0.04 * base], dtype=torch.float64))
+
+    def _forward_one(
+        self,
+        key: str,
+        x_t: torch.Tensor,
+        t: torch.Tensor,
+        condition: Any,
+        fwd_pred_type: str,
+    ) -> torch.Tensor:
+        schedule = (
+            self.noise_scheduler.subschedules[key]
+            if isinstance(self.noise_scheduler, CompositeNoiseSchedule)
+            else self.noise_scheduler
+        )
+        model_t = schedule.rescale_t(t).to(dtype=x_t.dtype)
+        x0 = (
+            self.heads[key](x_t)
+            + self.time_scale[key] * expand_like(model_t, x_t)
+            + 0.04 * _condition_term(condition, x_t)
+        )
+        return schedule.convert_model_output(
+            x_t,
+            x0,
+            t,
+            src_pred_type=self.net_pred_type,
+            target_pred_type=fwd_pred_type,
+        )
+
+    def forward(
+        self,
+        x_t,
+        t,
+        condition=None,
+        fwd_pred_type=None,
+        return_features_early=False,
+        feature_indices=None,
+        **kwargs,
+    ):
+        del kwargs
+        target = self.net_pred_type if fwd_pred_type is None else fwd_pred_type
+        if isinstance(x_t, dict):
+            result = {key: self._forward_one(key, value, t, condition, target) for key, value in x_t.items()}
+        else:
+            key = self.modalities[0]
+            result = self._forward_one(key, x_t, t, condition, target)
+
+        if feature_indices is None:
+            return result
+        features = [] if len(feature_indices) == 0 else [result]
+        return features if return_features_early else [result, features]
+
+    def sample(
+        self,
+        noise,
+        condition=None,
+        neg_condition=None,
+        sample_steps=3,
+        sample_type="ode",
+        guidance_cfg=None,
+    ):
+        student_grid = self.noise_scheduler.student_grid(sample_steps, device=torch.device("cpu"))
+        state = self.noise_scheduler.latents(noise, t_init=student_grid[0])
+        for step_index in range(sample_steps):
+            t = student_grid[step_index].expand(get_batch_size(state))
+            x0 = predict_with_guidance(
+                self,
+                state,
+                t,
+                guidance_cfg=guidance_cfg,
+                condition=condition,
+                neg_condition=neg_condition,
+                fwd_pred_type="x0",
+            )
+            if step_index + 1 == sample_steps:
+                state = x0
+            else:
+                state = self.noise_scheduler.step(
+                    state,
+                    x0,
+                    student_grid[step_index],
+                    student_grid[step_index + 1],
+                    sample_type=sample_type,
+                )
+        return state
+
+# tests/test_multimodal.py:392-399
+def _base_model_state(model, config, net) -> None:
+    model.config = config
+    model.device = torch.device("cpu")
+    model.precision = torch.float64
+    model.precision_amp_infer = None
+    model.input_shape = {key: [2] for key in _MODALITIES} if len(net.modalities) > 1 else [2]
+    model.use_ema = []
+    model.net = net
+
+# tests/test_multimodal.py:516-521
+def _real_data() -> dict[str, torch.Tensor]:
+    return {
+        "image": torch.tensor([[-0.8, 0.2], [0.4, 1.1]], dtype=torch.float64),
+        "audio": torch.tensor([[0.3, -1.2], [0.7, -0.1]], dtype=torch.float64),
+        "depth": torch.tensor([[1.4, 0.5], [-0.6, 0.9]], dtype=torch.float64),
+    }
+
+# tests/test_multimodal.py:402-418
+def _build_method(
+    method_name: str,
+    modality: str | None,
+    grid_type: str = "explicit",
+    guided: bool = False,
+):
+    if method_name == "sft":
+        config = SFTConfig()
+        config.sample_t_cfg = SampleTConfig(time_dist_type="uniform", min_t=0.1, max_t=0.8)
+        config.student_sample_type = "ode"
+        config.cond_dropout_prob = None
+        config.guidance_cfg = _guidance_config(modality) if guided else None
+        net = _IndependentX0Network(_diverse_schedule_configs(grid_type), modality=modality)
+        model = object.__new__(SFTModel)
+        torch.nn.Module.__init__(model)
+        _base_model_state(model, config, net)
+        return model

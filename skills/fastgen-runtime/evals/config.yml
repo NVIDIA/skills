@@ -1,0 +1,6 @@
+schema_version: 1
+skill_workspace:
+  mode: group
+  include:
+    - ../fastgen-setup
+    - ../fastgen-configure

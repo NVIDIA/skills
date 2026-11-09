@@ -1,0 +1,52 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "composite_schedule.py.txt",
+      "repository_path": "fastgen/networks/noise_schedule.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/networks/noise_schedule.py",
+      "source_sha256": "6331624356175728b52deb41da97dbb88b60347bbbf89d1f40c41f36e9440d5f",
+      "line_ranges": [
+        [
+          2476,
+          2745
+        ]
+      ],
+      "fixture_sha256": "a09767c9fd5149bb367c6829344aa8409c7fd7f43f0ed46c72010786014ddb28",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "sft_timestep.py.txt",
+      "repository_path": "fastgen/methods/fine_tuning/sft.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/fine_tuning/sft.py",
+      "source_sha256": "c7e7b085227624247625637bea0489c3c8f643db8b9986c862543ee8c50ba2e9",
+      "line_ranges": [
+        [
+          167,
+          223
+        ]
+      ],
+      "fixture_sha256": "252a23636e4806d3b4fa428b666c331d3fa8c099a18474db2dc787279746ee99",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "model_shape.py.txt",
+      "repository_path": "fastgen/configs/config_utils.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/configs/config_utils.py",
+      "source_sha256": "3771f974c38962f8647be7f2842eb08079ba01d2e3cb8c61e563fe30b97ff0f7",
+      "line_ranges": [
+        [
+          70,
+          79
+        ]
+      ],
+      "fixture_sha256": "9c77e82d6fd6f793b11379739442fc9488a4ed2446d18612e8cfce4cd826d843",
+      "kind": "source_excerpt"
+    }
+  ]
+}

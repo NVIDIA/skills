@@ -1,0 +1,115 @@
+# tests/test_network.py:1-2
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# tests/test_network.py:13-13
+from types import MethodType, SimpleNamespace
+
+# tests/test_network.py:15-15
+import torch
+
+# tests/test_network.py:17-17
+import pytest
+
+# tests/test_network.py:65-72
+from fastgen.networks.noise_schedule import (
+    AlphasNoiseSchedule,
+    CompositeNoiseSchedule,
+    EDMNoiseSchedule,
+    RFNoiseSchedule,
+    StudentGridConfig,
+    time_shift,
+)
+
+# tests/test_network.py:2292-2336
+def _tiny_flux_network(class_name):
+    """A Flux.1 or Flux.2 network around a tiny random transformer, without pretrained weights."""
+    if class_name == "Flux":
+        from diffusers.models import FluxTransformer2DModel
+
+        from fastgen.networks.Flux.network import Flux as network_type, classify_forward
+
+        transformer = FluxTransformer2DModel(
+            patch_size=1,
+            in_channels=8,
+            num_layers=1,
+            num_single_layers=1,
+            attention_head_dim=8,
+            num_attention_heads=2,
+            joint_attention_dim=8,
+            pooled_projection_dim=8,
+            guidance_embeds=True,
+            axes_dims_rope=(2, 2, 4),
+        )
+        transformer.r_embedder = None
+    else:
+        from diffusers.models import Flux2Transformer2DModel
+
+        from fastgen.networks.Flux2.network import Flux2 as network_type, classify_forward
+
+        transformer = Flux2Transformer2DModel(
+            patch_size=1,
+            in_channels=8,
+            num_layers=1,
+            num_single_layers=1,
+            attention_head_dim=8,
+            num_attention_heads=2,
+            joint_attention_dim=8,
+            axes_dims_rope=(2, 2, 2, 2),
+        )
+    transformer.forward = MethodType(classify_forward, transformer)
+    network = object.__new__(network_type)
+    torch.nn.Module.__init__(network)
+    network.transformer = transformer
+    network.noise_scheduler = RFNoiseSchedule()
+    network.net_pred_type = "flow"
+    network.guidance_scale = 3.5
+    network.ref_image_t_scale = 10
+    network._record_precision(precision_model=None)
+    return network
+
+# tests/test_network.py:2339-2353
+def test_flux_time_embedding_follows_the_state_not_the_pooled_text():
+    """Diffusers casts Flux's time and guidance projections to the pooled text's dtype, so the network hands the pooled
+    text over in the state's: its dtype then changes nothing, as in a JVP whose autocast promotes the state above the
+    text's dtype."""
+    torch.manual_seed(0)
+    network = _tiny_flux_network("Flux")
+    state = torch.randn(1, 2, 4, 8)
+    pooled = torch.randn(1, 8).to(torch.bfloat16)
+    text = torch.randn(1, 3, 8)
+    t = torch.tensor([0.5], dtype=network.noise_scheduler.t_precision)
+
+    with torch.no_grad():
+        expected = network(state, t, condition=(pooled.float(), text))
+        actual = network(state, t, condition=(pooled, text))
+    torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+
+# tests/test_network.py:2356-2382
+@pytest.mark.parametrize(("class_name", "image_edit"), [("Flux", False), ("Flux2", False), ("Flux2", True)])
+def test_flux_feature_maps_follow_non_square_latent_grids(class_name, image_edit):
+    """Feature maps keep a non-square latent's packed (rows, cols) grid and hold only the target image's tokens:
+    no text, and on Flux.2's image-edit path no reference-image tokens."""
+    torch.manual_seed(0)
+    network = _tiny_flux_network(class_name)
+    transformer = network.transformer
+    block_outputs = []
+    for block in (transformer.transformer_blocks[0], transformer.single_transformer_blocks[0]):
+        block.register_forward_hook(lambda module, args, output: block_outputs.append(output))
+
+    state = torch.randn(1, 2, 4, 8)  # packed grid 2 x 4
+    text = torch.randn(1, 3, 8)
+    condition = (torch.randn(1, 8), text) if class_name == "Flux" else (None, text)
+    if image_edit:
+        condition = {"text_embeds": condition, "condition_image": torch.randn(1, 2, 8, 4)}
+    t = torch.tensor([0.5], dtype=network.noise_scheduler.t_precision)
+    with torch.no_grad():
+        output, features = network(state, t, condition=condition, feature_indices={0, 1})
+
+    assert output.shape == state.shape
+    joint_tokens = block_outputs[0][1]
+    # Flux.1's single blocks keep the streams apart; Flux.2's return them joined, text first.
+    single_tokens = block_outputs[1][1] if class_name == "Flux" else block_outputs[1][:, text.shape[1] :]
+    for feature, tokens in zip(features, (joint_tokens, single_tokens), strict=True):
+        assert feature.shape == (1, 16, 2, 4)
+        torch.testing.assert_close(feature, tokens[:, :8].permute(0, 2, 1).reshape(1, 16, 2, 4), rtol=0, atol=0)

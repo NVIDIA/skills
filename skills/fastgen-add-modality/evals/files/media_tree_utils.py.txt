@@ -1,0 +1,23 @@
+# fastgen/utils/tree_utils.py:275-277
+def get_batch_size(structure: Any) -> int:
+    """Batch size (dim 0) of *structure*'s first tensor leaf (assumed leaf-uniform)."""
+    return first_leaf(structure).shape[0]
+
+
+# fastgen/utils/tree_utils.py:104-113
+def get_shape(data: TensorOrDict) -> Union[torch.Size, Dict[str, torch.Size]]:
+    """Structural shape of *data*.
+
+    * ``Tensor`` → ``torch.Size``.
+    * ``Dict[str, Tensor]`` → ``{key: torch.Size}`` (per-modality).
+
+    Useful for logging / debugging.  Multimodal call sites use ``get_shape``
+    rather than ``data.shape`` so the per-modality structure survives.
+    """
+    return per_modality(lambda x: x.shape, data)
+
+
+# fastgen/utils/tree_utils.py:265-267
+def get_device(structure: Any) -> torch.device:
+    """Device of *structure*'s first tensor leaf (assumed leaf-uniform)."""
+    return first_leaf(structure).device

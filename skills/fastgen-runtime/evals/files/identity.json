@@ -1,0 +1,19 @@
+{
+  "scenario": "Synthetic run collision observations",
+  "old_and_new_log_config": {
+    "project": "eval",
+    "group": "experiment",
+    "name": "same"
+  },
+  "trainer.resume": true,
+  "observed_start_iteration": 200,
+  "existing_files": [
+    "/workspace/outputs/shared-checkpoints/0000200.pth",
+    "/workspace/outputs/eval/experiment/same/wandb_id.txt"
+  ],
+  "FASTGEN_OUTPUT_ROOT": "/workspace/outputs",
+  "HF_HOME": "/workspace/shared-cache",
+  "new_experiment_goal": "Start from the configured initial weights at iteration zero in a distinct tracker run.",
+  "trainer.checkpointer.save_dir": "/workspace/outputs/shared-checkpoints",
+  "trainer.checkpointer.use_s3": false
+}

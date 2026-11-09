@@ -1,0 +1,25 @@
+# scripts/inference/inference_utils.py:565-588
+def add_common_args(parser: argparse.ArgumentParser) -> None:
+    """Add common arguments shared between image and video inference.
+
+    Args:
+        parser: ArgumentParser to add arguments to
+    """
+    parser.add_argument(
+        "--ckpt_path",
+        default="",
+        type=str,
+        help="Path to a .pth checkpoint file or DCP marker (optional, uses pretrained if not provided)",
+    )
+    parser.add_argument(
+        "--do_student_sampling",
+        default=True,
+        type=str2bool,
+        help="Whether to perform student sampling",
+    )
+    parser.add_argument(
+        "--do_teacher_sampling",
+        default=False,
+        type=str2bool,
+        help="Whether to perform teacher sampling (a method trained without a teacher builds one from its config)",
+    )

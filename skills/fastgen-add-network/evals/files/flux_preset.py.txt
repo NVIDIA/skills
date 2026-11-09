@@ -1,0 +1,4 @@
+# fastgen/configs/net.py:188-190
+FluxConfig: DictConfig = L(Flux)(
+    guidance_scale=3.5,
+)

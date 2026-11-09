@@ -1,0 +1,161 @@
+# fastgen/methods/distribution_matching/dmd2.py:516-617
+    def _student_update_step(
+        self,
+        inputs: TrainingInputs,
+        data: Dict[str, Any],
+    ) -> tuple[Dict[str, torch.Tensor], Dict[str, TensorOrDict | Callable]]:
+        """Update the student with the enabled VSD and generator GAN terms."""
+        # The auxiliary update trains the discriminator only on real data, so only then does the generator face it.
+        # `real` must be present or absent on every rank: the discriminator path and f-distill's histogram
+        # reduce collectively.
+        use_gan = self.use_gan and data.get("real") is not None
+        if not self.use_vsd and not use_gan:
+            raise ValueError("DMD2 student updates require VSD training, or GAN training with data['real'].")
+
+        condition = data.get("condition")
+        neg_condition = data.get("neg_condition")
+        generation = self.gen_data_from_net(
+            inputs.input_student,
+            inputs.student_step,
+            condition=condition,
+            neg_condition=neg_condition,
+            **inputs.generation_kwargs,
+        )
+        t_gen_data = self._generation_time(inputs.student_step)
+        perturbed_data = self.net.noise_scheduler.forward_process(
+            generation.data, inputs.eps, inputs.t, t_start=t_gen_data
+        )
+
+        # The teacher's native prediction is the conditional branch of its guided target below.
+        fake_logits = None
+        if use_gan:
+            teacher_outputs = self.teacher(
+                perturbed_data,
+                inputs.t,
+                condition=condition,
+                return_features_early=not self.use_vsd,
+                feature_indices=self.discriminator.feature_indices,
+                apply_output_conditioning=False,
+                output_dtype=None,
+            )
+            if self.use_vsd:
+                teacher_output, fake_feat = teacher_outputs
+                teacher_output = detach(teacher_output)
+            else:
+                fake_feat = teacher_outputs
+            assert isinstance(fake_feat, list)
+            fake_logits = self.discriminator(fake_feat)
+            loss_map = {
+                "gan_loss_gen": gan_loss_generator(
+                    fake_logits,
+                    loss_scale=inputs.loss_scale,
+                ),
+            }
+        else:
+            with torch.no_grad():
+                teacher_output = self.teacher(
+                    perturbed_data,
+                    inputs.t,
+                    condition=condition,
+                    apply_output_conditioning=False,
+                    output_dtype=None,
+                )
+            loss_map = {
+                "gan_loss_gen": torch.tensor(0.0, device=self.device, dtype=get_dtype(perturbed_data)),
+            }
+
+        total_loss = self.config.gan_loss_weight_gen * loss_map["gan_loss_gen"]
+        if self.use_vsd:
+            # The VSD loss upcasts these clean estimates, so they are not rounded to the state's dtype first.
+            with torch.no_grad():
+                fake_score_x0 = self.fake_score(
+                    perturbed_data, inputs.t, condition=condition, fwd_pred_type="x0", output_dtype=None
+                )
+                teacher_x0 = predict_with_guidance(
+                    self.teacher,
+                    perturbed_data,
+                    inputs.t,
+                    guidance_cfg=self.config.guidance_cfg,
+                    condition=condition,
+                    neg_condition=neg_condition,
+                    precomputed={"pos": teacher_output},
+                    skip_inactive=False,
+                    output_dtype=None,
+                    fwd_pred_type="x0",
+                )
+
+            distribution_loss_map, distribution_loss = self._compute_distribution_matching_loss(
+                self._vsd_input(generation.data, t_gen_data),
+                teacher_x0,
+                fake_score_x0,
+                fake_logits,
+                inputs.t,
+                loss_scale=inputs.loss_scale,
+                gen_x0=generation.x0,
+            )
+            safe_update(loss_map, distribution_loss_map)
+            total_loss = self.config.vsd_loss_weight * distribution_loss + total_loss
+
+        loss_map["total_loss"] = total_loss
+        safe_update(loss_map, generation.metrics)
+        outputs = self._training_outputs(generation, data, inputs.trajectory_step)
+        loss_map = self.apply_reward(cast_like(generation.x0, generation.data), data, loss_map)
+        return loss_map, outputs
+
+
+# fastgen/methods/distribution_matching/dmd2.py:217-224
+    def _setup_grad_requirements(self, iteration: int) -> None:
+        update_auxiliary = iteration % self.config.student_update_freq != 0
+
+        self.net.train(not update_auxiliary).requires_grad_(not update_auxiliary)
+        if self.use_gan:
+            self.discriminator.train(update_auxiliary).requires_grad_(update_auxiliary)
+        if self.use_vsd:
+            self.fake_score.train(update_auxiliary).requires_grad_(update_auxiliary)
+
+
+# fastgen/methods/distribution_matching/dmd2.py:790-805
+    def single_train_step(
+        self,
+        data: Dict[str, Any],
+        iteration: int,
+    ) -> tuple[dict[str, torch.Tensor], dict[str, TensorOrDict | Callable]]:
+        """Run one alternating student or auxiliary training step."""
+        self._setup_grad_requirements(iteration)
+
+        inputs = self._training_inputs(data, iteration)
+
+        update_step = (
+            self._student_update_step
+            if iteration % self.config.student_update_freq == 0
+            else self._auxiliary_update_step
+        )
+        return update_step(inputs, data)
+
+
+# fastgen/methods/distribution_matching/dmd2.py:830-840
+    def get_optimizers(self, iteration: int) -> list[torch.optim.Optimizer]:
+        """Return the optimizers active on this alternating iteration."""
+        if iteration % self.config.student_update_freq == 0:
+            return [self.net_optimizer]
+
+        optimizers = []
+        if self.use_vsd:
+            optimizers.append(self.fake_score_optimizer)
+        if self.use_gan:
+            optimizers.append(self.discriminator_optimizer)
+        return optimizers
+
+
+# fastgen/methods/distribution_matching/dmd2.py:842-852
+    def get_lr_schedulers(self, iteration: int) -> list[torch.optim.lr_scheduler.LRScheduler]:
+        """Return the learning-rate schedulers active on this iteration."""
+        if iteration % self.config.student_update_freq == 0:
+            return [self.net_lr_scheduler]
+
+        schedulers = []
+        if self.use_vsd:
+            schedulers.append(self.fake_score_lr_scheduler)
+        if self.use_gan:
+            schedulers.append(self.discriminator_lr_scheduler)
+        return schedulers

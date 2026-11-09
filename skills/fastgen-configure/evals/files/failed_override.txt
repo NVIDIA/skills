@@ -1,0 +1,5 @@
+Synthetic launch record (no command has been executed in this fixture).
+python train.py --config fastgen/configs/experiments/WanT2V/config_dmd2.py --dryrun - ++trainer.log_every=1 trainer.batch_size_global=16
+AssertionError: Unknown config fields {'log_every'} for BaseTrainerConfig
+Requested execution after review: four data-parallel ranks, local batch size 3.
+The supported scalar interval field in this fixture checkout is trainer.logging_iter.
