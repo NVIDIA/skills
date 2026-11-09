@@ -3589,6 +3589,18 @@
       }
     },
     {
+      "path": "skills/nvalchemi-toolkit",
+      "name": "nvalchemi-toolkit",
+      "description": "Build and change NVIDIA ALCHEMI Toolkit (nvalchemi) workflows for atomistic simulation and machine-learned interatomic potentials (MLIPs). Use for batched structure relaxation, molecular dynamics, reaction paths, training or fine-tuning an MLIP, atomistic datasets in Zarr, generative structure workflows, model wrapping, and custom hooks or integrators, with the ALCHEMI Toolkit (nvalchemi), or when the user asks for batched GPU atomistic simulation and nvalchemi is installed or acceptable. Not for other simulation packages the user asked for (ASE-only, OpenMM, LAMMPS, GROMACS) when the request does not involve nvalchemi, ALCHEMI Toolkit-Ops (nvalchemiops) kernel work, or plain PyTorch questions.",
+      "metadata": {
+        "product.primary": "ALCHEMI Toolkit",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "simulation_engineer,research_academic,hpc_developer,ml_engineer,developer",
+        "discovery.activity_tags": "train,fine_tune,optimize,generate,integrate"
+      }
+    },
+    {
       "path": "skills/nvflare-autofl",
       "name": "nvflare-autofl",
       "description": "Use for agent-assisted Auto-FL optimization of an existing NVFLARE job in simulation, POC, or production. Do not use for code conversion, diagnosis-only work, or deployment setup.",

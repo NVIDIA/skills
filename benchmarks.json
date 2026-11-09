@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 448,
-  "result_row_count": 4224,
+  "skill_count": 449,
+  "result_row_count": 4234,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5962,6 +5962,26 @@
       "component": "Medical AI Skills",
       "has_results": true,
       "average_uplift_pct": 24.77
+    },
+    {
+      "skill": "nvalchemi-toolkit",
+      "evaluation_date": "2026-11-07",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:c096747a831a786dceff6fcf5d46191b44347068431663c2a7e66efbf5593c7a",
+      "validation_status": "passed",
+      "tasks": 9,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "has_results": true,
+      "average_uplift_pct": 10.05
     },
     {
       "skill": "nvflare-autofl",
@@ -34173,6 +34193,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 68.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 5.6
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.6
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.6,
+      "uplift_pct": 6.7
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.8,
+      "uplift_pct": 15.6
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 82.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.3,
+      "uplift_pct": 10.6
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.0,
+      "uplift_pct": 16.2
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nvalchemi-toolkit",
+      "component": "ALCHEMI Toolkit",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.3,
       "uplift_pct": null
     },
     {
