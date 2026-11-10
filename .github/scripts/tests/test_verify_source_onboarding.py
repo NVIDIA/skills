@@ -69,6 +69,7 @@ BENCHMARK_PASS = """# Evaluation Report
 BENCHMARK_PASS_NO_RESULTS = BENCHMARK_PASS.split("## Results")[0] + "## Results\n\nNot yet run.\n"
 
 BENCHMARK_FAIL = BENCHMARK_PASS.replace("Overall verdict: PASS", "Overall verdict: FAIL")
+SELF_ASSESSED = (Path(__file__).parent / "fixtures" / "self_assessed_daqiri.md").read_text()
 
 
 def sign(skill_dir: Path) -> None:
@@ -235,6 +236,20 @@ class BenchmarkTests(unittest.TestCase):
         problems = "\n".join(vso.check_skill(d))
 
         self.assertIn("FAIL", problems)
+
+    def test_eligible_self_assessed_skill_passes_all_onboarding_checks(self):
+        self.assertEqual(vso.check_skill(make_skill(self.root, benchmark=SELF_ASSESSED)), [])
+
+    def test_self_assessed_pass_without_measurements_is_rejected(self):
+        intro, rest = SELF_ASSESSED.split("## Results at a Glance", 1)
+        report = intro + "## Tier Status" + rest.split("## Tier Status", 1)[1]
+        problems = "\n".join(vso.check_skill(make_skill(self.root, benchmark=report)))
+        self.assertIn("no results", problems.lower())
+
+    def test_self_assessed_report_still_requires_signature_integrity(self):
+        d = make_skill(self.root, benchmark=SELF_ASSESSED)
+        (d / "BENCHMARK.md").write_text(SELF_ASSESSED.replace("100.0%", "99.0%"))
+        self.assertIn("MISMATCH", "\n".join(vso.check_skill(d)))
 
     def test_pass_verdict_without_measurements_is_reported(self):
         """PASS on a report carrying no result rows is not evidence."""

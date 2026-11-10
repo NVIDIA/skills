@@ -32,8 +32,9 @@ fetches the source at the component's ``ref`` and checks that:
     signed digest;
   * ``SKILL.md``, ``skill.oms.sig``, ``skill-card.md`` and an eval dataset
     exist, applying the same filename rules the hourly sync applies;
-  * ``BENCHMARK.md`` reports an overall verdict of PASS backed by real
-    measurements.
+  * ``BENCHMARK.md`` reports PASS backed by real measurements. Self-assessed
+    reports also require publication eligibility and completed execution
+    without reported errors; the shared benchmark reader checks that format.
 
 It also checks that the component resolves to a ``product.primary`` value:
 an explicit ``product_primary``, or a ``name`` that exactly matches a value in
