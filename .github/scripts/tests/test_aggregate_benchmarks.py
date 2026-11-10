@@ -63,6 +63,7 @@ class TestSelfAssessedReports(unittest.TestCase):
         self.parse(self.report)
         data = json.loads(agg.generate(self.root))
         self.assertEqual(data["skills"][0]["verdict"], "PASS")
+        self.assertEqual(data["skills"][0]["evaluation_source"], "self-assessed")
         self.assertTrue(data["skills"][0]["has_results"])
         self.assertEqual(data["skills"][0]["average_uplift_pct"], 0.0)
         self.assertEqual(data["result_row_count"], 8)
@@ -135,6 +136,88 @@ class TestSelfAssessedReports(unittest.TestCase):
         report = report.replace("## Publication Recommendation",
                                 "> **Overall verdict: PASS**\n\n## Publication Recommendation")
         self.assertNotEqual(self.parse(report)["verdict"], "PASS")
+
+
+class TestEvaluationSource(unittest.TestCase):
+    """Source describes who evaluated, independently of whether it passed."""
+
+    def parse(self, report):
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "BENCHMARK.md"
+            path.write_text(report, encoding="utf-8")
+            return agg.parse_benchmark(path)
+
+    def test_self_assessed_source_survives_non_passing_reports(self):
+        report = SELF_ASSESSED.read_text(encoding="utf-8")
+        for old, new in (("Publication eligible", "Publication blocked"),
+                         ("Publication eligible", "Publication not assessed"),
+                         ("Quality assessment: SELF-ASSESSED", "Quality assessment: FAILED"),
+                         ("Reported execution: completed", "Reported execution: failed"),
+                         ("Reported evaluation verdict: PASS", "Reported evaluation verdict: FAIL")):
+            with self.subTest(new=new):
+                entry = self.parse(report.replace(old, new))
+                self.assertEqual(entry["evaluation_source"], "self-assessed")
+                self.assertNotEqual(entry["verdict"], "PASS")
+
+    def test_explicit_source_is_read_from_each_report_summary_layout(self):
+        for fixture, heading in ((V2, "## Evaluation Summary"),
+                                 (V3, "## Evaluation Metadata"),
+                                 (V3, "## Publication Recommendation")):
+            for source in ("ci", "self-assessed"):
+                for value in (source, f"`{source}`"):
+                    with self.subTest(fixture=fixture, heading=heading, value=value):
+                        report = fixture.read_text(encoding="utf-8").replace(
+                            heading, f"{heading}\n\n- Evaluation source: {value}")
+                        entry = self.parse(report)
+                        self.assertEqual(entry["evaluation_source"], source)
+                        self.assertEqual(entry["verdict"], "PASS")
+
+    def test_legacy_reports_do_not_infer_ci_from_environment_or_tier_status(self):
+        for fixture in (V2, V3):
+            with self.subTest(fixture=fixture):
+                self.assertIsNone(agg.parse_benchmark(fixture)["evaluation_source"])
+
+    def test_unknown_malformed_and_duplicate_sources_stay_unknown(self):
+        for lines in ("- Evaluation source: unknown", "- Evaluation source:",
+                      "- Evaluation source: ci only when approved", "- Evaluation source: `ci",
+                      "- Evaluation source: ci`", "- Evaluation source: CI",
+                      "- Evaluation source: ci\n- Evaluation source: ci",
+                      "- Evaluation source: ci\n- Evaluation source: self-assessed"):
+            with self.subTest(lines=lines):
+                report = V3.read_text(encoding="utf-8").replace(
+                    "## Evaluation Metadata", f"## Evaluation Metadata\n\n{lines}")
+                self.assertIsNone(self.parse(report)["evaluation_source"])
+
+    def test_conflicting_sources_across_summary_sections_stay_unknown(self):
+        report = SELF_ASSESSED.read_text(encoding="utf-8").replace(
+            "## Evaluation Metadata", "## Evaluation Metadata\n\n- Evaluation source: ci")
+        self.assertIsNone(self.parse(report)["evaluation_source"])
+
+    def test_body_examples_do_not_supply_or_override_source(self):
+        example = "\n## Examples\n\n## Evaluation Metadata\n\n- Evaluation source: ci\n"
+        for fixture, expected in ((V3, None), (SELF_ASSESSED, "self-assessed")):
+            with self.subTest(fixture=fixture):
+                entry = self.parse(fixture.read_text(encoding="utf-8") + example)
+                self.assertEqual(entry["evaluation_source"], expected)
+
+    def test_fenced_commented_and_quoted_fields_do_not_supply_source(self):
+        field = "- Evaluation source: ci"
+        examples = (f"```markdown\n{field}\n```", f"~~~markdown\n{field}\n~~~",
+                    f"<!--\n{field}\n-->", f"> {field}",
+                    f"Metadata <!--\n{field}\n-->", f"    {field}",
+                    f"### Example\n{field}", f"```markdown\n## Evaluation Metadata\n{field}\n```")
+        for example in examples:
+            with self.subTest(example=example):
+                report = V3.read_text(encoding="utf-8").replace(
+                    "## Evaluation Metadata", f"## Evaluation Metadata\n\n{example}")
+                self.assertIsNone(self.parse(report)["evaluation_source"])
+
+    def test_indented_heading_does_not_establish_a_summary(self):
+        for indent in ("    ", "\t"):
+            with self.subTest(indent=indent):
+                report = (f"# Skill Benchmark: sample\n\n{indent}## Evaluation Metadata\n\n"
+                          "- Evaluation source: ci\n")
+                self.assertIsNone(self.parse(report)["evaluation_source"])
 
 
 class TestV3ProvenanceFields(unittest.TestCase):

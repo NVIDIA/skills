@@ -96,6 +96,17 @@ class TestGuardBlocksRegeneration(unittest.TestCase):
         self._run()
         self.assertEqual((self.root / "benchmarks.json").read_text(), before)
 
+    def test_losing_recorded_evaluation_source_blocks_regeneration(self):
+        original = self.report.read_text()
+        self.report.write_text(original.replace(
+            "## Evaluation Metadata", "## Evaluation Metadata\n\n- Evaluation source: ci"))
+        self.assertEqual(self._run(), 0)
+        self.assertEqual(self._written()["evaluation_source"], "ci")
+        before = (self.root / "benchmarks.json").read_text()
+        self.report.write_text(original)
+        self.assertEqual(self._run(), 1)
+        self.assertEqual((self.root / "benchmarks.json").read_text(), before)
+
     def test_escape_hatch_allows_a_deliberate_format_change(self):
         """An upstream format change must be landable without editing code."""
         self._write(environment=False)
