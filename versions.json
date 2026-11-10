@@ -431,9 +431,9 @@
     {
       "name": "cuopt-numerical-optimization-api",
       "path": "skills/cuopt-numerical-optimization-api",
-      "content_digest": "sha256:cffb0fd68285d196408af6580d27151005c4f497ee5b9b207e3ea91b67db50db",
-      "last_commit": "e0cd22d572493dd3061708406a9ba53fddaa7087",
-      "last_modified": "2026-08-07"
+      "content_digest": "sha256:fe2da3b0c9aa036daf9d0ede478dcc14ce764c5eccd417fa3a4de73a8f7b330f",
+      "last_commit": "47d179c3e5dfc677974650533be734c71ef9115e",
+      "last_modified": "2026-11-10"
     },
     {
       "name": "cuopt-numerical-optimization-formulation",
@@ -1061,16 +1061,16 @@
     {
       "name": "fastgen-configure",
       "path": "skills/fastgen-configure",
-      "content_digest": "sha256:ed44454ff24fbcf48588a9ecf75b6d5ea1a28372b1e3affe169308d15b006695",
-      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
-      "last_modified": "2026-11-09"
+      "content_digest": "sha256:9224b3d3a4674f13a3b407b4582e4b8cb51cdfbcdb652261efa349de720fef75",
+      "last_commit": "47d179c3e5dfc677974650533be734c71ef9115e",
+      "last_modified": "2026-11-10"
     },
     {
       "name": "fastgen-dataset",
       "path": "skills/fastgen-dataset",
-      "content_digest": "sha256:d038737277ab8db5ad11fbc0872e771abbb40faa35e84932ddba070f61a35895",
-      "last_commit": "4cafd6032a5c75730be1a94155ccf34b135f2931",
-      "last_modified": "2026-11-09"
+      "content_digest": "sha256:c7dedd5db5b8748756a2a13f03afaa2caab9f34abaaf7c35d48db7db756938e8",
+      "last_commit": "47d179c3e5dfc677974650533be734c71ef9115e",
+      "last_modified": "2026-11-10"
     },
     {
       "name": "fastgen-develop",
@@ -2203,7 +2203,7 @@
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
       "content_digest": "sha256:63a07ba8ba0d12c9cb85c8a5dc4dabd52ec4fc56c7cb933a340aee85cb5724a2",
-      "last_commit": "5120ecb61e8bb246a16b3eab10366e4a1390b44b",
+      "last_commit": "7c3ee2281bfe47e12e31536355c1234060721e44",
       "last_modified": "2026-11-10"
     },
     {
