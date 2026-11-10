@@ -379,6 +379,81 @@ class ProductResolutionTests(unittest.TestCase):
             "    catalog_dir: example-skill", "    catalog_dir: example-skill\n    name: Run:ai")
         self.assertEqual(vso.parse_component(text)["name"], "DAQIRI")
 
+    def test_empty_product_primary_fails_even_when_the_name_resolves(self):
+        # The generator loads an empty key as null and rejects it; it does not
+        # fall back to the name. The check must not pass what the generator fails.
+        text = component("Run:ai").replace("repo:", "product_primary:\nrepo:")
+        problems = self.check(text)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("present but empty", problems[0])
+
+    def test_trailing_comment_is_not_part_of_product_primary(self):
+        self.assertEqual(self.check(component("FastGen", "Run:ai # approved mapping")), [])
+
+    def test_trailing_comment_is_not_part_of_the_name(self):
+        self.assertEqual(self.check(component("Run:ai  # display name")), [])
+
+    def test_invalid_yaml_fails(self):
+        problems = self.check(component("Run:ai").replace("repo:", "  bad: [\nrepo:"))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("not valid YAML", problems[0])
+
+
+def load_generator():
+    """generate-skill-metadata.py, imported by path (its name has hyphens)."""
+    import importlib.util
+    path = Path(__file__).resolve().parents[1] / "marketplace" / "generate-skill-metadata.py"
+    spec = importlib.util.spec_from_file_location("generate_skill_metadata", path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module  # dataclasses look the module up while executing it
+    spec.loader.exec_module(module)
+    return module
+
+
+class GeneratorParityTests(unittest.TestCase):
+    """The check must accept exactly the files the generator can resolve."""
+
+    CASES = [
+        component("Run:ai"),
+        component("ALCHEMI Toolkit"),
+        component("DAQIRI"),
+        component('"Run:ai"'),
+        component("Run:ai  # display name"),
+        component("FastGen", "Research Contributions"),
+        component("FastGen", "'Research Contributions'"),
+        component("FastGen", "Run:ai # approved mapping"),
+        component("FastGen", "Research"),
+        component("Run:ai", "Research"),
+        component("Run:ai").replace("repo:", "product_primary:\nrepo:"),
+        component("Run:ai").replace("repo:", "product_primary: ''\nrepo:"),
+        component("Run:ai").replace("repo:", "product_primary: 7\nrepo:"),
+        component("X").replace("name: X\n", ""),
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            cls.gen = load_generator()
+        except ImportError as exc:  # jsonschema absent outside the metadata workflow
+            raise unittest.SkipTest(f"generator dependencies unavailable: {exc}")
+
+    def generator_resolves(self, text):
+        import yaml
+        data = yaml.safe_load(text)
+        comp = {"component_name": data.get("name"), "components_file": "fixture.yml"}
+        if "product_primary" in data:
+            comp["product_primary"] = data["product_primary"]
+        try:
+            return self.gen.derive_product_from_component(comp, ENUM) is not None
+        except self.gen.GeneratorError:
+            return False
+
+    def test_check_agrees_with_generator(self):
+        for text in self.CASES:
+            with self.subTest(text=text.splitlines()[1:3]):
+                check_ok = vso.check_product(vso.parse_component(text), ENUM) == []
+                self.assertEqual(check_ok, self.generator_resolves(text))
+
 
 class ProductScopeTests(unittest.TestCase):
     def test_new_component_is_in_scope(self):
@@ -394,6 +469,15 @@ class ProductScopeTests(unittest.TestCase):
 
     def test_changed_product_primary_is_in_scope(self):
         self.assertTrue(vso.product_in_scope(component("FastGen"), component("FastGen", "Research Contributions")))
+
+    def test_adding_an_empty_product_primary_is_in_scope(self):
+        head = component("Run:ai").replace("repo:", "product_primary:\nrepo:")
+        self.assertTrue(vso.product_in_scope(component("Run:ai"), head))
+
+    def test_editing_only_a_comment_is_out_of_scope(self):
+        base = component("FastGen", "Research Contributions")
+        head = component("FastGen", "Research Contributions # see #839")
+        self.assertFalse(vso.product_in_scope(base, head))
 
     def test_real_schema_parses(self):
         schema = Path(__file__).resolve().parents[1] / "marketplace" / "metadata.schema.json"

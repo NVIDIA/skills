@@ -47,6 +47,16 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # The product check reads name/product_primary with the same YAML loader
+      # as the metadata generator, so the two cannot disagree.
+      - name: Install PyYAML
+        run: pip install pyyaml
+
       - name: Verify declared source skills
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
