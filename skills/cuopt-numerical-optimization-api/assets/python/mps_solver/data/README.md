@@ -78,5 +78,5 @@ from cuopt.linear_programming.problem import Problem
 
 problem = Problem("MyProblem")
 # ... define variables, constraints, objective ...
-problem.writeMPS("output.mps")
+problem.write("output.mps")
 ```

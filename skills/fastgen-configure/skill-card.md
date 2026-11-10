@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and ML researchers use this skill whenever a FastGen run needs a new or modified experiment config file or non-trivial overrides: inferring the task, choosing a method, composing presets, checking supervision and teacher/student alignment, and reviewing the resolved config with a dry run before handing off to training. <br>
+Developers and ML engineers use this skill to create or modify NVIDIA FastGen experiment configs and non-trivial overrides, choosing a fine-tuning or distillation method, aligning data, network and loss requirements, and validating the resolved config with a dry run before handing execution to training. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -29,15 +29,15 @@ Mitigation: Review and scan skill before deployment. <br>
 - [FastGen configuration README](https://github.com/NVlabs/FastGen/blob/main/fastgen/configs/README.md) <br>
 - [FastGen method index](https://github.com/NVlabs/FastGen/blob/main/fastgen/methods/README.md) <br>
 - [FastGen supported networks](https://github.com/NVlabs/FastGen/blob/main/fastgen/networks/README.md#supported-networks) <br>
-- [FastGen KD loader format](https://github.com/NVlabs/FastGen/blob/main/fastgen/datasets/README.md#knowledge-distillation-loaders) <br>
+- [FastGen knowledge distillation loaders](https://github.com/NVlabs/FastGen/blob/main/fastgen/datasets/README.md#knowledge-distillation-loaders) <br>
 - [FastGen documentation](https://docs.nvidia.com/fastgen) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Configuration instructions, Shell commands, Analysis] <br>
-**Output Format:** [Markdown with inline Python and bash code blocks, plus edited or new FastGen config files] <br>
+**Output Type(s):** [Files, Configuration instructions, Shell commands] <br>
+**Output Format:** [Python config files plus Markdown report with inline bash commands] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [None] <br>
+**Other Properties Related to Output:** [Reports config path, departures from the nearest recipe, method and data rationale, and validation extent (e.g. --dryrun)] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -46,7 +46,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (4 positive), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`); each task was also attempted without the skill as a baseline. <br>
+4 evaluation tasks (4 positive), 1 attempt per task, each attempt run in its own isolated sandbox pod (`k8s-sandbox`), compared against a no-skill baseline. Evaluator version `1.6.9`, evaluation date 2026-11-10. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -70,18 +70,20 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 > ✅ **Overall verdict: PASS — Recommended for publication**
 
-**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
 
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.4% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.3% — baseline ran, but no comparable score was available; uplift unavailable | 89.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 75.0% → 100.0% (+25.0 points) | 100.0% → 87.5% (-12.5 points) |
-| Correctness | 100.0% → 100.0% (±0.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 83.8% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 100.0% → 87.5% (-12.5 points) | 87.5% → 100.0% (+12.5 points) |
-| Efficiency | 86.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 81.3% — baseline ran, but no comparable score was available; uplift unavailable | 86.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 100.0% → 97.5% (-2.5 points) | 97.9% → 85.4% (-12.5 points) |
+| Efficiency | 77.7% — baseline ran, but no comparable score was available; uplift unavailable | 87.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -96,20 +98,12 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 94.3% → 93.6% (-0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 95.2% → 94.3% (-0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 89.0% → 89.6% (+0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
-
-### Tier Status
-
-| Tier | Purpose | Status | Evidence |
-|---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+| codex | Efficiency | Token-only comparison | 88.5% → 87.9% (-0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Skill Version(s): <br>
-fbf1ad8 (source: git SHA, committed 2026-11-05) <br>
+d79498f (source: git SHA, committed 2026-11-09) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

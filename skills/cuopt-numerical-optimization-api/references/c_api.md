@@ -131,11 +131,4 @@ See [assets/c/README.md](../assets/c/README.md) for the conda-env include/librar
 
 ## Reference Models
 
-| Model | Type | Location |
-|-------|------|----------|
-| Simple LP | LP | [assets/c/lp_basic/](../assets/c/lp_basic/) |
-| Dual values | LP | [assets/c/lp_duals/](../assets/c/lp_duals/) |
-| PDLP warmstart | LP | [assets/c/lp_warmstart/](../assets/c/lp_warmstart/) |
-| Integer variable | MILP | [assets/c/milp_basic/](../assets/c/milp_basic/) |
-| Production planning | MILP | [assets/c/milp_production_planning/](../assets/c/milp_production_planning/) |
-| MPS file solver | LP/MILP | [assets/c/mps_solver/](../assets/c/mps_solver/) |
+See [assets/c/README.md](../assets/c/README.md).

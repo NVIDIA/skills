@@ -177,12 +177,9 @@ objective = (
 )
 ```
 
-## Critical Reminders
+## Reminders
 
-1. **MINIMIZE only** - solver rejects MAXIMIZE for QP
-2. **Convexity** - Q should be positive semi-definite
-3. **Beta status** - API may change in future versions
-4. **Status checking** - use PascalCase: `"Optimal"` not `"OPTIMAL"`
+See the QP rules in [SKILL.md](../SKILL.md#qp-rules-all-interfaces); status strings are PascalCase (`"Optimal"`).
 
 ---
 

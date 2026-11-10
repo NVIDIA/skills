@@ -28,10 +28,10 @@ does not implement, use [fastgen-add-method](https://github.com/NVlabs/FastGen/b
    distillation, including data-free training and the
    [causal pipeline](https://github.com/NVlabs/FastGen/blob/main/fastgen/methods/README.md#causal-distillation-pipeline). Check the
    method's prerequisite checkpoints and supervision in its category README.
-3. **Compose.** Start from the nearest compatible experiment config. If none fits the
-   task, architecture and objective, compose the method config's `create_config()` with
-   compatible presets. Copy network, data, optimizer and callback presets from
-   `fastgen/configs/*.py` and derive loader geometry from the network where needed
+3. **Compose.** Start with hyperparameters from the experiment config closest in network
+   architecture, task and method. If none is compatible, compose the method config's
+   `create_config()` with compatible presets. Copy network, data, optimizer and callback
+   presets from `fastgen/configs/*.py` and derive loader geometry from the network where needed
    (`model_pixel_shape`). Change only justified values; do not carry precision, guidance,
    schedule, learning-rate or batch settings over from an unrelated recipe.
 4. **Supervision.** Decide data needs from the active losses, not the method name: SFT

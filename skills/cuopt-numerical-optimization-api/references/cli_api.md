@@ -34,7 +34,7 @@ If you're building a model from data (rather than solving a file you already hav
 
 When a file is genuinely the right artifact, still generate it programmatically rather than by hand:
 
-- **From cuOpt's Python API** — build the model, then export it with `model.writeMPS("problem.mps")` (emits a valid MPS file, including the quadratic objective for QP) and solve with `cuopt_cli problem.mps`.
+- **From cuOpt's Python API** — build the model, then export it with `model.write("problem.mps")` (the format follows the extension; `.mps` emits a valid MPS file, including the quadratic objective for QP) and solve with `cuopt_cli problem.mps`.
 - **From another modeling tool** — most LP/MILP modeling libraries and solvers can export standard MPS or LP files; pass the exported file straight to `cuopt_cli`.
 
 If you must read or write these formats by hand anyway, work from the format's full specification (and the cuOpt repo docs at `docs/cuopt/source/cuopt-cli/` for cuOpt-specific conventions such as the quadratic-objective encoding) — not from an example alone.
@@ -63,8 +63,4 @@ Quadratic objectives are **MINIMIZE only** (for maximization, negate the objecti
 
 ## Reference Models
 
-| Model | Type | Location |
-|-------|------|----------|
-| Minimal LP | LP | [assets/cli/lp_simple/](../assets/cli/lp_simple/) |
-| Production planning | LP | [assets/cli/lp_production/](../assets/cli/lp_production/) |
-| Facility location | MILP | [assets/cli/milp_facility/](../assets/cli/milp_facility/) |
+See [assets/cli/README.md](../assets/cli/README.md).
