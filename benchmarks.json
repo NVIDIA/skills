@@ -1247,11 +1247,11 @@
     },
     {
       "skill": "cuopt-numerical-optimization-api",
-      "evaluation_date": "2026-08-05",
+      "evaluation_date": "2026-11-10",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.0.0",
+      "evaluator_version": "1.6.9",
       "dataset_digest": "sha256:f385c69ce235035e8e5cbfd91a8d3245b75473f0bf0d694451e988e439f6e9e1",
-      "validation_status": null,
+      "validation_status": "passed",
       "tasks": 9,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
@@ -1263,7 +1263,7 @@
       "catalog_dir": "cuopt-numerical-optimization-api",
       "component": "cuOpt",
       "has_results": true,
-      "average_uplift_pct": 35.2
+      "average_uplift_pct": 10.33
     },
     {
       "skill": "cuopt-numerical-optimization-formulation",
@@ -3020,9 +3020,9 @@
     },
     {
       "skill": "fastgen-configure",
-      "evaluation_date": "2026-11-05",
+      "evaluation_date": "2026-11-10",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.8",
+      "evaluator_version": "1.6.9",
       "dataset_digest": "sha256:fa41f7ff4c9b6b32daf795dd8c8782eeb54aa4fd31fccc7bfc44ee93f02ffb17",
       "validation_status": "passed",
       "tasks": 4,
@@ -3036,13 +3036,13 @@
       "catalog_dir": "fastgen-configure",
       "component": "FastGen",
       "has_results": true,
-      "average_uplift_pct": 2.92
+      "average_uplift_pct": -0.42
     },
     {
       "skill": "fastgen-dataset",
-      "evaluation_date": "2026-11-05",
+      "evaluation_date": "2026-11-10",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.8",
+      "evaluator_version": "1.6.9",
       "dataset_digest": "sha256:4bd6ff59531d5a6836bb88feb12342a119a19b5c43b048491a733db2ef7f31ad",
       "validation_status": "passed",
       "tasks": 4,
@@ -3056,7 +3056,7 @@
       "catalog_dir": "fastgen-dataset",
       "component": "FastGen",
       "has_results": true,
-      "average_uplift_pct": 4.27
+      "average_uplift_pct": 6.15
     },
     {
       "skill": "fastgen-develop",
@@ -14464,8 +14464,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 11.0
+      "score_pct": 100.0,
+      "uplift_pct": 13.3
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -14473,8 +14473,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 9.0
+      "score_pct": 95.6,
+      "uplift_pct": 4.5
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -14483,7 +14483,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 72.0
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -14491,8 +14491,8 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
-      "uplift_pct": 48.0
+      "score_pct": 92.8,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -14500,8 +14500,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 89.0,
-      "uplift_pct": 20.0
+      "score_pct": 91.4,
+      "uplift_pct": 26.3
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -14509,8 +14509,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 81.0,
-      "uplift_pct": 12.0
+      "score_pct": 74.1,
+      "uplift_pct": 17.9
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -14518,8 +14518,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 90.0
+      "score_pct": 84.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-api",
@@ -14527,8 +14527,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 90.0
+      "score_pct": 70.7,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "cuopt-numerical-optimization-formulation",
@@ -21764,7 +21764,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 5.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "fastgen-configure",
@@ -21772,7 +21772,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.8,
+      "score_pct": 81.3,
       "uplift_pct": null
     },
     {
@@ -21781,7 +21781,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.8,
+      "score_pct": 86.3,
       "uplift_pct": null
     },
     {
@@ -21790,25 +21790,25 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.5,
+      "score_pct": 97.5,
+      "uplift_pct": -2.5
+    },
+    {
+      "catalog_dir": "fastgen-configure",
+      "component": "FastGen",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.4,
       "uplift_pct": -12.5
     },
     {
       "catalog_dir": "fastgen-configure",
       "component": "FastGen",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 12.5
-    },
-    {
-      "catalog_dir": "fastgen-configure",
-      "component": "FastGen",
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 86.0,
+      "score_pct": 77.7,
       "uplift_pct": null
     },
     {
@@ -21817,7 +21817,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.8,
+      "score_pct": 87.7,
       "uplift_pct": null
     },
     {
@@ -21827,7 +21827,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 25.0
     },
     {
       "catalog_dir": "fastgen-dataset",
@@ -21854,7 +21854,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 5.0
     },
     {
       "catalog_dir": "fastgen-dataset",
@@ -21862,7 +21862,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 68.8,
+      "score_pct": 77.5,
       "uplift_pct": null
     },
     {
@@ -21871,7 +21871,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 68.3,
+      "score_pct": 66.3,
       "uplift_pct": null
     },
     {
@@ -21881,7 +21881,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 15.6
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "fastgen-dataset",
@@ -21889,8 +21889,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 96.9,
+      "uplift_pct": -3.1
     },
     {
       "catalog_dir": "fastgen-dataset",
@@ -21898,7 +21898,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 89.5,
+      "score_pct": 88.1,
       "uplift_pct": null
     },
     {
@@ -21907,7 +21907,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.3,
+      "score_pct": 82.1,
       "uplift_pct": null
     },
     {
