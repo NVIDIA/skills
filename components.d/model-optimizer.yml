@@ -1,16 +1,24 @@
 name: Model Optimizer
 repo: NVIDIA/Model-Optimizer
-description: Quantize, serve, and evaluate models, search quantization recipes, and train speculative decoding draft models with NVIDIA Model Optimizer.
+description: Quantize, distill, serve, evaluate, monitor, and compare models with NVIDIA Model Optimizer.
 skills:
-  - path: plugins/modelopt/skills/ptq/
-    catalog_dir: ptq
-  - path: plugins/modelopt/skills/deployment/
-    catalog_dir: deployment
-  - path: plugins/modelopt/skills/evaluation/
-    catalog_dir: evaluation
-  - path: plugins/modelopt/skills/compare-results/
-    catalog_dir: compare-results
-  - path: plugins/modelopt/skills/quant-recipe-search/
-    catalog_dir: quant-recipe-search
-  - path: plugins/modelopt/skills/speculative-decoding/
-    catalog_dir: speculative-decoding
+  - path: skills/modelopt-quant-recipe-search/
+    catalog_dir: modelopt-quant-recipe-search
+  - path: skills/modelopt-speculative-decoding/
+    catalog_dir: modelopt-speculative-decoding
+  - path: skills/modelopt-accessing-mlflow/
+    catalog_dir: modelopt-accessing-mlflow
+  - path: skills/modelopt-launching-evals/
+    catalog_dir: modelopt-launching-evals
+  - path: skills/modelopt-compare-results/
+    catalog_dir: modelopt-compare-results
+  - path: skills/modelopt-deployment/
+    catalog_dir: modelopt-deployment
+  - path: skills/modelopt-evaluation/
+    catalog_dir: modelopt-evaluation
+  - path: skills/modelopt-monitor/
+    catalog_dir: modelopt-monitor
+  - path: skills/modelopt-ptq/
+    catalog_dir: modelopt-ptq
+  - path: skills/modelopt-qad/
+    catalog_dir: modelopt-qad
