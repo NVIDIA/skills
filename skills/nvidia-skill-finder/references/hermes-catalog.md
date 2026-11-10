@@ -17,8 +17,15 @@ curl -sL https://raw.githubusercontent.com/NVIDIA/skills/main/.github/scripts/ma
   | jq -r '.skills[] | "\(.name): \(.description[0:110])"'
 ```
 
-If `jq` is unavailable, pipe the same URL through
-`python3 -c 'import json,sys; [print(f"{s[\"name\"]}: {s[\"description\"][:110]}") for s in json.load(sys.stdin)["skills"]]'`.
+If `jq` is unavailable, use this instead. Do not reach for `python3 -c`: Hermes
+blocks inline interpreter scripts as "script execution via -e/-c flag", and the
+nested quoting such a one-liner needs is a syntax error on Python 3.11 and
+older.
+
+```bash
+curl -sL https://raw.githubusercontent.com/NVIDIA/skills/main/.github/scripts/marketplace/metadata.json \
+  | python3 -m json.tool | grep -E '"(name|description)":' | cut -c1-130
+```
 
 Read the list and pick the best match on the descriptions. Prefer this over
 searching. Searching looks cheaper but is not: it matches the query as a plain
