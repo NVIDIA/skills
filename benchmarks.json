@@ -6265,9 +6265,9 @@
     },
     {
       "skill": "nvidia-skill-finder",
-      "evaluation_date": "2026-11-04",
+      "evaluation_date": "2026-11-10",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.6",
+      "evaluator_version": "1.6.9",
       "dataset_digest": "sha256:75b2b97f4c0057ea5bbadcfcd92d5561919ce56e7f03a93f629cb8bdd8f01281",
       "validation_status": "passed",
       "tasks": 18,
@@ -6281,7 +6281,7 @@
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "has_results": true,
-      "average_uplift_pct": 21.57
+      "average_uplift_pct": 24.28
     },
     {
       "skill": "nvshmem-collect-performance-data",
@@ -35417,7 +35417,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 97.2,
-      "uplift_pct": -2.8
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35426,7 +35426,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 91.7,
-      "uplift_pct": -5.5
+      "uplift_pct": -8.3
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35443,8 +35443,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.1,
-      "uplift_pct": 13.3
+      "score_pct": 96.7,
+      "uplift_pct": 22.3
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35470,8 +35470,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.8,
-      "uplift_pct": 56.7
+      "score_pct": 95.8,
+      "uplift_pct": 59.4
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35479,8 +35479,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.2,
-      "uplift_pct": 35.4
+      "score_pct": 98.6,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35488,7 +35488,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 79.6,
+      "score_pct": 81.3,
       "uplift_pct": null
     },
     {
@@ -35497,7 +35497,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 64.7,
+      "score_pct": 64.4,
       "uplift_pct": null
     },
     {
