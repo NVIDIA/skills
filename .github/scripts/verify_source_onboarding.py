@@ -68,6 +68,8 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+import yaml  # PyYAML, the loader generate-skill-metadata.py uses.
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import aggregate_benchmarks as ab  # noqa: E402
@@ -91,8 +93,6 @@ RE_REF = re.compile(r"^ref:\s*(\S+)\s*$")
 RE_PATH = re.compile(r"^-?\s*path:\s*(\S+)\s*$")
 # Top-level scalars only: matched against the unindented line, so a skill
 # entry's nested keys can never be read as the component's name or product.
-RE_NAME = re.compile(r"^name:\s*(.+?)\s*$")
-RE_PRODUCT = re.compile(r"^product_primary:\s*(.+?)\s*$")
 
 
 @dataclass(frozen=True)
@@ -116,10 +116,10 @@ class Finding:
 def parse_component(text: str) -> dict:
     """Read repo, ref and declared skill paths from a component file.
 
-    Deliberately line-based rather than PyYAML: every other script in this
-    directory parses these files the same way, and CI carries no third-party
-    Python dependencies. The schema is flat and fixed (components.d/README.md),
-    so a real parser buys nothing here.
+    Repo, ref and paths are read line by line, the way the sync scripts read
+    them, so this check fetches exactly what the sync will fetch. ``name`` and
+    ``product_primary`` come from ``product_fields``, which uses the metadata
+    generator's YAML loader, because they decide what the generator does.
 
     Trailing slashes are stripped so a path compares equal however it was
     written — ``skills/write-dag/`` and ``skills/write-dag`` are the same
@@ -128,20 +128,8 @@ def parse_component(text: str) -> dict:
     """
     repo = None
     ref = None
-    name = None
-    product = None
     paths: list[str] = []
     for line in text.splitlines():
-        if name is None:
-            m = RE_NAME.match(line)
-            if m:
-                name = _unquote(m.group(1))
-                continue
-        if product is None:
-            m = RE_PRODUCT.match(line)
-            if m:
-                product = _unquote(m.group(1))
-                continue
         stripped = line.strip()
         if repo is None:
             m = RE_REPO.match(stripped)
@@ -160,14 +148,31 @@ def parse_component(text: str) -> dict:
     # components (AIQ, VSS) track develop instead; verifying those against
     # main compares a tree the sync will never fetch.
     return {"repo": repo, "ref": ref or "main", "paths": paths,
-            "name": name, "product_primary": product}
+            **product_fields(text)}
 
 
-def _unquote(value: str) -> str:
-    """Drop one pair of matching YAML quotes, as the generator's YAML load would."""
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
-        return value[1:-1]
-    return value
+def product_fields(text: str) -> dict:
+    """``name`` and ``product_primary`` exactly as the metadata generator sees them.
+
+    Unlike repo/ref/paths, these feed a decision the generator makes, so they
+    are read with the generator's own loader rather than imitated line by line.
+    YAML has too many edge cases to mirror by hand: a trailing ``# comment`` is
+    not part of the value, and an empty ``product_primary:`` is *present* with
+    a null value, which the generator rejects instead of falling back to the
+    name. ``has_product_primary`` keeps that present-but-empty case distinct
+    from an absent key.
+    """
+    try:
+        data = yaml.safe_load(text)
+    except yaml.YAMLError as exc:
+        return {"name": None, "product_primary": None,
+                "has_product_primary": False, "yaml_error": str(exc)}
+    if not isinstance(data, dict):
+        data = {}
+    return {"name": data.get("name"),
+            "product_primary": data.get("product_primary"),
+            "has_product_primary": "product_primary" in data,
+            "yaml_error": None}
 
 
 def added_paths(base_text: str | None, head_text: str) -> set[str]:
@@ -205,7 +210,8 @@ def product_in_scope(base_text: str | None, head_text: str) -> bool:
     if base_text is None:
         return True
     base, head = parse_component(base_text), parse_component(head_text)
-    return (base["name"], base["product_primary"]) != (head["name"], head["product_primary"])
+    keys = ("name", "product_primary", "has_product_primary")
+    return any(base[k] != head[k] for k in keys)
 
 
 def check_product(component: dict, enum: list[str]) -> list[str]:
@@ -215,17 +221,26 @@ def check_product(component: dict, enum: list[str]) -> list[str]:
     an explicit ``product_primary`` must be an enum value; otherwise the
     ``name`` must match one exactly.
     """
-    declared = component.get("product_primary")
-    if declared is not None:
-        if declared in enum:
+    if component.get("yaml_error"):
+        return [f"component file is not valid YAML: {component['yaml_error']}"]
+    if component.get("has_product_primary"):
+        declared = component.get("product_primary")
+        if isinstance(declared, str) and declared in enum:
             return []
+        if declared is None:
+            return [
+                "product_primary is present but empty. The metadata generator "
+                "rejects an empty value rather than falling back to the name. "
+                "Set it to a value in the product.primary enum "
+                f"({SCHEMA_PATH}), or remove the key."
+            ]
         return [
             f"product_primary {declared!r} is not a value in the product.primary "
             f"enum ({SCHEMA_PATH}). Use an existing value, or add {declared!r} "
             "to the enum in this PR."
         ]
     name = component.get("name")
-    if not name:
+    if not isinstance(name, str) or not name:
         return ["no name: declared"]
     if name in enum:
         return []
