@@ -32,8 +32,9 @@ fetches the source at the component's ``ref`` and checks that:
     signed digest;
   * ``SKILL.md``, ``skill.oms.sig``, ``skill-card.md`` and an eval dataset
     exist, applying the same filename rules the hourly sync applies;
-  * ``BENCHMARK.md`` reports an overall verdict of PASS backed by real
-    measurements.
+  * ``BENCHMARK.md`` reports PASS backed by real measurements. Self-assessed
+    reports also require publication eligibility and completed execution
+    without reported errors; the shared benchmark reader checks that format.
 
 Blocking scope: only paths the PR *adds*. Around 30 catalog skills already
 carry signature drift (tracked in #216 / #357); failing a PR for drift its
