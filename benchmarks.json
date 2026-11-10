@@ -40,6 +40,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "accelerated-computing-cudf",
       "component": "cuDF",
       "has_results": true,
@@ -60,6 +61,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "ambient-healthcare-agent-with-nemotron-voice-agent",
       "component": "Digital Health",
       "has_results": true,
@@ -80,6 +82,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "amc-run-rtsp-calibration",
       "component": "DeepStream",
       "has_results": true,
@@ -100,6 +103,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "amc-run-sample-calibration",
       "component": "DeepStream",
       "has_results": true,
@@ -120,6 +124,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "amc-run-video-calibration",
       "component": "DeepStream",
       "has_results": true,
@@ -140,6 +145,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "amc-setup-calibration-stack",
       "component": "DeepStream",
       "has_results": true,
@@ -160,6 +166,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-boltz2-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -180,6 +187,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-codonfm-embed",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -200,6 +208,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-codonfm-finetune",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -220,6 +229,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-codonfm-score",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -240,6 +250,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-codonfm-setup",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -260,6 +271,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-complexa-evaluate-pdbs",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -280,6 +292,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-complexa-sweep",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -300,6 +313,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-complexa-target",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -320,6 +334,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-cuequivariance",
       "component": "BioNeMo Libraries",
       "has_results": true,
@@ -340,6 +355,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-cuequivariance-jax",
       "component": "BioNeMo Libraries",
       "has_results": true,
@@ -360,6 +376,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-cuequivariance-torch",
       "component": "BioNeMo Libraries",
       "has_results": true,
@@ -380,6 +397,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-diffdock-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -400,6 +418,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-drug-discovery-pipeline",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -420,6 +439,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-evo2-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -440,6 +460,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-genmol-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -460,6 +481,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-genomics-workflow-acceleration",
       "component": "BioNeMo Libraries",
       "has_results": true,
@@ -480,6 +502,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-add-cmim-pretrain",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -500,6 +523,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-continue-pretrain",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -520,6 +544,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-embed",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -540,6 +565,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-finetune",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -560,6 +586,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-infer",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -580,6 +607,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-monitor",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -600,6 +628,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-pretrain-scratch",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -620,6 +649,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-kermt-setup",
       "component": "BioNeMo Open Models",
       "has_results": true,
@@ -640,6 +670,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-molmim-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -660,6 +691,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-msa-search-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -680,6 +712,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-msa-structure-prediction-pipeline",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -700,6 +733,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-nvmolkit-usage",
       "component": "BioNeMo Libraries",
       "has_results": true,
@@ -720,6 +754,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-openfold2-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -740,6 +775,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-openfold3-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -760,6 +796,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-parabricks",
       "component": "BioNeMo Libraries",
       "has_results": true,
@@ -780,6 +817,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-proteinmpnn-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -800,6 +838,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-rfd4-proteina-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -820,6 +859,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "bionemo-rfdiffusion-nim",
       "component": "BioNeMo NIMs",
       "has_results": true,
@@ -840,6 +880,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-anomalygen",
       "component": "CDF AnomalyGen",
       "has_results": true,
@@ -860,6 +901,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-augmentation",
       "component": "CDF Augmentation",
       "has_results": true,
@@ -880,6 +922,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-auto-labeling",
       "component": "CDF Auto-Labeling",
       "has_results": true,
@@ -900,6 +943,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-autonomous-vehicle-dataset-generation",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -920,6 +964,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-curation-and-retrieval",
       "component": "CDF Curation and Retrieval",
       "has_results": true,
@@ -940,6 +985,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-defect-image-generation",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -960,6 +1006,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-event-video-generation",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -980,6 +1027,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-image-attribute-augmentation",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -1000,6 +1048,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-orchestration-preflight",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -1020,6 +1069,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-orchestration-setup",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -1040,6 +1090,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-orchestration-write-dag",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -1060,6 +1111,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-simulation",
       "component": "CDF Simulation",
       "has_results": true,
@@ -1080,6 +1132,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cdf-video-data-augmentation",
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
@@ -1100,6 +1153,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "compute-sanitizer-diagnose-cuda-bugs",
       "component": "Nsight",
       "has_results": true,
@@ -1120,6 +1174,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "has_results": true,
@@ -1140,6 +1195,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cudaq-importing",
       "component": "CUDA-Q",
       "has_results": true,
@@ -1160,6 +1216,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cudf-query-engine-builder",
       "component": "cuDF",
       "has_results": true,
@@ -1180,6 +1237,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuml",
       "component": "cuML",
       "has_results": true,
@@ -1200,6 +1258,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuopt-developer",
       "component": "cuOpt",
       "has_results": true,
@@ -1220,6 +1279,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuopt-install",
       "component": "cuOpt",
       "has_results": true,
@@ -1240,6 +1300,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "has_results": true,
@@ -1260,6 +1321,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuopt-numerical-optimization-api",
       "component": "cuOpt",
       "has_results": true,
@@ -1280,6 +1342,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuopt-numerical-optimization-formulation",
       "component": "cuOpt",
       "has_results": true,
@@ -1300,6 +1363,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuopt-routing-api-python",
       "component": "cuOpt",
       "has_results": true,
@@ -1320,6 +1384,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "cuopt-server-api-python",
       "component": "cuOpt",
       "has_results": true,
@@ -1340,6 +1405,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "dali-dynamic-mode",
       "component": "DALI",
       "has_results": true,
@@ -1360,6 +1426,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "data-designer",
       "component": "NeMo Data Designer",
       "has_results": true,
@@ -1380,6 +1447,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "deepstream-dev",
       "component": "DeepStream",
       "has_results": true,
@@ -1397,6 +1465,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "deepstream-generate-pipeline",
       "component": "DeepStream",
       "has_results": false,
@@ -1417,6 +1486,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "deepstream-import-vision-model",
       "component": "DeepStream",
       "has_results": true,
@@ -1437,6 +1507,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "deepstream-profile-pipeline",
       "component": "DeepStream",
       "has_results": true,
@@ -1457,6 +1528,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "deepstream-run-mv3dt",
       "component": "DeepStream",
       "has_results": true,
@@ -1477,6 +1549,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "deepstream-sop",
       "component": "DeepStream",
       "has_results": true,
@@ -1497,6 +1570,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "dgx-spark-skills",
       "component": "DGX Spark Skills",
       "has_results": true,
@@ -1517,6 +1591,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "dicom-metadata-extract",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -1537,6 +1612,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "dicom-series-preflight",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -1557,6 +1633,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "dicom-series-to-volume",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -1577,6 +1654,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "digital-health-clinical-asr-build",
       "component": "Digital Health",
       "has_results": true,
@@ -1597,6 +1675,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "digital-health-clinical-asr-eval",
       "component": "Digital Health",
       "has_results": true,
@@ -1617,6 +1696,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "digital-health-clinical-asr-finetune",
       "component": "Digital Health",
       "has_results": true,
@@ -1634,6 +1714,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "digital-health-clinical-asr-setup",
       "component": "Digital Health",
       "has_results": false,
@@ -1654,6 +1735,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-aes-gcm",
       "component": "DOCA",
       "has_results": true,
@@ -1674,6 +1756,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-argp",
       "component": "DOCA",
       "has_results": true,
@@ -1694,6 +1777,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-argus",
       "component": "DOCA",
       "has_results": true,
@@ -1714,6 +1798,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-bare-metal-deployment",
       "component": "DOCA",
       "has_results": true,
@@ -1734,6 +1819,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-bench",
       "component": "DOCA",
       "has_results": true,
@@ -1754,6 +1840,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-bf3-deployment",
       "component": "DOCA",
       "has_results": true,
@@ -1774,6 +1861,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-bf4-deployment",
       "component": "DOCA",
       "has_results": true,
@@ -1794,6 +1882,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-caps",
       "component": "DOCA",
       "has_results": true,
@@ -1814,6 +1903,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-comch",
       "component": "DOCA",
       "has_results": true,
@@ -1834,6 +1924,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-comm-channel-admin",
       "component": "DOCA",
       "has_results": true,
@@ -1854,6 +1945,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-common",
       "component": "DOCA",
       "has_results": true,
@@ -1874,6 +1966,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-compress",
       "component": "DOCA",
       "has_results": true,
@@ -1894,6 +1987,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-container-deployment",
       "component": "DOCA",
       "has_results": true,
@@ -1914,6 +2008,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-debug",
       "component": "DOCA",
       "has_results": true,
@@ -1934,6 +2029,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-devemu",
       "component": "DOCA",
       "has_results": true,
@@ -1954,6 +2050,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-dma",
       "component": "DOCA",
       "has_results": true,
@@ -1974,6 +2071,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-dms",
       "component": "DOCA",
       "has_results": true,
@@ -1994,6 +2092,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-dpa",
       "component": "DOCA",
       "has_results": true,
@@ -2014,6 +2113,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-dpdk-bridge",
       "component": "DOCA",
       "has_results": true,
@@ -2034,6 +2134,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-dts",
       "component": "DOCA",
       "has_results": true,
@@ -2054,6 +2155,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-erasure-coding",
       "component": "DOCA",
       "has_results": true,
@@ -2074,6 +2176,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-eth",
       "component": "DOCA",
       "has_results": true,
@@ -2094,6 +2197,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-firefly",
       "component": "DOCA",
       "has_results": true,
@@ -2114,6 +2218,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-flow",
       "component": "DOCA",
       "has_results": true,
@@ -2134,6 +2239,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-flow-tune",
       "component": "DOCA",
       "has_results": true,
@@ -2154,6 +2260,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-gpunetio",
       "component": "DOCA",
       "has_results": true,
@@ -2174,6 +2281,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-hardware-safety",
       "component": "DOCA",
       "has_results": true,
@@ -2194,6 +2302,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-mgmt",
       "component": "DOCA",
       "has_results": true,
@@ -2214,6 +2323,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-ngauge",
       "component": "DOCA",
       "has_results": true,
@@ -2234,6 +2344,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-pcc",
       "component": "DOCA",
       "has_results": true,
@@ -2254,6 +2365,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-pcc-counters",
       "component": "DOCA",
       "has_results": true,
@@ -2274,6 +2386,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-perftest",
       "component": "DOCA",
       "has_results": true,
@@ -2294,6 +2407,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-pipeline-language-developer-tools",
       "component": "DOCA",
       "has_results": true,
@@ -2314,6 +2428,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-programming-guide",
       "component": "DOCA",
       "has_results": true,
@@ -2334,6 +2449,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-public-knowledge-map",
       "component": "DOCA",
       "has_results": true,
@@ -2354,6 +2470,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-rdma",
       "component": "DOCA",
       "has_results": true,
@@ -2374,6 +2491,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-rmax",
       "component": "DOCA",
       "has_results": true,
@@ -2394,6 +2512,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-setup",
       "component": "DOCA",
       "has_results": true,
@@ -2414,6 +2533,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-sha",
       "component": "DOCA",
       "has_results": true,
@@ -2434,6 +2554,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-sha-offload-engine",
       "component": "DOCA",
       "has_results": true,
@@ -2454,6 +2575,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-socket-relay",
       "component": "DOCA",
       "has_results": true,
@@ -2474,6 +2596,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-spcx-cc",
       "component": "DOCA",
       "has_results": true,
@@ -2494,6 +2617,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-sta",
       "component": "DOCA",
       "has_results": true,
@@ -2514,6 +2638,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-structured-tools-contract",
       "component": "DOCA",
       "has_results": true,
@@ -2534,6 +2659,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-telemetry",
       "component": "DOCA",
       "has_results": true,
@@ -2554,6 +2680,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-telemetry-exporter",
       "component": "DOCA",
       "has_results": true,
@@ -2574,6 +2701,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-telemetry-traceback-application",
       "component": "DOCA",
       "has_results": true,
@@ -2594,6 +2722,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-telemetry-utils",
       "component": "DOCA",
       "has_results": true,
@@ -2614,6 +2743,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-upgrade",
       "component": "DOCA",
       "has_results": true,
@@ -2634,6 +2764,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-urom",
       "component": "DOCA",
       "has_results": true,
@@ -2654,6 +2785,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-urom-svc",
       "component": "DOCA",
       "has_results": true,
@@ -2674,6 +2806,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-verbs",
       "component": "DOCA",
       "has_results": true,
@@ -2694,6 +2827,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "doca-version",
       "component": "DOCA",
       "has_results": true,
@@ -2711,6 +2845,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "dynamo-interconnect-check",
       "component": "Dynamo",
       "has_results": false,
@@ -2728,6 +2863,7 @@
       "pass_threshold_pct": null,
       "verdict": "FAIL",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "dynamo-recipe-runner",
       "component": "Dynamo",
       "has_results": false,
@@ -2745,6 +2881,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "dynamo-router-starter",
       "component": "Dynamo",
       "has_results": false,
@@ -2762,6 +2899,7 @@
       "pass_threshold_pct": null,
       "verdict": "FAIL",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "dynamo-troubleshoot",
       "component": "Dynamo",
       "has_results": false,
@@ -2779,6 +2917,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "earth2studio-create-datasource",
       "component": "Earth2Studio",
       "has_results": false,
@@ -2799,6 +2938,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "earth2studio-create-diagnostic",
       "component": "Earth2Studio",
       "has_results": true,
@@ -2816,6 +2956,7 @@
       "pass_threshold_pct": null,
       "verdict": "FAIL",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "earth2studio-create-prognostic",
       "component": "Earth2Studio",
       "has_results": false,
@@ -2836,6 +2977,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "earth2studio-data-fetch",
       "component": "Earth2Studio",
       "has_results": true,
@@ -2853,6 +2995,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "earth2studio-deterministic-forecast",
       "component": "Earth2Studio",
       "has_results": false,
@@ -2873,6 +3016,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "earth2studio-discover",
       "component": "Earth2Studio",
       "has_results": true,
@@ -2893,6 +3037,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "earth2studio-install",
       "component": "Earth2Studio",
       "has_results": true,
@@ -2913,6 +3058,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "ethos-explore",
       "component": "ETHOS.md",
       "has_results": true,
@@ -2933,6 +3079,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "ethos-orchestrate",
       "component": "ETHOS.md",
       "has_results": true,
@@ -2953,6 +3100,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "ethos-write",
       "component": "ETHOS.md",
       "has_results": true,
@@ -2973,6 +3121,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-add-method",
       "component": "FastGen",
       "has_results": true,
@@ -2993,6 +3142,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-add-modality",
       "component": "FastGen",
       "has_results": true,
@@ -3013,6 +3163,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-add-network",
       "component": "FastGen",
       "has_results": true,
@@ -3033,6 +3184,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-configure",
       "component": "FastGen",
       "has_results": true,
@@ -3053,6 +3205,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-dataset",
       "component": "FastGen",
       "has_results": true,
@@ -3073,6 +3226,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-develop",
       "component": "FastGen",
       "has_results": true,
@@ -3093,6 +3247,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-inference",
       "component": "FastGen",
       "has_results": true,
@@ -3113,6 +3268,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-runtime",
       "component": "FastGen",
       "has_results": true,
@@ -3133,6 +3289,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-setup",
       "component": "FastGen",
       "has_results": true,
@@ -3153,6 +3310,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-train",
       "component": "FastGen",
       "has_results": true,
@@ -3173,6 +3331,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "fastgen-validate",
       "component": "FastGen",
       "has_results": true,
@@ -3193,6 +3352,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "foundationpose-pipeline",
       "component": "FoundationPose Perception Pipeline",
       "has_results": true,
@@ -3213,6 +3373,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "foundationpose-setup",
       "component": "FoundationPose Perception Pipeline",
       "has_results": true,
@@ -3233,6 +3394,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "g-assist-mcp-skill",
       "component": "G-Assist",
       "has_results": true,
@@ -3253,6 +3415,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-app-debug-build-run",
       "component": "HoloHub",
       "has_results": true,
@@ -3273,6 +3436,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-install-conda",
       "component": "Holoscan SDK",
       "has_results": true,
@@ -3293,6 +3457,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-install-container",
       "component": "Holoscan SDK",
       "has_results": true,
@@ -3313,6 +3478,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-install-debian",
       "component": "Holoscan SDK",
       "has_results": true,
@@ -3333,6 +3499,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-install-source",
       "component": "Holoscan SDK",
       "has_results": true,
@@ -3353,6 +3520,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-install-wheel",
       "component": "Holoscan SDK",
       "has_results": true,
@@ -3373,6 +3541,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-module-lifecycle",
       "component": "HoloHub",
       "has_results": true,
@@ -3393,6 +3562,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "holoscan-setup",
       "component": "Holoscan SDK",
       "has_results": true,
@@ -3413,6 +3583,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "hsb-app",
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
@@ -3433,6 +3604,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "hsb-flash",
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
@@ -3453,6 +3625,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "hsb-ip-create-top",
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
@@ -3473,6 +3646,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "hsb-ip-def",
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
@@ -3493,6 +3667,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "hsb-ip-packetizer",
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
@@ -3513,6 +3688,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "hsb-setup",
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
@@ -3533,6 +3709,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "hsb-test",
       "component": "Holoscan Sensor Bridge",
       "has_results": true,
@@ -3553,6 +3730,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-lerobot-viz",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3573,6 +3751,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3593,6 +3772,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-create",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3613,6 +3793,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-dataset-annotate",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3633,6 +3814,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-dataset-convert",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3653,6 +3835,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-dataset-mimic",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3673,6 +3856,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-dataset-replay",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3693,6 +3877,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-dataset-teleop",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3713,6 +3898,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-e2e",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3733,6 +3919,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-finetune",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3753,6 +3940,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-scene-edit",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3773,6 +3961,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-setup",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3793,6 +3982,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-train-rl",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3813,6 +4003,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "i4h-workflow-validate",
       "component": "Isaac for Healthcare Workflows",
       "has_results": true,
@@ -3833,6 +4024,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "isaac-cable-insertion-policy-deployment",
       "component": "Physical AI",
       "has_results": true,
@@ -3853,6 +4045,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "isaac-cable-insertion-policy-training",
       "component": "Physical AI",
       "has_results": true,
@@ -3873,6 +4066,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "isaac-humanoid-cloud-control",
       "component": "Physical AI",
       "has_results": true,
@@ -3893,6 +4087,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "isaac-mission-control-showcase",
       "component": "Physical AI",
       "has_results": true,
@@ -3913,6 +4108,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-build-source",
       "component": "Jetson BSP",
       "has_results": true,
@@ -3933,6 +4129,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-camera",
       "component": "Jetson BSP",
       "has_results": true,
@@ -3953,6 +4150,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-clocks",
       "component": "Jetson BSP",
       "has_results": true,
@@ -3973,6 +4171,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-fan",
       "component": "Jetson BSP",
       "has_results": true,
@@ -3993,6 +4192,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-mgbe",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4013,6 +4213,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-nvpmodel",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4033,6 +4234,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-pcie",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4053,6 +4255,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-pinmux",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4073,6 +4276,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-uphy",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4093,6 +4297,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-customize-usb",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4113,6 +4318,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-derive-carrier",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4133,6 +4339,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-diagnostic",
       "component": "Jetson Device",
       "has_results": true,
@@ -4153,6 +4360,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-download-bsp",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4173,6 +4381,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-flash-image",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4193,6 +4402,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-generate-kb",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4213,6 +4423,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-headless-mode",
       "component": "Jetson Device",
       "has_results": true,
@@ -4233,6 +4444,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-inference-mem-tune",
       "component": "Jetson Device",
       "has_results": true,
@@ -4253,6 +4465,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-init-image",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4273,6 +4486,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-init-source",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4293,6 +4507,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-init-target",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4313,6 +4528,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-link-docs",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4333,6 +4549,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-llm-benchmark",
       "component": "Jetson Device",
       "has_results": true,
@@ -4353,6 +4570,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-llm-serve",
       "component": "Jetson Device",
       "has_results": true,
@@ -4373,6 +4591,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-memory-audit",
       "component": "Jetson Device",
       "has_results": true,
@@ -4393,6 +4612,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-optimize-memory",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4413,6 +4633,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-package",
       "component": "Jetson Device",
       "has_results": true,
@@ -4433,6 +4654,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-print-bsp-info",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4453,6 +4675,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-print-device-info",
       "component": "Jetson Device",
       "has_results": true,
@@ -4473,6 +4696,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-promote-image",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4493,6 +4717,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-quick-start",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4513,6 +4738,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-set-target",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4533,6 +4759,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-speculative-decoding",
       "component": "Jetson Device",
       "has_results": true,
@@ -4553,6 +4780,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-validate-image",
       "component": "Jetson BSP",
       "has_results": true,
@@ -4573,6 +4801,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-video-benchmark",
       "component": "Jetson Device",
       "has_results": true,
@@ -4593,6 +4822,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-video-capability",
       "component": "Jetson Device",
       "has_results": true,
@@ -4613,6 +4843,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-video-pipeline",
       "component": "Jetson Device",
       "has_results": true,
@@ -4633,6 +4864,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-video-recipe",
       "component": "Jetson Device",
       "has_results": true,
@@ -4653,6 +4885,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "jetson-video-setup",
       "component": "Jetson Device",
       "has_results": true,
@@ -4673,6 +4906,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "launch-nemo-rl",
       "component": "NeMo-RL",
       "has_results": true,
@@ -4690,6 +4924,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "mcore-create-issue",
       "component": "Megatron-Core",
       "has_results": false,
@@ -4707,6 +4942,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "mcore-linting-and-formatting",
       "component": "Megatron-Core",
       "has_results": false,
@@ -4724,6 +4960,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "mcore-run-on-slurm",
       "component": "Megatron-Core",
       "has_results": false,
@@ -4741,6 +4978,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "mcore-split-pr",
       "component": "Megatron-Core",
       "has_results": false,
@@ -4758,6 +4996,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "mcore-testing",
       "component": "Megatron-Core",
       "has_results": false,
@@ -4778,6 +5017,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "medtech-model-evidence-export",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -4798,6 +5038,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-automodel-distributed-training",
       "component": "NeMo AutoModel",
       "has_results": true,
@@ -4818,6 +5059,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-automodel-launcher-config",
       "component": "NeMo AutoModel",
       "has_results": true,
@@ -4838,6 +5080,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-automodel-model-onboarding",
       "component": "NeMo AutoModel",
       "has_results": true,
@@ -4858,6 +5101,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-automodel-recipe-development",
       "component": "NeMo AutoModel",
       "has_results": true,
@@ -4878,6 +5122,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-fabric-build-adapter",
       "component": "NeMo Fabric",
       "has_results": true,
@@ -4898,6 +5143,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-fabric-integrate",
       "component": "NeMo Fabric",
       "has_results": true,
@@ -4918,6 +5164,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -4938,6 +5185,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-multi-node-slurm",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -4958,6 +5206,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-activation-recompute",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -4978,6 +5227,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-cpu-offloading",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -4998,6 +5248,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-cuda-graphs",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5018,6 +5269,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-expert-parallel-overlap",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5038,6 +5290,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-hierarchical-context-parallel",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5058,6 +5311,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-megatron-fsdp",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5078,6 +5332,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-memory-tuning",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5098,6 +5353,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-moe-comm-overlap",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5118,6 +5374,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-moe-dispatcher-selection",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5138,6 +5395,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-moe-hardware-configs",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5158,6 +5416,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-moe-long-context",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5178,6 +5437,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-moe-optimization-workflow",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5198,6 +5458,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-moe-vlm-training",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5218,6 +5479,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-parallelism-strategies",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5238,6 +5500,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-sequence-packing",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5258,6 +5521,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-perf-tp-dp-comm-overlap",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5278,6 +5542,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5298,6 +5563,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-mbridge-resiliency",
       "component": "NeMo MBridge",
       "has_results": true,
@@ -5318,6 +5584,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-debug-runtime-integration",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5338,6 +5605,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-get-started",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5358,6 +5626,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-install",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5378,6 +5647,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-instrument-calls",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5398,6 +5668,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-instrument-context-isolation",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5418,6 +5689,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-instrument-typed-wrappers",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5438,6 +5710,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-migrate-from-flow",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5458,6 +5731,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-plugin-adaptive-tuning",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5478,6 +5752,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-plugin-build",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5498,6 +5773,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-relay-plugin-observability",
       "component": "NeMo Relay",
       "has_results": true,
@@ -5518,6 +5794,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-retriever",
       "component": "NeMo Retriever",
       "has_results": true,
@@ -5538,6 +5815,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-retriever-mcp",
       "component": "NeMo Retriever",
       "has_results": true,
@@ -5558,6 +5836,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-rl-auto-research",
       "component": "NeMo-RL",
       "has_results": true,
@@ -5578,6 +5857,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-rl-brev-etiquette",
       "component": "NeMo-RL",
       "has_results": true,
@@ -5598,6 +5878,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-rl-docs",
       "component": "NeMo-RL",
       "has_results": true,
@@ -5618,6 +5899,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemo-rl-session-memory",
       "component": "NeMo-RL",
       "has_results": true,
@@ -5638,6 +5920,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemoclaw-user-guide",
       "component": "NemoClaw",
       "has_results": false,
@@ -5658,6 +5941,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemotron-asr-finetune",
       "component": "Nemotron Speech",
       "has_results": true,
@@ -5678,6 +5962,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemotron-customize",
       "component": "Nemotron",
       "has_results": true,
@@ -5698,6 +5983,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemotron-policy-generator",
       "component": "Nemotron",
       "has_results": true,
@@ -5718,6 +6004,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemotron-retrieval-recipes",
       "component": "Nemotron",
       "has_results": true,
@@ -5738,6 +6025,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemotron-speech",
       "component": "Nemotron Speech",
       "has_results": true,
@@ -5758,6 +6046,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nemotron-voice-agent-builder",
       "component": "Nemotron Voice Agent",
       "has_results": true,
@@ -5778,6 +6067,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-generate-ct-rflow",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5798,6 +6088,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-generate-mr",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5818,6 +6109,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-generate-mr-brain",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5838,6 +6130,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-generate-mr-brain-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5858,6 +6151,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-generate-vae-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5878,6 +6172,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-reason-ct",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5898,6 +6193,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-reason-cxr",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5918,6 +6214,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-segment-ct",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5938,6 +6235,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-segment-ct-finetune",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5958,6 +6256,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nv-segment-ctmr",
       "component": "Medical AI Skills",
       "has_results": true,
@@ -5978,6 +6277,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvalchemi-toolkit",
       "component": "ALCHEMI Toolkit",
       "has_results": true,
@@ -5998,6 +6298,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-autofl",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6018,6 +6319,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-autofl-report",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6038,6 +6340,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-convert-huggingface",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6058,6 +6361,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-convert-lightning",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6078,6 +6382,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-convert-pytorch",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6098,6 +6403,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-diagnose-job",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6118,6 +6424,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-fed-stats",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6138,6 +6445,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-orient",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6158,6 +6466,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvflare-shared",
       "component": "NVIDIA FLARE",
       "has_results": true,
@@ -6178,6 +6487,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvidia-app",
       "component": "NVIDIA App",
       "has_results": true,
@@ -6198,6 +6508,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvidia-broadcast",
       "component": "NVIDIA Broadcast",
       "has_results": true,
@@ -6218,6 +6529,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvidia-ontology-management",
       "component": "Auto Ontology",
       "has_results": true,
@@ -6238,6 +6550,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvidia-ontology-query",
       "component": "Auto Ontology",
       "has_results": true,
@@ -6258,6 +6571,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvidia-ontology-setup",
       "component": "Auto Ontology",
       "has_results": true,
@@ -6278,6 +6592,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "has_results": true,
@@ -6298,6 +6613,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-collect-performance-data",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6318,6 +6634,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-configure-nic-pe-mapping",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6338,6 +6655,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-docs",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6358,6 +6676,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-enable-tma",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6378,6 +6697,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-get-started",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6398,6 +6718,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-install",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6418,6 +6739,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-select-remote-transport",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6438,6 +6760,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-troubleshoot-and-report-bugs",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6458,6 +6781,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "nvshmem-tune-performance",
       "component": "NVSHMEM",
       "has_results": true,
@@ -6478,6 +6802,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "omniverse-cad-to-simready",
       "component": "Physical AI",
       "has_results": true,
@@ -6498,6 +6823,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "omniverse-content-services",
       "component": "Physical AI",
       "has_results": true,
@@ -6518,6 +6844,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "omniverse-realtime-viewer",
       "component": "Physical AI",
       "has_results": true,
@@ -6538,6 +6865,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "omniverse-usd-performance-tuning",
       "component": "Physical AI",
       "has_results": true,
@@ -6558,6 +6886,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "ovnewton-usage",
       "component": "ovnewton",
       "has_results": true,
@@ -6578,6 +6907,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "paidf-cosmos-predict",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -6598,6 +6928,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "physical-ai-defect-image-generation",
       "component": "Physical AI",
       "has_results": true,
@@ -6615,6 +6946,7 @@
       "pass_threshold_pct": null,
       "verdict": "FAIL",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "physical-ai-infrastructure-setup-and-resilient-scaling",
       "component": "Physical AI",
       "has_results": false,
@@ -6635,6 +6967,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "physical-ai-neural-reconstruction",
       "component": "Physical AI",
       "has_results": true,
@@ -6655,6 +6988,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "physical-ai-physics-selection",
       "component": "Physical AI",
       "has_results": true,
@@ -6675,6 +7009,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "physical-ai-video-data-augmentation",
       "component": "Physical AI",
       "has_results": true,
@@ -6695,6 +7030,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "physicsnemo-discover",
       "component": "PhysicsNeMo",
       "has_results": true,
@@ -6715,6 +7051,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "physicsnemo-shard-tensor",
       "component": "PhysicsNeMo",
       "has_results": true,
@@ -6735,6 +7072,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "portfolio-optimization",
       "component": "Portfolio Optimization",
       "has_results": true,
@@ -6755,6 +7093,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "pva-build-test",
       "component": "PVA SDK",
       "has_results": true,
@@ -6775,6 +7114,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "pva-debug",
       "component": "PVA SDK",
       "has_results": true,
@@ -6795,6 +7135,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "pva-doctor",
       "component": "PVA SDK",
       "has_results": true,
@@ -6815,6 +7156,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "pva-opgen",
       "component": "PVA SDK",
       "has_results": true,
@@ -6835,6 +7177,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "pva-setup",
       "component": "PVA SDK",
       "has_results": true,
@@ -6855,6 +7198,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "pva-spec",
       "component": "PVA SDK",
       "has_results": true,
@@ -6872,6 +7216,7 @@
       "pass_threshold_pct": null,
       "verdict": "FAIL",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "rag-blueprint",
       "component": "RAG Blueprint",
       "has_results": false,
@@ -6889,6 +7234,7 @@
       "pass_threshold_pct": null,
       "verdict": "FAIL",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "rag-eval",
       "component": "RAG Blueprint",
       "has_results": false,
@@ -6906,6 +7252,7 @@
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "rag-perf",
       "component": "RAG Blueprint",
       "has_results": false,
@@ -6926,6 +7273,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "rtvi-cv-customize-model",
       "component": "DeepStream",
       "has_results": true,
@@ -6946,6 +7294,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "rtvi-cv-scaffold-vss-service",
       "component": "DeepStream",
       "has_results": true,
@@ -6966,6 +7315,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "rtvi-vlm-customize-model",
       "component": "DeepStream",
       "has_results": true,
@@ -6986,6 +7336,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "rtx-remix-modding",
       "component": "RTX Remix",
       "has_results": true,
@@ -7006,6 +7357,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "runai-audit-assigned-quota",
       "component": "Run:ai",
       "has_results": true,
@@ -7026,6 +7378,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "runai-diagnose-failed-workload",
       "component": "Run:ai",
       "has_results": true,
@@ -7046,6 +7399,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "runai-get-cluster-health-summary",
       "component": "Run:ai",
       "has_results": true,
@@ -7066,6 +7420,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "runai-get-utilization-overview",
       "component": "Run:ai",
       "has_results": true,
@@ -7086,6 +7441,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "runai-get-workload-health-summary",
       "component": "Run:ai",
       "has_results": true,
@@ -7106,6 +7462,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "skill-card-generator",
       "component": "Skill Card Generator",
       "has_results": true,
@@ -7126,6 +7483,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-analyze-changenet-rca",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7146,6 +7504,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-analyze-detection-kpi",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7166,6 +7525,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-analyze-gaps-od-map",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7186,6 +7546,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7206,6 +7567,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-analyze-gaps-vlm-bcq",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7226,6 +7588,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-artifacts",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7246,6 +7609,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-convert-dataset-format",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7266,6 +7630,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-data-io",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7286,6 +7651,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-anomalygennext",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7306,6 +7672,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-clip",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7326,6 +7693,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-cosmos-embed",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7346,6 +7714,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-cosmos-reason",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7366,6 +7735,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-huggingface-model",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7386,6 +7756,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-kumo-anomaly",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7406,6 +7777,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-kumo-forecast",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7426,6 +7798,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-finetune-video-clip",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7446,6 +7819,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-generate-anomalies",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7466,6 +7840,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-generate-image-embeddings",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7486,6 +7861,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-generate-image-grounding",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7506,6 +7882,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-generate-od-defects",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7526,6 +7903,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-generate-referring-expressions",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7546,6 +7924,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-generate-video-reasoning-annotations",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7566,6 +7945,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-launch-workflow",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7586,6 +7966,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-list-capabilities",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7606,6 +7987,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-mine-aoi-images",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7626,6 +8008,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-mine-nearest-neighbors",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7646,6 +8029,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-mine-od-images",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7666,6 +8050,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-port-huggingface-model",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7686,6 +8071,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-prepare-anomalygennext-inputs",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7706,6 +8092,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-route-visual-changenet-samples",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7726,6 +8113,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-automl",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7746,6 +8134,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-automl-deft-pipeline",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7766,6 +8155,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-deft-aoi",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7786,6 +8176,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-deft-aoi-cosmos3",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7806,6 +8197,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-deft-cr-its-mining",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7826,6 +8218,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-deft-object-detection",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7846,6 +8239,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-deft-od-aoi",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7866,6 +8260,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-deft-pas",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7886,6 +8281,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-dinov3-ssl-deft",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7906,6 +8302,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-inference-service",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7926,6 +8323,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-on-brev",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7946,6 +8344,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-on-docker",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7966,6 +8365,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-on-kubernetes",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -7986,6 +8386,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-on-slurm",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8006,6 +8407,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-run-on-virtualenv",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8026,6 +8428,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-setup",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8046,6 +8449,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-setup-nvidia-gpu-host",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8066,6 +8470,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-token-efficient-execution",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8086,6 +8491,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-action-recognition",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8106,6 +8512,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-bevfusion",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8126,6 +8533,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-centerpose",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8146,6 +8554,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-codetr",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8166,6 +8575,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-deformable-detr",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8186,6 +8596,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-depth-anything-v2",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8206,6 +8617,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-dino",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8226,6 +8638,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-dinov3",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8246,6 +8659,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-fast-foundation-stereo",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8266,6 +8680,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-foundation-stereo",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8286,6 +8701,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-grounding-dino",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8306,6 +8722,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-image-classification",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8326,6 +8743,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-mask-auto-encoder",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8346,6 +8764,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-mask-auto-label",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8366,6 +8785,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-mask-grounding-dino",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8386,6 +8806,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-mask2former",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8406,6 +8827,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-metric-learning-recognition",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8426,6 +8848,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-nvdinov2",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8446,6 +8869,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-nvpanoptix3d",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8466,6 +8890,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-ocdnet",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8486,6 +8911,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-ocrnet",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8506,6 +8932,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-oneformer",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8526,6 +8953,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-optical-inspection",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8546,6 +8974,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-pointpillars",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8566,6 +8995,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-pose-classification",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8586,6 +9016,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-reid",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8606,6 +9037,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-rtdetr",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8626,6 +9058,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-segformer",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8646,6 +9079,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-single-step",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8666,6 +9100,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-sparse4d",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8686,6 +9121,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-train-visual-changenet",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8706,6 +9142,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-validate-dataset-format",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8726,6 +9163,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tao-validate-recipe-transfer",
       "component": "TAO Toolkit",
       "has_results": true,
@@ -8746,6 +9184,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tilegym-adding-cutile-kernel",
       "component": "TileGym",
       "has_results": true,
@@ -8766,6 +9205,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tilegym-converting-cutile-to-julia",
       "component": "TileGym",
       "has_results": true,
@@ -8786,6 +9226,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tilegym-converting-cutile-to-triton",
       "component": "TileGym",
       "has_results": true,
@@ -8806,6 +9247,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tilegym-cutile-autotuning",
       "component": "TileGym",
       "has_results": true,
@@ -8826,6 +9268,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tilegym-cutile-python",
       "component": "TileGym",
       "has_results": true,
@@ -8843,6 +9286,7 @@
       "pass_threshold_pct": 50.0,
       "verdict": "PASS",
       "agents": [],
+      "evaluation_source": null,
       "catalog_dir": "tilegym-improve-cutile-kernel-perf",
       "component": "TileGym",
       "has_results": true,
@@ -8863,6 +9307,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "tilegym-monkey-patch-kernels-to-transformers",
       "component": "TileGym",
       "has_results": true,
@@ -8883,6 +9328,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "vss-build-vision-ai",
       "component": "Video Search and Summarization",
       "has_results": true,
@@ -8903,6 +9349,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "warp-compile-time-optimizer",
       "component": "Warp",
       "has_results": true,
@@ -8923,6 +9370,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "warp-debug-gradients",
       "component": "Warp",
       "has_results": true,
@@ -8943,6 +9391,7 @@
         "claude-code",
         "codex"
       ],
+      "evaluation_source": null,
       "catalog_dir": "warp-eval",
       "component": "Warp",
       "has_results": true,

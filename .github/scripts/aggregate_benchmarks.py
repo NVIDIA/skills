@@ -8,6 +8,11 @@ per-dimension results (skill-assisted score plus uplift vs. the no-skill
 baseline), and writes a single machine-readable benchmarks.json at the repo
 root for downstream dashboards and tooling.
 
+Each skill's evaluation_source is "self-assessed" or "ci" when explicitly
+recorded in the report summary, otherwise null (unknown). A signature, PASS,
+or live-evaluation row alone does not identify who ran the evaluation.
+Flat result rows can be joined to this field using catalog_dir.
+
 Usage:
     python3 .github/scripts/aggregate_benchmarks.py [--repo-root PATH]
     python3 .github/scripts/aggregate_benchmarks.py --check   # fail on drift
@@ -182,6 +187,33 @@ def self_assessed_verdict(intro: str):
     return fields["Reported evaluation verdict"]
 
 
+def evaluation_source(markdown: str):
+    """Preserve explicit source independently of the publication verdict."""
+    sections = {"## Publication Recommendation", "## Evaluation Metadata", "## Evaluation Summary"}
+    section = None
+    declarations = []
+    for raw in markdown.splitlines():
+        line = raw.strip()
+        # Generated summaries have no examples. Stop before the report body;
+        # fenced/commented content in the summary cannot establish provenance.
+        if line.startswith(("```", "~~~")) or "<!--" in line:
+            return None
+        if line.startswith("#"):
+            if not raw.startswith("#"):
+                break
+            if line.startswith("# ") and section is None:
+                continue
+            if line not in sections:
+                break
+            section = line
+        elif section and raw.startswith("- Evaluation source:"):
+            declarations.append(line)
+    if len(declarations) != 1:
+        return None
+    match = re.fullmatch(r"- Evaluation source: (?:`(ci|self-assessed)`|(ci|self-assessed))", declarations[0])
+    return (match.group(1) or match.group(2)) if match else None
+
+
 def parse_benchmark(path: Path) -> dict:
     entry = {k: None for k in SUMMARY_FIELDS}
     entry["agents"] = []
@@ -190,6 +222,7 @@ def parse_benchmark(path: Path) -> dict:
     agent_cols = {}  # results-table column index -> agent name, from the header row
 
     markdown = path.read_text(encoding="utf-8")
+    entry["evaluation_source"] = evaluation_source(markdown)
     for raw in markdown.splitlines():
         line = raw.strip()
         if line.startswith("#"):
