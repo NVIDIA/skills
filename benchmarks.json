@@ -6265,13 +6265,13 @@
     },
     {
       "skill": "nvidia-skill-finder",
-      "evaluation_date": "2026-10-01",
+      "evaluation_date": "2026-11-10",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:df412e229dfed3687e1112c8f5bc439a6f3695291f3d357f049002621e90845f",
-      "validation_status": null,
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:75b2b97f4c0057ea5bbadcfcd92d5561919ce56e7f03a93f629cb8bdd8f01281",
+      "validation_status": "passed",
       "tasks": 18,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -6281,7 +6281,7 @@
       "catalog_dir": "nvidia-skill-finder",
       "component": "NVIDIA Skills",
       "has_results": true,
-      "average_uplift_pct": 26.97
+      "average_uplift_pct": 24.28
     },
     {
       "skill": "nvshmem-collect-performance-data",
@@ -35417,7 +35417,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 97.2,
-      "uplift_pct": -1.0
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35425,8 +35425,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.4,
-      "uplift_pct": 5.9
+      "score_pct": 91.7,
+      "uplift_pct": -8.3
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35435,7 +35435,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 96.7,
-      "uplift_pct": 27.1
+      "uplift_pct": 32.3
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35443,8 +35443,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 29.2
+      "score_pct": 96.7,
+      "uplift_pct": 22.3
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35461,7 +35461,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.6,
+      "score_pct": 95.0,
       "uplift_pct": null
     },
     {
@@ -35470,8 +35470,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.9,
-      "uplift_pct": 51.8
+      "score_pct": 95.8,
+      "uplift_pct": 59.4
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35479,8 +35479,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.7,
-      "uplift_pct": 48.8
+      "score_pct": 98.6,
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nvidia-skill-finder",
@@ -35488,7 +35488,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 78.4,
+      "score_pct": 81.3,
       "uplift_pct": null
     },
     {
@@ -35497,7 +35497,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 66.5,
+      "score_pct": 64.4,
       "uplift_pct": null
     },
     {
