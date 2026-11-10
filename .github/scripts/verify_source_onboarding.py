@@ -35,6 +35,15 @@ fetches the source at the component's ``ref`` and checks that:
   * ``BENCHMARK.md`` reports an overall verdict of PASS backed by real
     measurements.
 
+It also checks that the component resolves to a ``product.primary`` value:
+an explicit ``product_primary``, or a ``name`` that exactly matches a value in
+the metadata schema. Without one, the metadata generator falls back to AI
+enrichment, and for a product the schema has never heard of the AI returns
+UNRESOLVED and the whole regeneration fails after the sync. That happened
+three times on 2026-11-09 with ALCHEMI Toolkit (#851); the fix was a schema
+addition that belonged on the onboarding PR. This check moves the failure
+there.
+
 Blocking scope: only paths the PR *adds*. Around 30 catalog skills already
 carry signature drift (tracked in #216 / #357); failing a PR for drift its
 author neither caused nor can fix would make the gate an obstacle rather than
@@ -49,6 +58,7 @@ merge.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -74,9 +84,15 @@ SIG_NAME = vci.SIG_NAME
 # which all 350 published skills carry — no skill relies on an alternate.
 REQUIRED_FILES = ("SKILL.md", SIG_NAME, "BENCHMARK.md", "skill-card.md")
 
+SCHEMA_PATH = ".github/scripts/marketplace/metadata.schema.json"
+
 RE_REPO = re.compile(r"^repo:\s*(\S+)\s*$")
 RE_REF = re.compile(r"^ref:\s*(\S+)\s*$")
 RE_PATH = re.compile(r"^-?\s*path:\s*(\S+)\s*$")
+# Top-level scalars only: matched against the unindented line, so a skill
+# entry's nested keys can never be read as the component's name or product.
+RE_NAME = re.compile(r"^name:\s*(.+?)\s*$")
+RE_PRODUCT = re.compile(r"^product_primary:\s*(.+?)\s*$")
 
 
 @dataclass(frozen=True)
@@ -112,8 +128,20 @@ def parse_component(text: str) -> dict:
     """
     repo = None
     ref = None
+    name = None
+    product = None
     paths: list[str] = []
     for line in text.splitlines():
+        if name is None:
+            m = RE_NAME.match(line)
+            if m:
+                name = _unquote(m.group(1))
+                continue
+        if product is None:
+            m = RE_PRODUCT.match(line)
+            if m:
+                product = _unquote(m.group(1))
+                continue
         stripped = line.strip()
         if repo is None:
             m = RE_REPO.match(stripped)
@@ -131,7 +159,15 @@ def parse_component(text: str) -> dict:
     # An absent ref means the component tracks the default branch. Several
     # components (AIQ, VSS) track develop instead; verifying those against
     # main compares a tree the sync will never fetch.
-    return {"repo": repo, "ref": ref or "main", "paths": paths}
+    return {"repo": repo, "ref": ref or "main", "paths": paths,
+            "name": name, "product_primary": product}
+
+
+def _unquote(value: str) -> str:
+    """Drop one pair of matching YAML quotes, as the generator's YAML load would."""
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        return value[1:-1]
+    return value
 
 
 def added_paths(base_text: str | None, head_text: str) -> set[str]:
@@ -145,6 +181,62 @@ def added_paths(base_text: str | None, head_text: str) -> set[str]:
     if base_text is None:
         return head
     return head - set(parse_component(base_text)["paths"])
+
+
+# --------------------------------------------------------------------------
+# Product resolution (pure — operates on component text and the schema)
+# --------------------------------------------------------------------------
+
+def product_enum(schema_text: str) -> list[str]:
+    """The ``product.primary`` values the metadata schema accepts."""
+    schema = json.loads(schema_text)
+    return schema["$defs"]["metadata"]["properties"]["product.primary"]["enum"]
+
+
+def product_in_scope(base_text: str | None, head_text: str) -> bool:
+    """Whether this PR is responsible for the component's product mapping.
+
+    A new component file, or one whose ``name`` or ``product_primary`` this PR
+    changed. Existing registries that rely on carried metadata are left alone:
+    they already have entries in metadata.json, so the generator never asks AI
+    to resolve them from scratch, and failing a PR for them would block an
+    author over a mapping they did not touch.
+    """
+    if base_text is None:
+        return True
+    base, head = parse_component(base_text), parse_component(head_text)
+    return (base["name"], base["product_primary"]) != (head["name"], head["product_primary"])
+
+
+def check_product(component: dict, enum: list[str]) -> list[str]:
+    """Problems with the component's product mapping (empty == resolves).
+
+    Mirrors ``derive_product_from_component`` in generate-skill-metadata.py:
+    an explicit ``product_primary`` must be an enum value; otherwise the
+    ``name`` must match one exactly.
+    """
+    declared = component.get("product_primary")
+    if declared is not None:
+        if declared in enum:
+            return []
+        return [
+            f"product_primary {declared!r} is not a value in the product.primary "
+            f"enum ({SCHEMA_PATH}). Use an existing value, or add {declared!r} "
+            "to the enum in this PR."
+        ]
+    name = component.get("name")
+    if not name:
+        return ["no name: declared"]
+    if name in enum:
+        return []
+    return [
+        f"product cannot be resolved: name {name!r} is not a value in the "
+        f"product.primary enum ({SCHEMA_PATH}) and no product_primary is set. "
+        f"Add {name!r} to the enum in this PR, or set product_primary to an "
+        "existing value. Without one, the metadata generator falls back to AI, "
+        "which cannot pick an unknown product and fails the regeneration after "
+        "the sync."
+    ]
 
 
 # --------------------------------------------------------------------------
@@ -324,6 +416,10 @@ def main() -> int:
         return 0
 
     findings: list[Finding] = []
+    # Read the schema at the PR head so an enum addition made in the same PR
+    # counts. That is the intended fix, and reading main would reject it.
+    schema_text = file_at(head_sha, SCHEMA_PATH)
+    enum = product_enum(schema_text) if schema_text else None
     workdir = Path(tempfile.mkdtemp(prefix="source-onboarding-"))
     try:
         for rel in component_files:
@@ -334,9 +430,23 @@ def main() -> int:
                 continue
             component = parse_component(head_text)
             repo, ref = component["repo"], component["ref"]
-            new = added_paths(file_at(base_sha, rel), head_text)
+            base_text = file_at(base_sha, rel)
+            new = added_paths(base_text, head_text)
 
             print(f"\n── {rel} → {repo}@{ref} ──")
+            if product_in_scope(base_text, head_text):
+                if enum is None:
+                    problems = [f"could not read the product enum from {SCHEMA_PATH}"]
+                else:
+                    problems = check_product(component, enum)
+                if problems:
+                    print("  FAIL  product mapping")
+                    for p in problems:
+                        print(f"          {p}")
+                        findings.append(Finding(rel, p, blocking=True))
+                else:
+                    resolved = component["product_primary"] or component["name"]
+                    print(f"  ok    product: {resolved}")
             if not repo:
                 findings.append(Finding(rel, "no repo: declared", blocking=True))
                 print("  FAIL  no repo: declared")
