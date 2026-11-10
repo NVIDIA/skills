@@ -11,4 +11,4 @@ gcc -I${INCLUDE_PATH} -L${LIB_PATH} -o lp_duals lp_duals.c -lcuopt
 LD_LIBRARY_PATH=${LIB_PATH}:$LD_LIBRARY_PATH ./lp_duals
 ```
 
-**See also:** [references/examples.md](../../references/examples.md) for full parameter reference.
+**See also:** [references/c_api.md](../../../references/c_api.md) for full parameter reference.

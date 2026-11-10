@@ -10,8 +10,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `fastgen-configure`
 - Validation status: `passed`
-- Evaluation date: 2026-11-05
-- Evaluator version: `1.6.8`
+- Evaluation date: 2026-11-10
+- Evaluator version: `1.6.9`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (4 positive)
 - Dataset digest: `sha256:fa41f7ff4c9b6b32daf795dd8c8782eeb54aa4fd31fccc7bfc44ee93f02ffb17` (skill-evaluator-dataset-snapshot/1)
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.4% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.3% — baseline ran, but no comparable score was available; uplift unavailable | 89.4% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 75.0% → 100.0% (+25.0 points) | 100.0% → 87.5% (-12.5 points) |
-| Correctness | 100.0% → 100.0% (±0.0 points) | 95.0% → 100.0% (+5.0 points) |
-| Discoverability | 83.8% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 100.0% → 87.5% (-12.5 points) | 87.5% → 100.0% (+12.5 points) |
-| Efficiency | 86.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 81.3% — baseline ran, but no comparable score was available; uplift unavailable | 86.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 100.0% → 97.5% (-2.5 points) | 97.9% → 85.4% (-12.5 points) |
+| Efficiency | 77.7% — baseline ran, but no comparable score was available; uplift unavailable | 87.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 94.3% → 93.6% (-0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 95.2% → 94.3% (-0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 89.0% → 89.6% (+0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 88.5% → 87.9% (-0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 817,840 | 680,178 | +137,662 | +20.24% | skill 4/4; base 4/4 |
-| claude-code | adjacent-training-execution | 73,851 | 73,644 | +207 | +0.28% | skill 1/1; base 1/1 |
-| claude-code | geometry-after-override | 423,130 | 374,373 | +48,757 | +13.02% | skill 1/1; base 1/1 |
-| claude-code | prompt-only-objective | 202,945 | 115,648 | +87,297 | +75.49% | skill 1/1; base 1/1 |
-| claude-code | typed-override-and-dryrun | 117,914 | 116,513 | +1,401 | +1.20% | skill 1/1; base 1/1 |
-| codex | All cases | 483,848 | 551,930 | -68,082 | -12.34% | skill 4/4; base 4/4 |
-| codex | adjacent-training-execution | 28,424 | 28,297 | +127 | +0.45% | skill 1/1; base 1/1 |
-| codex | geometry-after-override | 249,554 | 300,733 | -51,179 | -17.02% | skill 1/1; base 1/1 |
-| codex | prompt-only-objective | 84,808 | 98,461 | -13,653 | -13.87% | skill 1/1; base 1/1 |
-| codex | typed-override-and-dryrun | 121,062 | 124,439 | -3,377 | -2.71% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,301,688 | 1,232,108 | +69,580 | +5.65% | skill 8/8; base 8/8 |
+| claude-code | All cases | 713,337 | 555,669 | +157,668 | +28.37% | skill 4/4; base 4/4 |
+| claude-code | adjacent-training-execution | 73,786 | 73,598 | +188 | +0.26% | skill 1/1; base 1/1 |
+| claude-code | geometry-after-override | 363,457 | 212,003 | +151,454 | +71.44% | skill 1/1; base 1/1 |
+| claude-code | prompt-only-objective | 159,478 | 116,179 | +43,299 | +37.27% | skill 1/1; base 1/1 |
+| claude-code | typed-override-and-dryrun | 116,616 | 153,889 | -37,273 | -24.22% | skill 1/1; base 1/1 |
+| codex | All cases | 644,102 | 606,488 | +37,614 | +6.20% | skill 4/4; base 4/4 |
+| codex | adjacent-training-execution | 28,429 | 28,264 | +165 | +0.58% | skill 1/1; base 1/1 |
+| codex | geometry-after-override | 384,250 | 324,124 | +60,126 | +18.55% | skill 1/1; base 1/1 |
+| codex | prompt-only-objective | 104,545 | 111,180 | -6,635 | -5.97% | skill 1/1; base 1/1 |
+| codex | typed-override-and-dryrun | 126,878 | 142,920 | -16,042 | -11.22% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,357,439 | 1,162,157 | +195,282 | +16.80% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -110,8 +110,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/fastgen-configure/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Instructions' (`skills/fastgen-configure/SKILL.md`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/fastgen-configure/SKILL.md`)
-- **MEDIUM** SECURITY/Shadow Command Trigger (TR2): Trigger Abuse: Shadow Command Trigger: description clause 'Use it whenever a FastGen run needs a new or modified config file or non-tri (`SKILL.md:1`)
 - **MEDIUM** SECURITY/Skill Enumeration (AS3): Agent Snooping: skills/fastgen-add-method/SKILL.md (`SKILL.md:17`)
+- **MEDIUM** SECURITY/Shadow Command Trigger (TR2): Trigger Abuse: Shadow Command Trigger: description clause 'Use it whenever a FastGen run needs a new or modified config file or non-tri (`SKILL.md:1`)
 - 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
