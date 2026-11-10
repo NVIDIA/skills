@@ -2202,9 +2202,9 @@
     {
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
-      "content_digest": "sha256:b5c517e02618ea17df54fe204435adff5bcbd65716d56f4f8a5ec97eced30a0d",
-      "last_commit": "6ae4b5e52e84a5d446bb278023700cedc880dd23",
-      "last_modified": "2026-11-05"
+      "content_digest": "sha256:63a07ba8ba0d12c9cb85c8a5dc4dabd52ec4fc56c7cb933a340aee85cb5724a2",
+      "last_commit": "5120ecb61e8bb246a16b3eab10366e4a1390b44b",
+      "last_modified": "2026-11-10"
     },
     {
       "name": "nvshmem-collect-performance-data",
