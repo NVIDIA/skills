@@ -32,6 +32,26 @@ Read that platform's complete `SKILL.md`, run its preflight, and use its exact
 `submit`/`status`/`logs`/`cancel` contract. Do not translate one platform into
 another or fall back to Docker.
 
+For Docker, PAS packages that consumer directly. Use it instead of assembling
+`docker run`, mounts, job-record operations, or credential forwarding by hand:
+
+```bash
+"$SKILL_ROOT/scripts/deft_python.sh" --workspace "$WORKSPACE" \
+  "$SKILL_ROOT/scripts/run_deft_docker_action.py" submit --request "$ACTION_REQUEST"
+"$SKILL_ROOT/scripts/deft_python.sh" --workspace "$WORKSPACE" \
+  "$SKILL_ROOT/scripts/run_deft_docker_action.py" status --request "$ACTION_REQUEST"
+"$SKILL_ROOT/scripts/deft_python.sh" --workspace "$WORKSPACE" \
+  "$SKILL_ROOT/scripts/run_deft_docker_action.py" logs --request "$ACTION_REQUEST"
+# only when cancellation is requested:
+"$SKILL_ROOT/scripts/deft_python.sh" --workspace "$WORKSPACE" \
+  "$SKILL_ROOT/scripts/run_deft_docker_action.py" cancel --request "$ACTION_REQUEST"
+```
+
+The packaged submit checks every approved forwarded credential variable again
+at point of use, passes only its name to Docker, opens and binds the job-record
+before launch, renders every immutable request mount, and uses the exact
+approved GPU allocation. Never print or `echo` a credential value.
+
 ## Prepare
 
 Each stage reference supplies the exact arguments:
@@ -185,7 +205,7 @@ every rendered mount, the bundle command (`command` followed by `args`),
 variable names in `forward_env`. Mark `RUNNING` with the native handle.
 
 For Docker, SLURM, Kubernetes, and Brev the executable argv is the bundle argv
-inside the pinned image. Virtualenv mirrors the two image families with two
+inside the approved image. Virtualenv mirrors the two image families with two
 immutable profiles. `image_kind=pyt` selects the approved `pyt` environment
 for `clip`; `image_kind=ds` selects the approved `ds` environment for
 `embedding` or `tmm`. A single environment is compatible only when it passes

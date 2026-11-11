@@ -1,0 +1,60 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "media_utils.py.txt",
+      "repository_path": "fastgen/utils/media_utils.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/utils/media_utils.py",
+      "source_sha256": "59d509292f200153331d950c2ac56e8ed6a9ef5d025a06083b4600d1ad59e431",
+      "line_ranges": [
+        [
+          1,
+          330
+        ]
+      ],
+      "fixture_sha256": "59d509292f200153331d950c2ac56e8ed6a9ef5d025a06083b4600d1ad59e431",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "media_tree_utils.py.txt",
+      "repository_path": "fastgen/utils/tree_utils.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/utils/tree_utils.py",
+      "source_sha256": "f0e98a34ef4393dc01d39d60792f2b9a6d94166eeec81607245061065333b542",
+      "line_ranges": [
+        [
+          275,
+          277
+        ],
+        [
+          104,
+          113
+        ],
+        [
+          265,
+          267
+        ]
+      ],
+      "fixture_sha256": "c1576ab8346d7259843765d5d3c5a73fd9d8ff55710090d78db91bc8f633686f",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "media_existing_tests.py.txt",
+      "repository_path": "tests/test_media_utils.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/tests/test_media_utils.py",
+      "source_sha256": "84b6df4746ec200f8e98f73894197e424df80394c78bad36395bbfbfd041a0e2",
+      "line_ranges": [
+        [
+          17,
+          32
+        ]
+      ],
+      "fixture_sha256": "776cc2b349cb23a3f5e069cf3dbeb92836afd679e019eddce696465ea3482934",
+      "kind": "source_excerpt"
+    }
+  ]
+}

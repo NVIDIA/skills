@@ -1,138 +1,57 @@
 # C++ Interaction Features
 
-## Orbit Camera Control
+Apply these SDK contracts through the selected native toolkit. ImGui/GLFW
+input and widget snippets are examples; adapt event ownership and coordinates
+to the chosen shell without adding a second UI dependency.
 
-Use an orbit camera with azimuth, elevation, distance, and target. Mouse input
-updates camera state; the render loop writes the camera transform to
-`omni:xform` before `ovrtx_step()`.
+## Camera And Input State
+
+Use `camera-controls` for orbit/pan/zoom and live-bounds fitting. Initialize the
+camera from the scene's bounds, units and up-axis; preserve that convention in
+navigation and fitting. UI events become bounded owner-thread commands through
+`viewer-input-routing`. The owner updates camera state and writes its local
+`omni:xform` through OVStage before publication. For a root-level session camera,
+that local matrix is also its world matrix.
+
+## Live Stage Writes
+
+Create a query for the target prim through OVStage's own path dictionary and
+`ovstage_query_from_path_list()` (see `stage-queries`). Reuse valid queries within
+a stage generation and release them before replacement. A single-prim query can
+write a camera/local transform as one float64 matrix element:
 
 ```cpp
-#include <algorithm>
 #include <array>
-#include <cmath>
+using Mat4 = std::array<double, 16>;
 
-struct OrbitCamera {
-    using Mat4 = std::array<double, 16>;
-
-    double azimuth = -1.5707963267948966;
-    double elevation = 0.2912652529540066;
-    double distance = 500.0;
-    std::array<double, 3> target = {-74.5, 103.0, -22.5};
-    double lastX = 0.0;
-    double lastY = 0.0;
-    int dragButton = -1;  // 0 orbit, 1 pan, 2 dolly
-
-    void beginDrag(int button, double x, double y)
-    {
-        dragButton = button;
-        lastX = x;
-        lastY = y;
-    }
-
-    void drag(double x, double y)
-    {
-        const double dx = x - lastX;
-        const double dy = y - lastY;
-        lastX = x;
-        lastY = y;
-
-        if (dragButton == 0) {
-            azimuth += dx * 0.006;
-            elevation = std::clamp(elevation + dy * 0.006, -1.45, 1.45);
-        } else if (dragButton == 2) {
-            distance = std::max(1.0, distance * std::exp(dy * 0.01));
-        }
-    }
-
-    void scroll(double yoffset)
-    {
-        distance = std::max(1.0, distance * std::exp(-yoffset * 0.08));
-    }
-
-    Mat4 cameraToWorld() const
-    {
-        const double ce = std::cos(elevation);
-        const std::array<double, 3> eye = {
-            target[0] + distance * ce * std::cos(azimuth),
-            target[1] + distance * std::sin(elevation),
-            target[2] + distance * ce * std::sin(azimuth),
-        };
-
-        auto normalize = [](std::array<double, 3> v) {
-            const double len = std::sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-            return std::array<double, 3>{v[0] / len, v[1] / len, v[2] / len};
-        };
-        auto cross = [](std::array<double, 3> a, std::array<double, 3> b) {
-            return std::array<double, 3>{
-                a[1] * b[2] - a[2] * b[1],
-                a[2] * b[0] - a[0] * b[2],
-                a[0] * b[1] - a[1] * b[0],
-            };
-        };
-
-        const std::array<double, 3> forward = normalize({
-            target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]});
-        const std::array<double, 3> worldUp = {0.0, 1.0, 0.0};
-        const std::array<double, 3> right = normalize(cross(forward, worldUp));
-        const std::array<double, 3> up = cross(right, forward);
-
-        return {
-            right[0], right[1], right[2], 0.0,
-            up[0], up[1], up[2], 0.0,
-            -forward[0], -forward[1], -forward[2], 0.0,
-            eye[0], eye[1], eye[2], 1.0,
-        };
-    }
-};
-```
-
-Write the camera matrix with `OVRTX_SEMANTIC_XFORM_MAT4x4`:
-
-```cpp
-static bool writeMat4Attribute(
-    ovrtx_renderer_t* renderer,
-    const std::string& primPath,
-    const char* attributeName,
-    const OrbitCamera::Mat4& matrix)
+static bool writeLocalMatrix(
+    ovstage_instance_t* stage, ovstage_query_handle_t query,
+    const Mat4& matrix, ovstage_ordinal_t ordinal)
 {
-    int64_t shape[] = {1};
-    int64_t strides[] = {1};
-
-    DLTensor tensor = {};
+    int64_t shape = 1;
+    DLTensor tensor{};
     tensor.data = const_cast<double*>(matrix.data());
     tensor.device = {kDLCPU, 0};
     tensor.ndim = 1;
-    tensor.dtype = {static_cast<std::uint8_t>(kDLFloat), 64, 16};
-    tensor.shape = shape;
-    tensor.strides = strides;
-
-    ovrtx_input_buffer_t input = {};
-    input.tensors = &tensor;
-    input.tensor_count = 1;
-
-    const ovx_string_t path = toOvxString(primPath);
-    const ovx_string_t paths[] = {path};
-
-    ovrtx_binding_desc_or_handle_t binding = {};
-    binding.binding_desc.prim_list = {paths, 1};
-    binding.binding_desc.attribute_name = {0, literal_to_ovx_string(attributeName)};
-    binding.binding_desc.attribute_type = {
-        {static_cast<std::uint8_t>(kDLFloat), 64, 16},
-        false,
-        OVRTX_SEMANTIC_XFORM_MAT4x4,
-    };
-    binding.binding_desc.prim_mode = OVRTX_BINDING_PRIM_MODE_CREATE_NEW;
-
-    const ovrtx_enqueue_result_t write =
-        ovrtx_write_attribute(renderer, &binding, &input, OVRTX_DATA_ACCESS_SYNC);
-    return ok(write);
+    tensor.dtype = {kDLFloat, 64, 16};
+    tensor.shape = &shape;
+    ovstage_write_data_t data{};
+    data.tensors = &tensor;
+    data.tensor_count = 1;
+    data.semantic = OVSTAGE_SEMANTIC_MATRIX;
+    return waitStageOperation(stage, ovstage_write_attribute(
+        stage, query, {0, literal_to_ovx_string("omni:xform")}, ordinal,
+        data, OVSTAGE_PRIM_MODE_UPSERT));
 }
-
-writeMat4Attribute(renderer, "/OVCamera", "omni:xform", camera.cameraToWorld());
 ```
 
-Do not write `xformOp:transform` for live camera movement. OVRTX consumes the
-Fabric `omni:xform` attribute for live transforms.
+The wait keeps the stack-backed tensor alive until the write finishes; publish
+the batch's ordinal only after all writes succeed. Existing populated
+`omni:xform` values are local transforms. For world edits, read the live ancestor
+chain and reset-stack state, then compute the local result with the effective
+parent inverse. Preserve accepted local transforms across session recomposition.
+Use `prim-transform-safety` and `transform-manipulator` for this math; do not
+flatten a subtree into world matrices or create competing transform owners.
 
 ## Native Picking
 
@@ -151,16 +70,18 @@ struct PendingPick {
 static bool enqueuePick(
     ovrtx_renderer_t* renderer,
     const std::string& renderProductPath,
-    PendingPick& pendingPick)
+    PendingPick& pendingPick,
+    int renderWidth,
+    int renderHeight)
 {
-    if (!pendingPick.pending) return false;
+    if (!pendingPick.pending || renderWidth <= 0 || renderHeight <= 0) return false;
 
     const ovrtx_pick_query_desc_t desc = {
         toOvxString(renderProductPath),
-        pendingPick.left,
-        pendingPick.top,
-        pendingPick.right,
-        pendingPick.bottom,
+        static_cast<float>(pendingPick.left) / renderWidth,
+        static_cast<float>(pendingPick.top) / renderHeight,
+        static_cast<float>(pendingPick.right) / renderWidth,
+        static_cast<float>(pendingPick.bottom) / renderHeight,
         0,
     };
     pendingPick = {};
@@ -309,13 +230,15 @@ static std::vector<std::string> decodePickPaths(
 In the render loop, handle pick output beside `LdrColor`:
 
 ```cpp
-const bool pickQueued = enqueuePick(renderer, renderProductPath, pendingPick);
+const bool pickQueued = enqueuePick(renderer, renderProductPath, pendingPick, renderWidth, renderHeight);
 
-// After ovrtx_step() and ovrtx_fetch_results():
-if (pickQueued && sameString(var.render_var_name, OVRTX_RENDER_VAR_PICK_HIT)) {
+// After ovrtx_step_with_stage() and ovrtx_fetch_results():
+if (pickQueued && sameString(var.render_var_path, OVRTX_RENDER_VAR_PICK_HIT)) {
+    ovrtx_map_output_description_t mapDesc = {};
+    mapDesc.device_type = OVRTX_MAP_DEVICE_TYPE_CPU;
     ovrtx_render_var_output_t mapped = {};
     if (ok(ovrtx_map_render_var_output(renderer, var.output_handle,
-            ovrtx_timeout_infinite, &mapped)) &&
+            &mapDesc, ovrtx_timeout_infinite, &mapped)) &&
         mapped.status == OVRTX_EVENT_COMPLETED) {
         std::vector<std::string> picked = decodePickPaths(renderer, mapped);
         setSelectedPrim(picked.empty() ? std::string{} : picked.front());
@@ -327,260 +250,61 @@ if (pickQueued && sameString(var.render_var_name, OVRTX_RENDER_VAR_PICK_HIT)) {
 ```
 
 Treat `left` and `top` as inclusive, `right` and `bottom` as exclusive. A single
-click is a `1x1` rectangle: `{x, y, x + 1, y + 1}`.
+click is a `1x1` pixel rectangle: `{x, y, x + 1, y + 1}`. Divide its
+edges by the current render-product width and height before enqueueing; the
+OVRTX query takes top-left-origin normalized coordinates in `[0, 1]`, not pixels.
 
 ## Selection Outline
 
 Enable outlines in renderer config, then call
-`ovrtx_set_selection_outline_group()` with renderer path IDs. Group `0` clears
-the outline; group `1` is primary selection.
+`ovrtx_set_selection_outline_group_strings()` with canonical prim paths. Group `0` clears
+the outline; group `1` is primary selection. Queue this state on the owner after
+the waited stage update and before the next render step. Expand a selected Xform
+to its drawable descendants when the UI selects containers.
 
 ```cpp
 static void setSelectionOutline(
     ovrtx_renderer_t* renderer,
-    uint64_t previousPathId,
-    uint64_t nextPathId)
+    const std::string& previousPath,
+    const std::string& nextPath)
 {
-    if (previousPathId) {
+    if (!previousPath.empty()) {
+        const ovx_string_t path = toOvxString(previousPath);
         const uint8_t group = 0;
-        ovrtx_set_selection_outline_group(renderer, &previousPathId, 1, &group);
+        waitForOperation(renderer,
+            ovrtx_set_selection_outline_group_strings(renderer, &path, 1, &group),
+            "Failed to clear selection outline");
     }
-    if (nextPathId) {
+    if (!nextPath.empty()) {
+        const ovx_string_t path = toOvxString(nextPath);
         const uint8_t group = 1;
-        ovrtx_set_selection_outline_group(renderer, &nextPathId, 1, &group);
+        waitForOperation(renderer,
+            ovrtx_set_selection_outline_group_strings(renderer, &path, 1, &group),
+            "Failed to set selection outline");
     }
 }
 ```
 
-For bulk updates, pass parallel path-ID and group arrays to the same helper.
+For bulk updates, pass parallel string-path and group arrays. When renderer
+path IDs are already available, use `ovrtx_set_selection_outline_group()` with
+IDs from that renderer's own dictionary.
 Do not replace this renderer-owned selection state with a generic attribute
 write.
 
-## EffectLayer Prim-Pick Effects
+## Optional Material Effects And Animation
 
-EffectLayer faders are optional material effects, not the baseline selection
-signal. Keep native outlines enabled for all selected prims, then write
-`inputs:Fader` only for known material EffectLayer targets.
+Material effects write to OVStage at the owner's next ordinal. Resolve actual
+EffectLayer targets and save their current `inputs:Fader` values before changing
+them; do not hard-code scene-specific paths or create unknown shader inputs.
+For a single existing target, use a scalar float32 tensor (`dtype = {kDLFloat,
+32, 1}`, shape `{1}`) with `ovstage_write_attribute()` and
+`OVSTAGE_PRIM_MODE_UPSERT`, after confirming the target and input exist; wait,
+then publish. Restore the saved value
+when no selected prim still uses that target. See `prim-pick-effects` for shared
+materials and app-owned effect setup.
 
-```cpp
-static std::string effectLayerPathForPrim(const std::string& primPath)
-{
-    if (primPath == "/World/Cone") {
-        return "/World/Misc/Looks/Steel_Stainless/EffectLayer";
-    }
-    if (primPath == "/World/Cube") {
-        return "/World/Misc/Looks/Concrete_Rough/EffectLayer";
-    }
-    if (primPath == "/World/Sphere") {
-        return "/World/Misc/Looks/MetallicGreen_OmniPbr/EffectLayer";
-    }
-    return {};
-}
-
-static bool writeFloatAttribute(
-    ovrtx_renderer_t* renderer,
-    const std::string& primPath,
-    const char* attributeName,
-    float value,
-    ovrtx_binding_prim_mode_t primMode)
-{
-    int64_t shape[] = {1};
-    int64_t strides[] = {1};
-
-    DLTensor tensor = {};
-    tensor.data = &value;
-    tensor.device = {kDLCPU, 0};
-    tensor.ndim = 1;
-    tensor.dtype = {static_cast<std::uint8_t>(kDLFloat), 32, 1};
-    tensor.shape = shape;
-    tensor.strides = strides;
-
-    ovrtx_input_buffer_t input = {};
-    input.tensors = &tensor;
-    input.tensor_count = 1;
-
-    const ovx_string_t path = toOvxString(primPath);
-    const ovx_string_t paths[] = {path};
-
-    ovrtx_binding_desc_or_handle_t binding = {};
-    binding.binding_desc.prim_list = {paths, 1};
-    binding.binding_desc.attribute_name = {0, literal_to_ovx_string(attributeName)};
-    binding.binding_desc.attribute_type = {
-        {static_cast<std::uint8_t>(kDLFloat), 32, 1},
-        false,
-        OVRTX_SEMANTIC_NONE,
-    };
-    binding.binding_desc.prim_mode = primMode;
-
-    const ovrtx_enqueue_result_t write =
-        ovrtx_write_attribute(renderer, &binding, &input, OVRTX_DATA_ACCESS_SYNC);
-    return ok(write);
-}
-
-static void setEffectLayerFader(
-    ovrtx_renderer_t* renderer,
-    const std::string& primPath,
-    float fader)
-{
-    const std::string effectPath = effectLayerPathForPrim(primPath);
-    if (effectPath.empty()) return;
-
-    writeFloatAttribute(renderer, effectPath, "inputs:Fader", fader,
-        OVRTX_BINDING_PRIM_MODE_EXISTING_ONLY);
-}
-```
-
-For shared materials, compute active EffectLayer targets from the complete
-selected set. Do not turn off a shared material fader just because one of
-several selected prims was deselected.
-
-Author neutral startup values in the session layer when a sample material
-defaults to visible glow:
-
-```usda
-over "World"
-{
-    over "Misc"
-    {
-        over "Looks"
-        {
-            over "Concrete_Rough"
-            {
-                over "EffectLayer"
-                {
-                    float inputs:Fader = 0
-                }
-            }
-        }
-    }
-}
-```
-
-Use `CREATE_NEW` for load-time resets authored by the viewer. Use
-`EXISTING_ONLY` for runtime toggles when the target shader input must already
-exist.
-
-## Selection Animation
-
-Selection animation is just another live `omni:xform` write. Store the selected
-prim's base transform, then write an app-defined reversible offset every frame
-before `ovrtx_step()`. Choose the motion direction, magnitude, and timing from
-the product brief, stage units, asset scale, and coordinate system.
-
-```cpp
-enum class AnimationPhase {
-    Idle,
-    Rising,
-    Hovering,
-    Falling,
-};
-
-struct PrimAnimation {
-    std::string path;
-    OrbitCamera::Mat4 baseTransform;
-    AnimationPhase phase = AnimationPhase::Idle;
-    double t = 0.0;
-    double offset = 0.0;
-    double hoverTime = 0.0;
-    double fallStartOffset = 0.0;
-};
-
-static double clamp01(double value)
-{
-    return std::clamp(value, 0.0, 1.0);
-}
-
-static double easeOutQuint(double t)
-{
-    const double inv = 1.0 - clamp01(t);
-    return 1.0 - inv * inv * inv * inv * inv;
-}
-
-static OrbitCamera::Mat4 offsetTransform(
-    const PrimAnimation& animation,
-    int translationIndex)
-{
-    OrbitCamera::Mat4 transform = animation.baseTransform;
-    transform[translationIndex] += animation.offset;
-    return transform;
-}
-
-static void updateSelectionAnimation(
-    ovrtx_renderer_t* renderer,
-    std::vector<PrimAnimation>& animations,
-    double deltaSeconds)
-{
-    constexpr int kTranslationIndex = 13;       // app-defined axis in row-major matrix
-    constexpr double kBaseOffset = 0.05;        // stage units; choose from asset scale
-    constexpr double kRiseDuration = 0.25;
-    constexpr double kFallDuration = 0.25;
-    constexpr double kHoverAmplitude = 0.0;     // optional additional stage-unit offset
-    constexpr double kHoverFrequency = 1.5;
-    constexpr double kPi = 3.14159265358979323846;
-
-    deltaSeconds = std::clamp(deltaSeconds, 1.0 / 240.0, 0.1);
-
-    for (PrimAnimation& animation : animations) {
-        if (animation.phase == AnimationPhase::Idle) continue;
-
-        if (animation.phase == AnimationPhase::Rising) {
-            animation.t += deltaSeconds / kRiseDuration;
-            animation.offset = kBaseOffset * easeOutQuint(animation.t);
-            if (animation.t >= 1.0) {
-                animation.phase = AnimationPhase::Hovering;
-                animation.hoverTime = 0.0;
-            }
-        } else if (animation.phase == AnimationPhase::Hovering) {
-            animation.hoverTime += deltaSeconds;
-            animation.offset = kBaseOffset +
-                kHoverAmplitude * std::sin(2.0 * kPi * kHoverFrequency * animation.hoverTime);
-        } else if (animation.phase == AnimationPhase::Falling) {
-            animation.t += deltaSeconds / kFallDuration;
-            const double s = clamp01(animation.t);
-            animation.offset = animation.fallStartOffset * (1.0 - s);
-            if (s >= 1.0) {
-                animation.offset = 0.0;
-                animation.phase = AnimationPhase::Idle;
-            }
-        }
-
-        writeMat4Attribute(renderer, animation.path, "omni:xform",
-            offsetTransform(animation, kTranslationIndex));
-    }
-}
-```
-
-On selection change:
-
-```cpp
-static void selectPrim(
-    ovrtx_renderer_t* renderer,
-    std::string& selectedPath,
-    std::vector<PrimAnimation>& animations,
-    const std::string& nextPath)
-{
-    if (selectedPath == nextPath) return;
-
-    constexpr double kBaseOffset = 0.05;        // keep in sync with animation config
-
-    for (PrimAnimation& animation : animations) {
-        if (animation.path == selectedPath) {
-            animation.phase = AnimationPhase::Falling;
-            animation.t = 0.0;
-            animation.fallStartOffset = animation.offset;
-        }
-        if (animation.path == nextPath) {
-            animation.phase = AnimationPhase::Rising;
-            animation.t = animation.offset > 0.0 ? clamp01(animation.offset / kBaseOffset) : 0.0;
-        }
-    }
-
-    setSelectionOutline(renderer, selectedPath, nextPath);
-    // Update optional material effects in a separate manager when enabled.
-    selectedPath = nextPath;
-}
-```
-
-Only animate prims whose base transforms are known. For arbitrary scenes, query
-or initialize base `omni:xform` values first; do not overwrite unknown authored
-transforms with identity.
+Selection animation uses the same OVStage local-transform writer and publication
+clock. Capture a known local baseline, compose a reversible offset in parent
+space, and restore it on completion/deselection. Coordinate animation with manual
+editing so they never overwrite each other; do not substitute an identity matrix
+for an unknown baseline. See `selection-animation` and `prim-transform-safety`.

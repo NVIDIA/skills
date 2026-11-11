@@ -1,0 +1,929 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Black Forest Labs, The HuggingFace Team and The InstantX Team. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+from typing import Any, Optional, List, Set, Union, Tuple
+import types
+
+import numpy as np
+import torch
+import torch.utils.checkpoint
+from torch.distributed.fsdp import fully_shard
+
+from diffusers import FlowMatchEulerDiscreteScheduler, AutoencoderKL
+from diffusers.models import FluxTransformer2DModel
+from diffusers.models.transformers.transformer_flux import FluxTransformerBlock, FluxSingleTransformerBlock
+from diffusers.models.embeddings import TimestepEmbedding
+from transformers import CLIPTextModel, CLIPTokenizer, T5EncoderModel, T5TokenizerFast
+
+from fastgen.networks.network import FastGenNetwork, FastGenModule
+from fastgen.networks.lora_utils import LoRAMixin
+from fastgen.utils.tree_utils import OutputDtype, assert_same
+from fastgen.utils.distributed.fsdp import apply_fsdp_checkpointing
+from fastgen.utils.guidance import GuidanceConfig, predict_with_guidance
+from fastgen.utils.env import hf_load
+import fastgen.utils.logging_utils as logger
+
+
+class FluxTextEncoder(FastGenModule):
+    """Text encoder for Flux using CLIP and T5 models."""
+
+    def __init__(
+        self,
+        model_id_or_local_path: str,
+        max_sequence_length: int = 512,
+        dtype: Optional[torch.dtype] = torch.bfloat16,
+    ):
+        """Initialize the CLIP + T5 text encoders.
+
+        ``dtype`` defaults to bfloat16 to match the reference recipe, which loads every pipeline
+        component in bfloat16, including both text encoders (same rationale as
+        ``Flux2TextEncoder`` / ``QwenImageTextEncoder``).
+        """
+        super().__init__()
+        # Default T5 sequence length for ``encode``. Flux attends to pad-token
+        # embeddings (no text attention mask), so this affects conditioning too.
+        self.max_sequence_length = max_sequence_length
+        # CLIP text encoder
+        self.tokenizer = hf_load(
+            CLIPTokenizer.from_pretrained,
+            model_id_or_local_path,
+            subfolder="tokenizer",
+        )
+        self.text_encoder = hf_load(
+            CLIPTextModel.from_pretrained, model_id_or_local_path, subfolder="text_encoder", dtype=dtype
+        )
+
+        # T5 text encoder
+        self.tokenizer_2 = hf_load(
+            T5TokenizerFast.from_pretrained,
+            model_id_or_local_path,
+            subfolder="tokenizer_2",
+        )
+        self.text_encoder_2 = hf_load(
+            T5EncoderModel.from_pretrained, model_id_or_local_path, subfolder="text_encoder_2", dtype=dtype
+        )
+
+    def encode(
+        self,
+        conditioning: Optional[Any] = None,
+        max_sequence_length: Optional[int] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Encode text prompts to embeddings.
+
+        Args:
+            conditioning: Text prompt(s) to encode.
+            max_sequence_length: Maximum sequence length for T5 tokenization.
+                ``None`` (default) uses the encoder's configured value.
+
+        Returns:
+            Tuple of (pooled_prompt_embeds, prompt_embeds) tensors.
+        """
+        if max_sequence_length is None:
+            max_sequence_length = self.max_sequence_length
+        if isinstance(conditioning, str):
+            conditioning = [conditioning]
+
+        # CLIP encoding for pooled embeddings
+        text_inputs = self.tokenizer(
+            conditioning,
+            padding="max_length",
+            max_length=self.tokenizer.model_max_length,
+            truncation=True,
+            return_tensors="pt",
+        )
+
+        # T5 encoding for text embeddings
+        text_inputs_2 = self.tokenizer_2(
+            conditioning,
+            padding="max_length",
+            max_length=max_sequence_length,
+            truncation=True,
+            return_tensors="pt",
+        )
+
+        return self(text_inputs.input_ids.to(self.device), text_inputs_2.input_ids.to(self.device))
+
+    def forward(
+        self,
+        text_input_ids: torch.Tensor,
+        text_input_ids_2: torch.Tensor,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        prompt_embeds = self.text_encoder(
+            text_input_ids,
+            output_hidden_states=False,
+        )
+        pooled_prompt_embeds = prompt_embeds.pooler_output
+        prompt_embeds_2 = self.text_encoder_2(
+            text_input_ids_2,
+            output_hidden_states=False,
+        )[0]
+
+        return pooled_prompt_embeds, prompt_embeds_2
+
+
+class FluxImageEncoder(FastGenModule):
+    """VAE encoder/decoder for Flux.
+
+    BFL's original ``AutoEncoder`` owns the shift/scale transforms and its released
+    weights and encode boundary are FP32. Decode likewise reverses the transform from
+    an explicitly FP32 latent, although the neural decoder runs under BF16 autocast.
+    Diffusers externalizes the transforms around its raw ``AutoencoderKL``; FastGen
+    restores that ordering and returns each result in the dtype the VAE computed it in.
+    """
+
+    def __init__(self, model_id_or_local_path: str):
+        super().__init__()
+        self.vae: AutoencoderKL = hf_load(AutoencoderKL.from_pretrained, model_id_or_local_path, subfolder="vae")
+
+        # The Flux VAE shifts before it scales; ``AutoencoderKL`` registers ``shift_factor=None`` for other VAEs.
+        self.scaling_factor = self.vae.config.scaling_factor
+        self.shift_factor = self.vae.config.shift_factor
+        assert (
+            self.shift_factor is not None
+        ), f"Expected the FLUX.1 VAE (its config sets shift_factor) under {model_id_or_local_path}/vae"
+
+    @property
+    def precision_model(self) -> Optional[torch.dtype]:
+        """Keep the released FP32 VAE fixed while allowing custom replacements to opt out."""
+        if getattr(self.vae.config, "force_upcast", False):
+            return torch.float32
+        return super().precision_model
+
+    @property
+    def latent_compression_factors(self) -> tuple[int, int]:
+        """Pixel-to-latent ``(H, W)`` downsampling of the VAE; every down block but the last halves resolution."""
+        factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
+        return (factor, factor)
+
+    def encode(self, real_images: torch.Tensor) -> torch.Tensor:
+        """Encode images to latent space.
+
+        Args:
+            real_images: Input images in [-1, 1] range.
+
+        Returns:
+            torch.Tensor: Latent representations (shifted and scaled).
+        """
+        return self(real_images, operation="encode")
+
+    def decode(self, latent_images: torch.Tensor) -> torch.Tensor:
+        """Decode latents to images.
+
+        Args:
+            latent_images: Latent representations (shifted and scaled).
+
+        Returns:
+            torch.Tensor: Decoded images in [-1, 1] range.
+        """
+        return self(latent_images, operation="decode")
+
+    def forward(self, data: torch.Tensor, operation: str) -> torch.Tensor:
+        if operation == "encode":
+            latent_images = self.vae.encode(data.to(dtype=self.precision_model), return_dict=False)[0].sample()
+            return (latent_images - self.shift_factor) * self.scaling_factor
+        if operation == "decode":
+            latents = (data.to(dtype=self.precision_model) / self.scaling_factor) + self.shift_factor
+            if getattr(self.vae.config, "force_upcast", False):
+                with torch.autocast(device_type=latents.device.type, dtype=torch.bfloat16):
+                    images = self.vae.decode(latents, return_dict=False)[0]
+            else:
+                images = self.vae.decode(latents, return_dict=False)[0]
+            return images.clip(-1.0, 1.0)
+        raise ValueError(f"Unsupported preprocessor operation: {operation!r}")
+
+
+def classify_forward(
+    self,
+    hidden_states: torch.Tensor,
+    img_grid: Tuple[int, int],
+    encoder_hidden_states: torch.Tensor = None,
+    pooled_projections: torch.Tensor = None,
+    timestep: torch.LongTensor = None,
+    r: Optional[torch.Tensor] = None,
+    img_ids: torch.Tensor = None,
+    txt_ids: torch.Tensor = None,
+    guidance: torch.Tensor = None,
+    joint_attention_kwargs: Optional[dict] = None,
+    return_features_early: bool = False,
+    feature_indices: Optional[Set[int]] = None,
+    return_logvar: bool = False,
+) -> Union[torch.Tensor, List[torch.Tensor], Tuple[torch.Tensor, torch.Tensor]]:
+    """
+    Modified forward pass for FluxTransformer2DModel with feature extraction support.
+
+    Args:
+        hidden_states: Input latent states.
+        img_grid: Packed ``(rows, cols)`` of the image tokens; feature extraction reshapes them to
+            ``[B, C, rows, cols]``.
+        encoder_hidden_states: T5 text encoder hidden states.
+        pooled_projections: CLIP pooled text embeddings.
+        timestep: Current timestep.
+        img_ids: Image position IDs.
+        txt_ids: Text position IDs.
+        guidance: Guidance scale embedding.
+        joint_attention_kwargs: Additional attention kwargs.
+        return_features_early: If True, return features as soon as collected.
+        feature_indices: Set of block indices to extract features from.
+        return_logvar: If True, return log variance estimate.
+
+    Returns:
+        Model output, optionally with features or logvar.
+    """
+    idx, features = 0, []
+
+    # BFL builds t/guidance at the unprojected model-input dtype (``img.dtype``; bf16 in its
+    # pipeline: ``get_noise(dtype=torch.bfloat16)`` and a bf16 model), scales by 1000 there,
+    # embeds in fp32 and casts back to it. Capture that dtype before ``x_embedder`` so autocast
+    # cannot change it (diffusers casts after the projection).
+    input_dtype = hidden_states.dtype
+
+    # 1. Patch embedding
+    hidden_states = self.x_embedder(hidden_states)
+
+    # 2. Time embedding. ``time_text_embed`` casts its fp32 t/guidance sinusoids to ``pooled_projections.dtype``;
+    # give the pooled text the input dtype so the sinusoids enter their embedders in it, as in BFL.
+    pooled_projections = pooled_projections.to(dtype=input_dtype)
+    timestep_scaled = timestep.to(input_dtype) * 1000
+    if guidance is None and getattr(self.config, "guidance_embeds", False):
+        # The transformer was built with a guidance embedder (Flux.1-dev), so
+        # ``time_text_embed`` requires a guidance tensor. Fall back to zeros
+        # when the caller didn't supply one (e.g. CFG branch of ``Flux.sample``).
+        guidance = torch.zeros(timestep_scaled.shape, dtype=input_dtype, device=hidden_states.device)
+    if guidance is not None:
+        guidance_scaled = guidance.to(input_dtype) * 1000
+        temb = self.time_text_embed(timestep_scaled, guidance_scaled, pooled_projections)
+    else:
+        temb = self.time_text_embed(timestep_scaled, pooled_projections)
+
+    # 2b. Second-timestep (``r``) embedding for flow-map methods: a fresh additive
+    # ``r_embedder`` (zero-init -> no-op at start) sharing the frozen sinusoidal projection.
+    if getattr(self, "r_embedder", None) is not None and r is not None:
+        # ``r`` shares FLUX's time projector, so it uses the same input precision.
+        r_scaled = r.to(input_dtype) * 1000
+        r_in = (timestep_scaled - r_scaled) if self.time_cond_type == "diff" else r_scaled
+        r_proj = self.time_text_embed.time_proj(r_in)
+        temb = temb + self.r_embedder(r_proj.to(input_dtype))
+    elif getattr(self, "r_embedder", None) is None and r is not None:
+        raise ValueError("`r` was provided but the network has no `r_embedder` (set net.r_timestep=True).")
+
+    # 3. Text embedding
+    encoder_hidden_states = self.context_embedder(encoder_hidden_states)
+
+    # 4. Prepare positional embeddings
+    ids = torch.cat((txt_ids, img_ids), dim=0)
+    image_rotary_emb = self.pos_embed(ids)
+
+    # 5. Joint transformer blocks
+    for block in self.transformer_blocks:
+        if torch.is_grad_enabled() and self.gradient_checkpointing:
+            encoder_hidden_states, hidden_states = self._gradient_checkpointing_func(
+                block,
+                hidden_states,
+                encoder_hidden_states,
+                temb,
+                image_rotary_emb,
+                joint_attention_kwargs,
+            )
+        else:
+            encoder_hidden_states, hidden_states = block(
+                hidden_states=hidden_states,
+                encoder_hidden_states=encoder_hidden_states,
+                temb=temb,
+                image_rotary_emb=image_rotary_emb,
+                joint_attention_kwargs=joint_attention_kwargs,
+            )
+
+        # Check if we should extract features at this index
+        if feature_indices is not None and idx in feature_indices:
+            # Reshape from [B, seq_len, hidden_dim] to [B, hidden_dim, H, W] for discriminator
+            feat = hidden_states.detach()
+            B, S, C = feat.shape
+            feat = feat.permute(0, 2, 1).reshape(B, C, *img_grid)
+            features.append(feat)
+
+        # Early return if we have all features
+        if return_features_early and feature_indices is not None and len(features) == len(feature_indices):
+            return features
+
+        idx += 1
+
+    # 6. Single transformer blocks
+    for block in self.single_transformer_blocks:
+        if torch.is_grad_enabled() and self.gradient_checkpointing:
+            encoder_hidden_states, hidden_states = self._gradient_checkpointing_func(
+                block,
+                hidden_states,
+                encoder_hidden_states,
+                temb,
+                image_rotary_emb,
+                joint_attention_kwargs,
+            )
+        else:
+            encoder_hidden_states, hidden_states = block(
+                hidden_states=hidden_states,
+                encoder_hidden_states=encoder_hidden_states,
+                temb=temb,
+                image_rotary_emb=image_rotary_emb,
+                joint_attention_kwargs=joint_attention_kwargs,
+            )
+
+        # Check if we should extract features at this index
+        if feature_indices is not None and idx in feature_indices:
+            # Reshape from [B, seq_len, hidden_dim] to [B, hidden_dim, H, W] for discriminator
+            feat = hidden_states.detach()
+            B, S, C = feat.shape
+            feat = feat.permute(0, 2, 1).reshape(B, C, *img_grid)
+            features.append(feat)
+
+        # Early return if we have all features
+        if return_features_early and feature_indices is not None and len(features) == len(feature_indices):
+            return features
+
+        idx += 1
+
+    # 7. Final projection - hidden_states is already image-only after single blocks
+    hidden_states = self.norm_out(hidden_states, temb)
+    output = self.proj_out(hidden_states)
+
+    # If we have all the features, we can exit early
+    if return_features_early:
+        assert feature_indices is not None
+        assert len(features) == len(feature_indices), f"{len(features)} != {len(feature_indices)}"
+        return features
+
+    out = [output, features] if feature_indices is not None else output
+
+    if return_logvar:
+        logvar = self.logvar_linear(temb)
+        return out, logvar
+
+    return out
+
+
+DEFAULT_FLUX_LORA_TARGETS: List[str] = [
+    "to_q",
+    "to_k",
+    "to_v",
+    "to_out.0",
+    "add_q_proj",
+    "add_k_proj",
+    "add_v_proj",
+    "to_add_out",
+    "proj_out",
+    "proj_mlp",
+    "ff.net.0.proj",
+    "ff.net.2",
+    "ff_context.net.0.proj",
+    "ff_context.net.2",
+]
+
+
+class Flux(LoRAMixin, FastGenNetwork):
+    """Flux.1 network for text-to-image generation.
+
+    Reference: https://huggingface.co/black-forest-labs/FLUX.1-dev
+    """
+
+    MODEL_ID = "black-forest-labs/FLUX.1-dev"
+    latent_compression_factors = (8, 8)
+
+    def __init__(
+        self,
+        model_id_or_local_path: str = MODEL_ID,
+        net_pred_type: str = "flow",
+        schedule_type: str = "rf",
+        disable_grad_ckpt: bool = False,
+        guidance_scale: Optional[float] = 3.5,
+        load_pretrained: bool = True,
+        r_timestep: bool = False,
+        r_embedder_init: str = "zero",
+        time_cond_type: str = "diff",
+        max_sequence_length: int = 512,
+        **schedule_kwargs,
+    ):
+        """Flux.1 constructor.
+
+        Args:
+            model_id_or_local_path: The HuggingFace model ID or local path to load.
+                Defaults to "black-forest-labs/FLUX.1-dev".
+            net_pred_type: Prediction type. Defaults to "flow" for flow matching.
+            schedule_type: Schedule type. Defaults to "rf" (rectified flow).
+            disable_grad_ckpt: Disable activation checkpointing. FSDP needs no override: ``fully_shard``
+                replaces the Diffusers checkpointing with FSDP-compatible wrappers.
+            guidance_scale: Default guidance scale for Flux.1-dev guidance distillation.
+                None means no guidance. Defaults to 3.5 (recommended for Flux.1-dev).
+            r_timestep: Whether to support a second timestep (flow-map / mean-flow /
+                AYF methods) via an additive ``r_embedder``.
+            r_embedder_init: ``"zero"`` (no-op at init), ``"warm"`` (pretrained
+                linear_1 features, zero linear_2 -- still a no-op), or ``"pretrained"``
+                (initialize from the pretrained time embedder).
+            time_cond_type: ``"diff"`` embeds ``t - r``; ``"abs"`` embeds ``r``.
+            max_sequence_length: T5 text sequence length. Flux attends to pad-token
+                embeddings, so this affects conditioning semantics as well as compute.
+        """
+        # The native sampler grids start at sigma 1.0, so the raw-time bound defaults to 1.0 (configs may lower it).
+        schedule_kwargs.setdefault("max_t", 1.0)
+        super().__init__(net_pred_type=net_pred_type, schedule_type=schedule_type, **schedule_kwargs)
+
+        self.model_id_or_local_path = model_id_or_local_path
+        self.max_sequence_length = max_sequence_length
+        self.guidance_scale = guidance_scale
+        logger.debug(f"Embedded guidance scale: {guidance_scale}")
+
+        # Initialize the network (handles meta device and pretrained loading)
+        self._initialize_network(model_id_or_local_path, load_pretrained)
+        if guidance_scale is not None and not self.transformer.config.guidance_embeds:
+            raise ValueError(f"{model_id_or_local_path} has no guidance embedder; set guidance_scale=None")
+
+        # Optional second-timestep (``r``) embedder for flow-map / mean-flow / AYF methods.
+        self._init_r_embedder(r_timestep, r_embedder_init, time_cond_type)
+
+        # Override forward with classify_forward
+        self.transformer.forward = types.MethodType(classify_forward, self.transformer)
+
+        # Disable cuDNN SDPA backend to avoid mha_graph->execute errors during backward.
+        # This is a known issue with Flux transformer and cuDNN attention.
+        # Flash and mem_efficient backends still work; only cuDNN is problematic.
+        if torch.backends.cuda.is_built():
+            torch.backends.cuda.enable_cudnn_sdp(False)
+            logger.info("Disabled cuDNN SDPA backend for Flux compatibility")
+
+        # Gradient checkpointing configuration
+        if disable_grad_ckpt:
+            self.transformer.disable_gradient_checkpointing()
+        else:
+            self.transformer.enable_gradient_checkpointing()
+
+        torch.cuda.empty_cache()
+
+    def _initialize_network(self, model_id_or_local_path: str, load_pretrained: bool) -> None:
+        """Initialize the transformer network.
+
+        Args:
+            model_id_or_local_path: The HuggingFace model ID or local path.
+            load_pretrained: Whether to load pretrained weights.
+        """
+        # Check if we're in a meta context (for FSDP memory-efficient loading)
+        in_meta_context = self._is_in_meta_context()
+        should_load_weights = load_pretrained and (not in_meta_context)
+
+        if should_load_weights:
+            logger.info("Loading Flux transformer from pretrained")
+            self.transformer: FluxTransformer2DModel = hf_load(
+                FluxTransformer2DModel.from_pretrained, model_id_or_local_path, subfolder="transformer"
+            )
+        else:
+            # Load config and create model structure
+            # If we're in a meta context, tensors will automatically be on meta device
+            config = hf_load(FluxTransformer2DModel.load_config, model_id_or_local_path, subfolder="transformer")
+            if in_meta_context:
+                logger.info(
+                    "Initializing Flux transformer on meta device (zero memory, will receive weights via FSDP sync)"
+                )
+            else:
+                logger.info("Initializing Flux transformer from config (no pretrained weights)")
+                logger.warning("Flux transformer being initialized from config. No weights are loaded!")
+            self.transformer: FluxTransformer2DModel = FluxTransformer2DModel.from_config(config)
+
+        # Add logvar linear layer for variance estimation on the time embedding
+        inner_dim = self.transformer.config.num_attention_heads * self.transformer.config.attention_head_dim
+        self.transformer.logvar_linear = torch.nn.Linear(inner_dim, 1)
+
+    def default_lora_target_modules(self) -> List[str]:
+        return DEFAULT_FLUX_LORA_TARGETS
+
+    def _init_r_embedder(self, r_timestep: bool, r_embedder_init: str, time_cond_type: str) -> None:
+        """Attach an additive second-timestep (``r``) embedder to the transformer,
+        added to the time embedding inside ``classify_forward`` (Wan/DiT pattern)."""
+        if time_cond_type not in ("abs", "diff"):
+            raise ValueError(f"Invalid time condition: {time_cond_type}")
+        self.transformer.time_cond_type = time_cond_type
+        if not r_timestep:
+            self.transformer.r_embedder = None
+            return
+
+        if r_embedder_init not in ("zero", "pretrained", "warm"):
+            raise ValueError(f"Unknown r_embedder_init '{r_embedder_init}' ('zero', 'pretrained', or 'warm').")
+        self._r_embedder_init = r_embedder_init
+
+        inner_dim = self.transformer.config.num_attention_heads * self.transformer.config.attention_head_dim
+        self.transformer.r_embedder = TimestepEmbedding(in_channels=256, time_embed_dim=inner_dim)
+        # Under FSDP meta-init the params are meta tensors ('pretrained' cannot even be
+        # copied); skip -- rank 0 initializes for real and FSDP broadcasts its weights.
+        if self._is_in_meta_context():
+            logger.info("Skipping r_embedder weight init on meta device (weights will arrive via FSDP sync)")
+            return
+        self._reset_r_embedder_parameters()
+        logger.info(f"Initialized Flux r_embedder (init={r_embedder_init}, time_cond_type={time_cond_type}).")
+
+    def _reset_r_embedder_parameters(self) -> None:
+        """Apply the configured r_embedder init; the zero-init keeps the r_embedder a no-op at start."""
+        r_embedder = getattr(self.transformer, "r_embedder", None)
+        if r_embedder is None:
+            return
+        if self._r_embedder_init == "pretrained":
+            r_embedder.load_state_dict(self.transformer.time_text_embed.timestep_embedder.state_dict())
+            return
+        if self._r_embedder_init == "warm":
+            # Feature warm start: linear_1 from the pretrained time embedder;
+            # linear_2 stays zero so the embedder remains a no-op at init.
+            r_embedder.linear_1.load_state_dict(
+                self.transformer.time_text_embed.timestep_embedder.linear_1.state_dict()
+            )
+        torch.nn.init.zeros_(r_embedder.linear_2.weight)
+        if r_embedder.linear_2.bias is not None:
+            torch.nn.init.zeros_(r_embedder.linear_2.bias)
+
+    def fully_shard(self, **kwargs):
+        """Shard ``self.transformer``; see ``FastGenNetwork.fully_shard``.
+
+        Flux has two types of transformer blocks:
+        - transformer_blocks: Joint attention blocks for text-image interaction
+        - single_transformer_blocks: Single stream blocks for image processing
+        """
+        # Checkpointing has to happen first, for proper casting during backward pass recomputation.
+        if self.transformer.gradient_checkpointing:
+            self.transformer.disable_gradient_checkpointing()
+            apply_fsdp_checkpointing(self.transformer, (FluxTransformerBlock, FluxSingleTransformerBlock))
+
+        # Apply FSDP sharding to joint transformer blocks
+        for block in self.transformer.transformer_blocks:
+            fully_shard(block, **kwargs)
+        # Apply FSDP sharding to single transformer blocks
+        for block in self.transformer.single_transformer_blocks:
+            fully_shard(block, **kwargs)
+
+        fully_shard(self.transformer, **kwargs)
+
+    def init_preprocessors(self):
+        """Initialize text and image encoders."""
+        if "text_encoder" not in self.preprocessors:
+            self.init_text_encoder()
+        if "vae" not in self.preprocessors:
+            self.init_vae()
+
+    def init_text_encoder(self, dtype: Optional[torch.dtype] = torch.bfloat16):
+        """Initialize the text encoder for Flux."""
+        self.preprocessors["text_encoder"] = FluxTextEncoder(
+            model_id_or_local_path=self.model_id_or_local_path,
+            max_sequence_length=self.max_sequence_length,
+            dtype=dtype,
+        )
+
+    def init_vae(self):
+        """Initialize only the VAE for visualization."""
+        self.preprocessors["vae"] = FluxImageEncoder(model_id_or_local_path=self.model_id_or_local_path)
+
+    def _prepare_latent_image_ids(
+        self,
+        height: int,
+        width: int,
+        device: torch.device,
+        dtype: torch.dtype,
+    ) -> torch.Tensor:
+        """Prepare image position IDs for the transformer.
+
+        Args:
+            height: Latent height (before packing, will be divided by 2).
+            width: Latent width (before packing, will be divided by 2).
+            device: Target device.
+            dtype: Target dtype.
+
+        Returns:
+            torch.Tensor: Image position IDs [(H//2)*(W//2), 3] (2D, no batch dim).
+        """
+        # Use packed dimensions
+        packed_height = height // 2
+        packed_width = width // 2
+        latent_image_ids = torch.zeros(packed_height, packed_width, 3, device=device, dtype=dtype)
+        latent_image_ids[..., 1] = torch.arange(packed_height, device=device, dtype=dtype)[:, None]
+        latent_image_ids[..., 2] = torch.arange(packed_width, device=device, dtype=dtype)[None, :]
+        latent_image_ids = latent_image_ids.reshape(packed_height * packed_width, 3)
+        return latent_image_ids
+
+    def _prepare_text_ids(
+        self,
+        seq_length: int,
+        device: torch.device,
+        dtype: torch.dtype,
+    ) -> torch.Tensor:
+        """Prepare text position IDs.
+
+        Args:
+            seq_length: Text sequence length.
+            device: Target device.
+            dtype: Target dtype.
+
+        Returns:
+            torch.Tensor: Text position IDs [seq_length, 3] (2D, no batch dim).
+        """
+        text_ids = torch.zeros(seq_length, 3, device=device, dtype=dtype)
+        return text_ids
+
+    def _pack_latents(self, latents: torch.Tensor) -> torch.Tensor:
+        """Pack latents from [B, C, H, W] to [B, (H//2)*(W//2), C*4] for Flux transformer.
+
+        Flux uses 2x2 patch packing where each 2x2 spatial block is flattened into channels.
+
+        Args:
+            latents: Input latents [B, C, H, W].
+
+        Returns:
+            Packed latents [B, (H//2)*(W//2), C*4].
+        """
+        batch_size, channels, height, width = latents.shape
+        # Reshape to [B, C, H//2, 2, W//2, 2]
+        latents = latents.view(batch_size, channels, height // 2, 2, width // 2, 2)
+        # Permute to [B, H//2, W//2, C, 2, 2]
+        latents = latents.permute(0, 2, 4, 1, 3, 5)
+        # Reshape to [B, (H//2)*(W//2), C*4]
+        latents = latents.reshape(batch_size, (height // 2) * (width // 2), channels * 4)
+        return latents
+
+    def _unpack_latents(self, latents: torch.Tensor, height: int, width: int) -> torch.Tensor:
+        """Unpack latents from [B, (H//2)*(W//2), C*4] to [B, C, H, W].
+
+        Reverses the 2x2 patch packing used by Flux.
+
+        Args:
+            latents: Packed latents [B, (H//2)*(W//2), C*4].
+            height: Target height (original H before packing).
+            width: Target width (original W before packing).
+
+        Returns:
+            Unpacked latents [B, C, H, W].
+        """
+        batch_size = latents.shape[0]
+        channels = latents.shape[2] // 4  # C*4 -> C
+        # Reshape to [B, H//2, W//2, C, 2, 2]
+        latents = latents.reshape(batch_size, height // 2, width // 2, channels, 2, 2)
+        # Permute to [B, C, H//2, 2, W//2, 2]
+        latents = latents.permute(0, 3, 1, 4, 2, 5)
+        # Reshape to [B, C, H, W]
+        latents = latents.reshape(batch_size, channels, height, width)
+        return latents
+
+    def forward(
+        self,
+        x_t: torch.Tensor,
+        t: torch.Tensor,
+        condition: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        r: Optional[torch.Tensor] = None,  # second timestep for flow-map / mean-flow / AYF
+        guidance: Optional[torch.Tensor] = None,
+        return_features_early: bool = False,
+        feature_indices: Optional[Set[int]] = None,
+        return_logvar: bool = False,
+        fwd_pred_type: Optional[str] = None,
+        apply_output_conditioning: bool = True,
+        output_dtype: OutputDtype = "same",
+        **fwd_kwargs,
+    ) -> Union[torch.Tensor, List[torch.Tensor], Tuple[torch.Tensor, torch.Tensor]]:
+        """Forward pass of Flux diffusion model.
+
+        Args:
+            x_t: The diffused data sample [B, C, H, W].
+            t: The current timestep.
+            condition: Tuple of (pooled_prompt_embeds, prompt_embeds) from text encoder.
+            r: Second timestep (for mean flow methods).
+            return_features_early: If True, return features once collected.
+            feature_indices: Set of block indices for feature extraction.
+            return_logvar: If True, return the logvar.
+            fwd_pred_type: Override network prediction type.
+            guidance: Optional guidance scale embedding.
+            apply_output_conditioning: Apply the output constraint after the conversion.
+            output_dtype: ``"same"`` rounds the prediction to the state dtype; ``None`` keeps it in high precision.
+        Returns:
+            Model output tensor or tuple with logvar/features.
+        """
+        self._validate_forward_kwargs(
+            fwd_kwargs,
+            r=r,
+            return_features_early=return_features_early,
+            feature_indices=feature_indices,
+            supports_r_timestep=getattr(self.transformer, "r_embedder", None) is not None,
+            num_features=len(self.transformer.transformer_blocks) + len(self.transformer.single_transformer_blocks),
+        )
+        if return_features_early and feature_indices is not None and not feature_indices:
+            return []
+
+        x_t_model = self.cast_to_model_precision(x_t)
+        pooled_prompt_embeds, prompt_embeds = condition
+        assert_same(
+            dtype=self.precision_model,
+            device=x_t_model.device,
+            pooled_prompt_embeds=pooled_prompt_embeds,
+            prompt_embeds=prompt_embeds,
+        )
+        assert_same(
+            shape=True,
+            dtype=self.noise_scheduler.t_precision,
+            device=True,
+            t=t,
+            r=r,
+        )
+        batch_size = x_t_model.shape[0]
+        height, width = x_t_model.shape[2], x_t_model.shape[3]
+
+        # Flux.1-dev (w/ guidance distillation) uses embedded guidance, so callers
+        # that don't provide an explicit ``guidance`` tensor get one filled from
+        # ``self.guidance_scale``.
+        if guidance is None and self.guidance_scale is not None:
+            guidance = torch.full((batch_size,), self.guidance_scale, device=x_t_model.device, dtype=x_t_model.dtype)
+        assert_same(shape=True, device=True, t=t, guidance=guidance)
+
+        # Prepare position IDs (2D tensors, no batch dimension) in float32 like BFL's ``prepare``; bf16 represents
+        # integer positions exactly only up to 256.
+        img_ids = self._prepare_latent_image_ids(height, width, x_t_model.device, torch.float32)
+        txt_ids = self._prepare_text_ids(prompt_embeds.shape[1], x_t_model.device, torch.float32)
+
+        # Pack latents for transformer: [B, C, H, W] -> [B, (H//2)*(W//2), C*4]
+        hidden_states = self._pack_latents(x_t_model)
+
+        model_outputs = self.transformer(
+            hidden_states=hidden_states,
+            encoder_hidden_states=prompt_embeds,
+            pooled_projections=pooled_prompt_embeds,
+            timestep=t,  # Flux expects timestep in [0, 1]
+            r=r,
+            img_ids=img_ids,
+            txt_ids=txt_ids,
+            guidance=guidance,
+            return_features_early=return_features_early,
+            feature_indices=feature_indices,
+            return_logvar=return_logvar,
+            img_grid=(height // 2, width // 2),
+        )
+
+        if return_features_early:
+            return model_outputs
+
+        if return_logvar:
+            out, logvar = model_outputs[0], model_outputs[1]
+        else:
+            out = model_outputs
+
+        # Unpack output: [B, H*W, C] -> [B, C, H, W]
+        if isinstance(out, torch.Tensor):
+            out = self._unpack_latents(out, height, width)
+            out = self.transform_output(out, x_t, t, condition, "x0", "same", True)
+        else:
+            out[0] = self._unpack_latents(out[0], height, width)
+            out[0] = self.transform_output(
+                out[0], x_t, t, condition, "x0", "same", True
+            )
+
+        if return_logvar:
+            return out, logvar.to(dtype=x_t.dtype)
+        return out
+
+    def _calculate_shift(
+        self,
+        image_seq_len: int,
+        base_seq_len: int = 256,
+        max_seq_len: int = 4096,
+        base_shift: float = 0.5,
+        max_shift: float = 1.15,
+    ) -> float:
+        """Calculate the shift value for the scheduler based on image resolution.
+
+        Linear in the packed token count between ``(256, 0.5)`` and ``(4096, 1.15)``, as in
+        BFL's ``flux.sampling.get_lin_function`` / ``get_schedule`` defaults.
+        """
+
+        m = (max_shift - base_shift) / (max_seq_len - base_seq_len)
+        b = base_shift - m * base_seq_len
+        mu = image_seq_len * m + b
+        return mu
+
+    @staticmethod
+    def default_guidance_cfg() -> GuidanceConfig:
+        """Default traditional-CFG recipe at scale 3.5.
+
+        Consulted by ``sample()`` only when ``self.guidance_scale is None``
+        (the CFG branch). All shipped Flux.1 configs use Flux.1-dev with
+        embedded distillation guidance, so they should have
+        ``config.model.net.guidance_scale`` set to a non-None value.
+        """
+        g = GuidanceConfig()
+        g.cfg.scale = 3.5
+        return g
+
+    def sample_scheduler_and_grid(
+        self, sample_steps: int, image_seq_len: int, device: Optional[torch.device] = None
+    ) -> Tuple[FlowMatchEulerDiscreteScheduler, torch.Tensor]:
+        """Return a new flow-matching Euler scheduler on BFL's ``flux.sampling.get_schedule`` grid.
+
+        That is ``linspace(1, 0, steps + 1)`` under the exponential shift, with ``mu`` linear in ``image_seq_len`` (the
+        token count after 2x2 packing). diffusers applies this shift only with ``use_dynamic_shifting`` on an explicit
+        grid; ``shift=mu`` would shift multiplicatively instead.
+
+        Returns:
+            The scheduler, set to begin at the first step, and the times to query the network at, one per step: its
+            sigmas in ``t_precision``.
+        """
+        mu = self._calculate_shift(image_seq_len)
+        scheduler = FlowMatchEulerDiscreteScheduler(use_dynamic_shifting=True)
+        scheduler.set_timesteps(sigmas=np.linspace(1.0, 1 / sample_steps, sample_steps), mu=mu, device=device)
+        # Start at step 0: high shifts repeat the first timestep, and the lookup (a device sync) takes the second match.
+        scheduler.set_begin_index(0)
+        t_grid = self.noise_scheduler.safe_clamp(
+            scheduler.sigmas[:-1].to(device=device, dtype=self.noise_scheduler.t_precision),
+            min=self.noise_scheduler.min_t,
+            max=self.noise_scheduler.max_t,
+            warn=True,
+        )
+        return scheduler, t_grid
+
+    def sample(
+        self,
+        noise: torch.Tensor,
+        condition: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        neg_condition: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        sample_steps: int = 28,
+        sample_type: str = "ode",
+        guidance_cfg: Optional[GuidanceConfig] = None,
+    ) -> torch.Tensor:
+        """Generate samples using Euler flow matching.
+
+        Two internal modes (selected by ``self.guidance_scale``):
+
+        1. **Embedded Guidance** (``self.guidance_scale`` is set,
+           default for Flux.1-dev): a single forward whose embedded
+           distillation-guidance scalar is filled by ``self.forward``
+           from ``self.guidance_scale`` (set via
+           ``config.model.net.guidance_scale``). ``neg_condition``
+           and ``guidance_cfg`` are not consulted — applying CFG on top
+           of embedded guidance would double-count.
+        2. **CFG mode** (``self.guidance_scale is None``, undistilled
+           variants): uses ``predict_with_guidance`` to fuse the
+           cond + cfg-uncond pair into one batched forward.
+
+        Args:
+            noise: Initial noise tensor [B, C, H, W].
+            condition: Tuple of (pooled_prompt_embeds, prompt_embeds).
+            neg_condition: Negative condition tuple for CFG mode;
+                ignored in embedded guidance mode.
+            sample_steps: Number of sampling steps. Defaults to 28.
+            sample_type: Integration policy; only ``"ode"`` is supported.
+            guidance_cfg: Composite guidance config consulted only in CFG
+                mode; ``None`` → ``default_guidance_cfg()`` (CFG scale 3.5).
+
+        Returns:
+            Generated latent samples.
+        """
+        self._validate_sample_kwargs(
+            sample_type,
+            supported_schedule_types=("rf",),
+            supported_sample_types=("ode",),
+        )
+        batch_size, channels, height, width = noise.shape
+
+        # Calculate image sequence length for shift calculation
+        # After 2x2 packing: seq_len = (H // 2) * (W // 2)
+        image_seq_len = (height // 2) * (width // 2)
+
+        scheduler, t_grid = self.sample_scheduler_and_grid(sample_steps, image_seq_len, device=noise.device)
+
+        # Initialize latents with proper scaling based on the initial timestep
+        latents = self.noise_scheduler.latents(noise=noise, t_init=t_grid[0])
+
+        # Resolve the CFG config once up front; loop-invariant. Only consulted
+        # on the CFG branch, so skip resolution entirely under distillation.
+        cfg = (
+            (guidance_cfg if guidance_cfg is not None else self.default_guidance_cfg())
+            if self.guidance_scale is None
+            else None
+        )
+
+        # Sampling loop
+        for sched_step, t in zip(scheduler.timesteps, t_grid, strict=True):
+            t = t.expand(batch_size)
+
+            if self.guidance_scale is None:
+                # CFG mode (undistilled variants) — fuse cond + uncond
+                # into one batched forward via predict_with_guidance.
+                noise_pred = predict_with_guidance(
+                    self,
+                    latents,
+                    t,
+                    batched=True,
+                    guidance_cfg=cfg,
+                    condition=condition,
+                    neg_condition=neg_condition,
+                    fwd_pred_type="flow",
+                )
+            else:
+                # Guidance distillation mode (Flux.1-dev). forward() fills
+                # the embedded guidance tensor from self.guidance_scale
+                noise_pred = self(
+                    latents,
+                    t,
+                    condition,
+                    fwd_pred_type="flow",
+                )
+
+            # Euler step
+            latents = scheduler.step(noise_pred, sched_step, latents, return_dict=False)[0]
+
+        return latents

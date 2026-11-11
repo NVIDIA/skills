@@ -105,7 +105,7 @@ on the host.
 DEFT AOI is always a PCB workflow and uses the pre-staged, version-compatible
 fine-tuned checkpoint. AnomalyGen runs in its own container
 (`config.anomalygen.container`, `images.metropolis_sdg.paidf_anomalygen`), not
-the Cosmos-RL image.
+the model-action image.
 
 After Phase 2, parse `<output_dir>/allocation.json` before launching Phase 3. A
 large requested-vs-allocated gap means the cad_mask or anomaly-mask geometry is

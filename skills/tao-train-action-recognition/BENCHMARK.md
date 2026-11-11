@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-train-action-recognition`
-- Evaluation date: 2026-09-17
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:5a28679a2ce1c0f618dcb3a8bd8953e64b96e2eda82d50a65fe4ff5081a17989` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.5% — baseline ran, but no comparable score was available; uplift unavailable | 92.3% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 5.6% → 83.3% (+77.7 points) | 65.0% → 83.3% (+18.3 points) |
-| Efficiency | 97.2% — baseline ran, but no comparable score was available; uplift unavailable | 97.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 70.0% → 73.3% (+3.3 points) |
+| Efficiency | 72.6% — baseline ran, but no comparable score was available; uplift unavailable | 98.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -52,11 +52,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 69,389 | 637,286 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-train-action-recognition-basic | 69,389 | 637,286 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 30,886 | 13,929 | +16,957 | +121.74% | skill 1/1; base 1/1 |
-| codex | tao-train-action-recognition-basic | 30,886 | 13,929 | +16,957 | +121.74% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 100,275 | 651,215 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 97,598 | 388,694 | -291,096 | -74.89% | skill 1/1; base 1/1 |
+| claude-code | tao-train-action-recognition-basic | 97,598 | 388,694 | -291,096 | -74.89% | skill 1/1; base 1/1 |
+| codex | All cases | 47,190 | 13,880 | +33,310 | +239.99% | skill 1/1; base 1/1 |
+| codex | tao-train-action-recognition-basic | 47,190 | 13,880 | +33,310 | +239.99% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 144,788 | 402,574 | -257,786 | -64.03% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 

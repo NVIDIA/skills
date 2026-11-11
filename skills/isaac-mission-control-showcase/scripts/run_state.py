@@ -238,8 +238,8 @@ def record_isaac_exit(work_dir, pid, returncode, reason: str) -> dict:
     return update(
         work_dir,
         isaac={
-            "pid": pid,
-            "exit_status": returncode,
+            "pid": int(pid),
+            "exit_status": int(returncode) if returncode is not None else None,
             "exit_reason": reason,
             "running": False,
         },
@@ -274,6 +274,8 @@ def write_result(work_dir, **fields) -> Path:
             "motion_confirmed": bool(motion.get("motion_confirmed")),
         },
         "acceptance": manifest.get("acceptance"),
+        "failure": manifest.get("failure"),
+        "health": manifest.get("health"),
     }
     result.update({k: v for k, v in fields.items() if v is not None})
     path = result_path(work_dir)
@@ -281,7 +283,8 @@ def write_result(work_dir, **fields) -> Path:
     return path
 
 
-def accept(work_dir, *, mission_state, robot_state, robot_healthy, oom, processes_healthy):
+def accept(work_dir, *, mission_state, robot_state, robot_healthy, oom, processes_healthy,
+           isaac_running):
     """Apply the canonical acceptance criteria and record the verdict.
 
     Acceptance is strict and never weakened: the mission must be COMPLETED, the
@@ -294,13 +297,15 @@ def accept(work_dir, *, mission_state, robot_state, robot_healthy, oom, processe
         reasons.append(f"mission state is {mission_state!r}, expected 'COMPLETED'")
     if robot_state != "IDLE":
         reasons.append(f"robot state is {robot_state!r}, expected 'IDLE'")
-    if not robot_healthy:
+    if robot_healthy is not True:
         reasons.append("robot reported errors or was offline")
     if not motion["motion_confirmed"]:
         reasons.append(f"motion not confirmed ({motion['verdict']})")
-    if oom:
-        reasons.append("an OOM event was recorded during the run")
-    if not processes_healthy:
+    if oom is not False:
+        reasons.append("an OOM event was recorded or OOM status is unknown")
+    if isaac_running is not True:
+        reasons.append("Isaac Sim is not confirmed running")
+    if processes_healthy is not True:
         reasons.append("required Nova Carter or Nav2 processes were unhealthy")
     verdict = {
         "accepted": not reasons,
@@ -308,7 +313,8 @@ def accept(work_dir, *, mission_state, robot_state, robot_healthy, oom, processe
         "motion": motion,
         "mission_state": mission_state,
         "robot_state": robot_state,
-        "oom": bool(oom),
+        "oom": oom,
+        "isaac_running": isaac_running,
         "processes_healthy": bool(processes_healthy),
     }
     update(work_dir, acceptance=verdict, state="accepted" if not reasons else "failed")

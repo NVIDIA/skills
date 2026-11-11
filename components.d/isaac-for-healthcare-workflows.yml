@@ -2,6 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 
 name: Isaac for Healthcare Workflows
+product_primary: Isaac for Healthcare
 repo: isaac-for-healthcare/i4h-workflows
 description: Agent-ready skills for Isaac for Healthcare agentic and catheter-navigation workflows, covering task authoring, data pipelines, policy training and validation, CT-derived digital twins, DRR rendering, and interactive catheter simulation.
 links:

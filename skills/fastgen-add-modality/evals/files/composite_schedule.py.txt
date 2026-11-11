@@ -1,0 +1,271 @@
+# fastgen/networks/noise_schedule.py:2476-2745
+class CompositeNoiseSchedule(BaseNoiseSchedule):
+    """Applies independent per-modality noise schedules to dict-valued inputs.
+
+    Each entry in *schedules* maps a modality key (e.g. ``"video"``,
+    ``"audio"``) to a dict ``{"name": <schedule_name>, **schedule_kwargs}``.
+    Methods that accept data tensors (``forward_process``, ``latents``,
+    ``x0_to_eps``, …) require ``Dict[str, Tensor]`` inputs and dispatch
+    each key to the corresponding sub-schedule.  All modalities share the
+    same timestep ``t`` and time range.
+
+    Per-modality queries (``alpha``, ``sigma``, ``rescale_t``, …) return
+    dicts keyed by modality.  Time-only queries (``sample_t``, ``grid``)
+    delegate to the **primary** sub-schedule (configurable via
+    *primary_key*; defaults to the first key), and the composite uses that
+    schedule's ``student_grid_cfg``.  Individual sub-schedules are accessible
+    via ``self.subschedules[key]``.
+
+
+    Example::
+
+        composite = CompositeNoiseSchedule(
+            schedules={
+                "video": {"name": "rf", "min_t": 0.0, "max_t": 0.999},
+                "audio": {"name": "shifted_rf", "shift": 3.0, "min_t": 0.0, "max_t": 0.999},
+            },
+            primary_key="video",
+        )
+        t = composite.sample_t(batch_size)   # one Tensor
+        x_t = composite.forward_process({"video": x_v, "audio": x_a}, {"video": e_v, "audio": e_a}, t)
+    """
+
+    def __init__(
+        self,
+        schedules: dict[str, dict],
+        primary_key: Optional[str] = None,
+    ):
+        instantiated = {
+            k: get_noise_schedule(v["name"], **{kk: vv for kk, vv in v.items() if kk != "name"})
+            for k, v in schedules.items()
+        }
+
+        if primary_key is not None:
+            if primary_key not in instantiated:
+                raise KeyError(
+                    f"primary_key '{primary_key}' not in schedules. " f"Available keys: {list(instantiated.keys())}"
+                )
+        else:
+            primary_key = next(iter(instantiated))
+
+        primary = instantiated[primary_key]
+
+        super().__init__(
+            min_t=primary._min_t,
+            max_t=primary._max_t,
+            clamp_min=primary.clamp_min,
+            student_grid_cfg=primary.student_grid_cfg,
+        )
+        self.t_precision = primary.t_precision
+
+        # Underlying ModuleDict is exposed via the ``schedules`` property
+        # below; instance attribute uses a different name so the property
+        # on ``BaseNoiseSchedule`` (returning ``self``) can be cleanly
+        # overridden here without a property/instance-attr collision.
+        self.subschedules = torch.nn.ModuleDict(instantiated)
+        self.primary = self.subschedules[primary_key]
+
+        for k, sched in self.subschedules.items():
+            if sched.t_precision != primary.t_precision:
+                raise ValueError(
+                    f"Sub-schedule '{k}' has t_precision={sched.t_precision}, but primary "
+                    f"'{primary_key}' has t_precision={primary.t_precision}. Composite schedules "
+                    "share one timestep tensor, so all sub-schedules must use the same t_precision."
+                )
+            if sched._min_t != primary._min_t or sched._max_t != primary._max_t:
+                raise ValueError(
+                    f"Sub-schedule '{k}' has time range [{sched._min_t}, {sched._max_t}], "
+                    f"but primary has [{primary._min_t}, {primary._max_t}]. "
+                    "All sub-schedules must share the same time range."
+                )
+
+    def reset_parameters(self) -> None:
+        for schedule in self.subschedules.values():
+            schedule.reset_parameters()
+
+    @property
+    def schedules(self) -> torch.nn.ModuleDict:
+        """Per-modality dispatch view (used as ``ns.schedules`` arg to
+        ``tree_utils.per_modality``).  Overrides ``BaseNoiseSchedule``'s
+        property (which returns ``self``) so callers can dispatch
+        uniformly without an ``isinstance`` check."""
+        return self.subschedules
+
+    def _per_schedule(self, method: str, *args: Any, **kwargs: Any) -> Any:
+        """Call *method* on every sub-schedule, with the structure coming from the **schedules**.
+
+        The counterpart to `_per_modality`, which is driven by the *data*.  These take the
+        shared time, which is one Tensor rather than a per-modality dict, so the modalities have to
+        supply the structure instead.  Dict arguments are still indexed per key.
+        """
+        return per_modality(
+            lambda sched, *a, **kw: getattr(sched, method)(*a, **kw), self.subschedules, *args, **kwargs
+        )
+
+    def alpha(self, t: torch.Tensor) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("alpha", t)
+
+    def sigma(self, t: torch.Tensor) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("sigma", t)
+
+    def alpha_sigma(self, t: torch.Tensor) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
+        pairs = self._per_schedule("alpha_sigma", t)
+        return index(pairs, 0), index(pairs, 1)
+
+    def alpha_prime(self, t: torch.Tensor) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("alpha_prime", t)
+
+    def sigma_prime(self, t: torch.Tensor) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("sigma_prime", t)
+
+    def alpha_start(self, t_start: torch.Tensor, clean_end: bool = True) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("alpha_start", t_start, clean_end=clean_end)
+
+    def transition_std(
+        self,
+        t: torch.Tensor,
+        t_start: torch.Tensor,
+        clean_end: bool = True,
+    ) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("transition_std", t, t_start, clean_end=clean_end)
+
+    def determinant(
+        self,
+        t_start: torch.Tensor,
+        t_end: torch.Tensor,
+        clean_end: bool = True,
+    ) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("determinant", t_start, t_end, clean_end=clean_end)
+
+    def rescale_t(self, t: torch.Tensor) -> Dict[str, torch.Tensor]:
+        """The scale each modality's model input is conditioned on, from the one shared time.
+
+        A fan-out like the rest, since each sub-schedule may scale differently and carries its own
+        shift; delegating to the primary would put every modality on video's noise level.
+        """
+        return self._per_schedule("rescale_t", t)
+
+    def sqrt_snr(self, t: torch.Tensor) -> Dict[str, torch.Tensor]:
+        return self._per_schedule("sqrt_snr", t)
+
+    # ------------------------------------------------------------------
+    # Draws. The time is shared, so these are the primary's; the schedule grid
+    # likewise delegates to the primary clock.
+    # ------------------------------------------------------------------
+
+    def sample_t(self, *args, **kwargs) -> torch.Tensor:
+        """Draw the shared training time; each modality's noise level follows from its own shift."""
+        return self.primary.sample_t(*args, **kwargs)
+
+    def sample_t_icdf(self, *args, **kwargs) -> torch.Tensor:
+        """The quantiles of the shared training time, as drawn by ``sample_t``."""
+        return self.primary.sample_t_icdf(*args, **kwargs)
+
+    def grid(
+        self,
+        num_steps: int,
+        device: Optional[torch.device] = None,
+        dtype: Optional[torch.dtype] = None,
+    ) -> torch.Tensor:
+        """Return the shared grid on the primary schedule's clock."""
+        return self.primary.grid(num_steps=num_steps, device=device, dtype=dtype)
+
+    def _grid(self, num_steps: int, device: Optional[torch.device] = None) -> torch.Tensor:
+        """The primary schedule's grid before rounding, which native student grids shift."""
+        return self.primary._grid(num_steps, device)
+
+    # Ambiguous with several sub-schedules: each reaches a given sqrt-SNR at a different shared
+    # time, because each warps that time by its own shift.
+    def sqrt_snr_to_t(self, sqrt_snr_t: torch.Tensor) -> torch.Tensor:
+        raise NotImplementedError("Ambiguous with multiple schedules; use subschedules[key].sqrt_snr_to_t()")
+
+    # ------------------------------------------------------------------
+    # Per-modality dispatch helper (delegates to canonical ``per_modality``)
+    # ------------------------------------------------------------------
+
+    def _per_modality(self, method: str, first_arg: Any, *args: Any, **kwargs: Any) -> Any:
+        """Call *method* per-modality on each sub-schedule.
+
+        Drives ``per_modality`` by *first_arg* (the data) and passes
+        ``self.subschedules`` (a ``ModuleDict``) as a regular arg that
+        gets indexed per-key by ``per_modality``'s standard rule.
+        ``args`` / ``kwargs`` that are dicts are indexed per-key;
+        everything else is broadcast.
+
+        Bare-Tensor *first_arg* is rejected with ``TypeError``: a
+        ``CompositeNoiseSchedule`` is only meaningful for multimodal data,
+        and single-modality slices should call
+        ``self.subschedules[key].{method}(tensor, ...)`` directly rather
+        than route through the dispatcher.
+        """
+        if isinstance(first_arg, torch.Tensor):
+            raise TypeError(
+                f"CompositeNoiseSchedule.{method}() requires dict-shaped data input. "
+                f"For a single-modality slice, call "
+                f"``self.subschedules[key].{method}(tensor, ...)`` directly "
+                f"with `key` from {sorted(self.subschedules.keys())}."
+            )
+        return per_modality(
+            lambda x, sched, *a, **kw: getattr(sched, method)(x, *a, **kw),
+            first_arg,
+            self.subschedules,
+            *args,
+            **kwargs,
+        )
+
+    # ------------------------------------------------------------------
+    # Dict-aware overrides for data-accepting methods
+    # ------------------------------------------------------------------
+
+    def forward_process(self, x, eps, t, t_start=None, clean_end=True):
+        return self._per_modality("forward_process", x, eps, t, t_start=t_start, clean_end=clean_end)
+
+    def step(self, xt, model_output, t, t_next, pred_type="x0", sample_type="ode", clean_end=True):
+        return self._per_modality(
+            "step", xt, model_output, t, t_next, pred_type=pred_type, sample_type=sample_type, clean_end=clean_end
+        )
+
+    def latents(self, noise, t_init):
+        return self._per_modality("latents", noise, t_init=t_init)
+
+    def cond_velocity(self, x, eps, t, output_dtype="same"):
+        return self._per_modality("cond_velocity", x, eps, t, output_dtype=output_dtype)
+
+    def cond_v(self, x, eps, t, output_dtype="same"):
+        return self._per_modality("cond_v", x, eps, t, output_dtype=output_dtype)
+
+    def x0_to_eps(self, xt, x0, t, output_dtype="same"):
+        return self._per_modality("x0_to_eps", xt, x0, t, output_dtype=output_dtype)
+
+    def eps_to_x0(self, xt, eps, t, output_dtype="same"):
+        return self._per_modality("eps_to_x0", xt, eps, t, output_dtype=output_dtype)
+
+    def flow_to_x0(self, xt, v, t, output_dtype="same"):
+        return self._per_modality("flow_to_x0", xt, v, t, output_dtype=output_dtype)
+
+    def points_to_x0(self, x_start, x_end, t_start, t_end, clean_end=True, output_dtype="same"):
+        return self._per_modality(
+            "points_to_x0", x_start, x_end, t_start, t_end, clean_end=clean_end, output_dtype=output_dtype
+        )
+
+    def x0_to_flow(self, xt, x0, t, output_dtype="same"):
+        return self._per_modality("x0_to_flow", xt, x0, t, output_dtype=output_dtype)
+
+    def convert_model_output(
+        self,
+        xt,
+        model_output,
+        t,
+        src_pred_type="x0",
+        target_pred_type="eps",
+        output_dtype="same",
+    ):
+        return self._per_modality(
+            "convert_model_output",
+            xt,
+            model_output,
+            t,
+            src_pred_type=src_pred_type,
+            target_pred_type=target_pred_type,
+            output_dtype=output_dtype,
+        )

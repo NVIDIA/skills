@@ -1,0 +1,55 @@
+{
+  "skills": [
+    "vss-build-vision-ai"
+  ],
+  "profile": "vdr-1-quickstart",
+  "resources": {
+    "platforms": {
+      "RTXPRO6000BW": {
+        "gpu_count": 1
+      }
+    }
+  },
+  "env": "A stock RTX PRO 6000 Blackwell host with Docker, NVIDIA Container Toolkit, NGC credentials, and the VSS repository at `{{repo_root}}`. The prompts are verbatim from the VDR slide.\n\nQueries 1 and 2 are questions, not build requests: answer from the skill's own SKILL.md and references without writing a build directory, running `docker compose`, or starting a container. Query 3 is the quickstart deploy: artifacts under `_builds/vdr-1-quickstart/`, brought up with a detached `docker compose ... up -d` from the validated `resolved.yml` as soon as validation passes. Use the **build.nvidia.com hosted-model provider (notebook option (c))** for NemoClaw: `NVIDIA_API_KEY` is supplied; `COMPATIBLE_API_KEY` is not, so the default option (a) would block on a missing bearer. No teardown.",
+  "expects": [
+    {
+      "artifact_expected": false,
+      "query": "what does this skill do?",
+      "checks": [
+        "The answer describes what the skill does: it composes and deploys agent-ready vision capabilities as a self-contained stack on the NVIDIA VSS Blueprint, either by deploying a stock developer profile or by composing a delta overlay on one.",
+        "The answer identifies the stock developer profiles `base`, `alerts`, `search`, and LVS/video summarization, and identifies `warehouse` as the supported industry profile.",
+        "The answer scopes the skill to composing or deploying application stacks rather than single microservices, and distinguishes that from operating an already-deployed stack. The exact wording and examples are not prescribed.",
+        "No deployment or composition side effects: the trajectory runs no `docker compose up`, creates no `_builds/` directory, and starts no container."
+      ]
+    },
+    {
+      "artifact_expected": false,
+      "query": "what does the base vision agent harness include?",
+      "checks": [
+        "The answer names the base profile's in-stack agent - by service key (`vss-agent`) or by name (\"the in-stack agent\"), either is fine - and its Web UI, the `redis` cache, the VIOS video I/O and storage services, and the model tier of one LLM plus integrated RT-VLM. This describes the stock `base` profile as shipped, agent included; naming `phoenix` (the agent's trace sink) as well is fine, and so is noting that the LLM and `phoenix` leave with the agent on a harness build - the exact list wording is not prescribed.",
+        "The answer does not claim the base profile ships semantic search, real-time alerting, or video summarization - those belong to the `search`, `alerts` and `lvs` profiles.",
+        "No deployment or composition side effects: the trajectory runs no `docker compose up`, creates no `_builds/` directory, and starts no container."
+      ]
+    },
+    {
+      "query": "deploy vss vision agent autonomously, add nemoclaw, no teardown",
+      "checks": [
+        "`{{repo_root}}/_builds/vdr-1-quickstart/override.env` exists, declares a `FOUNDATION` that is exactly one of `base`, `alerts`, `lvs` or `search`, and carries the full effective `COMPOSE_PROFILES`. The Foundation choice is the skill's, not the check's - the effective service set is what the next check pins.",
+        "The effective service set is the `base` profile minus `vss-agent` and minus the two peers only it uses - its `llm_*` key and `phoenix` - and nothing else: `vss-ui`, `redis`, the VIOS services and `rtvi-vlm` all remain, `COMPOSE_PROFILES` carries no `llm_` key and no `phoenix` key (no remaining service consumes the LLM, the harness model is hosted, and phoenix only collected the agent's traces), and no key is added. Removing `vss-agent` makes this a Delta build rather than a stock deploy, and the response says so.",
+        "No build-directory label is used as a Compose profile: `COMPOSE_PROFILES` contains no key named `vdr-1-quickstart`, and every entry in it is a canonical service-profile key.",
+        "`{{repo_root}}/_builds/vdr-1-quickstart/compose.yml` includes the root `deploy/docker/compose.yml`, and the build directory contains `override.env`, `compose.yml`, and `resolved.yml`.",
+        "The deployment is launched directly from `_builds/vdr-1-quickstart/resolved.yml` after validation, not from a copied Compose project or the Foundation's own env files.",
+        "The NemoClaw harness the request asked for is brought up host-side after readiness, and `nemoclaw` stays a harness label - it appears in no `COMPOSE_PROFILES`, `compose.yml` or `patches/` entry. The build keeps `vss-haproxy-ingress`, which NemoClaw requires as its single origin.",
+        "The sandbox named in the response (`NEMOCLAW_SANDBOX_NAME`) is the harness image with the deployment recorded: `openshell sandbox exec -n <that name> -- vss --version` prints a version (the image was built from `.openclaw/Dockerfile`, not NemoClaw's stock image), and `openshell sandbox exec -n <that name> -- vss configure check` exits 0 with the `vlm` group available (the notebook recorded `http://host.openshell.internal:7777` inside the sandbox). A sandbox without the CLI, or with no deployment recorded, fails this check even if the Agent UI is reachable. `openshell` is the sandbox runtime NemoClaw installs on this host during onboarding (`~/.local/bin`), so it is present wherever the notebook ran; `nemoclaw <name> status` naming the sandbox is the fallback evidence if the binary is not on the judge's PATH.",
+        "The first `resolved.yml` and `vss-agent-ui` container enable the adapter with protocol `openclaw-ws` and a `ws://host.docker.internal:<selected-relay-port>` URL - the relay port, not the loopback-only forward port. The relay-aware NemoClaw notebook runs with `VSS_AGENT_ADAPTER_ENABLED=true`, the selected dashboard port (default `18789`) and relay port (default `18790`). The gateway token is entered in the running Web UI after onboarding; no regenerated Compose file or recreated UI container carries the token.",
+        "`sh -c 'i=1; while [ \"$i\" -le 24 ]; do curl -sf --max-time 10 http://localhost:7777/ >/dev/null 2>&1 && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (Web UI still served with no agent, fetched at the published edge-proxy origin rather than the container port; the UI has no vss CLI surface, so this one stays an HTTP fetch; polls up to ~2 min).",
+        "`sh -c 'cd {{repo_root}} && uv run --project libs/vss vss --version >/dev/null 2>&1; i=1; while [ \"$i\" -le 24 ]; do uv run --project libs/vss vss configure --base-url http://localhost:7777 >/dev/null 2>&1 && c=$(uv run --project libs/vss vss configure check 2>/dev/null) && echo \"$c\" | grep -Eq \"^ *vlm +available\" && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (a fresh `vss configure` against the compose edge proxy `vss-haproxy-ingress` at `:7777`, then `vss configure check` exiting 0 - every recorded route answers its live re-probe - with the `vlm` command group reported available: integrated RT-VLM routed and serving; polls up to ~2 min after a one-off venv warm-up).",
+        "`sh -c 'i=1; while [ \"$i\" -le 24 ]; do docker ps --format \"{{.Names}}\" | grep -qx vss-agent-ui && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (Web UI; polls up to ~2 min).",
+        "`sh -c 'i=1; while [ \"$i\" -le 24 ]; do docker ps --format \"{{.Names}}\" | grep -qx redis && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (shared cache peer; polls up to ~2 min).",
+        "`docker ps --format '{{.Names}}' | awk '$0 == \"phoenix\" { found=1 } END { exit found ? 1 : 0 }'` returns exit 0 (phoenix is absent: it collected the in-stack agent's traces and leaves with it).",
+        "`sh -c 'i=1; while [ \"$i\" -le 24 ]; do docker ps --format \"{{.Names}}\" | grep -qx vss-rtvi-vlm && exit 0; sleep 5; i=$((i+1)); done; exit 1'` returns exit 0 (integrated RT-VLM; polls up to ~2 min).",
+        "`docker ps --format '{{.Names}}' | awk '$0 == \"vss-agent\" { found=1 } END { exit found ? 1 : 0 }'` returns exit 0 (the in-stack agent is absent, as the harness choice requires)."
+      ]
+    }
+  ]
+}

@@ -76,12 +76,18 @@ def runtime_prim_info(runtime, path: str) -> dict:
     }
     if "omni:xform" in attrs:
         values = runtime.read_attribute("omni:xform", [path])
-        data["world_transform"] = np.asarray(values).reshape(1, 4, 4)[0].tolist()
+        data["local_transform"] = np.asarray(values).reshape(1, 4, 4)[0].tolist()
+        data["world_transform"] = runtime.read_world_transform(path).tolist()
     if "inputs:Fader" in attrs:
         values = runtime.read_attribute("inputs:Fader", [path])
         data["fader"] = float(np.asarray(values).reshape(-1)[0])
     return data
 ```
+
+`read_world_transform` is an application adapter, not an OVStage attribute
+alias. It composes current ancestor locals and reset-stack flags through the
+shared [transform model](../prim-transform-safety/README.md#resolve-current-world-transforms).
+Read both inspector transforms from the same runtime snapshot.
 
 Do not force every inspector field through pxr just because the UI already has a
 worker. The worker should augment runtime data with variants, material

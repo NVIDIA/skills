@@ -18,7 +18,7 @@ observability surface, and the safety policy, see
 patterns layered under everything below (the universal Core
 lifecycle, the cross-library `DOCA_ERROR_*` taxonomy, the
 modify-a-shipped-sample workflow), see
-[`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+`doca-programming-guide/SKILL.md`.
 
 Each verb below describes the **shape of the workflow**, not a
 copy-paste recipe. The agent's job is to walk the user through
@@ -36,20 +36,15 @@ kernel launch can succeed.
 
 Steps the agent should walk the user through:
 
-1. **Confirm the env preconditions.** Per the env-precondition
-   matrix in
-   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy):
-   `pkg-config --modversion doca-dpa` returns a version the
-   installed DPACC compiler is listed as compatible with under
-   the DOCA Compatibility Policy; the target BlueField is
-   present and exposes its DPA processor to the host (the
-   `doca_dev` enumeration succeeds AND a `doca_dpa_cap_*` query
-   against its `doca_devinfo` returns supported for the
-   baseline DPA surface); the user / process can open the
-   target `doca_dev`. If ANY of these fails, this is an env /
-   version / mode problem to fix via
-   [`doca-setup TASKS.md ## configure`](../../doca-setup/TASKS.md#configure)
-   + [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure),
+1. **Confirm the env preconditions.** Walk the three environment
+   rows of the env-precondition matrix in
+   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy)
+   (DPA exposed to the host, DOCA + DPACC compatible, `doca_dev`
+   accessible); the signature and smoke rows are checked later, in
+   `## build` and `## test`. Any failing environment row is an env /
+   version / mode fix via
+   `doca-setup TASKS.md ## configure` (`doca-setup/TASKS.md#configure`)
+   + `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`),
    NOT a code change in the host-side DPA program.
 2. **Walk the two-side-program model BEFORE writing any host
    code.** Per the two-side-program rule in
@@ -62,24 +57,18 @@ Steps the agent should walk the user through:
    host-side launch call is drafted. If the user is asking
    *"how do I write the DPA-side kernel itself"*, that is the
    DPACC + DPA-side libraries surface — route via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+   `doca-public-knowledge-map/SKILL.md`
    to the public DOCA DPA / DPACC / DPA-Comms / DPA-Verbs
    guides; do not redefine those surfaces here.
 3. **Run dual capability discovery against the target
-   BlueField.** Per the dual-axis rule in
-   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
-   on the DOCA side, run the matching `doca_dpa_cap_*` against
-   the active `doca_devinfo` for the BlueField the host is
-   driving; on the install side, confirm `pkg-config
-   --modversion doca-dpa` agrees with `doca_caps --version`
-   and with the installed `dpacc` version per the DOCA
-   Compatibility Policy. Quote BOTH results back to the user.
-   If either says *not supported*, that axis is the answer —
-   do not proceed.
+   BlueField** per the dual-axis rule in
+   [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
+   and quote BOTH results back to the user. If either says *not
+   supported*, that axis is the answer — do not proceed.
 4. **Create the `doca_dpa` Core context against the chosen
    `doca_dev`.** This is a standard DOCA Core context create —
    the universal lifecycle from
-   [`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure)
+   `doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`)
    applies. Choose the `doca_dev` deliberately: a multi-BlueField
    host needs one `doca_dpa` per BlueField, not a "global" one,
    per the per-instance rule in
@@ -116,7 +105,7 @@ Steps the agent should walk the user through:
 
 For the canonical DOCA universal lifecycle that underlies
 steps 4-5, see
-[`doca-programming-guide TASKS.md ## configure`](../../doca-programming-guide/TASKS.md#configure).
+`doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`).
 This skill adds the DPA overlay; do not re-explain the
 lifecycle here.
 
@@ -130,7 +119,7 @@ binary embedding.
 
 The build pattern for any DOCA C / C++ consumer is fully
 documented in
-[`doca-programming-guide TASKS.md ## build`](../../doca-programming-guide/TASKS.md#build).
+`doca-programming-guide TASKS.md ## build` (`doca-programming-guide/TASKS.md#build`).
 DPA adds a DPACC layer on top: the DPA-side translation units
 are compiled by `dpacc` into a binary embedded into the host
 executable, and the link line on the host side pulls in the
@@ -141,7 +130,7 @@ overlay:
 | --- | --- | --- |
 | `pkg-config` module name | `doca-dpa` | The library's `.pc` file installed by the DOCA host packages; gives the host-side include + link flags for the DOCA DPA host API |
 | DPA-side toolchain | `dpacc` (DPACC compiler), installed alongside DOCA | Compiles DPA-side translation units into the binary that the host executable embeds as the `doca_dpa_app`. The host system compiler is NOT a substitute |
-| Include flags | `pkg-config --cflags doca-dpa` for the host side; the DPACC-prescribed include path for the DPA side | Resolves DOCA headers under whichever include directory `pkg-config --cflags` reports on this install (do not hardcode the include path — it can move across DOCA install profiles) for the host side; the DPA-side include path comes from the DPACC install layout via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md) |
+| Include flags | `pkg-config --cflags doca-dpa` for the host side; the DPACC-prescribed include path for the DPA side | Resolves DOCA headers under whichever include directory `pkg-config --cflags` reports on this install (do not hardcode the include path — it can move across DOCA install profiles) for the host side; the DPA-side include path comes from the DPACC install layout via `doca-public-knowledge-map/SKILL.md` |
 | Link flags | `pkg-config --libs doca-dpa` on the host side, plus the DPACC-prescribed embed step that bakes the DPA-side binary into the host executable | Pulls in whatever `pkg-config --libs` resolves on this install (do not predict the `-l<name>` form by hand — `.so` basenames use underscores, `.pc` names use hyphens, and `pkg-config` is the only correct translator) on the host side. The DPACC embed step is the load-bearing build action — without it the host has no DPA application image to load at runtime |
 | Companion DOCA libs | `doca-argp` for arg parsing in samples; the shipped samples include both host-side and DPA-side translation units | The shipped samples are the verified two-side-program build template; do not invent a one-side-only manifest |
 | DPA device-side archives NOT to add to the host link line | `libdoca_dpa_dev_comm.a`, `libdoca_dpa_dev_verbs.a` | These are DPA-SIDE archives shipped within `doca-dpa` (NOT separate pkg-config modules): their symbols are linked into the DPA image from inside the DPA kernel by `dpacc`, NOT from the host link line. Adding them to the host link line is a common first-build error |
@@ -163,7 +152,7 @@ verified starting point and apply a **minimum diff** to make
 it match the user's intent, without rewriting from scratch.
 
 The universal modify-a-shipped-sample workflow is in
-[`doca-programming-guide TASKS.md ## modify`](../../doca-programming-guide/TASKS.md#modify);
+`doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`);
 this skill provides the DPA-specific slot fill.
 
 | Slot | What the agent asks the user | DPA-specific consideration |
@@ -218,19 +207,19 @@ Steps the agent should walk the user through:
    mode applied to DPA.
 4. **Capture the structured log on first failure.** Set
    `DOCA_LOG_LEVEL=trace` for the first run (see
-   [`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability));
+   `doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`));
    if the host-side log is silent but the launch never
    completes, the DPA kernel is running but stuck — that is the
    moment to reach for the DPA-side developer tools (the DPA
    debugger and the DPA process-state inspector named in
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
    and routed via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+   `doca-public-knowledge-map/SKILL.md`
    to the public *DPA Tools* umbrella).
 
 For the runtime version + `LD_LIBRARY_PATH` cross-checks that
 underlie *"the program built but does nothing"*, see
-[`doca-version TASKS.md ## run`](../../doca-version/TASKS.md#run).
+`doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`).
 
 ## test
 
@@ -293,7 +282,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
 | `DOCA_ERROR_NOT_SUPPORTED` on a BlueField the agent expected to work | DOCA cap-query failed against the active `doca_devinfo` | The BlueField generation / mode axis was missed; re-run the env-side BlueField mode check; if the BlueField truly does not expose the DPA, the answer is the hardware, not a code or DOCA upgrade |
-| `DOCA_ERROR_DRIVER` on first kernel launch | DOCA + DPACC versions are skewed OR the DPA-side image was built against a different DOCA install than the host runtime | Re-run the version chain per [`doca-version TASKS.md ## test`](../../doca-version/TASKS.md#test); rebuild BOTH sides via `dpacc` + the host build against the matched versions; cross-check against the DOCA Compatibility Policy |
+| `DOCA_ERROR_DRIVER` on first kernel launch | DOCA + DPACC versions are skewed OR the DPA-side image was built against a different DOCA install than the host runtime | Re-run the version chain per `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`); rebuild BOTH sides via `dpacc` + the host build against the matched versions; cross-check against the DOCA Compatibility Policy |
 | Single-kernel-launch smoke passed; streaming loop hangs | The host is not draining the completion queue fast enough OR the completion queue is too small | Raise the completion queue size in [`## modify`](#modify) slot 5; or restructure the host loop to drain completions per batch |
 | Host submitted N launches; received fewer than N completions; host log is silent | The DPA-side kernel is stuck mid-execution (most often a missing termination condition in the kernel body) | Walk the kernel-exit condition per [`## modify`](#modify) slot 6; reach for the DPA-side debugger / process-state inspector named in [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability) |
 | `doca_ctx_stop` blocks on teardown | A `doca_dpa_thread` still has an in-flight kernel that never exited | Walk the host-side flag (or other termination signal) the DPA kernel polls per [`## modify`](#modify) slot 6; the host cannot force-kill the DPA kernel from the `doca-dpa` API |
@@ -302,7 +291,7 @@ Loop termination: stop iterating once two consecutive
 iterations of the same kind don't change anything — that means
 the cause is below DPA (BlueField mode, DPA-side kernel logic
 bug, DPACC bug, NIC firmware). Escalate to
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured layer-1-through-5 evidence including BOTH
 the host-side DOCA log and the DPA-side tooling output.
 
@@ -313,7 +302,7 @@ a `DOCA_ERROR_*` or does not make forward progress, narrow the
 cause to a specific layer and act on it.
 
 The cross-library debug ladder lives in
-[`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 Walk through it in order — install → version → build → link →
 runtime → program → driver — *before* recommending DPA-specific
 fixes. This skill's overlay names the DPA-specific
@@ -373,18 +362,18 @@ manifestation at layers 5 (runtime), 6 (program), and 7
 - A BlueField in the wrong mode that does NOT expose the DPA
   surfaces as `DOCA_ERROR_NOT_SUPPORTED` at `doca_dpa` create
   time. Route to
-  [`doca-setup TASKS.md ## debug`](../../doca-setup/TASKS.md#debug)
+  `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`)
   layer 5 (driver) for the env-side BlueField mode fix; this
   is NOT a code change in the program.
 
 Once the layer is identified, route to the matching debug verb
 on the matching skill: install / build / link / driver to
-[`doca-setup ## debug`](../../doca-setup/TASKS.md#debug); version
-to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug);
+`doca-setup ## debug` (`doca-setup/TASKS.md#debug`); version
+to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`);
 cross-cutting runtime to
-[`doca-debug ## debug`](../../doca-debug/TASKS.md#debug);
+`doca-debug ## debug` (`doca-debug/TASKS.md#debug`);
 program-layer Core-context patterns to
-[`doca-programming-guide TASKS.md ## debug`](../../doca-programming-guide/TASKS.md#debug).
+`doca-programming-guide TASKS.md ## debug` (`doca-programming-guide/TASKS.md#debug`).
 
 ## comms
 
@@ -400,9 +389,9 @@ matrix, see [`CAPABILITIES.md ## comms`](CAPABILITIES.md#comms).
 1. **Confirm DPA-side scope, not host-side.** The user is writing
    the DPA-side translation unit `dpacc` compiles into the
    `doca_dpa_app`. If the user wanted host ↔ DPU messaging, that
-   is [`doca-comch`](../doca-comch/SKILL.md); if they wanted
+   is `doca-comch/SKILL.md`; if they wanted
    host-to-remote RDMA, that is
-   [`doca-rdma`](../doca-rdma/SKILL.md). Route there before any
+   `doca-rdma/SKILL.md`. Route there before any
    DPA-Comms code per the routing rule in
    [`CAPABILITIES.md ## comms`](CAPABILITIES.md#comms).
 2. **Parent host-side flow must be green first.** A trivial DPA
@@ -539,8 +528,8 @@ walk these overlays.
    cost). If the user cannot point at a measurement, ask them
    to take one BEFORE writing any DPA-side code. A guess does
    not count. If the bottleneck is NOT the host round-trip,
-   climb back up to [`doca-rdma`](../doca-rdma/SKILL.md) (or
-   [`doca-verbs`](../doca-verbs/SKILL.md) for the host-side
+   climb back up to `doca-rdma/SKILL.md` (or
+   `doca-verbs/SKILL.md` for the host-side
    raw-verbs escape hatch when `doca-rdma` does not expose the
    verb the user needs).
 3. **Confirm the SPECIFIC verb is exposed on this device.** There
@@ -569,7 +558,7 @@ walk these overlays.
    side; the agent must NOT quote them from memory. Direct the
    user to the DPA-side header `doca_dpa_dev_verbs.h` (per the
    DPACC guide via
-   [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md))
+   `doca-public-knowledge-map/SKILL.md`)
    and to `/opt/mellanox/doca/samples/doca_dpa/`. Headers
    win over docs.
 6. **Pick the completion topology.** Host-side CQE inspection
@@ -655,7 +644,7 @@ ladder:
 - On `DOCA_ERROR_IO_FAILED` surfaced through the completion,
   the DPA-side post return value is not the answer. Direct
   the user to the CQE error field — same shape as the host-side
-  raw-verbs [`doca-verbs`](../doca-verbs/SKILL.md) IO_FAILED.
+  raw-verbs `doca-verbs/SKILL.md` IO_FAILED.
 - **Two-side-program signature mismatch** is the single
   highest-frequency DPA-Verbs program bug. The host configured
   a QP that cannot honor the WR the kernel posts (opcode not
@@ -671,7 +660,7 @@ ladder:
   session, ask: did the latency-bottleneck premise actually
   hold? Sometimes the cheapest fix is to retire the DPA-side
   RDMA path entirely for the affected subset and route the
-  work back to host-side [`doca-rdma`](../doca-rdma/SKILL.md).
+  work back to host-side `doca-rdma/SKILL.md`.
 
 ## Deferred task verbs
 
@@ -682,22 +671,21 @@ follows so the agent does not invent guidance:
 - **install.** Installing DOCA, installing the DPACC compiler,
   choosing matched versions, post-install verification,
   `pkg-config` wiring — defer to
-  [`doca-setup`](../../doca-setup/SKILL.md) and to the
+  `doca-setup/SKILL.md` and to the
   install-tree layout in
-  [`doca-public-knowledge-map ## Layout of an installed DOCA package`](../../doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package).
+  `doca-public-knowledge-map ## Layout of an installed DOCA package` (`doca-public-knowledge-map/SKILL.md#layout-of-an-installed-doca-package`).
   This skill assumes DOCA + DPACC are already installed and
   matched.
 - **deploy.** Deploying DPA-using applications at scale
   (multi-BlueField clusters, Kubernetes operator workflows
-  for DPU workloads, multi-tenant DPA sharing) — out of scope
-  for Phase 1 and reserved for a future platform skill. For
+  for DPU workloads, multi-tenant DPA sharing) — out of scope for this skill. For
   single-host first-run testing, the right verb in this skill
   is `## run`; do not invent a "deploy" workflow.
 - **DPA-side kernel programming and DPACC usage.** Writing the
   kernel function body itself, DPA-side memory layout,
   DPACC compile flags, DPA-side debugging from inside the
   kernel — out of scope. Route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   to the public *DOCA DPA*, *DOCA DPACC Compiler*, *DOCA DPA
   Comms*, and *DOCA DPA Verbs* guides plus the *DPA Tools*
   umbrella. This skill prescribes how to *use* the
@@ -709,7 +697,7 @@ follows so the agent does not invent guidance:
   separate pkg-config modules): their symbols are called from
   inside the DPA kernel and linked by `dpacc`, not from the
   host. Route via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   to the public *DOCA DPA Comms* and *DOCA DPA Verbs* guides.
 
 ## Command appendix
@@ -723,7 +711,7 @@ privileges call that out explicitly.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -737,24 +725,24 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| `pkg-config --modversion doca-dpa` | `## configure` step 1; `## build` minimum-version slot | What is the build-time DOCA DPA host-side library version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2) |
-| `pkg-config --cflags --libs doca-dpa` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores on every release where we have ground truth, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
-| `which dpacc && dpacc --version` (or the install-tree path) | `## configure` step 1; `## build` minimum-DPACC slot | Is the DPACC compiler installed and at what version? | A version string the agent compares against the DOCA Compatibility Policy linked from [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility). Missing `dpacc` = the DPA-side translation unit cannot be built; route to [`doca-setup`](../../doca-setup/SKILL.md) |
-| `doca_caps --list-devs` | `## configure` step 1; `## configure` step 3 | Which DOCA devices does the host see, and which expose a DPA processor? | One entry per `doca_dev` with the BlueField identity and the per-library capability flags including the DPA support axis. No DPA-capable entry = the BlueField is not present, not in the right mode, or not on a generation that exposes the DPA; route to [`doca-setup`](../../doca-setup/SKILL.md) |
+| `pkg-config --modversion doca-dpa` | `## configure` step 1; `## build` minimum-version slot | What is the build-time DOCA DPA host-side library version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
+| `pkg-config --cflags --libs doca-dpa` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
+| `which dpacc && dpacc --version` (or the install-tree path) | `## configure` step 1; `## build` minimum-DPACC slot | Is the DPACC compiler installed and at what version? | A version string the agent compares against the DOCA Compatibility Policy linked from [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility). Missing `dpacc` = the DPA-side translation unit cannot be built; route to `doca-setup/SKILL.md` |
+| `doca_caps --list-devs` | `## configure` step 1; `## configure` step 3 | Which DOCA devices does the host see, and which expose a DPA processor? | One entry per `doca_dev` with the BlueField identity and the per-library capability flags including the DPA support axis. No DPA-capable entry = the BlueField is not present, not in the right mode, or not on a generation that exposes the DPA; route to `doca-setup/SKILL.md` |
 | `ls /opt/mellanox/doca/samples/doca_dpa/` | `## modify` slot 1 | Which DPA samples ship in this install (both host-side AND DPA-side translation units), and which is the closest starting point? | A list of sample directories that each contain BOTH host-side and DPA-side source plus a `meson.build` that wires `dpacc` and `pkg-config doca-dpa` together |
-| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last DPA call? | Empty or recent benign messages. Repeated mlx5 / DPA-driver errors → driver-layer bug; route to [`doca-setup ## debug`](../../doca-setup/TASKS.md#debug) |
+| `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last DPA call? | Empty or recent benign messages. Repeated mlx5 / DPA-driver errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 4 | What did the structured DOCA logger emit for the first failing host-side DPA call? | A trace-level line on every host-side lifecycle transition and every launch submit. Silence after a launch submit = either host PE not progressed OR DPA kernel running but stuck — reach for the DPA-side tooling next |
-| (route via [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)) DPA-side developer tools — DPA debugger, DPA process-state inspector, DPA statistics tool | `## debug` layer 5; `## debug` layer 6 | What is the DPA processor itself doing right now, from the DPA side? | The public *DPA Tools* umbrella documents the per-tool output; the agent's job is to NAME the existence of these tools and route the user there, not to redefine their surface |
+| (route via `doca-public-knowledge-map/SKILL.md`) DPA-side developer tools — DPA debugger, DPA process-state inspector, DPA statistics tool | `## debug` layer 5; `## debug` layer 6 | What is the DPA processor itself doing right now, from the DPA side? | The public *DPA Tools* umbrella documents the per-tool output; the agent's job is to NAME the existence of these tools and route the user there, not to redefine their surface |
 
 For commands shared across libraries (`pkg-config --modversion`,
 `doca_caps`, `cat /opt/mellanox/doca/applications/VERSION`,
 `DOCA_LOG_LEVEL`) the cross-library overlay is in
-[`doca-debug TASKS.md ## Command appendix`](../../doca-debug/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## Command appendix` (`doca-debug/TASKS.md#command-appendix`);
 this table adds the DPA-specific rows on top.

@@ -1,0 +1,3 @@
+# CPU evaluation baseline for the APIs documented in this skill.
+# Pin the source revision because main can contain APIs newer than PyPI.
+cuequivariance @ https://github.com/NVIDIA/cuEquivariance/archive/046edf7e2ee9e9fb7868e6c32c787d9049d79ebe.tar.gz#subdirectory=cuequivariance

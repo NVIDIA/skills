@@ -1,5 +1,5 @@
 ## Description: <br>
-Run iterative improvement for NVIDIA TAO CLIP / SigLIP image-text retrieval on attribute-labelled data. <br>
+Run iterative improvement for NVIDIA TAO CLIP / SigLIP image-text retrieval on attribute-labelled data, performing dataset preparation, zero-shot evaluation, attribute gap analysis, caption-space k-NN mining, history-aware selection, retraining, and re-evaluation until a retrieval KPI, validation plateau, or iteration budget stops the loop. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache-2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to orchestrate iterative DEFT (Dataset Evolution through Fine-Tuning) workflows for NVIDIA TAO CLIP/SigLIP image-text retrieval models on People Attribute Search (PAS) attribute-labelled datasets, including dataset preparation, zero-shot evaluation, attribute gap analysis, caption-space k-NN mining, retraining, and re-evaluation. <br>
+Developers and engineers use this skill to orchestrate iterative DEFT (Dataset Evolution through Fine-Tuning) workflows for NVIDIA TAO CLIP/SigLIP image-text retrieval models on People Attribute Search (PAS) attribute-labelled datasets, running a bounded, resumable evaluate-mine-retrain loop on Docker, SLURM, Kubernetes, Brev, or virtualenv execution platforms. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -40,10 +40,10 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis, Files] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces HTML reports, CSV metrics, Parquet datasets, and checkpoint artifacts under the results directory] <br>
+**Other Properties Related to Output:** [Produces an HTML loop report, CSV metrics, Parquet datasets, run state/log JSON, and checkpoint artifacts under the results directory] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
@@ -52,39 +52,38 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-14 evaluation tasks (14 positive), 3 attempts per task, in isolated k8s-sandbox pods. <br>
+20 evaluation tasks (20 positive), 1 attempt per task, each in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - Correctness: Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Checks whether the expected skill was selected and the workflow executed. <br>
-- Effectiveness: Checks goal completion and expected workflow behavior adherence. <br>
-- Efficiency: Checks tool-call productivity and token usage efficiency. <br>
+- Discoverability: Checks whether the right skill was loaded when needed. <br>
+- Effectiveness: Checks goal completion and expected workflow behavior adherence (equal weight). <br>
+- Efficiency: Checks tool-call productivity and token usage efficiency (equal weight). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Checks whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `accuracy`: Checks final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the user's goal was achieved. <br>
-- `behavior_check`: Checks whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Checks tool-call productivity. <br>
-- `token_efficiency`: Checks actual uncached prompt plus completion usage. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 85.7% | 62.5% |
-| Security | 100.0% → 100.0% (±0.0 pts) | 100.0% → 100.0% (±0.0 pts) |
-| Correctness | 21.3% → 96.0% (+74.7 pts) | 33.3% → 67.8% (+34.5 pts) |
-| Discoverability | 54.7% | 0.0% |
-| Effectiveness | 25.1% → 80.2% (+55.1 pts) | 25.0% → 45.4% (+20.4 pts) |
-| Efficiency | 97.8% | 99.6% → 99.2% (-0.4 pts) |
+| Overall | 89.4% | 69.7% |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 35.0% → 95.0% (+60.0 points) | 45.0% → 79.0% (+34.0 points) |
+| Discoverability | 67.0% | 9.5% |
+| Effectiveness | 30.0% → 85.5% (+55.5 points) | 29.4% → 59.8% (+30.4 points) |
+| Efficiency | 99.5% | 100.0% |
 
 ## Skill Version(s): <br>
-0.4.0 (source: frontmatter) <br>
+0.4.1 (source: frontmatter) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

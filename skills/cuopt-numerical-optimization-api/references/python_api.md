@@ -48,28 +48,9 @@ if problem.Status.name in ["Optimal", "FeasibleFound"]:
     print(f"Open: {open_facility.getValue() > 0.5}, Production: {production.getValue()}")
 ```
 
-## QP Example (beta — MINIMIZE only)
+## QP Examples (beta — MINIMIZE only)
 
-```python
-problem = Problem("Portfolio")
-x1 = problem.addVariable(lb=0, ub=1, vtype=CONTINUOUS, name="stock_a")
-x2 = problem.addVariable(lb=0, ub=1, vtype=CONTINUOUS, name="stock_b")
-x3 = problem.addVariable(lb=0, ub=1, vtype=CONTINUOUS, name="stock_c")
-
-problem.setObjective(
-    0.04*x1*x1 + 0.02*x2*x2 + 0.01*x3*x3
-    + 0.02*x1*x2 + 0.01*x1*x3 + 0.016*x2*x3,
-    sense=MINIMIZE,
-)
-problem.addConstraint(x1 + x2 + x3 == 1, name="budget")
-problem.addConstraint(0.12*x1 + 0.08*x2 + 0.05*x3 >= 0.08, name="min_return")
-
-problem.solve(SolverSettings())
-if problem.Status.name in ["Optimal", "PrimalFeasible"]:
-    print(f"Variance: {problem.ObjValue}")
-```
-
-See [qp_examples.md](qp_examples.md) for least-squares, maximization workaround, and covariance matrix expansion.
+See [qp_examples.md](qp_examples.md) for portfolio, least-squares, maximization workaround, and covariance matrix expansion.
 
 ## CRITICAL: Status Values Use PascalCase
 
@@ -136,14 +117,4 @@ problem.addConstraint(expr <= 100)
 
 ## Reference Models
 
-| Model | Type | Location |
-|-------|------|----------|
-| Minimal LP | LP | [assets/python/lp_basic/](../assets/python/lp_basic/) |
-| Dual values | LP | [assets/python/lp_duals/](../assets/python/lp_duals/) |
-| PDLP warmstart | LP | [assets/python/lp_warmstart/](../assets/python/lp_warmstart/) |
-| Integer variables | MILP | [assets/python/milp_basic/](../assets/python/milp_basic/) |
-| Production planning | MILP | [assets/python/milp_production_planning/](../assets/python/milp_production_planning/) |
-| Portfolio variance | QP | [assets/python/portfolio/](../assets/python/portfolio/) |
-| Least squares | QP | [assets/python/least_squares/](../assets/python/least_squares/) |
-| Maximization workaround | QP | [assets/python/maximization_workaround/](../assets/python/maximization_workaround/) |
-| MPS file solver | LP/MILP | [assets/python/mps_solver/](../assets/python/mps_solver/) |
+See [assets/python/README.md](../assets/python/README.md).

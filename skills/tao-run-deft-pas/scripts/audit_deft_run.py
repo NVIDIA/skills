@@ -44,6 +44,7 @@ from command_contract import (
 )
 from deft_action_contract import (
     SUPPORTED_PLATFORMS,
+    expected_runtime_image,
     platform_evidence_error,
     remote_freshness_attested,
     validate_tao_virtualenv,
@@ -51,8 +52,11 @@ from deft_action_contract import (
 from metric_contract import (
     compare,
     pick_best,
+    relative_evidence_required,
+    relative_metric_summary,
     validate_contract,
 )
+from finetuning_contract import validate_peft_record
 from pas_deft.pas_artifacts import PAS_METRICS_AGGREGATE_FILENAME
 from parse_pas_metrics import build_result
 
@@ -88,9 +92,6 @@ RUN_SPEC_NAMES = (
     "mining_spec.yaml",
     "approval.json",
 )
-PINNED_PYT_IMAGE = "nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt"  # versions-key: images.tao_toolkit.deft_pas_pyt
-PINNED_DS_IMAGE = "nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services"  # versions-key: images.tao_toolkit.deft_pas_data_services
-
 # Artifact fields recorded by commit_stage._apply_success, grouped by the
 # containment scope commit_stage enforced at commit time.
 RESULTS_SCOPED_FILE_FIELDS = {
@@ -894,6 +895,79 @@ def _next_action(
     return f"{nxt[0]}/{nxt[1]}", STAGE_REFERENCES[nxt[1]]
 
 
+def _completion_result(
+    *,
+    state: dict[str, Any],
+    results_dir: pathlib.Path,
+    gate: dict[str, Any] | None,
+    metric_candidates: list[tuple[str, dict[str, Any]]],
+    best_label: str | None,
+    best_result: dict[str, Any] | None,
+    warnings: list[str],
+    require_complete: bool,
+) -> dict[str, Any]:
+    """Build the single canonical payload a successful run must report."""
+    iterations = state.get("iterations")
+    if not isinstance(iterations, dict):
+        iterations = {}
+    baseline_result = next(
+        (result for label, result in metric_candidates if label == "baseline"),
+        None,
+    )
+    trained_candidates = [
+        (label, iterations[label], result)
+        for label, result in metric_candidates
+        if label != "baseline"
+        and isinstance(iterations.get(label), dict)
+        and iterations[label].get("best_ckpt_path")
+        and iterations[label].get("pretrained_state")
+    ]
+    checkpoint_label: str | None = None
+    checkpoint_info: dict[str, Any] | None = None
+    if gate is not None and trained_candidates:
+        checkpoint_label, checkpoint_info, _ = pick_best(trained_candidates, gate)
+    completed_iterations = sorted(
+        (
+            label
+            for label, info in iterations.items()
+            if re.fullmatch(r"iter[1-9][0-9]*", label)
+            and isinstance(info, dict)
+            and info.get("status") == "complete"
+        ),
+        key=lambda label: int(label[4:]),
+    )
+    return {
+        "stop_reason": state.get("loop_stop_reason"),
+        "metric_contract": gate,
+        "baseline": (
+            {"label": "baseline", "value": baseline_result.get("value")}
+            if baseline_result is not None
+            else None
+        ),
+        "best": (
+            {"label": best_label, "value": best_result.get("value")}
+            if best_label is not None and best_result is not None
+            else None
+        ),
+        "checkpoint_iteration": checkpoint_label,
+        "best_raw_checkpoint": (
+            checkpoint_info.get("best_ckpt_path")
+            if checkpoint_info is not None
+            else None
+        ),
+        "normalized_state": (
+            checkpoint_info.get("pretrained_state")
+            if checkpoint_info is not None
+            else None
+        ),
+        "completed_iterations": completed_iterations,
+        "completed_iteration_count": len(completed_iterations),
+        "warnings": list(warnings),
+        "html_report": str(results_dir / "DEFT_Loop_Report.html"),
+        "require_complete": "PASS" if require_complete else "NOT_REQUESTED",
+    }
+
+
 def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str, Any]:
     results_dir = results_dir.expanduser().resolve()
     state_path = results_dir / "deft_state.json"
@@ -1144,6 +1218,7 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                     )
 
             approval_path = config_dir_path / "approval.json"
+            approval = None
             approval_value = config.get("approval_manifest")
             if (
                 not approval_value
@@ -1181,7 +1256,22 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                         "pyt_image": config.get("pyt_image"),
                         "ds_image": config.get("ds_image"),
                     }
-                    if approval_version == "4":
+                    if approval_version in {"5", "6"}:
+                        expected_approval["finetuning_method"] = config.get(
+                            "finetuning_method"
+                        )
+                        if approval_version == "6":
+                            expected_approval["lora_rank"] = config.get("lora_rank")
+                            expected_approval["lora_alpha"] = config.get("lora_alpha")
+                        expected_approval["pyt_image_digest"] = config.get(
+                            "pyt_image_digest"
+                        )
+                        expected_approval["platform"] = config.get("platform")
+                        expected_approval["docker_remote"] = config.get(
+                            "docker_remote", False
+                        )
+                        expected_approval["virtualenvs"] = config.get("virtualenvs")
+                    elif approval_version == "4":
                         expected_approval["platform"] = config.get("platform")
                         expected_approval["docker_remote"] = config.get(
                             "docker_remote", False
@@ -1214,8 +1304,8 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                         and config.get("virtualenv") is None
                     ):
                         errors.append(
-                            "approval manifest schema must be version 4; versions 2 "
-                            "and 3 are accepted only for legacy local Docker runs"
+                            "approval manifest schema must be version 6; versions 2, "
+                            "3, 4, and 5 are accepted for legacy runs"
                         )
                     else:
                         expected_approval.pop("pas_deft_bundle_sha256")
@@ -1297,6 +1387,21 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                         tao_optim = _config_section(
                             tao_train, "optim", "tao_spec.train", errors
                         )
+                        approval_version_for_peft = (
+                            approval.get("schema_version")
+                            if isinstance(approval, dict)
+                            else None
+                        )
+                        if approval_version_for_peft == "6":
+                            try:
+                                validate_peft_record(
+                                    tao_payload.get("peft"),
+                                    method=config.get("finetuning_method"),
+                                    lora_rank=config.get("lora_rank"),
+                                    lora_alpha=config.get("lora_alpha"),
+                                )
+                            except ValueError as exc:
+                                errors.append(f"approved PEFT contract is invalid: {exc}")
                         eval_pairs_path = pathlib.Path(
                             typed_config.pas.eval_pairs_source_file
                             if typed_config is not None
@@ -1469,10 +1574,9 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
             errors.append(
                 "state virtualenv configuration must be null unless platform is virtualenv"
             )
-        if config.get("pyt_image") != PINNED_PYT_IMAGE:
-            errors.append("state.config.pyt_image must be the pinned PAS PyTorch image")
-        if config.get("ds_image") != PINNED_DS_IMAGE:
-            errors.append("state.config.ds_image must be the pinned PAS data-services image")
+        for field in ("pyt_image", "ds_image"):
+            if not isinstance(config.get(field), str) or not config[field].strip():
+                errors.append(f"state.config.{field} must be a non-empty approved image")
         for field in (
             "training_epochs",
             "num_gpus",
@@ -1998,7 +2102,7 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                         status_names[field], label, config
                     )
                     required_kind = expected_image_kind(status_names[field])
-                    required_image = config.get(f"{required_kind}_image")
+                    required_image = expected_runtime_image(config, required_kind)
                     required_hf = expected_hf_forwarding(status_names[field], config)
                 except ValueError as exc:
                     errors.append(
@@ -2544,6 +2648,74 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                     f"gap_analysis, got {completed!r}"
                 )
 
+    # Relative metric evidence is computed at metric commit, not deferred to
+    # the optional HTML renderer. New runs require it in canonical state and
+    # in each iteration summary; legacy schema-v3 runs remain readable.
+    metric_summaries: list[dict[str, Any]] = []
+    try:
+        require_relative_evidence = relative_evidence_required(state)
+    except ValueError as exc:
+        # Unsupported evidence versions are never treated as legacy. Continue
+        # validating the current shape, but keep the run invalid until a
+        # runtime that understands the declared version audits it.
+        require_relative_evidence = True
+        errors.append(str(exc))
+    for label, raw_result in metric_candidates:
+        try:
+            expected_summary = relative_metric_summary(state, label)
+        except (TypeError, ValueError) as exc:
+            errors.append(f"state.iterations.{label} relative metric evidence: {exc}")
+            continue
+        metric_summaries.append(expected_summary)
+        recorded_summary = raw_result.get("relative_change")
+        if recorded_summary != expected_summary:
+            message = (
+                f"state.iterations.{label}.metric_result.relative_change "
+                "does not match canonical metric evidence"
+            )
+            if recorded_summary is not None or require_relative_evidence:
+                errors.append(message)
+            else:
+                warnings.append(
+                    f"legacy run lacks {label} relative metric evidence; "
+                    "the audit derived it read-only"
+                )
+        if label == "baseline":
+            continue
+        info = iterations.get(label)
+        summary_value = (
+            info.get("iteration_summary") if isinstance(info, dict) else None
+        )
+        if not summary_value:
+            continue
+        try:
+            summary_payload = json.loads(
+                pathlib.Path(str(summary_value)).read_text()
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(
+                f"state.iterations.{label}.iteration_summary metric evidence "
+                f"is unreadable: {exc}"
+            )
+            continue
+        recorded_metric = (
+            summary_payload.get("metric")
+            if isinstance(summary_payload, dict)
+            else None
+        )
+        if recorded_metric != expected_summary:
+            message = (
+                f"state.iterations.{label}.iteration_summary.metric does not "
+                "match canonical metric evidence"
+            )
+            if recorded_metric is not None or require_relative_evidence:
+                errors.append(message)
+            else:
+                warnings.append(
+                    f"legacy run lacks {label} metric evidence in "
+                    "iteration_summary.json"
+                )
+
     # ---- log -> state proof validation --------------------------------------
     for entry in entries:
         label = str(entry.get("iteration"))
@@ -2921,6 +3093,12 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                 f"loop_stop reason {reason} requires every iteration to be "
                 f"complete; not complete: {incomplete}"
             )
+        report_path = results_dir / "DEFT_Loop_Report.html"
+        if require_complete and not report_path.is_file():
+            errors.append(
+                "--require-complete requires the deterministic loop-end report: "
+                f"{report_path}"
+            )
     if errors:
         status = "INVALID"
     elif terminal and (
@@ -2963,6 +3141,21 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
                     f"stop rather than substituting generic commands"
                 )
 
+    completion_result = (
+        _completion_result(
+            state=state,
+            results_dir=results_dir,
+            gate=gate,
+            metric_candidates=metric_candidates,
+            best_label=best_label,
+            best_result=best_result,
+            warnings=warnings,
+            require_complete=require_complete,
+        )
+        if status == "COMPLETE"
+        else None
+    )
+
     return {
         "status": status,
         "terminal": terminal,
@@ -2977,6 +3170,8 @@ def audit(results_dir: pathlib.Path, require_complete: bool = False) -> dict[str
         "last_committed": last,
         "best_iteration": best_label,
         "best_metric_result": best_result,
+        "metric_results": metric_summaries,
+        "completion_result": completion_result,
         "next_action": next_action,
         "required_reference": required_reference,
         "errors": errors,
@@ -3007,6 +3202,23 @@ def _print_text(report: dict[str, Any]) -> None:
             f"best={report['best_iteration']} "
             f"metric={gate['metric_name']}({gate['query_type']}) "
             f"value={float(result['value']):.6g} target={_render_target(gate)}"
+        )
+    for metric in report.get("metric_results", []):
+        if metric.get("iter_label") == "baseline":
+            continue
+        print(
+            "metric_result="
+            f"{metric['iter_label']} "
+            f"value={float(metric['value']):.6g} "
+            f"delta_baseline={float(metric['delta_from_baseline']):+.6g} "
+            f"({metric['comparison_to_baseline']}) "
+            f"delta_previous={float(metric['delta_from_previous']):+.6g} "
+            f"({metric['comparison_to_previous']})"
+        )
+    if report.get("completion_result") is not None:
+        print(
+            "completion_result="
+            + json.dumps(report["completion_result"], sort_keys=True)
         )
     print(f"next_action={report['next_action']}")
     if report["required_reference"]:

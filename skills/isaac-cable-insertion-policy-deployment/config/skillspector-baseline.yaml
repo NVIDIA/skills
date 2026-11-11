@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+version: 2
+rules:
+  - id: "OH1"
+    path: "scripts/sim_record.py"
+    message: "*encoder = subprocess.Popen*args.ffmpeg*rawvideo*"
+    reason: >-
+      Reviewed data flow in MR176: this call encodes rendered camera pixels,
+      not language-model output or policy actions. Its executable is an explicit
+      user-selected absolute path checked for existence and execute permission.
+      Arguments are fixed ffmpeg options plus the absolute session video path;
+      shell=False prevents shell expansion. RGB input arrives only through stdin
+      after exact uint8, dimensions, channel count, and byte-length validation.
+      No policy observation or action enters the command arguments. This rule
+      covers only the encoder OH1 finding; subprocess and other security checks
+      remain active and the suppressed finding remains in the CI report.
+fingerprints: []

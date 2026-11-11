@@ -1,12 +1,12 @@
 # DOCA BlueField-4 deployment — Tasks
 
 **Where to start:** The executable bring-up path is `configure -> run ->
-test -> debug`. The lint-required `build` and `modify` anchors below
+test -> debug`. The `build` and `modify` anchors below
 are routing stubs reached only when the user asks those questions —
 they are not steps in BF4 day-1 bring-up. There is no application
 artifact to build or sample to modify in a platform bring-up; those
 questions live in the application-deployment skills and
-[`doca-programming-guide`](../doca-programming-guide/SKILL.md). This
+`doca-programming-guide/SKILL.md`. This
 skill owns getting a bare BlueField-4 to a Grace OS installed and
 firmware at the target level, driven from the BMC. The `## test` verb
 is the post-install / post-update verification sweep.
@@ -15,11 +15,11 @@ These verbs cover the in-scope BF4-bring-up workflows for an external
 operator standing up a new BlueField-4 through its BMC. Every step
 assumes the operator has consulted the live public BlueField/DOCA
 documentation and release notes (reachable through
-[`doca-public-knowledge-map ## Public documentation entry points`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points))
+`doca-public-knowledge-map ## Public documentation entry points` (`doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`))
 and the Redfish / PLDM / UEFI standards; this file prescribes the
 *order* and *what to look up where*, not a copy-paste runbook. Every
 MUTATING step (PLDM burn, ISO reflash, power cycle, BMC factory reset)
-loads [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
+loads `doca-hardware-safety/SKILL.md`
 ALONGSIDE.
 
 ## configure
@@ -32,35 +32,31 @@ precondition BEFORE any boot, transfer, or burn.
    supplied by the operator — never invented), and that the DPU's OOB
    serial console is reachable via `obmc-console-client`. Without an
    OOB path the bar for proceeding is "stop, establish OOB first" per
-   [`doca-hardware-safety ## Out-of-band access classes`](../doca-hardware-safety/CAPABILITIES.md#out-of-band-access-classes).
+   `doca-hardware-safety ## Out-of-band access classes` (`doca-hardware-safety/CAPABILITIES.md#out-of-band-access-classes`).
 2. **Host the ISO.** Download the BlueField/DOCA bundle ISO (and, for
    the Grace-Ubuntu path, the Grace Ubuntu image and any cloud-init
    config ISO) from the public NVIDIA download surface, and host it at
    {iso-uri} on your own HTTP/HTTPS server. For a remote HTTPS source
-   used by Redfish Virtual Media, confirm it allows unauthenticated
-   access, supports HTTP `HEAD`, and that the BMC has the server
-   certificate in its truststore using the BMC's documented
-   certificate-store query. If trust cannot be verified, stop before
+   used by Redfish Virtual Media, confirm the BMC can reach it and
+   trusts its certificate. If trust cannot be verified, stop before
    transfer; do not improvise certificate-install commands.
 3. **Pick the install method.** Per the install-method table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
-   UEFI HTTP Boot (recommended — fewest moving parts), PXE Boot (when
-   you already have DHCP+TFTP or need a custom `bf.cfg`), or Redfish
-   Virtual Media (fully out-of-band; needs a recent dpu-bmc version).
-   For Virtual Media, read the installed dpu-bmc version from the
-   documented Redfish/BMC inventory surface and compare it with the
-   minimum in the current public BF4 deployment guide. If either value
-   is unavailable, do not use Virtual Media; choose UEFI HTTP Boot or
-   PXE when one fits. If Virtual Media is mandatory, stop and escalate
-   the missing version evidence rather than assuming support.
-   The choice feeds [`## run`](#run). If local BMC-eMMC Virtual Media
-   is selected, preflight the combined local payload and stop if it
-   exceeds 5 GB. For Grace Ubuntu, also record that the BMC-facing
-   URIs must be exactly `image.iso` and `config.iso`.
+   UEFI HTTP Boot (no DHCP/TFTP needed), PXE Boot (when you already
+   have DHCP+TFTP or need a custom `bf.cfg`), Redfish Virtual Media
+   (fully out-of-band; needs Virtual Media support in the installed
+   BMC firmware), or the DOCA Management Service install path (DOCA
+   3.5+, ISO and/or PLDM through the DPU BMC). For Virtual Media,
+   confirm support from the BMC's Redfish inventory first; if it
+   cannot be confirmed, choose UEFI HTTP Boot or PXE when one fits,
+   and if Virtual Media is mandatory, stop and escalate rather than
+   assuming support. The choice feeds [`## run`](#run). If local
+   BMC-eMMC Virtual Media is selected, confirm the payload fits the
+   BMC storage before transfer.
 4. **Capture the target versions.** Read the target bundle-ISO build,
-   NIC firmware level, and SBIOS / ERoT / BMC component versions from
+   NIC firmware level, and platform component versions from
    the **public BlueField/DOCA release notes** (route via
-   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)).
+   `doca-public-knowledge-map/SKILL.md`).
    Do NOT quote a pre-release firmware version from memory; record the
    release-notes targets as the verification baseline used in
    [`## test`](#test).
@@ -69,7 +65,7 @@ precondition BEFORE any boot, transfer, or burn.
    (current FirmwareInventory, current `/etc/mlnx-release` if Grace is
    already up), agree a maintenance window, and confirm the OOB path
    survives a failed change — all per
-   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify),
+   `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`),
    loaded ALONGSIDE.
 6. **Select optional branches explicitly.** Decide from the public
    release notes whether this bring-up requires the
@@ -91,11 +87,11 @@ not built here.
 
 - If the user is asking how to build a DOCA-linked binary or a service
   to deploy once Grace is up, route to
-  [`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build),
+  `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`),
   then to
-  [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md)
+  `doca-bare-metal-deployment/SKILL.md`
   or
-  [`doca-container-deployment`](../doca-container-deployment/SKILL.md)
+  `doca-container-deployment/SKILL.md`
   to deploy it.
 - If the user is asking how to assemble the bundle ISO or the
   firmware `.fwpkg` themselves, that is NVIDIA-internal release
@@ -114,7 +110,7 @@ change**, and any change to firmware *configuration* leaves this verb:
 1. **A firmware-config change is a hardware-state change.** Adjusting
    NV-config / mode toggles (e.g. via `mlxconfig set`) or burning new
    firmware is MUTATING and is owned by
-   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify);
+   `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`);
    this skill does not redefine that discipline. Control returns to
    [`## configure`](#configure) once the change is complete and
    verified.
@@ -123,12 +119,12 @@ change**, and any change to firmware *configuration* leaves this verb:
    verification sweep — re-walk [`## run`](#run) then
    [`## test`](#test).
 3. **A change to the cloud-init seed is a fresh Grace-Ubuntu install.**
-   Editing the CIDATA seed means re-attaching `config.iso` and
+   Editing the CIDATA seed means re-attaching the seed and
    re-installing; re-walk
    [`### grace-ubuntu-cloud-init`](#grace-ubuntu-cloud-init).
 4. **Modifying a workload's source belongs elsewhere.** Source changes
    to a DOCA application route to
-   [`doca-programming-guide ## modify`](../doca-programming-guide/TASKS.md#modify);
+   `doca-programming-guide ## modify` (`doca-programming-guide/TASKS.md#modify`);
    they are not a platform-bring-up concern.
 5. The H2 stays for verb-order parity; the substantive routing is
    above.
@@ -140,7 +136,7 @@ chosen method, update platform firmware via PLDM when required, and
 (optionally) install a Grace Ubuntu image with cloud-init. Each
 sub-anchor below is one documented flow. Reach the OOB console via BMC
 SSH + `obmc-console-client` before starting any of them, and load
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) ALONGSIDE.
+`doca-hardware-safety/SKILL.md` ALONGSIDE.
 The bundle-ISO methods and the Grace-Ubuntu path are alternative OS
 targets selected in [`## configure`](#configure); run one OS-install
 path. The PLDM firmware-update branch may accompany either when the
@@ -153,15 +149,14 @@ mutations.
 
 ### method-a-uefi-http-boot
 
-The recommended OS-install method — no PXE / DHCP / TFTP needed.
+OS install without PXE / DHCP / TFTP.
 
 1. Host the bundle ISO at {iso-uri} on your HTTP server.
 2. Reach the DPU OOB console via BMC SSH + `obmc-console-client`.
 3. Reboot Grace and enter UEFI.
-4. Go Device Manager -> Network Device List -> select the OOB MAC ->
-   HTTP Boot Configuration -> set the Boot URI to {iso-uri} -> save.
-5. Go Boot Manager -> select the UEFI HTTP entry -> boot the
-   installer.
+4. In the UEFI setup, set the HTTP boot URI of the OOB network
+   device to {iso-uri} and save.
+5. Boot the UEFI HTTP entry to start the installer.
 6. Watch the install on the OOB console; then do the shared
    post-install in [`### post-install`](#post-install).
 
@@ -172,17 +167,18 @@ Use when you already have PXE infrastructure or need a custom `bf.cfg`.
 1. Stand up / confirm a PXE server: DHCP + TFTP + the ISO.
 2. Reach the DPU OOB console via BMC SSH + `obmc-console-client`.
 3. In Boot Manager, set next boot to the OOB IPv4 net device.
-4. Select the DOCA arm64 menu, then the ISO, and boot the installer.
+4. Select the installer entry for the ISO and boot it.
 5. Watch the install on the OOB console; then do
    [`### post-install`](#post-install).
 
 ### method-c-redfish-virtual-media
 
-Fully out-of-band; needs a recent dpu-bmc version. No physical access.
+Fully out-of-band; needs Virtual Media support in the installed BMC
+firmware. No physical access.
 
-1. If uploading to local BMC eMMC, verify the combined local payload
-   is no more than 5 GB; otherwise stop and use remote hosting. Then
-   show the exact upload and blast radius, obtain confirmation for
+1. If uploading to local BMC eMMC, confirm the payload fits the BMC
+   storage; otherwise stop and use remote hosting. Then show the
+   exact upload and blast radius, obtain confirmation for
    this upload, and use the Redfish SimpleUpdate API.
 2. Attach it via Redfish VirtualMedia; Grace then sees USB
    mass-storage devices. Confirm the media reports `"Inserted": true`.
@@ -193,7 +189,8 @@ Fully out-of-band; needs a recent dpu-bmc version. No physical access.
 
 ### pldm-firmware-update
 
-Update BMC / NIC firmware / SBIOS / ERoT via PLDM over Redfish. Every
+Update the BMC, NIC firmware and the other platform components the
+PLDM package lists, via PLDM over Redfish. Every
 step here is MUTATING — `doca-hardware-safety` is loaded ALONGSIDE.
 
 1. **NIC firmware from the host (only when explicitly required).**
@@ -201,7 +198,7 @@ step here is MUTATING — `doca-hardware-safety` is loaded ALONGSIDE.
    for the selected bundle explicitly require it; otherwise skip this
    step rather than guessing. When required, program from the host and
    power cycle. Route each mutation through
-   [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify).
+   `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`).
 2. **Push the bundle.** Upload the `.fwpkg` ({fw-image}) via a Redfish
    multipart `POST` to the UpdateService update-multipart endpoint.
 3. **Monitor the Task.** Poll the returned Task ({task-id}):
@@ -237,16 +234,14 @@ Redfish Virtual Media.
 1. **Prepare the cloud-init seed (optional).** Build the seed as an
    ISO with volume label `CIDATA`.
 2. **Choose hosting and preflight it.** Local — calculate the image
-   plus seed size before transfer and proceed only when it is no more
-   than 5 GB combined on BMC eMMC. Remote — host on an HTTPS server that allows
-   unauthenticated access and supports HTTP `HEAD`, with the server
-   certificate in the BMC truststore.
+   plus seed size before transfer and proceed only when it fits the
+   BMC eMMC. Remote — host on an HTTPS server the BMC can reach and
+   whose certificate it trusts.
 3. **Transfer + attach.** For each action, show the exact transfer or
    attach and blast radius and obtain action-specific confirmation;
    then transfer via Redfish SimpleUpdate and attach via Redfish
-   VirtualMedia. The URIs are fixed to `image.iso` and
-   `config.iso` — original filenames do not matter. Confirm
-   `"Inserted": true`.
+   VirtualMedia. Confirm `"Inserted": true` for both the image and
+   the seed.
 4. **Boot.** Show and separately confirm the boot-state change and
    reset with their blast radii. Set BootSourceOverride to USB and
    reset Grace, OR
@@ -315,23 +310,23 @@ layer; do not declare the bring-up complete on a single green signal.
 ## debug
 
 Layered diagnosis. Walk the layers in this order; do not skip down
-without clearing the layer above. The six layers match
-[`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy).
+without clearing the layer above. This is the single source for each
+layer's symptoms, evidence and correction; `CAPABILITIES.md ## Error
+taxonomy` only lists the layers.
 
 1. **Boot-source layer.** ISO never starts: UEFI HTTP Boot cannot
    fetch the Boot URI, the PXE menu never appears, or the Virtual
    Media device is absent from the Boot Manager. Confirm {iso-uri} is
-   reachable from the OOB network and serves the ISO; confirm the OOB
-   MAC matches the Network Device List entry; (Method C) confirm the
+   reachable from the OOB network and serves the ISO; confirm the HTTP
+   boot entry belongs to the OOB network device; (Method C) confirm the
    media was attached before the reset. Evidence: the OOB console via
    `obmc-console-client`.
 2. **Virtual-media-attach layer.** InsertMedia fails or
    `"Inserted": false`; Grace sees no USB mass-storage device. Check
-   the dpu-bmc version supports Redfish Virtual Media; confirm the
+   the BMC firmware supports Redfish Virtual Media; confirm the
    SimpleUpdate transfer completed (Method C local) or that the remote
-   HTTPS source allows unauthenticated access, supports HTTP `HEAD`,
-   and has its certificate in the BMC truststore; confirm the combined
-   local payload is within 5 GB.
+   HTTPS source is reachable from the BMC and its certificate is
+   trusted; confirm the local payload fits the BMC storage.
 3. **Firmware-Task layer.** The multipart `POST` was accepted but the
    Task stays Running, ends with an Exception, or stalls
    `PercentComplete`. Read the Task `Messages`; verify the `.fwpkg`
@@ -352,8 +347,8 @@ without clearing the layer above. The six layers match
    the approved action.
 5. **Cloud-init layer (Grace-Ubuntu).** The OS installed but the
    cloud-init seed did not apply: confirm the seed ISO volume label is
-   exactly `CIDATA` and that both `image.iso` and `config.iso` were
-   attached under their fixed URIs.
+   exactly `CIDATA` and that both the image and the seed were
+   attached.
 6. **Boot-loop layer.** Grace re-enters the installer / Virtual Media
    on every reset: the install media was never detached. Detach all
    virtual media, confirm `"Inserted": false`, and clear / re-point
@@ -362,9 +357,9 @@ without clearing the layer above. The six layers match
 
 For any cross-cutting host-side issue on the machine that talks to the
 BF4 (kernel, drivers, PCIe link state), drop to
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug). For any
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`). For any
 mutating recovery action (re-burn, reflash, factory reset), route to
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md).
+`doca-hardware-safety/SKILL.md`.
 
 **Debug-loop bound.** Walk the six-layer sweep once, apply at most one
 evidence-backed, non-mutating correction: the exact failed observed
@@ -388,27 +383,27 @@ debug or request another power cycle.
   install methods). Route to `doca-bf3-deployment`.
 - **Running an application on an already-working BlueField** —
   out of scope. A DOCA service container routes to
-  [`doca-container-deployment`](../doca-container-deployment/SKILL.md);
+  `doca-container-deployment/SKILL.md`;
   a DOCA-linked binary launched directly routes to
-  [`doca-bare-metal-deployment`](../doca-bare-metal-deployment/SKILL.md).
+  `doca-bare-metal-deployment/SKILL.md`.
   This skill hands off once Grace is installed and firmware is at the
   target level.
 - **Library-API questions** (constructing a DOCA-Flow pipe, an RDMA
   queue pair, interpreting a `DOCA_ERROR_*` code) — out of scope.
   Route to the matching `libs/<library>` skill via
-  [`doca-public-knowledge-map ## Library- and module-specific guides`](../doca-public-knowledge-map/SKILL.md#library--and-module-specific-guides).
+  `doca-public-knowledge-map ## Library- and module-specific guides` (`doca-public-knowledge-map/SKILL.md#library--and-module-specific-guides`).
 - **Env preparation on the installed Grace OS** (hugepages,
   `PKG_CONFIG_PATH` / `LD_LIBRARY_PATH`, devlink mode, representor
   visibility) — out of scope here. Route to
-  [`doca-setup ## configure`](../doca-setup/TASKS.md#configure); this
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`); this
   skill stops at "Grace installed, firmware at target."
 - **The hardware-change meta-policy itself** (preflight, OOB-console
   discipline, maintenance window, rollback for any PLDM burn / ISO
   reflash / power cycle / BMC factory reset) — owned by
-  [`doca-hardware-safety ## modify`](../doca-hardware-safety/TASKS.md#modify).
+  `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`).
   This skill always loads it ALONGSIDE and adds only the BF4
   sequencing; it never redefines the meta-policy.
 - **Fleet-scale / orchestrated DPU provisioning** (DOCA Platform
   Framework, NVIDIA Network Operator) — out of scope per the bundle's
   non-goals. Route via
-  [`doca-public-knowledge-map ## Externally-productized DOCA software`](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route).
+  `doca-public-knowledge-map ## Externally-productized DOCA software` (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`).

@@ -1,4 +1,5 @@
 name: NeMo MBridge
+product_primary: NeMo Megatron Bridge
 repo: NVIDIA-NeMo/Megatron-Bridge
 description: NeMo MBridge - PyTorch-native bridge between Hugging Face and Megatron-Core for checkpoint conversion, training recipes, and NVIDIA GPU performance workflows.
 skills:

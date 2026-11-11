@@ -1,0 +1,44 @@
+[
+  {
+    "id": "holoscan-app-debug-build-run-009",
+    "question": "In my standalone Holoscan Module, `uv run holoscan install my-module --dev` succeeded, but the host Python that my consumer uses still cannot import it. Diagnose the environment mismatch.",
+    "expected_skill": "holoscan-app-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The agent treats this as an environment-scoped editable-hook failure. It records the CLI environment identity and recognizes that in 5.0.0 a standalone Module's install --dev runs in the development container unless --local is passed, so any hook landed in the container's Python rather than the host consumer's environment. It also checks whether a build staged the expected holoscan_<snake_name>_dev.py hook, because the packaged template stages none. It compares the selected and consuming environments, changes only the mismatched selection, such as --local with the consumer's interpreter or running the consumer in the same container, verifies the import, and removes stale diagnostic hooks with the same environment and build directory.",
+    "expected_behavior": [
+      "Activates holoscan-app-debug-build-run rather than the non-failing module lifecycle",
+      "Uses env-info --json and the install preview to identify where the hook was installed, with sensitive paths redacted",
+      "Recognizes that install --dev runs in the module's development container unless --local is passed",
+      "Checks whether a staged editable hook exists instead of changing module source first",
+      "Verifies import in the corrected environment and uninstalls stale hooks with the same environment and build directory"
+    ]
+  },
+  {
+    "id": "holoscan-app-debug-build-run-011",
+    "question": "`holoscan test my_app --clear-cache` fails in my holoscan-applications checkout. Diagnose and fix it, but do not clear existing cached artifacts unless I explicitly approve the exact affected paths after seeing them.",
+    "expected_skill": "holoscan-app-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The agent preserves the exact failing command and baseline, inspects local help, and previews the unchanged command to identify every cache path that would be cleared. Because --clear-cache is destructive, the request to diagnose is not treated as authorization to reproduce it: the agent shows the exact affected paths and obtains explicit user approval first. Only after approval does it reproduce once, test one causal hypothesis at a time, make the smallest fix, refresh the same preview, and run the identical proof command.",
+    "expected_behavior": [
+      "Activates holoscan-app-debug-build-run and preserves the exact command, revision, dirty state, and cache baseline",
+      "Previews the unchanged --clear-cache command and resolves every affected cache path before reproduction",
+      "Does not treat a diagnosis request as approval to clear existing cached artifacts",
+      "Obtains explicit user authorization for the displayed affected paths before the real reproduction",
+      "After a minimal fix, refreshes the preview before rerunning the identical proof command",
+      "Does not broaden cleanup to unrelated caches, prepared data, or other paths"
+    ]
+  },
+  {
+    "id": "holoscan-app-debug-build-run-runtime-docs",
+    "question": "Planning only: our holoscan-applications checkout pins holoscan-cli 5.0.0, whose wheel declares Requires-Python >=3.11,<3.15. Can we use Python 3.14? Does that also make an older module pinned to the published 5.0.0a1 wheel usable on 3.14? Where should we read general CLI usage versus this repository's workflow instructions? Do not run commands or change pins.",
+    "expected_skill": "holoscan-app-debug-build-run",
+    "expected_script": null,
+    "ground_truth": "The 5.0.0 wheel supports the CLI interpreter on 3.14; recommend 3.12–3.14. The published 5.0.0a1 wheel still requires <3.14, so keep an explicitly requested alpha pin with 3.12/3.13 or obtain authorization to update that module's CLI pins consistently. SDK/native-module compatibility needs separate proof. Use the CLI README, CLI_REFERENCE.md, CONFIGURATION.md, and local help for CLI usage; holoscan-applications README.md, CONTRIBUTING.md, and docs/ci.md for the repository workflow; and a generated module's README.md, DEVELOPER.md, and AGENTS.md for module development. The CLI repository's AGENTS.md is for contributing to the CLI. Respect planning-only scope.",
+    "expected_behavior": [
+      "Distinguishes the 5.0.0 wheel's metadata from the immutable published alpha artifact",
+      "Accepts Python 3.14 where package metadata supports it without claiming SDK compatibility",
+      "Uses CLI-owned documentation for CLI usage and holoscan-applications README, CONTRIBUTING, and docs/ci.md for the repository workflow",
+      "Does not execute, edit pins, bypass Requires-Python, or add a blanket project Python pin"
+    ]
+  }
+]

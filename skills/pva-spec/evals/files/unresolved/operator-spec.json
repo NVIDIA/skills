@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "schema_authority": "skill_workflow",
+  "status": "CONFIGURED",
+  "operator": {
+    "name": "MatMul2x2",
+    "purpose": "Multiply two 2x2 int16 matrices into an int32 matrix",
+    "task_mode": "new",
+    "public_api": {
+      "language": [],
+      "headers": [],
+      "symbols": []
+    }
+  },
+  "platform": {
+    "pva_sdk_version": "2.10.0~rc3",
+    "pva_generations": [
+      "GEN2"
+    ],
+    "operating_systems": [
+      "L4T"
+    ],
+    "emulator": {
+      "policy": "optional"
+    },
+    "safety": {
+      "required": false,
+      "standard": null,
+      "constraints": []
+    },
+    "interoperability": []
+  },
+  "requirements": [
+    {
+      "id": "REQ-MATMUL",
+      "authority": "user_input",
+      "behavior": "For contiguous row-major 2x2 int16 matrices A and B with entries from -10 to 10, return the exact int32 matrix product C. Inputs and output do not alias."
+    }
+  ],
+  "resources": {
+    "inputs": [],
+    "outputs": []
+  },
+  "parameters": [],
+  "behavior": {
+    "border": {
+      "modes": [],
+      "constant_value": null,
+      "halo": null
+    },
+    "arithmetic": {
+      "rounding": null,
+      "saturation": null,
+      "overflow": null,
+      "nan": null,
+      "infinity": null
+    },
+    "aliasing": {
+      "in_place": null,
+      "permitted_pairs": [],
+      "prohibited_pairs": []
+    },
+    "execution": {
+      "asynchronous": null,
+      "stream_rules": null,
+      "fence_rules": null,
+      "repeated_submission": null
+    },
+    "errors": []
+  },
+  "design_constraints": [],
+  "correctness_contracts": [
+    {
+      "requirement_ids": [
+        "REQ-MATMUL"
+      ],
+      "reference": "Independent exact integer matrix multiplication."
+    }
+  ],
+  "performance_contract": {
+    "acceptance": "not_set",
+    "target_source": null,
+    "sol_model": {
+      "required": false,
+      "assumptions": [],
+      "limiting_resource": null,
+      "predicted_time_or_cycles": null,
+      "acceptance_rule": null
+    }
+  },
+  "unresolved_requirements": []
+}

@@ -72,6 +72,7 @@ TOP_N = 25
 # would dissolve the reference-designator identity a service/BOM twin relies on.
 _ANON_RE = re.compile(
     r"^(mesh|xform|node|prim|group|shape|object|obj|geom|part)[_-]?\d*$"
+    r"|^fragment[_-]?(?:[a-z]|[0-9]+)$"
     r"|^\d+$"
     r"|^[0-9a-fA-F]{12,}$",
     re.IGNORECASE,
@@ -289,57 +290,3 @@ def scan_stage(stage, knobs=None) -> list:
             "distinct_materials": len([m for m in mats if m not in ("<none>", "<unreadable>")]) or len(mats),
         })
     return summaries
-
-
-def render_report(result: dict) -> str:
-    diag = result["diagnostics"]
-    L = ["Mesh-fragmentation suggester — root=%s, %d parent(s) examined, %d fan(s) surfaced."
-         % (diag.get("root", "/"), diag["parents_examined"], diag["fans_surfaced"])]
-    entered = diag.get("perf_small_mesh_inputs", 0)
-    L.append("perf_small_mesh entry signal: %s."
-             % ("%d path(s) from the validator" % entered if entered
-                else "none supplied — surfaced from structure alone"))
-    for s in result["suggestions"]:
-        L.append("  - %s  [fan=%d, materials=%d, ratio=%.1f%s%s]"
-                 % (s["merge_boundary"], s["fan_size"], s["distinct_materials"],
-                    s["mesh_material_ratio"],
-                    ", from perf_small_mesh" if s["from_perf_small_mesh"] else "",
-                    ", composes-with-instance" if s["composes_with_instance_candidate"] else ""))
-        L.append("      %s" % s["suggestion"])
-    rsg = result["routed_small_geometry"]
-    if rsg["remove_small_geometry_candidates"]:
-        L.append("  removeSmallGeometry (delete) candidates: %d"
-                 % len(rsg["remove_small_geometry_candidates"]))
-    L.append("")
-    L.append("Caveats:")
-    L.append("  - Advisory only; this tool does not modify the stage.")
-    L.append("  - Merge is identity-destroying and intent/archetype-gated: nothing here")
-    L.append("    runs until the user (or the archetype default) confirms it.")
-    L.append("  - No vertex-coincidence test is performed; the weld is realized by the op,")
-    L.append("    not measured here to decide.")
-    return "\n".join(L)
-
-
-def _main(argv) -> int:
-    emit = "--emit-suggestions" in argv
-    args = [a for a in argv[1:] if not a.startswith("--")]
-    small_paths = []
-    if "--small-mesh-paths" in argv:
-        i = argv.index("--small-mesh-paths")
-        if i + 1 < len(argv):
-            small_paths = json.loads(open(argv[i + 1]).read())
-            args = [a for a in args if a != argv[i + 1]]
-    stage_path = args[0] if args else os.environ.get("DTP_STAGE")
-    if not stage_path:
-        sys.stderr.write("usage: mesh_fragmentation_finder.py <stage.usd> [--emit-suggestions]\n")
-        return 2
-    from pxr import Usd
-    stage = Usd.Stage.Open(stage_path)
-    result = suggest_merges(scan_stage(stage), small_mesh_paths=small_paths,
-                            root=str(stage.GetPseudoRoot().GetPath()))
-    print(json.dumps(result, indent=2) if emit else render_report(result))
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(_main(sys.argv))

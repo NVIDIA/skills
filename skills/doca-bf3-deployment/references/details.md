@@ -55,7 +55,7 @@ the worked example is one instance.
   — the decision belongs at BFB-install time in
   [`TASKS.md ## configure`](../TASKS.md#configure) step 7, and the
   `mlxconfig set` burn itself routes to
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md).
+  `doca-hardware-safety/SKILL.md`.
 - **"How do I verify the install actually took?"** — worked example:
   *"the push finished; how do I confirm which BFB landed and that
   the versions line up?"*. Answered by `cat /etc/mlnx-release` +
@@ -85,20 +85,20 @@ does not contain — and pull requests should not add:
   canonical hallucination failure mode.
 - **BlueField-4 bring-up.** The BMC-Redfish provisioning path is the
   sibling skill
-  [`doca-bf4-deployment`](../../doca-bf4-deployment/SKILL.md), the BF4
+  `doca-bf4-deployment/SKILL.md`, the BF4
   equivalent of this skill; this skill is BF3-only (the classic
   RShim/BFB path).
 - **The app-launch and container-deploy workflows.** Running a
   DOCA-linked binary on a healthy BF3 belongs to
-  [`doca-bare-metal-deployment`](../../doca-bare-metal-deployment/SKILL.md);
+  `doca-bare-metal-deployment/SKILL.md`;
   deploying a DOCA service container belongs to
-  [`doca-container-deployment`](../../doca-container-deployment/SKILL.md).
+  `doca-container-deployment/SKILL.md`.
   This skill hands off once the BF3 is healthy.
 - **The hardware-state-change meta-policy.** The
   preflight / OOB-console / maintenance-window / rollback discipline
   wrapping any BFB reflash, `mlxconfig set`, or firmware burn is
   owned by
-  [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md); this
+  `doca-hardware-safety/SKILL.md`; this
   skill cross-links it and adds only BF3-specific sequencing, never
   redefining the meta-policy.
 - **A `samples/`, `templates/`, or `reference/` subtree of any
@@ -108,22 +108,22 @@ does not contain — and pull requests should not add:
 
 ## Related skills
 
-- [`doca-bf4-deployment`](../../doca-bf4-deployment/SKILL.md) — the
+- `doca-bf4-deployment/SKILL.md` — the
   BF4 equivalent of this skill. BF3 uses the classic RShim/BFB path
   (this skill); BF4 uses the BMC-Redfish provisioning path (that
   skill). Same lifecycle shape, different platform transport; route
   by which BlueField generation the operator has.
-- [`doca-bare-metal-deployment`](../../doca-bare-metal-deployment/SKILL.md)
+- `doca-bare-metal-deployment/SKILL.md`
   — the app-launch sibling and the source where the BF3 lifecycle
   facts this skill consolidates were originally vetted (its
-  [`## bluefield-lifecycle`](../../doca-bare-metal-deployment/TASKS.md#bluefield-lifecycle)
+  `## bluefield-lifecycle` (`doca-bare-metal-deployment/TASKS.md#bluefield-lifecycle`)
   anchor). Once a BF3 is healthy and the operator wants to *run a
   binary*, control routes there.
-- [`doca-container-deployment`](../../doca-container-deployment/SKILL.md)
+- `doca-container-deployment/SKILL.md`
   — the container-path deployment sibling. Once a BF3 is healthy and
   the operator wants to *deploy a service container*, control routes
   there.
-- [`doca-hardware-safety`](../../doca-hardware-safety/SKILL.md) — the
+- `doca-hardware-safety/SKILL.md` — the
   cross-cutting meta-policy for any change touching DPU / NIC
   hardware state. This skill's `## Safety policy` overlays that
   meta-policy with BF3-specific rules (OOB path is a precondition,
@@ -132,18 +132,18 @@ does not contain — and pull requests should not add:
   `mlxconfig set`, mode flip, and firmware burn leaves this skill for
   `doca-hardware-safety` and returns only once the change is
   complete.
-- [`doca-setup`](../../doca-setup/SKILL.md) — env preparation and
+- `doca-setup/SKILL.md` — env preparation and
   host-side DOCA-Host install (install verification, hugepages,
   IOMMU, pkg-config path, devlink mode, kernel module state). BF3
   bring-up assumes the host RShim surface is present; any host-side
   reinstall routes there.
-- [`doca-version`](../../doca-version/SKILL.md) — the four-way version
+- `doca-version/SKILL.md` — the four-way version
   match rule (host package ↔ binary build ↔ BlueField firmware ↔
   DOCA-version policy). This skill's
   [`## Version compatibility`](../CAPABILITIES.md#version-compatibility)
   cross-links the body there and adds only the BF3 three-leg overlay
   (host DOCA-Host, Arm-side BFB, NIC firmware).
-- [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+- `doca-public-knowledge-map/SKILL.md`
   — the routing table to the public BlueField Platform Software
   Manual, the public DOCA Installation Guide, the MFT manual, and
   the public DOCA Downloads page. This skill does not duplicate URLs;

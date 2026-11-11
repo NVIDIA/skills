@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-public-knowledge-map.explicit-positive.v1",
-      "prompt": "Use the doca-public-knowledge-map skill to help me. Use this skill when the user needs to locate authoritative information about NVIDIA DOCA without access to the source tree — finding the right docs.nvidia.com page for a library/service/tool, identifying which DOCA libraries are installed a",
+      "prompt": "Use the doca-public-knowledge-map skill for this task: I cannot find the authoritative guide and shipped sample for a DOCA component on my installed release. Show me how to locate both without guessing URLs.",
       "expected_skill": "doca-public-knowledge-map",
       "expected_output": "The agent loads doca-public-knowledge-map and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-public-knowledge-map's scope.",
       "assertions": [
@@ -14,22 +14,22 @@
     },
     {
       "id": "doca-public-knowledge-map.implicit-positive.v1",
-      "prompt": "I need help with the user needs to locate authoritative information about NVIDIA DOCA without access to the source tree — finding the right docs. How should I proceed?",
+      "prompt": "I cannot find the authoritative guide and shipped sample for a DOCA component on my installed release. Show me how to locate both without guessing URLs.",
       "expected_skill": "doca-public-knowledge-map",
       "expected_output": "The agent recognizes this as a doca-public-knowledge-map task even though the skill is not named, loads doca-public-knowledge-map, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
       "assertions": [
-        "The doca-public-knowledge-map skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The response is concrete and grounded in the skill content rather than generic advice."
       ]
     },
     {
       "id": "doca-public-knowledge-map.negative.v1",
-      "prompt": "I need help with something doca-public-knowledge-map explicitly says is out of scope (it should be handled by doca-hardware-safety). Which skill should handle it and why is it not doca-public-knowledge-map?",
+      "prompt": "I already have the authoritative documentation open. What I need is a concrete local debug loop for a runtime error on the installed host. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-public-knowledge-map; it recognizes the request is out of scope and routes to the correct skill (doca-hardware-safety, doca-programming-guide, doca-setup), explaining the boundary.",
+      "expected_output": "The agent does NOT force doca-public-knowledge-map; it recognizes a local runtime symptom and routes to doca-debug plus the matching component skill.",
       "assertions": [
-        "doca-public-knowledge-map is not used as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s): doca-hardware-safety, doca-programming-guide, doca-setup."
+        "The answer does not attempt the out-of-scope work itself.",
+        "The answer routes to doca-debug and the matching component skill."
       ]
     }
   ]

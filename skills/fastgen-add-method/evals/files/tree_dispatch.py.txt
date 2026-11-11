@@ -1,0 +1,49 @@
+# fastgen/utils/tree_utils.py:58-91
+def per_modality(fn: Callable, primary: Any, *args: Any, **kwargs: Any) -> Any:
+    """Apply *fn* per-modality, broadcasting non-dict args/kwargs as-is.
+
+    *primary* drives the output structure:
+
+    * **Non-dict primary** (``Tensor``, scalar, ``None``, ``Callable``, …):
+      short-circuits to ``fn(primary, *args, **kwargs)``.
+    * **Dict / ``ModuleDict`` primary**: iterates ``for k in primary`` and
+      calls ``fn(primary[k], *idx_args, **idx_kwargs)`` per key.  For each
+      element of ``args`` / ``kwargs``: if it is a dict (``Mapping`` or
+      ``ModuleDict``) it is **indexed per-key** (``v[k]``); otherwise it is
+      **broadcast as-is** to every per-modality call.
+
+    Per-key indexing applies symmetrically to positional and keyword args.
+    Mismatched dict keys raise ``KeyError`` at the per-modality call.
+
+    ``per_modality`` is the canonical primitive for multimodal-or-unimodal
+    data (``TensorOrDict``); it does *not* recurse into nested lists /
+    tuples / namedtuples — that is the job of ``tmap``.
+    """
+    if not isinstance(primary, DICT_TYPES):
+        return fn(primary, *args, **kwargs)
+
+    def _idx(v: Any, k: Any) -> Any:
+        return v[k] if isinstance(v, DICT_TYPES) else v
+
+    return {
+        k: fn(
+            primary[k],
+            *(_idx(a, k) for a in args),
+            **{kk: _idx(v, k) for kk, v in kwargs.items()},
+        )
+        for k in primary
+    }
+
+
+# fastgen/utils/tree_utils.py:209-219
+def to_dict(data: TensorOrDict, suffix: str = "") -> Dict[str, torch.Tensor]:
+    """Flatten *data* into ``{key + suffix: tensor, ...}``.
+
+    * ``Tensor`` → ``{suffix: tensor}``.
+    * ``Dict[str, Tensor]`` → ``{f"{k}_{suffix}": v, ...}``.
+
+    Used to format per-modality losses for downstream logging.
+    """
+    if isinstance(data, torch.Tensor):
+        return {suffix: data}
+    return {f"{k}_{suffix}": v for k, v in data.items()}

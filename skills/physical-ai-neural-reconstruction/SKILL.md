@@ -20,22 +20,18 @@ metadata:
     - nurec
     - neural-reconstruction
   upstream:
-    repo: https://github.com/NVIDIA/nurec-skills
-    branch: main
-    skills_dir: skills/
-    skills_dir_alias: .agents/skills/
-    index_skill: skills/nurec-index/SKILL.md
-    index_skill_name: nurec-index
     sibling_skills:
       - name: physical-ai-datasets
-        folder: physical-ai-datasets/
+        skill_repo: https://github.com/NVIDIA/nurec
+        skill_path: skills/physical-ai-datasets/
         upstream: https://huggingface.co/nvidia
-      - name: ncore
-        folder: ncore/
+      - name: ncore-data-conversion
+        skill_repo: https://github.com/NVIDIA/ncore
+        skill_path: skills/ncore-data-conversion/
         upstream: https://github.com/NVIDIA/ncore
-        release_tag: "2026.04"
-      - name: nre
-        folder: nre/
+      - name: nurec
+        skill_repo: https://github.com/NVIDIA/nurec
+        skill_path: skills/nurec/
         upstream: nvcr.io/nvidia/nre/nre-ga
         tools_container: nvcr.io/nvidia/nre/nre-tools-ga
         release_tag: "26.04"  # NRE release; NGC image tags are 26.04.01 / 26.04 / 26 / latest (not `release_26.04`)
@@ -44,13 +40,12 @@ metadata:
         skill_path: skills/asset-harvester/
         upstream: https://github.com/NVIDIA/asset-harvester
         hf_model: https://huggingface.co/nvidia/asset-harvester
-      - name: nurec-fixer
-        folder: nurec-fixer/
+      - name: harmonizer
+        skill_repo: https://github.com/NVIDIA/harmonizer
+        skill_path: skills/harmonizer/
         upstream: https://github.com/NVIDIA/harmonizer
         hf_model: https://huggingface.co/nvidia/Harmonizer
         container: nvcr.io/nvidia/pytorch:25.10-py3
-  upstream_clone_path: "${PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT:-$HOME/.physical-ai-skill-hub/upstreams}/nurec-skills"
-  upstream_override_env: NUREC_SKILLS_UPSTREAM_ROOT
 ---
 
 # Physical AI Neural Reconstruction (NuRec) Router
@@ -58,15 +53,15 @@ metadata:
 ## Purpose
 
 This is a **thin router** for NVIDIA Neural Reconstruction (NuRec)
-requests. It points at the upstream `nurec-index` skill at
-`https://github.com/NVIDIA/nurec-skills` and its sibling skills
-(`physical-ai-datasets`, `ncore`, `nre`, `asset-harvester`,
-`nurec-fixer`). Use this skill to:
+requests. It points at sibling skills in their product repos
+(`physical-ai-datasets`, `ncore-data-conversion`, `nurec`,
+`asset-harvester`, `harmonizer`). Use this skill to:
 
-- Identify which upstream sibling skill answers a NuRec question.
-- Locate, clone, or refresh the canonical `nurec-skills` checkout.
+- Identify which sibling skill answers a NuRec question.
+- Name each sibling's product repo and path so it can be fetched
+  with consent if it is not already installed.
 - Order multi-step NuRec workflows (data → conversion → train →
-  render → cleanup) before opening the upstream recipe.
+  render → cleanup) before opening the sibling recipe.
 
 The canonical recipes (training, rendering, data conversion, dataset
 downloads, object harvesting, frame cleanup) live in the upstream
@@ -120,10 +115,11 @@ each sibling's `scripts/validate_setup.py` over hand-written checks.
 LiDAR, radar, or stereo recordings — typically from a self-driving car
 or a robot — into a 3D scene that can be re-rendered from any
 viewpoint. A typical project runs in three stages: get the input
-(convert a recording with `ncore`, or download a ready-made dataset
-with `physical-ai-datasets`), train the reconstruction (`nre`, which
-emits a USDZ), then render new views (`nre`). Projects that only want
-to *use* a scene NVIDIA already published skip the training stage.
+(convert a recording with `ncore-data-conversion`, or download a
+ready-made dataset with `physical-ai-datasets`), train the
+reconstruction (`nurec`, which emits a USDZ), then render new views
+(`nurec`). Projects that only want to *use* a scene NVIDIA already
+published skip the training stage.
 
 Background on the vocabulary — NRE vs NuRec, USDZ, NCore V4, 3DGUT /
 3DGRT — is in
@@ -137,34 +133,34 @@ skill on the right. Arrows mean "do these in order".
 | I want to… | Upstream skill |
 |------------|----------------|
 | Find or download a NuRec dataset NVIDIA has published | `physical-ai-datasets` |
-| Convert my own camera / LiDAR / radar / depth / stereo recording into NCore V4 | `ncore` |
-| Write a new converter for an unsupported sensor setup (drone, RGB-D, ROS 2 bag, COLMAP, ScanNet++) | `ncore` |
-| Train a 3D reconstruction from an NCore clip | `ncore` → `nre` |
-| Generate the extra inputs NRE needs (segmentation masks, depth, ego mask, DINOv2, LiDAR-seg visibility) | `nre` (uses the `nre-tools-ga` container) |
-| Render a USDZ along the original camera positions | `nre` |
-| Render at full resolution / highest quality | `nre` (see "Quality presets") |
-| Render along a shifted trajectory (e.g. car moved 3 m left) | `nre` |
-| Adapt an existing USDZ to an augmented target-vehicle rig (carline adaptation) | `nre` (`export-custom-rig-trajectory` → `render`) → `nurec-fixer` |
-| Render through a server so CARLA / Isaac Sim / AlpaSim / a custom simulator can ask for frames | `nre` (`serve-grpc`) |
-| Render the same USDZ many times back-to-back from Python with minimal per-call latency | `nre` (warm `serve-grpc` + thin Python client / `batch_render_rgb`) |
-| Render LiDAR sweeps (point clouds) from a USDZ | `nre` (`render-grpc --lidar`) |
-| Skip training and just render a NuRec scene NVIDIA already built | `physical-ai-datasets` → `nre` |
-| Skip training and use a pre-built indoor robotics scene | `physical-ai-datasets` → `nre` (then Isaac Sim 5.1) |
+| Convert my own camera / LiDAR / radar / depth / stereo recording into NCore V4 | `ncore-data-conversion` |
+| Write a new converter for an unsupported sensor setup (drone, RGB-D, ROS 2 bag, COLMAP, ScanNet++) | `ncore-data-conversion` |
+| Train a 3D reconstruction from an NCore clip | `ncore-data-conversion` → `nurec` |
+| Generate the extra inputs NRE needs (segmentation masks, depth, ego mask, DINOv2, LiDAR-seg visibility) | `nurec` (uses the `nre-tools-ga` container) |
+| Render a USDZ along the original camera positions | `nurec` |
+| Render at full resolution / highest quality | `nurec` (see "Quality presets") |
+| Render along a shifted trajectory (e.g. car moved 3 m left) | `nurec` |
+| Adapt an existing USDZ to an augmented target-vehicle rig (carline adaptation) | `nurec` (`export-custom-rig-trajectory` → `render`) → `harmonizer` |
+| Render through a server so CARLA / Isaac Sim / AlpaSim / a custom simulator can ask for frames | `nurec` (`serve-grpc`) |
+| Render the same USDZ many times back-to-back from Python with minimal per-call latency | `nurec` (warm `serve-grpc` + thin Python client / `batch_render_rgb`) |
+| Render LiDAR sweeps (point clouds) from a USDZ | `nurec` (`render-grpc --lidar`) |
+| Skip training and just render a NuRec scene NVIDIA already built | `physical-ai-datasets` → `nurec` |
+| Skip training and use a pre-built indoor robotics scene | `physical-ai-datasets` → `nurec` (then Isaac Sim 5.1) |
 | Extract individual 3D objects (cars, pedestrians) from a driving clip | `asset-harvester` |
-| Add, remove, or replace cars / pedestrians in a NuRec scene | `asset-harvester` → `nre` |
-| Clean up or harmonize rendered frames (ghosting, floaters, flicker, lighting/shadows) | `nurec-fixer`, **or** `--enable-difix` inside `nre` for inline rendering |
-| Export the scene as a PLY, mesh, depth maps, ego mask, etc. | `nre` |
-| Upgrade an old USDZ so newer NRE versions load it faster | `nre` (`upgrade-artifact`) |
-| Open a USDZ or PLY in a browser viewer | `nre` (`viewer` / `ply_viewer`) |
-| Measure rendering quality (PSNR, SSIM, LPIPS) against ground truth | `nre` (`eval-rendering-metrics`) |
-| Benchmark different reconstruction methods on the same scenes | `physical-ai-datasets` (`PhysicalAI-NuRec-PPISP`) → `nre` |
-| Train on multiple GPUs or on SLURM | `nre` |
+| Add, remove, or replace cars / pedestrians in a NuRec scene | `asset-harvester` → `nurec` |
+| Clean up or harmonize rendered frames (ghosting, floaters, flicker, lighting/shadows) | `harmonizer`, **or** `--enable-difix` inside `nre` for inline rendering |
+| Export the scene as a PLY, mesh, depth maps, ego mask, etc. | `nurec` |
+| Upgrade an old USDZ so newer NRE versions load it faster | `nurec` (`upgrade-artifact`) |
+| Open a USDZ or PLY in a browser viewer | `nurec` (`viewer` / `ply_viewer`) |
+| Measure rendering quality (PSNR, SSIM, LPIPS) against ground truth | `nurec` (`eval-rendering-metrics`) |
+| Benchmark different reconstruction methods on the same scenes | `physical-ai-datasets` (`PhysicalAI-NuRec-PPISP`) → `nurec` |
+| Train on multiple GPUs or on SLURM | `nurec` |
 
 ## Common workflows
 
 Seven end-to-end workflows are documented in
-[`references/workflows.md`](references/workflows.md), lettered to
-match the upstream `nurec-index` workflow IDs:
+[`references/workflows.md`](references/workflows.md), lettered A–G
+by this router:
 
 - **A.** Make a NuRec scene from your own recording.
 - **B.** Use a NuRec scene NVIDIA has already trained.
@@ -179,89 +175,76 @@ Open that file when the user's task spans more than one sibling skill.
 ## Sibling skills (upstream)
 
 Refer to a sibling by its **name** — that is the portable identifier.
-The folder column is where it lives in a local `nurec-skills` checkout,
-except where a repo is named — `asset-harvester` ships from its own
-product repo.
+The skill-source column is the product repo and path of that skill.
 
-| Name | Upstream folder | What it does |
-|------|-----------------|--------------|
-| `physical-ai-datasets` | `skills/physical-ai-datasets/` | Catalog and download recipes for every NVIDIA Physical AI dataset on Hugging Face (driving, robotics, manipulation, NuRec scenes, benchmarks). |
-| `ncore` | `skills/ncore/` | Converts any sensor recording to NCore V4 (the format NRE needs), upstream release `2026.04`. Also covers writing a new converter. |
-| `nre` | `skills/nre/` | The Neural Reconstruction Engine itself (`nvcr.io/nvidia/nre/nre-ga`, `nvcr.io/nvidia/nre/nre-tools-ga`, NRE 26.04 — image tags `26.04.01` / `26.04` / `latest`). Trains, performs carline adaptation, renders (locally, via warm `serve-grpc` + thin Python client / `batch_render_rgb`, or to an external simulator), exports meshes / point clouds / depth, edits actors, evaluates quality. |
+| Name | Skill source | What it does |
+|------|--------------|--------------|
+| `physical-ai-datasets` | [`NVIDIA/nurec`](https://github.com/NVIDIA/nurec) → `skills/physical-ai-datasets/` | Catalog and download recipes for every NVIDIA Physical AI dataset on Hugging Face (driving, robotics, manipulation, NuRec scenes, benchmarks). |
+| `ncore-data-conversion` | [`NVIDIA/ncore`](https://github.com/NVIDIA/ncore) → `skills/ncore-data-conversion/` | Converts any sensor recording to NCore V4 (the format NRE needs). Also covers writing a new converter. |
+| `nurec` | [`NVIDIA/nurec`](https://github.com/NVIDIA/nurec) → `skills/nurec/` | The Neural Reconstruction Engine itself (`nvcr.io/nvidia/nre/nre-ga`, `nvcr.io/nvidia/nre/nre-tools-ga`, NRE 26.04 — image tags `26.04.01` / `26.04` / `latest`). Trains, performs carline adaptation, renders (locally, via warm `serve-grpc` + thin Python client / `batch_render_rgb`, or to an external simulator), exports meshes / point clouds / depth, edits actors, evaluates quality. |
 | `asset-harvester` | [`NVIDIA/asset-harvester`](https://github.com/NVIDIA/asset-harvester) → `skills/asset-harvester/` | Open-source Apache-2.0 pipeline (SparseViewDiT + TokenGS) that extracts individual 3D objects from sparse views in a driving clip and saves them as `.ply` Gaussian splats, optionally emitting `metadata.yaml` for the NuRec handoff. |
-| `nurec-fixer` | `skills/nurec-fixer/` | Standalone NVIDIA **DiffusionHarmonizer** workflow — public successor to the older Fixer / Difix3D+ recipes — that cleans rendered frames, harmonizes inserted actors, evaluates PSNR/LPIPS, and optionally fine-tunes the model. |
+| `harmonizer` | [`NVIDIA/harmonizer`](https://github.com/NVIDIA/harmonizer) → `skills/harmonizer/` | Standalone NVIDIA **DiffusionHarmonizer** workflow — public successor to the older Fixer / Difix3D+ recipes — that cleans rendered frames, harmonizes inserted actors, evaluates PSNR/LPIPS, and optionally fine-tunes the model. |
 
-For naming overlaps (NRE vs Fixer, ncore vs nre, AV-NuRec vs
+For naming overlaps (NRE vs Fixer, ncore-data-conversion vs nurec, AV-NuRec vs
 Cosmos-Drive-Dreams, NuRec vs SimReady) see
 [`references/mix-ups.md`](references/mix-ups.md).
 
 ## Locate and fetch the upstream skills
 
-Try the local disk first, in this order — a sibling skill already
-installed in the runtime is preferable to a network fetch. This applies
-to the `nurec-skills`-hosted siblings; `asset-harvester` is fetched from
-its own repo (see `references/upstream-fetch.md`):
+Select a sibling by its current registered `name` and the
+repo/path in the sibling table. Full lookup, consent, and
+stale-copy rules are in
+[`references/upstream-fetch.md`](references/upstream-fetch.md).
+
+For `ncore-data-conversion`, `nurec`, and `harmonizer`, try the
+runtime-local lookup first:
 
 1. `.agents/skills/<name>/SKILL.md` (Cursor, Codex, NemoClaw)
 2. `.claude/skills/<name>/SKILL.md` (Claude Code)
 3. `.cursor/skills/<name>/SKILL.md` (project-scoped)
 4. `~/.cursor/skills/<name>/SKILL.md` (personal skills)
-5. An existing `nurec-skills` clone under the shared upstream root.
 
-**This order covers the `nurec-skills`-hosted siblings only.**
-`asset-harvester` is not among them — see
-[`references/upstream-fetch.md`](references/upstream-fetch.md).
+A matching installed definition can be read locally. If it is a
+symlink, follow it and use that definition's own companion files.
 
-**Only if none of those exist**, ask the user for explicit consent
-before cloning. A `git clone` is a network fetch of an external
-repository plus a write to the local filesystem; it can violate
-org network policy and carries supply-chain risk. Show the user
-what you intend to run and wait for a yes.
+For `physical-ai-datasets` and `asset-harvester`, generic same-name
+discovery cannot distinguish the old bundled copy. Use their
+canonical product-repo source instead. A canonical definition
+already acquired for this task can be reused.
 
-Quick recipe (full version, including the pinned-commit layout, in
-[`references/upstream-fetch.md`](references/upstream-fetch.md)):
+Do not read sibling skills from a `nurec-skills` checkout: those
+copies are retired and may still exist. Use each skill's product-repo
+home. In particular, `physical-ai-datasets` and `asset-harvester`
+kept their names, so a generic same-name local hit may be the old
+copy. Renamed skills may resolve locally under their current names;
+never fall back to the retired `ncore`, `nre` or `nurec-fixer`
+skill folders.
 
-```bash
-UPSTREAM_ROOT="${NUREC_SKILLS_UPSTREAM_ROOT:-${PHYSICAL_AI_SKILL_HUB_UPSTREAM_ROOT:-$HOME/.physical-ai-skill-hub/upstreams}}"
-mkdir -p "$UPSTREAM_ROOT"
-if [ -d "$UPSTREAM_ROOT/nurec-skills/.git" ]; then
-  git -C "$UPSTREAM_ROOT/nurec-skills" fetch --tags
-  git -C "$UPSTREAM_ROOT/nurec-skills" checkout main
-  git -C "$UPSTREAM_ROOT/nurec-skills" pull --ff-only
-else
-  # Only after the user has agreed. Prefer --branch <tag-or-sha> over HEAD.
-  git clone --depth 1 https://github.com/NVIDIA/nurec-skills.git \
-    "$UPSTREAM_ROOT/nurec-skills"
-fi
-test -f "$UPSTREAM_ROOT/nurec-skills/skills/nurec-index/SKILL.md"
-```
+If the selected current definition is unavailable, follow
+[Ask before cloning](references/upstream-fetch.md#ask-before-cloning)
+before obtaining it from the mapped product repo. Missing a renamed
+local skill never falls back to an old folder or clone. If retrieval
+is declined, report the missing skill and stop that handoff.
 
-The upstream tree is rooted at `skills/<name>/SKILL.md`;
-`.agents/skills` is a symlink onto `skills/`, so either path
-resolves. Read the upstream skill before running any mutating
-command:
-
-```bash
-cat "$UPSTREAM_ROOT/nurec-skills/skills/nurec-index/SKILL.md"  # upstream router
-cat "$UPSTREAM_ROOT/nurec-skills/skills/<folder>/SKILL.md"     # sibling
-```
-
-Companion files (`references/`, `scripts/`, `assets/`) ship inside
-**the sibling's own skill directory**, alongside its skill definition
-— not next to this router.
+Read the selected definition before following its workflow. Open its
+own references on demand. Companion files (`references/`, `scripts/`,
+`assets/`) ship inside **the sibling's own skill directory**. This
+catalog router owns its picker and workflow letters; there is no
+upstream index to fetch.
 
 ## Hard Rules
 
 - Router only — do not duplicate upstream NuRec recipes here. Read
   the upstream sibling skill body before running any mutating command.
-- Refer to sibling skills by their `name:` (e.g. `nre`), not by repo
+- Refer to sibling skills by their `name:` (e.g. `nurec`), not by repo
   path. Folder layouts can change; the name is portable.
-- **Never `git clone` the upstream without explicit user consent.**
-  For the `nurec-skills` siblings, exhaust the local lookup order
-  first, show the exact command, and clone only into a path the user
-  agreed to — never silently into
-  `/tmp`. Do not scan broad developer workspaces such as `~/Codes` or
-  reuse unrelated old clones.
+- **Never `git clone` a product repo without explicit user consent.**
+  Exhaust the local lookup order first (and the same-name exception
+  for `physical-ai-datasets` and `asset-harvester`), show the exact
+  command, and clone only into a path the user agreed to — never
+  silently into `/tmp`. Do not scan broad developer workspaces such
+  as `~/Codes` or reuse unrelated old clones. Never fall back to a
+  `nurec-skills` checkout.
 - Use the GA container channel: `nvcr.io/nvidia/nre/nre-ga` and
   `nvcr.io/nvidia/nre/nre-tools-ga`. The un-suffixed
   `nvcr.io/nvidia/nre/nre` / `nre-tools` names are the legacy
@@ -276,15 +259,16 @@ Companion files (`references/`, `scripts/`, `assets/`) ship inside
   before downloading.
 - Asset Harvester runs **before** packaging into a USDZ. Do not call
   `nre`'s `export-external-assets` on hand-rolled `.ply` files unless
-  the user explicitly asks to skip Asset Harvester.
+  the user explicitly asks to skip Asset Harvester. The owning skill
+  for that command is `nurec`.
 - For artifact cleanup, prefer the built-in `--enable-difix` path in
-  `nre`. Route to the standalone `nurec-fixer` only when the user
+  `nre`. Route to the standalone `harmonizer` only when the user
   needs the public code/model card, paired evaluation, fine-tuning,
   or fixes on previously rendered frames.
 - Do not invent NRE / NCore / DiffusionHarmonizer commands from
   memory. Re-read the upstream sibling skill — versions move fast
   (NRE 26.04 — pull `nvcr.io/nvidia/nre/nre-ga:26.04.01` or `:26.04`; the release name
-  `release_26.04` is not a valid image tag — and NCore `2026.04` are the current pins).
+  `release_26.04` is not a valid image tag).
 - This router does not deploy infrastructure. Route AKS / OSMO /
   NIM Operator setup to
   `physical-ai-infrastructure-setup-and-resilient-scaling`.
@@ -294,11 +278,13 @@ Companion files (`references/`, `scripts/`, `assets/`) ship inside
 - **Router only.** This skill never executes mutating NuRec commands.
   All training, rendering, conversion, and harmonization happens in
   upstream sibling skills.
-- **Upstream-pinned.** Most recipes live in
-  `https://github.com/NVIDIA/nurec-skills`; `asset-harvester` lives in
-  `https://github.com/NVIDIA/asset-harvester`, which evolves outside
-  this repo. Stale clones can drift; always refresh the upstream
-  before relying on a sibling skill.
+- **Upstream-pinned.** Sibling recipes live in their product repos:
+  `https://github.com/NVIDIA/nurec`, `https://github.com/NVIDIA/ncore`,
+  `https://github.com/NVIDIA/harmonizer`, and
+  `https://github.com/NVIDIA/asset-harvester`. A renamed skill already
+  installed locally may be used without a network refresh; if a fetch
+  is needed, follow
+  [Ask before cloning](references/upstream-fetch.md#ask-before-cloning).
 - **Hand-curated catalogue.** A newly-added upstream sibling is not
   discoverable here until someone edits the tables (see
   [`references/maintenance.md`](references/maintenance.md)).
@@ -342,10 +328,7 @@ longer needs the workflow. Do **not** revoke `NGC_API_KEY` /
 
 Procedure for adding new sibling skills, renames, or upstream URL
 changes lives in [`references/maintenance.md`](references/maintenance.md).
-Treat the upstream `nurec-index` at
-<https://github.com/NVIDIA/nurec-skills/blob/main/skills/nurec-index/SKILL.md>
-as authoritative **for the routing taxonomy and workflow ordering**;
-this skill mirrors only the picker tables, the workflow ordering, and
-the upstream fetch recipe. It is not authoritative for
-`asset-harvester`, which is maintained in
+This catalog router is authoritative **for the routing taxonomy and
+workflow ordering**. Sibling recipes live in their product repos; it
+is not authoritative for `asset-harvester`, which is maintained in
 <https://github.com/NVIDIA/asset-harvester>.

@@ -1,6 +1,6 @@
 ---
 name: nemo-relay-install
-description: Use this skill when choosing or running NeMo Relay installation for the CLI, Python, Node.js, Rust, OpenClaw, Hermes, or maintained framework integrations before runtime configuration or quick-start setup.
+description: Use this skill when choosing or running NeMo Relay installation for an agent runtime, application language, framework integration, or plugin bundle, or checking a runtime's native Relay readiness. Do not use it for first-run instrumentation or export configuration.
 license: Apache-2.0
 metadata:
   author: NVIDIA Corporation and Affiliates
@@ -8,138 +8,103 @@ metadata:
 
 # Install NeMo Relay
 
-Choose the package or executable from the user's desired outcome. Stop after
-installation and basic availability checks. Do not configure runtime behavior,
-write `plugins.toml`, create scopes, register middleware, or build a first app
-example from this skill.
-Keep installation separate from first-use instrumentation.
+Resolve what the user needs, install the appropriate current stable package or
+executable, verify availability, and stop. Installation does not include a
+first application, plugin configuration, scopes, or a model-consuming trial.
 
-## Choose The Install Path
+## Disambiguate Before Installing
 
-If the user asks to install NeMo Relay but does not identify a target or
-desired outcome, ask one short clarifying question before giving commands:
+Establish the desired outcome and the boundary that owns execution before
+selecting a Relay type. Inspect available project context, but do not assume
+that a Python manifest means the user wants a Python binding rather than Relay
+for their coding agent.
 
-> Which install path do you want: CLI for coding-agent/local gateway use,
-> language package for a Python/Node.js/Rust app, or framework integration for
-> LangChain, LangGraph, Deep Agents, OpenClaw, or Hermes?
+When the target is unclear, ask one concise question:
 
-Do not ask when the user already names a CLI, language, framework, harness,
-source checkout, or target project file such as `pyproject.toml`, `package.json`,
-or `Cargo.toml`.
+> Are you adding Relay to an existing agent runtime or framework, integrating
+> it into your own application, or using its CLI or local gateway?
 
-Use this order from least to most application-specific:
+Resolve the named runtime, framework, language, or plugin only as far as needed
+to select its installation instructions. Preserve an explicit choice or an
+earlier handoff; do not repeat questions already answered. A generic "install
+Relay" or "try Relay" request alone does not authorize choosing the CLI.
 
-1. **CLI** for a generic "try Relay" request, a temporary coding-agent run, the
-   local gateway, or explicit persistent host-plugin setup. Read
-   [CLI Installation](references/cli-install.md).
-2. **Maintained integration** when the user already uses OpenClaw, Hermes,
-   LangChain, LangGraph, or Deep Agents. Read
-   [Maintained Integration Installation](references/maintained-integrations.md).
-3. **Language package** when a Python, Node.js, or Rust application directly
-   owns its tool or model call sites. Read
-   [Language Package Installation](references/language-packages.md).
-4. **Source checkout** only for contributors or unpublished changes. Follow the
-   repository development guide instead of published package commands.
+| Established target | Reference |
+|---|---|
+| CLI, coding-agent wrapper, or persistent host integration | [CLI Installation](references/cli-install.md) |
+| Native agent integration, framework integration, or plugin bundle | [Maintained Integrations](references/maintained-integrations.md) |
+| Application-owned language binding | [Language Packages](references/language-packages.md) |
+| Explicit contributor or source-build request | Current repository development guide |
 
-For "try Relay" requests, default to the CLI and temporary transparent run.
-Do not make persistent host-plugin installation the default.
+## Resolve Current Stable Requirements
 
-## Protect Codex Desktop Continuity
+Read the current [installation guide](https://docs.nvidia.com/nemo/relay/getting-started/installation)
+for the selected target. Resolve prerequisites from the selected release's
+installation sections, support matrix, and package metadata rather than a
+remembered standalone prerequisites page. Confirm the latest published stable
+release using [release metadata](https://api.github.com/repos/NVIDIA/NeMo-Relay/releases/latest),
+[official releases](https://github.com/NVIDIA/NeMo-Relay/releases/latest), and
+the relevant package registry. Check the target's actual platform assets and
+package availability, not just a repository version or a pending PR.
 
-Before persistent Codex installation, determine whether the user is operating
-from Codex Desktop. Persistent `nemo-relay install codex` changes the active
-Codex provider and can make the current or older Desktop threads appear missing
-after restart because of an upstream provider-filtering bug. The threads are
-not deleted.
+- Default to the latest published stable release, excluding prereleases unless
+  explicitly requested. Preserve explicit user or project version constraints.
+- Derive operating-system, architecture, language, host, and dependency
+  requirements from that release's documentation and metadata at execution time.
+- Do not copy version pins or minimum-version tables into this skill. Retain a
+  specific version note only for an established incompatibility, with its source.
+- A quick-start example's pin does not override the stable default. If its
+  requirements conflict with the selected release or project, explain the
+  mismatch and resolve the choice before installing.
+- Native or dependency-managed integrations may own their Relay dependency.
+  Follow that supported relationship rather than installing a second runtime.
+- Resolve independently released bundles separately and check compatibility.
+  Their release number need not match Relay's.
 
-For Codex Desktop users:
+Resolve the documentation version explicitly: an unversioned page may display
+an older stable guide. When rendered documentation is inaccessible or lacks the
+selected path, use the official repository at the matching release tag; use
+its development branch only for an explicitly requested development workflow.
+A cached release redirect alone does not establish the latest version.
 
-1. Recommend temporary transparent run first.
-2. If the user still wants persistent installation, read the Codex Desktop
-   section in [CLI Installation](references/cli-install.md).
-3. Preview the install and proposed recovery-note location.
-4. Obtain confirmation before writing either the recovery note or global Codex
-   configuration.
-5. Render `assets/codex-desktop-recovery.md` as
-   `NEMO_RELAY_CODEX_DESKTOP_RECOVERY.md` in the user's workspace root before
-   running the persistent installer.
-6. Do not restart Codex Desktop until the user has the recovery-file path.
-
-Do not directly inspect, copy, delete, edit, or rewrite Codex session files,
-private application configuration, or SQLite state to work around the
-visibility bug. Supported `nemo-relay` install, uninstall, and doctor commands
-may manage the Relay-generated provider and hook configuration.
+If current sources cannot be checked, state what is unverified. Do not infer
+the newest release or requirements from this skill, an old checkout, a generated
+benchmark, or a source-built quick-start test.
 
 ## Install And Verify
 
-1. Inspect the target manifest, environment, operating system, architecture,
-   and existing installation before changing anything.
-2. Load only the reference for the selected path.
-3. Preserve the project's existing package manager and virtual environment.
-4. Use the latest compatible release unless the user or project requires an
-   exact version.
-5. Show the exact install command before running a remote installer or changing
-   a project manifest.
-6. Run only the selected path's basic availability check.
-7. Report what was installed, where it was installed, and the verification
-   result. Then stop.
+Inspect the environment, existing installation, manifest, and authoritative
+package manager. Load only the relevant reference and current target-specific
+documentation. Preserve the project's manager and virtual environment.
 
-The primary documented language paths are Rust, Python, and Node.js. Treat Go
-and raw FFI as source-first advanced surfaces, not normal package installs.
-Do not treat a first scope, subscriber, gateway, plugin config, or LLM call as
-installation verification.
+Derive the install command from those sources, preview it, and proceed within
+existing authorization. For remote installers, separate download, review, and
+execution; use the resolved release's installer and integrity checks rather
+than executing an unreviewed default-branch response.
 
-## Use Doctor For CLI Readiness And Configuration Issues
+Use only the documented availability check for the chosen target. Diagnose a
+failed check at that boundary instead of reinstalling unrelated packages.
+Report the resolved release, installation location, and verification evidence.
+Do not configure export, launch a gateway, or make a model call as an install
+check.
 
-Know about `nemo-relay doctor`, but use it in the right scope:
+## Persistent Codex Desktop Continuity
 
-- Run `nemo-relay doctor` when the user installed the CLI and reports config,
-  gateway, agent-readiness, plugin, exporter, or model-pricing issues.
-- Use `nemo-relay doctor --json` when structured output will help an agent
-  inspect checks programmatically.
-- Use `nemo-relay doctor --plugin claude-code`, `nemo-relay doctor --plugin
-  codex`, or `nemo-relay doctor --plugin all` only for persistent host-plugin
-  installations.
-- Do not require plugin doctor for transparent runs. Transparent-run setup does
-  not require persistent host-plugin state.
-- Do not use doctor as proof that a Python, Node.js, or Rust package dependency
-  was installed. Verify those with the language package manager/import checks.
+Persistent Codex setup can change the provider used to display Desktop
+conversations. Before that path, read the continuity section in
+[CLI Installation](references/cli-install.md), check the referenced upstream
+issue's applicability, and explain any relevant risk.
 
-When doctor reports failures, summarize the failed checks and the specific
-remediation it suggests. Do not loop back to reinstalling every package unless
-the failed check points to a broken or missing install.
+Retain the recovery-note and explicit confirmation gate before global changes.
+Do not inspect, copy, delete, or rewrite private session storage or SQLite state
+as a visibility workaround. Use supported Relay install, uninstall, and
+diagnostic commands.
 
-## Hand Off After Install
+## Hand Off
 
-Choose the next workflow from the user's immediate outcome:
+For a first working example, hand off to `nemo-relay-get-started` with the
+chosen target, resolved release, environment, and verified installation.
+Continue from the appropriate guide step without repeating selection.
 
-- Use `nemo-relay-get-started` for a first working scope, tool call, LLM call,
-  or trial plugin setup.
-- Use the NeMo Relay CLI documentation or host-specific setup for a local CLI
-  host-plugin workflow, not application runtime setup.
-- Use the matching plugin or instrumentation skill for runtime configuration,
-  plugin files, observability, or adaptive behavior.
-
-## Common Mistakes
-
-Avoid these installation-scope mistakes:
-
-- Using repository development setup when the user only needs a published
-  package.
-- Installing the CLI when the user needs an application binding, or installing a
-  binding when the user only needs the local `nemo-relay` executable.
-- Treating persistent host-plugin installation as the default way to try Relay,
-  instead of starting with temporary transparent run.
-- Pinning old versions unless the user or project explicitly requires that
-  version.
-- Continuing into `plugins.toml`, middleware registration, scopes, or quick-start
-  examples before the install step has been verified.
-
-## Public Docs To Reference
-
-Use these public entry points to confirm current installation guidance:
-
-- [Installation](https://docs.nvidia.com/nemo/relay/getting-started/installation)
-- [Prerequisites](https://docs.nvidia.com/nemo/relay/getting-started/prerequisites)
-- [CLI transparent run](https://docs.nvidia.com/nemo/relay/dev/nemo-relay-cli/basic-usage#transparent-run)
-- [Configuration and setup handoff](https://docs.nvidia.com/nemo/relay/getting-started/configuration)
+For durable export, instrumentation expansion, or plugin behavior, use the
+matching workflow. Do not repeat installation when it is already complete.

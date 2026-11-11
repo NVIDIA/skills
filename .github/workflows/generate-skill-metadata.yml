@@ -84,8 +84,8 @@ jobs:
       - name: Validate benchmarks.json (must match BENCHMARK.md sources)
         run: python3 .github/scripts/aggregate_benchmarks.py --check
 
-      - name: Test versions.json generator
-        run: python3 -m unittest discover -s .github/scripts/tests -p 'test_generate_versions.py'
+      - name: Test catalog scripts
+        run: python3 -m unittest discover -s .github/scripts/tests
 
       - name: Validate versions.json (must match skills/*/skill.oms.sig)
         run: python3 .github/scripts/generate_versions.py --check

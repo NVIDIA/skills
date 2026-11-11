@@ -9,12 +9,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `tao-generate-anomalies`
-- Evaluation date: 2026-09-22
+- Evaluation date: 2026-10-16
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 1 evaluation tasks (1 positive)
 - Dataset digest: `sha256:f16074998b03223a85c3a4a806ad96050ff9fba4c9d9125dd3ab7b9e54d2c850` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.1% — baseline ran, but no comparable score was available; uplift unavailable | 79.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.4% — baseline ran, but no comparable score was available; uplift unavailable | 79.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 60.0% → 100.0% (+40.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 40.0% → 100.0% (+60.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 0.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 48.3% → 100.0% (+51.7 points) |
-| Efficiency | 95.6% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.4% (-1.3 points) |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 48.3% → 100.0% (+51.7 points) |
+| Efficiency | 96.9% — baseline ran, but no comparable score was available; uplift unavailable | 99.7% → 98.4% (-1.3 points) |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,11 +54,11 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 77,095 | 90,920 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | tao-generate-anomalies-basic | 77,095 | 90,920 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 14,215 | 13,588 | +627 | +4.61% | skill 1/1; base 1/1 |
-| codex | tao-generate-anomalies-basic | 14,215 | 13,588 | +627 | +4.61% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 91,310 | 104,508 | N/A | N/A | skill 2/2; base 4/4 |
+| claude-code | All cases | 71,017 | 303,400 | -232,383 | -76.59% | skill 1/1; base 1/1 |
+| claude-code | tao-generate-anomalies-basic | 71,017 | 303,400 | -232,383 | -76.59% | skill 1/1; base 1/1 |
+| codex | All cases | 14,175 | 13,525 | +650 | +4.81% | skill 1/1; base 1/1 |
+| codex | tao-generate-anomalies-basic | 14,175 | 13,525 | +650 | +4.81% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 85,192 | 316,925 | -231,733 | -73.12% | skill 2/2; base 2/2 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
@@ -66,7 +66,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 20 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 9 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 1 task(s) |
 
@@ -75,24 +75,22 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across references/eval.md and references/inference.md:
-  "## Feature counts" in references/eval.md (lines 147-157)
-  vs "### Feature counts" in references/inference.md (lines 234-240) (`references/eval.md:147`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across references/inference.md and references/sdg-refine.md:
   "### draws.json format" in references/inference.md (lines 273-290)
   vs "## draws.json format" in references/sdg-refine.md (lines 77-94) (`references/inference.md:273`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across references/inference.md and references/prep-testcase.md:
-  "### Submask handling" in references/inference.md (lines 93-100)
-  vs "## Submask handling" in references/prep-testcase.md (lines 138-148) (`references/inference.md:93`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across references/inference.md and references/sdg-refine.md:
   "### Re-rolling AMP (optional)" in references/inference.md (lines 291-308)
   vs "## Re-rolling AMP augmentation (optional)" in references/sdg-refine.md (lines 105-128) (`references/inference.md:291`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/inference.md and references/sdg-inference.md:
-  "## Phase 3 — SDG → `original/`" in SKILL.md (lines 255-273)
-  vs "### run_sdg.sh flags" in references/inference.md (lines 134-146)
-  vs "## Contents" in references/sdg-inference.md (lines 5-25)
-  vs "### Step 4 — Launch SDG" in references/sdg-inference.md (lines 67-79) (`SKILL.md:255`)
-- 23 additional finding(s) are available in the full evaluation artifacts.
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across references/inference.md and references/prep-testcase.md:
+  "### Submask handling" in references/inference.md (lines 93-100)
+  vs "## Submask handling" in references/prep-testcase.md (lines 138-148) (`references/inference.md:93`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across references/inference.md and references/prep-testcase.md:
+  "### Verification after prep_testcase.sh" in references/inference.md (lines 101-106)
+  vs "## Verification" in references/prep-testcase.md (lines 149-158) (`references/inference.md:101`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across references/eval.md and references/inference.md:
+  "## Feature counts" in references/eval.md (lines 160-177)
+  vs "### Feature counts" in references/inference.md (lines 234-240) (`references/eval.md:160`)
+- 24 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

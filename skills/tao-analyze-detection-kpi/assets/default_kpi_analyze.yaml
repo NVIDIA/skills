@@ -11,16 +11,18 @@ visualize:
 kpi:
   iou_threshold: 0.5
   filter: false
-  num_recall_points: 11        # TAO: 11. 11-point interpolated AP (VOC), which is what the
-                               # reference ITS pipeline these metrics are compared against uses.
-                               # 101 selects COCO-style sampling and reports different numbers.
+  num_recall_points: 101       # TAO: 11. 101-point interpolation, COCO-style, which is what
+                               # the reference ITS pipeline these metrics are compared against
+                               # uses. 11 selects the VOC curve and reports different numbers.
   conf_threshold: 0.0          # TAO: 0.5. Scores every detection the inference labels carry, so
                                # the full precision-recall curve is preserved and a threshold can
                                # be swept afterwards without re-running inference. Safe on the
                                # pinned image: unmatched ground truth uses a -1.0 sentinel, so it
                                # lands in FN at any threshold. On a build predating that fix, 0.0
                                # scored every missed box as a true positive -- use > 0 there.
-  ignore_sqwidth: 40           # TAO: 0. Drops boxes below 40px^2, matching the reference pipeline;
-                               # 0 scores small boxes the reference never counted.
+  ignore_sqwidth: 0            # TAO: 0. Scores every box, matching the reference pipeline. A
+                               # higher value drops boxes below that square-width from scoring
+                               # entirely, which raises AP by removing the hardest detections
+                               # rather than by detecting them.
   is_internal: false
 results_dir: null

@@ -15,7 +15,9 @@ Iteration stage 2, immediately after `gap_analysis`. Skipped only when `gap_anal
 
 The embedding written here is compared against the **source-pool** embedding parquet during mining. Both must come from the same encoder — same `model` and same `model_path`. Mismatched encoders produce vectors that are not comparable, and the failure is silent: mining succeeds and returns confidently wrong neighbours.
 
-Resolve `model` / `model_path` once in Pre-Flight (check 9) and reuse those exact values on every iteration from `state.config.embedding_model` / `state.config.embedding_model_path`. Never let one iteration pick a different encoder, and never let this stage fall back to a bare HuggingFace id at run time — Pre-Flight already decided between a local snapshot and a verified online id, and re-deciding mid-loop is how the two sides drift apart.
+Resolve `model` / `model_path` once in Pre-Flight (check 10) and reuse those exact values on every iteration from `state.config.embedding_model` / `state.config.embedding_model_path`. Never let one iteration pick a different encoder, and never let this stage fall back to a bare HuggingFace id at run time — Pre-Flight already decided between a local snapshot and a verified online id, and re-deciding mid-loop is how the two sides drift apart.
+
+Two checks hold this. `init_deft_state.py` compares the run's encoder against the one the pool report records as having built the pool. `verify_embed_encoder.py`, below, compares each iteration's embed spec against the run's. `verify_image_embeddings_spec.py` only checks a spec against itself, so it cannot catch either.
 
 ## Spec
 
@@ -47,6 +49,9 @@ batch_size:     64
 <skill_root>/scripts/deft_python.sh <skill_bank>/skills/data/tao-generate-image-embeddings/scripts/verify_image_embeddings_spec.py \
   --spec "$EMBED_SPEC"
 
+<skill_root>/scripts/deft_python.sh <skill_root>/scripts/verify_embed_encoder.py \
+  --spec "$EMBED_SPEC" --results-dir "${RESULTS_DIR}"
+
 docker run --rm --name "deft_iter${N}_embed" --gpus all --shm-size=8g --user "$(id -u):$(id -g)" $DOCKER_IDENTITY \
   -v "$WORKSPACE:$WORKSPACE" $EXTRA_MOUNTS -w "$WORKSPACE" \
   "$TAO_DS_IMAGE" \
@@ -69,6 +74,7 @@ The embedding column is named **`embedding`**, which is what `tmm unique_neighbo
 ```bash
 <skill_root>/scripts/deft_python.sh <skill_root>/scripts/commit_stage.py \
   --results-dir "${RESULTS_DIR}" --iter-label "iter${N}" --stage embed \
+  --execution-path skill \
   --embeddings-parquet "${RESULTS_DIR}/iter${N}/embeddings/weak_images_embeddings.parquet" \
   --duration-sec "$(( SECONDS - started ))" \
   --summary "embedded <N> weak images with <model>"

@@ -10,6 +10,13 @@ manager. Do not
 create `${RESULTS_DIR}`, write specs, pull images, or submit jobs before
 approval.
 
+Require one usable bank root before model resolution: `skills/`, `scripts/`,
+`templates/`, and `versions.yaml` must live under the same
+`TAO_SKILL_BANK_PATH`. Any install that ships only the skill folders, for
+example an agent plugin or skills-only install, must also provide the bank-level
+scripts, templates, and `versions.yaml` and point `TAO_SKILL_BANK_PATH` at their
+common root before running `scripts/resolve_tao_model.py`.
+
 ## 1. Select and preflight a platform
 
 Discover installed platform skills and ask the user to choose. Read the chosen
@@ -21,7 +28,8 @@ poll interval. Never default to a platform.
 
 The minimum a user has to provide is the annotations, the images they
 reference, and the decisions below. Everything else — both spec files, the
-prepared checkpoint path, output paths — is produced by this workflow. Do not
+prepared checkpoint path, local Framework TOML specs, and output paths — is
+produced by this workflow. Do not
 ask for a spec file.
 
 Require:
@@ -36,6 +44,16 @@ Require:
 Check only required environment-variable presence.
 
 ## 3. Validate bare annotations
+
+The selected host Python must provide `yaml`, `pyarrow`, and TOML support:
+Python 3.11+ provides `tomllib`; Python 3.10 requires `tomli`.
+
+**Blocker recovery (Python 3.10):** in network-enabled mode, install `tomli`
+into the skill-local `.venv` (or a pre-provisioned host Python) using the same
+state-backed `scripts/deft_exec.py --state ... -- <command>` wrapper and
+recorded network-mode rules, then rerun `deft_python.sh`. In air-gap mode,
+`tomli` is a staged-set requirement, not an install; report it missing and
+stop.
 
 Use the same selected host Python for every bundled script:
 
@@ -82,22 +100,61 @@ references may be shared. There is no input Train annotation. Record the
 printed Benchmark SHA-256 in the summary; `init_deft_state.py` freezes it after
 approval.
 
-## 5. Resolve current images
-
-Resolve, do not guess:
+For each assembled iteration Train file, preserve the two validators as
+distinct evidence artifacts:
 
 ```bash
-: "${TAO_SKILL_BANK_PATH:?set TAO_SKILL_BANK_PATH to the installed TAO skill-bank root containing versions.yaml and scripts/resolve_versions_key.py}"
+"$PYTHON" "$SKILL_ROOT/scripts/validate_sharegpt.py" \
+  --annotations "$TRAIN_JSON" --media-root "$MEDIA_ROOT" --require-files \
+  --summary "$RESULTS_DIR/$LABEL/validate/validation_report.json"
+"$PYTHON" "$SKILL_ROOT/scripts/validate_split_contract.py" \
+  --workspace "$WORKSPACE" --train "$TRAIN_JSON" \
+  --synthetic "$SYNTHETIC_JSON" \
+  --manifest "$RESULTS_DIR/manifests/benchmark_manifest.json" \
+  --summary "$RESULTS_DIR/$LABEL/validate/split_contract_summary.json"
+```
+
+Commit only `validation_report.json` with `--validation-report`; keep
+`split_contract_summary.json` beside it. The first must prove
+`require_files=true` and `unique_target_images` equal to the record count.
+
+## 5. Resolve current images
+
+Resolve, do not guess. Resolve the model first, then its explicit Framework
+implementation and the one image used by preparation and every model action:
+
+```bash
+: "${TAO_SKILL_BANK_PATH:?set TAO_SKILL_BANK_PATH to the installed TAO skill-bank root}"
+test -d "$TAO_SKILL_BANK_PATH/skills" || { echo "missing $TAO_SKILL_BANK_PATH/skills" >&2; exit 2; }
+test -d "$TAO_SKILL_BANK_PATH/scripts" || { echo "missing $TAO_SKILL_BANK_PATH/scripts" >&2; exit 2; }
+test -d "$TAO_SKILL_BANK_PATH/templates" || { echo "missing $TAO_SKILL_BANK_PATH/templates" >&2; exit 2; }
 test -f "$TAO_SKILL_BANK_PATH/versions.yaml" || { echo "missing $TAO_SKILL_BANK_PATH/versions.yaml" >&2; exit 2; }
-test -f "$TAO_SKILL_BANK_PATH/scripts/resolve_versions_key.py" || { echo "missing $TAO_SKILL_BANK_PATH/scripts/resolve_versions_key.py" >&2; exit 2; }
-test -f "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py" || { echo "missing $TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py" >&2; exit 2; }
+test -f "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_model.py" || { echo "missing model resolver" >&2; exit 2; }
+test -f "$TAO_SKILL_BANK_PATH/scripts/resolve_versions_key.py" || { echo "missing versions resolver" >&2; exit 2; }
+test -f "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py" || { echo "missing image resolver" >&2; exit 2; }
+MODEL_PREP_HELPER="$TAO_SKILL_BANK_PATH/skills/models/tao-finetune-cosmos-reason/scripts/prepare_cosmos3_vlm_checkpoint.py"
+test -f "$MODEL_PREP_HELPER" || { echo "missing model preparation helper" >&2; exit 2; }
+MODEL_PREP_HELP=$("$PYTHON" "$MODEL_PREP_HELPER" --help) || {
+  echo "FATAL: model preparation helper --help failed" >&2
+  exit 2
+}
+case "$MODEL_PREP_HELP" in
+  *--backend*cosmos-framework*) ;;
+  *) echo "FATAL: model skill predates PR 230; update it before preparation" >&2; exit 2 ;;
+esac
 COSMOS_MODEL_ID="${COSMOS_MODEL_ID:-nvidia/Cosmos3-Nano}"
-COSMOS_RL_IMAGE=$(
+"$PYTHON" "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_model.py" \
+  --model "$COSMOS_MODEL_ID" --action train \
+  --backend cosmos-framework --workload deft-aoi
+"$PYTHON" "$TAO_SKILL_BANK_PATH/skills/models/tao-finetune-cosmos-reason/scripts/cosmos_workflow.py" resolve \
+  --model "$COSMOS_MODEL_ID" --backend cosmos-framework \
+  --action train --workload training --format json
+TAO_CFW_IMAGE=$(
   "$PYTHON" "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py" \
     --skill-bank "$TAO_SKILL_BANK_PATH" \
     --model "$COSMOS_MODEL_ID" \
     --action train \
-    --backend cosmos-rl \
+    --backend cosmos-framework \
     --format json \
   | "$PYTHON" -c 'import json, sys; image = json.load(sys.stdin).get("image"); assert image; print(image)'
 )
@@ -113,25 +170,30 @@ AG_IMAGE=$(
 )
 ```
 
+`TAO_CFW_IMAGE` comes from the model skill's `cosmos-framework` backend
+contract. Pass `--backend cosmos-framework`, that image as helper
+`--runtime-image`, and its inspected immutable ID or digest as
+`--runtime-image-digest`; the same immutable image runs Train, Evaluate, and
+Inference.
+
 Use image inspection through the chosen platform. If an image is absent and
 pulling requires a credential, report the missing variable name only. A
 `DENIED` error on a public image usually means a stale `nvcr.io` entry in
 `~/.docker/config.json`, not a missing key — retry once with a throwaway empty
 `DOCKER_CONFIG` before reporting a credential problem.
 
-Run these evaluator compatibility checks against the model skill's selected
-`cosmos-rl` image and report them in the Pre-Flight Summary rather than
-discovering them on the first GPU job. Training is unaffected:
-
-- `cosmos_rl/evaluation/evaluator.py` hard-indexes `item["id"]` on the
-  conversations branch, so evaluation annotations need an `id` (step 3).
-- `scripts/patch_eval_image_cap.py` reads `cosmos_rl/evaluation/base.py` from
-  the selected image and reports `patch_required`, `already_sufficient`, or
-  `cap_absent` from the source rather than parsing its tag. Use `--probe` here:
-  it reports `classification`, `cap_in_image`, and `patch_needed` without
-  writing. After approval, run it with `--output-dir` and mount the emitted
-  file only for `patch_required`. If it reports `classification=unknown`, the
-  evaluator still references a changed cap/vLLM shape; hard-stop and verify it.
+Validate Framework-native action inputs before the first GPU job. Treat every
+TOML packaged in a fresh workspace as stale evidence and regenerate it with
+`render_cfw_sft.py` or `render_cfw_evaluate.py`. The submitters fail closed on
+legacy `/tao-workspace` paths, tokenizer/generation-era fields, or missing
+Framework-native keys. Verify Evaluate carries `dataloader_num_workers=1`,
+`dataloader_persistent_workers=true`, and `model.attn_implementation="sdpa"`;
+verify Train keeps `model.attn_implementation="cosmos"` because `sdpa`
+collapses Framework LoRA SFT to the majority label on this image. Do not patch
+installed image source.
+The legacy `--backend cosmos-rl` route is unsupported by this application; keep
+this fail-closed negative signature for shared contract validation, never as an
+executable preparation or action command.
 
 Probe the AnomalyGen assets read-only and report each as present or
 `WILL_AUTO_FETCH`: the fine-tuned checkpoint directory holding `ag_config.yaml`,
@@ -150,23 +212,13 @@ Guardrail safety model; a missing file is a hard stop.
 Read:
 
 - `skills/models/tao-finetune-cosmos-reason/SKILL.md`;
-- its `references/skill_info.yaml`;
-- its `references/spec_template_train.yaml` and
-  `references/spec_template_evaluate.yaml`;
+- its `references/skill_info.yaml` and selected Framework backend contract;
 - `references/cosmos-reason.md`.
 
-Reuse an existing spec, generate an absent one. When
-`workspace/specs/<name>.toml` is already present it is the operator's own
-tuning — validate it against the invariants below and keep it; never overwrite
-it with a freshly generated file. Generate only what is missing.
-
-Build separate Proxy and Benchmark nested spec dictionaries in memory from the
-model skill's same evaluate template. Validate the model skill's Train template
-plus the workspace's initial Mining Pool annotation path and requested
-hyperparameters. Show every override and its source, and report per spec
-whether it was reused or generated. Do not write staged TOML files until
-approval. Required invariants hold for both paths — a reused spec that violates
-one is a stop, not a silent regeneration:
+Treat every TOML included in a fresh workspace as stale. Build separate Proxy
+and Benchmark TOMLs with `render_cfw_evaluate.py` and a Train TOML with
+`render_cfw_sft.py`; never reuse or silently repair a packaged spec. Do not
+write staged TOML files until approval. Required invariants are:
 
 - normalize `nano`, `edge`, or `super` to `nvidia/Cosmos3-Nano`,
   `nvidia/Cosmos3-Edge`, or `nvidia/Cosmos3-Super`;
@@ -180,31 +232,36 @@ one is a stop, not a silent regeneration:
 - identify the published Cosmos Reason 3 checkpoint as the conversion source
   (recognizable by `model_type="cosmos3_omni"`) and plan a prepared Qwen3-VL
   PTM path;
-- prove the selected Cosmos-RL image can load the prepared PTM and train the
+- prove the selected Framework image can load the prepared PTM and train the
   selected variant, and derive its conversion and compute requirements
   independently;
+- use the prepared Qwen3-VL PTM for baseline Evaluate, iteration-1 Train,
+  standalone Inference, and as the vision checkpoint paired with an iteration
+  DCP, while retaining the selected Cosmos3 ID as source-model lineage;
 - `automl_policy=off` is a workflow argument, never a spec key;
-- `policy.model_name_or_path` uses the prepared Qwen3-VL PTM path while the
-  selected Cosmos3 ID remains the source-model lineage;
-- `policy.model_max_length >= 40960`;
-- `train.train_policy.type="sft"`;
-- the workspace Train template initially points to `mining_pool.json`;
+- Train keeps the ordered two-image adapter and
+  `model.attn_implementation="cosmos"`;
+- Evaluate keeps both ordered images, uses
+  `model.attn_implementation="sdpa"`, exactly one persistent DataLoader
+  worker, one frame per image, BF16, batch size 1, and at most four output
+  tokens;
 - baseline evaluates the frozen Benchmark gate first, and no Train job runs
   before the gate is shown unmet and zero-shot Proxy plus Proxy RCA follow;
-- after RCA and Mining selection, the staged Train annotation path is replaced
-  with the current `train_iter_<N>.json`;
-- Proxy and Benchmark both use the model skill's current `evaluate` action,
-  the same checkpoint, and separate job-records;
-- Proxy and Benchmark annotation and output paths are distinct;
-- Proxy is not gate eligible; Benchmark alone drives loop stopping;
+- after RCA and Mining selection, Train uses `train_iter_<N>.json`;
+- Proxy and Benchmark use separate job-records and distinct annotation/output
+  paths; Proxy is not gate eligible and Benchmark alone drives stopping;
+- iteration Evaluate loads the native DCP with Train's saved Hydra `config.yaml`
+  (never the input SFT TOML) and the prepared PTM; the next Train loads the
+  preceding DCP;
 - output paths land under the stage job-record's bound results directory.
 
 ## 7. Plan checkpoint preparation
 
 Read the `Nano checkpoint model-type choice` section in the model skill, run
-`prepare_cosmos3_vlm_checkpoint.py --help`, and review the command in
-`references/cosmos-reason.md`. Before approval, perform read-only checks and
-show:
+`prepare_cosmos3_vlm_checkpoint.py --help`, and require its output to advertise
+both `--backend` and `cosmos-framework`; otherwise stop and report that the
+model skill predates PR 230. Review the command in `references/cosmos-reason.md`.
+Before approval, perform read-only checks and show:
 
 - the selected reasoner by name and canonical ID, e.g.
   `Cosmos3 Nano Reasoner (nvidia/Cosmos3-Nano)`;
@@ -212,21 +269,44 @@ show:
   Qwen3-VL checkpoint;
 - whether a complete prepared output can be reused;
 - the exact `prepare_cosmos3_vlm_checkpoint.py` command planned after approval;
-- the selected backend image passed through `--runtime-image` and its resolved
-  image ID or digest passed through `--runtime-image-digest`;
+- helper `--backend cosmos-framework` plus the model skill's resolved Framework
+  image and inspected ID or digest through `--runtime-image` and
+  `--runtime-image-digest`; use that same immutable image for Train, Evaluate,
+  and Inference;
 - the variant-matched `--vlm-architecture-model-path-or-uri` and, for a model
-  ID or URI, its immutable `--vlm-architecture-model-revision`.
+  ID or URI, its immutable `--vlm-architecture-model-revision`;
+- the rendered Train/Proxy Evaluate/Benchmark Evaluate destinations;
+- the native DCP output convention, saved Train Hydra `config.yaml` (not the
+  input SFT TOML), iteration Evaluate handoff, and next-Train
+  `checkpoint.load_path`.
 
 Nano may use the model helper's packaged Qwen3-VL 8B default. Edge and Super
 must have their own validated mapping; never inherit Nano's default. The
 preparation helper may clone, pull, and write files, so run it only after the
 single approval gate and before the baseline frozen Benchmark evaluation.
+Missing or unverified prepared PTM files, DCP metadata, or a saved Train Hydra
+`config.yaml` are hard stops.
+
+After approval, initialize the state with the prepared PTM and the same
+immutable Framework image used by every model action:
+
+```bash
+"$PYTHON" "$SKILL_ROOT/scripts/init_deft_state.py" \
+  --results-dir "$RESULTS_DIR" --workspace "$WORKSPACE" \
+  --network-mode "$NETWORK_MODE" --network-mode-source "$NETWORK_MODE_SOURCE" \
+  --python-executable "$PYTHON" --platform "$PLATFORM" \
+  --max-iterations "$MAX_ITERATIONS" --base-model "$COSMOS_MODEL_ID" \
+  --base-model-path "$PREPARED_MODEL_HOST_PATH" --gpu-model "$GPU_MODEL" \
+  --framework-container "$TAO_CFW_IMAGE" \
+  --framework-image-digest "$TAO_CFW_IMAGE_DIGEST"
+```
 
 ## 8. Credentials
 
 Check only variables required for confirmed missing assets and the chosen
-platform. Neither token is required by default: the Cosmos-RL, data-services,
-and AnomalyGen images this workflow uses are public on `nvcr.io`, so `NGC_KEY`
+platform. Neither token is required by default: the Framework, data-services,
+and AnomalyGen images this workflow uses are
+public on `nvcr.io`, so `NGC_KEY`
 matters only for a registry that actually rejects an anonymous pull. Report
 `UNSET` as the normal case, not as a finding.
 
@@ -239,8 +319,8 @@ set -a; source /path/to/.env; set +a   # omit if already exported
 
 # HF_TOKEN and HUGGING_FACE_HUB_TOKEN are two names for the same HuggingFace
 # access token, not two credentials. huggingface_hub honors both (HF_TOKEN
-# wins), and prepare_cosmos3_vlm_checkpoint.py forwards whichever is set. Treat
-# either one as satisfying the HuggingFace requirement.
+# wins), and prepare_cosmos3_vlm_checkpoint.py forwards whichever is set.
+# Treat either one as satisfying the HuggingFace requirement.
 if [ -n "$HF_TOKEN" ] || [ -n "$HUGGING_FACE_HUB_TOKEN" ]; then
   echo HF_TOKEN=SET
 else
@@ -267,7 +347,8 @@ Record:
   the selected platform. Preserve that exact string for
   `init_deft_state.py --gpu-model`; never report the local host's accelerator
   for a remote Docker, Kubernetes, SLURM, Brev, or external-platform run;
-- `policy.parallelism.dp_shard_size` and `dp_replicate_size`;
+- checkpoint-preparation plan and Framework Train/Evaluate topology plus DCP
+  handoff;
 - LoRA rank/alpha/target modules;
 - epochs, batch size, learning rate;
 - Proxy and Benchmark sample counts;
@@ -288,7 +369,7 @@ without `sudo`. See `references/cosmos-reason.md`.
 
 Show the platform-native `submit/status/logs/cancel` mapping, storage tier,
 container images, annotation JSON paths, prepared checkpoint host/compute-frame
-paths, input/output compute-frame paths, and job-record root. The
+paths, DCP handoff paths, input/output compute-frame paths, and job-record root. The
 record-then-launch ordering must be explicit.
 
 ## 11. Pre-Flight Summary
@@ -315,7 +396,7 @@ record-then-launch ordering must be explicit.
 | Train shape | <nodes x GPUs; exact GPU model/memory; epochs; batch; LR; LoRA> | user/spec/platform |
 | Mining | <top-K, default 5; cosine floor; history-aware filepath dedup> | user/default |
 | AnomalyGen | <project; num_SDG; each asset path or will auto-fetch from HF (default)> | user/default |
-| Cosmos-RL image | <resolved URI> | versions.yaml |
+| Framework image | <one resolved URI + immutable digest for preparation, Train, Evaluate, and Inference> | model backend contract |
 | Data-services image | <resolved URI> | versions.yaml |
 | AnomalyGen image | <resolved URI> | versions.yaml |
 | Credential status | <names with SET/UNSET only> | environment |
@@ -340,7 +421,6 @@ lines below the table instead:
 
 Then stop. Remind the user that approval permits checkpoint preparation,
 post-gate spec/state creation, any network-enabled AnomalyGen bootstrap, and GPU
-submissions. After approval, prepare and
-validate the Qwen3-VL checkpoint, write the staged specs with concrete nested
-values, initialize state once, re-read it, then begin baseline frozen
-Benchmark evaluation.
+submissions. After approval, prepare and validate the Qwen3-VL checkpoint,
+write the staged Framework specs with concrete nested values, initialize state
+once, re-read it, then begin baseline frozen Benchmark evaluation.

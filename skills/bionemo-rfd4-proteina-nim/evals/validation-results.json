@@ -1,0 +1,55 @@
+{
+  "validated_on": "2026-10-20",
+  "validation_scope": "Offline client regression tests and comparison with the public API documentation; no production inference or live agent evaluation.",
+  "production_endpoint": "https://health.api.nvidia.com/v1/biology/ipd/rfd4-proteina/generative",
+  "api_schema_version": "1.0.0",
+  "public_sources": [
+    "https://build.nvidia.com/ipd/rfd4-proteina",
+    "https://build.nvidia.com/ipd/rfd4-proteina/deploy",
+    "https://build.nvidia.com/ipd/rfd4-proteina/modelcard"
+  ],
+  "offline_client_tests": {
+    "runner": "python -B -m unittest discover -s nim-skills/rfd4-proteina-nim/tests -v",
+    "tests": 35,
+    "status": "passed",
+    "fixtures": "Synthetic responses and loopback HTTP servers; no GPU, real API credentials, or external API requests.",
+    "coverage": [
+      "Fixed production URL and Bearer authentication",
+      "NVIDIA_API_KEY precedence and NGC_API_KEY fallback",
+      "Missing or malformed credentials rejected without disclosure",
+      "Local requests omit hosted authentication",
+      "Dry-run and saved-response modes require no credentials or network",
+      "Redirects are not followed and credentials are not forwarded",
+      "Pending and failed HTTP responses are preserved without automatic resubmission",
+      "Output containment, task matching, design count, and finite coordinates",
+      "Published request fixture checksum and client preflight"
+    ],
+    "tested_files": {
+      "scripts/design.py": "2ecdb08539a083631fcbcf4d5dc97664fb0ba2f66a808867a65b0aafa9e0698d",
+      "tests/test_design.py": "6426954f9770f7fa2a3e25745a3c53c2eb35b520362f9cb2bd6f70116513f020"
+    }
+  },
+  "public_schema_checks": {
+    "status": "passed",
+    "validator": "jsonschema Draft202012Validator with references resolved from the published OpenAPI document",
+    "schema_sha256": "7bedd8a5fc7ee3026000f8ae62365e86dc9f66dd3c5d22eac430d046a38cb9b6",
+    "checks": [
+      "Bundled PD-1 request matches the parsed public deployment example, including inline mmCIF",
+      "Bundled PD-1 request validates against the public request schema and client preflight",
+      "Documented search adaptation validates against the public request schema and client preflight",
+      "Client task names match all seven public task enum values",
+      "Client hosted URL matches the published server and operation path",
+      "Bundled request checksum matches assets/source-manifest.json"
+    ],
+    "limitation": "Schema acceptance does not establish successful inference or scientific quality."
+  },
+  "skill_frontmatter_validation": "passed",
+  "not_executed": [
+    "Live hosted production inference",
+    "Public container deployment on a local GPU",
+    "Tier 3 live agent evaluation and trigger evaluation",
+    "Independent refolding or experimental validation"
+  ],
+  "benchmark_status": "not_evaluated_for_public_revision",
+  "signature_status": "fresh_signature_required_after_evaluation"
+}

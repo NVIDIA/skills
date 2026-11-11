@@ -12,7 +12,7 @@ the matching per-service skill that layers on top of this one.
 This file enumerates the cross-cutting DOCA container-deployment
 runtime contract as described in the public **DOCA Container
 Deployment Guide** (reachable through
-[`doca-public-knowledge-map ## DOCA services`](../doca-public-knowledge-map/SKILL.md#doca-services))
+`doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`))
 and as overlaid on the BlueField OS image that ships kubelet in
 standalone mode. Treat this file as a *map of what is documented*,
 not a substitute for reading the live Container Deployment Guide
@@ -22,9 +22,9 @@ deployment.
 ## Pattern overview
 
 > **Non-goals (externally-productized NVIDIA services not in the
-> DOCA monorepo):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
-> Service (DTS, as productized), and any future external NVIDIA
-> networking software not under `doca/services/`. A user asking
+> DOCA SDK):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
+> Service (DTS, as productized), and any other NVIDIA networking
+> software that is not a DOCA SDK service. A user asking
 > *"how do I deploy BlueMan?"* (or any of the others) is routed to
 > the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for that
 > specific product, NOT silently extrapolated from this skill's
@@ -51,7 +51,7 @@ Two cross-cutting rules that apply to *every* pattern above:
   command-line flags, image strings, and volume-mount shapes all
   come from the public DOCA Container Deployment Guide and the
   matching per-service guide reached through
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
   Inferring them from generic Kubernetes / upstream `kubelet`
   prose is the most common hallucination failure for this skill.
 - **The runtime is uniform across supported services; the
@@ -67,8 +67,8 @@ Two cross-cutting rules that apply to *every* pattern above:
   counter for UROM service), and the paired-workload contract.
   The agent's job is to walk the shared runtime here, then route
   to the per-service skill for the overlay. Flow-Inspector and
-  OS-Inspector are policy-excluded; route those requests through
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  OS-Inspector are outside this bundle's scope; route those requests through
+  `doca-public-knowledge-map/SKILL.md`.
 
 ## Capabilities and modes
 
@@ -99,14 +99,14 @@ matrix. The matrix below names the *classes* of precondition; the
 exact commands / flags live in the public DOCA Container Deployment
 Guide and (for firmware slots) in the public BlueField firmware-
 configuration documentation reached through
-[`doca-setup`](../doca-setup/SKILL.md).
+`doca-setup/SKILL.md`.
 
 | Precondition class | What it covers | Where to confirm |
 | --- | --- | --- |
-| DOCA install on the BlueField Arm | DOCA installed and healthy on the BlueField Arm side. Without this, kubelet's documented runtime hooks and the DOCA Container Deployment Guide's documented mount paths do not exist | [`doca-setup ## test`](../doca-setup/TASKS.md#test) (install verification) and the *no-install* path at [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install) when there is no install yet |
+| DOCA install on the BlueField Arm | DOCA installed and healthy on the BlueField Arm side. Without this, kubelet's documented runtime hooks and the DOCA Container Deployment Guide's documented mount paths do not exist | `doca-setup ## test` (`doca-setup/TASKS.md#test`) (install verification) and the *no-install* path at `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`) when there is no install yet |
 | Container runtime + kubelet standalone | Both ship with the BlueField OS image per the public DOCA Container Deployment Guide. The operator confirms `kubelet` is running and that the static-pod manifests directory exists; the operator does NOT install upstream Kubernetes from scratch | Public DOCA Container Deployment Guide |
 | BFB version compatible with the service's container tag | The BlueField OS image (the BFB) ships a kubelet + container runtime version pair that the public Container Deployment Guide for the operator's DOCA release certifies. A BFB on a different release line can fail to run a service container even when the host DOCA install looks healthy | Public DOCA Container Deployment Guide + the per-service guide for the operator's DOCA release |
-| Per-service firmware slot (when the service emulates a host-facing PCIe device) | Some externally-productized NVIDIA services (notably SNAP and Virtio-net, both out of scope for this bundle per the strict-to-DOCA invariant) stand up emulated PCIe devices via the BlueField firmware emulation slots; the matching slot must be enabled BEFORE the pod is scheduled, and a BlueField reset is typically required after the slot is flipped. **None of the four supported service overlays (Argus, DMS, Firefly, UROM service) emulate a host-facing PCIe device**, so this precondition does NOT apply to them. The precondition is documented here only because an operator who reads this skill while deploying an external NVIDIA service needs to know the pattern exists; the operator's source of truth in that case is the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` | The public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for the external service plus [`doca-setup ## configure`](../doca-setup/TASKS.md#configure) for the firmware-tool workflow itself |
+| Per-service firmware slot (when the service emulates a host-facing PCIe device) | Some externally-productized NVIDIA services (notably SNAP and Virtio-net, both out of scope for this bundle per the strict-to-DOCA invariant) stand up emulated PCIe devices via the BlueField firmware emulation slots; the matching slot must be enabled BEFORE the pod is scheduled, and a BlueField reset is typically required after the slot is flipped. **None of the four supported service overlays (Argus, DMS, Firefly, UROM service) emulate a host-facing PCIe device**, so this precondition does NOT apply to them. The precondition is documented here only because an operator who reads this skill while deploying an external NVIDIA service needs to know the pattern exists; the operator's source of truth in that case is the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` | The public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for the external service plus `doca-setup ## configure` (`doca-setup/TASKS.md#configure`) for the firmware-tool workflow itself |
 | Image-pull reachability to NGC | The BlueField needs network reach to the NGC catalog (`nvcr.io`) so the container runtime can pull the service's image at the documented tag. A BlueField that can ping the world but cannot reach `nvcr.io` (corporate proxy, firewall, air-gap) will pass every other precondition and still fail to deploy | The container runtime's image-pull log surface + the operator's network team |
 | Host-OS permissions on the BlueField | The operator needs the permissions the public Container Deployment Guide names to write into the static-pod manifests directory, read kubelet's log surface, and inspect the container runtime. The permission boundary lives at the BlueField OS, not inside any DOCA service | The BlueField OS plus the public Container Deployment Guide |
 
@@ -140,10 +140,10 @@ BlueField:
 
 | Service | Service-specific overlay (lives in the per-service skill) |
 | --- | --- |
-| [`doca-argus`](../services/doca-argus/SKILL.md) | Runtime-security / monitoring policy config; event-stream output as the "healthy" signal |
-| [`doca-dms`](../services/doca-dms/SKILL.md) | gNMI / gNOI endpoint config; gNMI session up + per-RPC counter as the "healthy" signal; host-side gNMI client as the paired-workload contract |
-| [`doca-firefly`](../services/doca-firefly/SKILL.md) | Four-axis PTP config (role / profile / domain / interface); PHC offset + ports state as the "healthy" signal; host-side time follower as a paired requirement |
-| [`doca-urom-svc`](../services/doca-urom-svc/SKILL.md) | UROM operations endpoint; per-operation counter as the "healthy" signal; paired host↔DPU workload contract |
+| `doca-argus/SKILL.md` | Runtime-security / monitoring policy config; event-stream output as the "healthy" signal |
+| `doca-dms/SKILL.md` | gNMI / gNOI endpoint config; gNMI session up + per-RPC counter as the "healthy" signal; host-side gNMI client as the paired-workload contract |
+| `doca-firefly/SKILL.md` | Four-axis PTP config (role / profile / domain / interface); PHC offset + ports state as the "healthy" signal; host-side time follower as a paired requirement |
+| `doca-urom-svc/SKILL.md` | UROM operations endpoint; per-operation counter as the "healthy" signal; paired host↔DPU workload contract |
 
 The agent's rule: walk the shared runtime here, then route to the
 matching per-service skill for the per-service overlay. Re-stating
@@ -154,7 +154,7 @@ this skill exists to prevent.
 
 For the canonical DOCA version-detection chain, the four-way match
 rule, NGC container semantics, and the headers-win-over-docs rule,
-see [`doca-version`](../doca-version/SKILL.md). The body lives
+see `doca-version/SKILL.md`. The body lives
 there; this skill does not duplicate it.
 
 **The container-deployment-specific overlay** is:
@@ -162,7 +162,7 @@ there; this skill does not duplicate it.
 - **Three version anchors must agree, not two.** Every DOCA
   service container deployment has *three* runtime version anchors,
   not two: the host DOCA install version on the BlueField Arm
-  (per [`doca-version TASKS.md ## configure`](../doca-version/TASKS.md#configure)),
+  (per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)),
   the **BFB version** on the BlueField (the BlueField OS image
   version, which determines which kubelet + container-runtime
   build is in play), and the **per-service container tag** pulled
@@ -178,7 +178,7 @@ there; this skill does not duplicate it.
   version anchor is the container tag pulled, not
   `pkg-config --modversion doca-common` on the host. Quote both
   versions when triaging; if they diverge, route to
-  [`doca-version TASKS.md ## debug`](../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2 before diagnosing the service behavior itself.
 - **The public DOCA Container Deployment Guide version must match
   the BFB / container-runtime pair.** The Container Deployment
@@ -233,7 +233,7 @@ them wastes debug time and blames the wrong layer.
    tag the per-service guide names does not exist for the
    operator's BFB / DOCA release. Resolution: re-quote the image
    string + tag from the public per-service guide reached through
-   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md);
+   `doca-public-knowledge-map/SKILL.md`;
    confirm BlueField reach to `nvcr.io` independently of the
    pod-spec. Owner: this skill + the per-service skill + the
    operator's network team.
@@ -294,10 +294,10 @@ them wastes debug time and blames the wrong layer.
    BlueField is on a different release than the Container
    Deployment Guide describes; partial install on the BlueField
    Arm. Resolution: walk
-   [`doca-version TASKS.md ## debug`](../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2 and re-confirm the three version anchors in
    [`## Version compatibility`](#version-compatibility). Owner:
-   [`doca-version`](../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 8. **Cross-cutting host layer.** The deployment is healthy from
    kubelet's view and the service's view, but the BlueField OS
    or the host OS introduces a cross-cutting failure (kernel
@@ -305,19 +305,19 @@ them wastes debug time and blames the wrong layer.
    PCIe link state, BFB-side log surface). Symptoms: rare and
    hard to attribute; surface as everything-looks-fine-but-it-
    does-not. Resolution: drop to the cross-cutting debug ladder
-   at [`doca-debug`](../doca-debug/SKILL.md). Owner:
-   [`doca-debug`](../doca-debug/SKILL.md) + the operator's
+   at `doca-debug/SKILL.md`. Owner:
+   `doca-debug/SKILL.md` + the operator's
    BlueField OS team.
 
 Service containers do not return `DOCA_ERROR_*` to the operator's
 shell — the outward surface is kubelet's pod-status output, the
 container runtime's logs, and the service-specific liveness signal
 each per-service skill names. The DOCA error taxonomy at
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../doca-programming-guide/CAPABILITIES.md#error-taxonomy)
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`)
 becomes relevant only when a service container internally calls
 into a DOCA library that surfaces `DOCA_ERROR_*` in its log
 stream; that is owned by the per-service skill plus
-[`doca-debug`](../doca-debug/SKILL.md), not by this one.
+`doca-debug/SKILL.md`, not by this one.
 
 ## Observability
 
@@ -341,7 +341,7 @@ three agree.
   or failure, the documented bring-up lines, any per-service
   error / warning lines. The agent quotes the runtime command
   the public Container Deployment Guide names (or routes to it
-  via [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md));
+  via `doca-public-knowledge-map/SKILL.md`);
   the agent does NOT invent runtime CLI flags.
 - **Service-side liveness layer (THIRD, load-bearing for
   "healthy").** Each per-service skill names the documented
@@ -361,13 +361,13 @@ Per-pod observability is via the BlueField's local kubelet + local
 container runtime + per-service signal. Cross-cutting host-side
 observability (`dmesg`, `ip link`, `devlink`, `ethtool` on the
 BlueField) lives in
-[`doca-setup TASKS.md ## Command appendix`](../doca-setup/TASKS.md#command-appendix)
+`doca-setup TASKS.md ## Command appendix` (`doca-setup/TASKS.md#command-appendix`)
 and
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug).
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The cross-cutting safety surface for any DOCA service container
 deployment. Per-service skills add overlays on top (e.g. Firefly's
@@ -408,7 +408,7 @@ cross-cutting rules below apply across every service.
   pod-spec field names, or the static-pod manifests directory
   path.** Quote each from the public DOCA Container Deployment
   Guide plus the matching per-service guide reached through
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
   Prose-derived strings here are the load-bearing first-app
   hallucination failure for this skill; the operator pulls the
   wrong image, names the wrong field, drops the YAML in the
@@ -449,7 +449,7 @@ cross-cutting rules below apply across every service.
 The canonical public source for the cross-cutting DOCA container-
 deployment runtime is the **DOCA Container Deployment Guide** on
 `docs.nvidia.com`, reachable through
-[`doca-public-knowledge-map ## DOCA services`](../doca-public-knowledge-map/SKILL.md#doca-services).
+`doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 For each per-service overlay (image string, config schema, paired-
 workload contract, "healthy" definition), the canonical public
 source is the matching per-service guide listed in the same

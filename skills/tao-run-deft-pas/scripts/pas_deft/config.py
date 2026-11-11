@@ -48,10 +48,19 @@ def bool_str(value: Any) -> str:
     return "true" if str(value).strip().lower() in ("true", "1", "yes", "y") else "false"
 
 
-def _abs_data_path(value: Any) -> str:
-    """Make a PAS data path absolute, preserving a deliberately blank path."""
-    text = str(value or "")
-    return os.path.abspath(text) if text else text
+def _abs_data_path(value: Any, path: str) -> str:
+    """Make a PAS data path absolute, preserving a deliberately blank path.
+
+    Path normalization must not erase the typed-config boundary.  In
+    particular, stringifying YAML numbers here would turn an invalid path
+    value such as ``-1`` into a valid-looking host path before dataclass
+    materialization has a chance to reject it.
+    """
+    if not isinstance(value, str):
+        raise ValueError(
+            f"{path}={value!r} has type {type(value).__name__}; expected str"
+        )
+    return os.path.abspath(value) if value else value
 
 
 @dataclasses.dataclass
@@ -557,7 +566,12 @@ def _coerce_scalar(value: Any, expected_type: type, path: str) -> Any:
         if type(value) is bool:
             return value
         if type(value) is int:
-            return bool(value)
+            if value in {0, 1}:
+                return bool(value)
+            raise ValueError(
+                f"{path}={value!r} cannot be converted to bool; "
+                "integer booleans must be 0 or 1"
+            )
         if isinstance(value, str):
             normalized = value.strip().lower()
             if normalized in {"true", "yes", "y", "on", "1"}:
@@ -587,9 +601,9 @@ def _coerce_scalar(value: Any, expected_type: type, path: str) -> Any:
         raise ValueError(f"{path}={value!r} cannot be converted to float")
 
     if expected_type is str:
-        if isinstance(value, (Mapping, list, tuple, set)):
+        if not isinstance(value, str):
             raise ValueError(f"{path}={value!r} cannot be converted to str")
-        return str(value)
+        return value
 
     if isinstance(value, expected_type):
         return value
@@ -643,8 +657,8 @@ def _materialize_dataclass(
     return config_type(**values)
 
 
-def _abs_or_missing(value: Any) -> Any:
-    return value if value == MISSING else _abs_data_path(value)
+def _abs_or_missing(value: Any, path: str) -> Any:
+    return value if value == MISSING else _abs_data_path(value, path)
 
 
 def _build_source_dict(raw: dict[str, Any], mining_spec: dict[str, Any]) -> dict[str, Any]:
@@ -708,8 +722,17 @@ def _build_source_dict(raw: dict[str, Any], mining_spec: dict[str, Any]) -> dict
     mining_out["knn_metric"] = mining_spec["knn_metric"]
 
     pas = _mapping(raw.get("pas"), "pas")
-    train_pairs = _abs_data_path(pas.get("train_pairs_source_file", ""))
-    pool_pairs = _abs_data_path(pas.get("pool_pairs_source_file", "")) or train_pairs
+    train_pairs = _abs_data_path(
+        pas.get("train_pairs_source_file", ""),
+        "pas.train_pairs_source_file",
+    )
+    pool_pairs = (
+        _abs_data_path(
+            pas.get("pool_pairs_source_file", ""),
+            "pas.pool_pairs_source_file",
+        )
+        or train_pairs
+    )
     path_keys = {
         "train_pairs_source_file",
         "pool_pairs_source_file",
@@ -727,18 +750,33 @@ def _build_source_dict(raw: dict[str, Any], mining_spec: dict[str, Any]) -> dict
             "train_pairs_source_file": train_pairs,
             "pool_pairs_source_file": pool_pairs,
             "eval_pairs_source_file": _abs_or_missing(
-                pas.get("eval_pairs_source_file", MISSING)
+                pas.get("eval_pairs_source_file", MISSING),
+                "pas.eval_pairs_source_file",
             ),
-            "train_image_dir": _abs_or_missing(pas.get("train_image_dir", MISSING)),
+            "train_image_dir": _abs_or_missing(
+                pas.get("train_image_dir", MISSING),
+                "pas.train_image_dir",
+            ),
             "train_caption_dir": _abs_or_missing(
-                pas.get("train_caption_dir", MISSING)
+                pas.get("train_caption_dir", MISSING),
+                "pas.train_caption_dir",
             ),
-            "source_image_dir": _abs_or_missing(pas.get("source_image_dir", MISSING)),
+            "source_image_dir": _abs_or_missing(
+                pas.get("source_image_dir", MISSING),
+                "pas.source_image_dir",
+            ),
             "source_caption_dir": _abs_or_missing(
-                pas.get("source_caption_dir", MISSING)
+                pas.get("source_caption_dir", MISSING),
+                "pas.source_caption_dir",
             ),
-            "eval_image_dir": _abs_or_missing(pas.get("eval_image_dir", MISSING)),
-            "eval_caption_dir": _abs_or_missing(pas.get("eval_caption_dir", MISSING)),
+            "eval_image_dir": _abs_or_missing(
+                pas.get("eval_image_dir", MISSING),
+                "pas.eval_image_dir",
+            ),
+            "eval_caption_dir": _abs_or_missing(
+                pas.get("eval_caption_dir", MISSING),
+                "pas.eval_caption_dir",
+            ),
         }
     )
 
@@ -836,15 +874,17 @@ class PasDeftConfig:
         if not isinstance(mining_spec, dict):
             raise ValueError("mining_spec.yaml root must be an object")
 
-        source = _build_source_dict(raw, mining_spec)
         try:
+            source = _build_source_dict(raw, mining_spec)
             self.cfg: DeftExperimentConfig = _materialize_dataclass(
                 DeftExperimentConfig,
                 source,
             )
+            _validate_field_constraints(self.cfg)
         except (TypeError, ValueError) as exc:
-            raise ValueError(f"invalid typed DEFT configuration: {exc}") from exc
-        _validate_field_constraints(self.cfg)
+            raise ValueError(
+                f"invalid typed DEFT configuration {config_path}: {exc}"
+            ) from exc
 
         self.experiment = self.cfg.experiment
         self.visualization = self.cfg.visualization

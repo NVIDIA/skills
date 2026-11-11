@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: BioNeMo Open Models
+repo: NVIDIA-BioNeMo/Proteina-Complexa
+# Upstream's default branch contains the signed skills.
+ref: dev
+description: >-
+  Apply BioNeMo open models to molecular property prediction and generative
+  protein design.
+links:
+  contributing: README.md
+  discussions: false
+  security: false
+  primary: false
+# Add complexa-design and complexa-setup after their upstream BENCHMARK.md
+# verdicts reach PASS; source onboarding currently rejects their NEUTRAL reports.
+skills:
+  - path: skills/complexa-evaluate-pdbs/
+    catalog_dir: bionemo-complexa-evaluate-pdbs
+  - path: skills/complexa-sweep/
+    catalog_dir: bionemo-complexa-sweep
+  - path: skills/complexa-target/
+    catalog_dir: bionemo-complexa-target

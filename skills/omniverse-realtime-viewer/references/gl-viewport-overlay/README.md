@@ -1,5 +1,9 @@
 # GL Viewport Overlay Skill
 
+For a Vulkan presentation backend, use
+[Vulkan compositing](../vulkan-compositing/README.md) for the corresponding
+color, depth and resource-lifetime contracts.
+
 Use this skill when adding a GPU-rendered 3D overlay to the ovrtx C++ ImGui
 viewer. The overlay can be a transform gizmo, measurement ruler, bounding box,
 annotation pin, selection outline, axis tripod, or any other world-space widget

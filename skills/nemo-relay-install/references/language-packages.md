@@ -5,97 +5,37 @@ SPDX-License-Identifier: Apache-2.0
 
 # Language Package Installation
 
-Use this path when a Python, Node.js, or Rust application directly owns its
-tool or model call sites. Preserve the project's package manager and install
-only the package needed for the selected language.
+Use this path when the user's application owns the calls and needs a Relay
+binding. Establish that intent before inferring an install type from a manifest.
 
-## Python
+Read the current [installation guide](https://docs.nvidia.com/nemo/relay/getting-started/installation)
+for the selected language, together with the selected release's package metadata
+and linked support requirements. Resolve the latest published stable package and
+derive its runtime requirements from current package metadata and release
+documentation. Do not retain a package-version or language-minimum table here.
 
-Require Python 3.11 or newer. Inspect `pyproject.toml`, its build metadata, and
-the project lockfiles before choosing a command. Use explicit project
-instructions and manager-specific `pyproject.toml` configuration as the source
-of truth. When those signals are absent, use a single manager-specific lockfile.
-If metadata and lockfiles conflict, or more than one manager appears active,
-show the conflict and ask which manager is authoritative before changing the
-project.
+## Preserve The Authoritative Environment
 
-After resolving any conflict, preserve the selected manager:
+- Python: inspect project instructions, `pyproject.toml`, manager-specific
+  configuration, and lockfiles. Preserve the established manager and virtual
+  environment rather than introducing another dependency workflow.
+- Node.js: inspect `package.json`, especially `packageManager`, and the
+  lockfiles. Preserve the declared manager and its dependency conventions.
+- Rust: inspect `Cargo.toml`, the workspace, toolchain configuration, and
+  lockfile. Add only the runtime crates needed for the selected outcome.
 
-- Use `uv add nemo-relay` when `uv.lock` or existing project instructions select
-  `uv`.
-- Use `poetry add nemo-relay` when `poetry.lock` or `[tool.poetry]` selects
-  Poetry.
-- Use `pdm add nemo-relay` when `pdm.lock` or `[tool.pdm]` selects PDM.
-- Use the project's documented dependency workflow when another manager owns
-  `pyproject.toml`.
+When manager declarations and lockfiles conflict, explain the conflict and
+resolve which is authoritative before changing the project. Do not initialize
+another manifest or lockfile in an existing project.
 
-For a `uv`-managed project, run:
+Use the selected manager's syntax for the resolved stable dependency, respecting
+explicit project constraints. A newer repository version or quick-start pin is
+not evidence that a package has been published.
 
-```bash
-uv add nemo-relay
-```
+Verify availability in the actual target environment: an import or module-load
+check, or package-manager resolution as documented for that binding. Do not
+accidentally verify a system interpreter instead of the project environment.
 
-For an active `uv` environment without project metadata, run:
-
-```bash
-uv pip install nemo-relay
-```
-
-Use `python -m pip install nemo-relay` only when no project manager owns the
-environment. If multiple or conflicting lockfiles exist, ask which manager is
-authoritative instead of creating another lockfile. Verify in the target
-environment:
-
-```bash
-python -c "import nemo_relay"
-```
-
-## Node.js
-
-Require Node.js 24 or newer and an existing `package.json`. Inspect its
-`packageManager` field and lockfiles before choosing a command. Treat
-`packageManager` as authoritative. If it disagrees with an existing lockfile,
-show the mismatch and ask before running an install that could rewrite the stale
-lockfile. Without `packageManager`, use a single lockfile to select the manager;
-when multiple lockfiles exist, ask which one is authoritative before changing
-the project.
-
-After resolving any conflict, use the selected manager:
-
-- Use `npm install nemo-relay-node` for `package-lock.json` or
-  `npm-shrinkwrap.json`.
-- Use `pnpm add nemo-relay-node` for `pnpm-lock.yaml`.
-- Use `yarn add nemo-relay-node` for `yarn.lock`.
-- Use `bun add nemo-relay-node` for `bun.lock` or `bun.lockb`.
-
-Use npm only as the fallback when the project declares no package manager and
-has no existing lockfile:
-
-```bash
-npm install nemo-relay-node
-```
-
-Verify that the package and lockfile record `nemo-relay-node`.
-
-## Rust
-
-Require Rust 1.86 or newer and an existing `Cargo.toml`:
-
-```bash
-cargo add nemo-relay
-```
-
-Add `nemo-relay-adaptive` only when adaptive runtime primitives are already in
-scope:
-
-```bash
-cargo add nemo-relay-adaptive
-```
-
-Verify that `Cargo.toml` includes the selected crate and the lockfile resolves
-it. Do not configure adaptive behavior from the install skill.
-
-Use these public references to confirm prerequisites and published packages:
-
-- [Prerequisites](https://docs.nvidia.com/nemo/relay/getting-started/prerequisites)
-- [Installation](https://docs.nvidia.com/nemo/relay/getting-started/installation)
+Stop before scopes, tool/model examples, plugin configuration, or adaptive
+behavior. Pass the selected language, environment, and installed version to the
+matching quick-start guide through `nemo-relay-get-started`.

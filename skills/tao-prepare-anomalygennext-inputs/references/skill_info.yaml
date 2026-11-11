@@ -1,0 +1,80 @@
+network_arch: tao-prepare-anomalygennext-inputs
+type: data
+container_image: nvcr.io/nvidia/paidf-anomalygen:1.1.0  # versions-key: images.metropolis_sdg.anomalygen_next
+execution_environment: container
+gpu_spec_key: null
+required_credentials: []
+optional_credentials:
+- name: NGC_KEY
+  source: env_var
+  only_when: the selected platform requires authenticated access to nvcr.io
+actions:
+  prepare_plan:
+    command: scripts/prepare_anomalygennext_inputs.py
+    mode: args
+    inputs:
+      config:
+        type: file
+      pool_dataset_root:
+        type: folder
+    outputs:
+      results_dir:
+        type: folder
+      clean_embedding_spec:
+        type: file
+        optional: true
+      fn_embedding_spec:
+        type: file
+        optional: true
+      selected_fn_queries:
+        type: file
+        optional: true
+      input_contract:
+        type: file
+    upload_excludes:
+    - inputs/
+    args:
+      config: --config {config}
+      pool_dataset_root: --pool-dataset-root {pool_dataset_root}
+      output_dir: --output-dir {results_dir}
+  run_amp:
+    command: scripts/run_anomalygennext_amp.py
+    mode: args
+    inputs:
+      prepared_root:
+        type: folder
+      pool_dataset_root:
+        type: folder
+      published_root:
+        type: folder
+        optional: true
+      checkpoint_root:
+        type: folder
+        container_path: /workspace/paidf-anomalygen/checkpoints
+    outputs:
+      amp_testcase:
+        type: file
+      knn_candidates:
+        type: file
+    upload_excludes:
+    - inputs/
+    args:
+      prepared_root: --prepared-root {prepared_root}
+      pool_dataset_root: --pool-dataset-root {pool_dataset_root}
+      published_root: --published-root {published_root}
+      checkpoint_root: --checkpoint-root {checkpoint_root}
+  finalize_inputs:
+    command: scripts/finalize_anomalygennext_inputs.py
+    mode: args
+    inputs:
+      prepared_root:
+        type: folder
+    outputs:
+      generation_plan:
+        type: file
+      prepared_inputs_manifest:
+        type: file
+    upload_excludes:
+    - inputs/
+    args:
+      prepared_root: --prepared-root {prepared_root}

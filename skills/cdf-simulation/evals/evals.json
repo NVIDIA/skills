@@ -1,0 +1,90 @@
+[
+  {
+    "id": "1",
+    "question": "Airflow DAG trigger, no human in the loop: generate the golden board for the THT board. Attachment: /mnt/airflow/attachments/tht_board.usdc. Output root: /mnt/airflow/out/run-0142.",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "Catalog row 1. Build one cdf.CDFJob against the Airflow-provided attachment, compile it with job.compile_orders(...), read the result, and emit the payload -- the build, the plan serialized with JobOrderCodec.dumps(plan), and the resolved inputs -- to the caller. Do not call render(): execution belongs to the Airflow DAG the payload targets. Every unstated detail -- component types, resolution -- takes its documented default rather than a question; the attachment path and output root are required Airflow-provided inputs and are not replaced by a sample board. The summary names which defaults applied and states that nothing was rendered.",
+    "expected_behavior": [
+      "No clarifying question is asked; the defaults are applied and named in the summary.",
+      "The job is compiled and the compiled plan read; render() is not called and no images are claimed.",
+      "The payload is returned to the caller against the Airflow-provided attachment and output root, not a sample board."
+    ]
+  },
+  {
+    "id": "2",
+    "question": "Airflow-triggered DIG run, nobody to ask: generate the three SMT structural-defect variants (shift, tombstone, sideflip) for the attached allegro board in one go. Attachment: /mnt/airflow/attachments/allegro.usd. Output root: /mnt/airflow/out/run-0143.",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "Catalog row 4, but NOT as one record. Emit three independent hand-off records, one per variant, each marked independent_launch, because sequential job.capture.render(...) calls in one Python process segfault the second Kit subprocess -- the Airflow DAG must launch each as its own process. Each record is a compiled plan carrying operation labels and the per-component defect crop; none is executed here. The coverage ratio is the single documented one and applies to structural and solder defects alike.",
+    "expected_behavior": [
+      "The one-process request is declined and the reason given is the second-render segfault, not style.",
+      "Three compiled records are emitted, each marked as an independent launch; the skill renders none of them.",
+      "The documented coverage ratio is used rather than an invented one."
+    ]
+  },
+  {
+    "id": "3",
+    "question": "In the Airflow run's log the crop step ran fine but produced no files. Just skip the crop for this row so the job passes.",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "Do not skip it -- diagnose it. postprocess.crop(class_filter=...) takes a derived semantic class, not a component-type string; given the latter it compiles, reports \"error\": \"\" and writes zero files. That is the known cause of exactly this symptom. Fix by passing class_filter=None and filtering with types=. Dropping the crop would hide a real misconfiguration behind a green run.",
+    "expected_behavior": [
+      "Skipping the step is refused.",
+      "The class_filter taxonomy mismatch is named as the cause.",
+      "The fix offered is class_filter=None with types= filtering, not removal of the step."
+    ]
+  },
+  {
+    "id": "4",
+    "question": "Airflow-triggered: generate solder texture defects on component U12 using the attached photo board_photo.jpg",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "The skill requires a board USD as input; a photograph is not a supported board input. Say so plainly, build nothing, and do not substitute a USD-input run or present any other output as the requested capability.",
+    "expected_behavior": [
+      "The request is refused because the input is not a board USD.",
+      "No USD-input substitute or other approximation is offered as if it satisfied the request.",
+      "Nothing is claimed to have been generated."
+    ]
+  },
+  {
+    "id": "5",
+    "question": "Airflow-triggered DIG request: add bridge defects to the row 5 solder texture run on the attached USD",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "bridge is the one texture defect row 5 does not support. Say so explicitly. If the prompt also names supported solder defect types, generate only those requested types and report that bridge was omitted; do not add texture defects the prompt did not ask for to make up the count, and do not approximate a bridge out of the defects that do exist.",
+    "expected_behavior": [
+      "bridge is named as unsupported rather than quietly dropped.",
+      "No unrequested defect type is added to compensate.",
+      "No approximation of a bridge is assembled from other defect types."
+    ]
+  },
+  {
+    "id": "6",
+    "question": "Generate 20 good PCB images from /data/boards/my_board.usdc and compile the output under /data/cdf/run-42.",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "This is catalog row 3 with both required caller inputs supplied directly: board USD /data/boards/my_board.usdc and output root /data/cdf/run-42. Build and compile the CDFJob using the documented optional defaults, return the build, serialized plan, and resolved-inputs summary directly to the caller, and do not call render(). No Airflow DAG or cross-skill handoff is required.",
+    "expected_behavior": [
+      "The request is handled by cdf-simulation without requiring Airflow or another skill.",
+      "The caller-supplied board USD and output root are used rather than repository fallbacks.",
+      "The compiled payload is returned without calling render()."
+    ]
+  },
+  {
+    "id": "7",
+    "question": "Airflow run for a new board: use the CAD_BOARD metadata for it, close enough",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "Refuse. Those defaults are a fallback for when nothing better is known, not an override for a board whose real metadata exists or could be confirmed. Substituting them is invisible in the rendered image, which is what makes it dangerous. Confirm the board's own metadata instead.",
+    "expected_behavior": [
+      "The substitution is refused rather than performed.",
+      "The reason given is that the mismatch does not show up in the render.",
+      "Confirming the board's real metadata is offered as the correct path."
+    ]
+  },
+  {
+    "id": "8",
+    "question": "Airflow-triggered: using the attached USD, generate tombstone structural defects. Attachment: /mnt/airflow/attachments/board.usdc. Output root: /mnt/airflow/out/run-0144.",
+    "expected_skill": "cdf-simulation",
+    "ground_truth": "Catalog row 4. add_tombstone requires angle_range, which the prompt does not supply and which the API gives no default for -- omitting it is a TypeError before anything compiles. Take angle_range=(70.0, 90.0) and ratio=0.2 from references/fixed-defaults.md rather than inventing a magnitude or asking for one, and name both in the run summary. The record carries operation labels and the per-component defect crop, is compiled and returned, not rendered; on a non-empty selection the default ratio still yields at least one defect.",
+    "expected_behavior": [
+      "No clarifying question is asked about the tombstone angle.",
+      "angle_range is supplied from the documented fixed default, not invented and not omitted.",
+      "The applied ratio and angle_range are both stated in the run summary, and the record is compiled and returned rather than rendered."
+    ]
+  }
+]

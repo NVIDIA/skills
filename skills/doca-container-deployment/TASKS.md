@@ -11,21 +11,21 @@ source.
 These verbs cover the in-scope cross-cutting deployment workflows
 for an external operator deploying one of the four supported
 service overlays on the BlueField — Argus, DMS, Firefly, or UROM
-service. Flow-Inspector and OS-Inspector are policy-excluded and
+service. Flow-Inspector and OS-Inspector are outside this bundle's scope and
 must route through
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md),
+`doca-public-knowledge-map/SKILL.md`,
 not through this deployment workflow. Every step assumes the
 operator has consulted the live public DOCA Container Deployment
 Guide and the matching per-service guide (both reachable through
-[doca-public-knowledge-map ## DOCA services](../doca-public-knowledge-map/SKILL.md#doca-services))
+doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`))
 and is using them as the authoritative reference; this file
 prescribes the *order* and *what to look up where*, not a
 copy-paste runbook.
 
 > **Non-goals (externally-productized NVIDIA services not in the
-> DOCA monorepo):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
-> Service (DTS, as productized), and any future external NVIDIA
-> networking software not under `doca/services/`. A user asking
+> DOCA SDK):** BlueMan, HBN, SNAP, Virtio-net, DOCA Telemetry
+> Service (DTS, as productized), and any other NVIDIA networking
+> software that is not a DOCA SDK service. A user asking
 > *"how do I deploy BlueMan?"* (or any of the others) is routed to
 > the public NVIDIA docs at `docs.nvidia.com/doca/sdk/` for that
 > specific product, NOT silently extrapolated from this skill's
@@ -44,9 +44,9 @@ every later verb assumes the operator has read it here.
    installed on the BlueField Arm and the BlueField OS image
    shipping kubelet standalone + the documented container runtime.
    If install health is unverified, run
-   [`doca-setup ## test`](../doca-setup/TASKS.md#test) first.
+   `doca-setup ## test` (`doca-setup/TASKS.md#test`) first.
    If the user has no install yet, route to
-   [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install)
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    for the public NGC DOCA container path. Confirm the BFB
    version on the BlueField is one the public DOCA Container
    Deployment Guide certifies for the operator's DOCA release.
@@ -55,10 +55,10 @@ every later verb assumes the operator has read it here.
    per-service overlay (config schema, paired workload, "healthy"
    definition) lives in the matching per-service skill. Load both
    skills together:
-    - Argus → [`doca-argus`](../services/doca-argus/SKILL.md)
-    - DMS → [`doca-dms`](../services/doca-dms/SKILL.md)
-    - Firefly → [`doca-firefly`](../services/doca-firefly/SKILL.md)
-    - UROM service → [`doca-urom-svc`](../services/doca-urom-svc/SKILL.md)
+    - Argus → `doca-argus/SKILL.md`
+    - DMS → `doca-dms/SKILL.md`
+    - Firefly → `doca-firefly/SKILL.md`
+    - UROM service → `doca-urom-svc/SKILL.md`
 
    Quote the per-service config schema and "healthy" signal from
    the per-service skill; quote the runtime contract (kubelet
@@ -70,7 +70,7 @@ every later verb assumes the operator has read it here.
    close every precondition the per-service skill flags as
    required BEFORE writing a pod spec:
     - DOCA installed on the BlueField Arm and healthy (per
-      [`doca-setup ## test`](../doca-setup/TASKS.md#test)).
+      `doca-setup ## test` (`doca-setup/TASKS.md#test`)).
     - Container runtime + kubelet standalone present and running
       on the BlueField, as documented in the public Container
       Deployment Guide.
@@ -93,7 +93,7 @@ every later verb assumes the operator has read it here.
 4. **Identify the per-service image source.** Per the per-service
    public guide, the container image is published to the NGC
    catalog. The agent MUST route through
-   [`doca-public-knowledge-map ## DOCA services`](../doca-public-knowledge-map/SKILL.md#doca-services)
+   `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`)
    for the current image string + tag for the operator's DOCA
    release; do NOT invent an image name from memory. Wrong image
    string is the most common first-app failure for any DOCA service
@@ -127,7 +127,7 @@ every later verb assumes the operator has read it here.
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility),
    record BOTH the host DOCA install version on the BlueField
    Arm (via
-   [`doca-version TASKS.md ## configure`](../doca-version/TASKS.md#configure)),
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)),
    the BFB version on the BlueField, AND the per-service
    container tag pulled. A mismatch among the three is the silent
    *"the docs say this should work"* trap; align them explicitly.
@@ -152,7 +152,7 @@ will be deployed by the same kubelet-standalone + pod-spec-drop
 pattern — that is, a user-authored container image rather than an
 NVIDIA-shipped one — the build is the application's normal DOCA
 build (per
-[`doca-programming-guide ## build`](../doca-programming-guide/TASKS.md#build))
+`doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`))
 plus a container build the user owns. The shared runtime contract
 in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
 still applies to the *deploy* step; the build step is library-
@@ -162,7 +162,7 @@ If the user is asking how to build the **per-service container
 itself** from source, that is *not* an external-operator workflow
 — the container ships pre-built from NGC and rebuilding it is out
 of scope. Route to the per-service public guide via
-[doca-public-knowledge-map ## DOCA services](../doca-public-knowledge-map/SKILL.md#doca-services).
+doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`).
 
 ## modify
 
@@ -234,7 +234,7 @@ assumes the prerequisites in [`## configure`](#configure) are done.
 1. **Confirm the per-service image is pullable from NGC.** Per
    [`## configure`](#configure) step 4, the image string +
    tag comes from the per-service public guide reached through
-   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md);
+   `doca-public-knowledge-map/SKILL.md`;
    the BlueField has reach to `nvcr.io`; the documented image-list
    command on the BlueField container runtime can pull a fresh
    copy of the image and report the digest. A pull failure here
@@ -253,7 +253,7 @@ assumes the prerequisites in [`## configure`](#configure) are done.
 3. **Verify kubelet has scheduled the pod.** Use the BlueField
    container manager's documented status command (or its
    structured-status surface per
-   [`doca-structured-tools-contract`](../doca-structured-tools-contract/SKILL.md))
+   `doca-structured-tools-contract/SKILL.md`)
    to confirm the pod is in `Running` with no recent restarts.
    A pod stuck in `Pending` is layer 2 of
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy);
@@ -290,7 +290,7 @@ assumes the prerequisites in [`## configure`](#configure) are done.
 For the runtime version + container-tag cross-checks that
 underlie *"my service behaves differently from what the docs
 say"*, see
-[`doca-version TASKS.md ## run`](../doca-version/TASKS.md#run)
+`doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`)
 and apply the three-version-anchor overlay from
 [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 
@@ -405,7 +405,7 @@ success; the cause
 is below the deployment runtime (per-service config, paired peer,
 BlueField OS, host). Escalate to the per-service skill's debug
 ladder plus
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug)
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
 with the captured layer evidence.
 
 ## debug
@@ -442,7 +442,7 @@ down without clearing the layer above. The eight layers match
    surface shows a 404 / 403 / timeout against `nvcr.io`.
    Resolution: re-quote the image string + tag from the
    per-service public guide reached through
-   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md);
+   `doca-public-knowledge-map/SKILL.md`;
    confirm BlueField reach to `nvcr.io` independently of the
    pod (a documented image-pull probe from the BlueField CLI is
    the cheapest check); engage the operator's network team
@@ -489,7 +489,7 @@ down without clearing the layer above. The eight layers match
    guide on the screen describes. Symptoms: a documented field
    name is rejected; a documented "healthy" output line never
    appears. Resolution: walk
-   [`doca-version TASKS.md ## debug`](../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2 and re-confirm the three version anchors (host DOCA
    on the BlueField Arm, BFB, per-service container tag) per
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
@@ -500,7 +500,7 @@ down without clearing the layer above. The eight layers match
    (kernel version, driver loaded / not loaded, hugepage
    allocation, PCIe link state, BFB log surface) breaks the
    service's downstream behavior. Resolution: drop to
-   [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug)
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
    for the cross-cutting debug ladder; engage the operator's
    BlueField OS team.
 
@@ -514,7 +514,7 @@ on the installed tool or the public guide, not prose recall.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env
@@ -529,10 +529,10 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Purpose | Command (class shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
@@ -554,7 +554,7 @@ Three cross-cutting rules for this appendix:
   field name, or the static-pod manifests directory path.** The
   public DOCA Container Deployment Guide and the per-service
   guide reached through
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
   are the contract; prose-derived strings are the most common
   hallucination failure for this skill.
 - **Kubelet status before container logs; container logs before
@@ -568,9 +568,9 @@ Three cross-cutting rules for this appendix:
 - **Cross-link instead of duplicate.** Cross-cutting env
   commands (port-state, `devlink`, `ip link`, `ethtool` on the
   BlueField, `lspci` on the host) live in
-  [`doca-setup TASKS.md ## Command appendix`](../doca-setup/TASKS.md#command-appendix)
+  `doca-setup TASKS.md ## Command appendix` (`doca-setup/TASKS.md#command-appendix`)
   and
-  [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug);
+  `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`);
   this appendix names only the container-deployment-specific
   ones. Per-service liveness commands live in the matching
   per-service skill's Command appendix.
@@ -586,11 +586,11 @@ Three cross-cutting rules for this appendix:
   must be mounted, not *what* the per-service field names are.
 - **Installing DOCA on the BlueField target** — out of scope
   here. Route to
-  [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   for env preparation and
-  [`doca-setup ## test`](../doca-setup/TASKS.md#test) for
+  `doca-setup ## test` (`doca-setup/TASKS.md#test`) for
   install health verification, or
-  [`doca-setup ## no-install`](../doca-setup/TASKS.md#no-install)
+  `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
   for the public NGC DOCA container path if there is no DOCA
   install yet.
 - **Flipping a BlueField firmware emulation slot** — out of scope
@@ -601,7 +601,7 @@ Three cross-cutting rules for this appendix:
   Second, externally-productized NVIDIA services that *do* require
   a slot are themselves out of scope per the Non-goals callout at
   the top of this file; the firmware-tool workflow itself is owned
-  by [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
+  by `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   and the public BlueField firmware-configuration documentation.
 - **Building a paired-workload application** (host-side time-sync
   follower behind Firefly, gNMI client behind DMS, custom analyzer
@@ -609,9 +609,9 @@ Three cross-cutting rules for this appendix:
   workload behind UROM service) — not a container-deployment
   question. Route to the matching per-service skill's
   deferred-verbs block, which itself routes to the per-library
-  skill ([`doca-telemetry-exporter`](../libs/doca-telemetry-exporter/SKILL.md),
-  [`doca-flow`](../libs/doca-flow/SKILL.md),
-  [`doca-rmax`](../libs/doca-rmax/SKILL.md), …) when the paired
+  skill (`doca-telemetry-exporter/SKILL.md`,
+  `doca-flow/SKILL.md`,
+  `doca-rmax/SKILL.md`, …) when the paired
   workload is a DOCA-using application.
 - **Operating a full Kubernetes cluster** (cluster API,
   `kubectl`, `Deployment` / `Service` / `Ingress` objects,
@@ -619,17 +619,17 @@ Three cross-cutting rules for this appendix:
   This skill covers kubelet *standalone* mode on the BlueField,
   not a full Kubernetes control plane. For Kubernetes-scale DPU
   provisioning, see DOCA Platform Framework on GitHub via
-  [`doca-public-knowledge-map ## Public source code: GitHub`](../doca-public-knowledge-map/SKILL.md#public-source-code-github).
+  `doca-public-knowledge-map ## Public source code: GitHub` (`doca-public-knowledge-map/SKILL.md#public-source-code-github`).
 - **Authoring or rebuilding a DOCA service container image** —
   out of scope here. The container ships pre-built from NGC at
   the tag the per-service public guide names; rebuilding it
   from source is not an external-operator workflow. Route to
   the per-service public guide via
-  [`doca-public-knowledge-map ## DOCA services`](../doca-public-knowledge-map/SKILL.md#doca-services).
+  `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 - **Cross-cutting host-side debug** (BlueField kernel, driver
   loaded / not loaded, hugepage allocation, PCIe link state) —
   out of scope here. Route to
-  [`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug).
+  `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
 
 ## Cross-cutting
 
@@ -660,7 +660,7 @@ Three cross-cutting rules for this appendix:
   flags, image tags, or the static-pod manifests directory
   path. Quote each from the public DOCA Container Deployment
   Guide plus the per-service guide reached through
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - For URL routing to the Container Deployment Guide, the
   per-service guides, and the NGC catalog, see
-  [`doca-public-knowledge-map ## DOCA services`](../doca-public-knowledge-map/SKILL.md#doca-services).
+  `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).

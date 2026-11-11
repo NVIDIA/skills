@@ -1,57 +1,65 @@
 [
   {
-    "id": "holoscan-setup-001",
-    "question": "I want to use the holoscan-setup skill to get the Holoscan SDK installed on my workstation. Can you guide me through it?",
+    "id": "holoscan-setup-5x-001",
+    "question": "Review this request and return the installation decision and a command plan only. Host and publication facts below are test fixtures, not claims about this sandbox. Use the supplied facts and local skill guidance; do not execute commands, contact services, install packages, pull images, build, or run examples. Identify any missing prerequisite that must be checked before execution. Request: Help me choose how to install Holoscan 5.0 EA; its release notes say binary artifacts are still unavailable.",
     "expected_skill": "holoscan-setup",
     "expected_script": null,
-    "ground_truth": "The agent initiated the holoscan-setup workflow by fetching the Holoscan documentation, inspecting the host environment (OS, architecture, GPU, memory), assessed platform compatibility, and provided a bolded one-line installation method recommendation before asking the user which method to proceed with.",
+    "ground_truth": "Produce a plan without executing it. Recommend source based on publication status.",
     "expected_behavior": [
-      "The agent fetched https://docs.nvidia.com/holoscan/sdk-user-guide/ to read current installation documentation",
-      "The agent ran shell commands to inspect the host including uname, nvidia-smi, nproc, and free",
-      "The agent assessed platform compatibility based on the detected OS, architecture, and CUDA driver version",
-      "The agent provided a bolded one-line recommendation and asked the user which install method to use without pasting install commands",
-      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      "Return the decision, prerequisite checks, and proposed commands without executing installations or external lookups; use the supplied host and release facts as fixtures.",
+      "Use matching 5.0 docs and release notes.",
+      "Inspect the host with read-only commands.",
+      "Show publication separately from host readiness.",
+      "Recommend source and mark Conda unavailable."
     ]
   },
   {
-    "id": "holoscan-setup-002",
-    "question": "I need to install the NVIDIA Holoscan SDK on my Ubuntu 22.04 machine with an RTX 4090. What's the best way to set it up?",
+    "id": "holoscan-setup-5x-002",
+    "question": "Review this request and return the installation decision and a command plan only. Host and publication facts below are test fixtures, not claims about this sandbox. Use the supplied facts and local skill guidance; do not execute commands, contact services, install packages, pull images, build, or run examples. Identify any missing prerequisite that must be checked before execution. Request: Install the published Holoscan 5.x Python wheels on my compatible Ubuntu 24.04 CUDA 13 workstation; I already chose wheels.",
     "expected_skill": "holoscan-setup",
     "expected_script": null,
-    "ground_truth": "The agent recognized this as a Holoscan SDK installation request, followed the setup workflow to inspect the host, confirmed Ubuntu 22.04 x86_64 compatibility, and recommended the NGC Container method as the best path for a first-time user with Docker available, then stopped to ask the user's preference.",
+    "ground_truth": "Produce a plan without executing it. Honor the selected supported method and route to the wheel workflow.",
     "expected_behavior": [
-      "The agent fetched the Holoscan SDK documentation pages to determine current supported platforms and methods",
-      "The agent executed shell commands to verify the OS version, GPU driver, and CUDA version on the host",
-      "The agent presented a compatibility assessment listing available installation methods for the detected platform",
-      "The agent ended with a bolded recommendation and asked the user which method they prefer before proceeding",
-      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      "Return the decision, prerequisite checks, and proposed commands without executing installations or external lookups; use the supplied host and release facts as fixtures.",
+      "Inspect relevant prerequisites and availability.",
+      "Pass the release, components, and host details to the wheel workflow.",
+      "Do not require another method-selection question."
     ]
   },
   {
-    "id": "holoscan-setup-003",
-    "question": "We just received a new IGX Orin devkit for our medical imaging pipeline. I need to get Holoscan running on it so we can start deploying our ultrasound AI inference app. Where do I start?",
+    "id": "holoscan-setup-5x-003",
+    "question": "Review this request and return the installation decision and a command plan only. Host and publication facts below are test fixtures, not claims about this sandbox. Use the supplied facts and local skill guidance; do not execute commands, contact services, install packages, pull images, build, or run examples. Identify any missing prerequisite that must be checked before execution. Request: A 4.6 cuda13 image is already pulled. Does that mean my 5.x development container is ready?",
     "expected_skill": "holoscan-setup",
     "expected_script": null,
-    "ground_truth": "The agent guided the user through the Holoscan setup workflow on an IGX Orin (ARM64) platform, inspected the device's hardware and OS, identified the available methods (Container, Debian/apt, Source) for IGX Orin, and provided a tailored recommendation before asking the user to choose.",
+    "ground_truth": "Produce a plan without executing it. Inspect the exact full 5.x tag and distinguish image presence from runtime support.",
     "expected_behavior": [
-      "The agent fetched the Holoscan SDK user guide documentation to confirm IGX Orin support and available methods",
-      "The agent ran host inspection commands to detect the ARM64 architecture, OS, and GPU/iGPU configuration",
-      "The agent identified the platform as IGX Orin and listed Container, Debian/apt, and Source as available methods",
-      "The agent provided a bolded installation method recommendation and paused to ask the user's preference",
-      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      "Return the decision, prerequisite checks, and proposed commands without executing installations or external lookups; use the supplied host and release facts as fixtures.",
+      "Check a full v5.x-cuda13 tag rather than any cuda13 suffix.",
+      "Do not infer availability from the 4.x image.",
+      "Do not treat Docker presence or a local image as proof of GPU passthrough."
     ]
   },
   {
-    "id": "holoscan-setup-004",
-    "question": "How do I configure TensorRT optimization profiles for my ONNX model to reduce latency on batch size 1 inference?",
+    "id": "holoscan-setup-5x-004",
+    "question": "Review this request and return the installation decision and a command plan only. Host and publication facts below are test fixtures, not claims about this sandbox. Use the supplied facts and local skill guidance; do not execute commands, contact services, install packages, pull images, build, or run examples. Identify any missing prerequisite that must be checked before execution. Request: Can I install Holoscan 5.0 with Conda on my Jetson iGPU using CUDA 12?",
+    "expected_skill": "holoscan-setup",
+    "expected_script": null,
+    "ground_truth": "Produce a plan without executing it. Identify absent Conda, CUDA 12, and Tegra artifacts rather than inheriting 4.x support.",
+    "expected_behavior": [
+      "Return the decision, prerequisite checks, and proposed commands without executing installations or external lookups; use the supplied host and release facts as fixtures.",
+      "Explain that 5.0 Conda and CUDA 12 packages are unavailable.",
+      "Do not infer Tegra support from ARM64 architecture.",
+      "Check release-specific hardware support before recommending installation."
+    ]
+  },
+  {
+    "id": "holoscan-setup-5x-005",
+    "question": "Optimize my TensorRT ONNX engine; the SDK is already installed.",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The agent recognized this as a TensorRT model optimization question unrelated to Holoscan SDK installation and did not invoke the holoscan-setup skill. It provided general guidance on TensorRT optimization profiles or directed the user to TensorRT documentation.",
+    "ground_truth": "Answer the optimization question without starting setup.",
     "expected_behavior": [
-      "The agent did not fetch Holoscan SDK installation documentation or run host inspection commands",
-      "The agent did not provide a Holoscan installation method recommendation",
-      "The agent addressed the TensorRT optimization question directly or pointed to relevant TensorRT resources",
-      "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      "Do not invoke installation setup or run host-discovery commands for unrelated optimization."
     ]
   }
 ]

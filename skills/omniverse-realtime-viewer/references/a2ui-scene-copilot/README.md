@@ -3,457 +3,199 @@
 
 # A2UI Scene Copilot
 
-## Triggers
+Use this reference for agent-to-UI viewer operations, a scene copilot,
+chat-driven scene control, or tools that let an agent inspect and operate a
+viewer. Build the explicit operation interface first; add language-model
+orchestration and a chat or tool UI when requested.
 
-Use this reference for agent-to-UI (A2UI) copilot, scene copilot, chat-driven
-viewer control, LLM tool calling into the viewer, CopilotKit integration,
-natural language USD scene interaction, AI assistant for the viewer, or any
-request to build an agent that controls the Omniverse Realtime Viewer through
-conversation.
+The viewer remains the scene authority. An agent uses the same application
+commands as ordinary controls; it does not acquire a stage handle or a second
+renderer. The request envelope below is an application protocol, not an
+OVRTX API or a substitute for an agent framework's wire protocol.
 
-## Overview
+## Compose the operation path
 
-The A2UI Scene Copilot pattern adds an LLM-powered chat agent alongside the
-Omniverse Realtime Viewer. The agent communicates with the viewer server over
-a WebSocket protocol (the A2UI protocol), giving the user natural-language
-control over scene exploration, property editing, AOV switching, selection,
-and variant management — all reflected in real time through the WebRTC viewport.
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          Browser (React + Vite)                          │
-├───────────────────────────────────┬─────────────────────────────────────┤
-│       WebRTC Viewport             │         Chat Panel (CopilotKit)     │
-│   AppStreamer ↔ ovstream          │    user ↔ agent ↔ tools ↔ A2UI WS  │
-│       (video + audio)             │                                     │
-└──────────┬────────────────────────┴───────────────┬─────────────────────┘
-           │ UDP :47998 media                       │ WS to agent backend
-           │ TCP :8011 signaling                    │ (port 8123)
-           ▼                                        ▼
-┌───────────────────────────────────────┐  ┌──────────────────────────────┐
-│       Application Runtime Server       │  │     Agent Backend (Python)   │
-│  app-owned OVStage + runtime adapter   │  │  LangGraph / LangChain       │
-│  attached ovrtx + ovstream WebRTC      │  │  Tools → A2UI WS client      │
-│  A2UI endpoint (WS :3001/a2ui/agent)  │  │  System prompt from hello    │
-└───────────────────────────────────────┘  └──────────────────────────────┘
+```text
+operation form or agent tool
+  -> correlated client request
+  -> endpoint validation and bounded command queue
+  -> existing runtime owner
+       -> copied query state / worker preparation
+       -> stage publication or renderer/app interaction
+  -> completion result and copied state
+  -> tool result, controls and displayed viewer frame
 ```
 
-### Component Responsibilities
+Keep WebSocket I/O on its event loop and SDK work on the viewer's existing
+runtime owner. Calling an adapter method from a socket callback is safe only
+when that method enqueues work. Loading and authored metadata can use isolated
+workers; their results return to the owner before affecting the live scene.
+Use [stage-management](../stage-management/README.md) for preparation, generation
+invalidation, source lifetime and replacement, and
+[ovstage-ovrtx-integration](../ovstage-ovrtx-integration/README.md) for publication.
 
-| Component | Role |
-|-----------|------|
-| Application runtime server | Owns stage lifecycle, ordinals, OVStage query/write adapter, attached rendering, and WebRTC streaming |
-| Attached ovrtx renderer | Consumes committed OVStage publications; owns render products, frame output, renderer-native picks, and selection visualization |
-| A2UI endpoint | WebSocket server exposing the runtime adapter's viewer operations to agents |
-| Agent backend | LLM orchestration, tool definitions, A2UI client |
-| Frontend | WebRTC viewport + chat UI (CopilotKit or custom) |
+For WebRTC, compose this endpoint beside the existing streaming server and use
+[streaming-client](../streaming-client/README.md) for video connection. The same
+operation adapter can serve a native viewer through its chosen transport.
+Resolve runtime packages through [dependencies](../dependencies/README.md);
+choose the WebSocket and optional agent packages for the app's language and
+manifest. Keep the operation service opt-in when extending an existing viewer.
 
-## A2UI WebSocket Protocol
+## Advertise capabilities before accepting commands
 
-### Connection
+On connection, send a capability snapshot: supported operations, parameter
+schemas, effects, relevant bounds, current scene generation and copied app
+state. A client waits for this handshake before enabling tools or controls.
+Advertise only operations the current implementation can complete.
 
-Connect to `ws://<server-host>:<a2ui-port>/a2ui/agent` (default port 3001).
+| Capability | Contract to define |
+|---|---|
+| Scene and property queries | Canonical paths, pagination or bounded previews, authored versus live values, observed generation and ordinal |
+| Selection | Supported selection cardinality/modes and the common tree/pick selection path |
+| Output choice | Available display outputs and when a requested output becomes active |
+| Property edits | Explicit writable attributes or semantic commands, value types/shapes, units, coordinate space and edit ownership |
+| Variants, open and reset | Source types, composition policy, retained edits, camera policy and replacement completion |
 
-On connect the server sends an `agent_hello` notice:
+A generic `set_property` name does not make arbitrary USD values writable.
+Keep inspection schemas separate from write schemas. An authored attribute or
+bounded array preview describes the source; it need not describe the current
+simulation pose or be a lossless value that can be written back. Return live
+transforms through the runtime adapter and label authored metadata separately.
+Use [prim-info-display](../prim-info-display/README.md) for this split and
+[prim-transform-safety](../prim-transform-safety/README.md) for coordinate-space
+conversion. Define JSON encodings for supported values; reject unencodable
+results with a correlated error instead of leaving requests pending.
+
+Apply the same edit ownership as ordinary controls. For example, a simulator or
+scientific producer can own a geometry subtree and its composition. The agent
+should use an advertised workload command or switch scenes, rather than bypass
+that owner's controls. Variant edits follow the application's non-destructive
+composition policy, refresh metadata, and retain edits only for surviving paths.
+
+## Correlate requests through completion
+
+One possible envelope is:
 
 ```json
-{
-  "op": "agent_hello",
-  "notice": true,
-  "data": {
-    "version": "1.0",
-    "operations": ["open_stage", "list_prims", "get_properties", ...],
-    "operation_schemas": [...],
-    "app_state": { "stage_url": "...", "selection": [], "active_aov": "LdrColor", ... },
-    "system_prompt": "..."
-  }
-}
+{"op":"select","request_id":"pick-7","generation":3,"params":{"paths":["/World/Cube"]}}
 ```
 
-**Critical:** Wait for `agent_hello` before sending any operation request.
+Replies carry the same operation and request ID, with either a result or a
+structured error. Notices are separate messages and never complete a request.
+Use request IDs unique within a connection session and keep pending IDs
+protected until they finish, independently of any bounded completed-ID cache.
 
-### Request/Response Format
+Use one receive loop per connection. It dispatches notices to state consumers
+and responses to a pending-request map; each caller awaits its own completion.
+The following is application pseudocode, not an SDK class:
 
-```json
-// Request
-{"op": "operation_name", "request_id": "unique-id", "params": {...}}
+```text
+call(operation, parameters):
+    wait for capability handshake
+    validate against advertised schema
+    register pending[id] with deadline before sending
+    send operation, id, observed generation and parameters
+    await pending[id]
 
-// Success response
-{"op": "operation_name", "request_id": "unique-id", "result": {...}}
+receive(message):
+    notice -> apply copied state if still current
+    matching response -> resolve or reject pending[message.request_id], clear timer
+    unknown or expired response -> discard
 
-// Error response
-{"op": "operation_name", "request_id": "unique-id", "error": {"code": "...", "message": "..."}}
+connection closes:
+    reject pending requests and clear timers
+    reconnect -> acquire fresh capabilities and state
 ```
 
-### Server-Pushed Notices
-
-The server may push notices (e.g., `selection_changed`) at any time:
-
-```json
-{"op": "selection_changed", "notice": true, "data": {"paths": ["/World/Cube"]}}
-```
-
-### Operations
-
-| Operation | Category | Mutates | Description |
-|-----------|----------|---------|-------------|
-| `open_stage` | stage | yes | Load a USD stage by path or URL |
-| `list_prims` | stage | no | List child prims under a root path |
-| `get_properties` | stage | no | Return attributes and relationships for a prim |
-| `get_prim_count` | stage | no | Return total prim count |
-| `get_variants` | stage | no | Return variant sets for a prim |
-| `set_variant` | stage | yes | Set a variant selection |
-| `set_property` | stage | yes | Set a USD attribute value |
-| `reset_stage` | stage | yes | Force-reload the current stage |
-| `select` | selection | yes | Replace the current viewer selection |
-| `get_selection` | selection | no | Return current selection |
-| `change_aov` | render | yes | Switch the active display AOV |
-| `get_available_aovs` | render | no | List available AOVs |
-| `get_app_state` | app | no | Return full viewer snapshot |
-
-### Parameter Aliases
-
-Operations accept multiple parameter names for convenience:
-
-- Path params: `prim_path`, `path`, `url`
-- Selection: `paths`, `prim_path`, `path` (single string auto-wrapped in list)
-- AOV: `aov`, `name`
-- Property: `property_name`, `property`, `attr`
-- Variant: `variant_selection`, `selection`
-
-## Server-Side Implementation
-
-### A2UI Endpoint Setup
-
-The A2UI endpoint runs beside the application-owned runtime. Before exposing
-any operation, create and populate one `ovstage.Stage`, attach the renderer to
-that stage, and publish the initial ordinal. The endpoint dispatches commands
-through the application's runtime adapter; it does not use renderer attribute
-APIs or a second OpenUSD stage as an alternate scene authority.
-
-```python
-from a2ui_endpoint import A2UIAgentEndpoint
-
-# In startup, after the runtime owns a populated stage and attached renderer:
-a2ui = A2UIAgentEndpoint(runtime, host="0.0.0.0", port=3001, path="/a2ui/agent")
-a2ui.start()
-```
-
-The endpoint owns:
-- `A2UIOperationDispatcher` — maps operation names to runtime-adapter commands and queries
-- Connection lifecycle — sends `agent_hello`, dispatches requests, broadcasts notices
-- Thread isolation — runs on a dedicated asyncio event loop
-
-### Operation Dispatcher Pattern
-
-Each operation is a method on `A2UIOperationDispatcher` that:
-1. Validates params (using aliases)
-2. Calls the runtime adapter, which is the single authority for stage state
-3. Returns `A2UIDispatchResult(result_dict, notices=[...])`
-
-```python
-def _op_select(self, params):
-    paths = _paths_param(params)
-    self._set_selection(paths)
-    return A2UIDispatchResult(
-        {"paths": paths},
-        notices=[{"op": "selection_changed", "data": {"paths": paths}}],
-    )
-```
-
-### Runtime Adapter — One Read/Write Authority
-
-Implement `set_property`, `set_variant`, selection, hierarchy, and property
-queries through a narrow application-owned adapter over the active OVStage.
-Every mutating command must:
-
-1. validate the canonical USD path and value against the active stage generation;
-2. reserve the next application ordinal `N`;
-3. enqueue the OVStage write or stage-management operation and wait for it to complete;
-4. advance the stage write floor to `N`; and
-5. return the committed ordinal and generation in the response or notice.
-
-The render loop consumes that same publication with
-`renderer.step(..., ordinal=N)` (or an explicit pre-step
-`renderer.update_from_stage(N)` when required). Do not render above the write
-floor, and do not mutate or replace the stage while a renderer step is in
-flight.
-
-Queries return copied DTOs such as canonical path, value/schema summary,
-generation, and observed ordinal. They resolve paths through the OVStage path
-dictionary. Treat stage replacement, `open_stage`, and `reset_stage` as
-serialized lifecycle operations: stop new commands, detach or replace the
-renderer-stage pairing as required, populate the new stage, publish its initial
-ordinal, then resume requests with the new generation.
-
-Do not implement a renderer-write or `pxr`-worker fallback. With an attached
-renderer, direct `renderer.write_attribute()`, `query_prims()`, and
-`read_attribute()` are not the authority for viewer scene state. Keep ovrtx
-APIs for renderer-owned work: render products, output frames, pick queues, and
-selection-outline configuration.
-
-## Agent Backend Implementation
-
-### Framework Choice
-
-Any LLM orchestration framework works. Validated patterns:
-
-- **LangGraph + LangChain** — Python, tool-calling agents, streaming
-- **CopilotKit** — React-native chat UI with frontend actions
-- **AG-UI** — Agent-to-UI protocol (CopilotKit's wire format)
-
-### A2UI Client (Agent Side)
-
-The agent needs a synchronous WebSocket client that:
-1. Connects to the A2UI endpoint
-2. Waits for `agent_hello`
-3. Sends operations and waits for the matching `request_id` response
-
-```python
-import json
-import websocket  # websocket-client library
-
-class A2UIClient:
-    def __init__(self, url="ws://127.0.0.1:3001/a2ui/agent"):
-        self.url = url
-        self._ws = None
-
-    def connect(self):
-        self._ws = websocket.create_connection(self.url, timeout=10)
-        # Wait for agent_hello
-        hello = json.loads(self._ws.recv())
-        assert hello["op"] == "agent_hello"
-        return hello["data"]
-
-    def call(self, op: str, params: dict = None) -> dict:
-        request_id = str(uuid.uuid4())
-        self._ws.send(json.dumps({
-            "op": op,
-            "request_id": request_id,
-            "params": params or {},
-        }))
-        while True:
-            msg = json.loads(self._ws.recv())
-            if msg.get("notice"):
-                continue  # skip server-pushed notices
-            if msg.get("request_id") == request_id:
-                if "error" in msg:
-                    raise RuntimeError(msg["error"]["message"])
-                return msg["result"]
-```
-
-### LangChain Tool Definitions
-
-Map each A2UI operation to a LangChain tool:
-
-```python
-from langchain_core.tools import tool
-
-@tool
-def list_prims(root: str = "/World", recursive: bool = False) -> str:
-    """List prims under a root path in the USD stage."""
-    result = a2ui_client.call("list_prims", {"root": root, "recursive": recursive})
-    return json.dumps(result["flat_prims"], indent=2)
-
-@tool
-def select_prim(paths: list[str]) -> str:
-    """Select prims in the viewer by their USD paths."""
-    result = a2ui_client.call("select", {"paths": paths})
-    return f"Selected: {result['paths']}"
-
-@tool
-def set_property(prim_path: str, property_name: str, value) -> str:
-    """Set a USD attribute value on a prim (e.g., light intensity)."""
-    result = a2ui_client.call("set_property", {
-        "prim_path": prim_path,
-        "property_name": property_name,
-        "value": value,
-    })
-    return f"Set {result['property']} = {result['value']} on {result['prim_path']}"
-```
-
-### System Prompt Strategy
-
-The `agent_hello` message includes a server-generated `system_prompt` that lists
-available operations and current state. Use this as the agent's system prompt or
-merge it with your own:
-
-- Keep the prompt concise enough for the selected model and tool budget
-- Always include current stage URL and available operations
-- Instruct the agent to use read ops before mutating ops
-
-## Frontend Implementation
-
-### Split-View Layout
-
-The canonical layout places the WebRTC viewport on the left and chat on the right:
-
-```
-┌────────────────────────────┬──────────────────┐
-│                            │   Chat Panel     │
-│     WebRTC Viewport        │   (420px fixed)  │
-│     (flex-1)               │                  │
-│                            │   [user input]   │
-└────────────────────────────┴──────────────────┘
-```
-
-### WebRTC Viewport Integration (React)
-
-When integrating the current `@nvidia/ov-web-rtc` `AppStreamer` client in React,
-follow `streaming-client` for the current DirectConfig contract. Render the
-video/audio elements before connecting, then keep one stable connection effect:
-
-```tsx
-import { AppStreamer, StreamType } from "@nvidia/ov-web-rtc";
-
-function StreamingViewport({ server, signalingPort }: { server: string; signalingPort: number }) {
-  const videoId = "remote-video";
-
-  useEffect(() => {
-    void AppStreamer.connect({
-      streamSource: StreamType.DIRECT,
-      streamConfig: { videoElementId: videoId, audioElementId: "remote-audio", server, signalingPort, width: 1920, height: 1080, codec: "H264", codecList: ["H264"] },
-    });
-    return () => { AppStreamer.terminate(); };
-  }, [server, signalingPort]);
-
-  return <div className="relative w-full h-full"><video id={videoId} autoPlay /><audio id="remote-audio" autoPlay /></div>;
-}
-```
-
-### CopilotKit Frontend Actions (Interactive Widgets)
-
-CopilotKit `useCopilotAction` renders inline widgets in the chat when the agent
-calls a tool. Each action needs both `handler` AND `render` props:
-
-```tsx
-useCopilotAction({
-  name: "show_exposure_control",
-  description: "Show the light exposure control widget",
-  parameters: [
-    { name: "lightPath", type: "string", description: "USD path to the light" },
-  ],
-  handler: async (args) => "Showing exposure control",
-  render: (props) => <ExposureWidget lightPath={props.args.lightPath} />,
-});
-```
-
-**Key rules:**
-- CopilotKit requires BOTH `handler` and `render` (crashes without handler)
-- Parameter types: only `"string"`, `"number"`, `"boolean"`, `"object"` — NOT arrays
-- Widget WebSocket commands must wait for `agent_hello` before sending
-- Don't use `crypto.randomUUID()` over plain HTTP — use Math.random fallback
-
-### Widget-to-Server Communication
-
-Frontend widgets that need to send A2UI commands (e.g., slider → set_property)
-use short-lived WebSocket connections:
-
-```typescript
-async function sendA2UICommand(op: string, params: Record<string, unknown> = {}): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const ws = new WebSocket(`ws://${SERVER_IP}:${A2UI_PORT}/a2ui/agent`);
-    const requestId = generateId();
-    let gotHello = false;
-
-    ws.onmessage = (evt) => {
-      const msg = JSON.parse(evt.data);
-      if (msg.op === "agent_hello" && !gotHello) {
-        gotHello = true;
-        ws.send(JSON.stringify({ op, request_id: requestId, params }));
-        return;
-      }
-      if (msg.request_id === requestId) {
-        ws.close();
-        resolve(msg.result);
-      }
-    };
-  });
-}
-```
-
-## Port Map
-
-| Port | Protocol | Purpose |
-|------|----------|---------|
-| 8011 | HTTP + WS | REST API + ovstream WebRTC signaling |
-| 3001 | WS | A2UI agent protocol |
-| 8123 | HTTP | Agent backend (LangServe / AG-UI) |
-| 5173 | HTTP | Frontend dev server (Vite) |
-| UDP 47998 | UDP | WebRTC media (ICE candidate) |
-
-## Deployment Considerations
-
-### Public IP / Tailscale
-
-- Set `--public-ip <tailscale-ip>` on the OVRTX server for remote WebRTC media
-- ICE candidate in SDP will use this IP for UDP media delivery
-- Frontend `stream.config.json` needs `server` and `mediaServer` set to same IP
-- `tailscale ping` the server before connecting to warm DERP relay path
-
-### GPU Requirement
-
-The OVRTX server requires an NVIDIA GPU. The agent backend and frontend can run
-anywhere with network access to the server.
-
-### Process Supervision
-
-Run three long-lived processes:
-1. OVRTX streaming server (GPU-bound, port 8011 + 3001)
-2. Agent backend (CPU-bound, port 8123)
-3. Frontend dev server (CPU-bound, port 5173)
-
-Use a process supervisor (supervisord, systemd, or shell script with restart
-loops) to keep all three alive.
-
-## Validation
-
-### E2E Test Pattern
-
-Use Playwright to validate the full loop:
-
-1. Navigate to the frontend URL
-2. Type a natural-language query in the chat input
-3. Assert the agent responds with tool call results
-4. (Optional) Assert viewport frame is non-black after scene load
-
-### A2UI Protocol Test (No GPU)
-
-The `A2UIHeadlessViewer` class provides a no-GPU test harness:
-
-```python
-from a2ui_ops import A2UIOperationDispatcher, A2UIHeadlessViewer
-
-viewer = A2UIHeadlessViewer(stage_path="samples/stage01.usda")
-viewer.start()
-dispatcher = A2UIOperationDispatcher(viewer)
-
-result = dispatcher.dispatch("list_prims", {"root": "/World", "recursive": True})
-assert len(result.result["flat_prims"]) > 0
-viewer.stop()
-```
-
-## Dependencies
-
-| Package | Purpose | Install |
-|---------|---------|---------|
-| current ovrtx and ovstage packages resolved through `references/dependencies` | Attached runtime rendering and scene data | Follow the current upstream agent guidance, skills, examples, and package metadata |
-| current ovstream package resolved through `references/dependencies` | WebRTC streaming | Follow the current dependency guidance |
-| websockets | A2UI server endpoint | `pip install websockets` |
-| websocket-client | A2UI agent client | `pip install websocket-client` |
-| langchain-core | Agent tool framework | `pip install langchain-core` |
-| @copilotkit/react-core | Chat UI | `npm install @copilotkit/react-core` |
-| @nvidia/ov-web-rtc | WebRTC viewport | Follow `references/dependencies` and `streaming-client` |
-
-## Related References
-
-- `references/streaming-server` — OVRTX server setup and ovstream configuration
-- `references/streaming-lifecycle` — WebRTC signaling flow and callbacks
-- `references/streaming-client` — Browser-side WebRTC integration
-- `references/streaming-messages` — Data channel message protocol
-- `references/viewer-input-routing` — Input event routing architecture
-- `references/ovstage-runtime` — Stage ownership, ordinals, and lifecycle
-- `references/ovstage-data-plane` — Runtime query/write adapter and publication rules
-- `references/ovstage-ovrtx-integration` — Attached renderer update contract
+This permits concurrent calls without one caller consuming another's reply.
+Browser controls and widgets can share this client instead of opening a new
+connection for every slider edit. Coalesce compatible drafts before dispatch;
+keep Reset and scene replacement as explicit commands. Cap connections,
+message/result sizes and pending work, and return an overload error when full.
+State notices may be coalesced; correlated replies must retain their identity.
+The selected WebSocket library owns its receive and buffering contracts; for
+Python, consult the [public client reference](https://websockets.readthedocs.io/en/stable/reference/asyncio/client.html).
+
+## Execute on the owner and report the actual effect
+
+After admission, the owner rechecks the request's generation, deadline,
+cancellation and edit permissions. Recheck after asynchronous preparation and
+immediately before committing a scene change. Discard stale results even when
+the same prim path exists in the replacement scene. Property panels also need
+a request/selection identity so an older response cannot replace newer details.
+
+Choose publication according to the work performed:
+
+- **Stage writes:** reserve an ordinal, write and wait, advance the floor, then
+  let the existing render loop consume it. Use
+  [ovstage-data-plane](../ovstage-data-plane/README.md).
+- **Selection:** update the common selection state and native renderer groups
+  through [native-picking-selection](../native-picking-selection/README.md).
+  Renderer-only group changes do not require an invented stage write.
+- **Output changes:** follow [aov-switching](../aov-switching/README.md). This may
+  publish RenderProduct attributes. Distinguish the desired output from the
+  active output confirmed by its copied frame.
+- **Scene composition:** follow the normal scene handoff and wait for its first
+  valid frame before reporting replacement success.
+
+Return the scene generation and observed state; include a committed ordinal
+when a stage publication occurred. An application revision can order selection
+or other app-only changes without advancing the stage floor. State whether a
+result acknowledges a committed command or an observed frame. A tool response
+alone does not establish that the browser has decoded and displayed that frame.
+
+On disconnect or timeout, cancel uncommitted work and retire its workers and
+sources through the normal lifetime rules. A lost response does not prove that
+a command failed to commit. Requery state after reconnect before retrying a
+mutation; cancellation is not rollback of an already performed edit. During
+shutdown, stop accepting requests before retiring the runtime and its consumers.
+
+## Add an agent and tool UI when requested
+
+An operation form can use this interface without a language model. For a real
+agent, choose the provider/orchestrator appropriate to the product, then bind
+the advertised schemas as tools. Each tool calls the correlated client and
+returns the structured result or error; it should not guess unadvertised
+attributes, paths, aliases or writable types.
+
+[LangChain tools](https://docs.langchain.com/oss/python/langchain/tools) provide
+schema-based tool definitions for an agent backend. A LangGraph workflow can
+compose those tools when orchestration is needed. For a React chat or inline
+tool interface, use [CopilotKit's current reference](https://docs.copilotkit.ai/reference)
+and its selected version's execution/rendering hooks. Execution and rendering
+are separate roles: a widget renders status and sends edits through the same
+operation client. [AG-UI](https://docs.ag-ui.com/introduction) can carry agent
+interaction events between the agent and frontend; adapt that boundary to the
+viewer operation protocol rather than treating the two as interchangeable.
+
+Give the agent current capabilities and scene context, and refresh them after
+scene changes. Keep scene strings and tool results as data; the application's
+instructions and permissions govern execution. Enforce any product approval
+policy at the command boundary shared by UI and agent tools.
+
+Compose the chat or operation panel with
+[viewer-layout-patterns](../viewer-layout-patterns/README.md) and preserve the
+viewport's stable size and input routing. Show pending, completed and failed
+operations honestly. A rejected edit should leave camera navigation available;
+controls should refresh from authoritative state after successful mutations.
+
+Bind a local control endpoint to the intended local interface and validate
+browser origins. Remote access needs an explicit authentication, authorization
+and secure transport design; follow the selected deployment and transport
+references. Provider credentials belong on the agent backend, not in browser
+capability messages. Ports and process placement are application configuration.
+
+## Validate the selected product
+
+Protocol tests can check correlation, concurrent notices, schema errors,
+bounded queues, cancellation and stale-generation rejection without rendering.
+Use the actual viewer for visible selection, property edits, output switching,
+variant changes, source preservation and recovery while ordinary controls remain
+usable. Compare reported live values and displayed effects; a nonblack frame or
+a successful tool message alone does not validate an edit.
+
+When a real agent is part of the product, also exercise natural-language input,
+actual tool selection, parameter generation, errors and the resulting visible
+state through that agent. Explicit operation tests validate the viewer protocol;
+they do not validate a model provider, orchestration framework or chat interface.
+Use [validation](../validation.md) for the chosen delivery path.

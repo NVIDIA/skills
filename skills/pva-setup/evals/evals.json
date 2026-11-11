@@ -1,0 +1,73 @@
+{
+  "skill_name": "pva-setup",
+  "evals": [
+    {
+      "id": "setup-missing-installation-source",
+      "prompt": "This CI environment has Python but no PVA SDK, NVVPU, emulator, or board. Use pva-setup after these Doctor findings: NOT_READY for Spec; requested SDK 2.10.0~rc3, GEN2; SDK root /workspace/sdk-not-installed; sdk-installation and public-reference-corpus FAIL; no project or target in scope; EMU emulation optional. Work directory: /workspace/setup-check. I have no installation guide or installer location. Do not install dependencies, use the network, contact a remote machine, or ask questions. Inspect local state as needed and write the setup report.",
+      "expected_skill": "pva-setup",
+      "expected_script": null,
+      "expected_output": "A BLOCKED setup report identifies the missing matching installation guide and installer source. It does not claim SDK readiness or install another release.",
+      "assertions": [
+        "Identifies the missing installation guide or installer source for the requested SDK release.",
+        "Writes /workspace/setup-check/reports/pva-setup-report.md with a BLOCKED decision and next action.",
+        "Does not install packages, access the network, or contact a board.",
+        "Does not claim that the absent SDK or reference corpus is ready."
+      ],
+      "files": []
+    },
+    {
+      "id": "setup-release-mismatch-plan",
+      "prompt": "Use pva-setup to review this proposed setup without executing it. Doctor reports NOT_READY: SDK 2.10.0~rc3 is requested but absent; GEN2, Spec-only, optional EMU, no project or board. The proposed installer and its installation guide both identify release 2.10.1. Can I use them to satisfy the rc3 request? Work directory: /workspace/release-review. Treat the supplied release identities as planning inputs. Do not install, download, run remote commands, or ask questions. Write the setup report.",
+      "expected_skill": "pva-setup",
+      "expected_script": null,
+      "expected_output": "The proposed installation is blocked because 2.10.1 does not satisfy the explicitly requested 2.10.0~rc3 release. The next action is to obtain a matching source or an explicit change to the release request.",
+      "assertions": [
+        "Identifies the mismatch between requested 2.10.0~rc3 and proposed 2.10.1.",
+        "Does not silently substitute the newer SDK release.",
+        "Writes /workspace/release-review/reports/pva-setup-report.md with a BLOCKED decision.",
+        "Does not install packages, download artifacts, or access remote machines."
+      ],
+      "files": []
+    },
+    {
+      "id": "setup-driveos-out-of-scope",
+      "prompt": "Use pva-setup to install a DriveOS safety SDK and configure an ASIP license on a QNX target. This CI machine has none of these products or any board. Do not install anything, print credentials, access the network, or ask questions. Explain whether this skill supports the request.",
+      "expected_skill": "pva-setup",
+      "expected_script": null,
+      "expected_output": "The skill reports that DriveOS, safety SDK, QNX target, and ASIP setup are outside its L4T NVVPU scope. It does not run the L4T installation workflow.",
+      "assertions": [
+        "Explains that the requested setup is outside this skill's L4T NVVPU scope.",
+        "Does not replace the requested platform with L4T.",
+        "Does not install software, contact remote machines, or expose credentials."
+      ],
+      "files": []
+    },
+    {
+      "id": "setup-solutions-default-source-plan",
+      "prompt": "Use pva-setup to plan adding PVA Solutions for Spec. Doctor reports NOT_READY only because the requested Solutions source is absent; the existing SDK and references need no changes. No Solutions source URL, project path, or revision was supplied. Work directory: /workspace/solutions-plan. Treat these Doctor findings as planning inputs, not proof from this CI environment. Do not execute the plan, install software, clone, fetch, use the network, contact a board, or ask questions. Write the setup report with the source URL, destination, and revision selection.",
+      "expected_skill": "pva-setup",
+      "expected_script": null,
+      "expected_output": "A setup plan uses NVIDIA's public PVA Solutions repository, /workspace/solutions-plan/source, and the repository's default branch. It does not invent a commit or claim installation succeeded.",
+      "assertions": [
+        "Selects https://github.com/nvidia/pva-solutions as the default source; case and the optional .git suffix do not matter.",
+        "Uses /workspace/solutions-plan/source as the destination because no project path was supplied.",
+        "Uses the repository's default branch without inventing a tag, commit, or SDK-derived Solutions version.",
+        "Writes /workspace/solutions-plan/reports/pva-setup-report.md as a plan without claiming installation or readiness was verified.",
+        "Does not install, clone, fetch, use the network, or contact a board."
+      ],
+      "files": []
+    },
+    {
+      "id": "setup-negative",
+      "prompt": "What does an identity matrix do in matrix multiplication? Give a two-by-two example. Do not inspect my environment or create files.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "A correct explanation and two-by-two identity matrix example without PVA environment setup.",
+      "assertions": [
+        "Explains the identity matrix with a correct numeric example.",
+        "Does not invoke pva-setup or run environment probes."
+      ],
+      "files": []
+    }
+  ]
+}

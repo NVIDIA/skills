@@ -65,6 +65,18 @@ iterN) iteration summary together to `commit_stage.py`, as shown in
 re-derives the value and comparison, and records the canonical result. Never
 call `record_metric_result.py` directly.
 
+The committed `metric_result.relative_change` and iterN
+`iteration_summary.json.metric` contain the current value, baseline and
+previous values, signed deltas, and `improved` / `unchanged` / `regressed`
+classifications. Classification follows the approved operator, including
+lower-is-better contracts. Commit and audit independently re-derive these
+fields; the HTML renderer consumes the same helper rather than owning a
+separate delta implementation.
+The baseline record has no comparison target, so all baseline-relative and
+previous-relative fields are null rather than describing a self-comparison.
+Evidence-version bumps must evolve the state marker and nested summary schema
+together; an older audit fails closed on an unsupported declared version.
+
 ## Decision after commit
 
 Run the audit and follow only its state-aware next action:

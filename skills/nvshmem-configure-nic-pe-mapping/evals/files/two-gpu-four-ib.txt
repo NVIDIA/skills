@@ -1,0 +1,23 @@
+[gpu-pci]
+0, 00000000:01:00.0, NVIDIA H100
+1, 00000000:81:00.0, NVIDIA H100
+[gpu-nic-topology]
+        GPU0 GPU1 NIC0 NIC1 NIC2 NIC3
+GPU0    X    SYS  PIX  PXB  SYS  SYS
+GPU1    SYS  X    SYS  SYS  PIX  PXB
+NIC0    PIX  SYS  X    PXB  SYS  SYS
+NIC1    PXB  SYS  PXB  X    SYS  SYS
+NIC2    SYS  PIX  SYS  SYS  X    PXB
+NIC3    SYS  PXB  SYS  SYS  PXB  X
+NIC Legend:
+NIC0: mlx5_0
+NIC1: mlx5_1
+NIC2: mlx5_2
+NIC3: mlx5_3
+[rdma-ports]
+hca=mlx5_0 port=1 pci=0000:41:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib0
+hca=mlx5_1 port=1 pci=0000:42:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib1
+hca=mlx5_2 port=1 pci=0000:c1:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib2
+hca=mlx5_3 port=1 pci=0000:c2:00.0 state=4:_ACTIVE active=yes link_layer=InfiniBand netdev=ib3
+[diagnostics]
+status=complete

@@ -46,12 +46,6 @@ RUN_SPEC_NAMES = (
     "mining_spec.yaml",
     "approval.json",
 )
-PINNED_IMAGES = {
-    "pyt": "nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt",  # versions-key: images.tao_toolkit.deft_pas_pyt
-    "ds": "nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services",  # versions-key: images.tao_toolkit.deft_pas_data_services
-}
-
-
 def _atomic_json(path: pathlib.Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(
@@ -463,10 +457,8 @@ def run(args: argparse.Namespace) -> tuple[pathlib.Path, pathlib.Path, int]:
         raise ValueError("state.config must be an object")
     image_key = "pyt_image" if args.image == "pyt" else "ds_image"
     image = str(config.get(image_key, "")).strip()
-    if image != PINNED_IMAGES[args.image]:
-        raise ValueError(
-            f"state.config.{image_key} must be the pinned {args.image} image"
-        )
+    if not image:
+        raise ValueError(f"state.config.{image_key} must be a non-empty approved image")
     workspace, dataset_root, config_dir = _validated_runtime_paths(
         results_dir, config
     )

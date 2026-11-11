@@ -1,0 +1,1 @@
+Write and run a CPU float64 example for cuequivariance_torch.Linear mapping SO3 '2x0 + 3x1' to '3x0 + 2x1'. Compare mul_ir and ir_mul layouts using identical explicit weights and nonconstant features. Verify equivalence after correct per-block transposes, then check a nonzero rotation and gradients with respect to features and weights.

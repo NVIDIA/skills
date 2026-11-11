@@ -1,0 +1,74 @@
+{
+  "skill_name": "cuequivariance-torch",
+  "evals": [
+    {
+      "expected_skill": "cuequivariance-torch",
+      "id": "torch-001",
+      "prompt": "On CPU, use cuequivariance_torch.SphericalHarmonics for l=0,1,2 with normalize=False. Write and run a deterministic float64 example comparing it to the core NumPy descriptor, then run torch.autograd.gradcheck on nonzero input vectors. Do not install CUDA kernels.",
+      "expected_output": "Naive CPU spherical harmonics with dimension 9, a matching NumPy reference, and passing double-precision gradcheck.",
+      "assertions": [
+        "It explicitly selects method='naive' and uses CPU float64 inputs with requires_grad=True.",
+        "It uses normalize=False consistently with the raw NumPy polynomial reference and checks output shape (batch,9).",
+        "It actually runs the NumPy comparison and torch.autograd.gradcheck, reporting the outcome.",
+        "It does not invoke a CUDA backend or silently skip the gradient check."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-torch",
+      "id": "torch-002",
+      "prompt": "Write and run a CPU float64 example for cuequivariance_torch.Linear mapping SO3 '2x0 + 3x1' to '3x0 + 2x1'. Compare mul_ir and ir_mul layouts using identical explicit weights and nonconstant features. Verify equivalence after correct per-block transposes, then check a nonzero rotation and gradients with respect to features and weights.",
+      "expected_output": "Two layout-consistent naive Linear computations with passing equivariance and autograd checks.",
+      "assertions": [
+        "It uses method='naive', internal_weights=False, and consistent shared weights and dtype/device for both modules.",
+        "It converts layouts blockwise by swapping multiplicity and irrep axes, rather than only reshaping the full array.",
+        "It compares the two outputs after converting to the same layout and executes a nontrivial rotation check.",
+        "It computes finite, nonzero input and weight gradients from a nonconstant scalar loss."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-torch",
+      "id": "torch-003",
+      "prompt": "Use cuequivariance_torch.ChannelWiseTensorProduct on CPU for SO3 '2x0 + 2x1' and '0 + 1', filtered to l=0,1. I need different externally supplied weights for each batch item. Write and run a float64 example against the equivalent dense NumPy descriptor and demonstrate gradients through both features and weights.",
+      "expected_output": "A naive CPU channelwise module with external unshared weights, correct layouts and a passing numerical reference comparison.",
+      "assertions": [
+        "It sets shared_weights=False and internal_weights=False, uses method='naive', and obtains the per-example weight dimension from weight_numel.",
+        "The weight array has a batch axis with distinct weights per item, and module layout agrees with the NumPy descriptor or is explicitly converted.",
+        "It preserves actual output order and explains that filter_irreps_out filters types rather than setting multiplicities.",
+        "It executes a NumPy reference comparison and checks finite, nonzero gradients for both feature operands and the external weights."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-torch",
+      "id": "torch-004",
+      "prompt": "On CPU, use cuequivariance_torch.SegmentedPolynomial for a linear descriptor from SO3 '2x0' to '3x0'. With four source nodes and five edges, gather features using senders=[0,1,0,3,1] and scatter outputs to receivers=[2,0,2,1,2] into four destination nodes. Write and run a float64 example, compare against explicit gather plus index_add_, and compare feature and weight gradients. A destination with no edges must stay zero.",
+      "expected_output": "A correct naive gather/scatter call with repeated destinations summed, an explicit reference, and matching gradients.",
+      "assertions": [
+        "It indexes the feature operand with input_indices and output operand with output_indices, using integer index tensors.",
+        "It supplies output_shapes in the tensor-based form expected by this API to establish four destination rows.",
+        "The reference uses index_add_ or equivalent summation, so repeated receiver 2 accumulates all three edges and destination 3 remains zero.",
+        "It executes forward and gradient comparisons against the explicit reference for both features and weights."
+      ]
+    },
+    {
+      "expected_skill": "cuequivariance-torch",
+      "id": "torch-005",
+      "prompt": "I copied a cuEquivariance PyTorch example using FullyConnectedTensorProduct and SphericalHarmonics onto a CPU-only laptop and it tries to load CUDA kernels. Explain the backend choice and write and run a small supported CPU tensor-product example. Keep my CPU PyTorch installation.",
+      "expected_output": "Explicit naive backend selection and a working CPU example with truthful CUDA limitations.",
+      "assertions": [
+        "It explains that some high-level defaults select CUDA and explicitly passes method='naive' for CPU execution.",
+        "The example defines valid irreps, shapes, device and dtype, runs forward, and checks backward on CPU.",
+        "It does not promise that fused_tp, uniform_1d, or indexed_linear run on CPU, nor replace the CPU installation with a CUDA stack."
+      ]
+    },
+    {
+      "expected_skill": null,
+      "id": "torch-006",
+      "prompt": "Explain the difference between git merge and git rebase for a feature branch. I am not asking about numerical code.",
+      "expected_output": "A direct explanation of Git workflows without invoking cuEquivariance.",
+      "assertions": [
+        "It explains the Git operations and their history implications.",
+        "It does not import, install, or invoke PyTorch or cuEquivariance."
+      ]
+    }
+  ]
+}

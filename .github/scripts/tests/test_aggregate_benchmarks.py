@@ -19,9 +19,11 @@ belong in a published report, so the parser no longer looks for it.
 value that v3 turned into template prose. These tests pin both decisions.
 """
 
+import json
 import sys
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -30,6 +32,192 @@ import aggregate_benchmarks as agg  # noqa: E402
 FIXTURES = Path(__file__).parent / "fixtures"
 V2 = FIXTURES / "v2_cuopt_developer.md"
 V3 = FIXTURES / "v3_nemotron_speech.md"
+SELF_ASSESSED = FIXTURES / "self_assessed_daqiri.md"
+
+
+class TestSelfAssessedReports(unittest.TestCase):
+    """A reported PASS needs the publication and execution checks as well."""
+
+    def setUp(self):
+        self.tmp = TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.path = self.root / "skills" / "daqiri-onboarding" / "BENCHMARK.md"
+        self.path.parent.mkdir(parents=True)
+        self.report = SELF_ASSESSED.read_text(encoding="utf-8")
+
+    def parse(self, report):
+        self.path.write_text(report, encoding="utf-8")
+        return agg.parse_benchmark(self.path)
+
+    def test_eligible_report_retains_scores_and_zero_uplift(self):
+        entry = self.parse(self.report)
+        self.assertEqual(entry["verdict"], "PASS")
+        self.assertEqual(entry["skill"], "daqiri-onboarding")
+        self.assertEqual(len(entry["results"]), 4)
+        self.assertEqual(entry["results"][0]["agents"]["codex"],
+                         {"score_pct": 100.0, "uplift_pct": 0.0})
+        self.assertEqual(self.path.read_text(encoding="utf-8"), self.report)
+
+    def test_aggregation_uses_the_same_verdict(self):
+        self.parse(self.report)
+        data = json.loads(agg.generate(self.root))
+        self.assertEqual(data["skills"][0]["verdict"], "PASS")
+        self.assertEqual(data["skills"][0]["evaluation_source"], "self-assessed")
+        self.assertTrue(data["skills"][0]["has_results"])
+        self.assertEqual(data["skills"][0]["average_uplift_pct"], 0.0)
+        self.assertEqual(data["result_row_count"], 8)
+
+    def test_non_passing_producer_verdicts_are_preserved(self):
+        for verdict in ("FAIL", "NEUTRAL"):
+            with self.subTest(verdict=verdict):
+                entry = self.parse(self.report.replace(
+                    "Reported evaluation verdict: PASS", f"Reported evaluation verdict: {verdict}"))
+                self.assertEqual(entry["verdict"], verdict)
+
+    def test_missing_invalid_or_conflicting_summary_fields_do_not_pass(self):
+        replacements = [
+            ("Publication eligible", "Publication blocked"),
+            ("Publication eligible", "Publication not assessed"),
+            ("Publication eligible", "Publication unknown"),
+            ("> **Publication eligible**", ""),
+            ("> **Publication eligible**", "> **Publication eligible**\n> **Publication blocked**"),
+            ("Evaluation source: self-assessed", "Evaluation source: unknown"),
+            ("Quality assessment: SELF-ASSESSED", "Quality assessment: FAILED"),
+            ("Reported execution: completed", "Reported execution: failed"),
+            ("Reported execution: completed", "Reported execution: incomplete"),
+            ("Reported execution: completed", "Reported execution: cancelled"),
+            ("Reported evaluation verdict: PASS", "Reported evaluation verdict: NOT RECORDED"),
+            ("Reported evaluation verdict: PASS", "Reported evaluation verdict: PASS only when ..."),
+            ("## Publication Recommendation", "## Example"),
+            ("## Evaluation Metadata", "## Example Metadata"),
+        ]
+        for field in ("Evaluation source: self-assessed", "Quality assessment: SELF-ASSESSED",
+                      "Reported execution: completed", "Reported evaluation verdict: PASS"):
+            replacements.extend([
+                (f"- {field}\n", ""),
+                (f"- {field}", f"- {field}\n- {field}"),
+                (f"- {field}", f"- {field}\n- {field.split(':')[0]}: unknown"),
+            ])
+        for old, new in replacements:
+            with self.subTest(old=old, new=new):
+                self.assertNotEqual(self.parse(self.report.replace(old, new))["verdict"], "PASS")
+
+    def test_execution_errors_block_an_otherwise_eligible_report(self):
+        report = self.report.replace("## Evaluation Metadata",
+                                     "**Reported execution errors:**\n\n- timed out\n\n## Evaluation Metadata")
+        self.assertNotEqual(self.parse(report)["verdict"], "PASS")
+
+    def test_example_and_methodology_text_cannot_supply_a_missing_summary(self):
+        intro, body = self.report.split("## Evaluation Metadata", 1)
+        for wrapper in ("```markdown\n{}\n```", "~~~markdown\n{}\n~~~", "<!--\n{}\n-->"):
+            with self.subTest(wrapper=wrapper):
+                report = wrapper.format(intro) + "\n## Evaluation Metadata" + body
+                self.assertNotEqual(self.parse(report)["verdict"], "PASS")
+        report = "# Skill Benchmark: daqiri-onboarding\n\n## Evaluation Metadata" + body
+        report += "\n## Scoring Methodology\n" + intro
+        self.assertNotEqual(self.parse(report)["verdict"], "PASS")
+
+    def test_explicit_non_passing_overall_verdict_is_not_overridden(self):
+        for verdict in ("FAIL", "INCOMPLETE", "NEUTRAL"):
+            for section in ("Publication Recommendation", "Evaluation Metadata", "Scoring Methodology"):
+                with self.subTest(verdict=verdict, section=section):
+                    report = self.report.replace(f"## {section}",
+                                                 f"## {section}\n\n- Overall verdict: {verdict}")
+                    self.assertEqual(self.parse(report)["verdict"], verdict)
+
+    def test_mixed_verdict_layouts_cannot_hide_a_later_failure(self):
+        report = self.report.replace("## Evaluation Metadata",
+                                    "## Evaluation Metadata\n\n- Overall verdict: PASS\n- Overall verdict: FAIL")
+        self.assertNotEqual(self.parse(report)["verdict"], "PASS")
+
+    def test_conflicting_overall_pass_cannot_hide_blocked_publication(self):
+        report = self.report.replace("Publication eligible", "Publication blocked")
+        report = report.replace("## Publication Recommendation",
+                                "> **Overall verdict: PASS**\n\n## Publication Recommendation")
+        self.assertNotEqual(self.parse(report)["verdict"], "PASS")
+
+
+class TestEvaluationSource(unittest.TestCase):
+    """Source describes who evaluated, independently of whether it passed."""
+
+    def parse(self, report):
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "BENCHMARK.md"
+            path.write_text(report, encoding="utf-8")
+            return agg.parse_benchmark(path)
+
+    def test_self_assessed_source_survives_non_passing_reports(self):
+        report = SELF_ASSESSED.read_text(encoding="utf-8")
+        for old, new in (("Publication eligible", "Publication blocked"),
+                         ("Publication eligible", "Publication not assessed"),
+                         ("Quality assessment: SELF-ASSESSED", "Quality assessment: FAILED"),
+                         ("Reported execution: completed", "Reported execution: failed"),
+                         ("Reported evaluation verdict: PASS", "Reported evaluation verdict: FAIL")):
+            with self.subTest(new=new):
+                entry = self.parse(report.replace(old, new))
+                self.assertEqual(entry["evaluation_source"], "self-assessed")
+                self.assertNotEqual(entry["verdict"], "PASS")
+
+    def test_explicit_source_is_read_from_each_report_summary_layout(self):
+        for fixture, heading in ((V2, "## Evaluation Summary"),
+                                 (V3, "## Evaluation Metadata"),
+                                 (V3, "## Publication Recommendation")):
+            for source in ("ci", "self-assessed"):
+                for value in (source, f"`{source}`"):
+                    with self.subTest(fixture=fixture, heading=heading, value=value):
+                        report = fixture.read_text(encoding="utf-8").replace(
+                            heading, f"{heading}\n\n- Evaluation source: {value}")
+                        entry = self.parse(report)
+                        self.assertEqual(entry["evaluation_source"], source)
+                        self.assertEqual(entry["verdict"], "PASS")
+
+    def test_legacy_reports_do_not_infer_ci_from_environment_or_tier_status(self):
+        for fixture in (V2, V3):
+            with self.subTest(fixture=fixture):
+                self.assertIsNone(agg.parse_benchmark(fixture)["evaluation_source"])
+
+    def test_unknown_malformed_and_duplicate_sources_stay_unknown(self):
+        for lines in ("- Evaluation source: unknown", "- Evaluation source:",
+                      "- Evaluation source: ci only when approved", "- Evaluation source: `ci",
+                      "- Evaluation source: ci`", "- Evaluation source: CI",
+                      "- Evaluation source: ci\n- Evaluation source: ci",
+                      "- Evaluation source: ci\n- Evaluation source: self-assessed"):
+            with self.subTest(lines=lines):
+                report = V3.read_text(encoding="utf-8").replace(
+                    "## Evaluation Metadata", f"## Evaluation Metadata\n\n{lines}")
+                self.assertIsNone(self.parse(report)["evaluation_source"])
+
+    def test_conflicting_sources_across_summary_sections_stay_unknown(self):
+        report = SELF_ASSESSED.read_text(encoding="utf-8").replace(
+            "## Evaluation Metadata", "## Evaluation Metadata\n\n- Evaluation source: ci")
+        self.assertIsNone(self.parse(report)["evaluation_source"])
+
+    def test_body_examples_do_not_supply_or_override_source(self):
+        example = "\n## Examples\n\n## Evaluation Metadata\n\n- Evaluation source: ci\n"
+        for fixture, expected in ((V3, None), (SELF_ASSESSED, "self-assessed")):
+            with self.subTest(fixture=fixture):
+                entry = self.parse(fixture.read_text(encoding="utf-8") + example)
+                self.assertEqual(entry["evaluation_source"], expected)
+
+    def test_fenced_commented_and_quoted_fields_do_not_supply_source(self):
+        field = "- Evaluation source: ci"
+        examples = (f"```markdown\n{field}\n```", f"~~~markdown\n{field}\n~~~",
+                    f"<!--\n{field}\n-->", f"> {field}",
+                    f"Metadata <!--\n{field}\n-->", f"    {field}",
+                    f"### Example\n{field}", f"```markdown\n## Evaluation Metadata\n{field}\n```")
+        for example in examples:
+            with self.subTest(example=example):
+                report = V3.read_text(encoding="utf-8").replace(
+                    "## Evaluation Metadata", f"## Evaluation Metadata\n\n{example}")
+                self.assertIsNone(self.parse(report)["evaluation_source"])
+
+    def test_indented_heading_does_not_establish_a_summary(self):
+        for indent in ("    ", "\t"):
+            with self.subTest(indent=indent):
+                report = (f"# Skill Benchmark: sample\n\n{indent}## Evaluation Metadata\n\n"
+                          "- Evaluation source: ci\n")
+                self.assertIsNone(self.parse(report)["evaluation_source"])
 
 
 class TestV3ProvenanceFields(unittest.TestCase):

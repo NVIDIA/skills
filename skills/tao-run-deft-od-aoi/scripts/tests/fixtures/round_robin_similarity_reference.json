@@ -1,0 +1,26 @@
+{
+  "policy": {"retrieval": {"minimum_similarity": -1.0, "candidate_overfetch": 2}},
+  "ledger": ["/pool/excluded.png"],
+  "source_metadata": {
+    "q-a": ["dataset-a", "texture-a", "scratch"],
+    "q-b": ["dataset-b", "texture-b", "bridge"]
+  },
+  "candidates": [
+    {"candidate_id": "c-1", "source_filepath": "/pool/one.png", "embedding": [1.0, 0.0]},
+    {"candidate_id": "c-1-duplicate", "source_filepath": "/pool/one.png", "embedding": [0.99, 0.1]},
+    {"candidate_id": "c-2", "source_filepath": "/pool/two.png", "embedding": [0.8, 0.6]},
+    {"candidate_id": "c-3", "source_filepath": "/pool/three.png", "embedding": [0.0, 1.0]},
+    {"candidate_id": "c-4", "source_filepath": "/pool/four.png", "embedding": [0.6, 0.8]},
+    {"candidate_id": "excluded", "source_filepath": "/pool/excluded.png", "embedding": [1.0, 0.0]}
+  ],
+  "queries": [
+    {"query_id": "q-a", "embedding": [1.0, 0.0]},
+    {"query_id": "q-b", "embedding": [0.0, 1.0]}
+  ],
+  "reference_semantic_selection": [
+    ["q-a", "c-1", "/pool/one.png"],
+    ["q-b", "c-3", "/pool/three.png"],
+    ["q-a", "c-2", "/pool/two.png"],
+    ["q-b", "c-4", "/pool/four.png"]
+  ]
+}

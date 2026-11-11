@@ -1,0 +1,31 @@
+# Generated from evals/evals.json and evals/setup_cpu.sh; do not edit.
+[dataset]
+name = "nvidia/skillevaluator"
+description = "SkillEvaluator skill evaluation dataset"
+
+[[tasks]]
+name = "nvidia/comp-01"
+
+[[tasks]]
+name = "nvidia/imp-01"
+
+[[tasks]]
+name = "nvidia/imp-02"
+
+[[tasks]]
+name = "nvidia/model-01"
+
+[[tasks]]
+name = "nvidia/neg-01"
+
+[[tasks]]
+name = "nvidia/neg-03"
+
+[[tasks]]
+name = "nvidia/scope-01"
+
+[[tasks]]
+name = "nvidia/scope-02"
+
+[[tasks]]
+name = "nvidia/scope-03"

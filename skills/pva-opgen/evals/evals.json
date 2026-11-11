@@ -1,0 +1,65 @@
+{
+  "skill_name": "pva-opgen",
+  "evals": [
+    {
+      "id": "opgen-missing-handoff",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use pva-opgen to generate a GEN2 PVA matrix multiplication operator for SDK 2.10.0~rc3. The required Spec handoff has not been created. Work directory: /workspace/opgen-missing. Maximum Debug invocations: 0. Do not run Spec or Doctor, create a replacement handoff, or ask questions. Report why generation cannot proceed.",
+      "expected_skill": "pva-opgen",
+      "expected_script": null,
+      "expected_output": "BLOCKED because there is no finalized Spec handoff. No operator source, build result, or test result is produced.",
+      "assertions": [
+        "Reports the missing finalized Spec handoff as a blocker.",
+        "Does not generate source or fabricate a handoff.",
+        "Does not invoke Spec, Doctor, or Debug.",
+        "Does not claim build or test success.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": []
+    },
+    {
+      "id": "opgen-invalid-handoff",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Implement the PVA operator described by /workspace/input/invalid/opgen-inputs.json. Work directory: /workspace/opgen-invalid. Use SDK 2.10.0~rc3 and GEN2 with no automatic Debug calls. This file is the only supplied handoff. Validate it before source changes. Do not repair Spec-owned inputs or ask interactive questions.",
+      "expected_skill": "pva-opgen",
+      "expected_script": "scripts/finalize_opgen_inputs.py",
+      "expected_output": "BLOCKED because the handoff has an unsupported schema and lacks required finalized input records. No operator implementation is started.",
+      "assertions": [
+        "Runs the bundled handoff validator before any source generation.",
+        "Reports the invalid or unsupported handoff structure.",
+        "Leaves the supplied handoff unchanged.",
+        "Does not generate source or invoke Build-Test or Debug.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/invalid"
+      ]
+    },
+    {
+      "id": "opgen-nonfinite-handoff",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use pva-opgen with /workspace/input/nonfinite/opgen-inputs.json and /workspace/opgen-nonfinite as the work directory. Target SDK is 2.10.0~rc3, GEN2; automatic Debug is disabled. Check the handoff before any work. Preserve the original input, do not repair its contents, and do not ask questions.",
+      "expected_skill": "pva-opgen",
+      "expected_script": "scripts/finalize_opgen_inputs.py",
+      "expected_output": "BLOCKED because the supplied handoff contains a non-finite JSON number. No source changes or builds occur.",
+      "assertions": [
+        "Runs the bundled handoff validator and rejects the NaN token.",
+        "Does not replace NaN, change schema fields, or rewrite the input.",
+        "Does not generate source or claim successful validation.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/nonfinite"
+      ]
+    },
+    {
+      "id": "opgen-negative",
+      "prompt": "Explain the difference between a CPU and a vector processor in plain language. Do not implement, compile, or test an operator.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "A conceptual explanation without starting operator generation.",
+      "assertions": [
+        "Explains the requested distinction.",
+        "Does not invoke pva-opgen or create operator files."
+      ],
+      "files": []
+    }
+  ]
+}

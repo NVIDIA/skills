@@ -52,7 +52,7 @@ AutoML is not packaged for this model skill. Always use direct `video_clip` acti
 Use the pinned TAO container declared in `references/skill_info.yaml`. Pull with `NGC_KEY` when the image is not cached locally.
 
 ```bash
-VIDEO_CLIP_IMAGE_DEFAULT="nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt"  # versions-key: images.tao_toolkit.pyt
+VIDEO_CLIP_IMAGE_DEFAULT="nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt"  # versions-key: images.tao_toolkit.pyt
 VIDEO_CLIP_IMAGE="${VIDEO_CLIP_IMAGE:-$VIDEO_CLIP_IMAGE_DEFAULT}"
 docker pull "$VIDEO_CLIP_IMAGE"
 ```
@@ -84,7 +84,7 @@ workspace/
 Docker options for all actions (skill-eval CI uses the same `$WORKSPACE_DIR` bind-mount pattern):
 
 ```bash
-VIDEO_CLIP_IMAGE_DEFAULT="nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt"  # versions-key: images.tao_toolkit.pyt
+VIDEO_CLIP_IMAGE_DEFAULT="nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt"  # versions-key: images.tao_toolkit.pyt
 VIDEO_CLIP_IMAGE="${VIDEO_CLIP_IMAGE:-$VIDEO_CLIP_IMAGE_DEFAULT}"
 RUN_ROOT="${RUN_ROOT:-$PWD}"
 DOCKER_COMMON=(
@@ -153,7 +153,7 @@ docker run "${DOCKER_COMMON[@]}" "$VIDEO_CLIP_IMAGE" \
 Use the independently pinned TAO Deploy image after PyTorch export. Read `references/tao-deploy-video-clip.md` before running the deploy actions; its templates cover the engine build, retrieval evaluation, and embedding inference contracts.
 
 ```bash
-VIDEO_CLIP_DEPLOY_IMAGE_DEFAULT="nvcr.io/nvidia/tao/tao-toolkit:7.2.0-deploy"  # versions-key: images.tao_toolkit.deploy
+VIDEO_CLIP_DEPLOY_IMAGE_DEFAULT="nvcr.io/nvidia/tao/tao-toolkit:7.3.0-deploy"  # versions-key: images.tao_toolkit.deploy
 VIDEO_CLIP_DEPLOY_IMAGE="${VIDEO_CLIP_DEPLOY_IMAGE:-$VIDEO_CLIP_DEPLOY_IMAGE_DEFAULT}"
 
 # Verify the independently pinned image before staging artifacts or using a GPU.

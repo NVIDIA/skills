@@ -15,7 +15,7 @@ comparable — the mAP trend the loop exists to produce becomes meaningless.
 The encoder is the sharpest case. ``embedding_model_path`` must stay identical
 to the one that produced the source-pool parquet for the whole run; a mismatch
 does not raise, it just returns confidently wrong neighbours. Pre-Flight
-resolves it once (check 9) and this file pins it.
+resolves it once (check 10) and this file pins it.
 
 Refuses to overwrite an existing ``deft_state.json`` without ``--force``, which
 is the guard against clobbering a live run: state and log are the loop's only
@@ -45,6 +45,7 @@ from deft_stages import (  # noqa: E402
     write_log_atomic,
     write_state_atomic,
 )
+from render_report import REPORT_NAME, render as render_loop_report  # noqa: E402
 
 ALLOCATION_POLICIES = ("global", "class_stratified")
 # The encoder families the embedding stage accepts. Kept in step with
@@ -138,7 +139,9 @@ def _build_parser() -> argparse.ArgumentParser:
                         help="Source-pool ODVG directory (*.jsonl keyed by file_name).")
     parser.add_argument("--pool-report", default=None,
                         help="validate_pool_coco.py's report from the prep run. Cross-checks that "
-                             "the pool was prepared for these target classes.")
+                             "the pool was prepared for these target classes. Required for a "
+                             "pool that already exists, under every allocation policy; omit "
+                             "it only when prep will build the pool.")
 
     # Only consulted when the pool above does not exist yet, in which case `prep`
     # builds it before the baseline and all three are required.
@@ -485,6 +488,23 @@ def main() -> int:
             "--source-detection-file": args.source_detection_file,
             "--target-detection-file": args.target_detection_file,
         }
+        if not args.pool_report:
+            # pool_report.json is the only artifact that cross-checks the prepared pool
+            # against the requested classes, and the guards above that use it apply
+            # under every allocation policy -- a pool holding none of a target class
+            # mines real neighbours of the wrong ones whichever way the budget is split.
+            # It is also prep's own output, so demanding it on a run that still has to
+            # prep would make init and prep each other's precondition -- the same
+            # deadlock --source-detection-file had. Required once the pool exists.
+            message = (
+                "--pool-report is required: it is the only check that the prepared pool "
+                "holds this run's target classes (validate_pool_coco.py writes it in "
+                "seconds from the pool's coco.json; --pool-dir picks it up automatically "
+                "when it sits beside the pool)")
+            if missing_pool and not absent_inputs:
+                warnings.append(f"{message} — `prep` runs first and produces it")
+            else:
+                errors.append(message)
         if args.allocation_policy == "class_stratified":
             if not rare_classes:
                 # Which classes are rare is a property of the pool's annotation
@@ -500,20 +520,6 @@ def main() -> int:
                         f"{message} — left unset; `commit_stage.py --stage prep` derives it "
                         "from the pool's own class counts once prep has produced "
                         "pool_report.json")
-                else:
-                    errors.append(message)
-            if not args.pool_report:
-                # pool_report.json is the only artifact that cross-checks the prepared
-                # pool against the requested classes. It is also prep's own output, so
-                # demanding it on a run that still has to prep would make init and prep
-                # each other's precondition — the same deadlock --source-detection-file
-                # had. Required only when the pool already exists.
-                message = (
-                    "--allocation-policy class_stratified needs --pool-report "
-                    "(validate_pool_coco.py writes it; --pool-dir picks it up "
-                    "automatically when it sits beside the pool)")
-                if missing_pool and not absent_inputs:
-                    warnings.append(f"{message} — `prep` runs first and produces it")
                 else:
                     errors.append(message)
             for flag, raw in detection_files.items():
@@ -567,6 +573,36 @@ def main() -> int:
             warnings.append(
                 f"--embedding-model-path {model_path!r} is a HuggingFace id, not a local snapshot; "
                 "HF_TOKEN and outbound access are required on every iteration")
+
+        # Mining compares the pool's vectors with each iteration's weak-image vectors by
+        # distance, which only means anything within one encoder's space. A pool built
+        # with a different encoder either crashes mining (a different dimension) or,
+        # worse, returns confident nearest neighbours that are noise (the same one).
+        # The pool report is the only record of which encoder built the pool.
+        if isinstance(pool_provenance, dict) and pool_provenance:
+            def _as_encoder_path(value: str) -> str:
+                text = str(value)
+                local = text.startswith(("/", "~", ".")) or Path(text).exists()
+                return str(_abs(text)) if local else text
+
+            pool_encoder = pool_provenance.get("embedding_model_path")
+            pool_family = pool_provenance.get("embedding_model")
+            if pool_encoder is None:
+                warnings.append(
+                    "--pool-report records no embedding_model_path, so nothing can check "
+                    "that this run's encoder is the one that built the pool. Re-run "
+                    "validate_pool_coco.py with --record embedding_model_path=<encoder> "
+                    "to make it checkable")
+            elif _as_encoder_path(pool_encoder) != model_path:
+                errors.append(
+                    f"the pool was embedded with {pool_encoder} but this run's encoder is "
+                    f"{model_path}. Mining compares the two sets of vectors by distance, "
+                    f"which is meaningless across encoders; use the pool's encoder, or "
+                    f"re-embed the pool with this one")
+            if pool_family is not None and str(pool_family) != args.embedding_model:
+                errors.append(
+                    f"the pool was embedded with the {pool_family} family but this run "
+                    f"uses {args.embedding_model}; the two must match")
 
         if errors:
             raise ValueError("invalid run configuration:\n  - " + "\n  - ".join(errors))
@@ -633,13 +669,20 @@ def main() -> int:
             raise FileExistsError(
                 f"refusing to clobber an existing run: {', '.join(p.name for p in live)} already "
                 f"present in {results_dir}. Resume it with audit_deft_run.py, or pass --force to "
-                "reinitialize (the current state and log are archived as *.bak.<UTC stamp>).")
+                "reinitialize (the current state, log and report are archived as *.bak.<UTC stamp>).")
 
         now = datetime.datetime.now(datetime.timezone.utc)
         stamp = now.strftime("%Y%m%dT%H%M%SZ")
         results_dir.mkdir(parents=True, exist_ok=True)
 
         archived = [p for p in (_archive(f, stamp) for f in live) if p is not None]
+        # The previous run's report goes with its state and log. The render below
+        # writes a fresh one in its place, and the old report cannot be rebuilt from
+        # the archived pair -- render_report.py reads the live files.
+        if live:
+            report = _archive(results_dir / REPORT_NAME, stamp)
+            if report is not None:
+                archived.append(report)
         # A leftover commit journal describes the run being archived, not this one.
         (results_dir / COMMIT_JOURNAL_NAME).unlink(missing_ok=True)
         # Empty log first: a crash between the two writes leaves no state, so init is
@@ -694,6 +737,16 @@ def main() -> int:
             "status": "running",
         }
         write_state_atomic(results_dir, state)
+
+        # An empty report from the first moment, so the file a reader is told to open
+        # exists before any stage has run and every later commit refreshes it in place.
+        # Initialization is not blocked by a presentation failure.
+        try:
+            render_loop_report(results_dir)
+        except Exception as exc:  # noqa: BLE001 - presentation is not transactional
+            warnings.append(f"the initial loop report was not rendered "
+                            f"({type(exc).__name__}: {exc}); commit_stage.py will "
+                            "re-render it at the first commit")
 
         for warning in warnings:
             print(f"WARNING: {warning}", file=sys.stderr)

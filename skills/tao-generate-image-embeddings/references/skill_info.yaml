@@ -1,8 +1,8 @@
 network_arch: tao-generate-image-embeddings
 type: data
-container_image: nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services  # versions-key: images.tao_toolkit.data_services
+container_image: nvcr.io/nvidia/tao/tao-toolkit:7.3.0-data-services  # versions-key: images.tao_toolkit.data_services
 gpu_spec_key: null
-required_credentials: [NGC_KEY]   # the pinned image is nvstaging/*, which is not public
+required_credentials: []
 actions:
   image_embeddings:
     command: embedding image_embeddings -e {config_path}

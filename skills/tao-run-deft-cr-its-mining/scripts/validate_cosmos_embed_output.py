@@ -68,6 +68,8 @@ def spec_context(spec_path: Path) -> dict[str, Any]:
     if not results_dir.is_absolute():
         raise ValueError(f"{spec_path}: results_dir must be absolute: {results_dir}")
     inference_dir = results_dir / "inference"
+    if (results_dir / "batch-cancellation.json").exists():
+        raise ValueError("Batch wrapper was canceled; outputs cannot be promoted to completion")
     return {
         "spec_path": spec_path,
         "spec_sha256": file_sha256(spec_path),

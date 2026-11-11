@@ -1,0 +1,109 @@
+# fastgen/methods/common_loss.py:13-27
+def mean_with_loss_scale(
+    elementwise_loss: torch.Tensor,
+    loss_scale: Optional[torch.Tensor],
+) -> torch.Tensor:
+    """Scale each sample's mean loss, then average over the original batch."""
+    if loss_scale is None:
+        return elementwise_loss.mean()
+    assert elementwise_loss.ndim > 0, "A per-sample loss scale cannot be applied to a scalar loss."
+    assert_same(shape=(elementwise_loss.shape[0],), device=elementwise_loss.device, loss_scale=loss_scale)
+
+    non_batch_dims = tuple(range(1, elementwise_loss.ndim))
+    per_sample_loss = elementwise_loss.mean(dim=non_batch_dims) if non_batch_dims else elementwise_loss
+    # Per sample, so in the widest dtype, also that of a time-dependent scale.
+    per_sample_loss, loss_scale = to_high_precision(per_sample_loss, loss_scale)
+    return (per_sample_loss * loss_scale).mean()
+
+
+# fastgen/methods/common_loss.py:30-42
+def mse_loss(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    loss_scale: Optional[torch.Tensor] = None,
+) -> torch.Tensor:
+    """Mean squared error with an optional multiplicative scale per sample."""
+    # Dtypes may differ, but shapes must not: broadcasting would silently change the loss.
+    assert_same(shape=True, device=True, prediction=prediction, target=target)
+    prediction, target = to_high_precision(prediction, target)
+    if loss_scale is None:
+        return F.mse_loss(prediction, target, reduction="mean")
+    squared_error = (prediction - target).square()
+    return mean_with_loss_scale(squared_error, loss_scale)
+
+
+# fastgen/methods/common_loss.py:45-80
+def flow_matching_target(
+    pred_type: str,
+    x0: Optional[torch.Tensor] = None,
+    eps: Optional[torch.Tensor] = None,
+    noise_scheduler: Optional[BaseNoiseSchedule] = None,
+    t: Optional[torch.Tensor] = None,
+) -> torch.Tensor:
+    """The flow matching target of a ``pred_type`` prediction at ``x_t = alpha_t * x_0 + sigma_t * eps``.
+
+    ``x0`` and ``eps`` are returned as given; the v and flow targets are computed in high precision.
+
+    Args:
+        pred_type (str): Prediction type: 'x0', 'eps', 'v', 'flow'.
+        x0 (torch.Tensor): The clean data x_0.
+        eps (torch.Tensor): The epsilon used to compute noised data.
+        noise_scheduler (BaseNoiseSchedule): Noise scheduler (required for pred_types 'v' and 'flow').
+        t (torch.Tensor): The diffusion timestep (required for pred_types 'v' and 'flow').
+
+    Raises:
+        NotImplementedError: If an unknown pred_type is used.
+    """
+    if pred_type == "x0":
+        assert x0 is not None, "x0 cannot be None"
+        return x0
+    if pred_type == "eps":
+        assert eps is not None, "eps cannot be None"
+        return eps
+    if pred_type == "v":
+        assert x0 is not None and eps is not None and t is not None, "x0, eps, t should not be None"
+        assert noise_scheduler is not None, "v target needs the noise_scheduler"
+        return noise_scheduler.cond_v(x0, eps, t, output_dtype=None)
+    if pred_type == "flow":
+        assert x0 is not None and eps is not None and t is not None, "x0, eps, t cannot be None"
+        assert noise_scheduler is not None, "flow target needs the noise_scheduler"
+        return noise_scheduler.cond_velocity(x0, eps, t, output_dtype=None)
+    raise NotImplementedError(f"Unknown prediction type {pred_type}")
+
+
+# fastgen/methods/common_loss.py:83-117
+def flow_matching_loss(
+    net_pred: torch.Tensor,
+    pred_type: str,
+    x0: Optional[torch.Tensor] = None,
+    eps: Optional[torch.Tensor] = None,
+    noise_scheduler: Optional[BaseNoiseSchedule] = None,
+    t: Optional[torch.Tensor] = None,
+    loss_scale: Optional[torch.Tensor] = None,
+) -> torch.Tensor:
+    """Compute the flow matching objective.
+        Forward process:
+            x_t = alpha_t * x_0 + sigma_t * eps
+
+        Note: This function does not derive a time-dependent weight (for example,
+            from SNR), but callers may provide an explicit per-sample loss scale.
+
+    Args:
+        net_pred (torch.Tensor): The network output, and its meaning is determined by pred_type.
+        pred_type (str): Prediction type: 'x0', 'eps', 'v', 'flow'.
+        x0 (torch.Tensor): The clean data x_0.
+        eps (torch.Tensor): The epsilon used to compute noised data.
+        noise_scheduler (BaseNoiseSchedule): Noise scheduler (required for pred_type 'v').
+        t (torch.Tensor): The diffusion timestep.
+        loss_scale (Optional[torch.Tensor]): Multiplicative scale for each
+            sample's loss before the ordinary batch mean.
+
+    Raises:
+        NotImplementedError: If an unknown pred_type is used.
+
+    Returns:
+        loss (torch.Tensor): The flow matching loss.
+    """
+    assert_same(shape=True, dtype=True, device=True, net_pred=net_pred, x0=x0, eps=eps)
+    target = flow_matching_target(pred_type, x0=x0, eps=eps, noise_scheduler=noise_scheduler, t=t)
+    return mse_loss(net_pred, target, loss_scale)

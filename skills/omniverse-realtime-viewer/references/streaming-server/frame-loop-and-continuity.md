@@ -33,17 +33,18 @@ config = ovstream.ServerConfig(width=1920, height=1080, video_input=ovstream.Vid
 frame = VideoFrame(buffer=encoded_host_ptr, width=1920, height=1080, size_bytes=encoded_size)
 ```
 
-`stream_video()` does not copy; keep the CUDA buffer alive until the next
-`stream_video()` call on the same server returns. If the producer wrote the
-buffer on a CUDA stream, either synchronize before `stream_video()` or pass
-`sync=ovstream.CudaSync(stream=..., wait_event=...)` to
-`VideoFrame.from_cuda_array()` / `VideoFrame.from_dlpack()`.
+## Submission And Resolution
 
-## Fixed Stream Resolution
+Use a fixed renderer and stream size for the session, with `webrtc_resizable=False`.
+Scale the browser video with `object-fit: contain`. The
+[frame ownership contract](../dependencies/ovstream.md#frame-ownership) permits
+reusing the app-owned buffer after each submission returns. Synchronize producer
+work before submission or pass `sync=ovstream.CudaSync(stream=..., wait_event=...)`
+to `VideoFrame.from_cuda_array()` / `VideoFrame.from_dlpack()`.
 
-Use one server render and stream size for the session, typically 1920x1080. The frontend should scale the `<video>` element with `object-fit: contain`; NVST handles letterbox coordinate mapping for stream input.
-
-Do not implement live viewport-size changes. ovrtx does not expose a `renderer.resize()` API, ovstream encoders cannot be assumed to resize on the fly, and changing camera aspect after connection has caused failures. If an application exposes a different fixed stream size, apply it through startup configuration or an explicit reconnect/restart path.
+When live rendered resolution is a product requirement, follow
+[viewport resize](../viewport-resize/README.md). It changes both renderer state
+and encoder buffer ownership; a CSS layout change alone needs neither.
 
 ## Frame Continuity During Idle And Stage Loads
 
@@ -53,15 +54,20 @@ loading frame, before accepting browser connections. While the server is idle,
 loading, or blocked on renderer mutation, submit the fallback or last-good frame
 every render tick instead of waiting for the first real stage frame.
 
-Stage loads must not block the message callback thread or stop video output. Large USD files can take much longer than the WebRTC/encoder liveness window, and connections may be killed after roughly 7 seconds without frames.
+Stage loads must not block the message callback thread or stop video output. Asset resolution and shader compilation can outlast the transport liveness window.
 
-Run scene loading on a background thread and use a stage lock around renderer mutation. The render loop should attempt a non-blocking lock; if loading is in progress, skip `renderer.step()` and keep sending the last good frame.
+Keep one runtime owner for loading and rendering. While a load operation is pending,
+poll its progress between stream ticks, or delegate blocking renderer work to the
+runtime thread while a separate submission loop repeats an app-owned frame. A
+stage lock can serialize those operations; never retain a borrowed renderer
+mapping as the loading frame. A lock-based submission loop looks like:
 
 ```python
 while running:
     if stage_lock.acquire(blocking=False):
         try:
-            frame = render_next_frame()
+            # Copy/convert into app-owned storage before releasing renderer output.
+            frame = render_next_owned_frame() if scene_ready else loading_frame
             last_frame = frame
         finally:
             stage_lock.release()
@@ -76,7 +82,8 @@ while running:
 
 This preserves WebRTC heartbeats and avoids stepping ovrtx while `reset_stage()`, `open_usd()`, `open_usd_from_string()`, reference updates, or selection state rebuilds are mutating the renderer.
 
-Log the first valid converted frame and set readiness before relying on browser
+Log the first valid BGRA8 CUDA mapping or completed required conversion into
+the app-owned BGRA stream buffer and set readiness before relying on browser
 connection state. This separates renderer/frame-conversion failures from WebRTC
 lifecycle failures:
 

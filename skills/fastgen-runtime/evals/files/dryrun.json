@@ -1,0 +1,18 @@
+{
+  "scenario": "Synthetic resolved config and proposed topology",
+  "command_exit": 0,
+  "stdout": "Dryrun; serialized config only",
+  "config": {
+    "trainer": {
+      "ddp": true,
+      "fsdp": false,
+      "batch_size_global": 18,
+      "grad_accum_rounds": 1
+    },
+    "dataloader_train": {
+      "batch_size": 2
+    }
+  },
+  "proposed_world_size": 4,
+  "process_group_started": false
+}

@@ -24,6 +24,13 @@ The properties that matter, and what breaks if they fail:
   empty benchmarks    A report can say PASS while carrying no measurements at
                       all. Accepting the verdict alone would wave through a
                       skill with a template report and no evidence behind it.
+
+  product mapping     A new component whose product the schema does not know
+                      makes the metadata generator fall back to AI, which
+                      returns UNRESOLVED and fails the whole regeneration after
+                      the sync (ALCHEMI Toolkit, #851). The check must catch it
+                      on the onboarding PR, accept an enum addition made in the
+                      same PR, and leave untouched existing registries alone.
 """
 
 import base64
@@ -62,6 +69,7 @@ BENCHMARK_PASS = """# Evaluation Report
 BENCHMARK_PASS_NO_RESULTS = BENCHMARK_PASS.split("## Results")[0] + "## Results\n\nNot yet run.\n"
 
 BENCHMARK_FAIL = BENCHMARK_PASS.replace("Overall verdict: PASS", "Overall verdict: FAIL")
+SELF_ASSESSED = (Path(__file__).parent / "fixtures" / "self_assessed_daqiri.md").read_text()
 
 
 def sign(skill_dir: Path) -> None:
@@ -229,6 +237,20 @@ class BenchmarkTests(unittest.TestCase):
 
         self.assertIn("FAIL", problems)
 
+    def test_eligible_self_assessed_skill_passes_all_onboarding_checks(self):
+        self.assertEqual(vso.check_skill(make_skill(self.root, benchmark=SELF_ASSESSED)), [])
+
+    def test_self_assessed_pass_without_measurements_is_rejected(self):
+        intro, rest = SELF_ASSESSED.split("## Results at a Glance", 1)
+        report = intro + "## Tier Status" + rest.split("## Tier Status", 1)[1]
+        problems = "\n".join(vso.check_skill(make_skill(self.root, benchmark=report)))
+        self.assertIn("no results", problems.lower())
+
+    def test_self_assessed_report_still_requires_signature_integrity(self):
+        d = make_skill(self.root, benchmark=SELF_ASSESSED)
+        (d / "BENCHMARK.md").write_text(SELF_ASSESSED.replace("100.0%", "99.0%"))
+        self.assertIn("MISMATCH", "\n".join(vso.check_skill(d)))
+
     def test_pass_verdict_without_measurements_is_reported(self):
         """PASS on a report carrying no result rows is not evidence."""
         d = make_skill(self.root, benchmark=BENCHMARK_PASS_NO_RESULTS)
@@ -314,6 +336,168 @@ class BlockingScopeTests(unittest.TestCase):
             vso.Finding("skills/added", "BENCHMARK.md: MISMATCH", blocking=True),
         ]
         self.assertEqual(vso.exit_code(findings), 1)
+
+
+SCHEMA = json.dumps({"$defs": {"metadata": {"properties": {"product.primary": {
+    "enum": ["ALCHEMI Toolkit", "Research Contributions", "Run:ai"]}}}}})
+ENUM = vso.product_enum(SCHEMA)
+
+COMPONENT = """# SPDX-License-Identifier: Apache-2.0
+name: {name}
+{extra}repo: NVIDIA/example
+description: Example.
+skills:
+  - path: skills/example-skill/
+    catalog_dir: example-skill
+"""
+
+
+def component(name, product=None):
+    extra = f"product_primary: {product}\n" if product is not None else ""
+    return COMPONENT.format(name=name, extra=extra)
+
+
+class ProductResolutionTests(unittest.TestCase):
+    def check(self, text):
+        return vso.check_product(vso.parse_component(text), ENUM)
+
+    def test_name_matching_the_enum_resolves(self):
+        self.assertEqual(self.check(component("ALCHEMI Toolkit")), [])
+
+    def test_name_with_punctuation_resolves(self):
+        self.assertEqual(self.check(component("Run:ai")), [])
+
+    def test_unknown_name_without_product_primary_fails(self):
+        problems = self.check(component("DAQIRI"))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("'DAQIRI'", problems[0])
+        self.assertIn("product_primary", problems[0])
+
+    def test_product_primary_overrides_an_unknown_name(self):
+        self.assertEqual(self.check(component("FastGen", "Research Contributions")), [])
+
+    def test_product_primary_outside_the_enum_fails(self):
+        problems = self.check(component("FastGen", "Research"))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("'Research'", problems[0])
+
+    def test_quoted_values_match_like_yaml(self):
+        self.assertEqual(self.check(component('"Run:ai"')), [])
+        self.assertEqual(self.check(component("FastGen", "'Research Contributions'")), [])
+
+    def test_missing_name_fails(self):
+        text = component("X").replace("name: X\n", "")
+        self.assertEqual(self.check(text), ["no name: declared"])
+
+    def test_nested_keys_are_not_read_as_the_component_name(self):
+        text = component("DAQIRI").replace(
+            "    catalog_dir: example-skill", "    catalog_dir: example-skill\n    name: Run:ai")
+        self.assertEqual(vso.parse_component(text)["name"], "DAQIRI")
+
+    def test_empty_product_primary_fails_even_when_the_name_resolves(self):
+        # The generator loads an empty key as null and rejects it; it does not
+        # fall back to the name. The check must not pass what the generator fails.
+        text = component("Run:ai").replace("repo:", "product_primary:\nrepo:")
+        problems = self.check(text)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("present but empty", problems[0])
+
+    def test_trailing_comment_is_not_part_of_product_primary(self):
+        self.assertEqual(self.check(component("FastGen", "Run:ai # approved mapping")), [])
+
+    def test_trailing_comment_is_not_part_of_the_name(self):
+        self.assertEqual(self.check(component("Run:ai  # display name")), [])
+
+    def test_invalid_yaml_fails(self):
+        problems = self.check(component("Run:ai").replace("repo:", "  bad: [\nrepo:"))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("not valid YAML", problems[0])
+
+
+def load_generator():
+    """generate-skill-metadata.py, imported by path (its name has hyphens)."""
+    import importlib.util
+    path = Path(__file__).resolve().parents[1] / "marketplace" / "generate-skill-metadata.py"
+    spec = importlib.util.spec_from_file_location("generate_skill_metadata", path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module  # dataclasses look the module up while executing it
+    spec.loader.exec_module(module)
+    return module
+
+
+class GeneratorParityTests(unittest.TestCase):
+    """The check must accept exactly the files the generator can resolve."""
+
+    CASES = [
+        component("Run:ai"),
+        component("ALCHEMI Toolkit"),
+        component("DAQIRI"),
+        component('"Run:ai"'),
+        component("Run:ai  # display name"),
+        component("FastGen", "Research Contributions"),
+        component("FastGen", "'Research Contributions'"),
+        component("FastGen", "Run:ai # approved mapping"),
+        component("FastGen", "Research"),
+        component("Run:ai", "Research"),
+        component("Run:ai").replace("repo:", "product_primary:\nrepo:"),
+        component("Run:ai").replace("repo:", "product_primary: ''\nrepo:"),
+        component("Run:ai").replace("repo:", "product_primary: 7\nrepo:"),
+        component("X").replace("name: X\n", ""),
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            cls.gen = load_generator()
+        except ImportError as exc:  # jsonschema absent outside the metadata workflow
+            raise unittest.SkipTest(f"generator dependencies unavailable: {exc}")
+
+    def generator_resolves(self, text):
+        import yaml
+        data = yaml.safe_load(text)
+        comp = {"component_name": data.get("name"), "components_file": "fixture.yml"}
+        if "product_primary" in data:
+            comp["product_primary"] = data["product_primary"]
+        try:
+            return self.gen.derive_product_from_component(comp, ENUM) is not None
+        except self.gen.GeneratorError:
+            return False
+
+    def test_check_agrees_with_generator(self):
+        for text in self.CASES:
+            with self.subTest(text=text.splitlines()[1:3]):
+                check_ok = vso.check_product(vso.parse_component(text), ENUM) == []
+                self.assertEqual(check_ok, self.generator_resolves(text))
+
+
+class ProductScopeTests(unittest.TestCase):
+    def test_new_component_is_in_scope(self):
+        self.assertTrue(vso.product_in_scope(None, component("DAQIRI")))
+
+    def test_unchanged_mapping_is_out_of_scope(self):
+        base = component("Legacy Product")
+        head = base.replace("catalog_dir: example-skill", "catalog_dir: example-skill-2")
+        self.assertFalse(vso.product_in_scope(base, head))
+
+    def test_renamed_component_is_in_scope(self):
+        self.assertTrue(vso.product_in_scope(component("Data Designer"), component("NeMo Data Designer")))
+
+    def test_changed_product_primary_is_in_scope(self):
+        self.assertTrue(vso.product_in_scope(component("FastGen"), component("FastGen", "Research Contributions")))
+
+    def test_adding_an_empty_product_primary_is_in_scope(self):
+        head = component("Run:ai").replace("repo:", "product_primary:\nrepo:")
+        self.assertTrue(vso.product_in_scope(component("Run:ai"), head))
+
+    def test_editing_only_a_comment_is_out_of_scope(self):
+        base = component("FastGen", "Research Contributions")
+        head = component("FastGen", "Research Contributions # see #839")
+        self.assertFalse(vso.product_in_scope(base, head))
+
+    def test_real_schema_parses(self):
+        schema = Path(__file__).resolve().parents[1] / "marketplace" / "metadata.schema.json"
+        enum = vso.product_enum(schema.read_text(encoding="utf-8"))
+        self.assertIn("ALCHEMI Toolkit", enum)
 
 
 if __name__ == "__main__":

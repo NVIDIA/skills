@@ -137,22 +137,22 @@ def test_cli_identity_defaults_follow_invoking_account(monkeypatch: pytest.Monke
     required = {
         "--train-job": "train-1",
         "--train-container": "train-1",
-        "--train-results": "/tmp/train",
+        "--train-results": "/tmp/train",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
         "--checkpoint-epoch": "3",
-        "--expected-adapter-config": "/tmp/adapter.json",
-        "--eval-spec": "/tmp/evaluate.toml",
-        "--eval-results-root": "/tmp/eval-results",
-        "--eval-cache": "/tmp/cache",
-        "--dataset-root": "/tmp/data",
-        "--base-model": "/tmp/model",
+        "--expected-adapter-config": "/tmp/adapter.json",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--eval-spec": "/tmp/evaluate.toml",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--eval-results-root": "/tmp/eval-results",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--eval-cache": "/tmp/cache",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--dataset-root": "/tmp/data",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--base-model": "/tmp/model",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
         "--image": "example/image:test",
-        "--job-helper": "/tmp/job.py",
-        "--redactor": "/tmp/redact.py",
-        "--state-file": "/tmp/state.json",
-        "--summary-file": "/tmp/summary.json",
-        "--log-file": "/tmp/gate.log",
-        "--pid-file": "/tmp/gate.pid",
-        "--lock-file": "/tmp/gate.lock",
+        "--job-helper": "/tmp/job.py",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--redactor": "/tmp/redact.py",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--state-file": "/tmp/state.json",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--summary-file": "/tmp/summary.json",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--log-file": "/tmp/gate.log",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--pid-file": "/tmp/gate.pid",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+        "--lock-file": "/tmp/gate.lock",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
     }
     argv = [str(SCRIPT)]
     for key, value in required.items():
@@ -164,4 +164,4 @@ def test_cli_identity_defaults_follow_invoking_account(monkeypatch: pytest.Monke
     assert args.user == f"{os.getuid()}:{os.getgid()}"
     assert args.runtime_user
     assert args.group_add == []
-    assert args.dataset_mount_destination == Path("/tmp/data")
+    assert args.dataset_mount_destination == Path("/tmp/data")  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file

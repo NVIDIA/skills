@@ -1,0 +1,25 @@
+# fastgen/methods/model.py:975-998
+    def apply_reward(
+        self,
+        gen_data: TensorOrDict,
+        data: Dict[str, Any],
+        loss_map: Dict[str, torch.Tensor],
+        condition_dropout_mask: torch.Tensor | None = None,
+    ) -> Dict[str, torch.Tensor]:
+        """Apply rewards, optionally excluding samples whose prompt was dropped (``True`` in a ``[B]`` mask)."""
+        if hasattr(self, "reward"):
+            assert isinstance(
+                gen_data, torch.Tensor
+            ), f"Rewards currently require unimodal (tensor) gen_data, got {type(gen_data).__name__}"
+            if self.config.optimize_reward and torch.is_grad_enabled():
+                assert gen_data.requires_grad, "`gen_data` must require grad for rewards"
+            else:
+                gen_data = gen_data.detach()
+            reward_loss_map = self.reward(gen_data, data, condition_dropout_mask=condition_dropout_mask)
+            reward_loss = reward_loss_map.pop("total_loss")
+            basic_utils.safe_update(reward_loss_map, {"reward_loss": reward_loss})
+            basic_utils.safe_update(loss_map, reward_loss_map)
+            if self.config.optimize_reward:
+                # subtract the reward from the loss since we want to maximize the reward
+                loss_map["total_loss"] = loss_map["total_loss"] + reward_loss
+        return loss_map

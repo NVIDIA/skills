@@ -1,0 +1,37 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "flux_sft_config.py.txt",
+      "repository_path": "fastgen/configs/experiments/Flux/config_sft.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/configs/experiments/Flux/config_sft.py",
+      "source_sha256": "2d874a9788f1b09b3e412ad0e76cd8ecc7cdbdc36afc9f01f34e924b60b2f7fc",
+      "line_ranges": [
+        [
+          1,
+          57
+        ]
+      ],
+      "fixture_sha256": "2d874a9788f1b09b3e412ad0e76cd8ecc7cdbdc36afc9f01f34e924b60b2f7fc",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "flux_preset.py.txt",
+      "repository_path": "fastgen/configs/net.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/configs/net.py",
+      "source_sha256": "3b54a70f9085c6cf0e4c4675c04bd9ee9300b2a2e1bca534b7585455302117d0",
+      "line_ranges": [
+        [
+          188,
+          190
+        ]
+      ],
+      "fixture_sha256": "1a26d16c54247f8f17f291e88199fc80c7a1c50ee7d1f9a417b46004df753502",
+      "kind": "source_excerpt"
+    }
+  ]
+}

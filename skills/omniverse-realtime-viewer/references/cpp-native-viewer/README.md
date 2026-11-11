@@ -1,39 +1,61 @@
-# C++ Native ImGui OVRTX Viewer
+# C++ Native OVRTX Viewer
 
-## Triggers
+Use this path for a new C++ desktop USD viewer. Choose a native UI toolkit
+that suits the requested interaction, platform and available dependencies.
+Keep an existing app's selected shell; honor an explicitly requested toolkit.
+For a small new viewer, choose a simple sufficient shell and proceed without
+asking the user to select one. GLFW/ImGui below is a worked example; Qt or
+another native toolkit can implement the same contracts. OVRTX renders all
+3D; the selected toolkit presents its pixels. The application owns an attached OVStage,
+its publication clock and renderer on one runtime thread; the UI thread owns
+window events and presentation. File layout, widget library and pixel upload
+mechanism are application choices; SDK ownership and lifetimes are contracts.
 
-Use this skill for C++ viewer, ImGui viewer, native viewer, C++ OVRTX, GLFW viewer, native Dear ImGui viewport, native executable, no-Python local desktop viewer, or requests that use the OVRTX C API directly.
+## Build In Requested Increments
 
-Use this for a focused native binary: GLFW window, OpenGL pixel presentation, Dear ImGui controls, inline USDA session layer, OVRTX C API renderer, CPU-mapped `LdrColor`, and direct camera/picking/selection logic.
+Read the row for the current increment, then implement and check it before
+loading the next group. A full editor, generic property reflection, material
+effects, animation and extra menus are not prerequisites for a small viewer.
 
-For ovrtx C API behavior, native viewer behavior, renderer lifecycle guidance,
-or release-specific behavior not covered here, read `references/dependencies` for
-acquisition guidance and supplemental dependency documentation.
-
-Before copying any C API declaration, config entry, struct field, result status,
-or render-var mapping sequence from this reference, inspect the current upstream
-ovrtx `AGENTS.md`, relevant `skills/`, matching C examples, and installed public
-headers. Treat detailed snippets as validation targets; the installed headers and
-examples are authoritative when they differ.
-
-## Read Order
-
-| Need | Read |
+| Increment | Read and establish |
 |---|---|
-| Choose this path, create project skeleton, configure CMake, use common C API helpers | `project-build.md` |
-| Construct renderer, load user USD, author viewer-owned session layer | `renderer-session.md` |
-| Upload OVRTX frames to OpenGL and run the main render loop | `presentation-loop.md` |
-| Add orbit camera, picking, selection outline, pick effects, animation | `interaction-features.md` |
-| Add Dear ImGui toolbars, sliders, settings controls, menus, or dialogs | `viewer-control-patterns` |
-| Check gotchas, reference files, and validation checklist | `validation.md` |
+| Build and first displayed frame | `project-build.md`, then `renderer-session.md` and `presentation-loop.md`: one USD, viewer-owned camera/product, attached-stage publication, map/copy/unmap and an actual native-window frame. Keep the window responsive and verify normal close before adding panels. |
+| Requested navigation | Camera/input and live-write sections of `interaction-features.md`; follow its camera/input links for the math or gesture contract you need. Verify orbit, pan and zoom on the actual frame. |
+| Requested click selection | Native picking and selection sections of `interaction-features.md`: decode the GPU hit, resolve its ID with the renderer dictionary, and synchronize selection. |
+| Requested scene tree and part details | The Runtime Stage Query Path / Native Tree Construction sections of `references/stage-hierarchy/README.md` and the decoding contract in `references/stage-attribute-reads/README.md`. Use the matching release's [C query/read example](https://github.com/NVIDIA-Omniverse/ovstage/blob/main/examples/c/queries/main.cpp) and installed population mapping. Start with readable path/type and the requested numeric properties; expand reflection only when needed. |
+| Requested scene switching | Replacement/cleanup sections of `renderer-session.md`, then `validation.md`. Clear stale scene data and selection; test the new scene and switching back. |
+| Additional controls, effects or animation | `references/viewer-control-patterns/README.md` for nontrivial controls; the optional section of `interaction-features.md` links effect/animation guidance. Read these when implementing those features. |
 
-## Critical Rules
+For SDK acquisition, begin at `references/dependencies/README.md`. Read the selected
+upstream OVRTX/OVStage agent guidance and relevant skill entry points, then use
+one matching native minimal example and the installed headers for the current
+increment. Look up the exact functions, types and layouts you use; parallel
+Python/Rust/other-shell implementations are not prerequisite reading. Detailed
+snippets in this package are validation targets, not a substitute for the
+installed release's public C contract. If a complete build/wait-helper example
+is useful, `build-details.md` preserves it.
 
-- Do not use Three.js, WebGL scene rendering, glTF viewers, or browser-native rendering for USD.
-- OpenGL is only the pixel presentation path for frames already rendered by OVRTX.
-- Keep renderer creation, stage load/reset, pick query enqueue, result mapping, and `ovrtx_write_attribute()` calls on one owner thread.
-- Use the selected OVRTX C API and helper contracts from the references; do not mix Python renderer assumptions into this path.
-- Apply `viewer-control-patterns` to Dear ImGui UI: choose controls by user intent first, pair approximate sliders with numeric inputs when exact values matter, clamp values before sending them to OVRTX, and surface the effective backend value when it differs.
-- Choose C++/ImGui only when the app should run as a native executable on the GPU workstation and does not need web UI reuse.
+## Contracts To Preserve
 
-See also: `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `viewer-control-patterns`, `camera-controls`, `native-picking-selection`, `selection-feedback`, `selection-animation`, `prim-transform-safety`, `streaming-vs-local`, `ovui-local-viewer-recipe`, `tauri-local-viewer`, and `electron-shm-viewer`.
+- Keep population, writes, ordinals/write floors, renderer updates, picks,
+  stepping and output mapping on one runtime owner. The selected toolkit's window and presentation APIs stay on
+  their required UI thread; exchange bounded intent, copied state and latest owned frames.
+- Use the attached-stage C APIs and paired loader model. Native OVRTX still
+  owns picks and selection groups. Keep schema registration and any optional
+  OpenUSD ABI/isolation boundary consistent with the selected release.
+- Copy complete mapped output with its actual offset/strides, then unmap and
+  destroy results on success and failure paths. No SDK pointer crosses to UI.
+- Inspector metadata is typed data: path IDs, token IDs and token arrays need
+  their owning Stage dictionary; numeric values stay numeric. Use the linked
+  property-specific mapping rather than treating every unsigned value as a token.
+  The linked C query example resolves derived prim types and schema tokens; the
+  installed [population header](https://github.com/NVIDIA-Omniverse/ovstage/blob/main/include/ovstage/ovstage_population.h)
+  owns property mappings. Read the corresponding C sections, not parallel
+  Python/React inspector implementations.
+- Preserve source USD. Tag scene-dependent work by generation and clear stale
+  state on replacement. Check input ownership, click versus drag, stationary
+  selection and clean close through `validation.md`.
+
+Use `references/routing.md` only to select an additional capability or reconsider an
+unspecified delivery method. Keep the first implementation proportional to the
+user's requested features.

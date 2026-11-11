@@ -20,6 +20,7 @@ from command_contract import (
     expected_image_kind,
     expected_stage_directory,
 )
+from path_contract import safe_absolute_path
 from virtualenv_runtime import validate_tao_virtualenv
 
 
@@ -33,33 +34,7 @@ RUN_SPEC_NAMES = (
     "mining_spec.yaml",
     "approval.json",
 )
-PINNED_IMAGES = {
-    "pyt": "nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt",  # versions-key: images.tao_toolkit.deft_pas_pyt
-    "ds": "nvcr.io/nvidia/tao/tao-toolkit:7.2.0-data-services",  # versions-key: images.tao_toolkit.deft_pas_data_services
-}
-
-
-def safe_absolute_path(
-    path: pathlib.Path, name: str, *, require_exists: bool = False
-) -> pathlib.Path:
-    """Return one lexical absolute path after rejecting every symlink hop.
-
-    Resolving first and validating later loses whether the caller supplied a
-    symlink.  Keep the lexical path, normalize only ``.``/``..``, and compare it
-    with ``resolve(strict=False)`` so existing symlinks in any parent are
-    rejected even when the final path has not been created yet.
-    """
-    expanded = path.expanduser()
-    if not expanded.is_absolute():
-        raise ValueError(f"{name} must be an absolute path: {path}")
-    lexical = pathlib.Path(os.path.abspath(expanded))
-    if lexical == pathlib.Path(lexical.anchor):
-        raise ValueError(f"{name} must not be a filesystem root: {lexical}")
-    if lexical.resolve(strict=False) != lexical:
-        raise ValueError(f"{name} must not contain or traverse a symlink: {lexical}")
-    if require_exists and not lexical.exists():
-        raise ValueError(f"{name} does not exist: {lexical}")
-    return lexical
+IMAGE_KINDS = frozenset(("pyt", "ds"))
 
 
 @dataclass(frozen=True)
@@ -88,6 +63,49 @@ class ActionContext:
     request_path: pathlib.Path
     lock_path: pathlib.Path
     fresh_outputs: list[pathlib.Path]
+
+
+def expected_runtime_image(config: dict[str, Any], image_kind: str) -> str:
+    """Resolve the immutable runtime image recorded by a PAS action.
+
+    The approved PyTorch image remains a human-readable tag in the run config,
+    while container actions execute and record the attested RepoDigest.  Keep
+    that translation in one contract helper so prepare, commit, audit, and
+    checkpoint publication all validate the same identity.
+    """
+    if image_kind not in IMAGE_KINDS:
+        raise ValueError(f"unsupported image kind: {image_kind!r}")
+    image_key = "pyt_image" if image_kind == "pyt" else "ds_image"
+    image = str(config.get(image_key, "")).strip()
+    if not image:
+        raise ValueError(f"state.config.{image_key} must be a non-empty approved image")
+    if (
+        image_kind != "pyt"
+        or config.get("platform") == "virtualenv"
+        or config.get("finetuning_method") is None
+    ):
+        return image
+
+    digest = config.get("pyt_image_digest")
+    if not isinstance(digest, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest):
+        raise ValueError(
+            "state.config.pyt_image_digest must bind the approved PyTorch image"
+        )
+    reference, separator, reference_digest = image.rpartition("@")
+    if separator:
+        if reference_digest != digest:
+            raise ValueError(
+                "state.config.pyt_image digest disagrees with pyt_image_digest"
+            )
+        image = reference
+    repository = image
+    last_slash = repository.rfind("/")
+    last_colon = repository.rfind(":")
+    if last_colon > last_slash:
+        repository = repository[:last_colon]
+    if not repository:
+        raise ValueError("state.config.pyt_image must include an image repository")
+    return f"{repository}@{digest}"
 
 
 def atomic_json(path: pathlib.Path, payload: dict[str, Any]) -> None:
@@ -308,12 +326,7 @@ def validate_action(
     config = state.get("config")
     if not isinstance(config, dict):
         raise ValueError("state.config must be an object")
-    if image_kind not in PINNED_IMAGES:
-        raise ValueError(f"unsupported image kind: {image_kind!r}")
-    image_key = "pyt_image" if image_kind == "pyt" else "ds_image"
-    image = str(config.get(image_key, "")).strip()
-    if image != PINNED_IMAGES[image_kind]:
-        raise ValueError(f"state.config.{image_key} must be the pinned {image_kind} image")
+    image = expected_runtime_image(config, image_kind)
     workspace, dataset_root, config_dir = validate_runtime_paths(results_dir, config)
     platform = str(config["platform"])
     patches_dir = pathlib.Path(__file__).resolve().parent.parent / "patches"
@@ -352,7 +365,7 @@ def validate_action(
     legacy_virtualenv = config.get("virtualenv")
     virtualenvs = config.get("virtualenvs")
     if platform == "virtualenv":
-        if isinstance(virtualenvs, dict) and set(virtualenvs) == set(PINNED_IMAGES):
+        if isinstance(virtualenvs, dict) and set(virtualenvs) == IMAGE_KINDS:
             selected = virtualenvs.get(image_kind)
         elif isinstance(legacy_virtualenv, str) and legacy_virtualenv.strip():
             # Compatibility is truthful only when the same environment passed

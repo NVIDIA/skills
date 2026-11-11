@@ -29,6 +29,10 @@ New ovrtx viewer apps should use this split by default. Standalone
 renderer-owned stage APIs remain compatibility behavior; do not use them as the
 main scene data plane when an OVStage is attached.
 
+Construct `ovstage.PathDictionary(stage)` with its owning Stage. Recreate the
+dictionary and path lists when replacing that Stage; tokens cannot cross Stage
+boundaries. Pass canonical path strings between generations.
+
 ## Publication protocol
 
 Every mutation belongs to a new ordinal `N`:

@@ -1,0 +1,94 @@
+{
+  "schema_version": "2.0",
+  "verdict": "PASSED | FAILED | BLOCKED",
+  "reason": "Exact result reason",
+  "failed_stage": "INPUT | EMU_BUILD | EMU_TEST | L4T_BUILD | LISTING | TARGET_PROBE | DEPLOY | HARDWARE_TEST | CLOCK | PROFILE | COMPARE | SOURCE_FRESHNESS | NONE",
+  "operator": "Operator name",
+  "test_scope": "correctness-only | correctness-and-performance",
+  "emulator": {
+    "policy": "optional | required",
+    "build_mode": null,
+    "configure_options": [],
+    "status": "PASSED | FAILED | BLOCKED | SKIPPED_OPTIONAL",
+    "reason": "Exact status reason"
+  },
+  "result_time_utc": "ISO 8601 timestamp",
+  "source": {
+    "project_root": "Absolute path",
+    "build_sdk_version": "PVA SDK major.minor.patch",
+    "build_safety_variant": "safety | non-safety",
+    "compiler_backend": "NVVPU | ASIP/Chess",
+    "manifest": "Absolute path to source-manifest.sha256",
+    "git_identity": "Commit plus dirty state, or not available"
+  },
+  "target": {
+    "host": "Target address",
+    "architecture": "Target architecture",
+    "kernel": "Kernel version",
+    "bsp": "BSP identity",
+    "cupva_runtime": "Runtime identity",
+    "runtime_version": "PVA runtime major.minor.patch",
+    "runtime_safety_variant": "safety | non-safety",
+    "runtime_match": "PASSED | FAILED | BLOCKED",
+    "clock_setup": "PASSED | FAILED | BLOCKED | NOT_REQUIRED",
+    "expected_clock_and_power_state": "CPU, PVA, AXI, EMC, and power-mode values or not required",
+    "clock_evidence_before": "Absolute local path or not required",
+    "clock_evidence_after": "Absolute local path or not required"
+  },
+  "stages": [
+    {
+      "name": "Stage name",
+      "status": "PASSED | FAILED | BLOCKED | SKIPPED_OPTIONAL | NOT_RUN",
+      "reason": "Exact stage reason",
+      "command_exit_code": 0,
+      "log": "Absolute local path"
+    }
+  ],
+  "correctness": [
+    {
+      "environment": "EMU | HARDWARE",
+      "case": "Case identifier",
+      "status": "PASSED | FAILED | SKIPPED_OPTIONAL | NOT_RUN",
+      "inputs": [
+        {
+          "name": "Input name",
+          "shape_format_pitch_parameters": "Exact case values"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Output name",
+          "status": "PASSED | FAILED | NOT_RUN",
+          "reference": "Independent reference identity",
+          "comparison": "Exact | absolute | relative | combined",
+          "absolute_tolerance": null,
+          "relative_tolerance": null,
+          "maximum_error": null
+        }
+      ]
+    }
+  ],
+  "performance": [
+    {
+      "case": "Case identifier",
+      "method": "Profiling Stream | Nsight Systems | VPU timestamp counter",
+      "unit": "ns | cycles",
+      "warmups": 0,
+      "samples": 1000,
+      "minimum": null,
+      "maximum": null,
+      "mean": null,
+      "median": null,
+      "target": null,
+      "acceptance": "PASSED | FAILED | NOT_REQUIRED"
+    }
+  ],
+  "evidence": [
+    {
+      "name": "Artifact name",
+      "path": "Absolute local path",
+      "sha256": "Lowercase SHA-256"
+    }
+  ],
+  "remote_directory": "Retained target path"
+}

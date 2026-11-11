@@ -1,0 +1,7 @@
+interface:
+  display_name: "CDF Orchestration — SMT Defect Image Generation"
+  short_description: "Run SMT simulation, golden-image and defect workflows"
+  default_prompt: "Use $cdf-defect-image-generation to prepare and run an SMT DIG workflow, check its status, or retrieve matching simulation, golden and defect images."
+
+policy:
+  allow_implicit_invocation: true

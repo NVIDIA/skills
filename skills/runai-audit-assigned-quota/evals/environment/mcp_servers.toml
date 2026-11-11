@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# MCP servers made available to the agent during Tier 3 live evaluation.
+# The Run:ai server is a deterministic stdio mock replaying the frozen
+# demo-cluster testbed, so both baseline and with-skill arms see identical
+# tool data. Staged from evals/files/ -> /workspace/input/ in the Harbor container.
+# NOTE: astra-skill-eval 0.8.5 serializes each mcp_servers field as a quoted
+# string when it stages task.toml, so a list-valued `args` becomes an invalid
+# "['...']" string and Harbor rejects the task. Workaround: no `args` — the mock
+# is an executable (+x, `#!/usr/bin/env python3` shebang) invoked directly.
+[[mcp_servers]]
+name = "runai"
+transport = "stdio"
+command = "/workspace/input/mock_mcp.py"

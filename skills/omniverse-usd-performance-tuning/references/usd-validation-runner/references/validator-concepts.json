@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "$comment": "Canonical validator-concept registry for the USD performance-tuning workflow. Single binding layer between agent-facing concept names and runtime rule identity, tier, scope policy, and backing op. Curated by maintainers, not inferred. Resolution key is (package family of module, class_name): 'module' carries the current upstream path and 'module_aliases' the pre-rename paths, and the executor accepts either, so an upstream package rename does not break resolution. usd_validation_nvidia/omni.asset_validator are one family (oav); usd_optimize/omni.scene.optimizer are the other (so). Module paths here were derived by introspecting a live registry with both providers registered (usd-validation-nvidia 1.20.0 + usd-optimize 1.0.4), not hand-written. Category is informational. Tiers/costs are CPU-only worst-case from large-asset evidence (batch-additivity-findings.md); gpu_bound concepts relax on CUDA hosts. Governed by validator-concepts.schema.json.",
+  "$comment": "Canonical validator-concept registry for the USD performance-tuning workflow. Single binding layer between agent-facing concept names and runtime rule identity, tier, scope policy, and backing op. Curated by maintainers, not inferred. Resolution key is (package family of module, class_name): 'module' carries the current upstream path and 'module_aliases' the pre-rename paths, and the executor accepts either, so an upstream package rename does not break resolution. usd_validation_nvidia/omni.asset_validator are one family (oav); usd_optimize/omni.scene.optimizer are the other (so). Every (module, class_name) here resolves exactly against a live registry with both providers registered (usd-validation-nvidia 1.22.0 + usd-optimize 1.3.1), not hand-written. From usd-optimize 1.3 the so rules register as UsdOptimize<Name>; the bare names of 1.1.0 and earlier resolve to nothing. Category is informational. Tiers/costs are CPU-only worst-case from large-asset evidence (batch-additivity-findings.md); gpu_bound concepts relax on CUDA hosts. Governed by validator-concepts.schema.json.",
   "concepts": [
     {
       "canonical_name": "primvar_indexability",
@@ -17,7 +17,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.indexed_primvars_checker",
           "module_aliases": ["omni.scene.optimizer.validators.indexed_primvars_checker"],
-          "class_name": "IndexedPrimvarChecker",
+          "class_name": "UsdOptimizeIndexedPrimvarChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
@@ -48,7 +48,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.unused_uvs_checker",
           "module_aliases": ["omni.scene.optimizer.validators.unused_uvs_checker"],
-          "class_name": "UnusedUVsChecker",
+          "class_name": "UsdOptimizeUnusedUVsChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         },
@@ -78,7 +78,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.colocated_vertices_checker",
           "module_aliases": ["omni.scene.optimizer.validators.colocated_vertices_checker"],
-          "class_name": "ColocatedVerticesChecker",
+          "class_name": "UsdOptimizeColocatedVerticesChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
@@ -107,7 +107,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.zero_area_faces_checker",
           "module_aliases": ["omni.scene.optimizer.validators.zero_area_faces_checker"],
-          "class_name": "ZeroAreaFacesChecker",
+          "class_name": "UsdOptimizeZeroAreaFacesChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
@@ -137,7 +137,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.nonmanifold_checker",
           "module_aliases": ["omni.scene.optimizer.validators.nonmanifold_checker"],
-          "class_name": "NonManifoldChecker",
+          "class_name": "UsdOptimizeNonManifoldChecker",
           "category": "Omni:Geometry",
           "use_for": ["performance_tuning"]
         },
@@ -167,7 +167,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.normals_checker",
           "module_aliases": ["omni.scene.optimizer.validators.normals_checker"],
-          "class_name": "NormalsChecker",
+          "class_name": "UsdOptimizeNormalsChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         },
@@ -197,7 +197,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.windings_checker",
           "module_aliases": ["omni.scene.optimizer.validators.windings_checker"],
-          "class_name": "WindingsChecker",
+          "class_name": "UsdOptimizeWindingsChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         },
@@ -226,7 +226,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.primitive_fit_checker",
           "module_aliases": ["omni.scene.optimizer.validators.primitive_fit_checker"],
-          "class_name": "PrimitiveFitChecker",
+          "class_name": "UsdOptimizePrimitiveFitChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -247,7 +247,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.duplicate_geometry_checker",
           "module_aliases": ["omni.scene.optimizer.validators.duplicate_geometry_checker"],
-          "class_name": "DuplicateGeometryChecker",
+          "class_name": "UsdOptimizeDuplicateGeometryChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         }
@@ -269,7 +269,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.duplicate_geometry_fuzzy_checker",
           "module_aliases": ["omni.scene.optimizer.validators.duplicate_geometry_fuzzy_checker"],
-          "class_name": "FuzzyDuplicateGeometryChecker",
+          "class_name": "UsdOptimizeFuzzyDuplicateGeometryChecker",
           "category": "Usd:Performance",
           "use_for": ["performance_tuning"]
         }
@@ -291,7 +291,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.duplicate_materials_checker",
           "module_aliases": ["omni.scene.optimizer.validators.duplicate_materials_checker"],
-          "class_name": "DuplicateMaterialsChecker",
+          "class_name": "UsdOptimizeDuplicateMaterialsChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -312,7 +312,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.duplicate_face_checker",
           "module_aliases": ["omni.scene.optimizer.validators.duplicate_face_checker"],
-          "class_name": "DuplicateFaceChecker",
+          "class_name": "UsdOptimizeDuplicateFaceChecker",
           "use_for": ["performance_tuning"]
         }
       ]
@@ -332,7 +332,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.isolated_vertices_checker",
           "module_aliases": ["omni.scene.optimizer.validators.isolated_vertices_checker"],
-          "class_name": "IsolatedVerticesChecker",
+          "class_name": "UsdOptimizeIsolatedVerticesChecker",
           "use_for": ["performance_tuning"]
         }
       ]
@@ -352,7 +352,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.zero_extent_checker",
           "module_aliases": ["omni.scene.optimizer.validators.zero_extent_checker"],
-          "class_name": "ZeroExtentChecker",
+          "class_name": "UsdOptimizeZeroExtentChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -373,7 +373,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.rtx_mesh_count_checker",
           "module_aliases": ["omni.scene.optimizer.validators.rtx_mesh_count_checker"],
-          "class_name": "RtxMeshCountChecker",
+          "class_name": "UsdOptimizeRtxMeshCountChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -394,7 +394,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.small_mesh_checker",
           "module_aliases": ["omni.scene.optimizer.validators.small_mesh_checker"],
-          "class_name": "SmallMeshChecker",
+          "class_name": "UsdOptimizeSmallMeshChecker",
           "use_for": ["performance_tuning"]
         }
       ]
@@ -414,7 +414,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.sparse_mesh_checker",
           "module_aliases": ["omni.scene.optimizer.validators.sparse_mesh_checker"],
-          "class_name": "SparseMeshChecker",
+          "class_name": "UsdOptimizeSparseMeshChecker",
           "use_for": ["performance_tuning"]
         }
       ]
@@ -434,7 +434,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.high_vertex_count_checker",
           "module_aliases": ["omni.scene.optimizer.validators.high_vertex_count_checker"],
-          "class_name": "HighVertexCountChecker",
+          "class_name": "UsdOptimizeHighVertexCountChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -455,7 +455,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.redundant_timesamples_checker",
           "module_aliases": ["omni.scene.optimizer.validators.redundant_timesamples_checker"],
-          "class_name": "RedundantTimeSamplesChecker",
+          "class_name": "UsdOptimizeRedundantTimeSamplesChecker",
           "use_for": ["performance_tuning"]
         }
       ]
@@ -475,7 +475,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.empty_leaf_checker",
           "module_aliases": ["omni.scene.optimizer.validators.empty_leaf_checker"],
-          "class_name": "EmptyLeafChecker",
+          "class_name": "UsdOptimizeEmptyLeafChecker",
           "use_for": ["performance_tuning"]
         }
       ]
@@ -495,7 +495,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.flat_hierarchies_checker",
           "module_aliases": ["omni.scene.optimizer.validators.flat_hierarchies_checker"],
-          "class_name": "FlatHierarchiesChecker",
+          "class_name": "UsdOptimizeFlatHierarchiesChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -516,7 +516,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.invisible_prims_checker",
           "module_aliases": ["omni.scene.optimizer.validators.invisible_prims_checker"],
-          "class_name": "InvisiblePrimsChecker",
+          "class_name": "UsdOptimizeInvisiblePrimsChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -537,7 +537,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.occluded_meshes_checker",
           "module_aliases": ["omni.scene.optimizer.validators.occluded_meshes_checker"],
-          "class_name": "OccludedMeshesChecker",
+          "class_name": "UsdOptimizeOccludedMeshesChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -558,7 +558,7 @@
           "provider": "so",
           "module": "usd_optimize.validators.find_overlapping_meshes_checker",
           "module_aliases": ["omni.scene.optimizer.validators.find_overlapping_meshes_checker"],
-          "class_name": "FindOverlappingMeshesChecker",
+          "class_name": "UsdOptimizeFindOverlappingMeshesChecker",
           "use_for": ["performance_tuning"]
         }
       ],
@@ -579,11 +579,10 @@
           "provider": "so",
           "module": "usd_optimize.validators.coinciding_geometry_checker",
           "module_aliases": ["omni.scene.optimizer.validators.coinciding_geometry_checker"],
-          "class_name": "CoincidingGeometryChecker",
+          "class_name": "UsdOptimizeCoincidingGeometryChecker",
           "use_for": ["performance_tuning"]
         }
-      ],
-      "notes": "229 s full-stage on CPU. Prefer deduplicateGeometry before destructive deletion."
+      ]
     },
     {
       "canonical_name": "composition_missing_ref",

@@ -41,7 +41,7 @@ CLI:
 
 Exit codes:
   0  VALID and every --require-* condition met
-  1  INVALID, or a --require-* condition unmet
+  1  INVALID, a --require-* condition unmet, or invalid arguments (nothing audited)
   2  deft_state.json is missing or unparseable (a special case of INVALID)
 """
 
@@ -635,6 +635,19 @@ def audit(results_dir: Path) -> dict[str, Any]:
                         f"loop_log commits {phase}/{stage} but state.iterations.{phase}."
                         f"{field} ({flag}) was never recorded"
                     )
+        # A kpi_analyze recorded ok must carry its mAP: the per-phase trend is the
+        # loop's only result. commit_stage.py refuses such a commit now; this catches
+        # a run recorded before it did, so the run stops at the hole rather than
+        # advancing past it and ending "complete".
+        map_value = info.get("map_value")
+        if "kpi_analyze" in ok_stages_by_phase.get(phase, []) and (
+            isinstance(map_value, bool) or not isinstance(map_value, (int, float))
+        ):
+            errors.append(
+                f"loop_log commits {phase}/kpi_analyze ok but state.iterations.{phase}."
+                f"map_value (--map-value) was never recorded, so the trend has no {phase} "
+                f"point. Re-score the phase, or record it as --status error"
+            )
 
     highest_iteration = max(
         (
@@ -786,6 +799,19 @@ def audit(results_dir: Path) -> dict[str, Any]:
             max_iterations=max_iterations,
         )
 
+    # Stages that ran through the overlay's docker run rather than their mapped
+    # skill, as commit_stage.py --execution-path records them. Reported, not judged:
+    # the fallback is documented, and the point is that a run can be attributed to
+    # the code path that produced it.
+    direct_container_stages = [
+        f"{phase}/{stage}"
+        for phase in sorted(iterations, key=_phase_sort_key)
+        if isinstance(iterations[phase], dict)
+        and isinstance(iterations[phase].get("execution_paths"), dict)
+        for stage, path in iterations[phase]["execution_paths"].items()
+        if path == "direct-container"
+    ]
+
     last_event = entries[-1] if entries else None
     last_committed = (
         f"{last_event.get('iter')}/{last_event.get('stage')}" if last_event else "none"
@@ -808,6 +834,7 @@ def audit(results_dir: Path) -> dict[str, Any]:
         "run_failed": run_failed,
         "complete": complete,
         "completion_reason": completion_reason,
+        "direct_container_stages": direct_container_stages,
         "load_failed": load_failed,
         "errors": errors,
         "warnings": warnings,
@@ -831,6 +858,8 @@ def _print_text(report: dict[str, Any]) -> None:
     # iteration and "complete" reached by a documented early stop are different
     # runs, and the reason is the only thing that tells them apart.
     print(f"completion_reason={report['completion_reason']}")
+    if report["direct_container_stages"]:
+        print("direct_container_stages=" + ",".join(report["direct_container_stages"]))
     sys.stdout.flush()  # keep the key=value block ahead of stderr when piped
     for warning in report["warnings"]:
         print(f"warning: {warning}", file=sys.stderr)
@@ -838,8 +867,22 @@ def _print_text(report: dict[str, Any]) -> None:
         print(f"error: {error}", file=sys.stderr)
 
 
+class _AuditArgumentParser(argparse.ArgumentParser):
+    """argparse with this script's exit codes.
+
+    argparse exits 2 on a usage error, and here 2 means deft_state.json is missing or
+    unparseable -- so a mistyped flag would read as a corrupt run. A usage error
+    audits nothing; it is reported as 1, "not valid, stop", rather than as a fault in
+    the state.
+    """
+
+    def error(self, message: str):  # type: ignore[override]
+        self.print_usage(sys.stderr)
+        self.exit(1, f"{self.prog}: error: {message}\n")
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = _AuditArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
         "--results-dir",
         required=True,

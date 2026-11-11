@@ -28,6 +28,12 @@ train:
   validation_interval: 1
   resume_training_checkpoint_path: ''
   results_dir: ''
+  checkpointer:
+    enable_topk: false
+    replace_periodic: false
+    save_top_k: 1
+    filename: model_best_{epoch:03d}
+    auto_insert_metric_name: false
   pretrained_model_path: ''
   optim:
     type: adamw
@@ -48,6 +54,7 @@ train:
       warmup_ratio: 0.333333
       min_lr_ratio: 0.001
   precision: bf16
+  scrub_nan_gradients: false
 model:
   type: sparse4d
   embed_dims: 256
@@ -143,6 +150,7 @@ model:
       default_time_interval: 0.033333
       embed_dims: 256
       use_temporal_align: false
+      reset_on_time_gap: false
     anchor_encoder:
       type: SparseBox3DEncoder
       vel_dims: 3
@@ -292,12 +300,75 @@ model:
       act_cfg:
         type: ReLU
         inplace: true
+    loose_to_tight:
+      enable: false
+      mlp_ckpt: ''
+      loss_weight: 0.1
+      num_classes: 0
+      tight_l1_weight: 1.0
+      containment_weight: 1.0
+      box2d_key: gt_boxes_2d_visible  # gitleaks:allow (dataset field name)
+      occ_key: gt_occ_weight
+      instance_id_key: instance_id
+      ego2cam_key: cam2world_transform
+      min_gt_area: 1.0
+      eps: 0.1
+      pseudo_enable: false
+      det_box_key: det_boxes_2d
+      det_cls_key: det_classes_2d
+      det_score_key: det_scores_2d
+      has_3d_gt_key: has_3d_gt
+      giou_thr: 0.3
+      cost_giou: 2.0
+      cost_l1: 1.0
+      cost_cls: 1.0
+      det_score_thr: 0.0
+      min_cams: 1
+      dedup_dist: 0.0
+      class_gate: true
+      pseudo_box_weight: 0.1
+      pseudo_cls_weight: 1.0
   use_temporal_align: false
+  cotrain_param_touch: false
 dataset:
   type: omniverse_3d_det_track
   batch_size: 2
   use_h5_file_for_rgb: false
   use_h5_file_for_depth: true
+  lazy_load: false
+  lazy_load_cache_size: 50
+  pkl_sample_size: 0
+  pkl_cam_counts_path: ''
+  fps_drop_prob: 0.0
+  target_fps_choices:
+  - 30
+  - 20
+  - 15
+  - 10
+  - 6
+  - 5
+  - 3
+  - 2
+  - 1
+  max_cameras: -1
+  eval_dist_fcn: center_distance
+  eval_hota: false
+  ltt_2dgt_sidecar_dir: ''
+  ltt_2dgt_frame_regex: ''
+  ltt_2dgt_dedup_regex: ^CT[\w.]+?__
+  ltt_2dgt_cache_size: 8
+  ltt_2dgt_warn_on_miss: true
+  rtdetr_2d_cache_dir: ''
+  rtdetr_2d_cache_path: ''
+  rtdetr_2d_dedup_regex: ^CT[\w.]+?__
+  rtdetr_2d_score_thr: 0.0
+  rtdetr_2d_per_class_score_thr: {}
+  rtdetr_2d_cache_size: 4
+  rtdetr_2d_mark_real: true
+  sync_route: false
+  real_scene_keywords: []
+  real_block_prob: -1.0
+  scene_switch_iters: 0
   num_frames: 200
   num_bev_groups: 1
   data_root: ???
@@ -377,6 +448,7 @@ inference:
   batch_size: -1
   jsonfile_prefix: sparse4d_pred
   output_nvschema: true
+  nvschema_fps: 0.0
   tracking:
     enabled: true
     threshold: 0.2

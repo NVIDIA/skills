@@ -14,7 +14,7 @@ schema*, *its three documented invocation classes*,
 *the property-dimension model counters carry*, *the
 optional per-device capability probe*, *the version
 overlay against the developer-side
-[`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+`doca-telemetry/SKILL.md`
 library*, *the layered error and observability surfaces*,
 *and the safety posture* (the tool is read-only;
 operator mistakes show up downstream as silent metric
@@ -37,7 +37,7 @@ just one.
 | 3. Reverse-resolve Data ID → name + properties | Translate a captured Data ID from a downstream consumer back to its counter name + properties, for correlation against the public DOCA Telemetry guide or against the exporter's source-of-truth config. | [`## Capabilities and modes`](#capabilities-and-modes) invocation-class table + [TASKS.md ## run](TASKS.md#run) step 3 |
 | 4. Validate per-device support | Run the resolved counter against a specific device's capability surface (`<device PCI> <name> [properties]`) before committing it to an exporter config. A counter that resolves cleanly but is not supported on the target device produces no metric. | [`## Capabilities and modes`](#capabilities-and-modes) per-device-probe rule + [TASKS.md ## test](TASKS.md#test) validation gate |
 | 5. Diagnose a silent metric drop | A downstream consumer reports a metric missing; the exporter says it's emitting. Walk the schema-mismatch / unsupported-counter error taxonomy in [`## Error taxonomy`](#error-taxonomy) before suspecting the collector or network path. | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
-| 6. Bake a validated exporter config | The hand-off into the developer-side pipeline. Each counter the operator wants in the exporter config is first run through name → ID → per-device probe; the resulting validated tuple is the artifact the exporter config references. | [TASKS.md ## use](TASKS.md#use) hand-off + [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md) for the consumer side |
+| 6. Bake a validated exporter config | The hand-off into the developer-side pipeline. Each counter the operator wants in the exporter config is first run through name → ID → per-device probe; the resulting validated tuple is the artifact the exporter config references. | [TASKS.md ## use](TASKS.md#use) hand-off + `doca-telemetry/SKILL.md` for the consumer side |
 
 Two cross-cutting rules that apply to *every* pattern
 above:
@@ -69,9 +69,8 @@ schema-discovery + per-device-support question — the
 operator-side knowledge that exporter / collector setups
 need to be honest.
 
-**Three documented invocation classes.** Per the README
-shipped under `doca/tools/telemetry_utils/` and the
-public DOCA Telemetry guide:
+**Three documented invocation classes.** Per the public DOCA
+Telemetry Utils guide:
 
 | Invocation class | Shape | What it produces |
 | --- | --- | --- |
@@ -80,7 +79,7 @@ public DOCA Telemetry guide:
 | Reverse-resolve Data ID → name | `doca_telemetry_utils [<device PCI>] <DATA_ID>` | Reverse-resolves the Data ID to a counter name + unit + property values. If `<device PCI>` is provided, also probes the device's support. |
 
 Running the tool with no arguments prints a help
-banner per the shipped README; the exact subcommand
+banner; the exact subcommand
 strings and option names are authoritative on `--help`
 on the installed version and on the public DOCA
 Telemetry guide.
@@ -96,11 +95,11 @@ binary):
 | --- | --- |
 | `node` | Which logical node the counter is reported against — e.g. a per-port counter has a `node` that selects which port. |
 | `pcie_index` | Which PCIe interface the counter refers to — e.g. for `pcie_link_*` counters that distinguish between the device's PCIe ports / lanes. |
-| `depth` | Which depth-axis bucket the counter applies to — e.g. for queue-depth-conditioned counters. |
+| `depth` | Which depth (0-63) the counter refers to. In DOCA 3.5, `node`, `pcie_index`, and `depth` are fields encoded in the `pcie_link_*` Data IDs; they are not a queue-depth condition. |
 | Unit-specific axes (per the counter's `Unit:` line) | Each counter belongs to a `Unit` (e.g. `PCIE`, the host-RX-transport group, the TX-port group); each unit can expose unit-specific property axes beyond the generic three. |
 
-The shipped README's worked example (re-verifiable on a
-local DOCA install):
+A worked example (counter name and Data ID from the public DOCA
+Telemetry Diag counter list; re-verifiable on a local DOCA install):
 
 ```
 $ doca_telemetry_utils pcie_link_write_stalled_time_no_posted_header_credits_ns 1 2 3
@@ -111,6 +110,12 @@ node: 1
 pcie_index: 2
 depth: 3
 ```
+
+**Caveat (DOCA 3.5, known issue 4046180).** For `pcie_link_*`
+Data IDs that take `node`, `pcie_index`, and `depth`, the only
+valid values today are `0 0 0`. The `1 2 3` example above only
+shows how the Data ID is encoded; use `0 0 0` when sampling a
+real `pcie_link_*` counter.
 
 The agent's rule for *any* counter the operator names:
 run `doca_telemetry_utils <name>` once without
@@ -156,7 +161,7 @@ exporter configuration, not DTS deployment, not
 metric shipping. Once the operator has the validated
 Data ID for each counter, the hand-off is into the
 developer-side
-[`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+`doca-telemetry/SKILL.md`
 collector or the exporter library that consumes the
 IDs.
 
@@ -165,7 +170,7 @@ IDs.
 For the canonical DOCA version-detection chain, the
 four-way match rule, NGC container semantics, and the
 headers-win-over-docs rule, see
-[`doca-version`](../../doca-version/SKILL.md). The body
+`doca-version/SKILL.md`. The body
 lives there; this skill does not duplicate it.
 
 **The `doca_telemetry_utils`-specific overlay** is:
@@ -174,10 +179,10 @@ lives there; this skill does not duplicate it.
   resolves names ↔ Data IDs against the
   `doca_telemetry_diag` schema the host-side DOCA
   install carries; the developer-side
-  [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+  `doca-telemetry/SKILL.md`
   library consumes those Data IDs. The two must come
   from the same DOCA release band per the
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)
   four-way match rule, OR the exporter / collector
   pipeline can ship Data IDs the consumer's library
   does not understand.
@@ -221,10 +226,10 @@ time on the wrong fix.
    optional component is not installed, or the
    binary's loader-dependent shared libs are
    missing. Routing: route to
-  [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
    to install / repair the host-side DOCA package
    selection; confirm the installed version per
-   [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure).
+   `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 2. **Parse.** The invocation itself does not parse
    — unknown subcommand, missing required argument,
    Data ID in the wrong format (the documented
@@ -270,21 +275,21 @@ time on the wrong fix.
    guide for the per-platform support matrix.
 7. **Version.** Cross-cutting partial-install /
    mixed-version per
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility).
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`).
    Symptoms: the tool's reported counter set
    disagrees with the developer-side
-   [`doca-telemetry`](../../libs/doca-telemetry/SKILL.md)
+   `doca-telemetry/SKILL.md`
    library version's schema. Routing: walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    end-to-end.
 8. **Cross-cutting (downstream pipeline).** The
    tool reports cleanly but the exporter / collector
    pipeline still fails to ship a metric. Cause is
    in the downstream pipeline, not in the
    telemetry-utils tool. Routing: hand off to
-   [`doca-telemetry TASKS.md ## debug`](../../libs/doca-telemetry/TASKS.md#debug)
+   `doca-telemetry TASKS.md ## debug` (`doca-telemetry/TASKS.md#debug`)
    for the collector-side ladder, plus
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md)
+   `doca-debug ## debug` (`doca-debug/SKILL.md`)
    for the cross-cutting layers (driver, firmware,
    network).
 
@@ -293,7 +298,7 @@ the cross-library `DOCA_ERROR_*` taxonomy that DOCA
 libraries return through their C API; it is a CLI
 driving the diagnostic-data surface. The cross-library
 taxonomy is owned by
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
 
 ## Observability
 
@@ -303,7 +308,7 @@ counter name + unit + property values, or the
 enumerated counter set, in human-readable form. There
 is no file output, no daemon, no live-streaming mode.
 
-- **Stdout.** The primary surface. Per the README,
+- **Stdout.** The primary surface. Per the public guide,
   the resolved output is the (Data ID, Name, Unit,
   property-axis values) tuple. Capture stdout for
   every invocation the operator commits to an
@@ -320,7 +325,7 @@ is no file output, no daemon, no live-streaming mode.
   live guide and write the parser against their
   installed version, or use the structured helper
   per the
-  [`doca-structured-tools-contract`](../../doca-structured-tools-contract/SKILL.md)
+  `doca-structured-tools-contract/SKILL.md`
   preamble when present.
 - **Captured-evidence tuple.** The minimum metadata
   to attach to a validated counter committed to an
@@ -333,15 +338,15 @@ is no file output, no daemon, no live-streaming mode.
 
 For the cross-cutting env-side observability
 primitives (PCIe scans, `devlink`, `mlxconfig`), see
-[`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 For the developer-side collector observability
 (per-consume status, schema-query, consumer-queue-
 full handling), see
-[`doca-telemetry CAPABILITIES.md ## Observability`](../../libs/doca-telemetry/CAPABILITIES.md#observability).
+`doca-telemetry CAPABILITIES.md ## Observability` (`doca-telemetry/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 `doca_telemetry_utils` is a **read-only operator-side
 support tool**. It does not load algorithms, configure
@@ -396,7 +401,7 @@ when the operator's downstream exporter / collector
 configuration touches those, in which case the
 hardware-safety overlays of the matching
 per-artifact skill (e.g.
-[`doca-pcc CAPABILITIES.md ## Safety policy`](../../libs/doca-pcc/CAPABILITIES.md#safety-policy)
+`doca-pcc CAPABILITIES.md ## Safety policy` (`doca-pcc/CAPABILITIES.md#safety-policy`)
 when telemetry sits next to PCC) take over.
 
 ## Public-source pointer
@@ -405,13 +410,11 @@ The canonical public source for `doca_telemetry_utils`
 is the **DOCA Telemetry** page on `docs.nvidia.com`
 and the **DOCA Telemetry Service (DTS)** guide on
 the same site, reachable through
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
 and
-[`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
-The shipped README under
-`/opt/mellanox/doca/tools/telemetry_utils/README.md`
-on a real DOCA install carries the three documented
-invocation classes and one worked example each. Do
+`doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
+The public DOCA Telemetry Utils guide carries the three
+documented invocation classes. Do
 not invent counter names, Data IDs, property values,
 or unit-specific axes beyond what those public
 sources document, and re-verify against `--help` on

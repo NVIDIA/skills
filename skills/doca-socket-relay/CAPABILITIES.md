@@ -7,7 +7,7 @@ then drill into the H2 that owns the substance. For the *how* of
 executing each pattern, jump to [TASKS.md](TASKS.md). For the
 host ↔ DPU control-plane sibling whose channels coordinate the
 endpoints the relay carries traffic between, see
-[`doca-comch CAPABILITIES.md`](../../libs/doca-comch/CAPABILITIES.md).
+`doca-comch/CAPABILITIES.md`.
 
 This file is loaded by [`SKILL.md`](SKILL.md). It documents *what
 the relay carries and changes*, *which deployment shapes are
@@ -29,7 +29,7 @@ DOCA install that ships the relay, not just one platform.
 | 3. Configure the socket and the forwarding endpoint | Point the relay at the host application's AF_UNIX (UDS) socket via `-s/--socket <path>` and select the DPU-side Comch service name via `-n/--cc-name` plus the DOCA device PCIe address (`-p/--pci-addr`, plus `-r/--rep-pci` on the DPU side). The shipped binary uses an AF_UNIX socket on the host side — no TCP / UDP framing; the relay's network leg is Comch, not raw IP. | [`## Capabilities and modes`](#capabilities-and-modes) socket-type and forwarding-endpoint axes + [TASKS.md ## configure](TASKS.md#configure) steps 3-4 |
 | 4. Smoke-before-bulk admit a fleet | Bind one relay endpoint, confirm one host application client connects, confirm one round-trip succeeds end-to-end, only then admit the rest of the fleet | [TASKS.md ## test](TASKS.md#test) eval loop + [`## Safety policy`](#safety-policy) data-path posture |
 | 5. Diagnose a stuck or silent relay | Map the symptom (host app cannot connect, bytes leave the host but never arrive, fleet works in test but breaks in production) to the right layer of the error taxonomy before any state-changing intervention | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
-| 6. Pair the relay with its control-plane sibling | Use [`doca-comch`](../../libs/doca-comch/SKILL.md) to coordinate the relay's endpoints and lifecycle when the application owner needs programmatic control over which DPU-side terminator a host client is bridged to | [`## Observability`](#observability) cross-cutting pairing + [`SKILL.md ## Related skills`](SKILL.md#related-skills) |
+| 6. Pair the relay with its control-plane sibling | Use `doca-comch/SKILL.md` to coordinate the relay's endpoints and lifecycle when the application owner needs programmatic control over which DPU-side terminator a host client is bridged to | [`## Observability`](#observability) cross-cutting pairing + [`SKILL.md ## Related skills`](SKILL.md#related-skills) |
 
 Two cross-cutting rules that apply to *every* pattern above:
 
@@ -57,7 +57,7 @@ The DOCA Socket Relay is a documented DOCA artifact that ships on
 installs which include it. The exact installed location, binary
 name, packaging shape, and per-platform availability live in the
 public DOCA Socket Relay guide reachable via
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools)
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)
 and on the installed `--help`; the skill deliberately does not
 pin them — see
 [`SKILL.md ## What this skill deliberately does not ship`](SKILL.md#what-this-skill-deliberately-does-not-ship).
@@ -80,8 +80,8 @@ flag back to the user.
 
 | Axis | What it picks | Why the agent must name it |
 | --- | --- | --- |
-| 1. Deployment shape | How and where the relay process runs — *in-process* (linked or co-resident next to the host application), *sidecar* (a separate process / container next to the application on the same host), or *container* (a service container on the BlueField via the documented kubelet-standalone runtime). | Each shape has a different precondition surface (host-OS permissions for in-process; lifecycle coupling for sidecar; image-pull + static-pod + per-service config mount per [`doca-container-deployment CAPABILITIES.md ## Capabilities and modes`](../../doca-container-deployment/CAPABILITIES.md#capabilities-and-modes) for the container shape). An answer that picks one shape without naming the alternatives has silently narrowed the relay to a single use case. |
-| 2. Socket type / protocol on the host leg | The shipped `doca_socket_relay` binary uses AF_UNIX (Unix Domain Sockets, SOCK_STREAM) on its host leg — the listener and acceptor threads in the shipped binary are all AF_UNIX, and the relay's `-s/--socket` argument is a filesystem path, not an IP/port pair. The DPU-network leg is the DOCA Comch transport (`-n/--cc-name` selects the named Comch service). If the public DOCA Socket Relay guide on the user's installed version adds TCP / UDP / etc. variants in a later release, the agent verifies that on the user's `--help` output before quoting any non-AF_UNIX behavior — it does not invent transport modes the shipped binary does not support. | Treating the relay as protocol-agnostic and quoting TCP / UDP debug rules against a UDS-only binary is a category error: framing, error semantics, file-descriptor permissions, and peer-credential propagation are AF_UNIX-shaped, not socket-API-generic. |
+| 1. Deployment shape | How and where the relay process runs — *in-process* (linked or co-resident next to the host application), *sidecar* (a separate process / container next to the application on the same host), or *container* (a service container on the BlueField via the documented kubelet-standalone runtime). | Each shape has a different precondition surface (host-OS permissions for in-process; lifecycle coupling for sidecar; image-pull + static-pod + per-service config mount per `doca-container-deployment CAPABILITIES.md ## Capabilities and modes` (`doca-container-deployment/CAPABILITIES.md#capabilities-and-modes`) for the container shape). An answer that picks one shape without naming the alternatives has silently narrowed the relay to a single use case. |
+| 2. Socket type / protocol on the host leg | The shipped `doca_socket_relay` binary uses AF_UNIX (Unix Domain Sockets, SOCK_STREAM) on its host leg per the public guide, and the relay's `-s/--socket` argument is a filesystem path, not an IP/port pair. The DPU-network leg is the DOCA Comch transport (`-n/--cc-name` selects the named Comch service). If the public DOCA Socket Relay guide on the user's installed version adds TCP / UDP / etc. variants in a later release, the agent verifies that on the user's `--help` output before quoting any non-AF_UNIX behavior — it does not invent transport modes the shipped binary does not support. | Treating the relay as protocol-agnostic and quoting TCP / UDP debug rules against a UDS-only binary is a category error: framing, error semantics, file-descriptor permissions, and peer-credential propagation are AF_UNIX-shaped, not socket-API-generic. |
 | 3. Forwarding endpoint | Where on the DPU side the relay forwards traffic to — the DPU-side terminator (the relay's far half, a DPU-side service, or a documented service container on the BlueField that re-presents the bytes to the DPU peer). | This is the most consequential axis for safety: a *correct* host-side bind with a *wrong* forwarding endpoint produces a relay that the host application can connect to but whose bytes go to the wrong place (or nowhere). The agent's diagnosis ladder in [`## Error taxonomy`](#error-taxonomy) treats forwarding-endpoint misconfiguration as its own layer for that reason. |
 
 The three axes are **independent**; an in-process AF_UNIX relay
@@ -95,7 +95,7 @@ per the shipped binary; the host leg is never TCP / UDP.)
 relay operation falls into one of two functional families,
 exactly as the comm-channel-admin tool partitions its surface
 (see
-[`doca-comm-channel-admin CAPABILITIES.md ## Capabilities and modes`](../doca-comm-channel-admin/CAPABILITIES.md#capabilities-and-modes)
+`doca-comm-channel-admin CAPABILITIES.md ## Capabilities and modes` (`doca-comm-channel-admin/CAPABILITIES.md#capabilities-and-modes`)
 for the same shape):
 
 - **Read-only operations.** Inspect the relay's running state —
@@ -133,20 +133,20 @@ version. The skill deliberately does not pin them.
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see [`doca-version`](../../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The Socket Relay-specific overlay** is:
 
 - **Confirm the relay is shipped on the user's installed DOCA before assuming availability.** The relay is documented as a DOCA artifact under
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools); whether the binary or container image is actually present on a given host depends on the install profile and the DOCA version. If the user reports the artifact is absent, the right answer is to confirm the installed DOCA version per
-  [`doca-version TASKS.md ## configure`](../../doca-version/TASKS.md#configure)
-  and route to [`doca-setup`](../../doca-setup/SKILL.md) for an upgrade or reinstall, not to recommend a wrapper script that simulates the relay from outside.
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`); whether the binary or container image is actually present on a given host depends on the install profile and the DOCA version. If the user reports the artifact is absent, the right answer is to confirm the installed DOCA version per
+  `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)
+  and route to `doca-setup/SKILL.md` for an upgrade or reinstall, not to recommend a wrapper script that simulates the relay from outside.
 - **Where it runs:** on the x86 / Arm host that has DOCA installed, or on the BlueField Arm side, or on both sides of a host ↔ DPU pair depending on the deployment shape. The exact same artifact can be invoked as a CLI process or, when shipped as a service container, deployed via the runtime contract in
-  [`doca-container-deployment CAPABILITIES.md ## Version compatibility`](../../doca-container-deployment/CAPABILITIES.md#version-compatibility) (which adds a third version anchor — the per-service container tag — on top of host DOCA and BFB).
+  `doca-container-deployment CAPABILITIES.md ## Version compatibility` (`doca-container-deployment/CAPABILITIES.md#version-compatibility`) (which adds a third version anchor — the per-service container tag — on top of host DOCA and BFB).
 - **Relay version must match the DOCA fabric layer it sits on.** The relay is a DOCA artifact and consumes the same `doca-common` runtime as every other DOCA library; a relay binary from one DOCA train invoked against a different-train install is the same partial-install hazard as case (a) ≠ (c) in the four-way-match rule. When in doubt, run `pkg-config --modversion doca-common` and the relay's own `--version` per
-  [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility) and quote both.
+  `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`) and quote both.
 - **Public guide URL slug is `DOCA-Socket-Relay`.** Search results that point at older slugs or at relay material on third-party sites are not authoritative for the user's installed version; the canonical guide is reached via
-  [`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools), not from agent-memory recall.
+  `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`), not from agent-memory recall.
 
 ## Error taxonomy
 
@@ -161,7 +161,7 @@ distinguish, in escalating order:
    subpackage. Cause: DOCA is not installed on this side, the
    install does not include the Socket Relay subpackage, or the
    install version pre-dates the relay's availability. Routing:
-   [`doca-setup ## install`](../../doca-setup/TASKS.md#configure)
+   `doca-setup ## install` (`doca-setup/TASKS.md#configure`)
    and the version-compatibility overlay above.
 2. **Relay-not-bound (port / socket).** The relay process / container
    starts but cannot bind the host-side socket / port / UDS path
@@ -174,7 +174,7 @@ distinguish, in escalating order:
    Routing: re-quote the configuration from the public guide and
    `--help` on the installed binary; route filesystem / privilege
    issues to the host-OS team and to
-   [`doca-setup CAPABILITIES.md ## Safety policy`](../../doca-setup/CAPABILITIES.md#safety-policy).
+   `doca-setup CAPABILITIES.md ## Safety policy` (`doca-setup/CAPABILITIES.md#safety-policy`).
 3. **Host-app-not-connecting.** The relay is bound on its
    configured socket, but the host application reports it cannot
    reach the relay (`ECONNREFUSED`, connect timeout, write to a
@@ -199,7 +199,7 @@ distinguish, in escalating order:
    relay's transport, or — when the relay's far half is shipped
    as a service container — the BlueField pod is not in
    `Running` per
-   [`doca-container-deployment CAPABILITIES.md ## Error taxonomy`](../../doca-container-deployment/CAPABILITIES.md#error-taxonomy).
+   `doca-container-deployment CAPABILITIES.md ## Error taxonomy` (`doca-container-deployment/CAPABILITIES.md#error-taxonomy`).
    The agent's diagnosis discipline: capture the relay's view
    (was the byte received from the host?), the BlueField-side
    terminator's view (was the byte delivered?), and the DPU-side
@@ -222,9 +222,9 @@ distinguish, in escalating order:
    different DOCA installs (partial install), or because the
    relay container tag does not match the host DOCA / BFB
    versions on the BlueField (per the three-anchor rule in
-   [`doca-container-deployment CAPABILITIES.md ## Version compatibility`](../../doca-container-deployment/CAPABILITIES.md#version-compatibility)).
+   `doca-container-deployment CAPABILITIES.md ## Version compatibility` (`doca-container-deployment/CAPABILITIES.md#version-compatibility`)).
    Routing: walk the four-way match per
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2 and apply the overlay in
    [`## Version compatibility`](#version-compatibility) above.
 7. **Cross-cutting layer.** The relay is bound, the host
@@ -233,15 +233,15 @@ distinguish, in escalating order:
    symptom remains. The cause is below the relay: kernel /
    driver, BlueField mode, firmware, host networking
    misconfiguration, or hardware. Escalate to
-   [`doca-debug ## debug`](../../doca-debug/SKILL.md) with the
+   `doca-debug ## debug` (`doca-debug/SKILL.md`) with the
    captured relay-side inspection plus the host-side and
    DPU-side application traces as evidence; do not loop on
    bind / unbind / restart hoping for a different outcome.
 
 The Socket Relay does **not** itself return `DOCA_ERROR_*` values
 to a calling program — those are owned by the DOCA libraries
-([`doca-comch`](../../libs/doca-comch/SKILL.md),
-[`doca-eth`](../../libs/doca-eth/SKILL.md), and friends). The
+(`doca-comch/SKILL.md`,
+`doca-eth/SKILL.md`, and friends). The
 relay's CLI / container exit codes and printed messages are its
 own narrow surface; the agent maps those into the layers above
 before interpreting any program-side error from a paired DOCA
@@ -263,13 +263,13 @@ Three primary signals the agent should reach for:
   via the standard DOCA argp surface (`--help`, `--json-config`,
   `--sdk-log-level`, `--log-level` are inherited from DOCA argp),
   and its visibility into "what is the relay actually doing" is
-  delivered via **DOCA logger output** (`DOCA_LOG_REGISTER`-driven
-  category `SOCKET_RELAY`) controlled by `--sdk-log-level` and
-  `DOCA_LOG_LEVEL`, NOT via a dedicated `--list-channels` /
+  delivered via **DOCA logger output** controlled by `-l/--log-level`
+  (numeric, e.g. 50=INFO, 60=DEBUG; `--sdk-log-level` only raises DOCA
+  library internals), NOT via a dedicated `--list-channels` /
   `--list-connections` flag — those flags do NOT exist in the
-  shipped binary as of DOCA 3.3. For the container deployment shape,
+  shipped binary as of DOCA 3.5. For the container deployment shape,
   ENTRYPOINT log per
-  [`doca-container-deployment CAPABILITIES.md ## Observability`](../../doca-container-deployment/CAPABILITIES.md#observability)
+  `doca-container-deployment CAPABILITIES.md ## Observability` (`doca-container-deployment/CAPABILITIES.md#observability`)
   carries the same logger stream. The agent's discipline is: confirm
   what the binary actually exposes via `--help` on the user's
   installed version before quoting any inspection flag, and prefer
@@ -290,24 +290,24 @@ Three primary signals the agent should reach for:
 The relay is itself an **observability primitive** for the
 host ↔ DPU data plane the same way the comm-channel-admin tool
 is for the host ↔ DPU control plane (see
-[`doca-comm-channel-admin CAPABILITIES.md ## Observability`](../doca-comm-channel-admin/CAPABILITIES.md#observability)).
+`doca-comm-channel-admin CAPABILITIES.md ## Observability` (`doca-comm-channel-admin/CAPABILITIES.md#observability`)).
 A captured relay inspection is the artifact downstream debug
 consumes; without it, the next debug step starts guessing.
 
 For the cross-library env-side observability primitives
 (representor enumeration, port state, BlueField mode, firmware)
 see
-[`doca-setup CAPABILITIES.md ## Observability`](../../doca-setup/CAPABILITIES.md#observability).
+`doca-setup CAPABILITIES.md ## Observability` (`doca-setup/CAPABILITIES.md#observability`).
 For program-side observability of the paired DOCA libraries (the
 control-plane comch channel coordinating the bridge, or the
 underlying packet I/O layer) see
-[`doca-comch CAPABILITIES.md ## Observability`](../../libs/doca-comch/CAPABILITIES.md#observability)
+`doca-comch CAPABILITIES.md ## Observability` (`doca-comch/CAPABILITIES.md#observability`)
 and
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 The Socket Relay is the **most data-path-sensitive** tool this
 bundle currently teaches an agent to drive directly: it sits in
@@ -360,7 +360,7 @@ observes as a generic socket error.
   hardware). Re-issuing the same state-changing operation is
   the wrong move; route to
   [`TASKS.md ## debug`](TASKS.md#debug) layer 7 and escalate to
-  [`doca-debug`](../../doca-debug/SKILL.md).
+  `doca-debug/SKILL.md`.
 - **Quote what the relay said. Do not paraphrase relay state.**
   When the user later asks *"is this relay healthy"*, the
   correct answer is to point at the line of the inspection that
@@ -380,15 +380,15 @@ observes as a generic socket error.
 The single canonical public source for the DOCA Socket Relay is
 the **DOCA Socket Relay** page on `docs.nvidia.com`, reachable
 through
-[`doca-public-knowledge-map ## DOCA tools`](../../doca-public-knowledge-map/SKILL.md#doca-tools).
+`doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 Do not invent binary names, flags, subcommand names, output
 columns, socket-path defaults, or port numbers beyond what that
 page documents. For the comch library that owns the host ↔ DPU
 control-plane sibling pattern, the public source is the **DOCA
 Comch** page, reached the same way and named on the
-[`doca-comch`](../../libs/doca-comch/SKILL.md) skill. For the
+`doca-comch/SKILL.md` skill. For the
 service-container runtime when the relay is shipped as a
 container, the public source is the **DOCA Container Deployment
 Guide**, reached the same way and named on the
-[`doca-container-deployment`](../../doca-container-deployment/SKILL.md)
+`doca-container-deployment/SKILL.md`
 skill.

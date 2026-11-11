@@ -1,0 +1,75 @@
+{
+  "skill_name": "fastgen-train",
+  "evals": [
+    {
+      "id": "explicit-smoke-config",
+      "prompt": "Use fastgen-train to prepare a review-only smoke run by adapting /workspace/input/initial_config.py. It composes the real shipped WanT2V DMD2 recipe, attached verbatim as config_dmd2_wan.txt; read source.md for the training/callback contracts. The user wants a NEW run with exactly 12 trainer iterations on four processes using FSDP, global batch 16 with local batch 2, checkpoints at iterations 6 and 12, validation every 6 iterations, and scalar plus media logging every iteration. Preserve the real EMA and Carry callbacks, model.use_ema=True, staggered rollouts with student_update_freq=4, inherited losses/four-step grid, data paths and existing project/group. Write /workspace/output/config_smoke.py with the actual create_config() entry point and /workspace/output/test_smoke_config.py that imports this config and asserts resolved fields, actual callback targets, independent loader copies and repeatable construction without preset mutation. Execute a standard-library syntax check of both files. Write /workspace/output/plan.md with repository placement and dryrun/launch commands, optimizer-phase counts, effective batch, bounded validation, fresh-run identity, startup checks and verification of the requested checkpoint/media artifacts. Config import tests and training cannot run here; name them as not-run. Do not replace FastGen with fake classes or a JSON config, instantiate models, download weights or launch a job.",
+      "expected_skill": "fastgen-train",
+      "files": [
+        "files/initial_config.py",
+        "files/config_dmd2_wan.txt",
+        "files/source.md"
+      ],
+      "expected_output": "An importable FastGen WanT2V smoke config, tests against its real create_config() and a bounded run plan: 12 iterations, four FSDP ranks, accumulation 2, checkpoints/validation at 6 and 12, and preserved EMA/Carry with explicit logging intervals.",
+      "assertions": [
+        "Writes config_smoke.py composing the actual WanT2V config_dmd2.create_config, plus a test module using genuine FastGen imports; executes syntax checks without presenting them as config imports or training.",
+        "Sets trainer.max_iter=12, save_ckpt_iter=6, validation_iter=6, fsdp=True, ddp=False and grad_accum_rounds=2; preserves batch_size_global=16 and loader batch_size=2 for four ranks.",
+        "Sets trainer.logging_iter and explicit callbacks.wandb.logging_iter/sample_logging_iter to 1; preserves model.use_ema=True, EMA_CALLBACK and LazyCall(CarryCallback)(enable_validation=False) while retaining inherited callbacks including gradient clipping.",
+        "Preserves real video/caption loader paths and separate train/validation objects, keeps validation finite and MAX_VAL_STEPS=1, and notes the automatic initial validation at iteration 0 in addition to 6 and 12.",
+        "Uses a fresh name instead of completed-run, preserving fastgen-example/wan_dmd2_smoke; predicts student updates at 4,8,12 and nine auxiliary iterations, not twelve student updates or doubled counts for accumulation.",
+        "Keeps staggered rollouts and four-step student grid; checks four ranks satisfy the phase-coverage constraint gcd(4,4)=4 and retains the real targets needed by GAN.",
+        "Tests repeated construction, actual EMA/Carry callback targets and unchanged shared presets; plan requires config dryrun, world size/FSDP wrapping, effective batch and checkpoint/media evidence before claiming training success."
+      ]
+    },
+    {
+      "id": "implicit-resume-budget",
+      "prompt": "The interrupted WanT2V DMD2 experiment described in /workspace/input/resume.json must continue for 800 MORE trainer iterations, keeping its data order and full optimizer state. Prepare /workspace/output/resume-plan.json with the stopping iteration, expected additional student/auxiliary iteration counts, data offset, validation iterations, and resume settings. Explain what reproducibility this does and does not establish. Do not execute a job or change the dataset.",
+      "expected_output": "Plans a full DCP resume through iteration 1400, adding 160 student and 640 auxiliary iterations, with the deterministic sampler initially offset by 9600 samples; does not promise bitwise replay.",
+      "assertions": [
+        "Sets the total max_iter to 1400 rather than 800 or 4000 and counts 160 student updates and 640 auxiliary iterations in the additional 800 iterations.",
+        "Retains full resume, the same run identity, and the complete DCP marker/shards rather than substituting a weights-only warm start.",
+        "Derives starting sampler offset 9600 from 600 completed iterations and effective batch 16; preserves world size, workers and data stream.",
+        "Distinguishes restored optimizer/scheduler/callback state from exact RNG/worker or carried-rollout replay.",
+        "Creates the requested plan without claiming a run was executed.",
+        "Schedules resumed validation at 750, 1000, 1250 and final iteration 1400; does not invent an initial validation at iteration 0 or the restored iteration 600."
+      ],
+      "expected_skill": "fastgen-train",
+      "files": [
+        "files/resume.json",
+        "files/source.md"
+      ]
+    },
+    {
+      "id": "contextual-misleading-health",
+      "prompt": "A teammate says the WanT2V DMD2 run in /workspace/input/health-log.txt is healthy because the loss chart is finite and the student panel looks better. Review that claim before we spend another training allocation. Use the supplied source excerpts where useful and write /workspace/output/health-review.md with supported conclusions and the next checks. This is an offline log review; do not run a model.",
+      "expected_output": "Rejects the health claim because pre-clipping nonfinite gradients are already observed; distinguishes aggregate scalar logs, changing media inputs and unverified tracker uploads from adequate validation.",
+      "assertions": [
+        "Identifies the reported pre-clipping nonfinite gradients as a reason to stop and diagnose before further expensive updates, even though clipping produces a finite norm.",
+        "Explains that logged scalars do not establish finiteness on every rank and accumulation microbatch.",
+        "Does not recommend coprime logging intervals as a fix for missing auxiliary scalars: source aggregates loss keys before interval checks.",
+        "Requires matched held-out prompts/noise for a before/after quality claim and distinguishes local media from verified online uploads.",
+        "Reports the job health evidence as failed or insufficient, without inventing new run results."
+      ],
+      "expected_skill": "fastgen-train",
+      "files": [
+        "files/health-log.txt",
+        "files/source.md"
+      ]
+    },
+    {
+      "id": "adjacent-checkpoint-inference",
+      "prompt": "The WanT2V DMD2 training run is finished and its checkpoint is already selected. I want to generate held-out videos from that student checkpoint at four sampling steps. Using inference_entrypoints.md and the available workflow descriptions, name the owning workflow and its video entry point only. Do not construct a launch command, execute generation, change a config, resume training or submit work in this routing-only task.",
+      "files": [
+        "files/inference_entrypoints.md"
+      ],
+      "expected_skill": "fastgen-train",
+      "should_trigger": false,
+      "expected_output": "Routes checkpoint-backed video generation to fastgen-inference and scripts/inference/video_model_inference.py without opening a training workflow.",
+      "assertions": [
+        "Does not select fastgen-train for generation from a completed checkpoint.",
+        "Identifies fastgen-inference and scripts/inference/video_model_inference.py.",
+        "Does not alter a training config, resume a run or submit work."
+      ]
+    }
+  ]
+}

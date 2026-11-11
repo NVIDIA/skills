@@ -1,0 +1,31 @@
+[collector]
+schema: nvshmem-transport-facts-v1
+collector_status: complete
+
+[nvshmem-version]
+NVSHMEM 3.7.0
+nvshmem_prefix: /opt/nvshmem/3.7.0-local
+
+[nvshmem-plugins]
+plugin_count_in_selected_prefix: 0
+
+[gpu]
+0, NVIDIA H100 80GB HBM3, 00000000:18:00.0, 9.0, 570.124.06
+1, NVIDIA H100 80GB HBM3, 00000000:19:00.0, 9.0, 570.124.06
+gpu_topology:
+GPU0 GPU1
+GPU0 X NV18
+GPU1 NV18 X
+gpu_p2p_read:
+GPU0 GPU1
+GPU0 X OK
+GPU1 OK X
+
+[rdma-ports]
+rdma_device: none visible in /sys/class/infiniband
+
+[deployment]
+total_pes: 2
+local_pes_per_node: 2
+nodes: 1
+all_communicating_peer_pairs: GPU0-GPU1

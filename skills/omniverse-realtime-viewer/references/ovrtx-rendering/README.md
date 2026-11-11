@@ -19,6 +19,13 @@ supplemental dependency documentation.
 ## Core API
 
 ```python
+import os
+os.environ.setdefault("OVRTX_SKIP_USD_CHECK", "1")
+import ovrtx
+# Stage-first attached mode: publish OVRTX schema paths before OVStage or any
+# other OpenUSD consumer initializes. Importing ovrtx alone does not do this.
+ovrtx.register_schema_paths()
+
 import ovstage
 from ovstage import PopulationDomain, population
 from ovrtx import Renderer, RendererConfig
@@ -28,7 +35,7 @@ ordinal = 1
 population.open_usd(stage, "/path/to/composite.usda", ordinal=ordinal, domains=PopulationDomain.RENDERING)
 stage.advance_write_floor(ordinal).wait()
 
-# Create and populate the OVStage before constructing the renderer.
+# Create the renderer and attach the published stage.
 renderer = Renderer(config=RendererConfig(
     sync_mode=True,
     active_cuda_gpus="0",
@@ -42,8 +49,7 @@ products = renderer.step(
     delta_time=1.0 / 60.0,
     ordinal=ordinal,
 )
-with products as ctx:
-    product = ctx["/Session/Render/Viewport"]
+product = products["/Session/Render/Viewport"]
 ```
 
 `sync_mode=True` blocks until the GPU frame is complete. Async pipelines can use `False`, but then buffer lifetime and frame readiness need explicit care.
@@ -56,7 +62,19 @@ committed OVStage publication. A separate `renderer.update_from_stage(N)` is
 only needed when the app must update renderer state before a step, such as
 pre-step sensor or status work.
 
-`renderer.step()` returns `RenderProductSetOutputs`, not a Python `dict`. It supports `[]`, `in`, `keys()`, `values()`, and `items()`, but not `.get()` or `.update()`. Some installed builds also support context-manager cleanup. Generated code should use context-manager cleanup when `__enter__` is available, and otherwise consume the mapping-like result directly while copying required frame data before the next step.
+Call `ovrtx.register_schema_paths()` before constructing or first populating an
+OVStage (and before any other OpenUSD runtime initializes). In current OVRTX,
+this registers the RTX schema families with OVStage so populated schema
+fallbacks resolve. An OVStage instance can be attached to only one live OVRTX
+renderer. Renderer replacement must follow the
+[attached-stage lifetime guidance](../ovstage-ovrtx-integration/README.md#lifetime-and-scene-changes),
+including the payload limitation on affected builds.
+
+`renderer.step()` returns a mapping-like `RenderProductSetOutputs`, indexed by
+RenderProduct path; it is not a context manager. Map each needed RenderVar with
+`with render_var.map(...) as mapping:` and copy the pixels inside that context.
+Consume the results inside the frame loop and release references once the
+required outputs have been copied.
 
 `renderer.step_async()` enqueues the same frame work and returns an `Operation`. Poll `op.query_status()` from the runtime owner when you need the render loop to stay responsive, then call `op.wait()` before reading `RenderProductSetOutputs`. Do not mutate OVStage or the standalone renderer stage while a step operation is in flight.
 
@@ -84,36 +102,51 @@ one owner per app path.
 
 ```python
 products = renderer.step(render_products={RENDER_PRODUCT_PATH}, delta_time=dt, ordinal=ordinal)
-with products as ctx:
-    if RENDER_PRODUCT_PATH in ctx:
-        product = ctx[RENDER_PRODUCT_PATH]
-        for frame in product.frames:
-            if "LdrColor" in frame.render_vars:
-                with frame.render_vars["LdrColor"].map(device=Device.CUDA) as rv:
-                    rgba_cuda = wp.from_dlpack(rv)  # H x W x 4, channel-last
-                with frame.render_vars["LdrColor"].map(device=Device.CPU) as rv:
-                    pixels = np.from_dlpack(rv).copy()  # H x W x 4 RGBA
+if RENDER_PRODUCT_PATH in products:
+    product = products[RENDER_PRODUCT_PATH]
+    for frame in product.frames:
+        # Output identity is the full authored RenderVar prim path.
+        ldr_path = "/Session/Render/Vars/LdrColor"
+        if ldr_path in frame.render_vars:
+            with frame.render_vars[ldr_path].map(device=Device.CUDA) as rv:
+                rv.wait()  # Establish producer completion before Warp consumption.
+                rgba_cuda = wp.from_dlpack(rv)  # borrowed H x W x 4 view
+                wp.copy(owned_rgba_cuda, rgba_cuda)
+                wp.synchronize_stream()  # Copy must finish before unmap.
+            with frame.render_vars[ldr_path].map(device=Device.CPU) as rv:
+                pixels = np.from_dlpack(rv).copy()  # H x W x 4 RGBA
 ```
 
-CUDA mapping exposes linear CUDA memory. CPU mapping transfers data to host. For local UI, copy inside the map context before returning.
+CUDA mapping avoids a host transfer; CPU mapping copies to host. The mapped
+object implements DLPack directly for a single-tensor output such as `LdrColor`.
+For multi-tensor outputs, select names (`rv["Coordinates"]`, `rv["Intensity"]`)
+and read scalar params through `rv.params`.
 
-Current render variable output can contain one or more named tensors plus named params. For single-tensor outputs such as `LdrColor`, use the mapped object itself as the DLPack producer (`np.from_dlpack(rv)` / `wp.from_dlpack(rv)`). For multi-tensor outputs, address tensors by name (`rv["Coordinates"]`, `rv["Intensity"]`) and params through `rv.params["hitCount"]`. Do not write new code against older single-tensor convenience access.
+## Frame lifetime and synchronization
 
-C maps an `ovrtx_render_var_output_t` with `ovrtx_map_render_var_output()`. Iterate its `tensors[]` and `params[]` by name; do not assume tensor index `0` is the only payload unless the RenderVar contract says it is.
+Keep step outputs alive while obtaining maps. DLPack consumers retain their
+mapped backing storage, so copy frames into app-owned storage for UI and
+transport queues rather than retaining renderer buffers.
 
-## Frame Result Lifetime
+GPU handoff has two completion points: wait for rendering before reading the
+mapping, then finish the consumer's reads before releasing it. The example uses
+`rv.wait()` and a consumer-stream wait for a simple synchronous copy. To keep
+work asynchronous, use `rv.wait_on(consumer_stream_handle)` and
+`rv.unmap(stream=consumer_stream_handle)` or `unmap(event=completion_event)` with
+the actual consuming CUDA stream/event. Preserve destination-buffer ownership
+until the display or encoder finishes with it.
 
-`RenderProductSetOutputs`, products, frames, mapped render var outputs, and tensor wrappers are per-step views into ovrtx-owned output. Map and copy render vars while the owning `RenderProductSetOutputs` object is still alive, inside the same render-loop step that produced them. When the step result supports `__enter__`, use `with products as ctx:` for deterministic cleanup; when it does not, still copy the data before the next `renderer.step()`.
-
-Do not return a `frame`, render var output, mapped tensor, DLPack wrapper, or NumPy/Warp view that still depends on the mapped ovrtx output. Do not hold references to frame data across later `renderer.step()` calls; the next step can invalidate handles from the previous step.
-
-If frame data must move downstream to an encoder, streaming layer, UI bridge, worker queue, or logger, copy it before the step result goes out of scope. For CPU paths, use an owned array such as `np.from_dlpack(rv).copy()`. For CUDA paths, copy into an application-owned persistent CUDA buffer, such as a Warp array allocated outside the map context, before passing that buffer to the next stage.
+For C consumers, `ovrtx_map_render_var_output()` exposes named `tensors[]` and
+`params[]`; interpret them using the selected RenderVar's contract.
 
 ## Render Product Resolution
 
 Set the viewer-owned RenderProduct `resolution` in the session or composite layer before loading the stage. The render product path must be the same path passed to `renderer.step(render_products={...})`.
 
-Browser-streamed Omniverse Realtime Viewer apps should keep this resolution fixed, typically 1920x1080, and let the browser display the video with `object-fit: contain`. ovrtx does not expose a `renderer.resize()` API, and ovstream encoders should not be treated as live-resizable.
+Use a fixed render size with browser `object-fit: contain` by default. For an
+explicit resize feature, update the authored resolution through the stage API
+and follow `streaming-server/frame-loop-and-continuity.md` for the resizable
+transport contract; verify actual output dimensions before submission.
 
 ## Render Vars And AOVs
 
@@ -137,7 +170,15 @@ AOV/debug-view feature needs additional outputs. Add HDR, depth, normal,
 segmentation, or other debug AOVs together with the conversion, UI, and
 validation rules from `aov-switching` and `render-settings`.
 
-`frame.render_vars` is keyed by source name, not necessarily by `RenderVar` prim name. For example, a `RenderVar "Normal"` prim with `sourceName = "NormalSD"` appears as `NormalSD` in Python.
+`frame.render_vars` is keyed by the full authored `RenderVar` prim path, not by
+the prim name or `sourceName`. For example, a `RenderVar "Normal"` at
+`/Render/Vars/Normal` with `sourceName = "NormalSD"` appears under
+`/Render/Vars/Normal`. Keep `source_name` only as the friendly AOV category
+used for UI and conversion selection. Build a `source_name` →
+`render_var_path` mapping from the frame outputs when the wrapper does not
+author stable paths itself only if the viewer enforces one RenderVar per source
+name. Otherwise, make the full `render_var_path` the UI option identity and
+carry `source_name` only as display metadata.
 
 Common displayable AOVs for viewer apps:
 
@@ -145,62 +186,22 @@ Common displayable AOVs for viewer apps:
 |---|---|---|
 | `LdrColor` | `uint8 [H,W,4]` | Tonemapped RGBA; swap R/B for ovstream BGRA |
 | `HdrColor` | `uint16 [H,W,4]` | Linear HDR exposed as fp16 bits in `uint16`; display with approximate tonemap |
-| `NormalSD` | `uint32 [H,W,4]` | Screen-space normals exposed as packed float bit patterns |
+| `NormalSD` | `float32 [H,W,4]` | World-space surface normals (XYZA) |
 | `InstanceSegmentationSD` | `uint32 [H,W,1]` | Instance IDs; display/debug AOV, colorize for inspection |
 | `SemanticSegmentationSD` | `uint32 [H,W,1]` | Semantic IDs; display/debug AOV, colorize for inspection |
 
-All image tensors are channel-last `[H, W, C]`; scalar lanes are `[H, W, 1]`, not `[H, W]`. The composite stage can request more render vars for future use, but do not expose them until they map to real non-empty data.
+All image tensors are channel-last `[H, W, C]`; scalar lanes are `[H, W, 1]`, not `[H, W]`. Request only the render vars the feature uses, and expose them only after they map to real non-empty data.
 
-## AOV Discovery
+## Displaying other AOVs
 
-Discover available display AOVs from real frame output, then filter through a conservative allowlist.
+Keep output identity as the RenderVar path and offer only outputs that map to
+valid full-resolution data. Presence in `frame.render_vars` alone does not prove
+that an output is displayable. Convert the selected output on GPU into the
+transport's app-owned display buffer.
 
-```python
-DISPLAY_AOVS = (
-    "LdrColor",
-    "HdrColor",
-    "NormalSD",
-    "InstanceSegmentationSD",
-    "SemanticSegmentationSD",
-)
-
-def _update_available_aovs(self, render_vars: Any, notify: bool = False) -> None:
-    names = set(render_vars.keys()) if hasattr(render_vars, "keys") else set(render_vars)
-    available = {name for name in DISPLAY_AOVS if name in names}
-    if not available:
-        available = {"LdrColor"}
-    self._available_aovs = available
-```
-
-Log the full `render_vars` key list once when investigating new ovrtx versions, but use the allowlist for UI state. Presence in `render_vars` does not guarantee that mapping succeeds or that the tensor is non-empty.
-
-## AOV Conversion
-
-ovstream expects one BGRA8 CUDA image. Convert every selected AOV into a persistent `wp.uint8 [H,W,4]` buffer:
-
-```python
-with fout.render_vars[aov_name].map(device=Device.CUDA) as rv:
-    # Single-tensor output. For multi-tensor outputs, use rv["TensorName"].
-    src = wp.from_dlpack(rv)
-    shape = tuple(int(dim) for dim in src.shape)
-    height, width = shape[0], shape[1]
-    channels = shape[2] if len(shape) >= 3 else 1
-    dtype = src.dtype
-    dim = (width, height)
-
-    if dtype == wp.uint8 and len(shape) == 3 and channels == 4:
-        wp.copy(self._stream_buf, src)
-        wp.launch(_swap_rb, dim=dim, inputs=[self._stream_buf], device="cuda:0")
-        return True
-
-    if dtype == wp.uint32 and len(shape) == 3 and channels == 1:
-        wp.launch(_colorize_seg_3d, dim=dim, inputs=[src, self._stream_buf], device="cuda:0")
-        return True
-```
-
-Include kernels for `uint8`, `uint16`, `uint32`, `float32`, and `float16`,
-with channel-last scalar, RGB, and RGBA forms. See `aov-switching` for the full
-dispatch rules.
+Use [aov-switching](../aov-switching/README.md) for availability state, dtype
+conversion, and UI messages. Its output selection is independent of the chosen
+local or streamed presentation shell.
 
 ## Runtime Attribute Writes
 
@@ -247,26 +248,29 @@ products = renderer.step({RENDER_PRODUCT_PATH}, delta_time=dt, ordinal=ordinal)
 
 `omni:xform` matrices are row-major `float64` matrices using the USD row-vector
 convention, with translation in row `[3][0..2]`. In OVStage DLPack form, a
-matrix column is one 16-lane element per prim (`shape=[N]`, lanes `16`), not an
-`N x 4 x 4` tensor of one-lane elements.
+matrix write input is one 16-lane element per prim (`shape=[N]`, lanes `16`).
+OVStage read/map outputs use scalar lanes and explicit `[N,4,4]` shape/strides;
+map-creation dtypes remain lane-based. See [the data plane](../ovstage-data-plane/README.md).
 
 For standalone compatibility paths, ovrtx consumes Fabric attributes such as
 `omni:xform`; standard authored USD `xformOp:*` is not the live renderer update
 path.
 
 ```python
+import ovrtx
+
 xforms = np.array([...], dtype=np.float64).reshape(n, 4, 4)
 renderer.write_attribute(
     prim_paths=paths,
     attribute_name="omni:xform",
     tensor=xforms,
-    semantic=Semantic.XFORM_MAT4x4,
-    prim_mode=PrimMode.CREATE_NEW,
+    semantic=ovrtx.Semantic.XFORM_MAT4x4,
+    prim_mode=ovrtx.PrimMode.CREATE_NEW,
     data_access=0,  # 0=ASYNC for GPU tensors, 1=SYNC for CPU numpy
 )
 ```
 
-`PrimMode.EXISTING_ONLY` silently skips attributes not already registered. Use `CREATE_NEW` for compatibility camera, animation, and EffectLayer attributes that may not exist in Fabric yet. In OVStage examples, use OVStage's own `PrimMode` values, usually `PrimMode.UPSERT` for app-owned runtime state.
+`ovrtx.PrimMode.EXISTING_ONLY` silently skips attributes not already registered. Use `ovrtx.PrimMode.CREATE_NEW` for compatibility camera, animation, and EffectLayer attributes that may not exist in Fabric yet. This is a different enum from `ovstage.PrimMode`; OVStage examples usually use `ovstage.PrimMode.UPSERT` for app-owned runtime state.
 
 ## Renderer Config And Process State
 
@@ -274,7 +278,17 @@ Set renderer-wide behavior at construction time:
 
 - `sync_mode=True` keeps `step()` blocking until the frame is complete. Use `step_async()` for responsive loops that can poll an `Operation`.
 - `active_cuda_gpus="0"` or `"0,1"` restricts which CUDA-visible devices ovrtx can use. Values are indices into `CUDA_VISIBLE_DEVICES`.
-- `keep_system_alive=True` keeps the ovrtx system initialized across idle/reset periods, which is useful for long-running viewers that replace stages repeatedly. Choose the value once at renderer creation.
+- `keep_system_alive=True` keeps the ovrtx system initialized across idle/reset periods. Choose it at renderer creation.
+
+Set `enable_minimal`, `enable_realtimepathtracing` and `enable_pathtracing`
+on the first renderer in the process. Conflicting explicit choices on later
+instances fail. Selecting a RenderProduct mode does not disable the other
+startup modes or recover their initialization cost. Spectral preparation
+(`enable_spectral_rendering`) is also a first-renderer, process-lifetime choice.
+MDL displacement (`enable_mdl_displacement`) is configured at renderer creation
+and writes process-wide state; do not present it as an ordinary per-viewer live
+toggle. Resolve defaults and supported combinations from upstream
+[renderer configuration](https://github.com/NVIDIA-Omniverse/ovrtx/blob/main/docs/core/renderer_configuration.rst).
 
 The ovrtx logging callback is process-global state, not renderer-owned state. Install it once during process startup if the app needs to route ovrtx logs into its logger. Avoid registering a different callback per request, per viewer tab, or per renderer instance; in multi-viewer processes the last process-global registration is the one that matters.
 
@@ -335,8 +349,13 @@ If a separate USD build is present, ovrtx's bundled USD/plugins must resolve fir
 
 Use one import discipline per process:
 
+- Attached OVStage viewer (the default for new apps): set
+  `OVRTX_SKIP_USD_CHECK`, import `ovrtx`, call
+  `ovrtx.register_schema_paths()`, then create/populate OVStage before any
+  other OpenUSD consumer initializes. This ordering wins over convenience
+  import-order guidance for non-attached shells.
 - Streaming/direct ovrtx server: set `OVRTX_SKIP_USD_CHECK`, construct `Renderer`, then import `pxr` if direct queries are needed.
-- Lightweight local Omniverse Realtime Viewer and OvGear paths: import `pxr`
+- Verified in-process OpenUSD viewer/editor paths: import `pxr`
   first, then let local renderer/adapter code import ovrtx as documented in
   `local-viewer` and ovui guidance.
 - Windows streaming path: keep `pxr` in a subprocess; do not import it in the ovrtx process.
@@ -351,6 +370,8 @@ import os
 os.environ["OVRTX_SKIP_USD_CHECK"] = "1"
 
 import numpy as np
+import ovrtx
+ovrtx.register_schema_paths()
 import ovstage
 from PIL import Image
 from ovstage import PopulationDomain, population
@@ -369,12 +390,13 @@ for _ in range(60):
         delta_time=1/60,
         ordinal=ordinal,
     )
-    with products as ctx:
-        product = ctx["/Render/RenderProduct"]
-        for frame in product.frames:
-            if "LdrColor" in frame.render_vars:
-                with frame.render_vars["LdrColor"].map(device=Device.CPU) as rv:
-                    Image.fromarray(np.from_dlpack(rv).copy()).save("output.png")
+    product = products["/Render/RenderProduct"]
+    for frame in product.frames:
+        ldr_path = "/Render/Vars/LdrColor"
+        if ldr_path in frame.render_vars:
+            with frame.render_vars[ldr_path].map(device=Device.CPU) as rv:
+                rv.wait()
+                Image.fromarray(np.from_dlpack(rv).copy()).save("output.png")
 ```
 
 ## MDL Material Resolution
@@ -391,16 +413,15 @@ UJITSO "multi-node material unsupported" warnings are informational if the full 
 | `multiple debug symbol definitions for SDF_ASSET` | two USD instances | put ovrtx bundled libs first |
 | `usd-core detected` | version check conflict | set `OVRTX_SKIP_USD_CHECK=1` |
 | `Default.mdl` parse crash | renderer initialized after wrong USD registry | fix import/construction order |
-| `RenderProductSetOutputs` has no `.get` | treated `renderer.step()` output as a dict | use `ctx[path]` or `products[path]`; branch on `hasattr(products, "__enter__")` for context-manager cleanup |
-| `AttributeError: __enter__` from `with products as ctx:` | installed step result is mapping-like but not a context manager | branch on `hasattr(products, "__enter__")`, consume directly when absent, and copy frame data before the next step |
-| invalid output handle after returning frame data | frame or render var view outlived its `RenderProductSetOutputs` | copy inside the same step before the context exits |
+| `RenderProductSetOutputs` has no `.get` | treated the result as a Python dict | use membership checks and `products[path]` |
+| invalid output handle after returning frame data | renderer-backed output was retained past its valid lifetime | return an owned copy made inside the RenderVar map context |
 | first `renderer.step()` appears hung | cold RTX shader or pipeline compilation | use a 300s+ first-run timeout and inspect ovrtx logs |
 | `write_attribute` does nothing | used direct renderer writes in an attached-stage app, or missed compatibility prim mode | write through OVStage at a new ordinal; for standalone compatibility use `PrimMode.CREATE_NEW` |
 | transform not visible | wrote authored `xformOp:*`, used wrong matrix layout, or rendered above the write floor | write `omni:xform` through OVStage as a row-major 16-lane matrix, advance the floor, then step with that ordinal |
 | `Semantic.XFORM_MAT4x4` becomes `NONE` | imported adapter implementation module `_ovrtx` | `import ovrtx` directly |
 | single-tensor examples fail or hide data | current render vars can be multi-tensor | use `np.from_dlpack(rv)` or named tensors such as `rv["TensorName"]` |
-| AOV listed but blank | ovrtx produced empty tensor | enable PT flags, check source name |
-| `Depth` mapping fails | wrong source name | use `DepthSD` not `Depth` |
+| AOV listed but blank | ovrtx produced empty tensor | enable PT flags, check the full RenderVar path and source name |
+| `DepthSD` mapping fails | deprecated depth AOV | use `DistanceToImagePlaneSD` for axial depth or `DistanceToCameraSD` for radial distance; update the UI label accordingly |
 | `Diffuse` empty/fails | wrong source name | use `DiffuseAlbedoSD` not `Diffuse` |
 | `Roughness` mapping fails | unsupported in current ovrtx build | do not expose |
 | red/blue swapped in browser | streamed RGBA directly | convert to BGRA before `stream_video()` |
@@ -408,3 +429,12 @@ UJITSO "multi-node material unsupported" warnings are informational if the full 
 | stale hangs | old GPU process | inspect `nvidia-smi`, kill stale Omniverse Realtime Viewer PIDs |
 
 See also: `aov-switching`, `stage-loading`, `camera-controls`, `render-settings`, `selection-feedback`, `selection-animation`, `streaming-server`.
+
+## Processed GPU outputs
+
+For custom post-processing, chained resources or lens sampling, read
+[SPG processing](../spg-processing/README.md). For stylized image passes,
+technical/X-Ray geometry strokes or explicit full wireframe, continue to
+[stylized visualization](../stylized-visualization/README.md). Present the actual
+published processed output through this viewer's existing owner and transport;
+a menu selection or display conversion alone does not implement the effect.

@@ -2,14 +2,28 @@
 
 The `tao-launch-workflow` skill points here for the full per-platform preflight steps.
 
+First verify the bank path and required shared helpers. Reuse the plugin's
+`TAO_SKILL_BANK_PATH` when set. Otherwise obtain a complete checkout at the
+installed skills' release ref with user approval, as described in `tao-setup`.
+Individual skill installs do not include shared helper scripts. Set
+`TAO_SKILL_BANK_PATH` to another checkout root if needed, then run:
+
+```bash
+export TAO_SKILL_BANK_PATH="${TAO_SKILL_BANK_PATH:-$HOME/tao-skill-bank}"
+for item in versions.yaml scripts/resolve_tao_model.py scripts/resolve_tao_image.py scripts/check_tao_launch_preflight.py scripts/redact_secrets.py scripts/tao_job_record.py skills/models skills/platform; do
+  [ -e "$TAO_SKILL_BANK_PATH/$item" ] || { echo "Incomplete TAO skill bank: missing $item under $TAO_SKILL_BANK_PATH" >&2; exit 1; }
+done
+```
+
 Run the selected platform's preflight checks before any launch artifact is
 created.
 
-Prefer the packaged preflight helper when the needed inputs are available:
+Use the bank path verified by `tao-launch-workflow` before calling the packaged
+preflight helper. Stop if the checkout check failed:
 
 ```bash
-${TAO_SKILL_BANK_PATH:-~/tao-skill-bank}/scripts/check_tao_launch_preflight.py \
-  --skill-bank ${TAO_SKILL_BANK_PATH:-~/tao-skill-bank} \
+"$TAO_SKILL_BANK_PATH/scripts/check_tao_launch_preflight.py" \
+  --skill-bank "$TAO_SKILL_BANK_PATH" \
   --platform <platform> \
   --container-image <selected-image> \
   --path train_annotation=<path> \

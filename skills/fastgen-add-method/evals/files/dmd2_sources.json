@@ -1,0 +1,72 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "dmd2_student_step.py.txt",
+      "repository_path": "fastgen/methods/distribution_matching/dmd2.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/distribution_matching/dmd2.py",
+      "source_sha256": "8a4175e18e4ec7d02a78d11569eb36bc1c347c553ae9f859c63a844ff1d81db0",
+      "line_ranges": [
+        [
+          516,
+          617
+        ],
+        [
+          217,
+          224
+        ],
+        [
+          790,
+          805
+        ],
+        [
+          830,
+          840
+        ],
+        [
+          842,
+          852
+        ]
+      ],
+      "fixture_sha256": "15823a7a86a996adad15b02584cd6393e7f5264945b073824251d48302e82a6e",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "gan_reduction.py.txt",
+      "repository_path": "fastgen/methods/common_loss.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/methods/common_loss.py",
+      "source_sha256": "30f7d324ae496a0b8083830eb5a6877b86ebd9f9f8c8d039ffbfaecde6b12f98",
+      "line_ranges": [
+        [
+          13,
+          27
+        ],
+        [
+          235,
+          254
+        ]
+      ],
+      "fixture_sha256": "901047606efc9ce83af47b9ebb3f6b100a7abbcec8646f6fd07ad985ebcbf133",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "trainer_step.py.txt",
+      "repository_path": "fastgen/trainer.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/trainer.py",
+      "source_sha256": "f8c5c8ed11b272c7ffee7d9680fb5d05d093706aa8f84eb6f07548fe9ab81716",
+      "line_ranges": [
+        [
+          378,
+          432
+        ]
+      ],
+      "fixture_sha256": "ad8a1cc972b3342fb01e983e535f45914fb18862c6afd558e9feed884d5b6adb",
+      "kind": "source_excerpt"
+    }
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "skill_name": "nvshmem-select-remote-transport",
+  "evals": [
+    {
+      "id": "nvshmem-select-remote-transport-001",
+      "prompt": "Use nvshmem-select-remote-transport for the attached target-node facts and selected CUDA kernel. The job has 64 PEs, 8 local PEs per node, every remote PE may be targeted, and I want a throughput-oriented default. Recommend the transport statically; do not run the code.",
+      "files": [
+        "evals/files/mellanox-ibgda.txt",
+        "evals/files/fine-grained.cu"
+      ],
+      "expected_output": "The agent recommends IBGDA with IBRC as its independently selected host remote transport, emits only NVSHMEM_REMOTE_TRANSPORT=ibrc and NVSHMEM_IB_ENABLE_IBGDA=1, and ties the expected fit to many small independent device operations.",
+      "assertions": [
+        "The agent reads both bundled references and inspects the selected kernel's physical NVSHMEM calls",
+        "The recommendation is IBGDA with IBRC as the separate host transport, not IBGDA as NVSHMEM_REMOTE_TRANSPORT",
+        "The selection block contains NVSHMEM_REMOTE_TRANSPORT=ibrc and NVSHMEM_IB_ENABLE_IBGDA=1 and does not enable GPUNetIO GDAKI",
+        "The response follows the required section order, distinguishes facts from expected fit, and does not promise a speedup or run a workload"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-002",
+      "prompt": "Use nvshmem-select-remote-transport with the attached Mellanox facts and kernel. This is a 4096-PE all-to-all deployment with 8 local PEs per node. The site has validated IBGDA DCI/DCT, prohibits a full RC mesh because of connection memory, and wants a compatibility-first static selection.",
+      "files": [
+        "evals/files/mellanox-ibgda.txt",
+        "evals/files/fine-grained.cu"
+      ],
+      "expected_output": "The agent favors IBGDA because the validated DCI/DCT path addresses large-scale connection pressure, selects IBRC separately for host traffic, and leaves QP mapping and counts outside the selection exports.",
+      "assertions": [
+        "The agent uses the stated DCI/DCT requirement and scale as evidence favoring IBGDA over RC-only GDAKI paths",
+        "The agent emits IBRC plus NVSHMEM_IB_ENABLE_IBGDA=1 and does not put QP counts or mapping variables in the selection block",
+        "The agent does not invent a universal PE threshold or benchmark result",
+        "The response includes a runner-up, exclusions, confidence, unknowns, and static checks"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-003",
+      "prompt": "Use nvshmem-select-remote-transport on the attached Mellanox installation and selected packed-put kernel. It runs with 16 PEs and 8 local PEs per node; one lane issues each transfer, CPU proxy cores are available, and isolated latency plus compatibility matter most.",
+      "files": [
+        "evals/files/mellanox-ibgda.txt",
+        "evals/files/packed-put.cu"
+      ],
+      "expected_output": "The agent recommends the IBRC proxy path because the actual traffic is one packed 64 KiB operation from one lane, with IBGDA as runner-up or excluded from first place on fit rather than eligibility.",
+      "assertions": [
+        "The agent counts one 64 KiB physical operation rather than treating logical data elements as fine-grained traffic",
+        "The recommendation is IBRC with only NVSHMEM_REMOTE_TRANSPORT=ibrc in the selection block",
+        "The agent explains why low concurrency, packing, available proxy CPU, and latency priority favor a proxy",
+        "The agent does not claim IBRC is always faster"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-004",
+      "prompt": "Use nvshmem-select-remote-transport on the attached GPUNetIO-only installation and mixed host/device CUDA source. The job has 32 PEs, 8 local PEs, the RC connection footprint is validated, no DOCA-only feature is required, and I want a general default.",
+      "files": [
+        "evals/files/mellanox-gpunetio.txt",
+        "evals/files/mixed-api.cu"
+      ],
+      "expected_output": "The agent recommends GPUNetIO with GDAKI enabled as a unified eligible CPU/GPU path and emits both its remote-transport and enable variables without adding DOCA settings.",
+      "assertions": [
+        "The agent identifies both on-stream host-side traffic and highly parallel device traffic",
+        "The selection block contains NVSHMEM_REMOTE_TRANSPORT=gpunetio and NVSHMEM_GPUNETIO_ENABLE_GDAKI=1",
+        "The agent does not add DOCA variables or imply DOCA is required for the open GPUNetIO path",
+        "The agent excludes missing plugins and describes GPUNetIO fit as an inference, not guaranteed performance"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-005",
+      "prompt": "Use nvshmem-select-remote-transport with the attached EFA node facts. The application uses device puts of 4-64 KiB from one warp leader, no atomics, no registered user buffers, and the default non-VMM symmetric heap. It has 16 PEs with 8 local PEs and wants compatibility first.",
+      "files": [
+        "evals/files/efa.txt"
+      ],
+      "expected_output": "The agent selects the native EFA libfabric path and emits NVSHMEM_REMOTE_TRANSPORT=libfabric plus NVSHMEM_LIBFABRIC_PROVIDER=efa, while surfacing exact-release EFA preconditions separately.",
+      "assertions": [
+        "The recommendation is libfabric with provider efa because the installation and target fabric support the native provider",
+        "The selection block contains NVSHMEM_REMOTE_TRANSPORT=libfabric and NVSHMEM_LIBFABRIC_PROVIDER=efa",
+        "Any FI_EFA_ENABLE_SHM_TRANSFER precondition is clearly separated from the minimal selection block and is not presented as an unrelated tuning guess",
+        "The response does not substitute IBRC merely because the kernel is proxy-friendly"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-006",
+      "prompt": "Use nvshmem-select-remote-transport with the attached Slingshot/CXI facts. The job has 128 PEs, 4 local PEs, uses host and on-stream puts/gets from 8 bytes to 1 MiB, and wants a general static default.",
+      "files": [
+        "evals/files/slingshot-cxi.txt"
+      ],
+      "expected_output": "The agent recommends libfabric with the cxi provider as the native Slingshot path and emits only the two required selection variables.",
+      "assertions": [
+        "The recommendation is libfabric with NVSHMEM_LIBFABRIC_PROVIDER=cxi",
+        "The agent treats native Slingshot/CXI compatibility as a hard provider gate before kernel heuristics",
+        "The agent verifies or qualifies exact operation and release support rather than assuming all operations",
+        "No QP, NIC mapping, batching, or provider tuning variables appear in the minimal selection block"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-007",
+      "prompt": "Use nvshmem-select-remote-transport with the attached UCX-only installation. This site requires UCX over TCP and has already validated its NVSHMEM 3.7.0 64-bit socket atomic-add path. The host-driven job uses 8 PEs, 4 local PEs, low concurrency, and compatibility is the goal.",
+      "files": [
+        "evals/files/ucx-only.txt"
+      ],
+      "expected_output": "The agent selects UCX because both site control and the stated validated socket-atomic capability make it the only eligible path, while retaining the exact-release experimental/status caveat.",
+      "assertions": [
+        "The recommendation is UCX with only NVSHMEM_REMOTE_TRANSPORT=ucx in the selection block",
+        "The agent relies on the user's validated socket atomic capability instead of generalizing unsupported atomics",
+        "The agent states the bundled public-documentation caveat that UCX status and limitations are release-specific",
+        "The response does not invent UCX_TLS tuning"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-008",
+      "prompt": "Use nvshmem-select-remote-transport with the attached complete target facts. I need two-node device puts on InfiniBand, 16 total PEs, 8 local PEs, and a compatibility-first result. Tell me exactly what I can export.",
+      "files": [
+        "evals/files/missing-plugin.txt",
+        "evals/files/packed-put.cu"
+      ],
+      "expected_output": "The agent withholds an unconditional export block because the selected NVSHMEM prefix contains no remote transport plugin, names installation as the blocker, and does not confuse source support with installation support.",
+      "assertions": [
+        "The agent excludes all remote candidates whose plugins are absent from the selected installation",
+        "The agent does not emit an unconditional selection configuration despite the otherwise clear IBRC kernel fit",
+        "The response identifies the exact missing-plugin evidence and routes installation work to the sibling install skill",
+        "The agent does not run or propose a benchmark as the next check"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-009",
+      "prompt": "Use nvshmem-select-remote-transport with the attached Mellanox facts. The application team chooses system eligibility only. It has 16 PEs and wants the fastest transport.",
+      "files": [
+        "evals/files/mellanox-ibgda.txt"
+      ],
+      "expected_output": "The agent honors the explicit no-workload choice, recommends IBRC as the compatibility-first Mellanox system default, emits NVSHMEM_REMOTE_TRANSPORT=ibrc, and does not claim it is the fastest transport.",
+      "assertions": [
+        "The agent does not infer GDAKI fit merely from the available plugin and fast hardware",
+        "The agent does not request kernel source or communication-profile fields after the user chose system eligibility only",
+        "The response recommends the conservative IBRC system default and emits only NVSHMEM_REMOTE_TRANSPORT=ibrc",
+        "The agent does not search for kernels, promise a fastest transport, or require a benchmark"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-010",
+      "prompt": "Use nvshmem-select-remote-transport with the attached partial node facts and fine-grained kernel. The job has 64 PEs, 8 local PEs, and targets InfiniBand. Give me the exact exports without using the network.",
+      "files": [
+        "evals/files/unknown-version.txt",
+        "evals/files/fine-grained.cu"
+      ],
+      "expected_output": "The agent does not block on the missing patch version. It recommends and emits the conservative IBRC fallback, while identifying IBGDA as a conditional architectural fit pending its specific prerequisites.",
+      "assertions": [
+        "The agent does not invent the missing version or require a live documentation lookup",
+        "The selection block contains NVSHMEM_REMOTE_TRANSPORT=ibrc as the best-supported fallback",
+        "The agent keeps IBGDA conditional on its missing driver, registration, and release-specific prerequisite evidence rather than withholding every recommendation",
+        "The agent respects the request not to use live network documentation"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-011",
+      "prompt": "Use nvshmem-select-remote-transport with the attached node facts. The selected kernel uses device puts between PE 0 and PE 1 only, the launch is exactly the documented two PEs on one node, and compatibility is the goal.",
+      "files": [
+        "evals/files/nvlink-only.txt",
+        "evals/files/packed-put.cu"
+      ],
+      "expected_output": "The agent selects none because every relevant communicating pair is proven peer-reachable over NVLink and no network fallback is needed.",
+      "assertions": [
+        "The agent establishes the exact communication and deployment boundary before choosing none",
+        "The selection block contains only NVSHMEM_REMOTE_TRANSPORT=none",
+        "The agent does not treat node count alone as proof and cites the P2P/topology evidence",
+        "Remote plugins are not incorrectly required for this proven local-only path"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-012",
+      "prompt": "Use nvshmem-select-remote-transport with the attached NVSHMEM 3.7.0 EFA facts. This two-node application requires CUDA VMM for its symmetric heap and registered user buffers for remote device puts; these requirements cannot change. It has 16 PEs and wants compatibility first.",
+      "files": [
+        "evals/files/efa.txt"
+      ],
+      "expected_output": "The agent applies the bundled libfabric memory-mode gates, excludes or marks the only EFA transport incompatible, and withholds a transport export rather than overlooking the mandatory VMM and registered-buffer requirements.",
+      "assertions": [
+        "The agent treats VMM and registered remote user buffers as hard exact-release gates for libfabric",
+        "The agent does not recommend a non-EFA Mellanox transport on EFA hardware",
+        "The agent withholds an unconditional selection block and makes the incompatibility explicit",
+        "Static follow-up checks focus on an exact supporting release/install path, not a performance benchmark"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-013",
+      "prompt": "Use nvshmem-select-remote-transport with the attached GPUNetIO node facts and fine-grained selected kernel. The job has 16 PEs, 8 local PEs, the site's validated RC footprint is sufficient, no host-side NVSHMEM calls occur, and throughput is the goal.",
+      "files": [
+        "evals/files/mellanox-gpunetio.txt",
+        "evals/files/fine-grained.cu"
+      ],
+      "expected_output": "The agent selects GPUNetIO GDAKI as the installed eligible high-parallelism path and emits its required remote-transport and GDAKI-enable variables.",
+      "assertions": [
+        "The agent recommends GPUNetIO GDAKI based on installed eligibility and the kernel's many small independent physical messages",
+        "The selection block contains NVSHMEM_REMOTE_TRANSPORT=gpunetio and NVSHMEM_GPUNETIO_ENABLE_GDAKI=1",
+        "The agent does not enable IBGDA or add DOCA variables",
+        "The recommendation is an expected architectural fit rather than a performance guarantee"
+      ],
+      "expected_skill": "nvshmem-select-remote-transport",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-select-remote-transport-014",
+      "prompt": "Which Linux traffic-control qdisc should I use to limit a container to 2 Gbit/s on veth0? This has nothing to do with GPU communication or NVSHMEM.",
+      "expected_output": "The agent recognizes an unrelated Linux networking question and does not invoke nvshmem-select-remote-transport.",
+      "assertions": [
+        "The agent does not invoke nvshmem-select-remote-transport or inspect its references",
+        "The response answers or scopes the Linux traffic-control question directly",
+        "The agent does not introduce NVSHMEM environment variables"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

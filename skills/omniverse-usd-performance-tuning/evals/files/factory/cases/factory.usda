@@ -1,0 +1,278 @@
+#usda 1.0
+(
+    defaultPrim = "Building"
+    endTimeCode = 24
+    metersPerUnit = 1
+    startTimeCode = 0
+    timeCodesPerSecond = 24
+    upAxis = "Z"
+)
+
+def Xform "Building"
+{
+    double3 xformOp:translate = (0, 0, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+    def Scope "Levels"
+    {
+        def Xform "L1"
+        {
+            double3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "RobotA"
+            {
+                custom token semantic:category = "robots"
+                double3 xformOp:translate = (-3, 1, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                def Xform "Base"
+                {
+                    custom bool interface:editable = 1
+                    custom token semantic:category = "robot_links"
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                    def Mesh "mesh" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                        int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                        rel material:binding = </Building/Looks/Paint>
+                        point3f[] points = [(-0.2, -0.2, 0), (0.2, -0.2, 0), (0.2, 0.2, 0), (-0.2, 0.2, 0), (-0.2, -0.2, 0.2), (0.2, -0.2, 0.2), (0.2, 0.2, 0.2), (-0.2, 0.2, 0.2)]
+                        uniform token subdivisionScheme = "none"
+                    }
+
+                    def Xform "Arm"
+                    {
+                        custom bool interface:editable = 1
+                        custom token semantic:category = "robot_links"
+                        float xformOp:rotateY = 15
+                        double3 xformOp:translate = (0, 0, 0.2)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateY"]
+
+                        def Mesh "mesh" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                            rel material:binding = </Building/Looks/Paint>
+                            point3f[] points = [(-0.06, -0.06, 0), (0.06, -0.06, 0), (0.06, 0.06, 0), (-0.06, 0.06, 0), (-0.06, -0.06, 0.8), (0.06, -0.06, 0.8), (0.06, 0.06, 0.8), (-0.06, 0.06, 0.8)]
+                            uniform token subdivisionScheme = "none"
+                        }
+
+                        def Xform "Wrist"
+                        {
+                            custom bool interface:editable = 1
+                            custom token semantic:category = "robot_links"
+                            double3 xformOp:translate = (0, 0, 0.8)
+                            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                            def Mesh "mesh" (
+                                prepend apiSchemas = ["MaterialBindingAPI"]
+                            )
+                            {
+                                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                                int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                                rel material:binding = </Building/Looks/Paint>
+                                point3f[] points = [(-0.1, -0.075, 0), (0.1, -0.075, 0), (0.1, 0.075, 0), (-0.1, 0.075, 0), (-0.1, -0.075, 0.15), (0.1, -0.075, 0.15), (0.1, 0.075, 0.15), (-0.1, 0.075, 0.15)]
+                                uniform token subdivisionScheme = "none"
+                            }
+
+                            def Mesh "Attachment" (
+                                prepend apiSchemas = ["MaterialBindingAPI"]
+                            )
+                            {
+                                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                                int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                                rel material:binding = </Building/Looks/Steel>
+                                point3f[] points = [(-0.02, -0.02, 0.15), (0.02, -0.02, 0.15), (0.02, 0.02, 0.15), (-0.02, 0.02, 0.15), (-0.02, -0.02, 0.25), (0.02, -0.02, 0.25), (0.02, 0.02, 0.25), (-0.02, 0.02, 0.25)]
+                                uniform token subdivisionScheme = "none"
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Xform "RobotB"
+            {
+                custom token semantic:category = "robots"
+                double3 xformOp:translate = (-1, 1, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                def Xform "Base"
+                {
+                    custom bool interface:editable = 1
+                    custom token semantic:category = "robot_links"
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                    def Mesh "mesh" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                        int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                        rel material:binding = </Building/Looks/Paint>
+                        point3f[] points = [(-0.2, -0.2, 0), (0.2, -0.2, 0), (0.2, 0.2, 0), (-0.2, 0.2, 0), (-0.2, -0.2, 0.2), (0.2, -0.2, 0.2), (0.2, 0.2, 0.2), (-0.2, 0.2, 0.2)]
+                        uniform token subdivisionScheme = "none"
+                    }
+
+                    def Xform "Arm"
+                    {
+                        custom bool interface:editable = 1
+                        custom token semantic:category = "robot_links"
+                        float xformOp:rotateY = -30
+                        double3 xformOp:translate = (0, 0, 0.2)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateY"]
+
+                        def Mesh "mesh" (
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                            int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                            rel material:binding = </Building/Looks/Paint>
+                            point3f[] points = [(-0.06, -0.06, 0), (0.06, -0.06, 0), (0.06, 0.06, 0), (-0.06, 0.06, 0), (-0.06, -0.06, 0.8), (0.06, -0.06, 0.8), (0.06, 0.06, 0.8), (-0.06, 0.06, 0.8)]
+                            uniform token subdivisionScheme = "none"
+                        }
+
+                        def Xform "Wrist"
+                        {
+                            custom bool interface:editable = 1
+                            custom token semantic:category = "robot_links"
+                            double3 xformOp:translate = (0, 0, 0.8)
+                            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                            def Mesh "mesh" (
+                                prepend apiSchemas = ["MaterialBindingAPI"]
+                            )
+                            {
+                                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                                int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                                rel material:binding = </Building/Looks/Paint>
+                                point3f[] points = [(-0.1, -0.075, 0), (0.1, -0.075, 0), (0.1, 0.075, 0), (-0.1, 0.075, 0), (-0.1, -0.075, 0.15), (0.1, -0.075, 0.15), (0.1, 0.075, 0.15), (-0.1, 0.075, 0.15)]
+                                uniform token subdivisionScheme = "none"
+                            }
+
+                            def Mesh "Attachment" (
+                                prepend apiSchemas = ["MaterialBindingAPI"]
+                            )
+                            {
+                                int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                                int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                                rel material:binding = </Building/Looks/Steel>
+                                point3f[] points = [(-0.02, -0.02, 0.15), (0.02, -0.02, 0.15), (0.02, 0.02, 0.15), (-0.02, 0.02, 0.15), (-0.02, -0.02, 0.25), (0.02, -0.02, 0.25), (0.02, 0.02, 0.25), (-0.02, 0.02, 0.25)]
+                                uniform token subdivisionScheme = "none"
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Xform "ClampA"
+            {
+                custom token semantic:category = "clamps"
+                double3 xformOp:translate = (1, 1, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                def Mesh "body" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                    int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                    rel material:binding = </Building/Looks/Steel>
+                    point3f[] points = [(-0.2, -0.15, 0), (0.2, -0.15, 0), (0.2, 0.15, 0), (-0.2, 0.15, 0), (-0.2, -0.15, 0.1), (0.2, -0.15, 0.1), (0.2, 0.15, 0.1), (-0.2, 0.15, 0.1)]
+                    uniform token subdivisionScheme = "none"
+                }
+
+                def Xform "Jaw"
+                {
+                    custom bool interface:editable = 1
+                    token visibility.timeSamples = {
+                        0: "inherited",
+                        12: "invisible",
+                        24: "inherited",
+                    }
+                    double3 xformOp:translate = (0, 0, 0.1)
+                    double3 xformOp:translate.timeSamples = {
+                        0: (0, 0, 0.1),
+                        12: (0.1, 0, 0.1),
+                        24: (0, 0, 0.1),
+                    }
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                    def Mesh "mesh" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                        int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                        rel material:binding = </Building/Looks/Steel>
+                        point3f[] points = [(-0.05, -0.1, 0), (0.05, -0.1, 0), (0.05, 0.1, 0), (-0.05, 0.1, 0), (-0.05, -0.1, 0.1), (0.05, -0.1, 0.1), (0.05, 0.1, 0.1), (-0.05, 0.1, 0.1)]
+                        uniform token subdivisionScheme = "none"
+                    }
+                }
+            }
+
+            def Xform "ClampB"
+            {
+                custom token semantic:category = "clamps"
+                double3 xformOp:translate = (2, 1, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                def Mesh "body" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                    int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                    rel material:binding = </Building/Looks/Steel>
+                    point3f[] points = [(-0.2, -0.15, 0), (0.2, -0.15, 0), (0.2, 0.15, 0), (-0.2, 0.15, 0), (-0.2, -0.15, 0.1), (0.2, -0.15, 0.1), (0.2, 0.15, 0.1), (-0.2, 0.15, 0.1)]
+                    uniform token subdivisionScheme = "none"
+                }
+
+                def Xform "Jaw"
+                {
+                    custom bool interface:editable = 1
+                    double3 xformOp:translate = (0.05, 0, 0.1)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                    def Mesh "mesh" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+                        int[] faceVertexIndices = [0, 3, 2, 1, 4, 5, 6, 7, 0, 1, 5, 4, 1, 2, 6, 5, 2, 3, 7, 6, 3, 0, 4, 7]
+                        rel material:binding = </Building/Looks/Steel>
+                        point3f[] points = [(-0.05, -0.1, 0), (0.05, -0.1, 0), (0.05, 0.1, 0), (-0.05, 0.1, 0), (-0.05, -0.1, 0.1), (0.05, -0.1, 0.1), (0.05, 0.1, 0.1), (-0.05, 0.1, 0.1)]
+                        uniform token subdivisionScheme = "none"
+                    }
+                }
+            }
+        }
+    }
+
+    def Scope "Looks" (
+        prepend references = @../materials.usda@</Looks>
+    )
+    {
+    }
+
+    def Camera "Overview"
+    {
+        float2 clippingRange = (0.1, 1000)
+        float focalLength = 35
+        matrix4d xformOp:transform = ( (0.7808688094430304, 0.6246950475544244, -2.7755575615628914e-17, 0), (-0.33491152798229745, 0.4186394099778718, 0.8441417611029218, -0), (0.5273311775948653, -0.6591639719935815, 0.5361200305547796, 0), (12, -15, 13.000000000000004, 1.0000000000000002) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+    }
+
+    def DomeLight "DomeLight"
+    {
+        float inputs:intensity = 700
+    }
+}
+

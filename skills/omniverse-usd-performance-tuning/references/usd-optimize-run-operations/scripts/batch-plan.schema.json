@@ -2,9 +2,11 @@
   "$comment": "SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.\nSPDX-License-Identifier: Apache-2.0",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Batch Plan",
-  "description": "Contract for the plan JSON consumed by the batch scheduler (usd-optimize-run-operations/scripts/run_batch.py, --plan). This makes the descent -> apply-restructure manifest -> scheduler handoff a real contract: ONE target = ONE own-layer file = ONE job (the edit-target invariant). The agent decides max_workers, archetype tags, op chains, and intent-gated opt-ins; the runner owns spawning, dependency ordering, per-target/per-op timeouts, the GPU-cliff guard, status emission, and resume. The frontier metadata from apply-restructure-manifest.json phase4_targets[] flows into per-target jobs (level / archetype / role carried through). The emitted status.json is owned by status.schema.json.",
+  "description": "Writer jobs generated from definition manifests. Each job owns one editable layer and may optimize multiple definitions serially. Explicit dependencies release ready work; resource limits bound concurrent workers.",
   "type": "object",
-  "required": ["targets"],
+  "required": [
+    "targets"
+  ],
   "additionalProperties": true,
   "properties": {
     "run_id": {
@@ -17,10 +19,13 @@
     },
     "targets": {
       "type": "array",
-      "description": "One job per Phase-4 target. Each target file is an INDEPENDENT own-root-layer edit target (never the composed assembly); that independence is why per-target work parallelizes.",
+      "description": "One writer job per editable layer; multiple definitions may share a writer.",
       "items": {
         "type": "object",
-        "required": ["path", "command"],
+        "required": [
+          "path",
+          "command"
+        ],
         "additionalProperties": true,
         "properties": {
           "path": {
@@ -29,7 +34,13 @@
           },
           "role": {
             "type": "string",
-            "enum": ["assembly_root", "prototype", "shared_layer", "loadable_subasset", "monolith"],
+            "enum": [
+              "assembly_root",
+              "prototype",
+              "shared_layer",
+              "loadable_subasset",
+              "monolith"
+            ],
             "description": "Restructure role (mirrors the manifest phase4_targets[] target_class, plus 'monolith' for an N=1 optimize-as-is run)."
           },
           "target_class": {
@@ -37,22 +48,42 @@
             "description": "Alias accepted for role (matches the manifest field name)."
           },
           "level": {
-            "type": ["string", "null"],
-            "enum": ["assembly", "component", "subcomponent", "detail", null],
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "assembly",
+              "component",
+              "subcomponent",
+              "detail",
+              null
+            ],
             "description": "Descent level carried from the manifest (drives ordering / weight, not authority)."
           },
           "archetype": {
-            "type": ["string", "null"],
-            "description": "large-spatial | encapsulated-product | piping | generic — selects which op-chain steps apply."
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "large-spatial | encapsulated-product | piping | generic \u2014 selects which op-chain steps apply."
           },
           "dep_group": {
             "type": "string",
-            "enum": ["shared_first", "dependent_after", "independent"],
-            "description": "Prototype-first ordering: shared_first targets (prototypes/shared layers) run to completion before dependent targets so changes propagate. Independent targets ride the dependent wave. Alias: dependency_group."
+            "enum": [
+              "shared_first",
+              "dependent_after",
+              "independent"
+            ],
+            "description": "Legacy dependency translation: dependent_after waits for all shared_first jobs unless explicit depends_on is present. Independent jobs can start immediately."
           },
           "dependency_group": {
             "type": "string",
-            "enum": ["shared_first", "dependent_after", "independent"]
+            "enum": [
+              "shared_first",
+              "dependent_after",
+              "independent"
+            ]
           },
           "gpu_bound": {
             "type": "boolean",
@@ -60,25 +91,136 @@
           },
           "command": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "minItems": 1,
             "description": "Argv for the standalone single-asset worker process. The worker runs the per-target op chain (e.g. meshCleanup -> deduplicateGeometry -> computeExtents; pruneLeaves is NOT in the per-prototype chain) and emits its summary to summary_path."
           },
           "timeout_sec": {
-            "type": ["number", "null"],
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0,
             "description": "Per-target wall-clock budget; a worker exceeding it is killed (state timeout), bounding a hung op without stalling the batch."
           },
           "summary_path": {
             "type": "string",
-            "description": "Path the worker writes its before/after summary to. The runner derives the coverage disposition (optimized | no_op | unknown) from before/after deltas — 'done' alone is never 'optimized'."
+            "description": "Worker summary containing measured before/after and verified per-definition outcomes. Strict jobs require one result per owned definition."
           },
-          "log_path": { "type": "string" },
+          "log_path": {
+            "type": "string"
+          },
           "steps_applied": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "Op-chain steps planned/applied for this target (advisory; the worker summary is authoritative for outcome)."
+          },
+          "input_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "description": "Source USD, referenced/payload layers, textures and operation configuration files. Include the complete dependency set for resume."
+          },
+          "runtime_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "description": "Runtime binaries, plugins and worker scripts whose content affects the result. Resume hashes these files and the command executable."
+          },
+          "output_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "description": "Written USD layers and other required artifacts. Missing or changed outputs invalidate resume."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "definition_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "require_verified_results": {
+            "type": "boolean"
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "memory_mb": {
+                "type": "number",
+                "minimum": 0
+              },
+              "gpu_slots": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
           }
+        },
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "require_verified_results"
+              ],
+              "properties": {
+                "require_verified_results": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "id",
+                "depends_on",
+                "definition_ids",
+                "summary_path"
+              ],
+              "properties": {
+                "definition_ids": {
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "resource_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "memory_mb": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpu_slots": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     }

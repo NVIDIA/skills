@@ -18,44 +18,41 @@ Keep the StreamSDK callback responsibilities separate:
 
 | Callback | Payload | Use it for |
 |---|---|---|
-| Server `on_message` | JSON strings, bytes, dicts, or the browser library wrapper `{messageType,data}` | App protocol messages: stage switching, tree requests, property requests, prim count, AOV changes, variants, settings, and UI state queries. |
+| Server `on_app_message` (WebRTC/native) | Inner JSON text, already unwrapped by the SDK | App protocol messages: stage switching, tree requests, property requests, prim count, AOV changes, variants, settings, and UI state queries. |
+| Server `on_message` (SHM/raw) | Raw message text; SDK stream controls are not app commands | Local SHM app protocol or explicitly supported raw messages. |
 | Browser `onCustomEvent` | Parsed app events from the server | React state updates: `openStageResult`, `getChildrenResult`, `stageSelectionChanged`, `availableAOVsResult`, `activeAOVState`, and errors. |
 | Server `on_input` | Raw `ovstream.InputEvent` objects | Mouse, keyboard, wheel, and gamepad input for camera orbit/pan/zoom and click-to-pick. |
 | Server `on_unicode` | Composed text input | IME, on-screen keyboard, paste, and other text events when a viewer needs text entry. |
 
 The browser does not implement camera math. Normally the WebRTC streaming library forwards raw input through NVST/ovstream; the Python server handles orbit, pan, zoom, drag-threshold click detection, and picking. The verified fallback only serializes normalized pointer intent to that same server path.
 
-Golden-style server routing:
+Use the [transport contract](../dependencies/ovstream.md) and the
+[server adapter](server-handler-map.md) for encoding, dispatch, and replies.
+Put application correlation fields inside `payload`, and echo them there in
+both success and error responses. The browser SDK rebuilds the outer envelope,
+so custom top-level fields are not a reliable roundtrip contract:
+
+```json
+{"event_type":"getPropertiesRequest","payload":{"request_id":"properties-17","prim_path":"/World/Cube"}}
+```
+
+Resolve pending work from `event.payload.request_id`; keep any legacy top-level
+ID support inside the app adapter. Preserve stage/session generation checks when
+settling the request so delayed results cannot update a replaced scene.
+
+WebRTC server routing:
 
 ```python
 stream_server.on_connection = message_handler.on_connection
-stream_server.on_message = message_handler.on_message
+stream_server.on_app_message = message_handler.on_message
 stream_server.on_input = message_handler.on_input
 # Optional for composed text input:
 # stream_server.on_unicode = message_handler.on_unicode
 ```
 
-```python
-def on_input(self, event):
-    import ovstream
-    if event.type == ovstream.InputEventType.MOUSE:
-        mouse = event.mouse
-        if mouse.type == ovstream.MouseEventType.MOVE:
-            server.camera.on_mouse_move(mouse.x, mouse.y)
-        elif mouse.type == ovstream.MouseEventType.BUTTON:
-            button = camera_button_from_ovstream(mouse.data, ovstream)
-            if button is None:
-                return
-            is_down = mouse.button_state == ovstream.KeyState.DOWN
-            if is_down:
-                server.camera.on_mouse_button_down(mouse.x, mouse.y, button)
-            else:
-                was_click = server.camera.on_mouse_button_up(mouse.x, mouse.y, button)
-                if button == 0 and was_click:
-                    self._handle_click(mouse.x, mouse.y)
-        elif mouse.type == ovstream.MouseEventType.WHEEL:
-            server.camera.on_scroll(mouse.scroll_y or mouse.data)
-```
+Route native input through [viewer input routing](../viewer-input-routing/README.md)
+to the runtime queue, where camera motion and picking share the displayed frame's
+coordinates. Keep this path separate from JSON app commands.
 
 ## Message Reference
 
@@ -80,7 +77,7 @@ def on_input(self, event):
 | Render/settings | `toggleSegView`, `setCameraGizmo`, viewer-specific settings | implementation-specific result or state push | Server updates renderer/view state |
 | Runtime transform | `runtimeTransformRequest {request_id?,paths,...}` | `runtimeTransformResult {request_id?,result,error?,applied?}` and/or `stageSelectionChanged` | Optional capability: server writes accepted live transform updates through the runtime owner |
 | Pick effect | `pickEffectRequest {request_id?,paths,effect,value?}` | `pickEffectResult {request_id?,result,error?,applied?}` | Optional capability: server applies a verified selection-driven material, visibility, or effect change |
-| Physics impulse | `physicsImpulseRequest {request_id?,path,impulse,angular_impulse?,steps?,dt?}` | `physicsImpulseResult {request_id?,result,error?,samples?,summary?}` | Optional capability: server runs a bounded physics worker and applies returned poses through parent runtime state |
+| Physics impulse | `physicsImpulseRequest {request_id?,path,impulse,angular_impulse?,steps?,dt?}` | `physicsImpulseResult {request_id?,result,error?,samples?,summary?}` | Optional capability: server enqueues an impulse for its configured physics owner and reports accepted work/results |
 
 Exact event names matter. Current apps route `getChildrenResult` and `getPropertiesResponse`; older notes may say `getChildrenResponse` or `getPropertiesResult`. Accept old aliases when practical, but emit and document `getPropertiesResponse` for selected-prim properties.
 
@@ -99,10 +96,8 @@ response before showing controls. Keep names semantic and transport-neutral:
 better extension points than commands named after one delivery path or one
 library call.
 
-For physics messages, the server-side handler should normally start a bounded
-OVPhysX worker and return/apply pose samples. It must not use a failed
-`PhysX.attach_ovstage(stage, read_ordinal=...)` bridge as a reason to populate OVPhysX in the
-already-running viewer process.
+Physics commands target the configured simulator owner; see
+[physics integration](../physics-simulation/README.md) for the stage handoff.
 
 ## Payload Shapes
 
@@ -127,11 +122,11 @@ already-running viewer process.
 ```
 
 ```json
-{"event_type":"activeAOVState","payload":{"active":"NormalSD","available":["LdrColor","HdrColor","NormalSD","InstanceSegmentationSD","SemanticSegmentationSD","DepthSD","DiffuseAlbedoSD"],"result":"success","previous":"LdrColor"}}
+{"event_type":"activeAOVState","payload":{"active":"NormalSD","available":["LdrColor","HdrColor","NormalSD","InstanceSegmentationSD","SemanticSegmentationSD","DistanceToImagePlaneSD","DiffuseAlbedoSD"],"result":"success","previous":"LdrColor"}}
 ```
 
 ```json
-{"event_type":"availableAOVsResult","payload":{"aovs":["LdrColor","HdrColor","NormalSD","InstanceSegmentationSD","SemanticSegmentationSD","DepthSD","DiffuseAlbedoSD"],"available":["LdrColor","HdrColor","NormalSD","InstanceSegmentationSD","SemanticSegmentationSD","DepthSD","DiffuseAlbedoSD"]}}
+{"event_type":"availableAOVsResult","payload":{"aovs":["LdrColor","HdrColor","NormalSD","InstanceSegmentationSD","SemanticSegmentationSD","DistanceToImagePlaneSD","DiffuseAlbedoSD"],"available":["LdrColor","HdrColor","NormalSD","InstanceSegmentationSD","SemanticSegmentationSD","DistanceToImagePlaneSD","DiffuseAlbedoSD"]}}
 ```
 
 `paths: []` in `selectPrimsRequest` clears selection.
@@ -330,10 +325,14 @@ full geometry dump or paginated array viewer.
 
 If a project has `server/config.py`, add a message constant there; otherwise a literal string is acceptable. If generating code files, include these parts:
 
-1. `server/message_handler.py`: handler function, dictionary entry, payload validation, send helper call.
+1. Your app's message router (suggested `server/message_router.py`, or an
+   existing handler module): handler function, dictionary entry, payload
+   validation, and guarded send helper call. Build this adapter using
+   [server-handler-map.md](server-handler-map.md); no Python router is shipped
+   with this package.
 2. Runtime or worker module: a render-thread command for live viewer state, a
-   USD query worker for OpenUSD reads, or a bounded OVPhysX worker for physics
-   simulation when the handler needs those capabilities.
+   USD query worker for OpenUSD reads, or the configured physics owner
+   when the handler needs those capabilities.
 3. `frontend/src/types/usd.ts`: TypeScript payload interfaces and discriminated event type.
 4. `frontend/src/App.tsx` or the relevant component: `sendMessage({ event_type, payload })` and response routing in `onCustomEvent`.
 

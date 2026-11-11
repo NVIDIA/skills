@@ -1,0 +1,65 @@
+{
+  "skill_name": "pva-spec",
+  "evals": [
+    {
+      "id": "spec-finalize-approved-contract",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use only the handoff-finalization part of pva-spec for the already approved configuration in /workspace/input/approved. Create /workspace/spec-finalize/project and copy operator-spec.json, test-matrix.json, and evidence.json into /workspace/spec-finalize/configure without changing their contents. Use /workspace/input/approved/doctor-report.md as the report input. Run the bundled finalizer to create /workspace/spec-finalize/configure/opgen-inputs.json, then run its --check. Do not implement the operator. The supplied Doctor text is a structural test fixture: do not claim it proves SDK or hardware readiness.",
+      "expected_skill": "pva-spec",
+      "expected_script": "scripts/finalize_opgen_inputs.py",
+      "expected_output": "The finalizer creates a valid handoff and its --check succeeds. The approved three JSON inputs remain unchanged. The result is described as a handoff-format check, not a completed SDK or hardware readiness check.",
+      "assertions": [
+        "Uses finalize_opgen_inputs.py to create the handoff rather than inventing hashes manually.",
+        "The generated handoff passes the finalizer --check with the copied inputs and project directory.",
+        "Preserves the approved specification, matrix, evidence, and supplied Doctor text.",
+        "Does not implement an operator or claim compilation, readiness, or hardware testing.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/approved"
+      ]
+    },
+    {
+      "id": "spec-unresolved-contract",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Use only the handoff-finalization part of pva-spec on /workspace/input/unresolved. The approved matrix still has an unresolved overflow test. Do not invent or approve a resolution. Create /workspace/spec-unresolved/project and /workspace/spec-unresolved/configure. Use that project directory and /workspace/spec-unresolved/configure/opgen-inputs.json as the requested output. Keep supplied inputs unchanged. Check whether finalization is possible and report the result; do not ask questions or implement code. The Doctor text is a structural fixture, not proof of SDK readiness.",
+      "expected_skill": "pva-spec",
+      "expected_script": "scripts/finalize_opgen_inputs.py",
+      "expected_output": "Finalization is refused because coverage.unresolved_cases is nonempty. The report identifies the unresolved overflow behavior, returns NEEDS_INPUT, and no valid handoff is published.",
+      "assertions": [
+        "Identifies the unresolved matrix case and returns NEEDS_INPUT.",
+        "Does not erase the unresolved case or choose overflow behavior.",
+        "Does not publish a valid opgen-inputs.json or claim CONFIGURED.",
+        "Keeps supplied configuration and evidence unchanged.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": [
+        "files/unresolved"
+      ]
+    },
+    {
+      "id": "spec-missing-doctor",
+      "prompt": "This CI environment has Python but no PVA SDK, PVA Solutions, NVVPU or ASIP toolchain, CUDA, emulator, or board. Use only bundled skill helpers and supplied fixtures; do not install dependencies or access remote hosts. Create a new GEN2 PVA matrix multiplication specification for SDK 2.10.0~rc3 in /workspace/spec-matmul. I have no Doctor report or verified SDK references. Do not run Doctor, install anything, or ask questions; report any prerequisite that prevents you from proceeding.",
+      "expected_skill": "pva-spec",
+      "expected_script": null,
+      "expected_output": "BLOCKED because the required Doctor report and verified SDK reference corpus are unavailable. No completed handoff or implementation is produced.",
+      "assertions": [
+        "Identifies the missing Doctor report and verified reference corpus.",
+        "Returns BLOCKED without claiming CONFIGURED.",
+        "Does not create operator code or invent a passing Doctor report.",
+        "Does not install dependencies or access a remote host or board."
+      ],
+      "files": []
+    },
+    {
+      "id": "spec-negative",
+      "prompt": "Calculate the product of [[1, 2], [3, 4]] and [[5, 6], [7, 8]]. Give only the resulting matrix; do not create an operator or files.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "[[19, 22], [43, 50]]",
+      "assertions": [
+        "Returns the correct matrix product.",
+        "Does not invoke pva-spec or create specification files."
+      ],
+      "files": []
+    }
+  ]
+}

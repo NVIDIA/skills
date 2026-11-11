@@ -1,5 +1,5 @@
 ## Description: <br>
-Use this skill when the user is doing hands-on DOCA Rivermax work on a BlueField DPU or ConnectX host — standing up doca_rmax_in_stream (receive) sessions for timing-precise media-over-IP (SMPTE ST 2110 video/audio, market data, scientific feeds), confirming the Rivermax SDK + license precondition before any DOCA-side code, running doca_rmax_get_*_supported capability queries, pairing with doca-eth queues and doca-flow steering, or debugging DOCA_ERROR_* from a Rivermax call. <br>
+Guides DOCA Rivermax (doca_rmax) receive-stream work for timing-precise media over IP (SMPTE ST 2110 video/audio, market data, scientific feeds) on a target BlueField DPU once the Rivermax libraries and license are installed, covering the SDK + license precondition check, doca_rmax_in_stream sessions, doca_rmax_get_*_supported capability queries, pairing with doca-eth queues and doca-flow steering, and DOCA_ERROR_* from Rivermax calls. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,14 +9,14 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers building applications that consume the DOCA Rivermax integration — users whose code calls doca_rmax_* to drive timing-precise media-over-IP streams (SMPTE ST 2110, real-time market data, high-throughput scientific instrument streams) on a BlueField or ConnectX host. <br>
+External developers and engineers building applications that consume the DOCA Rivermax integration use this skill to confirm the Rivermax SDK and license preconditions, set up receive-only Rivermax input streams for ST 2110 or other timing-precise feeds, check device and Rivermax capabilities before choosing PTP-clock or packet-placement modes, find out why a started stream gets no packets, and work out which layer caused a Rivermax-related DOCA error on a BlueField DPU. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
 
 ## Requirements / Dependencies: <br>
-**Requires API Key or External Credential:** [No] <br>
-**Credential Type(s):** [None] <br>
+**Requires API Key or External Credential:** [Yes] <br>
+**Credential Type(s):** [Other [Rivermax license file]] <br>
 
 Do not include secrets in prompts/logs/output; use least-privilege credentials; rotate keys as appropriate. <br>
 
@@ -26,55 +26,57 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [DOCA SDK Documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA Samples (GitHub)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
-- [DOCA Platform Framework (GitHub)](https://github.com/NVIDIA/doca-platform) <br>
-- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
+- [NVIDIA DOCA Samples](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Shell commands, Code] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
 **Output Format:** [Markdown with inline bash and C code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 4 internal evaluation tasks (3 positive skill-activation, 1 negative). <br>
+4 evaluation tasks (3 positive, 1 negative), one attempt per task, each run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is the skill safe to use (unsafe operations, secret leakage, and unauthorized access). <br>
+- Correctness: Is the final answer correct against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed and were decoys avoided. <br>
+- Effectiveness: Did the skill help complete the task (equal-weight mean of goal completion and expected workflow adherence). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage (tool-call productivity and token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
+- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Whether the user's goal was achieved. <br>
+- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) | Codex (`openai/openai/gpt-5.5`) |
-|---|---:|---:|---:|
-| Security | 4 | 100% (+0%) | 100% (+0%) |
-| Correctness | 4 | 100% (+40%) | 100% (+35%) |
-| Discoverability | 4 | 100% (+25%) | 95% (+45%) |
-| Effectiveness | 4 | 88% (+78%) | 94% (+69%) |
-| Efficiency | 4 | 90% (+26%) | 100% (+75%) |
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | 92.3% — baseline ran, but no comparable score was available; uplift unavailable | 91.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 50.0% → 100.0% (+50.0 points) | 70.0% → 95.0% (+25.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 25.0% → 75.0% (+50.0 points) | 37.5% → 93.8% (+56.3 points) |
+| Efficiency | 86.3% — baseline ran, but no comparable score was available; uplift unavailable | 75.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-7b32072 (source: git SHA, committed 2026-07-26) <br>
+c98e456 (source: git SHA, committed 2026-10-28) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

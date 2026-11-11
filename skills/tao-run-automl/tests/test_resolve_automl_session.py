@@ -111,7 +111,7 @@ def test_explicit_identity_resumes_real_automl_controller(tmp_path):
     tao_automl = pytest.importorskip("tao_automl")
     schema_path = (
         Path(__file__).resolve().parents[3]
-        / "models/tao-finetune-nv-tesseract-forecasting/schemas/train.schema.json"
+        / "models/tao-finetune-kumo-forecast/schemas/train.schema.json"
     )
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     session_id = MODULE.new_session_id()
@@ -126,7 +126,7 @@ def test_explicit_identity_resumes_real_automl_controller(tmp_path):
     assert MODULE.validate_session_settings(settings, resume=False) == session_id
     fresh = tao_automl.AutoML(
         workspace=str(workspace),
-        network="nv_tesseract_forecasting",
+        network="kumo_forecast",
         train_specs=schema["default"],
         settings=settings,
         action="train",
@@ -147,7 +147,7 @@ def test_explicit_identity_resumes_real_automl_controller(tmp_path):
     )
     resumed = tao_automl.AutoML(
         workspace=str(workspace),
-        network="nv_tesseract_forecasting",
+        network="kumo_forecast",
         train_specs=schema["default"],
         settings={**settings, "automl_max_recommendations": 2},
         action="train",

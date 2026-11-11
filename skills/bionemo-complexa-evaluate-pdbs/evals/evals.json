@@ -1,0 +1,59 @@
+{
+  "skill_name": "complexa-evaluate-pdbs",
+  "evals": [
+    {
+      "id": "complexa-evaluate-pdbs-001",
+      "prompt": "I want to use the complexa-evaluate-pdbs skill to score my binder designs in /data/designs/pdl1_binders/ using AF2 refolding. Can you run that for me?",
+      "expected_output": "The agent ran the complexa-evaluate-pdbs workflow by executing preflight checks, selecting the evaluate_from_pdb_dir.yaml config with colabdesign as the folding backend, ran complexa analysis on the specified PDB directory, and reported pass-rate metrics including i_pAE, pLDDT, and scRMSD from the resulting CSV.",
+      "assertions": [
+        "The agent executed the preflight.sh script to verify GPU availability and required environment variables",
+        "The agent ran complexa analysis with configs/evaluate_from_pdb_dir.yaml and ++sample_storage_path=/data/designs/pdl1_binders/ with colabdesign as the binder_folding_method",
+        "The agent parsed the output CSV and reported pass-rate summaries against protein_binder thresholds",
+        "The agent generated or referenced an eval_manifest.json for reproducibility",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "complexa-evaluate-pdbs",
+      "expected_script": null
+    },
+    {
+      "id": "complexa-evaluate-pdbs-002",
+      "prompt": "I have a folder of BindCraft outputs at ~/bindcraft_results/her2/ and I need to compute interface pAE and i_pTM for all of them. Can you also check designability with ProteinMPNN?",
+      "expected_output": "The agent identified this as a PDB evaluation task, ran preflight checks, configured complexa analysis with the evaluate_from_pdb_dir.yaml config pointing to the BindCraft output directory, included designability metrics via inverse_folding_model=soluble_mpnn, and reported per-PDB interface pAE, i_pTM, and designability scRMSD results.",
+      "assertions": [
+        "The agent ran preflight.sh to check GPU, disk, and tool availability before launching the evaluation",
+        "The agent selected the protein_binder result_type and evaluate_from_pdb_dir.yaml config for third-party BindCraft outputs",
+        "The agent included ++metric.inverse_folding_model=soluble_mpnn to enable ProteinMPNN designability scoring",
+        "The agent reported interface pAE, i_pTM, and designability scRMSD metrics from the results CSV",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "complexa-evaluate-pdbs",
+      "expected_script": null
+    },
+    {
+      "id": "complexa-evaluate-pdbs-003",
+      "prompt": "We just received 50 hand-curated binder decoys from a collaborator targeting EGFR. They're in /shared/collab_decoys/egfr_v2/. I need to validate them before our meeting tomorrow — can you refold with RoseTTAFold3 and give me pass rates? We need at least 20% of designs passing on scRMSD and i_pAE.",
+      "expected_output": "The agent performed a full complexa evaluate-pdbs workflow using RF3 as the folding backend on the collaborator's EGFR decoys, verified RF3 environment variables were set, ran complexa analysis, and reported whether the 20% pass-rate threshold was met for scRMSD and i_pAE metrics.",
+      "assertions": [
+        "The agent ran preflight.sh and verified RF3_CKPT_PATH and RF3_EXEC_PATH were available in the environment",
+        "The agent ran complexa analysis with ++metric.binder_folding_method=rf3_latest and ++sample_storage_path=/shared/collab_decoys/egfr_v2/",
+        "The agent parsed the result CSV and explicitly reported pass-rates for scRMSD and i_pAE against the protein_binder thresholds",
+        "The agent compared the observed pass-rates to the user's stated 20% requirement and communicated whether the designs met that bar",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "complexa-evaluate-pdbs",
+      "expected_script": null
+    },
+    {
+      "id": "complexa-evaluate-pdbs-004",
+      "prompt": "How do I install RoseTTAFold3 and set up the checkpoint paths on my new workstation?",
+      "expected_output": "The agent recognized this as an installation/setup question rather than an evaluation task, and either provided general guidance on RF3 installation or directed the user to the complexa-setup skill instead of running complexa-evaluate-pdbs.",
+      "assertions": [
+        "The agent did not run complexa analysis or any evaluation workflow",
+        "The agent provided installation guidance or directed the user to the complexa-setup skill for environment configuration",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "fixture": "Synthetic port review; no downloadable model is required.",
+  "source_contracts": [
+    "fastgen/networks/module.py",
+    "fastgen/utils/module.py::materialize_meta_module",
+    "fastgen/utils/distributed/fsdp.py"
+  ],
+  "source_revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "author_reference": {
+    "backbone_weights": "bfloat16",
+    "normalization_weights": "float32",
+    "vae_default": "float32",
+    "rotary_table": {
+      "persistent": false,
+      "formula": "deterministic frequencies from model dimensions"
+    },
+    "guidance": "two native forwards composed outside the backbone"
+  },
+  "candidate": {
+    "weight_loading": "load checkpoint then call .to(bfloat16) on the whole module",
+    "fsdp": "one common mixed-precision policy for every layer",
+    "vae": "inherit backbone dtype",
+    "root_reset_parameters": "no-op",
+    "child_reset_parameters": "reconstructs rotary_table",
+    "state_dict": "does not contain rotary_table",
+    "validation": "single unsharded forward matched"
+  }
+}

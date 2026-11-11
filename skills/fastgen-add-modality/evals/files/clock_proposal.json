@@ -1,0 +1,41 @@
+{
+  "fixture": "Synthetic joint-generation proposal; no models are downloadable.",
+  "source_revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "source_contract": "fastgen/networks/noise_schedule.py::CompositeNoiseSchedule",
+  "upstream": {
+    "generated_modalities": [
+      "video",
+      "pose"
+    ],
+    "time_inputs": [
+      "t_video",
+      "t_pose"
+    ],
+    "sampling_pairs": [
+      [
+        1.0,
+        0.8
+      ],
+      [
+        0.5,
+        0.8
+      ],
+      [
+        0.5,
+        0.2
+      ],
+      [
+        0.0,
+        0.0
+      ]
+    ],
+    "training_times": "sampled independently"
+  },
+  "proposal": {
+    "schedule": "CompositeNoiseSchedule",
+    "primary_key": "video",
+    "t_precision": "float32",
+    "fix_for_two_times": "cast pose embeddings to float64"
+  },
+  "question": "Can this preserve the upstream algorithm with no training or sampler changes?"
+}

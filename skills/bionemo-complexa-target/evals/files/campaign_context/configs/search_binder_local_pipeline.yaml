@@ -1,0 +1,39 @@
+# Binder Design Pipeline Configuration
+#
+# Modular config that combines all pipeline stages:
+#   - model_sampling: Model schedules, temperatures, noise
+#   - binder_generate: Search, rewards, filtering
+#   - binder_evaluate: Metrics computation
+#   - binder_analyze: Results analysis and aggregation
+#
+# Usage:
+#   complexa design configs/search_binder_local_pipeline.yaml ++run_name=test_1_30_uv2 ++generation.task_name=38_TNFalpha 22_DerF21
+
+defaults:
+  - pipeline/binder/binder_generate@generation
+  - pipeline/binder/binder_evaluate@_global_
+  - pipeline/binder/binder_analyze@_global_
+  - _self_
+
+# =============================================================================
+# Run identification
+# =============================================================================
+run_name: search_binder_local
+ckpt_path: ./ckpts
+ckpt_name: complexa.ckpt
+autoencoder_ckpt_path: ./ckpts/complexa_ae.ckpt
+
+# =============================================================================
+# Job management — set gen_njobs/eval_njobs to your number of available GPUs
+# =============================================================================
+ncpus_: 24
+seed: 5
+gen_njobs: 1    # Number of parallel generation jobs (1 GPU each)
+eval_njobs: 1   # Number of parallel evaluation jobs (1 GPU each)
+
+# =============================================================================
+# Hydra
+# =============================================================================
+hydra:
+  run:
+    dir: ./logs/hydra_outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}

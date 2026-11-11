@@ -14,6 +14,7 @@
 # Matches julia/kernels/matmul.jl
 
 using CUDA
+using cuTile: cuTile
 import cuTile as ct
 
 # 2D swizzle for better L2 cache locality.
@@ -36,8 +37,6 @@ end
 function matmul_kernel(A::ct.TileArray{T,2}, B::ct.TileArray{T,2},
                        C::ct.TileArray{T,2},
                        tm::Int, tn::Int, tk::Int) where {T}
-    ct.@compiler_options num_ctas=ct.ByTarget(v"10.0" => 2)
-
     # 1D grid with 2D swizzle for better L2 cache locality
     bid = ct.bid(1)
     M = size(A, 1)
@@ -69,22 +68,41 @@ end
 # ── Host function ────────────────────────────────────────────────────────────
 
 """
-    matmul!(C, A, B; tm=128, tn=128, tk=64)
+    matmul!(C, A, B; tm, tn, tk, num_ctas)
 
 Launch matmul kernel: C = A * B.
 
 Memory layout (column-major):
   A shape: (M, K), B shape: (K, N), C shape: (M, N)
+
+Tile sizes and CTA-cluster size default to `default_matmul_config(M, N)`.
 """
 function matmul!(C::CuMatrix{T}, A::CuMatrix{T}, B::CuMatrix{T};
-                 tm::Int=128, tn::Int=128, tk::Int=64) where {T}
+                 tm::Union{Int,Nothing}=nothing, tn::Union{Int,Nothing}=nothing,
+                 tk::Union{Int,Nothing}=nothing, num_ctas::Union{Int,Nothing}=nothing) where {T}
     M = size(A, 1)
     N = size(B, 2)
+    dtm, dtn, dtk, dnc = default_matmul_config(M, N)
+    tm = something(tm, dtm); tn = something(tn, dtn)
+    tk = something(tk, dtk); num_ctas = something(num_ctas, dnc)
     grid = cld(M, tm) * cld(N, tn)
-    ct.launch(matmul_kernel, grid, A, B, C,
-              ct.Constant(tm), ct.Constant(tn), ct.Constant(tk))
-    CUDA.synchronize()
+    @cuda backend=cuTile blocks=grid num_ctas=num_ctas matmul_kernel(A, B, C, ct.Constant(tm), ct.Constant(tn), ct.Constant(tk))
     return
+end
+
+"""
+    default_matmul_config(M, N) -> (tm, tn, tk, num_ctas)
+
+Largest tiles that still give at least one output tile per two SMs: 256×128×32,
+then 128×128×64; below that, 128×128×64 tiles paired into 2-CTA clusters where
+the GPU supports them (sm_90+).
+"""
+function default_matmul_config(M, N)
+    dev = CUDA.device()
+    half_sms = cld(CUDA.attribute(dev, CUDA.DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT), 2)
+    cld(M, 256) * cld(N, 128) >= half_sms && return (256, 128, 32, 1)
+    cld(M, 128) * cld(N, 128) >= half_sms && return (128, 128, 64, 1)
+    return (128, 128, 64, CUDA.capability(dev) >= v"9.0" ? 2 : 1)
 end
 
 # ── Verify ───────────────────────────────────────────────────────────────────
@@ -95,14 +113,14 @@ function verify()
         (M=128, K=128, N=128),
         (M=256, K=256, N=256),
         (M=100, K=200, N=150),
+        (M=2048, K=512, N=2048),   # large enough for the 256x128 default tiles
     ]
-    tm, tn, tk = 128, 128, 64
     for tc in test_cases
         A = CUDA.rand(Float32, tc.M, tc.K)
         B = CUDA.rand(Float32, tc.K, tc.N)
         C = CUDA.zeros(Float32, tc.M, tc.N)
 
-        matmul!(C, A, B; tm, tn, tk)
+        matmul!(C, A, B)
 
         expected = Array(A) * Array(B)
         result = Array(C)

@@ -1,16 +1,16 @@
-# Cosmos3 Train and Bare OK/NG Evaluate
+# Cosmos Reason 3 Framework action contract
 
 ## Prepare the Cosmos Reason 3 checkpoint
 
 The model this loop fine-tunes is the published **Cosmos Reason 3** reasoner
-(`nvidia/Cosmos3-Nano` by default). Cosmos-RL cannot load that published
-directory: it ships in Cosmos3's own native Omni format — recognizable by
-`model_type="cosmos3_omni"` and `Cosmos3ForConditionalGeneration` — while the
-Cosmos-RL AOI train/evaluate jobs load a Qwen3-VL VLM safetensors PTM.
+(`nvidia/Cosmos3-Nano` by default). That published directory ships in Cosmos3's
+own native Omni format — recognizable by `model_type="cosmos3_omni"` and
+`Cosmos3ForConditionalGeneration` — while this application's Framework
+Train/Evaluate actions consume a Qwen3-VL VLM safetensors PTM.
 
 So a one-time conversion turns the selected Cosmos Reason 3 reasoner into a
 Qwen3-VL PTM. The reasoner stays the model's identity and lineage throughout;
-the Qwen3-VL PTM is only the on-disk format Cosmos-RL can consume.
+the Qwen3-VL PTM is only the on-disk format Framework consumes.
 
 After the user approves the launch review, prepare the selected checkpoint with
 the helper owned by `tao-finetune-cosmos-reason`:
@@ -41,8 +41,8 @@ probe="$PREPARED_MODEL_PARENT/.tao-write-probe.$$"
 COSMOS3_VLM_ARCHITECTURE_MODEL="${COSMOS3_VLM_ARCHITECTURE_MODEL:-Qwen/Qwen3-VL-8B-Instruct}"
 : "${COSMOS3_VLM_ARCHITECTURE_REVISION:?set the immutable revision resolved by the model planner}"
 COSMOS3_CONVERSION_CACHE_DIR="${COSMOS3_CONVERSION_CACHE_DIR:-$PREPARED_MODEL_PARENT/cache}"
-COSMOS_RL_IMAGE_DIGEST=$(docker image inspect --format '{{.Id}}' "$COSMOS_RL_IMAGE")
-: "${COSMOS_RL_IMAGE_DIGEST:?could not resolve the selected runtime image ID}"
+TAO_CFW_IMAGE_DIGEST=$(docker image inspect --format '{{.Id}}' "$TAO_CFW_IMAGE")
+: "${TAO_CFW_IMAGE_DIGEST:?could not resolve the selected runtime image ID}"
 
 "$PYTHON" \
   "$TAO_SKILL_BANK_PATH/skills/models/tao-finetune-cosmos-reason/scripts/prepare_cosmos3_vlm_checkpoint.py" \
@@ -51,9 +51,14 @@ COSMOS_RL_IMAGE_DIGEST=$(docker image inspect --format '{{.Id}}' "$COSMOS_RL_IMA
   --vlm-architecture-model-revision "$COSMOS3_VLM_ARCHITECTURE_REVISION" \
   --output-path "$PREPARED_MODEL_HOST_PATH" \
   --cache-dir "$COSMOS3_CONVERSION_CACHE_DIR" \
-  --runtime-image "$COSMOS_RL_IMAGE" \
-  --runtime-image-digest "$COSMOS_RL_IMAGE_DIGEST"
+  --backend cosmos-framework \
+  --runtime-image "$TAO_CFW_IMAGE" \
+  --runtime-image-digest "$TAO_CFW_IMAGE_DIGEST"
 ```
+
+The helper's `--runtime-image` and `--runtime-image-digest` must identify the
+model skill's resolved Framework image. The same immutable image runs checkpoint
+preparation, Train, Evaluate, and Inference.
 
 Confirm `$COSMOS3_SOURCE_DIR` exists before launching; that check costs nothing
 and saves several minutes plus a large cache write.
@@ -63,7 +68,7 @@ UID:GID before writing the prepared checkpoint. Treat any root-owned output as
 a helper regression and hard-stop; never launch a root repair container. A
 valid existing checkpoint is reported as `status=reused_verified` and reused.
 
-The helper may pull the selected backend image, download the architecture
+The helper may pull the selected Framework image, download the architecture
 checkpoint, and write a large checkpoint, so never run it before approval. It
 forwards whichever of `HF_TOKEN` or `HUGGING_FACE_HUB_TOKEN` is set in the
 session, by name and without printing values; the second is the legacy alias
@@ -73,12 +78,12 @@ Do not convert again when the helper reports `status=reused_verified`; it has
 already verified a complete `qwen3_vl` safetensors directory. Mount or stage
 that directory for the selected platform, then use its compute-frame path for:
 
-- baseline and iteration `model.model_name`;
-- Train `policy.model_name_or_path`;
-- LoRA evaluate `model.base_model_path`.
+- baseline `model.model_name`;
+- Train `model.backbone.model_name` and `model.backbone.safetensors_path`;
+- iteration Evaluate/Inference `model.vit_checkpoint_path` when loading DCP.
 
 Keep the canonical Cosmos Reason 3 ID (`nvidia/Cosmos3-Nano` by default) as the
-source-model lineage; it names the model, not the Cosmos-RL PTM path. The
+source-model lineage; it names the model, not the prepared PTM path. The
 command above is the Nano default. For Edge or Super, supply the selected
 source checkpoint plus a model-skill-approved, variant-matched
 `--vlm-architecture-model-path-or-uri` and immutable
@@ -86,15 +91,96 @@ source checkpoint plus a model-skill-approved, variant-matched
 have not been validated, hard-stop instead of applying Nano's Qwen3-VL 8B
 default.
 
-## Run containers as the invoking user
+## Framework image
 
-Every container that writes into the bound results directory — Train, both
-evaluate stages, AnomalyGen — must drop to the host user. Containers default to
-root, so their outputs land root-owned inside a directory the operator owns,
-and the run tree then cannot be deleted, re-rendered into, or cleaned up
-without `sudo`. On Docker:
+Resolve the Framework action image through the model skill and inspect its
+repository digest. The same immutable Framework image runs checkpoint
+preparation, Train, Evaluate, and Inference.
+
+## Train
+
+Render `references/cosmos_framework_sft_full.toml` with
+`"$PYTHON" scripts/render_cfw_sft.py`. The validation profile is single-GPU BF16 VLM
+LoRA, one ordered `[AOI, golden_reference]` pair per record, 10 epochs, and
+language-side projection targets. The mounted `cfw_cr3_aoi_adapter.py` decodes
+both paths and inserts both images before the inspection prompt.
+Keep Train `model.attn_implementation="cosmos"` because `sdpa` collapses
+Framework LoRA SFT to the majority label on this image. Evaluate remains
+`sdpa` because its HF loader rejects `cosmos`.
+The native command is:
 
 ```bash
+cosmos-framework-train --sft-toml=/tao/config/train.toml
+```
+
+Iteration 1 leaves `checkpoint.load_path="???"`. Later iterations set it to
+the preceding native DCP directory and retain
+`checkpoint.keys_to_skip_loading=[]`. Submit through
+`"$PYTHON" scripts/submit_cfw_train.py`; record the input SFT TOML, Train's saved
+Hydra `config.yaml`, and selected DCP path.
+
+## Evaluate
+
+Render an exact nested TOML with `"$PYTHON" scripts/render_cfw_evaluate.py`. The native
+command is:
+
+```bash
+cosmos-framework-evaluate --config /tao/config/evaluate.toml
+```
+
+The rendered Evaluate profile is single-GPU BF16, batch size 1, one frame per
+image, `torchcodec-cuda-on-demand` decoding, temperature 0, and at most four
+output tokens.
+Proxy and Benchmark annotations remain two-image ShareGPT arrays; the native
+Framework evaluator receives the ordered pair for each prompt.
+Use the prepared PTM directly for baseline. For an iteration DCP:
+
+- `model.model_name`: DCP directory;
+- `model.config_file`: Train's saved Hydra `config.yaml` beside that DCP, never
+  the input SFT TOML;
+- `model.export_dir`: action-local writable model directory;
+- `model.vit_checkpoint_path`: prepared Qwen3-VL PTM directory;
+- `model.enable_lora=false`.
+
+The public action handles the DCP locally when it starts. Mount the action
+model parent read-write and the rest of the workspace read-only. Submit with
+`"$PYTHON" scripts/submit_cfw_evaluate.py`.
+
+## Inference
+
+The native action remains Framework-owned. For standalone one-image use its
+public inference command:
+
+```bash
+cosmos-framework-inference \
+  --model_path MODEL --torch_dtype bfloat16 --device_map auto --num_gpus 1 \
+  --type image --media IMAGE --prompt 'Return exactly OK or NG.' \
+  --max_new_tokens 4 --results_dir RESULTS --enable_lora false
+```
+
+For a DCP add `--config_file`, `--export_dir`, and
+`--vit_checkpoint_path` with the same meanings as Evaluate. Use
+`"$PYTHON" scripts/submit_cfw_inference.py`.
+
+PCB pair inference uses a one-record two-image annotation through the native
+Framework Evaluate action so the AOI and golden reference reach the processor
+together. Do not discard the golden image or invoke a different backend.
+
+## Container invariants
+
+Use the job-record id as the Docker name and label. Run detached, poll Docker
+through `status`, read Docker output through `logs`, and stop through `cancel`.
+Before every action, prove the recorded results directory is writable and
+compose the application-owned identity arguments:
+
+```bash
+mkdir -p "$RESULTS_DIR"
+probe="$RESULTS_DIR/.tao-write-probe.$$"
+(umask 077 && : >"$probe" && rm -f "$probe") || {
+  echo "FATAL: $RESULTS_DIR is not writable by uid $(id -u)" >&2
+  exit 2
+}
+
 CR3_IDENTITY_ARGS=(
   --user "$(id -u):$(id -g)"
   -e USER="$(id -un)" -e LOGNAME="$(id -un)" -e HOME=/tmp
@@ -103,187 +189,7 @@ CR3_IDENTITY_ARGS=(
 ```
 
 Insert `"${CR3_IDENTITY_ARGS[@]}"` into every Docker Train, Proxy evaluate,
-and Benchmark evaluate launch, including resumed actions, and use the
-stage-local writable working directory:
-
-```bash
--w "$RESULTS_DIR/<label>/<stage>/cwd"
-```
-
-All four parts are one unit; dropping any of them fails.
-
-`HOME=/tmp` matters: a mapped uid has no home inside the image, and libraries
-that write caches to `$HOME` fail or scatter files otherwise.
-
-`-w` matters for the same reason. The image's `WORKDIR` is `/workspace`, owned
-by root, and TAO's status decorator falls back to creating `./results` in the
-current directory when `TAO_API_JOB_ID` is unset. As root that silently
-succeeded; as a mapped uid the first job dies with
-`PermissionError: [Errno 13] Permission denied: './results'`. Point `-w` at a
-writable directory you create inside the stage's bound results tree.
-
-That leaves a `cwd/results/status.json` stub per stage. It is inert, but treat
-`cwd/` as run scaffolding rather than an artifact — never record it in state.
-The cleaner alternative, read from the container's `decorators.py`, is to set
-`TAO_API_JOB_ID` together with `TAO_API_RESULTS_DIR` pointing into the bound
-results tree, which takes the branch that skips `./results` entirely; that path
-has not been run end-to-end here, so verify it before relying on it. Other platforms
-express the same intent differently — a Kubernetes `securityContext`
-`runAsUser`/`runAsGroup`, or SLURM's already-unprivileged execution — so apply
-the selected platform's equivalent rather than copying these flags blindly.
-
-## Train producer
-
-Read the current `tao-finetune-cosmos-reason` model skill and
-`references/skill_info.yaml`. The action contract is:
-
-- image: resolve the `cosmos-rl` backend image from the Cosmos model skill's
-  `references/skill_info.yaml` with
-  `"$PYTHON" "$TAO_SKILL_BANK_PATH/scripts/resolve_tao_image.py"`;
-- command: `cosmos-rl --config {config_path}
-  /opt/cosmos_rl/tao_sft_example.py`;
-- mode/format: `config` / TOML;
-- output: `train.output_dir`.
-
-Use `nvidia/Cosmos3-Nano` by default. Accept `nvidia/Cosmos3-Edge` or
-`nvidia/Cosmos3-Super` only when the user explicitly selects that variant.
-Keep the canonical selected ID as lineage across baseline evaluation, Train,
-and LoRA evaluation, and use its matching prepared PTM for each job. Treat
-checkpoint loading/conversion and compute shape as variant-specific preflight
-evidence. Give hardware recommendations consistent with the prompt and
-selected variant; report insufficient resources instead of silently
-substituting a different variant.
-
-Invoke the model train action with workflow argument `automl_policy: off`, then
-dispatch its bundle through the selected platform's four verbs. Build a nested
-spec from the model skill's current packaged Train template and apply only the
-AOI values below. Do not copy literal dotted override names into TOML.
-
-Required AOI values:
-
-- `custom.train_dataset.annotation_path`: the workspace template initially
-  points to `mining_pool.json`; after the baseline gate is shown unmet and
-  zero-shot Proxy, RCA, and Mining selection have run, replace it in the staged
-  Train spec with `iterN/assemble/train_iter_N.json`;
-- `custom.train_dataset.media_path` and `media_root`: compute-frame media root;
-- `custom.system_prompt`: exact OK/NG instruction;
-- `train.output_dir`: bound stage results directory. A checkpoint outside the
-  iteration result tree is a hard stop, so a carried-over template value such
-  as `results/train_lora` fails at commit rather than at launch — rewrite it
-  when staging, do not inherit it;
-- `validation.enable=false` and no `custom.val_dataset`; Proxy is evaluated by
-  a separate job and must not become Train validation data;
-- `train.train_policy.type="sft"`;
-- `policy.model_name_or_path`: prepared Qwen3-VL PTM compute-frame path;
-- `policy.model_max_length >= 40960`;
-- `policy.lora`: recorded rank/alpha with the recorded
-  `target_modules` — by default the language-side projections
-  `["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj",
-  "down_proj"]`, not `"all-linear"`;
-- parallelism values derived from selected platform shape;
-- LoRA unless the user explicitly approved full fine-tuning.
-
-Four of these are per-run values that no template can carry, and each is
-hard-stop grade if left at its template value. Rewrite them together when
-staging the Train spec, then re-read the file before launching:
-`custom.train_dataset.annotation_path`, `policy.model_name_or_path`,
-`train.output_dir`, and `train.epoch`.
-
-`references/example_lora_config.toml` shows the produced default shape at
-iteration N, and `references/example_sft_config.toml` shows the
-explicitly-approved full-parameter variant. Read them to review the serialized
-result, not as spec sources: build every staged spec from the model skill's
-current template so template changes are not silently overridden.
-
-Resolve the concrete exported safetensors checkpoint under the stage output.
-Do not record a broken `best` symlink or a launcher staging directory.
-
-The model skill warns that one-epoch runs can leave only a broken `best`
-symlink after checkpoint cleanup. That warning is about configurations relying
-on `best`. With `train.ckpt.save_freq_in_epoch=1` and
-`export_safetensors=true` — this workflow's shape — `epoch=1` was observed to
-write a concrete `<output>/<timestamp>/safetensors/epoch_1/` export and create
-no `best` symlink at all, so it is safe here. Commit that concrete directory.
-
-## Proxy and Benchmark evaluate producers
-
-Read the current model skill's `evaluate` action contract. Use it for both
-evaluation stages:
-
-- command: `cosmos-rl-evaluate --config {config_path}`;
-- mode/format: `config` / TOML;
-- inputs: `dataset.annotation_path`, `dataset.media_dir`, and
-  `model.model_name`;
-- output: `results_dir`.
-
-Start from the model skill's current packaged Evaluate template and materialize
-it once for Proxy and once for Benchmark. Apply these AOI overrides to both:
-
-- `task.type=""`;
-- `dataset.system_prompt`: return exactly `OK` or `NG`;
-- `evaluation.answer_type="freeform"` and
-  `evaluation.soft_accuracy.enabled=false`;
-- `generation.max_tokens=4` and `generation.temperature=0`;
-- `metrics.names=[]`;
-- save individual results; disable evaluator confusion-matrix and metric
-  summary output because `analyze_gaps.py` owns the discrete OK/NG metrics.
-
-Both stages must use the same checkpoint and generation settings; only the
-annotation, bound output directory, and save-folder label differ. For a LoRA
-export, set `model.enable_lora=true` and keep `model.base_model_path` aligned
-with Train's prepared Qwen3-VL PTM.
-
-### Classify and, when needed, lift the evaluation image cap
-
-Some `cosmos-rl` images build vLLM with
-`limit_mm_per_prompt={"video": 1, "image": 1}`. Every AOI record carries two
-images, so those images fail evaluation until the cap is raised. Other images,
-including framework-evaluator builds, contain neither that literal nor a vLLM
-engine construction and need no patch. Image tags are not a stable way to tell
-the two apart.
-
-Run this once per run, before the first evaluate job:
-
-```bash
-"$PYTHON" "$SKILL_ROOT/scripts/patch_eval_image_cap.py" \
-  --image "$COSMOS_RL_IMAGE" \
-  --output-dir "$RESULTS_DIR/patches/cosmos_rl_eval" \
-  --summary "$RESULTS_DIR/patches/cosmos_rl_eval/summary.json"
-```
-
-It reads `base.py` out of the selected image and reports one source-driven
-classification, independent of whether the tag is semver, a custom build name,
-or a future tag:
-
-- `patch_required`: the recognized cap is below two; the script rewrites only
-  that literal and prints `MOUNT_ARG=<host>:<container>:ro`. Add it as a
-  read-only mount to every `cosmos-rl-evaluate` job.
-- `already_sufficient`: the recognized cap is at least two; no file or mount.
-- `cap_absent`: the source contains neither the cap nor vLLM engine evidence;
-  no file or mount.
-
-If the source still references `limit_mm_per_prompt` or vLLM without the
-recognized literal, the script fails with `classification=unknown`; verify the
-new evaluator shape instead of guessing. Nothing is vendored into the skill,
-and Train jobs never need this mount.
-
-The evaluator writes `results.json` with per-sample `video_id`, `response`,
-`question`, and `gt`. Run `analyze_gaps.py` afterward:
-
-- `--evaluation-role proxy` writes per-sample RCCA artifacts and never gates;
-- `--evaluation-role benchmark` writes aggregate metrics and the stop-gate
-  `metric_result.json`.
-
-The analysis layer normalizes the last standalone `OK`/`NG` token. Source
-training labels remain exact.
-
-## Output commits
-
-Baseline begins with zero-shot frozen Benchmark against the base model and
-submits no Train job; zero-shot Proxy follows only when that gate is unmet.
-After Proxy RCA and Mining selection create `train_iter_N.json`, submit Train,
-Benchmark evaluate, and — only when the loop continues — Proxy evaluate, as
-separate platform jobs with separate job-records. Commit Train with
-`--best-ckpt` and `--training-spec`; commit each evaluation with its
-`results.json`. The `benchmark_metrics` commit records the KPI; a stopping
-iteration completes there, and a continuing one completes at `proxy_rcca`.
+Benchmark evaluate, and Inference launch, including resumed actions. Use a
+writable stage working directory, keep user data off `/workspace`, mount the
+workspace read-only, and expose only recorded results and action-model
+directories read-write.

@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-setup.explicit-positive.v1",
-      "prompt": "Use the doca-setup skill to help me. Use this skill when the user is dealing with the DOCA environment around their workload — verifying an install is healthy, preparing the build env (pkg-config, headers, LD_LIBRARY_PATH, hugepages, devlink, representors), debugging env-class",
+      "prompt": "Use the doca-setup skill for this task: I'm running into this: \"I just got a BlueField, what now\". Can you walk me through it?",
       "expected_skill": "doca-setup",
       "expected_output": "The agent loads doca-setup and answers strictly from that skill's documented workflow, quoting only real symbols, flags, paths, and commands from the bundle (no invented tokens) and routing out to other skills for anything out of doca-setup's scope.",
       "assertions": [
@@ -18,7 +18,7 @@
       "expected_skill": "doca-setup",
       "expected_output": "The agent recognizes this as a doca-setup task even though the skill is not named, loads doca-setup, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
       "assertions": [
-        "The doca-setup skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The response is concrete and grounded in the skill content rather than generic advice."
       ]
     },
@@ -28,18 +28,18 @@
       "expected_skill": "doca-setup",
       "expected_output": "The agent recognizes this as a doca-setup task even though the skill is not named, loads doca-setup, and walks the user through the documented workflow with concrete, bundle-grounded steps.",
       "assertions": [
-        "The doca-setup skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The response is concrete and grounded in the skill content rather than generic advice."
       ]
     },
     {
       "id": "doca-setup.negative.v1",
-      "prompt": "I need help with something doca-setup explicitly says is out of scope (it should be handled by doca-flow). Which skill should handle it and why is it not doca-setup?",
+      "prompt": "The environment and versions are already verified. I need to define and validate packet-steering rules in an application.",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-setup; it recognizes the request is out of scope and routes to the correct skill (doca-flow), explaining the boundary.",
+      "expected_output": "The agent does not apply doca-setup's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-setup as the answer.",
       "assertions": [
-        "doca-setup is not used as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s): doca-flow."
+        "The answer does not apply doca-setup's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

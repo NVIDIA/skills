@@ -1,5 +1,5 @@
 ## Description: <br>
-Use as the top-level router for Omniverse Realtime Viewer USD app requests and focused viewer reference documents. <br>
+Use as the top-level router for Omniverse Realtime Viewer USD apps, XR delivery, SPG GPU processing, stylized rendering, and focused viewer reference documents. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers building USD 3D viewer applications using NVIDIA Omniverse technologies, including local native viewers, cloud-streamed browser viewers, and hybrid desktop apps. <br>
+Developers and engineers use this skill to build responsive OpenUSD viewers with NVIDIA Omniverse libraries (OVRTX rendering, OVStage scene state, ovstream/ovui delivery), choosing local, browser-streamed, XR, or cloud delivery paths and adding capabilities such as camera control, picking, render settings, simulation, stylized rendering, and CAE/CFD visualization. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,60 +25,101 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Routing Reference](references/routing.md) <br>
-- [Conventions Reference](references/conventions.md) <br>
-- [Validation Reference](references/validation.md) <br>
+- [Routing](references/routing.md) <br>
 - [USD Viewer App](references/usd-viewer-app/README.md) <br>
-- [Streaming Viewer Recipe](references/streaming-viewer-recipe/README.md) <br>
-- [OVUI Local Viewer Recipe](references/ovui-local-viewer-recipe/README.md) <br>
-- [NVIDIA Skills Documentation](https://docs.nvidia.com/skills) <br>
+- [Dependencies](references/dependencies/README.md) <br>
+- [Conventions](references/conventions.md) <br>
+- [Validation](references/validation.md) <br>
+- [Viewer UX Workflow](references/viewer-ux-workflow/README.md) <br>
+- [OVStage / OVRTX Integration](references/ovstage-ovrtx-integration/README.md) <br>
+- [Realtime Simulation Integration](references/realtime-sim-integration/README.md) <br>
+- [Troubleshooting](references/troubleshooting/README.md) <br>
+- [SPG Processing](references/spg-processing/README.md) <br>
+- [Stylized Visualization](references/stylized-visualization/README.md) <br>
+- [XR Viewer Recipe](references/xr-viewer-recipe/README.md) <br>
+- [CAE/CFD Visualization](references/cae-cfd-visualization/README.md) <br>
+- [Cloud Deployment](references/cloud-deployment/README.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline code blocks and generated source files] <br>
+**Output Type(s):** [Code, Files, Shell commands, Configuration instructions] <br>
+**Output Format:** [Markdown with inline code blocks (Python, TypeScript, C++, USDA, bash)] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-7 evaluation tasks (7 positive) from the skill-evaluator-dataset-snapshot. <br>
+8 evaluation tasks (7 positive, 1 negative), 1 attempt per task, each attempt in its own isolated sandbox pod (`k8s-sandbox` environment), with baseline runs of the same tasks without the skill. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether the skill is safe to use. <br>
-- Correctness: Checks whether the answer is correct. <br>
-- Discoverability: Checks whether the right skill was loaded when needed. <br>
-- Effectiveness: Checks whether the skill helped complete the task. <br>
-- Efficiency: Checks whether the skill avoided wasted tool or skill usage. <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was found and executed. <br>
-- `skill_efficiency`: Routing quality, workspace-aware skill reads, and productive tool use. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+> ✅ **Overall verdict: PASS — Recommended for publication**
+
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 68% → 88% (+20 points) | 60% → 72% (+12 points) |
-| Security | 93% → 86% (-7 points) | 50% → 7% (-43 points) |
-| Correctness | 100% → 100% (±0 points) | 100% → 100% (±0 points) |
-| Discoverability | 42% → 92% (+50 points) | 45% → 79% (+34 points) |
-| Effectiveness | 82% → 92% (+10 points) | 73% → 95% (+22 points) |
-| Efficiency | 21% → 69% (+48 points) | 33% → 82% (+49 points) |
+| Overall | 93.9% — baseline ran, but no comparable score was available; uplift unavailable | 88.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 93.8% (-6.2 points) |
+| Correctness | 42.5% → 100.0% (+57.5 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 93.6% — baseline ran, but no comparable score was available; uplift unavailable | 91.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 54.2% → 89.1% (+34.9 points) | 66.7% → 82.3% (+15.6 points) |
+| Efficiency | 86.9% — baseline ran, but no comparable score was available; uplift unavailable | 72.4% — baseline ran, but no comparable score was available; uplift unavailable |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 92.3% → 86.0% (-6.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 84.7% → 81.8% (-2.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 70 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 54 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 8 task(s) |
 
 ## Skill Version(s): <br>
-0.2.0 (source: frontmatter) <br>
+0.3.0 (source: frontmatter, CHANGELOG) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

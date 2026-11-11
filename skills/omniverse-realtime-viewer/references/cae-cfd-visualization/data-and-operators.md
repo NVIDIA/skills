@@ -15,9 +15,8 @@ However your data arrives — CGNS, OpenFOAM, VTK/VTU, EnSight, FLASH, a `.npz` 
 arrays, raw numpy in memory, in-memory solver output, or a streamed buffer — the
 goal is always the same: **get it into a `warp_simdata.Dataset` (or the renderable
 arrays that back one), then run operators and read geometry + fields back.** The
-routes below (the `.npz` SIDS builder, the direct CGNS reader, and the native-file
-readers in [cae-data-ingestion.md](cae-data-ingestion.md)) are **examples of that
-one pattern**, not the only path. Whatever gets you node coordinates, element
+routes below (the `.npz` SIDS builder and the native-file USD adapters in
+[cae-data-ingestion.md](cae-data-ingestion.md)) are examples of that pattern. Whatever gets you node coordinates, element
 connectivity + type, and per-node/element field arrays onto the GPU will feed the
 same operators.
 
@@ -28,8 +27,8 @@ Acquisition (both are public on GitHub) is centralized in
 `references/dependencies/README.md` (CAE/CFD Visualization Libraries); do not
 duplicate install steps or URLs here.
 
-- **the `cae-openusd-plugins` USD reader/schema library** — read-only USD ingestion. Registers an `SdfFileFormat` plugin plus OmniSci (`Cae*`/`OmniSci*`) schemas that expose CGNS / OpenFOAM / VTK / EnSight / FLASH files as composed USD with **data-on-demand** field arrays (arrays are not read until an operator pulls them). Use this when the app should reference solver files directly as USD prims. Optional — frequently absent; keep the library-direct fallback in [cae-data-ingestion.md](cae-data-ingestion.md).
-- **the `warp-simdata` GPU operator library** — the GPU operator stack (NVIDIA Warp kernels). Builds an in-memory `Dataset` from raw arrays and runs `element_faces` / `iso_surface` / `slice` / `streamlines` / points on it. Imports Warp lazily; requires CUDA. This doc's recipes target this library.
+- **the `cae-openusd-plugins` USD reader/schema library** — read-only USD ingestion. Registers an `SdfFileFormat` plugin plus OmniSci (`Cae*`/`OmniSci*`) schemas that expose CGNS / OpenFOAM / VTK / EnSight / FLASH files as composed USD with **data-on-demand** field arrays (arrays are not read until an operator pulls them). Use this when the app should reference solver files directly as USD prims. Use the registered plugin and Warp SimData USD adapter flow in [cae-data-ingestion.md](cae-data-ingestion.md).
+- **the `warp-simdata` GPU operator library** — the GPU operator stack (NVIDIA Warp kernels). Builds an in-memory `Dataset` from raw arrays and runs `element_faces` / `iso_surface` / `slice` / `streamlines` / points on it. Supports CPU and CUDA execution. This doc's operator examples use CUDA.
 
 Import guard (so the package still imports without CUDA/warp):
 
@@ -105,18 +104,14 @@ for k in npz.keys():
 
 `_is_id_like(name)` excludes `ids`/`id`/`index`/`indices`, `*_id`, and any name containing `element`. Color a vector by magnitude with a synthetic `"<vec>|mag"` name computed in numpy (`np.linalg.norm(vec, axis=1)`); `add_field` itself takes only scalar or 3-component vector fields.
 
-### Direct CGNS (no npz)
+### Native files without an intermediate archive
 
-```python
-import warp_simdata
-ds = warp_simdata.io.cgns.read(path)   # requires h5py
-```
-
-Use this to skip the npz step. If an app needs a portable CGNS/HDF5 converter, read the
-`Elements_t` sections, remap referenced nodes to a compact 0-based node set, and extract
-`FlowSolution` vertex or cell fields into the schema above. A minimal smoke fixture can be a
-single HEXA_8 cell with a three-component swirl velocity field; generate it in the app's test
-suite rather than relying on an external sample file.
+Use [cae-data-ingestion.md](cae-data-ingestion.md) to open EnSight or CGNS through
+registered CAE OpenUSD Plugins and load the selected prim with
+`warp_simdata.usd.dataset_from_prim`. Load fields separately at the same time
+code, preserve their association, and pass the resulting dataset to a supported
+operator. Keep the SIDS array factory above for sources that already provide
+CGNS-coded arrays; it is not a native-file reader.
 
 ## Operators
 

@@ -1,0 +1,133 @@
+{
+  "skill_name": "omniverse-content-services",
+  "evals": [
+    {
+      "id": "existing-systems-to-simulation",
+      "prompt": "Our factory team has CAD assemblies, architectural models and robot scenes across an asset system, a file share and object storage. We want people and simulation workers to use this content while each existing system remains authoritative. What workflow should we explore first? Give advice only; do not install or change anything.",
+      "expected_output": "A focused content-access workflow that preserves the existing systems, distinguishes source conversion from delivery, selects the appropriate component owners, and proposes one representative asset-to-consumer proof before scaling.",
+      "files": [],
+      "assertions": [
+        "Selects omniverse-content-services for the content-access and pipeline coordination request.",
+        "Keeps the existing systems authoritative and distinguishes editable sources from derived or published simulation inputs.",
+        "Routes client access and USD resolution to ovstorage and service contracts or adapters to usd-content-workspace without claiming ready-made support for every asset system or native format.",
+        "Asks at most three focused initial questions about the intended consumer, source access or compute locality, and proposes opening one representative asset with its dependencies in the receiving tool.",
+        "Provides advice without installing services, modifying source assets or claiming a deployment has been tested."
+      ]
+    },
+    {
+      "id": "team-and-agent-collaboration",
+      "prompt": "How can my team and their agents collaborate on USD content? We have not decided whether to work live or exchange reviewed contributions. Explain the options before asking us to choose; do not deploy anything.",
+      "expected_output": "An explanation of live USD sessions with ovlive, independent contributions with versioned handoffs, and a combination of both, with concrete benefits and a small number of application and workflow questions.",
+      "files": [],
+      "assertions": [
+        "Introduces ovlive by name as a live USD session option before requiring the user to request same-layer editing.",
+        "Explains shared visibility of contributions and interactive human-agent feedback as benefits.",
+        "Offers reviewed versioned handoffs alongside live work and explains that accepted simulation inputs can stay pinned while editing continues.",
+        "Qualifies application and client integration rather than promising automatic conflict-free editing in every tool.",
+        "Asks at most three simple follow-up questions and does not start a service."
+      ]
+    },
+    {
+      "id": "clarify-local-caching",
+      "prompt": "Our remote artists work on home GPUs against a central content store. We do not want local copies because unmanaged downloads become stale and are hard to remove. We have no remote GPU workstations. How should we approach content access? Give a recommendation, not a deployment.",
+      "expected_output": "A clarification of managed caching versus unmanaged duplication, followed by an appropriate access/cache handoff that preserves the central source of truth without assuming that remote authoring is required.",
+      "files": [],
+      "assertions": [
+        "Asks whether managed local caching is acceptable instead of interpreting no local copies as an absolute ban on local persistence.",
+        "Distinguishes disposable read caches from writable working files, autosaves and offline replicas.",
+        "Routes cache placement and retention questions to usd-caches and client access to ovstorage, while keeping the central store authoritative.",
+        "Does not prescribe remote GPU workstations or promise that direct network access prevents every application from persisting data.",
+        "Does not choose cache or bucket counts from team size alone."
+      ]
+    },
+    {
+      "id": "reproducible-package-inputs",
+      "prompt": "I want simulation jobs to keep using an accepted USD asset version while artists continue editing. Will package versioning automatically find every referenced texture, deduplicate changed blocks of large files, and move existing jobs to the newest asset? Explain how to verify the workflow without running it.",
+      "expected_output": "A versioned-publication workflow using ovpackage, with explicit input versions and adoption of updates, separate verification of dependency closure and storage behavior, and a fresh-consumer check.",
+      "files": [],
+      "assertions": [
+        "Routes exact package publications and dependencies to ovpackage and distinguishes them from file history or live sessions.",
+        "Keeps existing jobs pinned to accepted inputs and treats adoption of a new asset version as an explicit decision.",
+        "Does not assume that package dependency declarations prove closure of every USD reference, texture or other required resource.",
+        "Does not infer block-level deduplication from package versioning.",
+        "Proposes reopening the exact accepted scene on a fresh consumer after an upstream change, with complete dependencies, without claiming the check ran."
+      ]
+    },
+    {
+      "id": "local-versioned-storage-handoff",
+      "prompt": "Use Omniverse Content Services to advise on versioned storage on one Linux workstation. My existing folders must remain authoritative, and I do not want Kubernetes. I have not decided whether applications must edit those folders directly or use a managed store. What should we establish and test first? Do not install or write anything.",
+      "expected_output": "A local-process handoff to the workspace expert that preserves the requested architecture, clarifies managed storage versus direct folder edits, separates examples from deployable implementations, and proposes a disposable version-readback proof.",
+      "files": [],
+      "assertions": [
+        "Honors the no-Kubernetes constraint and routes service implementation questions to usd-content-workspace on release/v0.1.0.",
+        "Asks whether a managed store is acceptable or ordinary folders must remain directly editable, without deciding that architecture for the user.",
+        "Preserves the existing content and does not initialize a managed backend over the source folders.",
+        "Distinguishes verified upstream implementations, examples and build recipes, or reports an evidence gap instead of asserting that a complete durable local service is already available.",
+        "Proposes a disposable write, update, exact old-version read and restart/fresh-consumer check; performs no installation or writes."
+      ]
+    },
+    {
+      "id": "custom-backend-contract",
+      "prompt": "We want an Omniverse-compatible service for our on-prem object store with read, write and file history. We do not yet know whether its S3 interface is enabled or whether other applications will keep writing directly. What should we verify before choosing an adapter? Give a source-backed investigation path, not implementation code.",
+      "expected_output": "A bounded investigation routed to the workspace service expert and ovstorage client expert, preserving the backend and distinguishing protocol, versioning, direct-writer behavior, conformance and actual application validation.",
+      "files": [],
+      "assertions": [
+        "Routes canonical service contracts and adapters to usd-content-workspace and client access or resolution to ovstorage.",
+        "Clarifies the actual backend API and versioning behavior rather than assuming S3 compatibility or substituting another storage system.",
+        "Asks whether direct writers remain and identifies how their changes affect version identity and stale-write detection.",
+        "Separates API conformance from authenticated client/application tests, including write/readback and exact historical-version reads.",
+        "Uses the listed public repositories for evidence and reports any unavailable source rather than inventing verified commands."
+      ]
+    },
+    {
+      "id": "version-and-source-identities",
+      "prompt": "Using only the dated release record shipped with Omniverse Content Services, summarize its own version, the latest two recorded releases for ovstorage and ovpackage, and the selected workspace branch. How should I record an expert with no declared version? Is the ovstorage repository release automatically the Python wheel version, and is a workspace guide release a Git tag? Do not fetch newer data or run anything.",
+      "expected_output": "A dated evidence summary that distinguishes router, expert, repository, library and service release identities, retains the selected workspace branch, and marks missing expert versions as unversioned.",
+      "files": [],
+      "assertions": [
+        "Identifies the router as omniverse-content-services@0.1.0 and states the release record's observation date instead of claiming it is a live latest-version check.",
+        "Reports ovstorage v0.4.0 and v0.3.0 and ovpackage 0.2.1 and 0.1.0, retaining the ovpackage prerelease labels.",
+        "Distinguishes ovstorage repository 0.4.0, library 0.3.0 and preview resolver 0.1.0 rather than prescribing a wheel version from the repository tag.",
+        "Retains workspace release/v0.1.0 and distinguishes that branch from GitHub Releases and guide/service release sets.",
+        "Records an expert with readable metadata but no declared version as unversioned, with its source revision separate, and does not claim runtime validation."
+      ]
+    },
+    {
+      "id": "prebuilds-and-cache-routing",
+      "prompt": "Use only the packaged Content Services references to point me to prebuilt Storage and Live Edit services, plus workstation, shared-content and derived-data caches. Explain each cache's role and where its documentation is. Do not download, install or deploy anything.",
+      "expected_output": "Official NGC and documentation routes for the requested services and Hub, OVCC and OVDC, with artifact versions kept distinct and access or runtime verification stated accurately.",
+      "files": [],
+      "assertions": [
+        "Provides official NGC collection or artifact links for Storage and Live Edit, with owning service documentation.",
+        "Identifies Hub Workstation Cache, Omniverse Content Cache (OVCC) and Omniverse Derived Cache (OVDC), with their different reuse roles and documentation links.",
+        "Routes placement and integration questions to usd-caches rather than treating a cache as an authoritative content store.",
+        "Distinguishes resource packages, charts and container images, and retains relevant incomplete or conflicting version evidence if giving versions.",
+        "Separates public catalog visibility, download entitlement and runtime compatibility, and performs no downloads or deployments."
+      ]
+    },
+    {
+      "id": "mesh-modeling-negative",
+      "prompt": "I am sculpting a stylized character and want advice on improving the silhouette of its nose. This is only a modeling question; I have no content storage, pipeline or collaboration problem.",
+      "expected_output": "Modeling guidance or a suitable modeling-specialist referral without activating the Content Services workflow or introducing storage architecture.",
+      "expected_skill": null,
+      "files": [],
+      "assertions": [
+        "Does not select omniverse-content-services as the workflow for this request.",
+        "Gives scoped modeling advice or refers to a relevant available specialist without inventing an installed skill.",
+        "Does not add content service deployment, cache placement, package publication or infrastructure discovery questions."
+      ]
+    },
+    {
+      "id": "simulation-algorithm-negative",
+      "prompt": "Explain how to tune the reward function for a robot reaching task. The simulation already has its assets, and I am not asking about data access, storage, versioning or a content pipeline.",
+      "expected_output": "A simulation or reinforcement-learning explanation that stays outside the Content Services workflow.",
+      "expected_skill": null,
+      "files": [],
+      "assertions": [
+        "Does not select omniverse-content-services for a simulation-algorithm question without a content workflow need.",
+        "Addresses reward design or routes to an appropriate available specialist.",
+        "Does not recommend storage adapters, caches, Live sessions or package infrastructure as prerequisites for answering."
+      ]
+    }
+  ]
+}

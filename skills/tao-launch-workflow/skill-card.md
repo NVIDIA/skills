@@ -29,6 +29,7 @@ Mitigation: Review and scan skill before deployment. <br>
 - [failure-analysis-retry.md](references/failure-analysis-retry.md) <br>
 - [intake-prompts.md](references/intake-prompts.md) <br>
 - [platform-preflight.md](references/platform-preflight.md) <br>
+- [runtime-downloads.md](references/runtime-downloads.md) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 - [Agent Skills Open Standard](https://agentskills.io) <br>
 
@@ -46,7 +47,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) with 3 attempts per task in isolated k8s-sandbox pods. <br>
+1 evaluation task (1 positive) with 1 attempt per task, each in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -70,12 +71,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% — uplift unavailable | 78.7% — uplift unavailable |
+| Overall | 96.3% — uplift unavailable | 79.7% — uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
 | Discoverability | 100.0% — uplift unavailable | 0.0% — uplift unavailable |
-| Effectiveness | 16.7% → 100.0% (+83.3 points) | 43.3% → 95.0% (+51.7 points) |
-| Efficiency | 97.4% — uplift unavailable | 99.7% → 98.5% (-1.2 points) |
+| Effectiveness | 16.7% → 83.3% (+66.6 points) | 48.3% → 100.0% (+51.7 points) |
+| Efficiency | 97.9% — uplift unavailable | 99.7% → 98.5% (-1.2 points) |
 
 ## Skill Version(s): <br>
 0.1.1 (source: frontmatter) <br>

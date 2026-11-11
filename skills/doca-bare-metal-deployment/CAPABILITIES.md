@@ -7,15 +7,15 @@ substance. For the *how* of executing each pattern, jump to
 [TASKS.md](TASKS.md). For the container-path counterpart of the same
 patterns (kubelet standalone on the BlueField Arm watching a
 documented static-pod manifests directory), see the sibling skill
-[`doca-container-deployment`](../doca-container-deployment/SKILL.md).
+`doca-container-deployment/SKILL.md`.
 For the cross-cutting safety meta-policy this skill overlays, see
-[`doca-hardware-safety`](../doca-hardware-safety/SKILL.md).
+`doca-hardware-safety/SKILL.md`.
 
 This file enumerates the cross-cutting bare-metal deployment runtime
 contract as described in the public **DOCA Programming Guide**, the
 public **DOCA Installation Guide**, and the public
 **BlueField / DPU User Manual** (all reachable through
-[`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)),
+`doca-public-knowledge-map/SKILL.md`),
 plus the standard Linux primitives the bare-metal path inherits
 (`numactl(8)`, `taskset(1)`, `systemd.service(5)`,
 `systemd.unit(5)`, cgroup-v2, network namespaces). Treat this file
@@ -52,7 +52,7 @@ Two cross-cutting rules apply to *every* pattern above:
   failure for this skill.
 - **The deployment shape branches early.** Container vs bare metal
   is a fork the operator picks once, in the recognition step
-  routed by [`doca-setup`](../doca-setup/SKILL.md); once the
+  routed by `doca-setup/SKILL.md`; once the
   operator is on the bare-metal path this skill owns the runtime
   contract end-to-end, and the per-library skill layers on top.
   Re-stating the bare-metal runtime inside a per-library skill is
@@ -69,12 +69,12 @@ differ.
 
 | Property | Host x86 mode | BlueField Arm bare-metal mode |
 | --- | --- | --- |
-| Where DOCA is installed | On the host x86 OS, per the public DOCA Installation Guide's host-side install path (reached through [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)) | On the BlueField Arm side, per the BlueField OS image's documented DOCA install path |
+| Where DOCA is installed | On the host x86 OS, per the public DOCA Installation Guide's host-side install path (reached through `doca-public-knowledge-map/SKILL.md`) | On the BlueField Arm side, per the BlueField OS image's documented DOCA install path |
 | Where the binary runs | On the host x86 CPU; calls into DOCA libraries that talk to the BlueField NIC over PCIe | On the BlueField Arm cores; calls into DOCA libraries that talk to the local NIC silicon directly |
 | Device enumeration | `devlink dev show` on the host lists the BlueField as a remote NIC; `lspci -d 15b3:` enumerates the BlueField PFs / VFs | `devlink dev show` on the BlueField Arm side lists the local NIC; representor naming follows the documented BlueField OS convention |
 | NUMA topology to bind against | The host's NUMA topology; the NUMA node owning the PCIe root complex that the BlueField is plugged into is the load-bearing one | The BlueField Arm's NUMA topology per the BlueField OS image's documentation |
-| Hugepage backing | Reserved on the host per [`doca-setup ## configure`](../doca-setup/TASKS.md#configure) step 7 | Reserved on the BlueField Arm side per the BlueField OS image's documented procedure (routed via the BlueField / DPU User Manual reached through [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)) |
-| Sibling deployment shape | The container path for this mode is *also* host-side (a container running on the host x86 that talks to the BlueField NIC over PCIe); the kubelet-standalone shape covered by [`doca-container-deployment`](../doca-container-deployment/SKILL.md) is the BlueField-Arm analog | The container path for this mode is the kubelet-standalone shape covered by [`doca-container-deployment`](../doca-container-deployment/SKILL.md) — the operator chooses container or bare metal at the recognition step in [`doca-setup`](../doca-setup/SKILL.md), not after the fact |
+| Hugepage backing | Reserved on the host per `doca-setup ## configure` (`doca-setup/TASKS.md#configure`) step 7 | Reserved on the BlueField Arm side per the BlueField OS image's documented procedure (routed via the BlueField / DPU User Manual reached through `doca-public-knowledge-map/SKILL.md`) |
+| Sibling deployment shape | The container path for this mode is *also* host-side (a container running on the host x86 that talks to the BlueField NIC over PCIe); the kubelet-standalone shape covered by `doca-container-deployment/SKILL.md` is the BlueField-Arm analog | The container path for this mode is the kubelet-standalone shape covered by `doca-container-deployment/SKILL.md` — the operator chooses container or bare metal at the recognition step in `doca-setup/SKILL.md`, not after the fact |
 
 Operators frequently have BOTH host modes in play (a host x86 with a
 DOCA host install AND a BlueField with DOCA on its Arm side). When
@@ -202,7 +202,7 @@ picked at [`TASKS.md ## configure`](TASKS.md#configure):
   hallucinates when working from memory).
 - **Crash-and-investigate vs supervisor-driven restart.** The
   cross-cutting rule (from
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
+  `doca-hardware-safety/SKILL.md`
   via [`## Safety policy`](#safety-policy) below) is that a
   failed bare-metal DOCA process that touched the device is
   HIGH-STAKES — the root cause MUST be cleared before the
@@ -215,7 +215,7 @@ picked at [`TASKS.md ## configure`](TASKS.md#configure):
 For the canonical DOCA version-detection chain, the four-way match
 rule (host package ↔ binary build ↔ BlueField firmware ↔
 DOCA-version policy), and the headers-win-over-docs rule, see
-[`doca-version`](../doca-version/SKILL.md). The body lives there;
+`doca-version/SKILL.md`. The body lives there;
 this skill does not duplicate it.
 
 **The bare-metal-deployment-specific overlay** is:
@@ -230,12 +230,12 @@ this skill does not duplicate it.
   between releases — sometimes immediately at `dlopen` time,
   sometimes at the first call site, sometimes silently with
   wrong-behavior. Diagnose with
-  [`doca-version TASKS.md ## debug`](../doca-version/TASKS.md#debug)
+  `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
   layer 2.
 - **`LD_LIBRARY_PATH` vs runtime-loader configuration.** When the
   operator picks the trace flavor at runtime
   (`/opt/mellanox/doca/lib/<arch>-linux-gnu/trace/`) per
-  [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
+  `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   step 3, the runtime `LD_LIBRARY_PATH` is the contract. A
   systemd unit that does not propagate `LD_LIBRARY_PATH` into
   the unit's `Environment=` will silently use the release
@@ -258,8 +258,8 @@ this skill does not duplicate it.
   (configures privileged-host mode, not BFB version) or
   `bfb-info` (not a real NVIDIA-documented tool) for the
   BFB-image leg — both are common hallucinations explicitly
-  banned in [`doca-version CAPABILITIES.md ## Capabilities and
-  modes`](../doca-version/CAPABILITIES.md#capabilities-and-modes).
+  banned in `doca-version CAPABILITIES.md ## Capabilities and
+  modes` (`doca-version/CAPABILITIES.md#capabilities-and-modes`).
   Mismatched anchors are the canonical *"the docs say this
   should work but it does not"* failure mode. Capture all three
   (host pkg-config, per-device `flint q`, per-BlueField
@@ -275,25 +275,25 @@ release to another (the canonical case: 3.1 → 3.3), the agent walks
 THIS ordered ladder before quoting any `apt install` line. The
 host-side portion is fully in-scope for this skill; the **BlueField
 BSP / BFB / RShim / TMFIFO portion is OUT OF SCOPE** for this
-bundle (per [`AGENTS.md ## Non-goals`](../../AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely)
+bundle (per `AGENTS.md ## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
 item 7) and the agent routes the operator to NVIDIA's BlueField
 BSP / DOCA Platform Framework documentation for those steps.
 
 1. **Audit the host's current four-source state.** Per
-   [`doca-version CAPABILITIES.md ## Version compatibility`](../doca-version/CAPABILITIES.md#version-compatibility),
+   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`),
    capture all four legs. The audit is read-only and is the rollback
    anchor — without a captured BEFORE state, "rollback" is a phrase
    the operator says, not a thing they can do.
 2. **Verify the target release line.** Pin to a specific DOCA `X.Y.Z`
    from NVIDIA's public release notes (route via
-   [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md)
+   `doca-public-knowledge-map/SKILL.md`
    — do NOT invent version strings). Read off the target's required
    OFED / kernel module version, the target BFB-image DOCA, and the
    target NIC firmware level from the release-notes *Supported NICs
    and Firmware* table.
 3. **Walk the apt-repo + OS-matrix preconditions BEFORE any install
    line.** See
-   [`doca-version CAPABILITIES.md ## Apt-repo and OS-matrix preconditions`](../doca-version/CAPABILITIES.md#apt-repo-and-os-matrix-preconditions).
+   `doca-version CAPABILITIES.md ## Apt-repo and OS-matrix preconditions` (`doca-version/CAPABILITIES.md#apt-repo-and-os-matrix-preconditions`).
    Pin the apt repo to the explicit `X.Y.Z` URL form, NOT to `latest`.
    Run `apt-cache policy <pkg>` for every package about to be
    installed. Confirm the host OS family AND point release is inside
@@ -306,7 +306,7 @@ BSP / DOCA Platform Framework documentation for those steps.
    `doca-version` so absent-source recovery is a single targeted
    install. Do NOT auto-reboot — let the operator schedule the
    reboot inside the documented maintenance window per
-   [`doca-hardware-safety CAPABILITIES.md ## Safety policy`](../doca-hardware-safety/CAPABILITIES.md#safety-policy).
+   `doca-hardware-safety CAPABILITIES.md ## Safety policy` (`doca-hardware-safety/CAPABILITIES.md#safety-policy`).
 5. **Reboot the host, then re-walk the four-source audit AFTER.**
    The host-side upgrade is not declared "done" until the AFTER
    audit shows (i) all four sources coherent at the target version,
@@ -326,18 +326,18 @@ BSP / DOCA Platform Framework documentation for those steps.
    action each evidence pattern lattices to — is in scope and lives in
    [`TASKS.md ## bluefield-lifecycle`](TASKS.md#bluefield-lifecycle); the
    *productized framework / BSP / BFB image / firmware tooling* is out
-   of scope for this bundle's strict-1:1 monorepo alignment, but the
+   of this bundle's DOCA SDK scope, but the
    bundle's `AGENTS.md ## Non-goals #7` contract still applies: the agent
    MUST produce the three-part response shape (recognize + name boundary
    + **route with substance**). For step (c), consult the per-product
    rows in the `doca-public-knowledge-map` routing table:
-   [BlueField BSP / BFB / `bfb-install` / RShim / TMFIFO / `bf.cfg`](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
-   for the single-host case, and [DOCA Platform Framework (DPF)](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
+   BlueField BSP / BFB / `bfb-install` / RShim / TMFIFO / `bf.cfg` (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`)
+   for the single-host case, and DOCA Platform Framework (DPF) (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`)
    for fleet-scale K8s-driven DPU provisioning. If the BFB-install symptom
    touches firmware state (`mlxconfig` / `flint` / `mlxfwmanager`), also
-   load the [NVIDIA Firmware Tools (MFT)](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
+   load the NVIDIA Firmware Tools (MFT) (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`)
    row. If the BFB-install left the BlueField unreachable, the recovery
-   path is the [BlueField BMC](../doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route)
+   path is the BlueField BMC (`doca-public-knowledge-map/SKILL.md#externally-productized-doca-software--not-in-this-bundle-but-here-is-where-to-route`)
    row. The agent **must** name the symptom-matching gotcha class from the
    relevant row (e.g. "`bfb-install` exit 0 with `NIC firmware update failed`
    is the BSP row's #1 partial-failure signature — bisect with `flint -d
@@ -360,7 +360,7 @@ The discipline mirrors the universal verification contract end-to-
 end: every step's preconditions established by the prior steps, no
 "upgrade complete" claimed on exit-code alone, the BFB / BSP
 boundary explicitly named and routed out rather than silently
-synthesized. See [`AGENTS.md ## The universal verification contract`](../../AGENTS.md#the-universal-verification-contract).
+synthesized. See `AGENTS.md ## The universal verification contract` (bundle `AGENTS.md#the-universal-verification-contract`).
 
 ### RShim instance ↔ BlueField disambiguation (canonical one-liner)
 
@@ -407,8 +407,8 @@ them wastes debug time and blames the wrong layer.
    (`file <binary>`) matches the host's arch (`uname -m`);
    confirm the binary's required shared objects are reachable
    (`ldd <binary>`); set `LD_LIBRARY_PATH` per
-   [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
-   step 3. Owner: this skill + [`doca-setup`](../doca-setup/SKILL.md).
+   `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
+   step 3. Owner: this skill + `doca-setup/SKILL.md`.
 2. **Process starts but exits immediately.** Symptoms: the
    process runs for milliseconds, exits with a non-zero status,
    prints a short message about a missing config file, a
@@ -417,7 +417,7 @@ them wastes debug time and blames the wrong layer.
    `DOCA_LOG_LEVEL`, a per-library env knob documented in the
    public DOCA Programming Guide) is unset; the config file the
    binary expects is missing or at the wrong path; hugepages
-   are not reserved per [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
+   are not reserved per `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
    step 4; the binary's argp surface rejected the operator's CLI
    args. Resolution: read the binary's stdout / stderr from
    the launch mode in use (direct = terminal; tmux = pane;
@@ -435,24 +435,24 @@ them wastes debug time and blames the wrong layer.
    `switchdev` mode); devlink mode wrong; the binary is in a
    netns that does not own the representor. Resolution: confirm
    the device shape from `devlink dev show` and `lspci -d
-   15b3:` per [`doca-setup ## configure`](../doca-setup/TASKS.md#configure)
+   15b3:` per `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
    step 5; re-read the public DOCA Programming Guide's
    device-open contract for the library in use; do NOT
    substitute a BDF from memory. Owner: this skill +
-   [`doca-setup`](../doca-setup/SKILL.md).
+   `doca-setup/SKILL.md`.
 4. **Process attaches to the device but the workload errors.**
    Symptoms: the binary stays up, the device is open, the
    per-library bring-up looks clean, but a runtime call returns
    `DOCA_ERROR_*` per the cross-library taxonomy in
-   [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+   `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
    Causes: per-library configuration error (a pipe / queue /
    buffer the per-library skill is the authority on); a
    capability the operator's BlueField does not have at the
    running firmware version. Resolution: defer to
-   [`doca-debug`](../doca-debug/SKILL.md) for the cross-cutting
+   `doca-debug/SKILL.md` for the cross-cutting
    ladder, then to the matching `libs/<library>` skill for the
    library-specific debug overlay. Owner: the per-library skill
-   + [`doca-debug`](../doca-debug/SKILL.md).
+   + `doca-debug/SKILL.md`.
 5. **Process runs correctly but OOMs / gets killed /
    signal-mishandled.** Symptoms: the binary disappears with
    no log line; `dmesg` shows an OOM-killer entry naming the
@@ -500,9 +500,9 @@ them wastes debug time and blames the wrong layer.
 
 DOCA library calls inside the binary return `DOCA_ERROR_*`
 according to the cross-library taxonomy in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 that taxonomy becomes relevant at layer 4 above and is owned by
-[`doca-debug`](../doca-debug/SKILL.md) plus the matching per-library
+`doca-debug/SKILL.md` plus the matching per-library
 skill, not by this one.
 
 ## Observability
@@ -531,11 +531,11 @@ host-side primitive. Healthy means all three agree.
   firmware configuration. The agent uses `mlxconfig query`
   freely as an observability primitive but treats `mlxconfig
   set` as a hardware-state change — it MUST defer to
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md)
+  `doca-hardware-safety/SKILL.md`
   before recommending any `mlxconfig set` invocation. The
   documented query commands the agent may quote live in the
   public BlueField / DPU User Manual reached through
-  [`doca-public-knowledge-map`](../doca-public-knowledge-map/SKILL.md).
+  `doca-public-knowledge-map/SKILL.md`.
 - **Per-tenant resource visibility layer (THIRD, load-bearing
   for multi-tenant).** When the binary is one of several DOCA
   processes on the same BlueField, the per-tenant resource
@@ -551,8 +551,8 @@ host-side primitive. Healthy means all three agree.
 Cross-cutting host-side debug (kernel version, driver loaded /
 not loaded, hugepage allocation health beyond reserved-vs-used,
 PCIe link state, `dmesg`) lives in
-[`doca-debug TASKS.md ## debug`](../doca-debug/TASKS.md#debug)
-and [`doca-setup TASKS.md ## Command appendix`](../doca-setup/TASKS.md#command-appendix);
+`doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
+and `doca-setup TASKS.md ## Command appendix` (`doca-setup/TASKS.md#command-appendix`);
 this skill names only the bare-metal-deployment-specific
 surfaces.
 
@@ -561,9 +561,9 @@ surfaces.
 > **Overlay on the bundle-wide hardware-safety meta-policy.** The
 > rules below are this skill's per-artifact overlay on the
 > cross-cutting rules in
-> [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../doca-hardware-safety/CAPABILITIES.md#safety-policy)
+> `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`)
 > (specifically
-> [### Per-artifact overlay pattern](../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)).
+> ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)).
 > When the two layers disagree, the stricter wins; when either
 > layer says STOP, the agent stops.
 
@@ -595,7 +595,7 @@ cross-cutting rules below apply across every library.
   touching the device burns BlueField cycles, fills the log
   surface, and obscures the actual root cause. This rule is
   the bare-metal analog of the failed-pod-restart-is-HIGH-STAKES
-  rule in [`doca-container-deployment`](../doca-container-deployment/SKILL.md);
+  rule in `doca-container-deployment/SKILL.md`;
   it applies just as strongly to systemd-supervised binaries.
 - **Do not invent PCI addresses, NUMA node numbers, representor
   names, devlink paths, hugepage allocation amounts, or
@@ -626,7 +626,7 @@ cross-cutting rules below apply across every library.
   firmware burn, BlueField mode flip, kernel-boot-parameter
   changes for IOMMU or hugepage reservation) is OUT OF SCOPE
   for this skill. The agent MUST hand off to
-  [`doca-hardware-safety`](../doca-hardware-safety/SKILL.md) for
+  `doca-hardware-safety/SKILL.md` for
   the change-application discipline and only return here once
   the hardware-state change is complete.
 - **The per-library skill owns the per-library safety overlay.**
@@ -644,12 +644,12 @@ are:
 
 - The **DOCA Programming Guide** on `docs.nvidia.com`, reachable
   through
-  [`doca-public-knowledge-map ## Library- and module-specific guides`](../doca-public-knowledge-map/SKILL.md#library--and-module-specific-guides),
+  `doca-public-knowledge-map ## Library- and module-specific guides` (`doca-public-knowledge-map/SKILL.md#library--and-module-specific-guides`),
   for the per-library device-open / capability / runtime
   contracts.
 - The **DOCA Installation Guide** on `docs.nvidia.com`, reachable
   through
-  [`doca-public-knowledge-map ## Public documentation entry points`](../doca-public-knowledge-map/SKILL.md#public-documentation-entry-points),
+  `doca-public-knowledge-map ## Public documentation entry points` (`doca-public-knowledge-map/SKILL.md#public-documentation-entry-points`),
   for the host-side and BlueField-Arm-side install layouts plus
   the documented env-var surface.
 - The **BlueField / DPU User Manual** on `docs.nvidia.com`,

@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "doca-flow.explicit-positive.v1",
-      "prompt": "Use the doca-flow skill to help me. I'm working on: DOCA Flow on a supported NVIDIA NIC/DPU \u2014 both for DOCA Flow application knowledge and for writing Flow applications: defining match/action pipes, bringing up ports / representors, forwarding with FWD_PORT (or another fwd target), reading flow counters, validating a pipe before hardware programming, picking the right Flow version against an installed DOCA, or debugging DOCA_ERROR_* from the Flow API.",
+      "prompt": "Use the doca-flow skill for this task: I'm running into this: \"packets aren't reaching my representor\". Can you walk me through it?",
       "expected_skill": "doca-flow",
       "expected_output": "The agent selects the doca-flow skill and answers from its documented workflow, quoting only real symbols/commands from the bundle (no invented tokens).",
       "assertions": [
@@ -17,7 +17,7 @@
       "expected_skill": "doca-flow",
       "expected_output": "The agent recognizes this as a doca-flow issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-flow skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
@@ -27,18 +27,18 @@
       "expected_skill": "doca-flow",
       "expected_output": "The agent recognizes this as a doca-flow issue even though the skill is not named, loads it, and answers grounded in the bundle.",
       "assertions": [
-        "The doca-flow skill is triggered from the implicit phrasing without the user naming it.",
+        "The answer engages the request directly rather than deflecting it.",
         "The answer stays grounded in real bundle symbols/commands."
       ]
     },
     {
       "id": "doca-flow.negative.v1",
-      "prompt": "I actually need help with non-Flow pipelines. Which skill should handle this, and why is it not doca-flow?",
+      "prompt": "I'm building my packet pipeline entirely in software on the host CPU, with no hardware steering involved anywhere. How should I approach this?",
       "expected_skill": null,
-      "expected_output": "The agent does NOT force doca-flow; it explains that non-Flow pipelines is out of doca-flow's scope and routes to the appropriate skill instead.",
+      "expected_output": "The agent does not apply doca-flow's workflow to this request: it points to the guidance that owns the request or helps with the actual need directly, without treating doca-flow as the answer.",
       "assertions": [
-        "doca-flow is not selected as the primary skill for this out-of-scope request.",
-        "The answer routes to the appropriate skill(s) instead."
+        "The answer does not apply doca-flow's workflow to this request.",
+        "The answer points to the guidance that owns the request or helps with it directly, rather than refusing without any direction."
       ]
     }
   ]

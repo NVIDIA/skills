@@ -52,3 +52,6 @@ rules:
   - id: "TM1"
     path: "scripts/tests/test_state_machine.sh"
     reason: "Reviewed FP (#67): scoped maintenance command operating on the skill's own workspace or eval fixture; not tool misuse."
+  - id: "LP1"
+    path: "scripts/fetch_codetr_checkpoint.py"
+    reason: "Reviewed FP (#67): MCP least-privilege rule applied to a non-MCP skill. The TAO skill schema declares tooling via allowed-tools and has no permissions field, so the capability cannot be declared."

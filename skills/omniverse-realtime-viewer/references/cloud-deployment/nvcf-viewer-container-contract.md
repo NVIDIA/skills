@@ -60,3 +60,33 @@ not make the viewer image emulate a different platform contract.
 After this contract is proven, return to `nvcf-self-hosted.md` and upstream
 `streaming-self-hosted`. Record resolved endpoints only in sanitized validation
 artifacts, not reusable skill text.
+
+## Session Recovery Acceptance
+
+Resolve callback schemas and response states from the selected upstream NVCF
+workflow and the official [NVCF streaming-function documentation](https://docs.nvidia.com/nvcf/latest/overview/streaming-functions.html),
+using the documentation version selected by the deployment compatibility matrix.
+Implement them as an explicit application state machine, with one
+owner for renderer/stream cleanup. Validate these cases in the deployed image:
+
+- When the selected session policy supports resume, an ordinary disconnect
+  preserves the session only for the configured, bounded resume window. Repeated callbacks must not indefinitely extend that deadline;
+  an accepted reconnect cancels pending expiry.
+- When resume is enabled, a reconnect using the existing session identity
+  resumes correctly. A fresh
+  browser/session is tested separately; it must not silently inherit ownership
+  of the old session or be mistaken for a resume.
+- Where the callback contract requires acknowledgement, application-initiated
+  expiry or terminal shutdown sends that response before stopping its HTTP
+  service and releases resources through the native render owner.
+- A callback arriving during fresh-worker initialization, when the process has
+  never owned a session, is handled according to the upstream contract without
+  stopping the replacement renderer or falsely assigning it an old session.
+- If cleanup replaces the worker, verify the replacement application's actual readiness and
+  advancing rendered frames, then a new browser connection. A transient cached
+  Kubernetes Ready condition alone is insufficient evidence of recovery.
+
+Distinguish resumable disconnect from immediate terminal session deletion.
+Validate the backend method/route before exposing a terminal action; an SDK
+termination option does not establish that every signaling proxy implements
+its corresponding REST operation.

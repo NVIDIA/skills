@@ -1,4 +1,5 @@
 name: NeMo Fabric
+product_primary: NeMo Fabric
 repo: NVIDIA/NeMo-Fabric
 description: Portable skills for integrating applications with NeMo Fabric through its public SDK and building compatible third-party adapters.
 links:

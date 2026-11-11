@@ -31,7 +31,7 @@ Docker/platform skill instead when it gives a stricter environment-specific
 command (non-root UID mapping, cache redirects, remote daemons).
 
 ```bash
-TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.2.0-pyt  # versions-key: images.tao_toolkit.pyt
+TAO_PYT_IMAGE_DEFAULT=nvcr.io/nvidia/tao/tao-toolkit:7.3.0-pyt  # versions-key: images.tao_toolkit.pyt
 TAO_PYT_IMAGE="${TAO_PYT_IMAGE:-$TAO_PYT_IMAGE_DEFAULT}"
 RUN_ROOT="${RUN_ROOT:-$PWD}"
 DOCKER_COMMON=(
@@ -171,6 +171,10 @@ For `convert`, `export`, and `inference`, copy the training-time backbone config
 - Crop and export dimensions need to be divisible by `model.backbone.patch_size`.
 
 ## Distributed training
+
+For iterative GRIT or multi-task weakness mining from an unlabeled pool followed
+by DINOv3 SSL retraining, use the related `tao-run-dinov3-ssl-deft` application.
+Ordinary pretraining and fine-tuning remain in this model skill.
 
 Use `train.num_gpus`, `train.gpu_ids`, `train.num_nodes`, and `train.distributed_strategy`. Start with `auto`; use `ddp` or `fsdp` when appropriate for the selected backbone, resolution, and available memory.
 

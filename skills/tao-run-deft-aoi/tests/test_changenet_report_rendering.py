@@ -174,8 +174,8 @@ class ReportRenderingTests(unittest.TestCase):
     def test_far_at_recall_contract_is_percentage_safe(self) -> None:
         args = init_deft_state._build_parser().parse_args(
             [
-                "--results-dir", "/tmp/results",
-                "--workspace", "/tmp/workspace",
+                "--results-dir", "/tmp/results",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
+                "--workspace", "/tmp/workspace",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
                 "--kpi-target", "FAR < 10% at Recall=100%",
                 "--max-iterations", "1",
                 "--num-gpus", "1",
@@ -244,7 +244,7 @@ class ReportRenderingTests(unittest.TestCase):
     def test_stage_commit_validates_duration_by_skip_contract(self) -> None:
         base = [
             "--results-dir",
-            "/tmp/deft-duration-contract",
+            "/tmp/deft-duration-contract",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
             "--iter-label",
             "baseline",
             "--stage",
@@ -260,7 +260,7 @@ class ReportRenderingTests(unittest.TestCase):
             )
         skip = [
             "--results-dir",
-            "/tmp/deft-duration-contract",
+            "/tmp/deft-duration-contract",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
             "--iter-label",
             "iter1",
             "--stage",
@@ -550,13 +550,13 @@ class ReportRenderingTests(unittest.TestCase):
         self.assertIn("[--rca-target-defect <label>]...", help_text)
         base = [
             "--results-dir",
-            "/tmp/deft-rca-label-contract",
+            "/tmp/deft-rca-label-contract",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
             "--iter-label",
             "baseline",
             "--stage",
             "rca",
             "--rca-gaps",
-            "/tmp/gaps.parquet",
+            "/tmp/gaps.parquet",  # nosec B108 - fixture path inside a test/probe sandbox, not a shared temp file
             "--duration-sec",
             "1",
             "--summary",

@@ -1,5 +1,5 @@
 ## Description: <br>
-Real-time stereo depth estimation using FastFoundationStereo (FFS), the distilled bp2 commercial variant of FoundationStereo that predicts disparity maps from rectified stereo image pairs with ~10× lower latency than full FoundationStereo. <br>
+Real-time stereo depth estimation using FastFoundationStereo (FFS), the distilled bp2 commercial variant of FoundationStereo that predicts disparity maps from stereo image pairs with ~10× lower latency than full FoundationStereo. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to train, evaluate, export, and run inference for NVIDIA TAO FastFoundationStereo (FFS) stereo depth estimation models using Docker containers with NVIDIA Container Toolkit. <br>
+Developers and engineers use this skill to train, evaluate, export, and run inference for NVIDIA TAO FastFoundationStereo (FFS) stereo depth estimation models, including raw bp2 checkpoint deployment and finetuning on user data, using Docker with NVIDIA Container Toolkit. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -47,7 +47,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox environment with isolated sandbox pods per attempt. <br>
+1 evaluation task (1 positive), 1 attempt per task, evaluated in the k8s-sandbox environment with each attempt in its own isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -59,11 +59,11 @@ Reported benchmark dimensions: <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Verifies absence of unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
 - `skill_execution`: Verifies whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Verifies tool-call productivity (routing is scored under Discoverability). <br>
+- `accuracy`: Verifies final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Verifies whether the user's goal was achieved. <br>
 - `behavior_check`: Verifies whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Verifies tool-call productivity (routing is scored under Discoverability). <br>
 - `token_efficiency`: Verifies actual uncached prompt plus completion token usage. <br>
 
 
@@ -71,12 +71,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% | 62.4% |
+| Overall | 99.6% | 57.6% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 13.3% → 100.0% (+86.7 points) | 20.0% → 60.0% (+40.0 points) |
+| Correctness | 40.0% → 100.0% (+60.0 points) | 40.0% → 40.0% (±0.0 points) |
 | Discoverability | 100.0% | 0.0% |
-| Effectiveness | 22.2% → 100.0% (+77.8 points) | 48.3% → 53.3% (+5.0 points) |
-| Efficiency | 97.6% | 99.7% → 98.5% (-1.2 points) |
+| Effectiveness | 33.3% → 100.0% (+66.7 points) | 33.3% → 48.3% (+15.0 points) |
+| Efficiency | 97.9% | 99.7% → 99.5% (-0.2 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

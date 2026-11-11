@@ -1,0 +1,39 @@
+schema_version: 1
+
+harbor:
+  agent_workdir: /workspace
+  runtime_env:
+    DATA_DESIGNER_HOME: /tmp/data-designer-eval
+    NEMO_TELEMETRY_ENABLED: "false"
+  pre_agent_setup:
+    - |
+      if [ ! -x /workspace/.venv/bin/data-designer ]; then
+        python3 -m venv --without-pip /workspace/.venv
+        python3 -m pip --python /workspace/.venv/bin/python install --disable-pip-version-check --no-cache-dir data-designer==0.9.7
+      fi
+    - |
+      /workspace/.venv/bin/python - <<'PY'
+      import os
+      from pathlib import Path
+
+      from data_designer.cli.repositories.model_repository import ModelConfigRegistry, ModelRepository
+      from data_designer.cli.repositories.provider_repository import ModelProviderRegistry, ProviderRepository
+      from data_designer.cli.utils.agent_introspection import get_model_aliases_state
+      from data_designer.config.models import ModelConfig, ModelProvider
+
+      config_dir = Path(os.environ["DATA_DESIGNER_HOME"])
+      config_dir.mkdir(parents=True, exist_ok=True)
+      ProviderRepository(config_dir).save(
+          ModelProviderRegistry(
+              providers=[
+                  ModelProvider(name="script-only", endpoint="http://127.0.0.1:9/v1", api_key="unused-for-script-only")
+              ]
+          )
+      )
+      ModelRepository(config_dir).save(
+          ModelConfigRegistry(
+              model_configs=[ModelConfig(alias="script-only-text", model="script-only", provider="script-only")]
+          )
+      )
+      assert get_model_aliases_state(config_dir)["items"][0]["usable"]
+      PY

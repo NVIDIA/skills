@@ -36,7 +36,7 @@ def download_air05(data_dir: str) -> str:
     gz_file = os.path.join(data_dir, "air05.mps.gz")
 
     print("Downloading air05.mps from MIPLIB...")
-    urllib.request.urlretrieve(AIR05_URL, gz_file)
+    urllib.request.urlretrieve(AIR05_URL, gz_file)  # nosec B310 - fixed https URL
 
     # Decompress
     print("Decompressing...")

@@ -1,0 +1,39 @@
+{
+  "skill_name": "cuequivariance-torch",
+  "evals": [
+    {
+      "id": "torch-challenge-layout-v1",
+      "expected_skill": "cuequivariance-torch",
+      "prompt": "Our PyTorch equivariant model receives O3 features in an older storage format: the original irreps can contain separated copies of the same irrep, and each original block is flattened in ir_mul order. We need a differentiable adapter to dictionaries keyed by cuequivariance.Irrep, with blocks shaped (..., multiplicity, irrep_dimension), plus an inverse that recovers the ORIGINAL block and channel order. Write /workspace/solution.py exposing to_blocks(irreps, flat) and from_blocks(irreps, blocks). Equal irreps must concatenate channels in their order of appearance; opposite parities must remain distinct. Support arbitrary leading batch axes and these representations: '1o + 2x0e + 2x1o + 1e + 0o' and '2x1e + 0o + 1o + 1e + 2x0e + 1o'. Use the installed cuEquivariance representation metadata and PyTorch on CPU with float64, including noncontiguous tensors. Write and run checks with distinct values, unbatched data and batch shape (2,3), exact dictionary block values and inverse values, and autograd through the round trip with a nonuniform cotangent. Also check that rotation and inversion commute with conversion. Keep these functions importable without running a demo at import time. Report the actual executed checks.",
+      "expected_output": "An executed, importable PyTorch adapter that preserves original data and ordering, combines only identical O3 irreps, supports noncontiguous tensors, and passes value, inverse, gradient, rotation and inversion checks.",
+      "assertions": [
+        "The functions concatenate repeated full irrep identities without overwriting earlier blocks or merging opposite parities, and preserve the original per-irrep channel order.",
+        "The inverse recovers the original ungrouped buffer exactly for unbatched and batched inputs, including noncontiguous tensors; layout conversion handles multiplicity and representation axes correctly.",
+        "Tensor operations retain autograd, and the executed round-trip derivative matches a nonuniform cotangent.",
+        "The agent actually runs block-value, inverse, rotation and inversion comparisons on CPU float64 and reports observed results."
+      ]
+    },
+    {
+      "id": "torch-challenge-graph-v1",
+      "expected_skill": "cuequivariance-torch",
+      "prompt": "Implement a small trainable equivariant graph layer for a CPU PyTorch application, using the installed cuEquivariance integration. Write /workspace/solution.py exposing GraphLayer, a torch.nn.Module with a no-argument constructor and forward(features, vectors, senders, receivers, num_dst). Input node features have SO3 irreps '2x0 + 2x1' in mul_ir layout; output destination features have '0 + 1' in mul_ir layout. Edges carry nonzero displacement vectors. The layer computes normalized spherical harmonics of degrees 0,1,2; a channelwise tensor product of each source feature and its edge harmonics, keeping output types l=0,1; a sum of messages at each destination; and a bias-free equivariant linear projection to the requested output. Use cuEquivariance's default descriptor coefficients and emitted tensor-product channel order. For reproducible parameter injection, expose exactly three trainable parameters as attributes: radial_in of shape (1,4), radial_out of shape (4,n_tp), and projection of shape (n_linear,). Here n_tp is the channelwise weight count and n_linear is the projection weight count. For each edge, its weight vector is tanh(norm(vector) @ radial_in) @ radial_out, with norm(vector) shaped (1,). There are no other learned weights or biases. Parameters must persist across forwards and be visible to a normal optimizer; support model.double(). Support varying source/destination counts and repeated receivers, including destinations with no incoming edges. Demonstrate five source nodes, four destinations, senders=[0,1,3,0,1,4,2], receivers=[2,0,2,1,2,0,1], and deterministic nonconstant float64 features, vectors and parameters. Run an independent NumPy edge-loop comparison, rotation and permutation checks, and gradients of sum(output**2) for every parameter and both floating inputs, checked against finite differences. Execute one torch.optim.SGD update with learning rate 0.001 and show that the output changes while retaining reference agreement. Keep GraphLayer importable without running a demo at import time; report observed results.",
+      "expected_output": "A CPU nn.Module with persistent registered parameters, correct edge-dependent tensor products and destination sums, passing independent values/equivariance/gradient checks and a verified optimizer update.",
+      "assertions": [
+        "The module combines the prescribed radial weights, normalized harmonics, channelwise product and linear projection with consistent layouts, descriptor ordering and normalization.",
+        "Repeated receivers accumulate, isolated destinations remain zero, and source relabeling and edge permutation preserve the corresponding output.",
+        "All three parameters are registered once and reused; autograd reaches every parameter, node features and edge vectors with finite nonzero derivatives consistent with the independent reference.",
+        "The agent executes the reference, rotation, gradient and optimizer-step checks on CPU float64 without replacing the CPU installation or claiming CUDA execution."
+      ]
+    },
+    {
+      "id": "torch-challenge-routing-v1",
+      "expected_skill": null,
+      "prompt": "Fix this loss in my ordinary PyTorch regression model: def mse_loss(predictions, targets): return ((predictions - targets) ** 2).mean(). Predictions have shape (N,1), targets have shape (N,), and each prediction should be compared only with its own target. Write /workspace/solution.py with the corrected, importable mse_loss function. Run a small example with distinct values and check its prediction gradient. Preserve the input floating dtype. Keep the change limited to the regression loss and use the existing PyTorch installation.",
+      "expected_output": "A standard PyTorch loss with correct per-example alignment and gradient, without invoking cuEquivariance or its skill.",
+      "assertions": [
+        "The scalar loss is the mean of N paired squared errors, and its prediction gradient has shape (N,1) with values 2*(prediction-target)/N.",
+        "The agent executes the loss and gradient checks, and does not import, install, or invoke cuEquivariance or load its skill."
+      ]
+    }
+  ]
+}

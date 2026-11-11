@@ -190,7 +190,7 @@ def load_exclusions() -> set[str]:
     return out
 
 
-def load_components() -> dict[str, dict]:
+def load_components(product_enum: list[str]) -> dict[str, dict]:
     """Build map: repo-relative skill path (without trailing slash) -> component dict.
 
     Source of truth is ``components.d/*.yml`` only — the synced product
@@ -208,6 +208,10 @@ def load_components() -> dict[str, dict]:
         data = load_yaml(ymlf) or {}
         cname = data.get("name")
         crepo = data.get("repo")
+        declared = {}
+        if "product_primary" in data:
+            validate_product_primary(data["product_primary"], product_enum, str(ymlf))
+            declared["product_primary"] = data["product_primary"]
         for entry in data.get("skills") or []:
             if not isinstance(entry, dict):
                 continue
@@ -236,6 +240,7 @@ def load_components() -> dict[str, dict]:
                 "component_repo": crepo,
                 "components_file": ymlf.name,
                 "catalog_dir": catalog_dir,
+                **declared,
             }
     return mapping
 
@@ -381,10 +386,13 @@ def existing_valid_metadata(
     baseline: dict | None,
     rename_map: dict[str, str],
     schema_validator: Draft202012Validator,
+    authoritative: dict[str, str] | None = None,
 ) -> dict | None:
     """Return baseline metadata for ``skill`` if it is valid under the current schema.
 
     Honors renames (old_path -> new_path) by looking up the old path's entry.
+    Apply authoritative values before validation so a renamed product enum
+    does not discard the skill's other valid metadata or require AI.
     """
     base_skills = (baseline or {}).get("skills") or []
     base_by_path = {b["path"]: b for b in base_skills if isinstance(b, dict) and "path" in b}
@@ -401,6 +409,7 @@ def existing_valid_metadata(
         md = entry.get("metadata") or {}
         if not isinstance(md, dict):
             continue
+        md = {**md, **(authoritative or {})}
         # Validate just this skill entry shape against the schema's $defs/skill.
         candidate_entry = {
             "path": skill.path,
@@ -691,9 +700,23 @@ class GeneratorError(Exception):
     pass
 
 
+def validate_product_primary(value: Any, product_enum: list[str], location: str) -> None:
+    if not isinstance(value, str) or value not in product_enum:
+        raise GeneratorError(
+            f"{location}: product_primary {value!r} must be a value in the "
+            "`product.primary` enum in metadata.schema.json."
+        )
+
+
 def derive_product_from_component(component: dict | None, product_enum: list[str]) -> str | None:
     if not component:
         return None
+    if "product_primary" in component:
+        value = component["product_primary"]
+        validate_product_primary(
+            value, product_enum, component.get("components_file", "component"),
+        )
+        return value
     cname = component.get("component_name")
     if isinstance(cname, str) and cname in product_enum:
         return cname
@@ -714,19 +737,22 @@ def build_skill_entry(
 ) -> dict | None:
     component = components.get(skill.path)
 
-    carried = existing_valid_metadata(skill, baseline, rename_map, schema_validator) or {}
-    metadata: dict[str, str] = {k: carried[k] for k in MVP_FIELDS if k in carried}
-
-    # Deterministic mapping wins: when the skill's registered component name
-    # is a valid taxonomy value, it is authoritative for product.primary —
+    # Explicit declarations win, followed by an exact component-name match.
+    # Both are authoritative for product.primary —
     # including over a carried baseline value. AI-enriched baselines can be
     # wrong (e.g. TAO skills labeled "Cosmos"/"Brev" from content inference)
     # and would otherwise persist forever, breaking product grouping on
     # downstream surfaces that read this file.
     product_enum = taxonomy["product.primary"]["values"]
     derived_product = derive_product_from_component(component, product_enum)
+    authoritative = {}
     if derived_product:
-        metadata["product.primary"] = derived_product
+        authoritative["product.primary"] = derived_product
+    carried = existing_valid_metadata(
+        skill, baseline, rename_map, schema_validator, authoritative=authoritative,
+    ) or {}
+    metadata: dict[str, str] = {k: carried[k] for k in MVP_FIELDS if k in carried}
+    metadata.update(authoritative)
 
     missing = missing_required_fields(metadata)
     if missing:
@@ -755,11 +781,12 @@ def build_skill_entry(
         # marketplace on a transient AI failure, with the regenerated file
         # still internally consistent and so still passing --check.
         amended = None
+        amendment_fields = [f for f in MVP_FIELDS if f not in authoritative]
         try:
             amended = ai_client(
                 skill,
                 component,
-                list(MVP_FIELDS),
+                amendment_fields,
                 taxonomy,
                 current_values=metadata,
             )
@@ -772,7 +799,7 @@ def build_skill_entry(
                     f"{skill.path}: {exc}; existing metadata values kept."
                 )
         if amended:
-            for k in MVP_FIELDS:
+            for k in amendment_fields:
                 if amended.get(k):
                     metadata[k] = amended[k]
 
@@ -964,8 +991,8 @@ def main(argv: list[str] | None = None) -> int:
     skills_sh_validator = Draft202012Validator(skills_sh_schema)
 
     exclusions = load_exclusions()
-    components = load_components()
     try:
+        components = load_components(taxonomy["product.primary"]["values"])
         skills_now, excluded_names = discover_skills(exclusions)
     except GeneratorError as e:
         print(f"error: {e}", file=sys.stderr)
@@ -1083,10 +1110,29 @@ def main(argv: list[str] | None = None) -> int:
         skipped_paths = {s.path for s in skills_now if s.path not in {e["path"] for e in entries}}
         validate_inventory_round_trip(skills_now, metadata_obj, skills_sh_obj, errors, skipped_paths=skipped_paths)
 
+    # Written before the error gate below. The per-skill reasons are needed
+    # most on the runs that fail validation, but that path used to return
+    # before reaching the reporting block, so the only thing reaching the log
+    # and the tracking issue was the summary line naming which skills had no
+    # entry -- never which field failed enrichment or why. The recovered case
+    # (a published skill kept from the baseline) does not set `errors` and so
+    # always reported correctly, which is why the gap stayed hidden.
+    if skill_warnings:
+        # Structured warnings file for CI to surface in issue bodies.
+        warnings_path = Path("/tmp/skill-warnings.json")
+        warnings_path.write_text(
+            json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
     if errors:
         print("VALIDATION FAILED:", file=sys.stderr)
         for e in errors:
             print(f"  - {e}", file=sys.stderr)
+        if skill_warnings:
+            print("\nPer-skill reasons:", file=sys.stderr)
+            for w in skill_warnings:
+                print(f"  - {w}", file=sys.stderr)
         _print_classification(cls, stream=sys.stderr)
         return 1
 
@@ -1109,12 +1155,6 @@ def main(argv: list[str] | None = None) -> int:
         )
         for w in skill_warnings:
             print(f"  - {w}", file=sys.stderr)
-        # Write a structured warnings file for CI to surface in issue bodies.
-        warnings_path = Path("/tmp/skill-warnings.json")
-        warnings_path.write_text(
-            json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
-            encoding="utf-8",
-        )
     # A skill that could not be built has to fail the run, in both --check and
     # write mode, so CI cannot read a partial success as a pass. Outputs are
     # still rendered first, so the catalog does not lose a skill either way.

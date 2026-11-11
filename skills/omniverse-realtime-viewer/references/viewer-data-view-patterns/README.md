@@ -100,3 +100,17 @@ Validate these flows when you add or change data views:
 - Loading/error/empty states are visible and do not collapse panel layout.
 
 See also: `object-selection`, `selection-feedback`, `prim-info-display`, `stage-hierarchy`, `stage-attribute-reads`, `viewer-backend-interface`.
+
+## Native Plots
+
+For requested telemetry or scientific data panels in ovui, use `ui.Plot` with
+`mode=ui.PlotMode.INTERACTIVE` for axes, labels, pan/zoom, line, scatter, bars,
+or histograms. Read `references/dependencies`, then discover the current native
+plot contract through ovui's upstream UI API skill. Verify plotting modes,
+constructors, data setters, and style selectors against the resolved package.
+Select the interactive mode explicitly; constructor scale arguments are not
+data samples. Supply data
+with `set_data()` or `set_xy_data()` and update retained data only when it changes.
+Use the documented `Plot` styles and `ui.PlotType` values.
+Keep sampling and aggregation outside the UI widget and give the plot ownership
+of its pointer gestures so panning a chart cannot move the viewport camera.

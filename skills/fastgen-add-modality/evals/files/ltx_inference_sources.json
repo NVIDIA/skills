@@ -1,0 +1,52 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Bounded source fixtures; not an installed FastGen checkout. Excerpts retain original lines. Patch targets are repository_path values. A candidate is derived from that revision and intentionally contains regressions; no other fixture changes source behavior.",
+  "sources": [
+    {
+      "fixture": "video_model_inference.py.txt",
+      "repository_path": "scripts/inference/video_model_inference.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/scripts/inference/video_model_inference.py",
+      "source_sha256": "f0ced886e4e5dd8ccc226d015ac2b8b6e8ea9c5e79a42d45dba13974bd512da0",
+      "line_ranges": [
+        [
+          1,
+          416
+        ]
+      ],
+      "fixture_sha256": "f0ced886e4e5dd8ccc226d015ac2b8b6e8ea9c5e79a42d45dba13974bd512da0",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "inference_common_args.py.txt",
+      "repository_path": "scripts/inference/inference_utils.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/scripts/inference/inference_utils.py",
+      "source_sha256": "4d48f270bf252f54b39cff73efb3033feff89f4c2a32e31fc84630f0a1fa8994",
+      "line_ranges": [
+        [
+          565,
+          588
+        ]
+      ],
+      "fixture_sha256": "5e31ccf36ea2f892e91d82dda61b680e89236a4af69e46be4d9fd817cba813ae",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "ltx2_sft_config.py.txt",
+      "repository_path": "fastgen/configs/experiments/LTX2/config_sft.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/fastgen/configs/experiments/LTX2/config_sft.py",
+      "source_sha256": "40519f253a360fd3ec7aabe4d101a349cb874bab1a40f3d3c8d1509e5c0a469d",
+      "line_ranges": [
+        [
+          1,
+          55
+        ]
+      ],
+      "fixture_sha256": "40519f253a360fd3ec7aabe4d101a349cb874bab1a40f3d3c8d1509e5c0a469d",
+      "kind": "complete_source"
+    }
+  ]
+}

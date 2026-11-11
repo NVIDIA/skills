@@ -1,5 +1,5 @@
 ## Description: <br>
-Stereo depth estimation using FoundationStereo. Predicts disparity maps from stereo image pairs for 3D reconstruction. <br>
+Stereo depth estimation using FoundationStereo that predicts disparity maps from stereo image pairs for 3D reconstruction. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, or running inference on TAO FoundationStereo stereo depth estimation models for 3D reconstruction from stereo image pairs. <br>
+Developers and engineers training, evaluating, exporting, quantizing, or running inference on TAO FoundationStereo stereo depth estimation models for 3D reconstruction from stereo image pairs. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -35,7 +35,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Skill Output: <br>
 **Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Format:** [Markdown with inline bash and YAML code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -46,36 +46,36 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), 3 attempts per task, evaluated in k8s-sandbox environment. <br>
+1 evaluation task (1 positive), 1 attempt per task, each run in an isolated sandbox pod in the k8s-sandbox environment. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Validates final-answer correctness against the reference answer. <br>
-- Discoverability: Whether the expected skill was selected and the workflow executed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and expected workflow. <br>
-- Efficiency: Tool-call productivity and token efficiency. <br>
+- Security: Is it safe to use? Checks for unsafe operations, secret leakage, and unauthorized access. <br>
+- Correctness: Is the answer correct? Final-answer correctness against the reference answer. <br>
+- Discoverability: Was the right skill loaded when needed? <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of goal completion and expected workflow adherence. <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Equal-weight mean of tool-call productivity and token efficiency. <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
-| Measure | Claude Code | Codex |
+| Measure | Claude Code (Baseline → Skill) | Codex (Baseline → Skill) |
 |---|---:|---:|
-| Overall | 99.5% | 95.3% |
-| Security | 100.0% | 100.0% |
-| Correctness | 100.0% | 100.0% |
-| Discoverability | 100.0% | 95.0% |
-| Effectiveness | 100.0% | 83.3% |
-| Efficiency | 97.3% | 98.3% |
+| Overall | 99.6% (no comparable baseline) | 66.4% (no comparable baseline) |
+| Security | 100.0% → 100.0% | 100.0% → 100.0% |
+| Correctness | 0.0% → 100.0% | 100.0% → 80.0% |
+| Discoverability | 100.0% (no comparable baseline) | 0.0% (no comparable baseline) |
+| Effectiveness | 0.0% → 100.0% | 48.3% → 53.3% |
+| Efficiency | 97.8% (no comparable baseline) | 99.5% → 98.4% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

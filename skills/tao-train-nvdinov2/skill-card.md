@@ -7,9 +7,9 @@ This skill is ready for commercial/non-commercial use. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache-2.0 <br>
+Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, exporting, and running inference on NVDINOv2 self-supervised vision transformer backbones using the NVIDIA TAO toolkit. <br>
+Developers and engineers training, exporting, and running inference on NVDINOv2 self-supervised vision transformer backbones using NVIDIA TAO, including TensorRT engine generation via TAO Deploy. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -43,7 +43,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive), each attempt in an isolated sandbox pod. 3 attempts per task. <br>
+1 evaluation task (1 positive), 1 attempt per task, each attempt in an isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -56,10 +56,10 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity. <br>
 - `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
@@ -67,12 +67,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 99.5% — uplift unavailable | 66.4% — uplift unavailable |
+| Overall | 96.3% — uplift unavailable | 73.7% — uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 6.7% → 100.0% (+93.3 points) | 100.0% → 80.0% (-20.0 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Discoverability | 100.0% — uplift unavailable | 0.0% — uplift unavailable |
-| Effectiveness | 0.0% → 100.0% (+100.0 points) | 70.0% → 53.3% (-16.7 points) |
-| Efficiency | 97.4% — uplift unavailable | 99.5% → 98.4% (-1.1 points) |
+| Effectiveness | 0.0% → 83.3% (+83.3 points) | 58.3% → 70.0% (+11.7 points) |
+| Efficiency | 98.0% — uplift unavailable | 99.5% → 98.6% (-0.9 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

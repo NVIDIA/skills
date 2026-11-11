@@ -49,7 +49,7 @@ find "${DATASET_DIR}/camInfo" -maxdepth 1 -type f -name '*.yaml' -print0 \
 
 If exact renames are required, create a backup or dry-run list first and ask before modifying dataset files.
 
-If calibration is missing, resolve the MV3DT detector first so the calibration handoff can normalize `camInfo` for the selected model. Use the detector requested by the user, or set `DETECTOR_MODEL=PeopleNetTransformer` when the user did not choose one. Then load `amc-calibration-handoff.md` and return here.
+If calibration is missing, resolve the MV3DT inference detector first so the calibration handoff can normalize `camInfo` for the selected model. Use the inference detector requested by the user, or set `DETECTOR_MODEL=PeopleNetTransformer` when the user did not choose one. Separately obtain the user's AMC calibration detector (`resnet` or `transformer`); neither MV3DT's default nor its detector name selects the AMC detector. Then load `amc-calibration-handoff.md` and return here.
 
 ## Select Detector And Tracker
 
@@ -89,7 +89,7 @@ If `MV3DT_RUN_MODE=headless`, explain that OSD/BEV windows will not appear and u
 
 ## Generate Configs
 
-Load `references/generate-configs.md` and run its `Generate Configs` block after the dataset, detector, tracker, run mode, and output directory are selected. That shared reference owns the configurator command, venv `PATH` setup, detector config mapping, output-directory creation, and file-output/message-broker flags.
+Load [generate-configs.md](generate-configs.md) and run its `Generate Configs` block after the dataset, detector, tracker, run mode, and output directory are selected. That shared reference owns the configurator command, venv `PATH` setup, detector config mapping, output-directory creation, and file-output/message-broker flags.
 
 For a 4-camera dataset that should use the sample tuning override:
 
@@ -115,13 +115,9 @@ For agent-managed display runs, stop `MV3DT_BEV_PID` after the DeepStream comman
 
 For headless runs, use the offline `--from-end` capture flow in `visualization-metadata.md` by default. Start it immediately before the Docker launch attempt expected to run, after config/security/startup blockers are resolved, and wait until it has subscribed before launching DeepStream. If Docker must be retried after capture starts, stop that capture and start a fresh one for the retry. If `map.png` or `transforms.yml` is missing, report that BEV video cannot be produced and continue with the tiled DeepStream MP4.
 
-## Docker Security Gate
+## Docker Access
 
-Before presenting or executing the Docker launch command, state that this run uses `--privileged` and `--net=host`. These flags give the container broad host device, network, mounted-repo, and mounted-dataset access.
-
-Require an explicit user confirmation such as: "I approve running DeepStream with `--privileged --net=host` for this MV3DT run." Do not execute the launch command on vague or unrelated approval. After approval, set `MV3DT_DOCKER_SECURITY_APPROVED=I_APPROVE_PRIVILEGED_HOST_NETWORK` for the launch shell.
-
-Before using those flags, discuss least-privilege alternatives with the user: prefer `${GPU_FLAG}`/`--gpus all` without `--privileged` when it works, add only specific `--device` mounts required by observed failures, use narrow `--cap-add` values only when needed, and prefer explicit port mappings for Kafka/MQTT/display over `--net=host` when the deployment allows it. Use the command below only after the user accepts the compatibility/security tradeoff.
+Use NVIDIA GPU access on Docker bridge networking. Before generating configs, follow [Container Networking](container-network.md) to verify an advertised Kafka listener reachable from the bridge. Retain the host localhost listener for BEV tools. The launch exposes only the dataset, model cache, run output directory, and (in display mode) the X11 socket. Do not add capabilities or arbitrary host devices to bypass an error.
 
 ## Launch DeepStream
 
@@ -136,30 +132,33 @@ else
   exit 1
 fi
 
+DRIVER_CAPABILITIES=compute,utility,video
 DOCKER_DISPLAY_ARGS=()
 if [ "${MV3DT_RUN_MODE:-display}" != "headless" ]; then
+  DRIVER_CAPABILITIES+=,graphics,display
   DOCKER_DISPLAY_ARGS=(-v /tmp/.X11-unix/:/tmp/.X11-unix -e DISPLAY="${DISPLAY}")
 fi
 
-case "${MV3DT_DOCKER_SECURITY_APPROVED:-}" in
-  I_APPROVE_PRIVILEGED_HOST_NETWORK) ;;
-  *)
-    echo "ERROR: explicit approval required before running Docker with --privileged --net=host."
-    echo "Set MV3DT_DOCKER_SECURITY_APPROVED=I_APPROVE_PRIVILEGED_HOST_NETWORK only after the user approves this run."
-    exit 1
-    ;;
-esac
+: "${MV3DT_KAFKA_HOST:?prepare the bridge-reachable Kafka listener}"
+: "${MV3DT_KAFKA_PORT:?prepare the bridge-reachable Kafka listener}"
 
 # If saved BEV is expected, start the offline BEV capture from
 # visualization-metadata.md now, in the same launch shell or background task.
 # Keep MV3DT_OFFLINE_BEV_PID, MV3DT_OFFLINE_BEV_LOG, and
 # MV3DT_OFFLINE_BEV_STARTED_AT for retry cleanup and verification.
-# Run only after the Docker Security Gate confirmation above. Use DOCKER_CMD="sudo docker" only if Docker needs sudo.
+# Run after the broker endpoint checks above. Use DOCKER_CMD="sudo docker" only if Docker needs sudo.
+MODEL_REPO="$(realpath -e "${MODEL_REPO:?set MODEL_REPO}")" || exit 1
+DATASET_DIR="$(realpath -e "${DATASET_DIR:?set DATASET_DIR}")" || exit 1
+EXPERIMENT_DIR="$(realpath -e "${EXPERIMENT_DIR:?set EXPERIMENT_DIR}")" || exit 1
+for mount_dir in "$MODEL_REPO" "$DATASET_DIR" "$EXPERIMENT_DIR"; do
+  test -d "$mount_dir" && test "$mount_dir" != / || { echo "ERROR: invalid mount directory"; exit 1; }
+done
 MV3DT_DOCKER_LAUNCH_AT="$(date +%s)"
 MV3DT_DEEPSTREAM_STATUS=0
-$DOCKER_CMD run -t --privileged --rm --net=host ${GPU_FLAG} \
+$DOCKER_CMD run -t --rm --network bridge ${GPU_FLAG} \
+  -e NVIDIA_DRIVER_CAPABILITIES="${DRIVER_CAPABILITIES}" \
   -v "${MODEL_REPO}:/workspace/models" \
-  -v "${DATASET_DIR}:/workspace/inputs" \
+  -v "${DATASET_DIR}:/workspace/inputs:ro" \
   -v "${EXPERIMENT_DIR}:/workspace/experiments" \
   "${DOCKER_DISPLAY_ARGS[@]}" \
   -w /workspace/experiments \
@@ -216,7 +215,7 @@ sudo chown -R "$(id -u):$(id -g)" \
 |---|---|
 | `No MP4 files found` | Confirm videos are directly under `${DATASET_DIR}/videos` |
 | Empty calibration list | Confirm files are under `${DATASET_DIR}/camInfo` and use `.yml` |
-| Wrong camera pairing | Rename videos and calibration files to matching basenames |
+| Wrong camera pairing | Show the camera mapping and obtain approval before renaming videos or calibration files to matching basenames; do not rename silently |
 | BEV visualizer fails | Confirm `map.png`, `transforms.yml`, and `config_msgconv.txt` exist |
 | Docker app cannot show OSD | Confirm `DISPLAY` is set, then use a scoped X11 entry such as `xhost +local:docker` or `xhost +SI:localuser:root`; remove it after the run |
 | Parser or model load error | Load `setup.md` and rebuild parsers |

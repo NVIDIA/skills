@@ -32,8 +32,18 @@ fetches the source at the component's ``ref`` and checks that:
     signed digest;
   * ``SKILL.md``, ``skill.oms.sig``, ``skill-card.md`` and an eval dataset
     exist, applying the same filename rules the hourly sync applies;
-  * ``BENCHMARK.md`` reports an overall verdict of PASS backed by real
-    measurements.
+  * ``BENCHMARK.md`` reports PASS backed by real measurements. Self-assessed
+    reports also require publication eligibility and completed execution
+    without reported errors; the shared benchmark reader checks that format.
+
+It also checks that the component resolves to a ``product.primary`` value:
+an explicit ``product_primary``, or a ``name`` that exactly matches a value in
+the metadata schema. Without one, the metadata generator falls back to AI
+enrichment, and for a product the schema has never heard of the AI returns
+UNRESOLVED and the whole regeneration fails after the sync. That happened
+three times on 2026-11-09 with ALCHEMI Toolkit (#851); the fix was a schema
+addition that belonged on the onboarding PR. This check moves the failure
+there.
 
 Blocking scope: only paths the PR *adds*. Around 30 catalog skills already
 carry signature drift (tracked in #216 / #357); failing a PR for drift its
@@ -49,6 +59,7 @@ merge.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -57,6 +68,8 @@ import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+
+import yaml  # PyYAML, the loader generate-skill-metadata.py uses.
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -74,9 +87,13 @@ SIG_NAME = vci.SIG_NAME
 # which all 350 published skills carry — no skill relies on an alternate.
 REQUIRED_FILES = ("SKILL.md", SIG_NAME, "BENCHMARK.md", "skill-card.md")
 
+SCHEMA_PATH = ".github/scripts/marketplace/metadata.schema.json"
+
 RE_REPO = re.compile(r"^repo:\s*(\S+)\s*$")
 RE_REF = re.compile(r"^ref:\s*(\S+)\s*$")
 RE_PATH = re.compile(r"^-?\s*path:\s*(\S+)\s*$")
+# Top-level scalars only: matched against the unindented line, so a skill
+# entry's nested keys can never be read as the component's name or product.
 
 
 @dataclass(frozen=True)
@@ -100,10 +117,10 @@ class Finding:
 def parse_component(text: str) -> dict:
     """Read repo, ref and declared skill paths from a component file.
 
-    Deliberately line-based rather than PyYAML: every other script in this
-    directory parses these files the same way, and CI carries no third-party
-    Python dependencies. The schema is flat and fixed (components.d/README.md),
-    so a real parser buys nothing here.
+    Repo, ref and paths are read line by line, the way the sync scripts read
+    them, so this check fetches exactly what the sync will fetch. ``name`` and
+    ``product_primary`` come from ``product_fields``, which uses the metadata
+    generator's YAML loader, because they decide what the generator does.
 
     Trailing slashes are stripped so a path compares equal however it was
     written — ``skills/write-dag/`` and ``skills/write-dag`` are the same
@@ -131,7 +148,32 @@ def parse_component(text: str) -> dict:
     # An absent ref means the component tracks the default branch. Several
     # components (AIQ, VSS) track develop instead; verifying those against
     # main compares a tree the sync will never fetch.
-    return {"repo": repo, "ref": ref or "main", "paths": paths}
+    return {"repo": repo, "ref": ref or "main", "paths": paths,
+            **product_fields(text)}
+
+
+def product_fields(text: str) -> dict:
+    """``name`` and ``product_primary`` exactly as the metadata generator sees them.
+
+    Unlike repo/ref/paths, these feed a decision the generator makes, so they
+    are read with the generator's own loader rather than imitated line by line.
+    YAML has too many edge cases to mirror by hand: a trailing ``# comment`` is
+    not part of the value, and an empty ``product_primary:`` is *present* with
+    a null value, which the generator rejects instead of falling back to the
+    name. ``has_product_primary`` keeps that present-but-empty case distinct
+    from an absent key.
+    """
+    try:
+        data = yaml.safe_load(text)
+    except yaml.YAMLError as exc:
+        return {"name": None, "product_primary": None,
+                "has_product_primary": False, "yaml_error": str(exc)}
+    if not isinstance(data, dict):
+        data = {}
+    return {"name": data.get("name"),
+            "product_primary": data.get("product_primary"),
+            "has_product_primary": "product_primary" in data,
+            "yaml_error": None}
 
 
 def added_paths(base_text: str | None, head_text: str) -> set[str]:
@@ -145,6 +187,72 @@ def added_paths(base_text: str | None, head_text: str) -> set[str]:
     if base_text is None:
         return head
     return head - set(parse_component(base_text)["paths"])
+
+
+# --------------------------------------------------------------------------
+# Product resolution (pure — operates on component text and the schema)
+# --------------------------------------------------------------------------
+
+def product_enum(schema_text: str) -> list[str]:
+    """The ``product.primary`` values the metadata schema accepts."""
+    schema = json.loads(schema_text)
+    return schema["$defs"]["metadata"]["properties"]["product.primary"]["enum"]
+
+
+def product_in_scope(base_text: str | None, head_text: str) -> bool:
+    """Whether this PR is responsible for the component's product mapping.
+
+    A new component file, or one whose ``name`` or ``product_primary`` this PR
+    changed. Existing registries that rely on carried metadata are left alone:
+    they already have entries in metadata.json, so the generator never asks AI
+    to resolve them from scratch, and failing a PR for them would block an
+    author over a mapping they did not touch.
+    """
+    if base_text is None:
+        return True
+    base, head = parse_component(base_text), parse_component(head_text)
+    keys = ("name", "product_primary", "has_product_primary")
+    return any(base[k] != head[k] for k in keys)
+
+
+def check_product(component: dict, enum: list[str]) -> list[str]:
+    """Problems with the component's product mapping (empty == resolves).
+
+    Mirrors ``derive_product_from_component`` in generate-skill-metadata.py:
+    an explicit ``product_primary`` must be an enum value; otherwise the
+    ``name`` must match one exactly.
+    """
+    if component.get("yaml_error"):
+        return [f"component file is not valid YAML: {component['yaml_error']}"]
+    if component.get("has_product_primary"):
+        declared = component.get("product_primary")
+        if isinstance(declared, str) and declared in enum:
+            return []
+        if declared is None:
+            return [
+                "product_primary is present but empty. The metadata generator "
+                "rejects an empty value rather than falling back to the name. "
+                "Set it to a value in the product.primary enum "
+                f"({SCHEMA_PATH}), or remove the key."
+            ]
+        return [
+            f"product_primary {declared!r} is not a value in the product.primary "
+            f"enum ({SCHEMA_PATH}). Use an existing value, or add {declared!r} "
+            "to the enum in this PR."
+        ]
+    name = component.get("name")
+    if not isinstance(name, str) or not name:
+        return ["no name: declared"]
+    if name in enum:
+        return []
+    return [
+        f"product cannot be resolved: name {name!r} is not a value in the "
+        f"product.primary enum ({SCHEMA_PATH}) and no product_primary is set. "
+        f"Add {name!r} to the enum in this PR, or set product_primary to an "
+        "existing value. Without one, the metadata generator falls back to AI, "
+        "which cannot pick an unknown product and fails the regeneration after "
+        "the sync."
+    ]
 
 
 # --------------------------------------------------------------------------
@@ -324,6 +432,10 @@ def main() -> int:
         return 0
 
     findings: list[Finding] = []
+    # Read the schema at the PR head so an enum addition made in the same PR
+    # counts. That is the intended fix, and reading main would reject it.
+    schema_text = file_at(head_sha, SCHEMA_PATH)
+    enum = product_enum(schema_text) if schema_text else None
     workdir = Path(tempfile.mkdtemp(prefix="source-onboarding-"))
     try:
         for rel in component_files:
@@ -334,9 +446,23 @@ def main() -> int:
                 continue
             component = parse_component(head_text)
             repo, ref = component["repo"], component["ref"]
-            new = added_paths(file_at(base_sha, rel), head_text)
+            base_text = file_at(base_sha, rel)
+            new = added_paths(base_text, head_text)
 
             print(f"\n── {rel} → {repo}@{ref} ──")
+            if product_in_scope(base_text, head_text):
+                if enum is None:
+                    problems = [f"could not read the product enum from {SCHEMA_PATH}"]
+                else:
+                    problems = check_product(component, enum)
+                if problems:
+                    print("  FAIL  product mapping")
+                    for p in problems:
+                        print(f"          {p}")
+                        findings.append(Finding(rel, p, blocking=True))
+                else:
+                    resolved = component["product_primary"] or component["name"]
+                    print(f"  ok    product: {resolved}")
             if not repo:
                 findings.append(Finding(rel, "no repo: declared", blocking=True))
                 print("  FAIL  no repo: declared")

@@ -208,7 +208,7 @@ scene has changed.
 
 ## pxr Worker Fallback
 
-`pxr_worker.py` is a fallback for capabilities that OVStage runtime queries and
+An app-generated `pxr_worker.py` is a fallback for capabilities that OVStage runtime queries and
 current standalone OVRTX native queries do not fully cover: variant sets, rich
 USD metadata, and relationship targets such as material bindings. Do not use it
 as the default hierarchy or scalar-attribute path.
@@ -223,9 +223,16 @@ renderer = Renderer(config=RendererConfig(sync_mode=True))
 from pxr import Usd, UsdGeom, Sdf, Gf
 ```
 
-On Windows or when avoiding USD DLL conflicts, run `pxr_worker.py` in a separate Python process with `usd-core` only. The main ovrtx process communicates over JSON lines. `--usd-subprocess auto` means subprocess on Windows and direct on Linux; `on` always uses subprocess; `off` always imports directly.
+Default to a separate worker Python process with the selected `usd-core`
+environment; communicate over JSON lines. If your app exposes an optional
+`--usd-subprocess` flag, implement its parser and policy explicitly: `auto`
+uses isolation unless the exact platform/package import path has been verified,
+`on` forces isolation, and `off` requires that verified in-process path.
 
-The tested server uses `pxr_worker.py` and an embedded `PxrWorkerClient` in `ov_web_viewer_server.py` for the fallback commands below. Older `usd_worker.py` and `usd_query_client.py` remain as reference only.
+Create the worker and its parent-side client in the generated app; neither is
+shipped with this skill. Use [fallback-worker-protocol.md](fallback-worker-protocol.md)
+for command shapes, dispatch, client lifecycle, and failure handling. The query
+and serialization examples below supply the USD operations behind that protocol.
 
 ## Fallback pxr Queries
 
@@ -306,7 +313,14 @@ def detect_root_prim_path(stage: Usd.Stage) -> str:
     return "/"
 ```
 
-Return this path as `root_prim_path` in stage-open responses. Frontend tree initialization, `getChildrenRequest`, descendant mesh expansion, and `makePrimsSelectable` should use `root_prim_path` instead of `/World`.
+Return this path as `root_prim_path` in stage-open responses. Use it for
+frontend tree initialization and `getChildrenRequest` instead of assuming
+`/World`. Hierarchy queries return rows; expanding a branch must not change
+which geometry can be picked. The runtime owner derives pickable geometry from
+its scene/workload policy and refreshes it after scene or composition changes.
+If the app exposes an explicit pickability command, define whether its paths
+replace the policy or add/remove members, and apply that intent on the owner.
+A partial tree response is not a complete selectable set.
 
 ## Properties
 

@@ -8,6 +8,11 @@ per-dimension results (skill-assisted score plus uplift vs. the no-skill
 baseline), and writes a single machine-readable benchmarks.json at the repo
 root for downstream dashboards and tooling.
 
+Each skill's evaluation_source is "self-assessed" or "ci" when explicitly
+recorded in the report summary, otherwise null (unknown). A signature, PASS,
+or live-evaluation row alone does not identify who ran the evaluation.
+Flat result rows can be joined to this field using catalog_dir.
+
 Usage:
     python3 .github/scripts/aggregate_benchmarks.py [--repo-root PATH]
     python3 .github/scripts/aggregate_benchmarks.py --check   # fail on drift
@@ -143,6 +148,72 @@ def normalize_agent(name: str) -> str:
     return name.lower().replace(" ", "-")
 
 
+def self_assessed_verdict(intro: str):
+    """Read the CI publication summary without treating producer PASS as approval.
+
+    This format has a publication banner instead of an overall verdict. Only
+    the generated introduction is authoritative; examples and methodology in
+    the report body cannot supply missing fields. Leave ambiguous reports
+    without a verdict so onboarding rejects them.
+    """
+    header, boundary, summary = intro.partition("## Publication Recommendation\n")
+    header_lines = [line.strip() for line in header.splitlines() if line.strip()]
+    if (not boundary or len(header_lines) != 2
+            or not header_lines[0].startswith("# Skill Benchmark: ")
+            or header_lines[1] != "> **Publication eligible**"):
+        return None
+
+    lines = [line.strip() for line in summary.splitlines()]
+    # The generated summary has no nested sections, code examples, comments,
+    # or overall verdict. Reject those rather than extracting a stray PASS.
+    if any(line.startswith(("#", "```", "~~~", "<!--", ">"))
+           or "Overall verdict:" in line or "Reported execution errors:" in line
+           for line in lines):
+        return None
+
+    allowed = {
+        "Evaluation source": {"self-assessed"},
+        "Quality assessment": {"SELF-ASSESSED"},
+        "Reported execution": {"completed"},
+        "Reported evaluation verdict": {"PASS", "FAIL", "NEUTRAL"},
+    }
+    fields = {}
+    for field, values in allowed.items():
+        prefix = f"- {field}:"
+        matches = [line[len(prefix):].strip() for line in lines if line.startswith(prefix)]
+        if len(matches) != 1 or matches[0] not in values:
+            return None
+        fields[field] = matches[0]
+    return fields["Reported evaluation verdict"]
+
+
+def evaluation_source(markdown: str):
+    """Preserve explicit source independently of the publication verdict."""
+    sections = {"## Publication Recommendation", "## Evaluation Metadata", "## Evaluation Summary"}
+    section = None
+    declarations = []
+    for raw in markdown.splitlines():
+        line = raw.strip()
+        # Generated summaries have no examples. Stop before the report body;
+        # fenced/commented content in the summary cannot establish provenance.
+        if line.startswith(("```", "~~~")) or "<!--" in line:
+            return None
+        if line.startswith("#"):
+            if not raw.startswith("#"):
+                break
+            if line.startswith("# ") and section is None:
+                continue
+            if line not in sections:
+                break
+            section = line
+        elif section and raw.startswith("- Evaluation source:"):
+            declarations.append(line)
+    if len(declarations) != 1:
+        return None
+    match = re.fullmatch(r"- Evaluation source: (?:`(ci|self-assessed)`|(ci|self-assessed))", declarations[0])
+    return (match.group(1) or match.group(2)) if match else None
+
+
 def parse_benchmark(path: Path) -> dict:
     entry = {k: None for k in SUMMARY_FIELDS}
     entry["agents"] = []
@@ -150,7 +221,9 @@ def parse_benchmark(path: Path) -> dict:
     section = None
     agent_cols = {}  # results-table column index -> agent name, from the header row
 
-    for raw in path.read_text(encoding="utf-8").splitlines():
+    markdown = path.read_text(encoding="utf-8")
+    entry["evaluation_source"] = evaluation_source(markdown)
+    for raw in markdown.splitlines():
         line = raw.strip()
         if line.startswith("#"):
             section = line.lstrip("# ").lower()
@@ -227,6 +300,13 @@ def parse_benchmark(path: Path) -> dict:
                     "num": num,
                     "agents": scores,
                 })
+    intro, metadata_boundary, _ = markdown.partition("## Evaluation Metadata\n")
+    if entry["verdict"] is None:
+        entry["verdict"] = self_assessed_verdict(intro) if metadata_boundary else None
+    elif entry["verdict"] == "PASS" and re.search(r"^> \*\*Publication ", intro, re.MULTILINE):
+        # Mixed verdict layouts are ambiguous: an overall PASS must not hide
+        # a blocked publication or another verdict. Explicit failures stay.
+        entry["verdict"] = None
     return entry
 
 

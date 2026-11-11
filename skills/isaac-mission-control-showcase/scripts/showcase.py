@@ -9,6 +9,9 @@ import hashlib
 import http.client
 import json
 import math
+import os
+import signal
+import subprocess
 from pathlib import Path
 import sys
 import time
@@ -354,6 +357,179 @@ def submit_mission(args):
     return 0
 
 
+def robot_is_healthy(robot, expected_name):
+    status = (robot or {}).get("status") or {}
+    return bool(
+        robot and robot.get("name") == expected_name
+        and robot.get("lifecycle") == "ALIVE"
+        and status.get("online") is True
+        and status.get("position_initialized") is True
+        and status.get("errors") in ({}, [])
+    )
+
+
+def process_running(isaac):
+    """Reject exited/zombie processes and a reused PID."""
+    try:
+        fields = Path(f"/proc/{int(isaac['pid'])}/stat").read_text().rsplit(")", 1)[1].split()
+        return fields[0] != "Z" and fields[19] == isaac["start_ticks"]
+    except (OSError, KeyError, ValueError, IndexError):
+        return False
+
+
+def record_isaac(args):
+    fields = Path(f"/proc/{args.pid}/stat").read_text().rsplit(")", 1)[1].split()
+    run_state.update(args.work_dir, isaac={
+        "pid": args.pid, "start_ticks": fields[19], "running": fields[0] != "Z",
+    })
+    return 0
+
+
+# Executed inside Carter; its cgroup contains the launch process and children.
+CARTER_HEALTH_SCRIPT = r'''
+import json
+import subprocess
+from pathlib import Path
+required = [
+    "nav2_map_server/map_server", "nav2_amcl/amcl",
+    "nav2_controller/controller_server", "nav2_planner/planner_server",
+    "nav2_bt_navigator/bt_navigator",
+    "isaac_ros_vda5050_nav2_client/vda5050_nav2_client",
+]
+processes = {
+    name: subprocess.run(
+        ["pgrep", "-f", "^/opt/ros/humble/lib/" + name + " "],
+        stdout=subprocess.DEVNULL, check=False,
+    ).returncode == 0 for name in required
+}
+events = dict(line.split() for line in Path("/sys/fs/cgroup/memory.events").read_text().splitlines())
+print(json.dumps({"processes": processes, "oom_events": {
+    key: int(events[key]) for key in ("oom", "oom_kill")
+}}))
+'''
+
+
+def runtime_health(manifest):
+    """Collect bounded, explicit observations; unavailable checks cannot pass."""
+    health = {
+        "isaac_running": None, "processes_healthy": None, "oom": None,
+    }
+    try:
+        container = manifest["carter_container"]
+        state = json.loads(subprocess.check_output(
+            ["docker", "inspect", "--format", "{{json .State}}", container],
+            text=True, timeout=10,
+        ))
+        if state.get("OOMKilled") is True:
+            health["oom"] = True
+        if state.get("Running") is not True:
+            health["processes_healthy"] = False
+            return health
+        observed = json.loads(subprocess.check_output(
+            ["docker", "exec", container, "python3", "-c", CARTER_HEALTH_SCRIPT],
+            text=True, timeout=10,
+        ))
+        health["processes"] = observed["processes"]
+        health["processes_healthy"] = bool(observed["processes"]) and all(
+            value is True for value in observed["processes"].values()
+        )
+        health["oom_events"] = observed["oom_events"]
+        counts = [observed["oom_events"][key] for key in ("oom", "oom_kill")]
+        if all(type(value) is int and value >= 0 for value in counts):
+            if state.get("OOMKilled") is False:
+                health["oom"] = any(value > 0 for value in counts)
+    except (OSError, subprocess.SubprocessError, KeyError, ValueError, TypeError) as exc:
+        health["error"] = f"{type(exc).__name__}: {exc}"
+    finally:
+        health["isaac_running"] = process_running(manifest.get("isaac") or {})
+    return health
+
+
+def check_health(args):
+    health = runtime_health(run_state.load(args.work_dir))
+    good = (health["isaac_running"] is True
+            and health["processes_healthy"] is True and health["oom"] is False)
+    if not good:
+        print(json.dumps({"runtime_health": health}), file=sys.stderr)
+    return 0 if good else 1
+
+
+def stop_recorded(args):
+    """Stop only resources matching this manifest's recorded ownership."""
+    manifest = run_state.load(args.work_dir)
+    if not manifest:
+        raise ValueError("no run manifest for targeted cleanup")
+    project = manifest["compose_project"]
+    containers = sorted(manifest.get("containers", []),
+                        key=lambda name: name != manifest.get("carter_container"))
+    for container in containers:
+        inspected = subprocess.run(
+            ["docker", "inspect", container], capture_output=True, text=True, timeout=10,
+        )
+        if inspected.returncode:
+            if "No such object" in inspected.stderr:
+                continue
+            raise RuntimeError(inspected.stderr)
+        info = json.loads(inspected.stdout)[0]
+        labels = info.get("Config", {}).get("Labels") or {}
+        if not (labels.get("com.docker.compose.project") == project
+                or labels.get("com.nvidia.mission-control-showcase.run") == project):
+            raise ValueError(f"container ownership mismatch: {container}")
+        if info["State"]["Running"]:
+            print(f"stop_container={container}", flush=True)
+            if not args.dry_run:
+                subprocess.run(["docker", "stop", container], check=True, timeout=60)
+    isaac = manifest.get("isaac") or {}
+    if process_running(isaac):
+        print(f"stop_isaac_pid={isaac['pid']}", flush=True)
+        if not args.dry_run:
+            os.kill(int(isaac["pid"]), signal.SIGTERM)
+            deadline = time.monotonic() + 30
+            while process_running(isaac) and time.monotonic() < deadline:
+                time.sleep(0.2)
+            if process_running(isaac):
+                raise RuntimeError("Isaac Sim did not exit after SIGTERM")
+    if not args.dry_run:
+        run_state.update(args.work_dir, state="stopped", isaac={"running": False})
+    return 0
+
+
+def finalize(args):
+    """Write one terminal result; cleanup cannot replace an earlier verdict."""
+    manifest = run_state.load(args.work_dir)
+    if manifest.get("state") not in run_state.VERDICT_STATES:
+        if args.exit_code:
+            run_state.update(args.work_dir, state="failed", acceptance={
+                "accepted": False, "reasons": [f"{args.phase}: {args.failed_command}"],
+            }, failure={"phase": args.phase, "command": args.failed_command,
+                        "exit_code": args.exit_code})
+        elif args.demo:
+            health = {}
+            mission, robot = None, None
+            try:
+                port = manifest["ports"]["database_controller_port"]
+                mission = fetch_json(mission_url(port, manifest["mission_id"]))
+                robot = fetch_json(robot_url(port, manifest["robot"]))
+            except (*TRANSIENT_HTTP_ERRORS, KeyError) as exc:
+                health["database_error"] = f"{type(exc).__name__}: {exc}"
+            health.update(runtime_health(manifest))
+            run_state.update(args.work_dir, isaac={"running": health["isaac_running"]},
+                             health=health)
+            identity_matches = (mission or {}).get("name") == manifest.get("mission_id")
+            run_state.accept(
+                args.work_dir,
+                mission_state=((mission or {}).get("status") or {}).get("state")
+                if identity_matches else None,
+                robot_state=((robot or {}).get("status") or {}).get("state"),
+                robot_healthy=robot_is_healthy(robot, manifest["robot"]),
+                oom=health["oom"], processes_healthy=health["processes_healthy"],
+                isaac_running=health["isaac_running"],
+            )
+    path = run_state.write_result(args.work_dir)
+    print(f"run_result={path}")
+    return 1 if run_state.load(args.work_dir).get("state") == "failed" else 0
+
+
 def wait_demo_complete(args):
     """Observe canonical mission fate and independent pose-motion evidence."""
     deadline = time.time() + args.timeout
@@ -387,8 +563,7 @@ def wait_demo_complete(args):
 
         mission_state = (mission.get("status") or {}).get("state")
         robot_status = (robot or {}).get("status", {})
-        robot_errors = robot_status.get("errors") or {}
-        current_pose = numeric_pose(robot)
+        current_pose = numeric_pose(robot) if robot_is_healthy(robot, args.robot_name) else None
         if current_pose is not None:
             if initial_pose is None:
                 initial_pose = current_pose
@@ -401,6 +576,13 @@ def wait_demo_complete(args):
                     or heading >= MIN_MOTION_HEADING_RAD
                 ):
                     moving_pose = current_pose
+        if getattr(args, "work_dir", None) and initial_pose is not None:
+            run_state.record_motion(args.work_dir, {
+                "initial_pose": initial_pose, "moving_pose": moving_pose,
+                "final_pose": current_pose, "max_translation_m": round(max_translation, 4),
+                "max_heading_rad": round(max_heading, 4),
+                "motion_confirmed": moving_pose is not None,
+            })
         last = {"mission": mission_summary(mission)}
         if robot is not None:
             last["robot"] = robot_summary(robot)
@@ -410,7 +592,8 @@ def wait_demo_complete(args):
             if robot is None:
                 time.sleep(2)
                 continue
-            if robot_status.get("state") == "IDLE" and not robot_errors:
+            if (robot_status.get("state") == "IDLE"
+                    and robot_is_healthy(robot, args.robot_name)):
                 motion = {
                     "initial_pose": initial_pose,
                     "moving_pose": moving_pose,
@@ -492,6 +675,25 @@ def build_parser():
         description="Small warehouse Carter showcase helper commands"
     )
     subparsers = parser.add_subparsers(required=True)
+
+    stop_parser = subparsers.add_parser("stop-recorded")
+    stop_parser.add_argument("--work-dir", required=True)
+    stop_parser.add_argument("--dry-run", action="store_true")
+    stop_parser.set_defaults(func=stop_recorded)
+    record_parser = subparsers.add_parser("record-isaac")
+    record_parser.add_argument("--work-dir", required=True)
+    record_parser.add_argument("--pid", type=int, required=True)
+    record_parser.set_defaults(func=record_isaac)
+    health_parser = subparsers.add_parser("check-health")
+    health_parser.add_argument("--work-dir", required=True)
+    health_parser.set_defaults(func=check_health)
+    finalize_parser = subparsers.add_parser("finalize")
+    finalize_parser.add_argument("--work-dir", required=True)
+    finalize_parser.add_argument("--exit-code", type=int, required=True)
+    finalize_parser.add_argument("--phase", required=True)
+    finalize_parser.add_argument("--failed-command", default="")
+    finalize_parser.add_argument("--demo", action="store_true")
+    finalize_parser.set_defaults(func=finalize)
 
     validate_maps_parser = subparsers.add_parser("validate-maps")
     validate_maps_parser.add_argument("--source", required=True)

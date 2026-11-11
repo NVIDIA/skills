@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers who need to run Python training or evaluation scripts directly in a local virtualenv on hosts where Docker is unavailable or unnecessary. <br>
+Developers and engineers who need to run plain-Python training or evaluation scripts natively in an existing local virtualenv, tracked through the submit/status/logs/cancel contract, on hosts where Docker is unavailable or container startup cost is not worthwhile (for example fast smokes and AutoML trial loops). <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -27,6 +27,7 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [Skill configuration (skill_info.yaml)](references/skill_info.yaml) <br>
 - [Virtualenv runner (process lifecycle CLI)](references/virtualenv_runner.py) <br>
+- [Virtualenv group supervisor (process-group cleanup)](references/virtualenv_group_supervisor.py) <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 - [Agent Skills open standard](https://agentskills.io) <br>
 
@@ -44,7 +45,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 1 task (1 positive) across 3 attempts per task in k8s-sandbox environment. <br>
+Evaluated against 1 task (1 positive) with 1 attempt per task in a k8s-sandbox environment, each attempt in its own isolated sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -68,12 +69,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.6% | 72.4% |
+| Overall | 94.7% (no comparable baseline; uplift unavailable) | 75.4% (no comparable baseline; uplift unavailable) |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 20.0% → 100.0% (+80.0 points) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 11.1% → 100.0% (+88.9 points) | 18.3% → 63.3% (+45.0 points) |
-| Efficiency | 73.2% | 99.5% → 98.6% (-0.9 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 0.0% → 100.0% (+100.0 points) |
+| Discoverability | 100.0% (no comparable baseline; uplift unavailable) | 0.0% (no comparable baseline; uplift unavailable) |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 16.7% → 78.3% (+61.6 points) |
+| Efficiency | 73.3% (no comparable baseline; uplift unavailable) | 99.5% → 98.6% (-0.9 points) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

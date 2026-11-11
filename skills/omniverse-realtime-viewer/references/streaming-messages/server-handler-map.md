@@ -5,31 +5,23 @@
 
 ## Server Handler Map
 
-If generating `server/message_handler.py`, keep it small: parse/unpack JSON, select a handler from a dictionary, validate payload defaults, and send a response. Slow USD queries should call a worker/queue rather than blocking the ovstream callback thread. Treat non-app stream messages as ignorable input; browser streaming libraries can send control messages or envelope payloads that are not app JSON.
-
-Robust decode helper:
+Keep the transport adapter small: parse the inner app JSON, validate its shape,
+select a handler, and queue slow queries or runtime commands. WebRTC's
+`on_app_message` already removes the SDK envelope; SHM can feed the same decoder
+with its raw app JSON. Stream-control envelopes do not belong in this dispatcher.
 
 ```python
-def decode_app_message(raw: str | bytes | dict) -> dict | None:
-    if isinstance(raw, bytes):
-        raw = raw.decode("utf-8")
+import json
+
+
+def decode_app_message(raw: str) -> dict | None:
     try:
-        msg = json.loads(raw) if isinstance(raw, str) else raw
-    except json.JSONDecodeError:
+        msg = json.loads(raw)
+    except (TypeError, json.JSONDecodeError):
         return None
-    if not isinstance(msg, dict):
+    if not isinstance(msg, dict) or not isinstance(msg.get("event_type"), str):
         return None
-
-    if "messageType" in msg and "data" in msg:
-        data = msg["data"]
-        try:
-            msg = json.loads(data) if isinstance(data, str) else data
-        except json.JSONDecodeError:
-            return None
-        if not isinstance(msg, dict):
-            return None
-
-    if "event_type" not in msg:
+    if not isinstance(msg.get("payload", {}), dict):
         return None
     return msg
 ```
@@ -56,23 +48,30 @@ self._handlers = {
 }
 ```
 
-Send helper:
+WebRTC/native send helper (use raw `send_message` for a SHM adapter):
 
 ```python
-def send_event(stream_server, event_type: str, payload: dict) -> None:
-    if not stream_server or not stream_server.is_client_connected:
+def send_event(stream_server, event_type: str, payload: dict, *, reply=False) -> None:
+    if not stream_server or (not reply and not stream_server.is_client_connected):
         return
     try:
-        stream_server.send_message(json.dumps({"event_type": event_type, "payload": payload}, default=str))
+        stream_server.send_app_message(json.dumps({"event_type": event_type, "payload": payload}, default=str))
     except Exception:
-        logger.debug("Dropping event during disconnect: %s", event_type, exc_info=True)
+        if stream_server.is_client_connected:
+            raise
+        logger.debug("Dropping event after disconnect: %s", event_type, exc_info=True)
 ```
 
 For a `MessageHandler` wrapper, apply the guard to the underlying ovstream server:
 
 ```python
-def send_message(self, event_type: str, payload: Dict[str, Any]) -> None:
-    send_event(self.server._stream_server, event_type, payload)
+def send_message(self, event_type: str, payload: Dict[str, Any], *, reply=False) -> None:
+    send_event(self.server._stream_server, event_type, payload, reply=reply)
 ```
+
+Pass `reply=True` for responses to app requests, which can arrive before the
+connected callback. Route persistent send failures to the session error handler.
+The wrapper name `send_message` is app-owned, not the raw
+ovstream method.
 
 If generating `server/pxr_worker.py`, make it a stateful JSON-lines worker with pure USD commands such as `load`, `get_children`, `get_properties`, `get_prim_count`, `get_variants`, and `get_root_prim_path`. It should not import ovstream or mutate renderer state.

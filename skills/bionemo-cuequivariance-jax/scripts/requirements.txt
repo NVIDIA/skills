@@ -1,0 +1,6 @@
+# CPU evaluation baseline for the APIs documented in this skill.
+# Match evals/config.yml and the tested Python 3.11-compatible release stack.
+cuequivariance==0.13.0
+cuequivariance-jax==0.13.0
+jax==0.10.2
+flax==0.12.7

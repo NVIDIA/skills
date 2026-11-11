@@ -17,7 +17,9 @@ documentation.
 
 ## Native Selection Model
 
-- Enable the native selection outline pass when creating the renderer.
+- Native selection outlines are enabled by default in current OVRTX. Set the
+  creation-time flag explicitly only when the viewer needs a stable visual
+  contract, or set it to `False` to disable the pass.
 - Assign non-zero selection group IDs to selected prims.
 - Write group `0` to clear a prim.
 - Configure outline width and fill mode at renderer creation.
@@ -177,6 +179,9 @@ On scene switch, reload, or renderer reset:
   the old selection state when practical.
 - Recreate renderer-level outline configuration if the renderer is recreated.
 - Reapply default group styles after creating a new renderer.
+- When same-scene population preserves selection intent, reapply its groups
+  after the new stage publication has completed its renderer update and before
+  rendering. Population can recreate the renderer-owned prim state.
 
 ## Gotchas
 

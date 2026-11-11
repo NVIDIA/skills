@@ -91,12 +91,24 @@ count against `max_iterations`.
    exclude Proxy and Benchmark targets.
 7. Run `validate_sharegpt.py --require-files` and
    `validate_split_contract.py` against the assembled Train file, passing
-   `--synthetic` when AnomalyGen produced records this iteration and
+   `--synthetic` when AnomalyGen produced records this iteration,
+   `--manifest RESULTS_DIR/manifests/benchmark_manifest.json`, and
    `--previous-train train_iter_<N-1>.json` for N>1. The latter makes historical
    records eligible while proving that the current Train retained all of them.
-8. Retrain, then Benchmark-evaluate/gate. Stop when the gate passes or
+8. Framework-train to a native DCP, then Benchmark-evaluate that DCP and gate. Stop when the gate passes or
    `N = max_iterations`. Only when the loop continues, Proxy-evaluate and run
    RCCA to seed the next iteration's routing.
+
+After approval and before the baseline gate, prepare the selected native Omni
+reasoner once as a Qwen3-VL safetensors PTM with the model skill's
+`prepare_cosmos3_vlm_checkpoint.py`, or let that helper validate and reuse the
+same provenance-bearing prepared output. Framework baseline Evaluate and Train
+consume that PTM. Iteration evaluation consumes the native DCP, Train's saved
+Hydra `config.yaml`, and the same prepared PTM as the vision checkpoint; there
+is no additional post-Train checkpoint-conversion stage.
+Pass helper `--backend cosmos-framework`; its `--runtime-image` and
+`--runtime-image-digest` use the same immutable Framework image that runs Train,
+Evaluate, and Inference.
 
 Training data is monotonic after its creation: `train_iter_1.json` contains
 only newly mined and newly generated, validated records; `train_iter_<N>.json`
@@ -109,6 +121,8 @@ and newly generated, validated records.
 `init_deft_state.py`, then mutate it only through `commit_stage.py`; never
 hand-edit or reinitialize it. It contains:
 
+- state schema version 6, the prepared Qwen3-VL PTM path, and the immutable
+  Framework image/digest;
 - immutable run identity, results directory, metric contract, execution
   policy, selected Python, and maximum iterations;
 - platform, model, image, spec, annotation, media-root, compute, and mining
@@ -134,7 +148,8 @@ All paths are absolute.
 ```bash
 "$PYTHON" "$SKILL_ROOT/scripts/commit_stage.py" \
   --results-dir "$RESULTS_DIR" --iter-label iter1 --stage train \
-  --best-ckpt "$RESULTS_DIR/iter1/train/safetensors/epoch_10" \
+  --best-ckpt "$RESULTS_DIR/iter1/train/checkpoints/epoch_10" \
+  --framework-config "$RESULTS_DIR/iter1/train/config.yaml" \
   --training-spec "$WORKSPACE/specs/train_spec.toml" \
   --duration-sec "$STAGE_DURATION_SEC" \
   --summary "first mined-data Cosmos3 LoRA SFT completed"

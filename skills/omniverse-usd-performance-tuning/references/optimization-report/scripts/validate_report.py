@@ -103,6 +103,9 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import descent_convergence_common as dcc  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from component_scope import identity_change_authorized, retains_boundary, validate_scope
+
 DEFAULT_SCHEMA = Path(__file__).resolve().parent / "optimization-report.schema.json"
 #: The validator-concept registry is the single source of truth for which concepts
 #: are safety gates (``role: safety_gate``). It ships in the sibling
@@ -118,7 +121,7 @@ DEFAULT_VALIDATOR_CONCEPTS = (
 #: (or a target with no entry at all) keeps ``target_coverage.complete`` false and
 #: the report non-final — mirroring the validation report's RESOLVED_STATUSES.
 PHASE4_RESOLVED_DISPOSITIONS = frozenset(
-    {"optimized", "skipped_zero_meshes", "skipped_user_declined"}
+    {"optimized", "exact_cache_hit", "normalized_cache_hit", "product_identity_hit", "verified_unchanged", "skipped_zero_meshes", "skipped_user_declined"}
 )
 RESTRUCTURE_TARGET_CLASSES = frozenset(
     {"prototype", "shared_layer", "loadable_subasset", "assembly_root"}
@@ -133,7 +136,7 @@ IDENTITY_DESTROYING_ROUTES = frozenset({"point_instance", "merge"})
 STRONG_IDENTITY_SIGNALS = frozenset({"kind", "naming", "semantic"})
 #: The structural-fallback grain: identity is absent, so the coarsest repeating
 #: subtree proposed the boundary. Weak identity, but a LEGAL shared-frontier basis —
-#: this is the escape hatch ``select_frontier.py`` grants and the value it emits.
+#: this value records a declared structural grouping without product identity.
 STRUCTURAL_FALLBACK_SIGNAL = "structural_fallback"
 #: Every identity_signal the apply-restructure manifest schema admits. Anything
 #: else (a typo, an invented spelling) is rejected rather than waved through: the
@@ -170,7 +173,7 @@ RESTRUCTURE_ROLES = dcc.RESTRUCTURE_ROLES
 
 
 def _is_number(value: Any) -> bool:
-    """True for a real JSON number. ``bool`` is an ``int`` in Python and is not one."""
+    """True for a real JSON number. Python counts a bool as an int; JSON does not."""
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
@@ -237,39 +240,21 @@ def validate_report(report: Any, schema: dict | None = None) -> list[str]:
 
 
 def _validate_frontier_entry(target: dict, label: str) -> list[str]:
-    """Enforce the reuse/descent frontier contract on a single phase4_targets[] entry (C3).
+    """Check boundary evidence and scope without requiring the USD runtime.
 
-    These checks are conditional on the frontier fields being present, so a
-    minimal (path / target_class / mesh_count) manifest is unaffected. When the
-    frontier metadata IS authored the contract makes a bad descent FAIL, not
-    merely be discouraged in prose:
-
-    * a shared (externalize_shared / internal_share) or identity-destroying
-      (point_instance / merge) entry must carry an ``identity_signal`` (the
-      queryable boundary basis), and that signal must be one the manifest schema
-      admits;
-    * a shared entry must land on a strong (kind / naming / semantic) unit or on
-      the ``structural_fallback`` grain — landing on anonymous meshes
-      (``identity_signal == "none"``) fails, because the descent crossed from
-      parts into triangles;
-    * an identity-destroying ``reduction_route`` on a STRONG-identity unit
-      (kind / naming / semantic) fails — point_instance / merge are the matrix's
-      two weak-identity-only rows — UNLESS the entry carries
-      ``intent_confirmed: true``.
-
-    The two exemptions (the ``structural_fallback`` grain and ``intent_confirmed``)
-    are the ones ``select_frontier.py`` already grants on the producer side. They
-    are honoured here so a descent the producer deliberately allows does not fail
-    its own report gate at the end of the run.
+    A retained interior merge preserves the named parent. Unscoped merges and
+    point-instancer conversion retain the historical identity-change guard.
+    Legacy manifests without additive scope fields remain readable.
     """
     errors: list[str] = []
     disposition = target.get("identity_disposition")
     route = target.get("reduction_route")
     signal = target.get("identity_signal")
-    intent_confirmed = bool(target.get("intent_confirmed"))
+    intent_confirmed = target.get("intent_confirmed") is True or identity_change_authorized(target)
 
     is_shared = disposition in SHARED_IDENTITY_DISPOSITIONS
-    is_destroying = route in IDENTITY_DESTROYING_ROUTES
+    errors.extend(f'{label}: {error}' for error in validate_scope(target))
+    is_destroying = route in IDENTITY_DESTROYING_ROUTES and not retains_boundary(target)
 
     if (is_shared or is_destroying) and not signal:
         errors.append(
@@ -433,18 +418,22 @@ def load_recorded_manifests(
     return labeled, errors
 
 
-def _manifest_targets(manifests: list[Any]) -> dict[str, int | None]:
-    """Union of every manifest's phase4_targets path -> authoritative mesh_count.
+def _coverage_key(record):
+    return (record["path"], record.get("definition_id", ""))
+
+
+def _manifest_targets(manifests: list[Any]) -> dict[tuple[str, str], int | None]:
+    """Union of each layer/definition identity and its authoritative mesh count.
 
     Multi-iteration runs must reconcile against the UNION: the exact regression
     that prompted this gate was iteration 1 listing an assembly_root that
     iteration 2's manifest dropped, leaving it uncovered by the final report.
     """
-    planned: dict[str, int | None] = {}
+    planned: dict[tuple[str, str], int | None] = {}
     for manifest in manifests:
         for target in manifest.get("phase4_targets", []) or []:
             if isinstance(target, dict) and isinstance(target.get("path"), str):
-                planned[target["path"]] = target.get("mesh_count")
+                planned[_coverage_key(target)] = target.get("mesh_count")
     return planned
 
 
@@ -542,6 +531,15 @@ def validate_footprint(report: Any) -> list[str]:
     ):
         observed_raw = raw_delta if isinstance(raw_delta, (int, float)) and not isinstance(raw_delta, bool) else _pct_change(raw, optimized)
         if observed_raw is not None and observed_raw < -_FOOTPRINT_STRUCTURAL_EPSILON_PCT:
+            storage_metrics=[row for row in report.get('metrics',[]) if isinstance(row,dict)
+                             and row.get('category')=='storage_proxy' and row.get('name') not in ('raw_referenced_storage_bytes', 'scene_storage_bytes', 'reuse_overhead_bytes')]
+            storage_groups=[row for row in report.get('metric_groups',[]) if isinstance(row,dict) and row.get('id')=='storage_proxy']
+            honest=(any(row.get('before')==normalized and row.get('after')==optimized and row.get('verdict') in ('neutral','regressed')
+                        for row in storage_metrics)
+                    and isinstance(report.get('optimization_score'),(int,float)) and report['optimization_score']<=5
+                    and storage_groups and all(isinstance(row.get('score'),(int,float)) and row['score']<=5 for row in storage_groups))
+            if honest:
+                return errors
             errors.append(
                 f"footprint: raw->optimized shows {observed_raw:.2f}% but the structural "
                 f"reduction off the repack-normalized baseline is only {structural_delta:.2f}% "
@@ -715,6 +713,28 @@ def validate_safety_gate(report: Any, concepts_path: Path | None = None) -> list
     return errors
 
 
+SCORE_INTERPOLATION = (
+    "Piecewise linear storage score: reductions of 10%, 25%, 50%, 75% map to "
+    "6, 7, 8.5, 10; changes within ±5% map to 5. Regression convention: "
+    "increases of 10%, 20%, 100% map to 3, 1, 0. This proxy does not measure usability."
+)
+
+
+def score_from_change(change_pct: float) -> float:
+    """Score a lower-is-better measurement using the documented report anchors."""
+    import math
+    if not math.isfinite(change_pct):
+        raise ValueError('A score requires a finite measured percentage change')
+    anchors = [(-75., 10.), (-50., 8.5), (-25., 7.), (-10., 6.),
+               (-5., 5.), (5., 5.), (10., 3.), (20., 1.), (100., 0.)]
+    if change_pct <= anchors[0][0]:
+        return anchors[0][1]
+    for (left, first), (right, last) in zip(anchors, anchors[1:]):
+        if change_pct <= right:
+            return round(first + (last-first)*(change_pct-left)/(right-left), 1)
+    return anchors[-1][1]
+
+
 def score_band(score: float) -> str:
     """The documented ``score_label`` band for a numeric ``optimization_score``."""
     for label, lower_bound in SCORE_BANDS:
@@ -812,11 +832,16 @@ def reconcile_target_coverage(report: Any, manifests: list[Any] | None = None) -
     if not isinstance(coverage, dict):
         return ["target_coverage missing or not an object"]
     entries = coverage.get("entries", [])
-    by_path: dict[str, dict[str, Any]] = {}
+    by_path: dict[tuple[str, str], dict[str, Any]] = {}
     for entry in entries:
         if isinstance(entry, dict) and isinstance(entry.get("path"), str):
-            by_path[entry["path"]] = entry
+            key = _coverage_key(entry)
+            if key in by_path:
+                errors.append(f"duplicate target_coverage definition entry: {key}")
+            by_path[key] = entry
 
+    checker = None
+    native_contract = any(m.get('schema_version') == 2 for m in (manifests or []))
     for entry in entries:
         path = entry.get("path", "<unknown>")
         disposition = entry.get("disposition")
@@ -826,6 +851,16 @@ def reconcile_target_coverage(report: Any, manifests: list[Any] | None = None) -
                 f"target_coverage entry {path}: skipped_zero_meshes requires "
                 f"mesh_count == 0, got {mesh_count!r} (a non-zero target cannot be skipped)"
             )
+        if disposition == "skipped_zero_meshes" and entry.get("geometry_count", mesh_count) != 0:
+            errors.append(f"target_coverage entry {path}: zero meshes does not establish empty geometry")
+        if disposition == "verified_unchanged" or (native_contract and disposition == "optimized"):
+            if checker is None:
+                import importlib.util
+                checker_spec = importlib.util.spec_from_file_location("report_conformance", Path(__file__).with_name("structure_conformance.py"))
+                checker = importlib.util.module_from_spec(checker_spec)
+                checker_spec.loader.exec_module(checker)
+            for error in checker.check_definition_result(entry, require_categories=native_contract):
+                errors.append(f"target_coverage entry {path}: {error}")
         # No-op-masquerading-as-optimized: an entry that claims the mesh op chain
         # ran must have touched at least one mesh when the target has meshes.
         optimized_mesh_count = entry.get("optimized_mesh_count")
@@ -885,7 +920,7 @@ def reconcile_target_coverage(report: Any, manifests: list[Any] | None = None) -
     elif not all_resolved:
         errors.append(
             "target_coverage.complete is true but some entries are unresolved "
-            "(only optimized | skipped_zero_meshes | skipped_user_declined count as resolved)"
+            "(only optimized | exact_cache_hit | normalized_cache_hit | product_identity_hit | verified_unchanged | skipped_zero_meshes | skipped_user_declined count as resolved)"
         )
 
     if manifests:
@@ -990,9 +1025,28 @@ def validate_descent_convergence(report: Any, manifests: list[Any] | None = None
                 "descent was declared complete while shareable reuse remained one level down"
             )
 
+    # The integrated schema-2 scanner inspects the complete nested definition
+    # graph once. Recompute its coverage evidence instead of requiring a legacy
+    # iterative frontier or pretending that a terminal rescan was performed.
+    recursive_complete = False
+    if manifests and all(m.get("schema_version") == 2 for m in manifests):
+        import importlib.util
+        path = Path(__file__).resolve().parents[2] / "usd-structure-assessment/scripts/structure_assessment.py"
+        spec = importlib.util.spec_from_file_location("report_discovery_evidence", path)
+        discovery = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(discovery)
+        checks = [discovery.check_discovery_evidence(m) for m in manifests]
+        recursive_complete = (report.get("target_coverage", {}).get("complete") is True
+                              and all(check["passed"] for check in checks))
+        if not recursive_complete:
+            errors.append("recursive assessment coverage incomplete: " + str(
+                [check["errors"] for check in checks if not check["passed"]]
+                or "target coverage is incomplete"))
+        return errors
+
     # FF1 — geometry op ran on a dedup/instancing run with no recorded convergence
     if dcc.did_dedup(report, manifests) and dcc.did_phase4_geom(report):
-        if not any(dcc.is_converged_or_waived(frontier) for _, frontier in states):
+        if not recursive_complete and not any(dcc.is_converged_or_waived(frontier) for _, frontier in states):
             errors.append(
                 "descent-convergence gate: a Phase-4 geometry op (decimation / "
                 "within-prototype merge / primitive-fit / quantization / topology edit) "
@@ -1006,6 +1060,28 @@ def validate_descent_convergence(report: Any, manifests: list[Any] | None = None
                 "running geometry ops first fuses or coarsens geometry that further sharing "
                 "would have collapsed (premature-merge inflation)."
             )
+    return errors
+
+
+def validate_completed_report(report: Any, manifests: list[Any] | None = None,
+                              validator_concepts: Path | None = None,
+                              schema: dict | None = None) -> list[str]:
+    """Apply the same complete report contract to API and CLI results.
+
+    Callers load referenced manifests before invoking this function; the CLI
+    additionally reports failures to load its recorded manifest paths.
+    """
+    manifests = manifests or []
+    errors = validate_report(report, schema)
+    for index, manifest in enumerate(manifests):
+        errors.extend(f"manifest[{index}]: {message}"
+                      for message in validate_manifest_structure(manifest))
+    errors.extend(reconcile_target_coverage(report, manifests))
+    errors.extend(validate_footprint(report))
+    errors.extend(validate_preservation(report))
+    errors.extend(validate_safety_gate(report, validator_concepts))
+    errors.extend(validate_score_arithmetic(report))
+    errors.extend(validate_descent_convergence(report, manifests))
     return errors
 
 
@@ -1035,7 +1111,7 @@ def main() -> int:
 
     report = json.loads(args.report.read_text(encoding="utf-8"))
     schema = json.loads(args.schema.read_text(encoding="utf-8"))
-    errors = validate_report(report, schema)
+    errors: list[str] = []
 
     labeled: list[tuple[str, Any]] = []
     for manifest_path in args.manifest:
@@ -1044,16 +1120,8 @@ def main() -> int:
     errors.extend(load_errors)
     labeled.extend(recorded)
 
-    for label, manifest in labeled:
-        errors.extend(f"{label}: {msg}" for msg in validate_manifest_structure(manifest))
-
     manifests = [manifest for _, manifest in labeled]
-    errors.extend(reconcile_target_coverage(report, manifests))
-    errors.extend(validate_footprint(report))
-    errors.extend(validate_preservation(report))
-    errors.extend(validate_safety_gate(report, args.validator_concepts))
-    errors.extend(validate_score_arithmetic(report))
-    errors.extend(validate_descent_convergence(report, manifests))
+    errors.extend(validate_completed_report(report, manifests, args.validator_concepts, schema))
 
     if errors:
         print(f"{args.report}: INVALID ({len(errors)} error(s))")

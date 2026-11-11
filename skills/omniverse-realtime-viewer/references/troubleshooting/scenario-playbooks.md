@@ -18,6 +18,19 @@ Check first:
 - A GPU is visible and the selected CUDA device is not already held by a stale Omniverse Realtime Viewer process.
 - Signaling and media ports are available.
 
+For a native startup stall, reduce to a fresh-process probe with the same
+packages and no UI, transport, or `pxr` imports. Record versions and elapsed
+before/after markers around registration, renderer/stage creation, attachment,
+population/publication, first step, output mapping, and teardown. Bound the
+process and capture the stack at the first incomplete phase; allow the existing
+300-second cold-cache budget for the first step. An attachment stall is not
+first-step shader warmup. Compare initialization orders only in fresh processes
+and against the selected upstream example; retain the failing/passing evidence
+rather than treating one host's workaround as a universal SDK requirement.
+A failed `nvidia-smi` query or display-related Vulkan warning alone does not
+establish that headless rendering is unavailable; identify the failing runtime
+call before requesting host changes.
+
 Logs to inspect:
 
 - Python server stdout/stderr, including ovrtx construction and ovstream initialize logs.
@@ -62,12 +75,11 @@ Check first:
 - DirectConfig sets explicit fixed `width`, `height`, `codec: 'H264'`, and
   `codecList: ['H264']` unless a verified deployment profile selected another
   codec.
-- The frontend uses `server` and `signalingPort`, not `signalingServer`.
-- The frontend uses standalone ovstream Direct config: `server` and
+- The frontend uses standalone ovstream Direct config: `signalingServer` and
   `signalingPort`.
 - The frontend does not set `mediaServer`, `mediaPort`, `signalingPath`, or
   auth/session fields in `DirectConfig`. If an orchestrator launches the
-  container, map its exposed endpoint to `server` and `signalingPort`.
+  container, map its exposed endpoint to `signalingServer` and `signalingPort`.
 - Local development uses `webrtc_public_ip=127.0.0.1` or an explicitly reachable LAN IP.
 - Only one WebRTC client is connected unless the server intentionally replaces the old session.
 - For Tableau or another embedded host, run the H264 preflight before connect and record whether the page is framed and whether `navigator.mediaCapabilities.decodingInfo` is exposed. Its absence is an embed-host diagnostic, not an automatic codec failure.
@@ -142,7 +154,7 @@ Check first:
   capture a desktop screenshot of the window.
 - Verify the image widget has nonzero computed size, visible opacity, and is not
   covered by an opaque overlay.
-- Verify ovui style colors use `0xAARRGGBB`, not another byte order.
+- Build ovui style colors with `ui.color("#RRGGBB")`; integer colors are `0xAABBGGRR`.
 - Verify only one owner calls `renderer.step()`, and no step overlaps
   `open_usd*`, reference mutation, or `reset_stage()`.
 
@@ -204,8 +216,8 @@ Usual fixes:
 Check first:
 
 - Frontend sends only after streaming status is connected.
-- Streaming status `connected` is set after `AppStreamer.connect()` resolves;
-  `onStart` is only the video-decoding/live signal.
+- Streaming status `connected` follows confirmed SDK start success; see
+  [client readiness](../streaming-client/README.md#appstreamer-direct-api). Prove decoded frames separately.
 - Server send helper checks that a client is connected before `send_message`.
 - The server unwraps browser library messages that contain `messageType`, `messageRecipient`, and nested `data`.
 - Exact event names match on both sides: `openStageResult`, `getChildrenResult`, `stageSelectionChanged`, `getPropertiesResponse`.
@@ -222,8 +234,8 @@ Logs to inspect:
 Usual fixes:
 
 - Unwrap the AppStreamer envelope before reading `event_type`.
-- Move initial `openStageRequest` and viewport app commands behind the resolved
-  `AppStreamer.connect()` Promise, not behind `onStart`.
+- Send initial `openStageRequest` and viewport app commands after confirmed SDK
+  start success, without waiting for a decoded scene frame.
 - Add one shared message-name reference and update both frontend and server routers.
 - Push current stage, hierarchy root, selection, loading state, and render settings after a reconnect.
 - Queue slow work for the render/runtime thread.
@@ -236,7 +248,7 @@ Check first:
 - Black frame means invalid camera relation, bad camera transform, missing resolution, wrong RenderVar `sourceName`, or wrong RenderProduct path.
 - Magenta materials mean MDL resolver paths are wrong, usually missing `OVRTX_BIN_PATH` or plugin library path.
 - Frozen frame means `renderer.step()` stopped, a buffer lifetime bug exists, or the browser is still connected to an old session.
-- Invalid output-handle errors usually mean a frame or mapped render var view outlived its `RenderProductSetOutputs`.
+- For invalid output-handle errors, check output and renderer lifetimes; pass owned copies from inside each RenderVar map context to downstream consumers.
 - Stale GPU hangs after crashes usually mean an old Python process still owns GPU resources.
 - GPU utilization can show 0% during first-run shader compilation; inspect logs before assuming a graphics hang.
 

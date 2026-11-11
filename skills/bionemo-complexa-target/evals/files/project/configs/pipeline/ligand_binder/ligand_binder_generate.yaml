@@ -1,0 +1,161 @@
+# Binder Generation Configuration
+#
+# Search algorithms, reward models, and filtering for binder generation.
+
+defaults:
+  - /targets/ligand_targets_dict@_here_
+  - /pipeline/base_gen_data@_here_
+  - /pipeline/model_sampling@_here_
+  - _self_
+
+# =============================================================================
+# Target and dataloader
+# =============================================================================
+task_name: 39_7V11_LIGAND
+
+dataloader:
+  batch_size: 16
+  dataset:
+    task_name: ${...task_name}
+    nres:
+      _target_: proteinfoundation.datasets.gen_dataset.UniformInt
+      low: ${....target_dict_cfg.${..task_name}.binder_length[0]}
+      high: ${oc.select:....target_dict_cfg.${..task_name}.binder_length.1,null}
+      nsamples: 2
+      endpoint: true
+    nrepeat_per_sample: 1
+    conditional_features:
+      - _target_: proteinfoundation.datasets.gen_dataset.LigandFeatures
+        task_name: ${...task_name}
+        pdb_path: ${oc.select:.....target_dict_cfg.${.task_name}.target_path,${oc.env:DATA_PATH}/target_data/${.....target_dict_cfg.${.task_name}.source}/${.....target_dict_cfg.${.task_name}.target_filename}.pdb}
+        ligand: ${.....target_dict_cfg.${.task_name}.ligand}
+        ligand_only: ${.....target_dict_cfg.${.task_name}.ligand_only}
+        SMILES: ${.....target_dict_cfg.${.task_name}.SMILES}
+        use_bonds_from_file: ${.....target_dict_cfg.${.task_name}.use_bonds_from_file}
+    transforms:
+      - _target_: proteinfoundation.datasets.transforms.CoordsTensorCenteringTransform
+        tensor_name: "x_target"
+        mask_name: "target_mask"
+        data_mode: "ligand_only"
+
+# =============================================================================
+# Search algorithm
+# =============================================================================
+search:
+  algorithm: best-of-n  # Options: single-pass, best-of-n, beam-search, fk-steering, mcts
+  max_batch_size: ${..dataloader.batch_size}  # Max samples per forward pass during search; inherits from dataloader batch_size
+  reward_threshold: null  # Also used during search to filter lookahead samples
+
+  # Shared step checkpoints for search algorithms
+  step_checkpoints: [0, 100, 200, 300, 400]
+
+  # Algorithm-specific settings
+  best_of_n:
+    replicas: 2
+
+  beam_search:
+    n_branch: 4
+    beam_width: 4
+    keep_lookahead_samples: true
+
+  fk_steering:
+    n_branch: 4
+    beam_width: 4
+    temperature: 0.1
+    keep_lookahead_samples: true
+
+  mcts:
+    n_simulations: 20
+    exploration_prob: 0.5
+    exploration_constant: 1.0
+    keep_lookahead_samples: true
+
+# =============================================================================
+# Reward model
+# =============================================================================
+# Used for scoring samples or guiding search.
+reward_model:
+  _target_: "proteinfoundation.rewards.base_reward.CompositeRewardModel"
+  reward_models:
+    rf3folding:
+      _target_: "proteinfoundation.rewards.rf3_reward.RF3RewardRunner"
+      ckpt_path: ${oc.env:RF3_CKPT_PATH}
+      rf3_path: ${oc.env:RF3_EXEC_PATH}
+      normalize_pae: true   # Divide PAE-family metrics by 31 so weights are on 0-1 scale
+      reward_weights:
+        min_ipAE: -1.0      # Lower ipAE is better, so negative weight
+        plddt: 0.0
+        ipAE: 0.0
+        mean_min_ipAE: 0.0
+        mean_ipAE: 0.0
+        min_mean_ipAE: 0.0
+        pAE: 0.0
+        ipTM: 0.0
+        pTM: 0.0
+        ranking_score: 0.0
+        has_clash: 0.0      # 1.0 if clash detected; use negative weight to penalize
+        min_ipSAE: 0.0      # ipSAE metrics (0-1, higher is better)
+        max_ipSAE: 0.0
+        avg_ipSAE: 0.0
+
+    # # TMOL reward model (TMOL support for ligand binders is not supported yet)
+    # tmol:
+    #   _target_: "proteinfoundation.rewards.tmol_reward.TmolRewardModel"
+    #   enable_hbond: true
+    #   enable_elec: false
+    #   hbond_weight: 1.0
+    #   elec_weight: 1.0
+    #   reward_type: "interaction_count"
+    #   energy_threshold: -0.6
+
+    # bioinformatics:
+    #   _target_: "proteinfoundation.rewards.bioinformatics_reward.BioinformaticsRewardModel"
+    #   reward_weights:
+    #     surface_hydrophobicity: 0.0
+    #     interface_sc: 1.0
+    #     interface_dSASA: 0.0
+    #     interface_fraction: 0.0
+    #     interface_hydrophobicity: 1.0
+    #     interface_nres: 0.0
+    #   reward_thresholds:
+    #     surface_hydrophobicity: 0.35
+    #     interface_sc: 0.55
+    #     interface_dSASA: 1.0
+    #     interface_fraction: null
+    #     interface_hydrophobicity: null
+    #     interface_nres: 7
+    #   reward_threshold_modes:
+    #     surface_hydrophobicity: min
+    #     interface_sc: max
+    #     interface_dSASA: max
+    #     interface_fraction: max
+    #     interface_hydrophobicity: max
+    #     interface_nres: max
+    #   structure_source: null
+
+  # weights: #if empty default to 1
+  #   rf3folding: 1.0
+  #   tmol: 1.0
+  #   bioinformatics: 1.0
+
+# =============================================================================
+# Post-generation filtering (used by filter.py)
+# =============================================================================
+filter:
+  filter_samples_limit: 1000
+  delete_non_top_n_samples: true
+  dedup_sequence: true
+  reward_threshold: null
+
+# =============================================================================
+# Refinement
+# =============================================================================
+refinement:
+  algorithm: null  # Options: null, gradient_ascent, sequence_hallucination
+  enable_soft_optimization: false
+  enable_greedy_optimization: true
+  n_temp_iters: 45
+  n_hard_iters: 5
+  n_recycles: 3
+  n_greedy_iters: 15
+  greedy_percentage: 1

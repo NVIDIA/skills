@@ -1,0 +1,99 @@
+{
+  "repository": "https://github.com/NVlabs/FastGen",
+  "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "scope": "Complete unchanged released files for each patch target; bounded caller excerpts are trace context only. Patch targets are repository_path values. Existing tests and usage are task source context, not evaluator assertions. CONTRIBUTING.md is separately identified current authored policy.",
+  "sources": [
+    {
+      "fixture": "inference_text_reader.py.txt",
+      "repository_path": "scripts/inference/inference_utils.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/scripts/inference/inference_utils.py",
+      "source_sha256": "4d48f270bf252f54b39cff73efb3033feff89f4c2a32e31fc84630f0a1fa8994",
+      "line_ranges": [
+        [
+          1,
+          588
+        ]
+      ],
+      "fixture_sha256": "4d48f270bf252f54b39cff73efb3033feff89f4c2a32e31fc84630f0a1fa8994",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "image_text_callers.py.txt",
+      "repository_path": "scripts/inference/image_model_inference.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/scripts/inference/image_model_inference.py",
+      "source_sha256": "cd540a43ddf8392a1c4ca8d72f786a88206180b60c32d542bee4af7f49185a0d",
+      "line_ranges": [
+        [
+          66,
+          94
+        ]
+      ],
+      "fixture_sha256": "1cdf7605bf6d9c1cbd6772743c42231a1ef3b08ed90fe2d84aa772504880274e",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "video_text_callers.py.txt",
+      "repository_path": "scripts/inference/video_model_inference.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/scripts/inference/video_model_inference.py",
+      "source_sha256": "f0ced886e4e5dd8ccc226d015ac2b8b6e8ea9c5e79a42d45dba13974bd512da0",
+      "line_ranges": [
+        [
+          112,
+          122
+        ]
+      ],
+      "fixture_sha256": "10abf302ceb15c7720642ae3a7af4a56e12475011e66df948ee9940013e347b2",
+      "kind": "source_excerpt"
+    },
+    {
+      "fixture": "inference_text_tests.py.txt",
+      "repository_path": "tests/test_inference_scripts.py",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/tests/test_inference_scripts.py",
+      "source_sha256": "2d3fdab6b1eb2f7fdb4fc62c32fec50dad1c8008e7089d48e488592b66150d42",
+      "line_ranges": [
+        [
+          1,
+          3000
+        ]
+      ],
+      "fixture_sha256": "2d3fdab6b1eb2f7fdb4fc62c32fec50dad1c8008e7089d48e488592b66150d42",
+      "kind": "complete_source"
+    },
+    {
+      "fixture": "inference_usage.md.txt",
+      "repository_path": "scripts/README.md",
+      "revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+      "source_url": "https://github.com/NVlabs/FastGen/blob/e0a92619fc56daf4dfa081273c7729c045bf1dcc/scripts/README.md",
+      "source_sha256": "c34d4126346c93556c98110eeadca98c2dcbf0935b0c6b13781226ac18cc406a",
+      "line_ranges": [
+        [
+          1,
+          236
+        ]
+      ],
+      "fixture_sha256": "c34d4126346c93556c98110eeadca98c2dcbf0935b0c6b13781226ac18cc406a",
+      "kind": "complete_source"
+    }
+  ],
+  "authored_policy": {
+    "fixture": "CONTRIBUTING.md",
+    "repository_path": "CONTRIBUTING.md",
+    "origin": "Current authored contribution policy in task repository, not the released revision",
+    "line_ranges": [
+      [
+        31,
+        73
+      ],
+      [
+        88,
+        94
+      ]
+    ],
+    "source_sha256": "61921535130991a8c75b6b832eb68c0ed8df3beb46609f6dd10f28452496cff8",
+    "fixture_sha256": "f29fec08d72a8a029eab524e205566a57568b8f0943a14477797f060d7e59b61"
+  }
+}

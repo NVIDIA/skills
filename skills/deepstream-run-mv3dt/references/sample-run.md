@@ -42,7 +42,7 @@ fi
 echo "MV3DT_RUN_MODE=${MV3DT_RUN_MODE}"
 ```
 
-For `display`, ask before changing host display access, then use the quick-start scripts. These scripts show OSD/BEV windows but do not save the tiled DeepStream MP4 because they do not enable the file-output sink.
+For `display`, ask before changing host display access, then use the config-generation and Docker launch below with `MV3DT_RUN_MODE=display`. The shipped quick-start scripts use broad container permissions; do not invoke them from this skill.
 
 Before changing X11 access, warn that disabling all X11 access control can let other clients capture the screen, inject input, or interfere with GUI apps. Do not use an allow-all X11 command for routine runs. Prefer a scoped local entry and remove it after the run:
 
@@ -55,65 +55,44 @@ xhost -SI:localuser:root 2>/dev/null || true
 
 For `headless`, explain that OSD/BEV windows will not appear and use saved outputs by default. Generate configs with `--enable-file-output` and `--enable-msg-broker`. The DeepStream MP4 is the tiled camera output only; BEV is a separate Kafka-derived artifact. Start the headless BEV capture from `visualization-metadata.md` immediately before the Docker launch attempt expected to run, after config/security/startup blockers are resolved. If Docker must be retried after capture starts, stop that capture and start a fresh one for the retry.
 
-## Display Launch Commands
+## Launch Inputs (Display And Headless)
 
-For agent-managed display runs, wrap the repo quick-start script so BEV visualizer processes created by that script are stopped after DeepStream exits. This keeps user-started BEV windows untouched while cleaning up current-run windows.
-
-```bash
-cd "${REPO_ROOT}"
-# Defaults to the 4-camera sample. Set SAMPLE_SCRIPT=./scripts/test_12cam_ds.sh for the 12-camera sample.
-SAMPLE_SCRIPT="${SAMPLE_SCRIPT:-./scripts/test_4cam_ds.sh}"
-BEV_PIDS_BEFORE="$(pgrep -f 'kafka_bev_visualizer.py' || true)"
-MV3DT_DEEPSTREAM_STATUS=0
-"${SAMPLE_SCRIPT}" || MV3DT_DEEPSTREAM_STATUS=$?
-BEV_PIDS_AFTER="$(pgrep -f 'kafka_bev_visualizer.py' || true)"
-comm -13 \
-  <(printf '%s\n' "${BEV_PIDS_BEFORE}" | sed '/^$/d' | sort -u) \
-  <(printf '%s\n' "${BEV_PIDS_AFTER}" | sed '/^$/d' | sort -u) \
-  | while IFS= read -r pid; do
-      if kill -0 "${pid}" 2>/dev/null; then
-        echo "Stopping current-run BEV visualizer PID: ${pid}"
-        kill "${pid}" 2>/dev/null || true
-      fi
-    done
-if [ "${MV3DT_DEEPSTREAM_STATUS}" -ne 0 ]; then
-  exit "${MV3DT_DEEPSTREAM_STATUS}"
-fi
-```
-
-Set these before the wrapper when needed:
-
-```bash
-export SAMPLE_SCRIPT=./scripts/test_12cam_ds.sh
-export DETECTOR_MODEL=RTDETR
-```
-
-If the user has display access and explicitly asks to save video or output, do not use the quick-start script unchanged. Generate configs with `--enable-osd`, `--enable-file-output`, and `--enable-msg-broker`, then launch Docker with the normal X11 mounts. The OSD window remains live, and the tiled DeepStream MP4 is saved to `${EXPERIMENT_DIR}/outVideos/tiled_display_raw.mp4`. For an unattended saved BEV MP4, use the offline BEV capture command from `visualization-metadata.md` immediately before the Docker launch attempt; interactive BEV recording also works by pressing `r` in the BEV window.
-
-## Headless Launch Commands
-
-Use the same sample dataset choices, but regenerate configs explicitly instead of using the quick-start scripts so file output and Kafka broker output are enabled. Set run-specific inputs first, then load `references/generate-configs.md` and run its `Generate Configs` block.
-
-Example inputs for the 4-camera sample with the default detector:
+Set these inputs for either mode, then read [Generate Configs](generate-configs.md) and run its command block. Select the dataset once; both modes use the Docker launch below.
 
 ```bash
 cd "${REPO_ROOT}"
-export DATASET_DIR="${REPO_ROOT}/datasets/mtmc_4cam"
-export EXPERIMENT_DIR="${EXPERIMENT_DIR:-${REPO_ROOT}/experiments/deepstream/4cam}"
-export RUN_STARTED_AT="$(date +%s)"
-export MODEL_REPO="${REPO_ROOT}/models"
-export MV3DT_RUN_MODE=headless
+export SAMPLE_CAMERAS="${SAMPLE_CAMERAS:-4}"
 export DETECTOR_MODEL="${DETECTOR_MODEL:-PeopleNetTransformer}"
-export CONFIG_OVERRIDES=override_tracker_4cam.yml
+export MODEL_REPO="${REPO_ROOT}/models"
+export RUN_STARTED_AT="$(date +%s)"
+export MV3DT_RUN_MODE="${MV3DT_RUN_MODE:-headless}"
+case "$SAMPLE_CAMERAS" in
+  4)
+    export DATASET_DIR="${REPO_ROOT}/datasets/mtmc_4cam"
+    export EXPERIMENT_DIR="${EXPERIMENT_DIR:-${REPO_ROOT}/experiments/deepstream/4cam}"
+    export TRACKER_CONFIG=config_tracker.yml
+    export CONFIG_OVERRIDES=override_tracker_4cam.yml
+    ;;
+  12)
+    export DATASET_DIR="${REPO_ROOT}/datasets/mtmc_12cam"
+    export EXPERIMENT_DIR="${EXPERIMENT_DIR:-${REPO_ROOT}/experiments/deepstream/12cam}"
+    unset CONFIG_OVERRIDES
+    case "$DETECTOR_MODEL" in
+      PeopleNetTransformer) export TRACKER_CONFIG=config_tracker_tuned_12cam.yml ;;
+      RTDETR) export TRACKER_CONFIG=config_tracker_tuned_12cam_rt_detr.yml ;;
+      PeopleNet2.6.3) export TRACKER_CONFIG=config_tracker.yml ;;
+      *) echo "ERROR: unsupported detector"; exit 1 ;;
+    esac
+    ;;
+  *) echo "ERROR: SAMPLE_CAMERAS must be 4 or 12"; exit 1 ;;
+esac
 ```
 
-## Docker Security Gate
+Display mode enables OSD. Set `MV3DT_SAVE_OUTPUTS=1` when the user also requests tiled MP4 output. Start the live BEV visualizer from [Visualization and Metadata](visualization-metadata.md) in display mode; keep only that process's PID for cleanup. In headless mode start the offline BEV capture immediately before Docker instead.
 
-Before presenting or executing the Docker launch command, state that this run uses `--privileged` and `--net=host`. These flags give the container broad host kernel capability, device, network, mounted-repo, and mounted-dataset access.
+## Docker Access
 
-Require an explicit user confirmation such as: "I approve running DeepStream with `--privileged --net=host` for this MV3DT sample run." Do not execute the launch command on vague or unrelated approval. After approval, set `MV3DT_DOCKER_SECURITY_APPROVED=I_APPROVE_PRIVILEGED_HOST_NETWORK` for the launch shell.
-
-Before using those flags, discuss least-privilege alternatives with the user: prefer `${GPU_FLAG}`/`--gpus all` without `--privileged` when it works, add only specific `--device` mounts required by observed failures, use narrow `--cap-add` values only when needed, and prefer explicit port mappings for Kafka/MQTT/display over `--net=host` when the deployment allows it. Use the command below only after the user accepts the compatibility/security tradeoff.
+Use NVIDIA GPU access on Docker bridge networking. Before generating configs, follow [Container Networking](container-network.md) to verify an advertised Kafka listener reachable from the bridge. Retain the host localhost listener for BEV tools. The launch exposes only the dataset, model cache, run output directory, and (in display mode) the X11 socket. Do not add capabilities or arbitrary host devices to bypass an error.
 
 After the shared config block completes, launch DeepStream:
 
@@ -128,26 +107,35 @@ else
   exit 1
 fi
 
-case "${MV3DT_DOCKER_SECURITY_APPROVED:-}" in
-  I_APPROVE_PRIVILEGED_HOST_NETWORK) ;;
-  *)
-    echo "ERROR: explicit approval required before running Docker with --privileged --net=host."
-    echo "Set MV3DT_DOCKER_SECURITY_APPROVED=I_APPROVE_PRIVILEGED_HOST_NETWORK only after the user approves this run."
-    exit 1
-    ;;
-esac
+: "${MV3DT_KAFKA_HOST:?prepare the bridge-reachable Kafka listener}"
+: "${MV3DT_KAFKA_PORT:?prepare the bridge-reachable Kafka listener}"
+
+DRIVER_CAPABILITIES=compute,utility,video
+DOCKER_DISPLAY_ARGS=()
+if [ "${MV3DT_RUN_MODE:-headless}" != "headless" ]; then
+  DRIVER_CAPABILITIES+=,graphics,display
+  DOCKER_DISPLAY_ARGS=(-v /tmp/.X11-unix/:/tmp/.X11-unix -e DISPLAY="${DISPLAY}")
+fi
 
 # If saved BEV is expected, start the offline BEV capture from
 # visualization-metadata.md now, in the same launch shell or background task.
 # Keep MV3DT_OFFLINE_BEV_PID, MV3DT_OFFLINE_BEV_LOG, and
 # MV3DT_OFFLINE_BEV_STARTED_AT for retry cleanup and verification.
-# Run only after the Docker Security Gate confirmation above. Use DOCKER_CMD="sudo docker" only if Docker needs sudo.
+# Run after the broker endpoint checks above. Use DOCKER_CMD="sudo docker" only if Docker needs sudo.
+MODEL_REPO="$(realpath -e "${MODEL_REPO:?set MODEL_REPO}")" || exit 1
+DATASET_DIR="$(realpath -e "${DATASET_DIR:?set DATASET_DIR}")" || exit 1
+EXPERIMENT_DIR="$(realpath -e "${EXPERIMENT_DIR:?set EXPERIMENT_DIR}")" || exit 1
+for mount_dir in "$MODEL_REPO" "$DATASET_DIR" "$EXPERIMENT_DIR"; do
+  test -d "$mount_dir" && test "$mount_dir" != / || { echo "ERROR: invalid mount directory"; exit 1; }
+done
 MV3DT_DOCKER_LAUNCH_AT="$(date +%s)"
 MV3DT_DEEPSTREAM_STATUS=0
-$DOCKER_CMD run -t --privileged --rm --net=host ${GPU_FLAG} \
+$DOCKER_CMD run -t --rm --network bridge ${GPU_FLAG} \
+  -e NVIDIA_DRIVER_CAPABILITIES="${DRIVER_CAPABILITIES}" \
   -v "${MODEL_REPO}:/workspace/models" \
-  -v "${DATASET_DIR}:/workspace/inputs" \
+  -v "${DATASET_DIR}:/workspace/inputs:ro" \
   -v "${EXPERIMENT_DIR}:/workspace/experiments" \
+  "${DOCKER_DISPLAY_ARGS[@]}" \
   -w /workspace/experiments \
   "${DEEPSTREAM_IMAGE:-nvcr.io/nvidia/deepstream:9.1-triton-multiarch}" \
   deepstream-test5-app -c config_deepstream.txt || MV3DT_DEEPSTREAM_STATUS=$?
@@ -156,6 +144,10 @@ if [ "${MV3DT_DEEPSTREAM_STATUS}" -ne 0 ] && [ -n "${MV3DT_OFFLINE_BEV_PID:-}" ]
   echo "Stopping offline BEV capture for failed DeepStream attempt: ${MV3DT_OFFLINE_BEV_PID}"
   kill "${MV3DT_OFFLINE_BEV_PID}" 2>/dev/null || true
   wait "${MV3DT_OFFLINE_BEV_PID}" 2>/dev/null || true
+fi
+if [ -n "${MV3DT_BEV_PID:-}" ] && kill -0 "${MV3DT_BEV_PID}" 2>/dev/null; then
+  kill "${MV3DT_BEV_PID}" 2>/dev/null || true
+  wait "${MV3DT_BEV_PID}" 2>/dev/null || true
 fi
 if [ "${MV3DT_DEEPSTREAM_STATUS}" -ne 0 ]; then
   exit "${MV3DT_DEEPSTREAM_STATUS}"

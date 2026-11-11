@@ -1,14 +1,14 @@
 # Setup And Readiness
 
-Load this reference when the user asks to install, prepare, or validate MV3DT DeepStream prerequisites, or when another workflow fails due missing setup.
+Load this reference when the user asks to install, prepare, or validate MV3DT DeepStream prerequisites, or when another workflow fails due missing setup. Teardown has its own reference in the skill routing table.
 
 ## What Setup Covers
 
 The repo script is the source of truth. It checks the OS, NVIDIA driver, Docker GPU runtime, pulls the DeepStream container, extracts `assets/datasets.zip`, downloads models, builds custom parsers, installs or starts Mosquitto and Kafka, creates the Kafka topic `mv3dt`, and creates `mv3dt_venv`.
 
-Default setup is DeepStream Container only. Do not enable Inference Builder from this skill; if the user asks for it, point them to `docs/step-by-step-inference-builder.md`.
+Default setup is DeepStream Container only. If the user asks for Inference Builder, consult the app checkout’s `docs/step-by-step-inference-builder.md` outside this operational workflow.
 
-Before full setup or a first run, summarize that setup may install packages, pull containers, download models, start Mosquitto/Kafka, and write generated files under the repo and `${BASE_DIR:-$HOME}`. Ask before using `sudo`, including the `DOCKER_CMD="sudo docker"` fallback.
+Before full setup or a first run, summarize that setup may install packages, pull containers, download models, start Mosquitto/Kafka, and write generated files under the repo and the Kafka base directory (`BASE_DIR`, defaulting to the user's home directory). Ask before using `sudo`, including the `DOCKER_CMD="sudo docker"` fallback.
 
 ## Commands
 
@@ -87,26 +87,19 @@ export DEEPSTREAM_IMAGE=nvcr.io/nvidia/deepstream:9.1-triton-multiarch
 
 Verify required repo paths are writable before commands that create datasets, models, parsers, or experiment outputs. Ask before any permission fix and keep it scoped to generated directories.
 
-```bash
-test -w . || { echo "ERROR: repo checkout is not writable: ${REPO_ROOT}"; exit 1; }
-mkdir -p experiments/deepstream
-test -w experiments/deepstream || { echo "ERROR: experiments/deepstream is not writable"; exit 1; }
-```
-
-
 Use these checks when setup fails:
 
 ```bash
 DOCKER_CMD="${DOCKER_CMD:-docker}"
 nvidia-smi
 $DOCKER_CMD info | grep -i runtimes
-$DOCKER_CMD run --rm --gpus all ubuntu:24.04 nvidia-smi
+$DOCKER_CMD run --rm --gpus all "${DEEPSTREAM_IMAGE:-nvcr.io/nvidia/deepstream:9.1-triton-multiarch}" nvidia-smi
 test -d datasets/mtmc_4cam && test -d datasets/mtmc_12cam
 test -d mv3dt_venv
 ./scripts/mosquitto_test.sh
 ```
 
-Kafka should listen on `localhost:9092` and have topic `mv3dt`; verify this after setup and again immediately before a run:
+Kafka should serve host BEV consumers at `localhost:9092` with topic `mv3dt`. Container clients additionally require the bridge listeners in [Container Networking](container-network.md); configure and verify Kafka and MQTT before generating run configs. Verify the host endpoint after setup:
 
 ```bash
 KAFKA_DIR="${BASE_DIR:-$HOME}/kafka_2.13-4.2.0"
@@ -122,51 +115,6 @@ bin/kafka-server-start.sh config/server.properties
 
 Then rerun the topic check above before launching DeepStream.
 
-
-## Cleanup And Teardown
-
-Default teardown is run-level cleanup only. MV3DT does not deploy a persistent application container: DeepStream runs in the foreground with `docker run --rm`, so the container is removed when `deepstream-test5-app` exits. Do not stop Kafka, Mosquitto, delete models, delete datasets, or remove generated artifacts after a normal run unless the user explicitly asks.
-
-For display runs, tell the user how to stop the windows:
-
-- In `DeepStreamTest5App`, press `q` to stop early.
-- In the BEV visualizer window, press `q` to close it.
-- If the user started BEV recording interactively, press `r` again to stop recording before closing when possible.
-- For agent-managed runs, stop the BEV visualizer PID that the skill started after DeepStream exits; no extra approval is needed for that current-run PID.
-
-For headless or interrupted runs, inspect before stopping anything:
-
-```bash
-docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Status}}\t{{.Names}}'
-pgrep -af 'kafka_bev_visualizer.py|kafka_client.py' || true
-```
-
-If a DeepStream container or Python visualizer process from an unknown, user-started, or interrupted MV3DT run is still active, show the exact container ID or PID and ask before stopping it. Stop only the selected process, for example `docker stop <container_id>` or `kill <pid>`; do not use broad process-kill patterns.
-
-If the user asks to stop prerequisite services, explain that they may be shared by future MV3DT runs or other local workflows, then ask before stopping them:
-
-```bash
-KAFKA_DIR="${BASE_DIR:-$HOME}/kafka_2.13-4.2.0"
-"${KAFKA_DIR}/bin/kafka-server-stop.sh"
-
-sudo systemctl stop mosquitto
-```
-
-If Mosquitto was started manually instead of through systemd, identify the listener first and ask before killing only that PID:
-
-```bash
-lsof -nP -iTCP:1883 -sTCP:LISTEN
-```
-
-If the user asks to delete generated outputs, show the planned target first and ask for confirmation. Keep deletion scoped to the selected `EXPERIMENT_DIR` or generated run output directories. Do not delete custom datasets, `models/`, Kafka installations, Kafka storage, or Mosquitto packages as part of ordinary cleanup.
-
-If the user asks for a full uninstall, treat it as destructive cleanup. Present separate confirmation for each category before removal:
-
-- Generated MV3DT experiment outputs under the selected `EXPERIMENT_DIR`.
-- Downloaded sample datasets under `${REPO_ROOT}/datasets`.
-- Downloaded model files and parser builds under `${REPO_ROOT}/models`.
-- Kafka installation under `${BASE_DIR:-$HOME}/kafka_2.13-4.2.0` and any Kafka storage the user confirms belongs only to MV3DT.
-- Mosquitto service configuration such as `/etc/mosquitto/conf.d/mv3dt.conf` and optional package removal.
 
 ## Success Criteria
 

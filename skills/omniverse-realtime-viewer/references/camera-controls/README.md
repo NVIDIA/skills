@@ -60,7 +60,7 @@ def camera_button_from_ovstream(raw_button) -> int | None:
     return None
 ```
 
-Use left drag for orbit, middle drag for pan, right drag for dolly/zoom, and wheel for zoom. For desktop apps with modifier keys, use Alt+LMB for orbit, Alt+MMB for pan, Alt+RMB for dolly. Optionally support RMB+WASD fly mode for free camera movement. Left-click selection should fire only on release when movement stayed below the drag threshold.
+Use left drag for orbit, middle drag for pan, right drag for dolly/zoom, and wheel for zoom. For desktop apps with modifier keys, use Alt+LMB for orbit, Alt+MMB for pan, Alt+RMB for dolly. Optionally support RMB+WASD fly mode for free camera movement. Left-click selection should fire only on release when movement stayed below the drag threshold. If a prompt asks for switchable or tool-specific schemes, keep this as the default and layer `navigation-presets/README.md` over the same camera state and input normalization.
 
 ## Render Aspect
 
@@ -239,8 +239,10 @@ Call this before handling input and before generating matrices.
 
 ## Stage Up-Axis Is Camera State
 
-Read the USD stage up-axis through the metadata worker described in
-`stage-loading` after every successful load. Preserve it in server-owned camera
+Read the source USD up-axis before wrapper composition through the metadata
+worker in `stage-loading`. Retain that result with its load request and apply it
+after the matching scene loads; the wrapper must author the same metrics on its
+root. Preserve the up-axis in server-owned camera
 state; do not rotate the user USD or compensate with mesh transforms.
 
 ```python

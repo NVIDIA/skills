@@ -2,13 +2,13 @@
 
 ## Triggers
 
-Use this skill for requests mentioning deploy, NVCF self-hosted, OKAS 1, cloud deployment, session APIs, Docker, health checks, Brev, launchables, or remote deployment.
+Use this skill for requests mentioning deploy, NVCF self-hosted, OKAS 1, cloud deployment, session APIs, Docker, health checks, Brev, launchables, on-premises Kubernetes, in-place NVCF upgrades, or remote deployment.
 
 ## Choose A Deployment Path
 
-- **Brev**: a fast demo deployment; use the Brev recipe below.
+- **Brev with standalone ovstream**: a fast demo deployment; use the Brev recipe below. Brev is the hosting provider, not the streaming architecture. For Kubernetes plus NVCF on a Brev machine, select the NVCF path instead.
 - **OKAS or another portable session orchestrator**: use the generic session contract below.
-- **NVCF self-hosted on AWS or Azure**: read `nvcf-self-hosted.md` first, then follow the current upstream `streaming-self-hosted` orchestration and component skills. Do not duplicate that workflow here.
+- **NVCF self-hosted on AWS, Azure, or on-premises Kubernetes**: read `nvcf-self-hosted.md` first, then follow the current upstream `streaming-self-hosted` orchestration and component skills. Do not duplicate that workflow here.
 
 For NVCF image preparation and viewer-side failures, use
 `nvcf-viewer-container-contract.md`, `gpu-container-runtime.md`,
@@ -123,6 +123,12 @@ server {
 
 #### Server (`ov_web_viewer_server.py`)
 
+Implement this app entry point using the
+[streaming recipe](../streaming-viewer-recipe/README.md) before applying the
+launch examples here. Python filenames, container paths, and CLI flags in this
+document refer to your generated app; this package does not ship that server.
+Keep each launch command aligned with the actual entry point and parser.
+
 The server binds signaling on port 49100 and media on port 47998:
 
 ```bash
@@ -193,21 +199,20 @@ With Option B, nginx proxies it on the same port.
    mkdir -p /opt/ov-viewer/clients/webrtc-browser
    cp -r /tmp/ov-deploy/frontend-dist /opt/ov-viewer/clients/webrtc-browser/dist
 
-   # Python venv + wheels
-   cd /opt/ov-viewer/server
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install --upgrade pip -q
-   pip install /tmp/ov-deploy/*.whl -q
-   pip install numpy warp-lang "usd-core" -q
-   python3 -c "import ovstream, ovrtx; print('OK')"
-   deactivate
-
    # Install Caddy (Option A only)
    curl -o /tmp/caddy.tar.gz -sL "https://github.com/caddyserver/caddy/releases/download/v2.8.4/caddy_2.8.4_linux_amd64.tar.gz"
    tar -xzf /tmp/caddy.tar.gz -C /tmp caddy
    sudo mv /tmp/caddy /usr/local/bin/caddy
    ```
+
+   Install the generated app's resolved dependencies using
+   [the central runtime guidance](../dependencies/nvidia-runtime.md) and its
+   manifest/lockfile. The server-start example below assumes its environment is
+   at `/opt/ov-viewer/server/.venv`; adjust activation to the app's actual
+   environment path. Preserve the selected interpreter and process boundaries:
+   USD query workers have their own environment; adding `usd-core` to the
+   renderer environment is not a deployment prerequisite. Run the app's
+   dependency and first-frame checks on the target GPU before starting clients.
 
 4. **Start server:**
    ```bash
@@ -276,38 +281,20 @@ For containerized deployments without a full orchestrator, build a standalone Do
 
 ### Base Image And System Dependencies
 
-Use `nvidia/cuda:12.6.3-base-ubuntu22.04` as the base. This provides CUDA runtime libraries without the full toolkit overhead.
-
-Required apt packages for ovrtx rendering and ovstream:
-
-```dockerfile
-# syntax=docker/dockerfile:1
-FROM nvidia/cuda:12.6.3-base-ubuntu22.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip python3-dev \
-    libgomp1 libatomic1 \
-    libgl1 libglx0 libegl1 libopengl0 \
-    libx11-6 libxau6 libxdmcp6 libxcb1 libbsd0 libmd0 \
-    libglib2.0-0 \
-    curl ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
-```
-
-The `# syntax=docker/dockerfile:1` directive at the top of the Dockerfile is required for BuildKit features like bind mounts.
+Select the base image, Python version, native prerequisites, and compatible
+package set through [the central runtime guidance](../dependencies/nvidia-runtime.md).
+Record the resolved combination in the generated app's manifest and image
+recipe. Follow [container image build](container-image-build.md) for build
+inputs and [GPU runtime preflight](gpu-container-runtime.md) for the image/host
+contract, including graphics, encoder, display, and USD-worker requirements.
 
 ### Installing Large Python Wheels Efficiently
 
-ovrtx and ovstream wheels can be hundreds of megabytes. Using a regular `COPY` + `pip install` doubles image size because layers retain both the wheel and the installed package. Use BuildKit bind mounts instead:
-
-```dockerfile
-# Place wheels in deps/wheels/ relative to build context
-RUN --mount=type=bind,source=deps/wheels,target=/tmp/wheels \
-    pip install --no-cache-dir /tmp/wheels/*.whl
-```
-
-This mounts the wheels at build time without copying them into a layer. The final image only contains the installed packages.
+If the selected dependency workflow uses large local artifacts, use the build
+system's supported temporary mounts so installation archives do not remain in
+image layers. Install only the artifacts selected by the app's resolved
+manifest; a wildcard wheel directory is not a compatibility check. Keep
+acquisition commands and artifact selection in the central dependency guidance.
 
 ### .dockerignore
 
@@ -322,7 +309,11 @@ A `.dockerignore` file is critical. Without it, `COPY . /app` sends `node_module
 
 ### Runtime Requirements
 
-The container must be started with GPU access and X11 display forwarding for ovrtx headless rendering:
+Start the container with GPU access and the display strategy required by the
+selected runtime. When that strategy uses a host X11 display, the launch may
+include the following socket mount and `DISPLAY`; those settings are not a
+universal headless-rendering requirement. Validate the actual image with
+[GPU runtime preflight](gpu-container-runtime.md).
 
 ```bash
 docker run --gpus all \
@@ -364,6 +355,10 @@ Do not connect clients or mark the service as ready until `/healthz` returns `20
 
 ### Entrypoint Pattern
 
+The following wrapper is the X11/Xvfb variant; include its display tools in the
+resolved image only when that strategy is selected. For another supported
+strategy, omit its display startup block and use the app's matching wrapper.
+
 ```dockerfile
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -388,42 +383,14 @@ exec python3 /app/server/ov_web_viewer_server.py \
   --stage "${STAGE_PATH:-/app/samples_data/stage01.usd}"
 ```
 
-### Sample Dockerfile (Complete)
+### Application Image Recipe
 
-```dockerfile
-# syntax=docker/dockerfile:1
-FROM nvidia/cuda:12.6.3-base-ubuntu22.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip python3-dev \
-    libgomp1 libatomic1 \
-    libgl1 libglx0 libegl1 libopengl0 \
-    libx11-6 libxau6 libxdmcp6 libxcb1 libbsd0 libmd0 \
-    libglib2.0-0 \
-    xvfb \
-    curl ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Install Python wheels without layer bloat
-RUN --mount=type=bind,source=deps/wheels,target=/tmp/wheels \
-    pip install --no-cache-dir /tmp/wheels/*.whl
-
-# Copy server code and sample data
-COPY server/ /app/server/
-COPY samples_data/ /app/samples_data/
-
-# Copy pre-built frontend (optional, for self-contained image)
-COPY frontend/dist/ /app/frontend/dist/
-
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-EXPOSE 49100 47998/udp 8081
-ENTRYPOINT ["/entrypoint.sh"]
-```
+Generate the Dockerfile for the selected app and runtime combination using
+[container image build](container-image-build.md). Include its server, frontend
+output, authorized scene assets, resolved dependency environments, and launch
+wrapper. Match paths to the generated app rather than assuming a sample-repo
+layout. Preserve `exec`-based server startup so session termination reaches the
+viewer, and validate readiness, decoded frames, and shutdown in the final image.
 
 ### Build And Run
 
@@ -440,7 +407,9 @@ docker run --gpus all \
   ovrtx-viewer:latest
 ```
 
-If the host already has an X11 display or Xvfb running, mount the socket and set `DISPLAY` accordingly. Otherwise the entrypoint starts its own Xvfb instance.
+For the X11/Xvfb variant, mount the socket and set `DISPLAY` when using an
+existing host display. Otherwise that variant's entrypoint starts its own Xvfb
+instance. Other display strategies use their corresponding launch configuration.
 
 ---
 
@@ -527,8 +496,8 @@ POST /sessions {application:"ovrtx-viewer"}
   → mark ready
   → browser connects to frontend and backend Direct signaling
   → WebRTC media flows
-  → DELETE /sessions/{id}
-  → SIGTERM
+  → client requests session shutdown through the orchestrator
+  → orchestrator sends SIGTERM to the viewer process
 ```
 
 ## Related

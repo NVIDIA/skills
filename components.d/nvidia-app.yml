@@ -2,6 +2,7 @@
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 
 name: NVIDIA App
+product_primary: NVIDIA App
 repo: NVIDIA/nvidia-app-skills
 ref: main
 

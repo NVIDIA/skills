@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers training, evaluating, exporting, and running inference for TAO pose-classification models that recognize human actions from skeleton keypoint sequences. <br>
+Developers and engineers converting DeepStream BodyPose data, training, evaluating, exporting to ONNX, and running inference for NVIDIA TAO pose-classification (ST-GCN) models that recognize actions from skeleton keypoint sequences. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -27,16 +27,16 @@ Mitigation: Review and scan skill before deployment. <br>
 ## Reference(s): <br>
 - [NVIDIA TAO Skill Bank](https://github.com/NVIDIA-TAO/tao-skill-bank) <br>
 - [skill_info.yaml](references/skill_info.yaml) <br>
+- [spec_template_dataset_convert.yaml](references/spec_template_dataset_convert.yaml) <br>
 - [spec_template_train.yaml](references/spec_template_train.yaml) <br>
 - [spec_template_evaluate.yaml](references/spec_template_evaluate.yaml) <br>
 - [spec_template_export.yaml](references/spec_template_export.yaml) <br>
 - [spec_template_inference.yaml](references/spec_template_inference.yaml) <br>
-- [spec_template_dataset_convert.yaml](references/spec_template_dataset_convert.yaml) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline bash code blocks] <br>
+**Output Type(s):** [Shell commands, Configuration instructions, Files] <br>
+**Output Format:** [Markdown with inline bash code blocks and YAML spec files] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -47,20 +47,20 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1, each attempt in an isolated sandbox pod. <br>
+1 evaluation task (1 positive) from skill-evaluator-dataset-snapshot/1, with 1 attempt per task, each attempt run in an isolated k8s-sandbox pod. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
 - Security: Whether the skill avoids unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Final-answer correctness against the reference answer. <br>
+- Correctness: Whether the final answer is correct against the reference answer. <br>
 - Discoverability: Whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and followed the expected workflow. <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage. <br>
+- Effectiveness: Whether the skill helped complete the user's goal and expected workflow (equal-weight mean of goal completion and workflow adherence). <br>
+- Efficiency: Whether the skill avoided wasted tool calls and token usage (50% tool-call productivity, 50% token efficiency). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys avoided, and workflow executed. <br>
+- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
 - `skill_efficiency`: Tool-call productivity scored under Efficiency. <br>
@@ -71,12 +71,12 @@ Underlying evaluation signals used in this run: <br>
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.4% | 79.7% |
+| Overall | 94.4% | 95.3% |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 0.0% → 100.0% (+100.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Discoverability | 100.0% | 0.0% |
-| Effectiveness | 0.0% → 100.0% (+100.0 points) | 53.3% → 100.0% (+46.7 points) |
-| Efficiency | 72.0% | 99.5% → 98.6% (-0.9 points) |
+| Correctness | 0.0% → 100.0% (+100.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Discoverability | 100.0% | 95.0% |
+| Effectiveness | 0.0% → 100.0% (+100.0 points) | 31.7% → 83.3% (+51.6 points) |
+| Efficiency | 72.0% | 98.3% |
 
 ## Skill Version(s): <br>
 0.1.0 (source: frontmatter) <br>

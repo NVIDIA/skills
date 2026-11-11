@@ -26,9 +26,7 @@ from typing import Any
 
 
 TEMPLATE_DIR = Path(__file__).resolve().parent
-DEFAULT_FIXTURE = TEMPLATE_DIR / "optimization-report.design-fixture.json"
 DEFAULT_TEMPLATE = TEMPLATE_DIR / "optimization-report.html.template"
-DEFAULT_OUTPUT = TEMPLATE_DIR / "optimization-report.preview.html"
 TAG_RE = re.compile(r"{%\s*(.*?)\s*%}", re.DOTALL)
 VAR_RE = re.compile(r"{{\s*(.*?)\s*}}", re.DOTALL)
 #: A block tag alone on its line: nothing but whitespace before it, nothing but
@@ -95,7 +93,7 @@ def _gate_summary_rows(report: dict) -> list[dict]:
             )
         breakdown = ", ".join(f"{name} {count}" for name, count in sorted(tally.items()))
         rows.append({
-            "name": "Phase-4 target coverage",
+            "name": "Optimization target coverage",
             "value": (
                 f"{len(entries)} target(s); ledger complete: {_flag(coverage.get('complete'))}"
                 + (f" ({breakdown})" if breakdown else "")
@@ -127,12 +125,75 @@ def _gate_summary_rows(report: dict) -> list[dict]:
     return rows
 
 
+def _quantity(value, unit=""):
+    if not isinstance(value, (int, float)):
+        return "Not recorded"
+    if unit == "bytes":
+        return f"{value / 1_000_000:,.1f} MB" if abs(value) >= 1_000_000 else f"{value:,.0f} bytes"
+    if unit == "ms":
+        return f"{value / 1000:,.2f} s" if abs(value) >= 1000 else f"{value:,.1f} ms"
+    if unit == "seconds":
+        return f"{value:,.2f} s"
+    number = f"{value:,.0f}" if float(value).is_integer() else f"{value:,.1f}"
+    return number + (" " + unit if unit else "")
+
+
+def _asset_context(asset, names):
+    row = dict(asset)
+    row['search_text'] = ' '.join([asset.get('name', ''), asset.get('semantic_category', ''), asset.get('equipment_family', ''), asset.get('source_prim_path', ''), *asset.get('occurrences', [])])
+    if row.get('structure_reason') == row.get('boundary_reason'):
+        row['structure_reason'] = ''
+    row['occurrence_count'] = len(asset.get('occurrences', []))
+    row['child_names'] = [names.get(identifier, identifier) for identifier in asset.get('children', [])]
+    row['metrics'] = [{'name': name.replace('_', ' ').title(),
+                      'before': _quantity(asset.get('before', {}).get(name)),
+                      'after': _quantity(asset.get('after', {}).get(name))}
+                     for name in ('meshes', 'vertices', 'faces', 'analytic_primitives')]
+    operations = [dict(op, seconds_display=_quantity(op.get('seconds'), 'seconds')) for op in asset.get('operations', [])]
+    timings = [op['seconds'] for op in operations if isinstance(op.get('seconds'), (int, float))]
+    row['operation_seconds'] = (_quantity(sum(timings), 'seconds') if timings and len(timings) == len(operations)
+                                else (f"{_quantity(sum(timings), 'seconds')} recorded; {len(timings)}/{len(operations)} operations timed" if timings else 'Not recorded'))
+    if not operations and asset.get('reused_from_library'):
+        row['operation_seconds'] = '0.00 s (no native operations in this run)'
+    row['prior_operations'] = [dict(op, seconds_display=_quantity(op.get('seconds'), 'seconds')) for op in asset.get('prior_operations', [])]
+    row['operations'] = operations
+    # Consecutive scopes of the same operation collapse without changing execution order.
+    groups = []
+    for operation in operations:
+        if not groups or groups[-1]['name'] != operation['name']:
+            groups.append({'name': operation['name'], 'count': 0, 'statuses': {}})
+        group = groups[-1]
+        group['count'] += 1
+        status = operation['status'].replace('_', ' ')
+        group['statuses'][status] = group['statuses'].get(status, 0) + 1
+    row['operation_groups'] = [dict(name=group['name'], outcomes=', '.join(f"{count} {status}" for status, count in group['statuses'].items())) for group in groups]
+    return row
+
+
 def build_context(report: dict) -> dict:
     context = dict(report)
     score = report.get("optimization_score")
     context["score_degrees"] = round(float(score) * 36, 1) if isinstance(score, (int, float)) else 0
     context.setdefault("executive_summary", "")
-    context.setdefault("score_scope_label", "Stage Optimization Score")
+    verdict = report.get('verdict', 'neutral')
+    context['verdict_label'] = {'improved': 'Improved', 'mixed': 'Mixed', 'neutral': 'Unchanged', 'regressed': 'Regressed'}.get(verdict, 'Unchanged')
+    context['verdict_color'] = {'improved': 'var(--good)', 'mixed': 'var(--warn)', 'neutral': 'var(--unknown)', 'regressed': 'var(--bad)'}.get(verdict, 'var(--unknown)')
+    groups = report.get('metric_groups', [])
+    insufficient = (report.get('measurement_context', {}).get('storage_coverage') == 'partial'
+                    or not report.get('metrics')
+                    or (bool(groups) and all(g.get('status') == 'not_measured' for g in groups)))
+    if verdict == 'neutral' and insufficient:
+        context['verdict_label'] = 'Insufficient measurements'
+        context['verdict_color'] = 'var(--unknown)'
+    context['completion'] = report.get('report_summary', {}).get('completion',
+        'Recorded target coverage complete.' if report.get('target_coverage', {}).get('complete') else 'Target coverage incomplete or not recorded.')
+    context['note_paragraphs'] = [p for p in report.get('notes', '').split('\n\n') if p]
+    names = {a['definition_id']: a['name'] for a in report.get('asset_results', [])}
+    context['assets'] = [_asset_context(a, names) for a in report.get('asset_results', [])]
+    # The legacy flat operation list remains available for old reports. Successor shared operations follow asset receipts.
+    context['shared_operations'] = [op for op in report.get('operations', []) if op.get('name') in ('optimizeMaterials', 'repairMaterialTargets')] if context['assets'] else []
+    context['execution_summary'] = report.get('measurement_context', {}).get('execution_counts', {})
+    context['next_run_text'] = '\n'.join(report.get('report_summary', {}).get('next_run_instructions', []))
     context.setdefault("reasoning", "")
     context["reasoning_paragraphs"] = [
         paragraph.strip()
@@ -154,13 +215,27 @@ def build_context(report: dict) -> dict:
         item.setdefault("display_name", item.get("name", ""))
         item.setdefault("unit", "")
         item.setdefault("evidence_type", "direct")
+        unit = item['unit'] or ('bytes' if item.get('name', '').endswith('_bytes') else '')
+        item['before_display'] = _quantity(item.get('before'), unit)
+        item['after_display'] = _quantity(item.get('after'), unit)
+        delta = item.get('change_pct')
+        item['change_display'] = (('Added ' + item['after_display']) if item.get('before') == 0 and item.get('after', 0) > 0 else
+                                  f"{delta:+.1f}%" if isinstance(delta, (int, float)) else 'Not measured')
         metrics.append(item)
     context["metrics"] = metrics
+    context['headline_metrics'] = [m for name in ('meshes', 'vertices', 'faces', 'warm_open_ms', 'referenced_storage_bytes') for m in metrics if m.get('name') == name]
+    footprint = dict(report.get('footprint') or {})
+    for key, value in list(footprint.items()):
+        if key.endswith('_bytes'):
+            footprint[key] = _quantity(value, 'bytes')
+        elif key.endswith('_pct') and isinstance(value, (int, float)):
+            footprint[key] = f"{value:+.1f}"
+    context['footprint'] = footprint
 
     measurement_context = report.get("measurement_context", {})
     context["measurement_context_items"] = [
         {"name": key.replace("_", " ").title(), "value": "N/A" if value is None else value}
-        for key, value in measurement_context.items()
+        for key, value in measurement_context.items() if key != "execution_counts"
     ]
     runtime_profiling = report.get("runtime_profiling", {})
     context["runtime_profiling_items"] = [
@@ -308,14 +383,15 @@ def trim_block_tag_lines(template: str) -> str:
 
 
 def render_template(template: str, context: Mapping[str, Any], *, autoescape: bool) -> str:
+    template = template.replace('/* shared-report-theme */', (TEMPLATE_DIR/'theme.css').read_text())
     return _render_block(trim_block_tag_lines(template), context, autoescape)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--fixture", type=Path, default=DEFAULT_FIXTURE)
+    parser.add_argument("--fixture", type=Path, required=True, help="Report JSON to render")
     parser.add_argument("--template", type=Path, default=DEFAULT_TEMPLATE)
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--output", type=Path, required=True, help="Output file in the run workspace")
     args = parser.parse_args()
 
     report = json.loads(args.fixture.read_text(encoding="utf-8"))

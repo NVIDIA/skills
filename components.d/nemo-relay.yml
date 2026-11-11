@@ -1,4 +1,5 @@
 name: NeMo Relay
+product_primary: NeMo Relay
 repo: NVIDIA/NeMo-Relay
 description: Skills to help get started and use NeMo Relay - a runtime for instrumenting and controlling AI agents across harnesses, applications, and frameworks.
 skills:

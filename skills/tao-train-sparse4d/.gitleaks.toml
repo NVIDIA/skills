@@ -1,0 +1,8 @@
+title = "tao-train-sparse4d gitleaks allowlist"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Sparse4D dataset field names (box2d_key: gt_boxes_2d_visible) matched by generic-api-key; not credentials"
+regexes = ['''gt_boxes_2d_visible''']

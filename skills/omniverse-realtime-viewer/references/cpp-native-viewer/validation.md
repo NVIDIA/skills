@@ -1,64 +1,55 @@
 # C++ Validation
 
-## Critical Gotchas
+Validate the native executable through its actual selected native window. Compilation and
+CPU checks establish API/math correctness; they do not prove rendered frames,
+input routing, loader compatibility, or cleanup. Follow `references/validation.md` for the
+shared evidence expectations.
 
-- **Import/load order:** In C++ set environment variables such as
-  `OVRTX_SKIP_USD_CHECK=1` before creating the renderer or loading mixed USD
-  plugins. In embedded or hybrid apps, do not load a mismatched OpenUSD/PXR
-  runtime before the OVRTX runtime.
-- **Single-thread rule:** One owner thread calls `ovrtx_step()`, stage
-  reset/load, result mapping, pick enqueue, and `ovrtx_write_attribute()`.
-  GLFW/ImGui callbacks should update pending state only.
-- **No concurrent stage mutation:** Do not call `ovrtx_step()` while resetting
-  the stage, loading a new USDA string, or changing render products.
-- **Map lifetime:** Map render vars, copy data, unmap, then destroy results.
-  Never keep `DLTensor` pointers or mapped output views across frames.
-- **BGRA to RGBA:** Normalize mapped `LdrColor` to the format used by
-  `glTexSubImage2D()`. If the mapped C output is BGRA, swap red and blue before
-  uploading as `GL_RGBA`.
-- **Render var mapping:** Match C output names by source name. Display uses
-  `"LdrColor"`. Native pick results use `OVRTX_RENDER_VAR_PICK_HIT`/
-  `"ovrtx_pick_hit"`. Do not expose AOVs that do not map to real full-resolution
-  tensors.
-- **Camera updates:** Write `omni:xform` with
-  `OVRTX_SEMANTIC_XFORM_MAT4x4`. Do not rely on USD `xformOp:*` edits for live
-  camera movement.
-- **Selection setup:** Native outlines require renderer config plus non-zero
-  renderer path-ID groups through `ovrtx_set_selection_outline_group()`.
-- **EffectLayer scope:** `inputs:Fader` is a material effect. It is not the
-  default selection path and only works for known material shader prims.
-- **First frame cost:** Cold shader/pipeline compilation can make the first
-  `ovrtx_step()` slow. Use long validation timeouts before diagnosing a hang.
+## Runtime Invariants
 
-## Expected Project Shape
+- Use paired public OVRTX/OVStage packages with one loader model. Register RTX
+  schemas before OVStage/OpenUSD initialization and respect the selected ABI or
+  isolation boundary for optional composition tools.
+- One runtime owner serializes population, writes, waits, publication, renderer
+  updates, picks, steps and output mapping. The selected toolkit and presentation
+  resources stay on their required UI thread, exchanging bounded commands and owned data.
+- Wait writes, seal the ordinal, wait `ovrtx_update_from_stage()`, apply dirty
+  native state, enqueue picking, then `ovrtx_step_with_stage()` at that ordinal.
+- Map, copy, unmap and destroy results on every exit path. No mapped pointer or
+  SDK handle crosses into the UI. `LdrColor` is uploaded as RGBA.
+- Match output identity using the full authored RenderVar path; native picks use
+  `OVRTX_RENDER_VAR_PICK_HIT`. Expose only AOVs with real full-resolution data.
+- Use OVStage for live camera, transform and material writes; renderer-native
+  selection groups and picks remain OVRTX operations.
 
-A generated C++ ImGui viewer should contain equivalent pieces:
+## Native Acceptance
 
-| File | Role |
-|---|---|
-| `src/main.cpp` | GLFW/ImGui lifecycle, OVRTX render loop, texture upload, picking, selection |
-| `include/camera.h` / `src/camera.cpp` | Orbit camera math and mouse input |
-| `include/session_layer.h` | Inline USDA session/composite layer generation |
-| `CMakeLists.txt` | CMake, FetchContent, `OVRTX_DIR`, ImGui/GLFW/OpenGL link setup |
+- [ ] Configure/build from the paired package helpers and launch on a real
+  display with an NVIDIA GPU; capture the actual first presented frame.
+- [ ] Exercise orbit, pan, wheel, fit and click picking with real pointer input.
+  Check normalized coordinates at letterbox edges and after resize.
+- [ ] Compare a known selected part's readable type/path and one numeric value
+  against its USD source or an independent USD read. A Cube/Sphere must not
+  appear as an opaque ID; distinguish correctly decoded metadata from a panel
+  that merely updates. Use `references/stage-attribute-reads/README.md` for the owning
+  dictionary and property-specific mapping.
+- [ ] Check selected outline, tree and property state agree; deselection clears
+  the previous outline. If variant/visibility recomposition retains selection,
+  its outline must return without another click.
+- [ ] For editing features, verify fractional values, a rotated/nonuniform live
+  parent, reset-stack behavior, and parent edits after child edits. Check stage
+  readback and rendered geometry, not only the control's displayed value.
+- [ ] For gizmos/shortcuts, verify text input and modals consume keys, gizmos
+  precede camera input, and releasing a drag outside the image ends the drag.
+- [ ] Open another scene, rapidly replace it, and try an invalid file. Verify
+  latest-request activation, cleared stale state and usable error recovery.
+- [ ] Preserve source USD files; optional effects restore scene-owned baselines.
+- [ ] Close through the window manager while rendering/loading, reopen, and
+  verify owned renderer, stage, preparation jobs and toolkit presentation resources are released.
 
-Keep generated app code scoped to the patterns above and the selected OVRTX C
-API aliases.
+Report observed failures with a focused reproduction against the public SDK
+contract. Keep API defects, environment issues and application omissions distinct
+when deciding what to change in an integration recipe.
 
-## Validation Checklist
-
-- [ ] CMake config finds `OVRTX_DIR`, GLFW, ImGui, and OpenGL.
-- [ ] App starts with a real display and an NVIDIA GPU.
-- [ ] Inline session layer opens the requested USD stage.
-- [ ] First `LdrColor` frame maps on CPU and appears in `ImGui::Image()`.
-- [ ] OpenGL upload displays correct red/blue channel ordering.
-- [ ] Orbit, dolly, and wheel update the camera through `omni:xform`.
-- [ ] Click coordinates are converted to render product pixels.
-- [ ] `ovrtx_enqueue_pick_query()` runs before `ovrtx_step()`.
-- [ ] `OVRTX_RENDER_VAR_PICK_HIT` is decoded through the path dictionary.
-- [ ] Selected prims get group `1`; previous prims get group `0`.
-- [ ] EffectLayer faders toggle only for known material targets.
-- [ ] Selection animation writes finite `omni:xform` matrices and restores on deselect.
-
-See also: `ovrtx-rendering`, `stage-loading`, `viewer-input-routing`, `camera-controls`,
-`native-picking-selection`, `selection-feedback`, `prim-pick-effects`,
-`selection-animation`, `stage-hierarchy`, and `streaming-vs-local`.
+See also: `ovstage-ovrtx-integration`, `stage-management`, `viewer-input-routing`,
+`native-picking-selection`, `selection-feedback`, and `prim-transform-safety`.

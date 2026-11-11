@@ -10,14 +10,14 @@ Read this file when the loader sent you here from
 verbs `configure / build / modify / run / test / debug`), jump to
 [TASKS.md](TASKS.md). For the canonical DOCA version-handling rules
 that this skill layers a SHA overlay on top of, see
-[`doca-version`](../../doca-version/SKILL.md).
+`doca-version/SKILL.md`.
 
 ## Pattern overview
 
 Every DOCA SHA question this skill teaches resolves into one of FIVE
 patterns. The patterns are CLASSES — they apply across every SHA
-release and every BlueField / ConnectX device the accelerator runs
-on.
+release and every device the accelerator runs on (hardware SHA is
+BlueField-2 only; BlueField-3 has no SHA engine).
 
 | Pattern | When it applies (class shape) | Where the substance lives |
 | --- | --- | --- |
@@ -47,7 +47,7 @@ Two cross-cutting rules that apply to *every* pattern above:
 DOCA SHA is a **DOCA Core Context**. Every SHA instance follows the
 universal `cfg-create → cfg-set-* → init → start → use → stop →
 destroy` lifecycle (see
-[`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes)).
+`doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`)).
 On top of that lifecycle, DOCA SHA layers its own task model and
 algorithm-selection surface.
 
@@ -125,30 +125,30 @@ active value with `doca_sha_cap_get_*`.
 
 ## Version compatibility
 
-For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see [`doca-version`](../../doca-version/SKILL.md). The body lives there; this skill does not duplicate it.
+For the canonical DOCA version-detection chain, the four-way match rule, NGC container semantics, and the headers-win-over-docs rule, see `doca-version/SKILL.md`. The body lives there; this skill does not duplicate it.
 
 **The SHA-specific overlay** is:
 
-- **Algorithm enum membership is device-bound, not version-bound.** The agent must not infer *"DOCA version X includes SHA-Y"* from release notes alone; the runtime authority is `doca_sha_cap_task_hash_get_supported(devinfo, DOCA_SHA_ALGORITHM_*)` against the active device (which folds task-support and algorithm-support into a single call). Per the cross-cutting cap-query rule in [`doca-version CAPABILITIES.md ## Observability`](../../doca-version/CAPABILITIES.md#observability), the cap query is the runtime authority — never quote an algorithm as available from agent memory.
-- **`doca_sha_task_partial_hash` is newer than the one-shot task.** When the user reports *"the partial-hash API I'm reading about isn't on my install"*, the first hypothesis is that the install pre-dates partial-hash support. Confirm via `doca_sha_cap_task_partial_hash_get_supported(devinfo, algorithm)` for each algorithm the user needs; if it returns anything other than `DOCA_SUCCESS`, route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) before invoking the partial-hash codepath.
-- **`doca-sha.pc` plus `doca-common.pc` must both match `doca_caps --version`** at the four-way-match check (per [`doca-version CAPABILITIES.md ## Version compatibility`](../../doca-version/CAPABILITIES.md#version-compatibility)). A common partial-install pattern on hosts where the SHA package was installed separately from the rest of DOCA is that `doca-sha.pc` reports release *X* while `doca-common.pc` reports release *Y*; route to [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug) layer 2 before any SHA-layer diagnosis.
+- **Algorithm enum membership is device-bound, not version-bound.** The agent must not infer *"DOCA version X includes SHA-Y"* from release notes alone; the runtime authority is `doca_sha_cap_task_hash_get_supported(devinfo, DOCA_SHA_ALGORITHM_*)` against the active device (which folds task-support and algorithm-support into a single call). Per the cross-cutting cap-query rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap query is the runtime authority — never quote an algorithm as available from agent memory.
+- **`doca_sha_task_partial_hash` is newer than the one-shot task.** When the user reports *"the partial-hash API I'm reading about isn't on my install"*, the first hypothesis is that the install pre-dates partial-hash support. Confirm via `doca_sha_cap_task_partial_hash_get_supported(devinfo, algorithm)` for each algorithm the user needs; if it returns anything other than `DOCA_SUCCESS`, route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) before invoking the partial-hash codepath.
+- **`doca-sha.pc` plus `doca-common.pc` must both match `doca_caps --version`** at the four-way-match check (per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)). A common partial-install pattern on hosts where the SHA package was installed separately from the rest of DOCA is that `doca-sha.pc` reports release *X* while `doca-common.pc` reports release *Y*; route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 before any SHA-layer diagnosis.
 
 ## Error taxonomy
 
 SHA-specific overlays on the cross-library `DOCA_ERROR_*` taxonomy.
 The cross-library taxonomy itself lives in
-[`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy);
+`doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`);
 the rows below are the *SHA surface* meaning that the agent must
 disambiguate before falling back to the cross-library response.
 
 | Error | SHA context where it shows up | SHA-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()` | Lifecycle violation. Walk the call sequence against the lifecycle in [`doca-programming-guide CAPABILITIES.md ## Capabilities and modes`](../../doca-programming-guide/CAPABILITIES.md#capabilities-and-modes). Note: marking a `doca_sha_task_partial_hash` task final on the first buffer (before any intermediate submit) is **undefined behavior**, not a defined `BAD_STATE` error — use a non-partial `doca_sha_task_hash` instead when a single buffer is all you have. |
+| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()` | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`). Note: marking a `doca_sha_task_partial_hash` task final on the first buffer (before any intermediate submit) is **undefined behavior**, not a defined `BAD_STATE` error — use a non-partial `doca_sha_task_hash` instead when a single buffer is all you have. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_sha_task_hash_alloc_init`; `doca_sha_task_partial_hash_alloc_init`; submit time | The destination buffer is smaller than `doca_sha_cap_get_min_dst_buf_size(devinfo, algorithm)`, OR the source buffer is larger than `doca_sha_cap_get_max_src_buf_size(devinfo)`. Re-run the matching cap query, then resize. |
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_sha_task_*_set_conf`; submit with an algorithm enum | The algorithm enum is not in this device's accelerator, OR `doca_sha_task_partial_hash` is requested on a device that advertises only the one-shot task for that algorithm. Re-run `doca_sha_cap_task_hash_get_supported(devinfo, algorithm)` / `doca_sha_cap_task_partial_hash_get_supported(devinfo, algorithm)` against the active `doca_devinfo`; if either returns anything other than `DOCA_SUCCESS`, that is the answer — fall back to CPU or change algorithm. |
 | `DOCA_ERROR_NOT_PERMITTED` | First task submission | The source mmap does not have `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY` (or a stronger flag that supersedes it), OR the destination mmap is missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`. Re-check the matrix in [`## Safety policy`](#safety-policy). |
 | `DOCA_ERROR_AGAIN` | `doca_task_submit` on either SHA task type | The task queue is full. This is *not* a hardware error; the program must drain completions via `doca_pe_progress()` before re-submitting. Same as the cross-library *"would-block, retry after progress"* pattern. |
-| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure. Capture state and route to env-class debug ([`doca-setup ## debug`](../../doca-setup/TASKS.md#debug)) — the layer below DOCA is the suspect, not the SHA program. |
+| `DOCA_ERROR_DRIVER` | Any submit / completion call | The layer below DOCA reported failure. Capture state and route to env-class debug (`doca-setup ## debug` (`doca-setup/TASKS.md#debug`)) — the layer below DOCA is the suspect, not the SHA program. |
 
 The agent's rule: **never recommend a retry loop on `DOCA_ERROR_*`
 without first identifying which of the rows above is the cause**.
@@ -186,14 +186,14 @@ Three primary signals the agent should reach for:
 
 For cross-cutting observability primitives (`--sdk-log-level`, the
 `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env var) see
-[`doca-debug CAPABILITIES.md ## Observability`](../../doca-debug/CAPABILITIES.md#observability).
+`doca-debug CAPABILITIES.md ## Observability` (`doca-debug/CAPABILITIES.md#observability`).
 For the install-tree observability (logger names, package layout)
 defer to
-[`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+`doca-public-knowledge-map/SKILL.md`.
 
 ## Safety policy
 
-> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in [`doca-hardware-safety` CAPABILITIES.md ## Safety policy](../../doca-hardware-safety/CAPABILITIES.md#safety-policy) (specifically [### Per-artifact overlay pattern](../../doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
+> **Overlay on the bundle-wide hardware-safety meta-policy.** The rules below are this skill's per-artifact overlay on the cross-cutting rules in `doca-hardware-safety` CAPABILITIES.md ## Safety policy (`doca-hardware-safety/CAPABILITIES.md#safety-policy`) (specifically ### Per-artifact overlay pattern (`doca-hardware-safety/CAPABILITIES.md#per-artifact-overlay-pattern`)). When the two layers disagree, the stricter wins; when either layer says STOP, the agent stops.
 
 DOCA SHA's safety surface is **buffer-permission discipline plus
 path-selection discipline**. The library reads from a source buffer
@@ -252,19 +252,19 @@ the agent will get asked but should route elsewhere:
   assumes the user already knows which algorithm they want and is
   asking *how to express it through the DOCA SHA API*.
 - **DOCA Core context and progress engine internals** — owned by
-  [`doca-programming-guide`](../../doca-programming-guide/SKILL.md).
+  `doca-programming-guide/SKILL.md`.
   This skill *uses* the Core context lifecycle; it does not
   redefine it.
 - **Cross-cutting `DOCA_ERROR_*` taxonomy** — owned by
-  [`doca-programming-guide CAPABILITIES.md ## Error taxonomy`](../../doca-programming-guide/CAPABILITIES.md#error-taxonomy).
+  `doca-programming-guide CAPABILITIES.md ## Error taxonomy` (`doca-programming-guide/CAPABILITIES.md#error-taxonomy`).
   This skill adds the SHA overlay, not the taxonomy itself.
 - **Other DOCA crypto-acceleration libraries (DOCA AES-GCM, DOCA
-  Compress, DOCA DMA)** — separate libraries with their own skills
-  (when they ship). Path-selection guidance in [`## Capabilities
+  Compress, DOCA DMA)** — separate libraries with their own skills.
+  Path-selection guidance in [`## Capabilities
   and modes`](#capabilities-and-modes) names them; the deep
   per-library substance lives in the matching skill.
 - **Cross-library `doca_caps` invocation patterns** — owned by
-  the cross-library `doca-caps` tool skill (when it ships). This
+  the cross-library `doca-caps` tool skill. This
   skill references the *SHA capability query family*
   (`doca_sha_cap_*`), which is per-library; the *cross-library
   capability snapshot tool* (`doca_caps --list-devs`) is a

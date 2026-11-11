@@ -1,0 +1,14 @@
+{
+  "source_revision": "94009ea7fb683f33f18730553663c0052d484808",
+  "scope": "Supplemental unmodified source snapshots for read-only inspection; supplied to both skill conditions. Other fixtures retain the provenance described in SNAPSHOT.md.",
+  "files": {
+    "configs/search_binder_local_pipeline.yaml": {
+      "source": "configs/search_binder_local_pipeline.yaml",
+      "sha256": "1b856a07672277e227aae02340422e509981a87cdc7dc66b9dfc0ec80cde3b00"
+    },
+    "script_utils/generate_inference_configs.py": {
+      "source": "script_utils/generate_inference_configs.py",
+      "sha256": "786eee8985af669caf3da94627f180bcaf65df2fa4e2d2b0d820f6ea65dcb82a"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+name: CDF Augmentation
+product_primary: Cosmos Data Factory
+repo: NVIDIA/cdf-augmentation
+description: Author, validate, and run Cosmos Data Factory augmentation pipelines for image and video generation and transformation.
+skills:
+  - path: skills/cdf-augmentation/
+    catalog_dir: cdf-augmentation
+links:
+  discussions: false

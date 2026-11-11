@@ -1,0 +1,97 @@
+# tests/test_network.py:1799-1894
+@RunIf(min_gpus=1, min_gpu_mem=60)
+@pytest.mark.large_model
+def test_network_flux():
+    """Test Flux network for text-to-image generation."""
+    # Clear memory before starting memory-intensive test
+    clear_gpu_memory()
+
+    teacher_config = FluxConfig
+
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
+
+    # Try to instantiate Flux model - skip if not accessible (gated model)
+    try:
+        teacher = instantiate(teacher_config)
+    except Exception as e:
+        if "not a valid model identifier" in str(e) or "token" in str(e).lower() or "gated" in str(e).lower():
+            pytest.skip(f"Test skipped: Flux model not accessible (requires HuggingFace authentication): {e}")
+        raise
+    teacher.init_preprocessors()
+    # No dtype cast yet, so we can test autocast first
+    teacher = teacher.to(device=device)
+    teacher._set_device(device)
+    _load_preprocessors(teacher, device, dtype)
+
+    # Test noise scheduler properties - Flux uses rectified flow
+    validate_noise_scheduler_properties(teacher, device, expected_schedule_type="rf")
+
+    batch_size = 1
+    # Flux operates on latent space: [B, C, H, W] where C=16 for Flux VAE
+    x = torch.randn(batch_size, 16, 8, 8, device=device, dtype=_STATE_DTYPE)
+    t = teacher.noise_scheduler.sample_t(batch_size, time_dist_type="uniform").to(device=device)
+
+    captions = ["a caption"]
+    with _borrow_on_device(teacher.preprocessors["text_encoder"], device):
+        condition = teacher.preprocessors["text_encoder"].encode(captions)
+    _assert_gpu_tree_dtype_and_device(
+        condition, teacher.preprocessors["text_encoder"].precision_model, "flux.text_encoder.encode"
+    )
+
+    guidance_scale = 3.5
+    guidance_tensor = torch.full((batch_size,), guidance_scale, device=x.device, dtype=x.dtype)
+
+    # Flux text encoder returns (pooled_prompt_embeds, prompt_embeds) tuple
+    assert isinstance(condition, tuple) and len(condition) == 2
+    pooled_prompt_embeds, prompt_embeds = condition
+    pooled_prompt_embeds = pooled_prompt_embeds.to(device=device, dtype=dtype)
+    prompt_embeds = prompt_embeds.to(device=device, dtype=dtype)
+    condition = (pooled_prompt_embeds, prompt_embeds)
+
+    # Do an autocasted forward pass
+    with torch.autocast(device_type=device.type, dtype=dtype):
+        output = teacher(x, t, condition, guidance=guidance_tensor)
+
+    assert output.shape == x.shape  # confirm output shape is the same as input shape
+    assert output.device == x.device  # confirm output device is the same as input device
+
+    teacher = teacher.to(device=device, dtype=dtype)
+    teacher._set_device(device)
+
+    # Test with return_logvar
+    output, logvar = teacher(x, t, condition, guidance=guidance_tensor, return_logvar=True)
+    assert output.shape == x.shape
+    assert logvar.shape == torch.Size([batch_size, 1])
+
+    assert teacher(x, t, condition, guidance=guidance_tensor, return_features_early=True, feature_indices=set()) == []
+
+    # Test feature extraction with non-empty set (extract from first transformer block)
+    output = teacher(x, t, condition, guidance=guidance_tensor, return_features_early=False, feature_indices={0})
+    assert isinstance(output, list) and len(output) == 2  # [model_output, features]
+    assert output[0].shape == x.shape  # model output shape
+    assert isinstance(output[1], list) and len(output[1]) == 1  # one feature extracted
+
+    # Test feature extraction with early return
+    features = teacher(x, t, condition, guidance=guidance_tensor, return_features_early=True, feature_indices={0})
+    assert isinstance(features, list)
+    assert len(features) == 1  # one feature extracted
+
+    # One-step sample() smoke (full guidance path).  Exercise both Flux.1
+    # sample-time modes — embedded-guidance distillation (Flux.1-dev) and
+    # batched CFG via ``predict_with_guidance(..., batched=True)`` — regardless of
+    # which mode the instantiated config picks. The mode is selected by
+    # ``self.guidance_scale`` (None -> CFG, else distillation), so we
+    # toggle that attribute around the second call.  Decode-after-sample
+    # is exercised on the first call only (one decode pass per test is
+    # sufficient — see ``_decode_smoke``).
+    _smoke_sample(teacher, x, condition=condition, neg_condition=condition, decode_after=True)
+    original_guidance_scale = teacher.guidance_scale
+    try:
+        teacher.guidance_scale = 3.5 if original_guidance_scale is None else None
+        _smoke_sample(teacher, x, condition=condition, neg_condition=condition)
+    finally:
+        teacher.guidance_scale = original_guidance_scale
+
+    # Clear memory after testing
+    clear_gpu_memory()

@@ -1,0 +1,121 @@
+{
+  "skill_name": "nvshmem-docs",
+  "evals": [
+    {
+      "id": "nvshmem-docs-001",
+      "prompt": "Using the nvshmem-docs skill, can I use the TMA feature in NVSHMEM 3.5?",
+      "expected_output": "The agent used nvshmem-docs, confirmed TMA is not available in NVSHMEM 3.5, and pointed the user to release 3.7.0 where it was introduced, citing live official documentation.",
+      "assertions": [
+        "The agent read nvshmem-docs/references/topic-map.md to route the request",
+        "The agent treated this explicit support question as an availability check for the 3.5 release family",
+        "The agent fetched live official NVSHMEM documentation or release notes before making the availability claim",
+        "The agent reported the 3.7 introduction gate and compared it with requested version 3.5 as a mismatch",
+        "The agent answered that TMA is not usable in 3.5 and identified 3.7.0 as the introducing release",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-docs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-docs-002",
+      "prompt": "What does NVSHMEM_THREAD_SERIALIZED mean?",
+      "expected_output": "The agent used nvshmem-docs and explained that NVSHMEM_THREAD_SERIALIZED is the thread support level allowing a multithreaded program provided NVSHMEM interfaces are not invoked concurrently by multiple threads, sourced from live official documentation.",
+      "assertions": [
+        "The agent read nvshmem-docs/references/topic-map.md to route the request",
+        "The agent selected the latest official NVSHMEM API documentation",
+        "The agent fetched the relevant live official API page before defining the constant",
+        "The agent explained that the program may be multithreaded but must not invoke NVSHMEM interfaces concurrently from multiple threads",
+        "The agent stated the resolved documentation version used for the answer",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-docs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-docs-003",
+      "prompt": "I'm tuning an InfiniBand GPUDirect Async setup and I'm confused about the RC and DCI QP mapping options. Can you explain how the different mapping modes work and when to pick each one?",
+      "expected_output": "The agent used nvshmem-docs and explained the IBGDA RC and DCI QP mapping modes (warp, cm, cta), giving guidance on when to use each, based on live official documentation.",
+      "assertions": [
+        "The agent read nvshmem-docs/references/topic-map.md to route the request",
+        "The agent selected the latest official NVSHMEM API documentation for the IBGDA transport/runtime-settings topic",
+        "The agent fetched the relevant live official documentation before describing the mapping modes",
+        "The agent reported the IBGDA 2.8 introduction gate; no version comparison was required because none was requested",
+        "The agent named the warp, cm, and cta modes and gave short guidance on when to use each",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-docs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-docs-004",
+      "prompt": "How do I configure a persistent volume claim in a Kubernetes deployment for a PostgreSQL database?",
+      "expected_output": "The agent recognized the question is unrelated to NVSHMEM documentation and did not invoke the nvshmem-docs skill, instead answering the Kubernetes PVC question directly.",
+      "assertions": [
+        "The agent did not invoke the nvshmem-docs skill or fetch NVSHMEM documentation",
+        "The agent answered the Kubernetes PersistentVolumeClaim configuration question directly",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    },
+    {
+      "id": "nvshmem-docs-005",
+      "prompt": "Find the installation documentation for NVSHMEM 3.5.21.",
+      "expected_output": "The agent used the archived NVSHMEM 3.5.21 release-notes and installation documentation and cited the relevant official archive page.",
+      "assertions": [
+        "The agent read nvshmem-docs/references/topic-map.md to route the request",
+        "The agent selected the release and installation archive rooted at https://archive.docs.nvidia.com/nvshmem/3.5.21/index.html",
+        "The agent did not use latest installation documentation as evidence for NVSHMEM 3.5.21",
+        "The agent cited a relevant official archived installation page",
+        "The agent did not perform a separate feature-availability investigation because the user did not ask for one",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-docs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-docs-006",
+      "prompt": "Explain the QP-specific APIs in NVSHMEM 3.4.5.",
+      "expected_output": "The agent reported that the QP API family was introduced in 3.5, compared that gate with requested version 3.4.5, and flagged the mismatch using live official gate evidence.",
+      "assertions": [
+        "The agent read nvshmem-docs/references/topic-map.md to route the request",
+        "The agent verified and reported the QP API 3.5 introduction gate from live official evidence",
+        "The agent compared requested version 3.4.5 by its 3.4 release family and reported a mismatch",
+        "The agent did not present current QP API documentation as applicable to NVSHMEM 3.4.5",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-docs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-docs-007",
+      "prompt": "Find the API documentation for NVSHMEM4Py 0.2.2.",
+      "expected_output": "The agent resolved NVSHMEM4Py 0.2.2 to compatible NVSHMEM 3.5.21 using the live official compatibility guide, then used the NVSHMEM 3.5.21 API archive and reported both component versions and the documentation edition.",
+      "assertions": [
+        "The agent read nvshmem-docs/references/topic-map.md to route the request",
+        "The agent fetched the live official NVSHMEM4Py compatibility guide rather than inferring or hard-coding the version relationship",
+        "The agent resolved NVSHMEM4Py 0.2.2 to NVSHMEM 3.5.21 and selected the archive rooted at https://archive.docs.nvidia.com/nvshmem/api/3.5.21/index.html",
+        "The agent did not construct an archive URL using NVSHMEM4Py version 0.2.2",
+        "The agent reported the NVSHMEM4Py version, compatible NVSHMEM version, and documentation edition",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-docs",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-docs-008",
+      "prompt": "Can I use NVSHMEM4Py 0.2.2 with NVSHMEM 3.6.5?",
+      "expected_output": "The agent checked the live official compatibility guide, reported that NVSHMEM4Py 0.2.2 maps to NVSHMEM 3.5.21 rather than 3.6.5, and flagged the requested pair as a mismatch.",
+      "assertions": [
+        "The agent read nvshmem-docs/references/topic-map.md to route the request",
+        "The agent fetched the live official NVSHMEM4Py compatibility guide",
+        "The agent kept NVSHMEM4Py 0.2.2 and NVSHMEM 3.6.5 as separate version axes",
+        "The agent reported the pair as a compatibility mismatch and identified the documented compatible NVSHMEM release",
+        "The agent did not compare NVSHMEM4Py 0.2.2 numerically with an NVSHMEM feature gate",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "nvshmem-docs",
+      "expected_script": "None"
+    }
+  ]
+}

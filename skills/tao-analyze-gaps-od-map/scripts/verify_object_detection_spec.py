@@ -152,7 +152,7 @@ def validate_config(config: dict[str, Any]) -> list[str]:
     gated = [key for key, value in defaults.items() if value > 0.0]
     if gated:
         warnings.append(
-            f"{', '.join(gated)} is above zero, so every class absent from weak_thresholds is "
+            f"{', '.join(gated)} is above zero, so every class absent from weak_thresholds is "  # nosec B608 - prose warning text, not a SQL query
             "also gated. An image is weak if ANY class falls below its gate, so a class you "
             "did not list can select images on its own — which inflates the weak set and any "
             "mining budget derived from it. Set these to 0.0 unless that is intended."

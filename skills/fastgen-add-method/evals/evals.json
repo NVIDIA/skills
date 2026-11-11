@@ -1,0 +1,73 @@
+{
+  "skill_name": "fastgen-add-method",
+  "evals": [
+    {
+      "id": "explicit-sft-quality-weighting",
+      "prompt": "Use fastgen-add-method to extend the existing SFT objective for curated data. A loader provides quality_weight as a finite, nonnegative tensor of shape [B]. When a new typed SFT config option is enabled, each sample contribution to each modality denoising loss is multiplied by that weight, then averaged over the original batch. Disabled mode must preserve current behavior; enabled mode requires the field. A zero-weight sample must contribute no denoising gradient, while configured reward semantics stay unchanged. Use the actual staged SFTModel, config and common_loss sources in sft_sources.json; decide whether a narrow extension is sufficient. Write /workspace/output/changes.patch, real pytest regressions under /workspace/output/regressions/, and /workspace/output/validation.md. The staged sft_multimodal_helpers.py.txt supplies real test-network construction and the SFT branch of the repository test factory; adapt it to the required unequal modality shapes. Tests must exercise SFTModel.single_train_step and actual FastGen losses with tensor and unequal-size modality-mapping inputs. Compare losses and parameter/input gradients to an independently computed tensor reference using fixed noise and times; cover disabled mode, enabled unit weights, mixed weights with a sum different from the batch size, and all-zero weights that remain connected for backward. Keep causal variants outside this noncausal request or identify and test any changed behavior. Do not introduce a parallel production loss or stub SFTModel; an independent tensor reference belongs in the tests. This runtime provides source only: do not install dependencies, download models or execute GPU code. Run available static checks and clearly separate them from the test command to run in a complete environment.",
+      "expected_output": "An opt-in extension of real SFTModel/config using FastGen loss dispatch and meaningful regression tests, without duplicating the method lifecycle.",
+      "assertions": [
+        "Adds a typed disabled-by-default config option and modifies SFTModel.single_train_step rather than adding an unrelated standalone objective or duplicating the trainer.",
+        "Uses the existing flow_matching_loss loss_scale interface through per_modality so each modality uses the same [B] weights and original-batch mean.",
+        "Checks missing weights, wrong shape, negative and nonfinite values when enabled, and preserves disabled behavior even when a loader carries unused quality metadata.",
+        "Leaves state/noise precision, condition dropout, _get_outputs and apply_reward behavior intact; quality metadata is not added to generated diffusion state.",
+        "Real pytest tests call the modified SFTModel and compare weighted scalar losses and parameter/input gradients to fixed-noise, fixed-time tensor references; include zero, mixed and unit weights and unequal-size modality leaves.",
+        "Keeps total_loss connected even for all-zero weights, leaves backward/optimizer stepping to Trainer, and identifies validation and any causal variants outside the requested noncausal path.",
+        "Delivers an applicable source patch and test artifact, with no claim that source checks proved training or distributed compatibility."
+      ],
+      "expected_skill": "fastgen-add-method",
+      "should_trigger": true,
+      "files": [
+        "files/sft.py.txt",
+        "files/config_sft.py.txt",
+        "files/flow_matching_loss.py.txt",
+        "files/prepare_batch.py.txt",
+        "files/tree_dispatch.py.txt",
+        "files/sft_existing_tests.py.txt",
+        "files/sft_sources.json",
+        "files/sft_multimodal_helpers.py.txt",
+        "files/reward_contract.py.txt"
+      ]
+    },
+    {
+      "id": "implicit-dmd2-sharded-gradient-review",
+      "prompt": "Review /workspace/input/dmd2_change_request.txt against the DMD2 and Trainer implementations in dmd2_sources.json. Write /workspace/output/dmd2-review.md with the failures, exact affected call paths and a minimal correction plan. Include which checks need two sharded ranks and which can be verified on small tensors. No framework imports, training or rank launches are available.",
+      "expected_output": "A concrete DMD2 review of sharded call participation, teacher input gradients, weighting and alternating optimizer phases.",
+      "assertions": [
+        "Connects the rank-local loss_scale early return to differing sharded teacher forward participation, and retains the forward on all ranks while weighting its per-sample objective.",
+        "Explains that frozen teacher parameters still need input derivatives for the GAN student loss; no_grad would sever that path although VSD can still yield a plausible total_loss.",
+        "Uses the existing gan_loss_generator/mean_with_loss_scale original-batch reduction, covering all-zero masks without normalizing by active count.",
+        "Matches get_optimizers and get_lr_schedulers to DMD2Model.single_train_step phase selection instead of stepping student and auxiliaries together.",
+        "Cites Trainer.train_step as the backward/accumulation owner and identifies real two-rank and gradient checks as unrun."
+      ],
+      "expected_skill": "fastgen-add-method",
+      "should_trigger": true,
+      "files": [
+        "files/dmd2_student_step.py.txt",
+        "files/gan_reduction.py.txt",
+        "files/trainer_step.py.txt",
+        "files/dmd2_sources.json",
+        "files/dmd2_change_request.txt"
+      ]
+    },
+    {
+      "id": "adjacent-existing-dmd2-recipe",
+      "prompt": "Using the staged existing CIFAR-10 DMD2 recipe, write /workspace/output/config_dmd2_recipe.py for one student update per three auxiliary updates, generator GAN weight 0.002 and approximate-R1 weight 5 with perturbation standard deviation 0.05. Keep the existing objective and network. Explain the iteration cadence from the supplied code and name the workflow that owns this change. Do not launch training or add a method subclass.",
+      "expected_output": "A fastgen-configure recipe using existing DMD2 options. The modulo-based cadence requires student_update_freq=4: Trainer starts at iteration 1, so iterations 1,2,3 update the auxiliary networks and iteration 4 updates the student. Frequency 3 would give only two auxiliary updates per student update.",
+      "assertions": [
+        "Routes to fastgen-configure rather than starting an algorithm integration.",
+        "Derives from the existing CIFAR-10 create_config and sets student_update_freq=4, gan_loss_weight_gen=0.002, gan_r1_reg_weight=5 and gan_r1_reg_alpha=0.05.",
+        "Explains student optimizer updates at trainer iterations 4,8,... with three intervening auxiliary iterations. The modulo dispatch also selects the student branch at 0 in direct calls or initial validation, but Trainer begins optimizer updates at iteration 1.",
+        "Does not claim training, dataset or model availability from writing a config."
+      ],
+      "expected_skill": "fastgen-add-method",
+      "should_trigger": false,
+      "files": [
+        "files/dmd2_cifar10_config.py.txt",
+        "files/config_dmd2.py.txt",
+        "files/dmd2_phase.py.txt",
+        "files/dmd2_recipe_sources.json",
+        "files/trainer_iterations.py.txt"
+      ]
+    }
+  ]
+}

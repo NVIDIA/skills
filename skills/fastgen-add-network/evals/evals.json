@@ -1,0 +1,67 @@
+{
+  "skill_name": "fastgen-add-network",
+  "evals": [
+    {
+      "id": "explicit-flux-adapter-regression",
+      "prompt": "Use fastgen-add-network to repair the candidate FLUX.1 adapter in /workspace/input/flux_candidate.py.txt. Its owner reports finite SFT loss, changed guided sampling, and no student learning through adversarial teacher features after a cleanup. The adapter and source contracts are staged with provenance in adapter_sources.json. Write /workspace/output/changes.patch against the candidate at its recorded repository path, real pytest regressions under /workspace/output/regressions/, and /workspace/output/validation.md explaining the failures and coverage. Use the staged flux_tiny_tests.py.txt helper as a reference for constructing a real tiny transformer without downloads. Tests must exercise the actual Flux adapter and classify_forward with a small real FluxTransformer2DModel or an explicitly available checkpoint; do not replace the adapter or transformer with a fake implementation. Compare prediction values at an interior time in all four combinations: native/ordinary, native/prediction-plus-features, x0/ordinary and x0/prediction-plus-features. Cover output_dtype=None and output-conditioning behavior on both return paths. Include frozen-transformer input gradients through joint and single blocks, early returns and the empty feature_indices contract. This runtime has source excerpts only: do not install dependencies, fetch weights, or run GPU code. Run syntax/patch checks that are available, and record the exact dependency-complete test command separately from checks you executed.",
+      "expected_output": "A patch to the actual Flux adapter and meaningful tensor/gradient regressions, with honest source-only validation limits.",
+      "assertions": [
+        "Repairs both tensor and prediction-plus-features output paths in Flux.forward so transform_output receives the caller fwd_pred_type, output_dtype and apply_output_conditioning flags.",
+        "Preserves Flux native flow and embedded guidance semantics; does not impose x0 conversion or multiply native output by guidance scale.",
+        "Preserves the autograd path through features from both joint and single transformer blocks while allowing teacher parameters to remain frozen.",
+        "Tests import the real Flux/classify_forward implementation and use a real small FluxTransformer2DModel; they cover native/x0 predictions at an interior time, output_dtype=None, and ordinary versus feature-returning calls.",
+        "Adds a regression that obtains a finite nonzero input gradient through frozen transformer features, plus the empty feature_indices contract.",
+        "Produces an applicable patch and real pytest artifact; reports syntax or patch checks separately from unrun FastGen, checkpoint, parity and distributed tests."
+      ],
+      "expected_skill": "fastgen-add-network",
+      "should_trigger": true,
+      "files": [
+        "files/flux_candidate.py.txt",
+        "files/network_output_contract.py.txt",
+        "files/dmd2_feature_consumer.py.txt",
+        "files/flux_existing_test.py.txt",
+        "files/adapter_sources.json",
+        "files/flux_tiny_tests.py.txt"
+      ]
+    },
+    {
+      "id": "implicit-port-precision",
+      "prompt": "Review the integration proposal in /workspace/input/port_manifest.json against the actual lifecycle and sharding code supplied in precision_sources.json. Write /workspace/output/port-review.md, citing the staged functions for each required change. Include a concrete root reset hook design and a precision/sharding verification plan covering meta initialization, sharded preparation, inference followed by backward, and checkpoint reload. This is a source review; no GPU or weights are available.",
+      "expected_output": "A source-grounded review of precision islands, meta-buffer restoration and module preparation, with explicit unrun checks.",
+      "assertions": [
+        "Preserves reference FP32 normalization and VAE state instead of casting every component to BF16; ties the design to _fixed_precision_overrides and prepare_module.",
+        "Uses _validate_fsdp_pins and make_fully_shard_kwargs to explain why pinned storage alone does not establish FSDP compute precision.",
+        "Cites materialize_meta_module calling only the root reset_parameters hook; a child-only rotary reconstruction is insufficient.",
+        "Requires deterministic in-place rebuilding that preserves registered objects, metadata and module ownership, avoids random draws, and audits other nonpersistent state.",
+        "Distinguishes source evidence from unrun meta/sharded preparation, inference-then-backward and checkpoint-reload tests."
+      ],
+      "expected_skill": "fastgen-add-network",
+      "should_trigger": true,
+      "files": [
+        "files/module_precision_contract.py.txt",
+        "files/meta_materialization.py.txt",
+        "files/fsdp_precision_groups.py.txt",
+        "files/precision_sources.json",
+        "files/port_manifest.json"
+      ]
+    },
+    {
+      "id": "adjacent-existing-flux-config",
+      "prompt": "Our existing FLUX.1-dev adapter already works. Using /workspace/input/flux_sft_config.py.txt, write /workspace/output/config_flux_small.py that derives from this experiment, uses 256x256 images, batch size 2 and learning rate 2e-6, and keeps the existing sampling/guidance recipe. No new architecture, training run or dependency installation is needed. Explain which FastGen workflow owns this request and show how the model and loader geometry stay consistent.",
+      "expected_output": "A configuration-only derivative of the existing Flux SFT experiment, routed to fastgen-configure.",
+      "assertions": [
+        "Recognizes fastgen-configure as the owning workflow and does not start a new-adapter integration.",
+        "Uses the existing create_config, sets model.input_shape=[16,32,32], dataloader_train.batch_size=2 and model.net_optimizer.lr=2e-6.",
+        "Updates loader input_res consistently to (256,256), recomputing it after changing input_shape or setting the derived value explicitly.",
+        "Keeps the existing embedded guidance and student sampling recipe; does not invent a FluxNetwork class or claim training execution."
+      ],
+      "expected_skill": "fastgen-add-network",
+      "should_trigger": false,
+      "files": [
+        "files/flux_sft_config.py.txt",
+        "files/flux_preset.py.txt",
+        "files/flux_recipe_sources.json"
+      ]
+    }
+  ]
+}

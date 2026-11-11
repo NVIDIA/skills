@@ -1,0 +1,83 @@
+# fastgen/utils/distributed/fsdp.py:163-204
+def _validate_fsdp_pins(module: FastGenModule) -> None:
+    """Require every fixed-precision pinned parameter under ``module`` to compute in its pinned dtype.
+
+    A pure check of the installed FSDP2 groups, run after wrapping and before any state is loaded, for
+    generic and architecture-owned layouts alike. Buffers are not checked: FSDP never casts them, so their
+    pinned storage already holds.
+    """
+    expected: dict[tuple[torch.nn.Module, str], tuple[str, torch.dtype]] = {}
+    for prefix, owner in module._named_fastgen_modules():
+        for local_name, dtype in owner._fixed_precision_overrides().items():
+            holder_path, _, param_name = local_name.rpartition(".")
+            holder = owner.get_submodule(holder_path) if holder_path else owner
+            if param_name in holder._parameters:
+                expected[(holder, param_name)] = (f"{prefix}.{local_name}" if prefix else local_name, dtype)
+    if not expected:
+        return
+
+    actual: dict[tuple[torch.nn.Module, str], tuple[Optional[torch.dtype], torch.dtype]] = {}
+    for candidate in module.modules():
+        if not isinstance(candidate, FSDPModule):
+            continue
+        group = fully_shard.state(candidate)._fsdp_param_group
+        for fsdp_param in group.fsdp_params if group is not None else ():
+            info = fsdp_param._module_info
+            dtypes = (group.mp_policy.param_dtype, fsdp_param.sharded_param.dtype)
+            holders = zip((info.module, *info.shared_modules), (info.param_name, *info.shared_param_names))
+            actual.update({holder: dtypes for holder in holders})
+
+    violations = []
+    for key, (name, pin) in expected.items():
+        if key not in actual:
+            violations.append(f"{name}: pinned {pin} but not managed by any FSDP group")
+            continue
+        param_dtype, storage_dtype = actual[key]
+        compute_dtype = storage_dtype if param_dtype is None else param_dtype
+        if compute_dtype != pin:
+            violations.append(f"{name}: computes in {compute_dtype}, pinned {pin}")
+    if violations:
+        raise RuntimeError(
+            f"FSDP layout of {type(module).__name__} violates fixed-precision pins: {violations[:8]}. Carve pinned "
+            "state into its own group (make_fully_shard_kwargs) or provide an architecture-owned fully_shard()."
+        )
+
+
+# fastgen/utils/distributed/fsdp.py:207-243
+def make_fully_shard_kwargs(
+    fsdp_kwargs: dict,
+    param_dtype: torch.dtype,
+    storage_dtype: Optional[torch.dtype],
+    enabled: bool,
+    cast_forward_inputs: Optional[bool] = None,
+    reshard_after_forward: Optional[bool] = None,
+) -> Optional[dict]:
+    """Return kwargs for an explicit precision/storage boundary, or ``None`` if unneeded.
+
+    ``storage_dtype`` is the enclosing root's default storage dtype before sharding. A separate
+    group is required when either that storage or the parent compute policy differs from the
+    island's ``param_dtype``. Set ``cast_forward_inputs=False`` for a group whose callable owner
+    still runs in the parent dtype, such as Wan's direct scale/shift tables.
+    """
+    mp_policy = fsdp_kwargs.get("mp_policy")
+    active = (
+        enabled
+        and mp_policy is not None
+        and (storage_dtype != param_dtype or mp_policy.param_dtype not in (None, param_dtype))
+    )
+    if not active:
+        return None
+
+    updated_kwargs = {
+        **fsdp_kwargs,
+        "mp_policy": MixedPrecisionPolicy(
+            param_dtype=param_dtype,
+            reduce_dtype=mp_policy.reduce_dtype,
+            output_dtype=mp_policy.output_dtype,
+            cast_forward_inputs=(mp_policy.cast_forward_inputs if cast_forward_inputs is None else cast_forward_inputs),
+        ),
+    }
+    if reshard_after_forward is not None:
+        updated_kwargs["reshard_after_forward"] = reshard_after_forward
+
+    return updated_kwargs

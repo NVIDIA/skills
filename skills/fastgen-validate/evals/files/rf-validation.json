@@ -1,0 +1,48 @@
+{
+  "purpose": "Regression coverage for the real ShiftedRFNoiseSchedule flow convention and ODE step; fixed test inputs, not a model benchmark.",
+  "source_revision": "e0a92619fc56daf4dfa081273c7729c045bf1dcc",
+  "class": "fastgen.networks.noise_schedule.ShiftedRFNoiseSchedule",
+  "device": "cpu",
+  "dtype": "float64",
+  "min_t": 0.0,
+  "max_t": 0.999,
+  "shifts": [
+    1.0,
+    3.0
+  ],
+  "x0": [
+    [
+      -1.25,
+      0.5
+    ],
+    [
+      0.75,
+      2.0
+    ]
+  ],
+  "eps": [
+    [
+      0.4,
+      -0.3
+    ],
+    [
+      1.1,
+      -0.8
+    ]
+  ],
+  "t": [
+    0.25,
+    0.75
+  ],
+  "t_next": [
+    0.1,
+    0.0
+  ],
+  "acceptance": {
+    "atol": 1e-10,
+    "rtol": 1e-10
+  },
+  "suspect_reference": "Treat eps - x0 as dx/dt for every shift, and take xt + (t_next - t) * flow as the shifted ODE step.",
+  "required_negative_control": "At shift=3 the unscaled eps-x0 must be rejected against the analytic derivative under the unchanged tolerances.",
+  "t_precision": "float64"
+}

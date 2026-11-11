@@ -1,0 +1,252 @@
+{
+  "$comment": "Copy of tao-data-services:nvidia_tao_ds/mining/dinov3/workflow/schemas/workflow.schema.yaml; source handoff enforces semantic parity.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developer.nvidia.com/tao/dinov3-ssl-deft/workflow-1.0.schema.json",
+  "title": "DINOv3 SSL DEFT Workflow",
+  "type": "object",
+  "required": ["schema_version", "workflow", "model", "data", "mining", "training", "actions", "execution", "output"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "workflow": {
+      "type": "object",
+      "required": ["strategy"],
+      "properties": {
+        "run_id": {"type": "string"},
+        "strategy": {"enum": ["grit_score", "multi_task_round_robin"]},
+        "initialization": {"enum": ["base_checkpoint", "parent_history"]},
+        "start_round": {"type": "integer", "minimum": 1},
+        "max_rounds": {"type": "integer", "minimum": 1},
+        "persistent_target_rounds": {"type": "integer", "minimum": 1},
+        "early_stopping": {
+          "type": "object",
+          "required": ["metrics"],
+          "properties": {
+            "patience": {"type": "integer", "minimum": 1},
+            "min_delta": {"type": "number", "minimum": 0},
+            "metrics": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["task", "name"],
+                "properties": {
+                  "task": {"type": "string", "minLength": 1},
+                  "name": {"type": "string", "minLength": 1},
+                  "weight": {"type": "number", "exclusiveMinimum": 0}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "required": ["base_checkpoint"],
+      "properties": {
+        "base_checkpoint": {"type": "string"},
+        "initial_scoring_checkpoint": {"type": "string"}
+      }
+    },
+    "data": {
+      "type": "object",
+      "required": ["target_manifest", "source_payload_contract"],
+      "properties": {
+        "target_manifest": {"type": "string"},
+        "source_payload_contract": {"type": "string"},
+        "source_store_validation": {"enum": ["full_sha256", "sealed_inventory"]},
+        "source_store_manifest": {"type": "string"},
+        "source_parts": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "previous_training_manifest": {"type": "string"},
+        "target_embedding_contract": {"type": "string"},
+        "source_identity_audit": {"type": "string"},
+        "benchmark_manifest": {"type": "string"},
+        "benchmark_acquisition_units": {"type": "string"},
+        "acquisition_unit_column": {"type": "string"}
+      },
+      "oneOf": [
+        {"required": ["source_store_manifest", "target_embedding_contract"], "not": {"required": ["source_parts"]}},
+        {"required": ["source_parts"], "not": {"required": ["source_store_manifest"]}}
+      ]
+    },
+    "continuation": {
+      "type": "object",
+      "required": ["previous_run_dir", "adopted_round", "training_contract", "training_commit", "success_marker", "previous_data_lock", "previous_release_lock"],
+      "properties": {
+        "previous_run_dir": {"type": "string"},
+        "adopted_round": {"type": "integer", "minimum": 1},
+        "training_contract": {"type": "string"},
+        "training_commit": {"type": "string"},
+        "success_marker": {"type": "string"},
+        "previous_data_lock": {"type": "string"},
+        "previous_release_lock": {"type": "string"}
+      }
+    },
+    "mining": {
+      "type": "object",
+      "required": ["top_k_per_target", "min_similarity"],
+      "properties": {
+        "top_k_per_target": {"type": "integer", "minimum": 1},
+        "min_similarity": {"type": "number", "minimum": -1, "maximum": 1},
+        "hard_min_similarity": {"type": "number", "minimum": -1, "maximum": 1},
+        "similarity_step": {"type": "number", "exclusiveMinimum": 0},
+        "duplicate_similarity": {"type": "number", "minimum": -1, "maximum": 1},
+        "candidate_multiplier": {"type": "integer", "minimum": 1},
+        "parent_history_policy": {"const": "exclude"}
+      }
+    },
+    "grit": {
+      "type": "object",
+      "properties": {
+        "target_fraction": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+      }
+    },
+    "multi_task": {
+      "type": "object",
+      "required": ["tasks"],
+      "properties": {
+        "tasks": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "targets_per_round": {"type": "integer", "minimum": 1},
+        "targets_per_task": {"type": "integer", "minimum": 1, "deprecated": true},
+        "task_weights": {
+          "type": "object",
+          "additionalProperties": {"type": "number", "exclusiveMinimum": 0}
+        }
+      }
+    },
+    "training": {
+      "type": "object",
+      "required": ["base_spec", "passes_per_round"],
+      "properties": {
+        "base_spec": {"type": "string"},
+        "passes_per_round": {"type": "integer", "minimum": 1},
+        "lr_scaling_rule": {"const": "preserve_base_spec"},
+        "checkpoint_policy": {"const": "base_checkpoint_each_round"},
+        "node_scaling": {
+          "type": "object",
+          "required": ["allowed_nodes", "gpus_per_node", "target_optimizer_updates"],
+          "properties": {
+            "mode": {"const": "target_optimizer_updates"},
+            "allowed_nodes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer", "minimum": 1}},
+            "gpus_per_node": {"type": "integer", "minimum": 1},
+            "target_optimizer_updates": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+    "actions": {
+      "type": "object",
+      "required": ["score", "train"],
+      "properties": {
+        "score": {"$ref": "#/$defs/actionExecution"},
+        "data": {"$ref": "#/$defs/actionExecution"},
+        "search": {
+          "allOf": [
+            {"$ref": "#/$defs/actionExecution"},
+            {
+              "type": "object",
+              "properties": {
+                "backend": {"enum": ["exact", "custom", "audited_ann"]},
+                "dense_store_manifest": {"type": "string"},
+                "ann_index_manifest": {"type": "string"},
+                "ann_audit_manifest": {"type": "string"},
+                "n_probes": {"type": "integer", "minimum": 1},
+                "ann_candidates": {"type": "integer", "minimum": 1},
+                "candidate": {"type": "object"},
+                "rerank": {"type": "object"}
+              }
+            }
+          ]
+        },
+        "train": {
+          "allOf": [
+            {"$ref": "#/$defs/actionExecution"},
+            {"not": {"anyOf": [{"required": ["contract"]}, {"required": ["checkpoint"]}]}}
+          ]
+        },
+        "evaluate": {"$ref": "#/$defs/actionExecution"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["backend"],
+      "properties": {
+        "backend": {"enum": ["local", "external"]},
+        "max_attempts": {"type": "integer", "minimum": 1, "default": 3},
+        "container_images": {
+          "type": "object",
+          "required": ["pytorch", "data_services"],
+          "properties": {
+            "pytorch": {"type": "string", "minLength": 1},
+            "data_services": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "runner_command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "workdir": {"type": "string"},
+        "poll_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "call_timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "environment": {"type": "object", "additionalProperties": {"type": "string"}},
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "gang_scheduling": {"type": "boolean"},
+            "gang_retry": {"type": "boolean"},
+            "attempt_scoped_launch_id": {"type": "boolean"},
+            "shared_filesystem": {"type": "boolean"},
+            "gpu_faiss": {"type": "boolean"},
+            "containers": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["run_dir"],
+      "properties": {"run_dir": {"type": "string"}}
+    },
+    "release": {"type": "object"}
+  },
+  "$defs": {
+    "actionExecution": {
+      "type": "object",
+      "properties": {
+        "container_image": {"type": "string", "minLength": 1},
+        "command": {"type": "array", "items": {"type": "string"}},
+        "parameters": {"type": "object"},
+        "settings": {"type": "object"},
+        "implementation_files": {"type": "array", "items": {"type": "string"}},
+        "scope": {"enum": ["sealed_benchmark", "diagnostic_replay"]},
+        "metrics": {"type": "string"},
+        "commit": {"type": "string"},
+        "contract": {"type": "string"},
+        "checkpoint": {"type": "string"},
+        "execution_mode": {"enum": ["runner", "adapter_managed"]},
+        "resources": {"$ref": "#/$defs/resources"},
+        "wrapper_resources": {
+          "allOf": [
+            {"$ref": "#/$defs/resources"},
+            {"type": "object", "properties": {"nodes": {"const": 1}}}
+          ]
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "nodes": {"type": "integer", "minimum": 1},
+        "gpus": {"type": "integer", "minimum": 0},
+        "gpus_per_node": {"type": "integer", "minimum": 0},
+        "cpus": {"type": "integer", "minimum": 1},
+        "memory": {"type": ["string", "integer"]},
+        "time_limit": {"type": "string"},
+        "local_scratch": {
+          "type": "object",
+          "required": ["path_environment"],
+          "properties": {"path_environment": {"type": "string"}},
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}

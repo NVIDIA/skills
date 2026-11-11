@@ -1,0 +1,101 @@
+{
+  "skill_name": "nvshmem-tune-performance",
+  "evals": [
+    {
+      "id": "nvshmem-tune-performance-001",
+      "prompt": "Use nvshmem-tune-performance to help me improve NVSHMEM performance. I do not have a concrete tuning question yet.",
+      "expected_output": "The agent presents a baseline-characterization workflow and a targeted-optimization workflow covering remote transport, NIC-to-PE mapping, and TMA, then requires an explicit selection without running anything.",
+      "assertions": [
+        "The agent offers initial performance data collection as an optional first step rather than an automatic prerequisite",
+        "The agent lists remote transport selection, NIC-to-PE mapping, and TMA as the three targeted optimization domains",
+        "The agent does not invoke a specialist, run a collector, execute a benchmark, or choose an optimization without user input"
+      ],
+      "expected_skill": "nvshmem-tune-performance",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-tune-performance-002",
+      "prompt": "Use nvshmem-tune-performance. I want to collect initial NVSHMEM performance data and system information first, then choose an optimization. I have not selected a benchmark suite yet.",
+      "expected_output": "The agent invokes nvshmem-collect-performance-data, which presents its benchmark-suite choices and waits for an explicit selection before running anything; no optimizer is chosen yet.",
+      "assertions": [
+        "The agent routes the request to nvshmem-collect-performance-data",
+        "The agent preserves the collector's requirement that the user explicitly select a benchmark or suite before execution",
+        "The agent does not invoke an optimization skill before collection completes and the user chooses an optimization"
+      ],
+      "expected_skill": "nvshmem-tune-performance",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-tune-performance-003",
+      "prompt": "Use nvshmem-tune-performance to choose an NVSHMEM remote transport for a two-node InfiniBand application. Skip benchmarking and make a static recommendation from my installation facts and kernel profile.",
+      "expected_output": "The agent directly invokes nvshmem-select-remote-transport with the supplied goal and evidence, without inserting performance data collection.",
+      "assertions": [
+        "The agent routes directly to nvshmem-select-remote-transport",
+        "The handoff includes the two-node InfiniBand target, static-analysis constraint, installation facts, and kernel profile",
+        "The agent does not invoke performance data collection or claim a measured performance winner"
+      ],
+      "expected_skill": "nvshmem-tune-performance",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-tune-performance-004",
+      "prompt": "Use nvshmem-tune-performance to optimize the NIC-to-PE mapping for my selected IBGDA transport. I already have the NVSHMEM version, local PE-to-GPU bindings, and target-node topology output.",
+      "expected_output": "The agent directly invokes nvshmem-configure-nic-pe-mapping and passes the established transport, version, PE-to-GPU binding, and topology evidence.",
+      "assertions": [
+        "The agent routes directly to nvshmem-configure-nic-pe-mapping",
+        "The handoff preserves the selected IBGDA transport and all supplied mapping evidence",
+        "The agent does not rerun transport selection or performance collection"
+      ],
+      "expected_skill": "nvshmem-tune-performance",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-tune-performance-005",
+      "prompt": "Use nvshmem-tune-performance to assess and prepare src/exchange.cu for NVSHMEM TMA on H100 GPUs connected by NVLink. Do not run a benchmark.",
+      "expected_output": "The agent directly invokes nvshmem-enable-tma with the selected source scope, H100/NVLink facts, assessment-and-preparation goal, and no-benchmark constraint.",
+      "assertions": [
+        "The agent routes directly to nvshmem-enable-tma",
+        "The handoff preserves src/exchange.cu as the selected source scope and includes the H100 and NVLink evidence",
+        "The agent does not route TMA through a remote transport skill or insert performance data collection"
+      ],
+      "expected_skill": "nvshmem-tune-performance",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-tune-performance-006",
+      "prompt": "Use nvshmem-tune-performance to select the best eligible remote transport for my target and then produce the matching NIC-to-PE mapping. Do not run benchmarks.",
+      "expected_output": "The agent invokes nvshmem-select-remote-transport first and, after a transport is resolved, invokes nvshmem-configure-nic-pe-mapping with the selection evidence and unresolved conditions.",
+      "assertions": [
+        "The agent sequences nvshmem-select-remote-transport before nvshmem-configure-nic-pe-mapping",
+        "The mapping handoff includes the selected transport, version, provider and relevant topology evidence or unresolved prerequisites",
+        "The agent does not invoke performance data collection"
+      ],
+      "expected_skill": "nvshmem-tune-performance",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-tune-performance-007",
+      "prompt": "Use nvshmem-tune-performance to tune my NIC-to-PE mapping, but nvshmem-configure-nic-pe-mapping is not installed in this environment.",
+      "expected_output": "The agent names the missing nvshmem-configure-nic-pe-mapping dependency, explains that mapping cannot proceed, and asks the user to install or expose it or select another service without inventing a mapping.",
+      "assertions": [
+        "The agent explicitly reports that nvshmem-configure-nic-pe-mapping is unavailable",
+        "The agent does not reconstruct the missing specialist's mapping algorithm or emit mapping exports",
+        "The agent offers to continue after the dependency is available or with another listed service"
+      ],
+      "expected_skill": "nvshmem-tune-performance",
+      "expected_script": "None"
+    },
+    {
+      "id": "nvshmem-tune-performance-008",
+      "prompt": "How should I tune NCCL all-reduce bucket sizes for a PyTorch training job that does not use NVSHMEM?",
+      "expected_output": "The agent recognizes an unrelated NCCL and PyTorch question and does not invoke nvshmem-tune-performance or any routed NVSHMEM skill.",
+      "assertions": [
+        "The agent does not invoke nvshmem-tune-performance or an NVSHMEM specialist",
+        "The response addresses or scopes the NCCL and PyTorch question directly",
+        "The agent does not introduce NVSHMEM transport, mapping, benchmark, or TMA guidance"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

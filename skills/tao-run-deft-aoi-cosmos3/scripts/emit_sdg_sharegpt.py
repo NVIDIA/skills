@@ -209,6 +209,8 @@ def emit_records(
     label: str = "NG",
     sdg_root: pathlib.Path | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    if label != "NG":
+        raise ValueError("AnomalyGen synthetic defects must use the exact NG label")
     sdg_dir = sdg_csv.parent.resolve()
     with sdg_csv.open(newline="") as handle:
         rows = list(csv.DictReader(handle))

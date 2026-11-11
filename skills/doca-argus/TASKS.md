@@ -11,7 +11,7 @@ These verbs cover the in-scope Argus operational workflows for an
 external operator deploying the Argus container on BlueField.
 Every step assumes the operator has consulted the live public
 DOCA Argus Service Guide (reachable through
-[doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services))
+doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`))
 and is using it as the authoritative reference; this file
 prescribes the *order* and *what to look up where*, not a
 copy-paste runbook.
@@ -36,22 +36,21 @@ review) before the container starts.
     - Is the user trying to build a custom DPU-side security
       tool of their own? That is the DOCA App Shield library —
       same shape of BlueField-side observation, different shape of
-      operator effort — which is **not covered by this bundle**
-      (policy-excluded from the public release); route them to the
+      operator effort — which is **not covered by this bundle**; route them to the
       public docs via
-      [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md).
+      `doca-public-knowledge-map/SKILL.md`.
     - Does the user actually want observability / metrics rather
       than security? Route to the DOCA Telemetry Service via
-      [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
+      `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
     - Is there no security-posture concern at all? Stop here
       honestly — Argus has operational cost (container, sampling
       CPU, SIEM channel) and deploying it for nothing is not a
       neutral choice.
 2. **Confirm the env is healthy.** This skill expects DOCA to be
    installed on the BlueField. If that has not been verified,
-   run [`doca-setup ## test`](../../doca-setup/TASKS.md#test)
+   run `doca-setup ## test` (`doca-setup/TASKS.md#test`)
    first. If the user has no install yet, route to
-   [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    for the public NGC DOCA container path.
 3. **Decide the four configuration axes.** Per the four-axis
    table in
@@ -117,16 +116,15 @@ If the user is asking how to build a **custom DPU-side security
 tool** (a program that reads host state from the BlueField side
 to make its own decisions), that is not an Argus question — it is
 the path-selection rule pointing at the DOCA App Shield library,
-which is **not covered by this bundle** (policy-excluded from the
-public release):
+which is **not covered by this bundle**:
 
 - For applications that **introspect the host's running kernel
   state from the DPU side** (rootkit detection, periodic process
   / module / library / thread snapshots, integrity verification),
   the build is the App Shield library's build — route the user to
   the public docs via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
-  and to [`doca-programming-guide`](../../doca-programming-guide/SKILL.md)
+  `doca-public-knowledge-map/SKILL.md`
+  and to `doca-programming-guide/SKILL.md`
   for the canonical build pattern.
 - For applications that **consume Argus's findings** (an internal
   dashboard, a custom enrichment pipeline that sits between
@@ -140,7 +138,7 @@ If the user is instead asking how to build the **Argus container
 itself** from source, that is *not* an external-operator workflow
 — the container ships pre-built from NGC and rebuilding it is
 out of scope for this skill. Route to the public DOCA Argus
-Service Guide via [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services).
+Service Guide via doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`).
 
 ## modify
 
@@ -207,7 +205,7 @@ flowing, BEFORE enabling any production alerting on top.
    (e.g. `docker run` / `crictl` / BlueField container manager)
    is documented in the Container Deployment Guide reachable
    through
-   [`doca-public-knowledge-map ## DOCA services`](../../doca-public-knowledge-map/SKILL.md#doca-services).
+   `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
 3. **Confirm the container is running, not restart-looping.** A
    restart loop is a layer-1 symptom per
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
@@ -241,7 +239,7 @@ flowing, BEFORE enabling any production alerting on top.
 
 For the runtime version + container-tag cross-checks that
 underlie *"my Argus behaves differently from what the docs say"*,
-see [`doca-version TASKS.md ## run`](../../doca-version/TASKS.md#run)
+see `doca-version TASKS.md ## run` (`doca-version/TASKS.md#run`)
 and apply the container-tag-lags-host-package overlay from
 [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
 
@@ -406,7 +404,7 @@ resolution alone does not clear it.
 6. **Version layer.** When the public Argus Service Guide page
    appears to disagree with what the deployed container does,
    the docs version may not match the container tag. Walk
-   [`doca-version TASKS.md ## debug`](../../doca-version/TASKS.md#debug)
+   `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`)
    layer 2 (partial install / version mismatch) and apply the
    container-tag overlay from
    [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility).
@@ -415,7 +413,7 @@ resolution alone does not clear it.
 7. **Cross-cutting layer.** For env-side and program-side debug
    that is not Argus-specific (host install, host kernel, DOCA
    library errors Argus may surface), drop to
-   [`doca-debug TASKS.md ## debug`](../../doca-debug/TASKS.md#debug).
+   `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`).
    **Cleared when:** the owning debug skill names and observes its
    green signal; Argus does not declare this layer clear on its behalf.
 
@@ -429,7 +427,7 @@ on the installed tool or the public guide, not prose recall.
 
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
-[`doca-structured-tools-contract ## The agent behavior contract`](../../doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract),
+`doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
 1. Probe for the matching structured helper FIRST (`doca-env --json`
@@ -443,10 +441,10 @@ the agent should:
 3. If the probe fails, fall back to the manual command in the
    row. Report *"falling back to manual chain"*.
 4. The schemas the structured tools emit are defined in
-   [`doca-structured-tools-contract ## Schemas`](../../doca-structured-tools-contract/SKILL.md#schemas);
+   `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`);
    the version-handling semantics (four-way match, NGC,
    headers-win) are owned by
-   [`doca-version`](../../doca-version/SKILL.md).
+   `doca-version/SKILL.md`.
 
 | Purpose | Command (class shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
@@ -475,17 +473,17 @@ Three cross-cutting rules for this appendix:
   meaningless.
 - **Cross-link instead of duplicate.** Cross-cutting env
   commands (port-state, `devlink`, `ip link`, `ethtool`) live
-  in [`doca-setup TASKS.md ## Command appendix`](../../doca-setup/TASKS.md#command-appendix);
+  in `doca-setup TASKS.md ## Command appendix` (`doca-setup/TASKS.md#command-appendix`);
   this appendix names only the Argus-specific ones.
 
 ## Deferred task verbs
 
 - **Installing DOCA on the BlueField** — out of scope here.
-  Route to [`doca-setup ## configure`](../../doca-setup/TASKS.md#configure)
+  Route to `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)
   for env preparation and
-  [`doca-setup ## test`](../../doca-setup/TASKS.md#test) for
+  `doca-setup ## test` (`doca-setup/TASKS.md#test`) for
   install health verification, or
-  [`doca-setup ## no-install`](../../doca-setup/TASKS.md#no-install)
+  `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
   for the public NGC DOCA container path.
 - **Configuring the SIEM-side ingest** (Splunk forwarder stanzas,
   Logstash pipelines, Sentinel data-connector blocks) — out of
@@ -501,20 +499,19 @@ Three cross-cutting rules for this appendix:
   posture has decided are worth emitting.
 - **Building a custom DPU-side security tool** — not an Argus
   question. That is the DOCA App Shield library, which is **not
-  covered by this bundle** (policy-excluded from the public
-  release); route the user to the public docs via
-  [`doca-public-knowledge-map`](../../doca-public-knowledge-map/SKILL.md)
+  covered by this bundle**; route the user to the public docs via
+  `doca-public-knowledge-map/SKILL.md`
   plus
-  [`doca-programming-guide ## build`](../../doca-programming-guide/TASKS.md#build)
+  `doca-programming-guide ## build` (`doca-programming-guide/TASKS.md#build`)
   for the canonical build pattern.
 - **Other DOCA services** (DMS / DTS / Firefly / BlueMan /
   HBN / …) — not Argus. Route to
-  [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services)
+  doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`)
   for the routing table and the matching `services/<service>`
   skill when it exists (e.g.
-  [`doca-dms ## configure`](../../services/doca-dms/TASKS.md#configure)
+  `doca-dms ## configure` (`doca-dms/TASKS.md#configure`)
   for device management, or
-  [`doca-firefly ## configure`](../../services/doca-firefly/TASKS.md#configure)
+  `doca-firefly ## configure` (`doca-firefly/TASKS.md#configure`)
   for PTP). The container-shaped deployment pattern is shared;
   the per-service domain is different.
 
@@ -548,4 +545,4 @@ Three cross-cutting rules for this appendix:
   enabled on the channel.
 - For URL routing to the Argus guide and other public DOCA
   documentation, see
-  [doca-public-knowledge-map ## DOCA services](../../doca-public-knowledge-map/SKILL.md#doca-services).
+  doca-public-knowledge-map ## DOCA services (`doca-public-knowledge-map/SKILL.md#doca-services`).

@@ -1,0 +1,4 @@
+# Skill-managed supplements for release-r1 / Isaac Sim 6.1.0.0.
+# Install with exported release constraints; do not add these to the upstream project.
+ipywidgets==8.1.9
+onnxruntime-gpu==1.26.0

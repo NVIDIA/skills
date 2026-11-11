@@ -32,6 +32,10 @@ the write floor, then attach the renderer. Author the live camera pose into the 
 pose the next tick will commit.
 
 ```python
+import os
+os.environ.setdefault("OVRTX_SKIP_USD_CHECK", "1")  # before importing ovrtx
+import ovrtx
+ovrtx.register_schema_paths()  # before OVStage or another OpenUSD consumer
 import ovstage
 from ovstage import PopulationDomain, population
 
@@ -67,28 +71,25 @@ renderer = Renderer(config=RendererConfig(
 ))
 ```
 
-`renderer.step()` returns a `RenderProductSetOutputs`, not a `dict`: it supports `[]`
-and `in` but not `.get()`. Some builds also make it a context manager, so branch on
-`hasattr(products, "__enter__")`. Extract `LdrColor` (RGBA8) and **copy inside the
-`.map()` context** — the DLPack view is invalid after the context exits.
+`renderer.step()` returns a mapping-like `RenderProductSetOutputs`: it supports
+`[]` and `in`, but not `.get()` or a context manager. Index the product directly,
+then map its RenderVar. Copy `LdrColor` (RGBA8) inside the `.map()` context so the
+UI receives owned pixels instead of retaining renderer-backed DLPack views.
 
 ```python
-def step_extract(renderer, render_product_path, render_var, ordinal, delta_time=1/60):
+def step_extract(renderer, render_product_path, render_var_path, ordinal, delta_time=1/60):
     products = renderer.step(
         render_products={render_product_path},
         delta_time=float(delta_time),
         ordinal=int(ordinal),
     )
-    if hasattr(products, "__enter__"):
-        with products as ctx:
-            return _extract(ctx[render_product_path], render_var)
-    return _extract(products[render_product_path], render_var)
+    return _extract(products[render_product_path], render_var_path)
 
-def _extract(product, render_var):
+def _extract(product, render_var_path):
     for frame in product.frames:
         render_vars = frame.render_vars           # supports `in`/[], NOT .get()
-        if render_var in render_vars:
-            with render_vars[render_var].map(device=Device.CPU) as rv:
+        if render_var_path in render_vars:
+            with render_vars[render_var_path].map(device=Device.CPU) as rv:
                 return np.from_dlpack(rv).copy()   # COPY inside the map ctx
     return None
 ```
@@ -154,10 +155,10 @@ Key facts:
 
 - `omni:xform` is a **row-major `float64`** matrix (USD row-vector convention:
   row 0 = right, row 1 = up, row 2 = `-forward`, row 3 = eye/translation).
-- OVStage DLPack storage is **one 16-lane element per prim** (`shape=[1]`, `lanes=16`,
-  `AttributeSemantic.MATRIX`) — **NOT** an `N x 4 x 4` tensor. For the single camera,
-  `shape=[1]`. Older standalone ovrtx Python compatibility snippets show `(N, 4, 4)`;
-  do not use that shape on the OVStage data plane.
+- OVStage transform **write inputs** use one 16-lane element per prim
+  (`shape=[1]` for this camera, `lanes=16`, `AttributeSemantic.MATRIX`).
+  Read/map outputs use scalar lanes, shape `[N,4,4]`, and explicit strides;
+  map-creation dtypes remain lane-based. See `references/ovstage-data-plane/README.md`.
 - Use `PrimMode.UPSERT` for this app-owned runtime attribute.
 - Keep the backing NumPy buffer (`data`) alive until `op.wait()` returns; release the
   query and path list in `finally` blocks; then `advance_write_floor(ordinal).wait()`.

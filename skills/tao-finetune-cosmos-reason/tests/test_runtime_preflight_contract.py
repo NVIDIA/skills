@@ -782,7 +782,9 @@ def test_framework_v12_preflight_requires_finite_validation_stream() -> None:
     )
 
     startup = preflight["container_startup"]
-    assert "inspect_converter_runtime" in startup
+    assert "cosmos_framework.scripts" in startup
+    assert "convert_model_to_vlm_safetensors" in startup
+    assert "cosmos_rl.model_preparation" not in startup
     assert "TAO_PREFLIGHT_ASSERTION_FAILED:model_preparation_runtime" in startup
     assert "framework_finite_validation_stream" in startup
     assert "evalval-lab-v10/modules" in startup
