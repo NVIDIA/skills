@@ -34,12 +34,34 @@ index details:
    recommendations, use `--dataset mock`. Do not pair the pretraining-only
    `mock` preset with an SFT or PEFT mode.
 5. After the recipe and dataset, give the required resizing rules: TP must
-   divide `num_key_value_heads`, keep TP within one node unless using
-   NVL72-class interconnect, enable SP when TP > 1, configure CP for long
-   context, DP is implicit, and reduce `micro_batch_size` first on OOM.
+   divide `num_key_value_heads`, use the lowest TP that still fits the dense
+   state, keep TP within one node unless using NVL72-class interconnect, enable
+   SP when TP > 1, configure CP for long context, and make both dense and
+   expert meshes divide the allocation.
 6. State whether each proposed override changes the convergence contract or
    only the execution/performance mapping. Do not trade convergence semantics
    for throughput without calling it a new experiment.
+
+## Performance Readiness for New Recipes
+
+Before publishing a new **pretraining library recipe** under
+`src/megatron/bridge/recipes/`, measure steady-state model TFLOP/s/GPU on its
+intended workload and GPU allocation. For BF16, aim for roughly **200
+TFLOP/s/GPU on H100** and **400 TFLOP/s/GPU on GB200**. These are approximate
+readiness targets, not exact pass/fail cutoffs. This requirement excludes SFT,
+PEFT, and long-context SFT; it assesses the base pretraining library recipe,
+not a `perf_recipes` benchmark or its result. For other precisions or hardware
+such as B200/GB300, establish a workload-matched measured target rather than
+silently reusing the BF16 H100/GB200 numbers.
+
+If measured performance is severely below the target, either withhold the
+recipe until it is improved or clearly label it **early, unoptimized** in the
+recipe docstring, accompanying public documentation/card, and PR description.
+Record the measured throughput, hardware, precision, workload, and GPU layout
+alongside the limitation. In a card, include the label in both the summary and
+the affected training item's `expected_result` so generated pages display it.
+Do not present it as a tuned recommendation or change the intended training
+workload or convergence settings merely to meet a target.
 
 ## Configuration Layers and Change Control
 
@@ -249,9 +271,49 @@ When the user's GPU count differs from the recipe default:
    `world_size / (PP × EP × ETP)`; both quotients must be integral, and the
    expert count must be divisible by EP.
 
+### Fit-First, Then Fill Tuning Loop
+
+For an MoE recipe on a fixed allocation, use this practical order:
+
+1. Start with the lowest legal TP that can hold the dense parameters,
+   optimizer state, and workspaces. Do not raise TP only to reduce activation
+   memory; TP communication is expensive, so try recompute first.
+2. Use the largest legal EP that matches the expert count and topology. EP=8
+   is a common first candidate on one 8-GPU node, and EP=32 is a common first
+   candidate on a 32-GPU allocation. These are starting points, not universal
+   defaults: EP shards expert weights only, not dense layers or activations.
+3. For final library, benchmark, and verification-card recipes, no recompute
+   and selective recompute on cheap supported modules are both appropriate
+   starting choices. Choose by measured memory headroom and steady-state
+   performance; selective recompute does not require a no-recompute OOM first.
+   Full recompute is acceptable temporarily for diagnostic bring-up,
+   but can severely reduce throughput. Retain it only when target-scale
+   measurements show that lighter choices still fail to fit, or matched runs
+   show better end-to-end throughput with full recompute (for example, by
+   enabling larger MBS or lower TP). Keep the workload, GBS, and convergence
+   settings fixed; document layout changes, memory evidence, and steady-state
+   performance for the alternatives tested. For
+   Qwen3.5 GDN layers, verify `gdn_norm_out` on the exact Megatron Core revision
+   instead of assuming `core_attn` covers the GDN peak.
+4. After a stable baseline completes optimizer initialization and several
+   steady steps, inspect W&B memory and confirm every rank's peak allocated and
+   reserved memory in the runtime logs; rank 0 can miss the hot EP or PP rank.
+   If there is safe headroom, test one change at a time: lower TP by one legal
+   step or increase MBS while keeping GBS, data order, and optimizer boundaries
+   fixed.
+5. Keep the candidate only when it improves end-to-end tokens/s/GPU or step
+   time with healthy loss and no skipped/NaN iterations. Leave headroom for
+   checkpointing, evaluation, routing imbalance, and optional CUDA graphs.
+
+EP=8 can leave less memory headroom than EP=32, but EP size alone does not
+justify full recompute. Measure the hot rank and supported Qwen3.5 GDN
+boundaries; retry no recompute or narrower selective recompute when a larger
+EP reduces expert-weight pressure.
+
 ### Batch Size Tuning
 
-- Start with the recipe's `micro_batch_size`. If OOM, reduce to 1.
+- Start with the recipe's `micro_batch_size`. If OOM, reduce to 1; after the
+  run fits, use measured headroom to sweep MBS upward again.
 - `global_batch_size` determines learning dynamics. Scale with DP:
   `GBS = micro_batch_size × DP × gradient_accumulation_steps`.
 - For MoE, `micro_batch_size=1` is typical at scale.
