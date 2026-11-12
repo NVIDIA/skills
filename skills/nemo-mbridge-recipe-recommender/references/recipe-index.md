@@ -13,7 +13,6 @@ All recipes live under `src/megatron/bridge/recipes/`. Each function returns a
 
 | Recipe | Mode | TP | PP | CP | SP | GPUs (min) | Seq Len |
 |--------|------|----|----|----|----|------------|---------|
-| `llama2_7b_pretrain_config` | Pretrain | 2 | 1 | — | — | 2 | 4K |
 | `llama3_8b_pretrain_config` | Pretrain | 2 | 1 | — | ✓ | 2 | 8K |
 | `llama3_8b_16k_pretrain_config` | Pretrain | 2 | 1 | 2 | ✓ | 4 | 16K |
 | `llama3_8b_64k_pretrain_config` | Pretrain | 2 | 1 | 4 | ✓ | 8 | 64K |
@@ -70,10 +69,13 @@ All recipes live under `src/megatron/bridge/recipes/`. Each function returns a
 
 | Recipe | Mode | TP | PP | EP | GPUs |
 |--------|------|----|----|-----|------|
-| `deepseek_v2_lite_pretrain_config` | Pretrain | 1 | 1 | 8 | 8 |
-| `deepseek_v2_pretrain_config` | Pretrain | 1 | 4 | 32 | 128 |
 | `deepseek_v3_pretrain_config` | Pretrain | 2 | 16 | 64 | 2048 |
 | `deepseek_v3_pretrain_config_32nodes` | Pretrain | 2 | 8 | 32 | 256 |
+| `deepseek_v4_flash_pretrain_64gpu_gb200_fp8mx_library_config` | Pretrain | 1 | 4 | 16 | 64 (GB200; VPP4; natural unlimited capacity) |
+| `deepseek_v4_flash_proxy_pretrain_8gpu_gb200_bf16_config` | Pretrain | 1 | 1 | 8 | 8 (GB200; six-layer proxy + MTP; BF16) |
+| `deepseek_v4_flash_sft_openmath_thinking_packed_gb200_config` | SFT | 1 | 4 | 8 | 32 (GB200; offline packed) |
+| `deepseek_v4_flash_peft_openmath_thinking_packed_config` | PEFT | 1 | 4 | 8 | 32 (offline packed) |
+| `deepseek_v4_flash_peft_openmath_thinking_packed_gb200_config` | PEFT | 1 | 4 | 8 | 32 (GB200; offline packed) |
 
 ### GLM-4.5
 
@@ -90,17 +92,14 @@ All recipes live under `src/megatron/bridge/recipes/`. Each function returns a
 
 | Recipe | Mode | TP | PP | Sizes |
 |--------|------|----|----|-------|
-| `gemma2_*_{pretrain,sft,peft}_config` | All | 2–8 | 1–2 | 2B, 9B, 27B |
 | `gemma3_1b_{pretrain,sft,peft}_config` | All | 1 | 1 | 1B (32K seq) |
 
 ### NemotronH / Nemotron
 
 | Recipe | Mode | TP | PP | EP | Notes |
 |--------|------|----|----|-----|-------|
-| `nemotronh_{4b,8b,47b,56b}_*_config` | P/S/PEFT | 1–8 | 1–4 | — | Dense SSM-hybrid |
 | `nemotron_3_nano_*_config` | P/S/PEFT | varies | 1 | 8 | MoE + Mamba |
 | `nemotron_3_super_*_config` | P/S/PEFT | 4 | 1 | 8 | MoE + Mamba, ~40% CUDA graph gain |
-| `nemotron_nano_{9b,12b}_v2_*_config` | P/S/PEFT | varies | 1 | — | Dense |
 
 ### Other Models
 
@@ -127,7 +126,6 @@ All recipes live under `src/megatron/bridge/recipes/`. Each function returns a
 | `qwen3_vl_{8b,30b_a3b,235b_a22b}_{sft,peft}_config` | SFT/PEFT | 1–4 | 1–8 | 1–32 | 1–512 |
 | `qwen35_vl_*_{sft,peft}_config` | SFT/PEFT | varies | varies | varies | varies |
 | `glm_45v_{sft,peft}_config` | SFT/PEFT | 1 | 8 | 4–16 | 64–512 |
-| `nemotron_nano_v2_vl_12b_{sft,peft}_config` | SFT/PEFT | 2–4 | 1 | — | 8 |
 
 ### Diffusion Recipes
 
@@ -194,7 +192,6 @@ SFT/LoRA variants also exist (e.g. 8B SFT with packed sequences, 70B SFT on 32 G
 |-------|------|-----------|--------------|
 | Nemotron 3 Nano (30B MoE+Mamba) | 8–16 | H100, B200, B300, GB200, GB300 | TE CUDA graphs (attn+mamba+moe), HybridEP |
 | Nemotron 3 Super | 64 | H100, B200, B300, GB200, GB300 | TE CUDA graphs, EP=64 |
-| NemotronH 56B | 64 | H100, B200, B300 | TP=2–8, TE graphs (mamba+attn) |
 
 ### GPT-OSS
 

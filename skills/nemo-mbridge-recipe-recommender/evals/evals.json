@@ -14,5 +14,20 @@
       "Distinguish library recipes from benchmark recipes and name the benchmark launcher paths.",
       "Distinguish convergence-contract changes from semantics-preserving execution changes and benchmark-only shortcuts."
     ]
+  },
+  {
+    "id": "recipe-recommender-moe-fit-then-fill",
+    "question": "Use the nemo-mbridge-recipe-recommender skill. Give me a rule-of-thumb tuning loop for a Qwen MoE recipe on 8 versus 32 GPUs. Cover TP, EP, selective versus full recompute including Qwen3.5 GDN, HybridEP versus alltoall on NVL8 BF16, and what to do after the first config fits.",
+    "expected_skill": "nemo-mbridge-recipe-recommender",
+    "expected_script": null,
+    "ground_truth": "The answer should use the lowest legal TP that still fits dense state and prefer recompute over raising TP solely for activation memory. It should use the largest legal EP supported by expert divisibility and both parallel meshes, with EP8 on one 8-GPU node and EP32 on 32 GPUs described as starting candidates rather than universal defaults. It must state that EP shards expert weights only and that EP8 alone does not justify full recompute. No recompute and cheap supported selective modules are equally valid starting choices; standard-attention Qwen can test core_attn, while Qwen3.5 GDN needs the exact revision's gdn_norm_out boundary tested. Full recompute may be temporary diagnostic bring-up, or retained with target-scale evidence that lighter choices fail to fit or matched viable layouts show better end-to-end throughput, including gains from larger MBS or lower TP. Record memory and steady-state performance with workload, hardware, precision, GBS, and convergence settings fixed. It should keep alltoall as the correctness baseline and treat HybridEP as a matched candidate because NVL8 BF16 results can be close. After the run fits, it should inspect W&B memory and confirm every rank's peak allocated and reserved memory in runtime logs because rank 0 can miss the hot EP or PP rank, then A/B one lower-TP step or higher MBS while keeping GBS and optimizer boundaries fixed. Acceptance requires improved end-to-end tokens/s/GPU or step time, healthy loss, no skipped or NaN iterations, and memory margin for transients.",
+    "expected_behavior": [
+      "Read the nemo-mbridge-recipe-recommender skill before answering.",
+      "Keep dense TP as low as capacity allows and make EP as large as the legal expert mesh permits.",
+      "Scope EP8 and EP32 as starting candidates and explain that EP does not shard dense or activation state.",
+      "Treat no recompute and cheap selective modules as equally valid, distinguish standard Qwen attention from Qwen3.5 GDN, and require measured fit or matched throughput evidence to retain full recompute.",
+      "Use a matched alltoall control when testing HybridEP on NVL8 BF16.",
+      "After fit, use per-rank memory evidence to A/B lower TP or higher MBS with fixed GBS and explicit safety headroom."
+    ]
   }
 ]
