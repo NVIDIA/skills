@@ -1852,9 +1852,9 @@
     {
       "name": "nemo-mbridge-recipe-recommender",
       "path": "skills/nemo-mbridge-recipe-recommender",
-      "content_digest": "sha256:676698981fc1794a8fea678042f5c7d129fc3ed555ef388ae2ff3937e474424d",
-      "last_commit": "eeeff9d8436e757a650bd20e19ae5ef99a177f70",
-      "last_modified": "2026-08-11"
+      "content_digest": "sha256:5625d04b0ff57f8e7a2d252d1f8f3ed89f68b57065e38578a4ae7020c06900d8",
+      "last_commit": "0b2dec8611c67ae09d9cdbe7c83826fa3fd42f80",
+      "last_modified": "2026-11-12"
     },
     {
       "name": "nemo-mbridge-resiliency",
@@ -2023,6 +2023,20 @@
       "content_digest": "sha256:3bc5d9dbb34860f7756084bab891a082f03cc158a807086f844aabab7fc235b3",
       "last_commit": "4ec84730fd5edd8a6e3c134e751589c61c1d1257",
       "last_modified": "2026-10-29"
+    },
+    {
+      "name": "newton-performance",
+      "path": "skills/newton-performance",
+      "content_digest": "sha256:f2cb44f424c5b190c3f70a1f85f65ed567513fe53539bc6b704d73924ee7040a",
+      "last_commit": "858abfaeefb6a0a30dc94614355b53ccc94c9116",
+      "last_modified": "2026-11-12"
+    },
+    {
+      "name": "newton-usage",
+      "path": "skills/newton-usage",
+      "content_digest": "sha256:4b3f7ccd2c23b013f7f9b7052204f5dd7fcf602e9b668c72e96935619a9a872d",
+      "last_commit": "858abfaeefb6a0a30dc94614355b53ccc94c9116",
+      "last_modified": "2026-11-12"
     },
     {
       "name": "nv-generate-ct-rflow",
