@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 449,
-  "result_row_count": 4234,
+  "skill_count": 451,
+  "result_row_count": 4254,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5529,12 +5529,12 @@
     },
     {
       "skill": "nemo-mbridge-recipe-recommender",
-      "evaluation_date": "2026-08-05",
+      "evaluation_date": "2026-11-10",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.0.0",
-      "dataset_digest": "sha256:ef1ce0be1100bdb45047e4131f641cc24d4f26a6a08e1a4f84d519d0b6da62a6",
-      "validation_status": null,
-      "tasks": 1,
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:2d74195284e485e3aa9cd8ea8b6b194ad7a6045dfda3049dcd1511080e3dca16",
+      "validation_status": "passed",
+      "tasks": 2,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -5546,7 +5546,7 @@
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
       "has_results": true,
-      "average_uplift_pct": 56.4
+      "average_uplift_pct": 28.08
     },
     {
       "skill": "nemo-mbridge-resiliency",
@@ -6051,6 +6051,48 @@
       "component": "Nemotron Voice Agent",
       "has_results": true,
       "average_uplift_pct": 28.33
+    },
+    {
+      "skill": "newton-performance",
+      "evaluation_date": "2026-11-11",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:6ecce6eb8f7b83630e185404459abc12d2a3d0ce0ab5c386ad9dbe1f77ef09f9",
+      "validation_status": "passed",
+      "tasks": 12,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "has_results": true,
+      "average_uplift_pct": 1.05
+    },
+    {
+      "skill": "newton-usage",
+      "evaluation_date": "2026-10-30",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.4",
+      "dataset_digest": "sha256:f186dac7d2c4e6f63962549401aecd2144324c46da0fee1334c49af5fc19b756",
+      "validation_status": "passed",
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "has_results": true,
+      "average_uplift_pct": 15.5
     },
     {
       "skill": "nv-generate-ct-rflow",
@@ -31600,61 +31642,61 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-recipe-recommender",
-      "component": "NeMo MBridge",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-recipe-recommender",
-      "component": "NeMo MBridge",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-recipe-recommender",
-      "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
       "uplift_pct": 50.0
     },
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
       "component": "NeMo MBridge",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 44.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-recipe-recommender",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
+      "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.0,
-      "uplift_pct": 98.0
-    },
-    {
-      "catalog_dir": "nemo-mbridge-recipe-recommender",
-      "component": "NeMo MBridge",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
       "score_pct": 90.0,
-      "uplift_pct": 39.0
+      "uplift_pct": 50.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-recipe-recommender",
+      "component": "NeMo MBridge",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "nemo-mbridge-recipe-recommender",
+      "component": "NeMo MBridge",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-mbridge-recipe-recommender",
+      "component": "NeMo MBridge",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-mbridge-recipe-recommender",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 68.0,
+      "uplift_pct": 52.1
+    },
+    {
+      "catalog_dir": "nemo-mbridge-recipe-recommender",
+      "component": "NeMo MBridge",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 63.0,
+      "uplift_pct": 6.4
     },
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
@@ -31662,8 +31704,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "score_pct": 64.6,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-mbridge-recipe-recommender",
@@ -31671,8 +31713,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 83.0
+      "score_pct": 66.4,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "nemo-mbridge-resiliency",
@@ -33742,6 +33784,186 @@
       "num": null,
       "agent": "codex",
       "score_pct": 81.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.7,
+      "uplift_pct": 3.4
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.3,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 65.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 74.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.8,
+      "uplift_pct": -3.7
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.8,
+      "uplift_pct": 1.6
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-performance",
+      "component": "Newton",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 54.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": 31.5
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": 29.5
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 99.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "newton-usage",
+      "component": "Newton",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.8,
       "uplift_pct": null
     },
     {

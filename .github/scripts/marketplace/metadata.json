@@ -3469,6 +3469,30 @@
       }
     },
     {
+      "path": "skills/newton-performance",
+      "name": "newton-performance",
+      "description": "Measure or improve the runtime, startup time, memory use, or throughput of a Newton simulation that already behaves correctly, or review a Newton step loop for performance problems such as CUDA graph capture mistakes and host synchronization. Not for setting up simulations, general solver or API questions, debugging unstable or incorrect physics without a performance goal, or optimizing Warp code that does not use Newton.",
+      "metadata": {
+        "product.primary": "Newton Physics Engine",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "simulation_engineer,robotics_developer,developer,hpc_developer,application_developer",
+        "discovery.activity_tags": "optimize,profile,benchmark,measure,inspect"
+      }
+    },
+    {
+      "path": "skills/newton-usage",
+      "name": "newton-usage",
+      "description": "Set up, build, or debug physics simulations with the Newton Python package. Use when installing Newton, choosing simulation components, finding examples, or diagnosing simulation and runtime problems.",
+      "metadata": {
+        "product.primary": "Newton Physics Engine",
+        "classification.category.primary": "physical_ai",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "simulation_engineer,robotics_developer,application_developer,developer",
+        "discovery.activity_tags": "get_started,debug,troubleshoot,configure,select"
+      }
+    },
+    {
       "path": "skills/nv-generate-ct-rflow",
       "name": "nv-generate-ct-rflow",
       "description": "Used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct. Not for production training data without review.",
