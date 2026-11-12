@@ -1,0 +1,72 @@
+{
+  "skill_name": "newton-usage",
+  "evals": [
+    {
+      "id": "newton-usage-explicit-setup",
+      "prompt": "Use newton-usage to help me get started with the Newton physics simulator from PyPI. I do not have a source checkout. Give me a short plan and commands to discover and run a suitable packaged example. Do not install packages or run simulations in this task.",
+      "expected_skill": "newton-usage",
+      "expected_script": null,
+      "expected_output": "A concise wheel-based setup plan using public Newton documentation, a command to identify the installed package version, python -m newton.examples --list, and commands to inspect and run a discovered example. Example dependencies are obtained through the examples extra while preserving the selected Newton version. A Git checkout is optional. No installation or simulation is claimed to have been performed.",
+      "assertions": [
+        "Routes to newton-usage.",
+        "Points to public Newton documentation and accounts for the installed package version.",
+        "Provides python -m newton.examples --list and the example launcher and --help patterns.",
+        "Does not require a source checkout or change packages.",
+        "Does not claim a successful simulation run."
+      ]
+    },
+    {
+      "id": "newton-usage-implicit-debug",
+      "prompt": "My simulation built with the Newton Python wheel sometimes lets a falling body pass through the ground. I have not provided a reproducer, package version, or solver yet. What should we inspect first? Give me a short diagnostic plan; do not invent a fix or execute a simulation.",
+      "expected_skill": "newton-usage",
+      "expected_script": null,
+      "expected_output": "A focused diagnostic plan requesting the Newton version, solver, CPU/GPU environment, and minimal reproducer. It routes to the matching collision/contact and simulation-tuning documentation and relevant wheel-shipped examples, proposes discriminating checks grounded in those sources, and identifies the original symptom as the verification target. The cause and resolution remain unverified without evidence.",
+      "assertions": [
+        "Routes to newton-usage without an explicit skill invocation.",
+        "Requests the package version, solver, execution environment, and reproducer.",
+        "Routes to collision/contact and simulation-tuning documentation for the relevant version and solver.",
+        "Uses packaged example discovery without requiring a checkout.",
+        "Does not assert a root cause, universal parameter value, or verified fix without evidence."
+      ]
+    },
+    {
+      "id": "newton-usage-context-version",
+      "prompt": "A teammate sent me a Newton example from the latest online docs, but our project uses an older pinned Newton wheel. We cannot upgrade it or clone the source repository. How should I find a compatible example and check whether the referenced API exists? Give instructions only; do not change the environment.",
+      "expected_skill": "newton-usage",
+      "expected_script": null,
+      "expected_output": "Instructions to discover the installed Newton version, select matching documentation where available, and explicitly flag any unresolved documentation-version mismatch. It uses the pinned wheel's example list, example --help, and installed example source as compatibility evidence. It does not assume that latest APIs exist, require a checkout, upgrade packages, or claim verification not performed.",
+      "assertions": [
+        "Routes to newton-usage in the project context.",
+        "Accounts for the pinned installed version and flags unmatched documentation.",
+        "Provides wheel-based example discovery and installed-source inspection.",
+        "Does not assume latest documentation proves compatibility with the older wheel.",
+        "Respects the restrictions on upgrading, cloning, and environment changes."
+      ]
+    },
+    {
+      "id": "newton-usage-negative-root-finding",
+      "prompt": "Starting at x = 1, show one Newton iteration for x^2 - 2 = 0.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "Uses f(x) = x^2 - 2 and f'(x) = 2x to compute x_next = 1 - (1 - 2)/2 = 1.5. Does not route to the Newton physics simulator skill, recommend installing Newton, or discuss simulation examples.",
+      "assertions": [
+        "Does not activate or read newton-usage.",
+        "Computes the first iteration as 1.5.",
+        "Does not introduce the Newton physics package or simulation workflow."
+      ]
+    },
+    {
+      "id": "newton-usage-negative-contributor-ci",
+      "prompt": "The Linux unit-test job failed on my Newton PR. Help me find the failing test, identify the tested commit, and check the contributor instructions before deciding what to rerun. Do not change files or rerun jobs.",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "A contributor-focused plan to inspect the failing job and its logs, identify the tested revision and failure, and consult the repository's contributor instructions. Does not activate the wheel-consumer newton-usage skill, route through simulation-tuning examples without relevant failure evidence, change files, or rerun jobs.",
+      "assertions": [
+        "Does not activate or read newton-usage.",
+        "Focuses on the failing CI job, logs, tested revision, and contributor instructions.",
+        "Does not treat repository maintenance as a wheel-consumer simulation task.",
+        "Respects the restrictions on file changes and job reruns."
+      ]
+    }
+  ]
+}
