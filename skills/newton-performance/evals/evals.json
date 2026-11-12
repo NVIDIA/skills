@@ -1,0 +1,154 @@
+{
+  "skill_name": "newton-performance",
+  "evals": [
+    {
+      "id": "newton-performance-explicit-review",
+      "prompt": "Use newton-performance to review this Newton step loop for performance and correctness problems. It is captured with wp.ScopedCapture once and replayed every frame.\n\n```python\nself.sim_substeps = 5\n\ndef simulate(self):\n    for _ in range(self.sim_substeps):\n        self.state_0.clear_forces()\n        self.pipeline.collide(self.state_0, self.contacts)\n        self.solver.step(self.state_0, self.state_1, self.control, self.contacts, self.sim_dt)\n        self.state_0, self.state_1 = self.state_1, self.state_0\n        n = self.contacts.rigid_contact_count.numpy()[0]\n        if n > self.max_seen:\n            self.max_seen = n\n```\n\nGive the findings and a corrected loop; do not run anything.",
+      "expected_skill": "newton-performance",
+      "expected_script": null,
+      "expected_output": "Explains that with an odd substep count the Python swap runs only during capture, so each replay reads a buffer that holds an older state and the simulation advances fewer substeps per frame without an error. Gives a correct fix: copying the final state with State.assign, an even substep count, or alternating two graphs with a consistent readable state. Explains that the .numpy() contact-count read synchronizes with the host and cannot be captured, and that the Python max tracking would only run during capture; moves peak or overflow tracking to the device or to occasional checks outside the graph. Provides a corrected loop and does not claim to have run it.",
+      "assertions": [
+        "After one replay of the corrected loop, the state that callers read has advanced by the intended frame duration and holds the correct output state, whether the fix keeps five substeps or adjusts the substep count and dt.",
+        "Identifies the per-substep .numpy() read as a host synchronization that is invalid or frozen inside a captured graph, and removes it from the frame.",
+        "Keeps peak or overflow contact tracking, either on the device inside the graph or as an occasional synchronized check outside it, rather than deleting it.",
+        "Keeps force clearing, collision, and the solver step inside the captured frame.",
+        "Does not claim the corrected loop was run or benchmarked."
+      ]
+    },
+    {
+      "id": "newton-performance-implicit-slow-motion",
+      "prompt": "After I wrapped my Newton simulate() in a CUDA graph, objects fall noticeably slower than before, but nothing errors. Without the graph it looks right. I use 3 substeps per frame and SolverSemiImplicit. What is likely going on and how do I confirm it? Instructions only.",
+      "expected_skill": "newton-performance",
+      "expected_script": null,
+      "expected_output": "Attributes the slow motion to the odd substep count combined with a Python state swap inside the captured frame: the swap runs once during capture, so each replay starts from an older state. Proposes confirming it by comparing captured and eager runs with odd and even substep counts, and gives a correct fix such as State.assign on the last substep, an even substep count, or alternating graphs.",
+      "assertions": [
+        "Attributes the slowdown to the odd substep count combined with the Python swap inside the captured graph.",
+        "Proposes a comparison between captured and eager execution that includes an odd substep count.",
+        "Gives a fix that makes each replay advance all substeps.",
+        "Does not claim the diagnosis was confirmed by running code."
+      ]
+    },
+    {
+      "id": "newton-performance-context-many-worlds",
+      "prompt": "We scale a Newton robot scene from 64 to 8192 worlds with CollisionPipeline and SolverMuJoCo (use_mujoco_contacts=False). GPU memory explodes and each step got much slower than linear. We pass rigid_contact_max computed as our per-world peak plus 25%. What should we check and change? Do not change the environment.",
+      "expected_skill": "newton-performance",
+      "expected_script": null,
+      "expected_output": "Explains that CollisionPipeline capacities are totals across all worlds, so a per-world value drops contacts at high world counts, and that MuJoCo's contact and constraint capacities are per world and grow with the world count. Recommends measuring peak counts at the target world count, checking overflow outside the per-step loop, reviewing broad phase and collision geometry, and measuring throughput and memory at several world counts. Points to the Newton documentation for the installed release for exact parameter names and defaults.",
+      "assertions": [
+        "States that the collision pipeline's rigid contact capacity covers all worlds, so a per-world value is too small.",
+        "Identifies per-world solver capacities multiplied by the world count as a memory cost.",
+        "Recommends sizing from measured peaks and checking overflow outside the per-step loop.",
+        "Does not claim measurements were taken."
+      ]
+    },
+    {
+      "id": "newton-performance-implicit-startup",
+      "prompt": "The first run of my Newton simulation takes almost a minute before anything moves, but later frames are fast. How do I find out whether model building, kernel compilation, allocation, or stepping is responsible? Give me a plan; do not run anything.",
+      "expected_skill": "newton-performance",
+      "expected_script": null,
+      "expected_output": "Treats this as a startup-cost question. Defines separate timing regions for import, model building and finalize, kernel compilation and loading, allocation and graph capture, and warm stepping, with synchronization at each boundary. Notes that Warp reports module load and compile times and that the kernel cache affects repeated runs. Does not attribute the first-run cost to steady-state stepping and does not claim measurements.",
+      "assertions": [
+        "Separates compilation, loading, and allocation from warm stepping in the measurement plan.",
+        "Synchronizes the device at the timing boundaries or otherwise accounts for asynchronous execution.",
+        "Accounts for kernel caching between runs.",
+        "Does not claim measurements were taken."
+      ]
+    },
+    {
+      "id": "newton-performance-coupled-sweep",
+      "prompt": "A Newton peg-in-hole insertion workload is correct but too slow. Collision frequency, the contact model, mesh resolution, and the shape gap may interact. Define a bounded experiment that improves throughput without invalidating the insertion. Do not assume universal default values or claim a speedup without measurements from the target GPU.",
+      "expected_skill": "newton-performance",
+      "expected_script": null,
+      "expected_output": "Treats the four settings as coupled factors, fixes the workload and the acceptance criteria (insertion success, contact forces or penetration within bounds, no contact overflow), and proposes a small bounded sweep over a few levels of each factor with repeated measurements on the target GPU. Accepts a configuration only if it meets the throughput objective and the insertion checks. States that no speedup has been measured yet.",
+      "assertions": [
+        "Treats the settings as interacting and proposes a bounded sweep rather than changing them independently.",
+        "Defines acceptance criteria for insertion validity before measuring.",
+        "Requires repeated measurements on the target GPU.",
+        "Does not propose universal default values or claim a speedup."
+      ]
+    },
+    {
+      "id": "newton-performance-blocker",
+      "prompt": "Measure how much faster our Newton training environment runs with CUDA graph capture than without it, and report the speedup. The environment is in our team's cluster repository.",
+      "expected_skill": "newton-performance",
+      "expected_script": null,
+      "expected_output": "Looks for the workload once, finds that the environment code and a GPU target are not available in the current workspace, and reports exactly what is missing (the workload, and the GPU or access needed to run it). Describes the measurement it would run, labeled as a proposal, and does not report a speedup.",
+      "assertions": [
+        "Reports which prerequisites are missing instead of inventing a workload.",
+        "Labels any described measurement as proposed, not collected.",
+        "Does not report a speedup number."
+      ]
+    },
+    {
+      "id": "newton-performance-multiturn-into-scope",
+      "prompt": "Earlier in this conversation:\nUser: My Newton gripper keeps dropping the cube.\nAssistant: The friction coefficient on the fingers was too low; raising it fixed the grasp in your test.\n\nUser: Thanks, the grasp is reliable now. The problem is speed: with 4096 worlds each frame takes about 40 ms, and we need it under 10 ms. Where should we start? Plan only.",
+      "expected_skill": "newton-performance",
+      "expected_script": null,
+      "expected_output": "Recognizes that the request has moved from correctness to performance. Records the objective (frame time under 10 ms at 4096 worlds) and the fidelity check (grasp success must not regress). Plans a baseline measurement that separates collision, solver, and rendering, then checks graph capture, host synchronization, buffer capacities, and collision cost before trading substeps or iterations for speed.",
+      "assertions": [
+        "Keeps the grasp success rate as a fidelity check for any change.",
+        "Plans a baseline measurement before proposing changes.",
+        "Considers overhead such as graph capture, host synchronization, or buffer sizing before reducing substeps or iterations.",
+        "Does not claim measurements were taken."
+      ]
+    },
+    {
+      "id": "newton-performance-multiturn-out-of-scope",
+      "prompt": "Earlier in this conversation:\nUser: Help me capture my Newton step loop in a CUDA graph.\nAssistant: Done. The captured loop matches the eager loop and runs 4x faster.\n\nUser: Great. Different question: a box placed on the ground slowly sinks into it over a few seconds, both with and without the graph. Speed is fine now. What should I check?",
+      "expected_skill": "newton-usage",
+      "expected_script": null,
+      "expected_output": "Treats the new question as a correctness problem rather than performance work. Routes to collision, contact, and simulation-tuning documentation, asks for the solver and contact settings, and suggests checks such as contact stiffness, substeps, and collision geometry. Does not continue the performance workflow.",
+      "assertions": [
+        "Treats the sinking as a contact or tuning problem, not a performance problem.",
+        "Does not propose performance changes or benchmarks.",
+        "Does not assert a root cause without evidence."
+      ]
+    },
+    {
+      "id": "newton-performance-negative-usage",
+      "prompt": "I just installed the Newton physics wheel. How do I list and run one of the packaged examples? Give me the commands only.",
+      "expected_skill": "newton-usage",
+      "expected_script": null,
+      "expected_output": "Gives python -m newton.examples --list and python -m newton.examples <name>. Does not discuss performance tuning, graph capture, or buffer sizing.",
+      "assertions": [
+        "Provides a command that lists the packaged examples and a command that runs one.",
+        "Does not introduce performance-optimization advice."
+      ]
+    },
+    {
+      "id": "newton-performance-negative-solver-api",
+      "prompt": "In Newton, what is the difference between SolverXPBD and SolverMuJoCo for articulated robots, and which one supports joint armature?",
+      "expected_skill": "newton-usage",
+      "expected_script": null,
+      "expected_output": "Answers from the Newton solver documentation and feature matrix for the installed release. Does not turn the question into a performance review.",
+      "assertions": [
+        "Points to the solver documentation or feature support table.",
+        "Does not introduce graph capture, benchmarking, or buffer-sizing advice."
+      ]
+    },
+    {
+      "id": "newton-performance-negative-correctness",
+      "prompt": "My Newton cloth simulation with SolverVBD explodes after a few seconds when the cloth touches a sphere. I do not care about speed yet. How do I find the cause?",
+      "expected_skill": "newton-usage",
+      "expected_script": null,
+      "expected_output": "Treats this as a stability problem. Routes to the VBD and simulation-tuning documentation, asks for the solver settings and a reproducer, and suggests checks such as the timestep, contact stiffness, and collision settings. Does not propose speed optimizations.",
+      "assertions": [
+        "Treats the explosion as a stability or correctness problem.",
+        "Does not propose speed optimizations or benchmarks.",
+        "Does not assert a root cause without evidence."
+      ]
+    },
+    {
+      "id": "newton-performance-negative-warp-kernel",
+      "prompt": "I wrote a Warp kernel for a 2D Eulerian fluid solver (no Newton involved). It is memory-bound. How can I improve its memory access pattern?",
+      "expected_skill": null,
+      "expected_script": null,
+      "expected_output": "Answers with Warp and CUDA memory-access guidance, such as coalesced access, data layout, and tiles. Does not load Newton skills or discuss Newton step loops.",
+      "assertions": [
+        "Does not read newton-performance.",
+        "Gives Warp or CUDA memory-access guidance for the kernel.",
+        "Does not attribute the problem to Newton."
+      ]
+    }
+  ]
+}
