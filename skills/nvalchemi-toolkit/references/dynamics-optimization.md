@@ -232,6 +232,29 @@ helper-specific fields, and optimizer state would leak into the production
 run, and a fresh engine or strategy instance gives the production stage its
 own optimizer history.
 
+## Inflight replacement
+
+`refill_check()` runs every `refill_frequency` steps. It writes
+finished graphs to sinks, selects the remaining graphs, requests replacements
+within the sampler's count, atom, and edge limits, then appends them. Supplied
+bookkeeping survives; missing fields use registered defaults such as `status=0`
+and, when registered, `fmax=inf`. Reset status and stage counters before reusing
+completed inputs. Refill returns a new batch after graduation, the original
+batch if none graduate, or `None` once the sampler and active batch are empty.
+
+Use `by_group=True` on both the sampler and engine for whole-group graduation
+and replacement. `max_batch_size` counts groups, and atom/edge limits include
+all graphs in each group. Grouped refill is supported on a single device;
+`DistributedPipeline` rejects grouped stages.
+
+`SizeAwareSampler(field_defaults=...)` fills missing fields before packing.
+Map each name to `(level, default)`, for example
+`{"fixed_mask": ("node", False)}`. Levels are node, edge, or system. A default
+may be a scalar or a callable accepting `(num_rows, device)` and returning a
+tensor. Supplied fields are preserved. Loading adds defaults and IDs to dataset
+items in place; assembly copies the data for simulation. Register defaults
+before loading samples.
+
 ## Reaction paths (NEB)
 
 - Build images with `interpolate_paths(initial, final, num_images=...)`. Each
@@ -284,6 +307,49 @@ own optimizer history.
   endpoint energy), the final force in eV/Å, and whether each path converged.
   CSV `energy_barrier` uses the lower endpoint, so it is not necessarily the
   forward barrier. Do not report an unconverged estimate as a final barrier.
+
+### Stream prepared paths on one device
+
+Prepare interpolation, IDPP, and constraints first. Each dataset item returns
+`(path_batch, metadata)` containing one complete group and optimizer inputs.
+Its `get_metadata(index)` reports total atoms and edges across the path.
+Use `SizeAwareSampler(prepared_dataset, by_group=True, ...)`, then
+`NEB(...).run(sampler=sampler, sinks=[results])`, where `results` can be
+`HostMemory(capacity=...)`. `max_batch_size` counts paths, and budgets include
+every image. `NEB.refill_frequency` defaults to 10 steps.
+
+`run()` takes either a batch or a sampler. Streaming builds a fresh engine and
+preserves resident optimizer history and fixed climbing choices across refills.
+It returns `None` on completion or the active batch at the global `n_steps`
+limit. Use `build_engine(sampler=..., sinks=...)` for manual stepping. Sink
+output is in finish order; per-image `group_id` identifies the dataset path.
+Clear incoming status and stage counters before reusing finished paths.
+
+Fix atoms with `batch.neb_fixed_node_mask`, a Boolean node field of shape
+`(batch.num_nodes,)` on the batch device, and include it in incoming paths.
+NEB creates the mask if absent, adds fixed endpoints in place, and registers
+`FreezeAtomsHook` to enforce it even with relaxed endpoints.
+`fixed_atom_indices` adds constraints for static runs but is rejected for
+sampler and pipeline workflows.
+
+### Custom path hooks
+
+For manual NEB, use a group-aware optimizer and register path hooks on the
+`FusedStage` in this order: `PathEnergyStatsHook`, optional
+`ClimbingImageSelectionHook`, `NEBForceHook`,
+`FreezeAtomsHook(mask_key="neb_fixed_node_mask")`, optional
+`PathDiagnosticsHook`, then optional `LoggingHook(by_group=True, ...)`.
+Share the same energy-stats hook instance and scope stage-specific hooks with
+`status_code`. Sub-stage `AFTER_COMPUTE` hooks run before fused-stage hooks,
+so path hooks on a sub-stage would read stale fused energy statistics.
+
+At admission, `ctx.previous_graph_indices` lets path hooks preserve residents'
+fixed climbing choices, admission-time springs, and constraints. Arrivals start
+fresh; a missing mapping resets all paths. Diagnostics reset at admission and
+update at `AFTER_COMPUTE`; `get_diagnostics()` reads the cache.
+A custom `SpringConfig.resolve(context)` returns one constant per link;
+`refresh` selects `ON_ADMISSION` or `AFTER_COMPUTE`. See
+[dynamics_mep.md][doc-mep] for the force-method protocols.
 
 ## Restraints and biased sampling
 
