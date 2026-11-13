@@ -2111,9 +2111,9 @@
     {
       "name": "nvalchemi-toolkit",
       "path": "skills/nvalchemi-toolkit",
-      "content_digest": "sha256:71209b5dc5c0015bac0a61ed6f29fb11b4a8adbfe2f18bd0cd2b80e81b608639",
-      "last_commit": "3687569c216eb7e15712231e2615dfa1b79084a5",
-      "last_modified": "2026-11-09"
+      "content_digest": "sha256:b3b4ff7e80f16491b8712934015877f2ab6c746ac686f3aae7b172a6762b25ad",
+      "last_commit": "ba4c5a72b494dff7795967457838a77e2bd6fc6b",
+      "last_modified": "2026-11-13"
     },
     {
       "name": "nvflare-autofl",
