@@ -1,11 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
 name: Nsight
-product_primary: Compute Sanitizer
+product_primary: Nsight
 repo: NVIDIA/nsight
 description: Agent-facing assets for Nsight developer workflows, including skills that help agents work with NVIDIA developer tools.
 skills:
   - path: skills/compute-sanitizer-diagnose-cuda-bugs/
     catalog_dir: compute-sanitizer-diagnose-cuda-bugs
+  - path: skills/nsight-port-cpu-to-gpu/
+    catalog_dir: nsight-port-cpu-to-gpu
 links:
   discussions: false
