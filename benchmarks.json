@@ -6306,7 +6306,7 @@
     },
     {
       "skill": "nvalchemi-toolkit",
-      "evaluation_date": "2026-11-07",
+      "evaluation_date": "2026-11-13",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.9",
       "dataset_digest": "sha256:c096747a831a786dceff6fcf5d46191b44347068431663c2a7e66efbf5593c7a",
@@ -6323,7 +6323,7 @@
       "catalog_dir": "nvalchemi-toolkit",
       "component": "ALCHEMI Toolkit",
       "has_results": true,
-      "average_uplift_pct": 10.05
+      "average_uplift_pct": 7.97
     },
     {
       "skill": "nvflare-autofl",
@@ -34873,7 +34873,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 5.6
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nvalchemi-toolkit",
@@ -34882,7 +34882,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 5.6
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "nvalchemi-toolkit",
@@ -34891,7 +34891,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 95.6,
-      "uplift_pct": 6.7
+      "uplift_pct": 13.4
     },
     {
       "catalog_dir": "nvalchemi-toolkit",
@@ -34900,7 +34900,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 97.8,
-      "uplift_pct": 15.6
+      "uplift_pct": 8.9
     },
     {
       "catalog_dir": "nvalchemi-toolkit",
@@ -34908,7 +34908,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
+      "score_pct": 95.4,
       "uplift_pct": null
     },
     {
@@ -34926,8 +34926,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.3,
-      "uplift_pct": 10.6
+      "score_pct": 88.8,
+      "uplift_pct": 15.8
     },
     {
       "catalog_dir": "nvalchemi-toolkit",
@@ -34935,8 +34935,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 87.0,
-      "uplift_pct": 16.2
+      "score_pct": 88.2,
+      "uplift_pct": 9.7
     },
     {
       "catalog_dir": "nvalchemi-toolkit",
@@ -34944,7 +34944,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.6,
+      "score_pct": 82.0,
       "uplift_pct": null
     },
     {
@@ -34953,7 +34953,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 76.3,
+      "score_pct": 77.6,
       "uplift_pct": null
     },
     {
