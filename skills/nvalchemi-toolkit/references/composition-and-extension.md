@@ -56,6 +56,18 @@ failure in tested scripts.
 6. **Record cheaply.** Store per-step results as detached tensors
    (`.detach().clone()`), and convert to Python or files after the run.
 
+### Preserve state when batch membership changes
+
+`BaseDynamics` and `FusedStage` pass a read-only
+`ctx.previous_graph_indices` at `ON_ADMISSION`: each current graph's index at
+its last admission, or `-1` for an arrival, regardless of status. This mapping
+composes membership changes since that admission. First admissions, new runs,
+and rebuilds after complete removal mark every graph new. Fused and sub-stage
+hooks receive the same full-batch mapping. Combine
+`previous_graph_indices < 0` with `active_graph_mask` to select a sub-stage's
+arrivals. Other stages receive `None`. Path hooks can recover previous paths
+using this mapping and their cached layout.
+
 ### Template
 
 This hook records a per-graph quantity every N steps and stops graphs that
