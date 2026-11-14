@@ -214,6 +214,22 @@ rank. Every stage needs a `buffer_config=BufferConfig(...)` (from
 a `FusedStage`. This `|` differs from the generative `gen | stage` pipeline.
 Details: [dynamics.md][doc-dyn], example [01_distributed_pipeline.py][ex-pipe].
 
+| Layer | Attribute | Purpose |
+| --- | --- | --- |
+| **Overflow sinks** | `overflow_sinks`: `DataSink` list (priority-ordered) | Received samples waiting for room; private `HostMemory` by default |
+| **Result sinks** | `sinks`: `DataSink` list (priority-ordered) | Finished samples; never drained back |
+
+`_complete_pending_recv()` waits on deferred receive, routes into
+the active batch, and drains `overflow_sinks` (never `sinks`).
+
+| Method | Purpose |
+| --- | --- |
+| `_recv_to_batch(incoming)` | Route received data directly into active batch or overflow sinks |
+| `_buffer_to_batch(incoming)` | Append to active batch, overflow to `overflow_sinks` if full |
+| `_overflow_to_sinks(batch)` | Write pending samples to the first overflow sink with room for all of them |
+| `_write_to_sinks(batch)` | Write finished samples to the first result sink with room for all of them |
+| `_drain_sinks_to_batch()` | Pull from `overflow_sinks` back into active batch when room available |
+
 ## Domain decomposition across GPUs
 
 - `DomainParallel(dynamics=integrator, config=DomainConfig(cutoff=...,

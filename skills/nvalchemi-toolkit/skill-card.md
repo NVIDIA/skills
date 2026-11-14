@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and computational scientists use this skill to have an agent write or change Python code that uses nvalchemi for atomic data and Zarr storage, MLIP model wrappers, batched relaxation and MD, reaction paths and enhanced sampling, training, fine-tuning, distillation, generative sampling, and custom hooks or integrators. It is not for other simulation packages without nvalchemi, ALCHEMI Toolkit-Ops (nvalchemiops) kernel work, or plain PyTorch questions. <br>
+Developers and computational scientists use this skill to have a coding agent write, change, and check Python code that uses the nvalchemi package for GPU-batched atomistic simulation, MLIP model wrapping, training, fine-tuning, and generative structure workflows. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,12 +25,12 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [references/data.md](references/data.md) <br>
-- [references/models.md](references/models.md) <br>
-- [references/dynamics-optimization.md](references/dynamics-optimization.md) <br>
-- [references/training.md](references/training.md) <br>
-- [references/generative-workflows.md](references/generative-workflows.md) <br>
-- [references/composition-and-extension.md](references/composition-and-extension.md) <br>
+- [Data note](references/data.md) <br>
+- [Models note](references/models.md) <br>
+- [Dynamics and optimization note](references/dynamics-optimization.md) <br>
+- [Training note](references/training.md) <br>
+- [Generative workflows note](references/generative-workflows.md) <br>
+- [Composition and extension note](references/composition-and-extension.md) <br>
 - [NVIDIA ALCHEMI Toolkit documentation](https://nvidia.github.io/nvalchemi-toolkit/) <br>
 
 
@@ -38,7 +38,7 @@ Mitigation: Review and scan skill before deployment. <br>
 **Output Type(s):** [Code, Shell commands, Analysis] <br>
 **Output Format:** [Markdown with inline Python and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Exploratory runs are capped at 3 systems, 100 steps, and under one minute of wall time; measured results are reported with units only for executed work, otherwise marked "Not executed".] <br>
+**Other Properties Related to Output:** [Exploratory runs limited to at most 3 systems and 100 steps; reports measured results only for executed work] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -47,7 +47,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-9 evaluation tasks (7 positive, 2 negative), 1 attempt per task, each in its own isolated sandbox pod (`k8s-sandbox` environment), with no-skill baseline runs for comparison; evaluator version `1.6.9`, evaluated 2026-11-13. <br>
+9 evaluation tasks (7 positive, 2 negative), 1 attempt per task, each run in an isolated sandbox pod (`k8s-sandbox`), with and without the skill as baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -69,22 +69,20 @@ Underlying evaluation signals used in this run: <br>
 
 
 ## Evaluation Results: <br>
-> ✅ **Overall verdict: PASS — Recommended for publication**
+**Overall verdict: PASS — Recommended for publication**
 
-### Publication Recommendation
-
-Recommended for publication based on the completed evaluation evidence in this report.
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
 
 ### Results at a Glance
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.4% — baseline ran, but no comparable score was available; uplift unavailable | 89.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 92.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 82.2% → 95.6% (+13.4 points) | 88.9% → 97.8% (+8.9 points) |
-| Discoverability | 95.4% — baseline ran, but no comparable score was available; uplift unavailable | 82.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 73.0% → 88.8% (+15.8 points) | 78.5% → 88.2% (+9.7 points) |
-| Efficiency | 82.0% — baseline ran, but no comparable score was available; uplift unavailable | 77.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 86.7% → 97.8% (+11.1 points) | 84.4% → 97.8% (+13.4 points) |
+| Discoverability | 92.9% — baseline ran, but no comparable score was available; uplift unavailable | 83.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 74.7% → 84.5% (+9.8 points) | 75.2% → 91.7% (+16.5 points) |
+| Efficiency | 84.8% — baseline ran, but no comparable score was available; uplift unavailable | 71.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -99,12 +97,20 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 80.9% → 85.0% (+4.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 80.9% → 84.7% (+3.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.3% → 84.6% (+1.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 81.7% → 84.0% (+2.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 6 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 9 task(s) |
 
 ## Skill Version(s): <br>
-6761022 (source: git SHA, committed 2026-11-13; skill notes track nvalchemi release 0.3.0) <br>
+f76491f (source: git SHA, committed 2026-11-13) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
