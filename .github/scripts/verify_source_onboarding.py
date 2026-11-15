@@ -61,7 +61,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -89,12 +88,6 @@ REQUIRED_FILES = ("SKILL.md", SIG_NAME, "BENCHMARK.md", "skill-card.md")
 
 SCHEMA_PATH = ".github/scripts/marketplace/metadata.schema.json"
 
-RE_REPO = re.compile(r"^repo:\s*(\S+)\s*$")
-RE_REF = re.compile(r"^ref:\s*(\S+)\s*$")
-RE_PATH = re.compile(r"^-?\s*path:\s*(\S+)\s*$")
-# Top-level scalars only: matched against the unindented line, so a skill
-# entry's nested keys can never be read as the component's name or product.
-
 
 @dataclass(frozen=True)
 class Finding:
@@ -117,38 +110,39 @@ class Finding:
 def parse_component(text: str) -> dict:
     """Read repo, ref and declared skill paths from a component file.
 
-    Repo, ref and paths are read line by line, the way the sync scripts read
-    them, so this check fetches exactly what the sync will fetch. ``name`` and
-    ``product_primary`` come from ``product_fields``, which uses the metadata
-    generator's YAML loader, because they decide what the generator does.
+    Repo, ref and paths are read as YAML, because the sync reads them with
+    ``yq`` (``.repo``, ``.ref // "main"``, ``.skills[].path``), so this check
+    fetches exactly what the sync will fetch. Matching lines by hand disagreed
+    with it: a trailing ``# comment`` after ``ref:`` sent the check to main,
+    one after ``- path:`` dropped the path so the skill was never verified,
+    and quotes stayed in the value. ``name`` and ``product_primary`` come from
+    ``product_fields``, which uses the metadata generator's YAML loader,
+    because they decide what the generator does.
 
     Trailing slashes are stripped so a path compares equal however it was
     written — ``skills/write-dag/`` and ``skills/write-dag`` are the same
     directory, and treating them as different would report a path as newly
     added when a PR only reformatted it.
     """
-    repo = None
-    ref = None
+    try:
+        data = yaml.safe_load(text)
+    except yaml.YAMLError:
+        data = None  # reported through product_fields' yaml_error
+    if not isinstance(data, dict):
+        data = {}
+    repo = data.get("repo")
+    ref = data.get("ref")
+    skills = data.get("skills")
     paths: list[str] = []
-    for line in text.splitlines():
-        stripped = line.strip()
-        if repo is None:
-            m = RE_REPO.match(stripped)
-            if m:
-                repo = m.group(1)
-                continue
-        if ref is None:
-            m = RE_REF.match(stripped)
-            if m:
-                ref = m.group(1)
-                continue
-        m = RE_PATH.match(stripped)
-        if m:
-            paths.append(m.group(1).rstrip("/"))
+    for entry in skills if isinstance(skills, list) else []:
+        path = entry.get("path") if isinstance(entry, dict) else None
+        if isinstance(path, str) and path:
+            paths.append(path.rstrip("/"))
     # An absent ref means the component tracks the default branch. Several
     # components (AIQ, VSS) track develop instead; verifying those against
     # main compares a tree the sync will never fetch.
-    return {"repo": repo, "ref": ref or "main", "paths": paths,
+    return {"repo": str(repo) if repo else None,
+            "ref": str(ref) if ref else "main", "paths": paths,
             **product_fields(text)}
 
 
@@ -464,8 +458,11 @@ def main() -> int:
                     resolved = component["product_primary"] or component["name"]
                     print(f"  ok    product: {resolved}")
             if not repo:
-                findings.append(Finding(rel, "no repo: declared", blocking=True))
-                print("  FAIL  no repo: declared")
+                # A file YAML cannot load has no repo either; say why.
+                problem = ("component file is not valid YAML; the sync cannot read it"
+                           if component["yaml_error"] else "no repo: declared")
+                findings.append(Finding(rel, problem, blocking=True))
+                print(f"  FAIL  {problem}")
                 continue
 
             clone = fetch_source(

@@ -268,7 +268,7 @@ class BenchmarkTests(unittest.TestCase):
 
 
 class DeclaredPathTests(unittest.TestCase):
-    """Parsing components.d/<slug>.yml without a YAML dependency."""
+    """Parsing components.d/<slug>.yml the way the sync's yq reads it."""
 
     COMPONENT = """name: Physical AI Orchestration
 repo: NVIDIA/paidf-orchestration
@@ -297,6 +297,75 @@ links:
                                 "skills:\n  - path: skills/aiq-research/\n")
 
         self.assertEqual(c["ref"], "develop")
+
+    def test_trailing_comment_is_not_part_of_the_ref(self):
+        """yq drops the comment and syncs develop; the check must verify develop too."""
+        c = vso.parse_component("repo: NVIDIA-AI-Blueprints/aiq\n"
+                                "ref: develop  # skills are published from develop\n"
+                                "skills:\n  - path: skills/aiq-research/\n")
+
+        self.assertEqual(c["ref"], "develop")
+
+    def test_trailing_comment_does_not_drop_the_path(self):
+        text = self.COMPONENT.replace("skills/write-dag/", "skills/write-dag/  # renamed upstream")
+
+        self.assertEqual(vso.parse_component(text)["paths"],
+                         ["skills/write-dag", "skills/orchestration-setup"])
+
+    def test_quoted_values_are_read_like_yaml(self):
+        c = vso.parse_component('repo: "NVIDIA/paidf-orchestration"\nref: \'develop\'\n'
+                                'skills:\n  - path: "skills/write-dag/"\n')
+
+        self.assertEqual((c["repo"], c["ref"], c["paths"]),
+                         ("NVIDIA/paidf-orchestration", "develop", ["skills/write-dag"]))
+
+
+class OnboardingRunTests(unittest.TestCase):
+    """main() end to end, with git and the source clone stubbed out."""
+
+    REL = "components.d/demo.yml"
+
+    def run_main(self, head_text):
+        """Run main() for a PR that adds REL; return (exit code, fetch_source calls)."""
+        from contextlib import redirect_stdout
+        from io import StringIO
+        from unittest import mock
+
+        tmp = TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        clone = Path(tmp.name)
+        skill = make_skill(clone / "skills", "unsigned")
+        (skill / vso.SIG_NAME).unlink()  # the skill being onboarded is not signed
+
+        def file_at(sha, path):
+            if sha != "head":
+                return None  # the component file is new in this PR
+            return {self.REL: head_text, vso.SCHEMA_PATH: SCHEMA}.get(path)
+
+        fetch = mock.Mock(return_value=clone)
+        with mock.patch.dict("os.environ", {"BASE_SHA": "base", "HEAD_SHA": "head"}), \
+                mock.patch.object(vso, "changed_component_files", return_value=[self.REL]), \
+                mock.patch.object(vso, "file_at", side_effect=file_at), \
+                mock.patch.object(vso, "fetch_source", fetch), \
+                redirect_stdout(StringIO()):
+            code = vso.main()
+        return code, fetch.call_args_list
+
+    HEAD = ("name: Run:ai\nrepo: NVIDIA/demo\n{ref}skills:\n"
+            "  - path: skills/unsigned/{comment}\n    catalog_dir: unsigned\n")
+
+    def test_unsigned_new_skill_fails(self):
+        code, _ = self.run_main(self.HEAD.format(ref="", comment=""))
+        self.assertEqual(code, 1)
+
+    def test_comment_after_the_path_does_not_skip_the_skill(self):
+        code, _ = self.run_main(self.HEAD.format(ref="", comment="  # first skill"))
+        self.assertEqual(code, 1)
+
+    def test_comment_after_the_ref_still_fetches_that_ref(self):
+        _, calls = self.run_main(
+            self.HEAD.format(ref="ref: develop  # tracks develop\n", comment=""))
+        self.assertEqual([c.args[:2] for c in calls], [("NVIDIA/demo", "develop")])
 
 
 class BlockingScopeTests(unittest.TestCase):
