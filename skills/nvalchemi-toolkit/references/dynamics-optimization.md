@@ -242,10 +242,13 @@ and, when registered, `fmax=inf`. Reset status and stage counters before reusing
 completed inputs. Refill returns a new batch after graduation, the original
 batch if none graduate, or `None` once the sampler and active batch are empty.
 
-Use `by_group=True` on both the sampler and engine for whole-group graduation
-and replacement. `max_batch_size` counts groups, and atom/edge limits include
-all graphs in each group. Grouped refill is supported on a single device;
-`DistributedPipeline` rejects grouped stages.
+Single-device grouped dynamics supports whole-group refill with a matching
+`by_group=True` sampler. It works like ungrouped refill, with complete groups in
+place of graphs. Refill follows only the sampler's limits, not the engine's own
+`max_batch_size`. Partial-group graduation is rejected.
+`DistributedPipeline` supports complete-group transfers when every stage uses
+`by_group=True`. Combining grouped stages with `mesh` raises
+`NotImplementedError`.
 
 `SizeAwareSampler(field_defaults=...)` fills missing fields before packing.
 Map each name to `(level, default)`, for example
