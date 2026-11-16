@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 451,
-  "result_row_count": 4254,
+  "skill_count": 452,
+  "result_row_count": 4264,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -6093,6 +6093,27 @@
       "component": "Newton",
       "has_results": true,
       "average_uplift_pct": 15.5
+    },
+    {
+      "skill": "nsight-port-cpu-to-gpu",
+      "evaluation_date": "2026-11-03",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.6",
+      "dataset_digest": "sha256:97f95413fa7e0482cf071499e79e15bb4c6ff0faf6e060796259828e2200b27c",
+      "validation_status": "passed",
+      "tasks": 21,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "has_results": true,
+      "average_uplift_pct": 12.68
     },
     {
       "skill": "nv-generate-ct-rflow",
@@ -33964,6 +33985,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 68.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 60.0,
+      "uplift_pct": 6.7
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 74.3,
+      "uplift_pct": 27.6
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 9.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 32.3,
+      "uplift_pct": 9.4
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 55.1,
+      "uplift_pct": 32.4
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nsight-port-cpu-to-gpu",
+      "component": "Nsight",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.4,
       "uplift_pct": null
     },
     {

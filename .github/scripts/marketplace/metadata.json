@@ -3493,6 +3493,18 @@
       }
     },
     {
+      "path": "skills/nsight-port-cpu-to-gpu",
+      "name": "nsight-port-cpu-to-gpu",
+      "description": "Guide an agent through GPU-accelerating a codebase: setup interview, flavor-specific translation (Fortran OpenACC, Fortran OpenMP, C++ CUDA, C++ Kokkos), and NVIDIA Nsight Systems (nsys) profile-guided orchestration. Use when porting HPC applications to GPU. Do not use for porting or optimizing  individual standalone kernels.",
+      "metadata": {
+        "product.primary": "Nsight",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "hpc_developer,application_developer,developer,simulation_engineer,research_academic",
+        "discovery.activity_tags": "migrate,profile,optimize,transform,validate"
+      }
+    },
+    {
       "path": "skills/nv-generate-ct-rflow",
       "name": "nv-generate-ct-rflow",
       "description": "Used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct. Not for production training data without review.",

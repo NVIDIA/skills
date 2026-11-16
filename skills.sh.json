@@ -432,6 +432,7 @@
         "jetson-video-pipeline",
         "jetson-video-recipe",
         "jetson-video-setup",
+        "nsight-port-cpu-to-gpu",
         "nvmolkit-usage",
         "nvshmem-collect-performance-data",
         "nvshmem-configure-nic-pe-mapping",
