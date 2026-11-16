@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Tier 3 (live A/B) execution policy for the Nsight AI Porting Agent skill.
+#
+# Code-based cases stage a single-file Fortran advection fixture from
+# evals/files/ into /workspace/input/ (see EVAL.md); the rest are advisory
+# questions with the needed facts in the prompt. The default python:3.12-slim
+# Harbor container has no GPU, nvfortran, or nsys, and the prompts say so:
+# cases are graded on what the agent writes and where it stops
+# (aces_default), not on a GPU build. A full end-to-end port needs a GPU and
+# the HPC SDK and is run outside this pipeline.
+harbor:
+  task_source: auto          # derive tasks from evals/evals.json
+  base_image_mode: reuse
+  n_attempts: 3              # A/B pairs per case; bump for tighter CIs
+  pass_threshold: 0.60       # per-attempt pass for pass@k; not the verdict gate
+  stop_on_pass: false         # NVCARPS CI runs one attempt; early-stop needs >1
+  # Pick agents/models on the CLI, e.g.:
+  #   skillevaluator evaluate ./nsight-port-cpu-to-gpu -a claude-code
+
+skill_workspace:
+  mode: isolated             # only the target skill is staged; no siblings leak
+
+grading:
+  mode: aces_default         # LLM judge over expected_output + assertions

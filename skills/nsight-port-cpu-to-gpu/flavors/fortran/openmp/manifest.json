@@ -1,0 +1,12 @@
+{
+  "id": "fortran-openmp",
+  "from_lang": "fortran",
+  "to_lang": "fortran",
+  "framework": "openmp",
+  "status": "complete",
+  "display_name": "Fortran + OpenMP offload",
+  "compiler": "nvfortran",
+  "supports_memory_mode": true,
+  "supports_inline_translation": true,
+  "gpu_flag_note": "nvfortran: -mp=gpu (never -fopenmp). gfortran: -fopenmp -foffload=nvptx-none."
+}

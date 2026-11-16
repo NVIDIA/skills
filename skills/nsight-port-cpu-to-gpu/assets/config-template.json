@@ -1,0 +1,27 @@
+{
+  "schema_version": "6.0.0",
+  "source_dir": "",
+  "from_lang": "fortran",
+  "to_lang": "fortran",
+  "framework": "openacc",
+  "memory_mode": "managed",
+  "translation_mode": "sibling",
+
+  "performance_mode": "single",
+
+  "problems": [],
+
+  "engagement": "low",
+
+  "include_guard": "USE_OPENACC",
+
+  "build_correctness": ".nsight-ai-port/build_correctness.sh",
+  "run_correctness": ".nsight-ai-port/run_correctness.sh",
+  "verify_timeout": 600,
+
+  "gpu_environment": {
+    "compiler_path": "",
+    "compute_capability": "",
+    "cuda_version": ""
+  }
+}
