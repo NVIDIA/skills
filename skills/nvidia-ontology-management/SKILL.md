@@ -101,7 +101,7 @@ Stay on the semantic layer. Do not browse raw schemas to answer meaning.
 - Term → columns: MCP `get_term_columns` or
   `GET /api/terms/{term_id}/column-attributes`
 - Term → derived SQL: MCP `get_term_sql_attributes`
-- Table → terms and SQL attributes: MCP `describe_table` or
+- Table → terms and stored queries that reference it: MCP `describe_table` or
   `GET /api/exploration/tables/{table_id}/details`
 - Semantic hop chain between two terms:
   `GET /api/exploration/terms/{term_id}/path/{other_term_id}`

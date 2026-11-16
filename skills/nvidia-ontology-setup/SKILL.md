@@ -35,6 +35,9 @@ developer tool, not an installer. Typed setup, connection, ingestion,
 compilation, and readiness artifacts are in
 [runtime-contract.yaml](assets/runtime-contract.yaml).
 
+Before a first install, confirm an ontology fits the use case: see *When to
+use* in `nvidia-ontology-query`.
+
 On failure, read [troubleshooting.md](references/troubleshooting.md) instead of
 searching the web.
 
