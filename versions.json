@@ -2039,6 +2039,13 @@
       "last_modified": "2026-11-12"
     },
     {
+      "name": "nsight-port-cpu-to-gpu",
+      "path": "skills/nsight-port-cpu-to-gpu",
+      "content_digest": "sha256:b24c80cdb437080ac1b356866a774d80773eaedb4ac9da2ede611ca621be31b0",
+      "last_commit": "41b57aa9652c613e09c2ab8cd20d6b017cc3007e",
+      "last_modified": "2026-11-16"
+    },
+    {
       "name": "nv-generate-ct-rflow",
       "path": "skills/nv-generate-ct-rflow",
       "content_digest": "sha256:a91579e7f4643eeb7fe6230d214a2d5d37c514687a3f1f9ca164a01be90305a5",
