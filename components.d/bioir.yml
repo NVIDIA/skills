@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: BioIR
+product_primary: BioNeMo
+repo: NVIDIA-BioNeMo/BioNeMo-Inference-Runtime
+ref: main
+description: Benchmark BioIR folding inference against upstream implementations.
+links:
+  contributing: docs/contributing.md
+  security: false
+skills:
+  - path: skills/bench-perf-oss/
+    catalog_dir: bench-perf-oss
