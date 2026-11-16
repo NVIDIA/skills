@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 92.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Correctness | 42.0% → 100.0% (+58.0 points) | 56.0% → 98.0% (+42.0 points) |
-| Discoverability | 94.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 37.3% → 95.0% (+57.7 points) | 56.2% → 90.7% (+34.5 points) |
-| Efficiency | 86.8% — baseline ran, but no comparable score was available; uplift unavailable | 81.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.8% — baseline ran, but no comparable score was available; uplift unavailable | 90.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 90.0% → 100.0% (+10.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Correctness | 50.0% → 100.0% (+50.0 points) | 60.0% → 98.0% (+38.0 points) |
+| Discoverability | 88.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 38.1% → 95.0% (+56.9 points) | 57.2% → 77.1% (+19.9 points) |
+| Efficiency | 85.8% — baseline ran, but no comparable score was available; uplift unavailable | 86.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -68,9 +68,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.5% → 96.8% (-1.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 96.6% (-1.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 90.1% → 90.5% (+0.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 88.7% → 91.2% (+2.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -78,29 +78,29 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,147,298 | 1,472,943 | -325,645 | -22.11% | skill 10/10; base 10/10 |
-| claude-code | setup-eval-001-underspecified | 116,219 | 106,949 | +9,270 | +8.67% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-002-use-existing-scripts | 75,561 | 106,903 | -31,342 | -29.32% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-003-auth-secret-cookies | 117,292 | 143,920 | -26,628 | -18.50% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-004-postgres-port-host-only | 115,756 | 142,007 | -26,251 | -18.49% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-005-mcp-already-up | 115,175 | 182,127 | -66,952 | -36.76% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-006-vault-partial | 107,248 | 143,085 | -35,837 | -25.05% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-007-embed-triplet-mismatch | 155,543 | 142,502 | +13,041 | +9.15% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-008-connect-source-workflow | 117,488 | 217,998 | -100,510 | -46.11% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-009-env-vs-ui-connections | 110,730 | 143,292 | -32,562 | -22.72% | skill 1/1; base 1/1 |
-| claude-code | setup-eval-010-helm-install | 116,286 | 144,160 | -27,874 | -19.34% | skill 1/1; base 1/1 |
-| codex | All cases | 495,379 | 543,819 | -48,440 | -8.91% | skill 10/10; base 10/10 |
-| codex | setup-eval-001-underspecified | 29,652 | 78,780 | -49,128 | -62.36% | skill 1/1; base 1/1 |
-| codex | setup-eval-002-use-existing-scripts | 50,231 | 49,048 | +1,183 | +2.41% | skill 1/1; base 1/1 |
-| codex | setup-eval-003-auth-secret-cookies | 46,935 | 41,105 | +5,830 | +14.18% | skill 1/1; base 1/1 |
-| codex | setup-eval-004-postgres-port-host-only | 33,975 | 48,623 | -14,648 | -30.13% | skill 1/1; base 1/1 |
-| codex | setup-eval-005-mcp-already-up | 51,029 | 36,697 | +14,332 | +39.05% | skill 1/1; base 1/1 |
-| codex | setup-eval-006-vault-partial | 79,118 | 58,064 | +21,054 | +36.26% | skill 1/1; base 1/1 |
-| codex | setup-eval-007-embed-triplet-mismatch | 50,989 | 44,874 | +6,115 | +13.63% | skill 1/1; base 1/1 |
-| codex | setup-eval-008-connect-source-workflow | 46,497 | 58,004 | -11,507 | -19.84% | skill 1/1; base 1/1 |
-| codex | setup-eval-009-env-vs-ui-connections | 72,843 | 70,447 | +2,396 | +3.40% | skill 1/1; base 1/1 |
-| codex | setup-eval-010-helm-install | 34,110 | 58,177 | -24,067 | -41.37% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,642,677 | 2,016,762 | -374,085 | -18.55% | skill 20/20; base 20/20 |
+| claude-code | All cases | 1,148,232 | 1,300,257 | -152,025 | -11.69% | skill 10/10; base 10/10 |
+| claude-code | setup-eval-001-underspecified | 116,039 | 70,645 | +45,394 | +64.26% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-002-use-existing-scripts | 75,538 | 143,470 | -67,932 | -47.35% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-003-auth-secret-cookies | 117,202 | 143,503 | -26,301 | -18.33% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-004-postgres-port-host-only | 115,842 | 106,683 | +9,159 | +8.59% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-005-mcp-already-up | 115,126 | 144,116 | -28,990 | -20.12% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-006-vault-partial | 107,389 | 107,054 | +335 | +0.31% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-007-embed-triplet-mismatch | 108,659 | 107,526 | +1,133 | +1.05% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-008-connect-source-workflow | 200,209 | 226,258 | -26,049 | -11.51% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-009-env-vs-ui-connections | 75,981 | 143,250 | -67,269 | -46.96% | skill 1/1; base 1/1 |
+| claude-code | setup-eval-010-helm-install | 116,247 | 107,752 | +8,495 | +7.88% | skill 1/1; base 1/1 |
+| codex | All cases | 527,703 | 871,973 | -344,270 | -39.48% | skill 10/10; base 10/10 |
+| codex | setup-eval-001-underspecified | 29,616 | 64,810 | -35,194 | -54.30% | skill 1/1; base 1/1 |
+| codex | setup-eval-002-use-existing-scripts | 33,715 | 49,128 | -15,413 | -31.37% | skill 1/1; base 1/1 |
+| codex | setup-eval-003-auth-secret-cookies | 46,940 | 54,849 | -7,909 | -14.42% | skill 1/1; base 1/1 |
+| codex | setup-eval-004-postgres-port-host-only | 51,363 | 46,744 | +4,619 | +9.88% | skill 1/1; base 1/1 |
+| codex | setup-eval-005-mcp-already-up | 64,068 | 282,194 | -218,126 | -77.30% | skill 1/1; base 1/1 |
+| codex | setup-eval-006-vault-partial | 75,834 | 62,244 | +13,590 | +21.83% | skill 1/1; base 1/1 |
+| codex | setup-eval-007-embed-triplet-mismatch | 66,767 | 64,039 | +2,728 | +4.26% | skill 1/1; base 1/1 |
+| codex | setup-eval-008-connect-source-workflow | 46,386 | 77,042 | -30,656 | -39.79% | skill 1/1; base 1/1 |
+| codex | setup-eval-009-env-vs-ui-connections | 47,800 | 73,155 | -25,355 | -34.66% | skill 1/1; base 1/1 |
+| codex | setup-eval-010-helm-install | 65,214 | 97,768 | -32,554 | -33.30% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,675,935 | 2,172,230 | -496,295 | -22.85% | skill 20/20; base 20/20 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
