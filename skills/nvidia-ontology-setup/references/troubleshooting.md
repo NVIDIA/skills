@@ -70,7 +70,7 @@ Users, sessions, API keys, and the MCP OAuth tables live in the Prisma
 without an error before while leaving MCP login broken:
 
 - Compose: `docker compose logs frontend-migrate`
-- Helm: `kubectl logs job/frontend-migrate-<release revision>`
+- Helm: `kubectl logs -l app.kubernetes.io/component=frontend-migrate --tail=-1 --prefix`
 
 ## "Protected resource ... does not match expected ..."
 
