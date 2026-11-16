@@ -1,0 +1,13 @@
+{
+  "id": "cpp-cuda",
+  "from_lang": "cpp",
+  "to_lang": "cpp",
+  "framework": "cuda",
+  "status": "complete",
+  "display_name": "C/C++ + CUDA",
+  "compiler": "nvcc",
+  "supports_memory_mode": true,
+  "cxx_standard": "c++17",
+  "kernel_extension": ".cu",
+  "compiler_note": "nvcc compiles .cu kernels; the host call site (.cpp) sees only a plain C++ header. nvc++ also accepts CUDA C++ if the project already uses it."
+}

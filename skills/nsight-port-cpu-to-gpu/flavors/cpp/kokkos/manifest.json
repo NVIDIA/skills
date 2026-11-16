@@ -1,0 +1,13 @@
+{
+  "id": "cpp-kokkos",
+  "from_lang": "cpp",
+  "to_lang": "cpp",
+  "framework": "kokkos",
+  "status": "complete",
+  "display_name": "C/C++ + Kokkos",
+  "compiler": "nvcc_wrapper",
+  "supports_memory_mode": true,
+  "cxx_standard": "c++17",
+  "kokkos_target": "4",
+  "kokkos_target_note": "Kokkos 4.x — SharedSpace managed memory on C++17. Kokkos 5 requires C++20; not targeted."
+}

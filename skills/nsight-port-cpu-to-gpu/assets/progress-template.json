@@ -1,0 +1,17 @@
+{
+  "schema_version": "6.0.0",
+  "status": "in_progress",
+  "last_working_commit": "",
+  "current_problem": "",
+  "current_round": 0,
+  "setup_complete": false,
+  "plan_complete": false,
+  "refactor_complete": false,
+  "device_utils_complete": false,
+  "functions": [],
+  "translated_functions": [],
+  "problems": [],
+  "rounds": [],
+  "profile_rounds": [],
+  "notes": ""
+}

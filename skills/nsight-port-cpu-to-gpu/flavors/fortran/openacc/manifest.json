@@ -1,0 +1,11 @@
+{
+  "id": "fortran-openacc",
+  "from_lang": "fortran",
+  "to_lang": "fortran",
+  "framework": "openacc",
+  "status": "complete",
+  "display_name": "Fortran + OpenACC",
+  "compiler": "nvfortran",
+  "supports_memory_mode": true,
+  "supports_inline_translation": true
+}

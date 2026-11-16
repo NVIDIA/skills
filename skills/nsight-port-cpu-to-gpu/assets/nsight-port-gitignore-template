@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+# .nsight-ai-port profiler artifacts — do not commit binary reports
+profiles/**/*.nsys-rep
+profiles/**/*.sqlite
+profiles/**/*.qdstrm
+history/**/*.nsys-rep
+history/**/*.sqlite
+history/**/*.qdstrm
+*.nsys-rep
+*.qdstrm
+
+# Keep distilled text exports (nvtx_sum.csv, summary.txt, extraction_meta.txt)
+# and archived run records under history/ (progress.json snapshots, summaries)
