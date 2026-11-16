@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 86.9% — baseline ran, but no comparable score was available; uplift unavailable | 82.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 88.5% (-11.5 points) | 100.0% → 84.6% (-15.4 points) |
-| Correctness | 38.5% → 95.4% (+56.9 points) | 49.2% → 80.0% (+30.8 points) |
-| Discoverability | 90.8% — baseline ran, but no comparable score was available; uplift unavailable | 94.2% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 27.8% → 74.4% (+46.6 points) | 40.4% → 66.7% (+26.3 points) |
-| Efficiency | 85.4% — baseline ran, but no comparable score was available; uplift unavailable | 84.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 88.4% — baseline ran, but no comparable score was available; uplift unavailable | 82.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 96.2% → 84.6% (-11.6 points) |
+| Correctness | 40.0% → 95.4% (+55.4 points) | 44.6% → 84.6% (+40.0 points) |
+| Discoverability | 90.8% — baseline ran, but no comparable score was available; uplift unavailable | 94.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 23.7% → 70.5% (+46.8 points) | 47.4% → 61.5% (+14.1 points) |
+| Efficiency | 85.2% — baseline ran, but no comparable score was available; uplift unavailable | 85.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -68,9 +68,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.5% → 96.2% (-2.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.4% → 96.2% (-2.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 91.7% → 90.6% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 91.7% → 91.1% (-0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -78,35 +78,35 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 2,016,341 | 1,534,739 | +481,602 | +31.38% | skill 13/13; base 13/13 |
-| claude-code | management-eval-001-mcp-readonly | 154,696 | 107,414 | +47,282 | +44.02% | skill 1/1; base 1/1 |
-| claude-code | management-eval-002-validate-422 | 188,571 | 142,209 | +46,362 | +32.60% | skill 1/1; base 1/1 |
-| claude-code | management-eval-003-reset-is-destructive | 111,697 | 142,645 | -30,948 | -21.70% | skill 1/1; base 1/1 |
-| claude-code | management-eval-004-token-acts-as-owner | 145,240 | 142,526 | +2,714 | +1.90% | skill 1/1; base 1/1 |
-| claude-code | management-eval-005-import-replace | 229,424 | 142,862 | +86,562 | +60.59% | skill 1/1; base 1/1 |
-| claude-code | management-eval-006-lineage-semantic-layer | 186,578 | 141,919 | +44,659 | +31.47% | skill 1/1; base 1/1 |
-| claude-code | management-eval-007-patch-vs-put-sql-attribute | 113,257 | 70,644 | +42,613 | +60.32% | skill 1/1; base 1/1 |
-| claude-code | management-eval-008-run-grain-measure | 113,012 | 71,609 | +41,403 | +57.82% | skill 1/1; base 1/1 |
-| claude-code | management-eval-009-relationship-evidence | 200,954 | 142,716 | +58,238 | +40.81% | skill 1/1; base 1/1 |
-| claude-code | management-eval-010-import-exact-readback | 113,886 | 106,998 | +6,888 | +6.44% | skill 1/1; base 1/1 |
-| claude-code | management-eval-011-result-publication-mode | 186,668 | 108,115 | +78,553 | +72.66% | skill 1/1; base 1/1 |
-| claude-code | management-eval-012-promotion-readback-failure | 113,833 | 107,246 | +6,587 | +6.14% | skill 1/1; base 1/1 |
-| claude-code | management-eval-013-composed-lifecycle | 158,525 | 107,836 | +50,689 | +47.01% | skill 1/1; base 1/1 |
-| codex | All cases | 891,349 | 639,118 | +252,231 | +39.47% | skill 13/13; base 13/13 |
-| codex | management-eval-001-mcp-readonly | 81,756 | 55,952 | +25,804 | +46.12% | skill 1/1; base 1/1 |
-| codex | management-eval-002-validate-422 | 64,735 | 55,864 | +8,871 | +15.88% | skill 1/1; base 1/1 |
-| codex | management-eval-003-reset-is-destructive | 48,290 | 60,041 | -11,751 | -19.57% | skill 1/1; base 1/1 |
-| codex | management-eval-004-token-acts-as-owner | 57,097 | 91,171 | -34,074 | -37.37% | skill 1/1; base 1/1 |
-| codex | management-eval-005-import-replace | 52,670 | 40,926 | +11,744 | +28.70% | skill 1/1; base 1/1 |
-| codex | management-eval-006-lineage-semantic-layer | 107,452 | 40,567 | +66,885 | +164.88% | skill 1/1; base 1/1 |
-| codex | management-eval-007-patch-vs-put-sql-attribute | 48,329 | 61,639 | -13,310 | -21.59% | skill 1/1; base 1/1 |
-| codex | management-eval-008-run-grain-measure | 48,486 | 18,012 | +30,474 | +169.19% | skill 1/1; base 1/1 |
-| codex | management-eval-009-relationship-evidence | 45,829 | 40,779 | +5,050 | +12.38% | skill 1/1; base 1/1 |
-| codex | management-eval-010-import-exact-readback | 49,037 | 50,961 | -1,924 | -3.78% | skill 1/1; base 1/1 |
-| codex | management-eval-011-result-publication-mode | 44,128 | 13,309 | +30,819 | +231.57% | skill 1/1; base 1/1 |
-| codex | management-eval-012-promotion-readback-failure | 44,690 | 54,363 | -9,673 | -17.79% | skill 1/1; base 1/1 |
-| codex | management-eval-013-composed-lifecycle | 198,850 | 55,534 | +143,316 | +258.07% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 2,907,690 | 2,173,857 | +733,833 | +33.76% | skill 26/26; base 26/26 |
+| claude-code | All cases | 1,824,072 | 1,606,351 | +217,721 | +13.55% | skill 13/13; base 13/13 |
+| claude-code | management-eval-001-mcp-readonly | 158,099 | 107,426 | +50,673 | +47.17% | skill 1/1; base 1/1 |
+| claude-code | management-eval-002-validate-422 | 111,861 | 142,707 | -30,846 | -21.61% | skill 1/1; base 1/1 |
+| claude-code | management-eval-003-reset-is-destructive | 111,863 | 142,244 | -30,381 | -21.36% | skill 1/1; base 1/1 |
+| claude-code | management-eval-004-token-acts-as-owner | 155,734 | 142,618 | +13,116 | +9.20% | skill 1/1; base 1/1 |
+| claude-code | management-eval-005-import-replace | 192,127 | 142,590 | +49,537 | +34.74% | skill 1/1; base 1/1 |
+| claude-code | management-eval-006-lineage-semantic-layer | 221,503 | 106,401 | +115,102 | +108.18% | skill 1/1; base 1/1 |
+| claude-code | management-eval-007-patch-vs-put-sql-attribute | 113,535 | 178,348 | -64,813 | -36.34% | skill 1/1; base 1/1 |
+| claude-code | management-eval-008-run-grain-measure | 112,808 | 72,042 | +40,766 | +56.59% | skill 1/1; base 1/1 |
+| claude-code | management-eval-009-relationship-evidence | 152,112 | 142,264 | +9,848 | +6.92% | skill 1/1; base 1/1 |
+| claude-code | management-eval-010-import-exact-readback | 112,957 | 106,863 | +6,094 | +5.70% | skill 1/1; base 1/1 |
+| claude-code | management-eval-011-result-publication-mode | 110,623 | 108,031 | +2,592 | +2.40% | skill 1/1; base 1/1 |
+| claude-code | management-eval-012-promotion-readback-failure | 112,878 | 106,888 | +5,990 | +5.60% | skill 1/1; base 1/1 |
+| claude-code | management-eval-013-composed-lifecycle | 157,972 | 107,929 | +50,043 | +46.37% | skill 1/1; base 1/1 |
+| codex | All cases | 1,002,425 | 583,965 | +418,460 | +71.66% | skill 13/13; base 13/13 |
+| codex | management-eval-001-mcp-readonly | 81,638 | 56,170 | +25,468 | +45.34% | skill 1/1; base 1/1 |
+| codex | management-eval-002-validate-422 | 79,056 | 54,223 | +24,833 | +45.80% | skill 1/1; base 1/1 |
+| codex | management-eval-003-reset-is-destructive | 48,409 | 61,974 | -13,565 | -21.89% | skill 1/1; base 1/1 |
+| codex | management-eval-004-token-acts-as-owner | 46,516 | 60,949 | -14,433 | -23.68% | skill 1/1; base 1/1 |
+| codex | management-eval-005-import-replace | 52,776 | 41,663 | +11,113 | +26.67% | skill 1/1; base 1/1 |
+| codex | management-eval-006-lineage-semantic-layer | 178,136 | 27,009 | +151,127 | +559.54% | skill 1/1; base 1/1 |
+| codex | management-eval-007-patch-vs-put-sql-attribute | 48,253 | 52,789 | -4,536 | -8.59% | skill 1/1; base 1/1 |
+| codex | management-eval-008-run-grain-measure | 44,155 | 17,847 | +26,308 | +147.41% | skill 1/1; base 1/1 |
+| codex | management-eval-009-relationship-evidence | 44,842 | 40,375 | +4,467 | +11.06% | skill 1/1; base 1/1 |
+| codex | management-eval-010-import-exact-readback | 49,007 | 33,499 | +15,508 | +46.29% | skill 1/1; base 1/1 |
+| codex | management-eval-011-result-publication-mode | 44,140 | 41,260 | +2,880 | +6.98% | skill 1/1; base 1/1 |
+| codex | management-eval-012-promotion-readback-failure | 44,694 | 41,000 | +3,694 | +9.01% | skill 1/1; base 1/1 |
+| codex | management-eval-013-composed-lifecycle | 240,803 | 55,207 | +185,596 | +336.18% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 2,826,497 | 2,190,316 | +636,181 | +29.05% | skill 26/26; base 26/26 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 

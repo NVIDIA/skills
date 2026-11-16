@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 91.3% — baseline ran, but no comparable score was available; uplift unavailable | 89.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 90.4% — baseline ran, but no comparable score was available; uplift unavailable | 85.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 53.9% → 95.4% (+41.5 points) | 55.4% → 87.7% (+32.3 points) |
-| Discoverability | 85.8% — baseline ran, but no comparable score was available; uplift unavailable | 85.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 49.7% → 88.5% (+38.8 points) | 49.0% → 84.0% (+35.0 points) |
-| Efficiency | 86.6% — baseline ran, but no comparable score was available; uplift unavailable | 92.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Correctness | 52.3% → 98.5% (+46.2 points) | 53.9% → 78.5% (+24.6 points) |
+| Discoverability | 82.3% — baseline ran, but no comparable score was available; uplift unavailable | 77.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 54.2% → 81.4% (+27.2 points) | 59.0% → 80.1% (+21.1 points) |
+| Efficiency | 90.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 99.1% → 97.1% (-2.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.8% → 96.6% (-2.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 92.6% → 92.2% (-0.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 92.6% → 92.3% (-0.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,35 +80,35 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,608,089 | 1,142,141 | +465,948 | +40.80% | skill 13/13; base 13/13 |
-| claude-code | query-eval-001-mcp-first | 113,440 | 143,455 | -30,015 | -20.92% | skill 1/1; base 1/1 |
-| claude-code | query-eval-002-no-fastapi-public | 74,039 | 70,908 | +3,131 | +4.42% | skill 1/1; base 1/1 |
-| claude-code | query-eval-003-conversation-409 | 109,861 | 143,256 | -33,395 | -23.31% | skill 1/1; base 1/1 |
-| claude-code | query-eval-004-sso-vs-api-token | 112,797 | 70,881 | +41,916 | +59.14% | skill 1/1; base 1/1 |
-| claude-code | query-eval-005-no-raw-schema-tools | 73,482 | 70,457 | +3,025 | +4.29% | skill 1/1; base 1/1 |
-| claude-code | query-eval-006-cuopt-not-in-repo | 454,596 | 180,977 | +273,619 | +151.19% | skill 1/1; base 1/1 |
-| claude-code | query-eval-007-readiness-before-retry | 73,732 | 70,522 | +3,210 | +4.55% | skill 1/1; base 1/1 |
-| claude-code | query-eval-008-quantity-not-ratio | 71,516 | 71,185 | +331 | +0.46% | skill 1/1; base 1/1 |
-| claude-code | query-eval-009-run-metric-fanout | 113,193 | 35,498 | +77,695 | +218.87% | skill 1/1; base 1/1 |
-| claude-code | query-eval-010-scenario-lineage | 113,758 | 107,348 | +6,410 | +5.97% | skill 1/1; base 1/1 |
-| claude-code | query-eval-011-prose-versus-rows | 113,220 | 35,275 | +77,945 | +220.96% | skill 1/1; base 1/1 |
-| claude-code | query-eval-012-source-role | 70,991 | 71,283 | -292 | -0.41% | skill 1/1; base 1/1 |
-| claude-code | query-eval-013-truncated-result | 113,464 | 71,096 | +42,368 | +59.59% | skill 1/1; base 1/1 |
-| codex | All cases | 575,329 | 395,890 | +179,439 | +45.33% | skill 13/13; base 13/13 |
-| codex | query-eval-001-mcp-first | 49,306 | 55,605 | -6,299 | -11.33% | skill 1/1; base 1/1 |
-| codex | query-eval-002-no-fastapi-public | 28,542 | 40,577 | -12,035 | -29.66% | skill 1/1; base 1/1 |
-| codex | query-eval-003-conversation-409 | 72,770 | 68,120 | +4,650 | +6.83% | skill 1/1; base 1/1 |
-| codex | query-eval-004-sso-vs-api-token | 48,342 | 52,291 | -3,949 | -7.55% | skill 1/1; base 1/1 |
-| codex | query-eval-005-no-raw-schema-tools | 28,357 | 13,327 | +15,030 | +112.78% | skill 1/1; base 1/1 |
-| codex | query-eval-006-cuopt-not-in-repo | 68,544 | 59,303 | +9,241 | +15.58% | skill 1/1; base 1/1 |
-| codex | query-eval-007-readiness-before-retry | 13,228 | 13,196 | +32 | +0.24% | skill 1/1; base 1/1 |
-| codex | query-eval-008-quantity-not-ratio | 44,474 | 13,262 | +31,212 | +235.35% | skill 1/1; base 1/1 |
-| codex | query-eval-009-run-metric-fanout | 44,559 | 13,487 | +31,072 | +230.38% | skill 1/1; base 1/1 |
-| codex | query-eval-010-scenario-lineage | 44,331 | 26,968 | +17,363 | +64.38% | skill 1/1; base 1/1 |
-| codex | query-eval-011-prose-versus-rows | 44,302 | 13,189 | +31,113 | +235.90% | skill 1/1; base 1/1 |
-| codex | query-eval-012-source-role | 44,315 | 13,314 | +31,001 | +232.85% | skill 1/1; base 1/1 |
-| codex | query-eval-013-truncated-result | 44,259 | 13,251 | +31,008 | +234.00% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 2,183,418 | 1,538,031 | +645,387 | +41.96% | skill 26/26; base 26/26 |
+| claude-code | All cases | 1,575,273 | 961,353 | +613,920 | +63.86% | skill 13/13; base 13/13 |
+| claude-code | query-eval-001-mcp-first | 113,356 | 143,452 | -30,096 | -20.98% | skill 1/1; base 1/1 |
+| claude-code | query-eval-002-no-fastapi-public | 74,425 | 70,970 | +3,455 | +4.87% | skill 1/1; base 1/1 |
+| claude-code | query-eval-003-conversation-409 | 110,419 | 142,457 | -32,038 | -22.49% | skill 1/1; base 1/1 |
+| claude-code | query-eval-004-sso-vs-api-token | 112,773 | 70,674 | +42,099 | +59.57% | skill 1/1; base 1/1 |
+| claude-code | query-eval-005-no-raw-schema-tools | 73,483 | 35,337 | +38,146 | +107.95% | skill 1/1; base 1/1 |
+| claude-code | query-eval-006-cuopt-not-in-repo | 457,091 | 107,318 | +349,773 | +325.92% | skill 1/1; base 1/1 |
+| claude-code | query-eval-007-readiness-before-retry | 73,809 | 35,310 | +38,499 | +109.03% | skill 1/1; base 1/1 |
+| claude-code | query-eval-008-quantity-not-ratio | 35,546 | 71,140 | -35,594 | -50.03% | skill 1/1; base 1/1 |
+| claude-code | query-eval-009-run-metric-fanout | 113,097 | 35,740 | +77,357 | +216.44% | skill 1/1; base 1/1 |
+| claude-code | query-eval-010-scenario-lineage | 113,502 | 107,232 | +6,270 | +5.85% | skill 1/1; base 1/1 |
+| claude-code | query-eval-011-prose-versus-rows | 113,272 | 35,221 | +78,051 | +221.60% | skill 1/1; base 1/1 |
+| claude-code | query-eval-012-source-role | 71,435 | 71,044 | +391 | +0.55% | skill 1/1; base 1/1 |
+| claude-code | query-eval-013-truncated-result | 113,065 | 35,458 | +77,607 | +218.87% | skill 1/1; base 1/1 |
+| codex | All cases | 526,096 | 410,591 | +115,505 | +28.13% | skill 13/13; base 13/13 |
+| codex | query-eval-001-mcp-first | 48,618 | 60,316 | -11,698 | -19.39% | skill 1/1; base 1/1 |
+| codex | query-eval-002-no-fastapi-public | 13,328 | 13,297 | +31 | +0.23% | skill 1/1; base 1/1 |
+| codex | query-eval-003-conversation-409 | 72,867 | 54,538 | +18,329 | +33.61% | skill 1/1; base 1/1 |
+| codex | query-eval-004-sso-vs-api-token | 48,334 | 49,435 | -1,101 | -2.23% | skill 1/1; base 1/1 |
+| codex | query-eval-005-no-raw-schema-tools | 28,395 | 40,334 | -11,939 | -29.60% | skill 1/1; base 1/1 |
+| codex | query-eval-006-cuopt-not-in-repo | 50,871 | 58,736 | -7,865 | -13.39% | skill 1/1; base 1/1 |
+| codex | query-eval-007-readiness-before-retry | 13,313 | 13,257 | +56 | +0.42% | skill 1/1; base 1/1 |
+| codex | query-eval-008-quantity-not-ratio | 44,493 | 13,260 | +31,233 | +235.54% | skill 1/1; base 1/1 |
+| codex | query-eval-009-run-metric-fanout | 44,555 | 13,458 | +31,097 | +231.07% | skill 1/1; base 1/1 |
+| codex | query-eval-010-scenario-lineage | 44,353 | 27,010 | +17,343 | +64.21% | skill 1/1; base 1/1 |
+| codex | query-eval-011-prose-versus-rows | 44,327 | 13,204 | +31,123 | +235.71% | skill 1/1; base 1/1 |
+| codex | query-eval-012-source-role | 28,391 | 40,510 | -12,119 | -29.92% | skill 1/1; base 1/1 |
+| codex | query-eval-013-truncated-result | 44,251 | 13,236 | +31,015 | +234.32% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 2,101,369 | 1,371,944 | +729,425 | +53.17% | skill 26/26; base 26/26 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
