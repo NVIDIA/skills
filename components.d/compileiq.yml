@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: CompileIQ
+repo: NVIDIA/CompileIQ
+description: Compiler autotuning for CUDA C++, Triton, and Helion kernels; set up CompileIQ, apply Booster Packs, pick a search space, write the objective, run and debug the search, and validate the winning configuration.
+links:
+  discussions: false
+skills:
+  - path: skills/compileiq-author-objective/
+    catalog_dir: compileiq-author-objective
+  - path: skills/compileiq-booster-pack/
+    catalog_dir: compileiq-booster-pack
+  - path: skills/compileiq-bootstrap/
+    catalog_dir: compileiq-bootstrap
+  - path: skills/compileiq-debug/
+    catalog_dir: compileiq-debug
+  - path: skills/compileiq-run-search/
+    catalog_dir: compileiq-run-search
+  - path: skills/compileiq-search-space/
+    catalog_dir: compileiq-search-space
+  - path: skills/compileiq-validate-result/
+    catalog_dir: compileiq-validate-result
