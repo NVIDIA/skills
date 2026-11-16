@@ -41,8 +41,10 @@ Helm values, not a Nemotron training or customize integration.
 
 Triplets: `<PREFIX>_ENDPOINT`, `<PREFIX>_API_KEY`, `<PREFIX>_MODEL`. Unset
 fields fall back to `DEFAULT_MODELS_*`. Prefixes: `DEFAULT_MODELS`,
-`REASONING` (NL-to-SQL), `NON_REASONING` (entity extraction), `EMBED`,
-`RERANK`. `*_API_KEY` also falls back to `NVIDIA_API_KEY`.
+`REASONING` (the answering agent, `check_answerable`, semantic compilation,
+PII detection), `NON_REASONING` (follow-up rewrites, charts, PQL, interactive
+analysis), `EMBED`, `RERANK` (bridge-table compilation only). `*_API_KEY` also
+falls back to `NVIDIA_API_KEY`.
 
 `EMBED_ENDPOINT` + `EMBED_MODEL` must be the same at ingest and query.
 Defaults in `.env.example` include a Nemotron embed model id; changing it
