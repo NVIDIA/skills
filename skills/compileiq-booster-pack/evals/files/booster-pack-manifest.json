@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalog_version": "2026.05.21",
+  "release_tag": "booster-packs-2026.05.21",
+  "pack_id": "helion-pack",
+  "pack_type": "performance",
+  "display_name": "Helion Booster Pack",
+  "description": "ACFs found while tuning Helion kernels: FP8 Quantization, Causal Depthwise Convolution, Gated DeltaNet Forward.",
+  "cuda_version": "13.3.0",
+  "controls_stage": "both",
+  "supported_gpus": [
+    "B200"
+  ],
+  "validation_summary": {
+    "status": "passed",
+    "evidence": "Each candidate compiled, matched the reference output, and beat the no-ACF baseline on its source Helion kernel on B200.",
+    "notes": [
+      "Not a guaranteed speedup; validate every candidate on your own workload."
+    ]
+  },
+  "acfs": [
+    {
+      "filename": "helion_fp8_quant_01.acf",
+      "sha256": "ed461b81699533c001ae3a89ba18cd41a124ab3c1086745927c1ff32174ccb5f",
+      "size_bytes": 404,
+      "compiler_stages": [
+        "ptxas"
+      ]
+    },
+    {
+      "filename": "helion_dwconv_02.acf",
+      "sha256": "0f2b86ab6406bee648132237430759a89bb6b8c9cfa383caef209531f674047d",
+      "size_bytes": 396,
+      "compiler_stages": [
+        "ptxas"
+      ]
+    },
+    {
+      "filename": "helion_gdn_fwd_03.acf",
+      "sha256": "2ae8b2e1b2762d6a659fd4273e7cc1627430c5459d1cdf575bb3f39dfab4b996",
+      "size_bytes": 1188,
+      "compiler_stages": [
+        "nvcc",
+        "ptxas"
+      ]
+    },
+    {
+      "filename": "helion_gdn_fwd_04.acf",
+      "sha256": "b84fcd4686c39ef462e00529952163dd12abef060720b12376cd2b1a797bffa3",
+      "size_bytes": 772,
+      "compiler_stages": [
+        "nvcc"
+      ]
+    }
+  ]
+}

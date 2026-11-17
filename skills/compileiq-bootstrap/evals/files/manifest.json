@@ -1,0 +1,35 @@
+{
+  "manifest_format": "1.0.0",
+  "tag": "search-spaces-2026.10.15",
+  "generated_at": "2026-10-15T18:42:07Z",
+  "entries": [
+    {
+      "compiler": "ptxas",
+      "compiler_version": "13.3",
+      "variant": "default",
+      "filename": "ptxas13.3_search_space.bin",
+      "sha256": "38bedc91fda59161ebaa87b2d701dc911d47d720b6fce0e7bd2a6e55a9722803",
+      "size_bytes": 48213504,
+      "search_space_format": "1.0.0"
+    },
+    {
+      "compiler": "ptxas",
+      "compiler_version": "13.3",
+      "variant": "att",
+      "filename": "ptxas13.3_att_search_space.bin",
+      "sha256": "12af06f87a4f79d54388ed3ebf15798e864ba6234a8ac786d4865c054e54f0b4",
+      "size_bytes": 21987328,
+      "search_space_format": "1.0.0",
+      "description": "Curated for attention kernels (FlashAttention, GQA, MHA, MLA, FlashInfer Batch Decode)"
+    },
+    {
+      "compiler": "nvcc",
+      "compiler_version": "13.3",
+      "variant": "default",
+      "filename": "nvcc13.3_search_space.bin",
+      "sha256": "ffbc5c75397713cbbbcd4da81b104eb70547f0e77c23b6edf024ac744cce3056",
+      "size_bytes": 9437184,
+      "search_space_format": "1.0.0"
+    }
+  ]
+}

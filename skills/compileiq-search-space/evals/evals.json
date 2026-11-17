@@ -1,0 +1,100 @@
+{
+  "skill_name": "compileiq-search-space",
+  "evals": [
+    {
+      "id": "compileiq-search-space-pick-provider",
+      "prompt": "I'm setting up CompileIQ for a CUDA GEMM kernel and three of us need to pick what to pass as search_space= to Search():\n\n(a) I only want to tune the PTXAS stage for the kernel.\n(b) A colleague wants full-pipeline tuning with nvcc-level knobs, front-end included.\n(c) Another colleague was sent a dev-build search space .bin file and just wants to try it as-is.\n\nWhat should each of us pass, and is there anything to watch out for?",
+      "expected_skill": "compileiq-search-space",
+      "expected_output": "All three providers come from compileiq.search_spaces.compilers. (a) PtxasSearchSpace(), which by default fetches the latest PTXAS 13.3 'default' variant from GitHub releases; 'default' is the generic starting point and the right choice for a GEMM, not the attention-focused 'att' variant. (b) NvccSearchSpace(version=\"13.3\") for full-compiler (front-end plus back-end) tuning. (c) LocalSearchSpaceBin(\"/path/to/file.bin\"), which skips the manifest and the network; it only checks that the file exists and does not validate the .bin contents, so a malformed file fails later when the core parses it. Each is passed as Search(objective_function=..., search_space=ss, search_config=...).",
+      "assertions": [
+        "Recommended PtxasSearchSpace with the default variant for the PTXAS-only GEMM case",
+        "Recommended NvccSearchSpace for full nvcc-pipeline tuning",
+        "Recommended LocalSearchSpaceBin with the file path for the one-off .bin, noting it skips the manifest and network",
+        "Warned that LocalSearchSpaceBin only checks the file exists and does not validate its contents"
+      ]
+    },
+    {
+      "id": "compileiq-search-space-pin-release",
+      "prompt": "We're publishing a paper with CompileIQ results and reviewers need to rerun exactly what we ran. Our script currently does `search_space=PtxasSearchSpace()`. Is that reproducible? If not, what should we change, and how do we see which search-space files a given release contains?",
+      "expected_skill": "compileiq-search-space",
+      "expected_output": "Not reproducible as written: PtxasSearchSpace() uses tag=\"latest\", so it resolves to whatever the newest search-space release is at run time, and that can change. Pin all three selectors explicitly, for example PtxasSearchSpace(version=\"13.3\", variant=\"default\", tag=\"search-spaces-...\") with the concrete release tag you used. List the assets of a release with `gh release view --json assets --jq '.assets[].name' -R NVIDIA/CompileIQ <tag>`. Resolved binaries are cached under ~/.cache/compileiq/<tag>/ and verified by sha256, so a pinned tag gives the same file on every run.",
+      "assertions": [
+        "Explained that the default tag is 'latest' and can resolve to a different release over time",
+        "Showed PtxasSearchSpace with version, variant and an explicit search-spaces-* tag pinned",
+        "Gave the gh release view command against NVIDIA/CompileIQ to enumerate a release's assets"
+      ]
+    },
+    {
+      "id": "compileiq-search-space-att-variant",
+      "prompt": "I'm tuning a FlashAttention-style grouped-query attention kernel with CompileIQ. I saw an 'att' variant for ptxas mentioned somewhere and assumed it means attribute-based register allocation, which doesn't sound relevant. Should I use it, or stick with the default ptxas search space?",
+      "expected_skill": "compileiq-search-space",
+      "expected_output": "Use it. 'att' is short for attention, not \"attribute\"; the attribute wording came from earlier docs that mislabeled the variant. The att variant (file ptxas13.3_att_search_space.bin) is curated for attention kernels such as FlashAttention, GQA, MHA, MLA and FlashInfer Batch Decode, and should be preferred whenever the kernel is attention-shaped. Select it with PtxasSearchSpace(version=\"13.3\", variant=\"att\") and pass it as search_space= to Search(). The 'default' variant remains the starting point for generic, non-attention kernels.",
+      "assertions": [
+        "Corrected the user: 'att' means attention, not attribute",
+        "Recommended the att variant for the GQA / FlashAttention kernel",
+        "Showed PtxasSearchSpace(version=\"13.3\", variant=\"att\")",
+        "Noted that the default variant is the choice for non-attention kernels"
+      ]
+    },
+    {
+      "id": "compileiq-search-space-review-script",
+      "prompt": "Can you review /workspace/input/tune_kernels.py before I merge it? It's our nightly CompileIQ tuning script and I want to make sure each kernel is getting the right search space. Point out anything wrong and show the corrected KERNEL_SEARCH_SPACES block.",
+      "expected_skill": "compileiq-search-space",
+      "files": ["files/tune_kernels.py"],
+      "expected_output": "Findings: (1) The comment is wrong: 'att' means attention, not attribute-based register allocation. (2) fused_gemm_bias_gelu and rmsnorm are not attention kernels, so they should use PtxasSearchSpace(version=\"13.3\", variant=\"default\") (or just PtxasSearchSpace()). (3) gqa_decode is a GQA / FlashInfer-style batch decode attention kernel, so it should use PtxasSearchSpace(version=\"13.3\", variant=\"att\"). (4) mla_prefill uses NvccSearchSpace(variant=\"att\"), but the only NVCC variant available is 'default' (the att variant exists for ptxas 13.3 only); use PtxasSearchSpace(version=\"13.3\", variant=\"att\") for MLA, or NvccSearchSpace(version=\"13.3\") with the default variant if NVCC-level knobs are required. (5) paged_kv_copy feeds a Booster Pack .acf to LocalSearchSpaceBin; Booster Pack .acf files are pre-built candidates to apply outside a search, not search spaces, and LocalSearchSpaceBin does not validate contents, so this fails downstream. Apply the .acf directly, or run a fresh search with a real search space such as PtxasSearchSpace(). Optionally pin tag= for nightly reproducibility.",
+      "assertions": [
+        "Read /workspace/input/tune_kernels.py",
+        "Flagged the comment: 'att' means attention, not attribute",
+        "Moved the GEMM and RMSNorm kernels to the default ptxas variant",
+        "Switched gqa_decode to PtxasSearchSpace(version=\"13.3\", variant=\"att\")",
+        "Flagged NvccSearchSpace(variant=\"att\") because NVCC only has a default variant",
+        "Flagged passing a Booster Pack .acf to LocalSearchSpaceBin as a misuse, since Booster Pack .acf files are applied outside a search"
+      ]
+    },
+    {
+      "id": "compileiq-search-space-airgapped",
+      "prompt": "Our GPU cluster has no outbound internet access. When I call PtxasSearchSpace().retrieve() on a compute node it hangs and then fails trying to reach GitHub. I do have a laptop with internet and can copy files onto the cluster's shared filesystem. How do I get CompileIQ working there?",
+      "expected_skill": "compileiq-search-space",
+      "expected_output": "Mirror the search-space release. On the connected machine, download the release's manifest plus all .bin files with `gh release download <tag> -R NVIDIA/CompileIQ -D <dir>`. Copy that directory to the cluster (rsync, scp, etc.), then on the compute node `export CIQ_SEARCH_SPACES_DIR=<dir>`. The providers then read manifest.json and the .bin files from that directory and skip the network. Verify with `python -c \"from compileiq.search_spaces.compilers import PtxasSearchSpace; print(PtxasSearchSpace().retrieve())\"`. A misconfigured mirror (for example a missing manifest) produces a clear error. If only one .bin is needed, LocalSearchSpaceBin(path) also works without the manifest.",
+      "assertions": [
+        "Recommended downloading the release manifest and .bin files on a connected host with gh release download from NVIDIA/CompileIQ",
+        "Told the user to set CIQ_SEARCH_SPACES_DIR to the mirrored directory on the cluster",
+        "Stated that the mirror directory needs the manifest plus the .bin files",
+        "Suggested verifying with PtxasSearchSpace().retrieve()"
+      ]
+    },
+    {
+      "id": "compileiq-search-space-custom-mixed",
+      "prompt": "I want CompileIQ to tune my custom CUDA kernel's launch parameters and the PTXAS flags at the same time. The launch parameters are: BLOCK_SIZE from {64, 128, 256, 512}; NUM_STAGES an integer from 1 to 5; an ENABLE_PREFETCH flag that should normally be 1 but that the search is allowed to switch off; and a SCALE factor between 1e-3 and 1.0 that should be explored on a log scale with about 20 values. Write the search_space for me and tell me what my objective function will receive.",
+      "expected_skill": "compileiq-search-space",
+      "expected_output": "Build the user-defined part from the primitives in compileiq.search_spaces.base and combine it with a compiler provider in a list:\n\n    import compileiq.search_spaces.base as ss\n    from compileiq.search_spaces.compilers import PtxasSearchSpace\n\n    search_space = [\n        {\n            \"BLOCK_SIZE\": ss.choice([64, 128, 256, 512]),\n            \"NUM_STAGES\": ss.range(start=1, end=5, step=1),\n            \"ENABLE_PREFETCH\": ss.literal(1, knockout_prob=0.5),\n            \"SCALE\": ss.log_sampling(start=1e-3, end=1.0, total=20),\n        },\n        PtxasSearchSpace(version=\"13.3\"),\n    ]\n\nchoice samples from a discrete list, range covers the integer span, literal with knockout_prob lets the GA disable the flag, and log_sampling gives 20 log-spaced buckets. Because the search space is a list, the objective receives a list of the same length, one entry per search-space element in the same order, so it must unpack both entries (compileiq-author-objective shows the unpacking pattern).",
+      "assertions": [
+        "Used ss.choice for BLOCK_SIZE and ss.range for NUM_STAGES from compileiq.search_spaces.base",
+        "Used ss.literal with knockout_prob for the ENABLE_PREFETCH flag",
+        "Used ss.log_sampling with start, end and total for SCALE",
+        "Combined the user dict and PtxasSearchSpace in a list",
+        "Explained that the objective receives a list of the same length and must unpack it"
+      ]
+    },
+    {
+      "id": "compileiq-search-space-negative-maxrregcount",
+      "prompt": "My CUDA kernel's occupancy is limited by register usage. What does the ptxas -maxrregcount option do, how do I pass it through nvcc, and what's the downside of setting it too low?",
+      "expected_skill": null,
+      "expected_output": "General CUDA advice: -maxrregcount caps the registers per thread that ptxas may allocate, which can raise occupancy. Pass it with `nvcc --maxrregcount=N` or `-Xptxas -maxrregcount=N` (or use __launch_bounds__ per kernel). Setting it too low forces register spills to local memory, which can slow the kernel. Check with -Xptxas -v and a profiler. Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-search-space",
+        "Explained how to pass -maxrregcount through nvcc and the register-spill tradeoff"
+      ]
+    },
+    {
+      "id": "compileiq-search-space-negative-largest-files",
+      "prompt": "Give me a shell one-liner that lists the 10 largest files under the current directory, recursively, with human-readable sizes.",
+      "expected_skill": null,
+      "expected_output": "A standard shell pipeline, for example `find . -type f -exec du -h {} + | sort -rh | head -n 10`. Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-search-space",
+        "Gave a working shell one-liner that lists the 10 largest files with human-readable sizes"
+      ]
+    }
+  ]
+}

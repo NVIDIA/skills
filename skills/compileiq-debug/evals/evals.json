@@ -1,0 +1,99 @@
+{
+  "skill_name": "compileiq-debug",
+  "evals": [
+    {
+      "id": "compileiq-debug-first-eval-hang",
+      "prompt": "My CompileIQ search hangs on the very first evaluation. A teammate said the fix is to symlink libblas.so into the CompileIQ directory. Should I do that? What should I try instead?",
+      "expected_skill": "compileiq-debug",
+      "expected_output": "Advises against the BLAS symlink: current CompileIQ binaries do not link BLAS, so that fix is obsolete. Instead, the first search-space fetch from GitHub may be slow or blocked, so pre-download the search spaces (the newest dated search-spaces-* release) and point CIQ_SEARCH_SPACES_DIR at the local mirror. If it still hangs, set CIQ_PROCESS_MODE=spawn in case forkserver is unsupported on the host.",
+      "assertions": [
+        "Told the user not to symlink libblas.so because current binaries do not depend on BLAS",
+        "Recommended pre-staging search spaces and pointing CIQ_SEARCH_SPACES_DIR at the local mirror",
+        "Mentioned CIQ_PROCESS_MODE=spawn as a further fallback"
+      ]
+    },
+    {
+      "id": "compileiq-debug-invalid-score-tuple",
+      "prompt": "Every single evaluation in my CompileIQ search comes back as INVALID_SCORE. My config is SearchConfiguration(num_objectives=1, ...) and my objective ends with:\n\n    latency_ms = run_benchmark(binary)\n    return (latency_ms,)\n\nThe benchmark itself prints sensible numbers. What's wrong?",
+      "expected_skill": "compileiq-debug",
+      "expected_output": "The objective returns a 1-tuple, but with num_objectives=1 CompileIQ expects a single scalar (int or float). Change the return to `return latency_ms`, dropping the trailing comma. Confirm the fix by sampling one config with tuner.sample(1) and calling the objective by hand to check the return type before relaunching the search.",
+      "assertions": [
+        "Identified the trailing-comma 1-tuple as the cause",
+        "Explained that num_objectives=1 requires a scalar int or float return",
+        "Suggested calling the objective by hand on a sampled config (tuner.sample(1)) to verify"
+      ]
+    },
+    {
+      "id": "compileiq-debug-same-score-triton",
+      "prompt": "I'm tuning a Triton kernel with CompileIQ. Every candidate config scores exactly 0.8312 ms, the same as my baseline, across 5 generations. It's like the ACF is being ignored. How do I figure out what's going on?",
+      "expected_skill": "compileiq-debug",
+      "expected_output": "Identical scores almost always mean a framework cache is serving a stale binary, so the ACF never reaches PTXAS. Confirm with the Debug-pack O0/O3 canary: apply the O0 ACF by hand, and if performance does not regress versus baseline, the ACF is not being applied. For Triton, set TRITON_ALWAYS_COMPILE=1 and use a fresh, unique TRITON_CACHE_DIR per evaluation.",
+      "assertions": [
+        "Attributed identical scores to a cache hiding the ACF from the compiler",
+        "Recommended the O0/O3 canary from the Debug pack to confirm the ACF reaches PTXAS",
+        "Recommended TRITON_ALWAYS_COMPILE=1",
+        "Recommended a unique TRITON_CACHE_DIR per evaluation"
+      ]
+    },
+    {
+      "id": "compileiq-debug-fromhex",
+      "prompt": "I copied an old CompileIQ objective from a wiki page and turned on normalize=True. The search dies on its very first task with `TypeError: fromhex() argument must be str, not dict`. The objective starts like this:\n\n    def objective(config_blob):\n        with open(acf_path, 'wb') as f:\n            f.write(bytes.fromhex(config_blob))\n\nHow do I fix it?",
+      "expected_skill": "compileiq-debug",
+      "expected_output": "With normalize=True, CompileIQ's first task is a baseline run that calls the objective with BASELINE_CONFIG, an empty dict, instead of a hex string, so bytes.fromhex fails on it. The objective needs a baseline branch: if config == BASELINE_CONFIG (imported from compileiq.types), measure without any ACF and return that score. For real configs, write the ACF with save_compiler_config(acf_path, config) from compileiq.utils.helpers instead of the legacy manual bytes.fromhex write. Swapping in save_compiler_config alone would not fix the crash, because it also calls bytes.fromhex.",
+      "assertions": [
+        "Explained that the first (baseline) call passes BASELINE_CONFIG, an empty dict, because normalize=True",
+        "Added a baseline branch that runs without an ACF when config is BASELINE_CONFIG",
+        "Replaced the manual bytes.fromhex write with save_compiler_config",
+        "Showed the corrected objective code"
+      ]
+    },
+    {
+      "id": "compileiq-debug-csv-rising-invalid",
+      "prompt": "Last night's CompileIQ search wrote its dump_results CSV to /workspace/input/results_rising_invalid.csv. It started fine but the best score stopped improving and the run feels like it got worse over time. Can you diagnose what happened from the CSV?",
+      "expected_skill": "compileiq-debug",
+      "expected_script": "diagnose_csv.py",
+      "files": [
+        "files/results_rising_invalid.csv"
+      ],
+      "expected_output": "The CSV shows two problems. The invalid rate rises every generation, from about 3% (1 of 32) in generation 0 to about 66% (21 of 32) in generation 7, which points to a mutation arm spreading a structurally bad config through the population. The best score also stalls at about 0.92 from generation 4 onward. Recommended next step: re-run with CIQ_KEEP_CACHE=1 so failing configs are kept in ~/.cache/compileiq/, then replay a few of them by hand to find what they have in common.",
+      "assertions": [
+        "Ran diagnose_csv.py on the provided CSV, or computed an equivalent per-generation summary",
+        "Reported that the invalid rate increases across generations, with approximate numbers",
+        "Reported that the best score stopped improving in later generations",
+        "Recommended CIQ_KEEP_CACHE=1 to keep and replay the failing configs"
+      ]
+    },
+    {
+      "id": "compileiq-debug-high-cv",
+      "prompt": "I'm validating a CompileIQ winner and the run-to-run coefficient of variation is around 14%, so I can't tell whether the 3% speedup is real. More warmup didn't help. What should I do?",
+      "expected_skill": "compileiq-debug",
+      "expected_output": "Above 10% CV the measurement can't separate signal from noise. In order: lock GPU and memory clocks (this needs root, so the user or an admin runs the nvidia-smi lock commands), pin CUDA_VISIBLE_DEVICES so the validation has the GPU to itself, watch `nvidia-smi dmon` for thermal throttling, raise warmup and trial counts (for example 100 warmup, 200 trials), and consider NVBench for more stable timing.",
+      "assertions": [
+        "Stated that CV above 10% is too noisy to validate a small speedup",
+        "Recommended locking GPU and memory clocks",
+        "Recommended pinning CUDA_VISIBLE_DEVICES to avoid contention",
+        "Mentioned checking for thermal throttling"
+      ]
+    },
+    {
+      "id": "compileiq-debug-negative-pytorch-nan",
+      "prompt": "My PyTorch training loss turns into NaN after about 200 steps with mixed precision. How do I track down where it starts?",
+      "expected_skill": null,
+      "expected_output": "General PyTorch numerical debugging, such as anomaly detection, gradient clipping, checking the loss scaler, and inspecting activations for inf. The CompileIQ debug skill is not relevant.",
+      "assertions": [
+        "Did not load or follow compileiq-debug",
+        "Gave general PyTorch NaN debugging advice"
+      ]
+    },
+    {
+      "id": "compileiq-debug-negative-nvcc-install",
+      "prompt": "How do I install the CUDA toolkit on Ubuntu 22.04 so that nvcc is on my PATH?",
+      "expected_skill": null,
+      "expected_output": "Standard CUDA toolkit installation steps for Ubuntu 22.04, plus adding the CUDA bin directory to PATH. Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-debug",
+        "Explained how to install the CUDA toolkit and put nvcc on PATH"
+      ]
+    }
+  ]
+}

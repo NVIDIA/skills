@@ -1,0 +1,107 @@
+{
+  "skill_name": "compileiq-bootstrap",
+  "evals": [
+    {
+      "id": "compileiq-bootstrap-check-fresh-container",
+      "prompt": "I just got this container and I'm about to start a CompileIQ project in it. Before I write any code, can you check whether this environment can actually run CompileIQ and tell me exactly what I'd need to fix?",
+      "expected_skill": "compileiq-bootstrap",
+      "expected_script": "check_env.sh",
+      "expected_output": "Runs the environment self-test (bash scripts/check_env.sh), which checks four things in order: CUDA toolkit 13.3+ (nvcc and ptxas), a visible GPU via nvidia-smi, that the CompileIQ public imports resolve, and that PtxasSearchSpace().retrieve() returns a real file. On this CPU-only container the GPU check fails (nvidia-smi not in PATH or no GPU found), and the CUDA toolkit check fails unless nvcc and ptxas 13.3+ are installed (fix: export PATH=/usr/local/cuda/bin:$PATH, or install/upgrade the CUDA toolkit to 13.3+). If the compileiq package is missing, the import check fails with the fix `pip install compileiq` (or `pip install -e .` from a source checkout), and the search-space round-trip then fails as a consequence of the missing package rather than a network problem. The script exits with the number of failed checks, so a non-zero exit means the host is not ready. The answer relays each failure with its fix and leaves system-level installs (driver, CUDA toolkit) to the user instead of running them.",
+      "assertions": [
+        "Ran check_env.sh (or the equivalent four checks: CUDA 13.3+ nvcc/ptxas, nvidia-smi GPU, compileiq imports, PtxasSearchSpace().retrieve())",
+        "Reported that no GPU is visible in this environment",
+        "Reported the result of the CUDA toolkit 13.3+ check for nvcc and ptxas",
+        "Gave the specific next-step fix for each failing check",
+        "Did not try to install the NVIDIA driver, the CUDA toolkit, or other system packages (for example with apt-get) itself"
+      ]
+    },
+    {
+      "id": "compileiq-bootstrap-check-log-no-network",
+      "prompt": "On our new H100 node, CompileIQ's Search().start() hangs on the very first evaluation. I ran CompileIQ's environment check script on that node and saved the output to /workspace/input/check_env_h100.log. What's actually wrong, and what should I do?",
+      "expected_skill": "compileiq-bootstrap",
+      "files": [
+        "files/check_env_h100.log"
+      ],
+      "expected_output": "Steps 1 to 3 pass: nvcc and ptxas are both 13.3, the GPU is an NVIDIA H100 80GB HBM3 with compute capability 9.0, and all CompileIQ imports resolve. Only step 4 fails: PtxasSearchSpace().retrieve() raises a requests ConnectionError because the node cannot resolve api.github.com, so it cannot download the search space from the GitHub release. That network/air-gap problem is what surfaces as the first-evaluation hang; it is not a BLAS problem. Fix: on a machine with network access, download the release's manifest.json plus the .bin files it references, copy them into one directory on the node, set CIQ_SEARCH_SPACES_DIR to that directory, and re-run the check until step 4 passes. If the search still hangs afterwards, set CIQ_PROCESS_MODE=spawn.",
+      "assertions": [
+        "Read the provided check_env_h100.log",
+        "Reported that the CUDA, GPU, and import checks pass and only the search-space round-trip (step 4) fails",
+        "Identified the cause as the node being unable to reach or resolve api.github.com to fetch search spaces",
+        "Recommended mirroring manifest.json plus the referenced .bin files locally and setting CIQ_SEARCH_SPACES_DIR",
+        "Did not attribute the hang to BLAS or recommend installing BLAS"
+      ]
+    },
+    {
+      "id": "compileiq-bootstrap-first-eval-hang-no-root",
+      "prompt": "I'm setting up CompileIQ on a shared Slurm cluster where I don't have root. The first evaluation of my search just hangs. Someone on our team said CompileIQ needs BLAS and that I should ask an admin to run `sudo apt-get install libopenblas-dev liblapack-dev`. Is that right? What should I try, and in what order?",
+      "expected_skill": "compileiq-bootstrap",
+      "expected_output": "No. A hang on the first evaluation is not a BLAS problem: current shipped CompileIQ binaries do not require BLAS or LAPACK, so the apt install is unnecessary, and distro-specific system installs need root and break in containers and on shared clusters anyway. Try in order: (1) mirror the search spaces locally (manifest.json plus the referenced .bin files) and set CIQ_SEARCH_SPACES_DIR=/path/to/mirror so nothing is fetched from the network, since a slow or blocked first fetch from GitHub is the usual cause; (2) if it still hangs, set CIQ_PROCESS_MODE=spawn (the default is forkserver, which can fail on constrained hosts). Running the environment self-test (check_env.sh) shows which step is failing.",
+      "assertions": [
+        "Said the hang is not caused by missing BLAS/LAPACK and the apt-get install is unnecessary",
+        "Recommended a local search-space mirror via CIQ_SEARCH_SPACES_DIR as the first step",
+        "Recommended CIQ_PROCESS_MODE=spawn as the fallback if it still hangs",
+        "Presented the fixes in that order"
+      ]
+    },
+    {
+      "id": "compileiq-bootstrap-airgap-mirror-manifest",
+      "prompt": "Our GPU cluster is fully air-gapped. On my laptop I downloaded manifest.json from the latest CompileIQ search-space release; it's at /workspace/input/manifest.json. I'm only tuning a regular (non-attention) kernel with PTXAS. What exactly do I need to carry over to the cluster, and how do I configure CompileIQ so it never tries to reach the network for search spaces? How can I confirm it worked?",
+      "expected_skill": "compileiq-bootstrap",
+      "files": [
+        "files/manifest.json"
+      ],
+      "expected_output": "The manifest is release tag search-spaces-2026.10.15 and lists three entries: ptxas 13.3 default (ptxas13.3_search_space.bin), ptxas 13.3 att (ptxas13.3_att_search_space.bin, curated for attention kernels), and nvcc 13.3 default (nvcc13.3_search_space.bin). For PTXAS on a non-attention kernel the needed binary is ptxas13.3_search_space.bin (copying all three gives a complete mirror). Download the .bin files from that same release, put them in one directory next to manifest.json, copy that directory to the cluster, and set CIQ_SEARCH_SPACES_DIR to it. With that set, the resolver reads the local manifest and binaries and skips the network. Confirm with the round-trip check: python -c 'from compileiq.search_spaces.compilers import PtxasSearchSpace; p = PtxasSearchSpace().retrieve(); assert p.exists() and p.stat().st_size > 0; print(p)', which should print a path inside the mirror directory (or run check_env.sh and see step 4 pass).",
+      "assertions": [
+        "Read the provided manifest.json",
+        "Identified ptxas13.3_search_space.bin (the ptxas 13.3 default entry) as the binary needed for a non-attention PTXAS search",
+        "Said manifest.json and the referenced .bin files must sit together in one mirror directory",
+        "Recommended setting CIQ_SEARCH_SPACES_DIR to that mirror directory",
+        "Recommended verifying with PtxasSearchSpace().retrieve() returning a real path, or with check_env.sh"
+      ]
+    },
+    {
+      "id": "compileiq-bootstrap-ptxas-version-mismatch",
+      "prompt": "Setting up CompileIQ on a new box. Here's what I see:\n\n    $ nvcc --version | tail -2\n    Cuda compilation tools, release 13.3, V13.3.48\n    Build cuda_13.3.r13.3/compiler.36870459_0\n    $ which ptxas\n    /opt/conda/bin/ptxas\n    $ ptxas --version | tail -2\n    Cuda compilation tools, release 12.8, V12.8.93\n    Build cuda_12.8.r12.8/compiler.35583870_0\n\nnvcc is fine, so this toolchain is good enough for CompileIQ, right?",
+      "expected_skill": "compileiq-bootstrap",
+      "expected_output": "No. CompileIQ needs CUDA 13.3 or later for both nvcc and ptxas, because its --apply-controls mechanism requires CUDA 13.3+. nvcc is 13.3, but the ptxas found first on PATH is /opt/conda/bin/ptxas at 12.8, which fails the 13.3+ check. Put the 13.3 toolkit first: export PATH=/usr/local/cuda/bin:$PATH and add /usr/local/cuda/lib64 to LD_LIBRARY_PATH (or install/upgrade so the active ptxas is 13.3+), then re-check with `ptxas --version` or the environment self-test (check_env.sh) until both nvcc and ptxas pass.",
+      "assertions": [
+        "Said the toolchain is not ready because ptxas 12.8 is below the required 13.3",
+        "Stated that CompileIQ requires CUDA 13.3+ for both nvcc and ptxas",
+        "Pointed out that the conda ptxas shadows the CUDA 13.3 toolkit on PATH",
+        "Recommended putting /usr/local/cuda/bin first on PATH (and /usr/local/cuda/lib64 on LD_LIBRARY_PATH) and re-checking"
+      ]
+    },
+    {
+      "id": "compileiq-bootstrap-search-space-source-fork",
+      "prompt": "Two CompileIQ setup questions. First, where does PtxasSearchSpace().retrieve() actually get the search space from, and is it re-downloaded every run? Second, our release team publishes candidate search spaces on a fork, nv-ciq-staging/CompileIQ, and I want my runs to use that instead of the official one. I'd also like CompileIQ to keep its per-run cache files so I can replay failing configs afterwards. What do I set?",
+      "expected_skill": "compileiq-bootstrap",
+      "expected_output": "By default retrieve() resolves the search space from GitHub releases of NVIDIA/CompileIQ. The first run downloads it and caches it under ~/.cache/compileiq/<tag>/; later runs hit that cache instead of re-downloading. With tag=\"latest\" the resolver picks the newest release whose tag starts with the prefix in CIQ_SS_TAG_PREFIX (default search-spaces-). To use the fork, set CIQ_SEARCH_SPACES_REPO=nv-ciq-staging/CompileIQ; change CIQ_SS_TAG_PREFIX only if the fork tags its search-space releases differently. To keep the .cache files after a run for post-mortem replay, set CIQ_KEEP_CACHE=1 (true or yes also work; it is unset/0 by default). If CIQ_SEARCH_SPACES_DIR is set, that local mirror is used instead of any GitHub repo.",
+      "assertions": [
+        "Explained that search spaces come from GitHub releases (NVIDIA/CompileIQ by default) and are cached under ~/.cache/compileiq/<tag>/ after the first download",
+        "Recommended CIQ_SEARCH_SPACES_REPO=nv-ciq-staging/CompileIQ to point at the fork",
+        "Mentioned CIQ_SS_TAG_PREFIX (default search-spaces-) as the tag prefix used to resolve latest",
+        "Recommended CIQ_KEEP_CACHE=1 to keep cache files after the run"
+      ]
+    },
+    {
+      "id": "compileiq-bootstrap-negative-no-kernel-image",
+      "prompt": "My CUDA program builds fine but at runtime every kernel launch fails with `cudaErrorNoKernelImageForDevice: no kernel image is available for execution on the device`. I'm compiling with `nvcc -arch=sm_70` and running on an H100. How do I fix this?",
+      "expected_skill": null,
+      "expected_output": "The binary only contains code for sm_70, which an H100 (compute capability 9.0) cannot run. Rebuild targeting the device, for example -arch=sm_90 or -gencode arch=compute_90,code=sm_90, optionally also embedding PTX (code=compute_90) for forward compatibility. Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-bootstrap",
+        "Explained that sm_70 code cannot run on the H100 and recommended compiling for sm_90 (or including compatible PTX)"
+      ]
+    },
+    {
+      "id": "compileiq-bootstrap-negative-csv-dedupe",
+      "prompt": "Write a Python script that reads contacts.csv, removes duplicate rows by the email column (case-insensitive, keep the first occurrence), and writes the result to contacts_deduped.csv.",
+      "expected_skill": null,
+      "expected_output": "A short Python script (csv module or pandas) that normalizes email to lowercase for comparison, keeps the first occurrence of each email, and writes the remaining rows with the original header to contacts_deduped.csv. Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-bootstrap",
+        "Provided a working script that deduplicates by email case-insensitively and keeps the first occurrence"
+      ]
+    }
+  ]
+}
