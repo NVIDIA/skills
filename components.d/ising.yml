@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Ising
+repo: NVIDIA/Ising
+description: Connect to the NVIDIA Ising Calibration model through the hosted API or a self-hosted NIM, with credential setup and connectivity checks.
+skills:
+  - path: skills/ising-calibration-setup/
+    catalog_dir: ising-calibration-setup
+links:
+  contributing: false
