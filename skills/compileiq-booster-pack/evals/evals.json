@@ -1,0 +1,114 @@
+{
+  "skill_name": "compileiq-booster-pack",
+  "evals": [
+    {
+      "id": "compileiq-booster-pack-canary-o0-no-regress",
+      "prompt": "Before trying the Helion booster pack ACFs on my Helion FP8 quantization kernel, I ran the two debug-pack ACFs. Results: no-ACF baseline 0.2184 ms, ptxas_opt0.acf 0.2201 ms, ptxas_opt3.acf 0.2179 ms. So the debug ACFs are basically neutral on this kernel. Can I move on to the real Helion candidates now?",
+      "expected_skill": "compileiq-booster-pack",
+      "expected_output": "No. This is the O0/O3 ACF-injection canary and it failed. ptxas_opt0.acf forces unoptimized PTXAS compilation and must cause a measurable regression (often 2-10x slower); here O0 is only about 0.8% slower than baseline, below the 5% threshold (o0 < base * 1.05), so the ACF is not reaching PTXAS and a cache is most likely serving a stale binary. O3 matching baseline is expected and does not prove anything on its own. Stop and fix the cache-bust before trying any real pack candidate: for Helion, export HELION_SKIP_CACHE=1 and inject the ACF through Helion's official ACF API. Then rerun the canary; only when O0 clearly regresses and O3 stays within about 5% of baseline should the Helion candidates be tried, one at a time.",
+      "assertions": [
+        "Said the canary failed and the user should not move on to the real candidates yet",
+        "Explained that ptxas_opt0.acf must produce a clear regression (5% or more, often 2-10x) and that a near-identical O0 time means the ACF is not reaching PTXAS",
+        "Recommended HELION_SKIP_CACHE=1 to force Helion to recompile",
+        "Recommended applying the ACF through Helion's official ACF API",
+        "Said to rerun the canary and only proceed once O0 regresses and O3 matches baseline"
+      ]
+    },
+    {
+      "id": "compileiq-booster-pack-flashinfer-batch-decode",
+      "prompt": "I'd like to know whether the ACFs from the Helion booster pack can speed up FlashInfer's BatchDecodeWithPagedKVCacheWrapper. The pack was built from Helion kernels, so is it even worth trying on FlashInfer? If it is, how do I get an ACF into FlashInfer's kernel compile, and what should I watch out for?",
+      "expected_skill": "compileiq-booster-pack",
+      "expected_output": "Worth trying: the pack name is not a hard boundary, and the Helion pack has shown benefit on FlashInfer BatchDecodeWithPagedKVCacheWrapper, though results must be validated. Inject one ACF per run with FLASHINFER_EXTRA_CUDAFLAGS=\"--ptxas-options=--apply-controls=$ACF_FILE\" before running the benchmark. Watch out for caching: confirm the prebuilt flashinfer_cubin and flashinfer_jit_cache packages are absent (use a source or editable FlashInfer) and make sure kernels actually recompile for each candidate. Run the Debug-pack O0/O3 canary first to prove the ACF reaches PTXAS. Run a no-ACF baseline, reject any candidate that fails to compile, hangs, crashes, gives wrong answers or regresses, check correctness against a known-good reference across the decode shapes that matter, and record each candidate (ACF, release version, command, GPU, driver, CTK, nvcc/ptxas versions, FlashInfer version, shape, baseline and candidate results, correctness, decision).",
+      "assertions": [
+        "Said the pack name is not a hard boundary and that the Helion pack has shown benefit on FlashInfer BatchDecode",
+        "Gave FLASHINFER_EXTRA_CUDAFLAGS with --ptxas-options=--apply-controls=<acf> as the injection mechanism",
+        "Said to make sure the flashinfer_cubin and flashinfer_jit_cache packages are not installed so kernels are recompiled",
+        "Recommended the Debug-pack O0/O3 canary before trusting any candidate",
+        "Said to apply one ACF at a time and validate correctness, not just speed"
+      ]
+    },
+    {
+      "id": "compileiq-booster-pack-not-search-space-input",
+      "prompt": "I want my CompileIQ search to start from the Helion booster pack ACFs instead of from scratch, so I wrote:\n\n    import glob\n    from compileiq.search_spaces.compilers import PtxasSearchSpace\n    space = PtxasSearchSpace(version=\"13.3\", seed_acfs=sorted(glob.glob(\"packs/booster-pack-helion/*.acf\")))\n\nIt fails with an unexpected keyword argument. What's the right argument name for passing the pack ACFs in?",
+      "expected_skill": "compileiq-booster-pack",
+      "expected_output": "There is no such argument. Booster Packs are not search-space inputs: they are already-generated .acf candidate bundles, not inputs to PtxasSearchSpace or NvccSearchSpace, so do not feed them through PtxasSearchSpace(...). Use them directly instead: run the Debug-pack O0/O3 canary, then apply each pack ACF one at a time to the compiler with --apply-controls, keep only candidates that compile, pass correctness and beat the no-ACF baseline, and log each one. If no candidate helps, run a full CompileIQ search over a plain PtxasSearchSpace() (for example PtxasSearchSpace(version=\"13.3\")) via the run-search workflow, without the pack ACFs.",
+      "assertions": [
+        "Said there is no PtxasSearchSpace argument for booster pack ACFs and that packs are not search-space inputs",
+        "Explained that pack ACFs are applied directly to the compiler with --apply-controls, one at a time",
+        "Said to fall back to a full CompileIQ search over PtxasSearchSpace() if no pack candidate helps",
+        "Did not invent a seed or warm-start parameter for PtxasSearchSpace"
+      ]
+    },
+    {
+      "id": "compileiq-booster-pack-apply-one-acf-mock-bench",
+      "prompt": "Our B200 box is down for the day, so I made a CPU stand-in for my RMSNorm benchmark at /workspace/input/mock_bench.py. It replays the timings we recorded on the GPU and prints a line like 'mean: 0.4120' (milliseconds, lower is better); pass --acf <path> to select a candidate, or omit --acf for the no-ACF baseline. Three candidates from the Helion booster pack are in /workspace/input/: candidate_03.acf, candidate_07.acf and candidate_11.acf. Please evaluate each one against the baseline, keep a reproducibility log of the results, and tell me which ones to keep.",
+      "expected_skill": "compileiq-booster-pack",
+      "expected_script": "apply_one_acf.sh",
+      "files": [
+        "files/mock_bench.py",
+        "files/candidate_03.acf",
+        "files/candidate_07.acf",
+        "files/candidate_11.acf"
+      ],
+      "expected_output": "Each candidate was evaluated on its own against the no-ACF baseline of about 0.412 ms (for example with scripts/apply_one_acf.sh --acf <acf> --baseline-cmd \"python3 /workspace/input/mock_bench.py\" --candidate-cmd \"python3 /workspace/input/mock_bench.py --acf <acf>\", default 10 trials and score regex 'mean: ([0-9.]+)'). candidate_03.acf: about 0.361 ms, about 1.14x speedup, KEPT. candidate_07.acf: about 0.410 ms, less than 1% better than baseline, REJECTED (no_improvement_or_within_1pct). candidate_11.acf: about 0.503 ms, a regression of roughly 22%, REJECTED. One row per candidate was appended to booster-pack-log.csv with the ACF path, sha256, trial count, baseline and candidate means, decision and commands. These are timing-only results: candidate_03 still has to pass a correctness check against a known-good reference (and ideally the O0/O3 canary, other input shapes and the remaining log fields such as GPU, driver, CTK and compiler versions) on the real GPU before it is adopted.",
+      "assertions": [
+        "Ran apply_one_acf.sh once per candidate, or an equivalent one-ACF-at-a-time baseline vs candidate comparison",
+        "Reported candidate_03.acf as kept with roughly a 1.14x speedup",
+        "Reported candidate_07.acf as rejected because its improvement is within the 1% margin",
+        "Reported candidate_11.acf as rejected because it regresses",
+        "Wrote a booster-pack-log.csv (or equivalent log) with one row per candidate",
+        "Noted that the kept candidate still needs correctness validation, since these results only measure speed"
+      ]
+    },
+    {
+      "id": "compileiq-booster-pack-download-and-prereqs",
+      "prompt": "I want to try the Helion booster pack on my Helion Gated DeltaNet forward kernel today. I don't have a correctness check for the kernel yet, only a timing script, but I figured I'd grab the pack first and see what it does. Is there a CompileIQ Python call that downloads it? If not, give me the exact commands to fetch it.",
+      "expected_skill": "compileiq-booster-pack",
+      "expected_output": "There is no runtime download API in CompileIQ; booster packs are zip assets on the NVIDIA/CompileIQ GitHub Releases page. Find the latest non-draft release whose tag starts with booster-packs- (for example with gh release list -R NVIDIA/CompileIQ --json tagName,isDraft and a jq filter on startswith(\"booster-packs-\")), then gh release download \"$BOOSTER_TAG\" -R NVIDIA/CompileIQ -p 'booster-pack-helion.zip' -p 'booster-pack-catalog.json' -D ./packs, unzip it, and read booster-pack-helion/booster-pack-manifest.json for the intended workload, compiler version, GPU target, validation context and caveats. Record the exact BOOSTER_TAG for reproducible reruns. Downloading is fine, but do not apply any candidate yet: without a correctness check (and a stable no-ACF baseline) candidates cannot be validated, so wait and put those in place first. The Debug pack (booster-pack-debug.zip) is also needed for the mandatory O0/O3 canary before trying the Helion candidates.",
+      "assertions": [
+        "Said CompileIQ has no runtime or Python download API for booster packs",
+        "Gave commands that fetch booster-pack-helion.zip from NVIDIA/CompileIQ GitHub Releases using a tag starting with booster-packs-",
+        "Said to read the pack's booster-pack-manifest.json before applying anything",
+        "Said not to apply candidates until a correctness check and stable baseline are in place",
+        "Mentioned the Debug pack or the O0/O3 canary as a required first step before real candidates"
+      ]
+    },
+    {
+      "id": "compileiq-booster-pack-manifest-compiler-stages",
+      "prompt": "I unzipped the Helion booster pack and copied its manifest to /workspace/input/booster-pack-manifest.json. My kernel is a Triton implementation of Gated DeltaNet forward, running on a B200 with CUDA 13.3. Which ACFs in this pack can I actually try with my Triton setup, and how should I apply them?",
+      "expected_skill": "compileiq-booster-pack",
+      "files": [
+        "files/booster-pack-manifest.json"
+      ],
+      "expected_output": "The manifest marks the pack controls_stage \"both\" and lists compiler_stages per ACF, and each ACF must be applied through every stage it lists. helion_fp8_quant_01.acf and helion_dwconv_02.acf are [\"ptxas\"] only, so they can be applied through Triton, which only reaches ptxas: pass `ptx_options=\"--apply-controls=<acf>\"` on the kernel launch (or, on Triton 3.6+, prefix the run with PTXAS_OPTIONS=\"--apply-controls=<acf>\"), with TRITON_ALWAYS_COMPILE=1 and a unique TRITON_CACHE_DIR per run. helion_gdn_fwd_03.acf ([\"nvcc\", \"ptxas\"]) and helion_gdn_fwd_04.acf ([\"nvcc\"]) need the nvcc stage, which only an NVCC build (`nvcc --apply-controls`) reaches, so they cannot be applied as packaged in this setup even though they were found on Gated DeltaNet forward; passing 03 only to PTXAS would not be the validated candidate. The pack name is not a hard boundary, so the two ptxas-only ACFs are still worth testing on GDN forward. GPU (B200) and CUDA 13.3.0 match the manifest. Run the Debug-pack O0/O3 canary first, then apply one ACF at a time, validate correctness against a reference, compare to the no-ACF baseline and log each result.",
+      "assertions": [
+        "Read the per-ACF compiler_stages from the staged manifest",
+        "Identified helion_fp8_quant_01.acf and helion_dwconv_02.acf as ptxas-only candidates that can be applied through Triton",
+        "Explained that helion_gdn_fwd_03.acf and helion_gdn_fwd_04.acf list the nvcc stage, which only an NVCC build reaches, so Triton cannot apply them through every listed stage",
+        "Recommended forcing Triton recompilation (TRITON_ALWAYS_COMPILE=1 and a fresh TRITON_CACHE_DIR)",
+        "Recommended the O0/O3 canary and applying one ACF at a time"
+      ]
+    },
+    {
+      "id": "compileiq-booster-pack-negative-ptxas-register-spills",
+      "prompt": "My CUDA kernel compiled with nvcc for sm_90 is slower than I expected and I suspect register spilling. How do I get ptxas to report register usage and spills, and how can I limit registers per thread to see whether occupancy improves?",
+      "expected_skill": null,
+      "expected_output": "Standard CUDA advice: compile with -Xptxas -v (or --resource-usage) to see registers, spill stores/loads and shared memory per kernel; limit registers with --maxrregcount=N or __launch_bounds__ on the kernel; check occupancy with the occupancy calculator or Nsight Compute and benchmark the variants. No Booster Pack or ACF workflow is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-booster-pack",
+        "Explained -Xptxas -v (or equivalent) for register and spill reporting",
+        "Explained --maxrregcount or __launch_bounds__ for limiting registers"
+      ]
+    },
+    {
+      "id": "compileiq-booster-pack-negative-merge-intervals",
+      "prompt": "Write a Python function that takes a list of [start, end] intervals and merges any that overlap, returning the merged list sorted by start.",
+      "expected_skill": null,
+      "expected_output": "A Python function that sorts the intervals by start, then walks them, extending the last merged interval when the next one overlaps and appending otherwise, returning the merged list. Nothing CompileIQ-specific is involved.",
+      "assertions": [
+        "Did not load or follow compileiq-booster-pack",
+        "Provided a correct interval-merging function that sorts by start and merges overlaps"
+      ]
+    }
+  ]
+}

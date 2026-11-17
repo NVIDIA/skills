@@ -1,0 +1,107 @@
+{
+  "skill_name": "compileiq-author-objective",
+  "evals": [
+    {
+      "id": "compileiq-author-objective-legacy-nvcc-review",
+      "prompt": "My CompileIQ objective for an NVCC-built reduction kernel is at /workspace/input/objective_legacy_nvcc.py. It worked with normalize=False, but after switching to normalize=True the very first evaluation logs `TypeError: fromhex() argument must be str, not dict`. Please review the objective and give me a fixed version. There is no GPU on this machine, so just fix the code; don't try to run it.",
+      "expected_skill": "compileiq-author-objective",
+      "files": [
+        "files/objective_legacy_nvcc.py"
+      ],
+      "expected_output": "The objective uses the stale legacy pattern: a `config_blob` parameter and a manual `bytes.fromhex` write. With normalize=True CompileIQ first calls the objective with BASELINE_CONFIG, the empty dict `{}`, which bytes.fromhex cannot decode. Fixes: (1) rename the parameter to `config` and write the ACF with `save_compiler_config(acf_path, config)` from compileiq.utils.helpers, which does the hex decoding internally; also use it (not bytes.fromhex) to save `best[\"params\"]` to best.acf. (2) Add a baseline-knockout branch: `if isinstance(config, dict) and not config:` build and time the kernel without any `--apply-controls` flag to establish the baseline. (3) Delete the local `INVALID_SCORE = float(\"inf\")` and import INVALID_SCORE (and BASELINE_CONFIG) from compileiq.types. (4) Wrap the nvcc build and benchmark run in try/except (e.g. subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError, FileNotFoundError, ValueError, OSError), give the subprocess calls a timeout, and return INVALID_SCORE on any failure. The NVCC injection works as written (`-Xptxas --apply-controls=<acf>` reaches ptxas); on this sm_100 (Blackwell) build the preferred form is `nvcc --apply-controls <acf>`, which covers every stage the ACF lists. Optionally note that the benchmark only reports time, so the output should also be checked against a reference before timing.",
+      "assertions": [
+        "Identified config_blob plus bytes.fromhex as the stale legacy pattern and replaced the write with save_compiler_config from compileiq.utils.helpers",
+        "Explained that the failing first call is the BASELINE_CONFIG empty dict and added an `isinstance(config, dict) and not config` branch that measures without the ACF",
+        "Replaced the local INVALID_SCORE = float('inf') with an import from compileiq.types",
+        "Wrapped compile and run in try/except returning INVALID_SCORE, with timeouts on the subprocess calls",
+        "Kept a working NVCC injection: `nvcc --apply-controls <acf>` (preferred on Blackwell) or `-Xptxas --apply-controls=<acf>`"
+      ]
+    },
+    {
+      "id": "compileiq-author-objective-triton-same-score",
+      "prompt": "I'm tuning a Triton softmax with CompileIQ. The objective is at /workspace/input/triton_softmax_objective.py. Over 8 generations every candidate scores the same as the baseline within noise, so I don't think the ACF is doing anything. Can you find what's wrong and rewrite the objective? No GPU here, so just edit the code.",
+      "expected_skill": "compileiq-author-objective",
+      "files": [
+        "files/triton_softmax_objective.py"
+      ],
+      "expected_output": "The ACF never reaches PTXAS. The objective sets os.environ[\"PTXAS_OPTIONS\"] per evaluation, but Triton reads PTXAS_OPTIONS only once, when its NVIDIA backend is imported (Triton 3.6+; earlier versions ignore it), so later changes have no effect. Pass the ACF through the kernel launch kwarg `ptx_options=f\"--apply-controls={acf_path}\"` instead. Triton's cache also serves stale binaries, so bust it per evaluation: set TRITON_ALWAYS_COMPILE=1 and a fresh TRITON_CACHE_DIR per eval (e.g. tempfile.mkdtemp(prefix=\"ciq_triton_\")). Point TRITON_PTXAS_PATH (and TRITON_PTXAS_BLACKWELL_PATH when Blackwell PTXAS selection may apply) at shutil.which(\"ptxas\"). Keep the baseline branch but launch without ptx_options there. The objective also times without checking correctness: compute a reference (e.g. torch.softmax on the same input), return INVALID_SCORE if `torch.allclose(out, ref, atol=1e-2, rtol=0)` fails, and only then time with triton.testing.do_bench. Optionally move the heavy torch/triton imports inside the objective so isolated worker processes re-import cleanly. Before relaunching, run the Debug-pack O0/O3 canary to confirm the ACF now changes performance.",
+      "assertions": [
+        "Explained that setting PTXAS_OPTIONS inside the objective does not take effect per evaluation, and replaced it with the ptx_options=f\"--apply-controls={acf_path}\" kernel kwarg",
+        "Set TRITON_ALWAYS_COMPILE=1 and a unique TRITON_CACHE_DIR per evaluation",
+        "Set TRITON_PTXAS_PATH to shutil.which(\"ptxas\")",
+        "Added a correctness check against a reference that returns INVALID_SCORE before timing",
+        "Recommended running the O0/O3 canary before relaunching the search"
+      ]
+    },
+    {
+      "id": "compileiq-author-objective-mixed-space",
+      "prompt": "I'm searching a CUDA kernel's block size together with ptxas controls in CompileIQ:\n\n    search_space = [{\"block_size\": ss.choice([64, 128, 256])}, PtxasSearchSpace()]\n\n    def objective(config):\n        save_compiler_config(acf_path, config)\n        ...\n\nEvery evaluation fails with `TypeError: fromhex() argument must be str, not list`. What signature should the objective have, and once the search finishes, how do I save the winning ACF and get the winning block size?",
+      "expected_skill": "compileiq-author-objective",
+      "expected_output": "With a list search space the objective receives a list of the same length, not a hex string. Use `def objective(mixed: list) -> float`. First handle the baseline run: CompileIQ passes BASELINE_CONFIG (an empty dict) even for a list search space, so `if mixed == BASELINE_CONFIG:` measure the default block size with no ACF. Then unpack `user_space, ptxas_config = mixed`; read the block size from `user_space[\"block_size\"]` and call `save_compiler_config(acf_path, ptxas_config)` with only the hex part. Results keep the same list shape: after the search, `best = results.get_best_result()`, then `user_space, ptxas_config = best[\"params\"]`, save the ACF with `save_compiler_config(\"best.acf\", ptxas_config)`, and take the block size from `user_space[\"block_size\"]`. The single-provider signature `def objective(config: str)` only applies when search_space is a single provider such as PtxasSearchSpace().",
+      "assertions": [
+        "Explained that a list search space passes the objective a list of the same length rather than a hex string",
+        "Showed unpacking user_space, ptxas_config = mixed and passing only ptxas_config to save_compiler_config",
+        "Checked for BASELINE_CONFIG (empty dict) before unpacking, measuring default parameters with no ACF",
+        "Showed unpacking best[\"params\"] the same way before saving best.acf",
+        "Contrasted with the single-provider def objective(config: str) signature"
+      ]
+    },
+    {
+      "id": "compileiq-author-objective-canary",
+      "prompt": "I finished a CompileIQ objective for a raw .ptx kernel (search_space=PtxasSearchSpace(), minimizing latency). Before I spend a night of GPU time on the full search, write me a short pre-flight block to put just before tuner.start() that proves the objective runs and that the ACF really changes what ptxas produces. Assume `tuner` and `objective` already exist in the script.",
+      "expected_skill": "compileiq-author-objective",
+      "expected_output": "Two checks. (1) Shape check: `sample = tuner.sample(1)[0]`, `score = objective(sample)`, assert the score is an int or float and not NaN (`score == score`). (2) ACF-injection canary with the Debug booster pack: `from compileiq.utils.helpers import load_compiler_config`, load `booster-pack-debug/ptxas_opt0.acf` and `booster-pack-debug/ptxas_opt3.acf` as hex strings, then `baseline = objective({})` (the BASELINE_CONFIG path), `score_O0 = objective(O0_HEX)`, `score_O3 = objective(O3_HEX)`. Assert O0 regresses clearly (score_O0 > baseline * 1.05) and O3 stays within about 5% of baseline. If either assertion fails, stop and fix the cache busting / ACF injection before launching, because otherwise every generation's score is noise on a stale binary.",
+      "assertions": [
+        "Included a shape check that calls the objective on tuner.sample(1)[0] and checks for a numeric, non-NaN score",
+        "Used the Debug pack ptxas_opt0.acf and ptxas_opt3.acf loaded with load_compiler_config",
+        "Measured a baseline by calling objective({}) (BASELINE_CONFIG)",
+        "Asserted O0 regresses by more than about 5% versus baseline and O3 is within about 5% of baseline",
+        "Said to stop and fix the ACF injection or cache busting if the canary fails"
+      ]
+    },
+    {
+      "id": "compileiq-author-objective-fa4-cutedsl",
+      "prompt": "I want to tune FlashAttention-4 (the cuTeDSL implementation that compiles through TVM-FFI) with CompileIQ over ptxas controls. FA4 calls cute.compile() deep inside its own code and I'd rather not fork it. Write the objective function so each candidate ACF actually reaches ptxas. Leave the timing call as a stub `measure_fa4()`.",
+      "expected_skill": "compileiq-author-objective",
+      "expected_output": "cuTeDSL injects PTXAS flags through the cute.compile options string: `--ptxas-options '--apply-controls <acf_path>'`. Since the call site is not reachable, monkey-patch `CompileCallable.__call__` (from cutlass.base_dsl.compiler) to append that string to the `options` kwarg, reading the ACF path from an env var such as COMPILEIQ_ACF_PATH. The objective takes `config: str`: for BASELINE_CONFIG (`isinstance(config, dict) and not config`) remove the env var and measure the baseline; otherwise write the ACF with `save_compiler_config(path, config)` to a temp .acf file, set the env var, and measure. Wrap measurement in try/except returning INVALID_SCORE (imported from compileiq.types), check output correctness against a reference before timing, and run the O0/O3 canary before launching the search.",
+      "assertions": [
+        "Monkey-patched CompileCallable.__call__ to splice the ACF into the options kwarg",
+        "Used the option form --ptxas-options '--apply-controls <acf path>'",
+        "Wrote the ACF with save_compiler_config and handled the BASELINE_CONFIG empty-dict case by measuring without the ACF",
+        "Returned INVALID_SCORE from compileiq.types on failure"
+      ]
+    },
+    {
+      "id": "compileiq-author-objective-flashinfer",
+      "prompt": "I'm setting up a CompileIQ search over ptxas controls for a FlashInfer batch-decode kernel that FlashInfer JIT-compiles. Inside my objective function, how do I make sure each candidate ACF actually gets compiled into the kernel I benchmark? Sketch the objective; the benchmark itself can be a subprocess call to my existing script.",
+      "expected_skill": "compileiq-author-objective",
+      "expected_output": "Write each candidate with `save_compiler_config(acf_path, config)` and inject it through NVCC by setting `FLASHINFER_EXTRA_CUDAFLAGS=\"--ptxas-options=--apply-controls=<acf_path>\"` in the environment of the benchmark run (an env copy passed to the subprocess); for BASELINE_CONFIG (empty dict) unset it and measure the baseline. First confirm the prebuilt FlashInfer cache packages `flashinfer_cubin` and `flashinfer_jit_cache` are not installed (importlib.util.find_spec returns None), since prebuilt cubins would bypass the ACF, and make sure each evaluation forces a recompile. Return INVALID_SCORE (from compileiq.types) on compile failure, timeout, wrong answers or exceptions, verify correctness before timing, and run the O0/O3 canary before launching the search.",
+      "assertions": [
+        "Injected the ACF via FLASHINFER_EXTRA_CUDAFLAGS=\"--ptxas-options=--apply-controls=<acf path>\"",
+        "Said to confirm flashinfer_cubin and flashinfer_jit_cache are absent so prebuilt cubins do not bypass the ACF",
+        "Handled the BASELINE_CONFIG case by running without the ACF flag",
+        "Returned INVALID_SCORE on compile failure, timeout, or wrong output"
+      ]
+    },
+    {
+      "id": "compileiq-author-objective-negative-triton-autotune",
+      "prompt": "How do I use @triton.autotune to choose BLOCK_SIZE and num_warps for my Triton matmul kernel, and how do I make it re-tune when the matrix shape changes?",
+      "expected_skill": null,
+      "expected_output": "Standard Triton autotuning: decorate the kernel with @triton.autotune(configs=[triton.Config({'BLOCK_SIZE': ...}, num_warps=...), ...], key=['M', 'N', 'K']) so it re-tunes when the key arguments change. No CompileIQ objective function or ACF injection is involved.",
+      "assertions": [
+        "Did not load or follow compileiq-author-objective",
+        "Explained @triton.autotune with triton.Config entries and the key argument for re-tuning on shape changes"
+      ]
+    },
+    {
+      "id": "compileiq-author-objective-negative-scipy-objective",
+      "prompt": "I'm fitting an exponential decay y = a * exp(-b * t) + c to some noisy sensor data. Can you write the objective function for scipy.optimize.minimize and show how to call it?",
+      "expected_skill": null,
+      "expected_output": "A sum-of-squared-residuals objective over params (a, b, c), passed to scipy.optimize.minimize with an initial guess (or scipy.optimize.curve_fit as an alternative). Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-author-objective",
+        "Wrote a least-squares objective and called scipy.optimize.minimize with an initial guess"
+      ]
+    }
+  ]
+}

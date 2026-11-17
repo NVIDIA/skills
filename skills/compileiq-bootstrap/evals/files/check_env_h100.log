@@ -1,0 +1,22 @@
+$ bash check_env.sh
+
+[1] CUDA toolkit 13.3+
+  PASS  nvcc release 13.3
+  PASS  ptxas V13.3
+
+[2] GPU visible
+  PASS  GPU: NVIDIA H100 80GB HBM3, 9.0
+
+[3] CompileIQ imports resolve
+  PASS  all public imports resolve
+
+[4] Search-space resolution round-trip
+  FAIL  PtxasSearchSpace().retrieve() failed or timed out
+        fix: set CIQ_SEARCH_SPACES_DIR=/path/to/local/mirror if air-gapped; otherwise check network to github.com
+        diagnostic:   File "/home/jdoe/venvs/ciq/lib/python3.12/site-packages/requests/adapters.py", line 700, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/NVIDIA/CompileIQ/releases?per_page=100&page=1 (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7f9a4c2b1d90>: Failed to resolve 'api.github.com' ([Errno -3] Temporary failure in name resolution)"))
+
+1 check(s) failed.
+$ echo $?
+1

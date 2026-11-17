@@ -1,0 +1,102 @@
+{
+  "skill_name": "compileiq-run-search",
+  "evals": [
+    {
+      "id": "compileiq-run-search-hang-isolated-worker",
+      "prompt": "I'm tuning ptxas flags for a CUDA GEMM kernel with CompileIQ. Every so often a candidate config makes the kernel hang and the whole search just sits there for hours. Right now I call `Search(...)` with the default worker and `tuner.start(num_workers=4)`. Separately, a colleague has an objective written as `async def` that mostly awaits a remote build service. Which worker should each of us use, and what should we pass to start()?",
+      "expected_skill": "compileiq-run-search",
+      "expected_output": "For the hanging GPU kernel, switch from the default MultiProcessWorker to IsoMultiProcessWorker (or WorkerTypes.ISOLATED), which runs one fresh process per task and has the parent kill it once task_timeout elapses. Always pass task_timeout with it; without it a hung config wedges that branch, which is the most common reason a search hangs for hours. Use a task_timeout between 30s for small kernels and 180s for large kernels such as attention or XLA HLO, for example tuner.start(num_workers=..., task_timeout=120). For the colleague's I/O-bound async def objective, AsyncWorker fits: it gives concurrency, not parallelism, and it ignores num_workers (respects_num_workers=False), so CompileIQ warns \"num_workers is not supported by AsyncWorker\" if they pass it.",
+      "assertions": [
+        "Recommended IsoMultiProcessWorker (or WorkerTypes.ISOLATED) for the hanging GPU kernel",
+        "Recommended setting task_timeout, in the 30s to 180s range, and explained the worker kills a stuck process only after task_timeout elapses",
+        "Recommended AsyncWorker for the async def objective",
+        "Noted that AsyncWorker ignores num_workers"
+      ]
+    },
+    {
+      "id": "compileiq-run-search-ray-warnings",
+      "prompt": "We moved our CompileIQ search to a 3-node Ray cluster (8 GPUs per node) by passing `worker_type=RayWorker` to Search, and kept our old launch line `tuner.start(num_workers=24, task_timeout=90)`. Now we get a warning that num_workers is not supported, and configs that hang are never killed. Is something misconfigured? What do we need to know about running on Ray?",
+      "expected_skill": "compileiq-run-search",
+      "expected_output": "Nothing is broken: RayWorker has respects_num_workers=False and supports_timeout=False, so both num_workers and task_timeout are ignored, and CompileIQ emits the warning \"num_workers is not supported by RayWorker\" so users recognize this. Drop num_workers and task_timeout from the start() call. RayWorker is the choice for multi-node / multi-GPU clusters, but the user must set up the Ray cluster themselves and install compileiq on every worker node.",
+      "assertions": [
+        "Explained that RayWorker ignores num_workers and that the warning is expected",
+        "Explained that RayWorker ignores task_timeout (no task-level timeout), so hung configs are not killed by it",
+        "Stated that the user must set up the Ray cluster and install compileiq on every worker"
+      ]
+    },
+    {
+      "id": "compileiq-run-search-config-sizing",
+      "prompt": "A teammate's CompileIQ launch script fails before the search even starts. The config is:\n\n    SearchConfiguration(problem_type=ProblemType.MIN, generations=5, pool_size=4, cull_size=3)\n\nWe're tuning ptxas for a kernel and the search space has roughly 2,000 design points. Please fix the config and explain the sizing you chose.",
+      "expected_skill": "compileiq-run-search",
+      "expected_output": "pool_size must be greater than 5, so pool_size=4 is rejected, and cull_size=3 is rejected because it must be even. Remove the cull_size override entirely: since CompileIQ 1.1 the amber engine owns its optimizer settings, so cull_size (like mutate_rate) has no effect and Search ignores a non-default value with a FutureWarning; tune amber through engine=EngineConfig(name=\"amber\", options={...}) if needed. For a space of >= 1k design points use pool_size=32, and generations=10 for initial exploration (20-40 for a deep run). Sanity check: the original 4 x 5 = 20 is below 50, which is exploring rather than optimizing; 32 x 10 = 320 is in a reasonable range, well under the 2000 point where the search starts overfitting to measurement noise and well below the ~2,000 distinct points, so amber will not run out of untried candidates. Corrected: SearchConfiguration(problem_type=ProblemType.MIN, generations=10, pool_size=32).",
+      "assertions": [
+        "Identified that pool_size must be greater than 5",
+        "Recommended removing the cull_size override rather than setting another value",
+        "Recommended pool_size=32 for a space of about 2,000 design points",
+        "Applied the pool_size * generations rule of thumb (under 50 is exploring, over 2000 risks overfitting to noise)",
+        "Showed a corrected SearchConfiguration"
+      ]
+    },
+    {
+      "id": "compileiq-run-search-review-overnight-script",
+      "prompt": "I'm about to kick off an overnight CompileIQ search on our 2-GPU box. The launch script is at /workspace/input/run_reduction_search.py. Can you review it before I start it and tell me what to change? Don't try to run it; there is no GPU here.",
+      "expected_skill": "compileiq-run-search",
+      "files": [
+        "files/run_reduction_search.py"
+      ],
+      "expected_output": "Issues to fix: (1) No dump_results. Always set dump_results=Path(\"results.csv\"); the CSV is flushed every batch, so a crashed or killed overnight run leaves recoverable state. (2) Clock locking is inside the objective via sudo nvidia-smi. GPU-clock lock calls need root and are per-host operator setup, not per-eval; remove lock_clocks() from the objective and have the user or admin lock clocks as root once before tuner.start() and reset them after the search. (3) num_workers=8 with a local worker makes eight processes share the same visible GPUs, because local workers do not assign GPUs, so evaluations contend and the timings are skewed. To use both GPUs, switch to RayWorker, the only worker that schedules a GPU per task: tuner.start(num_gpus=1) and read the assigned device from CUDA_VISIBLE_DEVICES (or ray.get_gpu_ids()) in the objective. If staying on a local worker, use num_workers=1. (4) For a GPU kernel on a local worker, the default MultiProcessWorker is not the recommended choice; use IsoMultiProcessWorker (WorkerTypes.ISOLATED) with task_timeout between 30s and 180s so hung configs are killed (RayWorker ignores task_timeout). Optionally add LoguruTrackerConfig(sink=\"optimization.log\") for a serious overnight campaign.",
+      "assertions": [
+        "Read /workspace/input/run_reduction_search.py",
+        "Flagged the missing dump_results and recommended setting it so a crashed run is recoverable",
+        "Flagged the sudo nvidia-smi clock locking inside the objective and said it belongs outside the search as one-time root setup",
+        "Flagged num_workers=8 as making local worker processes share the GPUs, and recommended RayWorker with num_gpus=1 per task to use both GPUs (or num_workers=1 on a local worker)",
+        "Recommended IsoMultiProcessWorker with a task_timeout if staying on a local worker",
+        "Did not try to execute the script"
+      ]
+    },
+    {
+      "id": "compileiq-run-search-mlflow-tracker",
+      "prompt": "Write me the Search(...) setup for our CompileIQ ptxas run (PtxasSearchSpace version 13.3, objective function already called `objective`, latency so lower is better, 20 generations). Our team logs everything to MLflow at http://mlflow.internal:5000 under the experiment name \"ptxas-gemm\", and I want each evaluation to show up there. Just write the code; I'll run it on the GPU machine.",
+      "expected_skill": "compileiq-run-search",
+      "expected_output": "Code that imports MLflowTrackerConfig from compileiq.tracker and passes tracker_config=MLflowTrackerConfig(experiment_name=\"ptxas-gemm\", tracking_uri=\"http://mlflow.internal:5000\", run_name=...) to Search, which creates a nested MLflow run per evaluation. It uses SearchConfiguration(problem_type=ProblemType.MIN, generations=20) with pool_size left to auto-derive or set per the sizing table, search_space=PtxasSearchSpace(version=\"13.3\"), worker_type=IsoMultiProcessWorker (or WorkerTypes.ISOLATED) for a GPU kernel, dump_results=Path(\"results.csv\"), and tuner.start(num_workers=<num GPUs>, task_timeout=<30-180>). Notes that DisabledTrackerConfig is the default and LoguruTrackerConfig is the low-overhead option when MLflow is not needed.",
+      "assertions": [
+        "Used MLflowTrackerConfig with experiment_name=\"ptxas-gemm\" and tracking_uri=\"http://mlflow.internal:5000\"",
+        "Used ProblemType.MIN and generations=20 in SearchConfiguration",
+        "Set dump_results to a Path",
+        "Passed a task_timeout to tuner.start() alongside an isolated worker choice"
+      ]
+    },
+    {
+      "id": "compileiq-run-search-clock-lock-no-root",
+      "prompt": "Before I launch my CompileIQ search, please lock the GPU and memory clocks on this machine to their max so the measurements are stable. Go ahead and set it up.",
+      "expected_skill": "compileiq-run-search",
+      "expected_output": "The agent does not run the locking commands itself, because locking needs root. It shows the commands for the user (or their cluster admin) to run as root before tuner.start(): nvidia-smi -pm 1; query MAX_GPU via nvidia-smi --query-gpu=clocks.max.graphics and MAX_MEM via clocks.max.memory; then nvidia-smi --lock-gpu-clocks=$MAX_GPU,$MAX_GPU --lock-memory-clocks=$MAX_MEM,$MAX_MEM. After the search, reset with nvidia-smi --reset-gpu-clocks --reset-memory-clocks. It asks the user to confirm the clocks are locked before starting the search, mentions the unprivileged check nvidia-smi --query-gpu=clocks.gr,clocks.max.graphics --format=csv, and says that if clocks cannot be locked (CI container, shared cluster) to skip it and report the higher CV% to the validation step.",
+      "assertions": [
+        "Did not run sudo, nvidia-smi -pm, or nvidia-smi --lock-gpu-clocks / --lock-memory-clocks itself",
+        "Showed the nvidia-smi persistence-mode and lock commands and said they must be run as root",
+        "Asked the user (or their admin) to run the commands and confirm before starting the search",
+        "Showed the reset command nvidia-smi --reset-gpu-clocks --reset-memory-clocks for after the search"
+      ]
+    },
+    {
+      "id": "compileiq-run-search-negative-triton-autotune",
+      "prompt": "How do I use Triton's @triton.autotune decorator to pick the best BLOCK_SIZE and num_warps for my matmul kernel?",
+      "expected_skill": null,
+      "expected_output": "Explains Triton's built-in autotuner: decorate the kernel with @triton.autotune, pass a list of triton.Config objects with BLOCK_SIZE meta-parameters and num_warps (and optionally num_stages), and set key=[...] to the arguments whose values trigger re-tuning. Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-run-search",
+        "Explained @triton.autotune with triton.Config entries and the key argument"
+      ]
+    },
+    {
+      "id": "compileiq-run-search-negative-largest-files",
+      "prompt": "Give me a shell one-liner that lists the 10 largest files under my home directory.",
+      "expected_skill": null,
+      "expected_output": "A one-liner such as `find ~ -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10`, or an equivalent using du or ls. Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-run-search",
+        "Gave a working shell one-liner that lists the 10 largest files"
+      ]
+    }
+  ]
+}

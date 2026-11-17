@@ -1,0 +1,109 @@
+{
+  "skill_name": "compileiq-validate-result",
+  "evals": [
+    {
+      "id": "compileiq-validate-result-topk-csv",
+      "prompt": "My CompileIQ search on a layernorm kernel finished (single objective, minimizing latency in ms) and dumped its results to /workspace/input/results_layernorm.csv. Pull out the top 5 configs for me. The best one is about 8% below my 1.0 ms baseline; can I put that number in my status report?",
+      "expected_skill": "compileiq-validate-result",
+      "files": ["files/results_layernorm.csv"],
+      "expected_output": "The CSV has 96 evaluations across 6 generations; 17 rows have the invalid score \"*\" and must be excluded (coerce score_1 to numeric, as in the skill's top-K snippet), leaving 79 valid rows. Top 5 by lowest score_1: 0.9167 (generation 5, params 297da195...), 0.9168 (generation 4, params 0f5cbe40...), 0.9173 (generation 5, params 78237d6c...), 0.9186 (generation 3, params 2cd1048f...), 0.9232 (generation 4, params 253b8983...). The ~8% figure should not go in the report: search-time scores use only 5-15 trials per evaluation and a shared cache, and the best of many evaluations will look good partly by chance (the multiple-comparisons false-positive pattern). Re-measure the no-ACF baseline and each top-K candidate at validation settings (at least 50 warmup and 100 trials, fresh cache, locked GPU clocks), then apply the ship rule: Welch's t-test p < 0.05, Cohen's d > 0.2 (preferably > 0.5), and candidate mean below baseline mean.",
+      "assertions": [
+        "Excluded the 17 invalid \"*\" score rows by converting score_1 to numeric before ranking",
+        "Listed the five lowest score_1 values (0.9167, 0.9168, 0.9173, 0.9186, 0.9232) with their generation and params",
+        "Advised against reporting the search-time ~8% as a speedup because the best of many noisy evaluations can be a multiple-comparisons false positive",
+        "Recommended re-measuring the baseline and the top-K candidates with at least 100 trials and 50 warmup runs on a fresh cache before claiming anything"
+      ]
+    },
+    {
+      "id": "compileiq-validate-result-genuine-win",
+      "prompt": "I re-measured the winning CompileIQ ACF for our GEMM kernel against the no-ACF baseline: 100 trials each, fresh cache, GPU clocks locked. The per-trial latencies in ms are in /workspace/input/samples_gemm_candidate.csv (columns baseline_ms and candidate_ms). Is the speedup real, and is it OK to ship this ACF?",
+      "expected_skill": "compileiq-validate-result",
+      "expected_script": "welch_validate.py",
+      "files": ["files/samples_gemm_candidate.csv"],
+      "expected_output": "Yes, it passes the gate. Baseline mean 1.0010 ms (std 0.0116), candidate mean 0.9614 ms (std 0.0106): mean speedup about 1.041x (median speedup also about 1.04x). Welch's t-test p is about 2e-63 and Cohen's d is about 3.56, so p < 0.05, d > 0.2 (and above the preferred 0.5), and the candidate mean is lower, so validate_speedup reports significant=True. Neither rejection check fires: the candidate mean is lower (not lucky-min), and the p5-p95 range is 0.0362 ms versus 0.0358 ms for the baseline, about 1% wider, well under the 25% higher-variance threshold. Decision KEPT: save the ACF as best.acf and record the result in validation-log.csv.",
+      "assertions": [
+        "Ran validate_speedup from welch_validate.py on the two columns, or computed an equivalent Welch's t-test plus Cohen's d",
+        "Reported a mean speedup of about 1.04x (baseline about 1.001 ms, candidate about 0.961 ms)",
+        "Reported p well below 0.05 and Cohen's d about 3.6, satisfying the ship rule",
+        "Checked the lucky-min and higher-variance patterns and found that neither applies",
+        "Concluded the candidate can be kept and shipped as best.acf, with the result logged"
+      ]
+    },
+    {
+      "id": "compileiq-validate-result-lucky-min",
+      "prompt": "CompileIQ found an ACF for our attention kernel. I benchmarked it 100 times alongside the baseline; the data is in /workspace/input/samples_attention_candidate.csv (columns baseline_ms and candidate_ms). The fastest run dropped from 0.9732 ms to 0.9321 ms, so about 4.4% faster. I'm about to announce that to the team. Sanity-check me first?",
+      "expected_skill": "compileiq-validate-result",
+      "expected_script": "welch_validate.py",
+      "files": ["files/samples_attention_candidate.csv"],
+      "expected_output": "Do not announce it; this is the lucky-min false positive. The minimums do drop (0.9732 to 0.9321 ms), but the means do not: baseline mean 0.9994 ms, candidate mean 1.0029 ms, so the candidate is slightly slower on average (mean speedup about 0.9965x; medians 1.0000 vs 1.0069 ms). Welch's t-test p is about 0.126 and Cohen's d is about -0.22, so validate_speedup reports significant=False. reject_lucky_min fires because the optimized mean is not lower than the baseline mean, and reject_higher_variance also fires: the candidate's p5-p95 range is 0.0881 ms versus 0.0376 ms, about 135% wider, far above the 25% threshold. Decision: REJECTED. Compare means, not minimums.",
+      "assertions": [
+        "Ran validate_speedup from welch_validate.py, or computed an equivalent Welch's t-test plus Cohen's d",
+        "Compared means rather than minimums and reported that the candidate mean (about 1.003 ms) is not below the baseline mean (about 0.999 ms)",
+        "Identified the lucky-min false-positive pattern",
+        "Reported that the result is not significant (p about 0.13, Cohen's d negative)",
+        "Told the user not to announce the 4.4% speedup; the candidate is rejected"
+      ]
+    },
+    {
+      "id": "compileiq-validate-result-higher-variance",
+      "prompt": "Validation run for a CompileIQ softmax ACF: 100 baseline trials and 100 candidate trials, latencies in ms, in /workspace/input/samples_softmax_candidate.csv (columns baseline_ms and candidate_ms). I ran a t-test myself and got p < 0.05, so I think it's good to ship. Can you confirm with the proper checks before I do?",
+      "expected_skill": "compileiq-validate-result",
+      "expected_script": "welch_validate.py",
+      "files": ["files/samples_softmax_candidate.csv"],
+      "expected_output": "Do not ship. The statistical gate alone passes: Welch's t-test p is about 0.017, Cohen's d is about 0.34 (above 0.2 but below the preferred 0.5), and the candidate mean 0.9956 ms is below the baseline mean 1.0002 ms, a mean speedup of only about 1.0047x (0.5%). But the higher-variance check fails: the candidate's p5-p95 range is 0.0553 ms versus 0.0305 ms for the baseline, about 81.5% wider, far above the 25% threshold (candidate std 0.0173 vs 0.0088 ms). Per the skill's higher-variance pattern the ACF mostly spread the distribution rather than speeding anything up, so the decision is REJECTED:higher_variance.",
+      "assertions": [
+        "Ran validate_speedup and reject_higher_variance from welch_validate.py, or computed equivalent statistics including the p5-p95 ranges",
+        "Reported p about 0.017 and Cohen's d about 0.34, with a mean speedup of only about 0.5%",
+        "Reported that the candidate p5-p95 range is about 81% wider than the baseline, above the 25% threshold",
+        "Identified the higher-variance false-positive pattern and rejected the candidate despite p < 0.05"
+      ]
+    },
+    {
+      "id": "compileiq-validate-result-cli-dry-run",
+      "prompt": "Before I book GPU time I want to dry-run our CompileIQ validation step end to end. /workspace/input/fake_bench.py is a CPU stand-in for our benchmark: each run prints 'mean: <ms>' and it runs faster when PTXAS_OPTIONS contains --apply-controls. The candidate ACF is /workspace/input/candidate.acf. Run the validation helper on it against the stand-in with only 20 trials and 2 warmup runs per side (it's just a dry run), log to /workspace/input/validation-log.csv, and tell me the decision and what got logged.",
+      "expected_skill": "compileiq-validate-result",
+      "expected_script": "welch_validate.py",
+      "files": ["files/fake_bench.py", "files/candidate.acf"],
+      "expected_output": "Ran welch_validate.py with --acf /workspace/input/candidate.acf, a baseline command that runs fake_bench.py, an --opt-cmd of the form \"PTXAS_OPTIONS='--apply-controls=/workspace/input/candidate.acf' python /workspace/input/fake_bench.py\" (the leading VAR=value becomes an environment override; no shell is used), --trials 20 --warmup 2, the default --score-regex 'mean: ([0-9.]+)', and --output /workspace/input/validation-log.csv. The decision is KEPT with a speedup of about 1.11x: baseline mean about 1.000 ms, candidate mean about 0.900 ms, p far below 0.05 and Cohen's d far above 0.5 (exact values vary per run because the stand-in adds random noise), and the script exits 0. One row was appended to validation-log.csv containing the timestamp, ACF path and sha256 (975e4dc68ce05596ccdf975438f6d8dbdd8e0d01601a22451bf67f9d8fb14e2d), trials=20, warmup=2, baseline and candidate mean and std, speedup, p-value, Cohen's d, the decision string, both commands, and environment/toolchain fields that are empty or partial on a machine without a GPU. 20 trials is only a pipeline check; a real validation needs at least 100 trials and 50 warmup runs.",
+      "assertions": [
+        "Ran welch_validate.py with --acf, --baseline-cmd and --opt-cmd, using a leading PTXAS_OPTIONS=... assignment in --opt-cmd and no pipes or redirection",
+        "Used 20 trials and 2 warmup runs as requested",
+        "Reported the KEPT decision with a speedup of about 1.11x",
+        "Confirmed that a row was appended to /workspace/input/validation-log.csv and summarized its fields, including the ACF sha256",
+        "Noted that 20 trials is below the 100-trial minimum for a real validation"
+      ]
+    },
+    {
+      "id": "compileiq-validate-result-reuse-and-pipe",
+      "prompt": "My CompileIQ search just finished. The best config scored 3.5% faster than baseline, measured with 10 trials per evaluation and CIQ_KEEP_CACHE=1 on during the search. To save time I was going to reuse those search-time samples for the significance test, and for the re-check run:\n\n    --opt-cmd \"PTXAS_OPTIONS='--apply-controls=best.acf' python bench.py 2>&1 | grep mean\"\n\nAnything wrong with this plan?",
+      "expected_skill": "compileiq-validate-result",
+      "expected_output": "Three problems. (1) Do not reuse search-time samples: validation N is independent of optimization N, and the search-time numbers (5-15 trials, shared cache) are too noisy to ship from. Re-measure both the no-ACF baseline and the candidate with at least 50 warmup runs and at least 100 trials, with GPU clocks locked. (2) Because CIQ_KEEP_CACHE=1 was on during the search, validation must wipe ~/.cache/compileiq or use a fresh TRITON_CACHE_DIR and HELION_SKIP_CACHE=1; otherwise the optimization-time numbers reappear and nothing is being validated. (3) welch_validate.py runs commands without a shell: the leading PTXAS_OPTIONS=... assignment is fine (it becomes an environment override), but the pipe and 2>&1 redirection are not supported. Drop them, since the default --score-regex 'mean: ([0-9.]+)' already extracts the score from stdout, or wrap the pipeline in a script and pass the script. Then apply the ship rule: p < 0.05, Cohen's d > 0.2, and candidate mean below baseline mean.",
+      "assertions": [
+        "Told the user not to reuse search-time samples and to re-measure baseline and candidate with at least 100 trials and 50 warmup runs",
+        "Said the cache from the CIQ_KEEP_CACHE=1 search must be wiped (~/.cache/compileiq) or bypassed with a fresh TRITON_CACHE_DIR / HELION_SKIP_CACHE=1",
+        "Explained that the helper runs commands without a shell, so the pipe and redirection will not work, while the leading PTXAS_OPTIONS= assignment is supported",
+        "Suggested dropping the pipe in favor of --score-regex, or wrapping the pipeline in a script"
+      ]
+    },
+    {
+      "id": "compileiq-validate-result-negative-generic-timing",
+      "prompt": "I rewrote a pandas groupby in our ETL job and timed the old and new versions 30 times each. What's the right statistical test to tell whether the new version is actually faster, and how do I run it in Python?",
+      "expected_skill": null,
+      "expected_output": "General benchmarking statistics: compare the two timing samples with Welch's t-test (scipy.stats.ttest_ind with equal_var=False) or a Mann-Whitney U test if the timings are skewed, report an effect size or confidence interval alongside the p-value, and control for warmup and system noise. Nothing CompileIQ-specific (ACFs, dump_results CSVs, best.acf) is involved.",
+      "assertions": [
+        "Did not load or follow compileiq-validate-result",
+        "Gave general guidance on testing whether one set of timings is faster than another in Python"
+      ]
+    },
+    {
+      "id": "compileiq-validate-result-negative-largest-files",
+      "prompt": "Give me a shell one-liner that lists the 10 largest files under my home directory, with human-readable sizes.",
+      "expected_skill": null,
+      "expected_output": "A shell command using find or du with sort and head (for example find ~ -type f -exec du -h {} + | sort -rh | head -n 10). Nothing CompileIQ-specific is needed.",
+      "assertions": [
+        "Did not load or follow compileiq-validate-result",
+        "Provided a working one-liner that lists the 10 largest files with human-readable sizes"
+      ]
+    }
+  ]
+}
