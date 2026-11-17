@@ -1,0 +1,119 @@
+{
+  "skills": [
+    "vss-ask-video",
+    "vss-build-vision-ai"
+  ],
+  "profile": "base",
+  "resources": {
+    "platforms": {
+      "DGX-SPARK": {
+        "gpu_count": 1
+      },
+      "L40S": {
+        "gpu_count": 1
+      }
+    }
+  },
+  "expects": [
+    {
+      "query": "Use `/vss-build-vision-ai` to deploy the VSS base profile on `{{platform}}` with VIOS, a video-understanding VLM, and VSS unified memory (Elasticsearch) enabled. Enable memory introspection too, with its sufficiency judge pointed at the profile's own text LLM. First obtain the pinned `nvidia/vss-developer/dev-profile-sample-data:3.2.0` bundle with the documented sample-data bootstrap. Then, so the following queries have a camera to work with, onboard the local file /tmp/vss-sample-data/dev-profile-sample-data/warehouse_safety_0001.mp4 into VIOS as a sensor named warehouse_sample. Use the configured remote model endpoints and run autonomously.\n\nThe selected operational harness is supplied in $SKILLS_EVAL_OPERATIONAL_HARNESS. If it is `nemoclaw`, use Build Vision AI to attach NemoClaw to this same deployment and install `/vss-ask-video` in that sandbox. Preserve the supplied $NEMOCLAW_SANDBOX_NAME, $NEMOCLAW_GATEWAY_PORT, $NEMOCLAW_DASHBOARD_PORT, $NEMOCLAW_DASHBOARD_RELAY_PORT, and model-provider environment values. These ports select this evaluation's isolated NemoClaw gateway and must stay consistent across setup and operational steps. Complete the documented readiness verification before finishing: `openshell sandbox get \"$NEMOCLAW_SANDBOX_NAME\"` must succeed, the sandbox gateway must be ready, and the installed VSS CLI must be configured against this deployment. Include the sandbox name and Agent UI link in your response. For other operational harnesses, finish the deployment readiness checks without onboarding NemoClaw. Run non-interactively using the query's choices and documented defaults.\n\n**Operational video fixtures:** Use the documented vss-manage-video-io-storage sample-data bootstrap on the host to download and extract the pinned `nvidia/vss-developer/dev-profile-sample-data:3.2.0` bundle. Set `SAMPLE_DIR` to that extraction's `dev-profile-sample-data` directory and require nonempty `warehouse_safety_0001.mp4`. For host harnesses, make these exact files available under `/tmp/vss-sample-data/dev-profile-sample-data/`. After NemoClaw onboarding, when selected, create `/tmp/vss-sample-data/dev-profile-sample-data/` inside the supplied sandbox with `openshell sandbox exec -n \"$NEMOCLAW_SANDBOX_NAME\" -- mkdir -p /tmp/vss-sample-data/dev-profile-sample-data` and copy the files through the supported upload command: `nemoclaw \"$NEMOCLAW_SANDBOX_NAME\" upload \"$SAMPLE_DIR/warehouse_safety_0001.mp4\" /tmp/vss-sample-data/dev-profile-sample-data/`. Verify each copied file is nonempty and its `sha256sum` inside the sandbox matches the host source. Stage only media files; keep NGC credentials on the host. These are input fixtures for later tasks; do not upload them to VIOS or NvStreamer during staging.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:30888/vst/api/v1/sensor/version` returns exit 0 (VIOS is responsive).",
+        "`timeout 570s sh -c 'while :; do for url in http://localhost:30081/v1/models http://localhost:30082/v1/models http://localhost:8018/v1/models; do curl -sf --connect-timeout 2 --max-time 5 \"$url\" >/dev/null 2>&1 && exit 0; done; sleep 5; done'` returns exit 0 (at least one configured video-understanding VLM becomes ready; polls for up to 9.5 minutes to absorb model warmup).",
+        "`vss configure check` reports elasticsearch reachable, and `vss vios list` includes a sensor named warehouse_sample with a recorded timeline.",
+        "`vss vlm run --sensor warehouse_sample --prompt 'Describe the scene.' --max-frames 2 --no-persist` returns exit 0 (the configured VLM serves inference, not merely lists a model it cannot run).",
+        "The setup trajectory shows the agent reading or invoking the bundled `/vss-build-vision-ai` skill and using its workflow to deploy the requested backend; mentioning the skill only in the final answer is insufficient.",
+        "When `$SKILLS_EVAL_OPERATIONAL_HARNESS` is `nemoclaw`, the setup trajectory proves the supplied sandbox exists (`openshell sandbox get \"$NEMOCLAW_SANDBOX_NAME\"` succeeds), its gateway is ready, and the sandbox-installed `vss configure check` succeeds against this deployment. For a different selected operational harness, no NemoClaw sandbox is required.",
+        "The setup trajectory proves the pinned sample-data bundle provides nonempty `warehouse_safety_0001.mp4` on the host. When `$SKILLS_EVAL_OPERATIONAL_HARNESS` is `nemoclaw`, the same `warehouse_safety_0001.mp4` exist as nonempty files under `/tmp/vss-sample-data/dev-profile-sample-data/` inside the supplied sandbox and each sandbox `sha256sum` matches its host source. Host-only file checks are insufficient for NemoClaw. For other harnesses the host files suffice."
+      ]
+    },
+    {
+      "query": "Was the worker wearing a safety helmet on warehouse_sample? Check the video itself, not anything already stored.",
+      "checks": [
+        "It uses exactly one vss vlm run against warehouse_sample, with --fps rather than a fixed --max-frames, and returns the answer.",
+        "It does not search stored agent Markdown memory (for example MEMORY.md, memory/*.md, or the harness-native memory_search tool) or call vss memory introspect before the fresh inspection, because the request already names its own scope. Reading startup/deployment instructions such as ENV.md, AGENTS.md, or SKILL.md is not memory recall and does not violate this check."
+      ]
+    },
+    {
+      "query": "Ask that again: was the worker wearing a safety helmet in the first 10 seconds of warehouse_sample?",
+      "checks": [
+        "It answers from what VSS unified memory already holds for warehouse_sample, using a vss memory command.",
+        "It does not run vss vlm run a second time."
+      ]
+    },
+    {
+      "query": "Read the stored VSS record for the most recent warehouse_sample analysis, then answer from that output alone: was the worker wearing a safety helmet?",
+      "checks": [
+        "It reads the record with a vss memory command and answers from that output.",
+        "It answers from that record's own text and runs no VLM job."
+      ]
+    },
+    {
+      "query": "First find the job id of the most recent stored warehouse_sample analysis, then introspect that job with --job-id: was anyone missing PPE?",
+      "checks": [
+        "It resolves the job id from VSS memory and calls vss memory introspect with --job-id, the user's question preserved verbatim, and --fps chosen from the skim/locate/inspect policy.",
+        "It does not run vss vlm run after introspection returns."
+      ]
+    },
+    {
+      "query": "Was the worker wearing a high-visibility vest as well as a helmet on warehouse_sample?",
+      "checks": [
+        "The VSS operation is vss memory introspect with --sensor warehouse_sample, the verbatim question, and --fps.",
+        "It does not issue vss memory query first or call a backend directly."
+      ]
+    },
+    {
+      "query": "Introspection is turned off on this deployment. Read the stored VSS job for the most recent warehouse_sample analysis.",
+      "checks": [
+        "It reads the record with vss memory get --job-id for ordinary structured retrieval.",
+        "It never calls vss memory introspect, never enables it, and never runs vss vlm run when the records are thin."
+      ]
+    },
+    {
+      "query": "Introspection is not configured on this deployment. Find the stored VSS records about forklifts on warehouse_sample.",
+      "checks": [
+        "It treats introspection as unavailable and uses vss memory query with forklift text and warehouse_sample scope.",
+        "It does not call or configure introspection and does not run vss vlm run."
+      ]
+    },
+    {
+      "query": "Show me the raw stored VSS record for warehouse_sample's most recent job, by its job id - the record itself, not a fresh analysis.",
+      "checks": [
+        "It resolves the job id from VSS memory and then reads the full record with vss memory get --job-id.",
+        "It does not run vss vlm run."
+      ]
+    },
+    {
+      "query": "Introspection came back partial: the answer was 'a helmet is visible, but identity is uncertain', and identity was left unconfirmed. Respond to the user.",
+      "checks": [
+        "It returns the partial answer with the identity limitation and the unresolved gap.",
+        "It does not retry introspection or any internal VLM work."
+      ]
+    },
+    {
+      "query": "Where did the worker put the box down on warehouse_sample in the first 10 seconds?",
+      "checks": [
+        "When stored memory does not cover the question, it allows exactly one vss vlm run for warehouse_sample and that exact window.",
+        "It does not broaden or invent scope."
+      ]
+    },
+    {
+      "query": "I want the stored child record event-17 but I do not know its job id or record type. What is the safe way to ask for it? Assume each command runs in a fresh shell.",
+      "checks": [
+        "It never emits --record-id without both --job-id and --record-type and requests the missing identity or another valid scope.",
+        "Any proposed VSS command calls the vss CLI on PATH as `vss`, with no uv run wrapper.",
+        "It does not rely on a shell function or prior-shell state and does not use raw REST."
+      ]
+    },
+    {
+      "query": "Freshly inspect the local video file `/tmp/vss-sample-data/dev-profile-sample-data/warehouse_safety_0001.mp4` using the canonical vss-ask-video skill. Do not use VST/VIOS or raw HTTP: is the worker wearing PPE?",
+      "checks": [
+        "It uses vss vlm run --file through the installed CLI when available, in one shell call, and returns its answer. Only a development checkout without an installed CLI uses the project-local fallback.",
+        "It does not search stored agent Markdown memory (for example MEMORY.md, memory/*.md, or the harness-native memory_search tool), introspect, access VIOS, call RT-VLM directly, or POST to the VSS Agent. Reading startup/deployment instructions such as ENV.md, AGENTS.md, or SKILL.md is not memory recall and does not violate this check."
+      ]
+    }
+  ],
+  "sandbox_fixtures": [
+    "warehouse_safety_0001.mp4"
+  ]
+}

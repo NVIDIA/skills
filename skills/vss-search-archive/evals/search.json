@@ -1,0 +1,156 @@
+{
+  "skills": [
+    "vss-search-archive",
+    "vss-build-vision-ai",
+    "vss-manage-video-io-storage",
+    "vss-ask-video"
+  ],
+  "profile": "search",
+  "deploy_mode": "remote-all",
+  "resources": {
+    "platforms": {
+      "RTXPRO6000BW": {
+        "gpu_count": 2
+      },
+      "DGX-SPARK": {
+        "gpu_count": 1
+      }
+    }
+  },
+  "expects": [
+    {
+      "scenario": "deploy-search-profile",
+      "role": "setup",
+      "query": "Use `/vss-build-vision-ai` for the following deployment setup. Deploy the VSS **search** profile on `{{platform}}` via the `/vss-build-vision-ai` stock Search workflow in remote-all mode, including the in-stack Agent. Set `VSS_REPO_ROOT=\"${VSS_REPO_ROOT:-$HOME/video-search-and-summarization}\"`. This is a host-side eval: select the explicit brev.md#host-local-search-eval branch during preflight, skipping browser-only secure-link overrides and external-browser checks when the 7777 link is not published or unreadable. Missing public Brev links do not block deployment; use the host origin supplied by that workflow and report that scope. On Brev, provide BREV_ENV_ID when available before generated.env is written, and read any published 7777, 5601, and 31000 links from the local environment context file only (`$BREV_ENVIRONMENT_CONTEXT_PATH`, default `/etc/brev/environment-context.json`). If that file is absent, lists no ports, or is unreadable, report that and treat 7777 as having no published link; do not take the privileged docker read, do not query any Brev API endpoint or other network service for links, and never invent hostnames or modify ports. After local Agent and VST health succeeds, install the CLI from that checkout with `uv tool install \"${VSS_REPO_ROOT}/libs/vss/cli\"` and run `vss search run --help`. Then, exactly once and whether or not a 7777 link was published, run the vss-search-archive skill's bundled `scripts/select_brev_origin.sh` with two arguments: first the published 7777 HTTPS origin (an empty string when none), second the host origin the deployment workflow supplied (`http://$HOST_IP:$HAPROXY_HOST_PORT`). Capture its JSON stdout and its exit status separately, and read `origin` and `media_scope` from the JSON. Do not skip the call because the candidate is empty, and do not issue any curl against the public origin yourself. The selector probes only a valid HTTPS origin candidate and prefers a nonredirecting HTTP 200 with valid VST version JSON, and otherwise returns the supplied host origin with media_scope host-local. Run `vss configure --base-url` with the returned `origin`, and report media_scope and the host-local media limitation when applicable. Stop if the deployment supplies no host origin or local readiness fails. Require vss-rtvi-vlm to be running and a fresh RT-VLM probe to return a nonempty served-model list; configure show inventory alone is not fresh serving evidence. Do not ingest sample media in this step. Download files here only for the NemoClaw fixture staging described below; other harnesses download during ingestion. Compose commands in the initial deployment workflow are expected. Wait for image pulls and bring-up to finish, checking their exit status; if a tool returns a running session, wait on that session before proceeding. A pull still in progress does not complete this task. Do not edit VST_EXTERNAL_URL after deployment or loop on routing. This deployment uses the in-stack agent: deploy `vss-agent` as part of the service set and do not replace it with the evaluation harness. The operational evaluation harness is a separate client of this backend.\n\nThe selected operational harness is supplied in $SKILLS_EVAL_OPERATIONAL_HARNESS. If it is `nemoclaw`, first finish the above application deployment through Build Vision AI with its explicitly requested in-stack agent. Then bootstrap a separate evaluation client using the checked-in `deploy/docker/scripts/run_setup_notebook.py --notebook deploy/docker/scripts/deploy_nemoclaw.ipynb` and install `/vss-search-archive` in that sandbox. NemoClaw is evaluation infrastructure here, not the application's harness: do not select it in Build Vision AI's Q3 or change the application service set. Set `VSS_AGENT_ADAPTER_ENABLED=false` so the application's UI keeps its in-stack backend. Preserve the supplied $NEMOCLAW_SANDBOX_NAME, $NEMOCLAW_GATEWAY_PORT, $NEMOCLAW_DASHBOARD_PORT, $NEMOCLAW_DASHBOARD_RELAY_PORT, and model-provider environment values. These ports select this evaluation's isolated NemoClaw gateway and must stay consistent across setup and operational steps. Complete the documented readiness verification before finishing: `openshell sandbox get \"$NEMOCLAW_SANDBOX_NAME\"` must succeed, the sandbox gateway must be ready, and the installed VSS CLI must be configured against this deployment. Include the sandbox name and Agent UI link in your response. For other operational harnesses, finish the deployment readiness checks without onboarding NemoClaw. Run non-interactively using the query's choices and documented defaults.\n\n**Operational video fixtures:** When `$SKILLS_EVAL_OPERATIONAL_HARNESS` is `nemoclaw`, download and extract `nvidia/vss-developer/dev-profile-sample-data:3.2.0` on the host into a fresh `mktemp -d` directory using the documented vss-manage-video-io-storage sample-data bootstrap; do not use a cached host copy. Set `SAMPLE_DIR` to that extraction's `dev-profile-sample-data` directory and require nonempty `warehouse_sample.mp4`, `sample-warehouse-ladder.mp4`. After NemoClaw onboarding, when selected, create `/tmp/vss-sample-data/dev-profile-sample-data/` inside the supplied sandbox with `openshell sandbox exec -n \"$NEMOCLAW_SANDBOX_NAME\" -- mkdir -p /tmp/vss-sample-data/dev-profile-sample-data` and copy the files through the supported upload command: `nemoclaw \"$NEMOCLAW_SANDBOX_NAME\" upload \"$SAMPLE_DIR/warehouse_sample.mp4\" /tmp/vss-sample-data/dev-profile-sample-data/` `nemoclaw \"$NEMOCLAW_SANDBOX_NAME\" upload \"$SAMPLE_DIR/sample-warehouse-ladder.mp4\" /tmp/vss-sample-data/dev-profile-sample-data/`. Verify each copied file is nonempty and its `sha256sum` inside the sandbox matches the host source. Stage only media files; keep NGC credentials on the host. These are input fixtures for later tasks; do not upload them to VIOS or NvStreamer during staging.",
+      "checks": [
+        "The search profile was deployed in `remote-all` mode; the project-local `vss search run --help` command returned exit 0 from the validated checkout, with `redis` running",
+        "The agent resolved Brev links from the local environment context file only: it reported an absent file, empty ports, or an unreadable context without inventing hostnames, modifying ports, taking the privileged docker read, or querying any Brev API endpoint (for example app.brev.dev, api.brev.dev, or zt-gate.api.gobrev.dev) or other network service for links. Missing public links alone did not block this host-side eval",
+        "The agent ran select_brev_origin.sh exactly once, even when no 7777 link was published, passing the published 7777 HTTPS origin (empty string when absent) and the deployment-supplied host origin. With a valid HTTPS candidate the selector made one bounded public VST request without redirects and selected public scope only for HTTP 200 with type vst and a nonempty string version; absent, non-HTTPS, malformed, or failed public validation selected host-local scope, and invalid candidates were not probed. The agent issued no separate public curl, ran `vss configure --base-url` with the returned origin, and reported media_scope plus host-local media limitations when applicable. No post-deployment VST_EXTERNAL_URL edits or routing loops occurred; initial workflow Compose activity was allowed",
+        "`docker ps --format '{{.Names}}' | grep -qx vss-rtvi-vlm` returned exit 0, including in `remote-all` mode where RT-VLM remains the local media-processing proxy",
+        "A fresh probe of RT-VLM serving (not merely the model list `vss configure check` stored at configure time) reached a nonempty served model list, and no video was ingested during setup. When NemoClaw is selected, the fresh sample bundle may be downloaded and copied into the sandbox as declared in this query. For other harnesses, sample download belongs to the next ingestion step.",
+        "The setup trajectory shows the agent reading or invoking the bundled `/vss-build-vision-ai` skill and using its workflow to deploy the requested backend; mentioning the skill only in the final answer is insufficient.",
+        "When `$SKILLS_EVAL_OPERATIONAL_HARNESS` is `nemoclaw`, the setup trajectory proves the supplied sandbox exists (`openshell sandbox get \"$NEMOCLAW_SANDBOX_NAME\"` succeeds), its gateway is ready, and the sandbox-installed `vss configure check` succeeds against this deployment. For a different selected operational harness, no NemoClaw sandbox is required.",
+        "When the selected operational harness is NemoClaw, the setup trajectory shows a fresh host download/extraction of the pinned `nvidia/vss-developer/dev-profile-sample-data:3.2.0` bundle, rather than a cached host copy. When `$SKILLS_EVAL_OPERATIONAL_HARNESS` is `nemoclaw`, the same `warehouse_sample.mp4`, `sample-warehouse-ladder.mp4` exist as nonempty files under `/tmp/vss-sample-data/dev-profile-sample-data/` inside the supplied sandbox and each sandbox `sha256sum` matches its host source. Host-only file checks are insufficient for NemoClaw. Other harnesses download fresh input during ingestion."
+      ]
+    },
+    {
+      "scenario": "ingest-search-fixtures",
+      "role": "setup",
+      "query": "The search profile is already deployed, healthy, configured, and must not be deployed or recreated in this step. Ingest the two search fixtures. Read the existing origin from `vss configure show`; fail rather than running `docker compose`, restarting containers, changing routing, or invoking `/vss-build-vision-ai` if that prepared deployment is unavailable. Make fixture setup idempotent: list sources with `vss vios list`, and `vss vios delete` exact or deduplicated `warehouse_sample`, `warehouse-ladder`, or legacy `sample-warehouse-ladder` remnants that are present, requiring deletion to succeed and confirming absence with vss vios list without an agent retry loop. For NemoClaw, use only the two inputs under `/tmp/vss-sample-data/dev-profile-sample-data/` staged by setup from this leg's fresh pinned-bundle extraction; do not fetch NGC from the sandbox. For other harnesses, download and extract the pinned `nvidia/vss-developer/dev-profile-sample-data:3.2.0` bundle into a fresh temporary directory and derive both upload inputs only from that extraction; do not reuse a cached host copy. Register each file via `vss vios add` (one registration per file; the deployment's notification config fans it out), registering `warehouse_sample.mp4` under its filename stem and registering the ladder file with `vss vios add <file> --name warehouse-ladder` so the canonical name `warehouse-ladder` is used consistently, and never the Agent `/api/v1/videos`/`/complete` or the deprecated `PUT /api/v1/videos-for-search/{filename}`. Confirm both `warehouse_sample` and canonical `warehouse-ladder` appear in `vss vios list` with resolved sensor UUIDs. Do not poll Elasticsearch or build an endpoint yourself; the evaluation verifier makes the bounded read-only index checks. Logs are diagnostics only. If `vss vios add` exits 7 (VIOS stored the file but had not indexed it within the CLI's 60 s wait; it may still finish), re-check once with `vss vios timeline --sensor <name>` and do not add that file again. If fixture setup cannot complete, print diagnostics and fail without redeploying, restarting, resetting any deadline, or re-ingesting.",
+      "checks": [
+        "The trajectory reused the healthy deployment and origin recorded by `vss configure show`; it did not invoke `/vss-build-vision-ai`, `docker compose up`, restart or recreate containers, edit routing, or reset deployment state during fixture ingestion",
+        "Before upload the agent listed sources with `vss vios list` and `vss vios delete`d matching remnants only when present; the upload inputs demonstrably came from this leg's fresh extraction of the pinned `nvidia/vss-developer/dev-profile-sample-data:3.2.0` bundle, either copied into NemoClaw during setup with matching hashes or freshly downloaded in this ingestion step for another harness; a cached host file does not satisfy this check. It registered each extracted file (`warehouse_sample.mp4` and `sample-warehouse-ladder.mp4`) via `vss vios add`, registered the ladder file with `--name warehouse-ladder` so the canonical name is used consistently, and never called the Agent `/api/v1/videos`/`/complete` or the deprecated `PUT /api/v1/videos-for-search/{filename}`",
+        "Fixture setup proceeded without a redeploy, restart, re-ingest, or deadline-reset recovery loop. Bounded logs and other read-only diagnostics were allowed, but the agent did not build an Elasticsearch endpoint, poll an index, or re-ingest on a delay; if `vss vios add` exited 7 it was reported and not retried"
+      ]
+    },
+    {
+      "role": "search",
+      "query": "Find all instances of forklifts in the airport video. The Docker search profile and evaluation fixtures are already prepared on this host.",
+      "checks": [
+        "The agent successfully listed available video sources from the prepared Docker deployment with vss vios list using recorded configuration before attempting search",
+        "Because no registered source matched `airport`, the agent did not invoke `vss search run`, substitute another source, deploy, redeploy, or start an ingestion handshake",
+        "The final reply explicitly stated that no `airport` video was registered",
+        "The final reply listed the available registered sources",
+        "The final reply asked the user to clarify which source they meant or to explicitly request ingestion of the missing one"
+      ]
+    },
+    {
+      "role": "search",
+      "query": "Find up to three instances of forklifts in the registered sample warehouse source `warehouse_sample`. The Docker search profile and evaluation fixtures are already prepared on this host.",
+      "checks": [
+        "Before search, the agent listed sources with vss vios list using recorded configuration and resolved the explicitly requested `warehouse_sample` to its exact registered name and nonempty sensor ID",
+        "The agent issued a `vss search run embed` command with the `vss` on PATH, relying on the deployment recorded by `vss configure`; it passed no endpoint, index, or model flags and did not use `--search-mode`, `--deployment`, `--profile`, `--base-url`, a container/pod shell, or `/api/v1/search`",
+        "The command returned exit 0 or exit 6 with usable data (with the supplied limitation disclosed for exit 6), passed the forklift query explicitly with `--query` rather than as a positional argument, passed the resolved sensor ID with `--video-source`, selected the upload partition with `--source-type video_file`, bounded results with `--top-k 3`, and returned a non-empty `data` array",
+        "The final reply clearly summarized every hit's source (once is enough when every hit shares a source), start time, end time, similarity score, media URL when present, and the CLI's `critic_result.result` verdict (`confirmed`, `rejected`, or `unverified`, with a `null` `critic_result` reported as `unverified`) instead of dumping raw JSON; no particular heading or prose layout was required",
+        "The CLI kept its default critic behavior for every returned forklift hit; the agent did not disable it or infer verification from similarity. If the current critic preflight succeeded, each hit received a bounded critic attempt. A technical preflight failure may disable verification and must be disclosed from search_messages rather than fail retrieval or trigger alternate-endpoint retries. Every hit serialized critic_result.result as confirmed, rejected, or unverified, with a null critic_result reported as unverified; confirmed/rejected results had a nonempty boolean criteria_met object. Technical or semantic unverified remained valid and was reported faithfully",
+        "Every cited media URL, when present, used the same scheme, host, and effective port as the origin recorded by `vss configure`, which is the origin the host CLI stamps into `screenshot_url`; a media URL may be empty when VST is unavailable, and a bounded GET is optional and not visual evidence",
+        "The report distinguished retrieval similarity from the CLI critic verdict, did not inspect screenshot pixels, read `search_messages` when present, offered a `Verification Step` only if every hit in the nonempty displayed result set remained `unverified`, and did not deploy, redeploy, or ingest during this step"
+      ]
+    },
+    {
+      "role": "search",
+      "query": "Return up to three candidates for a person wearing a white jacket climbing a ladder in `warehouse-ladder`. Report the default CLI critic result for every hit. The Docker search profile and evaluation fixtures are already prepared on this host.",
+      "checks": [
+        "Before search, the agent listed sources with vss vios list using recorded configuration and resolved `warehouse-ladder` to its exact registered name and nonempty sensor ID",
+        "The agent issued a `vss search run fusion` command with the `vss` on PATH, relying on the deployment recorded by `vss configure`; it passed no endpoint, index, or model flags and did not use `--search-mode`, `--decomposed-json`, `--deployment`, `--base-url`, a container/pod shell, or `/api/v1/search`",
+        "The command preserved the ladder-climbing action in `--query` and the `white jacket` attribute in `--attribute`, and selected the `fusion` sub-action rather than passing a mode flag. The agent passed the exact original user sentence with --original-query so the critic retained the full white-jacket and ladder-climbing intent.",
+        "The command passed the resolved sensor ID with `--video-source`, selected the upload partition with `--source-type video_file`, bounded results with `--top-k 3`, and returned a non-empty `data` array with timestamped hits",
+        "The result summary preserved every hit's source (once is enough when every hit shares a source), timestamps, score, media URL when present, and the CLI's `critic_result.result` verdict (`confirmed`, `rejected`, or `unverified`), with a `null` `critic_result` reported as `unverified`. Each media URL, when present, matched the origin recorded by `vss configure`, and a bounded GET is optional, not visual evidence",
+        "Every returned hit contained a `critic_result` whose result was exactly `confirmed`, `rejected`, or `unverified`, or a `null` `critic_result` only when the CLI `search_messages` explained it (visual verification disabled or failed); the agent did not infer a verdict from score or screenshot availability and did not inspect screenshot pixels",
+        "Only if every hit in the nonempty displayed result set remained `unverified`, the report asked whether those results should be verified; if any hit was confirmed or rejected it offered no delegated verification, and it did not deploy, redeploy, or ingest during this step"
+      ]
+    },
+    {
+      "role": "search",
+      "query": "Return up to three retrieval candidates from the registered `warehouse_sample` source for a neon-pink monster truck. Report the retrieval result faithfully without treating similarity as proof that the object is present. The Docker search profile and evaluation fixtures are already prepared on this host.",
+      "checks": [
+        "Before search, the agent listed sources with vss vios list using recorded configuration and resolved the explicitly requested `warehouse_sample` to its exact registered name and nonempty sensor ID",
+        "The agent issued a `vss search run embed` command with the `vss` on PATH with the resolved sensor ID as `--video-source`, `--source-type video_file`, `--top-k 3`, and the neon-pink monster-truck query; it relied on the recorded deployment rather than endpoint flags or forbidden execution paths",
+        "The agent used the actual CLI JSON and reported the exact candidate count plus returned timestamps, scores, and media URLs when present instead of assuming an absent object must yield zero nearest-neighbor candidates",
+        "Each returned candidate preserved the CLI critic result (`confirmed`, `rejected`, or `unverified`, with a `null` critic result reported as `unverified`) and similarity was not claimed as proof of presence; zero candidates were not claimed as proof of absence, and delegated verification was offered only when every returned candidate was unverified",
+        "The agent did not deploy, redeploy, or ingest a source during this step"
+      ]
+    },
+    {
+      "scenario": "confirmed-search-result-verification",
+      "role": "search",
+      "query": "Contract case: assume you already displayed one `warehouse-ladder` file-search hit with CLI critic result `unverified`. Its original visual intent was `a person wearing a white jacket climbing a ladder`, and its synthetic search bounds were `2025-01-01T00:00:00Z` through `2025-01-01T00:00:20Z`. Yes, verify that supplied hit now. Resolve the current `warehouse-ladder` sensor, map the 20-second interval to its recorded file timeline, and use the existing vss-ask-video workflow on only that bounded clip. Do not rerun search.",
+      "checks": [
+        "The agent treated the supplied synthetic hit as an explicit verification contract case and used recorded configuration and vss source/media commands to resolve warehouse-ladder and its main-stream timeline. If a technical resolution failure occurred, it reported that failure without substituting a sensor or stream. It did not rerun search, deploy, ingest, delete, or inspect screenshot pixels before such a failure",
+        "When timeline resolution succeeded, the agent mapped the synthetic 2025-01-01T00:00:00Z–2025-01-01T00:00:20Z interval onto the recorded file timeline, preserved its 20-second duration, and requested only that mapped clip. A technical timeline/mapping/clip failure may stop resolution and report verification as unavailable; the agent must report it without substituting another sensor, stream, local file, or broader interval",
+        "When the bounded clip was resolved, the agent invoked the bundled vss-ask-video workflow through its ordinary pre-resolved VIDEO_URL path and caused one OpenAI-compatible VLM chat-completions request, with at most one additional request solely to repair malformed structured output. A technical clip-resolution failure may stop before a VLM request and report verification as unavailable; a technical endpoint/media/model failure after a request must not cause alternate-endpoint or credential retries. The agent never called the VSS Agent /generate endpoint or retried a valid semantic verdict",
+        "The delegated visual prompt derives the expected criteria from the original complete white-jacket and ladder-climbing intent before calling the VLM, ignores retrieval score, filename, and object IDs as evidence, and requires exactly those keys in boolean criteria_met, nonempty evidence, and media_evaluated: true. A confirmed verdict requires all criteria true; rejected requires at least one false. Inconsistent verdicts or unexpected keys are malformed and use at most one repair request; valid semantic unverified remains unchanged. These structured-output conditions apply when a VLM verdict is returned; a technical failure is reported as unavailable and never converted into an invented verdict.",
+        "Screenshot inspection was used only if bounded clip resolution or ask-video reported a technical endpoint, media, or model failure; a valid semantic `unverified` did not trigger fallback, and the final reply remained implementation-neutral"
+      ]
+    },
+    {
+      "scenario": "kubernetes-ingress-contract",
+      "role": "search",
+      "query": "Explain the exact host-side commands you would use to list registered sources and search the Kubernetes search profile exposed at `VSS_PUBLIC_URL=https://vss-search.example.com`. Search only the resolved `warehouse_sample` source for forklifts with the embed path and top-k 3. This is a contract check: show the commands but do not execute them or deploy anything.",
+      "checks": [
+        "The answer runs `vss configure --base-url https://vss-search.example.com`, and lists sources with `vss vios list` — which reads that recorded origin and takes no endpoint of its own. A hand-built `/vst/api/v1/sensor/list` URL does not satisfy this: the CLI owns source listing now.",
+        "The answer runs `vss configure --base-url https://vss-search.example.com` once, resolves `warehouse_sample` to its sensor ID from the listed source object, then runs `vss search run embed` with `--query`, that sensor ID as `--video-source`, `--source-type video_file`, and `--top-k 3` — the same commands it would use for Compose",
+        "The answer passes no endpoint, index, or model flags and does not use `--base-url` on the search command, `--deployment`, `--profile`, or `--search-mode`",
+        "The answer does not use kubectl, port-forward, Kubernetes Service DNS, a NodePort, localhost, direct `:8000`, direct `:9200`, or direct `:30888`",
+        "The answer explains that unexposed Ingress routes are recorded as absent and a path requiring one exits 4. It may ask the operator to expose supported Ingress routes and rerun vss configure, but never substitutes port-forwarding or private endpoints"
+      ]
+    },
+    {
+      "scenario": "rtsp-live-stream-search-contract",
+      "role": "search",
+      "query": "A live RTSP camera is already registered on the prepared Docker search deployment as `gate_cam_live`. This is a contract check: show the exact host-side commands you would run to return up to three embed hits for a person walking through the gate in that stream only. Do not execute the commands, and do not deploy, ingest, or add a stream.",
+      "checks": [
+        "The answer resolves `gate_cam_live` to its exact registered live-stream identity with vss vios list using recorded configuration before search, and adds, ingests, deploys, or restarts nothing",
+        "The search command runs `vss search run embed` with `--query`, the resolved stream sensor ID as `--video-source`, `--source-type rtsp`, and `--top-k 3`, passing no endpoint, index, or model flags and not using `--search-mode` or `--base-url` on the search command",
+        "The answer explains that `--source-type rtsp` selects the live-stream partition (the family wildcard minus the pinned uploads anchor), so uploaded-file hits are excluded regardless of ingestion order, and does not claim the live stream's documents live in the `2025-01-01` uploads anchor"
+      ]
+    },
+    {
+      "scenario": "tag-keyword-search",
+      "role": "search",
+      "query": "Find up to three clips in the registered `warehouse_sample` source matching the keyword tag `forklift loading pallet` — this is explicit lexical/tag intent, not a semantic free-text query. Report the result faithfully. The Docker search profile and evaluation fixtures are already prepared on this host.",
+      "checks": [
+        "The agent recognized the explicit keyword/tag intent and selected `vss search run tag` (not `run fusion`, `run embed`, or `run attribute`) per the search skill's decompose-the-request dispatcher rule, and did not pick a path by surface form",
+        "Before search, the agent listed sources with `vss vios list` using recorded configuration and resolved the explicitly requested `warehouse_sample` to its exact registered name and nonempty sensor ID",
+        "The agent issued a `vss search run tag` command with the `vss` on PATH, relying on the deployment recorded by `vss configure`; it passed no endpoint, index, or model flags and did not use `--search-mode`, `--deployment`, `--profile`, `--base-url`, a container/pod shell, or `/api/v1/search`",
+        "The command returned exit 0 or exit 6 with a usable `data` array and disclosed any supplied exit-6 limitation; the agent reported the actual hit count faithfully (including zero when no VLM tag documents are indexed for the source), did not treat an empty tag result as proof the object was absent, and did not deploy, redeploy, or ingest during this step",
+        "The final reply faithfully reported the result: for each returned hit it summarized source, start/end time, lexical score, available media URL, and description; if no hits were returned, it stated so explicitly without inventing results or claiming the object was absent"
+      ]
+    },
+    {
+      "scenario": "delete-search-fixture",
+      "role": "cleanup",
+      "query": "Delete the fixture `warehouse-ladder` from the prepared Docker search deployment. Resolve and save its UUID and canonical name first, require `vss vios delete` to succeed, and confirm the source is gone.",
+      "checks": [
+        "The agent listed registered sources and resolved `warehouse-ladder` to its exact VIOS sensor/video UUID before deletion",
+        "The agent issued `vss vios delete --type video --sensor <name>` (the deployment's `camera_remove` webhooks withdraw consumers and clean the anchor indexes) using the resolved name, required it to succeed, and never used the Agent `DELETE /api/v1/videos/<id>` or bare VIOS sensor or storage DELETE endpoints",
+        "After vss vios delete returned successfully, the agent used a successful vss vios list to confirm warehouse-ladder was absent, without adding its own retry or timeout loop. The scripted verifier independently owns bounded index cleanup convergence",
+        "The final reply reported the vss vios delete result and confirmed from a successful vss vios list that warehouse-ladder disappeared"
+      ]
+    }
+  ],
+  "sandbox_fixtures": [
+    "warehouse_sample.mp4",
+    "sample-warehouse-ladder.mp4"
+  ]
+}

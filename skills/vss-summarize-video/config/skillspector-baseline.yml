@@ -1,0 +1,40 @@
+version: 2
+
+# SkillSpector suppression baseline for skills/operations/vss-summarize-video.
+# Entries are scoped to one file and one matched-text pattern; line numbers are
+# not used, so doc edits do not invalidate them.
+
+rules:
+  # --- Reviewed scanner false positives (temporary) -------------------------
+  - id: "PE3"
+    path: "assets/video-summarization.env.example"
+    message: "*[.]env*"
+    reason: &pe3_env >-
+      Reviewed false positive (temporary until the SkillSpector PE3 fix ships).
+      The .env files are the VSS Blueprint's own LVS profile Compose env layers
+      (dev-profile-lvs/.env, overrides.env, generated.env), passed to `docker
+      compose --env-file` or named as edit targets. The skill never reads,
+      prints, or transmits their contents.
+
+  - id: "PE3"
+    path: "references/deploy-lvs-service.md"
+    message: "*[.]env*"
+    reason: *pe3_env
+
+  - id: "PE3"
+    path: "references/video-summarization-deployment.md"
+    message: "*[.]env*"
+    reason: *pe3_env
+
+  - id: "AE1"
+    path: "SKILL.md"
+    message: "*(partial)"
+    reason: &ae1_bridge >-
+      Temporary bridge until SkillEvaluator 1.7.0 (SkillSpector 2.12.1) reaches
+      the NV-CARPS gate; remove this entry then. SkillSpector 2.11.2 marks a
+      referenced file "partial" when it contains ordinary shell parameter
+      expansion (${VAR:-default}, "${ARR[@]}") or certain quoted forms, and
+      reports each SKILL.md link to it as AE1. Fixed upstream in SkillSpector
+      #634 and #686 (SKILLSPECT-12, SKILLSPECT-135).
+
+fingerprints: []

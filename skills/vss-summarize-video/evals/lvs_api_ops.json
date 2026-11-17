@@ -1,0 +1,46 @@
+{
+  "skills": [
+    "vss-summarize-video",
+    "vss-build-vision-ai"
+  ],
+  "resources": {
+    "platforms": {
+      "RTXPRO6000BW": {
+        "gpu_count": 1
+      }
+    }
+  },
+  "expects": [
+    {
+      "query": "Use `/vss-build-vision-ai` for the following deployment setup. Deploy the VSS **lvs** profile on `{{platform}}` via the `/vss-build-vision-ai` stock LVS workflow. Run autonomously.\n\n**Environment & prerequisites:** A full-remote deployed VSS lvs profile (deploy mode = `remote-all` - the agent LLM and video summarization VLM dependencies are served by remote endpoints, no local NIMs). Run on one platform only: the video summarization API surface tested here is independent of GPU model once the lvs profile is deployed. Required: video summarization REST API reachable at http://localhost:38111, VSS Agent reachable at http://localhost:8000/docs, Docker available for non-destructive service status checks, and `jq` available for response validation. These checks intentionally avoid full video summarization because `skills/operations/vss-summarize-video/evals/lvs_profile_summarize.json` owns end-to-end summarization coverage. This deployment uses the in-stack agent: deploy `vss-agent` as part of the service set and do not replace it with the evaluation harness. The operational evaluation harness is a separate client of this backend.\n\nThe selected operational harness is supplied in $SKILLS_EVAL_OPERATIONAL_HARNESS. If it is `nemoclaw`, first finish the above application deployment through Build Vision AI with its explicitly requested in-stack agent. Then bootstrap a separate evaluation client using the checked-in `deploy/docker/scripts/run_setup_notebook.py --notebook deploy/docker/scripts/deploy_nemoclaw.ipynb` and install `/vss-summarize-video` in that sandbox. NemoClaw is evaluation infrastructure here, not the application's harness: do not select it in Build Vision AI's Q3 or change the application service set. Set `VSS_AGENT_ADAPTER_ENABLED=false` so the application's UI keeps its in-stack backend. Preserve the supplied $NEMOCLAW_SANDBOX_NAME, $NEMOCLAW_GATEWAY_PORT, $NEMOCLAW_DASHBOARD_PORT, $NEMOCLAW_DASHBOARD_RELAY_PORT, and model-provider environment values. These ports select this evaluation's isolated NemoClaw gateway and must stay consistent across setup and operational steps. Complete the documented readiness verification before finishing: `openshell sandbox get \"$NEMOCLAW_SANDBOX_NAME\"` must succeed, the sandbox gateway must be ready, and the installed VSS CLI must be configured against this deployment. Include the sandbox name and Agent UI link in your response. For other operational harnesses, finish the deployment readiness checks without onboarding NemoClaw. Run non-interactively using the query's choices and documented defaults.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:38111/v1/ready` returns exit 0 (video summarization API ready)",
+        "`docker ps --format '{{.Names}}' | grep -qx redis` returns exit 0",
+        "The setup trajectory shows the agent reading or invoking the bundled `/vss-build-vision-ai` skill and using its workflow to deploy the requested backend; mentioning the skill only in the final answer is insufficient.",
+        "When `$SKILLS_EVAL_OPERATIONAL_HARNESS` is `nemoclaw`, the setup trajectory proves the supplied sandbox exists (`openshell sandbox get \"$NEMOCLAW_SANDBOX_NAME\"` succeeds), its gateway is ready, and the sandbox-installed `vss configure check` succeeds against this deployment. For a different selected operational harness, no NemoClaw sandbox is required."
+      ]
+    },
+    {
+      "query": "Using the `vss-summarize-video` skill's video summarization API reference, verify the running video summarization service without summarizing a video: check readiness, list available models, request a recommended config for a 300-second video with a 60-second target response time and a 5-second target event duration, fetch metrics, and report the key results.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:38111/v1/ready` returns exit 0",
+        "`curl -sf --max-time 15 http://localhost:38111/models | jq -e '.data | length > 0'` returns exit 0",
+        "`curl -sf --max-time 15 -X POST http://localhost:38111/recommended_config -H 'Content-Type: application/json' -d '{\"video_length\":300,\"target_response_time\":60,\"usecase_event_duration\":5}' | jq -e '(.text // .chunk_size) != null'` returns exit 0",
+        "`curl -sf --max-time 15 http://localhost:38111/metrics | grep -q .` returns exit 0",
+        "The agent trajectory contains API calls to `/v1/ready`, `/models`, `/recommended_config`, and `/metrics` under the LVS base URL `vss configure show` recorded (`services.lvs.url`, the ingress `/lvs` mount such as `http://<host>:7777/lvs`), not a base assembled from `HOST_IP` or port 38111.",
+        "The POST `/recommended_config` request body contains exactly the requested numeric values: video_length=300, target_response_time=60, and usecase_event_duration=5.",
+        "The agent does not call `/v1/summarize`, `/summarize`, or any VLM `/v1/chat/completions` endpoint for this query.",
+        "The final response reports video summarization readiness, at least one model id, the recommended chunk size or text returned by `/recommended_config`, and that metrics were reachable."
+      ]
+    },
+    {
+      "query": "Using the `vss-summarize-video` skill's video summarization deployment reference, produce a non-destructive video summarization deployment status report: identify the REST port, readiness endpoint, expected compose profile or container signal, whether the service is currently reachable, and where the detailed deployment runbook lives.",
+      "checks": [
+        "`curl -sf --max-time 15 http://localhost:38111/v1/ready` returns exit 0",
+        "The agent uses a non-destructive status probe such as `docker ps`, `docker compose ps`, `docker logs --tail`, or `curl` readiness checks.",
+        "The agent does not run destructive or state-changing deployment commands such as `docker compose down`, `docker stop`, `docker rm`, `docker compose up`, or `docker compose up --force-recreate`.",
+        "The final response identifies REST port 38111, readiness endpoint `/v1/ready`, and the `bp_developer_lvs_2d` compose profile or the `vss-lvs` / `lvs-server` service signal."
+      ]
+    }
+  ]
+}

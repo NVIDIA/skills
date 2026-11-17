@@ -1,0 +1,21 @@
+[
+  {
+    "id": "query-analytics-routing",
+    "question": "What skill can I use to query analytics from my video data?",
+    "expected_skill": "vss-query-analytics",
+    "ground_truth": "vss-query-analytics is the skill for read-only video-analytics metrics, incidents, places, and analytics sensor data through `vss analytics`; in response to this request the agent should identify and load it.",
+    "expected_behavior": [
+      "Loads (activates) the vss-query-analytics skill in response to the question."
+    ]
+  },
+  {
+    "id": "deploy-analytics-api-non-activation",
+    "question": "Deploy the video analytics REST API against my Elasticsearch cluster.",
+    "expected_skill": null,
+    "ground_truth": "This is a deployment request for vss-setup-video-analytics-api, not a read-only analytics query.",
+    "expected_behavior": [
+      "Does not activate vss-query-analytics for an API deployment request.",
+      "Routes the request to vss-setup-video-analytics-api."
+    ]
+  }
+]

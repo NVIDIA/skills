@@ -1,0 +1,185 @@
+[
+    {
+      "id": "video-report-routing-mode-a",
+      "question": "Which skill should I use to generate a structured report for a recorded video clip?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and explains that recorded video or sensor report requests use Mode A: /vss-manage-video-io-storage to resolve a clip URL, a VLM chat/completions call for analysis, and references/report-templates/video-analysis-report.md for the final report. It should mention that /generate is not used.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Identifies Mode A for recorded video clip reports.",
+        "Mentions the clip URL plus VLM chat/completions path.",
+        "Mentions references/report-templates/video-analysis-report.md as the output template.",
+        "States that POST /generate is not the report path."
+      ]
+    },
+    {
+      "id": "video-report-routing-mode-b",
+      "question": "Which skill should handle a report on incidents for a sensor between two timestamps?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and explains that incident-range report requests use Mode B: /vss-query-analytics with project-local vss analytics incidents, then references/report-templates/incident-range-report.md for the final report. It should note that Mode B does not call the VLM and does not use POST /generate.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Identifies Mode B for incident range reports.",
+        "Mentions /vss-query-analytics and vss analytics incidents.",
+        "Mentions references/report-templates/incident-range-report.md as the output template.",
+        "States that Mode B does not use the VLM chat path or POST /generate."
+      ]
+    },
+    {
+      "id": "video-report-empty-range-policy",
+      "question": "How should a video incident report behave when analytics returns zero incidents?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and states that a zero-result Mode B analytics query should produce a concise one-line no-incidents report naming the range and scope. It should not invent incidents and should not fall back to Mode A.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Identifies this as the Mode B empty-result policy.",
+        "Returns a one-line no-incidents report when the result set is empty.",
+        "States not to invent incidents.",
+        "States not to fall back to Mode A or call the VLM for an empty incident range."
+      ]
+    },
+    {
+      "id": "video-report-hitl-off-policy",
+      "question": "For Mode A report generation, what should happen when video_report_gen.hitl_enabled is false?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and states that resolved HITL=false skips prompt-confirmation questions and runs Mode A directly with the default/current prompt before VLM chat/completions. Runtime video_report_gen.hitl_enabled is preferred; HITL_ENABLED is fallback only when runtime config is unavailable.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Identifies this as the Mode A HITL-off path.",
+        "States that prompt-approval questions are skipped when video_report_gen.hitl_enabled=false.",
+        "States that Mode A proceeds directly to the VLM chat/completions call."
+      ]
+    },
+    {
+      "id": "video-report-hitl-on-policy",
+      "question": "For Mode A report generation, what choices should be offered when video_report_gen.hitl_enabled is true?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and states that resolved HITL=true shows the current prompt and asks the user to choose APPROVE, EDIT, or NEW prompt. After every EDIT or NEW, it must show the same three options again and continue looping until explicit APPROVE. It should also mention anti-stall handling: do not treat yes/confirm/whitespace as approval and do not wait for empty-string confirmation loops.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Identifies this as the Mode A HITL-on path.",
+        "Lists APPROVE, EDIT, and NEW prompt choices.",
+        "States the same APPROVE/EDIT/NEW options are re-shown after every EDIT or NEW until APPROVE.",
+        "States that report generation starts only after explicit APPROVE.",
+        "States that yes/confirm/ok or whitespace are not treated as approval.",
+        "States not to wait for empty-string confirmation or loop indefinitely."
+      ]
+    },
+    {
+      "id": "video-report-hitl-harness-fallback",
+      "question": "If runtime video_report_gen.hitl_enabled cannot be read, how should HITL mode be resolved?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and states HITL resolution is runtime-first, then harness fallback HITL_ENABLED=true/false when runtime config is unavailable, then default false when neither source is set.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Prefers runtime video_report_gen.hitl_enabled when available.",
+        "Uses HITL_ENABLED=true/false only as fallback when runtime config is unavailable.",
+        "Defaults to false when neither runtime nor fallback is set.",
+        "Notes on first report generation that HITL defaulted off and HITL_ENABLED=true enables it.",
+        "Maps resolved true/false to the same Mode A HITL behaviors."
+      ]
+    },
+    {
+      "id": "video-report-hitl-stall-guard",
+      "question": "If the user responds 'yes' after you show the Mode A prompt in HITL on mode, what should you do?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and says 'yes' is ambiguous. The agent should re-prompt with explicit APPROVE | EDIT | NEW options and continue the HITL loop until explicit APPROVE, without assuming approval.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Treats 'yes' as ambiguous (not approval).",
+        "Re-prompts with explicit APPROVE/EDIT/NEW options.",
+        "Continues HITL until explicit APPROVE before report generation.",
+        "Avoids empty-string approval assumptions."
+      ]
+    },
+    {
+      "id": "video-report-hitl-multi-edit-loop",
+      "question": "In HITL-on mode, if the user edits the prompt multiple times, when should report generation start?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and states that each EDIT/NEW updates the working prompt, then the same APPROVE/EDIT/NEW menu is shown again. Report generation starts only when the user explicitly says APPROVE, using the latest edited prompt.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "States users can EDIT/NEW multiple times.",
+        "States the same APPROVE/EDIT/NEW options repeat each round.",
+        "States report generation starts only on explicit APPROVE.",
+        "States the latest edited prompt is used."
+      ]
+    },
+    {
+      "id": "video-report-profile-agnostic-mode-a",
+      "question": "Does Mode A require a specific VSS profile before report generation?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and explains Mode A is profile-agnostic: it can run via VST clip URL + VLM or via local video file/base64 + explicit VLM endpoint. It should not claim base profile is always mandatory.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "States Mode A is profile-agnostic.",
+        "Mentions both Mode A paths: VST clip URL path and local-file/base64 plus endpoint path.",
+        "Avoids claiming base profile is always required."
+      ]
+    },
+    {
+      "id": "video-report-local-or-base64-path",
+      "question": "If I provide either a local video file path on disk or a base64 video payload and a VLM endpoint, how should Mode A run?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report, reads its Mode A report-type file (references/report-types/video-analysis.md) and explains Mode A path A2 accepts either a local video file on disk or base64 video, then calls the provided VLM endpoint/model without requiring VST or vss-agent. Step 3 falls back to base-profile video_understanding defaults when vss-agent is absent and reuses the same MM_KWARGS multimodal settings as A1.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Opens references/report-types/video-analysis.md Step 3 for the video_understanding defaults fallback and the A1/A2-shared MM_KWARGS before answering.",
+        "Identifies Mode A path A2 for local-file/base64 input.",
+        "States that VST is not required for local-file/base64 plus endpoint path.",
+        "States that vss-agent is not required for Step 3 config on the A2 path.",
+        "States Step 3 falls back to base-profile video_understanding defaults when vss-agent is unavailable.",
+        "States A2 reuses the same MM_KWARGS / multimodal settings as A1 for Cosmos backends.",
+        "States that VLM endpoint and model must be explicit or discovered."
+      ]
+    },
+    {
+      "id": "video-report-long-video-lvs-handoff",
+      "question": "If the input video is longer than 2 minutes, what should the report skill do?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and states that a clip of 120 seconds or longer never takes the direct Mode A VLM path: it hands off to /vss-summarize-video (LVS when ready, otherwise `vss vlm run`) and fills the report template from that output. Clips under 120 seconds stay on the direct Mode A VLM path.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "States videos of 120 seconds or longer should not continue on direct Mode A VLM path.",
+        "Hands long videos to /vss-summarize-video instead of asking the user to deploy LVS.",
+        "Keeps clips under 120 seconds on the direct Mode A VLM path."
+      ]
+    },
+    {
+      "id": "video-report-step3-no-vss-agent-fallback",
+      "question": "If vss-agent is not running during Mode A Step 3, should report generation hard-fail?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report, reads its Mode A report-type file (references/report-types/video-analysis.md) and states Step 3 should not hard-fail when vss-agent is absent: fall back to base-profile video_understanding defaults (max_fps=2, max_frames=30, min_pixels=3136, max_pixels=8388608) or VIDEO_UNDERSTANDING_* env overrides.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Opens references/report-types/video-analysis.md Step 3 for the video_understanding defaults and the VIDEO_UNDERSTANDING_* overrides before answering.",
+        "States Step 3 does not hard-fail when vss-agent is absent.",
+        "Mentions base-profile video_understanding defaults fallback.",
+        "Mentions optional VIDEO_UNDERSTANDING_* env overrides.",
+        "Notes this fallback supports Mode A2 / profile-agnostic runs."
+      ]
+    },
+    {
+      "id": "video-report-vlm-unclear-options",
+      "question": "When VLM/deployment is unclear and no default is selected, what options should the user get?",
+      "expected_skill": "vss-generate-video-report",
+      "ground_truth": "Loads vss-generate-video-report and offers exactly four options: provide endpoint, use the public Ingress VLM when VSS_PUBLIC_URL is set, suggest options from auto-discovery, or deploy a local VLM.",
+      "expected_behavior": [
+        "Loads vss-generate-video-report.",
+        "Offers provide endpoint option.",
+        "Offers the public Ingress VLM option and explains that it is applicable when VSS_PUBLIC_URL is set.",
+        "Offers auto-discover based suggestion option.",
+        "Offers deploy local VLM option."
+      ]
+    },
+    {
+      "id": "summarize-without-report-non-activation",
+      "question": "Summarize this long recording; I do not need a formatted report.",
+      "expected_skill": null,
+      "ground_truth": "This is a summarization request for vss-summarize-video, not a request to generate a report.",
+      "expected_behavior": [
+        "Does not activate vss-generate-video-report when a formatted report is explicitly excluded.",
+        "Routes the request to vss-summarize-video."
+      ]
+    }
+  ]

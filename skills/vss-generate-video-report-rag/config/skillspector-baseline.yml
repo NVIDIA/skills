@@ -1,0 +1,34 @@
+version: 2
+
+# SkillSpector suppression baseline for skills/operations/vss-generate-video-report-rag.
+# Entries are scoped to one file and one matched-text pattern; line numbers are
+# not used, so doc edits do not invalidate them.
+
+rules:
+  # --- Reviewed scanner false positives (temporary) -------------------------
+  - id: "PE3"
+    path: "SKILL.md"
+    message: "*[.]env*"
+    reason: &pe3_env >-
+      Reviewed false positive (temporary until the SkillSpector PE3 fix ships).
+      The .env files are the VSS Blueprint's own LVS profile Compose env layers
+      (dev-profile-lvs/.env, generated.env), passed to `docker compose
+      --env-file` or named as paths. The skill never reads, prints, or
+      transmits their contents.
+
+  - id: "PE3"
+    path: "evals/evals.json"
+    message: "*[.]env*"
+    reason: *pe3_env
+
+  - id: "SC2"
+    path: "SKILL.md"
+    message: "curl -sS *${VSS_AGENT_PORT:-8000}/*"
+    reason: >-
+      Reviewed false positive (temporary until SkillSpector #638 is fixed).
+      The commands call the local VSS agent API on ${HOST_IP}:${VSS_AGENT_PORT}
+      and pipe only the polling responses into `python3 -m json.tool`, which
+      pretty-prints JSON and does not execute its input. The match spans from
+      the /v1/chat POST to a later code block's pipe.
+
+fingerprints: []
