@@ -2202,16 +2202,16 @@
     {
       "name": "nvidia-ontology-management",
       "path": "skills/nvidia-ontology-management",
-      "content_digest": "sha256:3d83c025d377df95e3349138ec80bf7c87d3df1dbf3f4ffa27c67279e12178d5",
-      "last_commit": "78c6f0c6aac2da84aa1d6b117899875eebf439d6",
-      "last_modified": "2026-11-16"
+      "content_digest": "sha256:ee6c981a2756eeb053f2d80441464228dab7ed19cfaea6413cb447f732d396ee",
+      "last_commit": "71bb80be8cc7dbd05767f037980b817c405c7a97",
+      "last_modified": "2026-11-17"
     },
     {
       "name": "nvidia-ontology-query",
       "path": "skills/nvidia-ontology-query",
-      "content_digest": "sha256:756f76ffa66821045aca55a216bc1d7a4160ead3d41366f8e6eda5618dfccffc",
-      "last_commit": "78c6f0c6aac2da84aa1d6b117899875eebf439d6",
-      "last_modified": "2026-11-16"
+      "content_digest": "sha256:e303e4d5f08c68761d1143e1f9e4de93bf691c1c5a51bda2ac1d0f330ce5c7a7",
+      "last_commit": "71bb80be8cc7dbd05767f037980b817c405c7a97",
+      "last_modified": "2026-11-17"
     },
     {
       "name": "nvidia-ontology-setup",
