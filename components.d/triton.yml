@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: Triton Inference Server
+repo: triton-inference-server/server
+description: Agent skills for serving ONNX and PyTorch models on NVIDIA Triton Inference Server — config.pbtxt generation, naming rules, version policy, datatype crosswalk, dynamic batching, sequence batching, and client-side HTTP / gRPC usage.
+skills:
+  - path: skills/triton-onnx-model-repository/
+    catalog_dir: triton-onnx-model-repository
+  - path: skills/triton-pytorch-model-repository/
+    catalog_dir: triton-pytorch-model-repository
