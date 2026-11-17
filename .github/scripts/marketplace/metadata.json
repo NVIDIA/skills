@@ -637,6 +637,90 @@
       }
     },
     {
+      "path": "skills/compileiq-author-objective",
+      "name": "compileiq-author-objective",
+      "description": "Use when writing the objective_function= passed to Search(). Covers the two legal signatures (compiler-only str vs mixed list), the baseline-knockout branch, per-eval cache busting, framework-specific --apply-controls injection (raw PTXAS, NVCC, Triton, Helion, cuTeDSL/FA4, FlashInfer), correctness-before-timing, INVALID_SCORE handling, and the Debug-pack O0/O3 ACF-injection canary that must pass before launching a search. Triggers on \"objective function\", \"apply-controls\", \"INVALID_SCORE\", \"save_compiler_config\", \"baseline knockout\", \"BASELINE_CONFIG\", \"every config returns the same score\", \"TypeError fromhex\".\n",
+      "metadata": {
+        "product.primary": "CompileIQ",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer,ml_engineer,hands_on_builder",
+        "discovery.activity_tags": "optimize,debug,configure,benchmark,validate"
+      }
+    },
+    {
+      "path": "skills/compileiq-booster-pack",
+      "name": "compileiq-booster-pack",
+      "description": "Use BEFORE running a full CompileIQ search. Walks through downloading a Booster Pack from NVIDIA/CompileIQ GitHub Releases, applying ACF candidates one at a time to the user's compiler (raw PTXAS, NVCC, Triton, Helion, FlashInfer), and keeping only candidates that compile, pass correctness, and beat the no-ACF baseline. Includes the mandatory Debug-pack O0/O3 ACF-injection canary that proves the ACF is reaching PTXAS. Triggers on \"booster pack\", \"ACF\", \"apply-controls\", \"speed up without searching\", \"helion fp8\", \"flashinfer batch decode\", \"debug pack\".\n",
+      "metadata": {
+        "product.primary": "CompileIQ",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "optimize,benchmark,validate,configure,debug"
+      }
+    },
+    {
+      "path": "skills/compileiq-bootstrap",
+      "name": "compileiq-bootstrap",
+      "description": "Use when starting a fresh CompileIQ project, hitting a hang on the first evaluation, or before running any other compileiq-* skill. Verifies CUDA 13.3+, ptxas, GPU access, that `from compileiq.ciq import Search` and friends resolve, and that `PtxasSearchSpace().retrieve()` returns a real path. Documents the env vars that control timeouts, caching, and search-space mirroring. Triggers on \"set up compileiq\", \"compileiq doesn't work\", \"first eval hangs\", \"where do search spaces come from\", \"air-gapped compileiq\".\n",
+      "metadata": {
+        "product.primary": "CompileIQ",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "get_started,validate,troubleshoot,configure,debug"
+      }
+    },
+    {
+      "path": "skills/compileiq-debug",
+      "name": "compileiq-debug",
+      "description": "Use when something is wrong: Search() hangs, all evaluations return INVALID_SCORE, scores aren't improving, every config returns the same number, ptxas errors fill the log, CV% is too high, or a winning ACF candidate needs NCU profiling to explain. Symptom-indexed table on top. Triggers on \"compileiq hang\", \"socket timeout\", \"INVALID_SCORE\", \"not converging\", \"every score is the same\", \"TypeError fromhex\", \"ncu profile\", \"register spill\", \"ptxas error\", \"not in expected format\", \"high cv\".\n",
+      "metadata": {
+        "product.primary": "CompileIQ",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer",
+        "discovery.activity_tags": "troubleshoot,debug,profile,optimize,validate"
+      }
+    },
+    {
+      "path": "skills/compileiq-run-search",
+      "name": "compileiq-run-search",
+      "description": "Use when composing the Search(...) call and calling .start(). Covers the four worker classes (MultiProcessWorker / IsoMultiProcessWorker / RayWorker / AsyncWorker) and when to pick each, SearchConfiguration sizing rules, dump_results checkpointing, tracker_config choice (Disabled / Loguru / MLflow), num_workers/task_timeout semantics, and GPU clock locking for stable measurements. Triggers on \"Search()\", \"tuner.start()\", \"pool_size\", \"num_workers\", \"task_timeout\", \"IsoMultiProcessWorker\", \"RayWorker\", \"dump_results\", \"MLflow\", \"GPU clocks\".\n",
+      "metadata": {
+        "product.primary": "CompileIQ",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer,platform_engineer",
+        "discovery.activity_tags": "optimize,configure,benchmark,scale,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/compileiq-search-space",
+      "name": "compileiq-search-space",
+      "description": "Use when picking the search_space= argument for Search(). Covers the three provider classes (PtxasSearchSpace, NvccSearchSpace, LocalSearchSpaceBin), how to pin a version/variant/tag, the attention-focused 'att' variant for attention kernels (FlashAttention, GQA, MHA, MLA, FlashInfer Batch Decode), air-gapped mirroring via CIQ_SEARCH_SPACES_DIR, and custom user-defined search spaces built from compileiq.search_spaces.base primitives. Triggers on \"search space\", \"PtxasSearchSpace\", \"NvccSearchSpace\", \"air-gapped compileiq\", \"offline compileiq\", \"CIQ_SEARCH_SPACES_DIR\", \"attention variant\", \"ptxas att\".\n",
+      "metadata": {
+        "product.primary": "CompileIQ",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer,ml_engineer",
+        "discovery.activity_tags": "select,configure,optimize,benchmark"
+      }
+    },
+    {
+      "path": "skills/compileiq-validate-result",
+      "name": "compileiq-validate-result",
+      "description": "Use AFTER a Search has completed and BEFORE claiming any speedup or shipping an ACF. Loads the dump_results CSV, extracts top-K candidates (single-objective) or the Pareto front (multi-objective), re-measures each against the no-ACF baseline with 100+ trials on fresh caches, runs Welch's t-test plus Cohen's d, rejects three classic false-positive patterns (lucky-min / higher-variance / multiple-comparisons-of-N), and saves the validated winner as best.acf. Triggers on \"validate result\", \"extract best config\", \"Welch's t-test\", \"is my speedup real\", \"save best ACF\", \"pareto front\", \"claim speedup\", \"ship config\".\n",
+      "metadata": {
+        "product.primary": "CompileIQ",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,hpc_developer,application_developer",
+        "discovery.activity_tags": "validate,benchmark,optimize,measure,extract"
+      }
+    },
+    {
       "path": "skills/compute-sanitizer-diagnose-cuda-bugs",
       "name": "compute-sanitizer-diagnose-cuda-bugs",
       "description": "Detect and diagnose CUDA correctness bugs with NVIDIA Compute Sanitizer. Routes GPU memory errors, shared-memory data races, uninitialized-memory reads, and synchronization/barrier bugs to the right sub-tool (memcheck, racecheck, initcheck, synccheck) and explains how to build, run, and read the report. Use when debugging illegal memory access, out-of-bounds, misaligned access, leaks, WAW/WAR/RAW races, __shared__ hazards, uninitialized reads, garbage results, hangs, divergent __syncthreads/__syncwarp, or cuda::barrier / wgmma issues. Do NOT use for host/CPU-side bugs (use valgrind or AddressSanitizer) or global-memory data races (out of scope). Trigger keywords - compute-sanitizer, memcheck, racecheck, initcheck, synccheck, CUDA memory error, OOB, race condition, uninitialized memory, __syncthreads, barrier, deadlock.",

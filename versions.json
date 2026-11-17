@@ -373,6 +373,55 @@
       "last_modified": "2026-10-20"
     },
     {
+      "name": "compileiq-author-objective",
+      "path": "skills/compileiq-author-objective",
+      "content_digest": "sha256:bd68ef6f2c3657dab6d216cde1d3aa986490da63c58f7fb36e1b83f70edebfe8",
+      "last_commit": "b798288c2481df3e04f31f4b37acc998b88265a4",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "compileiq-booster-pack",
+      "path": "skills/compileiq-booster-pack",
+      "content_digest": "sha256:98d635f3f3842d5a014c6f4277a08e9e8c2ebcb91f15ce65dde1f8d8ccb3623b",
+      "last_commit": "b798288c2481df3e04f31f4b37acc998b88265a4",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "compileiq-bootstrap",
+      "path": "skills/compileiq-bootstrap",
+      "content_digest": "sha256:f1727f4ebc0278268f469f7eaaebb9b64886e42fb3908f05cb7869e6c07c735e",
+      "last_commit": "b798288c2481df3e04f31f4b37acc998b88265a4",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "compileiq-debug",
+      "path": "skills/compileiq-debug",
+      "content_digest": "sha256:dbc7efc023efeb9a5482b9997371561e31d9fe152075bdb98df2095f7ab2b7cd",
+      "last_commit": "b798288c2481df3e04f31f4b37acc998b88265a4",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "compileiq-run-search",
+      "path": "skills/compileiq-run-search",
+      "content_digest": "sha256:7d1bb05043b908e88736ee3ff563d4c853251d57b1d440c9e4309bfdb0ac9067",
+      "last_commit": "b798288c2481df3e04f31f4b37acc998b88265a4",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "compileiq-search-space",
+      "path": "skills/compileiq-search-space",
+      "content_digest": "sha256:72b53b56b4422f91e27604f67bba771be7a6e29864c09fb0443301247b200b9c",
+      "last_commit": "b798288c2481df3e04f31f4b37acc998b88265a4",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "compileiq-validate-result",
+      "path": "skills/compileiq-validate-result",
+      "content_digest": "sha256:462e148f52871d3e8fca8de45e08b3c6d2b805e7cd2b8ac35356fcf241855089",
+      "last_commit": "b798288c2481df3e04f31f4b37acc998b88265a4",
+      "last_modified": "2026-11-17"
+    },
+    {
       "name": "compute-sanitizer-diagnose-cuda-bugs",
       "path": "skills/compute-sanitizer-diagnose-cuda-bugs",
       "content_digest": "sha256:f60e527e8be3030f85cde7bdf40e8ebad093cc7462542e307839867f2f3e912a",
