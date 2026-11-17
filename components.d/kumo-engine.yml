@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+
+name: Kumo Engine
+repo: NVIDIA/kumo-engine
+description: Build, train and run inference with Kumo relational models from a coding agent.
+skills:
+  - path: skills/kumo-data-science/
+    catalog_dir: kumo-data-science
+  - path: skills/kumoai-reference/
+    catalog_dir: kumoai-reference
+  - path: skills/kumo-model-tuning/
+    catalog_dir: kumo-model-tuning
+  - path: skills/kumo-model-persistence/
+    catalog_dir: kumo-model-persistence
+  - path: skills/kumo-model-explanations/
+    catalog_dir: kumo-model-explanations
+  - path: skills/kumo-training-diagnostics/
+    catalog_dir: kumo-training-diagnostics
+  - path: skills/kumo-custom-populations/
+    catalog_dir: kumo-custom-populations
+  - path: skills/kumo-graph-visualization/
+    catalog_dir: kumo-graph-visualization
