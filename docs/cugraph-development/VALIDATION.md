@@ -21,3 +21,7 @@ Not run: Linux CUDA execution, SG/MG numerical equivalence, Dask runtime, NCCL t
 Initial validation encountered missing PyYAML and a system Python cache path outside the writable workspace. PyYAML was installed in an isolated workspace venv; compilation was rerun with a temporary cache prefix. No system Python configuration was changed.
 
 Catalog submission is not yet eligible: public NVIDIA-owned source placement, release clearance, measured benchmark PASS and final signed manifest remain pending. See README.md for the handoff.
+
+## Draft PR preparation — 2026-11-17
+
+Rebased the implementation onto NVIDIA/skills `3e2ed2d8` without changing the skill or GPU examples. Reran the four CPU tests, script compilation, frontmatter validation, skill-card marker check, local link and Python code-block checks, and evaluation JSON validation. All passed. GPU and agent evaluation status remains unchanged. Updated onboarding notes for the current product metadata requirement and the public review draft.
