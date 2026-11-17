@@ -1,0 +1,38 @@
+[
+  {
+    "id": "summarize-video",
+    "question": "Summarize a recorded video using the LVS summarization microservice.",
+    "expected_skill": "vss-summarize-video",
+    "ground_truth": "Loads vss-summarize-video and summarizes a recorded video via the LVS summarization microservice (HITL-gated), falling back to `vss vlm run` without asking when LVS is not ready. Not for report generation or live RTSP captioning.",
+    "expected_behavior": [
+      "Loads vss-summarize-video and uses the LVS summarization microservice (HITL-gated); falls back to `vss vlm run` without asking when LVS is not ready.",
+      "Does not route to report generation or live RTSP captioning skills.",
+      "Does not print plaintext API tokens or other secrets."
+    ]
+  },
+  {
+    "id": "summarize-video-no-lvs-vlm-fallback",
+    "question": "Summarize the recording on sensor dock_cam. The lvs profile is not deployed.",
+    "expected_skill": "vss-summarize-video",
+    "ground_truth": "Loads vss-summarize-video, finds LVS not ready, and falls back to `vss vlm run --sensor dock_cam` with explicit --start-time/--end-time for each segment from `vss vios timeline`, without asking for approval or offering to deploy LVS.",
+    "expected_behavior": [
+      "Probes LVS readiness and treats a non-200 result as not ready.",
+      "Runs `vss vlm run --sensor` once per recorded segment from `vss vios timeline`, with explicit bounds.",
+      "Does not ask for approval or offer to deploy LVS before the fallback.",
+      "Does not hand-build a `/v1/chat/completions` request.",
+      "Notes that the summary came from the VLM alone, not LVS."
+    ]
+  },
+  {
+    "id": "summarize-video-negative-archive-search",
+    "question": "Search my archived recordings from last week for any clip showing a forklift near the loading dock.",
+    "expected_skill": null,
+    "ground_truth": "This is an archive search over previously recorded/indexed video, not a recorded-video HITL summarization request. The agent does not use vss-summarize-video and routes to vss-search-archive instead.",
+    "expected_behavior": [
+      "Does not load vss-summarize-video for an archive search request.",
+      "Does not probe LVS readiness, prepare a VIOS clip, or issue a `vss summarize run`.",
+      "Identifies that the request belongs to vss-search-archive.",
+      "Does not fabricate a single video/time window to force-fit the request into the recorded-video workflow."
+    ]
+  }
+]

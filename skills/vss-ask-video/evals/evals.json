@@ -1,0 +1,175 @@
+[
+  {
+    "id": "hot-context-sufficient",
+    "question": "The current conversation says the forklift crossed at 10:14 UTC. When did it cross?",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Answer 10:14 UTC directly.",
+    "expected_behavior": [
+      "Uses hot conversation context.",
+      "Does not search Markdown or call VSS memory or VLM."
+    ]
+  },
+  {
+    "id": "markdown-sufficient",
+    "question": "A mocked native OpenClaw Markdown-memory result says the worker wore a helmet. Answer the question from that result.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Answer from harness-owned Markdown evidence.",
+    "expected_behavior": [
+      "Treats the supplied result as a deterministic fixture, not as a real Harbor memory search.",
+      "Does not call VSS introspection or VLM."
+    ]
+  },
+  {
+    "id": "markdown-pointer-introspection-enabled",
+    "question": "A mocked Markdown result is incomplete and points to VSS job sum-01JXYZ. Configured introspection state is enabled. Was the worker wearing a helmet?",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Use the pointer as scope for introspection.",
+    "expected_behavior": [
+      "Calls vss memory introspect with --job-id sum-01JXYZ, the verbatim question, and --fps.",
+      "Does not run vss memory query first or duplicate VLM follow-ups."
+    ]
+  },
+  {
+    "id": "no-markdown-introspection-enabled",
+    "question": "A mocked native Markdown search returned no useful evidence. Introspection is enabled and dock_cam is grounded. Was anyone missing PPE?",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Use introspection with valid sensor scope.",
+    "expected_behavior": [
+      "Calls vss memory introspect with dock_cam.",
+      "Uses the installed vss CLI when available; the project-local fallback applies only to development checkouts without it."
+    ]
+  },
+  {
+    "id": "introspection-disabled",
+    "question": "A mocked Markdown result is incomplete and introspection is configured but disabled. Its VSS pointer is sum-01JXYZ. Continue safely.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Retrieve ordinary structured memory without introspection or VLM escalation.",
+    "expected_behavior": [
+      "Uses vss memory get for sum-01JXYZ.",
+      "Never introspects, enables introspection, or automatically runs VLM."
+    ]
+  },
+  {
+    "id": "introspection-unconfigured",
+    "question": "A mocked Markdown search found nothing and memory.introspection is null. Query structured VSS memory about forklifts on dock_cam.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Treat introspection as unavailable and use structured retrieval.",
+    "expected_behavior": [
+      "Uses vss memory query with grounded filters.",
+      "Does not call or configure introspection."
+    ]
+  },
+  {
+    "id": "exact-stored-job",
+    "question": "Read VSS job sum-01JXYZ.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Go directly to the exact stored parent.",
+    "expected_behavior": [
+      "Uses vss memory get --job-id sum-01JXYZ.",
+      "Does not perform broad Markdown or semantic discovery."
+    ]
+  },
+  {
+    "id": "explicit-fresh-window",
+    "question": "Freshly verify dock_cam from 2026-08-13T20:00:00Z to 2026-08-13T20:00:30Z: was the worker wearing a helmet?",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Use one direct VLM job for the exact scope.",
+    "expected_behavior": [
+      "Uses exactly one vss vlm run.",
+      "Chooses --fps from the skim/locate/inspect policy instead of a fixed --max-frames.",
+      "Does not search Markdown or introspect."
+    ]
+  },
+  {
+    "id": "introspection-partial",
+    "question": "A mocked introspection result is partial with answer 'A helmet is visible, but identity is uncertain' and unresolved_gaps ['identity not confirmed']. Return it safely.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Preserve the partial answer and limitation.",
+    "expected_behavior": [
+      "Reports the answer as partial and includes the unresolved gap.",
+      "Does not retry internal VLM inspection."
+    ]
+  },
+  {
+    "id": "no-memory-grounded-window",
+    "question": "A mocked introspection result is no_memory; dock_cam and 2026-08-13T20:00:00Z through 2026-08-13T20:00:30Z were grounded before the call.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Allow one direct VLM job for the pre-grounded exact scope.",
+    "expected_behavior": [
+      "Uses one vss vlm run for exactly that window.",
+      "Does not broaden the scope."
+    ]
+  },
+  {
+    "id": "no-memory-without-scope",
+    "question": "A mocked introspection result is no_memory and no exact sensor/window was previously grounded.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Request missing scope.",
+    "expected_behavior": [
+      "Asks for an exact recorded sensor and UTC window.",
+      "Does not call VLM."
+    ]
+  },
+  {
+    "id": "invalid-child-identity",
+    "question": "Introspect record event-17, but no job id or record type is known.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Do not emit an invalid child selector.",
+    "expected_behavior": [
+      "Never passes --record-id alone.",
+      "Requests the missing job id and record type or uses another valid grounded scope."
+    ]
+  },
+  {
+    "id": "direct-file-vlm",
+    "question": "Confirm the configured VSS deployment, then freshly inspect warehouse_safety_0001.mp4: is the worker wearing PPE?",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Use one vss vlm run --file through the provided CLI after configuration is confirmed.",
+    "expected_behavior": [
+      "Confirms VSS configuration before the live inspection.",
+      "Uses vss vlm run --file and does not search Markdown, introspect, or call backends directly."
+    ]
+  },
+  {
+    "id": "separate-shell-cli",
+    "question": "Show the command for querying structured VSS memory in a fresh OpenClaw shell.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Select and invoke the provided VSS CLI in one shell call.",
+    "expected_behavior": [
+      "Uses the vss CLI on PATH, called as `vss`; no uv run wrapper and no parallel virtualenv.",
+      "Does not depend on a shell function or array from an earlier call."
+    ]
+  },
+  {
+    "id": "archive-search-non-activation",
+    "question": "Search the video archive for every clip containing a red truck.",
+    "expected_skill": null,
+    "ground_truth": "This is an archive-wide retrieval request for vss-search-archive, not a question about one specified video.",
+    "expected_behavior": [
+      "Does not activate vss-ask-video for an archive search request.",
+      "Routes the request to vss-search-archive."
+    ]
+  },
+  {
+    "id": "whole-recording-short",
+    "question": "What happens in dock_cam? Its recording is 45 seconds long.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Run `vss vios timeline --sensor dock_cam`, then one `vss vlm run --sensor dock_cam` with explicit --start-time/--end-time per recorded segment.",
+    "expected_behavior": [
+      "Reads the recording's segments with `vss vios timeline`.",
+      "Runs `vss vlm run --sensor` with explicit bounds, once per segment.",
+      "Does not hand off to vss-summarize-video for a recording under 120 seconds."
+    ]
+  },
+  {
+    "id": "whole-recording-long",
+    "question": "What happens in warehouse-front? Its recording is 235 seconds long.",
+    "expected_skill": "vss-ask-video",
+    "ground_truth": "Hand off to /vss-summarize-video, since the whole recording is 120 seconds or longer.",
+    "expected_behavior": [
+      "Reads the recording's length with `vss vios timeline`.",
+      "Hands off to /vss-summarize-video instead of running `vss vlm run` itself.",
+      "Does not stop to ask the user for a shorter window."
+    ]
+  }
+]

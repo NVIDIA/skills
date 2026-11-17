@@ -1,0 +1,40 @@
+[
+  {
+    "id": "rag-report-routing",
+    "question": "Which skill should I use for a knowledge-enhanced video report that uses Enterprise RAG context?",
+    "expected_skill": "vss-generate-video-report-rag",
+    "ground_truth": "Loads vss-generate-video-report-rag for Enterprise RAG or knowledge-enhanced report requests. It should explain that the skill uses the LVS profile's RAG-enabled config, requires a selected video plus scenario/events/optional objects, and follows the actual HITL sequence from config_rag.yml.",
+    "expected_behavior": [
+      "Loads vss-generate-video-report-rag for Enterprise RAG or knowledge-enhanced report wording.",
+      "Mentions that a selected video, scenario, events, and optional objects are needed.",
+      "Describes the actual HITL prompt sequence: scenario, events, objects of interest, and confirmation.",
+      "Does not invent a separate Enterprise RAG Query HITL prompt.",
+      "Mentions that document grounding comes from the configured frag_retrieval context."
+    ]
+  },
+  {
+    "id": "rag-config-deploy",
+    "question": "What deployment configuration enables Enterprise RAG document grounding for LVS reports?",
+    "expected_skill": "vss-generate-video-report-rag",
+    "ground_truth": "Loads vss-generate-video-report-rag and describes the shipped LVS config_rag.yml path plus the normal .env + generated.env workflow. It should list the non-secret settings RAG_SERVER_URL and KNOWLEDGE_COLLECTION, explain that RAG_API_KEY must be supplied securely without writing it to generated.env or resolved.yml, and avoid stale app/video_search_frag or deployments/developer-workflow paths.",
+    "expected_behavior": [
+      "Loads vss-generate-video-report-rag.",
+      "Uses deploy/docker/developer-profiles/dev-profile-lvs/vss-agent/configs/config_rag.yml.",
+      "Initializes generated.env from overrides.env and uses it with the checked-in .env, without mutating either source file.",
+      "Documents RAG_SERVER_URL and KNOWLEDGE_COLLECTION for frag_retrieval.",
+      "Warns that RAG_API_KEY is sensitive and should not be written to generated.env or resolved.yml.",
+      "Does not reference app/video_search_frag/docker-compose.yml or ./configs/video_search_frag/config.yml.",
+      "Does not print plaintext API tokens."
+    ]
+  },
+  {
+    "id": "standard-report-non-activation",
+    "question": "Generate a standard analysis report for this clip without Enterprise RAG context.",
+    "expected_skill": null,
+    "ground_truth": "This is a standard report request for vss-generate-video-report, not an Enterprise RAG-grounded report request.",
+    "expected_behavior": [
+      "Does not activate vss-generate-video-report-rag when Enterprise RAG grounding is explicitly excluded.",
+      "Routes the request to vss-generate-video-report."
+    ]
+  }
+]

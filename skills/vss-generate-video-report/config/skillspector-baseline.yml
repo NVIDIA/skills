@@ -1,0 +1,20 @@
+version: 2
+
+# SkillSpector suppression baseline for skills/operations/vss-generate-video-report.
+# Entries are scoped to one file and one matched-text pattern; line numbers are
+# not used, so doc edits do not invalidate them.
+
+rules:
+  # --- Reviewed scanner false positives (temporary) -------------------------
+  - id: "AE1"
+    path: "SKILL.md"
+    message: "*(partial)"
+    reason: >-
+      Temporary bridge until SkillEvaluator 1.7.0 (SkillSpector 2.12.1) reaches
+      the NV-CARPS gate; remove this entry then. SkillSpector 2.11.2 marks a
+      referenced file "partial" when it contains ordinary shell parameter
+      expansion (${VAR:-default}, "${ARR[@]}") or certain quoted forms, and
+      reports each SKILL.md link to it as AE1. Fixed upstream in SkillSpector
+      #634 and #686 (SKILLSPECT-12, SKILLSPECT-135).
+
+fingerprints: []
