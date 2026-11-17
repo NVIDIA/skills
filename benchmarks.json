@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 452,
-  "result_row_count": 4264,
+  "skill_count": 459,
+  "result_row_count": 4329,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1137,6 +1137,153 @@
       "component": "Cosmos Data Factory Orchestration",
       "has_results": true,
       "average_uplift_pct": 31.8
+    },
+    {
+      "skill": "compileiq-author-objective",
+      "evaluation_date": "2026-11-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:41f4cb8b11ebfdd0634e651d5b1521635fec3258bc30530fdfd787b6b6ad72d0",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "has_results": true,
+      "average_uplift_pct": 24.47
+    },
+    {
+      "skill": "compileiq-booster-pack",
+      "evaluation_date": "2026-11-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:999fc35cc7916a152827262764788e8b1570b506d4e999c118c75e504bd2337a",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "has_results": true,
+      "average_uplift_pct": 20.97
+    },
+    {
+      "skill": "compileiq-bootstrap",
+      "evaluation_date": "2026-11-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:d47065e1d904ad38bab2c34451ead408ce01931003282433cbb592165dbd715c",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "has_results": true,
+      "average_uplift_pct": 10.65
+    },
+    {
+      "skill": "compileiq-debug",
+      "evaluation_date": "2026-11-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:8ed6852b90ceee0271a5e7784520510f89b65ecf1ed06d44bab90070712127ae",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "compileiq-debug",
+      "component": "CompileIQ",
+      "has_results": true,
+      "average_uplift_pct": 5.43
+    },
+    {
+      "skill": "compileiq-run-search",
+      "evaluation_date": "2026-11-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:701c577c265244c03db5998862ab7d9963e6ca9f9d889907a5f39465fb99e61b",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "has_results": true,
+      "average_uplift_pct": 17.3
+    },
+    {
+      "skill": "compileiq-search-space",
+      "evaluation_date": "2026-11-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:6a725db989ce9bc944391c21a818c2dfae298e1dc37867df583f1d2c11c60db7",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "has_results": true,
+      "average_uplift_pct": 18.05
+    },
+    {
+      "skill": "compileiq-validate-result",
+      "evaluation_date": "2026-11-14",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:6901114747ad65942d6998dd3d4f88cf58994f875bdd3f21d7c6d6f05b5fde64",
+      "validation_status": "passed",
+      "tasks": 8,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "has_results": true,
+      "average_uplift_pct": 20.55
     },
     {
       "skill": "compute-sanitizer-diagnose-cuda-bugs",
@@ -14230,6 +14377,591 @@
       "num": null,
       "agent": "codex",
       "score_pct": 93.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 18.7
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": 30.0
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 92.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 82.8,
+      "uplift_pct": 47.2
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.4,
+      "uplift_pct": 38.4
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-author-objective",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 65.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.0,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.5,
+      "uplift_pct": 17.5
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 60.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.5,
+      "uplift_pct": 38.7
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.2,
+      "uplift_pct": 29.6
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-booster-pack",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 65.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.8,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 27.5
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 70.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.4,
+      "uplift_pct": 24.6
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.1,
+      "uplift_pct": 6.8
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-bootstrap",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 63.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-debug",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-debug",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 7.5
+    },
+    {
+      "catalog_dir": "compileiq-debug",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-debug",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.4,
+      "uplift_pct": 8.8
+    },
+    {
+      "catalog_dir": "compileiq-debug",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 6.2
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": 27.5
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.5,
+      "uplift_pct": 12.5
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.6,
+      "uplift_pct": 40.4
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.2,
+      "uplift_pct": 17.2
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-run-search",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 65.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 6.2
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 37.5
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.9,
+      "uplift_pct": 54.7
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.3,
+      "uplift_pct": 9.9
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 80.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-search-space",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 59.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 6.2
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": 32.5
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 59.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.1,
+      "uplift_pct": 26.5
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.1,
+      "uplift_pct": 33.1
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "compileiq-validate-result",
+      "component": "CompileIQ",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 85.3,
       "uplift_pct": null
     },
     {
