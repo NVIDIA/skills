@@ -203,7 +203,13 @@
         "tao-train-sparse4d",
         "tao-train-visual-changenet",
         "tao-validate-recipe-transfer",
-        "vss-build-vision-ai"
+        "vss-ask-video",
+        "vss-build-vision-ai",
+        "vss-generate-video-report",
+        "vss-generate-video-report-rag",
+        "vss-query-analytics",
+        "vss-search-archive",
+        "vss-summarize-video"
       ]
     },
     {

@@ -5461,6 +5461,18 @@
       }
     },
     {
+      "path": "skills/vss-ask-video",
+      "name": "vss-ask-video",
+      "description": "Use this skill when answering a question about previously analyzed or freshly scoped VSS video, or when reading a stored VSS memory job or record by id, or whenever a question should be answered by running the `vss memory introspect` command. Route through hot context, agent Markdown notes, `vss memory get` or `vss memory query`, `vss memory introspect`, or an exact-window `vss vlm run`. Not for video retrieval or metadata-answerable questions.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,ml_engineer,platform_engineer,devops_engineer",
+        "discovery.activity_tags": "inspect,summarize,inference,operate,extract"
+      }
+    },
+    {
       "path": "skills/vss-build-vision-ai",
       "name": "vss-build-vision-ai",
       "description": "Add agent-ready vision capabilities — dense captioning, detection, search, alerting, summarization — to an agent or application through a customizable, self-contained vision stack built on the NVIDIA VSS Blueprint. Use this skill when a developer or agent wants to give their app vision: pick capabilities via guided intake (\"build a vision agent\", \"add vision capabilities\") or describe them in natural language (\"create a profile for streaming dense captioning\", \"add agentic search to my base deployment\", \"deploy warehouse 3d\"). Route, compose, configure, and deploy stock base, alerts, LVS, search developer profiles, or the warehouse industry profile and lean custom combinations expressed as delta overlays using one current developer profile as the Foundation. Not for operating a stack that is already deployed — searching, asking about a video, summarizing, managing alerts, or generating a report — and not for deploying a single microservice on its own; use the matching vss-* skill for those.",
@@ -5470,6 +5482,66 @@
         "catalog.subdomain": "vision-ai",
         "audience": "application_developer,ai_engineer,solutions_architect,devops_engineer,platform_engineer",
         "discovery.activity_tags": "orchestrate,configure,deploy,integrate,generate"
+      }
+    },
+    {
+      "path": "skills/vss-generate-video-report",
+      "name": "vss-generate-video-report",
+      "description": "Use this skill when producing a VSS analysis report — Mode A per-clip VLM, Mode B incident-range via video-analytics, Mode C SOP compliance via the SOP tools. Not for standalone video summarization, real-time alerts or ad-hoc Q&A.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,production_operator,solutions_architect,ai_engineer",
+        "discovery.activity_tags": "generate,summarize,synthesize,assess,extract"
+      }
+    },
+    {
+      "path": "skills/vss-generate-video-report-rag",
+      "name": "vss-generate-video-report-rag",
+      "description": "Generates VSS video summary reports with LVS HITL and optional Enterprise RAG document grounding. Trigger when the user asks for a frag/RAG-assisted video report, knowledge-enhanced analysis, or Enterprise RAG context in a video summary.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,solutions_architect,ml_engineer,developer",
+        "discovery.activity_tags": "summarize,generate,inference,integrate,configure"
+      }
+    },
+    {
+      "path": "skills/vss-query-analytics",
+      "name": "vss-query-analytics",
+      "description": "Query read-only video analytics with `vss analytics` for incidents, occupancy metrics, average speed, places, and analytics sensors. Load this skill for video-analytics questions about these records and metrics, including requests asking which skill to use for analytics. Not for live VLM, incident-range narrative reports, deployment, or alert-rule management.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,production_operator,ai_engineer",
+        "discovery.activity_tags": "inspect,measure,monitor,operate,extract"
+      }
+    },
+    {
+      "path": "skills/vss-search-archive",
+      "name": "vss-search-archive",
+      "description": "Use this skill to search archived VSS video or indexed live RTSP camera streams already registered in a configured deployment — by natural-language, similarity, attribute, object-ID, or lexical tag query — and for follow-up questions about displayed search results or their verification. For fresh clip Q&A use vss-ask-video; for full-recording summaries use vss-summarize-video; for source ingestion/deletion use vss-manage-video-io-storage; for deployment use vss-build-vision-ai. Route those requests to the named workflow without loading this skill, including when media, the CLI, or the deployment is unavailable. Not for live captioning.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,production_operator,ai_engineer,solutions_architect",
+        "discovery.activity_tags": "inspect,extract,inference,operate,validate"
+      }
+    },
+    {
+      "path": "skills/vss-summarize-video",
+      "name": "vss-summarize-video",
+      "description": "Use when summarizing a recorded video through HITL-gated LVS, falling back to `vss vlm run` when LVS is not ready. Not for reports, archive search, or live RTSP captioning.",
+      "metadata": {
+        "product.primary": "Video Search and Summarization (VSS)",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "vision-ai",
+        "audience": "application_developer,ai_engineer,production_operator,devops_engineer",
+        "discovery.activity_tags": "summarize,inference,operate,integrate"
       }
     },
     {

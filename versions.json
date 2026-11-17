@@ -3187,11 +3187,53 @@
       "last_modified": "2026-07-13"
     },
     {
+      "name": "vss-ask-video",
+      "path": "skills/vss-ask-video",
+      "content_digest": "sha256:e1e2040b69a06708e81dae5da3becc22c3f436fd6c800477a761d0a702e0724e",
+      "last_commit": "f718a2510d2fdf804960f68c06016347cb4b3d2b",
+      "last_modified": "2026-11-17"
+    },
+    {
       "name": "vss-build-vision-ai",
       "path": "skills/vss-build-vision-ai",
       "content_digest": "sha256:089f30ab7fa60ad29106902f0f7545435831ab758656f4dd772142d7db576492",
       "last_commit": "b091c3d109fc977bb96653f34481efe42e23f602",
       "last_modified": "2026-10-21"
+    },
+    {
+      "name": "vss-generate-video-report",
+      "path": "skills/vss-generate-video-report",
+      "content_digest": "sha256:29fc0c318f6ea05cf324f8163e3de9051a41c21ca387176e6bf9bcd0f3eca209",
+      "last_commit": "f718a2510d2fdf804960f68c06016347cb4b3d2b",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "vss-generate-video-report-rag",
+      "path": "skills/vss-generate-video-report-rag",
+      "content_digest": "sha256:db54a83241ae142e10c52cb8b45a4c3cbcbcc25c560dea318804b4c9f7e7bcfd",
+      "last_commit": "f718a2510d2fdf804960f68c06016347cb4b3d2b",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "vss-query-analytics",
+      "path": "skills/vss-query-analytics",
+      "content_digest": "sha256:24836f7444d5a913fc8d8fcc68c17d88c7a14f544f8d673e8d9db350e3782b1b",
+      "last_commit": "f718a2510d2fdf804960f68c06016347cb4b3d2b",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "vss-search-archive",
+      "path": "skills/vss-search-archive",
+      "content_digest": "sha256:02c112692785106814ed447f25e88f3898a78d46c41b5f6577c46e51f4b40c7e",
+      "last_commit": "f718a2510d2fdf804960f68c06016347cb4b3d2b",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "vss-summarize-video",
+      "path": "skills/vss-summarize-video",
+      "content_digest": "sha256:399e1f0169bdeff1f3da97409ab6a85c76347e2f5847645e88faf86001c5f7eb",
+      "last_commit": "f718a2510d2fdf804960f68c06016347cb4b3d2b",
+      "last_modified": "2026-11-17"
     },
     {
       "name": "warp-compile-time-optimizer",

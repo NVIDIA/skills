@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 459,
-  "result_row_count": 4329,
+  "skill_count": 465,
+  "result_row_count": 4389,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -9524,6 +9524,27 @@
       "average_uplift_pct": 12.0
     },
     {
+      "skill": "vss-ask-video",
+      "evaluation_date": "2026-11-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:830efbe7c931304d5f442008bdbca6a2d7b5552ad59745dfd4190886fe681b13",
+      "validation_status": "passed",
+      "tasks": 17,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "has_results": true,
+      "average_uplift_pct": 27.12
+    },
+    {
       "skill": "vss-build-vision-ai",
       "evaluation_date": "2026-10-21",
       "environment": "k8s-sandbox",
@@ -9543,6 +9564,111 @@
       "component": "Video Search and Summarization",
       "has_results": true,
       "average_uplift_pct": 17.58
+    },
+    {
+      "skill": "vss-generate-video-report",
+      "evaluation_date": "2026-11-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:7df8115f049bfd086f9d9ee077273beec9ef5f0167a6b6f16ae646ea847d284b",
+      "validation_status": "passed",
+      "tasks": 14,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "has_results": true,
+      "average_uplift_pct": 42.13
+    },
+    {
+      "skill": "vss-generate-video-report-rag",
+      "evaluation_date": "2026-11-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:f91e7a51aeca96528dda454c2c82f368bbefbfaaea8558971605461d1415fa00",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "has_results": true,
+      "average_uplift_pct": 25.13
+    },
+    {
+      "skill": "vss-query-analytics",
+      "evaluation_date": "2026-11-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:3af12be3300a761f5bd46d2c88a850c801af66211ba765a37a0add2186563560",
+      "validation_status": "passed",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "has_results": true,
+      "average_uplift_pct": 23.75
+    },
+    {
+      "skill": "vss-search-archive",
+      "evaluation_date": "2026-11-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:c7f67a32c256d3ea604292404038de74527eaf4d41c696cd5ec21622f8de6d1a",
+      "validation_status": "passed",
+      "tasks": 18,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "has_results": true,
+      "average_uplift_pct": 21.7
+    },
+    {
+      "skill": "vss-summarize-video",
+      "evaluation_date": "2026-11-16",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:2d3aa44da1d687045c1aa735919e28dc2ffee16c19aa3676de506299a16876bc",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "has_results": true,
+      "average_uplift_pct": 26.8
     },
     {
       "skill": "warp-compile-time-optimizer",
@@ -48256,6 +48382,96 @@
       "uplift_pct": 7.0
     },
     {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 2.9
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 8.8
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.8,
+      "uplift_pct": 54.1
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.7,
+      "uplift_pct": 49.4
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.0,
+      "uplift_pct": 32.3
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 58.3,
+      "uplift_pct": 15.2
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-ask-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.2,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "vss-build-vision-ai",
       "component": "Video Search and Summarization",
       "dimension": "Security",
@@ -48343,6 +48559,456 @@
       "num": null,
       "agent": "codex",
       "score_pct": 81.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.3,
+      "uplift_pct": 81.4
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.3,
+      "uplift_pct": 57.2
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 75.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 74.3,
+      "uplift_pct": 65.2
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.6,
+      "uplift_pct": 49.0
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 72.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": -16.7
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": 66.7
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.7,
+      "uplift_pct": 33.4
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 65.0,
+      "uplift_pct": 48.6
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 56.7,
+      "uplift_pct": 18.8
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 73.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-generate-video-report-rag",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 60.0
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.5,
+      "uplift_pct": 42.5
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-query-analytics",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 2.8
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.6,
+      "uplift_pct": 57.8
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.9,
+      "uplift_pct": 23.3
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.2,
+      "uplift_pct": 36.6
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.1,
+      "uplift_pct": 9.7
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-search-archive",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 16.7
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": 66.6
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 53.3,
+      "uplift_pct": 40.0
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 51.1,
+      "uplift_pct": 20.8
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 47.0,
+      "uplift_pct": 16.7
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "vss-summarize-video",
+      "component": "Video Search and Summarization",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.0,
       "uplift_pct": null
     },
     {
