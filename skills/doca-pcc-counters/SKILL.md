@@ -17,15 +17,15 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - pcc
     - counters
 compatibility: >
-  Requires DOCA/MFT on Linux with a ConnectX-6 or newer (not
-  ConnectX-8) or BlueField
-  device, mst tools, mounted debugfs, and root access to the mlx5
+  Requires DOCA/MFT on Linux with a ConnectX-7 or BlueField-3
+  device only (BlueField-3: Arm in DPU mode, host in NIC mode),
+  mst tools, mounted debugfs, and root on the mlx5
   diag_cnt interface. The script reads fixed firmware and hardware
   diagnostics independently of custom PCC code. Its set operation
   changes which counters are collected, not congestion-control or
@@ -37,11 +37,23 @@ compatibility: >
 
 ## Examples
 
+- **Any counter answer starts with the version match.** The installed
+  `doca-pcc-counters` package version (`dpkg-query -W -f='${Version}' doca-pcc-counters`,
+  or `rpm -q doca-pcc-counters`; the script itself has no `--version`),
+  `pkg-config --modversion doca-pcc` and `doca_caps --version`
+  must agree (doca-version); a mismatch goes to `doca-version ## debug`
+  layer 2 before any counter is quoted.
 - **"How do I read the PCC diagnostic counters on this device?"** —
   this is in scope. Arm then query; do not treat this as PCC
   algorithm tuning.
 - **"The script printed ERROR: Bad Device."** — resolve the mst
   path before assuming firmware is broken.
+- **"Can I trust these counters on my install?"** Match versions before
+  quoting any counter: the installed `doca-pcc-counters` package version,
+  `pkg-config --modversion doca-pcc` and `doca_caps --version`, checked
+  against the DOCA Compatibility Policy through `doca-version`; any
+  disagreement goes to `doca-version ## debug` layer 2 (partial install)
+  first.
 
 ## Instructions
 

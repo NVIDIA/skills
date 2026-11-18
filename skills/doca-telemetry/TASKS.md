@@ -182,11 +182,10 @@ user before recommending any code-level edit:
 | Slot | What the agent asks the user | Reader-specific consideration |
 | --- | --- | --- |
 | 1. Starting sample | Which sample under `/opt/mellanox/doca/samples/doca_telemetry/`? | Pick the sample for the SAME domain the user picked in [`## configure`](#configure) step 2 (e.g. the PHY sample for PHY counters). A smaller diff is always safer than a re-architecture across domains |
-| 2. Domain + counters | Which per-domain sub-library, and which specific counters / sub-areas within it? | Re-validate against the per-domain cap-query per [`## configure`](#configure) step 3; a counter family present on one install / device may return `NOT_SUPPORTED` on another |
+| 2. Domain + counters | Which per-domain sub-library, and which specific counters / sub-areas within it? | Re-validate against the per-domain cap-query per [`## configure`](#configure) step 3. For PHY sample-info getters and PCC counter-group getters, call the new PHY sample-info capability support check functions and the PCC counter-group support check function before using the corresponding getter. Use the `DOCA_TELEMETRY_PHY_LINK_DOWN_*` constant family for link-down reason/blame values, never raw values. Exact names are in the public DOCA Telemetry header. A counter family present on one install / device may return `NOT_SUPPORTED` on another |
 | 3. Sample shape (sampled domains) | For `diag` / `adp_retx`: what sample mode, sample period, and num-samples / histogram-bin shape? | Bound every setter by the `_cap_*` sizing caps from [`## configure`](#configure) step 3; a value past the cap returns `DOCA_ERROR_INVALID_VALUE`. For `diag`, the `_apply_config` + `_apply_counters_list_by_id` calls MUST stay before `_start` |
 | 4. Read cadence + `AGAIN` behavior | How often does the modified reader read, and what does it do when a read returns `DOCA_ERROR_AGAIN`? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) sample-window rule, the retry must respect the sample window (for diag, wait for the previous sampling cycle); a tight `AGAIN` spin is a sample gap that needs editing out before the modify lands |
-| 5. Clear-on-read intent | Does the modified reader enable clear-on-read (`adp_retx` `_set_hist_clear_on_read`, `diag` data-clear)? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), clear-on-read resets the underlying counters — a second reader sees the counters as they stand after the reset. Decide explicitly; default to NOT clearing unless the user wants destructive reads |
-| 6. Build manifest | Keep the sample's existing `meson.build` (which already wires `pkg-config doca-telemetry`)? | Yes. Do not switch to a hand-rolled Makefile for *“simplicity”* — it removes the version-check rail. And do not silently swap the `pkg-config` module to `doca-telemetry-exporter` — that flips the role and is the load-bearing first-app failure |
+| 5. Clear-on-read intent | Does the modified reader enable clear-on-read (`adp_retx` `_set_hist_clear_on_read`, `diag` data-clear, or a PHY sample-info getter's `read_and_clear` argument)? | Per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), clear-on-read resets the underlying counters — a second reader sees the counters as they stand after the reset. Decide explicitly; default to NOT clearing unless the user wants destructive reads. This applies to every clear-on-read mechanism, including PHY sample-info getters that take a `read_and_clear` argument |
 
 The agent emits an *intent description + the filled slots*, then
 walks the unified diff line-by-line against the sample source
@@ -454,11 +453,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST
-   (`doca-env --json` for version + devices + libraries +
-   drivers + hugepages in one shot; `doca-capability-snapshot`
-   for per-device capability flags; `version-matrix.json` for
-   *“available since”* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *“using structured

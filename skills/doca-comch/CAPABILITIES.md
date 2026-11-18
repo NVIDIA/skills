@@ -176,7 +176,7 @@ setup:
 | Side | What must be true before `doca_comch_<role>_create` | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
 | DPU (server) | The host representor for the target PF / VF / SF is visible to the DPU process (`/sys/class/net/<rep>` exists, owned by a user the process can access; user must typically be in the `mlnx` group or run with sudo) | `ls /sys/class/net/`; `id` to confirm group membership | `doca-setup/SKILL.md` for the env-side; do not modify the program |
-| Host (client) | The PCIe address of the BlueField is enumerable from the host (`lspci | grep Mellanox`) and the corresponding `doca_dev_rep` is opened against it | `lspci | grep Mellanox`; programmatic via `doca_dev_rep_list_create` + the per-device filter | `doca-setup/SKILL.md` for the env-side; do not modify the program |
+| Host (client) | The PCIe address of the BlueField is enumerable from the host (`lspci | grep Mellanox`) and the corresponding `doca_dev_rep` is opened against it | `lspci | grep Mellanox`; programmatic via `doca_devinfo_rep_create_list` + the per-device filter | `doca-setup/SKILL.md` for the env-side; do not modify the program |
 | Both | The DPU is in the correct mode for the host ↔ DPU pair the user expects (SmartNIC vs DPU vs switch) | `mlxconfig -d <pcie> q INTERNAL_CPU_MODEL` (sudo) | `doca-setup CAPABILITIES.md ## Capabilities and modes` (`doca-setup/CAPABILITIES.md#capabilities-and-modes`) runtime-modes table |
 
 **Do not invent a "fallback transport" for Comch.** The Comch

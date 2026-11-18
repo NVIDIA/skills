@@ -141,6 +141,8 @@ missing the support fails the feature.
 
 **DOCA 3.5 DPA capability additions.** The DPA public header now exposes EU group affinity, validation resources, and dev thread retrigger capabilities. Use the `doca_dpa_eu_group_affinity_*` family to create, set, get, clear, and destroy EU group affinity objects; use `doca_dpa_thread_get_group_affinity` and `doca_dpa_thread_set_group_affinity` to attach an affinity to a `doca_dpa_thread`; use `doca_dpa_get_validation_resources` and `doca_dpa_set_validation_resources` to obtain and apply validation resources; use `doca_dpa_resources_get_num_eu_groups` and `doca_dpa_resources_get_eu_groups` to enumerate EU groups from a resources object; and call `doca_dpa_dev_thread_retrigger` from DPA-side code to retrigger the current dev thread. All of these are declared in the DPA public header. A developer targeting DOCA 3.5 must query and apply these capabilities through the `doca_dpa`/`doca_dpa_thread` lifecycle instead of assuming a fixed EU-group layout or a fixed validation-resource set: obtain validation resources with `doca_dpa_get_validation_resources`, apply them with `doca_dpa_set_validation_resources`, enumerate EU groups with the `doca_dpa_resources_get_*` family, and set per-thread EU group affinity with the `doca_dpa_thread_*_group_affinity` family before relying on any EU-group placement.
 
+**DOCA 3.6 DPA event-channel capability additions.** The DPA public header now exposes event-channel capability queries on the device info: event-channel support, maximum completions per event channel, and maximum event channels are queryable through the `doca_dpa_cap_*` family against the active `doca_devinfo`. The same header adds per-thread event-channel configuration and completion-ID access: the `doca_dpa_thread_*_event_channel_*` family enables or disables event channels on a `doca_dpa_thread` and sets or gets the maximum completions per event channel for that thread, and the completion-ID accessor family lets host and DPA-side code obtain the completion ID associated with an event channel. All of these are declared in the DPA public header. A developer targeting DOCA 3.6 must query these device capabilities before configuring event channels on any thread: call the event-channel capability queries on the `doca_devinfo` for the BlueField being driven, then set the per-thread event-channel enabled state and per-thread maximum completions per event channel through the `doca_dpa_thread_*_event_channel_*` family, and use the completion-ID accessor family to correlate completions with event channels instead of assuming a fixed event-channel layout or a fixed completion count.
+
 **Configuration shape.** *Mandatory* preconditions before any
 `doca_dpa_kernel_launch_update_*` call: the `doca_dpa` Core
 context must be created against a `doca_dev` that maps to a
@@ -203,11 +205,43 @@ The family-level shape is stable enough to teach:
 | Small-message send / receive | Inter-thread hand-off, control messages, latency-optimized coordination between DPA threads on the same `doca_dpa_app` | Bulk data movement (use the DPA Verbs device-side component for remote RDMA from inside the kernel) |
 | Signal / event | Lightweight wake-up / wait between DPA threads in the same loaded `doca_dpa_app` | A substitute for `doca_dpa_completion` — the host's view of *"the kernel finished"* still lives in the parent's completion mechanism, not in a DPA-side signal |
 
+**Event channels.** DOCA 3.6 adds an event-channel communication
+mechanism for DPA threads. An event channel is a per-thread
+channel that carries completions from the DPA thread to the host;
+each channel has a configurable maximum number of completions per
+event channel. The host enables or disables the event channel on
+a `doca_dpa_thread` and sets the per-channel completion limit with
+the thread setters `doca_dpa_thread_set_event_channel_enabled`
+and
+`doca_dpa_thread_set_max_num_completions_per_event_channel`; the
+corresponding getters are
+`doca_dpa_thread_get_event_channel_enabled` and
+`doca_dpa_thread_get_max_num_completions_per_event_channel`. The
+host discovers whether event channels are supported and the
+device limits with `doca_dpa_cap_event_channel_is_supported`,
+`doca_dpa_cap_get_max_num_completions_per_event_channel`, and
+`doca_dpa_cap_get_max_num_event_channels`. A DPA thread obtains
+its completion ID from the event channel by calling the DPA-side
+function `doca_dpa_dev_thread_get_completion_id_from_event_channel`;
+the host retrieves the completion ID from a `doca_dpa_completion`
+with `doca_dpa_completion_get_id`. The event channel is not a
+replacement for the existing DPA-side comms primitives; it is the
+completion-delivery path for DPA threads that opt in. When the
+event channel is enabled, the DPA thread obtains its completion
+ID from the event channel and reports completion through that ID.
+The exact event-channel symbol set is install-bound and lives in
+the DOCA DPA host-side header and the DPA-side header; the agent
+must not quote symbol names from memory.
+
 **Capability discovery — no per-primitive cap family.** There is
-NO `doca_dpa_comms_cap_*` host cap family. The only DPA host-side
+NO `doca_dpa_comms_cap_*` host cap family. The DPA host-side
 capability queries are `doca_dpa_cap_is_supported` (is a DPA
-exposed to the host on this `doca_devinfo` at all) and
-`doca_dpa_cap_get_max_kernel_time_alive_supported`. Whether a
+exposed to the host on this `doca_devinfo` at all),
+`doca_dpa_cap_get_max_kernel_time_alive_supported`, and the
+event-channel capability queries
+`doca_dpa_cap_event_channel_is_supported`,
+`doca_dpa_cap_get_max_num_completions_per_event_channel`, and
+`doca_dpa_cap_get_max_num_event_channels`. Whether a
 specific DPA-Comms primitive is available is a function of the
 BlueField generation and the matched DOCA + DPACC install, read
 from the device header `doca_dpa_dev_comch_msgq.h` and the
@@ -368,6 +402,8 @@ lives there; this skill does not duplicate it.
 - **DOCA must match the DPACC compiler per the DOCA Compatibility Policy.** The DPACC compiler is the build-time component that turns DPA-side source into the binary embedded in the host executable as a `doca_dpa_app`; the host-side runtime that loads it is `doca-dpa`. Mismatched DOCA + DPACC versions fail at link time (missing symbols on either side) or at launch time (`DOCA_ERROR_DRIVER` from a `doca_dpa_kernel_launch_update_*` call) in ways that look like hardware bugs but are version-skew bugs. The agent must surface BOTH `pkg-config --modversion doca-dpa` AND the installed `dpacc` version, cross-check them against the DOCA Compatibility Policy at <https://docs.nvidia.com/doca/sdk/doca-compatibility-policy/index.html>, and route any disagreement to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) before any DPA-layer diagnosis. Per the cross-cutting cap-query rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the `doca_dpa_cap_*` query against the active `doca_devinfo` is the runtime authority for *"is this DPA feature on this hardware + this DOCA install"*, and the four-way-match check (`doca-dpa.pc` plus `doca-common.pc` plus the matching DPACC) per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`) catches the *DOCA upgraded but DPACC didn't* partial-install pattern before it surfaces as a launch failure.
 
 - **DOCA 3.5 DPA API.** The release adds the EU group affinity family, the validation resources family, and the dev thread retrigger family; use those APIs from the DPA public API header.
+
+- **DOCA 3.6 DPA API.** The release adds the event channel family. Code using the event channel family requires DOCA 3.6 or later and is not available in earlier releases; use the event channel family from the DPA public API header.
 
 ## Error taxonomy
 

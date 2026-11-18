@@ -263,7 +263,14 @@ like a hang; drive these prompts from the same foreground command
 and wait for both processes, do not leave them in the background;
 (b) prove the transfer with the independent evidence in `## test`
 (receiver-side data check plus the receiving port's RDMA byte
-counters sampled before and after), not from the sample's log alone.
+counters sampled before and after), not from the sample's log alone;
+(c) **the user's contract wins over the sample's defaults.** When
+the user names the programs (for example `*_sender` / `*_receiver`),
+fixes the proof line's format, or prescribes the shape of the run
+command, build the sample under those names (the `executable()`
+name in its `meson.build`) and keep that shape. The shipped
+sample's binary names and log lines are defaults, not a
+requirement.
 
 ## test
 
@@ -298,7 +305,12 @@ data path working only when one run captures all four:
    `ibdev2netdev`, then read `ethtool -S <netdev>` (the mlx5
    `rx_vport_rdma_unicast_bytes` / `tx_vport_rdma_unicast_bytes`
    counters). The receive-side delta should be at least the payload
-   size.
+   size. Take each sample in **its own command**, immediately before
+   and after the run — not inside the run command. Keep the run
+   command to the receiver, the sender and their exit-status checks,
+   so its output is only what the two programs print: a counter
+   dump or a `grep` / `cat` in the same command makes the receiver's
+   proof indistinguishable from text the command itself printed.
 
 `ib_write_bw`, `ib_send_bw`, `rping`, `ibv_rc_pingpong`, and other
 rdma-core / perftest tools exercise only the verbs layer and the
@@ -394,7 +406,7 @@ at layers 5 (runtime) and 6 (program):
   against the user's configured permissions.
 - Lifecycle order: create → configure → start → connect → use →
   stop → destroy. Out-of-order returns `DOCA_ERROR_BAD_STATE`. The most
-  common case is destroying an mmap before `doca_ctx_destroy()`.
+  common case is destroying an mmap before `doca_rdma_destroy()`.
 - Bulk-submit sizing: `DOCA_ERROR_FULL` on bulk submit is a
   sizing-vs-drain mismatch, not a hardware failure.
 
@@ -425,7 +437,7 @@ does not invent guidance:
 - **rollback.** Coordinated rollback of RDMA-using applications
   across multiple hosts / DPUs — out of scope for this skill. For a single in-session
   RDMA configuration rollback, the right verb in this skill is
-  destroying the context (`doca_ctx_stop` → `doca_ctx_destroy`) and
+  destroying the context (`doca_ctx_stop` → `doca_rdma_destroy`) and
   re-running `## configure` with the corrected parameters; do not
   invent a "rollback" workflow.
 - **kernel-level driver install / firmware burn.** Installing the
@@ -449,10 +461,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *“available since”* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *“using structured
@@ -478,7 +493,7 @@ the agent should:
 | `ibv_devinfo` (sudo) | `## configure` step 2; `## debug` layer 7 | What does the underlying `libibverbs` see for this device? | One device row with `state: PORT_ACTIVE` and a sane MTU |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 3 | What did the structured DOCA logger emit for the first failing call? | A trace-level line on every lifecycle transition and every task submission. Silence after submission = PE not progressed |
 | `ldd <build-dir>/doca_rdma_send` (unfiltered, own command) | `## build` step 4; `## test` evidence 1 | Does the binary I am about to run actually use DOCA RDMA? | A `libdoca_rdma.so => …` line. Missing = not a DOCA RDMA build |
-| `ibdev2netdev`, then `ethtool -S <netdev>` before and after | `## test` evidence 4 | Did RDMA bytes really cross the receiving port? | `rx_vport_rdma_unicast_bytes` delta ≥ payload bytes |
+| `ibdev2netdev`, then `ethtool -S <netdev>` in separate commands before and after the run | `## test` evidence 4 | Did RDMA bytes really cross the receiving port? | `rx_vport_rdma_unicast_bytes` delta ≥ payload bytes |
 | `ib_write_bw` / `rping` / `ibv_rc_pingpong` | fabric pre-check only | Does the verbs layer / fabric work at all? | Passing says nothing about DOCA RDMA; never report it as the DOCA RDMA proof |
 
 For commands shared across libraries (`pkg-config --modversion`,

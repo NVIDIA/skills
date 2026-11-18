@@ -10,8 +10,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-comm-channel-admin`
 - Validation status: `passed`
-- Evaluation date: 2026-10-28
-- Evaluator version: `1.6.2`
+- Evaluation date: 2026-11-18
+- Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:9d2e8574f2afb5f9a860008df26c43b3364e7a22f743c6823e50820b6cd7785a` (skill-evaluator-dataset-snapshot/1)
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| doca-comm-channel-admin | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-comm-channel-admin | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-comm-channel-admin | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-comm-channel-admin | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-comm-channel-admin | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-comm-channel-admin | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-comm-channel-admin | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-comm-channel-admin | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-comm-channel-admin | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-comm-channel-admin | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
 
 - Controls for `doca-comm-channel-admin`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.2% — baseline ran, but no comparable score was available; uplift unavailable | 93.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 93.2% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 25.0% → 95.0% (+70.0 points) | 55.0% → 100.0% (+45.0 points) |
+| Correctness | 25.0% → 100.0% (+75.0 points) | 80.0% → 100.0% (+20.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 12.5% → 75.0% (+62.5 points) | 37.5% → 93.8% (+56.3 points) |
-| Efficiency | 91.0% — baseline ran, but no comparable score was available; uplift unavailable | 78.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 25.0% → 75.0% (+50.0 points) | 62.5% → 93.8% (+31.3 points) |
+| Efficiency | 90.9% — baseline ran, but no comparable score was available; uplift unavailable | 76.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.5% → 95.2% (-3.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.4% → 95.2% (-3.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 89.3% → 88.2% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 88.6% → 88.0% (-0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 730,124 | 321,949 | +408,175 | +126.78% | skill 4/4; base 4/4 |
-| claude-code | doca-comm-channel-admin.explicit-positive.v1 | 208,454 | 107,463 | +100,991 | +93.98% | skill 1/1; base 1/1 |
-| claude-code | doca-comm-channel-admin.implicit-positive.v1 | 242,827 | 71,736 | +171,091 | +238.50% | skill 1/1; base 1/1 |
-| claude-code | doca-comm-channel-admin.implicit-positive.v2 | 243,021 | 71,739 | +171,282 | +238.76% | skill 1/1; base 1/1 |
-| claude-code | doca-comm-channel-admin.negative.v1 | 35,822 | 71,011 | -35,189 | -49.55% | skill 1/1; base 1/1 |
-| codex | All cases | 299,859 | 123,137 | +176,722 | +143.52% | skill 4/4; base 4/4 |
-| codex | doca-comm-channel-admin.explicit-positive.v1 | 97,146 | 30,516 | +66,630 | +218.34% | skill 1/1; base 1/1 |
-| codex | doca-comm-channel-admin.implicit-positive.v1 | 71,266 | 26,000 | +45,266 | +174.10% | skill 1/1; base 1/1 |
-| codex | doca-comm-channel-admin.implicit-positive.v2 | 96,840 | 21,438 | +75,402 | +351.72% | skill 1/1; base 1/1 |
-| codex | doca-comm-channel-admin.negative.v1 | 34,607 | 45,183 | -10,576 | -23.41% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,029,983 | 445,086 | +584,897 | +131.41% | skill 8/8; base 8/8 |
+| claude-code | All cases | 729,300 | 393,812 | +335,488 | +85.19% | skill 4/4; base 4/4 |
+| claude-code | doca-comm-channel-admin.explicit-positive.v1 | 242,758 | 108,093 | +134,665 | +124.58% | skill 1/1; base 1/1 |
+| claude-code | doca-comm-channel-admin.implicit-positive.v1 | 242,506 | 107,139 | +135,367 | +126.35% | skill 1/1; base 1/1 |
+| claude-code | doca-comm-channel-admin.implicit-positive.v2 | 207,555 | 107,468 | +100,087 | +93.13% | skill 1/1; base 1/1 |
+| claude-code | doca-comm-channel-admin.negative.v1 | 36,481 | 71,112 | -34,631 | -48.70% | skill 1/1; base 1/1 |
+| codex | All cases | 301,613 | 103,224 | +198,389 | +192.19% | skill 4/4; base 4/4 |
+| codex | doca-comm-channel-admin.explicit-positive.v1 | 96,165 | 35,977 | +60,188 | +167.30% | skill 1/1; base 1/1 |
+| codex | doca-comm-channel-admin.implicit-positive.v1 | 72,641 | 19,319 | +53,322 | +276.01% | skill 1/1; base 1/1 |
+| codex | doca-comm-channel-admin.implicit-positive.v2 | 98,588 | 25,482 | +73,106 | +286.89% | skill 1/1; base 1/1 |
+| codex | doca-comm-channel-admin.negative.v1 | 34,219 | 22,446 | +11,773 | +52.45% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,030,913 | 497,036 | +533,877 | +107.41% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -107,16 +107,18 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/tools/doca-comm-channel-admin`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found within SKILL.md:
   "## Examples" in SKILL.md (lines 3-11)
-  vs "## Example questions this skill answers well" in SKILL.md (lines 58-95) (`SKILL.md:3`)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 56-94) (`SKILL.md:3`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md:
   "# DOCA Comm Channel Admin Tool — Capabilities" in CAPABILITIES.md (lines 1-20)
   vs "## Capabilities and modes" in CAPABILITIES.md (lines 45-87)
-  vs "## Instructions" in SKILL.md (lines 12-57)
+  vs "## Instructions" in SKILL.md (lines 12-55)
   vs "# DOCA Comm Channel Admin Tool — Tasks" in TASKS.md (lines 1-31)
   vs "## run" in TASKS.md (lines 114-147) (`CAPABILITIES.md:1`)
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
+  "## Error taxonomy" in CAPABILITIES.md (lines 101-145)
+  vs "## debug" in TASKS.md (lines 174-224) (`CAPABILITIES.md:101`)
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/tools/doca-comm-channel-admin/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-comm-channel-admin/SKILL.md`)
 - 10 additional finding(s) are available in the full evaluation artifacts.

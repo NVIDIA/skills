@@ -283,7 +283,7 @@ layers 5 (runtime) and 6 (program):
   almost always a missing `doca_pe_progress()` in the user's main
   loop.
 - Confirm both the source mmap and the destination mmap are still
-  alive at submit time. Destroying either before `doca_ctx_destroy`
+  alive at submit time. Destroying either before `doca_sha_destroy`
   is a use-after-free that surfaces as `DOCA_ERROR_BAD_STATE` from
   subsequent calls.
 
@@ -344,7 +344,7 @@ the agent does not invent guidance:
 - **rollback.** Coordinated rollback of SHA-using applications
   across many hosts — out of scope. For a single in-session SHA
   configuration rollback, the right verb in this skill is
-  destroying the context (`doca_ctx_stop` → `doca_ctx_destroy`)
+  destroying the context (`doca_ctx_stop` → `doca_sha_destroy`)
   and re-running [`## configure`](#configure) with corrected
   parameters.
 - **kernel-level driver install / firmware burn.** SHA depends on
@@ -366,10 +366,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

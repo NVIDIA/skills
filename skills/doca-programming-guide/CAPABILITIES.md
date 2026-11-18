@@ -9,8 +9,6 @@ Read this file when the loader sent you here from [SKILL.md](SKILL.md). For the 
 
 This file describes the **shape every DOCA program shares** — the architecture every library plugs into, the lifecycle every library follows, the error pattern every library returns, the observability surface every library emits into, and the safety rules every program must respect. Library-specific overlays live in the matching library skill.
 
-> Note: this file references `/opt/mellanox/doca` and `docs.nvidia.com` paths several times on purpose — the canonical install tree and the canonical docs tree are the two coordinate systems every prescription is anchored against.
-
 ## Pattern overview
 
 Every program-class question this skill teaches reduces to one of FIVE
@@ -95,7 +93,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 
 - **Quote the version observed, never "latest" and never agent memory.** API names, sample filenames, and capability availability all depend on the user's installed version. Per the safety policy in `doca-version CAPABILITIES.md ## Safety policy` (`doca-version/CAPABILITIES.md#safety-policy`), a recommendation that quotes a version-pinned URL or invents a feature based on agent memory is the bundle's primary hallucination failure mode.
 - **For non-C consumers (FFI / bindings).** The binding tooling generates declarations from the headers at build time. Re-generate after any DOCA upgrade — bindings pinned to a stale header will compile but call into the new `*.so` with mismatched signatures, returning `DOCA_ERROR_INVALID_VALUE` or, worse, silent corruption.
-- **Use the per-library `doca_<library>_cap_*` query family at runtime** as the authoritative answer for *"is this capability supported on this device + this install"*. The version-matrix is the *promise*; the cap query is the *reality*. When they disagree, the cap query wins — see `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) step 3.
+- **Use the per-library `doca_<library>_cap_*` query family at runtime** as the authoritative answer for *"is this capability supported on this device + this install"*. The documented availability is the *promise*; the cap query is the *reality*. When they disagree, the cap query wins — see `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) step 3.
 
 ## Error taxonomy
 
@@ -125,15 +123,16 @@ Every DOCA program has access to the same shared observability surface; library-
 
 **Logging.** DOCA libraries log via the `doca_log_register_*` API and emit to stderr by default. The CLI flag `--sdk-log-level <level>` (or the equivalent programmatic call `doca_log_backend_set_sdk_level()`) controls verbosity:
 
-- `30` (`DOCA_LOG_LEVEL_INFO`) — quiet, production default.
-- `50` (`DOCA_LOG_LEVEL_DEBUG`) — useful debug detail.
+- `10` (`DOCA_LOG_LEVEL_DISABLE`), `20` (`DOCA_LOG_LEVEL_CRIT`), `30` (`DOCA_LOG_LEVEL_ERROR`), `40` (`DOCA_LOG_LEVEL_WARNING`) — quieter than INFO.
+- `50` (`DOCA_LOG_LEVEL_INFO`) — quiet.
+- `60` (`DOCA_LOG_LEVEL_DEBUG`) — useful debug detail.
 - `70` (`DOCA_LOG_LEVEL_TRACE`) — every call traced; **the right setting for any first run of any new code path**.
 
 The trace build flavor enables additional sanitation that surfaces as log lines at `DEBUG` / `TRACE` level the release flavor would not emit.
 
 **Capability snapshots.** `doca_caps` (CLI) and the library's own capability-query API (programmatic) are the source of truth for *what this program can attempt on this host*. Capture both at the start of any debugging session; a stale capability picture is a leading cause of *"it worked yesterday"*.
 
-**Library-specific surfaces.** Pipe counters, queue statistics, channel send / recv counters, and tracing dumps are owned by each library. The library skill names the call (e.g. `doca_flow_pipe_query`) and the right cadence to query it; this skill does not duplicate that.
+**Library-specific surfaces.** Pipe counters, queue statistics, channel send / recv counters, and tracing dumps are owned by each library. The library skill names the call (e.g. `doca_flow_resource_query_entry`) and the right cadence to query it; this skill does not duplicate that.
 
 **Where logs go in long-running services.** DOCA services (DTS, telemetry exporter, etc.) configure their own log paths. Check `/var/log/doca*` or the service's own README before assuming output is missing; do not assume stderr.
 

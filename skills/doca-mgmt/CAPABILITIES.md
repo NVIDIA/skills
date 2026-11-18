@@ -81,7 +81,7 @@ or latency, `doca-bench` is the answer.
 
 ### The management context object model
 
-Two objects expose the management plane. Verified surface
+Two objects expose the management plane. Public surface
 (`doca_mgmt.h`):
 
 | Object | Calls | Note |

@@ -64,7 +64,7 @@ Two cross-cutting rules that apply to *every* pattern above:
 ## Capabilities and modes
 
 DOCA Device Emulation is an **umbrella library**: a shared
-architecture across the four sub-libraries covered end-to-end here,
+architecture across the five sub-libraries covered end-to-end here,
 each of which exposes its
 own API surface, `pkg-config` module, sample tree subdirectory,
 and capability-query family. The umbrella architecture is
@@ -101,6 +101,8 @@ and different firmware-level enablement axes.
 | Build a custom emulated PCIe device whose interface does not match any standard virtio class (e.g. a custom PCIe peripheral for prototyping, a security-isolated device with a custom PCIe surface, a research device with bespoke registers) | PCI Generic — raw PCIe device emulation | Gives the user direct control over the PCIe surface the host sees; the host binds its generic PCIe driver model rather than a class-specific virtio driver. The user owns the entire register / interrupt / BAR / configuration-space contract |
 | Expose a virtio network device to the host backed by custom DPU-side packet processing (e.g. a custom packet-forwarding logic the user wants the host to see as a standard virtio NIC) | virtio-net — emulated virtio network device | The host sees a standard virtio-net device and binds its upstream `virtio_net` kernel driver; the user only writes the DPU-side backend. The virtio framing + feature-negotiation is handled by the sub-library |
 | Expose a virtio filesystem to the host backed by custom DPU-side filesystem logic (e.g. a network-attached or specialized filesystem the host should see as a standard virtio-fs device) | virtio-fs — emulated virtio filesystem device | The host sees a standard virtio-fs device and binds its upstream `virtio_fs` kernel driver; the user only writes the DPU-side backend. The virtio-fs request shape is handled by the sub-library |
+| Expose a virtio-blk storage device to the host backed by custom DPU-side storage logic (e.g. a custom virtio-blk device whose blocks are served by DPU-side code) | virtio-blk — emulated virtio block device | The host sees a standard virtio-blk device; the user only writes the DPU-side backend. The virtio-blk sub-library exposes the queue counter, DMA device attachment, and capability-query families declared in the devemu public header |
+| Expose an NVMe storage device to the host backed by custom DPU-side storage logic (e.g. a custom NVMe controller whose namespaces are served by DPU-side code) | NVMe — emulated NVMe controller | The host sees a standard NVMe controller and binds its upstream `nvme` kernel driver; the user writes the DPU-side backend. The NVMe sub-library exposes the controller/queue/doorbell surface, including the DOCA 3.6 public CQ, PCI controller info, event, enable/disable, and DMA device attachment APIs |
 | Want a packaged NVMe / virtio-blk storage backend without writing the backend code yourself | None of this skill — DOCA SNAP Service; route via `doca-public-knowledge-map/SKILL.md` | SNAP is a packaged storage service built on top of Device Emulation; the user does not implement the backend. This skill is the *building block* the service uses; the service is a *separate artifact* |
 | Want a packaged virtio-net daemon without writing the backend code yourself | None of this skill — DOCA Virtio-net Service; route via `doca-public-knowledge-map/SKILL.md` | Virtio-net Service is a packaged virtio-net daemon built on top of this library's virtio-net sub-library; the user does not implement the backend. The library is the building block; the service is the packaged solution |
 | Want standard NIC behavior on the BlueField (no new emulated device class; just shape the data plane on the existing NIC) | None of this skill — use `doca-flow/SKILL.md` + `doca-eth/SKILL.md` | Device Emulation is for *new* emulated PCIe devices the host did not previously see. The BlueField's built-in NIC personality is shaped by Flow + Eth, not by this library |
@@ -111,12 +113,22 @@ before writing any code. Picking a sub-library *for* the user
 when the rows do not pin one is a wrong answer regardless of
 how clean the rest of the setup goes.
 
+**NVMe sub-library — DOCA 3.6 public API surface.** DOCA 3.6 adds public APIs to the NVMe sub-library. The creation flow is attr-based. For a completion queue, create a `doca_devemu_nvme_cq_create_attr` object, set the queue parameters (qid, qsize, PRP1, physically contiguous, interrupt enable/vector), then create the CQ from either a `doca_devemu_nvme_dev` or a `doca_devemu_nvme_offload_engine`; bind the CQ to an IO, modify/query its doorbell value, and unbind it. For a submission queue, the SQ family covers create/bind/flush/doorbell management. For started-from-export creation, create a `doca_devemu_nvme_dev_create_started_attr` object, set the shared-memory directory path and the event handlers, then call the started-from-export creation entry point with the PCI type, device representor, progress engine, export descriptor, attr, user data, and state-change callback. The public header for the NVMe sub-library declares the `doca_devemu_nvme_*` families: device and IO create, CQ create/bind/modify/query/destroy, SQ create/bind/flush/doorbell management/destroy, device export/shm/state, PCI controller info enumeration, started-from-export creation, device enable/disable, event registration, DMA device attachment, and the `doca_devemu_nvme_cap_*` capability queries (including max PF/VF MSI-X, max export descriptor length, max shared-memory directory path length, and PCI controller management support). Do not treat these as unsupported; they are the DOCA 3.6 public surface for the NVMe sub-library.
+
+**PCI sub-library — DOCA 3.6 public API surface.** The PCI sub-library's public header now declares the `doca_devemu_pci_dpu_db_completion_*` family for DPU doorbell completion, the `doca_devemu_pci_tlp_cap_pcie_is_*_supported` family for PCIe TLP capability queries (part of the broader `doca_devemu_pci_tlp_cap_*` family), and the PCI controller number handling families. These are capability families, not individual functions; query them through the same per-sub-library capability pattern. Do not treat these as unsupported; they are the DOCA 3.6 public surface for the PCI sub-library.
+
+**virtio-net sub-library — DOCA 3.6 public API surface.** DOCA 3.6 adds public APIs to the virtio-net sub-library. The devemu public header declares the `doca_devemu_virtio_dev_*` family for virtio device lifecycle and state control, the `doca_devemu_virtio_dev_get_shm_dir_path` / `doca_devemu_virtio_dev_set_shm_dir_path` family for virtio shared-memory directory configuration, the `doca_devemu_virtio_queue_counters_get_*` family for virtio queue counter getters, and the `doca_devemu_vnet_offload_engine_get_*` family for vnet offload engine ifindex/rep getters. Do not treat these as unsupported; they are the DOCA 3.6 public surface for the virtio-net sub-library.
+
+**virtio-blk sub-library — DOCA 3.6 public API surface.** DOCA 3.6 adds public APIs to the virtio-blk sub-library. The devemu public header declares the `doca_devemu_vblk_*_dma_dev` family for DMA device attachment/removal, the `doca_devemu_vblk_cap_is_*_queue_counter_supported` family for queue counter capability queries, and the `doca_devemu_vblk_offload_engine_create_queue_counters_list` / `doca_devemu_vblk_queue_counters_*` families for queue counter list creation, population, and query. Do not treat these as unsupported; they are the DOCA 3.6 public surface for the virtio-blk sub-library.
+
+**virtio-fs sub-library — DOCA 3.6 public API surface.** DOCA 3.6 adds public APIs to the virtio-fs sub-library. The devemu public header declares the `doca_devemu_vfs_add_dma_dev` family for DMA device attachment, the `doca_devemu_vfs_rm_dma_dev` family for DMA device removal, the `doca_devemu_vfs_cap_get_*` / `doca_devemu_vfs_cap_is_pci_controller_mgmt_supported` families for default-VF-type MSI-X, export-descriptor-length, and PCI-controller-management capability queries, the `doca_devemu_vfs_create_pci_controller_info_list` family for PCI controller info enumeration, the `doca_devemu_vfs_dev_create_started_attr_*` family for started-from-export creation attributes, the `doca_devemu_vfs_dev_*` family for device export/import, and the `doca_devemu_vfs_io_event_vfs_fuse_*` family now including the 64-bit FUSE copy_file_range handler registration entry point. The 64-bit FUSE handler supplements the existing 32-bit handler; both are declared in the devemu public header. Do not treat these as unsupported; they are the DOCA 3.6 public surface for the virtio-fs sub-library.
+
 **The per-sub-library DOCA Core context — one per emulated
 device per sub-library.**
 
 | Object class | Per | Lifetime | What it owns | Key calls |
 | --- | --- | --- | --- | --- |
-| The chosen sub-library's emulated-device context (one of: PCI Generic emulated-device context, virtio-net emulated-device context, virtio-fs emulated-device context) | One per emulated device the DPU is exposing in that sub-library | Created against a `doca_dev` that maps to a BlueField with the matching emulation type enabled in firmware; lives until the host driver is detached and the context is destroyed | The DOCA-side bookkeeping for that emulated device, the registration of the doorbell / DMA primitives the host driver will interact with, and the host-side observability for the emulated device's state | DOCA Core create / configure / start / stop / destroy on the per-sub-library context object; the per-sub-library `doca_devemu_<sub>_cap_*` family for capability queries; the per-sub-library doorbell / DMA primitives for host ↔ DPU interaction |
+| The chosen sub-library's emulated-device context (one of: PCI Generic emulated-device context, virtio-net emulated-device context, virtio-fs emulated-device context, virtio-blk emulated-device context, NVMe emulated-device context) | One per emulated device the DPU is exposing in that sub-library | Created against a `doca_dev` that maps to a BlueField with the matching emulation type enabled in firmware; lives until the host driver is detached and the context is destroyed | The DOCA-side bookkeeping for that emulated device, the registration of the doorbell / DMA primitives the host driver will interact with, and the host-side observability for the emulated device's state | DOCA Core create / configure / start / stop / destroy on the per-sub-library context object; the per-sub-library `doca_devemu_<sub>_cap_*` family for capability queries; the per-sub-library doorbell / DMA primitives for host ↔ DPU interaction |
 
 
 A DPU exposing more than one emulated device — or emulated
@@ -144,7 +156,11 @@ sub-library exposes its own `doca_devemu_<sub>_cap_*` family.
 Before assuming a feature bit, a maximum, or a device
 characteristic is available, call the matching family against
 the active `doca_devinfo` for the BlueField device the user is
-emulating from.
+emulating from. The DOCA 3.6 additions include the virtio-blk
+queue-counter capability family and the virtio-fs
+default-VF-type MSI-X, export-descriptor-length, and
+PCI-controller-management capability families; query them
+through the same pattern.
 
 ## Version compatibility
 
@@ -182,31 +198,48 @@ there; this skill does not duplicate it.
   `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)
   catches the partial-install case where the umbrella is
   installed but a sub-library is not.
-- **The devemu public API changed in DOCA 3.5.** DOCA 3.5
-  introduced breaking public API changes for devemu. Code
-  using the previous devemu API surface must migrate. Removed
-  families include VFS configuration
-  create/destroy/add/remove/user-data-size APIs
-  (`doca_devemu_vfs_cfg_*`) and the PCI device VF-count and
-  reset getters/controls (`doca_devemu_pci_dev_get_num_vfs`,
-  `_get_total_vfs`, `_reset_db`, `_reset_msix`), and the PCI
-  capability-type hotplug query
-  (`doca_devemu_pci_cap_type_is_hotplug_supported`; use
-  `doca_devemu_pci_cap_is_hotplug_supported`).
-  Added families include the virtio offload engine setters
-  (`doca_devemu_virtio_offload_engine_*`), vnet capability
-  queries (`doca_devemu_vnet_cap_*`), vnet counters
-  (`doca_devemu_vnet_counters_*`), admin request user-data
-  size get/set (`doca_devemu_vnet_get_admin_req_user_data_size`
-  and `doca_devemu_vnet_set_admin_req_user_data_size`), and
-  vnet offload engine export/import
-  (`doca_devemu_vnet_offload_engine_export` and
-  `doca_devemu_vnet_offload_engine_create_from_export`).
-  Developers must use the devemu public header for exact
-  prototypes and constants for these families; do not hardcode
-  them from memory or from older DOCA releases. The header is
-  the same public Device Emulation header referenced in the
-  headers-win-over-docs bullet below.
+- **The devemu public API gained additions in DOCA 3.6.** DOCA 3.6
+  added public API families for devemu; the DOCA 3.5 devemu API
+  surface remains available but is not the current API surface.
+  Added families include the NVMe capability query family
+  (`doca_devemu_nvme_cap_get_*`), the NVMe completion queue family
+  (`doca_devemu_nvme_cq_*`), the NVMe device create-started
+  attribute family (`doca_devemu_nvme_dev_create_started_attr_*`),
+  the NVMe device event registration family
+  (`doca_devemu_nvme_dev_event_*_register`), the NVMe submission
+  queue family (`doca_devemu_nvme_sq_*`), the NVMe create/destroy
+  family (`doca_devemu_nvme_*_create`, `doca_devemu_nvme_*_destroy`),
+  the PCI DPU doorbell completion family
+  (`doca_devemu_pci_dpu_db_completion_*`), the PCI TLP capability
+  query family (`doca_devemu_pci_tlp_cap_*`), the NVMe device
+  export/shm/state family, the PCI controller number family, the
+  vblk DMA device add/remove family (`doca_devemu_vblk_*_dma_dev`),
+  the vblk queue-counter capability query family
+  (`doca_devemu_vblk_cap_is_*_queue_counter_supported`), the vblk
+  queue counters family (`doca_devemu_vblk_queue_counters_*` plus
+  the offload-engine queue-counters-list creation entry point), the
+  vfs DMA device add/remove family (`doca_devemu_vfs_*_dma_dev`),
+  the vfs capability query family (`doca_devemu_vfs_cap_*`), the
+  vfs PCI controller info list family
+  (`doca_devemu_vfs_create_pci_controller_info_list`), the vfs
+  device create-started attribute family
+  (`doca_devemu_vfs_dev_create_started_attr_*`), the vfs
+  export/import family (`doca_devemu_vfs_dev_export*`), the virtio
+  device enable/disable/state family
+  (`doca_devemu_virtio_dev_*` state/enable/disable), the virtio
+  queue counter getter family
+  (`doca_devemu_virtio_queue_counters_get_*`), the vnet counters
+  conversion entry point
+  (`doca_devemu_vnet_counters_vq_as_virtio_queue_counters`), the
+  vnet offload engine getter family
+  (`doca_devemu_vnet_offload_engine_get_*`), and the 64-bit FUSE
+  handler family
+  (`doca_devemu_vfs_io_event_vfs_fuse_*_64_req_handler_register`).
+  These families require DOCA 3.6. Developers must use the devemu
+  public header for exact prototypes and constants for these
+  families; do not hardcode them from memory or from older DOCA
+  releases. The header is the same public Device Emulation header
+  referenced in the headers-win-over-docs bullet below.
 - **Headers in $(pkg-config --variable=includedir doca-common)
   win over docs.** Per the headers-win-over-docs rule in
   `doca-version/SKILL.md`, if a public
@@ -300,6 +333,26 @@ declared in the header that declares the devemu vnet counter
 queries; treat them as the authoritative counter surface and
 do not rely on older counter guidance that omits them.
 
+DOCA 3.6 added vblk queue counters. Create the counters list
+from the vblk offload engine, populate the list, and read the
+qid, retry count, non-OK status count, header DMA fail count,
+and status DMA fail count through the
+`doca_devemu_vblk_queue_counters_*` family declared in the
+devemu public header. Treat that family as the authoritative
+vblk queue-counter surface; do not infer queue-counter values
+from older vblk guidance that omits it.
+
+DOCA 3.6 also added virtio queue counters. Obtain the virtio
+queue counter view for a VQ index from the vnet counters with
+`doca_devemu_vnet_counters_vq_as_virtio_queue_counters`, then
+read doorbells handled, heads completed, heads fetched, and
+MSI-X raised through the
+`doca_devemu_virtio_queue_counters_*` family declared in the
+devemu public header. Treat that family as the authoritative
+virtio queue-counter surface; do not infer virtio
+queue-counter values from older virtio guidance that omits
+it.
+
 For cross-cutting observability primitives
 (`--sdk-log-level`, the `DOCA_LOG_LEVEL` env var, the trace
 build flavor) see
@@ -324,6 +377,8 @@ negotiation reason. The agent's job is to verify all three
 before any `doca_devemu_<sub>_*` create call, not after the
 first `DOCA_ERROR_NOT_PERMITTED` or first silent host-side
 non-enumeration.
+
+**Device-state changes are hardware-safety-gated.** The DOCA 3.6 virtio device state family (`doca_devemu_virtio_dev_*` enable, disable, and event-state-change registration functions declared in the installed devemu header) changes the emulated device's runtime state. Before any code or run task calls an enable, disable, or state-change registration function, the agent must route the operation through `doca-hardware-safety/SKILL.md` and obtain its approval; do not treat these as ordinary library calls.
 
 The **env-precondition matrix** the agent must walk for any
 new Device Emulation setup:

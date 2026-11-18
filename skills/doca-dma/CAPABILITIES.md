@@ -69,6 +69,7 @@ buffer or assuming scatter-gather is supported, call the matching
 | Memcpy task supported on this device | `doca_dma_cap_task_memcpy_is_supported(devinfo)` | Some `doca_dev` entries do not advertise DMA at all; recommending the task without the probe is the silent-fail case |
 | Maximum per-task buffer size | `doca_dma_cap_task_memcpy_get_max_buf_size(devinfo)` | Device-dependent; submitting a task whose source or destination buffer exceeds this returns `DOCA_ERROR_INVALID_VALUE` |
 | Maximum scatter-gather buffer-list length | `doca_dma_cap_task_memcpy_get_max_buf_list_len(devinfo)` | Some devices cap the buffer-list at 1 (no scatter-gather); a multi-element list past the cap also returns `DOCA_ERROR_INVALID_VALUE` |
+| Sibling-PCI-link DMA device discovery | `doca_dma_get_dma_dev_on_sibling_pci_link` (declared in `doca_dma.h`) | Some DMA devices are reachable only through a sibling PCI link; use this to obtain the sibling `doca_devinfo` before creating the DMA context |
 
 **Path selection — DMA vs the adjacent libraries.** DMA is for
 mmap-to-mmap copies through the BlueField DMA engine. It is not
@@ -97,7 +98,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 
 **The DMA-specific overlay** is:
 
-- **Use the `doca_dma_cap_task_memcpy_*` query family at runtime.** Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap-query is the runtime authority for *"is the memcpy task supported on this device + this DOCA version, and how big a buffer can it move"*. The version-matrix is the *promise*; the cap query is the *reality*. Use `pkg-config --modversion doca-dma` as the build-time anchor (per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)) when the user asks which DMA features ship on this install.
+- **Use the `doca_dma_cap_task_memcpy_*` query family at runtime.** Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap-query is the runtime authority for *"is the memcpy task supported on this device + this DOCA version, and how big a buffer can it move"*. The documented availability is the *promise*; the cap query is the *reality*. Use `pkg-config --modversion doca-dma` as the build-time anchor (per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)) when the user asks which DMA features ship on this install.
 - **`doca-dma.pc` plus `doca-common.pc` must both match `doca_caps --version`** at the four-way-match check (per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)). A common partial-install pattern after a DOCA upgrade is that `doca-dma.pc` lingers from the previous release; route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) ladder step 2 before any DMA-layer diagnosis.
 - **Headers in $(pkg-config --variable=includedir doca-common) win over public docs.** Per the headers-win-over-docs rule in `doca-version/SKILL.md`, if a public DMA doc page mentions a `doca_dma_*` symbol that is not in the installed `doca_dma.h`, the headers describe what *this* install can call; the docs describe what *some* release shipped. The agent must quote the headers, not the docs URL, when the two disagree.
 
@@ -111,7 +112,7 @@ disambiguate before falling back to the cross-library response.
 
 | Error | DMA context where it shows up | DMA-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any submit before `doca_ctx_start()` or after `doca_ctx_stop()`; destroying the source or destination `doca_mmap` before `doca_ctx_destroy()` | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing an mmap underneath a still-running context. |
+| `DOCA_ERROR_BAD_STATE` | Any submit before `doca_ctx_start()` or after `doca_ctx_stop()`; destroying the source or destination `doca_mmap` before `doca_dma_destroy()` | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing an mmap underneath a still-running context. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_dma_task_memcpy_alloc_init` with an oversized buffer or an oversized buffer-list | The length exceeds `doca_dma_cap_task_memcpy_get_max_buf_size(devinfo)`, or the scatter-gather list exceeds `_get_max_buf_list_len(devinfo)`. The fix is to fragment at the application layer; do not retry without re-reading the cap. |
 | `DOCA_ERROR_AGAIN` | `doca_task_submit` on the memcpy task | The DMA task queue is full. This is *not* a hardware error; the program must drain completions via `doca_pe_progress()` before re-submitting. Same as the cross-library *"would-block, retry after progress"* pattern. |
 | `DOCA_ERROR_NOT_PERMITTED` | First memcpy submit, or first cross-peer submit | The mmap permission flag is missing for the direction of access — source mmap missing `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY`, destination missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`, or a cross-peer source not exported via `doca_mmap_export_*`. Re-walk the matrix in [`## Safety policy`](#safety-policy). |
@@ -181,7 +182,7 @@ walk for any new DMA setup:
 
 - **The mmap must stay valid until the DMA context is destroyed.**
   Destroying the source or destination mmap before
-  `doca_ctx_destroy()` is a use-after-free on the library's
+  `doca_dma_destroy()` is a use-after-free on the library's
   bookkeeping; symptoms include `DOCA_ERROR_BAD_STATE` from
   subsequent calls and undefined behavior on outstanding tasks.
 - **Validate permissions BEFORE the bulk run.** A small-buffer

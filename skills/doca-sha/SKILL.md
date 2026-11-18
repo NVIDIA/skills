@@ -17,7 +17,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - sha
@@ -34,6 +34,16 @@ compatibility: >
 
 ## Examples
 
+- **"SHA-256 a file with the DOCA SHA accelerator."** Answer shape, in
+  this order:
+  1. Lifecycle: `doca_sha_create` → configure (`doca_sha_task_hash_set_conf`
+     and the source / destination mmap permissions, both BEFORE
+     `doca_ctx_start`) → `doca_ctx_start` → submit → `doca_pe_progress` until
+     the completion arrives → `doca_ctx_stop` → `doca_sha_destroy`.
+  2. Task shape: one-shot `doca_sha_task_hash` when the input fits in one
+     buffer (a 1 MiB file normally does); `doca_sha_task_partial_hash` when
+     the input is larger than `doca_sha_cap_get_max_src_buf_size` or arrives
+     in chunks. Check that cap on the active `doca_devinfo` first.
 - **"Offload SHA-256 to the BlueField."** — this is in scope. Use the
   shipped SHA sample and `doca_sha_cap_*` before picking SHA-1 /
   SHA-256 / SHA-512.

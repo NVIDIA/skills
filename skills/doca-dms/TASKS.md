@@ -338,7 +338,7 @@ Three cross-cutting rules for this appendix:
 - The public DMS guide is the single source of truth. Any flag,
   path, operation, or auth-mode detail the agent quotes must come
   from there, not from generic gNMI / gNOI / gRPC knowledge.
-- DMS is currently **beta** with GA scoped to SPC-X use cases. Treat
+- Check the DMS guide's release status for your version. Treat
   any "what is the long-term roadmap" question as out of scope and
   defer to the live public guide.
 - Localhost-only auth is **never** safe to expose externally.

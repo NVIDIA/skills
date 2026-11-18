@@ -10,8 +10,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-argp`
 - Validation status: `passed`
-- Evaluation date: 2026-10-28
-- Evaluator version: `1.6.2`
+- Evaluation date: 2026-11-18
+- Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:00eed782d91c38f8c0b9ff88b81e2b137ce3f0533a3a7e49712ace4e29bfec0d` (skill-evaluator-dataset-snapshot/1)
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| doca-argp | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argp | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argp | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argp | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argp | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-argp | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argp | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argp | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argp | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argp | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
 
 - Controls for `doca-argp`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 96.4% — baseline ran, but no comparable score was available; uplift unavailable | 90.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 85.0% → 100.0% (+15.0 points) | 95.0% → 95.0% (±0.0 points) |
+| Correctness | 80.0% → 100.0% (+20.0 points) | 95.0% → 100.0% (+5.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 54.2% → 91.7% (+37.5 points) | 66.7% → 79.2% (+12.5 points) |
-| Efficiency | 90.1% — baseline ran, but no comparable score was available; uplift unavailable | 75.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 54.2% → 91.7% (+37.5 points) | 62.5% → 83.3% (+20.8 points) |
+| Efficiency | 90.1% — baseline ran, but no comparable score was available; uplift unavailable | 74.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -72,7 +72,7 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
 | claude-code | Efficiency | Token-only comparison | 98.4% → 91.4% (-7.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 85.2% → 86.6% (+1.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 85.1% → 86.3% (+1.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 677,794 | 286,985 | +390,809 | +136.18% | skill 4/4; base 4/4 |
-| claude-code | doca-argp.explicit-positive.v1 | 238,294 | 72,031 | +166,263 | +230.82% | skill 1/1; base 1/1 |
-| claude-code | doca-argp.implicit-positive.v1 | 237,594 | 71,914 | +165,680 | +230.39% | skill 1/1; base 1/1 |
-| claude-code | doca-argp.implicit-positive.v2 | 165,365 | 71,187 | +94,178 | +132.30% | skill 1/1; base 1/1 |
-| claude-code | doca-argp.negative.v1 | 36,541 | 71,853 | -35,312 | -49.14% | skill 1/1; base 1/1 |
-| codex | All cases | 338,665 | 167,284 | +171,381 | +102.45% | skill 4/4; base 4/4 |
-| codex | doca-argp.explicit-positive.v1 | 97,336 | 47,641 | +49,695 | +104.31% | skill 1/1; base 1/1 |
-| codex | doca-argp.implicit-positive.v1 | 102,524 | 35,234 | +67,290 | +190.98% | skill 1/1; base 1/1 |
-| codex | doca-argp.implicit-positive.v2 | 99,565 | 22,346 | +77,219 | +345.56% | skill 1/1; base 1/1 |
-| codex | doca-argp.negative.v1 | 39,240 | 62,063 | -22,823 | -36.77% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,016,459 | 454,269 | +562,190 | +123.76% | skill 8/8; base 8/8 |
+| claude-code | All cases | 677,742 | 287,063 | +390,679 | +136.10% | skill 4/4; base 4/4 |
+| claude-code | doca-argp.explicit-positive.v1 | 237,815 | 72,262 | +165,553 | +229.10% | skill 1/1; base 1/1 |
+| claude-code | doca-argp.implicit-positive.v1 | 238,038 | 71,953 | +166,085 | +230.82% | skill 1/1; base 1/1 |
+| claude-code | doca-argp.implicit-positive.v2 | 165,253 | 71,473 | +93,780 | +131.21% | skill 1/1; base 1/1 |
+| claude-code | doca-argp.negative.v1 | 36,636 | 71,375 | -34,739 | -48.67% | skill 1/1; base 1/1 |
+| codex | All cases | 341,014 | 220,866 | +120,148 | +54.40% | skill 4/4; base 4/4 |
+| codex | doca-argp.explicit-positive.v1 | 98,686 | 66,482 | +32,204 | +48.44% | skill 1/1; base 1/1 |
+| codex | doca-argp.implicit-positive.v1 | 103,183 | 70,510 | +32,673 | +46.34% | skill 1/1; base 1/1 |
+| codex | doca-argp.implicit-positive.v2 | 100,455 | 21,833 | +78,622 | +360.11% | skill 1/1; base 1/1 |
+| codex | doca-argp.negative.v1 | 38,690 | 62,041 | -23,351 | -37.64% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,018,756 | 507,929 | +510,827 | +100.57% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -98,8 +98,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -107,14 +107,12 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
-  "## Error taxonomy" in CAPABILITIES.md (lines 158-181)
-  vs "## debug" in TASKS.md (lines 266-323) (`CAPABILITIES.md:158`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-argp/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-argp/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-argp`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo        (`BENCHMARK.md:87`)
-- 11 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo          (`BENCHMARK.md:116`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: Sudo  (`TASKS.md:353`)
+- 9 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

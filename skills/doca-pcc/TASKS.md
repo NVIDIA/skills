@@ -111,7 +111,10 @@ Steps the agent should walk the user through:
    `doca_pcc_dev_histogram_*` family. Validate limits with the
    `doca_pcc_dev_get_*` family before declaring. These
    declarations are mandatory before runtime; skipping them
-   leaves the configure flow incomplete. Then load the
+   leaves the configure flow incomplete. Set the algorithm
+   preconfiguration path with `doca_pcc_set_algo_preconfig_path()`
+   (declared in the DOCA PCC public header) before loading the
+   algorithm image. Then load the
    `doca_pcc_app` produced by `dpacc`
    from the user's DPA-side algorithm source into the
    `doca_pcc`; then set whatever host-side parameters the
@@ -194,7 +197,7 @@ this skill provides the PCC-specific slot fill.
 
 | Slot | What the agent asks the user | PCC-specific consideration |
 | --- | --- | --- |
-| 1. Starting sample | Which sample under `/opt/mellanox/doca/samples/doca_pcc/`? | Pick a sample whose **shape** matches the user's intent: same host-side parameter shape, same observability pattern, same DPA-side algorithm-entry-point set. PCC samples are two-side programs; the sample's DPA-side translation unit is the second half of the verified base, and the algorithm body in it is the starting point for the user's own algorithm |
+| 1. Starting sample | Which starting point under `/opt/mellanox/doca/applications/pcc/` (`host/` + `device/`)? | Pick a sample whose **shape** matches the user's intent: same host-side parameter shape, same observability pattern, same DPA-side algorithm-entry-point set. PCC samples are two-side programs; the sample's DPA-side translation unit is the second half of the verified base, and the algorithm body in it is the starting point for the user's own algorithm |
 | 2. DPA-side algorithm body | What is the algorithm actually computing? Is it a brand-new design or a tweak on the sample's algorithm? | The DPA-side translation unit is the in-place edit point for the algorithm body. The agent's anti-pattern alerts: (a) do NOT propose moving the algorithm logic to the host side — that defeats the entire reason to use PCC (the algorithm has to run per packet / per event on the DPA, not host-round-trip per packet); (b) do NOT invent a brand-new algorithm body in this skill — congestion-control algorithm design is a research / domain question, not an API question, route via `doca-public-knowledge-map/SKILL.md` |
 | 3. Host-side parameter shape | What parameters does the algorithm take, what shapes / sizes / ranges? | Per the two-side-program rule in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes), the host-side parameter calls and the DPA-side algorithm's parameter shape MUST agree on count, size, type, and range. Any change to one side requires updating the other; track this as a single edit, not two |
 | 4. Attach-to-port choice | Which `doca_dev` will the modified algorithm attach to? Is it the same port the sample assumes? | The `doca_dev` selection in the sample's host-side configure step is what determines which BlueField port the algorithm modulates. Changing it changes which RDMA / RoCE traffic the algorithm affects; the agent must surface this even when it looks like a trivial config tweak |
@@ -540,10 +543,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *“available since”* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *“using structured
@@ -562,7 +568,7 @@ the agent should:
 | `pkg-config --cflags --libs doca-pcc` | `## build` | What include + link flags does the host-side linker need? | Trust whatever `pkg-config --cflags --libs` produces on this install. Do not hardcode either the `-I` include path or the `-l<name>` flag form — both can drift between DOCA install profiles and DOCA majors; the on-disk `.so` basenames use underscores, while the `.pc` package names use hyphens, and `pkg-config` is the only thing that resolves both correctly. Hand-crafted `-l` lines silently break when DOCA upgrades. |
 | `which dpacc && dpacc --version` (or the install-tree path) | `## configure` step 1; `## build` minimum-DPACC slot | Is the DPACC compiler installed and at what version? | A version string the agent compares against the DOCA Compatibility Policy linked from [`CAPABILITIES.md ## Version compatibility`](CAPABILITIES.md#version-compatibility). Missing `dpacc` = the DPA-side algorithm cannot be built; route to `doca-setup/SKILL.md` |
 | `doca_caps --list-devs` | `## configure` step 1; `## configure` step 3 | Which DOCA devices does the host see, and which expose a DPA processor (the hardware substrate the custom PCC algorithm runs on)? | One entry per `doca_dev` with the BlueField identity and the per-library capability flags including the DPA support axis. No DPA-capable entry = the BlueField is not present, not in the right mode, or not on a generation that exposes the DPA; route to `doca-setup/SKILL.md` |
-| `ls /opt/mellanox/doca/samples/doca_pcc/` | `## modify` slot 1 | Which PCC samples ship in this install (both host-side AND DPA-side translation units), and which is the closest starting point? | A list of sample directories that each contain BOTH host-side and DPA-side source plus a `meson.build` that wires `dpacc` and `pkg-config doca-pcc` together |
+| `ls /opt/mellanox/doca/applications/pcc/ /opt/mellanox/doca/applications/pcc/device/` | `## modify` slot 1 | Which PCC sources ship in this install (both host-side AND DPA-side translation units), and which is the closest starting point? | A `host/` directory and a `device/` directory (with `rp/` / `np/` algorithm subtrees), plus a `meson.build` and `build_device_code.sh` that wire `dpacc` and `pkg-config doca-pcc` together |
 | `dmesg \| tail -n 40` (sudo) | `## debug` layer 7 | What did the kernel / driver log around the last PCC call? | Empty or recent benign messages. Repeated mlx5 / PCC-driver / firmware errors → driver-layer bug; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`). Repeated *“custom PCC slot not enabled”* or similar → firmware-side fix |
 | `DOCA_LOG_LEVEL=trace ./<binary>` | `## run` step 5 | What did the structured DOCA logger emit for the first failing host-side PCC call? | A trace-level line on every host-side lifecycle transition and every algorithm-load / parameter-set call. Silence after a `doca_pcc_start()` = either host PE not progressed OR algorithm body running but emitting nothing — reach for the counter tool next |
 | (route via `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`)) `pcc_counters` CLI — read-only PCC counter inspection at the port | `## test` step 2; `## debug` layer 5 | What are the actual PCC-related counters at the BlueField port doing right now, independent of the host-side `doca-pcc` program? | The public *DOCA Tools* umbrella documents the per-tool output; the agent's job is to NAME the existence of this tool and route the user there, not to redefine its surface. This is the load-bearing diagnostic for the *“the algorithm loaded but I see no on-wire change”* case |

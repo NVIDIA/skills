@@ -77,7 +77,7 @@ load-bearing routing rule before any code:
 | --- | --- | --- |
 | **Factory PCC** (firmware-resident default) | The user wants a documented, supported CC algorithm with no custom code; firmware-level configuration is sufficient; no programmable-CC slot is required. | Firmware configuration via `mlxconfig`-class knobs; route via `doca-public-knowledge-map/SKILL.md`. |
 | **`doca-pcc/SKILL.md`** (stable, established) | The user wants a custom CC algorithm on the established PCC surface; the install supports it; the BlueField generation + firmware exposes the custom-PCC slot. | `doca-pcc/SKILL.md` host-side lifecycle + DPA-side algorithm via DPACC. |
-| **`doca_spcx_cc` / SPCX** (SPC-X CC extension) | The user wants the documented SPCX-class flexibility (the extension surface this tool drives), the install has SPCX exposed, and the user accepts that SPCX is the *newer* of the two surfaces (potentially preview / limited HW on some installs). | This skill (operator side) + the DPA-side SPCX algorithm via DPACC. |
+| **`doca_spcx_cc` / SPCX** (SPC-X CC extension) | The user wants the documented SPCX-class flexibility (the extension surface this tool drives), the install has SPCX exposed, and the user accepts that SPCX is the *newer* of the two surfaces (availability per the release notes). | This skill (operator side) + the DPA-side SPCX algorithm via DPACC. |
 
 The agent's rule: **probe before committing**. Confirm
 which surfaces are exposed on the user's install (via
@@ -105,7 +105,7 @@ programming guide:
 | Role | What it is | When it is loaded |
 | --- | --- | --- |
 | Reaction Point (RP) | The role that REACTS to congestion signal by adjusting send rate. The shipped `doca_spcx_cc` binary runs in this role and registers no runtime `--role` flag (confirm with `--help`). The agent does NOT quote `--role RP`; it loads RP by running the shipped binary as-is. | The standard custom-CC role; loaded on the side of the fabric that is *sourcing* the RDMA / RoCE traffic and that needs to be rate-adjusted. |
-| Notification Point (NP) | The role that GENERATES the congestion signal — typically the receive side or a switch ASIC. The shipped binary exposes no NP switch; route NP-side questions to the public SPC-X CC documentation via `doca-public-knowledge-map ## DOCA tools` and confirm on `--help`. The agent does NOT invent a runtime `--role` flag that the binary does not register. | When the SPCX algorithm needs a custom NP-side behaviour different from the documented factory behaviour. |
+| Notification Point (NP) | The role that GENERATES the congestion signal — typically the receive side or a switch ASIC. The shipped binary exposes no NP switch; route NP-side questions to the DOCA release notes (via `doca-public-knowledge-map`) and confirm on `--help`. The agent does NOT invent a runtime `--role` flag that the binary does not register. | When the SPCX algorithm needs a custom NP-side behaviour different from the documented factory behaviour. |
 
 The probe-packet format axis (`--probe-packet-format`)
 selects between the documented formats (CCMAD per the
@@ -145,7 +145,7 @@ the run is uninformative by construction.
 **SPCX runtime observability surface.** The host-side
 tool prints a status indicator (per the
 `doca-pcc/SKILL.md` status surface
-the agent observed in the shipped sample: `Active`,
+as documented in the shipped sample / `doca_pcc.h`: `Active`,
 `Standby`, `Deactivated`, `Error`) and produces tracer-
 style per-port / per-flow runtime captures the user can
 correlate against the algorithm's intended behaviour.

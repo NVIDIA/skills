@@ -53,10 +53,15 @@ Steps the agent should walk the user through, in order:
    `/sys/kernel/debug/mlx5/<pci>/diag_cnt/`, so debugfs must be
    mounted (`mount | grep debugfs`), the mlx5 driver loaded,
    and the user must have root / sudo.
-4. **Confirm platform and exclusivity.** The tool is not
-   supported on ConnectX-8 and must not run alongside DOCA
-   Ngauge or DOCA Telemetry. On BlueField-3, run it on the Arm
-   side in DPU mode and on the host side in NIC mode.
+4. **Confirm platform and exclusivity.** The tool is supported
+   only on ConnectX-7 and BlueField-3 and must not run alongside DOCA
+   Ngauge or DOCA Telemetry. Check both, read-only, before any
+   `set`: `lspci -s <pci> | grep -Ei 'connectx-7|bluefield-3'` must
+   match the target device (otherwise stop and confirm support in the public PCC Counter Tool guide), and `pgrep -af 'ngauge|telemetry'`
+   must show no DOCA Ngauge or DOCA Telemetry process. If either
+   check fails, stop and tell the operator which one; do not arm
+   counters. On BlueField-3, run it on the Arm side in DPU mode
+   and on the host side in NIC mode.
 
 `pcc_counters.sh` takes **no configuration of its own** — there
 is no config file, no environment knob. "Configure" here means

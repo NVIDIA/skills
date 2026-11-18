@@ -174,7 +174,7 @@ there; this skill does not duplicate it.
   `pkg-config --exists doca-dpdk-bridge` returns failure, the
   bridge is either not installed on this DOCA, or the module
   name in this DOCA release differs — confirm via
-  `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep
+  `ls /opt/mellanox/doca/lib/$(uname -m)-linux-gnu/pkgconfig/ | grep
   -i dpdk` before claiming the bridge is missing.
 
 ## Error taxonomy
@@ -259,7 +259,7 @@ bridge setup:
 
 | Precondition | What must be true before the first bridge call | How the agent verifies | Where to fix |
 | --- | --- | --- | --- |
-| DOCA + DPDK matched pair | `pkg-config --modversion doca-dpdk-bridge` agrees with `doca_caps --version`; `pkg-config --modversion libdpdk` falls within the window the bridge's installed headers / docs declare; `pkg-config --exists doca-dpdk-bridge` succeeds | The three pkg-config queries above; if the bridge module name differs in this release, `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep -i dpdk` to find it | `doca-version/SKILL.md` for the canonical four-way match; reinstall the matched pair if it does not hold — do not patch around it |
+| DOCA + DPDK matched pair | `pkg-config --modversion doca-dpdk-bridge` agrees with `doca_caps --version`; `pkg-config --modversion libdpdk` falls within the window the bridge's installed headers / docs declare; `pkg-config --exists doca-dpdk-bridge` succeeds | The three pkg-config queries above; if the bridge module name differs in this release, `ls /opt/mellanox/doca/lib/$(uname -m)-linux-gnu/pkgconfig/ | grep -i dpdk` to find it | `doca-version/SKILL.md` for the canonical four-way match; reinstall the matched pair if it does not hold — do not patch around it |
 | DPDK runtime preconditions met | The user has hugepages mounted, the target PCIe port is bound under DPDK (e.g. via `dpdk-devbind.py`), `rte_eal_init` is called by the user's app, `rte_eth_dev_start` succeeded on the target port id | DPDK's own diagnostics (`dpdk-devbind.py --status`, hugepage `cat /proc/meminfo | grep Huge`); the agent does NOT walk DPDK setup itself — defer to upstream DPDK docs via `doca-public-knowledge-map/SKILL.md` | Upstream DPDK documentation; `doca-setup/SKILL.md` for the hugepage / `mlx5` env preconditions DOCA shares with DPDK |
 | DOCA-side device access | A `doca_dev` opens against the same physical device DPDK is using (typically requires sudo or `mlnx`-group membership) | `id` for group membership; the open call failing with `DOCA_ERROR_NOT_PERMITTED` is the runtime symptom | `doca-setup/SKILL.md` for the env-side; do not modify the bridge program |
 

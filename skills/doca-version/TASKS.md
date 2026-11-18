@@ -2,7 +2,7 @@
 
 **Where to start:** The verbs run `configure → build → modify → run
 → test → debug`. Skip ahead only when the user is already past a
-verb. The `## test` verb is the four-way match + version-matrix
+verb. The `## test` verb is the four-way match + capability-availability
 lookup loop (read sources → cross-check → look up min-version per
 capability → loop back if drift detected), not a one-shot pass —
 see the eval-loop overlay in `## test` below.
@@ -28,12 +28,13 @@ can quote the verified version).
 
 Steps the agent should walk the user through:
 
-1. **Probe for the structured helper first.** Run `command -v
-   doca-env` (per
+1. **Probe for an optional site-provided helper first.** If your
+   site provides an env-report helper (none ships with public
+   DOCA), probe it with `command -v <site env-report helper>` (per
    `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`)).
-   If present, run `doca-env --json` and read `version.consistent`
+   If present, run it and read `version.consistent`
    — one line, four-way match pre-computed. Report *"using
-   structured `doca-env`"* per the contract's report rule.
+   structured `<helper>`"* per the contract's report rule.
    If the command fails, emits invalid JSON, or omits
    `version.consistent`, record the helper failure and fall back to
    the manual chain; do not infer coherence from partial output.
@@ -98,9 +99,9 @@ Three concrete shapes the modify workflow handles:
 
 | Modify intent | What changes | Pre-modify checklist |
 | --- | --- | --- |
-| 1. Update a build-manifest `pkg-config` minimum | The minimum DOCA version the project requires (e.g. `dependency('doca-common', version: '>=2.6.0')` in `meson.build`) | Confirm via the version-matrix that 2.6.0 is in fact when the user's needed capability landed; over-pinning excludes users whose install is older but supports the capability via a different path |
+| 1. Update a build-manifest `pkg-config` minimum | The minimum DOCA version the project requires (e.g. `dependency('doca-common', version: '>=2.6.0')` in `meson.build`) | Confirm via the documented availability that 2.6.0 is in fact when the user's needed capability landed; over-pinning excludes users whose install is older but supports the capability via a different path |
 | 2. Update a per-library skill's `## Version compatibility` overlay | The 3-5 line redirect + the one library-specific overlay rule | Per the overlay pattern in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), the overlay MUST cross-link this skill and MUST add at most one library-specific rule; if you find yourself writing more, the content belongs here instead |
-| 3. Bump the version-matrix when a new DOCA release ships | Append rows to `version-matrix.json` for newly-available capabilities, set `max_doca_version` on rows the new release removes | The schema is locked in `doca-structured-tools-contract/SKILL.md#schemas`; follow it. The source-quote field MUST be derived from a public docs URL, never agent memory |
+| 3. Bump a site capability-availability table when a new DOCA release ships | Append rows to that table for newly-available capabilities, set `max_doca_version` on rows the new release removes | The schema is locked in `doca-structured-tools-contract/SKILL.md#schemas`; follow it. The source-quote field MUST be derived from a public docs URL, never agent memory |
 
 Each modify intent produces a *minimum diff*; never expand scope
 to "while we're here". A version-only modify that also re-flows
@@ -126,7 +127,7 @@ Three runtime checks the agent recommends in order:
    at build time.
 3. **Per-library cap query at runtime.** Once the program is up,
    call the relevant `doca_<library>_cap_*` query for the
-   capabilities the program depends on. The version-matrix told
+   capabilities the program depends on. The documented availability told
    the program *what should be there*; the cap query tells it
    *what is actually there*. When they disagree, the cap query
    wins.
@@ -150,16 +151,16 @@ Iteration shape:
 1. **Four-way match check.** Read all four sources (per
    [`## configure`](#configure) step 2). Pass = all four agree.
    Fail = route to [`## debug`](#debug) ladder step 2.
-2. **Version-matrix lookup.** For each capability the user's
+2. **Capability-availability lookup.** For each capability the user's
    program / question depends on: look up
-   `version-matrix.json` (per
-   `doca-structured-tools-contract ## version-matrix.json schema` (`doca-structured-tools-contract/SKILL.md#schemas`))
+   a site capability-availability table (per
+   `doca-structured-tools-contract ## capability-availability table schema` (`doca-structured-tools-contract/SKILL.md#schemas`))
    if present; otherwise fetch the matching per-library docs
    page via `doca-public-knowledge-map/SKILL.md`
    and extract the *"available since"* prose. Compare the
    minimum DOCA version against the installed version.
 3. **Per-library capability query.** For each capability the
-   version-matrix says is in this release: run the matching
+   documented availability says is in this release: run the matching
    `doca_<library>_cap_*` query against the active
    `doca_devinfo`. If false, the device does not support the
    capability even though the version does — narrow to a
@@ -178,9 +179,9 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
 | Four-way match was passing yesterday, fails today | One of the sources is now reading a different version | Something on disk changed: a partial upgrade, a new `LD_LIBRARY_PATH`, a different `PKG_CONFIG_PATH` in the shell. Re-narrow to *which* source moved. |
-| Version-matrix says capability X is available; cap query returns false | The release supports the capability; this device does not | Device-level constraint; the answer is at the device layer, not the version layer. Route to the matching library skill's `## configure`. |
+| The capability-availability table says capability X is available; cap query returns false | The release supports the capability; this device does not | Device-level constraint; the answer is at the device layer, not the version layer. Route to the matching library skill's `## configure`. |
 | Cap query returns true; runtime call still returns `DOCA_ERROR_NOT_SUPPORTED` | The capability claim is fine at startup; something else changed | Runtime state changed mid-program (different context, different device, different permissions). Route to the matching library skill's `## debug`. |
-| Version-matrix lookup gave a definitive answer; the user reports a different result | Either the version-matrix is stale, OR the user's installed version is not what the agent thought | Re-run step 1 (four-way match) first; a stale version-matrix is rare, a forgotten reinstall is common. |
+| Capability-availability lookup gave a definitive answer; the user reports a different result | Either the availability source is stale, OR the user's installed version is not what the agent thought | Re-run step 1 (four-way match) first; a stale availability source is rare, a forgotten reinstall is common. |
 | Cross-host: host A passes; host B fails | The deploy host has a different DOCA install | This is the multi-host case of partial-install. The fix is to bring both hosts to the same release. |
 
 Loop termination: run the version sweep once and, only when one
@@ -393,12 +394,12 @@ unprivileged user unless noted. Rows that need elevated privileges call that out
 
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
-| Read `version.consistent` from `doca-env --json` if present per `doca-structured-tools-contract/SKILL.md#schemas`; else walk the manual chain below | `## configure` step 1 | What is the installed DOCA version and is it consistent? | Single semver matching across all sources (structured) OR four matching semver strings from the manual chain |
+| Read `version.consistent` from a site env-report helper if present per `doca-structured-tools-contract/SKILL.md#schemas`; else walk the manual chain below | `## configure` step 1 | What is the installed DOCA version and is it consistent? | Single semver matching across all sources (structured) OR four matching semver strings from the manual chain |
 | `pkg-config --modversion doca-common` | `## configure` step 2; `## build` slot 1 | What is the build-time DOCA version? | A semver string matching `doca_caps --version` |
 | `cat /opt/mellanox/doca/applications/VERSION` | `## configure` step 2 | What does the install tree itself claim? | A semver string matching the other sources |
 | `"$DOCA_CAPS" --version` after resolving `DOCA_CAPS` in `## configure` step 2 (the canonical `doca_caps --version` leg) | `## configure` step 2; `## run` step 1 | What is the runtime DOCA version without assuming the tool is on `PATH`? | A semver string matching `pkg-config --modversion doca-common` |
 | `bfver` (BlueField Arm console, or on the host against a standalone BFB file) and `cat /etc/mlnx-release` (BlueField Arm side) | `## configure` step 2 (BlueField only) | What is the BFB-side DOCA version? | A semver string from `bfver` and a full BFB image string from `/etc/mlnx-release`, both matching the host package version. Do NOT use `mlxprivhost` or `bfb-info` for this — see [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes). |
 | `grep -RHn 'DOCA_VERSION_' $(pkg-config --variable=includedir doca-common)/doca_version.h` | `## configure` step 2; `## build` slot 2 | What macros does this install expose for compile-time version checks? | A `DOCA_VERSION_MAJOR / MINOR / PATCH` triple matching the runtime version |
 | `ldconfig -p | grep doca` | `## run` step 2; `## debug` layer 2 | Which DOCA `*.so` files does the runtime linker see? | One install's set of `*.so` files; multiple installs visible = the runtime might resolve to the wrong one |
-| `ls "$(dirname "$(find /opt/mellanox/doca -name doca-common.pc -print -quit)")"` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/` on DOCA 3.3+, OR `/opt/mellanox/doca/infrastructure/lib/pkgconfig/` on legacy / split-profile installs) | `## debug` layer 2 | Which `*.pc` files does this install ship? | One `*.pc` per installed library; `doca-common.pc` MUST be present |
-| Look up capability in `version-matrix.json` if present per `doca-structured-tools-contract/SKILL.md#schemas`; else fetch the matching per-library docs page via `doca-public-knowledge-map/SKILL.md` and extract the *"available since"* prose | `## test` step 2 | Is capability X available on the user's installed version? | Min-version row (structured) OR quoted prose (manual) — both saying *"available since DOCA Y.Z.W"* |
+| `ls "$(dirname "$(find /opt/mellanox/doca -name doca-common.pc -print -quit)")"` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/`) | `## debug` layer 2 | Which `*.pc` files does this install ship? | One `*.pc` per installed library; `doca-common.pc` MUST be present |
+| Look up capability in a site capability-availability table if present per `doca-structured-tools-contract/SKILL.md#schemas`; else fetch the matching per-library docs page via `doca-public-knowledge-map/SKILL.md` and extract the *"available since"* prose | `## test` step 2 | Is capability X available on the user's installed version? | Min-version row (structured) OR quoted prose (manual) — both saying *"available since DOCA Y.Z.W"* |

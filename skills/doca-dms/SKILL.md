@@ -18,7 +18,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: service
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - dms
@@ -37,6 +37,23 @@ compatibility: >
 
 ## Examples
 
+- **"Deploy DMS on my BlueField-3 and check it came up healthy."**
+  Mandated answer shape, in this order. First say what DMS is: from DOCA 3.5 the local `dms-cli`
+  (`/opt/mellanox/doca/services/dms/dms-cli`, one command per YANG path,
+  no server, ships with the DOCA install, nothing to deploy); for remote or
+  fleet management over gRPC (gNMI Get/Set, gNOI), the legacy service: the
+  `dmsd` frontend plus the privileged `dmspe` backend. Where it runs: on the
+  BlueField Arm (default) or on the host that owns the PCIe device, with the
+  `dmsc` client local or remote over the management network; containerized
+  or as a pod, the image comes from the NGC catalog (never invent a tag).
+  Healthy: `dms-cli --tree /nvidia` lists the model and
+  `dms-cli -t pci/<BDF> /nvidia/mode/operating-mode` returns a value; for
+  the service, `systemctl status dmsd` and a documented read such as
+  `dmsc -a <host>:9339 <auth flags> get --path /state/system/platform`.
+  If it did not come up: `journalctl -u dmsd` (systemd) or
+  `docker logs` / `kubectl logs` plus `/var/log/dms/dms_wrapper.log`
+  (container / pod) for the frontend, `journalctl | grep dmspe` for the
+  backend, and the gRPC status code of the failing call.
 - **"Read or change a BlueField setting locally."** — use
   `dms-cli` (DOCA 3.5+); explore the path with `--tree` first.
 - **"Manage a remote BlueField over gRPC."** — this is in
@@ -88,12 +105,9 @@ BlueField Arm with no server or daemon. One syntax per YANG path:
 path plus a value sets it, and action paths run operations. Explore before
 writing: `--tree /nvidia`, `--describe <path>` and `list-xpaths <path>`;
 script with `--json`; validate with `--dry-run`. VFs and SFs take
-`-t pci/<BDF>,pf<N>vf<M>` or `pf<N>sf<M>`. On DOCA 3.5: as a normal
-user it fails with `backend fork/exec .../dmspe: permission denied` — run it
-with `sudo` or add the user to `dmsgroup`; some example paths do not exist on
-every device (for example congestion-control slots are under
-`/nvidia/cc/algo/slot` there), so confirm every path with `--tree` /
-`list-xpaths` before using it. Firmware or BFB installs
+`-t pci/<BDF>,pf<N>vf<M>` or `pf<N>sf<M>`. `dms-cli` may need `sudo` or
+`dmsgroup` membership; YANG paths vary by device, so confirm them with the
+CLI's tree/list commands (`--tree` / `list-xpaths`) before using them. Firmware or BFB installs
 (`/nvidia/provisioning/install`), resets and mode changes are
 hardware-state changes: follow `doca-hardware-safety`. The `dmsd` + `dmspe`
 gRPC (gNMI / gNOI) service below remains for remote and fleet management.
@@ -159,11 +173,11 @@ library skill under `libs/`). DMS is a **service**, not a library: the
 user invokes it as a daemon and talks to it over gRPC; they do not link
 against `libdms.so` to write their own program.
 
-**Status note.** Per the public DMS guide, DMS is currently in **beta**,
-with General Availability scoped to SPC-X use cases. The skill reflects
+**Status note.** Check the DMS guide's release status for your
+version. The skill reflects
 the public guide's posture: prescribe the documented launch / auth /
 deployment paths, follow the documented security best practices, and
-defer roadmap and GA-scope questions to the live public guide rather
+defer roadmap and release-status questions to the live public guide rather
 than guessing.
 
 ## When to load this skill

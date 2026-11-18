@@ -19,7 +19,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - comch
@@ -50,23 +50,21 @@ Follow Loading order below. Open the tasks companion for run /
 debug. Open the capabilities companion for table columns and
 error layers. Do not open every companion file.
 
-> **Actual binary contract.** `doca_comm_channel_admin` is one
-> zero-application-argument, read-only scan-and-print operation.
-> It scans every comch-capable `doca_dev` on the current side via
-> `resourcedump` (MFT) and prints SERVERS and CONNECTIONS tables.
-> It has no list, inspect, device-scope, drain, restart, or other
-> application operation. This skill does not retain conceptual
-> workflows under invented command names.
+> **Actual binary contract.** Run `doca_comm_channel_admin` with no
+> arguments; it is one read-only scan-and-print operation. It scans
+> the PCIe devices on the current side, needs the MFT Resource dump
+> binary, and prints SERVERS and CONNECTIONS tables. `--help` lists
+> the flags. It has no list, inspect, device-scope, drain, restart,
+> or other application operation.
 
 **Where to start:** This is a tool skill for invoking the DOCA Comm
 Channel Admin Tool — the **read-only inventory** CLI counterpart
 to the `doca-comch/SKILL.md` library. The
-shipped `doca_comm_channel_admin` binary takes **no arguments
-beyond ARGP defaults** (`--help`, `--version`, `--log-level`,
-`--sdk-log-level`, `--json`) and performs **one inventory pass**
-per invocation: it walks every `doca_dev` on this side, filters
-to comch-capable devices, shells out to `resourcedump` (MFT) on
-each, and prints two ASCII tables (SERVERS and CONNECTIONS).
+shipped `doca_comm_channel_admin` binary is **run with no
+arguments** (`--help` lists the flags) and performs **one
+inventory pass** per invocation: it scans the PCIe devices on
+this side (it needs the MFT Resource dump binary) and prints
+two ASCII tables (SERVERS and CONNECTIONS).
 There is no `list` subcommand, no `inspect` subcommand, no
 `drain` flag, and no `restart` flag — those are not part of the
 tool's surface. Open the tasks companion and start at
@@ -116,14 +114,15 @@ the worked example is one instance.
   the capabilities companion.
 - **"Is this admin tool on my installed DOCA version, and does it
   match the comch library version?"** — worked example: *"is the
-  tool available on DOCA 2.4"*. Answered by the overlay in
+  tool available on an older DOCA release"* (the tool requires
+  see the DOCA release notes for availability). Answered by the overlay in
   the capabilities companion,
   which redirects to the canonical
   `doca-version/SKILL.md` rules and adds the
   Comm Channel Admin Tool specifics.
 - **"The tool prints nothing — is the install broken or is there
-  genuinely no channel?"** — worked example: *"`list` returned an
-  empty result on a host with a known-good Comch client"*.
+  genuinely no channel?"** — worked example: *"the tool printed
+  empty tables on a host with a known-good Comch client"*.
   Answered by the empty-output interpretation rules in
   the tasks companion +
   the capabilities companion.

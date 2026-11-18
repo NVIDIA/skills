@@ -10,8 +10,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-argus`
 - Validation status: `passed`
-- Evaluation date: 2026-10-28
-- Evaluator version: `1.6.2`
+- Evaluation date: 2026-11-18
+- Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:e2b075fe2be9760c3a342f783c65ee6bbfa9912f5f08a84aadaa925b77cbe4e4` (skill-evaluator-dataset-snapshot/1)
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| doca-argus | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argus | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argus | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argus | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-argus | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-argus | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argus | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argus | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argus | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-argus | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
 
 - Controls for `doca-argus`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 94.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.1% — baseline ran, but no comparable score was available; uplift unavailable | 94.8% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Correctness | 55.0% → 100.0% (+45.0 points) | 70.0% → 100.0% (+30.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
 | Effectiveness | 50.0% → 100.0% (+50.0 points) | 62.5% → 100.0% (+37.5 points) |
-| Efficiency | 88.2% — baseline ran, but no comparable score was available; uplift unavailable | 76.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Efficiency | 85.5% — baseline ran, but no comparable score was available; uplift unavailable | 78.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.5% → 94.1% (-4.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.6% → 93.9% (-4.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 87.3% → 86.2% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 87.9% → 87.0% (-0.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 663,468 | 286,962 | +376,506 | +131.20% | skill 4/4; base 4/4 |
-| claude-code | doca-argus.explicit-positive.v1 | 210,209 | 71,287 | +138,922 | +194.88% | skill 1/1; base 1/1 |
-| claude-code | doca-argus.implicit-positive.v1 | 208,115 | 107,500 | +100,615 | +93.60% | skill 1/1; base 1/1 |
-| claude-code | doca-argus.implicit-positive.v2 | 208,473 | 71,983 | +136,490 | +189.61% | skill 1/1; base 1/1 |
-| claude-code | doca-argus.negative.v1 | 36,671 | 36,192 | +479 | +1.32% | skill 1/1; base 1/1 |
-| codex | All cases | 383,418 | 183,925 | +199,493 | +108.46% | skill 4/4; base 4/4 |
-| codex | doca-argus.explicit-positive.v1 | 120,155 | 66,829 | +53,326 | +79.79% | skill 1/1; base 1/1 |
-| codex | doca-argus.implicit-positive.v1 | 101,549 | 59,167 | +42,382 | +71.63% | skill 1/1; base 1/1 |
-| codex | doca-argus.implicit-positive.v2 | 127,475 | 26,687 | +100,788 | +377.67% | skill 1/1; base 1/1 |
-| codex | doca-argus.negative.v1 | 34,239 | 31,242 | +2,997 | +9.59% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,046,886 | 470,887 | +575,999 | +122.32% | skill 8/8; base 8/8 |
+| claude-code | All cases | 716,251 | 286,549 | +429,702 | +149.96% | skill 4/4; base 4/4 |
+| claude-code | doca-argus.explicit-positive.v1 | 252,593 | 71,520 | +181,073 | +253.18% | skill 1/1; base 1/1 |
+| claude-code | doca-argus.implicit-positive.v1 | 215,421 | 107,048 | +108,373 | +101.24% | skill 1/1; base 1/1 |
+| claude-code | doca-argus.implicit-positive.v2 | 211,876 | 71,569 | +140,307 | +196.04% | skill 1/1; base 1/1 |
+| claude-code | doca-argus.negative.v1 | 36,361 | 36,412 | -51 | -0.14% | skill 1/1; base 1/1 |
+| codex | All cases | 374,069 | 179,307 | +194,762 | +108.62% | skill 4/4; base 4/4 |
+| codex | doca-argus.explicit-positive.v1 | 123,580 | 84,631 | +38,949 | +46.02% | skill 1/1; base 1/1 |
+| codex | doca-argus.implicit-positive.v1 | 97,443 | 45,237 | +52,206 | +115.41% | skill 1/1; base 1/1 |
+| codex | doca-argus.implicit-positive.v2 | 118,834 | 18,116 | +100,718 | +555.96% | skill 1/1; base 1/1 |
+| codex | doca-argus.negative.v1 | 34,212 | 31,323 | +2,889 | +9.22% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,090,320 | 465,856 | +624,464 | +134.05% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -99,7 +99,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -107,29 +107,29 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/services/doca-argus`)
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md:
   "## Pattern overview" in CAPABILITIES.md (lines 17-51)
   vs "### Service shape" in CAPABILITIES.md (lines 54-91)
   vs "## Deployment shape" in CAPABILITIES.md (lines 92-117)
   vs "## Safety policy" in CAPABILITIES.md (lines 289-377)
   vs "## Examples" in SKILL.md (lines 3-11)
-  vs "## Instructions" in SKILL.md (lines 12-54)
-  vs "## Example questions this skill answers well" in SKILL.md (lines 55-106)
-  vs "## Audience" in SKILL.md (lines 107-142)
-  vs "## When to load this skill" in SKILL.md (lines 143-178)
-  vs "## What this skill provides" in SKILL.md (lines 179-209)
-  vs "## Loading order" in SKILL.md (lines 249-263)
-  vs "## Related skills" in SKILL.md (lines 264-312)
+  vs "## Instructions" in SKILL.md (lines 12-53)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 54-105)
+  vs "## Audience" in SKILL.md (lines 106-141)
+  vs "## When to load this skill" in SKILL.md (lines 142-177)
+  vs "## What this skill provides" in SKILL.md (lines 178-208)
+  vs "## Loading order" in SKILL.md (lines 248-262)
+  vs "## Related skills" in SKILL.md (lines 263-311)
   vs "## configure" in TASKS.md (lines 23-105)
   vs "## build" in TASKS.md (lines 109-142)
-  vs "## Command appendix" in TASKS.md (lines 456-471)
-  vs "## Deferred task verbs" in TASKS.md (lines 479-517)
-  vs "## Cross-cutting" in TASKS.md (lines 518-548) (`CAPABILITIES.md:17`)
+  vs "## Command appendix" in TASKS.md (lines 459-474)
+  vs "## Deferred task verbs" in TASKS.md (lines 482-520)
+  vs "## Cross-cutting" in TASKS.md (lines 521-551) (`CAPABILITIES.md:17`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/services/doca-argus/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/services/doca-argus`)
-- **LOW** QUALITY/quality_discoverability: Description very long (977 chars, recommend 50-150) (`skills/services/doca-argus/SKILL.md`)
-- 8 additional finding(s) are available in the full evaluation artifacts.
+- **LOW** QUALITY/quality_discoverability: Description very long (952 chars, recommend 50-150) (`skills/services/doca-argus/SKILL.md`)
+- **LOW** QUALITY/quality_discoverability: No '## Purpose' section (`skills/services/doca-argus/SKILL.md`)
+- 7 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

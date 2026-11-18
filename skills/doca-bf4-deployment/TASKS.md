@@ -20,7 +20,9 @@ and the Redfish / PLDM / UEFI standards; this file prescribes the
 *order* and *what to look up where*, not a copy-paste runbook. Every
 MUTATING step (PLDM burn, ISO reflash, power cycle, BMC factory reset)
 loads `doca-hardware-safety/SKILL.md`
-ALONGSIDE.
+ALONGSIDE. If that skill cannot be loaded, fail closed: stop before the
+first mutating step and say why; never apply it without the
+hardware-safety discipline.
 
 ## configure
 
@@ -38,15 +40,23 @@ precondition BEFORE any boot, transfer, or burn.
    config ISO) from the public NVIDIA download surface, and host it at
    {iso-uri} on your own HTTP/HTTPS server. For a remote HTTPS source
    used by Redfish Virtual Media, confirm the BMC can reach it and
-   trusts its certificate. If trust cannot be verified, stop before
-   transfer; do not improvise certificate-install commands.
+   trusts its certificate. Verify it from the BMC side, read-only: the
+   BMC's Redfish certificate inventory (CertificateService /
+   the Virtual Media certificate collection, where the installed BMC
+   firmware exposes one) must list the CA that signed the server's
+   certificate. If that cannot be shown, or the BMC exposes no such
+   inventory, stop before transfer and use local hosting or UEFI HTTP
+   Boot from a server the BMC already trusts; do not improvise
+   certificate-install commands.
 3. **Pick the install method.** Per the install-method table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes):
    UEFI HTTP Boot (no DHCP/TFTP needed), PXE Boot (when you already
    have DHCP+TFTP or need a custom `bf.cfg`), Redfish Virtual Media
    (fully out-of-band; needs Virtual Media support in the installed
    BMC firmware), or the DOCA Management Service install path (DOCA
-   3.5+, ISO and/or PLDM through the DPU BMC). For Virtual Media,
+   3.5+, ISO and/or PLDM through the DPU BMC; its run steps live in
+   `doca-dms/SKILL.md`, so hand over there for `run` and come back for
+   `### post-install`). For Virtual Media,
    confirm support from the BMC's Redfish inventory first; if it
    cannot be confirmed, choose UEFI HTTP Boot or PXE when one fits,
    and if Virtual Media is mandatory, stop and escalate rather than
@@ -94,8 +104,8 @@ not built here.
   `doca-container-deployment/SKILL.md`
   to deploy it.
 - If the user is asking how to assemble the bundle ISO or the
-  firmware `.fwpkg` themselves, that is NVIDIA-internal release
-  engineering — out of scope. The operator downloads the published
+  firmware `.fwpkg` themselves, that is part of NVIDIA's release
+  process — out of scope. The operator downloads the published
   artifacts from the public NVIDIA download surface.
 - The H2 stays so the verb order is intact; the answer is *there is no
   build step in platform bring-up — you download published artifacts
@@ -183,7 +193,8 @@ firmware. No physical access.
 2. Attach it via Redfish VirtualMedia; Grace then sees USB
    mass-storage devices. Confirm the media reports `"Inserted": true`.
 3. Set BootSourceOverride to USB (Once / UEFI).
-4. Reset Grace; monitor via `obmc-console-client`.
+4. Show the reset and its blast radius, obtain confirmation for this
+   reset, then reset Grace; monitor via `obmc-console-client`.
 5. Do [`### post-install`](#post-install), and **detach the media**
    when done.
 

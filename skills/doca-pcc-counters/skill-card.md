@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides an agent to invoke the DOCA PCC Counters tool (the pcc_counters.sh bash script) with its two positional arguments, set or query plus an mst device path, to arm and read the fixed firmware/hardware PCC (Programmable Congestion Control) diagnostic counters such as CNP, RTT and WRED-drop on a ConnectX or BlueField device through mst and the mlx5 debugfs diag_cnt interface, and to diagnose Bad Device errors or counters stuck at zero. <br>
+Guides agents invoking the DOCA PCC Counters tool (`pcc_counters.sh`) to arm and read the fixed firmware/hardware PCC (Programmable Congestion Control) diagnostic counters (CNP, RTT, WRED-drop, etc.) on a ConnectX / BlueField device via mst and the mlx5 debugfs `diag_cnt` interface using its two positional arguments (`set | query` and an mst device path), routing custom PCC algorithm work, firmware PCC configuration, DOCA install, and fleet-wide CC tuning to other skills. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External network operators, developers and AI agents working with ConnectX or BlueField devices use this skill to arm and read the device's firmware PCC diagnostic counters, confirm whether congestion-control events (CNPs, RTT, WRED drops) are occurring on a port, and capture counter snapshots as evidence for congestion-control investigations without modifying the script or deriving CC tuning changes. <br>
+Network operators, developers, and AI agents use this skill to arm and read a ConnectX-7 / BlueField-3 device's firmware PCC diagnostic counters with `pcc_counters.sh`, diagnose errors such as `Bad Device` or counters stuck at zero, and capture counter snapshots as evidence for congestion-control investigations. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,13 +25,15 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [TASKS.md — configure, run, test and debug workflows plus command appendix](TASKS.md) <br>
-- [CAPABILITIES.md — fixed counter set, debugfs mechanism, error taxonomy and safety policy](CAPABILITIES.md) <br>
+- [CAPABILITIES.md](CAPABILITIES.md) <br>
+- [TASKS.md](TASKS.md) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 - [NVIDIA DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA Developer Forum](https://forums.developer.nvidia.com/c/infrastructure/doca/370) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Shell commands, Configuration instructions, Analysis] <br>
+**Output Type(s):** [Shell commands, Analysis, Configuration instructions] <br>
 **Output Format:** [Markdown with inline bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -43,39 +45,76 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), one attempt per task, each attempt run in its own isolated k8s-sandbox pod. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each attempt run in its own isolated sandbox pod (`k8s-sandbox`), with a no-skill baseline for each task. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Is it safe to use? Checks unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Is the answer correct? Checks final-answer correctness against the reference answer. <br>
-- Discoverability: Was the right skill loaded when needed, decoys avoided, and the workflow executed. <br>
-- Effectiveness: Did the skill help complete the task — equal-weight mean of goal completion and expected workflow adherence. <br>
-- Efficiency: Did it avoid wasted tool calls and token usage — tool-call productivity plus token efficiency. <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.5% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 20.0% → 100.0% (+80.0 points) | 80.0% → 100.0% (+20.0 points) |
+| Correctness | 15.0% → 100.0% (+85.0 points) | 90.0% → 100.0% (+10.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 31.3% → 87.5% (+56.2 points) | 62.5% → 75.0% (+12.5 points) |
-| Efficiency | 97.4% — baseline ran, but no comparable score was available; uplift unavailable | 73.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 18.8% → 87.5% (+68.7 points) | 75.0% → 87.5% (+12.5 points) |
+| Efficiency | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 74.8% — baseline ran, but no comparable score was available; uplift unavailable |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+#### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.5% → 94.6% (-3.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 88.1% → 87.3% (-0.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 33 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
+
+### Overall verdict
+
+✅ **Overall verdict: PASS — Recommended for publication**
+
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
+
+Evaluation date: 2026-11-18; evaluator version `1.6.10`; environment `k8s-sandbox`; 1 attempt per task.
 
 ## Skill Version(s): <br>
-c98e456 (source: git SHA, committed 2026-10-28) <br>
+155651c (source: git SHA, committed 2026-11-17); targets DOCA 3.6 (source: frontmatter doca_version) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

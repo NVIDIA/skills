@@ -22,7 +22,7 @@ every DOCA release, every library, and every host kind.
 | --- | --- | --- |
 | 1. Detect the installed version | Read every source-of-truth and confirm they agree (four-way match) | [`## Capabilities and modes`](#capabilities-and-modes) source-of-truth table + [TASKS.md ## configure](TASKS.md#configure) |
 | 2. Validate consistency | Cross-check sources; flag drift; explain partial-install | [`## Version compatibility`](#version-compatibility) four-way match rule + [TASKS.md ## test](TASKS.md#test) |
-| 3. Look up capability availability | Compare a required minimum DOCA version against the installed version | [`## Observability`](#observability) version-matrix lookup + [TASKS.md ## test](TASKS.md#test) |
+| 3. Look up capability availability | Compare a required minimum DOCA version against the installed version | [`## Observability`](#observability) capability-availability lookup + [TASKS.md ## test](TASKS.md#test) |
 | 4. Diagnose a version-related error | Map symptom (pkg-config missing / mismatch / wrong API / BFB drift) to root cause | [`## Error taxonomy`](#error-taxonomy) + [TASKS.md ## debug](TASKS.md#debug) |
 | 5. Author the per-library overlay | When adding a new library skill, write its `## Version compatibility` against THIS skill's template | [`## Safety policy`](#safety-policy) per-library overlay pattern + [TASKS.md ## modify](TASKS.md#modify) |
 
@@ -61,10 +61,10 @@ continues.
 | `flint -d <bdf> q` (host-side, MFT tools, runs against any 15b3:* device — BlueField NIC functions AND ConnectX) | The *NIC firmware* version (the `FW Version:` and `FW Release Date:` lines of the output). This is a DIFFERENT anchor from the BFB-image DOCA version above: `flint q` reads the firmware *image* the silicon is currently running; `bfver` reads the BFB *userland*. Use when the BlueField Arm console is not reachable (e.g. NIC personality, BFB SSH access not configured) AND when reasoning about NIC FW vs host DOCA skew. Alternative names for the same surface: `mlxfwmanager --query` (NVIDIA-supported, same info) and `mst status -v` (less detail; only OK as a fallback). | On any 15b3:* host, including hosts without an SSH-reachable BlueField Arm side. Apply [`## Version compatibility`](#version-compatibility) NIC-FW skew rule against the captured `FW Version:` / `FW Release Date:` lines. Cross-reference the host DOCA's required FW level via the *Supported NICs and Firmware* table in the [DOCA Release Notes](https://docs.nvidia.com/doca/sdk/doca-release-notes/index.html). |
 | Header path `$(pkg-config --variable=includedir doca-common)/doca_version.h` | The *compile-time* DOCA version constants (`DOCA_VERSION_MAJOR / MINOR / PATCH`). Read by C programs at compile time. | When the user is reasoning about *what their program will see at compile time*; otherwise, `pkg-config` is the same information. |
 
-**Discovery shortcut.** When the host has a structured-tools
-helper installed (per
-`doca-structured-tools-contract/SKILL.md#doca-env---json-schema`),
-`doca-env --json` returns all five sources in one JSON object with
+**Discovery shortcut.** When the site provides an optional
+env-report helper (per
+`doca-structured-tools-contract/SKILL.md#env-report-schema`; none
+ships with public DOCA), it returns all five sources in one JSON object with
 a `version.consistent` boolean that pre-computes the four-way
 match. Prefer this when present; fall back to the chain above
 when not.
@@ -232,7 +232,7 @@ up *as* those errors.
 
 | Symptom | Most-likely version cause | First action |
 | --- | --- | --- |
-| `pkg-config: Package 'doca-common' was not found` | `PKG_CONFIG_PATH` is not configured OR the install is missing the `doca-common` package | Locate the live `doca-common.pc` first: `find /opt/mellanox/doca -name doca-common.pc -print -quit` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/` on DOCA 3.3+, OR `/opt/mellanox/doca/infrastructure/lib/pkgconfig/` on legacy / split-profile installs). If found, fix `PKG_CONFIG_PATH` (see `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)). If not found, route to `doca-setup` to select and install the appropriate DOCA profile. |
+| `pkg-config: Package 'doca-common' was not found` | `PKG_CONFIG_PATH` is not configured OR the install is missing the `doca-common` package | Locate the live `doca-common.pc` first: `find /opt/mellanox/doca -name doca-common.pc -print -quit` (commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig/`). If found, fix `PKG_CONFIG_PATH` (see `doca-setup ## configure` (`doca-setup/TASKS.md#configure`)). If not found, route to `doca-setup` to select and install the appropriate DOCA profile. |
 | `pkg-config --modversion doca-common` returns *X*; `doca_caps --version` returns `command not found` (NOT a version disagreement; the binary is ABSENT) | Either the per-tool package that ships the binary was not installed, OR the package IS installed but `/opt/mellanox/doca/tools/` is not on `$PATH` (DOCA 3.3+ ships these binaries off-PATH by default). | First disambiguate with the installed-package query and `ls /opt/mellanox/doca/tools/doca_caps`. If the package is absent, route to `doca-setup` for targeted installation after its package-policy precheck. If the binary is present, it is a `$PATH` issue: invoke it by absolute path or extend `PATH`. See `## Version compatibility` partial-install table. |
 | `pkg-config --modversion doca-common` returns *X*; `cat /opt/mellanox/doca/applications/VERSION` errors with `No such file or directory` | Partial install: the package that ships `applications/VERSION` was not installed. | Route to `doca-setup` for targeted installation after it identifies and validates the package for this DOCA release. |
 | `pkg-config --modversion doca-common` returns *X*; `ls /opt/mellanox/doca/samples/` errors with `No such file or directory` | Partial install: the samples package was not installed alongside `doca-common`. The bundle's modify-from-sample first-app workflow CANNOT apply on this host — the agent must say so explicitly (see AGENTS.md `## Ground rules` rule 5 (bundle `AGENTS.md#ground-rules-every-agent-must-follow`)) rather than scaffold a sample from memory. | Route to `doca-setup` for targeted installation or pivot to the NGC DOCA container via `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`) Path 0. |
@@ -242,7 +242,7 @@ up *as* those errors.
 | NIC firmware version (per `flint -d <bdf> q` `FW Version:` line) major.minor predates the host DOCA's published required-FW level, OR the `FW Release Date:` predates the host DOCA's release by more than 12 months | NIC FW is out-of-window for this DOCA. NIC FW is a DIFFERENT anchor from BFB-image DOCA version — `flint q` reads the FW *image* shipped to the silicon, `bfver` reads the BFB DOCA *userland* — and skew on either independently disqualifies the pairing. | Route to `doca-hardware-safety ## modify` (`doca-hardware-safety/TASKS.md#modify`) for a firmware burn (NOT a host-package reinstall). Cross-check the required FW level against the *Supported NICs and Firmware* table in the [DOCA Release Notes](https://docs.nvidia.com/doca/sdk/doca-release-notes/index.html) before burning. |
 | Two or more BlueField devices on the same host (e.g. BF2 + BF3, or BF3 ×2 from different procurement waves) with DIFFERENT firmware levels | The four-way match is *per-device*: each BlueField/NIC enumerated by `lspci -d 15b3:` is its own anchor and must independently sit inside the host DOCA's compatibility window. BF2 and BF3 FW levels are independent silicon and need not match each other; do not "average" them or pick one. | Run `flint -d <bdf> q` (and `bfver` when the BlueField Arm console is reachable) once per visible 15b3:* device; apply the FW-skew rule above to each independently; surface a per-device verdict to the user rather than a single global verdict. |
 | `doca-flow.pc` exists; `pkg-config --modversion doca-flow` works; `doca_caps --version` is silent or errors | DOCA runtime is not on `LD_LIBRARY_PATH` OR is from a different install | Verify with `ldconfig -p | grep doca`; route to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) layer 3. |
-| Public docs say capability *C* exists; on the user's host, `doca_<library>_cap_*` returns false | The user's installed version pre-dates the capability | Look up the minimum version in the version-matrix (see [TASKS.md ## test](TASKS.md#test)); if installed < min, the answer is to upgrade or to use a different approach. |
+| Public docs say capability *C* exists; on the user's host, `doca_<library>_cap_*` returns false | The user's installed version pre-dates the capability | Look up the documented minimum version (see [TASKS.md ## test](TASKS.md#test)); if installed < min, the answer is to upgrade or to use a different approach. |
 | User pastes a URL like `docs.nvidia.com/doca/sdk/.../archive/v2.5.0/...` | Version-pinned doc URL; describes an old release | Tell the user the URL is version-pinned and fetch the current-release equivalent via `doca-public-knowledge-map/SKILL.md`. |
 
 ## Observability
@@ -256,15 +256,15 @@ visibility comes from probing the sources in
 Three primary signals the agent should reach for:
 
 1. **The four-way match status.** Either `version.consistent`
-   from `doca-env --json` (preferred) or the agent computing it
+   from a site env-report helper (if present) or the agent computing it
    itself from the manual chain. The single most informative
    one-line answer to *“is my install consistent”*.
-2. **The version-matrix lookup result.** Either a row in
-   `version-matrix.json` (preferred) or the manual fallback of
+2. **The capability-availability lookup result.** Either a row in
+   a site capability-availability table (if present) or the manual fallback of
    fetching the per-library docs page and extracting the
    *“available since”* prose (per
-   `doca-structured-tools-contract ## version-matrix.json schema` (`doca-structured-tools-contract/SKILL.md#schemas`)).
-   **No populated `version-matrix.json` is provided** with the
+   `doca-structured-tools-contract ## capability-availability table schema` (`doca-structured-tools-contract/SKILL.md#schemas`)).
+   **No populated capability-availability table is provided** with the
    bundle or with DOCA, so in practice the agent falls back
    to fetching the *“available since”* prose from the per-library
    docs via `doca-public-knowledge-map/SKILL.md`.
@@ -276,7 +276,7 @@ Three primary signals the agent should reach for:
    manual verification.
 3. **The capability-query result.** The per-library
    `doca_<library>_cap_*` API answers *“is this supported on this
-   device + this version”* at runtime. The version-matrix is the
+   device + this version”* at runtime. The documented availability is the
    *promise*; the capability query is the *reality*. When they
    disagree, the capability query wins.
 
@@ -330,11 +330,6 @@ this skill, the bundle convention is:
 > NOT redefine the four-way match rule or restate the detection
 > chain.
 
-The bundle's conformance checks flag repeated `/opt/mellanox/doca`
-references in a library skill's CAPABILITIES.md; if you find
-yourself accumulating warnings on a new skill's `## Version
-compatibility`, you are duplicating instead of cross-linking.
-
 ## Deferred topic boundaries
 
 This skill scopes itself to DOCA version handling. Adjacent topics
@@ -345,7 +340,7 @@ the agent will get asked but should route elsewhere:
   assumes something is installed somewhere; the version question
   is *what was installed and is it consistent*.
 - **Per-library capability availability** (which symbols exist in
-  Flow at version *X*). The version-matrix lookup procedure in
+  Flow at version *X*). The capability-availability lookup procedure in
   [TASKS.md ## test](TASKS.md#test) is generic; the per-library
   *interpretation* belongs in the matching library skill's
   `## Capabilities and modes`.

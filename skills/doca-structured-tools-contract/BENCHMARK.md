@@ -10,11 +10,11 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-structured-tools-contract`
 - Validation status: `passed`
-- Evaluation date: 2026-10-28
-- Evaluator version: `1.6.2`
+- Evaluation date: 2026-11-18
+- Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
-- Dataset digest: `sha256:82695ce3d4c672d09e4623d3003c4c9e5072053ed44721848acd4e0c62cfd09f` (skill-evaluator-dataset-snapshot/1)
+- Dataset digest: `sha256:9f0e74e9e93f6adaf59703cc2bc5b11aac844586edff0ba18f49ddcf38c2f870` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| doca-structured-tools-contract | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-structured-tools-contract | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-structured-tools-contract | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-structured-tools-contract | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-structured-tools-contract | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-structured-tools-contract | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
 
 - Controls for `doca-structured-tools-contract`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 94.9% — baseline ran, but no comparable score was available; uplift unavailable | 89.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.5% — baseline ran, but no comparable score was available; uplift unavailable | 87.7% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 60.0% → 95.0% (+35.0 points) | 75.0% → 95.0% (+20.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 85.0% → 100.0% (+15.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 52.1% → 81.3% (+29.2 points) | 50.0% → 87.5% (+37.5 points) |
-| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 71.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 52.1% → 100.0% (+47.9 points) | 62.5% → 75.0% (+12.5 points) |
+| Efficiency | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 71.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.1% → 96.0% (-2.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 95.2% (-2.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.8% → 89.7% (+5.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 85.1% → 88.0% (+2.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 503,720 | 255,426 | +248,294 | +97.21% | skill 4/4; base 4/4 |
-| claude-code | doca-structured-tools-contract.explicit-positive.v1 | 119,259 | 36,753 | +82,506 | +224.49% | skill 1/1; base 1/1 |
-| claude-code | doca-structured-tools-contract.implicit-positive.v1 | 119,245 | 38,456 | +80,789 | +210.08% | skill 1/1; base 1/1 |
-| claude-code | doca-structured-tools-contract.implicit-positive.v2 | 118,766 | 72,473 | +46,293 | +63.88% | skill 1/1; base 1/1 |
-| claude-code | doca-structured-tools-contract.negative.v1 | 146,450 | 107,744 | +38,706 | +35.92% | skill 1/1; base 1/1 |
-| codex | All cases | 220,211 | 231,861 | -11,650 | -5.02% | skill 4/4; base 4/4 |
-| codex | doca-structured-tools-contract.explicit-positive.v1 | 73,348 | 131,226 | -57,878 | -44.11% | skill 1/1; base 1/1 |
-| codex | doca-structured-tools-contract.implicit-positive.v1 | 77,580 | 39,658 | +37,922 | +95.62% | skill 1/1; base 1/1 |
-| codex | doca-structured-tools-contract.implicit-positive.v2 | 55,676 | 47,654 | +8,022 | +16.83% | skill 1/1; base 1/1 |
-| codex | doca-structured-tools-contract.negative.v1 | 13,607 | 13,323 | +284 | +2.13% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 723,931 | 487,287 | +236,644 | +48.56% | skill 8/8; base 8/8 |
+| claude-code | All cases | 474,988 | 184,918 | +290,070 | +156.86% | skill 4/4; base 4/4 |
+| claude-code | doca-structured-tools-contract.explicit-positive.v1 | 121,041 | 37,187 | +83,854 | +225.49% | skill 1/1; base 1/1 |
+| claude-code | doca-structured-tools-contract.implicit-positive.v1 | 119,199 | 38,203 | +80,996 | +212.01% | skill 1/1; base 1/1 |
+| claude-code | doca-structured-tools-contract.implicit-positive.v2 | 119,738 | 37,845 | +81,893 | +216.39% | skill 1/1; base 1/1 |
+| claude-code | doca-structured-tools-contract.negative.v1 | 115,010 | 71,683 | +43,327 | +60.44% | skill 1/1; base 1/1 |
+| codex | All cases | 217,643 | 254,681 | -37,038 | -14.54% | skill 4/4; base 4/4 |
+| codex | doca-structured-tools-contract.explicit-positive.v1 | 54,177 | 163,281 | -109,104 | -66.82% | skill 1/1; base 1/1 |
+| codex | doca-structured-tools-contract.implicit-positive.v1 | 85,496 | 38,963 | +46,533 | +119.43% | skill 1/1; base 1/1 |
+| codex | doca-structured-tools-contract.implicit-positive.v2 | 60,048 | 39,127 | +20,921 | +53.47% | skill 1/1; base 1/1 |
+| codex | doca-structured-tools-contract.negative.v1 | 17,922 | 13,310 | +4,612 | +34.65% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 692,631 | 439,599 | +253,032 | +57.56% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -109,7 +109,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **HIGH** DUPLICATE/duplicate: Duplicate content found within SKILL.md:
   "## Ground rules for any agent using this skill" in SKILL.md (lines 40-73)
-  vs "## The agent behavior contract" in SKILL.md (lines 74-111) (`SKILL.md:40`)
+  vs "## The agent behavior contract" in SKILL.md (lines 74-112) (`SKILL.md:40`)
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/doca-structured-tools-contract/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description contains vague words (`skills/doca-structured-tools-contract/SKILL.md`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/doca-structured-tools-contract/SKILL.md`)

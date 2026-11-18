@@ -15,7 +15,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: service
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - urom
@@ -70,7 +70,7 @@ library offloads to.
 **How to use this skill.** Read this file, then search the companion file
 for the `## <name>` heading the question needs and read that whole section.
 Answer completely from it, quoting only its symbols and commands. Do not
-browse docs; use the entry points in `doca-public-knowledge-map`. For
+search the web or browse docs freely; when a step says to quote from the live guide, take that guide's URL from `doca-public-knowledge-map` and read only that page. For
 out-of-scope requests, name the skill that owns them and stop.
 
 ## Example questions this skill answers well

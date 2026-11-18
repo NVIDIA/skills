@@ -21,10 +21,9 @@ copy-paste recipe. The agent's job is to walk the user through the
 steps in order, verifying preconditions before recommending the
 next call.
 
-## DOCA 3.5 field notes
+## Usage notes (DOCA 3.5)
 
-Known behaviours on DOCA 3.5; check them before debugging
-further:
+Check these before debugging further:
 
 - **`doca_ctx_start()` returns `DOCA_ERROR_IN_PROGRESS`** for the
   Comch client and consumer. That is an asynchronous start, not a
@@ -32,11 +31,12 @@ further:
   callback reports `DOCA_CTX_STATE_RUNNING`. Code that treats the
   return value as an error exits too early.
 - **Start the BlueField server first.** A client with no server
-  fails with a firmware code instead of a reason (`Failed to create
-  devx object with syndrome=0xe5300 ... Client registration failed`).
-- **Run the BlueField side as root.** Without it, opening the
-  representor fails with the misleading `representor devices are
-  available only on DPU, do not run on Host`, even on the DPU.
+  fails registration.
+- **Run the BlueField-side process with the documented privileges.**
+  Elevate just that one launch (`sudo` on the BlueField Arm) as the
+  DOCA Comch guide documents; the host side and the build stay
+  unprivileged. If the operator does not allow that, stop and say so;
+  do not work around it.
 
 ## configure
 
@@ -46,6 +46,11 @@ will use, before any production message flows.
 
 Steps the agent should walk the user through:
 
+0. **Match versions first.** Before any other step, run the
+   `doca-version` four-source chain (`pkg-config --modversion
+   doca-comch`, `doca_caps --version`, and on the BlueField the BFB
+   version) and stop on a mismatch; host and BlueField must run the
+   same DOCA release.
 1. **Confirm the env preconditions.** The DPU side must see the
    host representor; the host side must see the BlueField PCIe
    address. Per the permission matrix in
@@ -216,7 +221,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 
 | Iteration trigger | What it looks like | What changes next iteration |
 | --- | --- | --- |
-| Single-message smoke passed; multi-message hung | Send queue depth too small OR `doca_pe_progress()` missing | Re-narrow to the progress / queue-depth axis; widen depth via `_set_max_num_tasks` |
+| Single-message smoke passed; multi-message hung | Send queue depth too small OR `doca_pe_progress()` missing | Re-narrow to the progress / queue-depth axis; widen depth via the `num_send_tasks` argument of the matching `doca_comch_*_task_send_set_conf` call (and the receive-task count of `doca_comch_consumer_task_post_recv_set_conf`), bounded by `doca_comch_producer_cap_get_max_num_tasks` / `doca_comch_consumer_cap_get_max_num_tasks`; there is no separate max-tasks setter |
 | Slow-path passed; fast-path consumer never fires | Consumer not attached / not progressed; fast-path producer wrote into a queue with no consumer reader | Confirm `doca_comch_consumer_create` + `_progress`; do not assume slow-path patterns transfer |
 | First connect succeeded; reconnect failed with `BAD_STATE` | Connection objects not torn down before re-connect | Walk the connection-event-callback teardown; the disconnected connection needs explicit destroy before the new accept |
 | Producer submit returns `AGAIN` after 100 successful submits | Consumer is not draining at the same rate | This is a flow-control problem in the app, not a Comch bug; the agent must surface the rate gap, not paper over with retries |
@@ -257,11 +262,16 @@ at the *runtime* and *program* layers.
   is reached because a previous client did not cleanly disconnect
   (leaked connection object on the server side). The cap is a
   device capability, not a user-settable knob, and the public Comch
-  API provides no live-connection enumeration call. Use the
-  application's own connection registry to identify and destroy a
-  connection object only when that registry exists and proves which
-  object is stale. Otherwise stop and report that selective cleanup is
-  unavailable. A planned server-process restart destroys every
+  API provides no live-connection enumeration call. Recovery, in order:
+  (1) if the server registered
+  `doca_comch_server_event_connection_status_changed_register`, its
+  callback is the application's connection registry: the connection it
+  reported connected but never disconnected is the stale one, so call
+  `doca_comch_server_disconnect` on it; (2) without that registry,
+  selective cleanup is unavailable, so recover by stopping the server
+  context (`doca_ctx_stop`), which drops every connection, and starting
+  it again; (3) prevent a repeat by registering the status callback and
+  keeping that registry from the first start. A planned server-process restart destroys every
   connection and is allowed only after showing that blast radius and
   obtaining explicit operator confirmation; never invent a "raise the
   limit" setter or prune an unverified object.
@@ -331,10 +341,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

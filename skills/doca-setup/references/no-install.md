@@ -6,7 +6,7 @@ The wrong behavior — and the failure mode this section exists to prevent — i
 
 ### Stage 1 vs Stage 2 — open every "I am new to DOCA" answer with the staged roadmap
 
-When the user opens with *"I am new to DOCA, guide me to my first app"* (or any equivalent beginner orientation prompt), the agent's first move is **not** a command. The agent leads with the staged roadmap below and only *then* drops into the per-path details under [What the agent does instead](#what-the-agent-does-instead). This prevents the *command-first overwhelm* failure mode ("the response was correct but too command-heavy for a beginner"). The table is also surfaced verbatim in bundle `README.md` so a human reading the bundle without an agent sees the same roadmap; runtime agents MUST quote (or paraphrase faithfully) the same two stages here.
+When the user opens with *"I am new to DOCA, guide me to my first app"* (or any equivalent beginner orientation prompt), the agent's first move is **not** a command. The agent leads with the staged roadmap below and only *then* drops into the per-path details under [What the agent does instead](#what-the-agent-does-instead). This prevents the *command-first overwhelm* failure mode. The table is also surfaced verbatim in bundle `README.md` so a human reading the bundle without an agent sees the same roadmap; runtime agents MUST quote (or paraphrase faithfully) the same two stages here.
 
 | Stage | What the user is doing | Where they are | Bundle path |
 | --- | --- | --- | --- |

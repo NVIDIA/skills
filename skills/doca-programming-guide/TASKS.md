@@ -344,7 +344,7 @@ treats as first-class:
 
 | Category | Stack shape | Representative artifacts |
 | --- | --- | --- |
-| `security` | DOCA App Shield, DOCA IPsec, packet inspection, file integrity, secure-channel patterns | `app_shield_agent`, `ipsec_security_gw`, `psp_gateway`, `secure_channel`, `yara_inspection`, APSH samples, file-integrity samples |
+| `security` | DOCA IPsec, packet inspection, file integrity, secure-channel patterns | `ipsec_security_gw`, `psp_gateway`, `secure_channel`, `file_integrity`, `east_west_overlay_encryption` |
 | `storage` | NVMe emulation, virtio-fs, storage path samples, NVMe-oF integration | `nvme_emulation`, `storage/*`, `virtiofs`, STA/NVMe-oF related samples |
 | `networking` | DOCA Flow, DOCA Eth, DOCA RDMA, DOCA Comch — line-rate or control-plane packet/RDMA path | `eth_l2_fwd`, `simple_fwd_vnf`, `switch`, `upf_accel`, `ip_frag`, Flow samples, RDMA samples, Comch samples |
 | `acceleration` | DOCA DMA, AES-GCM, SHA, Compress, Erasure Coding — offloading specific compute kernels | DMA samples, AES-GCM samples, SHA samples, Compress samples, Erasure Coding samples |
@@ -442,19 +442,18 @@ are out of scope for this target.
 
 ### known-sample-build-quirks
 
-A short, evidence-tagged list of build quirks the agent has seen
-in shipped DOCA samples / applications. Each row is reported AS A
+A short list of known build quirks in shipped DOCA samples /
+applications. Each row is reported AS A
 QUIRK in any sweep that hits it — the row exists so the agent does
 not classify a documented quirk as `fail-sdk-class` and lose
 operator trust by mis-reporting a workaround as an SDK fault.
 
 | Quirk | Evidence | Documented workaround |
 | --- | --- | --- |
-| `doca_storage_gga_offload_sbc_generator` needs `-llz4` at link time | The application's link step fails on `lz4_*` symbols (`undefined reference to LZ4_compress_*`) even though its meson target does not explicitly declare a `liblz4` dependency in some shipped versions; the linker needs `-llz4` added (or the meson dependency added back). | Either pass `LDFLAGS="$(pkg-config --libs liblz4)"` for the build invocation, OR (if the operator is modifying the sample, per [`## modify`](#modify)) add `dependency('liblz4')` to the meson target. Mark the result as `built-with-known-quirk` (rationale = "DOCA storage sample expected `lz4` dependency was not declared by the meson target in some shipped versions; explicit `-llz4` closes the gap"). Do NOT classify the original failure as `fail-sdk-class`; this is a sample-build-script quirk, not a DOCA SDK bug. The agent surfaces the workaround verbatim, does NOT bake the workaround into a script, and does not silently suppress the original error. |
+| The storage GGA offload SBC generator application needs `-llz4` at link time | The application's link step fails on `lz4_*` symbols (`undefined reference to LZ4_compress_*`) even though its meson target does not explicitly declare a `liblz4` dependency in some shipped versions; the linker needs `-llz4` added (or the meson dependency added back). | Either pass `LDFLAGS="$(pkg-config --libs liblz4)"` for the build invocation, OR (if the operator is modifying the sample, per [`## modify`](#modify)) add `dependency('liblz4')` to the meson target. Mark the result as `built-with-known-quirk` (rationale = "DOCA storage sample expected `lz4` dependency was not declared by the meson target in some shipped versions; explicit `-llz4` closes the gap"). Do NOT classify the original failure as `fail-sdk-class`; this is a sample-build-script quirk, not a DOCA SDK bug. The agent surfaces the workaround verbatim, does NOT bake the workaround into a script, and does not silently suppress the original error. |
 
-The list is intentionally small: the agent only adds a row when
-the quirk is *documented evidence in a real build log* AND the
-workaround has been *applied successfully*. The bundle does not
+The list is intentionally small: a row is added only for a known
+build quirk with a workaround that resolves it. The bundle does not
 fabricate quirks from memory; an unfamiliar build failure is
 reported as `fail-unknown` and surfaced verbatim, not silently
 mapped to a fabricated "quirk".
@@ -471,7 +470,7 @@ library-agnostic ones.
 | --- | --- | --- | --- |
 | Detect program version | `pkg-config --modversion doca-<library>` | [`## configure`](#configure) step 2 | Returns a version string identical to `doca_caps --version`. |
 | Detect program version | `pkg-config --modversion doca-common` | [`## configure`](#configure) step 2 | Returns the unified DOCA version; quote *this* for API-availability answers. |
-| Wire build (C/C++ Track 1) | `pkg-config --cflags doca-<library>` | [`## build`](#build) Track 1 step 2 | Returns `-I` flags rooted at `/opt/mellanox/doca/infrastructure/include`. |
+| Wire build (C/C++ Track 1) | `pkg-config --cflags doca-<library>` | [`## build`](#build) Track 1 step 2 | Returns `-I` flags rooted at `/opt/mellanox/doca/include`. |
 | Wire build (C/C++ Track 1) | `pkg-config --libs doca-<library>` | [`## build`](#build) Track 1 step 2 | Returns `-L /opt/mellanox/doca/lib/<arch>-linux-gnu -ldoca_<library>` (plus deps). |
 | Wire build (Track 2 FFI) | `pkg-config --cflags --libs doca-<library>` | [`## build`](#build) Track 2 step 1 | Same as above; binding tooling consumes both. |
 | Find samples on disk | `ls /opt/mellanox/doca/samples/<library>/` | [`## modify`](#modify) precondition table | Lists `meson.build` plus the sample subdirectories. |

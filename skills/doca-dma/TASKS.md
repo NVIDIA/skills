@@ -21,25 +21,24 @@ copy-paste recipe. The agent's job is to walk the user through
 the steps in order, verifying preconditions before recommending
 the next call.
 
-## DOCA 3.5 field notes
+## Usage notes (DOCA 3.5)
 
-Known behaviours on DOCA 3.5; check them before debugging
-further:
+Check these before debugging further:
 
 - **Size limit.** Query `doca_dma_cap_task_memcpy_get_max_buf_size()`
-  before submitting. The DMA Copy reference app caps files at 2 MiB
-  (2097152 bytes) on a BlueField-3; the host only reports
-  `Failure was detected in dma copy`, while the real reason is in the
-  BlueField log.
-- **Validate before submitting.** On DOCA 3.5, `doca_task_try_submit()`
-  rejected a too-large copy cleanly (`buffer byte size=... must be <=
-  maximum_byte size=2097152`), whereas `doca_task_submit()` failed in
-  hardware and stopped the DMA context.
-- **Local copy runs on the host too.** The local-copy sample refuses
-  to run on the host (`Local DMA copy can run only on the DPU`), but
-  the library supports host-local copies in your own program.
-- **Run the BlueField side as root.** Without it, DMA Copy fails with
-  the misleading `do not run on Host` representor message.
+  before submitting. The DMA Copy reference app also caps the file
+  size; when a copy fails, check the BlueField-side log.
+- **Validate before submitting.** Use `doca_task_try_submit()` to
+  validate the size first.
+- **Local copy runs on the host too.** The local-copy sample runs
+  only on the DPU, but the library supports host-local copies in your
+  own program.
+- **Run the BlueField side with the documented privileges.** Run the
+  BlueField-side process with the privileges the DOCA DMA guide
+  documents.
+- **Sibling PCI link enumeration (DOCA 3.6).** Use
+  `doca_dma_get_dma_dev_on_sibling_pci_link()` from `doca_dma.h`
+  instead of any prior manual sibling-link enumeration approach.
 
 ## configure
 
@@ -304,7 +303,7 @@ at layers 5 (runtime) and 6 (program):
 - Lifecycle order: configure → start → submit → progress → stop
   → destroy. Out-of-order returns `DOCA_ERROR_BAD_STATE`. The
   most common case is destroying a source or destination mmap
-  before `doca_ctx_destroy()`.
+  before `doca_dma_destroy()`.
 
 Once the layer is identified, route to the matching debug verb
 on the matching skill: install / build / link / driver to
@@ -333,7 +332,7 @@ so the agent does not invent guidance:
 - **rollback.** Coordinated rollback across multiple hosts /
   DPUs — out of scope for this skill. For a single in-session DMA
   configuration rollback, the right answer in this skill is
-  destroying the context (`doca_ctx_stop` → `doca_ctx_destroy`)
+  destroying the context (`doca_ctx_stop` → `doca_dma_destroy`)
   and re-running [`## configure`](#configure) with the corrected
   parameters; do not invent a "rollback" workflow.
 - **kernel-level driver install / firmware burn.** If the debug
@@ -358,10 +357,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

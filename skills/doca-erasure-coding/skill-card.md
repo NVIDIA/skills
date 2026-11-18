@@ -1,5 +1,5 @@
 ## Description: <br>
-Guides hardware-offloaded Reed-Solomon erasure coding with the DOCA Erasure Coding library (doca_ec) on a BlueField DPU, ConnectX NIC, or host, covering parity generation, rebuilding lost blocks from the survivors, and refreshing parity after a change through the create / recover / update tasks. <br>
+Hardware-offloaded erasure coding with DOCA Erasure Coding (Reed-Solomon, doca_ec) on a BlueField DPU, ConnectX NIC, or host: generating parity for data blocks, rebuilding lost blocks from the survivors, and refreshing parity after a change. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 AND CC-BY-4.0 <br>
 ## Use Case: <br>
-External developers and engineers building applications that consume the DOCA Erasure Coding C ABI (directly or through FFI/bindings) use this skill to offload Reed-Solomon erasure coding onto a BlueField DPU or ConnectX accelerator for distributed-storage resilience such as RAID-6-style block layouts, distributed file system parity, and object-storage erasure-coded buckets. <br>
+External developers and engineers building applications that call the DOCA Erasure Coding library (doca_ec) use this skill to offload Reed-Solomon create, recover, and update tasks to a BlueField DPU or ConnectX NIC for distributed-storage resilience, including capability queries, mmap permissions, and DOCA_ERROR_* debugging. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,16 +25,17 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [DOCA Erasure Coding (SDK documentation)](https://docs.nvidia.com/doca/sdk/DOCA-Erasure-Coding/index.html) <br>
-- [DOCA SDK documentation index](https://docs.nvidia.com/doca/sdk/index.html) <br>
-- [DOCA samples (NVIDIA-DOCA/doca-samples)](https://github.com/NVIDIA-DOCA/doca-samples) <br>
+- [DOCA Erasure Coding documentation](https://docs.nvidia.com/doca/sdk/DOCA-Erasure-Coding/index.html) <br>
+- [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/index.html) <br>
+- [DOCA samples and applications](https://github.com/NVIDIA-DOCA/doca-samples) <br>
 - [CAPABILITIES.md](CAPABILITIES.md) <br>
 - [TASKS.md](TASKS.md) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Code, Shell commands, Configuration instructions] <br>
-**Output Format:** [Markdown with inline code and command blocks] <br>
+**Output Format:** [Markdown with inline C and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
 
@@ -45,39 +46,72 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-4 evaluation tasks (3 positive, 1 negative), each attempted once in its own isolated sandbox pod on a k8s-sandbox environment. <br>
+4 evaluation tasks (3 positive, 1 negative), 1 attempt per task, each attempt in its own isolated sandbox pod (`k8s-sandbox` environment); dataset digest `sha256:ce6ee874a1ed1103e7f48d2a35930d6eafc4d66d818d35f6cca641d5b505d03e` (skill-evaluator-dataset-snapshot/1); evaluator version `1.6.10`; evaluation date 2026-11-18. Each task was also attempted without the skill as a baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use — no unsafe operations, secret leakage, or unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the expected skill was loaded and activated when needed, avoiding decoys. <br>
-- Effectiveness: Whether the skill helped complete the user's goal and the expected workflow was followed. <br>
-- Efficiency: Whether the skill avoided wasted tool calls and excess token usage. <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Equal-weight mean of `goal_accuracy` (50%) and `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? `skill_efficiency` (50%) plus `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
+- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+✅ **Overall verdict: PASS — Recommended for publication**
+
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.2% (uplift unavailable) | 87.8% (uplift unavailable) |
-| Security | 75.0% → 100.0% (+25.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 45.0% → 100.0% (+55.0 points) | 70.0% → 90.0% (+20.0 points) |
-| Discoverability | 100.0% (uplift unavailable) | 95.0% (uplift unavailable) |
-| Effectiveness | 43.8% → 100.0% (+56.2 points) | 58.3% → 83.3% (+25.0 points) |
-| Efficiency | 90.9% (uplift unavailable) | 70.9% (uplift unavailable) |
+| Overall | 97.0% — baseline ran, but no comparable score was available; uplift unavailable | 89.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 75.0% → 100.0% (+25.0 points) | 62.5% → 100.0% (+37.5 points) |
+| Correctness | 45.0% → 100.0% (+55.0 points) | 50.0% → 100.0% (+50.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.8% → 100.0% (+56.2 points) | 54.2% → 79.2% (+25.0 points) |
+| Efficiency | 85.1% — baseline ran, but no comparable score was available; uplift unavailable | 72.0% — baseline ran, but no comparable score was available; uplift unavailable |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
+
+#### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 96.6% → 92.3% (-4.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 86.4% → 85.8% (-0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 3 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Skill Version(s): <br>
-c98e456 (source: git SHA, committed 2026-10-28) <br>
+155651c (source: git SHA, committed 2026-11-17) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

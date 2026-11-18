@@ -34,28 +34,20 @@ next call.
 
 See [references/install.md](references/install.md).
 
-## DOCA 3.5 field notes
+## Usage notes (DOCA 3.5)
 
-Known behaviours on DOCA 3.5 with BlueField-3; check them
-before debugging further:
+Check these before debugging further:
 
-- **Async events block.** `doca_verbs_get_async_event()` blocks until
-  an event is pending; the header says it is a blocking function even
-  though the guide calls async events non-blocking notifications.
-  Poll the context's async-event handle (`doca_verbs_get_async_event_handle()`)
+- **Poll before reading async events.** Poll the context's async-event handle (`doca_verbs_get_async_event_handle()`)
   with `poll()` / `epoll` first, then call `doca_verbs_get_async_event()`
   only when it is readable, and acknowledge every event with
   `doca_verbs_ack_async_event()`.
-- **Multi-Rail on BlueField-3.** The 3.5 Multi-Rail app fails with
-  default settings: `EWMA (measured-BW) LB mode is supported only on
-  Spectrum-X devices`, and `doca_verbs_multi_rail_update_qp` returns
-  `DOCA_ERROR_NOT_SUPPORTED`. Use `lb_mode: port_speed` (listed in the
-  app's `--help`). No dedicated application guide is published; treat
-  `--help` as the reference.
-- **Multi-Rail build is skipped without json-c.** meson prints
-  `Skipping compilation of DOCA Application - verbs_multi_rail_server_client
-  - Missing json-c support`; install `libjson-c-dev` (not pulled in by
-  `doca-all`) and rebuild.
+- **Multi-Rail LB modes.** Check the Multi-Rail app's `--help` for the
+  load-balancing modes supported on your device and pick one listed
+  there.
+- **Multi-Rail optional dependencies.** Check the meson output for
+  skipped applications and missing optional dependencies such as
+  json-c; install the missing development package and rebuild.
 - **DOCA 3.5 API changes.** Use the new RCX type setter
   (`doca_verbs_qp_init_attr_set_rcx_type()`) when initializing QP
   attributes. The DOCA Verbs header now defines new constant families:
@@ -157,7 +149,12 @@ Steps the agent should walk the user through:
    state machine via `doca_verbs_qp_modify(qp, qp_attr)` through the
    transitions the QP type requires (RESET → INIT → RTR → RTS for RC)
    → `doca_pe_connect_ctx(pe, ctx_as_doca_ctx)` → `doca_ctx_start`.
-   This is the order in [CAPABILITIES.md](CAPABILITIES.md) and
+   When the QP attributes include LAG TX port affinity or a Q counter
+   attachment, set them with the DOCA 3.6 setters
+   `doca_verbs_qp_attr_set_lag_tx_port_affinity` and
+   `doca_verbs_qp_attr_set_q_counter`; exact signatures are in the
+   installed verbs header from step 3. This is the order in
+   [CAPABILITIES.md](CAPABILITIES.md) and
    [references/use.md](references/use.md); when the shipped sample
    differs on your release, follow the sample. Per the no-mixing rule in
    [CAPABILITIES.md ## Safety policy](CAPABILITIES.md#safety-policy),
@@ -495,6 +492,22 @@ higher-level Rivermax patterns to
 ## use
 
 See [references/use.md](references/use.md).
+
+### Queue counters
+
+DOCA 3.6 replaces the previous queue-counter approach with the `doca_verbs_q_counter` family. Create a counter with `doca_verbs_q_counter_create`, query it with `doca_verbs_q_counter_query`, read individual error and traffic values with the `doca_verbs_q_counter_get_*` getters, and release it with `doca_verbs_q_counter_destroy`. A context-level default counter is available through `doca_verbs_context_get_default_q_counter`.
+
+To attach a counter to a QP, set the QP attribute's external counter set ID with `doca_verbs_qp_attr_set_external_counter_set_id` and read it back with `doca_verbs_qp_attr_get_external_counter_set_id`. The counter set ID for a created counter is obtained with `doca_verbs_q_counter_get_counter_set_id`. The QP attribute also exposes the associated counter object via `doca_verbs_qp_attr_get_q_counter`.
+
+### LAG TX port affinity
+
+For LAG TX port affinity, first check device support with the `doca_verbs_device_attr_get_is_lag_tx_port_affinity_supported`, `doca_verbs_device_attr_get_is_init2_lag_tx_port_affinity_supported`, and `doca_verbs_device_attr_get_is_rts2rts_lag_tx_port_affinity_supported` getters, and obtain the number of LAG ports with `doca_verbs_device_attr_get_num_lag_ports`. Set the affinity on a QP attribute with `doca_verbs_qp_attr_set_lag_tx_port_affinity` and read it with `doca_verbs_qp_attr_get_lag_tx_port_affinity`.
+
+### Path MTU 8K support
+
+Check whether the device supports an 8K path MTU with `doca_verbs_device_attr_get_is_path_mtu_8k_supported` before configuring such an MTU.
+
+All new declarations are in the DOCA Verbs public headers shipped with the component; see the installed header files for exact signatures and the full `doca_verbs_q_counter_get_*` getter family.
 
 ## Deferred task verbs
 

@@ -12,7 +12,7 @@ to and the H2 anchor in this file or in
 | Detect install | `pkg-config --list-all \| grep -i doca` | [`## configure`](../TASKS.md#configure) step 2 | Lists at least one `doca-*` module. Empty ⇒ install profile probably wrong. |
 | Detect install | `doca_caps --version` | [`## test`](../TASKS.md#test) step 2 | Matches `pkg-config --modversion doca-common`. Mismatch ⇒ partial upgrade. |
 | Detect install | `cat /opt/mellanox/doca/applications/VERSION` | [CAPABILITIES.md ## Version compatibility](../CAPABILITIES.md#version-compatibility) | Fallback when `pkg-config` is broken. Returns the same string. |
-| Wire build | `pkg-config --cflags doca-<library>` | [`## configure`](../TASKS.md#configure) step 2 | Returns `-I/opt/mellanox/doca/infrastructure/include` (or trace-flavor equivalent). |
+| Wire build | `pkg-config --cflags doca-<library>` | [`## configure`](../TASKS.md#configure) step 2 | Returns `-I/opt/mellanox/doca/include` (or trace-flavor equivalent). |
 | Wire build | `pkg-config --libs doca-<library>` | [`## configure`](../TASKS.md#configure) step 2 / [`## run`](../TASKS.md#run) checklist | Returns `-L/opt/mellanox/doca/lib/<arch>-linux-gnu -ldoca_<library>` plus deps. |
 | Wire runtime | `mount \| grep huge` | [`## configure`](../TASKS.md#configure) step 7 / [CAPABILITIES.md ## Observability](../CAPABILITIES.md#observability) | Shows a `hugetlbfs` mount. Empty ⇒ no hugetlbfs mount (pages may still be reserved; the `/proc/meminfo` row is the reservation check). |
 | Wire runtime | `cat /proc/meminfo \| grep -i huge` | [`## configure`](../TASKS.md#configure) step 7 | Shows `HugePages_Total` > 0 and `HugePages_Free` > 0. |

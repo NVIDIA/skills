@@ -91,6 +91,11 @@ the cap check.** Run `doca_sta_cap_is_supported` against the
 active `doca_devinfo`; quote the queried result. Do not assume
 from the docs page.
 
+**Scheduling mode.** The `DOCA_STA_*` scheduling-mode family in
+`doca_sta.h` now includes an EU scheduler mode. Developers can
+select the EU scheduler through that family; guidance that only
+the previously documented modes exist is incomplete.
+
 **NVMe queue-pair shape.** Each NVMe-oF *connection* (initiator
 ↔ target pair) carries:
 
@@ -168,6 +173,12 @@ there; this skill does not duplicate it.
   partial-install hazard. Route to
   `doca-rdma CAPABILITIES.md ## Version compatibility` (`doca-rdma/CAPABILITIES.md#version-compatibility`)
   for the RDMA-side overlay.
+- **DOCA 3.6 public API addition.** The `DOCA_STA_*` family gained
+  a new EU scheduler constant in the public DOCA STA header.
+  Developers targeting DOCA 3.6 can use it; code that references
+  it must be compiled against the DOCA 3.6 header set and must
+  not be built against older DOCA headers. Check the public DOCA
+  STA header for the exact spelling and semantics.
 
 ## Error taxonomy
 

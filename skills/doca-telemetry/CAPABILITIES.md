@@ -89,13 +89,16 @@ per the headers-win-over-docs rule in
 
 | Header | Domain | Counter family it reads | Per-domain cap query |
 | --- | --- | --- | --- |
-| `doca_telemetry_pcc.h` | Programmable Congestion Control | Per-algo-slot info + the PCC counter set (`doca_telemetry_pcc_get_counters` / `_get_and_clear_counters`, `_get_num_counters`, `_get_counter_info`, `_get_algo_*`) plus PCC histogram reads (`doca_telemetry_pcc_get_histo_bins`, `_get_and_clear_histo_bins`, `_get_histo_desc`, `_get_histo_edge_info`, `_get_histo_edges`, `_get_histo_enable_status`, `_get_histo_ids_per_slot`, `_get_max_algo_slots`, `_get_max_histo_bins`, `_get_max_histo_desc_len`, `_get_max_histo_edges`, `_get_max_histo_per_slot`, `_get_max_num_counters`) | `doca_telemetry_pcc_cap_is_supported(devinfo)` (plus `doca_telemetry_pcc_cap_histo_is_supported(pcc)` for the histogram area, `_cap_rep_is_supported` for the representor path and `_cap_get_max_*` sizing caps) |
+| `doca_telemetry_pcc.h` | Programmable Congestion Control | Per-algo-slot info + the PCC counter set (`doca_telemetry_pcc_get_counters` / `_get_and_clear_counters`, `_get_num_counters`, `_get_counter_info`, `_get_algo_*`) plus PCC histogram reads (`doca_telemetry_pcc_get_histo_bins`, `_get_and_clear_histo_bins`, `_get_histo_desc`, `_get_histo_edge_info`, `_get_histo_edges`, `_get_histo_enable_status`, `_get_histo_ids_per_slot`, `_get_max_algo_slots`, `_get_max_histo_bins`, `_get_max_histo_desc_len`, `_get_max_histo_edges`, `_get_max_histo_per_slot`, `_get_max_num_counters`) plus PCC counter-group getters (see `doca_telemetry_pcc.h` for exact names) | `doca_telemetry_pcc_cap_is_supported(devinfo)` (plus `doca_telemetry_pcc_cap_histo_is_supported(pcc)` for the histogram area, `_cap_rep_is_supported` for the representor path and `_cap_get_max_*` sizing caps; plus a PCC counter-group capability check — see `doca_telemetry_pcc.h` for the exact name) |
 | `doca_telemetry_dpa.h` | DPA | DPA process / thread lists, cumulative info, perf-event samples, per-counter start/restart/stop (`doca_telemetry_dpa_read_processes_list`, `_read_thread_list`, `_read_cumul_info_list`, `_read_perf_event_list`, `_counter_start`/`_counter_restart`/`_counter_stop`) | `doca_telemetry_dpa_cap_is_supported(devinfo)` |
 | `doca_telemetry_diag.h` | Device diagnostic counters | Sampled diagnostic-counter data in one of three formats (`doca_telemetry_diag_query_counters` after `_apply_config` + `_apply_counters_list_by_id` + `_start`), with sample-mode / sample-period / num-samples setters | `doca_telemetry_diag_cap_is_supported(devinfo)` (plus `_cap_get_max_num_data_ids`, `_cap_get_log_max_num_samples`, `_cap_is_data_clear_supported`, `_cap_is_sample_mode_supported`) |
 | `doca_telemetry_adp_retx.h` | Adaptive-retransmit histogram | Configurable retransmit-latency histogram (bin widths, time unit, vHCA id, clear-on-read) read off the device | `doca_telemetry_adp_retx_cap_is_supported(devinfo)` (plus `_cap_histogram_is_supported`, `_cap_get_hist_max_bins`, `_cap_get_hist_time_units`) |
-| `doca_telemetry_phy.h` | Physical layer | Operation info, supported info, troubleshooting info, system temp/power info, module info, counter-and-BER info, FEC histogram, management-cable info (`doca_telemetry_phy_get_*_info` including `_get_supported_info`, `_get_troubleshooting_info`, `_get_system_temp_and_pwr_info`, `_get_fec_histogram_info`, `_get_management_cable_ddm_info`, `_get_management_cable_dump_info`, `_get_management_cable_single_page_info`) | `doca_telemetry_phy_cap_is_supported(devinfo)` **plus per-sub-area caps** `doca_telemetry_phy_cap_operation_info_is_supported`, `_cap_counter_and_ber_info_is_supported`, `_cap_fec_histogram_info_is_supported`, `_cap_module_info_is_supported`, `_cap_management_cable_is_supported`, `_cap_supported_info_is_supported`, `_cap_system_temp_and_pwr_info_is_supported`, `_cap_troubleshooting_info_is_supported` (query the specific sub-area you intend to read) |
+| `doca_telemetry_phy.h` | Physical layer | Operation info, supported info, troubleshooting info, system temp/power info, module info, counter-and-BER info, FEC histogram, management-cable info (`doca_telemetry_phy_get_*_info` including `_get_supported_info`, `_get_troubleshooting_info`, `_get_system_temp_and_pwr_info`, `_get_fec_histogram_info`, `_get_management_cable_ddm_info`, `_get_management_cable_dump_info`, `_get_management_cable_single_page_info`) plus PHY sample-info getters for FER, laser monitors, PAM4 level transition, pre-FEC BER, SEW max, SNR, system power, and system temperature (see `doca_telemetry_phy.h` for exact names) | `doca_telemetry_phy_cap_is_supported(devinfo)` **plus per-sub-area caps** `doca_telemetry_phy_cap_operation_info_is_supported`, `_cap_counter_and_ber_info_is_supported`, `_cap_fec_histogram_info_is_supported`, `_cap_module_info_is_supported`, `_cap_management_cable_is_supported`, `_cap_supported_info_is_supported`, `_cap_system_temp_and_pwr_info_is_supported`, `_cap_troubleshooting_info_is_supported` (query the specific sub-area you intend to read); DOCA 3.6 added per-sample-info capability checks for FER, laser monitors, PAM4 level transition, pre-FEC BER, SEW max, SNR, system power, and system temperature — call the matching check before the corresponding getter (see `doca_telemetry_phy.h` for exact names) |
 | `doca_telemetry_pci.h` | PCI / PCIe | Management info, perf-counters set 1, latency histogram (`doca_telemetry_pci_read_management_info`, `_read_perf_counters_1`, `_read_latency_histogram`, plus `_by_pci_addr` variants and `doca_telemetry_pci_get_latency_histogram_dimensions_by_pci_addr`) | **No single domain-level cap.** Query the per-feature caps: `doca_telemetry_pci_cap_management_info_is_supported`, `_cap_perf_counters_1_is_supported`, `_cap_latency_histogram_is_supported` (plus finer per-counter variants like `_cap_perf_counters_1_fec_error_is_supported`) |
 
+DOCA 3.6 also added PHY link-down blame/reason constants in the
+`DOCA_TELEMETRY_PHY_LINK_DOWN_*` family; see `doca_telemetry_phy.h`
+for exact names.
 
 **Per-domain lifecycle.** Every domain follows the same shape;
 the verbs are domain-specific (`doca_telemetry_<domain>_*`), not
@@ -103,7 +106,7 @@ the generic DOCA Core `doca_ctx_*` surface:
 
 | Step | Call (phy shown; substitute the domain) | Notes |
 | --- | --- | --- |
-| 0. Cap-query | `doca_telemetry_phy_cap_is_supported(devinfo)` | Runtime authority for "this device exposes this domain". For `pci`, query the per-feature `_cap_*_is_supported` instead. Returns `DOCA_ERROR_NOT_SUPPORTED` when the device does not expose the domain — that is the answer, not a bug |
+| 0. Cap-query | `doca_telemetry_phy_cap_is_supported(devinfo)` | Runtime authority for "this device exposes this domain". For `phy`, query the specific sub-area cap (including the per-sample-info caps for FER, laser monitors, PAM4 level transition, pre-FEC BER, SEW max, SNR, system power, and system temperature) before the corresponding getter. For `pcc`, query the counter-group cap before the counter-group getters. For `pci`, query the per-feature `_cap_*_is_supported` instead. Returns `DOCA_ERROR_NOT_SUPPORTED` when the device does not expose the domain — that is the answer, not a bug |
 | 1. Create | `doca_telemetry_phy_create(struct doca_dev *dev, struct doca_telemetry_phy **phy)` | Creates the per-domain context bound to an already-open `doca_dev`. `pcc` additionally offers `doca_telemetry_pcc_rep_create(struct doca_dev_rep *, …)` for the representor path |
 | 2. Configure | domain setters (e.g. `doca_telemetry_diag_set_sample_mode` / `_set_sample_period`; `doca_telemetry_adp_retx_set_hist_num_bins`; `doca_telemetry_dpa_set_max_perf_event_samples`) | Domain-specific knobs only — there is no transport / socket / schema to configure. `diag` requires `doca_telemetry_diag_apply_config` (and `_apply_counters_list_by_id`) before start |
 | 3. Start | `doca_telemetry_phy_start(phy)` | Reads before start return `DOCA_ERROR_BAD_STATE` |
@@ -121,7 +124,12 @@ supports PHY FEC histograms"* from memory without the cap query
 is the silent-fail case — when the device does not expose it,
 the read returns `DOCA_ERROR_NOT_SUPPORTED` and the user has no
 idea why. The agent MUST quote the queried values back to the
-user. **`doca_telemetry_pci` has no single domain-level cap**;
+user. For `phy`, DOCA 3.6 added per-sample-info capability checks
+for FER, laser monitors, PAM4 level transition, pre-FEC BER, SEW
+max, SNR, system power, and system temperature; call the matching
+check before the corresponding getter. For `pcc`, DOCA 3.6 added
+a counter-group capability check; call it before the counter-group
+getters. **`doca_telemetry_pci` has no single domain-level cap**;
 query its per-feature `_cap_*_is_supported` functions for the
 specific PCI counter family you intend to read.
 
@@ -180,7 +188,22 @@ lives there; this skill does not duplicate it.
   or constants in a build file or assume them from a docs page.
   DOCA 3.5 added PCC histogram query functions, PCI by-address
   read functions, PHY capability/get functions, and PHY
-  firmware/management constants.
+  firmware/management constants. DOCA 3.6 added the capability-check
+  plus getter pattern for PHY sample types (the
+  `doca_telemetry_phy_cap_*_is_supported` /
+  `doca_telemetry_phy_get_*` family) and PCC counter-group
+  capability/get functions, and introduced the
+  `DOCA_TELEMETRY_PHY_LINK_DOWN_*` constant family for link-down
+  blame and reason values. DOCA 3.6 added new
+  `DOCA_TELEMETRY_PHY_LINK_DOWN_REASON_*` constants to that family.
+  Code written against earlier DOCA releases must be recompiled,
+  must adopt the new capability-check plus getter pattern for these
+  telemetry sample types, must use the
+  `DOCA_TELEMETRY_PHY_LINK_DOWN_*` constant family for link-down
+  blame and reason values, and must update switch statements over
+  the enum to handle the new
+  `DOCA_TELEMETRY_PHY_LINK_DOWN_REASON_*` constants; see the public
+  telemetry header for the exact declarations.
 
 ## Error taxonomy
 
@@ -216,6 +239,8 @@ plus `DOCA_TELEMETRY_PHY_ERROR_CODE_CFG_REJECTED_INVALID_VS_SI`.
 Read the exact set from `doca_telemetry_phy.h` on the installed
 release; do not list or hardcode them.
 
+DOCA 3.6 expands the `DOCA_TELEMETRY_PHY_LINK_DOWN_REASON_*` family; read the exact set from `doca_telemetry_phy.h` on the installed release; do not list or hardcode them.
+
 When a PHY read surfaces one of these constants, do not map it to the `DOCA_ERROR_*` rows above; surface the constant name and the PHY firmware/management firmware status it reports.
 
 ## Observability
@@ -233,6 +258,41 @@ corresponding PCC and PHY cap queries. These are all
 `doca_telemetry_<domain>_*` read/query or
 `doca_telemetry_<domain>_cap_*` calls and are covered by the
 same two signals below.
+
+In DOCA 3.6 this surface extends further with two new data
+families:
+
+- **PHY sample-info getters.** A family of
+  `doca_telemetry_phy_get_*_samples_info` calls reads
+  observability samples for FEC, laser monitors, PAM4 level
+  transitions, pre-FEC BER, SEW max, and SNR. Each has a
+  matching `doca_telemetry_phy_cap_*_samples_info_is_supported`
+  capability query on `struct doca_devinfo`, plus system power
+  and system temperature info getters with their own cap
+  queries. Some getters take a `read_and_clear` flag that
+  resets the sample accumulator after the read; consult the
+  header for which getters expose that flag and what each
+  output struct contains.
+- **PCC counter-group getters.** A family of
+  `doca_telemetry_pcc_*_counter_group*` calls reads per-slot
+  counter groups: query the max groups per slot, enumerate the
+  groups a slot exposes, read a group, or read-and-clear a
+  group. A `doca_telemetry_pcc_cap_counter_group_is_supported`
+  capability query gates the whole family on a given PCC
+  handle.
+
+Both families follow the same two signals below: inspect the
+`doca_error_t` on every call, and take the matching cap query
+at configure time as the baseline before any read.
+
+For interpreting PHY link-down reasons and blame, the
+`DOCA_TELEMETRY_PHY_LINK_DOWN_*` constant family in the header
+enumerates link-down reasons (cable unplugged, HI BER, FEC sync
+loss, management-command down, fast-recovery triggers, and
+others) and blame values (local PHY vs unknown). Map the
+reason/blame fields of the PHY troubleshooting read outputs to
+these constants; do not treat the raw integer values as
+self-explanatory.
 
 Two primary signals the agent should reach for:
 

@@ -162,6 +162,8 @@ DOCA's zero-copy data plane rests on three objects layered together:
 
 DOCA 3.5 adds direct buffer initialization: `doca_buf_get_struct_size` returns the size to allocate for a `struct doca_buf`, and `doca_buf_init` initializes that memory over a head pointer and size. It also adds `doca_mmap_create_from_mr` to create a `doca_mmap` from an existing memory region (`remote_addr`, `length`, `rkey`, `access_flags`) on a device. Developers must use these constructors instead of assuming struct layout or manual initialization; see the public header for exact signatures.
 
+DOCA 3.6 adds a buffer offset accessor family (`doca_buf_get_*_offset`) that returns the data-length, data, head, and length offsets for a `doca_buf`. Developers must use these accessors instead of manually computing offsets from buffer pointers and lengths; see the public header for exact signatures.
+
 The `doca_buf_pool` surface (allocate-by-pool variant) and the
 `doca_buf_array` surface (DPA / GPU-targetable buffer arrays) are
 adjacent flavors of the same model. The buf-chain primitives
@@ -280,7 +282,8 @@ generic ones (`doca_devinfo_cap_is_hotplug_manager_supported`,
 `doca_devinfo_cap_is_accelerate_resource_reclaim_supported`,
 `doca_devinfo_cap_is_notification_moderation_supported`, …) and the
 library-specific ones every higher-level skill cross-links to here
-(`doca_flow_cap_*`, `doca_rdma_cap_*`, `doca_eth_cap_*`,
+(`doca_flow_port_capabilities_*`, `doca_flow_ct_cap_*`,
+`doca_rdma_cap_*`, `doca_eth_rxq_cap_*` / `doca_eth_txq_cap_*`,
 `doca_dma_cap_*`, …). The agent's rule: **the cap-query against the
 active `doca_devinfo` is the runtime authority for what the device
 + firmware + DOCA version actually supports.** The public docs are
@@ -442,7 +445,7 @@ there; this skill does not duplicate it.
   `doca_mmap_advise_*`, several newer `doca_ctx_*` and
   `doca_devinfo_*` extensions). The experimental markers are
   release-specific; the agent must read the installed
-  `doca_common.h` family on the user's install before claiming
+  doca-common headers (`doca_ctx.h`, `doca_dev.h`, `doca_buf.h`, ...) on the user's install before claiming
   experimental-tier surface is available.
 - **No standalone `doca-log.pc` in this contract.** On this DOCA
   version the log subsystem is exposed through
@@ -486,11 +489,28 @@ there; this skill does not duplicate it.
   `DOCA_DEVINFO_PCIE_LINK_WIDTH_X8`,
   `DOCA_DEV_EVENT_TYPE_LINK_DOWN`, `DOCA_DEV_EVENT_TYPE_LINK_UP`,
   `DOCA_DEV_LINK_STATE_DOWN`, `DOCA_DEV_LINK_STATE_UP`.
+- **DOCA 3.6 public API changes.** DOCA 3.6 changed the signature of
+  `doca_clock_get_crosstimestamp`: the final parameter is renamed from
+  `error_margin_nsecs` to `error_margin`. The type, position and meaning
+  are unchanged; C parameter names are not part of the calling interface,
+  so existing call sites compile and behave as before. Only documentation
+  and code that names the parameter (for example generated bindings)
+  needs the new name. DOCA 3.6 also added the
+  `doca_buf_get_*_offset` family, `doca_mmap_set_data_direct`, and the
+  `DOCA_MTU_SIZE_8K_BYTES` member of the `DOCA_MTU_SIZE_*` constant
+  family. Developers configuring MTU sizes can use
+  `DOCA_MTU_SIZE_8K_BYTES` instead of a literal `8192`; the constant is
+  declared in the installed header that defines the `DOCA_MTU_SIZE_*`
+  family. On a DOCA 3.6 install these are part of the public surface;
+  on older installs they are absent. Confirm the installed headers
+  (`doca_buf.h`, `doca_mmap.h`, the header that declares
+  `doca_clock_get_crosstimestamp`, and the header that declares the
+  `DOCA_MTU_SIZE_*` family) before relying on them.
 
 Version-specific tables of symbol availability are deliberately not
-maintained in this file except for the DOCA 3.5 additions recorded
-above — they would drift out of date silently. The discipline is
-"read the headers and the matching release notes", not "trust this
+maintained in this file except for the DOCA 3.5 and DOCA 3.6 additions
+recorded above — they would drift out of date silently. The discipline
+is "read the headers and the matching release notes", not "trust this
 file's table".
 
 ## Error taxonomy
@@ -569,7 +589,8 @@ log-side guardrails the rest of the bundle relies on.
   `doca_pe_connect_ctx` before `doca_ctx_start`, destroying a
   `doca_mmap` while a `doca_buf` from its inventory is still in
   flight, destroying a `doca_dev` while a context is still using it,
-  or calling `doca_ctx_destroy` before `doca_ctx_stop` is the
+  or destroying a context through its library destroy call (for example
+  `doca_dma_destroy`) before `doca_ctx_stop` is the
   canonical "the program crashes far from the offending line"
   failure mode. The agent's response is *always* to walk the
   lifecycle in [`## ctx`](#ctx) / [`## buf`](#buf) /

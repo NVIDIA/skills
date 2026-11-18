@@ -19,7 +19,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - flow
@@ -41,6 +41,10 @@ compatibility: >
   a first-app `main.c`.
 - **“Match 5-tuple and send to a queue.”** — express it as a Flow
   pipe. Do not fall back to kernel tc or iptables.
+- **"Write my first DOCA Flow app."** Start from a shipped sample, not
+  authored code: `ls /opt/mellanox/doca/samples/doca_flow/`, copy the closest
+  one, build it, then make the minimum change. The NGC container builds and
+  links it, but pipe creation needs a real BlueField or ConnectX at runtime.
 
 ## Instructions
 
@@ -48,8 +52,8 @@ Follow Loading order below. Open the tasks companion for configure /
 modify / debug. Open the capabilities companion for the pipe-spec
 schema and safety policy.
 For connection tracking, read the tasks companion's `flow-ct` section
-before starting ports: CT initialization is process-global and must precede
-port start. Adding CT to running ports requires an approved interruption
+before starting ports: in DOCA 3.6 CT is configured on each port's
+`doca_flow_port_cfg` (`doca_flow_port_cfg_set_ct_*`) before that port starts. Adding CT to running ports requires an approved interruption
 and reconstruction from a captured configuration, not a per-port
 `doca_ctx_start` call or reuse of invalidated pipe handles.
 

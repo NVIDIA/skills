@@ -20,7 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - sha
@@ -149,7 +149,7 @@ is one instance.
   will the engine still load?”*. Answered by the version
   overlay in
   the capabilities companion
-  (verified surface: the engine is documented for
+  (documented surface: the engine is documented for
   OpenSSL 1.1.1f on Ubuntu 20.04 and OpenSSL 3.0.2 on
   Ubuntu 22.04 per the shipped `engine_readme.md`).
 

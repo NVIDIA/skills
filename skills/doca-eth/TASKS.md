@@ -57,7 +57,7 @@ Steps the agent should walk the user through:
    versa). Sketch the call sequence per side before writing
    code.
 3. **Run capability discovery against the active `doca_devinfo`.**
-   For RX: `doca_eth_rxq_cap_get_max_burst_size`, for each
+   For RX: `doca_eth_rxq_cap_get_max_inflight_packets`, for each
    RX type the user is considering,
    `doca_eth_rxq_cap_is_type_supported(devinfo, type)`, and for
    each CQE format under consideration,
@@ -67,7 +67,8 @@ Steps the agent should walk the user through:
    `doca_eth_txq_cap_get_max_send_buf_list_len`,
    `doca_eth_txq_cap_get_max_inline_data_size`, and, if the
    user wants offload,
-   `doca_eth_txq_cap_is_l3_chksum_offload_supported`. Quote the
+   `doca_eth_txq_cap_is_l3_checksum_offload_supported` /
+   `_l4_checksum_offload_supported`. Quote the
    queried values back to the user; do not assume from prior
    installs.
 4. **Pick the RX type per data shape.** Per the RX-type
@@ -147,9 +148,11 @@ recommending any code-level edit:
 | --- | --- | --- |
 | 1. Starting sample | Which sample under `/opt/mellanox/doca/samples/doca_eth/`? | Pick the closest in *queue side* (RX vs TX vs both) and *RX type* (regular vs cyclic vs managed-recv) to the user's intent. Do NOT bridge across both axes — a smaller diff is always safer than a re-architecture |
 | 2. RX type change | Switching regular → cyclic or → managed-recv? | Re-run `doca_eth_rxq_cap_is_type_supported(devinfo, type)` for the new type; types are device-conditional |
-| 3. Queue sizing | Changing burst size, scatter-gather depth, ring length? | Each one re-runs the matching `_cap_get_max_*` query; the device cap is the only authority. Quote the queried value, not a value the user remembered from another host |
+| 3. Queue sizing | Changing burst size, scatter-gather depth, ring length? | Scatter-gather depth and ring length re-run the matching capability query; the device cap is the only authority. Queue depth is `doca_eth_rxq_set_max_inflight_packets` / `doca_eth_txq_set_max_inflight_packets`, bounded by the matching `_cap_get_max_inflight_packets` (DOCA 3.6 names for the 3.5 max-burst-size calls). Quote the queried value, not a value the user remembered from another host |
 | 4. Steering / promisc | Adding a flow rule, or moving from promiscuous mode to a real Flow rule? | This is a steering change, not an Ethernet change. Route to `doca-flow/SKILL.md` for the rule body and back here only after the rule programs cleanly |
-| 5. Offload flags | Enabling L3 checksum offload or other TX features? | Each gates on the matching `doca_eth_txq_cap_*` query; the cap is the answer if it says false |
+| 5. Offload flags | Enabling L3/L4 checksum offload or other TX features? | L3/L4 checksum offload: query `doca_eth_txq_cap_is_l3_checksum_offload_supported` / `_l4_checksum_offload_supported` and enable it with `doca_eth_txq_set_l3_checksum_offload` / `_l4_checksum_offload` (DOCA 3.6 names; 3.5 used `_chksum_`). Other TX features gate on the matching capability query; the cap is the answer if it says false |
+
+DOCA 3.6 renamed `doca_eth_rxq_set_pkt_buf` to `doca_eth_rxq_set_packet_buf`; the shared-mempool non-library-buffer controls remain under their 3.6 names (`doca_eth_rxq_shared_mempool_alloc_non_library_buf`, `_get_non_library_bufs_count` / `_set_non_library_bufs_count`).
 
 Keep the build manifest unchanged: the sample's existing
 `meson.build` already wires `pkg-config doca-eth`; do not switch
@@ -199,7 +202,7 @@ Steps the agent should walk the user through:
    (flow tag, L3 OK, L4 OK, metadata, RX hash, and timestamp).
    Buffers must be returned with the
    `doca_eth_rxq_shared_mempool_*` family
-   (`..._allocate_non_library_buffer`, `..._free_buf`, and
+   (`..._alloc_non_library_buf`, `..._free_buf`, and
    `..._free_buf_bulk`). The RX queue must also have been
    configured with `doca_eth_rxq_set_shared_mempool` and a CQE
    format from the `DOCA_ETH_RXQ_CQE_FORMAT_*` family. See the
@@ -269,7 +272,7 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 | Single-packet RX never fires | Queue started cleanly, no `DOCA_ERROR_*`, no completion event | Almost always a steering / promiscuous-mode gap. Verify a DOCA Flow rule is programmed for this queue, or `PROMISC` is on the underlying interface; if both are claimed-but-true, capture `dmesg` and route to driver layer |
 | TX send-task returns `DOCA_ERROR_AGAIN` after N submits | First N submissions succeed; then `AGAIN` | The queue is full; the PE is not being progressed at the rate the user is submitting. Drain completions via `doca_pe_progress()` before re-submitting, or raise queue sizing within the cap |
 | RX type set returns `DOCA_ERROR_NOT_SUPPORTED` at start | A `doca_eth_rxq_cap_is_type_supported` returned `true` for the type, but `doca_ctx_start()` rejects it | The cap query was run against the wrong `doca_devinfo`, or another setter on the queue is incompatible with the chosen type. Re-narrow to the per-`devinfo` query and the full setter sequence |
-| L3 checksum offload silently does not apply | Packets go out but the checksum is wrong | The user requested the offload without first calling `doca_eth_txq_cap_is_l3_chksum_offload_supported`. The fix is to cap-query first and refuse to enable the flag when false |
+| L3 checksum offload silently does not apply | Packets go out but the checksum is wrong | The user requested the offload without first calling `doca_eth_txq_cap_is_l3_checksum_offload_supported`. The fix is to cap-query first and refuse to enable the flag when false |
 | Same code works on host A, fails on host B | One host advertises an RX type or offload the other does not | Re-run [`## configure`](#configure) step 3 (capability discovery) + `doca-version TASKS.md ## test` (`doca-version/TASKS.md#test`) four-way match on host B; the cap surface is per-device, not per-bundle |
 
 Loop termination: stop iterating once two consecutive iterations
@@ -319,7 +322,7 @@ overlay at the *runtime* and *program* layers.
 - Lifecycle order: configure → start → use → stop → destroy,
   per side. Out-of-order returns `DOCA_ERROR_BAD_STATE`. The
   most common case is destroying the underlying `doca_dev`
-  before `doca_ctx_destroy()` on the queue.
+  before `doca_eth_rxq_destroy()` / `doca_eth_txq_destroy()` on the queue.
 - Sizing-vs-drain mismatch: `DOCA_ERROR_NO_MEMORY` on the RX
   side, `DOCA_ERROR_AGAIN` on the TX side are not hardware
   failures; they are flow-control symptoms that the agent must
@@ -381,10 +384,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *“available since”* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *“using structured

@@ -20,7 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - hardware
@@ -41,6 +41,10 @@ compatibility: >
 - **"Enable SR-IOV and reboot."** — this is in scope. Inventory first,
   require out-of-band reachability, a maintenance window, replica
   rehearsal, then apply.
+- **A pre-flight source is missing (no `bfver`, no `/etc/mlnx-release`).**
+  Record it as unknown, finish the read-only capture (`flint -d <bdf> q`,
+  `mlxconfig -d <bdf> q`, link state), then stop before the write and say
+  which item is still missing.
 - **"Flip BlueField mode over SSH."** — refuse if the host has no
   out-of-band path. A link-breaking change without BMC / RShim /
   console is a hard stop.
@@ -99,7 +103,11 @@ substitute for walking the gates:
    a warm reboot.
 2. Require a pre-flight capture of PCIe topology, link state, firmware
    level, BFB level, the current `mlxconfig` configuration, and the
-   host kernel/modules/environment.
+   host kernel/modules/environment. These reads are all read-only: if one
+   source is unavailable (for example no `bfver` or `/etc/mlnx-release` on
+   an x86 host), record that item as unknown and **still capture the
+   rest**, including `mlxconfig -d <bdf> q`. A missing item blocks the
+   write, never the read-only capture.
 3. Treat the change as potentially link-breaking and refuse to issue
    it until a deployment-specific OOB console class is named and
    proven reachable. Never describe an `mlxconfig`-class production
@@ -107,8 +115,15 @@ substitute for walking the gates:
 4. Require a time-boxed maintenance window with stakeholders,
    rollback decision point, rollback plan, and verification gate
    documented before application.
-5. Rehearse both the forward change and the rollback on a matching
-   non-production replica before production.
+5. Rehearse both the forward change **and the rollback** on a
+   non-production replica that matches production's hardware class
+   (BlueField generation, running firmware level, host kernel, and
+   the representors / VFs / SFs the change touches) before production.
+   When the user asks whether the change is small enough to skip the
+   replica, the answer is **no**, with the reason: the replica is the
+   last chance to find out that the rollback does not work before
+   production depends on it, so a change with an unrehearsed rollback
+   is not a small change but one with an untested recovery path.
 6. Keep production workload gated until the four-way version match,
    per-artifact health metric, and end-to-end observability path all
    pass.
@@ -265,10 +280,10 @@ companion files:
   symptom now lives at a software layer.
 - `doca-structured-tools-contract/SKILL.md` —
   the JSON schemas the agent prefers when present. The
-  `collect-host-state` / `collect-dpu-state` schemas are the
+  host-state / DPU-state schemas are the
   structured form of this skill's pre-flight inventory; the agent
-  uses them as the one-shot answer when the host has the helpers
-  installed.
+  uses them as the one-shot answer when the site provides such
+  helpers (none ships with public DOCA).
 - `doca-container-deployment/SKILL.md` —
   the canonical container-deployment recipe shared across DOCA
   services. Several hardware-touching changes (BlueField cold

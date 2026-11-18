@@ -97,10 +97,15 @@ Steps the agent should walk the user through:
    `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY`); set destination mmap
    permissions (`DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`); size the
    source buffer to ≤ the matching `_get_max_buf_size` and the
-   destination buffer to the worst-case output size (a compress
-   destination may need to be slightly larger than the source for
-   poorly-compressible inputs; a decompress destination may need
-   to be substantially larger than the compressed source). Per
+   destination buffer to the worst-case output size. Compress:
+   never smaller than the input; DEFLATE stored blocks add 5 bytes
+   per started 64 KiB of input plus a few header bytes, so input
+   length + 5 × ceil(input / 65535) + 16 bytes covers incompressible
+   data. Decompress: the uncompressed length the producer recorded
+   (container header or application metadata); if none was recorded,
+   the largest output the application accepts, and an
+   `DOCA_ERROR_INVALID_VALUE` then means the payload is larger than
+   that limit. Per
    the matrix in
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
 6. **Sanity check before any task submission.** Confirm with the
@@ -298,7 +303,9 @@ Eval-loop overlay — why this is a loop, not a one-shot pass:
 
 Loop termination: stop iterating once two consecutive iterations
 have the same task / algorithm mode, cap results, permission map,
-submitted/completed counts, and byte-comparison outcome. That
+the same `DOCA_ERROR_*` at the same call, and the same
+byte-comparison outcome (the submitted/completed counts naturally
+differ between runs and are not part of the identity). That
 unchanged identity means the cause is below DOCA Compress and is
 never success. Escalate to
 `doca-debug TASKS.md ## debug` (`doca-debug/TASKS.md#debug`)
@@ -330,7 +337,7 @@ manifestation at layers 5 (runtime) and 6 (program):
   main loop.
 - Confirm both the source mmap and the destination mmap are
   still alive at submit time. Destroying either before
-  `doca_ctx_destroy` is a use-after-free that surfaces as
+  `doca_compress_destroy` is a use-after-free that surfaces as
   `DOCA_ERROR_BAD_STATE` from subsequent calls.
 
 **Layer 6 (program) — Compress overlay.**
@@ -424,8 +431,9 @@ list. The triple IS the rollback target.
 1. **Drain outstanding tasks FIRST.** Walk
    `doca_pe_progress` until the outstanding-task counter is
    zero. Do NOT submit new tasks after rollback intent is
-   declared. If the drain stalls (counter not decrementing
-   within the bounded debug-loop window), fire the
+   declared. If the drain stalls (the outstanding-task counter has
+   not decreased after 10 seconds of `doca_pe_progress` polling),
+   fire the
    deploy-loop bridge (`doca-setup/CAPABILITIES.md#deploy-loop-bridge--step-5-not-green-is-the-debug-loop-trigger`)
    on the stalled-drain symptom before continuing the rollback.
 2. **`doca_ctx_stop` on the Compress context.** Returns
@@ -483,7 +491,7 @@ so the agent does not invent guidance:
   applications across many hosts — out of scope. For a single
   in-session Compress configuration rollback, the right verb in
   this skill is destroying the context (`doca_ctx_stop` →
-  `doca_ctx_destroy`) and re-running [`## configure`](#configure)
+  `doca_compress_destroy`) and re-running [`## configure`](#configure)
   with corrected parameters.
 - **kernel-level driver install / firmware burn.** Compress
   depends on the underlying ConnectX firmware and BlueField BFB;
@@ -507,10 +515,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

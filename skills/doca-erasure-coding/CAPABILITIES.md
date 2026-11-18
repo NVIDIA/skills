@@ -235,7 +235,7 @@ disambiguate before falling back to the cross-library response.
 
 | Error | EC context where it shows up | EC-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; destroying the source or destination `doca_mmap` before `doca_ctx_destroy()`; submitting any task before the matching `set_conf` ran | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing a source / destination mmap underneath a still-running context. |
+| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; destroying the source or destination `doca_mmap` before `doca_ec_destroy()`; submitting any task before the matching `set_conf` ran | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing a source / destination mmap underneath a still-running context. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_ec_task_create_allocate_init`, `_recover_allocate_init`, `_update_allocate_init`, `_galois_mul_allocate_init`; submit time | One of: block size > `doca_ec_cap_get_max_block_size(devinfo)`; total block count > `doca_ec_cap_get_max_buf_list_len(devinfo, &max)`; mismatched block sizes between source / destination buffers within a single task; recover with more than K missing blocks; matrix type configured does not match the matrix type associated with the buffers being recovered. Re-run the matching cap query and re-check that EVERY block in the task is the same size. |
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_ec_task_*_set_conf`; matrix-type selection; first submit | The requested task type is not in this device's accelerator (any of create / recover / update / galois_mul can be independently unsupported), OR the matrix variant the user is trying to construct via `doca_ec_matrix_create()` is not supported on this device, OR the user is asking for a coding scheme outside the public Reed-Solomon surface. Re-run the matching `doca_ec_cap_task_*_is_supported` and re-attempt `doca_ec_matrix_create()` for the variant; if either fails, that is the answer — fall back to CPU EC, change matrix variant, or change N + K. |
 | `DOCA_ERROR_NOT_PERMITTED` | First task submission | One or more source mmaps do not have `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY` (or a stronger flag that supersedes it), OR one or more destination mmaps are missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`. Re-check the matrix in [`## Safety policy`](#safety-policy) against EVERY source and destination buffer (EC tasks have multiple buffers on both sides; a missing permission on one block of a 12-block layout is enough to trip this). |
@@ -352,7 +352,7 @@ important:
 
 **The mmaps must stay valid until the EC context is destroyed.**
 Destroying any source or destination mmap before
-`doca_ctx_destroy()` is a use-after-free on the library's
+`doca_ec_destroy()` is a use-after-free on the library's
 bookkeeping; symptoms include `DOCA_ERROR_BAD_STATE` from
 subsequent calls and undefined behavior on outstanding tasks.
 This applies to EVERY buffer in an EC task (N data + K parity =

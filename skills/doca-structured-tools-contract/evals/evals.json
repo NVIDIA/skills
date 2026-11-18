@@ -5,7 +5,7 @@
       "id": "doca-structured-tools-contract.explicit-positive.v1",
       "prompt": "Use the doca-structured-tools-contract skill for this task: I'm running into this: \"I want every PF, VF and SF visible on this BlueField with its PCIe address and link state in one shot\". Can you walk me through it?",
       "expected_skill": "doca-structured-tools-contract",
-      "expected_output": "The agent loads doca-structured-tools-contract, runs the detection probe (command -v doca-env) first, prefers the structured doca-env --json output when present, otherwise walks the documented manual fallback chain, and always reports which path it took — quoting only fields/commands defined in the schema (no invented JSON fields).",
+      "expected_output": "The agent loads doca-structured-tools-contract, runs the detection probe for the site's env-report helper first, prefers its structured JSON output when present, otherwise walks the documented manual fallback chain, and always reports which path it took — quoting only fields/commands defined in the schema (no invented JSON fields).",
       "assertions": [
         "The doca-structured-tools-contract skill is selected and the detect → prefer → fall back → report loop drives the answer.",
         "The agent reports whether the structured tool or the manual fallback chain was used.",
@@ -16,7 +16,7 @@
       "id": "doca-structured-tools-contract.implicit-positive.v1",
       "prompt": "I'm running into this: \"I want every PF, VF and SF visible on this BlueField with its PCIe address and link state in one shot\". Can you walk me through it?",
       "expected_skill": "doca-structured-tools-contract",
-      "expected_output": "The agent recognizes this as a one-shot structured-state request even though the skill is not named, loads the contract, uses the collect-host-state / collect-dpu-state schema with the manual fallback (devlink dev show + lspci | grep Mellanox + ip -j link), and reports which path was used.",
+      "expected_output": "The agent recognizes this as a one-shot structured-state request even though the skill is not named, loads the contract, uses the host-state / DPU-state schema with the manual fallback (devlink dev show + lspci | grep Mellanox + ip -j link), and reports which path was used.",
       "assertions": [
         "The answer engages the request directly rather than deflecting it.",
         "The answer uses the collect-state schema and its documented manual fallback rather than inventing a tool."

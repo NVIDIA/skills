@@ -85,7 +85,7 @@ in the operator's runbook, not in this skill.
 | Host-side env snapshot | The host's kernel command line (IOMMU mode, hugepage reservations), the loaded `mlx5_*` modules, and the host kernel version | A kernel-boot-parameter change rolls forward this anchor; the rollback path is to revert the boot configuration to the captured baseline |
 
 For the structured one-shot form of this inventory, see the
-`collect-host-state` and `collect-dpu-state` schemas in
+host-state and DPU-state schemas in
 `doca-structured-tools-contract/SKILL.md`;
 the agent prefers the structured tool when present and falls back to
 the manual chain documented there otherwise.
@@ -103,7 +103,7 @@ the class.
 | --- | --- | --- |
 | BMC serial console | A BMC is present on the host or the BlueField management board and exposes a serial console the operator can reach independently of the data-plane link | The operator knows the BMC's reachable address (or local KVM path) and has confirmed access before the change |
 | RShim USB / RShim-over-PCIe console | The operator has physical or PCIe-level access to the BlueField's RShim management interface | The operator has confirmed RShim is reachable and the console is responsive before the change |
-| Operator-managed console (KVM, terminal server, OCC-attached console) | The deployment includes a dedicated console path the operator controls | The operator names the path and has confirmed it works before the change |
+| Operator-managed console (KVM, terminal server, serial console) | The deployment includes a dedicated console path the operator controls | The operator names the path and has confirmed it works before the change |
 
 The agent's rule: when the recommended change is in the *link-
 breaking* class (mode flip, BAR change, port reassignment, BFB

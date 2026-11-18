@@ -76,12 +76,8 @@ DTS is a **single container** with a two-phase lifecycle:
   `/opt/mellanox/doca/services/telemetry/config/dts_config.ini`).
   Editing that file *is* the reconfiguration verb. The guide documents
   the automatic pickup only for `level_labels.ini` (process exits, DTS
-  restarts within 60 s); in practice the same watcher covers
-  `dts_config.ini`: expect the collector process to exit and respawn
-  *inside* the container within ~60 s (supervisor lines `exited: clx` /
-  `spawned: 'clx'` in the container log — the pod's restart count does
-  not move), and apply the shape's restart rule only if no respawn
-  appears. Edit the symlink's *target*: in the generated dir
+  restarts within 60 s); for any other edit, apply the shape's restart
+  rule and verify the change took effect. Edit the symlink's *target*: in the generated dir
   `dts_config.ini -> clx_config.ini`, and `sed -i` without
   `--follow-symlinks` replaces the link with a copy that DTS never
   reads — `ls -l dts_config.ini` tells you which one you have.
@@ -101,7 +97,7 @@ DTS is a **single container** with a two-phase lifecycle:
 | Aspect | (A) BlueField (built-in static pod) | (B) Host (docker) | (C) DPF (DPUService / helm chart) |
 | --- | --- | --- | --- |
 | Where the manifest lives | `/etc/kubelet.d/doca_telemetry_standalone.yaml` (pre-installed; backup copy plus `doca_telemetry_service_${version}_arm64.tar.gz` on the DPU; per-version yaml published under `configs/<version>/` on the container's NGC page) | No manifest — the `docker run` invocation *is* the artifact; copy it from the guide's "Host Deployment" section | `DPUService.yaml` (`apiVersion: svc.dpu.nvidia.com/v1alpha1`, `kind: DPUService`, `namespace: dpf-operator-system`) pointing at the NGC DOCA helm repository as `repoURL` (copy it from the public `dpuservices/dts/DPUService.yaml`), `chart: doca-telemetry`; or a `DPUServiceTemplate` + `DPUServiceConfiguration` pair referenced from `DPUDeployment.spec.services.dts` |
-| How config reaches the container | Host dir `/opt/mellanox/doca/services/telemetry/config` bind-mounted at `/config`; edit `dts_config.ini` on the DPU | Same host dir, mounted via `-v .../config:/config` | `spec.helmChart.values.configMapData` is delivered to the pod as a ConfigMap (mounted at `/configmap` in the chart observed 2026-09-16) and DTS regenerates `/config/dts_config.ini` from it, then self-restarts — mount path and regeneration mechanics are chart internals, confirm with `helm show values` |
+| How config reaches the container | Host dir `/opt/mellanox/doca/services/telemetry/config` bind-mounted at `/config`; edit `dts_config.ini` on the DPU | Same host dir, mounted via `-v .../config:/config` | `spec.helmChart.values.configMapData` is delivered to the pod as a ConfigMap (mounted at `/configmap` in the published chart) and DTS regenerates `/config/dts_config.ini` from it, then self-restarts — mount path and regeneration mechanics are chart internals, confirm with `helm show values` |
 | Start / stop | Kubelet starts it at boot while the yaml is present; taking the yaml out of that directory disables auto-start, and yaml edits apply on system restart (guide); restart without a reboot: `crictl stop <container-id>` — kubelet recreates the static-pod container (attempt +1), the config dir is kept | `docker run -d ...` / removing the `doca-telemetry` container | `kubectl apply -f DPUService.yaml` / `kubectl delete -f DPUService.yaml`; rollout per `spec.serviceDaemonSet.updateStrategy` (`RollingUpdate`, `maxUnavailable`) |
 | Upgrade | Download the newer version's yaml from the NGC page and replace the one in `/etc/kubelet.d` (guide: "DOCA Service on NGC"; the yaml path, the NGC `configs/<version>/` download and `crictl` inspection are this skill's; generic static-pod manifest mechanics in `doca-container-deployment ## configure` (`doca-container-deployment/TASKS.md#configure`)). A freshly downloaded yaml carries the documented default `-i=127.0.0.1 -p=24224` — re-apply your Fluent Bit destination before dropping it in | Re-run with the newer `-host` tag (init step reuses the existing config dir) | Bump `spec.helmChart.source.version` and re-apply; the chart pins its own image tag |
 | Inspect | `crictl pods`, `crictl ps`, `crictl logs <container-id>` (the static-pod tooling of the Container Deployment Guide — the DTS guide itself names only the yaml path) | `docker ps`, `docker logs doca-telemetry` | `kubectl` on the DPU cluster plus `dpfctl describe all --show-resources=dpuservice/doca-telemetry-service --show-conditions=all` |
@@ -140,7 +136,7 @@ option key, and quote what you observed rather than this file.
 | Layer | (A) BlueField (built-in static pod) | (B) Host (docker) | (C) DPF (DPUService / helm chart) |
 | --- | --- | --- | --- |
 | **Available** — what this version knows | The generated `dts_config.ini` in `/opt/mellanox/doca/services/telemetry/config/` (guide "Generating Configuration": defaults are generated on first launch). Its `#####`-banner section headers are the exporter / provider sections; `grep -n -E '^#?enable-provider=' dts_config.ini` lists providers, commented lines included; `fluent_bit_configs/` lists the Fluent Bit outputs | Same file, same host path, written by the documented init container (`-e DTS_CONFIG_DIR=host … /usr/bin/telemetry-init.sh`). Zero-footprint variant: run that documented init command with an empty scratch directory mounted at `/config` to read the template of any image tag without touching the live install | `helm show values <repo>/doca-telemetry --version <pinned>` = the keys the chart models as typed values; `configMapData.general` = free-form `key: value` passthrough rendered verbatim into `dts_config.ini`, for **any** key the image supports (a typed value being absent does not mean unsupported); `kubectl get configmap -n <ns> <name> -o yaml` on the DPU cluster = the rendered `dts_config.ini` in use; `kubectl exec <pod> -- cat /config/dts_config.ini` = what the running image actually loaded |
-| **Active** — what is really running | `GET <addr>:<port>/management/provider` and `/management/exporter` on the Prometheus endpoint (run status + statistics — the authoritative live list); `/management/config_file` for what was loaded; then the start-up block in `clx.log`, metric names on `/metrics`, files under the host `data/` dir | same management routes; `docker exec doca-telemetry tail /var/log/clx.log`; the same `/metrics` and `data/` checks | same management routes through the service port; `kubectl exec <pod> -- tail /var/log/clx.log`; `dpfctl describe` conditions |
+| **Active** — what is really running | The start-up block in `clx.log`, metric names on `/metrics`, files under the host `data/` dir | `docker exec doca-telemetry tail /var/log/clx.log`; the same `/metrics` and `data/` checks | `kubectl exec <pod> -- tail /var/log/clx.log`; `dpfctl describe` conditions |
 | **Docs** | guide chapters "Telemetry Providers" and "Data Export Options", cited by name and read live when a specific row is needed | same | same, plus the chart page on NGC |
 
 Fallback order when a layer is out of reach (no web access, no cluster
@@ -227,25 +223,13 @@ HFT ad-hoc API reuses the same set per run
 `start` body) — see [`## HFT HTTP API family`](#hft-http-api-family).
 Anything else a user asks for (NetFlow / IPFIX export, Kafka or
 InfluxDB *without* Fluent Bit in front, syslog) is not in the guide.
-Some of it is nevertheless visible in the product: the generated
-`dts_config.ini` and the published chart's `configMapData.general`
-block carry a commented NetFlow section (`#netflow-collector-ip=`,
-`#netflow-collector-port=`, "Exporter is disabled if this option is
-not set"). Say that it exists but is undocumented, point the user at
-the commented block in *their* generated config rather than asserting
-its semantics, and route collector-level NetFlow design to the
-public DTS guide via `doca-public-knowledge-map/SKILL.md`.
-Never name a key that is not in their file or the guide. A NetFlow
-"no" still owes a ladder for each alternative: *application-side
-NetFlow* through the exporter library → its own test / debug anchors
+NetFlow is not a documented DTS exporter: say so, and route the user
+to the public DTS guide via `doca-public-knowledge-map/SKILL.md`.
+Never name a key that is not in their file or the guide. For
+*application-side NetFlow* through the exporter library, use its own
+test / debug anchors
 (`libs/doca-telemetry-exporter ## test` (`doca-telemetry-exporter/TASKS.md#test`),
-`## debug` (`doca-telemetry-exporter/TASKS.md#debug`));
-*the undocumented DTS block, if the user enables it anyway* → layer 4
-(does the start-up block list the NetFlow exporter as enabled after the
-restart?), layer 5 (is the collector reachable on the UDP port named in
-their file — `ss -u`/listener on the collector side), layer 6 (does the
-collector's own flow log show records?) — one change per iteration, and
-say explicitly that NVIDIA documents none of it.
+`## debug` (`doca-telemetry-exporter/TASKS.md#debug`)).
 
 Choosing rule: pull (Prometheus) makes *DTS* the thing that must be
 reachable — firewall / port / node exposure questions land here. Push
@@ -335,21 +319,20 @@ this skill does not duplicate it.
   record all three before comparing against the guide.
 - **Never fabricate a tag.** Copy it from the NGC tag list
   (container page in [`## Public-source pointer`](#public-source-pointer));
-  tags observed on 2026-09-16 are *examples of the shape*, not values
+  the tags shown here are *examples of the shape*, not values
   to reuse (DPU: `1.26.5-doca3.5.0`; host: `1.26.5-doca3.5.0-host`).
   If the page cannot be reached, say so and ask the user to paste the
   tag list. Rule of record:
   `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`).
 - **Chart version != image tag.** The `doca-telemetry` chart has its
-  own version series (e.g. `1.26.5`, `1.25.5` observed 2026-09-16) and
+  own version series (e.g. `1.26.5`, `1.25.5`) and
   pins the image tag internally; inspect with `helm show chart` /
   `helm show values` rather than assuming they are equal.
 - **Guide page version vs deployed version.** Option names in this
-  file were read from the guide page as published on 2026-09-16 (page
-  version 3.5.0 at that time); confirm the live page version matches
+  file were read from the DOCA 3.5.0 guide page; confirm the live page version matches
   the DOCA component of the deployed tag, and when they diverge the
   `dts_config.ini` generated by the deployed image wins. Feature floors
-  recorded from the public DTS pages on 2026-09-16: host deployment
+  recorded from the public DTS pages: host deployment
   from DTS 1.13.0-doca2.0.2; `/dev/shm/telemetry/` from DTS 1.9.0 (NGC
   container page note) — re-confirm them on the live page for your tag
   rather than quoting them as guide facts.
@@ -430,30 +413,10 @@ Documented observability surfaces, by shape:
   the only record of the exit; (C)
   `kubectl logs` on the DPU cluster. Provider prerequisite failures
   (layer 4) and exporter connect failures (layer 5) appear here first.
-- **Management HTTP API on the Prometheus endpoint.** When
-  `prometheus=` is set, the same listener serves a management surface:
-  `GET <addr>:<port>/management` prints the route table for *your*
-  build — read it there rather than from memory. The routes that
-  matter for deployment debugging: `/management/provider` (statistics
-  and `run_status` of every provider — the live answer to "which
-  providers are actually running", layer 4), `/management/provider/<name>`
-  (one provider's runtime status), `/management/exporter` (state and
-  `statistics` of every exporter — exported page / record counters, the
-  destination-independent validation signal for push exporters,
-  layer 5), `/management/exporter/<name>` (use the names the list
-  returns; they are plugin names, not `prometheus`),
-  `/management/config_file` (the configuration DTS actually loaded —
-  settles "did my edit reach it" without touching the file), and
-  `/management/all_configs` / `/management/(cset|fset|xcset)[/<name>]`
-  (the data-set files behind `prometheus-fset-indexes` and the chart's
-  `counterset.*`; GET to read, POST/PUT/DELETE change them — treat the
-  mutating verbs as config edits). On (C) reach it through the service
-  port. Every management request is itself logged in `clx.log`.
 - **Reading the log.** The public guide documents only the mount, so
   everything below is read from the target, never assumed. *Two logs:*
   the container log (`crictl logs` / `docker logs` / `kubectl logs`) is
-  the supervisor's process view — `spawned: 'clx'`, `exited: clx`, a
-  sibling service going `FATAL` — and is where a respawn or a restart
+  the process view — a service going `FATAL` — and is where a restart
   loop shows; the collector's own log (`clx.log` in the mounted log
   dir, rotated at ~10 MB into `clx.log.1…N`; inside the container the
   same file is `/var/log/clx.log` — `crictl exec <id> tail -f
@@ -535,9 +498,8 @@ surface is everything *around* it:
   `grpc.*` remote collection on BlueField) starts a privileged system
   service on the DPU. Treat it as a hardware-touching change: state
   the reason, confirm the target identity, and obtain authorization
-  bound to that target (explicit user reply, or an approved-system
-  artifact in unattended runs); otherwise stop with
-  `confirmation_required`.
+  bound to that target (explicit user reply); otherwise stop and ask
+  the operator.
 - **DPF flavor-template / DPUDevice value changes reprovision DPUs**
   per the DPUSet rollout strategy. Editing a level-labels template is
   therefore *not* a config-only change; preview with `dpfctl

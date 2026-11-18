@@ -24,7 +24,7 @@ copy-paste recipe. The agent's job is to walk the user through
 the steps in order, verifying preconditions before recommending
 the next call.
 
-## DOCA 3.5 field notes
+## Usage notes (DOCA 3.5)
 
 **GPU memory registration: dmabuf first, `nvidia-peermem` only as a
 fallback** (DOCA 3.5 GPUNetIO installation and setup page). dmabuf is
@@ -56,6 +56,25 @@ therefore only a problem when dmabuf is unavailable.
 See the public GPUNetIO header for the exact declarations and constant
 families.
 
+**DOCA 3.6 public API changes** (public GPUNetIO header,
+`doca_gpunetio.h`). Update code that uses GPI channels, capability
+checks, or GPI work-queue elements:
+
+- Use the new channel-export function `doca_gpu_gpi_export_channel()`
+  to export a GPI channel.
+- Use the new capability-query functions
+  `doca_gpu_nic_cap_is_gpu_mem_umem_supported()`,
+  `doca_gpu_nic_cap_is_host_mem_umem_supported()`, and
+  `doca_gpu_nic_cap_is_nic_handler_gpu_sm_db_supported()` to check
+  GPU/NIC capabilities before relying on those features.
+- Update GPI work-queue-element construction to use the DOCA 3.6
+  `DOCA_GPUNETIO_GPI_WQE_*` constant families (`..._CTRL_*`,
+  `..._DATA_*`, and `..._SEG_*`) from the public header. Consult the
+  GPUNetIO headers for the exact constant names and values.
+
+See the public GPUNetIO header for the exact declarations and constant
+families.
+
 ## configure
 
 Goal: stand up a `doca_gpu` context on a target CUDA device,
@@ -71,7 +90,7 @@ Steps the agent should walk the user through:
    `nvcc --version` returns a CUDA toolkit version listed as
    compatible with the installed DOCA release by the DOCA
    Compatibility Policy; GPU memory registration is available —
-   dmabuf first (see *DOCA 3.5 field notes* below), and only when
+   dmabuf first (see *Usage notes (DOCA 3.5)* above), and only when
    dmabuf is unavailable `lsmod | grep nvidia_peermem` shows the
    fallback module loaded (or `sudo modprobe nvidia_peermem`);
    `nvidia-smi -L` enumerates the candidate GPU; the underlying
@@ -108,7 +127,7 @@ Steps the agent should walk the user through:
    The receive payload pool lives in GPU memory: allocate via
    `cudaMalloc` (or the CUDA allocator the user's app already
    uses) on the target device, then register the buffer with
-   DOCA via the `doca_buf_arr_create_*` family before starting
+   DOCA via `doca_buf_arr_create` + `doca_buf_arr_set_*` (e.g. `doca_buf_arr_set_target_gpu`) before starting
    the parent doca-eth context with `doca_ctx_start()`. Per the
    safety policy in
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy),
@@ -184,13 +203,15 @@ The universal modify-a-shipped-sample workflow is in
 `doca-programming-guide TASKS.md ## modify` (`doca-programming-guide/TASKS.md#modify`);
 this skill provides the GPUNetIO-specific slot fill.
 
+DOCA 3.6 changed the GPUNetIO public API. Before configuring memory or signaling, the agent must call the new capability-query functions `doca_gpu_nic_cap_is_gpu_mem_umem_supported`, `doca_gpu_nic_cap_is_host_mem_umem_supported`, and `doca_gpu_nic_cap_is_nic_handler_gpu_sm_db_supported`; do not assume UMEM support or GPU-side doorbell availability. To obtain the device-side channel handle, use `doca_gpu_gpi_export_channel` instead of any prior mechanism. For WQE control/data segment construction, use the `DOCA_GPUNETIO_GPI_WQE_*` family declared in the GPUNetIO header rather than ad-hoc offsets.
+
 | Slot | What the agent asks the user | GPUNetIO-specific consideration |
 | --- | --- | --- |
 | 1. Starting sample | Which sample under `/opt/mellanox/doca/samples/doca_gpunetio/`? Or the GPU Packet Processing reference application? | Match the user's intent (RX-only / TX-only / both; single-flow / multi-flow) to a sample whose code shape already matches. Do NOT bridge across the persistent-kernel boundary — a sample that uses a persistent kernel is the right base for any persistent-kernel app |
 | 2. Persistent kernel body | Which packet-processing logic goes inside the persistent kernel? | The persistent-kernel body is the in-place edit point. The agent's anti-pattern alert: do NOT propose launching one CUDA kernel per packet — that defeats GPUNetIO entirely per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes) |
 | 3. CUDA device ordinal | Which GPU is the persistent kernel pinned to? Single-GPU or multi-GPU? | Per the per-GPU rule in [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes), multi-GPU means one `doca_gpu` per device AND one persistent kernel per device — that is a re-architecture, not a tweak |
-| 4. RX-only vs TX-only vs both | Which directions does the persistent kernel need? | Each direction needs its own GPU-visible queue handle and its own underlying doca-eth queue; adding TX after RX is up means re-running cap-query for the TX side |
-| 5. Buffer pool sizing | How big is the GPU payload pool that backs the RX queue? | Per the env-precondition matrix in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), the pool is allocated via `cudaMalloc` and registered with DOCA via `doca_buf_arr_create_*` BEFORE `doca_ctx_start()`; resizing means re-running the registration sequence |
+| 4. RX-only vs TX-only vs both | Which directions does the persistent kernel need? | Each direction needs its own GPU-visible queue handle obtained via `doca_gpu_gpi_export_channel` and its own underlying doca-eth queue; adding TX after RX is up means re-running the DOCA 3.6 capability queries for the TX side, including the GPU-side doorbell query |
+| 5. Buffer pool sizing | How big is the GPU payload pool that backs the RX queue? | Per the env-precondition matrix in [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy), the pool is allocated via `cudaMalloc` and registered with DOCA via `doca_buf_arr_create` + `doca_buf_arr_set_target_gpu` BEFORE `doca_ctx_start()`; resizing means re-running the registration sequence. Before choosing the backing memory, query the GPU-memory UMEM capability with `doca_gpu_nic_cap_is_gpu_mem_umem_supported`; if host memory is intended, query `doca_gpu_nic_cap_is_host_mem_umem_supported` |
 | 6. Termination signal | How does the persistent kernel know when to exit? | A host-side flag read from device memory is the canonical signal; without it the kernel runs forever and `doca_ctx_stop` blocks. The agent must surface this on every modify pass |
 
 The agent emits an *intent description + the six filled slots*;
@@ -351,7 +372,7 @@ GPUNetIO-specific manifestation at layers 5 (runtime), 6
   `DOCA_ERROR_BAD_STATE` per
   [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
 - Buffer registration: a CUDA-allocated buffer that was not
-  registered with DOCA via `doca_buf_arr_create_*` before
+  registered with DOCA via `doca_buf_arr_create` + `doca_buf_arr_set_target_gpu` before
   `doca_ctx_start()` returns `DOCA_ERROR_BAD_STATE` from the
   first device-side submit, not at create time. Walk the
   registration sequence in [`## configure`](#configure) step 4.
@@ -452,7 +473,7 @@ rollback target.
    `cudaStreamQuery` reports completion.
 2. **Unregister GPU buffers in reverse-register order.**
    `doca_buf_arr_destroy` on every array created with
-   `doca_buf_arr_create_*`. Buffers MUST be unregistered before
+   `doca_buf_arr_create` + `doca_buf_arr_set_target_gpu`. Buffers MUST be unregistered before
    `cudaFree`; the reverse order is non-negotiable per
    [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy).
 3. **Stop and destroy the GPUNetIO context.** `doca_ctx_stop`
@@ -527,10 +548,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

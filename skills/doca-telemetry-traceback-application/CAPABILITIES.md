@@ -4,9 +4,7 @@
 artifact that can be deployed in more than one shape; the pattern overview
 below names the recurring traceback-class questions. Pick the pattern first,
 then drill into the H2 that owns the substance. For the *how* of executing
-each pattern, jump to [TASKS.md](TASKS.md). For the host ↔ DPU control-plane
-sibling whose channels coordinate the endpoints the relay carries traffic
-between, see `doca-comch/CAPABILITIES.md`.
+each pattern, jump to [TASKS.md](TASKS.md).
 
 This file is loaded by [`SKILL.md`](SKILL.md). It documents *what the
 application monitors and logs*, *which deployment shapes are documented*,
@@ -210,12 +208,8 @@ The source code for this application is located at:
 /opt/mellanox/doca/applications/telemetry/traceback/
 ```
 
-The authoritative public guide is the DOCA Telemetry Traceback application
-documentation at:
-
-```
-https://docs.nvidia.com/doca/archive/3-5-0/doca-telemetry-traceback-application/index.html
-```
+The authoritative public guide is the public DOCA Telemetry Traceback Application guide,
+reachable through `doca-public-knowledge-map ## DOCA tools` (`doca-public-knowledge-map/SKILL.md#doca-tools`).
 
 For extended capability details of the underlying DOCA Telemetry Diag
 library, refer to its official programming guide. For any issue encountered

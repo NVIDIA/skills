@@ -1,6 +1,6 @@
 # doca-bare-metal-deployment — reference detail
 
-Moved out of `SKILL.md` to keep the loader under the per-file size budget. This is supporting detail, not routing logic.
+This is supporting detail, not routing logic.
 
 ## Example questions this skill answers well
 
@@ -186,7 +186,7 @@ does not contain — and pull requests should not add:
   (detect / prefer / fall back / report). The
   [`## Command appendix`](../TASKS.md#command-appendix) in
   [`TASKS.md`](../TASKS.md) honors this contract — the agent probes
-  for the matching structured helper first (`doca-env --json`,
-  `doca-capability-snapshot`, `version-matrix.json`) and falls
+  for an optional site-provided structured helper first (none
+  ships with public DOCA) and falls
   back to the documented manual commands when the probe fails.
 

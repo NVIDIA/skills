@@ -10,8 +10,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-rmax`
 - Validation status: `passed`
-- Evaluation date: 2026-10-28
-- Evaluator version: `1.6.2`
+- Evaluation date: 2026-11-18
+- Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:6a4d01baa73511220efb9c0ead385bb4eff7924fe876469a2bf3c1cbfebf8a79` (skill-evaluator-dataset-snapshot/1)
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| doca-rmax | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-rmax | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-rmax | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-rmax | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-rmax | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-rmax | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-rmax | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-rmax | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-rmax | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-rmax | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
 
 - Controls for `doca-rmax`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.3% — baseline ran, but no comparable score was available; uplift unavailable | 91.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 88.1% — baseline ran, but no comparable score was available; uplift unavailable | 90.6% — baseline ran, but no comparable score was available; uplift unavailable |
 | Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 50.0% → 100.0% (+50.0 points) | 70.0% → 95.0% (+25.0 points) |
+| Correctness | 45.0% → 75.0% (+30.0 points) | 55.0% → 100.0% (+45.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 25.0% → 75.0% (+50.0 points) | 37.5% → 93.8% (+56.3 points) |
-| Efficiency | 86.3% — baseline ran, but no comparable score was available; uplift unavailable | 75.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 31.3% → 81.3% (+50.0 points) | 43.8% → 87.5% (+43.7 points) |
+| Efficiency | 84.4% — baseline ran, but no comparable score was available; uplift unavailable | 70.4% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.4% → 93.2% (-5.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 93.3% (-4.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.3% → 86.0% (+2.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 84.2% → 85.2% (+1.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 728,978 | 253,371 | +475,607 | +187.71% | skill 4/4; base 4/4 |
-| claude-code | doca-rmax.explicit-positive.v1 | 216,921 | 36,322 | +180,599 | +497.22% | skill 1/1; base 1/1 |
-| claude-code | doca-rmax.implicit-positive.v1 | 262,285 | 108,409 | +153,876 | +141.94% | skill 1/1; base 1/1 |
-| claude-code | doca-rmax.implicit-positive.v2 | 213,266 | 72,503 | +140,763 | +194.15% | skill 1/1; base 1/1 |
-| claude-code | doca-rmax.negative.v1 | 36,506 | 36,137 | +369 | +1.02% | skill 1/1; base 1/1 |
-| codex | All cases | 310,593 | 226,891 | +83,702 | +36.89% | skill 4/4; base 4/4 |
-| codex | doca-rmax.explicit-positive.v1 | 115,343 | 52,447 | +62,896 | +119.92% | skill 1/1; base 1/1 |
-| codex | doca-rmax.implicit-positive.v1 | 77,810 | 66,372 | +11,438 | +17.23% | skill 1/1; base 1/1 |
-| codex | doca-rmax.implicit-positive.v2 | 82,938 | 39,298 | +43,640 | +111.05% | skill 1/1; base 1/1 |
-| codex | doca-rmax.negative.v1 | 34,502 | 68,774 | -34,272 | -49.83% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,039,571 | 480,262 | +559,309 | +116.46% | skill 8/8; base 8/8 |
+| claude-code | All cases | 672,008 | 361,528 | +310,480 | +85.88% | skill 4/4; base 4/4 |
+| claude-code | doca-rmax.explicit-positive.v1 | 217,598 | 109,045 | +108,553 | +99.55% | skill 1/1; base 1/1 |
+| claude-code | doca-rmax.implicit-positive.v1 | 213,733 | 107,870 | +105,863 | +98.14% | skill 1/1; base 1/1 |
+| claude-code | doca-rmax.implicit-positive.v2 | 167,727 | 72,378 | +95,349 | +131.74% | skill 1/1; base 1/1 |
+| claude-code | doca-rmax.negative.v1 | 72,950 | 72,235 | +715 | +0.99% | skill 1/1; base 1/1 |
+| codex | All cases | 404,247 | 193,102 | +211,145 | +109.34% | skill 4/4; base 4/4 |
+| codex | doca-rmax.explicit-positive.v1 | 152,592 | 46,870 | +105,722 | +225.56% | skill 1/1; base 1/1 |
+| codex | doca-rmax.implicit-positive.v1 | 78,746 | 25,270 | +53,476 | +211.62% | skill 1/1; base 1/1 |
+| codex | doca-rmax.implicit-positive.v2 | 134,240 | 30,427 | +103,813 | +341.19% | skill 1/1; base 1/1 |
+| codex | doca-rmax.negative.v1 | 38,669 | 90,535 | -51,866 | -57.29% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,076,255 | 554,630 | +521,625 | +94.05% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -98,7 +98,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 20 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -110,9 +110,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-rmax/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-rmax/SKILL.md`)
 - **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/libs/doca-rmax`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`BENCHMARK.md:87`)
-- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo   (`BENCHMARK.md:88`)
-- 15 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo       (`BENCHMARK.md:114`)
+- **MEDIUM** SECURITY/Sudo/Root Execution (PE2): Privilege Escalation: sudo  (`CAPABILITIES.md:35`)
+- 14 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -51,7 +51,7 @@ before any artifact is written.
      "DOCA Service on NGC" section.
    - (B): a `-host` tag copied verbatim from the NGC container page
      tag list for `nvcr.io/nvidia/doca/doca_telemetry:<tag>`. Example of
-     the *rule only*, observed on NGC 2026-09-16: `1.26.5-doca3.5.0-host`.
+     the *rule only*: `1.26.5-doca3.5.0-host`.
      If the page is unreachable, say so and ask the user to paste the
      tag list.
    - (C): the chart version from the NGC helm chart page, confirmed
@@ -201,10 +201,9 @@ to the environment with the minimum change**.
    value override is a chart-upgrade liability. Config edits go into
    `dts_config.ini` (host `/opt/mellanox/doca/services/telemetry/config/dts_config.ini`,
    `/config/dts_config.ini` in-container) — edit the symlink target
-   `clx_config.ini` (or use `sed -i --follow-symlinks`), then expect the
-   collector to respawn within ~60 s (documented for `level_labels.ini`,
-   observed for `dts_config.ini` too); apply the shape's restart rule
-   only if no respawn appears;
+   `clx_config.ini` (or use `sed -i --follow-symlinks`), then apply the
+   shape's restart rule (only `level_labels.ini` is documented to
+   reload automatically, within ~60 s);
    on (C) edit the `DPUService` values instead: the chart delivers
    `configMapData` to the pod as a ConfigMap and DTS regenerates
    `/config/dts_config.ini` from it (the `/configmap` mount path and the
@@ -228,9 +227,8 @@ Start / stop / restart / upgrade, per shape.
   yaml change*: "applied on system restart" — reboot, or the
   kubelet-side mechanics in
   `doca-container-deployment ## run` (`doca-container-deployment/TASKS.md#run`);
-  a `dts_config.ini` edit is normally picked up without it (collector
-  respawn within ~60 s; `crictl stop <container-id>` is the no-reboot
-  restart when it is not) — only the `level_labels.ini` auto-reload is
+  for a `dts_config.ini` edit, `crictl stop <container-id>` is the
+  no-reboot restart — only the `level_labels.ini` auto-reload is
   documented. *Upgrade*: replace the yaml with the per-version one from NGC
   (build (A)); a non-empty config dir keeps operator config — but the
   downloaded yaml carries the default `-i=127.0.0.1 -p=24224`, and
@@ -287,7 +285,7 @@ second sweep — regardless of which back-edge consumes it. If the
 second sweep reveals any failure, including a different
 class, do not take another back-edge: return a diagnostic bundle (all
 smoke results, debug-layer captures, the capability snapshot if step 6
-was reached) and mark the result `requires_human_decision`. Rollback is
+was reached), then stop and ask the operator. Rollback is
 the shape's stop action (remove the yaml from `/etc/kubelet.d`,
 removing the container, `kubectl delete -f DPUService.yaml` — or, on the
 `DPUDeployment` route, removing the `dts` entry from
@@ -323,10 +321,9 @@ The eval-loop overlay (rows apply to every shape):
    exists ((C): `/config/dts_config.ini` in the pod) and its
    `enable-provider=` lines match configure step 4. If the dir was
    non-empty before first start, this is the *pre-existing* file — say so.
-   Cross-check what DTS actually loaded with
-   `curl -s <addr>:<port>/management/config_file` and which providers
-   really run with `/management/provider` (`run_status: running`) —
-   that is the live truth if the file and the process disagree.
+   Cross-check which providers DTS actually enabled in the start-up
+   block of `clx.log` — that is the live truth if the file and the
+   process disagree.
 3. **Prometheus scraped twice — baseline first.**
    `curl -s <addr>:<port>/metrics | head`, wait at least two
    `update` intervals (default `update=1000` ms), scrape again, and show
@@ -348,10 +345,9 @@ The eval-loop overlay (rows apply to every shape):
    `fluent_bit_configs`); OTel: the receiver's ingest counter moves;
    storage: files appear under `/opt/mellanox/doca/services/telemetry/data`
    and decode with `clx_read` (package `collectx-clxapidev`). Before
-   touching the destination, read `/management/exporter` twice: the
-   exporter's `statistics` counters increasing prove DTS is pushing;
-   a destination that still sees nothing is then a layer-5/6 problem,
-   not a DTS one. Skip only if the plan is Prometheus-only, and say so.
+   touching the destination, confirm in `clx.log` that the exporter
+   started without connect errors; a destination that still sees
+   nothing is then a layer-5/6 problem, not a DTS one. Skip only if the plan is Prometheus-only, and say so.
 5. **Negative side.** SSH to the host/DPU still works from outside and
    its networking is unchanged; `crictl ps` / `docker ps` / pod restart
    counts are flat since step 1. DTS is read-only telemetry — any
@@ -367,8 +363,7 @@ Layered diagnosis mirroring
 Walk the layers in order; each is *symptom → read-only capture →
 single-variable change*; clear a layer before dropping below it. One
 change per iteration, re-capture; if still not green after one
-iteration, roll back per `## test` and return
-`requires_human_decision`. Generic loop contract:
+iteration, roll back per `## test`, then stop and ask the operator. Generic loop contract:
 `doca-debug ## Universal debug-loop contract` (`doca-debug/CAPABILITIES.md#universal-debug-loop-contract`).
 
 **Every debug answer opens with the deployment shape and closes with
@@ -420,9 +415,8 @@ apart, and show a counter or timestamp that advanced.
    ppcc_eth), `--gpus all` (nvidia_smi / dcgm). *Gotcha*: ini edited
    and nothing changed — first `ls -l dts_config.ini`: a plain file
    instead of the `-> clx_config.ini` symlink means a `sed -i` broke the
-   link and DTS never saw the edit; then look for the respawn
-   (`exited: clx` / `spawned: 'clx'` in the container log) and restart
-   only if it is absent; on (A)/(B) confirm you edited the
+   link and DTS never saw the edit; then apply the shape's restart
+   rule; on (A)/(B) confirm you edited the
    host-mounted `/opt/mellanox/doca/services/telemetry/config/dts_config.ini`,
    not a copy; on (C) the file is regenerated from the ConfigMap the
    chart delivers (chart mechanics — confirm with `helm show values`),
@@ -497,7 +491,6 @@ the pinned version is the only source for the verbatim form. `<addr>`,
 | Shape detection | `uname -m`, `lspci -d 15b3:`, `cat /etc/mlnx-release` (BlueField bundle) or `/etc/nvidia/bf-release` (if present) | [`## configure`](#configure) step 1 | Output pins exactly one of (A)/(B)/(C); user acknowledges. |
 | (A) pod state | `crictl pods`, `crictl ps` | [`## run`](#run), [`## test`](#test) step 1 | DTS pod Ready, container Running, restart count flat across two reads. |
 | (A) logs | `crictl logs <container-id>` (init container id for layer 3); persisted copy under the host dir the yaml's `volumes:` maps to `/var/log` (`/var/log/doca/telemetry` in the shipped yaml) | [`## debug`](#debug) layers 3–4 | Start-up block lists the intended providers as enabled; no repeating provider / exporter error. |
-| Management API (all shapes, needs `prometheus=`) | `curl -s <addr>:<port>/management` (route table), `/management/provider`, `/management/provider/<name>`, `/management/exporter`, `/management/exporter/<name>`, `/management/config_file`, `/management/all_configs`, `/management/(cset\|fset\|xcset)[/<name>]` | [`## test`](#test), [`## debug`](#debug) layers 4–5 | Providers report `run_status: running`; exporter `statistics` counters increase between two calls; `config_file` shows your edit. |
 | In-container log (all shapes) | `crictl exec <id> tail -n 200 /var/log/clx.log` / `docker exec doca-telemetry tail -n 200 /var/log/clx.log` / `kubectl exec <pod> -- tail -n 200 /var/log/clx.log` | [`## debug`](#debug) | Start-up block (`# of enabled providers`) present; no repeating provider / exporter error. |
 | Log verbosity (all shapes) | `verbose=` in the generated `dts_config.ini` (scale in its inline comment: error / info / debug); raise for one restart cycle, then restore | [`## debug`](#debug) | Debug-level lines appear after the restart; value restored afterwards. |
 | (A) enable / disable auto-start | place / remove `/etc/kubelet.d/doca_telemetry_standalone.yaml`, then system restart | [`## run`](#run) | Pod appears / disappears after restart; removed yaml kept as rollback. |
@@ -510,7 +503,7 @@ the pinned version is the only source for the verbatim form. `<addr>`,
 | (C) conditions | `kubectl -n dpf-operator-system exec deploy/dpf-operator-controller-manager -- /dpfctl describe all --show-resources=dpuservice/doca-telemetry-service --show-conditions=all` | [`## run`](#run), [`## test`](#test) step 1 | Every condition printed is True (including `ApplicationPrereqsReconciled`, `ApplicationsReady`, `ApplicationsReconciled`, `DPUServiceInterfaceReconciled`). |
 | (C) pods | `kubectl get pods -n dpf-operator-system` (host cluster); DaemonSet pods in the DPU cluster | [`## test`](#test) step 1 | Running, restarts flat. |
 | (C) level-label preview | `dpfctl flavor-template render -f template.yaml --dpudevice-file device.yaml` | [`## configure`](#configure) step 6 | Rendered INI has `[global_labels] [device_labels] [device_mapping] [data_types_mapping]`; applying it reprovisions DPUs. |
-| Config edit | edit the symlink target `/opt/mellanox/doca/services/telemetry/config/clx_config.ini` (`dts_config.ini -> clx_config.ini`; `sed -i` without `--follow-symlinks` breaks the link) ((A)/(B)) or the `DPUService` `configMapData` values ((C)) | [`## modify`](#modify) | After the respawn (~60 s; `exited: clx` / `spawned: 'clx'` in the container log, pod attempt count unchanged), new `enable-provider=` visible on the next `/metrics`. |
+| Config edit | edit the symlink target `/opt/mellanox/doca/services/telemetry/config/clx_config.ini` (`dts_config.ini -> clx_config.ini`; `sed -i` without `--follow-symlinks` breaks the link) ((A)/(B)) or the `DPUService` `configMapData` values ((C)) | [`## modify`](#modify) | After the shape's restart rule, new `enable-provider=` visible on the next `/metrics`. |
 | Config reset | delete all files in `/opt/mellanox/doca/services/telemetry/config/`, restart DTS | [`## configure`](#configure) step 3, [`## debug`](#debug) layer 3 | Fresh `dts_config.ini` regenerated by `telemetry-init.sh`. |
 | Prometheus probe | `curl -s <addr>:<port>/metrics \| head` — twice, >= 2 `update` intervals apart | [`## test`](#test) step 3 | Metric lines present; a counter/timestamp advanced between scrapes. |
 | Provider prerequisites | `lsmod \| grep fwctl`, `ls -l /dev/fwctl/fwctl*`, `systemctl status dpe`, `ls /dev/mst` | [`## configure`](#configure) step 4, [`## debug`](#debug) layer 4 | Prerequisite present *before* the provider is enabled. |
@@ -567,9 +560,9 @@ Three cross-cutting rules for this appendix:
   static pod, an ini edit on a DPF-managed DPU).
 - Configuration is shared across shapes; only delivery differs. Two
   invariants hold everywhere: init generates defaults **only into an
-  empty config dir**, and an ini change (documented for
-  `level_labels.ini`, observed for `dts_config.ini`) respawns the
-  collector **within ~60 s** — restart manually only if no respawn appears.
+  empty config dir**, and a `level_labels.ini` change is documented to
+  be picked up automatically **within ~60 s** — for other ini edits,
+  apply the shape's restart rule.
 - DTS is read-only telemetry, but privileged mode, the MST device mapping,
   fwctl exposure, `systemctl start dpe`, and DPF flavor-template changes
   (DPU reprovision) are the safety-relevant actions —
