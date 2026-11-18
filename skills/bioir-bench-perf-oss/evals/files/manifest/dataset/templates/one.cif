@@ -1,0 +1,3 @@
+data_synthetic_one
+# Preparation fixture only; not a folding-quality reference.
+_entry.id one

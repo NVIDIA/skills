@@ -1,0 +1,452 @@
+{
+  "skill_name": "make-data-pipeline",
+  "evals": [
+    {
+      "id": "make-data-pipeline-001-coverage",
+      "prompt": "Use make-data-pipeline to audit the pipeline run recorded in /workspace/input/coverage/request.json. manifest_ids is the sample set. processed_ids is what the command returned, in order. Decide whether this run satisfies Level 2. Write /workspace/output/answer.json with missing and extra as arrays of sample ids, duplicate as a boolean, and level2_pass as a boolean. This is an offline audit: do not run a pipeline, install software, use the network, or modify the input.",
+      "expected_output": "missing is [7r6r], extra is [], duplicate is true because 6m3u appears twice, and level2_pass is false. A one-file demo command that does not cover the manifest is not Level 2. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/coverage"
+      ],
+      "assertions": [
+        "The agent compares the returned ids with the full manifest and records the missing id, the duplicate, and an empty extra set.",
+        "The agent does not treat this run as a passing Level 2 result.",
+        "The agent does not execute the recorded command or change the input."
+      ],
+      "domain_checks": [
+        {
+          "label": "missing id",
+          "artifact": "answer.json",
+          "path": [
+            "missing"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "7r6r"
+          ]
+        },
+        {
+          "label": "extra ids",
+          "artifact": "answer.json",
+          "path": [
+            "extra"
+          ],
+          "op": "set_equals",
+          "expected": []
+        },
+        {
+          "label": "duplicate ids",
+          "artifact": "answer.json",
+          "path": [
+            "duplicate"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "level 2 pass",
+          "artifact": "answer.json",
+          "path": [
+            "level2_pass"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "coverage/request.json": "93ef78f5b4b39bd0a8fbb3f1a4cb3ba1104201a9604849cf56f41b3aeaf63fff"
+      }
+    },
+    {
+      "id": "make-data-pipeline-002-level1-gate",
+      "prompt": "Read /workspace/input/level1/request.json. Level 1 has already been run. Decide whether Level 2 may start and whether the port can be reported complete. Write /workspace/output/answer.json with start_level2 and claim_complete as booleans and blocker as one of level1, settings, or none. Offline review only: do not run code or change the input.",
+      "expected_output": "start_level2 and claim_complete are false. blocker is level1. A failed feature comparison blocks the full pipeline run even when the config file and notes exist. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/level1"
+      ],
+      "assertions": [
+        "The agent refuses to start Level 2 while a Level 1 feature comparison has failed.",
+        "The agent does not report the port complete.",
+        "The agent names the failed feature comparison as the blocker rather than the shared settings."
+      ],
+      "domain_checks": [
+        {
+          "label": "start level 2",
+          "artifact": "answer.json",
+          "path": [
+            "start_level2"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "claim complete",
+          "artifact": "answer.json",
+          "path": [
+            "claim_complete"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "blocker",
+          "artifact": "answer.json",
+          "path": [
+            "blocker"
+          ],
+          "op": "equals",
+          "expected": "level1"
+        }
+      ],
+      "input_sha256": {
+        "level1/request.json": "214a02467835ab0982cf6617f2d6a399af13db9d9db29c507bb5378b5f5316ee"
+      }
+    },
+    {
+      "id": "make-data-pipeline-003-runtime-args",
+      "prompt": "Read /workspace/input/runtime/request.json. Level 1 passed. The validation guide contains an example runtime_args object, and NOTES.md does not record runtime_args or the seed. Decide whether those example numbers may be copied into the Level 2 run. Write /workspace/output/answer.json with copy_guide_numbers, start_level2, and runtime_args_recorded as booleans. Offline review only.",
+      "expected_output": "All three booleans are false. Example numbers in the validation guide are not the shared settings until NOTES.md records them. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/runtime"
+      ],
+      "assertions": [
+        "The agent does not copy the guide's example recycling, sampling, diffusion, or seed values.",
+        "The agent does not start Level 2 before NOTES.md records runtime_args and the seed.",
+        "The agent treats the guide example as an illustration rather than the run's settings."
+      ],
+      "domain_checks": [
+        {
+          "label": "copy guide numbers",
+          "artifact": "answer.json",
+          "path": [
+            "copy_guide_numbers"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "start level 2",
+          "artifact": "answer.json",
+          "path": [
+            "start_level2"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "runtime args recorded",
+          "artifact": "answer.json",
+          "path": [
+            "runtime_args_recorded"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "runtime/request.json": "dd3cbff6ad8ae942763bc26cffbded95ba2a8d7449bc44eb7c06e11171d2b8de"
+      }
+    },
+    {
+      "id": "make-data-pipeline-004-score-gate",
+      "prompt": "Read /workspace/input/scores/request.json. Scores are lDDT in thousandths for two samples, with a serial score and a Ray score. Apply the Level 2 comparison rule, including the requirement on the serial and Ray runs. Write /workspace/output/answer.json with verdicts, an object from sample id to PASS, FAIL, or INVESTIGATE, and claim_complete as a boolean. Offline review only: do not rescore structures.",
+      "expected_output": "T1031 is FAIL because BioIR is lower by 0.060, which meets the 0.05 failure line. 6m3u is FAIL because serial and Ray differ, even though the serial drop is 0.010. claim_complete is false. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/scores"
+      ],
+      "assertions": [
+        "The agent fails the sample whose BioIR lDDT is lower than upstream by 0.05 or more.",
+        "The agent fails the sample whose serial and Ray scores differ.",
+        "The agent does not report validation complete."
+      ],
+      "domain_checks": [
+        {
+          "label": "T1031 verdict",
+          "artifact": "answer.json",
+          "path": [
+            "verdicts",
+            "T1031"
+          ],
+          "op": "equals",
+          "expected": "FAIL"
+        },
+        {
+          "label": "6m3u verdict",
+          "artifact": "answer.json",
+          "path": [
+            "verdicts",
+            "6m3u"
+          ],
+          "op": "equals",
+          "expected": "FAIL"
+        },
+        {
+          "label": "claim complete",
+          "artifact": "answer.json",
+          "path": [
+            "claim_complete"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "scores/request.json": "27126290f7a76e8606b431c9484e6e5732bd44532adfb17afce01e4b6e7e371b"
+      }
+    },
+    {
+      "id": "make-data-pipeline-005-demo-is-not-level2",
+      "prompt": "Read /workspace/input/demo/request.json. The recorded command exited 0. Decide whether it satisfies Level 2. Write /workspace/output/answer.json with level2_satisfied and demo_counts_as_level2 as booleans. Offline review only.",
+      "expected_output": "Both booleans are false. examples/folding/run_demo.py on one file only shows that stages connect. Level 2 runs every manifest id through the serial processor and through Ray. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/demo"
+      ],
+      "assertions": [
+        "The agent does not accept a successful one-file demo as Level 2.",
+        "The agent requires the full manifest on both the serial processor and Ray.",
+        "The agent does not treat exit code 0 by itself as coverage of the sample set."
+      ],
+      "domain_checks": [
+        {
+          "label": "level 2 satisfied",
+          "artifact": "answer.json",
+          "path": [
+            "level2_satisfied"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "demo counts as level 2",
+          "artifact": "answer.json",
+          "path": [
+            "demo_counts_as_level2"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "demo/request.json": "04462bb73c569a7f9f388761ba30b9f9e511c00b82824443ce083c4153133a2a"
+      }
+    },
+    {
+      "id": "make-data-pipeline-006-tolerance",
+      "prompt": "Read /workspace/input/tolerance/request.json. A comparison failed at the frozen tolerance, and a wider tolerance is proposed. Decide whether to accept it and whether the comparison can be reported as a pass. Write /workspace/output/answer.json with accept_change, needs_user_approval, and claim_pass as booleans. Offline review only.",
+      "expected_output": "accept_change and claim_pass are false. needs_user_approval is true. A tolerance frozen before the comparison cannot be relaxed after a failure without user approval and a rationale in NOTES.md. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/tolerance"
+      ],
+      "assertions": [
+        "The agent rejects the wider tolerance because the user has not approved it.",
+        "The agent does not report the failed comparison as a pass.",
+        "The agent states that changing the frozen tolerance needs user approval and a rationale."
+      ],
+      "domain_checks": [
+        {
+          "label": "accept change",
+          "artifact": "answer.json",
+          "path": [
+            "accept_change"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "needs approval",
+          "artifact": "answer.json",
+          "path": [
+            "needs_user_approval"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "claim pass",
+          "artifact": "answer.json",
+          "path": [
+            "claim_pass"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "tolerance/request.json": "243a20891e7e477d7fc0185bcf0bd4becf2d74fba176081b6fe0657a6b8ee13a"
+      }
+    },
+    {
+      "id": "make-data-pipeline-007-higher-score",
+      "prompt": "Read /workspace/input/higher/request.json. One sample's BioIR lDDT, in thousandths, is higher than upstream, and the serial and Ray scores match. Feature equivalence, identical settings, and the same scoring command are not confirmed. Classify the sample. Write /workspace/output/answer.json with verdict as PASS, FAIL, or INVESTIGATE, and claim_complete as a boolean. Offline review only.",
+      "expected_output": "verdict is INVESTIGATE and claim_complete is false. A higher BioIR score is not an automatic pass until feature equivalence, identical settings, the same sample set, the shared writer, and the same scoring command are confirmed. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/higher"
+      ],
+      "assertions": [
+        "The agent does not pass the sample only because BioIR scored higher.",
+        "The agent keeps the result under investigation while the listed confirmations are missing.",
+        "The agent does not report the port complete."
+      ],
+      "domain_checks": [
+        {
+          "label": "verdict",
+          "artifact": "answer.json",
+          "path": [
+            "verdict"
+          ],
+          "op": "equals",
+          "expected": "INVESTIGATE"
+        },
+        {
+          "label": "claim complete",
+          "artifact": "answer.json",
+          "path": [
+            "claim_complete"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "higher/request.json": "db29a995a65f538cb28de349236e99e28d708b8d0c7f5602c9076a671fc793f8"
+      }
+    },
+    {
+      "id": "make-data-pipeline-008-module-swap-negative",
+      "prompt": "Read /workspace/input/swap/request.json and answer that request. Write /workspace/output/answer.json with task as module_swap or data_pipeline, port_data_pipeline as a boolean, and guide as accelerate-custom-model or port-data-pipeline. Do not create pipeline files.",
+      "expected_output": "task is module_swap, port_data_pipeline is false, and guide is accelerate-custom-model. Replacing one module inside the user's model is not a data-pipeline port. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/swap"
+      ],
+      "assertions": [
+        "The agent answers the module-swap request without porting a BioIR data pipeline.",
+        "The agent points at accelerating a custom model rather than registering a new pipeline.",
+        "The agent does not create a pipeline package, registry entry, or Level 2 run."
+      ],
+      "domain_checks": [
+        {
+          "label": "task",
+          "artifact": "answer.json",
+          "path": [
+            "task"
+          ],
+          "op": "equals",
+          "expected": "module_swap"
+        },
+        {
+          "label": "port data pipeline",
+          "artifact": "answer.json",
+          "path": [
+            "port_data_pipeline"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "guide",
+          "artifact": "answer.json",
+          "path": [
+            "guide"
+          ],
+          "op": "equals",
+          "expected": "accelerate-custom-model"
+        }
+      ],
+      "expected_skill": null,
+      "input_sha256": {
+        "swap/request.json": "0c96c49ce1df0b39317bb248194fa4d1b7a92e424d79e008f600e218778560d0"
+      }
+    },
+    {
+      "id": "make-data-pipeline-009-benchmark-negative",
+      "prompt": "Read /workspace/input/benchmark/request.json and answer that request. Write /workspace/output/answer.json with task as folding_benchmark or data_pipeline, port_data_pipeline as a boolean, and benchmark_skill as bench-perf-oss or none. Do not start a port or a benchmark run.",
+      "expected_output": "task is folding_benchmark, port_data_pipeline is false, and benchmark_skill is bench-perf-oss. A BioIR-versus-OSS folding latency comparison is outside the data-pipeline port. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/benchmark"
+      ],
+      "assertions": [
+        "The agent answers the latency comparison without porting a data pipeline.",
+        "The agent identifies the folding benchmark skill as the applicable procedure.",
+        "The agent does not launch inference, dataset rebuilds, or a pipeline registration."
+      ],
+      "domain_checks": [
+        {
+          "label": "task",
+          "artifact": "answer.json",
+          "path": [
+            "task"
+          ],
+          "op": "equals",
+          "expected": "folding_benchmark"
+        },
+        {
+          "label": "port data pipeline",
+          "artifact": "answer.json",
+          "path": [
+            "port_data_pipeline"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "benchmark skill",
+          "artifact": "answer.json",
+          "path": [
+            "benchmark_skill"
+          ],
+          "op": "equals",
+          "expected": "bench-perf-oss"
+        }
+      ],
+      "expected_skill": null,
+      "input_sha256": {
+        "benchmark/request.json": "533739bc4cccb18a947f38e34bf460606674d8e392448d2080f83af6138daccd"
+      }
+    },
+    {
+      "id": "make-data-pipeline-010-revision",
+      "prompt": "Read /workspace/input/revision/request.json. Two source revisions are visible and the user has not named one. The hub does not resolve a checkpoint. Decide how to start the port. Write /workspace/output/answer.json with guess_revision, ask_user, and start_port as booleans. Offline review only.",
+      "expected_output": "guess_revision and start_port are false. ask_user is true. The authoritative upstream revision is not chosen from the visible candidates. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/revision"
+      ],
+      "assertions": [
+        "The agent asks which revision is authoritative instead of picking one of the candidates.",
+        "The agent does not start the port or download an unresolved checkpoint.",
+        "The agent does not treat either visible revision as the default."
+      ],
+      "domain_checks": [
+        {
+          "label": "guess revision",
+          "artifact": "answer.json",
+          "path": [
+            "guess_revision"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "ask user",
+          "artifact": "answer.json",
+          "path": [
+            "ask_user"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "start port",
+          "artifact": "answer.json",
+          "path": [
+            "start_port"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "revision/request.json": "3219539339c37bc835e6a84dea6a2e657e38a7709ce2c8aebf052b06e96431a8"
+      }
+    }
+  ]
+}

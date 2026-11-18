@@ -1,0 +1,9 @@
+{
+  "level1_status": "FAIL",
+  "failed_samples": [
+    "T1031"
+  ],
+  "failed_feature": "template_mask",
+  "upstream_config_present": true,
+  "notes_record_shared_settings": true
+}

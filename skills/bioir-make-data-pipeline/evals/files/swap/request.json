@@ -1,0 +1,3 @@
+{
+  "request": "Replace the Pairformer stack inside my RoseTTAFold3 inference code with BioIR's faster Pairformer and keep my data loading."
+}

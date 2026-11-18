@@ -1,0 +1,16 @@
+{
+  "manifest_ids": [
+    "T1031",
+    "6m3u",
+    "7sfy",
+    "7r6r"
+  ],
+  "processed_ids": [
+    "T1031",
+    "6m3u",
+    "6m3u",
+    "7sfy"
+  ],
+  "command": "uv run --locked python examples/folding/run_demo.py",
+  "executor": "serial"
+}

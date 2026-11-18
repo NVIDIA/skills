@@ -1,0 +1,8 @@
+{
+  "candidates": [
+    "upstream/model@abc111",
+    "fork/model@def222"
+  ],
+  "user_named_revision": null,
+  "hub_resolves_checkpoint": false
+}

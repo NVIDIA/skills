@@ -1,0 +1,7 @@
+{
+  "n_complexes": 7,
+  "max_abs_top_sample_lddt_delta": 0.003,
+  "module_comparisons_run": false,
+  "quality_gate_negative_control_run": false,
+  "revisions_recorded": false
+}

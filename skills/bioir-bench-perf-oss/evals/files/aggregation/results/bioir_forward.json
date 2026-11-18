@@ -1,0 +1,188 @@
+{
+  "evidence_kind": "synthetic_fixture_not_a_hardware_benchmark",
+  "backend": "bioir_build_processor",
+  "model_source": "boltz-2",
+  "gpu": {
+    "device_name": "fixture-device"
+  },
+  "config": {
+    "recycling_steps": 3
+  },
+  "warmup": 1,
+  "repeats": 1,
+  "samples": {
+    "short": {
+      "residues": 511,
+      "status": "ok",
+      "forward_s": [
+        2
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only"
+    },
+    "medium-low": {
+      "residues": 512,
+      "status": "ok",
+      "forward_s": [
+        4
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only"
+    },
+    "medium-high": {
+      "residues": 1024,
+      "status": "ok",
+      "forward_s": [
+        1
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only"
+    },
+    "long": {
+      "residues": 1025,
+      "status": "ok",
+      "forward_s": [
+        2
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only"
+    },
+    "oom-bioir": {
+      "residues": 2048,
+      "status": "oom",
+      "forward_s": [],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only"
+    },
+    "oom-oss": {
+      "residues": 2048,
+      "status": "ok",
+      "forward_s": [
+        0.01
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only"
+    },
+    "failed-oss": {
+      "residues": 2048,
+      "status": "ok",
+      "forward_s": [
+        0.01
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only"
+    }
+  },
+  "gpu_telemetry": {
+    "n_ok": 6,
+    "power_draw_w": null,
+    "clocks_sm_mhz": null,
+    "clocks_graphics_mhz": null,
+    "clocks_memory_mhz": null
+  }
+}

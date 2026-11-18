@@ -1,0 +1,11 @@
+{
+  "requested_widths": [
+    448,
+    320
+  ],
+  "shipped_kernel_widths": [
+    128,
+    256
+  ],
+  "gpu_available": false
+}

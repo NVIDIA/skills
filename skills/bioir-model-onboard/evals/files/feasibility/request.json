@@ -1,0 +1,11 @@
+{
+  "gpu_available": false,
+  "upstream_revision": null,
+  "checkpoint_identity": null,
+  "full_pipeline_requested": true,
+  "base_model": "protenix-v2",
+  "pair_channels": 384,
+  "parent_pair_channels": 256,
+  "refiner": "4-block Pairformer after the trunk",
+  "diffusion_pair_channels": 128
+}

@@ -1,0 +1,6 @@
+{
+  "exception": "KeyError",
+  "missing_name": "myfork",
+  "raised_from": "bionemo_ir/hubs/local.py",
+  "requested_surface": "compute module only"
+}

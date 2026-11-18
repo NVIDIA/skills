@@ -1,0 +1,17 @@
+{
+  "unit": "lddt_thousandths",
+  "samples": [
+    {
+      "id": "T1031",
+      "upstream": 800,
+      "bioir_serial": 740,
+      "bioir_ray": 740
+    },
+    {
+      "id": "6m3u",
+      "upstream": 700,
+      "bioir_serial": 690,
+      "bioir_ray": 600
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+schema_version: 1
+harbor:
+  task_source: evals_json
+  # One trial at a time. The multiplier is explicit because concurrency
+  # otherwise scales the 300s agent budget, and 1 leaves it at 300s.
+  n_concurrent: 1
+  timeout_multiplier: 8
+skill_workspace:
+  mode: isolated
+  include: []
+grading:
+  mode: aces_plus_custom
+  custom_metrics:
+    - domain_correctness
+    - domain_check_fraction

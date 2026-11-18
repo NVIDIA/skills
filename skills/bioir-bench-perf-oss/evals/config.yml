@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+schema_version: 1
+harbor:
+  task_source: evals_json
+  n_concurrent: 2
+skill_workspace:
+  mode: isolated
+  include: []
+grading:
+  mode: aces_plus_custom
+  custom_metrics:
+    - domain_correctness
+    - domain_check_fraction

@@ -1,0 +1,3 @@
+{
+  "request": "I have my own RoseTTAFold3 code. Replace only its Pairformer stack with BioIR's and check the outputs match. Keep my data loading."
+}

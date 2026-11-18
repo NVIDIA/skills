@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# Applied by NV-CARPS Tier 1 through --skillspector-baseline. Keep the
+# authentication exception limited to the validated, non-redirecting transport.
+version: 2
+scanner_version: "2.13.4"
+rules:
+  - id: TT3
+    path: dataset/rebuild_dataset.py
+    message: "urllib.request.build_opener(_NoRedirect()).open(request, timeout=timeout)"
+    reason: >-
+      Required MSA service authentication, reviewed with SkillSpector 2.13.4.
+      The builder reads only NGC_API_KEY and sends it as an Authorization
+      header to the documented NVIDIA HTTPS MSA and status endpoints. A custom
+      --msa-url is an explicit user-selected service that must be trusted to
+      receive this key and the protein sequences. _https_url rejects non-TLS
+      URLs and embedded credentials; the transport keeps certificate checking
+      enabled and refuses every redirect. The key is never placed in a URL,
+      output artifact, or log. Other sinks and findings remain unsuppressed.

@@ -1,0 +1,7 @@
+{
+  "frozen_atol": "1e-3",
+  "proposed_atol": "1e-2",
+  "reason": "the first comparison failed",
+  "user_approved": false,
+  "recorded_in_notes_before_comparison": false
+}

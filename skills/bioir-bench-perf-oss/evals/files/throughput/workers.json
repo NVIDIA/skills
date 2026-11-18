@@ -1,0 +1,17 @@
+{
+  "task": "ray_replica_throughput",
+  "workers": [
+    {
+      "id": "worker-1",
+      "start_s": 0,
+      "end_s": 10,
+      "processed_items": 100
+    },
+    {
+      "id": "worker-2",
+      "start_s": 0,
+      "end_s": 10,
+      "processed_items": 150
+    }
+  ]
+}

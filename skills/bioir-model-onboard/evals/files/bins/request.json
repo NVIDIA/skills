@@ -1,0 +1,8 @@
+{
+  "skipped_keys": [
+    "confidence_head.lower_bins",
+    "confidence_head.upper_bins"
+  ],
+  "target_recomputes_with_arange": true,
+  "proposed_fix": "load with strict=False so the keys are ignored"
+}

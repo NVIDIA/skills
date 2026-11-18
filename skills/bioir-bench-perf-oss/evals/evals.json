@@ -1,0 +1,1298 @@
+{
+  "skill_name": "bench-perf-oss",
+  "evals": [
+    {
+      "id": "bench-perf-oss-001-manifest",
+      "prompt": "Use bench-perf-oss to prepare an OpenFold3 input manifest and staging tree only. I explicitly substitute the synthetic preparation fixture at /workspace/input/manifest/dataset for the real benchmark dataset in this task. These tiny CIF fragments must never be scored or used to claim model performance. Do not load models, install software, access the network, or change input files.\n\nWrite /workspace/output/ref_data/sample_manifest.json as {\"samples\": {sample_id: {\"residues\": integer, \"in_scope\": boolean, \"chains\": {chain_id: {\"unpaired_msas\": [absolute source paths], \"paired_msas\": [absolute source paths], \"templates\": [absolute source paths]}}}}}. Enumerate every sample and every chain. The preparation-only OSS reader wants oss_data/<sample>/<chain>/unpaired_0.a3m, unpaired_1.a3m, paired_0.a3m, template_0.cif, template_1.cif when declared, numbered from zero within each category. Write /workspace/output/bench/stage_oss_data.py and run it twice; its second run must be silent and idempotent. Write /workspace/output/oss_data/index.json with samples keyed by sample ID, each containing chain_ids and the source-to-staged mappings. Keep all generated files under /workspace/output. Report the checks you actually performed.",
+      "expected_output": "Both samples are retained. The complex has 11 residues (two protein copies of length 4 plus RNA length 3; ligand excluded), the monomer 5. Both A and B retain both unpaired A3Ms, the paired A3M, and both templates. The mapper stages distinct per-chain symlinks, records all chains, runs twice without duplication, and leaves the original dataset unchanged. No inference or quality claim is made. Inspect the required output artifacts: /workspace/output/bench/stage_oss_data.py, /workspace/output/oss_data/index.json, /workspace/output/ref_data/sample_manifest.json.",
+      "files": [
+        "evals/files/manifest"
+      ],
+      "assertions": [
+        "The agent produces the manifest, executable staging script, and index in /workspace/output and actually runs the mapper twice.",
+        "The complex residue count includes both protein copies and RNA, excludes the ligand, and the model-capable mixed sample is retained.",
+        "Every declared A3M and template is present for each protein copy, through separate per-chain symlinks; the input dataset remains unchanged.",
+        "The final answer identifies this as a preparation fixture and makes no latency or folding-quality claim."
+      ],
+      "domain_checks": [
+        {
+          "label": "complex residue count",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "residues"
+          ],
+          "op": "equals",
+          "expected": 11
+        },
+        {
+          "label": "monomer residue count",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-monomer",
+            "residues"
+          ],
+          "op": "equals",
+          "expected": 5
+        },
+        {
+          "label": "fixture-complex retained",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "in_scope"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "fixture-complex index entries",
+          "artifact": "oss_data/index.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "chain_ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        {
+          "label": "fixture-monomer retained",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-monomer",
+            "in_scope"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "fixture-monomer index entries",
+          "artifact": "oss_data/index.json",
+          "path": [
+            "samples",
+            "fixture-monomer",
+            "chain_ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "M"
+          ]
+        },
+        {
+          "label": "A unpaired_msas",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "chains",
+            "A",
+            "unpaired_msas"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "/workspace/input/manifest/dataset/msa/first.a3m",
+            "/workspace/input/manifest/dataset/msa/second.a3m"
+          ]
+        },
+        {
+          "label": "A paired_msas",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "chains",
+            "A",
+            "paired_msas"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "/workspace/input/manifest/dataset/msa/paired.a3m"
+          ]
+        },
+        {
+          "label": "A templates",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "chains",
+            "A",
+            "templates"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "/workspace/input/manifest/dataset/templates/one.cif",
+            "/workspace/input/manifest/dataset/templates/two.cif"
+          ]
+        },
+        {
+          "label": "A link unpaired_0.a3m",
+          "artifact": "oss_data/fixture-complex/A/unpaired_0.a3m",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/msa/first.a3m"
+        },
+        {
+          "label": "A link unpaired_1.a3m",
+          "artifact": "oss_data/fixture-complex/A/unpaired_1.a3m",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/msa/second.a3m"
+        },
+        {
+          "label": "A link paired_0.a3m",
+          "artifact": "oss_data/fixture-complex/A/paired_0.a3m",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/msa/paired.a3m"
+        },
+        {
+          "label": "A link template_0.cif",
+          "artifact": "oss_data/fixture-complex/A/template_0.cif",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/templates/one.cif"
+        },
+        {
+          "label": "A link template_1.cif",
+          "artifact": "oss_data/fixture-complex/A/template_1.cif",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/templates/two.cif"
+        },
+        {
+          "label": "B unpaired_msas",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "chains",
+            "B",
+            "unpaired_msas"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "/workspace/input/manifest/dataset/msa/first.a3m",
+            "/workspace/input/manifest/dataset/msa/second.a3m"
+          ]
+        },
+        {
+          "label": "B paired_msas",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "chains",
+            "B",
+            "paired_msas"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "/workspace/input/manifest/dataset/msa/paired.a3m"
+          ]
+        },
+        {
+          "label": "B templates",
+          "artifact": "ref_data/sample_manifest.json",
+          "path": [
+            "samples",
+            "fixture-complex",
+            "chains",
+            "B",
+            "templates"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "/workspace/input/manifest/dataset/templates/one.cif",
+            "/workspace/input/manifest/dataset/templates/two.cif"
+          ]
+        },
+        {
+          "label": "B link unpaired_0.a3m",
+          "artifact": "oss_data/fixture-complex/B/unpaired_0.a3m",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/msa/first.a3m"
+        },
+        {
+          "label": "B link unpaired_1.a3m",
+          "artifact": "oss_data/fixture-complex/B/unpaired_1.a3m",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/msa/second.a3m"
+        },
+        {
+          "label": "B link paired_0.a3m",
+          "artifact": "oss_data/fixture-complex/B/paired_0.a3m",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/msa/paired.a3m"
+        },
+        {
+          "label": "B link template_0.cif",
+          "artifact": "oss_data/fixture-complex/B/template_0.cif",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/templates/one.cif"
+        },
+        {
+          "label": "B link template_1.cif",
+          "artifact": "oss_data/fixture-complex/B/template_1.cif",
+          "op": "symlink_to",
+          "expected": "manifest/dataset/templates/two.cif"
+        },
+        {
+          "label": "staging mapper exists",
+          "artifact": "bench/stage_oss_data.py",
+          "op": "exists"
+        }
+      ],
+      "input_sha256": {
+        "manifest/dataset/ground_truth/complex.cif": "586429bee16f76608db0258d96944cee5c0afac0f0c8ca4ce42b6320da025dbe",
+        "manifest/dataset/ground_truth/monomer.cif": "93c9fd77e213b7bc011c983fe313574bf7cb6671a06761e6e5f396b520656dfc",
+        "manifest/dataset/msa/first.a3m": "df96e0467baff1e3de8e63706bcc13ca6252403b4b5d87e99610022cfc0c326e",
+        "manifest/dataset/msa/paired.a3m": "df96e0467baff1e3de8e63706bcc13ca6252403b4b5d87e99610022cfc0c326e",
+        "manifest/dataset/msa/second.a3m": "df96e0467baff1e3de8e63706bcc13ca6252403b4b5d87e99610022cfc0c326e",
+        "manifest/dataset/spec_full.json": "899ff1838415d937d2a085bf5469d56adb1490c0d29f805e408d41f5461e3c00",
+        "manifest/dataset/templates/one.cif": "bb57c900d4a503cd7cc70a5735abdbe93ba953f72492916016a0a4b2e5591fa9",
+        "manifest/dataset/templates/two.cif": "b4b1022e3546a7a9962b401f29f63d209a1de37b4a13874b6121202113e7a095"
+      }
+    },
+    {
+      "id": "bench-perf-oss-002-input-parity",
+      "prompt": "We have the same template cap and nominal MSA settings on both folding stacks, and both report a nonzero template mask. Please review /workspace/input/parity/feature_probe.json before we start timing. Do these probes establish a fair comparison? Write /workspace/output/answer.json with status (ready or blocked), sample_status (mapping each ID to ready or blocked), and a recovery_plan explaining what to inspect or correct. Do not run inference, fetch substitute alignments, edit the probes, or drop cases simply to make the comparison pass.",
+      "expected_output": "The overall decision is blocked. clean is ready, template-gap is blocked because one of two supplied templates is unattached despite a nonzero mask, and paired-gap is blocked because one OSS chain has fewer paired rows. Restore attachment and pairing, verify populated slots and per-chain rows on both sides, and preserve the sample set; do not erase the richer inputs to hide a mismatch. Inspect the required output artifacts: /workspace/output/answer.json.",
+      "files": [
+        "evals/files/parity"
+      ],
+      "assertions": [
+        "The answer checks populated template counts against supplied templates and cap instead of accepting a nonzero mask.",
+        "The answer finds the unequal paired alignment row counts, leaves clean marked ready, and blocks timing until the input mismatch is fixed.",
+        "The recovery plan preserves required inputs and does not replace MSAs with a server search or discard template-bearing samples."
+      ],
+      "domain_checks": [
+        {
+          "label": "comparison blocked",
+          "artifact": "answer.json",
+          "path": [
+            "status"
+          ],
+          "op": "equals",
+          "expected": "blocked"
+        },
+        {
+          "label": "clean decision",
+          "artifact": "answer.json",
+          "path": [
+            "sample_status",
+            "clean"
+          ],
+          "op": "equals",
+          "expected": "ready"
+        },
+        {
+          "label": "template-gap decision",
+          "artifact": "answer.json",
+          "path": [
+            "sample_status",
+            "template-gap"
+          ],
+          "op": "equals",
+          "expected": "blocked"
+        },
+        {
+          "label": "paired-gap decision",
+          "artifact": "answer.json",
+          "path": [
+            "sample_status",
+            "paired-gap"
+          ],
+          "op": "equals",
+          "expected": "blocked"
+        }
+      ],
+      "input_sha256": {
+        "parity/feature_probe.json": "6171b452a25b4bb01c1abc5d9666c393fb5714d29d79a1a6698f86d0e6f57039"
+      }
+    },
+    {
+      "id": "bench-perf-oss-003-protenix-lock",
+      "prompt": "I am preparing a BioIR-versus-Protenix-v2 folding run. Review /workspace/input/protenix/request.json and write a corrected draft /workspace/output/ref_data/bench_config.json plus a short explanation. Use model_source, feature_path, bioir, oss, seed, oss_compile, cuda_wheel, ready_to_run, and weights as the top-level fields. Preserve the requested BioIR settings, use the upstream dotted option names as keys in oss, and put download_from_hub and strict_load_required under weights. This is a configuration review, not a live benchmark: no installs, checkpoint loads, downloads, or inference.",
+      "expected_output": "Use native Processor path for protenix-v2. BioIR recycling_steps=5 maps to OSS model.N_cycle=6; sample_diffusion.N_step=200 and N_sample=5. Keep seed 101, do not compile Protenix OSS, select cuequivariance-ops-torch-cu13 for CUDA 13, and leave the existing BioIR environment intact. Protenix-v2 weights are staged manually with no Hub fallback. Both strict-load preflights remain required, so ready_to_run is false. Inspect the required output artifacts: /workspace/output/ref_data/bench_config.json.",
+      "files": [
+        "evals/files/protenix"
+      ],
+      "assertions": [
+        "The draft preserves the requested sampling and seed while mapping five recycles to six OSS trunk cycles.",
+        "The plan uses Processor path, disables the unsupported Protenix OSS compile column, and chooses the CUDA 13 wheel without downgrading BioIR.",
+        "The answer requires both local strict loads and does not invent a Protenix-v2 Hub fallback or mark the run ready."
+      ],
+      "domain_checks": [
+        {
+          "label": "model identity",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "model_source"
+          ],
+          "op": "equals",
+          "expected": "protenix-v2"
+        },
+        {
+          "label": "native feature path",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "feature_path"
+          ],
+          "op": "equals",
+          "expected": "processor"
+        },
+        {
+          "label": "cycle semantics",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "oss",
+            "model.N_cycle"
+          ],
+          "op": "equals",
+          "expected": 6
+        },
+        {
+          "label": "sampling steps",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "oss",
+            "sample_diffusion.N_step"
+          ],
+          "op": "equals",
+          "expected": 200
+        },
+        {
+          "label": "sampling count",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "oss",
+            "sample_diffusion.N_sample"
+          ],
+          "op": "equals",
+          "expected": 5
+        },
+        {
+          "label": "seed",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "seed"
+          ],
+          "op": "equals",
+          "expected": 101
+        },
+        {
+          "label": "no unsupported compile",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "oss_compile"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "CUDA wheel",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "cuda_wheel"
+          ],
+          "op": "equals",
+          "expected": "cuequivariance-ops-torch-cu13"
+        },
+        {
+          "label": "strict loads outstanding",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "ready_to_run"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "strict checkpoint load",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "weights",
+            "strict_load_required"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "no hub fallback",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "weights",
+            "download_from_hub"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "preserve recycling_steps",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "bioir",
+            "recycling_steps"
+          ],
+          "op": "equals",
+          "expected": 5
+        },
+        {
+          "label": "preserve num_sampling_steps",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "bioir",
+            "num_sampling_steps"
+          ],
+          "op": "equals",
+          "expected": 200
+        },
+        {
+          "label": "preserve diffusion_samples",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "bioir",
+            "diffusion_samples"
+          ],
+          "op": "equals",
+          "expected": 5
+        }
+      ],
+      "input_sha256": {
+        "protenix/request.json": "ab5e07251da2ac611210bb3872c5706cc59924202885682f832b52a2146c884c"
+      }
+    },
+    {
+      "id": "bench-perf-oss-004-boltz-quality",
+      "prompt": "A Boltz-2 comparison has a large lDDT gap even though its locked checkpoint, seed, MSA paths, and templates agree. Review /workspace/input/boltz/quality_probe.json. Write /workspace/output/answer.json containing a primary_hypothesis, the observed bioir_nonquery_deletion_sum and oss_nonquery_deletion_sum, modify_bioir_deletions (boolean), can_attribute_gap_to_engine (boolean), and the next diagnostic steps. Treat the supplied values as a diagnostic fixture, not newly measured results. Do not change either implementation or run a sweep.",
+      "expected_output": "The pinned Boltz v2.2.1 OSS featurizer loses non-query MSA deletions. The observed sums are 42 and 0 despite the same source alignments, so input-feature divergence is the leading hypothesis; the gap cannot yet be attributed to the engine. Never zero BioIR deletions to hide it. Inspect the pinned deletion path, preserve original evidence, and propose a separate documented input-parity diagnostic without presenting it as the unmodified baseline. Inspect the required output artifacts: /workspace/output/answer.json.",
+      "files": [
+        "evals/files/boltz"
+      ],
+      "assertions": [
+        "The diagnosis connects the pinned v2.2.1 behavior to the unequal deletion features rather than immediately blaming the engine.",
+        "The answer preserves BioIR deletion features and distinguishes a separately documented parity diagnostic from the published unmodified baseline.",
+        "The response reports only the supplied diagnostic evidence and does not claim to have measured new quality or latency."
+      ],
+      "domain_checks": [
+        {
+          "label": "BioIR evidence",
+          "artifact": "answer.json",
+          "path": [
+            "bioir_nonquery_deletion_sum"
+          ],
+          "op": "equals",
+          "expected": 42
+        },
+        {
+          "label": "OSS evidence",
+          "artifact": "answer.json",
+          "path": [
+            "oss_nonquery_deletion_sum"
+          ],
+          "op": "equals",
+          "expected": 0
+        },
+        {
+          "label": "preserve BioIR",
+          "artifact": "answer.json",
+          "path": [
+            "modify_bioir_deletions"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "no premature attribution",
+          "artifact": "answer.json",
+          "path": [
+            "can_attribute_gap_to_engine"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "boltz/quality_probe.json": "8f1124b2c81fbaf3665110cf59222242ec2b80ca561b4a106085262af20f450d"
+      }
+    },
+    {
+      "id": "bench-perf-oss-005-artifact-audit",
+      "prompt": "Please audit the folding result files under /workspace/input/result-audit/results before we publish a speedup table. Write /workspace/output/answer.json with publish (boolean), clean_sample_ok (boolean), issues_by_sample (sample IDs mapped to lists of invalid field names), and explanations. Use the JSON field names from the artifacts, including dotted names for nested fields. Do not repair evidence, invent replacement numbers, or run inference. These are synthetic regression fixtures, not measured hardware results.",
+      "expected_output": "Publication is blocked. The clean sample is valid. recaptured has measure_compile_delta=1 while status is ok; monomer-zero has numeric dockq although single_chain requires null; template-mismatch has unequal n_templates_attached across backends; no-polls has zero gpu_telemetry.n_polls. Identify all four, keep the original evidence, and require a corrected harness or fresh valid measurements before publishing. Inspect the required output artifacts: /workspace/output/answer.json.",
+      "files": [
+        "evals/files/result-audit"
+      ],
+      "assertions": [
+        "The audit identifies measured-forward recapture, numeric monomer DockQ, cross-backend template attachment mismatch, and missing in-forward telemetry polls.",
+        "The answer preserves the valid clean control, blocks publication, and does not substitute or silently omit invalid rows to produce a favorable result.",
+        "The response distinguishes fixture validation from a new model-quality or performance measurement."
+      ],
+      "domain_checks": [
+        {
+          "label": "publication blocked",
+          "artifact": "answer.json",
+          "path": [
+            "publish"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "valid control preserved",
+          "artifact": "answer.json",
+          "path": [
+            "clean_sample_ok"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "recaptured defect",
+          "artifact": "answer.json",
+          "path": [
+            "issues_by_sample",
+            "recaptured"
+          ],
+          "op": "contains",
+          "expected": [
+            "measure_compile_delta"
+          ]
+        },
+        {
+          "label": "monomer-zero defect",
+          "artifact": "answer.json",
+          "path": [
+            "issues_by_sample",
+            "monomer-zero"
+          ],
+          "op": "contains",
+          "expected": [
+            "dockq"
+          ]
+        },
+        {
+          "label": "template-mismatch defect",
+          "artifact": "answer.json",
+          "path": [
+            "issues_by_sample",
+            "template-mismatch"
+          ],
+          "op": "contains",
+          "expected": [
+            "n_templates_attached"
+          ]
+        },
+        {
+          "label": "no-polls defect",
+          "artifact": "answer.json",
+          "path": [
+            "issues_by_sample",
+            "no-polls"
+          ],
+          "op": "contains",
+          "expected": [
+            "gpu_telemetry.n_polls"
+          ]
+        }
+      ],
+      "input_sha256": {
+        "result-audit/results/bioir_forward.json": "f147fbbedd11823eddcbb1532d11cf485b1b0a75d84e6f6fe5e53e906bb19fe9",
+        "result-audit/results/oss_compile.json": "d5c9ac09d42f776134c293fdd266d17a25725d1348ab99f4defa080c27eb0793",
+        "result-audit/results/oss_eager.json": "4433c6292e387c7558ed4fc5a9470e43e2fee4904d9d921785fde60a08656277"
+      }
+    },
+    {
+      "id": "bench-perf-oss-006-speedup-aggregation",
+      "prompt": "We are regression-testing the arithmetic portion of our folding comparison report. Use the synthetic result snapshots under /workspace/input/aggregation/results to produce only /workspace/output/results/speedup.json in the comparison helper's standard vs_eager format: overall, short, medium, and long, each with n, geomean, median, and ids. This request stops at aggregation; do not produce charts or claim a complete Phase 6 benchmark. Work on output copies and leave the supplied files unchanged. Report which samples contributed and which did not, and label the computed values as fixture arithmetic. No GPU, model loading, installs, or network calls are needed.",
+      "expected_output": "Include only the four sample IDs that are ok on both backends, with ratios OSS seconds/BioIR seconds [2,0.5,8,4]. Overall n=4, geometric mean=2.378414230005442, median=3. Short (<512) contains short with 2x; medium (512 through 1024 inclusive) contains medium-low and medium-high with geometric mean 2 and median 4.25; long (>1024) contains long with 4x. Exclude oom-bioir, oom-oss, and failed-oss. Do not replace absent values with zero or claim these synthetic inputs establish hardware performance. Inspect the required output artifacts: /workspace/output/results/speedup.json.",
+      "files": [
+        "evals/files/aggregation"
+      ],
+      "assertions": [
+        "The agent writes a numerical speedup artifact based on samples that succeeded on both backends and computes OSS time divided by BioIR time.",
+        "The overall and per-bin geomeans, medians, counts, and sample IDs match the supplied inputs, including the 512 and 1024 boundaries.",
+        "The response reports excluded OOM/failed rows and explicitly treats the numbers as fixture arithmetic without a hardware or full-report claim."
+      ],
+      "domain_checks": [
+        {
+          "label": "overall n",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "overall",
+            "n"
+          ],
+          "op": "equals",
+          "expected": 4
+        },
+        {
+          "label": "overall geomean",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "overall",
+            "geomean"
+          ],
+          "op": "close",
+          "expected": 2.378414230005442
+        },
+        {
+          "label": "overall median",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "overall",
+            "median"
+          ],
+          "op": "close",
+          "expected": 3.0
+        },
+        {
+          "label": "overall ids",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "overall",
+            "ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "short",
+            "medium-low",
+            "medium-high",
+            "long"
+          ]
+        },
+        {
+          "label": "short n",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "short",
+            "n"
+          ],
+          "op": "equals",
+          "expected": 1
+        },
+        {
+          "label": "short geomean",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "short",
+            "geomean"
+          ],
+          "op": "close",
+          "expected": 2.0
+        },
+        {
+          "label": "short median",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "short",
+            "median"
+          ],
+          "op": "close",
+          "expected": 2.0
+        },
+        {
+          "label": "short ids",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "short",
+            "ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "short"
+          ]
+        },
+        {
+          "label": "medium n",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "medium",
+            "n"
+          ],
+          "op": "equals",
+          "expected": 2
+        },
+        {
+          "label": "medium geomean",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "medium",
+            "geomean"
+          ],
+          "op": "close",
+          "expected": 2.0
+        },
+        {
+          "label": "medium median",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "medium",
+            "median"
+          ],
+          "op": "close",
+          "expected": 4.25
+        },
+        {
+          "label": "medium ids",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "medium",
+            "ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "medium-low",
+            "medium-high"
+          ]
+        },
+        {
+          "label": "long n",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "long",
+            "n"
+          ],
+          "op": "equals",
+          "expected": 1
+        },
+        {
+          "label": "long geomean",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "long",
+            "geomean"
+          ],
+          "op": "close",
+          "expected": 4.0
+        },
+        {
+          "label": "long median",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "long",
+            "median"
+          ],
+          "op": "close",
+          "expected": 4.0
+        },
+        {
+          "label": "long ids",
+          "artifact": "results/speedup.json",
+          "path": [
+            "vs_eager",
+            "long",
+            "ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "long"
+          ]
+        }
+      ],
+      "input_sha256": {
+        "aggregation/results/bioir_forward.json": "147f54353bbabb7704b47f79a1781722a32ef628c700f2435feb651057c9bf3a",
+        "aggregation/results/oss_eager.json": "359dab2784b53a180c9c0f3c11823d38d5cf3d19fe73cc946a0c95787fef4b4d"
+      }
+    },
+    {
+      "id": "bench-perf-oss-007-checkpoint-gate",
+      "prompt": "The team wants to compare OpenFold3 today and proposes the workaround in /workspace/input/weights/preflight.json. Review that evidence and give a go/no-go decision. Write /workspace/output/answer.json with status (ready or blocked), required_oss_tag, allow_non_strict_load, allow_hub_requests_in_timed_loop, and a recovery_plan. Do not load weights, change source checkouts, or download another model as part of this review.",
+      "expected_output": "Block timing. The P2 checkpoint is declared compatible with OSS >=0.4,<0.4.4dev0, not the observed 0.5.0/OpenBind layout. Use the model profile checkpoint-compatible OSS tag 0.4.3 and verify a clean checkout and strict local load once in both interpreters. Preserve user source changes. Never use strict=False, rename/rewrite parameters ad hoc, switch to a different model variant for convenience, or allow a Hub request inside the timed/sample loop. Inspect the required output artifacts: /workspace/output/answer.json.",
+      "files": [
+        "evals/files/weights"
+      ],
+      "assertions": [
+        "The decision recognizes an incompatible model variant rather than treating a newer OSS package as automatically suitable.",
+        "The recovery selects the P2-compatible 0.4.3 tag and requires local strict loads on both sides without discarding dirty checkout changes.",
+        "The answer rejects the non-strict workaround and per-sample Hub requests, and performs no unauthorized source or model mutation."
+      ],
+      "domain_checks": [
+        {
+          "label": "weights gate blocked",
+          "artifact": "answer.json",
+          "path": [
+            "status"
+          ],
+          "op": "equals",
+          "expected": "blocked"
+        },
+        {
+          "label": "compatible OSS tag",
+          "artifact": "answer.json",
+          "path": [
+            "required_oss_tag"
+          ],
+          "op": "equals",
+          "expected": "0.4.3"
+        },
+        {
+          "label": "strict loading preserved",
+          "artifact": "answer.json",
+          "path": [
+            "allow_non_strict_load"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "no timed network fallback",
+          "artifact": "answer.json",
+          "path": [
+            "allow_hub_requests_in_timed_loop"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "weights/preflight.json": "7322cafcffa4eed38ee21822e5af90f38ee48107a1641d495d9aee2dd287cfb1"
+      }
+    },
+    {
+      "id": "bench-perf-oss-008-affinity-negative",
+      "prompt": "I have affinity regression predictions, not folded structures. Read /workspace/input/affinity/predictions.json and compute the mean absolute error for each predictor in the given units. Write /workspace/output/answer.json with bioir_mae and oss_mae, and briefly explain the result. Please keep this to the supplied prediction table.",
+      "expected_output": "Compute BioIR MAE=(3+1+2)/3=2 and OSS MAE=(1+1+1)/3=1. Answer the regression-analysis request directly. Do not activate bench-perf-oss, construct a folding dataset, request MSAs/checkpoints/GPU access, compute lDDT or DockQ, or claim folding speedup. Inspect the required output artifacts: /workspace/output/answer.json.",
+      "files": [
+        "evals/files/affinity"
+      ],
+      "assertions": [
+        "The agent answers the requested affinity regression analysis without activating the folding benchmark skill.",
+        "The artifact contains BioIR MAE 2 and OSS MAE 1 in the supplied units.",
+        "The response does not replace this task with folding latency, structure-quality scoring, or a model-inference workflow."
+      ],
+      "domain_checks": [
+        {
+          "label": "BioIR MAE",
+          "artifact": "answer.json",
+          "path": [
+            "bioir_mae"
+          ],
+          "op": "close",
+          "expected": 2.0
+        },
+        {
+          "label": "OSS MAE",
+          "artifact": "answer.json",
+          "path": [
+            "oss_mae"
+          ],
+          "op": "close",
+          "expected": 1.0
+        }
+      ],
+      "input_sha256": {
+        "affinity/predictions.json": "5c114ff0ac74cf5618abfcf18a9ae9132f0769e596491c9b89bf191c80257398"
+      },
+      "expected_skill": null
+    },
+    {
+      "id": "bench-perf-oss-009-throughput-negative",
+      "prompt": "Can you summarize the aggregate throughput of the two Ray replicas in /workspace/input/throughput/workers.json? Use the full elapsed interval from the earliest worker start to the latest worker finish. Write /workspace/output/answer.json with total_items, wall_time_s, and items_per_s. I only need this throughput summary of the existing worker records.",
+      "expected_output": "Answer directly: 250 items over 10 seconds, or 25 items/second. The workers overlap, so do not add their elapsed durations. Do not activate bench-perf-oss, turn the request into serial model.forward timing, add lDDT/DockQ, or launch a new benchmark. Inspect the required output artifacts: /workspace/output/answer.json.",
+      "files": [
+        "evals/files/throughput"
+      ],
+      "assertions": [
+        "The agent answers the replica-throughput request without activating the serial folding benchmark skill.",
+        "The output reports 250 items, a 10-second elapsed span, and 25 items/second.",
+        "The response makes no folding-quality or per-sample forward-latency claims and launches no new workloads."
+      ],
+      "domain_checks": [
+        {
+          "label": "completed items",
+          "artifact": "answer.json",
+          "path": [
+            "total_items"
+          ],
+          "op": "equals",
+          "expected": 250
+        },
+        {
+          "label": "wall interval",
+          "artifact": "answer.json",
+          "path": [
+            "wall_time_s"
+          ],
+          "op": "close",
+          "expected": 10.0
+        },
+        {
+          "label": "aggregate throughput",
+          "artifact": "answer.json",
+          "path": [
+            "items_per_s"
+          ],
+          "op": "close",
+          "expected": 25.0
+        }
+      ],
+      "input_sha256": {
+        "throughput/workers.json": "f599475b5a065913ea2bacc767765d5e5ec52796e01e9a55dbbfbf3ded717d23"
+      },
+      "expected_skill": null
+    },
+    {
+      "id": "bench-perf-oss-010-of2-role-lock",
+      "prompt": "Review the proposed AlphaFold2 multimer benchmark configuration and candidate samples in /workspace/input/of2/request.json. We want three fixed trunk iterations on both stacks. Write /workspace/output/ref_data/bench_config.json with model_source, oss_preset, recycling_steps, bioir_model, oss_model, in_scope_ids, and out_of_scope_ids. Each model object should include max_recycling_iters and recycle_early_stop_tolerance. Explain the role and template handling. This is an offline plan review: no weights, installs, source changes, feature generation, or inference.",
+      "expected_output": "Use BioIR alphafold2_multimer_1 and OpenFold model_1_multimer_v3, retaining the protein-pair sample and its templates. Exclude protein-ligand and rna by model capability. recycling_steps=3 means three total iterations here, unlike the AF3-style +1 mapping. Both feature/model configurations need max_recycling_iters=2, producing three slices, and recycle_early_stop_tolerance=-1. Keep monomer and multimer roles and weights separate and record the documented pretrained-config delta. Inspect the required output artifacts: /workspace/output/ref_data/bench_config.json.",
+      "files": [
+        "evals/files/of2"
+      ],
+      "assertions": [
+        "The plan selects the AF2 multimer role and excludes unsupported non-protein samples while retaining a template-bearing protein complex.",
+        "The answer produces exactly three recycle-axis slices with max_recycling_iters=2, not four, and disables early stopping on both stacks.",
+        "The explanation distinguishes the OF2 cap semantics from the Protenix/AF3-style recycle-plus-one rule and preserves role-specific weights."
+      ],
+      "domain_checks": [
+        {
+          "label": "AF2 model role",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "model_source"
+          ],
+          "op": "equals",
+          "expected": "alphafold2_multimer_1"
+        },
+        {
+          "label": "OpenFold preset",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "oss_preset"
+          ],
+          "op": "equals",
+          "expected": "model_1_multimer_v3"
+        },
+        {
+          "label": "runtime iteration cap",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "recycling_steps"
+          ],
+          "op": "equals",
+          "expected": 3
+        },
+        {
+          "label": "capability filter includes templates",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "in_scope_ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "protein-pair"
+          ]
+        },
+        {
+          "label": "exclude unsupported polymers",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "out_of_scope_ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "protein-ligand",
+            "rna"
+          ]
+        },
+        {
+          "label": "bioir_model recycle axis",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "bioir_model",
+            "max_recycling_iters"
+          ],
+          "op": "equals",
+          "expected": 2
+        },
+        {
+          "label": "oss_model recycle axis",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "oss_model",
+            "max_recycling_iters"
+          ],
+          "op": "equals",
+          "expected": 2
+        },
+        {
+          "label": "bioir_model early stop",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "bioir_model",
+            "recycle_early_stop_tolerance"
+          ],
+          "op": "close",
+          "expected": -1.0
+        },
+        {
+          "label": "oss_model early stop",
+          "artifact": "ref_data/bench_config.json",
+          "path": [
+            "oss_model",
+            "recycle_early_stop_tolerance"
+          ],
+          "op": "close",
+          "expected": -1.0
+        }
+      ],
+      "input_sha256": {
+        "of2/request.json": "bbf21726546d05870cae97a681ee334bac77cf757a6c746e13c01eb9afc253c1"
+      }
+    },
+    {
+      "id": "bench-perf-oss-011-approximate-control",
+      "prompt": "Review the proposed Protenix-v2 benchmark plan in /workspace/input/approximate/review.json. A colleague wants to publish its single BioIR column under the caption shown, arguing that the faster setting is the skill default. Decide whether that plan satisfies the benchmark protocol and provide the corrected BioIR arms, including the config provenance and only the required config deltas. Keep the supplied runtime lock, sample set, inputs, seed, and GPU fixed. Name selected roles bioir_exact and bioir_approx_frame_reuse_period. The paired score rows are synthetic diagnostic fixtures, supplied separately from the proposed plan; calculate approximate-minus-exact lDDT and DockQ deltas per sample and the mean of applicable paired deltas. Explain how the final table should identify approximate settings and show fidelity alongside speedup. Do not load models, run inference, install packages, access the network, alter inputs, or claim that these fixtures measure real folding accuracy or speed.\n\nWrite /workspace/output/answer.json with proposed_plan_acceptable, results_are_synthetic, inference_executed, shared_runtime_args, sample_ids, corrected_arms (keyed by role, each containing config_source and an overrides object keyed by full dotted config field), and paired_fidelity (n, dockq_n, mean_lddt_delta, mean_dockq_delta, and samples keyed by ID with lddt_delta, dockq_delta, dockq_status). Include a brief explanation of your decision in the final response.",
+      "expected_output": "Reject the unlabelled fast-only plan. Retain the optimized pretrained config and document frame_reuse_period=4 for the approximate arm and 0 for its paired exact control; leave the seed, 200 diffusion steps, five diffusion samples, five recycles, sample set and GPU unchanged. Label the approximate column and caption with its option/value, report speedup against exact BioIR and OSS, and display paired lDDT/DockQ differences rather than demanding approximate tensor equality. Protein-pair deltas are -0.01 lDDT and -0.03 DockQ; monomer delta is +0.02 lDDT, with DockQ null/single_chain. Mean paired lDDT delta is +0.005 over two samples; mean DockQ delta is -0.03 over one applicable sample. Make no inference or measured-performance claim. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/approximate"
+      ],
+      "assertions": [
+        "The agent rejects the proposed unlabelled approximate-only plan and supplies both the approximate BioIR arm and a paired exact control derived from the official pretrained config.",
+        "The approximate arm uses the documented frame reuse value, the exact arm disables that option, and every other runtime setting and the sample set remain fixed.",
+        "The explanation requires an explicit approximate column label and option/value caption, speedup comparisons against exact BioIR and OSS, and paired quality differences; it does not demand approximate tensor equality.",
+        "The agent computes approximate-minus-exact paired deltas with the correct sign and denominator, and preserves null/single_chain DockQ for the monomer.",
+        "The agent treats the supplied scores as synthetic fixtures, leaves input files unchanged and executes no inference, installs, or network requests."
+      ],
+      "domain_checks": [
+        {
+          "label": "reject unlabelled fast-only plan",
+          "artifact": "answer.json",
+          "path": [
+            "proposed_plan_acceptable"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "synthetic scores acknowledged",
+          "artifact": "answer.json",
+          "path": [
+            "results_are_synthetic"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "no inference executed",
+          "artifact": "answer.json",
+          "path": [
+            "inference_executed"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "preserve shared runtime lock",
+          "artifact": "answer.json",
+          "path": [
+            "shared_runtime_args"
+          ],
+          "op": "equals",
+          "expected": {
+            "seed": 101,
+            "recycling_steps": 5,
+            "num_sampling_steps": 200,
+            "diffusion_samples": 5,
+            "gpu_uuid": "fixture-gpu"
+          }
+        },
+        {
+          "label": "retain paired sample set",
+          "artifact": "answer.json",
+          "path": [
+            "sample_ids"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "protein-pair",
+            "monomer"
+          ]
+        },
+        {
+          "label": "bioir_approx_frame_reuse_period config source",
+          "artifact": "answer.json",
+          "path": [
+            "corrected_arms",
+            "bioir_approx_frame_reuse_period",
+            "config_source"
+          ],
+          "op": "equals",
+          "expected": "get_pretrained_config"
+        },
+        {
+          "label": "bioir_approx_frame_reuse_period config delta",
+          "artifact": "answer.json",
+          "path": [
+            "corrected_arms",
+            "bioir_approx_frame_reuse_period",
+            "overrides"
+          ],
+          "op": "equals",
+          "expected": {
+            "edm_sampling_config.frame_reuse_period": 4
+          }
+        },
+        {
+          "label": "bioir_exact config source",
+          "artifact": "answer.json",
+          "path": [
+            "corrected_arms",
+            "bioir_exact",
+            "config_source"
+          ],
+          "op": "equals",
+          "expected": "get_pretrained_config"
+        },
+        {
+          "label": "bioir_exact config delta",
+          "artifact": "answer.json",
+          "path": [
+            "corrected_arms",
+            "bioir_exact",
+            "overrides"
+          ],
+          "op": "equals",
+          "expected": {
+            "edm_sampling_config.frame_reuse_period": 0
+          }
+        },
+        {
+          "label": "protein-pair lDDT delta",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "samples",
+            "protein-pair",
+            "lddt_delta"
+          ],
+          "op": "close",
+          "expected": -0.01
+        },
+        {
+          "label": "protein-pair DockQ delta",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "samples",
+            "protein-pair",
+            "dockq_delta"
+          ],
+          "op": "close",
+          "expected": -0.03
+        },
+        {
+          "label": "protein-pair DockQ status",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "samples",
+            "protein-pair",
+            "dockq_status"
+          ],
+          "op": "equals",
+          "expected": "ok"
+        },
+        {
+          "label": "monomer lDDT delta",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "samples",
+            "monomer",
+            "lddt_delta"
+          ],
+          "op": "close",
+          "expected": 0.02
+        },
+        {
+          "label": "monomer DockQ delta",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "samples",
+            "monomer",
+            "dockq_delta"
+          ],
+          "op": "equals",
+          "expected": null
+        },
+        {
+          "label": "monomer DockQ status",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "samples",
+            "monomer",
+            "dockq_status"
+          ],
+          "op": "equals",
+          "expected": "single_chain"
+        },
+        {
+          "label": "paired sample count",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "n"
+          ],
+          "op": "equals",
+          "expected": 2
+        },
+        {
+          "label": "applicable DockQ count",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "dockq_n"
+          ],
+          "op": "equals",
+          "expected": 1
+        },
+        {
+          "label": "mean paired lDDT delta",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "mean_lddt_delta"
+          ],
+          "op": "close",
+          "expected": 0.005
+        },
+        {
+          "label": "mean applicable DockQ delta",
+          "artifact": "answer.json",
+          "path": [
+            "paired_fidelity",
+            "mean_dockq_delta"
+          ],
+          "op": "close",
+          "expected": -0.03
+        }
+      ],
+      "input_sha256": {
+        "approximate/review.json": "e58a70c0bc21bd39f670ed81a9b2a93ad5b7ab2e1a7d90a8cb52b2b376f33e76"
+      }
+    }
+  ]
+}

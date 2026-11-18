@@ -1,0 +1,21 @@
+{
+  "evidence_kind": "synthetic_preflight_fixture",
+  "model_source": "openfold3",
+  "checkpoint_registry_name": "of3-p2-155k.pt",
+  "checkpoint_declared_oss_range": ">=0.4,<0.4.4dev0",
+  "checkpoint_contains_version_tensor": false,
+  "oss_version": "0.5.0",
+  "bioir_local_checkpoint": "/weights/of3-p2-155k.pt",
+  "oss_local_checkpoint": "/weights/of3-p2-155k.pt",
+  "bioir_strict_load": "passed",
+  "oss_strict_load": {
+    "status": "failed",
+    "missing_keys": [
+      "shared_pair_normalization.weight"
+    ],
+    "unexpected_keys": [
+      "blocks.0.attention_pair_bias.layer_norm_z.weight"
+    ]
+  },
+  "proposed_workaround": "retry with strict=False and continue the sweep"
+}

@@ -1,0 +1,3 @@
+data_synthetic_complex
+# Preparation fixture only; not a folding-quality reference.
+_entry.id complex
