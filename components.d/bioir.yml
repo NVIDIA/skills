@@ -16,3 +16,7 @@ links:
 skills:
   - path: skills/bench-perf-oss/
     catalog_dir: bioir-bench-perf-oss
+  - path: skills/make-data-pipeline/
+    catalog_dir: bioir-make-data-pipeline
+  - path: skills/model-onboard/
+    catalog_dir: bioir-model-onboard
