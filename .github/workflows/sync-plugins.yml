@@ -1,0 +1,456 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+#
+# Sync plugins from product repos into the nvidia/skills catalog.
+#
+# Plugin counterpart of sync-skills.yml. Reads the `plugins:` list from
+# components.d/*.yml and mirrors each declared plugin directory verbatim
+# into plugins/<catalog_dir>/. Deliberately a SEPARATE workflow with its
+# own PR branch (automated/sync-plugins): the two syncs write disjoint
+# paths (skills/ vs plugins/ + marketplace files) and regenerate only
+# their own README marker section, so their PRs never conflict and each
+# can be reviewed and reverted on its own.
+#
+# Gates, same shape as skills:
+#   - signature drift / missing / mismatch on plugin.oms.sig → revert to
+#     the last signed tree on main (drop if the plugin is new)
+#   - compliance: plugin.json, plugin-card.md, plugin.oms.sig, evals/,
+#     BENCHMARK.md, and every bundled skill must itself be compliant
+#   - version: content changed since main ⇒ plugin.json version must be
+#     higher, else hold
+#   - orphan pruning with its own cap (prune-orphan-plugins.sh)
+#
+# Requires a PAT (SKILLS_SYNC_PAT) with read access to all product repos,
+# stored as a repository secret. Falls back to GITHUB_TOKEN for public
+# sources (fork / trial runs).
+
+name: Sync Plugins from Product Repos
+
+on:
+  schedule:
+    # Hourly, offset 30 min from sync-skills.yml so the two never run together
+    - cron: "30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: sync-plugins
+  cancel-in-progress: true
+
+env:
+  PR_BRANCH: automated/sync-plugins
+  TRACKER_LABEL: missing-compliance-plugins
+  FAILURE_LABEL: sync-failure-plugins
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout skills catalog
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Verify yq is available
+        run: yq --version
+
+      - name: Sync plugins from product repos
+        env:
+          GH_TOKEN: ${{ secrets.SKILLS_SYNC_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          for f in rsynced-components changed-components failed-components sync-versions rsynced-plugin-dirs; do
+            truncate -s 0 "/tmp/plugins-$f.txt"
+          done
+
+          CONFIG=/tmp/plugin-components.aggregated.yml
+          # Keep only components that declare at least one plugin.
+          yq ea '[.] | map(select(.plugins != null and (.plugins | length) > 0)) | {"components": .}' components.d/*.yml > "$CONFIG"
+
+          git config --global credential.helper '!f() { echo "username=x-access-token"; echo "password=${GH_TOKEN}"; }; f'
+
+          component_count=$(yq '.components | length' "$CONFIG")
+          echo "plugin_components=$component_count" >> "$GITHUB_ENV"
+          if [ "$component_count" -eq 0 ]; then
+            echo "::notice::No component declares a plugins: list yet — nothing to mirror (prune/regenerate steps still run)"
+            exit 0
+          fi
+
+          for i in $(seq 0 $((component_count - 1))); do
+            name=$(yq -r ".components[$i].name" "$CONFIG")
+            repo=$(yq -r ".components[$i].repo" "$CONFIG")
+            ref=$(yq -r ".components[$i].ref // \"main\"" "$CONFIG")
+            echo "── $name ──"
+
+            tmp_dir=".tmp/${i}-$(echo "$repo" | tr '/' '-')"
+            if ! git clone --depth 1 --filter=blob:none --sparse \
+                   "https://github.com/${repo}.git" "$tmp_dir" -b "$ref" 2>/dev/null; then
+              echo "  ⚠ Clone failed for $repo — skipping"
+              echo "- **$name** ($repo): clone failed" >> /tmp/plugins-failed-components.txt
+              continue
+            fi
+
+            upstream_short_sha=$(git -C "$tmp_dir" rev-parse --short HEAD)
+            upstream_date=$(git -C "$tmp_dir" show -s --format=%cs HEAD)
+            slug=$(echo "$name" | tr 'A-Z ' 'a-z-')
+            echo "$slug|$upstream_short_sha|$upstream_date|$repo" >> /tmp/plugins-sync-versions.txt
+
+            plugin_count=$(yq -r ".components[$i].plugins | length" "$CONFIG")
+            sparse_paths=""
+            for j in $(seq 0 $((plugin_count - 1))); do
+              sparse_paths="$sparse_paths $(yq -r ".components[$i].plugins[$j].path" "$CONFIG")"
+            done
+            (cd "$tmp_dir" && git sparse-checkout set $sparse_paths 2>/dev/null) || true
+
+            synced=false
+            for j in $(seq 0 $((plugin_count - 1))); do
+              path=$(yq -r ".components[$i].plugins[$j].path" "$CONFIG")
+              catalog_dir=$(yq -r ".components[$i].plugins[$j].catalog_dir" "$CONFIG")
+              src="$tmp_dir/$path"
+              if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ]; then
+                mkdir -p "plugins/$catalog_dir"
+                # Mirror verbatim. Exclude the source repo's own git metadata only.
+                rsync -a --delete --exclude '.git' "$src/" "plugins/$catalog_dir/"
+                synced=true
+                echo "plugins/$catalog_dir" >> /tmp/plugins-rsynced-plugin-dirs.txt
+                echo "  ✓ $path → plugins/$catalog_dir/"
+              else
+                echo "  ⚠ $path empty or missing — skipping to preserve existing catalog"
+                echo "- **$name** ($repo): \`$path\` empty or missing" >> /tmp/plugins-failed-components.txt
+              fi
+            done
+
+            if $synced; then
+              echo "- $name" >> /tmp/plugins-rsynced-components.txt
+              for j in $(seq 0 $((plugin_count - 1))); do
+                catalog_dir=$(yq -r ".components[$i].plugins[$j].catalog_dir" "$CONFIG")
+                if [ -n "$(git status --porcelain "plugins/$catalog_dir" 2>/dev/null)" ]; then
+                  echo "- $name" >> /tmp/plugins-changed-components.txt
+                  break
+                fi
+              done
+            fi
+            echo ""
+          done
+          rm -rf .tmp
+
+      - name: Fail if nothing synced
+        run: |
+          if [ "${plugin_components:-0}" -gt 0 ] && [ ! -s /tmp/plugins-rsynced-components.txt ]; then
+            echo "::error::All plugin component checkouts failed — no plugins were synced"
+            exit 1
+          fi
+
+      - name: Detect signature drift and enforce compliance
+        run: |
+          set -euo pipefail
+          # One pass per rsynced plugin dir. Every failure mode results in
+          # the same recovery as skills: a plugin that already exists on
+          # main is REVERTED to its last signed tree (HOLD); a new plugin
+          # is DROPPED. Reasons are recorded as "<catalog_dir>|<dir>|<reason>"
+          # in /tmp/plugins-dropped.txt with a known prefix so the tracker
+          # issue can partition them.
+          dropped=/tmp/plugins-dropped.txt
+          : > "$dropped"
+          [ -f /tmp/plugins-rsynced-plugin-dirs.txt ] || exit 0
+          sort -u -o /tmp/plugins-rsynced-plugin-dirs.txt /tmp/plugins-rsynced-plugin-dirs.txt
+
+          hold() {  # hold <dir> <reason>
+            local dir="$1" reason="$2" name
+            name=$(basename "$dir")
+            if git ls-tree HEAD -- "$dir" | grep -q .; then
+              echo "$name|$dir|$reason (reverted to last signed tree on main)" >> "$dropped"
+              echo "  ↩ $dir — $reason — reverting to HEAD"
+              git checkout HEAD -- "$dir/"
+              git clean -fdx -- "$dir/" >/dev/null
+            else
+              echo "$name|$dir|$reason (new plugin, dropped)" >> "$dropped"
+              echo "  ✗ $dir — $reason — dropping"
+              rm -rf "$dir"
+            fi
+          }
+
+          while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
+            [ -d "$dir" ] || continue
+            echo "── $dir ──"
+
+            # Defense #1: no plugin.oms.sig at all.
+            if [ ! -f "$dir/plugin.oms.sig" ]; then
+              hold "$dir" "sig missing: source has no plugin.oms.sig"
+              continue
+            fi
+
+            modified=$(git diff --name-only HEAD -- "$dir/" 2>/dev/null || true)
+            untracked=$(git ls-files --others --exclude-standard -- "$dir/" 2>/dev/null || true)
+            changed=$(printf '%s\n%s\n' "$modified" "$untracked" | sed '/^$/d')
+            sig_path="$dir/plugin.oms.sig"
+            sig_changed=$(echo "$changed" | grep -Fx -- "$sig_path" || true)
+            non_sig_changed=$(echo "$changed" | grep -Fvx -- "$sig_path" || true)
+
+            # Defense #2: content changed but the signature did not.
+            if [ -n "$non_sig_changed" ] && [ -z "$sig_changed" ]; then
+              n=$(echo "$non_sig_changed" | wc -l | tr -d ' ')
+              hold "$dir" "sig drift: $n file(s) changed without plugin.oms.sig refresh"
+              continue
+            fi
+
+            # Defense #3: the incoming signature does not hash-match the
+            # incoming tree (same digest compare as verify_content_integrity.py).
+            if [ -n "$sig_changed" ]; then
+              mismatch=$(python3 - "$dir" <<'PYEOF'
+          import base64, hashlib, json, sys
+          from pathlib import Path
+          d = Path(sys.argv[1])
+          try:
+              bundle = json.loads((d / "plugin.oms.sig").read_text())
+              stmt = json.loads(base64.b64decode(bundle["dsseEnvelope"]["payload"]))
+              resources = stmt["predicate"]["resources"]
+          except Exception:
+              print(1); sys.exit(0)
+          bad = 0
+          for res in resources:
+              t = d / res["name"]
+              if not t.is_file() or hashlib.sha256(t.read_bytes()).hexdigest() != res["digest"]:
+                  bad += 1
+          print(bad if bad else "")
+          PYEOF
+              )
+              if [ -n "$mismatch" ]; then
+                hold "$dir" "sig mismatch: $mismatch signed file(s) do not match plugin.oms.sig"
+                continue
+              fi
+            fi
+
+            # Compliance: required plugin-level artifacts.
+            missing=""
+            for f in plugin.json plugin-card.md BENCHMARK.md; do
+              [ -f "$dir/$f" ] || missing="$missing $f"
+            done
+            if [ ! -f "$dir/evals/evals.json" ] && \
+               [ -z "$(find "$dir/evals" -maxdepth 1 -type f -name '*.json' -print -quit 2>/dev/null)" ]; then
+              missing="$missing evals/"
+            fi
+            if [ -n "$missing" ]; then
+              hold "$dir" "missing artifacts:$(echo "$missing" | xargs)"
+              continue
+            fi
+
+            # plugin.json must parse and its name must equal the catalog dir
+            # (the install name).
+            pname=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("name",""))' "$dir/plugin.json" 2>/dev/null || echo "")
+            if [ "$pname" != "$(basename "$dir")" ]; then
+              hold "$dir" "manifest: plugin.json name '$pname' does not match catalog_dir '$(basename "$dir")'"
+              continue
+            fi
+
+            # Every bundled skill must be compliant on its own
+            # (skill.oms.sig + skill-card.md + eval data), same rule as skills/.
+            bad_skills=""
+            while IFS= read -r skill_md; do
+              sdir=$(dirname "$skill_md")
+              smiss=""
+              [ -f "$sdir/skill.oms.sig" ] || smiss="$smiss skill.oms.sig"
+              [ -f "$sdir/skill-card.md" ] || smiss="$smiss skill-card.md"
+              if [ -z "$(find "$sdir" -type f -name evals.json -print -quit 2>/dev/null)" ] && \
+                 [ -z "$(find "$sdir/evals" "$sdir/eval" -maxdepth 1 -type f -name '*.json' -print -quit 2>/dev/null)" ]; then
+                smiss="$smiss evals.json"
+              fi
+              [ -z "$smiss" ] || bad_skills="$bad_skills ${sdir#$dir/}(missing:$(echo "$smiss" | xargs))"
+            done < <(find "$dir/skills" -type f -name SKILL.md 2>/dev/null)
+            if [ -n "$bad_skills" ]; then
+              hold "$dir" "bundled skill non-compliant:$bad_skills"
+              continue
+            fi
+
+            # Version gate: if anything changed vs main, plugin.json version
+            # must be strictly higher than the version on main.
+            if [ -n "$changed" ] && git ls-tree HEAD -- "$dir/plugin.json" | grep -q .; then
+              old_v=$(git show "HEAD:$dir/plugin.json" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("version",""))' 2>/dev/null || echo "")
+              new_v=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("version",""))' "$dir/plugin.json")
+              higher=$(python3 - "$old_v" "$new_v" <<'PYEOF'
+          import re, sys
+          def key(v):
+              return tuple(int(x) for x in re.findall(r"\d+", v.split("-")[0])[:3]) or (0,)
+          print("yes" if key(sys.argv[2]) > key(sys.argv[1]) else "")
+          PYEOF
+              )
+              if [ -z "$higher" ]; then
+                hold "$dir" "version: content changed but plugin.json version '$new_v' is not higher than '$old_v' on main"
+                continue
+              fi
+            fi
+            echo "  ✓ compliant"
+          done < /tmp/plugins-rsynced-plugin-dirs.txt
+
+          # A held/dropped plugin still counts as a change so the PR opens
+          # and the body explains it.
+          if [ -s "$dropped" ]; then
+            while IFS='|' read -r name _ _; do
+              grep -Fqx -- "- $name" /tmp/plugins-changed-components.txt 2>/dev/null || echo "- $name" >> /tmp/plugins-changed-components.txt
+            done < "$dropped"
+          fi
+
+      - name: Prune orphaned plugin dirs
+        run: |
+          bash .github/scripts/prune-orphan-plugins.sh
+          if [ -s /tmp/pruned-plugins.txt ]; then
+            echo "- orphan pruning" >> /tmp/plugins-changed-components.txt
+          fi
+
+      - name: Derive marketplace entries
+        # Only the three marketplace.json files; never rebuilds plugin trees.
+        run: python3 .github/scripts/build-plugins.py --marketplaces-only
+
+      - name: Regenerate README plugin table
+        run: .github/scripts/regenerate-plugins-readme.sh
+
+      - name: Track held plugins (rolling issue)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          dropped=/tmp/plugins-dropped.txt
+          touch "$dropped"
+          gh label create "$TRACKER_LABEL" --color FFA500 \
+            --description "Catalog plugins held or dropped by the plugin sync — missing artifacts, signature drift, or version not bumped" \
+            --force >/dev/null
+          existing=$(gh issue list --label "$TRACKER_LABEL" --state open --json number --jq '.[0].number // empty' --limit 1)
+          if [ ! -s "$dropped" ]; then
+            if [ -n "$existing" ]; then
+              gh issue close "$existing" --comment "All mirrored plugins are compliant and signature-consistent. Closing automatically."
+            fi
+            echo "All compliant"; exit 0
+          fi
+          sort -t'|' -k1,1 -o "$dropped" "$dropped"
+          count=$(wc -l < "$dropped" | tr -d ' ')
+          body=/tmp/plugins-tracker-body.md
+          {
+            echo "Plugins **held** (reverted to the last signed tree on main) or **dropped** (new, never landed) by the last plugin sync run."
+            echo ""
+            echo "Recovery is always on the product repo: fix the listed artifact, bump \`version\` in \`plugin.json\` if content changed, re-run NVSkills CI so \`plugin.oms.sig\` is refreshed, and the next hourly sync picks it up."
+            echo ""
+            echo "**Last updated:** $(date -u +%Y-%m-%d) by [sync run #${{ github.run_id }}]($RUN_URL)"
+            echo ""
+            while IFS='|' read -r name dir reason; do
+              echo "- \`$dir\` — $reason"
+            done < "$dropped"
+          } > "$body"
+          title="Plugins held by sync — $count plugin(s)"
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --title "$title" --body-file "$body" >/dev/null
+            echo "Updated tracker #$existing"
+          else
+            gh issue create --title "$title" --body-file "$body" --label "$TRACKER_LABEL" >/dev/null
+            echo "Opened tracker"
+          fi
+
+      - name: Build sync summary
+        id: summary
+        run: |
+          set -euo pipefail
+          # Only plugin-owned paths count as changes; anything else in the
+          # tree is not ours and must not end up in this PR.
+          changed_paths=$(git status --porcelain -- plugins/ README.md \
+            .claude-plugin/marketplace.json .agents/plugins/marketplace.json .cursor-plugin/marketplace.json)
+          if [ -n "$changed_paths" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -s /tmp/plugins-failed-components.txt ]; then
+            echo "has_failures=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_failures=false" >> "$GITHUB_OUTPUT"
+          fi
+          sort -u -o /tmp/plugins-changed-components.txt /tmp/plugins-changed-components.txt
+          names=$(sed 's/^- //' /tmp/plugins-changed-components.txt | paste -sd, - | sed 's/,/, /g')
+          echo "title=chore: sync plugins (${names:-no content changes})" >> "$GITHUB_OUTPUT"
+          {
+            echo 'body<<EOFBODY'
+            echo "Automated mirror of product-repo plugin directories into \`plugins/\`. Review, approve and merge; held plugins stay at their last signed tree until the product repo re-signs."
+            echo ""
+            if [ -s /tmp/plugins-changed-components.txt ]; then
+              echo "**Components with changes:**"; cat /tmp/plugins-changed-components.txt; echo ""
+            fi
+            if [ -s /tmp/plugins-sync-versions.txt ]; then
+              echo "**Upstream refs synced:**"
+              while IFS='|' read -r slug sha date repo; do echo "- \`$repo\` @ \`$sha\` ($date)"; done < /tmp/plugins-sync-versions.txt
+              echo ""
+            fi
+            if [ -s /tmp/plugins-dropped.txt ]; then
+              echo "**Plugins held or dropped (see the \`$TRACKER_LABEL\` issue):**"
+              while IFS='|' read -r _ dir reason; do echo "- \`$dir\` — $reason"; done < /tmp/plugins-dropped.txt
+              echo ""
+            fi
+            if [ -s /tmp/pruned-plugins.txt ]; then
+              echo "**Pruned — deregistered from components.d:**"
+              while read -r d; do echo "- \`plugins/$d\`"; done < /tmp/pruned-plugins.txt; echo ""
+            fi
+            if [ -s /tmp/pruned-plugins-overflow.txt ]; then
+              echo "**⚠ Plugin pruning skipped — count exceeds safety cap; needs human triage:**"
+              while read -r d; do echo "- \`plugins/$d\`"; done < /tmp/pruned-plugins-overflow.txt; echo ""
+            fi
+            if [ -s /tmp/plugins-failed-components.txt ]; then
+              echo "**Components that failed to sync:**"; cat /tmp/plugins-failed-components.txt; echo ""
+            fi
+            echo "Triggered by: \`${{ github.event_name }}\`"
+            echo 'EOFBODY'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        if: steps.summary.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: ${{ steps.summary.outputs.title }}
+          branch: ${{ env.PR_BRANCH }}
+          title: ${{ steps.summary.outputs.title }}
+          body: ${{ steps.summary.outputs.body }}
+          add-paths: |
+            plugins/
+            README.md
+            .claude-plugin/marketplace.json
+            .agents/plugins/marketplace.json
+            .cursor-plugin/marketplace.json
+          delete-branch: true
+
+      - name: Update sync-failure tracking issue (rolling)
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HAS_FAILURES: ${{ steps.summary.outputs.has_failures }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh label create "$FAILURE_LABEL" --color B60205 --description "Plugin sync run failed or some plugin components failed to sync" --force >/dev/null
+          existing=$(gh issue list --label "$FAILURE_LABEL" --state open --json number --jq '.[0].number // empty' --limit 1)
+          if [ "$HAS_FAILURES" != "true" ] && [ "$JOB_STATUS" != "failure" ]; then
+            [ -n "$existing" ] && gh issue close "$existing" --comment "Plugin sync run [#${{ github.run_id }}]($RUN_URL) completed cleanly — closing."
+            exit 0
+          fi
+          body=/tmp/plugins-failure-body.md
+          {
+            if [ "$JOB_STATUS" = "failure" ]; then
+              echo "The most recent plugin sync workflow run failed entirely."
+            else
+              echo "Plugin components that failed to sync on the most recent run:"; echo ""
+              cat /tmp/plugins-failed-components.txt 2>/dev/null || true
+            fi
+            echo ""; echo "**Most recent run:** [#${{ github.run_id }}]($RUN_URL)"
+            echo "**Last updated:** $(date -u +%Y-%m-%d)"
+            echo ""; echo "Failures usually mean the \`plugins[].path\` in \`components.d/<slug>.yml\` doesn't match the directory in the source repo. This issue auto-updates each run and closes when the sync is clean."
+          } > "$body"
+          title="Plugin sync failure tracker ($(date -u +%Y-%m-%d))"
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --title "$title" --body-file "$body" >/dev/null
+          else
+            gh issue create --title "$title" --body-file "$body" --label "$FAILURE_LABEL" >/dev/null
+          fi
