@@ -38,6 +38,24 @@ Each entry under `skills:` requires:
 | `links.security`       | `true`             | Set to `false` if the repo has no `SECURITY.md`.           |
 | `links.primary`        | `true`             | Set to `false` when this component shares its `name` with another component, so the shared README row keeps the other component's help links. |
 
+## Plugins (optional)
+
+A component may also publish one or more **plugins** — a directory in the product repo that bundles skills with their evals, MCP servers, hooks and assets, plus a `plugin.json`, `plugin-card.md`, `plugin.oms.sig`, `evals/` and `BENCHMARK.md`. Plugins are mirrored byte-for-byte into `plugins/<catalog_dir>/` by a separate hourly workflow (`sync-plugins.yml`, PR branch `automated/sync-plugins`) with the same signature-drift and compliance gates as skills. The catalog never generates or edits anything inside a mirrored plugin; `version` in `plugin.json` is owned by the product repo and must increase whenever the plugin's content changes.
+
+| Field         | Type   | Description                                                                                     |
+|---------------|--------|-------------------------------------------------------------------------------------------------|
+| `plugins`     | list   | Plugin source locations — one entry per plugin.                                                 |
+| `plugins[].path`        | string | Directory in the source repo containing the plugin (`plugin.json` at its root).        |
+| `plugins[].catalog_dir` | string | Directory name under `plugins/` in this catalog and the plugin's install name (must equal `name` in `plugin.json`, unique across components). |
+
+```yaml
+plugins:
+  - path: plugin/
+    catalog_dir: your-product
+```
+
+Skills bundled inside a plugin are independent copies of the standalone `skills/` entries; the sync does not deduplicate them.
+
 ## Declared product mapping
 
 `product_primary` is separate from the display `name`. Use it when the display
@@ -105,3 +123,5 @@ Then iterates the resulting `components` list. Files are read in alphabetical or
 ## Removal and orphan pruning
 
 Removing a skill entry from a component file removes its `skills/<catalog_dir>/` copy from the catalog on the next sync — the sync's orphan-pruning step (`.github/scripts/prune-orphans.sh`) deletes any top-level `skills/` dir with no `components.d` registration. Dirs that intentionally exist without a registration (e.g. contributor-facing or manually curated skills) must be listed in `catalog-exceptions.yml` at the repository root, with a reason and owner. Pruning is skipped for the whole run if any component file fails to parse, and refuses to act (flagging for human triage instead) if more than 5 dirs would be removed at once.
+
+Removing a `plugins:` entry likewise removes `plugins/<catalog_dir>/` on the next plugin sync (`.github/scripts/prune-orphan-plugins.sh`, same parse guard and a separate cap of 5). Catalog-owned plugins without a registration go under `plugin_exceptions:` in `catalog-exceptions.yml`.
