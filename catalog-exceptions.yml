@@ -13,12 +13,10 @@ exceptions:
     component: NVIDIA Skills
 
 # Plugin exceptions — plugins/ dirs allowed to exist WITHOUT a
-# components.d `plugins:` registration. Everything else in plugins/ must
+# components.d `plugins:` registration AND without a plugins.d/<name>.yml.
+# Plugins built from plugins.d/ (e.g. nvidia-skills) are outside the plugin
+# sync altogether and need no entry here. Everything else in plugins/ must
 # be declared by a components.d/<slug>.yml plugins: entry or listed here —
 # otherwise the hourly plugin sync prunes it
 # (see .github/scripts/prune-orphan-plugins.sh).
-plugin_exceptions:
-  - dir: nvidia-skills
-    reason: Catalog-owned discovery plugin with no product repo; built in this repo from plugins.d/nvidia-skills.yml
-    owner: jdudash
-    component: NVIDIA Skills
+plugin_exceptions: []

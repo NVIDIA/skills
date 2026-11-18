@@ -12,6 +12,10 @@
 #                                 its product (name, repo) for the Source column
 #   catalog-exceptions.yml      — `plugin_exceptions:` dirs are catalog-owned
 #                                 and link to this repo
+#   plugins.d/<name>.yml        — presence means the plugin is BUILT by
+#                                 build-plugins.py from catalog skills, not
+#                                 mirrored; the plugin sync ignores it entirely
+#                                 (e.g. nvidia-skills)
 #
 # Writes:
 #   README.md (in place) — content between this marker pair is replaced:
@@ -57,6 +61,8 @@ for pdir in sorted(Path("plugins").glob("*/")):
     manifest = pdir / "plugin.json"
     if not manifest.is_file():
         continue
+    if (Path("plugins.d") / f"{pdir.name}.yml").is_file():
+        continue  # catalog-built plugin, outside the plugin sync
     try:
         m = json.loads(manifest.read_text())
     except Exception:
