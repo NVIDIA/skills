@@ -25,6 +25,13 @@ Inputs (hand-maintained):
   plugins/<name>/assets/<file>      Hand-maintained logo/image assets.
   plugins/<name>/README.md          Optional plugin-specific notes.
 
+  plugins/<name>/plugin.json  (no plugins.d/<name>.yml, no .skills-manifest.yml)
+      Mirrored plugin: the whole directory is rsynced verbatim from a
+      product repo by sync-plugins.yml (declared under `plugins:` in
+      components.d/<slug>.yml) and signed there. Nothing inside it is
+      generated here; only its marketplace entries are derived from
+      plugin.json.
+
 Generated outputs (committed):
   plugins/<name>/skills/<skill>/    Real dir or symlink (see below)
   plugins/<name>/.claude-plugin/plugin.json   (catalog plugins only)
@@ -55,6 +62,12 @@ Usage:
   build-plugins.py --check     Build, then fail if the working tree changed
                                (CI drift guard).
   build-plugins.py --only NAME Restrict to a single plugin name.
+  build-plugins.py --marketplaces-only
+                               Skip all plugin builds; only re-derive the
+                               three marketplace.json files from plugins.d/
+                               and plugins/*/plugin.json. Used by
+                               sync-plugins.yml so it never touches
+                               skills-derived files.
 """
 from __future__ import annotations
 
@@ -625,7 +638,37 @@ def merge_with_defaults(defaults: dict[str, Any], plugin: dict[str, Any]) -> dic
     return merged
 
 
-def discover() -> tuple[dict[str, dict[str, Any]], list[Path]]:
+def mirrored_spec(plugin_dir: Path) -> dict[str, Any] | None:
+    """Synthesize a marketplace spec for a mirrored plugin from its
+    plugin.json (and .codex-plugin/plugin.json for the Codex category)."""
+    manifest = plugin_dir / "plugin.json"
+    try:
+        data = json.loads(manifest.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        error(f"  ! skipping mirrored plugin {plugin_dir.name!r} — {manifest.relative_to(REPO_ROOT)}: {exc}")
+        return None
+    name = data.get("name")
+    if name != plugin_dir.name:
+        error(
+            f"  ! skipping mirrored plugin {plugin_dir.name!r} — plugin.json "
+            f"name {name!r} does not match its directory"
+        )
+        return None
+    spec: dict[str, Any] = {
+        "name": name,
+        "description": data.get("description", ""),
+        "__source": str(manifest.relative_to(REPO_ROOT)),
+    }
+    codex = plugin_dir / ".codex-plugin" / "plugin.json"
+    if codex.is_file():
+        try:
+            spec["category"] = json.loads(codex.read_text()).get("category", "Developer Tools")
+        except (OSError, json.JSONDecodeError):
+            pass
+    return spec
+
+
+def discover() -> tuple[dict[str, dict[str, Any]], list[Path], dict[str, dict[str, Any]]]:
     # _defaults.yml is structural (every plugin merges from it); a parse
     # failure there makes downstream merges meaningless, so keep strict.
     defaults: dict[str, Any] = {}
@@ -667,6 +710,7 @@ def discover() -> tuple[dict[str, dict[str, Any]], list[Path]]:
             catalog[name] = spec
 
     curated: list[Path] = []
+    mirrored: dict[str, dict[str, Any]] = {}
     if PLUGINS_DIR.is_dir():
         for plugin_dir in sorted(PLUGINS_DIR.iterdir()):
             if not plugin_dir.is_dir():
@@ -675,7 +719,11 @@ def discover() -> tuple[dict[str, dict[str, Any]], list[Path]]:
                 continue
             if (plugin_dir / ".skills-manifest.yml").is_file():
                 curated.append(plugin_dir)
-    return catalog, curated
+            elif (plugin_dir / "plugin.json").is_file():
+                spec = mirrored_spec(plugin_dir)
+                if spec is not None:
+                    mirrored[plugin_dir.name] = spec
+    return catalog, curated, mirrored
 
 
 def main(argv: list[str]) -> int:
@@ -686,27 +734,42 @@ def main(argv: list[str]) -> int:
         action="store_true",
         help="After building, fail if the working tree changed (CI drift guard).",
     )
+    p.add_argument(
+        "--marketplaces-only",
+        action="store_true",
+        help="Skip plugin builds; only re-derive the marketplace.json files.",
+    )
     args = p.parse_args(argv)
 
-    catalog, curated = discover()
+    catalog, curated, mirrored = discover()
     if args.only:
         catalog = {k: v for k, v in catalog.items() if k == args.only}
         curated = [d for d in curated if d.name == args.only]
-        if not catalog and not curated:
+        mirrored = {k: v for k, v in mirrored.items() if k == args.only}
+        if not catalog and not curated and not mirrored:
             die(f"no plugin named '{args.only}' found in plugins.d/ or plugins/")
 
-    log(f"Found {len(catalog)} catalog plugin(s) and {len(curated)} curated plugin(s).")
+    log(
+        f"Found {len(catalog)} catalog plugin(s), {len(curated)} curated "
+        f"plugin(s) and {len(mirrored)} mirrored plugin(s)."
+    )
 
-    for name in sorted(catalog):
-        build_catalog_plugin(catalog[name])
-    for plugin_dir in curated:
-        build_curated_plugin(plugin_dir)
+    if not args.marketplaces_only:
+        for name in sorted(catalog):
+            build_catalog_plugin(catalog[name])
+        for plugin_dir in curated:
+            build_curated_plugin(plugin_dir)
+        # Mirrored plugins are never built here — their content is owned
+        # and signed in the product repo.
 
     log("── marketplaces ──")
+    # Mirrored plugins get generated entries exactly like catalog plugins;
+    # they carry no marketplace_enabled flags so they appear in all three.
+    marketplace_specs = {**mirrored, **catalog}
     curated_names = {d.name for d in curated}
-    upsert_claude_marketplace(catalog, curated_names)
-    upsert_agents_marketplace(catalog, curated_names)
-    upsert_cursor_marketplace(catalog, curated_names)
+    upsert_claude_marketplace(marketplace_specs, curated_names)
+    upsert_agents_marketplace(marketplace_specs, curated_names)
+    upsert_cursor_marketplace(marketplace_specs, curated_names)
 
     if args.check:
         log("── drift check ──")
