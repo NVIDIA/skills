@@ -5,8 +5,9 @@ name: BioNeMo Libraries
 repo: NVIDIA/cuEquivariance
 ref: main
 description: >-
-  Accelerate cheminformatics, genomic analysis, and equivariant model
-  development with NVIDIA GPU libraries and tools.
+  Accelerate cheminformatics, genomic analysis, biomolecular structure
+  prediction, and equivariant model development with NVIDIA GPU libraries
+  and tools.
 links:
   contributing: CONTRIBUTING.md
   discussions: false
