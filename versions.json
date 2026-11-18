@@ -431,9 +431,9 @@
     {
       "name": "cudaq-guide",
       "path": "skills/cudaq-guide",
-      "content_digest": "sha256:1a71ecd2bcb906fdfadceb9dead2211135ed0b3327ff05c415da1821669b3555",
-      "last_commit": "46293cb1dcc3b6984f1569cf8d819a387d5a9916",
-      "last_modified": "2026-09-11"
+      "content_digest": "sha256:c2a9f99670f2218f34e20d972625ce371df7fb4909a0573554f15d03ddd15bcc",
+      "last_commit": "15886223ed6cebd69f2970f2a16da03fd0cd5a35",
+      "last_modified": "2026-11-17"
     },
     {
       "name": "cudaq-importing",
@@ -1416,6 +1416,13 @@
       "last_modified": "2026-10-26"
     },
     {
+      "name": "ising-calibration-setup",
+      "path": "skills/ising-calibration-setup",
+      "content_digest": "sha256:06ce8e96333d0c8fe8974502ea78995469ce4c4003013ee32ed59144c5f943c8",
+      "last_commit": "15886223ed6cebd69f2970f2a16da03fd0cd5a35",
+      "last_modified": "2026-11-17"
+    },
+    {
       "name": "jetson-build-source",
       "path": "skills/jetson-build-source",
       "content_digest": "sha256:27fad2dfe13174f5d6ba426b0d6a5f14dd21d31ff2dfb89ac50a0ad0c4eade4a",
@@ -1768,9 +1775,9 @@
     {
       "name": "nemo-fabric-integrate",
       "path": "skills/nemo-fabric-integrate",
-      "content_digest": "sha256:97afdf3c13d14cc0940b6f487f3ccaeb7714b0e9af4a75ba5c627b5c68ad21c6",
-      "last_commit": "c8f420e0d486ee7573db82225d8a7f75a42da60e",
-      "last_modified": "2026-11-02"
+      "content_digest": "sha256:09d115a590593e652af9e458d94dff9b911de42b4ed0b08fd8784b72394955e4",
+      "last_commit": "4887f922ff7188470e9e64662885d2c9ca41608c",
+      "last_modified": "2026-11-18"
     },
     {
       "name": "nemo-mbridge-mlm-bridge-training",
@@ -2370,9 +2377,9 @@
     {
       "name": "ovnewton-usage",
       "path": "skills/ovnewton-usage",
-      "content_digest": "sha256:237a53d11c4b30319970a504363aba385461d5e6c2cbea29867ac675275c6e93",
-      "last_commit": "a4cf47e064e3a8ef15e11687342d592cd268e62f",
-      "last_modified": "2026-10-22"
+      "content_digest": "sha256:e91621cac2b9cfe769d2e6dedf727c60699d309ed65dabb2cbab5fe34659402d",
+      "last_commit": "4887f922ff7188470e9e64662885d2c9ca41608c",
+      "last_modified": "2026-11-18"
     },
     {
       "name": "paidf-cosmos-predict",
@@ -2405,9 +2412,9 @@
     {
       "name": "physical-ai-physics-selection",
       "path": "skills/physical-ai-physics-selection",
-      "content_digest": "sha256:446145caef1ffa28d1a66b9793119c3c9f0a59619bed9a2d8c4e6e965a098cac",
-      "last_commit": "7c8da3f6ab587bf126236da7f170d6e2bbf9cb53",
-      "last_modified": "2026-10-19"
+      "content_digest": "sha256:37482cf3a083dd8c8b4e5e2e99a7facf976355a101f808e7a6379fa8b3b200d2",
+      "last_commit": "4887f922ff7188470e9e64662885d2c9ca41608c",
+      "last_modified": "2026-11-18"
     },
     {
       "name": "physical-ai-video-data-augmentation",
@@ -3185,6 +3192,20 @@
       "content_digest": "sha256:266017dab3f9ada052ecb9558303665c386e5776c950c5f48b1774a9404a7ed6",
       "last_commit": "061d42ccc84cdcb64473a43e5f669986a9683bfc",
       "last_modified": "2026-07-13"
+    },
+    {
+      "name": "triton-onnx-model-repository",
+      "path": "skills/triton-onnx-model-repository",
+      "content_digest": "sha256:38f3b3901ca47103045fd4cb542d9e51cd66e2f484217d33102701cea0cc01dc",
+      "last_commit": "15886223ed6cebd69f2970f2a16da03fd0cd5a35",
+      "last_modified": "2026-11-17"
+    },
+    {
+      "name": "triton-pytorch-model-repository",
+      "path": "skills/triton-pytorch-model-repository",
+      "content_digest": "sha256:c5c9d3dbabc23820ae609c4543e37cf9d2d9ed1f0254ee17ca3777f83eb4bbbd",
+      "last_commit": "15886223ed6cebd69f2970f2a16da03fd0cd5a35",
+      "last_modified": "2026-11-17"
     },
     {
       "name": "vss-ask-video",
