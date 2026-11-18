@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 468,
-  "result_row_count": 4419,
+  "skill_count": 471,
+  "result_row_count": 4444,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -150,6 +150,69 @@
       "component": "DeepStream",
       "has_results": true,
       "average_uplift_pct": 23.3
+    },
+    {
+      "skill": "bench-perf-oss",
+      "evaluation_date": "2026-11-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:84f4a60929fe1591ebfdb376f2313a0123288921678895e37f156e774ec52c2b",
+      "validation_status": "passed",
+      "tasks": 11,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bioir-bench-perf-oss",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 7.43
+    },
+    {
+      "skill": "make-data-pipeline",
+      "evaluation_date": "2026-11-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:28abb53723ba2e11254de9d0adb3e076e5715b7723e28b1222f17e0dc540a82c",
+      "validation_status": "passed",
+      "tasks": 10,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 6.05
+    },
+    {
+      "skill": "model-onboard",
+      "evaluation_date": "2026-11-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:5a0da6e54e8b513fed09cf61c70a0c16dbe1009d7c1e1d13947071f80a5e2caf",
+      "validation_status": "passed",
+      "tasks": 9,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 2.4
     },
     {
       "skill": "boltz2-nim",
@@ -10337,6 +10400,231 @@
       "agent": "codex",
       "score_pct": 85.0,
       "uplift_pct": 25.0
+    },
+    {
+      "catalog_dir": "bioir-bench-perf-oss",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 13.6
+    },
+    {
+      "catalog_dir": "bioir-bench-perf-oss",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.6,
+      "uplift_pct": 9.1
+    },
+    {
+      "catalog_dir": "bioir-bench-perf-oss",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-bench-perf-oss",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 82.8,
+      "uplift_pct": -0.4
+    },
+    {
+      "catalog_dir": "bioir-bench-perf-oss",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 98.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 53.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 76.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 8.3
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-make-data-pipeline",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.6,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.9,
+      "uplift_pct": 8.9
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 55.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.6,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.1,
+      "uplift_pct": 5.5
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bioir-model-onboard",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 96.3,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "bionemo-boltz2-nim",

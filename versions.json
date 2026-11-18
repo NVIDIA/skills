@@ -44,6 +44,27 @@
       "last_modified": "2026-07-14"
     },
     {
+      "name": "bioir-bench-perf-oss",
+      "path": "skills/bioir-bench-perf-oss",
+      "content_digest": "sha256:55711df9f8035109620735ce25a60db67d3d515430c0bab4f1e368171ef4adb0",
+      "last_commit": "979f975e5c1ef7969402085be05902f216b841ac",
+      "last_modified": "2026-11-18"
+    },
+    {
+      "name": "bioir-make-data-pipeline",
+      "path": "skills/bioir-make-data-pipeline",
+      "content_digest": "sha256:55929ce92f279d953928d279993e28de14fc1255b019a91a178c4c34464b7c7c",
+      "last_commit": "979f975e5c1ef7969402085be05902f216b841ac",
+      "last_modified": "2026-11-18"
+    },
+    {
+      "name": "bioir-model-onboard",
+      "path": "skills/bioir-model-onboard",
+      "content_digest": "sha256:8a15e6da5a554fbc7b5d6c27bf6090a5cae41b236fad9af4f2cd2f1d2fb0d153",
+      "last_commit": "979f975e5c1ef7969402085be05902f216b841ac",
+      "last_modified": "2026-11-18"
+    },
+    {
       "name": "bionemo-boltz2-nim",
       "path": "skills/bionemo-boltz2-nim",
       "content_digest": "sha256:b12e1701bd327d2b911444d81645a0009681336f77d13307dfe4920090bbc9b7",
