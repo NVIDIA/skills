@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers integrating Newton physics with Omniverse use this skill to build Newton models from a populated ovstage, run an application-owned solver loop, consume sealed stage edits, and publish or read simulation state for rendering or downstream use. <br>
+Developers and engineers integrating the Newton physics engine with Omniverse use this skill to build Newton models from a populated ovstage, run an application-owned solver loop, consume sealed stage edits, and publish simulation state for rendering. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -31,7 +31,6 @@ Mitigation: Review and scan skill before deployment. <br>
 - [ovnewton support guide](https://github.com/NVIDIA-Omniverse/ovnewton/blob/main/docs/site/support.md) <br>
 - [ovnewton concepts guide](https://github.com/NVIDIA-Omniverse/ovnewton/blob/main/docs/site/concepts.md) <br>
 - [ovnewton output-read guide](https://github.com/NVIDIA-Omniverse/ovnewton/blob/main/docs/site/output-reads.md) <br>
-- [Newton physics engine](https://github.com/newton-physics/newton) <br>
 
 
 ## Skill Output: <br>
@@ -47,7 +46,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-7 evaluation tasks (5 positive integration requests, 2 negative routing cases), one attempt per task, each run with and without the skill in an isolated `k8s-sandbox` pod using evaluator version 1.5.6. <br>
+7 evaluation tasks (5 positive integration requests, 2 negative routing cases), one attempt per task, each run in an isolated sandbox pod and compared against a no-skill baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -60,26 +59,26 @@ Reported benchmark dimensions: <br>
 Underlying evaluation signals used in this run: <br>
 - `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
 - `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `skill_efficiency`: Tool-call productivity. <br>
 - `accuracy`: Final-answer correctness against the reference answer. <br>
 - `goal_accuracy`: Whether the user's goal was achieved. <br>
 - `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage (50% of Efficiency). <br>
+- `token_efficiency`: Actual uncached prompt plus completion token usage. <br>
 
 
 
 ## Evaluation Results: <br>
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.2% — baseline ran, but no comparable score was available; uplift unavailable | 83.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 57.1% → 100.0% (+42.9 points) | 100.0% → 85.7% (-14.3 points) |
-| Correctness | 71.4% → 94.3% (+22.9 points) | 85.7% → 88.6% (+2.9 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 55.0% → 87.9% (+32.9 points) | 58.2% → 79.3% (+21.1 points) |
-| Efficiency | 93.9% — baseline ran, but no comparable score was available; uplift unavailable | 69.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.6% — baseline ran, but no comparable score was available; uplift unavailable | 88.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 78.6% → 92.9% (+14.3 points) | 85.7% → 85.7% (±0.0 points) |
+| Correctness | 54.3% → 100.0% (+45.7 points) | 77.1% → 100.0% (+22.9 points) |
+| Discoverability | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 40.7% → 89.6% (+48.9 points) | 61.4% → 91.8% (+30.4 points) |
+| Efficiency | 92.7% — baseline ran, but no comparable score was available; uplift unavailable | 71.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 ## Skill Version(s): <br>
-0.2.0 (source: pyproject.toml, CHANGELOG, released 2026-10-08) <br>
+0.2.0 (source: CHANGELOG, released 2026-10-08; pyproject.toml reports development version 0.3.0.dev0) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

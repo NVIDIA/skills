@@ -9,7 +9,7 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `physical-ai-physics-selection`
-- Evaluation date: 2026-10-16
+- Evaluation date: 2026-10-14
 - Evaluator version: `1.5.6`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
 - Tasks: 18 evaluation tasks (16 positive, 2 negative)
@@ -35,12 +35,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 95.3% — baseline ran, but no comparable score was available; uplift unavailable | 84.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 88.9% → 94.4% (+5.5 points) | 94.4% → 94.4% (±0.0 points) |
-| Correctness | 88.9% → 100.0% (+11.1 points) | 97.8% → 98.9% (+1.1 points) |
-| Discoverability | 98.1% — baseline ran, but no comparable score was available; uplift unavailable | 89.4% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 78.5% → 98.1% (+19.6 points) | 90.3% → 95.6% (+5.3 points) |
-| Efficiency | 85.8% — baseline ran, but no comparable score was available; uplift unavailable | 43.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 95.6% — baseline ran, but no comparable score was available; uplift unavailable | 84.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 91.7% → 94.4% (+2.7 points) | 94.4% → 94.4% (±0.0 points) |
+| Correctness | 90.0% → 100.0% (+10.0 points) | 97.8% → 100.0% (+2.2 points) |
+| Discoverability | 98.8% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 77.2% → 95.3% (+18.1 points) | 87.6% → 97.2% (+9.6 points) |
+| Efficiency | 89.5% — baseline ran, but no comparable score was available; uplift unavailable | 36.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -54,45 +54,45 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 4,425,174 | 5,094,765 | N/A | N/A | skill 17/18; base 17/18 |
-| claude-code | physical-ai-physics-selection-analysis-only | 100,308 | 93,327 | +6,981 | +7.48% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-cable-shared-stage | 99,077 | 257,155 | -158,078 | -61.47% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-cpu-only | 1,894,103 | 1,885,677 | +8,426 | +0.45% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-drake-analysis | 104,637 | 31,871 | +72,766 | +228.31% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-existing-stage | 224,179 | 184,719 | +39,460 | +21.36% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-framework-owned | 137,647 | 124,838 | +12,809 | +10.26% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-genesis-hardware | 316,402 | 225,922 | +90,480 | +40.05% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-gradient-required | 99,489 | 33,733 | +65,756 | +194.93% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-jax-tpu | 100,687 | 62,432 | +38,255 | +61.27% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-new-manipulation-learning | 100,577 | 35,766 | +64,811 | +181.21% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-physx-live-edits | 142,583 | 32,533 | +110,050 | +338.27% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-preserve-bullet | 356,997 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| claude-code | physical-ai-physics-selection-preserve-mujoco | N/A | 366,991 | N/A | N/A | skill 0/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-standalone-urdf | 102,420 | 370,302 | -267,882 | -72.34% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-unverified-performance | 97,036 | 29,618 | +67,418 | +227.63% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-usd-is-not-enough | 99,825 | 119,338 | -19,513 | -16.35% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-vsim-robotics | 349,122 | 1,210,598 | -861,476 | -71.16% | skill 1/1; base 1/1 |
-| claude-code | physical-ai-physics-selection-windows-host | 100,085 | 29,945 | +70,140 | +234.23% | skill 1/1; base 1/1 |
-| codex | All cases | 2,402,713 | 1,570,171 | N/A | N/A | skill 17/18; base 17/18 |
-| codex | physical-ai-physics-selection-analysis-only | 34,256 | 45,297 | -11,041 | -24.37% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-cable-shared-stage | 75,052 | 44,437 | +30,615 | +68.90% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-cpu-only | 1,269,781 | 721,876 | +547,905 | +75.90% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-drake-analysis | 62,540 | 30,170 | +32,370 | +107.29% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-existing-stage | 47,012 | 103,738 | -56,726 | -54.68% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-framework-owned | 286,702 | 97,222 | +189,480 | +194.89% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-genesis-hardware | 56,033 | 37,629 | +18,404 | +48.91% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-gradient-required | 61,836 | 63,291 | -1,455 | -2.30% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-jax-tpu | 45,192 | 25,818 | +19,374 | +75.04% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-new-manipulation-learning | 112,003 | 80,895 | +31,108 | +38.45% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-physx-live-edits | 40,664 | 25,212 | +15,452 | +61.29% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-preserve-bullet | 103,675 | N/A | N/A | N/A | skill 1/1; base 0/1 |
-| codex | physical-ai-physics-selection-preserve-mujoco | N/A | 137,127 | N/A | N/A | skill 0/1; base 1/1 |
-| codex | physical-ai-physics-selection-standalone-urdf | 28,787 | 38,218 | -9,431 | -24.68% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-unverified-performance | 28,755 | 13,553 | +15,202 | +112.17% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-usd-is-not-enough | 33,002 | 24,366 | +8,636 | +35.44% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-vsim-robotics | 77,337 | 47,353 | +29,984 | +63.32% | skill 1/1; base 1/1 |
-| codex | physical-ai-physics-selection-windows-host | 40,086 | 33,969 | +6,117 | +18.01% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 6,827,887 | 6,664,936 | N/A | N/A | skill 34/36; base 34/36 |
+| claude-code | All cases | 4,600,301 | 11,200,487 | N/A | N/A | skill 17/18; base 17/18 |
+| claude-code | physical-ai-physics-selection-analysis-only | 103,284 | 92,922 | +10,362 | +11.15% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-cable-shared-stage | 104,450 | 92,245 | +12,205 | +13.23% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-cpu-only | 1,542,854 | 7,201,948 | -5,659,094 | -78.58% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-drake-analysis | 104,443 | 31,291 | +73,152 | +233.78% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-existing-stage | 184,006 | 691,883 | -507,877 | -73.41% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-framework-owned | 179,296 | 92,772 | +86,524 | +93.27% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-genesis-hardware | 549,259 | 842,997 | -293,738 | -34.84% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-gradient-required | 103,707 | 157,674 | -53,967 | -34.23% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-jax-tpu | 104,741 | 31,321 | +73,420 | +234.41% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-new-manipulation-learning | 105,402 | 97,829 | +7,573 | +7.74% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-physx-live-edits | 144,257 | 32,566 | +111,691 | +342.97% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-preserve-bullet | N/A | 336,384 | N/A | N/A | skill 0/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-preserve-mujoco | 443,651 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| claude-code | physical-ai-physics-selection-standalone-urdf | 100,614 | 254,050 | -153,436 | -60.40% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-unverified-performance | 62,706 | 30,113 | +32,593 | +108.24% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-usd-is-not-enough | 99,848 | 91,540 | +8,308 | +9.08% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-vsim-robotics | 568,026 | 1,092,776 | -524,750 | -48.02% | skill 1/1; base 1/1 |
+| claude-code | physical-ai-physics-selection-windows-host | 99,757 | 30,176 | +69,581 | +230.58% | skill 1/1; base 1/1 |
+| codex | All cases | 3,042,611 | 972,920 | N/A | N/A | skill 17/18; base 17/18 |
+| codex | physical-ai-physics-selection-analysis-only | 47,909 | 33,343 | +14,566 | +43.69% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-cable-shared-stage | 92,405 | 39,279 | +53,126 | +135.25% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-cpu-only | 1,824,496 | 242,096 | +1,582,400 | +653.63% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-drake-analysis | 72,065 | 37,456 | +34,609 | +92.40% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-existing-stage | 42,738 | 94,531 | -51,793 | -54.79% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-framework-owned | 147,476 | 84,957 | +62,519 | +73.59% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-genesis-hardware | 88,699 | 44,242 | +44,457 | +100.49% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-gradient-required | 51,398 | 43,764 | +7,634 | +17.44% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-jax-tpu | 52,378 | 27,409 | +24,969 | +91.10% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-new-manipulation-learning | 80,299 | 54,657 | +25,642 | +46.91% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-physx-live-edits | 47,672 | 24,828 | +22,844 | +92.01% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-preserve-bullet | 113,235 | N/A | N/A | N/A | skill 1/1; base 0/1 |
+| codex | physical-ai-physics-selection-preserve-mujoco | N/A | 82,371 | N/A | N/A | skill 0/1; base 1/1 |
+| codex | physical-ai-physics-selection-standalone-urdf | 47,183 | 39,087 | +8,096 | +20.71% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-unverified-performance | 28,842 | 13,611 | +15,231 | +111.90% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-usd-is-not-enough | 40,519 | 18,045 | +22,474 | +124.54% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-vsim-robotics | 207,028 | 70,320 | +136,708 | +194.41% | skill 1/1; base 1/1 |
+| codex | physical-ai-physics-selection-windows-host | 58,269 | 22,924 | +35,345 | +154.18% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 7,642,912 | 12,173,407 | N/A | N/A | skill 34/36; base 34/36 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
 
