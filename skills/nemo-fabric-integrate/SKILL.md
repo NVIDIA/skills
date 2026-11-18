@@ -50,7 +50,7 @@ runtime assumptions but never installs harnesses or credentials at run time.
   `nemo-fabric[claude]`, `nemo-fabric[codex]`,
   or `nemo-fabric[deepagents]`.
 - Install Hermes Agent separately from the Fabric adapter. Follow the
-  [Hermes integration guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/integrations/harness/hermes.mdx)
+  [Hermes integration guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/integrations/harness/hermes/hermes.mdx)
   for the current compatible interpreter, source checkout, Relay dependencies,
   and adapter installation. The `nemo-fabric[hermes-agent]` extra does not
   install Hermes Agent.
@@ -150,7 +150,10 @@ def to_fabric_config(job) -> FabricConfig:
   `remove_skill_path`,
   `add_mcp_server`, `remove_mcp_server`, and `enable_relay`.
 - Use `add_tool_definition` only when the selected adapter accepts
-  `tools.definitions` and publishes a `tool_definition_schema`.
+  `tools.definitions` and publishes a `tool_definition_schema`. The LangChain
+  Deep Agents adapter accepts `kind="python"` with `ref="package.module:attribute"`
+  naming an installed LangChain `BaseTool` instance or subclass, and accepts
+  custom `AgentMiddleware` classes in `harness.settings.deepagents.middleware`.
 - Use a restricted `allowed_tools` list or non-empty `blocked_tools` on
   `add_mcp_server` only when the selected adapter declares both `mcp` and
   `mcp.tool_filters`. An unfiltered server requires only `mcp`.
@@ -163,6 +166,13 @@ def to_fabric_config(job) -> FabricConfig:
   type.
 - Create deployment or evaluation variants with `model_copy(deep=True)` and
   ordinary Python functions; each copy plans and runs independently.
+- To give a skill path the same meaning on every adapter, set
+  `SkillConfig.directories` to `SkillDirectory(skill=...)` and
+  `SkillDirectory(folder=...)` entries instead of using `paths`, with optional
+  `bundled=BundledSkills(...)` and
+  `duplicates`. These need adapter support, and `add_skill_path` raises
+  `ValueError` once `directories` is set. Refer to
+  [Configure Skills](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/integrations/harness/skills.mdx).
 - Pass `base_dir=...` to any `Fabric` call when the config uses relative paths,
   so skills, workspaces, and artifacts anchor to the consumer's own layout.
 
@@ -173,7 +183,29 @@ construction.
 
 ## Choose A Lifecycle
 
+For Hermes, embedded SDK execution is enabled and eager by default. Set `harness.settings.sdk.enabled=False` only for native-only runtimes with an enabled API, dashboard, or terminal interface; management through the SDK remains available, but invocation fails explicitly. Browser and terminal clients share one managed TUI backend. Native responses remain native even when Relay emits standard ATOF/ATIF; do not treat them as SDK `RunResult` objects. Follow the [Hermes invocation guides](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/integrations/harness/hermes/hermes.mdx) for interface-specific installation and attachment.
+
 For Deep Agents, mini-SWE-agent, and the LangGraph custom-agent example, pass the same UUID string through `RunRequest.relay_session_root` on each conversation turn to group Relay trajectories under one session. Core forwards the typed field as `AgentRunRequest.relay_session_root`; context keys do not control Relay propagation. An unusable UUID preserves per-request behavior. The remaining adapters do not consume this field.
+
+For Hermes and OpenClaw cold resume, configure `runtime.keep_state` and retain the complete
+artifact state tree. Persist `Runtime.session_ref.to_mapping()` in caller-owned
+storage and pass `session_ref=SessionRef.from_mapping(saved_reference)`
+to `Fabric.start_runtime()`, `start_runtime_in()`, or `run()`. A new runtime ID
+does not change the selected session. Retention alone starts a fresh
+conversation. Never select the latest conversation implicitly. Agent names are
+labels, while the reference's adapter must match. Handle `state_in_use` and
+missing or incompatible session errors explicitly. Inspect
+`Runtime.recovery_warnings` before continuing an uncertain session. Send a new
+`RunRequest(..., acknowledge_recovery=True)` only after inspecting native and
+external state. Do not replay an interrupted request automatically. Keep
+ownership and retry cleanup when stop is unconfirmed. Native Hermes API and
+dashboard behavior remains owned by Hermes. OpenClaw supports retained managed
+runtimes and NeMo Fabric-owned services. A retained service keeps the Gateway
+and storage lock across connected-runtime stops. Caller-owned OpenClaw services
+reject retained sessions because their references cannot verify a native storage
+boundary. See the [OpenClaw guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/integrations/harness/openclaw/openclaw.mdx).
+
+Hermes `SessionRef` resume requires the SDK backend to be enabled. Native-only Hermes runtimes can retain state and report `RunPlan.capabilities.session_resume: false`. Explicit SDK session selection then fails with `session_resume_unsupported` before native startup.
 
 Pick the smallest lifecycle the consumer needs:
 
@@ -228,7 +260,11 @@ For explicit environment management, call `prepare_environment(config)` or
 Use typed `EnvironmentHandle` and `EnvironmentReference` objects. Stop the
 runtime before calling `release_environment(environment)` separately. Provider
 availability and reuse limits vary; task paths must remain strings for non-local
-environments. See the [environment lifecycle guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/sdk/python.mdx#explicit-environment-lifecycle).
+environments. See the [environment lifecycle guide](https://github.com/NVIDIA/NeMo-Fabric/blob/main/docs/sdk/environments-and-shared-services.mdx#explicit-environment-lifecycle).
+
+Use `await fabric.runtime_status(runtime_id=runtime_id, agent_name=name)` to read recorded state and a safe discovery handle for a runtime started by the same `Fabric` instance. The client retains live runtime objects until successful stop. Add `environment=environment` for an OpenShell lookup through `fabric-agent-ctl status`, including from a later client process while the original server remains alive. `RuntimeStatusReport` reports `active`, `stopped`, or `failed`; `server_state` is present for server reads and null for direct local reads. Each client holds at most 128 runtime records, including pending starts. New starts evict the oldest successfully stopped records first; when active, failed, and pending runtimes fill the limit, startup raises `FabricStateError` with `code="runtime_limit_reached"`. Retained stopped records have a null handle. Discovery handles omit environment variable values and arbitrary provider metadata; use the original `Runtime` for invocation and cleanup. Status reads perform no lifecycle operation or health probe. Use `Fabric.check()` when the consumer needs fresh health evidence.
+
+After a caller timeout, use `await fabric.invocation_result(agent_name=name, runtime_id=runtime_id, request_id=request_id)` to retrieve the original invocation result. Set a stable `RunRequest.request_id` before dispatch. A timeout reported as `invocation_timeout` leaves effects unknown and does not stop the invocation. Pass the original `artifacts` directory from a new local client, or `environment=environment` for OpenShell lookup. The CLI equivalent is `fabric-agent-ctl result --agent <name> --runtime-id <runtime-id> --request-id <request-id>`. Lookup does not invoke or probe the harness. A null result can mean pending or unknown work and never authorizes replay. A matching buffered retry returns a saved result; changed input with the same ID is rejected. Dispatched failures save a terminal result with unknown effects and `retryable=False`. Results remain until their storage is removed.
 
 The selected adapter owns the execution topology. The bundled Claude, Codex,
 Deep Agents, and Hermes Agent adapters retain their native client, graph/checkpointer,
@@ -323,7 +359,12 @@ print(plan.adapter.adapter_id, report.status)
   resolved descriptor without a settings schema accepts only an empty settings
   map.
 - For a separate admission host, call public `inspect_adapter(config, descriptor)`
-  with matching catalog or canonical external metadata. The immutable
+  with matching catalog or canonical external metadata. The returned
+  `AdapterInspection` contains `issues` and `capability_profile`. Compatibility
+  failures return issues and no profile by default (`diagnostics=True`).
+  Pass `diagnostics=False` for exception-based rejection.
+  Check issues before deployment. Malformed inputs raise in both modes. Read flags from
+  `inspection.capability_profile`. The immutable
   `AdapterCapabilityProfile` has `adapter_id`, `descriptor_sha256`, `skills`,
   `mcp`, and `atif` fields. It does not import harness SDKs or read task-local
   discovery paths. Missing metadata makes conservative claims and rejects

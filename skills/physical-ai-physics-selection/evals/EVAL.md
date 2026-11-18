@@ -10,8 +10,8 @@ metadata/source checks from executed simulation and measured improvement.
 If a runtime or input asset is unavailable, report that limitation rather than
 inventing a passing result. Negative cases must not load this skill.
 
-Helper unit tests use synthetic inputs to check metadata handling; they do not
-validate simulation behavior or physics fidelity.
+Local helper tests are in `ovnewton/tests/test_skill_physics_selection.py`.
+They use synthetic inputs to test helper behavior, not to claim physics fidelity.
 SkillEvaluator performs the separate live-agent evaluation. Record its actual
 runtime and results; do not author `BENCHMARK.md`, `skill-card.md`, or
 `skill.oms.sig` by hand. CI generates those artifacts after validation.

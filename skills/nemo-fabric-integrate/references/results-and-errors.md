@@ -90,6 +90,8 @@ Refer to the [errors reference](https://github.com/NVIDIA/NeMo-Fabric/blob/main/
 | `ResourceObservationUnavailableError` | A resource snapshot cannot be read because the runtime stopped, is stopping, its adapter host exited, a live process in its tree or the process table cannot be read, or the process tree kept changing during the read. Subclass of `FabricRuntimeError`. |
 | `ResourceObservationUnsupportedError` | The runtime's adapter kind, environment provider, or operating system has no resource reader. Subclass of `FabricRuntimeError`. |
 
+One-shot lifecycle exceptions can carry obtained identities, cleanup events, and selected software evidence in `error.details["runtime_evidence"]`. Treat these as partial observations and keep the original exception and cause. Do not construct a successful `RunResult` or infer missing usage from this evidence.
+
 ## Cleanup And Resilience
 
 Core host-operation deadlines (`host_timeout`) become Python `TimeoutError`, then
