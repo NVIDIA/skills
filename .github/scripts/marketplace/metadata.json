@@ -73,6 +73,42 @@
       }
     },
     {
+      "path": "skills/bioir-bench-perf-oss",
+      "name": "bench-perf-oss",
+      "description": "Compare BioIR vs OSS folding performance: model.forward() latency, GPU use, lDDT and DockQ with matched inputs. Use for benchmark setup, execution or audits; excludes affinity heads and Ray throughput.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "computational_biologist,bioinformatician,ml_engineer,ai_engineer,hpc_developer",
+        "discovery.activity_tags": "benchmark,compare,measure,profile,evaluate"
+      }
+    },
+    {
+      "path": "skills/bioir-make-data-pipeline",
+      "name": "make-data-pipeline",
+      "description": "Port an open-source bioinformatics data pipeline into the BioIR pipeline architecture. Use when the user asks to create, port, convert, or write a new data pipeline from OSS code, or add a new model's data processing to the BioIR system. Level 2 is one full build_processor run of the sample manifest, serial and Ray.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "bioinformatician,computational_biologist,genomics_researcher,application_developer,data_engineer",
+        "discovery.activity_tags": "convert,integrate,validate,test,benchmark"
+      }
+    },
+    {
+      "path": "skills/bioir-model-onboard",
+      "name": "model-onboard",
+      "description": "Implement an upstream pretrained model natively in BioIR using its optimized components, with checkpoint conversion and numerical validation. Use when adding a new model or architecture to BioIR; includes data pipeline integration when requested.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,developer,bioinformatician,computational_biologist",
+        "discovery.activity_tags": "integrate,convert,validate,optimize,test"
+      }
+    },
+    {
       "path": "skills/bionemo-boltz2-nim",
       "name": "boltz2-nim",
       "description": "Use Boltz2 NIM for biomolecular structure prediction and binding affinity. Invoke for Boltz2, protein structures, protein-ligand/DNA/RNA complexes, SMILES or CCD ligands, pIC50/IC50 affinity scoring, mmCIF output, hosted NVIDIA API calls, or local Docker deployment.\n",

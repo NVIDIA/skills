@@ -376,6 +376,7 @@
       "title": "Inference AI",
       "description": "Deploy, serve, optimize, and evaluate models for production inference, including quantization, runtime performance, and serving configuration.",
       "skills": [
+        "bench-perf-oss",
         "boltz2-nim",
         "codonfm-embed",
         "codonfm-score",
@@ -396,7 +397,9 @@
         "jetson-speculative-decoding",
         "kermt-embed",
         "kermt-infer",
+        "make-data-pipeline",
         "medtech-model-evidence-export",
+        "model-onboard",
         "molmim-nim",
         "msa-search-nim",
         "msa-structure-prediction-pipeline",
