@@ -189,6 +189,18 @@ For non-interactive installs, global installs, agent-specific installs, updates,
 
 ---
 
+## Plugin Catalog
+
+Plugins bundle a product's skills together with their evals, MCP servers, hooks and assets, mirrored from the product repo and signed there. Install from the `nvidia-official` marketplace (see [plugins/README.md](plugins/README.md)).
+
+<!-- plugins-table-start -->
+| Plugin | Description | Version | Skills | Source |
+|--------|-------------|---------|--------|--------|
+| `nvidia-skills` | Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows. | `1.5.0` | 1 | NVIDIA Skills (this repo) |
+<!-- plugins-table-end -->
+
+---
+
 ## Getting Help & Contributing
 
 **Where to file an issue depends on what's broken:**
