@@ -67,15 +67,20 @@ Steps the agent should walk the user through:
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes)
    capability-discovery rule).
 4. **Init and configure the schema.**
-   `doca_telemetry_exporter_schema_init(name, &schema)`, then set
-   the exporters you need BEFORE `schema_start`:
-   `_schema_set_file_write_enabled` (file), `_schema_set_ipc_enabled`
-   (IPC → DTS), `_schema_set_opaque_events_enabled` (if using
-   opaque events or OTLP logs), and optionally `_schema_set_buf_size`
-   / `_schema_set_buf_data_root` / the IPC reconnect knobs. Defaults
-   for the data root and IPC socket dir are documented in the header
-   (do not hardcode them as universal — read them back with the
-   `_schema_get_*` getters if needed).
+   `doca_telemetry_exporter_schema_init(name, &schema)`, then select
+   and configure the exporters you need BEFORE `schema_start` with
+   the DOCA 3.6 schema exporter functions:
+   `doca_telemetry_exporter_schema_set_exporter_enabled(schema,
+   exporter)` to enable an exporter by name (file, IPC → DTS, etc.;
+   exact exporter names are in the public header), and
+   `doca_telemetry_exporter_schema_set_exporter_option(schema, key,
+   value)` to set exporter options (buffer size, data root, IPC
+   reconnect knobs, etc.; exact option keys are in the public
+   header). If using opaque events or OTLP logs, also call
+   `_schema_set_opaque_events_enabled` before `schema_start`.
+   Defaults for the data root and IPC socket dir are documented in
+   the header (do not hardcode them as universal — read them back
+   with the `_schema_get_*` getters if needed).
 5. **Register the event type(s) — only for the typed-events
    surface.** `doca_telemetry_exporter_type_create(&type)`, add
    fields with `_field_create` + `_field_set_name` /
@@ -100,9 +105,12 @@ Steps the agent should walk the user through:
 7. **Create and start the source(s).**
    `doca_telemetry_exporter_source_create(schema, &source)`,
    `_source_set_id` / `_source_set_tag`, then
-   `doca_telemetry_exporter_source_start(source)`. One source per
-   logical reporter (per-worker / per-pipeline-stage / per-tenant);
-   do not default to one source for the whole app without asking.
+   `doca_telemetry_exporter_source_start(source)`. Set the source
+   period with `doca_telemetry_exporter_sleep`; the public header
+   documents the exact call point and period semantics. One source
+   per logical reporter (per-worker / per-pipeline-stage /
+   per-tenant); do not default to one source for the whole app
+   without asking.
 8. **Create the per-surface context if needed.** For metrics:
    `doca_telemetry_exporter_metrics_create_context(source)` AFTER
    `source_start`, then add labels. For OTLP logs:
@@ -175,8 +183,8 @@ before recommending any code-level edit:
 | --- | --- | --- |
 | 1. Starting sample | Which of the four samples above is closest to the user's intended publish surface? | Pick by surface first (events / metrics / otlp / netflow), then by shape. A smaller diff is always safer than a re-architecture |
 | 2. Schema / record shape | For events: which fields with which `DOCA_TELEMETRY_EXPORTER_FIELD_TYPE_*` each? For metrics: which counters/gauges/histograms and label sets? For NetFlow: which `DOCA_TELEMETRY_EXPORTER_NETFLOW_*` field IDs? | The packed event struct MUST match the registered field list, or `_source_report` payloads mis-parse. In DOCA 3.5, `doca_telemetry_exporter_source_report` is const-correct: the data argument is `const void *`. Pass a const-qualified buffer and do not cast away const. For schema index handling, use `doca_telemetry_exporter_schema_get_indexes` / `doca_telemetry_exporter_schema_set_indexes` (DOCA 3.5). For metrics, label-value arity MUST match the registered label set or `_metrics_add_*` returns `DOCA_ERROR_INVALID_VALUE` |
-| 3. Lifecycle order | Where in the app flow do `schema_start`, `source_start`, and (if used) `_metrics_create_context` / `_otlp_logs_create_context` fall? | Per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes): types registered before `schema_start`; source created after `schema_start`; report only after `source_start`; metrics/OTLP context created only after `source_start`. Out-of-order source/report calls return `DOCA_ERROR_BAD_STATE`; metrics misuse more often surfaces as `DOCA_ERROR_INVALID_VALUE` per the header |
-| 4. Destinations | File write, IPC to DTS, Prometheus (metrics only), NetFlow collector — which, and is each reachable? | Enable on the schema (`_set_file_write_enabled` / `_set_ipc_enabled`) BEFORE `schema_start`; `_set_opaque_events_enabled` if opaque/OTLP. Prometheus is the `PROMETHEUS_ENDPOINT` env var, not a `schema_set_*` call |
+| 3. Lifecycle order | Where in the app flow do `schema_start`, `source_start`, and (if used) `_metrics_create_context` / `_otlp_logs_create_context` fall? | Per [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes): types registered before `schema_start`; source created after `schema_start`; report only after `source_start`; metrics/OTLP context created only after `source_start`. Out-of-order source/report calls return `DOCA_ERROR_BAD_STATE`; metrics misuse more often surfaces as `DOCA_ERROR_INVALID_VALUE` per the header. For source pacing, use the source sleep API declared in the public header instead of a generic `usleep`/`nanosleep`; it is the supported way to delay a source between reports |
+| 4. Destinations | File write, IPC to DTS, Prometheus (metrics only), NetFlow collector — which, and is each reachable? | Enable on the schema (`_set_file_write_enabled` / `_set_ipc_enabled`) BEFORE `schema_start`; `_set_opaque_events_enabled` if opaque/OTLP. For exporter selection and exporter-specific options, use the schema exporter enable/option setters declared in the public header before `schema_start`; do not hand-roll exporter configuration. Prometheus endpoint configuration remains the `PROMETHEUS_ENDPOINT` env var |
 | 5. Flush + teardown | Does the modified app flush before destroy? | Call `_source_flush` / `_metrics_flush` / `_netflow_flush` before destroy so trailing buffered events are not lost, per [`CAPABILITIES.md ## Safety policy`](CAPABILITIES.md#safety-policy) |
 | 6. Build manifest | Keep the sample's existing `meson.build` (which already wires `pkg-config doca-telemetry-exporter` and `-DDOCA_ALLOW_EXPERIMENTAL_API`)? | Yes. Do not switch to a hand-rolled Makefile for *"simplicity"* — it removes the version-check rail and the experimental-API flag |
 
@@ -387,8 +395,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + libraries in one shot).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer; report *"using structured `<tool>`"*.
 3. If the probe fails, fall back to the manual command in the row;

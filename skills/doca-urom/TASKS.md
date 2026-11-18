@@ -46,7 +46,7 @@ Steps the agent should walk the user through:
    `doca-public-knowledge-map ## DOCA services` (`doca-public-knowledge-map/SKILL.md#doca-services`).
    If the service is not running, this is a service-side env
    problem to fix BEFORE writing any host-side `doca_urom_*`
-   code — NOT a host-side library bug. A baseline agent that
+   code — NOT a host-side library bug. An agent that
    jumps to `doca_urom_*` calls without confirming the
    DPU-side service is up has the model wrong for every
    version of UROM.
@@ -140,9 +140,10 @@ If any step fails with a `DOCA_ERROR_*`, route through the
 error taxonomy in
 [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
 before retrying. For `DOCA_ERROR_NOT_PERMITTED`, check both
-explicit preconditions — target `doca_dev` access and DPU-side
-service state/version — because the API error alone does not
-distinguish them.
+explicit preconditions, because the API error alone does not
+distinguish them, in this order: first the DPU-side service
+state/version (cheap, and the usual cause when Worker start
+succeeded), then target `doca_dev` access.
 
 ## build
 
@@ -280,7 +281,8 @@ Iteration shape:
 
 1. **Single-pair smoke (one put + one get round-trip).**
    Between TWO nodes, enqueue one put with a small payload
-   into the peer's exported memory; verify the host-side
+   into a peer region exported only for this test (a dedicated,
+   disposable buffer, never application data); verify the host-side
    completion event fires AND the peer-side memory contains
    the expected bytes. Then enqueue one get to read the same
    region back; verify both completions. This is the cheapest
@@ -301,7 +303,9 @@ Iteration shape:
    per-node memory has the expected pattern. Catches
    service-side collective-variant gaps that the single-pair
    smoke cannot exercise.
-4. **Capability negative test.** Intentionally try to enqueue
+4. **Capability negative test.** On a test Worker and the
+   disposable test buffers from step 1 (never a production Worker
+   or application memory), intentionally try to enqueue
    an operation family the agent expects to be *not supported*
    on this device + DOCA + UROM Service combo (per the
    triple-axis cap-query result from
@@ -496,10 +500,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *“available since”* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *“using structured

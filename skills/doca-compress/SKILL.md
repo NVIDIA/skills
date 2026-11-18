@@ -19,7 +19,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - compress
@@ -43,6 +43,10 @@ compatibility: >
 - **"Compress task returns INVALID_VALUE on alloc_init."** — size
   the `doca_buf` against the per-task cap query before changing
   the algorithm.
+- **"Offload bulk compression."** Lifecycle: `doca_compress_create` →
+  `doca_compress_task_compress_deflate_set_conf` and the source / destination
+  mmap permissions, both BEFORE `doca_ctx_start` → submit → `doca_pe_progress`
+  until the completion arrives → `doca_ctx_stop` → `doca_compress_destroy`.
 
 ## Instructions
 

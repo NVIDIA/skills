@@ -10,8 +10,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-devemu`
 - Validation status: `passed`
-- Evaluation date: 2026-10-28
-- Evaluator version: `1.6.3`
+- Evaluation date: 2026-11-18
+- Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (3 positive, 1 negative)
 - Dataset digest: `sha256:bddc3102319aeedfab57309e910e03e8c1185f748c84845eadf3d5b4a3799de2` (skill-evaluator-dataset-snapshot/1)
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| doca-devemu | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-devemu | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-devemu | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-devemu | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-devemu | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-devemu | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-devemu | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-devemu | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-devemu | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| doca-devemu | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
 
 - Controls for `doca-devemu`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 87.5% → 100.0% (+12.5 points) |
-| Correctness | 55.0% → 100.0% (+45.0 points) | 95.0% → 80.0% (-15.0 points) |
+| Overall | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 60.0% → 100.0% (+40.0 points) | 95.0% → 95.0% (±0.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 50.0% → 100.0% (+50.0 points) | 81.3% → 100.0% (+18.7 points) |
-| Efficiency | 90.1% — baseline ran, but no comparable score was available; uplift unavailable | 67.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.8% → 93.8% (+50.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Efficiency | 92.9% — baseline ran, but no comparable score was available; uplift unavailable | 68.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.9% → 86.8% (-11.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.0% → 85.8% (-12.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 79.2% → 82.8% (+3.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 82.2% → 83.5% (+1.3 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,17 +80,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 679,428 | 327,381 | +352,047 | +107.53% | skill 4/4; base 4/4 |
-| claude-code | doca-devemu.explicit-positive.v1 | 190,400 | 37,939 | +152,461 | +401.86% | skill 1/1; base 1/1 |
-| claude-code | doca-devemu.implicit-positive.v1 | 262,075 | 109,391 | +152,684 | +139.58% | skill 1/1; base 1/1 |
-| claude-code | doca-devemu.implicit-positive.v2 | 190,207 | 108,517 | +81,690 | +75.28% | skill 1/1; base 1/1 |
-| claude-code | doca-devemu.negative.v1 | 36,746 | 71,534 | -34,788 | -48.63% | skill 1/1; base 1/1 |
-| codex | All cases | 378,754 | 356,758 | +21,996 | +6.17% | skill 4/4; base 4/4 |
-| codex | doca-devemu.explicit-positive.v1 | 99,274 | 202,636 | -103,362 | -51.01% | skill 1/1; base 1/1 |
-| codex | doca-devemu.implicit-positive.v1 | 117,163 | 39,995 | +77,168 | +192.94% | skill 1/1; base 1/1 |
-| codex | doca-devemu.implicit-positive.v2 | 110,881 | 26,663 | +84,218 | +315.86% | skill 1/1; base 1/1 |
-| codex | doca-devemu.negative.v1 | 51,436 | 87,464 | -36,028 | -41.19% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,058,182 | 684,139 | +374,043 | +54.67% | skill 8/8; base 8/8 |
+| claude-code | All cases | 620,649 | 326,743 | +293,906 | +89.95% | skill 4/4; base 4/4 |
+| claude-code | doca-devemu.explicit-positive.v1 | 195,089 | 37,708 | +157,381 | +417.37% | skill 1/1; base 1/1 |
+| claude-code | doca-devemu.implicit-positive.v1 | 194,404 | 73,749 | +120,655 | +163.60% | skill 1/1; base 1/1 |
+| claude-code | doca-devemu.implicit-positive.v2 | 194,129 | 107,969 | +86,160 | +79.80% | skill 1/1; base 1/1 |
+| claude-code | doca-devemu.negative.v1 | 37,027 | 107,317 | -70,290 | -65.50% | skill 1/1; base 1/1 |
+| codex | All cases | 371,813 | 200,436 | +171,377 | +85.50% | skill 4/4; base 4/4 |
+| codex | doca-devemu.explicit-positive.v1 | 97,800 | 60,942 | +36,858 | +60.48% | skill 1/1; base 1/1 |
+| codex | doca-devemu.implicit-positive.v1 | 118,799 | 47,930 | +70,869 | +147.86% | skill 1/1; base 1/1 |
+| codex | doca-devemu.implicit-positive.v2 | 112,533 | 30,481 | +82,052 | +269.19% | skill 1/1; base 1/1 |
+| codex | doca-devemu.negative.v1 | 42,681 | 61,083 | -18,402 | -30.13% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 992,462 | 527,179 | +465,283 | +88.26% | skill 8/8; base 8/8 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -99,7 +99,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 4 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
 ## Findings and Observations
@@ -107,12 +107,53 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-devemu`)
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/libs/doca-devemu`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md and references/details.md:
+  "## Pattern overview" in CAPABILITIES.md (lines 30-37)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 73-76)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 77-85)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 93-102)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 113-114)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 118-122)
+  vs "## Error taxonomy" in CAPABILITIES.md (lines 260-266)
+  vs "## Observability" in CAPABILITIES.md (lines 290-322)
+  vs "## Safety policy" in CAPABILITIES.md (lines 366-377)
+  vs "## Safety policy" in CAPABILITIES.md (lines 381-387)
+  vs "## Safety policy" in CAPABILITIES.md (lines 388-400)
+  vs "## Safety policy" in CAPABILITIES.md (lines 426-434)
+  vs "## Deferred topic boundaries" in CAPABILITIES.md (lines 449-507)
+  vs "## Examples" in SKILL.md (lines 3-11)
+  vs "## Instructions" in SKILL.md (lines 12-48)
+  vs "## Audience" in SKILL.md (lines 49-81)
+  vs "## When to load this skill" in SKILL.md (lines 82-124)
+  vs "## What this skill provides" in SKILL.md (lines 125-163)
+  vs "## Loading order" in SKILL.md (lines 164-195)
+  vs "## Related skills" in SKILL.md (lines 196-249)
+  vs "## configure" in TASKS.md (lines 109-117)
+  vs "## configure" in TASKS.md (lines 138-165)
+  vs "## configure" in TASKS.md (lines 187-196)
+  vs "## configure" in TASKS.md (lines 229-243)
+  vs "## run" in TASKS.md (lines 341-344)
+  vs "## run" in TASKS.md (lines 346-391)
+  vs "## test" in TASKS.md (lines 401-407)
+  vs "## test" in TASKS.md (lines 420-463)
+  vs "## test" in TASKS.md (lines 465-472)
+  vs "## debug" in TASKS.md (lines 508-532)
+  vs "## debug" in TASKS.md (lines 557-583)
+  vs "## Example questions this skill answers well" in references/details.md (lines 10-75)
+  vs "## Related skills" in references/details.md (lines 125-176) (`CAPABILITIES.md:30`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
+  "## Capabilities and modes" in CAPABILITIES.md (lines 108-108)
+  vs "## Usage notes (DOCA 3.5)" in TASKS.md (lines 79-96) (`CAPABILITIES.md:108`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and TASKS.md:
+  "## Observability" in CAPABILITIES.md (lines 323-330)
+  vs "## Observability" in CAPABILITIES.md (lines 339-348)
+  vs "## Usage notes (DOCA 3.5)" in TASKS.md (lines 72-75) (`CAPABILITIES.md:323`)
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and references/details.md:
+  "## Pattern overview" in CAPABILITIES.md (lines 39-58)
+  vs "## Safety policy" in CAPABILITIES.md (lines 401-411)
+  vs "## Related skills" in references/details.md (lines 177-184) (`CAPABILITIES.md:39`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/libs/doca-devemu/SKILL.md`)
-- **MEDIUM** QUALITY/quality_efficiency: Deeply nested references in details.md (`skills/libs/doca-devemu/SKILL.md`)
-- **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/libs/doca-devemu/SKILL.md`)
-- 15 additional finding(s) are available in the full evaluation artifacts.
+- 17 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

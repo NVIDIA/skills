@@ -178,9 +178,9 @@ preconditions in [`## configure`](#configure) are done.
    `doca-hardware-safety/SKILL.md`
    ALONGSIDE for the preflight / OOB / rollback discipline.
 3. **Do NOT trust `bfb-install` exit code 0 alone.** This is the
-   single most expensive failure mode. `bfb-install` has been
-   observed to exit 0 while the Arm-side flow only partially
-   completed — the canonical field signature is *"Ubuntu
+   single most expensive failure mode. A known failure mode is
+   `bfb-install` exiting 0 while the Arm-side flow only partially
+   completed — the canonical signature is *"Ubuntu
    installation completed"* followed by an `INFO[MISC]: NIC firmware
    update failed` line. Parse the actual console / log output for:
    (a) any `[MISC]` / `[ERR]` line with a failure verb, (b) the

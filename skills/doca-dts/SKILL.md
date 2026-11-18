@@ -20,7 +20,7 @@ description: >
   skills or to external products.
 metadata:
   kind: service
-  doca_version: "3.5"
+  doca_version: "3.6"
 compatibility: >
   Container-shaped DOCA service. On BlueField Arm it ships inside
   the BlueField OS image (upgradable from the NGC image); on an
@@ -81,7 +81,7 @@ run uses `--rm`, so `docker logs` finds nothing: read the host-mounted
 with `crictl pods`, `crictl ps -a` and `crictl logs <id>` (not docker);
 check `prometheus=` and `enable-provider=` in
 `/opt/mellanox/doca/services/telemetry/config/dts_config.ini` (edit the file
-it links to and allow about 60 s for the respawn). Green signal: two
+it links to, then apply the shape's restart rule). Green signal: two
 `curl <bluefield-ip>:9100/metrics` scrapes at least two update intervals
 apart show a counter that advanced. Change one variable per iteration.
 
@@ -89,6 +89,18 @@ apart show a counter that advanced. Change one variable per iteration.
 `DPUService` helm values (`configMapData`), confirm the keys with
 `helm show values`, apply with `kubectl apply -f`, and check the service
 conditions with `dpfctl`. Never hand-edit the INI on a DPF-managed DPU.
+
+## Examples
+
+- **"I changed dts_config.ini — did it take effect?"** Only
+  `level_labels.ini` is documented to reload automatically; for
+  `dts_config.ini`, `crictl stop <container-id>` restarts the container
+  and keeps the config directory. Verify by scraping
+  `curl http://<dpu>:9100/metrics` and finding the new counters.
+- **"Prometheus scrape is empty."** Debug in order: `crictl pods` /
+  `crictl ps` / `crictl logs`, then the Prometheus exporter line and port in
+  `dts_config.ini`, then reachability with `curl http://<dpu>:9100/metrics`
+  from the Prometheus server.
 
 ## Example questions this skill answers well
 

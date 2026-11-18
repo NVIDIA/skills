@@ -96,7 +96,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 
 - **`doca_caps` is available since DOCA 2.6.0.** On older installs the binary is not present; the right answer for *"I can't find doca_caps"* is to confirm the installed version per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`) and, if `< 2.6.0`, route to `doca-setup/SKILL.md` for an upgrade rather than recommending alternative tools.
 - **Where it runs:** on the x86 / Arm host that has DOCA installed, *or* on the BlueField Arm side. Same binary, same flags; the set of devices it sees differs by execution context.
-- **Output format stability:** the documented capability families (the five listed in [`## Capabilities and modes`](#capabilities-and-modes)) are stable across the recent DOCA train. The exact textual / column layout of the output is **not** contractually frozen — agents that need to consume the output programmatically should prefer the structured `doca-capability-snapshot` helper per `doca-structured-tools-contract/SKILL.md#schemas` when present, and re-verify the textual layout against the user's installed version when absent.
+- **Output format stability:** the documented capability families (the five listed in [`## Capabilities and modes`](#capabilities-and-modes)) are stable across the recent DOCA train. The exact textual / column layout of the output is **not** contractually frozen — agents that need to consume the output programmatically should prefer a site-provided capability-snapshot helper (none ships with public DOCA) per `doca-structured-tools-contract/SKILL.md#schemas` when present, and re-verify the textual layout against the user's installed version when absent.
 - **Per-OS library support:** capability family 3 ("DOCA library list") explicitly varies with the OS the install runs on; do not copy a library-availability claim from one host to another.
 
 ## Error taxonomy
@@ -123,8 +123,8 @@ the agent should distinguish, in escalating order:
      DOCA 3.3+ this is the granular `doca-caps` package; on older
      releases it shipped via the legacy `doca-tools` meta-package
      that no longer exists on 3.3+) was not installed alongside
-     `doca-common`. This is the most common cause on lab boxes and
-     CI containers that pinned a minimal install. Confirm via:
+     `doca-common`. This is the most common cause on minimal
+     installs. Confirm via:
      `pkg-config --modversion doca-common` succeeds AND `ls
      /opt/mellanox/doca/tools/doca_caps` errors. Routing: this
      skill does not install packages — hand off to

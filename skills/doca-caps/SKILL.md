@@ -20,7 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: tool
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - caps
@@ -38,6 +38,22 @@ compatibility: >
 
 ## Examples
 
+- **"Does my BlueField-3 support Flow hardware steering, RDMA and GPUNetIO?"**
+  Answer in this order:
+  1. Install baseline first (`doca-setup`): `pkg-config --modversion doca-common`
+     and `/opt/mellanox/doca` present; `doca_caps` is only as current as that
+     install.
+  2. `doca_caps --list-devs`: the BlueField-3 row with its PCIe address must be there.
+  3. `doca_caps --pci-addr <bdf>` scoped to that device, with the per-library
+     flag `doca_caps --help` lists (never guess a flag name), once each for
+     Flow, RDMA and GPUNetIO. Read each library's section for that device: it
+     lists the capabilities the device supports (for Flow, the hardware
+     steering entries; for RDMA, the supported tasks; for GPUNetIO, whether the
+     library is listed at all).
+  4. An absent capability means one of two things: the device does not support
+     it, or this firmware / driver / DOCA version does not surface it yet. Tell
+     them apart with the version check (`doca-version`) before concluding the
+     hardware lacks it.
 - **"What DOCA devices does this host see?"** — this is in
   scope. Stay on `doca_caps`; do not start a library-internal
   capability matrix here.
@@ -74,6 +90,32 @@ question is *what kinds of capability families `doca_caps` reports*.
 > it (`doca_bench`, `doca_flow_tune`, `pcc_counters.sh`,
 > `doca_comm_channel_admin`, …) and tie it to the question. Pointing at
 > the rest of the catalog is this skill's job, not a boundary breach.
+
+**Answer contract for "does my device support X?"** This applies only
+to capability questions on a machine that has (or will verify) a DOCA
+install. A request to *install* DOCA is not one: do not walk `doca_caps`
+for it; say installation is out of this skill's scope and route to
+`doca-setup`. For capability questions, every answer contains these, in
+this order:
+1. **Install baseline first, per `doca-setup`.** Quote the command
+   itself, `pkg-config --modversion doca-common`, plus `ls
+   /opt/mellanox/doca`, and name `doca-setup` as the skill that owns the
+   baseline. `doca_caps`
+   is only as current as that install.
+2. **`doca_caps --list-devs`**: the target device's row (PCIe address).
+3. **Scoped run and what to read**: `doca_caps --pci-addr <bdf>` with
+   the per-library flag `doca_caps --help` lists, and name the line to
+   read per capability (Flow: the hardware-steering entries in its
+   section; RDMA: the supported tasks; GPUNetIO: whether the library is
+   listed for the device at all).
+4. **Absent is not unsupported**: a missing entry means the device lacks
+   it *or* this firmware / driver / DOCA version does not surface it
+   yet; run the version check (`doca-version`, firmware and driver via
+   `doca-setup`) before telling the user the hardware cannot do it.
+5. **The next question's tool**: when the user also asks what else to ask
+   the hardware, name the sibling tool that answers it (PCC counters:
+   `pcc_counters.sh`; performance: `doca_bench`; Flow pipeline
+   inspection: `doca_flow_tune`) and tie it to that question.
 
 ## Example questions this skill answers well
 

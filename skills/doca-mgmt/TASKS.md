@@ -51,7 +51,7 @@ DOCA install:
    `doca_mgmt_cc_global_status.h`,
    `doca_mgmt_diagnostics_data.h`,
    `doca_mgmt_icm_quota.h`) resolves under the installed DOCA
-   infrastructure include tree. If the `.pc` resolves but the
+   include tree. If the `.pc` resolves but the
    headers are missing, the install is partial.
 4. **`fwctl` is available on the host kernel.** doca-mgmt's
    raw-command path issues `fwctl` ioctls; the host kernel
@@ -140,7 +140,7 @@ This skill carries only the mgmt-specific overlay:
 | --- | --- | --- |
 | `pkg-config` module name | `doca-mgmt` | The library's `.pc` file installed by the DOCA host packages |
 | Co-required modules | `doca-common` | doca-mgmt depends on Core / Common |
-| Header check | The public mgmt header set (`doca_mgmt.h` plus the sub-domain headers) resolvable under the installed DOCA infrastructure include tree (path via `doca-public-knowledge-map/SKILL.md`) | If `pkg-config --cflags doca-mgmt` resolves but the headers are missing, the install is partial |
+| Header check | The public mgmt header set (`doca_mgmt.h` plus the sub-domain headers) resolvable under the installed DOCA include tree (path via `doca-public-knowledge-map/SKILL.md`) | If `pkg-config --cflags doca-mgmt` resolves but the headers are missing, the install is partial |
 | Minimum required DOCA version | Query with `pkg-config --modversion doca-mgmt`; never hardcode in build files | The EXPERIMENTAL tag means a version pin from agent memory is wrong by construction |
 | Runtime privilege model | The built binary will need root or an equivalent capability set to issue management operations; ensure the deployment plan accounts for this | A binary that compiles but cannot exercise its primary surface in deployment is a productivity sink |
 
@@ -509,10 +509,12 @@ the worked example is a single instance.
 **Infra-aware preamble (every row below).** Per the bundle's
 detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
-the agent probes for the matching structured helper FIRST
-(`doca-env --json` for version + devices + libraries +
-drivers; `doca-capability-snapshot` for per-device capability
-flags; `version-matrix.json` for *“available since”* lookups).
+the agent checks whether your site provides an optional structured helper
+(for example an env-report script that emits JSON) per
+`doca-structured-tools-contract`; none ships with public DOCA,
+so by default use the real commands
+(`pkg-config --modversion doca-common`, `doca_caps --version`,
+`cat /opt/mellanox/doca/applications/VERSION`).
 If the probe succeeds, the structured tool's output is the
 authoritative answer. If the probe fails, fall back to the
 manual command in the row.

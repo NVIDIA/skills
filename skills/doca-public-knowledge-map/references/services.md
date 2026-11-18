@@ -141,10 +141,9 @@ to discover it. Do not guess service URLs.
 >     (OFED driver, SR-IOV / RDMA device plugins, CNI) on regular k8s
 >     nodes; pairs with DPF. See its row in the table below. Docs:
 >     <https://docs.nvidia.com/networking/software/cloud-orchestration/index.html>.
->   - **NVIDIA Kubernetes Launch Kit** — an emerging aggregation/
->     integration layer that bundles orchestration (Network Operator
->     today, DPF next) behind an agent-friendly discovery + deployment-
->     generation interface: <https://github.com/NVIDIA/k8s-launch-kit>.
+>   - **NVIDIA Kubernetes Launch Kit** — an integration layer that
+>     currently bundles Network Operator orchestration behind an
+>     agent-friendly discovery + deployment-generation interface: <https://github.com/NVIDIA/k8s-launch-kit>.
 >
 > **Agent contract for scale questions.** When the user's intent is
 > production/fleet-scale, the agent should *prefer routing them to invoke

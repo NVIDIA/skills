@@ -110,7 +110,7 @@ through, in order:
    live-link rule.
 3. **Source the DPA-side algorithm.** Either build the
    user-authored algorithm via DPACC (walk the public
-   DOCA SPCX / DOCA PCC programming guides via
+   DOCA PCC / DPACC guides via
    `doca-public-knowledge-map/SKILL.md`
    for the algorithm-side discipline) or stage the
    documented shipped reference per
@@ -187,9 +187,9 @@ Routing for nearby "build" questions:
   the DPA-side build. Route to
   `doca-pcc TASKS.md ## build` (`doca-pcc/TASKS.md#build`)
   for the cross-side build pattern + the public DOCA
-  SPCX / DPACC guides via
+  PCC / DPACC guides via
   `doca-public-knowledge-map/SKILL.md`
-  for the SPCX-specific algorithm authoring detail.
+  (SPCX-specific flags: `doca_spcx_cc --help` and the DOCA release notes).
 - *"I want to build the shipped reference RTT-based
   algorithm."* → route to
   the ZTR-RTT CC documentation via `doca-public-knowledge-map`
@@ -214,7 +214,7 @@ parameter surface, and none should be invented.
 
 What the agent *does* modify, every time, is:
 
-1. The **tool invocation** — the registered argp flags (`--device`,
+1. The **tool invocation** — the flags per `doca_spcx_cc --help` (`--device`,
    `--threads`, `--wait-time`, `--probe-packet-format`),
    the algorithm-image / DPA-resource flags exactly as `--help`
    lists them, and
@@ -261,7 +261,7 @@ of the flow, not verbatim command lines (per
 > `doca_spcx_cc` binary takes **flags only — it has no
 > subcommand surface**. There is no `load` / `start` /
 > `observe` / `stop` subcommand family for this binary.
-> The flag inventory the bundle enumerates verbatim is
+> The flags per `doca_spcx_cc --help` are
 > `--device`, `--threads`, `--wait-time`,
 > `--probe-packet-format`, plus algorithm-image and
 > capture-surface flags (see
@@ -542,11 +542,13 @@ documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST
-   (`doca-env --json` for version + devices + DPA
-   availability + custom-PCC slot state in one shot;
-   `doca-capability-snapshot` for per-device
-   capability flags).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's
    output is the authoritative answer.
 3. If the probe fails, fall back to the manual
@@ -557,7 +559,7 @@ the agent should:
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
-| Discover the documented flag surface | `doca_spcx_cc --help` + the DOCA release notes | [`## configure`](#configure); [`## debug`](#debug) layer 1 | Prints the documented inventory the shipped binary actually registers via argp: `--device`, `--threads`, `--wait-time`, `--probe-packet-format`, plus algorithm-image / capture-surface flags. The role (RP vs NP) is NOT registered as a CLI flag on this DOCA release; do not quote `--role` against `--help` output that does not list it. |
+| Discover the documented flag surface | `doca_spcx_cc --help` + the DOCA release notes | [`## configure`](#configure); [`## debug`](#debug) layer 1 | Prints the documented flags per `doca_spcx_cc --help`: `--device`, `--threads`, `--wait-time`, `--probe-packet-format`, plus algorithm-image / capture-surface flags. The role (RP vs NP) is NOT registered as a CLI flag on this DOCA release; do not quote `--role` against `--help` output that does not list it. |
 | Smoke-load the algorithm in RP role | `doca_spcx_cc --device <mlx5_*> --probe-packet-format <token> ... ` (flags per `--help`; the binary runs as RP, see `## configure` step 4) | [`## run`](#run) step 4 | Host-side status reaches `Active`; the documented start banner prints; the per-port tracer surface begins emitting. |
 | Drive the contention-positive evaluation | Smoke-load above + the planned contention pattern injected on the fabric | [`## run`](#run) steps 5–6; [`## test`](#test) iteration | The tracer surface shows the algorithm reacting to the contention; `doca-pcc-counters` snapshots show non-trivial PCC counter activity; `doca-rdma` metrics show the modulation the algorithm is designed for. |
 | Stop the algorithm cleanly | SIGINT / SIGTERM to the running session per the shipped sample's signal handling | [`## run`](#run) step 7 | Host-side status transitions to `Deactivated`; the post-stop fabric state matches the captured pre-flight baseline. |

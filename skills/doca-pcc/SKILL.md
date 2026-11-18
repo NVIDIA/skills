@@ -21,7 +21,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - pcc
@@ -240,8 +240,8 @@ contain — and pull requests should not add:
 
 - **Pre-written DOCA PCC application source code or DPA-side
   algorithm source, in any language.** The verified PCC source
-  is the shipped C + DPA-side samples at
-  `/opt/mellanox/doca/samples/doca_pcc/`. The agent's job is to
+  is the shipped C + DPA-side reference application at
+  `/opt/mellanox/doca/applications/pcc/`. The agent's job is to
   route the user to those files and prescribe a minimum-diff
   modification on them via the universal modify-a-sample
   workflow in

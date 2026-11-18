@@ -8,7 +8,7 @@ description: >
   a one-shot answer consolidating what multiple manual commands
   would produce — DOCA env / version / devices / capabilities /
   validate / host vs DPU state. Trigger even without the phrases
-  "structured tool" or "doca-env --json" — typical phrasings
+  "structured tool" or "env report as JSON" — typical phrasings
   include "is there one command that tells me everything about my
   DOCA install", "what version is X capability available since",
   "every PF/VF/SF visible on this BlueField with PCIe address", or
@@ -19,7 +19,7 @@ description: >
 metadata:
   author: NVIDIA
   kind: knowledge
-  doca_version: "3.5"
+  doca_version: "3.6"
 compatibility: >
   No DOCA install required to read this skill (it is an overlay
   loaded against any DOCA artifact skill); its validation steps DO
@@ -104,11 +104,12 @@ host, directly or via user-run commands.
 A four-step loop run every time a Command appendix references this
 contract:
 
-1. **Detect.** Run the schema's probe command. Examples:
-   `command -v doca-env`,
-   `test -f <site version-matrix.json path>`,
-   `command -v doca-capability-snapshot`. Probes are read-only and
-   safe. The helpers are optional, so failed probes are expected.
+1. **Detect.** Run the schema's probe command against whatever
+   helper your site provides (for example
+   `command -v <site env-report helper>` or
+   `test -f <site capability-availability table path>`). No such
+   helper ships with public DOCA. Probes are read-only and safe;
+   failed probes are expected.
 2. **Prefer.** If the probe succeeds, invoke the structured tool and
    parse its JSON per the schema in [`## Schemas`](#schemas). It is
    authoritative only when parsing succeeds and every required field
@@ -140,7 +141,8 @@ The report step proves the agent tried the helper first.
 ## Schemas
 
 Select the schema from the question shape: env/install state uses
-`doca-env`; capability minimum-version lookup uses `version-matrix`;
+the env-report schema; capability minimum-version lookup uses the
+capability-availability table;
 per-device library capabilities use `capability-snapshot`; spec
 validation uses `validate-before-commit`; host-vs-DPU comparison uses
 the two collect-state schemas. When a per-skill Command appendix names
@@ -148,9 +150,10 @@ a schema, use it directly. Each subsection names ONE structured
 tool, its probe, its top-level JSON shape, and the manual chain
 walked when the probe fails.
 
-### doca-env --json schema
+### env-report schema
 
-**Detection probe:** `command -v doca-env`.
+**Detection probe:** `command -v <site env-report helper>` (a
+hypothetical site-provided script that emits this JSON).
 
 **Top-level shape (JSON object):**
 
@@ -172,16 +175,17 @@ the same answer):
 2. `cat /opt/mellanox/doca/applications/VERSION` → `version.applications_version`
 3. `doca_caps --version` → `version.doca_caps`
 4. `doca_caps --list-devs` → `devices` array (PCIe address + kind + representor)
-5. Find `doca-common.pc` first: if `find /opt/mellanox/doca -name doca-common.pc -print -quit` is empty, stop, surface the partial-install gap, and route to `doca-setup`; never expand an empty glob. Otherwise set `PCDIR` to its directory and run `for pc in "$PCDIR"/*.pc; do m="${pc##*/}"; pkg-config --exists "${m%.pc}" && echo "$pc"; done` → `libraries` array. If `PCDIR` is not a directory or no module resolves, surface the gap and route to `doca-setup`. `PCDIR` is commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig` on DOCA 3.3+, or `/opt/mellanox/doca/infrastructure/lib/pkgconfig` on legacy / split-profile installs.
+5. Find `doca-common.pc` first: if `find /opt/mellanox/doca -name doca-common.pc -print -quit` is empty, stop, surface the partial-install gap, and route to `doca-setup`; never expand an empty glob. Otherwise set `PCDIR` to its directory and run `for pc in "$PCDIR"/*.pc; do m="${pc##*/}"; pkg-config --exists "${m%.pc}" && echo "$pc"; done` → `libraries` array. If `PCDIR` is not a directory or no module resolves, surface the gap and route to `doca-setup`. `PCDIR` is commonly `/opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig` on DOCA 3.3+.
 6. `ls /opt/mellanox/doca/samples/` → `sample_paths` array
 7. `lsmod | grep -E '^mlx5_(core|ib)'` + `uname -r` → `drivers` object
 8. `cat /proc/meminfo | grep -i Huge` → `hugepages` object
 9. `dmidecode -s system-product-name` (or `cat /proc/device-tree/model` on BlueField) → `host_kind`
 10. `mlxconfig -d <pcie> q INTERNAL_CPU_MODEL` → `bf_mode` (when `host_kind == bluefield`)
 
-### version-matrix.json schema
+### capability-availability table schema
 
-**Detection probe:** `test -f <site version-matrix.json path>`.
+**Detection probe:** `test -f <site capability-availability table path>`
+(a hypothetical site-maintained JSON file).
 
 **Top-level shape (JSON object):**
 
@@ -216,7 +220,7 @@ the same answer):
 
 ### capability-snapshot schema
 
-**Detection probe:** `command -v doca-capability-snapshot`.
+**Detection probe:** `command -v <site capability-snapshot helper>`.
 
 **Top-level shape (JSON object):**
 
@@ -237,7 +241,7 @@ the same answer):
 
 ### validate-before-commit schema
 
-**Detection probe:** `command -v doca-validate`. A library-specific
+**Detection probe:** `command -v <site validate helper>`. A library-specific
 constructor-time validation surface is not a detection probe and may
 mutate state. The public Flow header ships no `doca_flow_pipe_validate`
 symbol: never invent one, and never use `doca_flow_pipe_create` to test
@@ -272,15 +276,15 @@ for the helper.
    remediation in a `checks` entry. Never turn an inability to run
    validation into a spec failure.
 
-### collect-host-state and collect-dpu-state schemas
+### host-state and DPU-state schemas
 
-Select the helper for the side where commands execute: host uses
-`doca-collect-host-state`; BlueField uses `doca-collect-dpu-state`.
+Select the helper for the side where commands execute: a site-provided
+host-state helper on the host, a DPU-state helper on BlueField.
 Both being present does not imply cross-side access; for a diff,
 collect independently on each side and compare.
 
-**Detection probes:** `command -v doca-collect-host-state` (host) /
-`command -v doca-collect-dpu-state` (BlueField).
+**Detection probes:** `command -v <site host-state helper>` (host) /
+`command -v <site DPU-state helper>` (BlueField).
 
 **Top-level shape (JSON object), shared by both:**
 

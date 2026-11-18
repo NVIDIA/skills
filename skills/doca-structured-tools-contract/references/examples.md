@@ -11,7 +11,7 @@ about my DOCA install?"
 **Example:** "Version, devices, installed libraries, sample paths,
 drivers, and hugepages — all at once."
 
-Use the `doca-env --json` schema and its ordered manual fallback chain
+Use the env-report schema and its ordered manual fallback chain
 in [`SKILL.md ## Schemas`](../SKILL.md#schemas).
 
 ## Capability version
@@ -21,7 +21,7 @@ requires without fetching a doc page?"
 
 **Example:** "Is symmetric RSS hash mode in DOCA 2.6.0?"
 
-Use the `version-matrix.json` schema. Its manual fallback fetches the
+Use the capability-availability table schema. Its manual fallback fetches the
 matching per-library page through
 `doca-public-knowledge-map/SKILL.md`.
 
@@ -33,7 +33,7 @@ every PCIe function and representor?"
 **Example:** "Show every PF, VF, and SF visible on this BlueField,
 including PCIe address and link state."
 
-Use the `collect-host-state` / `collect-dpu-state` schema. The manual
+Use the host-state / DPU-state schema. The manual
 fallback is `devlink dev show`, `lspci | grep Mellanox`, and
 `ip -j link`.
 

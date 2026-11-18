@@ -20,7 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - rdma
@@ -44,6 +44,13 @@ compatibility: >
 - **"One-sided read returns permission denied."** — check mmap +
   RDMA permissions and `doca_rdma_cap_*` before changing the task
   type.
+- **"Set up an RDMA context for one-sided Read / Write."** Lifecycle in
+  order: create → configure (`doca_rdma_task_*_set_conf`, the mmap
+  permissions, optional setters) → `doca_ctx_start` → connect → use → stop
+  → `doca_rdma_destroy`; task configuration and permissions MUST precede
+  `doca_ctx_start`. First functional test: a two-sided Send + Receive pair,
+  which proves the connection and two-sided permissions before adding the
+  one-sided Read / Write permissions.
 
 ## Instructions
 
@@ -79,7 +86,7 @@ name, `PKG_CONFIG_PATH`, sample path) — do not silently fall back to
 verbs. A binary whose `ldd` shows no `libdoca_rdma` is a failed
 DOCA-RDMA task, regardless of whether bytes moved.
 
-Concrete path (verified on DOCA 3.3, one RoCE port, two processes):
+Concrete path (DOCA 3.3+):
 
 0. **Record the installed version first:** run
    `pkg-config --modversion doca-rdma` and show the result.

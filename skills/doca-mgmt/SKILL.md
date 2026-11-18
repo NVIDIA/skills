@@ -21,7 +21,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - mgmt
@@ -48,6 +48,19 @@ compatibility: >
   narrowest correct scope (CONFIGURATION, DEBUG_READ_ONLY, DEBUG_WRITE,
   DEBUG_WRITE_FULL). fwctl or permission failures surface as
   `DOCA_ERROR_OPERATING_SYSTEM` instead.
+- **"Change device state safely."** Gate every sub-domain on its capability
+  first: `doca_mgmt_cap_icm_quota_is_supported` for icm-quota,
+  `doca_mgmt_cap_diagnostics_data_multi_domain_is_supported` for multi-domain
+  diagnostics, attempt-and-handle `DOCA_ERROR_NOT_SUPPORTED` for caps-general
+  and cc-global-status. Prefer the dedicated wrapper (data-direct:
+  `doca_mgmt_device_caps_general_set_data_direct`) over `doca_mgmt_raw_cmd`;
+  when raw is needed, pick the narrowest `DOCA_MGMT_CMD_SCOPE_*`
+  (`_CONFIGURATION`, `_DEBUG_READ_ONLY`, `_DEBUG_WRITE`, `_DEBUG_WRITE_FULL`).
+  Every doca-mgmt write is a hardware-state change: cite `doca-hardware-safety`
+  as the policy that owns it (pre-flight inventory, out-of-band access for
+  link-breaking changes, maintenance window, replica first, documented
+  rollback, observability before workload; no documented rollback means
+  refuse) and apply it before the write.
 
 ## Instructions
 
@@ -109,7 +122,11 @@ single instance.
   + the test step in ## test.
 - **"How do I modify a device-level feature flag safely?"** —
   worked example: *"toggle `data_direct` on a representor;
-  capture pre-state, write, verify, prepare rollback"*.
+  capture pre-state, write, verify, prepare rollback"*. The rollback
+  answer always names its owner and gates: `doca-hardware-safety` owns
+  it, so state the maintenance window, the out-of-band access path if the
+  change can break the link, the captured pre-state as the rollback
+  target, and that no documented rollback means no write.
   Answered by the apply-with-rollback workflow in
   ## modify layered on the
   bundle-wide hardware-safety meta-policy referenced from

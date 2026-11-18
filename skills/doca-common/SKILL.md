@@ -20,7 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - common
@@ -38,10 +38,27 @@ compatibility: >
 
 ## Examples
 
+- **Any app-foundation answer: version first, progress loop, drain last.**
+  1. Start: `pkg-config --modversion doca-common`, four-way matched with
+     `doca_caps --version` and `cat /opt/mellanox/doca/applications/VERSION`.
+  2. Run: `doca_pe_create` (one per worker thread), `doca_<library>_create`,
+     `doca_pe_connect_ctx` BEFORE `doca_ctx_start`, then a loop that calls
+     `doca_pe_progress`; nothing completes without it.
+  3. End: drain before `doca_ctx_stop` and any destroy, with
+     `doca_ctx_flush_tasks` or `doca_pe_progress` until
+     `doca_ctx_get_num_inflight_tasks` is 0; then stop, destroy the context,
+     the buffer inventory, the mmap and the PE, in reverse order.
 - **"Tasks submit but nothing completes."** — start at the progress
   engine and ctx lifecycle, not a per-library rewrite.
 - **"DOCA_ERROR_BAD_STATE from doca_ctx_start."** — walk the Common
   lifecycle order before blaming Flow or RDMA.
+- **"Set up and tear down the runtime foundation for my app."** Anchor first
+  on `pkg-config --modversion doca-common`, four-way matched with
+  `doca_caps --version` and `cat /opt/mellanox/doca/applications/VERSION`.
+  On shutdown drain first: `doca_ctx_flush_tasks` or loop `doca_pe_progress`
+  until `doca_ctx_get_num_inflight_tasks` is 0, then `doca_ctx_stop`, the
+  library destroy, `doca_buf_inventory_stop` / destroy, `doca_mmap_stop` /
+  destroy, `doca_pe_destroy`, and close the device.
 
 ## Instructions
 

@@ -30,8 +30,8 @@ deployment shape, not just one specific topology.
 
 Two cross-cutting rules that apply to *every* pattern above:
 
-- **Operate the documented path; do not invent one.** DMS is in
-  beta with a defined GA scope; quoting flags or paths not in the
+- **Operate the documented path; do not invent one.** Check the DMS
+  guide's release status for your version; quoting flags or paths not in the
   public guide is the most common hallucination failure for this
   skill.
 - **Frontend before backend, every time.** When a request fails, the
@@ -190,7 +190,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 
 **The DMS-specific overlay** is:
 
-- **DMS is currently in beta**, with General Availability scoped to SPC-X use cases. Flags, supported paths, and gNOI operation lists can change between DOCA releases. Always verify against the live public DMS guide whose version corresponds to the DOCA release confirmed by `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
+- **Check the DMS guide's release status for your version.** Flags, supported paths, and gNOI operation lists can change between DOCA releases. Always verify against the live public DMS guide whose version corresponds to the DOCA release confirmed by `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`).
 - **DMS container tags lag DOCA host-package versions.** The DMS container shipped from NGC carries its own tag that may not match the host's `pkg-config --modversion doca-common`. When the user is using DMS-as-a-container, the relevant version anchor is the container tag pulled, not the host install — confirm both and route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2 if they diverge.
 DMS-specific check: read the version of the public DMS guide page
 header and confirm it matches the DOCA install version on the target.

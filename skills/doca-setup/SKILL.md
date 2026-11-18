@@ -20,7 +20,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - setup
@@ -78,6 +78,30 @@ user's intent.
 
 The CLASSES this skill is built to handle, each with one worked example.
 The skill must answer the *class*; the worked example is illustrative.
+- **"What is the latest NGC DOCA tag?"** Answer in this order:
+  1. Apply the "How to pick an NGC tag without guessing" rule (`doca-setup
+     TASKS.md`): copy the tag from the NGC catalog Tags page
+     (`https://catalog.ngc.nvidia.com/orgs/nvidia/teams/doca/containers/doca/tags`);
+     never guess a tag or use `:latest`.
+  2. Explain the tag shape for DOCA 3.5: `<flavor>-<version>[-host]`, for
+     example `devel-3.5.0-host`. Flavor `devel` builds, `full-rt` / `base-rt`
+     run; `-host` is the multi-arch host image (x86_64 and aarch64 alike) and
+     the same tag without `-host` is the BlueField Arm image; 3.5 has no OS
+     or architecture fragment, while DOCA 3.3 also published
+     `<version>-devel-amd64-host` / `-arm64-host`. Always say which CPU
+     architecture the recommended tag serves (x86_64 = amd64, Arm / Apple
+     Silicon = arm64) and whether it is the host or the BlueField image.
+     Before giving one tag, ask which CPU architecture (amd64 or arm64)
+     and which target (host or BlueField) they pull for, unless the user
+     already said; then give the tag for that answer.
+  3. Verify what was pulled: run `pkg-config --modversion doca-common` inside
+     the container and check it matches the version in the tag.
+- **"I'm new — where do I start?"** DOCA is NVIDIA's SDK and runtime for
+  building and running accelerated networking, storage and security
+  workloads on BlueField DPUs and ConnectX NICs. First action: run
+  `pkg-config --modversion doca-common` (or `ls /opt/mellanox/doca`). No
+  install yet: pull the NGC DOCA container, copying the tag for your DOCA
+  version from the NGC catalog Tags page; never hardcode a tag.
 
 ## Instructions
 
@@ -192,9 +216,7 @@ This skill assumes nothing about whether DOCA is installed — the `## no-instal
    `## no-install` Paths A/C, followed by `## recognize` before
    selecting container versus bare-metal. Ask one clarifying question
    when the stage is unknown; if it remains unknown or no reply is
-   available in unattended execution, stop with
-   `confirmation_required` and both paths explained rather than
-   guessing. Include the authoritative
+   possible, stop and present both paths rather than guessing. Include the authoritative
    [DOCA SDK documentation](https://docs.nvidia.com/doca/sdk/) as the
    next-reading link; an NGC catalog link alone is not documentation.
 3. **For deployment routing**, walk

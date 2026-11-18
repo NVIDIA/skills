@@ -18,7 +18,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - version
@@ -77,9 +77,9 @@ instance.
   ## debug.
 - **"Is this DOCA capability / API / sample on the version I
   have?"** — worked example: *"is the symmetric-RSS hash mode in
-  Flow 2.6.0"*. Answered by the version-matrix lookup procedure in
+  Flow 2.6.0"*. Answered by the capability-availability lookup procedure in
   ## test (which uses the
-  `version-matrix.json` schema defined in
+  capability-availability table schema defined in
   `doca-structured-tools-contract/SKILL.md#schemas`
   with fallback to per-library docs via
   `doca-public-knowledge-map/SKILL.md`).
@@ -169,7 +169,7 @@ version-handling material lives in two companion files:
   version verbs: `configure` (detect on this host), `build`
   (build-time match), `modify` (update a version pin in a build
   manifest), `run` (runtime check), `test` (four-way validation +
-  version-matrix lookup), `debug` (diagnose mismatch / partial
+  capability-availability lookup), `debug` (diagnose mismatch / partial
   install). Plus a `Deferred task verbs` block.
 
 ## Loading order
@@ -187,7 +187,7 @@ version-handling material lives in two companion files:
 - `doca-structured-tools-contract/SKILL.md` —
   the JSON schemas for the helper tools the agent should prefer
   when present. This skill's `## test` workflow uses the
-  `version-matrix.json` schema defined there; do not redefine the
+  capability-availability table schema defined there; do not redefine the
   schema here.
 - `doca-public-knowledge-map/SKILL.md` —
   the routing table to public DOCA docs, including the

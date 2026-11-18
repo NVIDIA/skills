@@ -25,12 +25,15 @@ copy-paste recipe. The agent's job is to walk the user through
 the steps in order, verifying preconditions before recommending
 the next call.
 
-## DOCA 3.5 field notes
+## Usage notes (DOCA 3.5)
 
-The emulation features are off in firmware by default, and the
-samples do not say so: PCI samples fail with `Requested Resource Not
-Found`, virtio-fs samples with `variable 'vfs_type' is NULL ...
-Invalid input` (DOCA 3.5). Enable the feature first:
+The emulation features are off in firmware by default. Enabling
+one is a firmware write plus a reset:
+load `doca-hardware-safety` and follow it (inventory, out-of-band
+access, maintenance window, rollback, operator approval) *before*
+the commands below; until then only the read-only
+`mlxconfig -d <bdf> q` probe runs. With the feature off, the PCI and
+virtio-fs samples fail. Enable the feature first:
 
 - **PCI (generic) emulation:** `PCI_SWITCH_EMULATION_ENABLE=1` via
   `mlxconfig` on the BlueField in DPU mode, then a BlueField
@@ -83,6 +86,25 @@ DOCA 3.5 adds vnet offload engine export/import. Use the vnet offload
 engine export and create-from-export APIs from the devemu public header
 to export and import offload engine state.
 
+DOCA 3.6 adds NVMe emulation APIs.
+Use the current `doca_devemu_nvme_cq_*` family for completion queue
+create attributes, creation from a device or offload engine, bind and
+unbind, and doorbell value modify and query. Use the
+`doca_devemu_nvme_dev_create_started_attr_*` family to set the
+shared-memory directory path and event handlers, and use the
+started-from-export creation entry point to create a started NVMe
+device from an export descriptor. Use the enable and disable entry
+points to enable and disable an NVMe device. Use the
+`doca_devemu_nvme_dev_event_*_register` family to register CQ, SQ, and
+device state-change events. Use the PCI controller info list entry
+point to obtain the PCI controller info list. Use the current
+`doca_devemu_nvme_cap_*` family for the new capability queries:
+default NVMe PCI type max PF and VF MSI-X counts, max export descriptor
+length, max shared-memory directory path length, and PCI controller
+management support. Use the DMA device add entry point to add a DMA
+device. See the devemu public header for the current NVMe emulation
+API.
+
 ## configure
 
 Goal: stand up a per-sub-library Device Emulation context on
@@ -103,17 +125,20 @@ Steps the agent should walk the user through:
    walk the rows with the user: PCI Generic (raw PCIe device
    the host binds via its generic PCIe driver model),
    virtio-net (emulated NIC the host binds via the upstream
-   `virtio_net` driver), or virtio-fs (emulated filesystem
-   the host binds via the upstream `virtio_fs` driver). If
+   `virtio_net` driver), virtio-fs (emulated filesystem
+   the host binds via the upstream `virtio_fs` driver), or
+   NVMe (emulated NVMe controller the host binds via the
+   upstream `nvme` driver). If
    the user's intent does not pin one of the rows, stop and
    ask. Picking a sub-library *for* the user when the rows do
    not pin one is a wrong answer regardless of how clean the
    rest of the setup goes. If the user's intent is actually a
-   packaged service (NVMe / virtio-blk SNAP-style storage, or
+   packaged service (virtio-blk SNAP-style storage, or
    a packaged virtio-net daemon), route via
    `doca-public-knowledge-map/SKILL.md`
    to the DOCA SNAP Service / DOCA Virtio-net Service guide —
    the user does not need this library at all in that case.
+
 2. **Confirm the env preconditions on BOTH sides for the pinned
    sub-library.** Per the
    env-precondition matrix in
@@ -122,7 +147,7 @@ Steps the agent should walk the user through:
    emulation (typically sudo on the DPU); on the BlueField,
    the firmware has the matching emulation type enabled (this
    is a firmware-level slot the user must verify is on, NOT
-   a casual setting — it is the precondition baseline agents
+   a casual setting — it is the precondition agents
    most often miss, and a disabled slot will look like a
    permission bug at the `doca_devemu_<sub>_*` API surface);
    on the host side, the host kernel ships the standard
@@ -136,11 +161,13 @@ Steps the agent should walk the user through:
    next-boot configuration for the selected emulation class.
    Use `VIRTIO_NET_EMULATION_ENABLE` only for virtio-net and only
    when that field is documented by the matching public guide or
-   present in installed MFT output. For PCI Generic and virtio-fs,
+   present in installed MFT output. For PCI Generic, virtio-fs,
+   and NVMe,
    resolve the exact field from the installed tool / matching guide;
    never derive a field name by analogy. A pending next-boot value
    is not active. Any write or reset leaves this skill for
    `doca-hardware-safety/SKILL.md`.
+
 3. **Run per-sub-library capability discovery against the
    active `doca_devinfo`.** Per the capability-query rule in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
@@ -148,11 +175,21 @@ Steps the agent should walk the user through:
    getter documented for the sub-library the user pinned in step 1.
    Quote the exact installed symbol and queried values back to the
    user; do not construct a getter from the
-   `doca_devemu_<sub>_cap_*` pattern. If the cap-query says *not
+   `doca_devemu_<sub>_cap_*` pattern. For NVMe, the installed
+   header exposes the `doca_devemu_nvme_cap_get_*` family; query
+   the PF/VF MSI-X limit getters, the export descriptor length
+   getter, and the shared-memory directory path length getter
+   before setting up devices. For virtio-fs, the installed header
+   exposes the `doca_devemu_vfs_cap_*` family; query the PCI
+   controller management support getter and then enumerate
+   controllers with `doca_devemu_vfs_create_pci_controller_info_list`
+   before setting up devices. See the devemu public header for the
+   exact getter names and signatures. If the cap-query says *not
    supported*, stop, but do not infer that firmware is disabled
    solely from `false`: separately classify installed-module/header
    presence, BlueField-generation support, and the read-only current
    / next-boot firmware configuration captured in step 2.
+
 4. **Create the per-sub-library Core context against the
    chosen `doca_dev`.** Pick the `doca_dev` deliberately: it
    must map to the BlueField whose firmware has the matching
@@ -163,7 +200,18 @@ Steps the agent should walk the user through:
    context create — the universal lifecycle from
    `doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`)
    applies; this skill adds the per-sub-library overlay.
-5. **Wire the per-sub-library doorbell / DMA primitives.**
+
+5. **For virtio-fs, create and populate the started attributes
+   object before starting the context.** Use the
+   `doca_devemu_vfs_dev_create_started_attr_*` family from the
+   devemu public header to create the object and set the FLR,
+   hotplug, reset, SRIOV, and state-change event handlers, the
+   fuse client architecture, the shared memory directory path,
+   and the required running virtio I/O contexts. The exact call
+   that consumes this object is in the same header; do not start
+   a virtio-fs context without populating these attributes.
+
+6. **Wire the per-sub-library doorbell / DMA primitives.**
    Per the doorbell / DMA table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
    register the doorbell that lets the DPU-side backend react
@@ -176,7 +224,8 @@ Steps the agent should walk the user through:
    may even bind — but no host-driver activity will produce
    any DPU-side reaction; the agent must explicitly verify the
    wiring before recommending a smoke run.
-6. **Start the per-sub-library context** via
+
+7. **Start the per-sub-library context** via
    `doca_ctx_start()`. This is the moment the emulated PCIe
    device becomes visible to the host. Per the lifecycle
    ordering in
@@ -186,7 +235,8 @@ Steps the agent should walk the user through:
    stop the per-sub-library context → destroy emulated devices
    → destroy the per-sub-library context → close the
    `doca_dev`.
-7. **Confirm the emulated device is visible on the host AND
+
+8. **Confirm the emulated device is visible on the host AND
    bound to its kernel driver.** Per the host-side
    observability rule in
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability),
@@ -201,7 +251,8 @@ Steps the agent should walk the user through:
    driver is bound, that is most often a host kernel that
    ships no driver for the emulated class. Both fixes are
    host- or firmware-side, not DPU-side code changes.
-8. **Sanity check before any production use.** Confirm with
+
+9. **Sanity check before any production use.** Confirm with
    the user: which sub-library was picked, which `doca_dev`
    the per-sub-library context was created against, which
    BlueField generation that maps to and whether its firmware
@@ -213,7 +264,7 @@ Steps the agent should walk the user through:
    invent.
 
 For the canonical DOCA universal lifecycle that underlies
-steps 4-6, see
+steps 4, 6, and 7, see
 `doca-programming-guide TASKS.md ## configure` (`doca-programming-guide/TASKS.md#configure`).
 This skill adds the Device Emulation overlay; do not
 re-explain the lifecycle here.
@@ -512,8 +563,10 @@ Device Emulation-specific manifestation at layers 5 (runtime),
 **Layer 7 (driver) — Device Emulation overlay.**
 
 - `DOCA_ERROR_NOT_PERMITTED` from Device Emulation create /
-  start is ambiguous. Capture the DPU process identity and the
-  install's documented device-access policy; run read-only
+  start is ambiguous. Capture the DPU process identity (`id`, and
+  whether it runs as root on the BlueField Arm) and whether the same identity can open the
+  device for another library (for example a `doca_caps --list-devs`
+  listing as that user); run read-only
   `mlxconfig -d <bdf> q` and compare current with next-boot
   configuration for the exact emulation field; check whether a
   documented reset is pending; run the exact capability getter
@@ -605,11 +658,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST
-   (`doca-env --json` for version + devices + libraries +
-   drivers + hugepages in one shot; `doca-capability-snapshot`
-   for per-device capability flags; `version-matrix.json` for
-   *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

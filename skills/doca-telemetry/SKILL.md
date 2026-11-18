@@ -16,7 +16,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - telemetry
@@ -34,6 +34,26 @@ compatibility: >
 
 ## Examples
 
+- **"Build a collector that receives my exporter's events."** Answer in this order:
+  1. Role split first: `doca-telemetry-exporter` is the publisher library
+     linked into the app that emits events. The receiver is the DOCA Telemetry
+     Service (`doca-dts`) over IPC, or the exporter's file output for a local
+     smoke test. `doca-telemetry` reads per-domain hardware counters of a
+     `doca_dev`; it is not a consumer of exporter events, and there is no DOCA
+     consume or subscribe API (never name one).
+  2. Lifecycle on the publisher side: schema and types
+     (`doca_telemetry_exporter_schema_init`, `_schema_add_type`,
+     `_schema_start`), then source (`doca_telemetry_exporter_source_create`,
+     `_source_start`), then `_source_report` and `_source_flush`; calls before
+     start return `DOCA_ERROR_BAD_STATE`. The IPC path needs DTS running for
+     events to arrive; file output (`_schema_set_file_write_enabled`) works
+     without it.
+  3. Verify on the install before assuming a path or limit:
+     `doca_telemetry_exporter_check_ipc_status` for the DTS connection, and the
+     exporter's documented limits for this release.
+  4. Back-pressure is a policy the app owns (drop on the hot path, flush more
+     often, widen buffers, aggregate before reporting), never a blocking
+     sleep-and-retry in the packet path; DOCA does not slow the publisher down.
 - **"Build a second program that RECEIVES the events my exporter app
   publishes."** No DOCA library consumes exporter events, and this skill
   is not that library: `doca-telemetry` reads a device's hardware
@@ -57,6 +77,31 @@ compatibility: >
   to the exporter skill.
 
 ## Instructions
+
+> **Boundary: publishing your own metrics is not this skill.** A request
+> to define an event schema, emit application metrics or push events to a
+> collector belongs to `doca-telemetry-exporter`. Hand the whole request to
+> `doca-telemetry-exporter/SKILL.md` by name and stop; do not walk this
+> skill's workflow or the exporter's steps here, not even as a summary.
+
+**Answer contract (reading device telemetry).** There is no DOCA
+"collector context". This skill's path is direct counter reading: create,
+start, read, stop, destroy; calls before start return
+`DOCA_ERROR_BAD_STATE`. When the user's design also involves the exporter,
+name it as the publishing side (schema and types, source, start, report,
+flush) without walking it. Staging: the IPC path needs DTS running
+(`doca_telemetry_exporter_check_ipc_status`), the file-output smoke does not.
+Check the install's limits and per-domain `doca_telemetry_*_cap_*` queries
+before assuming any.
+
+**Non-negotiable when the user wants to RECEIVE / consume / collect
+exporter events:** there is no DOCA library a second program links to
+consume them, and no consume, subscribe or collector function exists in
+any `doca_telemetry_*` header. Never write one, not even as an example.
+Say so first, then answer with the documented model: the app links
+`doca-telemetry-exporter` to publish; the receiver is DTS (`doca-dts`)
+over IPC, or a reader of the exporter's file output; the lifecycle to
+walk is the publisher's (schema, source, start, report, flush).
 
 Follow Loading order below. Open the tasks companion for configure /
 read / debug. Open the capabilities companion for the per-domain

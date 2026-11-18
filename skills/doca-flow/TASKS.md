@@ -629,8 +629,12 @@ pipe-spec edit.
 Walk in this order — do not skip steps:
 
 1. **Counters first.** Read the entry-level counters (built in `## build`
-   step 4). If the counter for the suspected entry is zero, the entry
-   is not matching. Stop blaming the data plane; the spec is wrong.
+   step 4). A zero counter for the suspected entry means the entry saw no
+   matching packets. Before blaming the spec, rule out the other causes in
+   order: no test traffic actually reached the port (check port / pipe-miss
+   counters), the entry was never installed (its add call or completion
+   failed), or no counter was attached to it (`doca_flow_pipe_cfg_set_monitor`
+   missing). Only then treat the match spec as wrong.
 2. **Pipe statistics second.** If counters are non-zero but behavior is
    still wrong, read the pipe-level statistics from
    [`CAPABILITIES.md ## Observability`](CAPABILITIES.md#observability)
@@ -676,16 +680,21 @@ the requested change is described as adding CT to existing stateless pipes.
 For device support, sizing, and safety, read
 [`CAPABILITIES.md ## flow-ct`](CAPABILITIES.md#flow-ct).
 
-**Lifecycle to explain before applying the change:** `doca_flow_init` →
-`doca_flow_ct_cfg_create` and the verified `doca_flow_ct_cfg_set_*` setters →
-`doca_flow_ct_init(cfg)` once per process → port start → CT-aware pipes →
-entries. CT is not a per-port `doca_ctx`; do not call `doca_ctx_start` for CT.
+**Lifecycle to explain before applying the change (DOCA 3.6):**
+`doca_flow_init` → CT settings on each port's `doca_flow_port_cfg`
+(`doca_flow_port_cfg_set_ct_direction`, `_set_ct_flags`,
+`_set_ct_actions_mem_size`, `_set_ct_aging_query_delay` /
+`_set_ct_aging_plugin_ops`, `_set_cb_ct_tcp_window_validation`) → port start →
+CT pipes sized with the `doca_flow_pipe_cfg_set_ct_*` setters → entries.
+DOCA 3.6 removed `doca_flow_ct_init`, `doca_flow_ct_destroy` and the
+`doca_flow_ct_cfg_*` family; do not call them. CT is not a `doca_ctx`; do not
+call `doca_ctx_start` for CT.
 If ports are already running, this is not an in-place attachment. The
 agent does not perform the restart itself; it hands the operator this
 sequence and stops until the operator confirms:
 (1) **snapshot** — the pipe definitions are the application's own source
 (the `doca_flow_pipe_cfg_*` / `doca_flow_pipe_create` calls), so record the
-source revision plus `doca_flow_query_pipe_miss` / `doca_flow_query_entry`
+source revision plus `doca_flow_resource_query_pipe_miss` / `doca_flow_resource_query_entry`
 counter baselines; there is no runtime pipe-dump API to rely on;
 (2) **approval** — the operator explicitly confirms a maintenance window,
 because stopping ports drops all traffic on them (follow
@@ -694,18 +703,20 @@ with no human operator available, return `requires_human_decision` instead
 of proceeding; (3) stop the affected ports, initialize CT, restart, and
 recreate the configuration from the recorded source revision and shipped
 sample. Do not assume old pipe handles survive.
-On shutdown, stop ports before `doca_flow_ct_destroy`, then
-`doca_flow_destroy`. Verify matching and unrelated traffic after restart;
+On shutdown, remove CT entries, destroy the CT pipes, stop the ports, then
+`doca_flow_destroy`; there is no separate CT teardown call. Verify matching and unrelated traffic after restart;
 if the smoke fails, follow this section's rollback overlay.
 
 **configure overlay.**
 
-1. **Slot CT init BEFORE port start.** The order is `doca_flow_init` →
-   `doca_flow_ct_init` (global, one-time) → port start (layering rule in
+1. **Set CT on the port cfg BEFORE port start.** The order is
+   `doca_flow_init` → `doca_flow_port_cfg_set_ct_*` on each port that carries
+   CT → port start (layering rule in
    [`CAPABILITIES.md ## flow-ct`](CAPABILITIES.md#flow-ct)). If doca-flow
    isn't initialized yet, route back to [`## configure`](#configure) FIRST —
    CT extends, it does not replace. CT cannot be bolted onto an
-   already-running port: if ports are started, CT init must move earlier.
+   already-running port: if ports are started, they must be stopped and
+   restarted with the CT port settings (see the lifecycle above).
 2. **Device-support check for CT.** Call
    `doca_flow_ct_cap_is_dev_supported(devinfo)` against the active
    `doca_devinfo`. There is no per-axis `doca_flow_ct_cap_*`
@@ -724,12 +735,16 @@ if the smoke fails, follow this section's rollback overlay.
    (not `doca_flow_ct_cfg_set_*`), sized to the peak
    concurrent-flow estimate; oversubscription surfaces as
    `DOCA_ERROR_FULL` / `_NO_MEMORY` at runtime.
-4. **Build and init the CT cfg.** Create `struct doca_flow_ct_cfg` via
-   `doca_flow_ct_cfg_create` + the `doca_flow_ct_cfg_set_*` setters, then
-   call `doca_flow_ct_init(cfg)` once for the process (ordering per
-   step 1; there is NO per-port CT context).
-5. **Configure NAT direction / actions** through
-   `doca_flow_ct_cfg_set_direction` and the CT actions. There is
+4. **Set the CT port configuration.** On each CT port's
+   `doca_flow_port_cfg`: `doca_flow_port_cfg_set_ct_direction` (origin or
+   reply, inner 5-tuple match, zone match mask, CT meta modify mask),
+   `_set_ct_flags`, `_set_ct_actions_mem_size`, the aging setters
+   (`_set_ct_aging_query_delay`, `_set_ct_aging_plugin_ops`) and, for TCP
+   window validation, `_set_cb_ct_tcp_window_validation`. Verify each
+   signature in the installed `doca_flow.h`; most are `DOCA_EXPERIMENTAL`.
+5. **Configure NAT direction / actions** through the port's
+   `doca_flow_port_cfg_set_ct_direction` and the CT actions
+   (`doca_flow_ct_actions_add_shared` for shared actions). There is
    no per-variant cap query, so confirm SNAT / DNAT / combined
    behavior only on a dedicated test representor/VF or isolated ports
    carrying no production traffic. Snapshot counters first and stage
@@ -814,13 +829,13 @@ existing doca-flow setup:
 ladder:
 
 - `DOCA_ERROR_BAD_STATE` from a CT-layer call is *always* a
-  layering / lifecycle violation: `doca_flow_ct_init` run after a
-  port was already started (it must precede port start), OR a CT
-  entry add before the ports and wrapped pipes are up, OR
-  `doca_flow_ct_destroy` called out of order. Walk the lifecycle
-  in this order — doca_flow_init → doca_flow_ct_init →
-  port-start → ct-entry-add → … → port-stop → doca_flow_ct_destroy
-  → doca_flow_destroy — BEFORE inspecting any individual CT call.
+  layering / lifecycle violation: CT port settings applied after the
+  port was already started (they must precede port start), OR a CT
+  entry add before the ports and CT pipes are up, OR teardown out of
+  order. Walk the lifecycle in this order — doca_flow_init →
+  doca_flow_port_cfg_set_ct_* → port-start → CT pipe create →
+  ct-entry-add → … → ct-entry-rm → CT pipe destroy → port-stop →
+  doca_flow_destroy — BEFORE inspecting any individual CT call.
 - `DOCA_ERROR_FULL` on entry add is *always* a table-sizing /
   aging-pressure mismatch with the workload. Read the per-CT-
   entry counters to identify stale entries; either wait for
@@ -861,9 +876,9 @@ that record IS the rollback target.
    add:** (a) `doca_flow_ct_rm_entry` on every CT entry added since the
    snapshot, in reverse-add order; (b) `doca_flow_pipe_destroy` on every
    CT-aware pipe wrapped on top of the stateless pipes, in reverse-create
-   order; (c) once the ports are stopped, `doca_flow_ct_destroy()`
-   (global, no arguments) BEFORE `doca_flow_destroy`. There is no per-port
-   CT context and no `doca_ctx_stop` for CT. The original stateless pipes
+   order; (c) stop the ports and restart them without the CT port
+   settings if CT itself is being removed. DOCA 3.6 has no
+   `doca_flow_ct_destroy` and no `doca_ctx_stop` for CT. The original stateless pipes
    are untouched by entry / CT-pipe teardown and must remain valid; a
    stateless-pipe edit made *in addition to* the CT add needs its own
    rollback step first.

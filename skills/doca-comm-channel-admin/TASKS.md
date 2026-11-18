@@ -119,7 +119,7 @@ zero-application-argument scan-and-print.
 1. **Confirm the binary is present** under
    `/opt/mellanox/doca/tools/`. If absent, route to
    [`## configure`](#configure) above.
-2. **Run the binary with zero application arguments** on the side
+2. **Run the binary with no arguments** on the side
    where the user reports the problem. Do not add a device selector
    or a list/inspect token; the binary itself scans every
    comch-capable `doca_dev` on that side.
@@ -257,10 +257,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer for the environment facts it covers
    (versions, devices, capabilities) and the agent SHOULD NOT also
@@ -278,7 +281,7 @@ the agent should:
 
 | Purpose (class) | Invocation (shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
-| Scan and print all comch rows on this side | `/opt/mellanox/doca/tools/doca_comm_channel_admin` with zero application arguments; capture exit status, complete stdout, and complete stderr | [`## run`](#run), [`## test`](#test), [`## debug`](#debug) | Exit 0; MFT `resourcedump` is installed and reachable through `PATH`, privilege is sufficient, no child invocation fails, and stdout contains the SERVERS and CONNECTIONS tables. Any MFT/PATH/privilege/non-zero-exit/stderr failure routes to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) before table interpretation. |
+| Scan and print all comch rows on this side | `/opt/mellanox/doca/tools/doca_comm_channel_admin` with no arguments; capture exit status, complete stdout, and complete stderr | [`## run`](#run), [`## test`](#test), [`## debug`](#debug) | Exit 0; MFT `resourcedump` is installed and reachable through `PATH`, privilege is sufficient, no child invocation fails, and stdout contains the SERVERS and CONNECTIONS tables. Any MFT/PATH/privilege/non-zero-exit/stderr failure routes to `doca-setup ## debug` (`doca-setup/TASKS.md#debug`) before table interpretation. |
 
 Three cross-cutting rules for this appendix:
 

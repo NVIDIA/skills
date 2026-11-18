@@ -19,7 +19,7 @@ description: >
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - upgrade
@@ -41,6 +41,11 @@ compatibility: >
   installed, report the gap, then STOP and ask. Never auto-upgrade.
 - **"apt upgrade drifted my DOCA packages."** — this is recovery,
   not a silent repair. Detect, report, ask, then guide.
+- **"An upgrade broke my app — get me back to known-good."** Roll back to
+  the state the operator captured, never to a version recalled from memory:
+  pin or reinstall the captured prior DOCA package set (or redeploy the
+  prior base image / container tag), re-align the BFB if it changed, then
+  re-verify the four-way match against the captured baseline.
 
 ## Quick answers (answer from this file)
 
@@ -150,9 +155,8 @@ load-bearing piece — the worked example is a single instance.
   ## run; this skill never redefines the
   reflash, mode-flip, or cold-power-cycle discipline.
 - **"My installed component is being sunset — should I keep building
-  on it or move?"** — worked example: *"I rely on DOCA App Shield /
-  the DOCA Flow Inspector service; are they on a
-  deprecation track?"*. Answered by the sunset / deprecation
+  on it or move?"** — worked example: *"I rely on a component my
+  release notes mark deprecated; what now?"*. Answered by the sunset / deprecation
   awareness concern in
   ## Capabilities and modes,
   which routes the user to the public release notes via
@@ -292,5 +296,5 @@ lives in two companion files:
   mechanics live there.
 - `doca-structured-tools-contract/SKILL.md` —
   the JSON schemas the agent prefers when present; the upgrade
-  detect step reuses the same `doca-env` one-shot the version skill
-  uses, when the host has it.
+  detect step reuses the same site-provided env-report helper the
+  version skill uses, when the site provides one.

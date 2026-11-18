@@ -359,7 +359,7 @@ at layers 5 (runtime) and 6 (program):
   user's main loop.
 - Confirm EVERY source and destination mmap is still alive at
   submit time (EC has N + K buffers per task, not just two).
-  Destroying any of them before `doca_ctx_destroy` is a
+  Destroying any of them before `doca_ec_destroy` is a
   use-after-free that surfaces as `DOCA_ERROR_BAD_STATE` from
   subsequent calls.
 
@@ -433,7 +433,7 @@ so the agent does not invent guidance:
   across many hosts — out of scope. For a single in-session
   EC configuration rollback, the right verb in this skill is
   destroying the context (`doca_ctx_stop` →
-  `doca_ctx_destroy`) and re-running [`## configure`](#configure)
+  `doca_ec_destroy`) and re-running [`## configure`](#configure)
   with corrected parameters.
 - **storage-stack design.** How to layer replication on top of
   EC, how to schedule rebuilds, how to choose N + K per
@@ -463,10 +463,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

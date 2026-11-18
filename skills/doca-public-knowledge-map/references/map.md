@@ -1,6 +1,6 @@
 # doca-public-knowledge-map — routing tables
 
-Full enumerated routing tables moved out of `SKILL.md` to keep the loader within the per-file size budget. The agent opens this file when it needs the concrete docs.nvidia.com / on-disk / GitHub entries. The version-pinned DOCA 3.5 docs are under `docs.nvidia.com/doca/archive/3-5-0/` (they redirect to NVIDIA's networking docs site).
+The agent opens this file when it needs the concrete docs.nvidia.com / on-disk / GitHub entries. The version-pinned DOCA 3.5 docs are under `docs.nvidia.com/doca/archive/3-5-0/` (they redirect to NVIDIA's networking docs site).
 
 Companion routing tables (open only the file that matches the question; do not load every file):
 
@@ -13,8 +13,8 @@ Companion routing tables (open only the file that matches the question; do not l
 ## Example questions this skill answers well
 
 These are the question SHAPES this skill is designed to route, with one worked
-example each. A productive A/B test against this skill probes the *shape*, not
-the literal wording.
+example each. The useful check for this skill is the *shape*, not the
+literal wording.
 
 - **"Where can I read about DOCA &lt;library/service/tool/concept&gt;?"** —
   worked example: *"Where can I read about DOCA Flow Connection Tracking?"*
@@ -74,11 +74,11 @@ the user to share source code.
 
 | Path | What is there | How to use it |
 | --- | --- | --- |
-| `/opt/mellanox/doca` | Install root. | Use as `${DOCA_DIR}` in any command you suggest. |
+| `/opt/mellanox/doca` | Install root. | Substitute your install root (`${DOCA_DIR}` in some skills; normally `/opt/mellanox/doca`) in any command you suggest. |
 | `/opt/mellanox/doca/samples` | One subdirectory per library, each containing a self-contained sample (typical files: `<library>_main.c`, `meson.build`). | The authoritative example for that library on the installed version. Read these before answering "show me a sample of X". |
-| `/opt/mellanox/doca/applications` | Full reference applications (e.g. `doca_pcc`, `doca_dpi`). | Larger, integrated examples. Inspect their `meson.build` to see how they declare DOCA dependencies. |
+| `/opt/mellanox/doca/applications` | Full reference applications (e.g. `pcc`, `ipsec_security_gw`). | Larger, integrated examples. Inspect their `meson.build` to see how they declare DOCA dependencies. |
 | `/opt/mellanox/doca/tools` | Shipped CLIs (e.g. `doca_caps`, `doca_socket_relay`). | Use them for runtime introspection before answering capability questions. |
-| `/opt/mellanox/doca/infrastructure` *(legacy / split-profile installs only)* OR `/opt/mellanox/doca/lib/<arch>-linux-gnu/` + `/opt/mellanox/doca/include/` *(default on DOCA 3.3+)* | Headers, libraries, and `pkg-config` files used to build against DOCA. The `infrastructure/` subtree is present in some legacy / split installer profiles; on most current DOCA 3.3+ installs the layout has flattened and `infrastructure/` may NOT exist. ALWAYS resolve via `pkg-config --variable=includedir doca-common` and `pkg-config --variable=libdir doca-common` rather than hard-coding either path. | Inspect `*.pc` to verify the exact Meson dependency name for a library (`doca-flow`, `doca-common`, etc.). |
+| `/opt/mellanox/doca/lib/<arch>-linux-gnu/` + `/opt/mellanox/doca/include/` | Headers, libraries, and `pkg-config` files used to build against DOCA. ALWAYS resolve via `pkg-config --variable=includedir doca-common` and `pkg-config --variable=libdir doca-common` rather than hard-coding either path. | Inspect `*.pc` to verify the exact Meson dependency name for a library (`doca-flow`, `doca-common`, etc.). |
 | `/opt/mellanox/doca/services` | Bundled services (DTS, telemetry agents, etc.). | Read service-specific README files inside each subdirectory before suggesting service-level changes. |
 
 Useful enumeration commands to suggest to the user (read-only, safe):
@@ -96,7 +96,7 @@ hint is to expose the DOCA `pkg-config` directory before running `meson setup`:
 ```bash
 PC=$(find /opt/mellanox/doca -name doca-common.pc -print -quit 2>/dev/null)
 if [ -n "$PC" ]; then
-  export PKG_CONFIG_PATH="${PC%/*}:$PKG_CONFIG_PATH"  # commonly /opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig on DOCA 3.3+; or /opt/mellanox/doca/infrastructure/lib/pkgconfig on legacy / split-profile installs
+  export PKG_CONFIG_PATH="${PC%/*}:$PKG_CONFIG_PATH"  # commonly /opt/mellanox/doca/lib/<arch>-linux-gnu/pkgconfig
 else
   echo "doca-common.pc not found: partial install, see doca-setup" >&2
 fi
@@ -132,10 +132,7 @@ and never route documentation by an assumed latest release.
 
 ## URL audit
 
-Every URL referenced by this routing map is HEAD-checked against the
-public NVIDIA documentation surface on every commit, so bundle
-releases always ship a routing map whose every URL was reachable at
-release time. If a URL on this page no longer resolves, that is the
+URLs were current at release time. If a URL on this page no longer resolves, that is the
 release's bug, not yours — fall back to the umbrella entry points
 listed in *Public documentation entry points* (DOCA SDK index, DOCA
 Libraries / Services / Tools umbrella pages) and search from there.

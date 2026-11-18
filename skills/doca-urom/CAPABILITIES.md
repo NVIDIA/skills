@@ -50,7 +50,8 @@ Two cross-cutting rules that apply to *every* pattern above:
   surface, do not assume.** Every pattern above gates on
   `pkg-config --modversion doca-urom` (host-side build-time),
   the `doca_urom_service_get_plugins_list` query against a
-  started Service (host-side runtime — UROM has no
+  started Service, run right after the Service starts and before
+  the first Worker task (host-side runtime — UROM has no
   `doca_urom_cap_*` devinfo capability family; the supported
   plugins discovered on the DPU side ARE the capability
   surface), AND the DPU-side UROM Service's version reachable

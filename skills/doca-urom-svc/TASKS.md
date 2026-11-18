@@ -1,7 +1,10 @@
 # DOCA UROM Service — Tasks
 
 **Where to start:** The order is `configure → build → modify →
-run → test → debug`. The `## test` verb is an iterative loop,
+run → test → debug`. `## run` deploys the service and ends with
+the single-operation smoke (`## test` step 1); the remaining
+`## test` steps then run before any production traffic, which is
+the hand-off back to `## run`. The `## test` verb is an iterative loop,
 not a one-shot pass — see the eval-loop overlay in `## test`
 below. For the DOCA UROM Service, `build` and `modify` are
 about *deployment configuration* (container image selection,
@@ -54,8 +57,10 @@ substrate before the container starts.
    that host library version. If the user does not know which
    tag to deploy, the right answer is to look it up in the
    live public DOCA UROM Service Guide whose version matches
-   the host library — NOT to memorize a tag. Route any
-   version-mismatch ambiguity to
+   the host library — NOT to memorize a tag. If neither the
+   Compatibility Policy nor that guide can be reached, stop and
+   report the pairing as unverified; do not deploy on a guessed tag.
+   Route any version-mismatch ambiguity to
    `doca-version/SKILL.md`.
 4. **Confirm the underlying RDMA transport substrate.** This
    service consumes the BlueField's `doca-rdma` substrate to
@@ -80,7 +85,8 @@ substrate before the container starts.
       components and collective primitives this service
       instance exposes for host offload. Cap-bound to the
       BlueField generation; cross-check against what the
-      host's `doca_urom_cap_*` query (per
+      host's `doca_urom_service_get_plugins_list` query (UROM has no cap family;
+      the plugins list is the capability surface; per
       `doca-urom CAPABILITIES.md ## Capabilities and modes` (`doca-urom/CAPABILITIES.md#capabilities-and-modes`))
       believes is supported.
     - **Enqueue queue depth** — sized to the cluster's
@@ -308,7 +314,7 @@ not just one BlueField generation):
 | --- | --- | --- |
 | 1 → 3 → 1 | Step 3 (cluster-pattern check) often reveals an as-deployed gap in queue sizing or in the exposed UCX-component / collective surface; loop back to step 1 | [`## test`](#test) step 3 |
 | 1 → ## debug | When the single-host smoke (step 1) does NOT see the service receive the enqueue, the deployment is non-functional — escalate to `## debug` immediately, do not run later steps | [`## debug`](#debug) |
-| 2 → ## configure → 2 | When the cap-query disagreement smoke (step 2) shows the host's `doca_urom_cap_*` and the service's exposed surface don't match, the service config is wrong — loop back to `## configure` step 5 and re-run | [`## configure`](#configure) |
+| 2 → ## configure → 2 | When the cap-query disagreement smoke (step 2) shows the host's `doca_urom_service_get_plugins_list` result and the service's exposed surface don't match, the service config is wrong — loop back to `## configure` step 5 and re-run | [`## configure`](#configure) |
 | 1..4 → ## run | Each loop iteration ends with a smoke; if all four pass, hand off to live `## run` traffic | [`## run`](#run) |
 
 The agent's rule: every mutation re-opens the sweep. A
@@ -327,8 +333,8 @@ prevent.
    [`CAPABILITIES.md ## Error taxonomy`](CAPABILITIES.md#error-taxonomy)
    before any HPC stack effort is wasted.
 2. **Cap-query agreement smoke.** From a paired host, run the
-   matching `doca_urom_cap_*` queries against the active
-   `doca_devinfo` (per
+   `doca_urom_service_get_plugins_list` query against a started
+   Service (per
    `doca-urom ## configure` (`doca-urom/TASKS.md#configure`)
    step 4) and confirm the operation families / collective
    variants the host says are supported are the same set the
@@ -337,13 +343,19 @@ prevent.
    knows how to use, or the service is exposing less than the
    host library expects — either way, layer-2 or layer-4
    debugging starts here.
-3. **Cluster-pattern smoke.** With 2 paired hosts on the
-   service, exercise a small batch (e.g. a few hundred puts
-   across two nodes) AND a small collective (e.g. a small
-   all-reduce across the same two nodes). Confirms the
-   service's queue depth supports the in-flight pattern AND
-   that the service's exposed collective surface actually
-   executes end-to-end. A service that passes step 1 but
+3. **Cluster-pattern smoke.** Use the shipped samples, not
+   ad-hoc test code: build `urom_multi_workers_bootstrap` and
+   `urom_ping_pong` from `/opt/mellanox/doca/samples/doca_urom/`
+   (`meson /tmp/build && ninja -C /tmp/build`, per the samples
+   `README.md`), run the bootstrap sample against the service to
+   confirm several workers start, then run the built ping-pong binary from `/tmp/build/`
+   with `-d <IB device>` under the Open MPI launcher across two
+   processes (on the two paired hosts when the cluster has them).
+   Confirms the service's queue depth supports the in-flight pattern
+   and that worker-to-worker traffic executes end-to-end. DOCA ships
+   no collective (all-reduce) sample: a collective smoke runs through
+   the user's own UCC / upstream HPC stack, never through collective
+   code written from memory. A service that passes step 1 but
    fails step 3 most often has a queue-depth (layer 2) or
    collective-variant (layer 4) gap.
 4. **Capability snapshot.** Save the *as-deployed* answer to:
@@ -409,7 +421,7 @@ layer the operator must touch.
    layers 5-7 for substrate-layer diagnosis. **Do NOT try to
    fix this from service config; it is a substrate property,
    not a service knob.**
-4. **Paired-version mismatch layer.** Host's `doca_urom_cap_*`
+4. **Paired-version mismatch layer.** The host's plugins list
    claims an operation family / collective is supported, but
    runtime enqueue returns `DOCA_ERROR_NOT_SUPPORTED` (despite
    a healthy container). Resolution:
@@ -456,10 +468,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in
-   one shot on the BlueField; the BlueField container manager's
-   structured status output when available).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured
@@ -475,11 +490,11 @@ the agent should:
 | Purpose | Command (class shape) | Owning step | Reads as healthy when … |
 | --- | --- | --- | --- |
 | Container lifecycle | The BlueField container manager's start / stop / status command for the service container, per the public Container Deployment Guide | [`## run`](#run) | Container `running`, restart count stable. |
-| Container logs | The BlueField container manager's log-stream command for the service container | [`## debug`](#debug) layers 1-2 + 4 | Service-ready line on startup; no queue-saturation / handler-stuck lines repeating; no paired-version warnings. |
+| Container logs | The BlueField container manager's log-stream command for the service container | [`## debug`](#debug) layers 1-2 + 4 | The readiness signal the version-matched guide documents (quote it from the guide; do not assert an exact log string); no queue-saturation / handler-stuck lines repeating; no paired-version warnings. |
 | Container tag in use | The BlueField container manager's image-inspect command for the running service container | [`## run`](#run) step 1; [`## debug`](#debug) layer 4 | Tag matches what the public DOCA UROM Service Guide names for the paired host library version. |
 | Host-library version (on paired host) | `pkg-config --modversion doca-urom` on the host | [`## configure`](#configure) step 3; [`## debug`](#debug) layer 4 | A semver string the DOCA Compatibility Policy lists as compatible with this service's container tag. |
 | BlueField DOCA version | `doca_caps --version` on the BlueField | [`## configure`](#configure) step 2; [`## debug`](#debug) layer 4 | A semver string matching the BlueField's `pkg-config --modversion doca-common`; disagreement = partial install per `doca-version/SKILL.md`. |
-| Host-side cap-query agreement | A `doca_urom_cap_*` query from a paired host against the active `doca_devinfo`, then compare to the service's exposed surface | [`## test`](#test) step 2; [`## debug`](#debug) layer 4 | The host's cap-query result is a subset of (or equal to) the service's exposed UCX-component / collective surface. |
+| Host-side cap-query agreement | A `doca_urom_service_get_plugins_list` query from a paired host against a started Service, then compare to the service's exposed surface | [`## test`](#test) step 2; [`## debug`](#debug) layer 4 | The host's cap-query result is a subset of (or equal to) the service's exposed UCX-component / collective surface. |
 | Substrate port check | `ibv_devinfo` (sudo) for the BlueField port the service is using; OR the substrate-side checks from `doca-rdma TASKS.md ## debug` (`doca-rdma/TASKS.md#debug`) | [`## configure`](#configure) step 4; [`## debug`](#debug) layer 3 | `PORT_ACTIVE` with a sane MTU; substrate counters not error-spiking. |
 | Single-operation smoke | A single put or get from one paired host through `doca-urom` to a peer, with the service's logs observed in parallel | [`## run`](#run) step 6; [`## test`](#test) step 1 | Service logs show the enqueue received; host's progress engine fires the completion. |
 

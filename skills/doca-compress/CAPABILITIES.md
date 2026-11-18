@@ -176,7 +176,7 @@ there; this skill does not duplicate it.
   layer 2 before any Compress-layer diagnosis.
 - **Per-task max buffer size is device-bound, not version-bound.**
   The `_get_max_buf_size` queries are the runtime authority; the
-  matching `version-matrix.json` row records the *promise*. If
+  documented *"available since"* release records the *promise*. If
   the two disagree, the cap-query value wins, per the
   headers-win-over-docs rule in
   `doca-version/SKILL.md`.
@@ -192,7 +192,7 @@ response.
 
 | Error | Compress context where it shows up | Compress-specific cause |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Any call after `doca_ctx_stop()` or before `doca_ctx_start()`; destroying the source or destination `doca_mmap` before `doca_ctx_destroy()` | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing a source / destination mmap underneath a still-running context. |
+| `DOCA_ERROR_BAD_STATE` | Allocating or submitting a task before `doca_ctx_start()` or after `doca_ctx_stop()` (task configuration such as `doca_compress_task_compress_deflate_set_conf` / `doca_compress_task_decompress_deflate_set_conf` belongs *before* start and is not this error); destroying the source or destination `doca_mmap` before `doca_compress_destroy()` | Lifecycle violation. Walk the call sequence against the lifecycle in `doca-programming-guide CAPABILITIES.md ## Capabilities and modes` (`doca-programming-guide/CAPABILITIES.md#capabilities-and-modes`); the most common case is releasing a source / destination mmap underneath a still-running context. |
 | `DOCA_ERROR_INVALID_VALUE` | `doca_compress_task_compress_deflate_alloc_init`; `doca_compress_task_decompress_deflate_alloc_init`; submit time | The source buffer is larger than the matching `_get_max_buf_size` for the task type, OR the destination buffer is too small for the worst-case output (compress: input that does not compress well can produce slightly more bytes than the input; decompress: output can be substantially larger than the compressed input). Re-run the matching cap query, then resize. |
 | `DOCA_ERROR_NOT_SUPPORTED` | `doca_compress_task_*_set_conf`; first submit | The requested task type is not available on this device's accelerator. Re-run the matching `doca_compress_cap_task_*_is_supported(devinfo)` query; if false, that is the answer — the user's device cannot offload this task type. Fall back to CPU compression or pick a different device. |
 | `DOCA_ERROR_NOT_PERMITTED` | First task submission | The source mmap does not have `DOCA_ACCESS_FLAG_LOCAL_READ_ONLY` (or a stronger flag that supersedes it), OR the destination mmap is missing `DOCA_ACCESS_FLAG_LOCAL_READ_WRITE`. Re-check the matrix in [`## Safety policy`](#safety-policy). |
@@ -295,7 +295,7 @@ important:
 
 **The mmap must stay valid until the Compress context is
 destroyed.** Destroying either the source or destination mmap
-before `doca_ctx_destroy()` is a use-after-free on the library's
+before `doca_compress_destroy()` is a use-after-free on the library's
 bookkeeping; symptoms include `DOCA_ERROR_BAD_STATE` from
 subsequent calls and undefined behavior on outstanding tasks.
 

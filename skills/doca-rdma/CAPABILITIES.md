@@ -145,7 +145,7 @@ For the canonical DOCA version-detection chain, the four-way match rule, NGC con
 **The RDMA-specific overlay** is:
 
 - **DC transport is alpha.** The public DOCA RDMA guide explicitly notes that dynamically-connected (DC) transport support is alpha-level. The agent must surface this when the user asks about DC, not present it as production-stable. Use `pkg-config --modversion doca` as the build-time anchor (per `doca-version TASKS.md ## configure` (`doca-version/TASKS.md#configure`)) when asked which RDMA features are on this install.
-- **Use the `doca_rdma_cap_*` query family at runtime.** Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap-query is the runtime authority for *"is this task / transport supported on this device + this DOCA version"*. The version-matrix is the *promise*; the cap query is the *reality*.
+- **Use the `doca_rdma_cap_*` query family at runtime.** Per the cross-cutting rule in `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`), the cap-query is the runtime authority for *"is this task / transport supported on this device + this DOCA version"*. The documented availability is the *promise*; the cap query is the *reality*.
 - **The resolved DOCA pkg-config module must match `doca_caps --version`** at the four-way-match check (per `doca-version CAPABILITIES.md ## Version compatibility` (`doca-version/CAPABILITIES.md#version-compatibility`)). RDMA normally ships inside the umbrella `doca` module; `pkg-config --modversion doca` must agree with `doca_caps --version`. On rarer split installs that expose per-library `.pc` files, every resolved component `.pc` must agree; a mismatch (one component reporting release *X*, another release *Y*) is the classic partial-install pattern — route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) ladder step 2 before any RDMA-layer diagnosis.
 
 ## Error taxonomy
@@ -158,7 +158,7 @@ most often from RDMA calls and what they specifically indicate:
 
 | Family | Most common RDMA cause | First action |
 | --- | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Connection state-machine misuse (e.g. `connection_disconnect` on a connection that's already gone); lifecycle out of order | Walk the state machine; confirm the `doca_ctx_state` is what the call expects |
+| `DOCA_ERROR_BAD_STATE` | Connection state-machine misuse (e.g. `connection_disconnect` on a connection that's already gone); lifecycle out of order | Walk the state machine; confirm the context state (`enum doca_ctx_states`) is what the call expects |
 | `DOCA_ERROR_NOT_PERMITTED` | mmap permissions / RDMA permissions don't cover the task type | Re-check the permission matrix in [`## Safety policy`](#safety-policy); confirm the mmap was exported when required |
 | `DOCA_ERROR_NOT_SUPPORTED` | The task type / transport type is not supported on this device + DOCA version | Run the matching `doca_rdma_cap_*_is_supported` against the active `doca_devinfo`; if false, that is the answer |
 | `DOCA_ERROR_FULL` | Send queue full; bulk-submit exceeded `max_send_buf_list_len * send_queue_size` | Drain completions on the PE before re-submitting; or raise the queue size at configure time |
@@ -234,7 +234,7 @@ Per the public RDMA guide:
 | Receive | local read-write | — | local read-write | — | not relevant |
 
 - **The mmap must stay valid until the RDMA context is destroyed.**
-  Destroying the mmap before `doca_ctx_destroy()` is a use-after-free
+  Destroying the mmap before `doca_rdma_destroy()` is a use-after-free
   on the library's bookkeeping; symptoms include
   `DOCA_ERROR_BAD_STATE` from subsequent calls and undefined
   behavior on the peer's outstanding tasks.

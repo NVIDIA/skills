@@ -1,6 +1,6 @@
 # doca-container-deployment — reference detail
 
-Moved out of `SKILL.md` to keep the loader under the per-file size budget. This is supporting detail, not routing logic.
+This is supporting detail, not routing logic.
 
 ## Example questions this skill answers well
 

@@ -26,9 +26,12 @@ end-to-end discipline before the container starts.
     - Is PTP-grade time precision genuinely required by the consumer
       workload (SMPTE ST 2110 on Rivermax, 5G UPF, financial
       trading, or sub-microsecond distributed-database time)?
-    - Is the network between Firefly and the upstream PTP master
-      PTP-aware (PTP-aware switches in the path, or boundary clocks
-      where the switches are not PTP-aware)?
+    - Is the network between Firefly and its PTP peers PTP-aware
+      (PTP-aware switches in the path, or boundary clocks where the
+      switches are not PTP-aware)? The peer is the upstream PTP
+      master when Firefly follows time, and the downstream clients
+      when Firefly is the master (it then needs a time source of its
+      own, e.g. GNSS, per the guide).
     - If either answer is *no*, stop here and tell the user
       honestly: keep the host's chrony / NTP setup, *do not* deploy
       Firefly speculatively.
@@ -38,8 +41,10 @@ end-to-end discipline before the container starts.
    If the user has no install yet, route to
    `doca-setup ## no-install` (`doca-setup/TASKS.md#no-install`)
    for the public NGC DOCA container path.
-   Then check the BlueField PTP prerequisites the DOCA 3.5 Firefly
-   Service Guide lists. Query first; change nothing yet:
+   Then check the BlueField PTP prerequisites the Firefly Service
+   Guide for the installed DOCA release lists (the values below are
+   from the DOCA 3.5 guide; re-check them against the version-matched
+   guide before relying on them). Query first; change nothing yet:
     - **Firmware and BSP.** Firmware must be 24.34.1002 or higher and
       the BlueField image 3.9.0 or higher. Read the running firmware
       (e.g. `fw_ver` in `ibv_devinfo`) and compare.
@@ -66,7 +71,12 @@ end-to-end discipline before the container starts.
     - **NTP off on the BlueField.** `phc2sys` can only discipline the
       BlueField OS clock if no other time service fights it. The guide's
       Ubuntu example is `systemctl stop systemd-timesyncd`; also stop
-      chrony / ntpd if they run on the BlueField.
+      chrony / ntpd if they run on the BlueField. Stopping time
+      services changes what every workload on the BlueField sees as
+      time, so record which services were active
+      (`systemctl is-active systemd-timesyncd chrony ntp`), get the
+      operator's approval first, and restore with `systemctl start`
+      of the same services if Firefly is rolled back.
 3. **Decide the four PTP configuration axes.** Per the four-axis
    table in
    [`CAPABILITIES.md ## Capabilities and modes`](CAPABILITIES.md#capabilities-and-modes),
@@ -207,13 +217,10 @@ not, stop and hand off to the BlueField container-runtime owner.
    invent the tag. If that version-matched guide/tag source is
    inaccessible, stop and ask the operator to provide the tag from
    the guide; do not infer one from the host package version.
-   **Take the YAML from the NGC Firefly resource, not the shared
-   bundle.** The shared `doca_container_configs` bundle linked from
-   the Container Deployment Guide has shipped an old Firefly YAML
-   (image `1.5.0-doca2.9.0`). The NGC Firefly resource carries the
-   current `doca_firefly.yaml` for the release. Before copying the
-   YAML into `/etc/kubelet.d`, open it and check that its `image:` tag
-   matches the operator's DOCA release.
+   **Take the YAML from the NGC Firefly resource.** The NGC Firefly
+   resource carries the current `doca_firefly.yaml` for the release.
+   Check that the YAML's `image:` tag matches your DOCA release
+   before deploying (copying it into `/etc/kubelet.d`).
 2. **Start the container per the public Container Deployment Guide
    pattern.** Mount the Firefly config file at the path the public
    Firefly Service Guide names. The runtime command shape (e.g.
@@ -410,10 +417,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; the BlueField container manager's structured status output
-   when available).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

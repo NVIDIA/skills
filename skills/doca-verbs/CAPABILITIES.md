@@ -40,7 +40,7 @@ discussion.
 | Axis | Higher-level DOCA library | doca-verbs (this skill) |
 | --- | --- | --- |
 | Default for | The vast majority of work in scope: `doca-rdma/SKILL.md` covers Send / Receive / Read / Write / Write-Imm / Atomic / Sync-Event RDMA tasks; `doca-eth/SKILL.md` covers Ethernet TX / RX queue patterns; `doca-rmax/SKILL.md` covers timing-precise media / data-over-IP streams | The narrow case where the higher-level library's task abstractions do not expose the specific verb / opcode / WR flag / QP attribute / SRQ option / AH attribute / CC-group attachment the user needs |
-| Surface shape | Task-level (`doca_<library>_task_*`) — submit a task, get a completion event | Raw verbs primitives (`doca_verbs_pd` / `_qp` / `_cq` / `_srq` / `_ah_attr` / `_comp_channel` / `_eth_sq` / `_eth_rq` / `_cc_group` / `_multi_rail`) inside DOCA Core — closer to what libibverbs exposes, but inside the DOCA Core lifecycle |
+| Surface shape | Task-level (`doca_<library>_task_*`) — submit a task, get a completion event | Raw verbs primitives (`doca_verbs_pd` / `_qp` / `_cq` / `_srq` / `_ah_attr` / `_comp_channel` / `_eth_sq` / `_eth_rq` / `_cc_group` / `_q_counter` / `_multi_rail`) inside DOCA Core — closer to what libibverbs exposes, but inside the DOCA Core lifecycle |
 | Completion handling | DOCA progress engine (`doca_pe_progress`), event per task | DOCA progress engine OR manual completion-queue handling via `doca_verbs_bridge_poll_cq` OR completion-channel event delivery via `doca_verbs_comp_channel_create` + `doca_verbs_get_cq_event`, picked explicitly by the user |
 | Capability discovery | `doca_<library>_cap_*` (per-task supported, per-transport supported, per-property max) against `doca_devinfo` | `doca_verbs_query_device` returns a `doca_verbs_device_attr` handle; the `doca_verbs_device_attr_get_*` family (max QP, max QP WR, max SGE, max CQ / CQE, max MR / PD / AH / SRQ / SRQ-WR / SRQ-SGE, per-QP-type supported, max-rd-atomic, ECE / CC-group / CQE-inline / ordering-semantic / DPA-external-datapath / GPU-external-datapath / plane-index / send-DBR-mode / TS-source-type supported, etc.) is the per-attribute query family |
 | Right answer for *"I want raw QP control"* | Often: the higher-level task abstractions cover the case once the user names the actual semantic | Sometimes: when the user has confirmed the higher level genuinely does not surface the option |
@@ -62,6 +62,7 @@ the experimental ABI tier on this release:
 | `doca_verbs_ah_attr` (Address-Handle attributes) | The Address-Handle attribute block for routing send WRs over IB or RoCE (address type is one of the `DOCA_VERBS_ADDR_TYPE_*` family) | `doca_verbs_ah_attr_create` → `_set_*` (DGID / DLID / SL / SGID-index / static-rate / hop-limit / traffic-class / UDP-source-port / address-type) → attached to a `doca_verbs_qp_attr` via `doca_verbs_qp_attr_set_ah_attr` → `doca_verbs_ah_attr_destroy`. UDP source port is read/written via the `doca_verbs_ah_attr_get_udp_sport` / `_set_udp_sport` pair |
 | `doca_verbs_comp_channel` (Completion Channel) | An event-delivery channel that fires when a CQ has new completions. Alternative to PE-driven completions and to manual CQ poll | `doca_verbs_comp_channel_create(ctx, &chan)` → `doca_verbs_comp_channel_get_handle` → poll the OS handle → `doca_verbs_get_cq_event` to drain → `doca_verbs_comp_channel_destroy(chan)`. CQ ACK via `doca_verbs_ack_cq_events`; arming via `doca_verbs_req_notify_cq` |
 | `doca_verbs_cc_group` (Congestion-Control Group) | A congestion-control group that QPs can be attached to | `doca_verbs_cc_group_attr_create` → `_set_hint` → `doca_verbs_cc_group_create(ctx, group_attr, &cc_group)` → attach to a QP via `doca_verbs_qp_attr_set_cc_group` → modify / query / destroy. The matching cap-query is `doca_verbs_query_cc_group_caps`; the `doca_verbs_cc_group_caps_get_*` family exposes the hint schema, including hint fields and hint value range |
+| `doca_verbs_q_counter` (Q Counter) | A QP counter object that exposes hardware QP counters (request/response errors, RoCE retransmission/restart counters, received atomic/read/write requests, etc.) | `doca_verbs_q_counter_create(ctx, &q_counter)` → use → `doca_verbs_q_counter_destroy(q_counter)`. Query the counters with `doca_verbs_q_counter_query(q_counter, clear)`; read individual counters via the `doca_verbs_q_counter_get_*` family; counter set ID via `doca_verbs_q_counter_get_counter_set_id`. A default Q counter is available via `doca_verbs_context_get_default_q_counter`. The QP attribute family exposes the external counter set ID setter/getter, the attached q_counter setter/getter, and the LAG TX port affinity setter/getter |
 | `doca_verbs_multi_rail` (Multi-Rail) | Multi-rail load balancing and probing across a set of QPs | `doca_verbs_multi_rail_create(num_qps, &multi_rail)` → configure via the `doca_verbs_multi_rail_cfg_*` family and `doca_verbs_multi_rail_apply_cfg` → attach probe QPs via `doca_verbs_multi_rail_set_probe_qp` → drive probing via the `doca_verbs_multi_rail_probe_*` family → update / query state via the `doca_verbs_multi_rail_update*` and `doca_verbs_multi_rail_*_get_*` families → `doca_verbs_multi_rail_destroy(multi_rail)`. Version descriptors use the `doca_verbs_multi_rail_version_desc_*` family |
 | `doca_verbs_eth_sq` (Ethernet Send Queue) | An Ethernet-side SQ (the verbs-tier counterpart to the `doca-eth/SKILL.md` TX queue) — only when the user has confirmed `doca-eth` does not expose the option they need (e.g., explicit TS-source-type, plane-index, multi-pkt-send-WQE) | `doca_verbs_eth_sq_init_attr_create` → `_set_*` (PD / CQ / WR-num / max-SGEs / max-inline-data / queue-id / user-index / external-datapath / DPA / TS-source-type / plane-index / flush-in-error / allow-multi-pkt-send-WQE / sig-all) → `doca_verbs_eth_sq_create(ctx, init_attr, &sq)` → use → `doca_verbs_eth_sq_destroy(sq)`. Query via `doca_verbs_eth_sq_query`; recover from error via `doca_verbs_eth_sq_recover_from_error` |
 | `doca_verbs_eth_rq` (Ethernet Receive Queue) | An Ethernet-side RQ (the verbs-tier counterpart to the `doca-eth/SKILL.md` RX queue) — same drop-down logic as `doca_verbs_eth_sq` | `doca_verbs_eth_rq_init_attr_create` → `_set_*` (PD / CQ / WR-num / max-SGEs / queue-id / user-index / external-datapath / DPA / TS-source-type / SRQ / flush-in-error) → `doca_verbs_eth_rq_create(ctx, init_attr, &rq)` → use → `doca_verbs_eth_rq_destroy(rq)` |
@@ -95,7 +96,12 @@ matching `doca_verbs_device_attr_get_*` for what the user wants:
   `_get_is_plane_index_supported`,
   `_get_is_eth_sq_ts_source_type_supported`,
   `_get_is_eth_rq_srq_supported`,
-  `_get_is_eth_rq_ts_source_type_supported`.
+  `_get_is_eth_rq_ts_source_type_supported`,
+  `_get_is_init2_lag_tx_port_affinity_supported`,
+  `_get_is_lag_tx_port_affinity_supported`,
+  `_get_is_rts2rts_lag_tx_port_affinity_supported`,
+  `_get_num_lag_ports`,
+  `_get_is_path_mtu_8k_supported`.
 - Per-CC-group: `_get_max_cc_group`,
   `_get_max_cc_group_hint_max_size`; plus the per-vendor
   `doca_verbs_query_cc_group_caps` + the
@@ -116,6 +122,11 @@ states (`DOCA_VERBS_CQ_ST_*`), multi-rail load-balancing modes
 and symbol names live in the DOCA Verbs public header on the user's
 install; the agent must read them from that header rather than
 quote them from memory.
+
+The QP attribute setter family (`doca_verbs_qp_attr_set_*`) now
+includes a LAG TX port affinity setter and a Q-counter attachment
+setter. Read the exact symbol names from the DOCA Verbs public
+header on the user's install.
 
 Per the cross-cutting rule in
 `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
@@ -142,6 +153,8 @@ commonly needed*:
 explicit QP-type selection (the `DOCA_VERBS_QP_TYPE_*` family;
 this release defines only RC and UC), queue depths,
 per-WR flag selection, ECE attribute tuning, CC-group attachment,
+Q-counter attachment via the `doca_verbs_q_counter` family and the
+QP attribute Q-counter attachment setter and external-counter-set-id setter,
 SRQ attachment, completion-channel attachment to a CQ, and
 multi-rail configuration/probe/update via the
 `doca_verbs_multi_rail_*` family. Query the active value of any
@@ -190,26 +203,7 @@ there; this skill does not duplicate it.
   rename, reshape, or graduate between releases. Quote the symbol
   surface from the installed headers, not from the public docs;
   pin against the release the user is actually building on.
-- **DOCA 3.5 added new public API families; treat them as 3.5+
-  only.** The following families are available only in DOCA 3.5
-  and later and are absent from earlier headers: the multi-rail
-  configuration/probe/update family, the CQ attribute
-  collapsed/external-DBR/state family, the QP init attribute
-  ordering-semantic/RCX-type family (including the new RCX type
-  setter), the AH attribute UDP source-port family, the bridge
-  context default-device family, the CC group caps
-  hint-fields/range family, and the device attribute
-  ordering-semantic support family. The new constant families —
-  the CQ state constants, the multi-rail constants, and the QP
-  ordering-semantic constants — are also available only in DOCA
-  3.5 and later. The installed doca-verbs public headers (the
-  headers-win-over-docs source named above) are authoritative for
-  exact signatures and constant names; do not copy prototypes or
-  constant lists from docs. A developer must not assume these
-  symbols exist on older DOCA: code that must build against
-  pre-3.5 DOCA must not reference them, and code targeting 3.5+
-  should still guard with the four-way match and cap-query before
-  relying on the new capability getters.
+- **DOCA 3.5 and DOCA 3.6 added new public API families; treat them as 3.5+ / 3.6+ only.** The following families are available only in DOCA 3.5 and later and are absent from earlier headers: the multi-rail configuration/probe/update family, the CQ attribute collapsed/external-DBR/state family, the QP init attribute ordering-semantic/RCX-type family (including the new RCX type setter), the AH attribute UDP source-port family, the bridge context default-device family, the CC group caps hint-fields/range family, and the device attribute ordering-semantic support family. The new constant families — the CQ state constants, the multi-rail constants, and the QP ordering-semantic constants — are also available only in DOCA 3.5 and later. The following families are available only in DOCA 3.6 and later and are absent from earlier headers: the q_counter family (context default q_counter getter, q_counter create/destroy/query, and the q_counter counter getters), the device attribute LAG/MTU getter family, and the QP attribute external-counter/LAG/q_counter getter/setter family. The installed doca-verbs public headers (the headers-win-over-docs source named above) are authoritative for exact signatures and constant names; do not copy prototypes or constant lists from docs. A developer must not assume these symbols exist on older DOCA: code that must build against pre-3.5 DOCA must not reference the 3.5 families, code that must build against pre-3.6 DOCA must not reference the 3.6 families, and code targeting 3.5+ or 3.6+ should still guard with the four-way match and cap-query before relying on the new capability getters.
 - **Use the cap-query at runtime, not at configure time alone.**
   Per the cross-cutting rule in
   `doca-version CAPABILITIES.md ## Observability` (`doca-version/CAPABILITIES.md#observability`),
@@ -291,7 +285,7 @@ CQ in the same program. *"Some completions go through the PE,
 others I poll manually, others come on the comp channel"* is
 unsupported and a source of dropped completions.
 
-Six primary signals the agent should reach for:
+Seven primary signals the agent should reach for:
 
 1. **Per-WR completion entries.** Whether surfaced through the PE,
    polled manually, or delivered on a comp channel, the CQE
@@ -334,6 +328,19 @@ Six primary signals the agent should reach for:
    as recoverable. Point to the installed public `doca_verbs.h` for the exact
    signatures and enum/struct definitions; do not quote prototypes or
    constants.
+7. **Queue counter observability.** DOCA 3.6 adds the `doca_verbs_q_counter`
+   family for queue-level counters. A developer must create a counter with
+   `doca_verbs_q_counter_create`, query it with `doca_verbs_q_counter_query`
+   (using the clear flag), read individual counters through the
+   `doca_verbs_q_counter_get_*` getters, and release it with
+   `doca_verbs_q_counter_destroy`. The default counter is available without
+   explicit creation via `doca_verbs_context_get_default_q_counter`. QP
+   attributes expose the attached counter and external counter set id through
+   `doca_verbs_qp_attr_get_q_counter`,
+   `doca_verbs_qp_attr_get_external_counter_set_id`, and
+   `doca_verbs_qp_attr_set_external_counter_set_id`. Point to the installed
+   public `doca_verbs.h` for the exact signatures and enum/struct definitions;
+   do not quote prototypes or constants.
 
 For cross-cutting observability primitives (`--sdk-log-level`, the
 `doca-<lib>-trace` build flavor, the `DOCA_LOG_LEVEL` env var) see

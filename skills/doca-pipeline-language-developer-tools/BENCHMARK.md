@@ -10,8 +10,8 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `doca-pipeline-language-developer-tools`
 - Validation status: `passed`
-- Evaluation date: 2026-10-28
-- Evaluator version: `1.6.2`
+- Evaluation date: 2026-11-08
+- Evaluator version: `1.6.9`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 5 evaluation tasks (3 positive, 2 negative)
 - Dataset digest: `sha256:b8bbbcc052479714d9ea60279e534806882df2d3c9535b6b49a539ae925b6c5d` (skill-evaluator-dataset-snapshot/1)
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| doca-pipeline-language-developer-tools | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-pipeline-language-developer-tools | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-pipeline-language-developer-tools | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-pipeline-language-developer-tools | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
-| doca-pipeline-language-developer-tools | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.1` | nondeterministic / provider_defaults |
+| doca-pipeline-language-developer-tools | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| doca-pipeline-language-developer-tools | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| doca-pipeline-language-developer-tools | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| doca-pipeline-language-developer-tools | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| doca-pipeline-language-developer-tools | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
 
 - Controls for `doca-pipeline-language-developer-tools`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.2% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 90.0% → 100.0% (+10.0 points) |
-| Correctness | 40.0% → 88.0% (+48.0 points) | 64.0% → 96.0% (+32.0 points) |
+| Overall | 96.5% — baseline ran, but no comparable score was available; uplift unavailable | 93.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 44.0% → 100.0% (+56.0 points) | 60.0% → 100.0% (+40.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 25.0% → 85.0% (+60.0 points) | 35.0% → 100.0% (+65.0 points) |
-| Efficiency | 88.1% — baseline ran, but no comparable score was available; uplift unavailable | 73.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 25.0% → 95.0% (+70.0 points) | 35.0% → 100.0% (+65.0 points) |
+| Efficiency | 87.3% — baseline ran, but no comparable score was available; uplift unavailable | 74.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.2% → 96.2% (-2.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.1% → 96.3% (-1.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 83.9% → 87.9% (+4.0 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 84.3% → 88.0% (+3.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,19 +80,19 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 722,551 | 539,273 | +183,278 | +33.99% | skill 5/5; base 5/5 |
-| claude-code | doca-pipeline-language-developer-tools.explicit-positive.v1 | 202,707 | 107,958 | +94,749 | +87.76% | skill 1/1; base 1/1 |
-| claude-code | doca-pipeline-language-developer-tools.implicit-positive.v1 | 202,732 | 108,088 | +94,644 | +87.56% | skill 1/1; base 1/1 |
-| claude-code | doca-pipeline-language-developer-tools.implicit-positive.v2 | 244,016 | 107,041 | +136,975 | +127.96% | skill 1/1; base 1/1 |
-| claude-code | doca-pipeline-language-developer-tools.negative.v1 | 36,780 | 108,108 | -71,328 | -65.98% | skill 1/1; base 1/1 |
-| claude-code | doca-pipeline-language-developer-tools.negative.v2 | 36,316 | 108,078 | -71,762 | -66.40% | skill 1/1; base 1/1 |
-| codex | All cases | 329,109 | 249,047 | +80,062 | +32.15% | skill 5/5; base 5/5 |
-| codex | doca-pipeline-language-developer-tools.explicit-positive.v1 | 83,234 | 86,979 | -3,745 | -4.31% | skill 1/1; base 1/1 |
-| codex | doca-pipeline-language-developer-tools.implicit-positive.v1 | 85,304 | 30,711 | +54,593 | +177.76% | skill 1/1; base 1/1 |
-| codex | doca-pipeline-language-developer-tools.implicit-positive.v2 | 96,112 | 53,140 | +42,972 | +80.87% | skill 1/1; base 1/1 |
-| codex | doca-pipeline-language-developer-tools.negative.v1 | 34,448 | 48,010 | -13,562 | -28.25% | skill 1/1; base 1/1 |
-| codex | doca-pipeline-language-developer-tools.negative.v2 | 30,011 | 30,207 | -196 | -0.65% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,051,660 | 788,320 | +263,340 | +33.41% | skill 10/10; base 10/10 |
+| claude-code | All cases | 721,572 | 575,432 | +146,140 | +25.40% | skill 5/5; base 5/5 |
+| claude-code | doca-pipeline-language-developer-tools.explicit-positive.v1 | 245,120 | 108,548 | +136,572 | +125.82% | skill 1/1; base 1/1 |
+| claude-code | doca-pipeline-language-developer-tools.implicit-positive.v1 | 202,949 | 107,811 | +95,138 | +88.25% | skill 1/1; base 1/1 |
+| claude-code | doca-pipeline-language-developer-tools.implicit-positive.v2 | 200,656 | 106,831 | +93,825 | +87.83% | skill 1/1; base 1/1 |
+| claude-code | doca-pipeline-language-developer-tools.negative.v1 | 36,638 | 144,207 | -107,569 | -74.59% | skill 1/1; base 1/1 |
+| claude-code | doca-pipeline-language-developer-tools.negative.v2 | 36,209 | 108,035 | -71,826 | -66.48% | skill 1/1; base 1/1 |
+| codex | All cases | 347,932 | 254,844 | +93,088 | +36.53% | skill 5/5; base 5/5 |
+| codex | doca-pipeline-language-developer-tools.explicit-positive.v1 | 105,350 | 38,943 | +66,407 | +170.52% | skill 1/1; base 1/1 |
+| codex | doca-pipeline-language-developer-tools.implicit-positive.v1 | 81,008 | 39,105 | +41,903 | +107.16% | skill 1/1; base 1/1 |
+| codex | doca-pipeline-language-developer-tools.implicit-positive.v2 | 101,430 | 58,540 | +42,890 | +73.27% | skill 1/1; base 1/1 |
+| codex | doca-pipeline-language-developer-tools.negative.v1 | 30,135 | 52,056 | -21,921 | -42.11% | skill 1/1; base 1/1 |
+| codex | doca-pipeline-language-developer-tools.negative.v2 | 30,009 | 66,200 | -36,191 | -54.67% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,069,504 | 830,276 | +239,228 | +28.81% | skill 10/10; base 10/10 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -100,8 +100,8 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 19 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 3 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 5 task(s) |
 
 ## Findings and Observations
@@ -109,14 +109,32 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/tools/doca-pipeline-language-developer-tools`)
-- **CRITICAL** CONTENT_DEDUP/llm_error: LLM analysis failed for a content cluster (`skills/tools/doca-pipeline-language-developer-tools`)
-- **HIGH** DUPLICATE/duplicate: Duplicate content found within CAPABILITIES.md:
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across CAPABILITIES.md and SKILL.md and TASKS.md:
+  "# DOCA Pipeline Language Developer Tools — Capabilities" in CAPABILITIES.md (lines 1-19)
+  vs "## Pattern overview" in CAPABILITIES.md (lines 24-31)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 56-66)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 67-74)
+  vs "## Capabilities and modes" in CAPABILITIES.md (lines 79-86)
+  vs "## Version compatibility" in CAPABILITIES.md (lines 112-121)
+  vs "## Observability" in CAPABILITIES.md (lines 135-146)
+  vs "## Scope boundaries" in SKILL.md (lines 3-15)
+  vs "## Examples" in SKILL.md (lines 16-31)
+  vs "## Quick facts" in SKILL.md (lines 32-71)
+  vs "## Instructions" in SKILL.md (lines 72-102)
+  vs "## Example questions this skill answers well" in SKILL.md (lines 103-133)
+  vs "## When to load this skill" in SKILL.md (lines 134-160)
+  vs "## What this skill provides" in SKILL.md (lines 161-189)
+  vs "## Loading order" in SKILL.md (lines 213-224)
+  vs "## Related skills" in SKILL.md (lines 225-248)
+  vs "## debug" in TASKS.md (lines 77-129)
+  vs "## Cross-cutting" in TASKS.md (lines 289-308) (`CAPABILITIES.md:1`)
+- **MEDIUM** DUPLICATE/duplicate: Duplicate content found within CAPABILITIES.md:
   "## Pattern overview" in CAPABILITIES.md (lines 33-49)
   vs "## Safety policy" in CAPABILITIES.md (lines 147-163) (`CAPABILITIES.md:33`)
 - **MEDIUM** QUALITY/quality_discoverability: Description uses first/second person (`skills/tools/doca-pipeline-language-developer-tools/SKILL.md`)
 - **MEDIUM** SCHEMA/metadata_key_style: Metadata key 'doca_version' is not kebab-case (`skills/tools/doca-pipeline-language-developer-tools/SKILL.md`)
-- 17 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SCHEMA/folder_hierarchy: Unexpected nesting depth for general skill (`skills/tools/doca-pipeline-language-developer-tools`)
+- 13 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

@@ -492,11 +492,13 @@ contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST
-   (`doca-env --json` for version + devices +
-   telemetry-component availability in one shot;
-   `doca-capability-snapshot` for per-device
-   capability flags).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is authoritative for
    the overlapping environment/device-capability fields it reports. It does
    not replace artifact-specific `doca_telemetry_utils` name↔ID resolution or

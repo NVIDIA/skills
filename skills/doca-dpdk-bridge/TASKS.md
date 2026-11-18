@@ -50,7 +50,7 @@ Steps the agent should walk the user through, in order:
    run three pkg-config probes BEFORE writing any code:
    `pkg-config --exists doca-dpdk-bridge` (the bridge is
    present on this DOCA install — if it returns failure, run
-   `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep
+   `ls /opt/mellanox/doca/lib/$(uname -m)-linux-gnu/pkgconfig/ | grep
    -i dpdk` before claiming the bridge is missing, because some
    releases use a slightly different module name);
    `pkg-config --modversion doca-dpdk-bridge` agrees with
@@ -146,7 +146,7 @@ spans TWO independent pkg-config namespaces (DOCA and DPDK), and
 
 | Slot | Value | Why it matters |
 | --- | --- | --- |
-| `pkg-config` module name (DOCA side) | `doca-dpdk-bridge` on the user's install — confirm with `pkg-config --exists doca-dpdk-bridge`; if it returns failure, run `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep -i dpdk` before claiming the bridge is missing, because some DOCA releases use a slightly different module name | Wrong module name = `pkg-config: Package 'doca-dpdk-bridge' was not found` at build time. Do not guess — read the install. |
+| `pkg-config` module name (DOCA side) | `doca-dpdk-bridge` on the user's install — confirm with `pkg-config --exists doca-dpdk-bridge`; if it returns failure, run `ls /opt/mellanox/doca/lib/$(uname -m)-linux-gnu/pkgconfig/ | grep -i dpdk` before claiming the bridge is missing, because some DOCA releases use a slightly different module name | Wrong module name = `pkg-config: Package 'doca-dpdk-bridge' was not found` at build time. Do not guess — read the install. |
 | `pkg-config` module name (DPDK side) | `libdpdk` from the user's DPDK install | The bridge's link line depends on DPDK symbols; without `libdpdk` on the line the build fails at link time with unresolved `rte_*` references |
 | Include flags | `pkg-config --cflags doca-dpdk-bridge libdpdk` | Resolves DOCA-side headers under $(pkg-config --variable=includedir doca-common) AND DPDK-side headers wherever DPDK is installed |
 | Link flags | `pkg-config --libs doca-dpdk-bridge libdpdk` | Pulls in whatever `pkg-config --libs` resolves on this install (do not predict the `-l<name>` form by hand — `.so` basenames use underscores, `.pc` names use hyphens, and `pkg-config` is the only correct translator) on the DOCA side plus the DPDK shared libs (`-lrte_*`) on the DPDK side |
@@ -350,7 +350,7 @@ DPDK side overlays on all of them and is a frequent source of mismatch.
 - `pkg-config --exists doca-dpdk-bridge` returning failure is
   not always *“the bridge is not installed”* — some DOCA
   releases use a slightly different module name. Confirm via
-  `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep
+  `ls /opt/mellanox/doca/lib/$(uname -m)-linux-gnu/pkgconfig/ | grep
   -i dpdk` before claiming the bridge is missing.
 
 **Layer 5 (runtime) — bridge overlay.**
@@ -464,10 +464,13 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env --json`
-   for version + devices + libraries + drivers + hugepages in one
-   shot; `doca-capability-snapshot` for per-device capability flags;
-   `version-matrix.json` for *“available since”* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so probe it with `command -v <site env-report helper>` if your
+   site has one, and by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *“using structured
@@ -483,7 +486,7 @@ the agent should:
 | Command (worked example) | Owning step | Class of question it answers | What healthy output looks like |
 | --- | --- | --- | --- |
 | `pkg-config --exists doca-dpdk-bridge && echo present` | `## configure` step 1; `## build` slot 1 | Is the bridge module present on this DOCA install (and under this spelling)? | `present`. Empty / non-zero exit = either the bridge is not installed on this DOCA, or the module name in this release differs — confirm via the `ls` row below before claiming the bridge is missing |
-| `ls /opt/mellanox/doca/infrastructure/lib/pkgconfig/ | grep -i dpdk` | `## configure` step 1; `## debug` layer 2 | If `pkg-config --exists doca-dpdk-bridge` fails, what is the bridge module actually called in this DOCA release? | One `.pc` file containing `dpdk` in its name. Empty = the bridge truly is not installed on this DOCA; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
+| `ls /opt/mellanox/doca/lib/$(uname -m)-linux-gnu/pkgconfig/ | grep -i dpdk` | `## configure` step 1; `## debug` layer 2 | If `pkg-config --exists doca-dpdk-bridge` fails, what is the bridge module actually called in this DOCA release? | One `.pc` file containing `dpdk` in its name. Empty = the bridge truly is not installed on this DOCA; route to `doca-setup TASKS.md ## debug` (`doca-setup/TASKS.md#debug`) |
 | `pkg-config --modversion doca-dpdk-bridge` | `## configure` step 1; `## build` slot 6 | What is the build-time DOCA DPDK Bridge version? | A semver string matching `doca_caps --version`. Disagreement = partial install (route to `doca-version TASKS.md ## debug` (`doca-version/TASKS.md#debug`) layer 2) |
 | `pkg-config --modversion libdpdk` | `## configure` step 1; `## build` slot 6; `## debug` layer 2 | What DPDK version is installed on this host, and does it fall within the bridge's matched-pair window? | A semver string; the agent quotes it against the bridge's installed headers / docs declared window. Disagreement = the canonical *“the bridge loads but every operation returns confusing errors”* failure; do not assume *“latest DPDK works”* |
 | `pkg-config --cflags --libs doca-dpdk-bridge libdpdk` | `## build` | What include + link flags does the linker need for a bridge consumer? | DOCA-side includes resolve under $(pkg-config --variable=includedir doca-common); libs include whatever `pkg-config --libs doca-dpdk-bridge` resolves (do not predict the `-l<name>` form by hand); DPDK-side includes resolve under the user's DPDK install; libs include the `-lrte_*` set |

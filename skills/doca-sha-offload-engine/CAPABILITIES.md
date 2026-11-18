@@ -107,7 +107,7 @@ device; the operator must check (`doca_caps --list-devs`
 or platform-specific PCIe inspection per
 `doca-setup/SKILL.md`).
 
-### Engine-load pattern (the verified surface)
+### Engine-load pattern (the documented surface)
 
 Two load patterns, both verified in the shipped
 `engine_readme.md`:
@@ -363,7 +363,7 @@ overlay:
   does not invent a PROVIDER artifact that the bundle
   does not ship.
 - **Do not invent OpenSSL flags or engine ctrl-cmds.**
-  The verified surface is `-pre NO_VCHECK:1`, `-pre
+  The documented surface is `-pre NO_VCHECK:1`, `-pre
   SO_PATH:...`, `-pre LOAD`, `-pre "set_pci_addr:..."`,
   `-vvv -t -c`, `-engine <path>`, `-engine_impl`,
   `-async_jobs <N>`, `-multi <N>`. Anything beyond

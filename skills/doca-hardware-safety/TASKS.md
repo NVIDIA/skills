@@ -46,9 +46,9 @@ Steps the agent should walk the operator through:
    PCIe topology, link state, running firmware level, BFB level (on
    BlueField), `mlxconfig`-class configuration snapshot, and host-side
    env snapshot. Prefer the structured one-shot via the
-   `collect-host-state` and `collect-dpu-state` schemas in
+   host-state and DPU-state schemas in
    `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`)
-   when the host has them; otherwise walk the manual command chain
+   when the site provides such helpers; otherwise walk the manual command chain
    the same schema section names. Record every captured value in the
    session — the rollback path will quote them.
 3. **Record the four-way version anchor for the session.** Per

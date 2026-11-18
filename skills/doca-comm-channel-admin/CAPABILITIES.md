@@ -1,7 +1,7 @@
 # DOCA Comm Channel Admin Tool — Capabilities
 
 > **Actual binary contract.** The tool has one read-only operation:
-> invoke it with zero application arguments, let it scan every
+> invoke it with no arguments, let it scan every
 > comch-capable device on the current side through `resourcedump`
 > (MFT), and read the SERVERS and CONNECTIONS tables. It has no
 > per-device scope, per-row follow-up, or state-changing operation.
@@ -48,8 +48,8 @@ The DOCA Comm Channel Admin Tool ships as a CLI binary under
 `/opt/mellanox/doca/tools/` on every DOCA install that includes the
 tool. There is no daemon, no library to link against, and no
 programmatic API; the user's entire interaction model is *invoke
-the binary and read the two printed read-only tables*. The binary
-registers ZERO application-level arguments. It performs only the
+the binary and read the two printed read-only tables*. Run it with
+no arguments (`--help` lists the flags). It performs only the
 scan-and-print operation described here.
 
 The tool exposes a single, read-only family of operations,
@@ -59,8 +59,8 @@ documented in the public DOCA Comm Channel Admin Tool guide
 
 - **Read-only operations (the entire tool surface).** The binary
   scans every DOCA device on the side it runs on (host or
-  BlueField Arm), shells out to `resourcedump` for the devices
-  that support a comch client / server, and prints two tables — a
+  BlueField Arm) — it needs the MFT Resource dump binary — and
+  for the devices that support a comch client / server, prints two tables — a
   CONNECTIONS table and a SERVERS table — naming each channel's
   server name, owning PID, PCIe address, and interface (plus the
   connected / max-connection counts for servers). These cost

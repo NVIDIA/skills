@@ -1,6 +1,6 @@
 # doca-bf3-deployment — reference detail
 
-Moved out of `SKILL.md` to keep the loader under the per-file size budget. This is supporting detail, not routing logic.
+This is supporting detail, not routing logic.
 
 ## Example questions this skill answers well
 
@@ -115,7 +115,7 @@ does not contain — and pull requests should not add:
   by which BlueField generation the operator has.
 - `doca-bare-metal-deployment/SKILL.md`
   — the app-launch sibling and the source where the BF3 lifecycle
-  facts this skill consolidates were originally vetted (its
+  facts this skill consolidates were originally documented (its
   `## bluefield-lifecycle` (`doca-bare-metal-deployment/TASKS.md#bluefield-lifecycle`)
   anchor). Once a BF3 is healthy and the operator wants to *run a
   binary*, control routes there.

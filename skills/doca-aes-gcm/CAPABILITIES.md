@@ -35,7 +35,7 @@ Three cross-cutting rules that apply to *every* pattern above:
   tag verification on decrypt are not optional add-ons. Treating
   AES-GCM like AES-CTR (where there is no tag) or AES-CBC (where
   authentication is a separate HMAC) is the single most common
-  baseline-agent error. If the user wants a non-AEAD AES mode, the
+  error. If the user wants a non-AEAD AES mode, the
   answer is CPU + OpenSSL — not this library.
 - **Discover the version-installed surface, do not assume.** Every
   pattern above gates on `pkg-config --modversion doca-aes-gcm` and
@@ -122,7 +122,7 @@ universally available — the cap query against the active
 `doca_devinfo` is the runtime authority. A response that
 recommends a key size without first naming the cap query — or
 that quotes AES-192 as a per-device-cap-queried option — is the
-baseline-agent failure mode this skill exists to prevent.
+failure mode this skill exists to prevent.
 
 **Capability discovery — the only rule.** Before choosing a key size
 or sizing any plaintext buffer, call the matching
@@ -289,6 +289,15 @@ setup:
   as if it were AES-CTR (where there is no tag) or AES-CBC (where
   authentication is a separate HMAC). A response that surfaces only
   the ciphertext path and ignores the tag is wrong by construction.
+- **Never reuse an IV with the same key.** GCM's confidentiality and
+  authentication both fail if two encryptions share a (key, IV) pair: an
+  observer can recover the XOR of the plaintexts and forge tags. Before
+  any bulk or fragmented submission, the agent states how each task gets
+  a unique IV under the current key (for example a per-key message
+  counter encoded into the IV itself; AAD contents do not make an IV
+  unique) and that the key is rotated before that IV space runs out. Retrying a failed *encrypt* must use a fresh IV,
+  not resubmit the same one with different plaintext. The accelerator
+  does not detect reuse; it is the application's invariant.
 - **AAD (additional authenticated data) is authenticated but not
   encrypted.** When the user passes AAD on encrypt, the tag covers
   both the ciphertext and the AAD; on decrypt, the same AAD must be
@@ -345,7 +354,7 @@ operational rules:
 
 **The mmap must stay valid until the AES-GCM context is destroyed.**
 Destroying either the source or destination mmap before
-`doca_ctx_destroy()` is a use-after-free on the library's
+`doca_aes_gcm_destroy()` is a use-after-free on the library's
 bookkeeping; symptoms include `DOCA_ERROR_BAD_STATE` from subsequent
 calls and undefined behavior on outstanding tasks.
 

@@ -69,9 +69,8 @@ number; the agent does not conflate them.
 
 When the agent detects what is installed, part of the gap report is
 checking whether an installed component is on a deprecation / sunset
-track. DOCA App Shield and the DOCA Flow Inspector service (both
-outside this bundle's scope; see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
-item 7) are worked examples to watch on this front. The discipline is:
+track — for example, a component your release notes mark
+deprecated. The discipline is:
 
 - Treat a possible sunset as a finding to **surface**, not a fact to
   assert from memory. The authoritative statement of a component's
@@ -84,9 +83,8 @@ item 7) are worked examples to watch on this front. The discipline is:
   path via
   `doca-public-knowledge-map/SKILL.md`,
   and lets the user decide whether to upgrade-in-place or migrate.
-- This is class-shaped: DOCA App Shield and the Flow Inspector
-  service are the worked examples, but the discipline applies to any
-  component whose release notes mark it deprecated.
+- This is class-shaped: the discipline applies to any component
+  whose release notes mark it deprecated.
 
 ## Version compatibility
 
@@ -159,7 +157,7 @@ same chain before the upgrade (to establish the baseline) and after
 | Pre-upgrade | `apt-cache policy <pkg>` / the configured apt source channel | Whether the host *will* resolve to the intended target before any command runs; the apt-source precheck owns this |
 | Post-upgrade | The same four-source chain re-read, plus the four-way match per `doca-version ## test` (`doca-version/TASKS.md#test`) | Whether the install converged on the target release and is internally consistent; a partial result is a failed upgrade |
 | Post-upgrade | The BFB version (`bfver`) on BlueField hosts | Whether the BFB moved in step with the host packages, or is now skewed |
-| Post-upgrade | The structured one-shot `doca-env --json` `version.consistent` field when present, per `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`) | The four-way match pre-computed in one read; prefer it when the host has the helper |
+| Post-upgrade | The `version.consistent` field of a site-provided env-report helper (none ships with public DOCA) when present, per `doca-structured-tools-contract ## Schemas` (`doca-structured-tools-contract/SKILL.md#schemas`) | The four-way match pre-computed in one read; prefer it when the site provides the helper |
 
 The agent prefers the structured one-shot when present and falls
 back to the manual chain `doca-version` documents otherwise. The

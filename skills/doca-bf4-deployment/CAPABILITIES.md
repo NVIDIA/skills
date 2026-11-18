@@ -129,7 +129,7 @@ Update** flow driven over Redfish. The class-level surface:
 
 The target versions for every component come from the **public
 BlueField/DOCA release notes** — this skill never cites a specific
-pre-release / "dev drop" firmware version number.
+pre-release firmware version number.
 
 ### Grace Ubuntu image + optional cloud-init via Virtual Media
 

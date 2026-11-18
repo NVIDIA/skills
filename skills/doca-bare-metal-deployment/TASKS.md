@@ -616,11 +616,11 @@ public BlueField Platform Software Manual.
    UEFI → Linux up → first-boot init.
 4. **Do not trust `bfb-install` exit code 0 alone.** This is the
    single most expensive failure mode in the operator's loop.
-   `bfb-install` has been observed in the field to exit 0 while
+   A known failure mode is `bfb-install` exiting 0 while
    the Arm-side flow only partially completed — the canonical
-   field-reported signature is *"Ubuntu installation completed"*
-   (or *"Ubuntu installation finished"*, both phrasings have
-   been seen in different BFB releases) followed by an
+   signature is *"Ubuntu installation completed"*
+   (or *"Ubuntu installation finished"*; wording varies by BFB
+   release, so check the BSP manual) followed by an
    `INFO[MISC]: NIC firmware update failed` line in the RShim
    console / log, meaning the OS image landed but the
    firmware-update sub-step silently failed. The agent ALWAYS
@@ -802,7 +802,7 @@ This is a **reasoning ladder, not a binary**: an Arm OS can be
 "Linux up" AND "host PFs unbound" simultaneously; the agent
 walks the ladder top-to-bottom and reports every state that
 matches, not just the first. The point is the *sequencing of
-evidence collection*, so two ops engineers reading the same
+evidence collection*, so two operators reading the same
 console output reach the same triage step.
 
 1. **`installer-still-running`.** Evidence: `bfb-install` is still
@@ -918,11 +918,12 @@ detect → prefer → fall back → report contract documented in
 `doca-structured-tools-contract ## The agent behavior contract` (`doca-structured-tools-contract/SKILL.md#the-agent-behavior-contract`),
 the agent should:
 
-1. Probe for the matching structured helper FIRST (`doca-env
-   --json` for version + devices + libraries + drivers +
-   hugepages in one shot; `collect-host-state` /
-   `collect-dpu-state` for the host-side device topology;
-   `version-matrix.json` for *"available since"* lookups).
+1. Check whether your site provides an optional structured helper
+   (for example an env-report script that emits JSON) per
+   `doca-structured-tools-contract`; none ships with public DOCA,
+   so by default use the real commands
+   (`pkg-config --modversion doca-common`, `doca_caps --version`,
+   `cat /opt/mellanox/doca/applications/VERSION`).
 2. If the probe succeeds, the structured tool's output is the
    authoritative answer and the agent SHOULD NOT also run the
    manual command in the row below. Report *"using structured

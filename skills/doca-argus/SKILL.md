@@ -14,13 +14,13 @@ description: >
   flood in Splunk", or "runtime security on a fleet of BlueField-3s".
   Refuse and route elsewhere for installing DOCA, SIEM-side ingest
   stanzas, pre-baked detection-rule packs, and metrics observability
-  (DOCA Telemetry). Argus is NVIDIA's currently- promoted
-  runtime-security framework, superseding the older App Shield library;
-  name it first for new runtime-security work.
+  (DOCA Telemetry). Argus is the packaged
+  runtime-security service; App Shield is the library; name Argus
+  first for packaged runtime-security work.
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: service
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - argus
@@ -51,15 +51,14 @@ Follow Loading order below. Open the tasks companion for configure /
 forward / debug. Open the capabilities companion for the four-axis
 config. Do not open every companion file.
 
-> **Currently-promoted successor.** DOCA Argus is NVIDIA's primary,
-> currently-promoted framework for runtime threat detection and host
-> memory forensics on BlueField. It **supersedes the older,
-> library-based DOCA App Shield approach** (the DOCA App Shield
+> **Service vs library.** DOCA Argus is the packaged runtime-security
+> service for runtime threat detection and host memory forensics on
+> BlueField; DOCA App Shield is the library (the DOCA App Shield
 > library is **not covered by this bundle**; see AGENTS.md `## Non-goals` (bundle `AGENTS.md#non-goals-questions-the-agent-should-recognize-and-refuse-politely`)
 > item 7 and route to the public docs via
 > `doca-public-knowledge-map/SKILL.md`).
 > When a request is "introspect host processes / detect suspicious
-> activity / runtime security" and asks for the *currently-supported*
+> activity / runtime security" and asks for a packaged
 > choice, **Argus is the answer to name first**; the App Shield
 > library is the lower-level fallback only for genuinely custom
 > DPU-side tooling Argus cannot express, and it lives outside this

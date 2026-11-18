@@ -14,13 +14,13 @@ description: >
   Ubuntu image with optional cloud-init. Trigger on BlueField-4/BF4
   bring-up phrasings even without "BF4": {bring up my new BlueField-4},
   {the BlueField ISO will not boot over HTTP from the BMC}, {attach BF4
-  virtual media via Redfish}, {BF4 firmware Task stuck at Running}, {prepare a BlueField-4 host: platform
-  support, version alignment, safest first smoke test}. Route
+  virtual media via Redfish}, {BF4 firmware Task stuck at Running}, or preparing a BlueField-4 host
+  (platform support, version alignment, safest first smoke test). Route
   application launch and library APIs to other skills.
 metadata:
   author: NVIDIA <doca-feedback@nvidia.com>
   kind: library
-  doca_version: "3.5"
+  doca_version: "3.6"
   tags:
     - doca
     - bluefield-4
@@ -49,7 +49,7 @@ compatibility: >
 **BlueField-3 or any other generation is not this skill.** Name
 `doca-bf3-deployment` and stop; do not read further or run commands.
 
-## Preparing a BlueField-4 host (answer from here)
+## Preparing a BlueField-4 host
 
 1. **Platform:** confirm it is BlueField-4 and that the BMC is reachable
    out of band; compare

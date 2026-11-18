@@ -65,6 +65,20 @@ configuration and feature set the device is in:
   § *Forward-to-target actions*), RSS (`DOCA_FLOW_FWD_RSS`), drop
   (`DOCA_FLOW_FWD_DROP`), modify (header rewrite, decap, encap), and
   counter. Encap/decap depends on the firmware feature set.
+- **Definition mode.** The public DOCA Flow header defines a
+  `DOCA_FLOW_DEFINITIONS_MODE_*` family for app-defined versus
+  library-defined definitions.
+- **External actions.** DOCA Flow now exposes external-action operation
+  families for memory, mutex, RIA, and timer; see the
+  `DOCA_FLOW_EXTERNAL_ACTION_*` families in the public DOCA Flow header.
+- **MACsec crypto.** The public DOCA Flow header now defines MACsec crypto
+  constants for header type, offset choices, PN offload, and resource type;
+  see the `DOCA_FLOW_CRYPTO_*` families.
+- **CT TCP window validation.** CT TCP window validation is configured
+  through the port configuration callback setter; the public DOCA Flow
+  header defines the validation state, packet syndrome, and last-packet
+  constants in the `DOCA_FLOW_CT_TCP_WINDOW_VALIDATION_*` families, plus
+  the CT entry flag for enabling it.
 - **Capability discovery at runtime.** Query through the installed
   `doca_caps` tool and the Flow capability-query API rather than guessing
   from docs. When the user has not checked feature support, capability
@@ -75,7 +89,7 @@ configuration and feature set the device is in:
 
 A pipe expresses **one logic step**: its execution order is fixed
 *match → actions → fwd*, and pipe configuration (match fields, actions,
-forwarding) is **immutable after creation** — only entries are
+forwarding, isolation type, packet window) is **immutable after creation** — only entries are
 added/removed/updated at runtime. Chain pipes with `DOCA_FLOW_FWD_PIPE`
 when the request implies more than one step.
 
@@ -91,6 +105,16 @@ Decomposition rules:
 3. **Group by transform shape, not entry count.** Many entries doing the
    same transform in one pipe is cheaper than several small pipes; mixing
    transform shapes in one pipe is impossible (rule 1).
+
+Pipe isolation and packet windowing are now part of pipe configuration.
+Before creating a pipe, set the isolation type with
+`doca_flow_pipe_cfg_set_isolation_type(cfg, isolation_type)` and the packet
+window with `doca_flow_pipe_cfg_set_packet_window(cfg, packet_window_cfg)`.
+The isolation type controls how the pipe is isolated from other pipes; the
+packet window config controls packet windowing for the pipe. Both are
+immutable after pipe creation, so choose them when decomposing logic into
+pipes. See `enum doca_flow_pipe_isolation_type` and
+`struct doca_flow_packet_window_cfg` in the installed `doca_flow.h`.
 
 Worked examples:
 
@@ -206,6 +230,22 @@ and use the canonical name:
 | `DOCA_FLOW_ENTRY_FLAGS_NONE` | no such flag — pass `0` for default; only `_NO_WAIT` / `_WAIT_FOR_BATCH` exist |
 | `doca_pci.h` / `doca_pci_bdf` (open a NIC by PCI BDF) | no DOCA "pci" header exists — open by BDF with `open_doca_device_with_pci(bdf, NULL, &dev)` (`samples/common.h`), or match a `doca_devinfo` via `doca_devinfo_is_equal_pci_addr()` |
 
+DOCA 3.6 removed the standalone CT config family (`doca_flow_ct_cfg_*`)
+and the CT init/destroy entry points (`doca_flow_ct_init`,
+`doca_flow_ct_destroy`). Do not call those names; CT configuration is now
+done through pipe/port configuration setters and the new constant families
+below.
+
+DOCA 3.6 added pipe/port configuration setters:
+`doca_flow_pipe_cfg_set_isolation_type()`,
+`doca_flow_pipe_cfg_set_packet_window()`,
+`doca_flow_port_cfg_set_cb_ct_tcp_window_validation()`,
+`doca_flow_port_cfg_set_cb_message_process()`,
+`doca_flow_port_cfg_set_message_queue_depth()`,
+`doca_flow_port_cfg_set_nr_message_queues()`, and
+`doca_flow_port_crypto_macsec_update_pn()`. Verify exact signatures in the
+public flow header (`doca_flow*.h`).
+
 Add-entry is **pipe-type-specific** — there is no generic
 `doca_flow_pipe_add_entry()`. An `undefined reference to
 doca_flow_pipe_add_entry` at link time means exactly this:
@@ -240,6 +280,13 @@ real symbol — re-grep the prefix. If the compiler points at a name ending
 in `_vN` (e.g. `doca_flow_pipe_basic_add_entry_v1`), that suffix is
 ABI-versioning machinery for the same function; apply the fix to the
 un-suffixed call.
+
+DOCA 3.6 added new constant families: `DOCA_FLOW_CRYPTO_*`,
+`DOCA_FLOW_CT_TCP_WINDOW_VALIDATION_*`, `DOCA_FLOW_EXTERNAL_ACTION_*`,
+`DOCA_FLOW_DEFINITIONS_MODE_*`, and `DOCA_FLOW_CT_ENTRY_FLAGS_*`; it also
+added a built-in message timer timeout constant and a deprecated-enum
+marker. Do not guess individual members; verify them in the public flow
+header (`doca_flow*.h`).
 
 Names that *look* invented but **are** real (verify, then use without
 second-guessing): `doca_flow_port_switch_get()`,
@@ -364,16 +411,17 @@ hardware-accelerated 5-tuple connection tracking, aging timers, and
 NAT-aware actions (SNAT / DNAT). It is **not** a separate library — it ships
 inside doca-flow.
 
-**Layering rule (non-negotiable).** `doca_flow_ct_init(cfg)` (configured via
-`struct doca_flow_ct_cfg`) is a one-time, process-global call that runs AFTER
-`doca_flow_init()` but BEFORE any port starts; CT entries can be added only
-once the ports and the wrapped pipes are up. CT is **global, not per-port** —
-one `doca_flow_ct_init` even across several ports; there is no per-port CT
-context. It owns the CT entry table, the aging config, and the CT-aware pipes
-wrapping the ports' pipes, and is torn down by `doca_flow_ct_destroy(void)`
-before `doca_flow_destroy`. CT **extends** the doca-flow setup, never replaces
-it: treating CT as a standalone library, a per-port context, or rebuilding
-doca-flow from scratch to add CT is the layering error. If doca-flow is not
+**Layering rule (non-negotiable, DOCA 3.6).** CT is configured on each port's
+`doca_flow_port_cfg` (`doca_flow_port_cfg_set_ct_direction`, `_set_ct_flags`,
+`_set_ct_actions_mem_size`, the aging setters, `_set_cb_ct_tcp_window_validation`)
+AFTER `doca_flow_init()` and BEFORE that port starts; CT pipes are sized with
+the `doca_flow_pipe_cfg_set_ct_*` setters, and CT entries can be added only once
+the ports and CT pipes are up. DOCA 3.6 removed the process-global
+`doca_flow_ct_init` / `doca_flow_ct_destroy` and the `doca_flow_ct_cfg_*`
+family; teardown is entries, then CT pipes, then port stop, then
+`doca_flow_destroy`. CT is not a `doca_ctx`. CT **extends** the doca-flow
+setup, never replaces it: treating CT as a standalone library, a `doca_ctx`,
+or rebuilding doca-flow from scratch to add CT is the layering error. If doca-flow is not
 initialized yet, route to [`TASKS.md ## configure`](TASKS.md#configure) first.
 
 **Path selection — stateless vs CT vs Linux kernel conntrack.**
@@ -408,8 +456,8 @@ ask for *more*, confirm via the cap-query before promising it.
 | Action class | How to confirm support |
 | --- | --- |
 | State-tracking only (new → established → related → closed) | Base CT capability — gated by `doca_flow_ct_cap_is_dev_supported(devinfo)` |
-| SNAT (rewrite source address / port; reverse is symmetric) | Same device-support query; NAT direction is requested through `doca_flow_ct_cfg_set_direction` and the CT actions, not a separate cap query |
-| DNAT (rewrite destination address / port; reverse is symmetric) | Same device-support query; configured via `doca_flow_ct_cfg_set_direction` and the CT actions |
+| SNAT (rewrite source address / port; reverse is symmetric) | Same device-support query; NAT direction is requested through `doca_flow_port_cfg_set_ct_direction` and the CT actions, not a separate cap query |
+| DNAT (rewrite destination address / port; reverse is symmetric) | Same device-support query; configured via `doca_flow_port_cfg_set_ct_direction` and the CT actions |
 | SNAT + DNAT combined (full-cone, hairpin, double NAT) | Same device-support query; confirm the combined behavior empirically — there is no per-variant cap symbol |
 | Overlay-aware CT (inner 5-tuple over VXLAN / GENEVE / …) | Same device-support query; confirm overlay handling against the shipped CT sample |
 
@@ -428,8 +476,8 @@ through more cap queries:
 | Concern | How it is actually handled |
 | --- | --- |
 | Max concurrent CT flows | Sized per CT pipe since DOCA 3.4 (`doca_flow_pipe_cfg_set_ct_connections`, `doca_flow_pipe_cfg_set_ct_max_connections_per_zone`, `doca_flow_pipe_cfg_set_ct_dup_filter_size`), not via `doca_flow_ct_cfg_set_*`; oversubscription surfaces as `DOCA_ERROR_FULL` / `_NO_MEMORY` at runtime, so validate against the workload's peak |
-| Aging-timer configuration | Set via `doca_flow_ct_cfg_set_aging_query_delay` and the aging plugin ops; an unworkable value surfaces as `DOCA_ERROR_INVALID_VALUE` at init/configure |
-| NAT variants (SNAT / DNAT / combined) | Requested through `doca_flow_ct_cfg_set_direction` and the CT actions; an unsupported request surfaces as `_NOT_SUPPORTED` at entry add — there is no per-variant cap query |
+| Aging-timer configuration | Set on the port cfg via `doca_flow_port_cfg_set_ct_aging_query_delay` and `_set_ct_aging_plugin_ops` (aging runs on the port's counter service thread); an unworkable value surfaces as `DOCA_ERROR_INVALID_VALUE` at port configure |
+| NAT variants (SNAT / DNAT / combined) | Requested through `doca_flow_port_cfg_set_ct_direction` and the CT actions; an unsupported request surfaces as `_NOT_SUPPORTED` at entry add — there is no per-variant cap query |
 | Overlay encapsulations for CT | Confirmed against the shipped CT sample and runtime behavior, not a per-overlay cap symbol |
 
 **Empirical CT checks are isolation-only.** Confirm NAT variants,
@@ -452,7 +500,7 @@ in [`## Error taxonomy`](#error-taxonomy):
 
 | Error | CT-specific cause |
 | --- | --- |
-| `DOCA_ERROR_BAD_STATE` | Layering / lifecycle violation: `doca_flow_ct_init` called after a port was already started (it must run before port start), OR a CT entry add before the ports and wrapped pipes are up, OR calling `doca_flow_ct_destroy` out of order relative to `doca_flow_destroy` |
+| `DOCA_ERROR_BAD_STATE` | Layering / lifecycle violation: CT port settings applied after the port was already started (they must precede port start), OR a CT entry add before the ports and CT pipes are up, OR teardown out of order (entries, CT pipes, port stop, then `doca_flow_destroy`) |
 | `DOCA_ERROR_NOT_SUPPORTED` | NAT variant / overlay / aging range / CT feature is unsupported on this device + firmware combo. Re-run `doca_flow_ct_cap_is_dev_supported(devinfo)` to confirm the device supports CT at all; surface which DOCA version is installed. Do not retry the same spec on the same device |
 | `DOCA_ERROR_FULL` (or `_NO_MEMORY`) | CT entry table at capacity. Read the per-CT-entry counters to identify idle / stale entries; either wait for aging to evict them or evict explicitly. The documented surface has no separate max-concurrent-flows cap getter: do not invent one. Use the configured table sizing accepted by the installed CT sample/API plus observed add failures, then surface a device-fit gap if the required peak cannot be admitted |
 | `DOCA_ERROR_INVALID_VALUE` | Malformed 5-tuple (zero protocol, mismatched IP versions on src / dst), NAT translation that conflicts with an existing entry (two entries cannot map the same translated 5-tuple to two different connections), unsupported overlay configuration, or an aging value rejected by the installed CT configuration API. Confirm accepted values from the installed header/sample and setter return; do not claim a numeric cap-advertised range |
@@ -495,7 +543,7 @@ container semantics, and the headers-win-over-docs rule, see
   verify the symbol exists in the installed headers, then read the Flow
   guide for *that* release.
 - `pkg-config --modversion doca-flow` is the build-time anchor for the
-  version-matrix lookup in
+  capability-availability lookup in
   `doca-version/TASKS.md#test` step 2.
 
 Read the headers and the matching release notes for symbol

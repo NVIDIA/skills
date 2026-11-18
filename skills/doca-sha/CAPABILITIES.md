@@ -231,7 +231,7 @@ setup:
 
 **The mmap must stay valid until the SHA context is destroyed.**
 Destroying either the source or destination mmap before
-`doca_ctx_destroy()` is a use-after-free on the library's
+`doca_sha_destroy()` is a use-after-free on the library's
 bookkeeping; symptoms include `DOCA_ERROR_BAD_STATE` from
 subsequent calls and undefined behavior on outstanding tasks.
 
