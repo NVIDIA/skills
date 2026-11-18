@@ -162,7 +162,7 @@ asynchronously with `qpu_id` to all GPUs simultaneously.
 import cudaq
 
 cudaq.set_target("nvidia", option="mqpu")
-n_qpus = cudaq.get_platform().num_qpus()
+n_qpus = cudaq.get_target().num_qpus()
 
 futures = [
     cudaq.observe_async(kernel, hamiltonian, params, qpu_id=i % n_qpus)
