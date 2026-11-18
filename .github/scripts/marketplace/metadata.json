@@ -2425,6 +2425,18 @@
       }
     },
     {
+      "path": "skills/ising-calibration-setup",
+      "name": "ising-calibration-setup",
+      "description": "Use when connecting to the NVIDIA Ising Calibration model via the hosted API or a self-hosted NIM. Covers auth, keys and connectivity checks only.",
+      "metadata": {
+        "product.primary": "Ising",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "quantum-computing",
+        "audience": "quantum_researcher,application_developer,devops_engineer,platform_engineer,developer",
+        "discovery.activity_tags": "get_started,configure,validate,troubleshoot,integrate"
+      }
+    },
+    {
       "path": "skills/jetson-build-source",
       "name": "jetson-build-source",
       "description": "Use when you need to rebuild the BSP overlay — DT, OOT modules, or kernel — from changes under bsp_sources/. Triggers: build bsp, rebuild dtb, rebuild kernel.",
@@ -5458,6 +5470,30 @@
         "catalog.subdomain": "gpu-development",
         "audience": "developer,ml_engineer,ai_engineer,hpc_developer,application_developer",
         "discovery.activity_tags": "integrate,optimize,configure,inference,train"
+      }
+    },
+    {
+      "path": "skills/triton-onnx-model-repository",
+      "name": "triton-onnx-model-repository",
+      "description": "Deploy a user's ONNX file as a working Triton Inference Server endpoint, end to end. Use when the user has a .onnx file and wants it served, wants a config.pbtxt generated from the ONNX graph, or wants to debug a Triton load or inference failure on an ONNX model. Use triton-pytorch-model-repository for .pt files and triton-tensorrt-model-repository for .plan engines.",
+      "metadata": {
+        "product.primary": "Triton Inference Server",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,devops_engineer,application_developer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,debug,inference,validate"
+      }
+    },
+    {
+      "path": "skills/triton-pytorch-model-repository",
+      "name": "triton-pytorch-model-repository",
+      "description": "Deploy a user's PyTorch model as a working Triton Inference Server endpoint, end to end. Use when the user has a TorchScript .pt file or a PT2 archive (.pt2 from torch.export + AOT Inductor) and wants it served, wants a config.pbtxt written from scratch, or wants to debug a Triton load or inference failure on a PyTorch model. Use triton-onnx-model-repository for .onnx files and triton-tensorrt-model-repository for .plan engines.",
+      "metadata": {
+        "product.primary": "Triton Inference Server",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,application_developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "deploy,configure,inference,debug,troubleshoot"
       }
     },
     {

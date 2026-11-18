@@ -406,7 +406,9 @@
         "proteinmpnn-nim",
         "rfd4-proteina-nim",
         "rfdiffusion-nim",
-        "tao-run-inference-service"
+        "tao-run-inference-service",
+        "triton-onnx-model-repository",
+        "triton-pytorch-model-repository"
       ]
     },
     {
@@ -479,7 +481,8 @@
       "description": "Build, run, and validate quantum and hybrid quantum-classical applications, including CUDA-Q development workflows.",
       "skills": [
         "cudaq-guide",
-        "cudaq-importing"
+        "cudaq-importing",
+        "ising-calibration-setup"
       ]
     },
     {

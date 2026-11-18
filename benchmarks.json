@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 465,
-  "result_row_count": 4389,
+  "skill_count": 468,
+  "result_row_count": 4419,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -1308,13 +1308,13 @@
     },
     {
       "skill": "cudaq-guide",
-      "evaluation_date": "2026-09-11",
+      "evaluation_date": "2026-11-17",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
+      "evaluator_version": "1.6.9",
       "dataset_digest": "sha256:7884d2878ed008a3969a7668a02fb2f9fda8e70495368a69ca8bf4ce1f6071dd",
-      "validation_status": null,
+      "validation_status": "passed",
       "tasks": 13,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -1325,7 +1325,7 @@
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "has_results": true,
-      "average_uplift_pct": 8.68
+      "average_uplift_pct": 12.28
     },
     {
       "skill": "cudaq-importing",
@@ -4241,6 +4241,27 @@
       "average_uplift_pct": 28.98
     },
     {
+      "skill": "ising-calibration-setup",
+      "evaluation_date": "2026-11-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:7bcd71995dd5970325a3c55dca88a58c524bf50d9aef5648358643d00f01b048",
+      "validation_status": "passed",
+      "tasks": 9,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "has_results": true,
+      "average_uplift_pct": 17.12
+    },
+    {
       "skill": "jetson-build-source",
       "evaluation_date": "2026-05-30",
       "environment": "local",
@@ -5277,9 +5298,9 @@
     },
     {
       "skill": "nemo-fabric-integrate",
-      "evaluation_date": "2026-10-29",
+      "evaluation_date": "2026-11-18",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.4",
+      "evaluator_version": "1.6.9",
       "dataset_digest": "sha256:4e12e11bb429ad195c00ceab9cd53bbf6351f32173f03b0ae827531ba2441a9e",
       "validation_status": "passed",
       "tasks": 6,
@@ -5294,7 +5315,7 @@
       "catalog_dir": "nemo-fabric-integrate",
       "component": "NeMo Fabric",
       "has_results": true,
-      "average_uplift_pct": 11.52
+      "average_uplift_pct": 28.25
     },
     {
       "skill": "nemo-mbridge-mlm-bridge-training",
@@ -7083,10 +7104,10 @@
     },
     {
       "skill": "using-ovnewton",
-      "evaluation_date": "2026-10-19",
+      "evaluation_date": "2026-10-14",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:229164b02575b0e70ff657dae1616a1289f9db36e537a0fbb9465d6694922319",
+      "dataset_digest": "sha256:207f3dfeb5504f9b90e549d26ffcd798dc3df9d4764d50d0f11043cc5e892ab3",
       "validation_status": null,
       "tasks": 7,
       "attempts_per_task": 1,
@@ -7100,7 +7121,7 @@
       "catalog_dir": "ovnewton-usage",
       "component": "ovnewton",
       "has_results": true,
-      "average_uplift_pct": 18.07
+      "average_uplift_pct": 27.03
     },
     {
       "skill": "paidf-cosmos-predict",
@@ -7185,7 +7206,7 @@
     },
     {
       "skill": "physical-ai-physics-selection",
-      "evaluation_date": "2026-10-16",
+      "evaluation_date": "2026-10-14",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.5.6",
       "dataset_digest": "sha256:8f634bf9512031e90d3fd187a56f4049871355b21e5f96efbbe09abb60fa9858",
@@ -9522,6 +9543,48 @@
       "component": "TileGym",
       "has_results": true,
       "average_uplift_pct": 12.0
+    },
+    {
+      "skill": "triton-onnx-model-repository",
+      "evaluation_date": "2026-11-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:4f5a3a16d08c0c6097e9f4feed77951af9e79a193496d17fec7ed7d89531219a",
+      "validation_status": "passed",
+      "tasks": 10,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "has_results": true,
+      "average_uplift_pct": 12.33
+    },
+    {
+      "skill": "triton-pytorch-model-repository",
+      "evaluation_date": "2026-11-17",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.9",
+      "dataset_digest": "sha256:6590ed5a89d7c12a607bc2f8305ff42c176a8f43d043fd07c29d22c4781e2e9d",
+      "validation_status": "passed",
+      "tasks": 12,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "has_results": true,
+      "average_uplift_pct": 8.37
     },
     {
       "skill": "vss-ask-video",
@@ -15195,26 +15258,26 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "cudaq-guide",
+      "component": "CUDA-Q",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.5,
+      "uplift_pct": 12.3
+    },
+    {
+      "catalog_dir": "cudaq-guide",
+      "component": "CUDA-Q",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
       "score_pct": 92.3,
-      "uplift_pct": 6.6
-    },
-    {
-      "catalog_dir": "cudaq-guide",
-      "component": "CUDA-Q",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 98.5,
-      "uplift_pct": 6.2
-    },
-    {
-      "catalog_dir": "cudaq-guide",
-      "component": "CUDA-Q",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": 8.5
+      "uplift_pct": 3.1
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -15222,7 +15285,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.5,
+      "score_pct": 96.0,
       "uplift_pct": null
     },
     {
@@ -15231,7 +15294,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.0,
+      "score_pct": 94.5,
       "uplift_pct": null
     },
     {
@@ -15240,8 +15303,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 79.9,
-      "uplift_pct": 10.7
+      "score_pct": 87.8,
+      "uplift_pct": 36.5
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -15249,8 +15312,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.1,
-      "uplift_pct": 20.1
+      "score_pct": 76.3,
+      "uplift_pct": 21.8
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -15258,7 +15321,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 91.9,
+      "score_pct": 83.4,
       "uplift_pct": null
     },
     {
@@ -15267,7 +15330,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 77.1,
+      "score_pct": 66.9,
       "uplift_pct": null
     },
     {
@@ -26836,6 +26899,96 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 11.1
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.8,
+      "uplift_pct": 35.6
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.1,
+      "uplift_pct": 11.1
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 89.0,
+      "uplift_pct": 39.6
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.5,
+      "uplift_pct": 5.3
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "ising-calibration-setup",
+      "component": "Ising",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 72.7,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "jetson-build-source",
       "component": "Jetson BSP",
       "dimension": "Security",
@@ -30801,8 +30954,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 66.7,
-      "uplift_pct": -33.3
+      "score_pct": 100.0,
+      "uplift_pct": 16.7
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -30811,7 +30964,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 83.3,
-      "uplift_pct": 0.0
+      "uplift_pct": -16.7
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -30829,7 +30982,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 63.3,
-      "uplift_pct": 23.3
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -30837,7 +30990,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.8,
+      "score_pct": 91.3,
       "uplift_pct": null
     },
     {
@@ -30846,7 +30999,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 88.8,
+      "score_pct": 87.5,
       "uplift_pct": null
     },
     {
@@ -30855,8 +31008,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 35.9,
-      "uplift_pct": 2.4
+      "score_pct": 65.1,
+      "uplift_pct": 26.1
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -30864,8 +31017,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 63.1,
-      "uplift_pct": 20.0
+      "score_pct": 70.1,
+      "uplift_pct": 46.7
     },
     {
       "catalog_dir": "nemo-fabric-integrate",
@@ -30873,7 +31026,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 77.0,
+      "score_pct": 72.8,
       "uplift_pct": null
     },
     {
@@ -30882,7 +31035,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 74.6,
+      "score_pct": 76.4,
       "uplift_pct": null
     },
     {
@@ -38271,8 +38424,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 42.9
+      "score_pct": 92.9,
+      "uplift_pct": 14.3
     },
     {
       "catalog_dir": "ovnewton-usage",
@@ -38281,7 +38434,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 85.7,
-      "uplift_pct": -14.3
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "ovnewton-usage",
@@ -38289,25 +38442,25 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 94.3,
+      "score_pct": 100.0,
+      "uplift_pct": 45.7
+    },
+    {
+      "catalog_dir": "ovnewton-usage",
+      "component": "ovnewton",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
       "uplift_pct": 22.9
     },
     {
       "catalog_dir": "ovnewton-usage",
       "component": "ovnewton",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 88.6,
-      "uplift_pct": 2.9
-    },
-    {
-      "catalog_dir": "ovnewton-usage",
-      "component": "ovnewton",
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 98.0,
       "uplift_pct": null
     },
     {
@@ -38316,7 +38469,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.0,
+      "score_pct": 93.0,
       "uplift_pct": null
     },
     {
@@ -38325,8 +38478,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 87.9,
-      "uplift_pct": 32.9
+      "score_pct": 89.6,
+      "uplift_pct": 48.9
     },
     {
       "catalog_dir": "ovnewton-usage",
@@ -38334,8 +38487,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 79.3,
-      "uplift_pct": 21.1
+      "score_pct": 91.8,
+      "uplift_pct": 30.4
     },
     {
       "catalog_dir": "ovnewton-usage",
@@ -38343,7 +38496,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 93.9,
+      "score_pct": 92.7,
       "uplift_pct": null
     },
     {
@@ -38352,7 +38505,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 69.1,
+      "score_pct": 71.0,
       "uplift_pct": null
     },
     {
@@ -38632,7 +38785,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 94.4,
-      "uplift_pct": 5.5
+      "uplift_pct": 2.7
     },
     {
       "catalog_dir": "physical-ai-physics-selection",
@@ -38650,7 +38803,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 11.1
+      "uplift_pct": 10.0
     },
     {
       "catalog_dir": "physical-ai-physics-selection",
@@ -38658,8 +38811,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.9,
-      "uplift_pct": 1.1
+      "score_pct": 100.0,
+      "uplift_pct": 2.2
     },
     {
       "catalog_dir": "physical-ai-physics-selection",
@@ -38667,7 +38820,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.1,
+      "score_pct": 98.8,
       "uplift_pct": null
     },
     {
@@ -38676,7 +38829,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 89.4,
+      "score_pct": 92.5,
       "uplift_pct": null
     },
     {
@@ -38685,8 +38838,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.1,
-      "uplift_pct": 19.6
+      "score_pct": 95.3,
+      "uplift_pct": 18.1
     },
     {
       "catalog_dir": "physical-ai-physics-selection",
@@ -38694,8 +38847,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.6,
-      "uplift_pct": 5.3
+      "score_pct": 97.2,
+      "uplift_pct": 9.6
     },
     {
       "catalog_dir": "physical-ai-physics-selection",
@@ -38703,7 +38856,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.8,
+      "score_pct": 89.5,
       "uplift_pct": null
     },
     {
@@ -38712,7 +38865,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 43.0,
+      "score_pct": 36.6,
       "uplift_pct": null
     },
     {
@@ -48380,6 +48533,186 @@
       "agent": "codex",
       "score_pct": 97.0,
       "uplift_pct": 7.0
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": 5.0
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": 18.0
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 74.0,
+      "uplift_pct": 18.0
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 59.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 58.3,
+      "uplift_pct": 14.0
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 39.2,
+      "uplift_pct": 9.0
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 77.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "triton-onnx-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 67.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.7,
+      "uplift_pct": 4.2
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 98.3,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": -1.7
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 87.2,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 91.0,
+      "uplift_pct": 33.4
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.0,
+      "uplift_pct": -0.7
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "triton-pytorch-model-repository",
+      "component": "Triton Inference Server",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 71.5,
+      "uplift_pct": null
     },
     {
       "catalog_dir": "vss-ask-video",
