@@ -1,0 +1,37 @@
+{
+  "evidence_kind": "synthetic_configuration_fixture",
+  "model_source": "alphafold2_multimer_1",
+  "draft": {
+    "recycling_steps": 3,
+    "max_recycling_iters": 3,
+    "recycle_early_stop_tolerance": 0.5
+  },
+  "samples": [
+    {
+      "id": "protein-pair",
+      "chemical_class": "protein-protein",
+      "polymer_types": [
+        "protein",
+        "protein"
+      ],
+      "has_templates": true
+    },
+    {
+      "id": "protein-ligand",
+      "chemical_class": "protein-ligand",
+      "polymer_types": [
+        "protein",
+        "ccd_ligand"
+      ],
+      "has_templates": false
+    },
+    {
+      "id": "rna",
+      "chemical_class": "ligand",
+      "polymer_types": [
+        "rna"
+      ],
+      "has_templates": false
+    }
+  ]
+}

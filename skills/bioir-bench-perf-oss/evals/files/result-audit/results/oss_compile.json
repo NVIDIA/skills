@@ -1,0 +1,159 @@
+{
+  "evidence_kind": "synthetic_fixture_not_a_hardware_benchmark",
+  "backend": "oss_compile",
+  "model_source": "boltz-2",
+  "gpu": {
+    "device_name": "fixture-device"
+  },
+  "config": {
+    "recycling_steps": 3
+  },
+  "warmup": 1,
+  "repeats": 1,
+  "samples": {
+    "clean": {
+      "residues": 100,
+      "status": "ok",
+      "forward_s": [
+        1.0
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only",
+      "warmup_compile_delta": 1,
+      "measure_compile_delta": 0
+    },
+    "recaptured": {
+      "residues": 100,
+      "status": "ok",
+      "forward_s": [
+        1.0
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only",
+      "warmup_compile_delta": 1,
+      "measure_compile_delta": 1
+    },
+    "monomer-zero": {
+      "residues": 100,
+      "status": "ok",
+      "forward_s": [
+        1.0
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": 0.0,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only",
+      "warmup_compile_delta": 1,
+      "measure_compile_delta": 0
+    },
+    "template-mismatch": {
+      "residues": 100,
+      "status": "ok",
+      "forward_s": [
+        1.0
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 3,
+        "n_busy": 3,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [
+        "/fixture/template.cif",
+        "/fixture/template.cif"
+      ],
+      "template_status": "attached",
+      "n_templates_supplied": 2,
+      "n_templates_attached": 1,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only",
+      "warmup_compile_delta": 1,
+      "measure_compile_delta": 0
+    },
+    "no-polls": {
+      "residues": 100,
+      "status": "ok",
+      "forward_s": [
+        1.0
+      ],
+      "peak_alloc_gb": 1.0,
+      "peak_reserved_gb": 1.5,
+      "gpu_telemetry": {
+        "n_polls": 0,
+        "n_busy": 0,
+        "throttle": []
+      },
+      "unpaired_msas": [],
+      "paired_msas": [],
+      "templates": [],
+      "template_status": "none_declared",
+      "n_templates_supplied": 0,
+      "n_templates_attached": 0,
+      "lddt": 0.8,
+      "dockq": null,
+      "dockq_status": "single_chain",
+      "dockq_scope": "protein_only",
+      "warmup_compile_delta": 1,
+      "measure_compile_delta": 0
+    }
+  },
+  "gpu_telemetry": {
+    "n_ok": 5,
+    "power_draw_w": null,
+    "clocks_sm_mhz": null,
+    "clocks_graphics_mhz": null,
+    "clocks_memory_mhz": null
+  },
+  "compile_stats": {
+    "measurement_stable": true,
+    "compile_dynamic": null
+  }
+}

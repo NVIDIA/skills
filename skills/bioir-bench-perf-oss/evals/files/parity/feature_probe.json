@@ -1,0 +1,45 @@
+{
+  "evidence_kind": "synthetic_preflight_fixture",
+  "template_cap_both": 2,
+  "samples": {
+    "clean": {
+      "supplied_templates": 2,
+      "bioir_populated_slots": 2,
+      "oss_populated_slots": 2,
+      "bioir_paired_rows": [
+        3,
+        3
+      ],
+      "oss_paired_rows": [
+        3,
+        3
+      ]
+    },
+    "template-gap": {
+      "supplied_templates": 2,
+      "bioir_populated_slots": 1,
+      "oss_populated_slots": 2,
+      "bioir_paired_rows": [
+        3,
+        3
+      ],
+      "oss_paired_rows": [
+        3,
+        3
+      ]
+    },
+    "paired-gap": {
+      "supplied_templates": 0,
+      "bioir_populated_slots": 0,
+      "oss_populated_slots": 0,
+      "bioir_paired_rows": [
+        3,
+        3
+      ],
+      "oss_paired_rows": [
+        3,
+        2
+      ]
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "synthetic": true,
+  "purpose": "CPU-only plan review and score arithmetic; no measured model performance",
+  "model_source": "protenix-v2",
+  "shared_runtime_args": {
+    "seed": 101,
+    "recycling_steps": 5,
+    "num_sampling_steps": 200,
+    "diffusion_samples": 5,
+    "gpu_uuid": "fixture-gpu"
+  },
+  "proposed_plan": {
+    "arms": {
+      "bioir": {
+        "config_source": "get_pretrained_config",
+        "overrides": {
+          "edm_sampling_config.frame_reuse_period": 4
+        }
+      }
+    },
+    "include_exact_control": false,
+    "table_caption": "BioIR vs OSS"
+  },
+  "paired_scores": [
+    {
+      "id": "protein-pair",
+      "dockq_status": "ok",
+      "exact": {
+        "lddt": 0.8,
+        "dockq": 0.6
+      },
+      "approximate": {
+        "lddt": 0.79,
+        "dockq": 0.57
+      }
+    },
+    {
+      "id": "monomer",
+      "dockq_status": "single_chain",
+      "exact": {
+        "lddt": 0.7,
+        "dockq": null
+      },
+      "approximate": {
+        "lddt": 0.72,
+        "dockq": null
+      }
+    }
+  ]
+}

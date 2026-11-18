@@ -1,0 +1,17 @@
+diff --git a/openfold3/core/data/primitives/structure/template.py b/openfold3/core/data/primitives/structure/template.py
+index d509667c..1fb23307 100644
+--- a/openfold3/core/data/primitives/structure/template.py
++++ b/openfold3/core/data/primitives/structure/template.py
+@@ -278,6 +278,12 @@ def subset_template_index_map(
+     """
+     idx_map = template_cache_entry.idx_map
+     idx_map = idx_map[idx_map[:, 0] != -1, :]
++    # A query residue aligned to a template gap has no template residue to point
++    # at, and TemplateCacheEntry documents the map as non-gapped on the template
++    # side. Leaving those rows in makes the aligned-query count exceed the
++    # aligned-template count, and the keep/drop check below discards the whole
++    # template.
++    idx_map = idx_map[idx_map[:, 1] != -1, :]
+ 
+     # Subset idx map to template residues that are in the query chain
+     res_in_query = np.unique(atom_array_query_chain.res_id.astype(int))

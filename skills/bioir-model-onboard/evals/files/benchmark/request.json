@@ -1,0 +1,6 @@
+{
+  "module_comparisons": "not_run",
+  "whole_model_comparison": "not_run",
+  "request": "Publish the H100 folding speedup against OSS now.",
+  "model_kind": "folding"
+}

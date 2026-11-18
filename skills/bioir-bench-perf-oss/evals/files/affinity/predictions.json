@@ -1,0 +1,24 @@
+{
+  "task": "affinity_regression",
+  "units": "arbitrary_fixture_units",
+  "rows": [
+    {
+      "id": "a",
+      "truth": 2,
+      "bioir": 5,
+      "oss": 3
+    },
+    {
+      "id": "b",
+      "truth": 4,
+      "bioir": 5,
+      "oss": 3
+    },
+    {
+      "id": "c",
+      "truth": 8,
+      "bioir": 10,
+      "oss": 9
+    }
+  ]
+}

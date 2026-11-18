@@ -1,0 +1,24 @@
+{
+  "evidence_kind": "synthetic_configuration_fixture",
+  "model_source": "protenix-v2",
+  "bioir_request": {
+    "recycling_steps": 5,
+    "num_sampling_steps": 200,
+    "diffusion_samples": 5
+  },
+  "oss_draft": {
+    "model.N_cycle": 5,
+    "sample_diffusion.N_step": 200,
+    "sample_diffusion.N_sample": 5
+  },
+  "seed": 101,
+  "bioir_cuda_major": 13,
+  "oss_requested_wheel": "cuequivariance-ops-torch-cu12",
+  "local_checkpoint": "/weights/protenix-v2.pt",
+  "strict_loads": {
+    "bioir": "not_run",
+    "oss": "not_run"
+  },
+  "proposed_feature_path": "oss",
+  "proposed_oss_compile": true
+}

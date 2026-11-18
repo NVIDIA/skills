@@ -1,0 +1,83 @@
+{
+  "name": "synthetic_preparation_fixture",
+  "items": [
+    {
+      "id": "fixture-complex",
+      "seq_len": 11,
+      "token_bin": "16-256",
+      "chemical_class": "protein-rna-ligand",
+      "polymers": [
+        {
+          "polymer_type": "protein",
+          "chain_id": [
+            "A",
+            "B"
+          ],
+          "sequence": "ACDE",
+          "msas": [
+            {
+              "path": "msa/first.a3m",
+              "format": "a3m"
+            },
+            {
+              "path": "msa/second.a3m",
+              "format": "a3m"
+            }
+          ],
+          "paired_msas": [
+            {
+              "path": "msa/paired.a3m",
+              "format": "a3m"
+            }
+          ],
+          "templates": [
+            {
+              "path": "templates/one.cif",
+              "format": "cif",
+              "chain_id": "X"
+            },
+            {
+              "path": "templates/two.cif",
+              "format": "cif",
+              "chain_id": "Y"
+            }
+          ]
+        },
+        {
+          "polymer_type": "rna",
+          "chain_id": "C",
+          "sequence": "ACG",
+          "msas": [],
+          "paired_msas": [],
+          "templates": []
+        },
+        {
+          "polymer_type": "ccd_ligand",
+          "chain_id": "D",
+          "sequence": "ATP",
+          "msas": [],
+          "paired_msas": [],
+          "templates": []
+        }
+      ],
+      "gt": "ground_truth/complex.cif"
+    },
+    {
+      "id": "fixture-monomer",
+      "seq_len": 5,
+      "token_bin": "16-256",
+      "chemical_class": "monomer",
+      "polymers": [
+        {
+          "polymer_type": "protein",
+          "chain_id": "M",
+          "sequence": "ACDEF",
+          "msas": [],
+          "paired_msas": [],
+          "templates": []
+        }
+      ],
+      "gt": "ground_truth/monomer.cif"
+    }
+  ]
+}

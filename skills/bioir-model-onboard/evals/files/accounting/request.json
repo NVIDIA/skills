@@ -1,0 +1,15 @@
+{
+  "format": "training checkpoint with model, optimizer, and scheduler",
+  "key_prefix": "module.",
+  "keys": [
+    "trunk.weight",
+    "head.bias",
+    "unused.scale"
+  ],
+  "reads": [
+    "trunk.weight",
+    "head.bias",
+    "head.bias"
+  ],
+  "weights_are_synthetic": true
+}

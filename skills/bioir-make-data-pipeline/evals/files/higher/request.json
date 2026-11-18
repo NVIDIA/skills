@@ -1,0 +1,10 @@
+{
+  "unit": "lddt_thousandths",
+  "sample_id": "7sfy",
+  "upstream": 700,
+  "bioir_serial": 780,
+  "bioir_ray": 780,
+  "feature_equivalence_confirmed": false,
+  "identical_settings_confirmed": false,
+  "same_scoring_command_confirmed": false
+}

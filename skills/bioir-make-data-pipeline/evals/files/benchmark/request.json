@@ -1,0 +1,3 @@
+{
+  "request": "Compare BioIR and OSS OpenFold3 model.forward latency on the folding bench set, with lDDT and DockQ."
+}

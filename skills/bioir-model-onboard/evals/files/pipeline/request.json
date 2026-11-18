@@ -1,0 +1,5 @@
+{
+  "model_name": "protenix-v2",
+  "model_already_native_in_bioir": true,
+  "request": "Port only the data pipeline for one new ligand input. Do not change the network or its checkpoint."
+}

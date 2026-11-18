@@ -1,0 +1,14 @@
+{
+  "evidence_kind": "synthetic_diagnostic_fixture",
+  "oss_tag": "v2.2.1",
+  "model_source": "boltz-2",
+  "checkpoint_sha_equal": true,
+  "seed_equal": true,
+  "msa_files_equal": true,
+  "template_attachment_equal": true,
+  "bioir_lddt": 0.72,
+  "oss_lddt": 0.57,
+  "bioir_nonquery_deletion_sum": 42,
+  "oss_nonquery_deletion_sum": 0,
+  "proposed_action": "zero BioIR deletion features to match OSS"
+}

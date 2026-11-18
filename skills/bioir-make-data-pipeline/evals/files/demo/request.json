@@ -1,0 +1,12 @@
+{
+  "command": "examples/folding/run_demo.py",
+  "n_inputs": 1,
+  "manifest_ids": [
+    "T1031",
+    "6m3u",
+    "7sfy"
+  ],
+  "ran_serial_manifest": false,
+  "ran_ray_manifest": false,
+  "exit_code": 0
+}

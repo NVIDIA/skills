@@ -1,0 +1,11 @@
+{
+  "level1_status": "PASS",
+  "notes_records_runtime_args": false,
+  "notes_records_seed": false,
+  "guide_example_only": {
+    "recycling_steps": 3,
+    "num_sampling_steps": 200,
+    "diffusion_samples": 1,
+    "seed": 0
+  }
+}

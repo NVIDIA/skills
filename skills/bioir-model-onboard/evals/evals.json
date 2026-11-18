@@ -1,0 +1,507 @@
+{
+  "skill_name": "model-onboard",
+  "evals": [
+    {
+      "id": "model-onboard-001-feasibility",
+      "prompt": "Use model-onboard to plan the port described in /workspace/input/feasibility/request.json. Do not implement the model. Write /workspace/output/answer.json with implement_now, claimed_validated, reuse_parent_components, check_kernel_shapes, and module_comparisons_before_structure_scores as booleans, gpu_validation as PASS, FAIL, or PENDING, and missing as an array of the absent identity fields. Offline planning only: do not install software, use the network, or modify the input.",
+      "expected_output": "implement_now and claimed_validated are false. gpu_validation is PENDING. reuse_parent_components, check_kernel_shapes, and module_comparisons_before_structure_scores are true. missing contains upstream_revision and checkpoint_identity. The refiner is a configured Pairformer, and the new widths need a kernel shape check. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/feasibility"
+      ],
+      "assertions": [
+        "The agent checks the recorded GPU availability and marks GPU validation pending without claiming the port is validated.",
+        "The agent plans to reuse the Protenix model, configs, converters, and pipeline, and to check fused-kernel shapes before enabling a kernel.",
+        "The agent asks for the missing upstream revision and checkpoint identity and does not invent them.",
+        "The agent requires module comparisons on captured inputs before relying on an end-to-end structure score."
+      ],
+      "domain_checks": [
+        {
+          "label": "implement now",
+          "artifact": "answer.json",
+          "path": [
+            "implement_now"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "claimed validated",
+          "artifact": "answer.json",
+          "path": [
+            "claimed_validated"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "reuse parent",
+          "artifact": "answer.json",
+          "path": [
+            "reuse_parent_components"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "kernel shapes",
+          "artifact": "answer.json",
+          "path": [
+            "check_kernel_shapes"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "modules before scores",
+          "artifact": "answer.json",
+          "path": [
+            "module_comparisons_before_structure_scores"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "gpu validation",
+          "artifact": "answer.json",
+          "path": [
+            "gpu_validation"
+          ],
+          "op": "equals",
+          "expected": "PENDING"
+        },
+        {
+          "label": "missing identity",
+          "artifact": "answer.json",
+          "path": [
+            "missing"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "upstream_revision",
+            "checkpoint_identity"
+          ]
+        }
+      ],
+      "input_sha256": {
+        "feasibility/request.json": "c4c12ea39ad426df782ddb1a20e7eea69206fc6826a047eb962b3d2902c197f2"
+      }
+    },
+    {
+      "id": "model-onboard-002-checkpoint-accounting",
+      "prompt": "Read /workspace/input/accounting/request.json. A converter would perform the listed reads on a training checkpoint. Decide whether that conversion passes, which keys are unread, and which keys are read twice. Write /workspace/output/answer.json with passed, require_weights_only, strip_module_prefix, and synthetic_proves_pretrained_accuracy as booleans, plus unread and read_twice as arrays of keys. Offline review only: do not load a real checkpoint.",
+      "expected_output": "passed and synthetic_proves_pretrained_accuracy are false. require_weights_only and strip_module_prefix are true. unread is [unused.scale] and read_twice is [head.bias]. The loader uses weights_only=True, reads the model entry, and strips the module. prefix. Synthetic weights do not prove pretrained accuracy. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/accounting"
+      ],
+      "assertions": [
+        "The agent fails the conversion because one tensor is unread and another is read twice.",
+        "The agent requires weights_only=True and stripping of the data-parallel module. prefix.",
+        "The agent states that synthetic weights do not establish pretrained-model accuracy."
+      ],
+      "domain_checks": [
+        {
+          "label": "passed",
+          "artifact": "answer.json",
+          "path": [
+            "passed"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "weights only",
+          "artifact": "answer.json",
+          "path": [
+            "require_weights_only"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "strip prefix",
+          "artifact": "answer.json",
+          "path": [
+            "strip_module_prefix"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "synthetic accuracy",
+          "artifact": "answer.json",
+          "path": [
+            "synthetic_proves_pretrained_accuracy"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "unread",
+          "artifact": "answer.json",
+          "path": [
+            "unread"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "unused.scale"
+          ]
+        },
+        {
+          "label": "read twice",
+          "artifact": "answer.json",
+          "path": [
+            "read_twice"
+          ],
+          "op": "set_equals",
+          "expected": [
+            "head.bias"
+          ]
+        }
+      ],
+      "input_sha256": {
+        "accounting/request.json": "b368c02c6a642e5457093262b73925e90454ff7c85051ff63cc8a340436ab4f5"
+      }
+    },
+    {
+      "id": "model-onboard-003-bin-edges",
+      "prompt": "Read /workspace/input/bins/request.json. The proposed port skips two checkpoint buffers because the BioIR head recomputes them, and it suggests a non-strict load. Decide whether that is acceptable. Write /workspace/output/answer.json with silent_skip_ok, compare_recomputed, load_checkpoint_when_different, and non_strict_to_hide_keys as booleans. Offline review only.",
+      "expected_output": "silent_skip_ok and non_strict_to_hide_keys are false. compare_recomputed and load_checkpoint_when_different are true. Recomputed bin edges must be compared with the checkpoint, and the checkpoint values are loaded when they differ. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/bins"
+      ],
+      "assertions": [
+        "The agent rejects a silent skip of the checkpoint buffers.",
+        "The agent compares the recomputed edges with the checkpoint and loads the checkpoint values when they differ.",
+        "The agent does not use non-strict loading to hide the keys."
+      ],
+      "domain_checks": [
+        {
+          "label": "silent skip",
+          "artifact": "answer.json",
+          "path": [
+            "silent_skip_ok"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "compare recomputed",
+          "artifact": "answer.json",
+          "path": [
+            "compare_recomputed"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "load checkpoint values",
+          "artifact": "answer.json",
+          "path": [
+            "load_checkpoint_when_different"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "non-strict hide",
+          "artifact": "answer.json",
+          "path": [
+            "non_strict_to_hide_keys"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "bins/request.json": "e96a0f2405a757173c4e64943fcf2fbb4314488e6e3709c6773fe680a672bdba"
+      }
+    },
+    {
+      "id": "model-onboard-004-structure-score",
+      "prompt": "Read /workspace/input/structure/request.json. Draft the validation decision for this folding port. Write /workspace/output/answer.json with numerically_validated and structure_score_establishes_module_parity as booleans, module_comparisons as PASS, FAIL, or PENDING, and record_revisions_checkpoint_and_settings as a boolean. Offline review only.",
+      "expected_output": "numerically_validated and structure_score_establishes_module_parity are false. module_comparisons is PENDING. record_revisions_checkpoint_and_settings is true. A close lDDT on seven complexes does not establish module parity. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/structure"
+      ],
+      "assertions": [
+        "The agent does not call the port numerically validated from the structure scores alone.",
+        "The agent marks module comparisons pending and explains that a similar structure can hide a changed recycle or conditioning path.",
+        "The agent requires the revisions, checkpoint identity, settings, and a negative control of the quality gate."
+      ],
+      "domain_checks": [
+        {
+          "label": "numerically validated",
+          "artifact": "answer.json",
+          "path": [
+            "numerically_validated"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "structure score parity",
+          "artifact": "answer.json",
+          "path": [
+            "structure_score_establishes_module_parity"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "module comparisons",
+          "artifact": "answer.json",
+          "path": [
+            "module_comparisons"
+          ],
+          "op": "equals",
+          "expected": "PENDING"
+        },
+        {
+          "label": "record provenance",
+          "artifact": "answer.json",
+          "path": [
+            "record_revisions_checkpoint_and_settings"
+          ],
+          "op": "equals",
+          "expected": true
+        }
+      ],
+      "input_sha256": {
+        "structure/request.json": "5b5a4528776cfc06f305c8ce6521df10cd656bd2ce95d68bad2ac67afdc1c737"
+      }
+    },
+    {
+      "id": "model-onboard-005-kernel-shapes",
+      "prompt": "Read /workspace/input/kernels/request.json. Decide whether the fused triangle-multiplication kernel should be enabled at the requested widths and how to report the fallback. Write /workspace/output/answer.json with enable_kernel_at_requested_widths, unsupported_shape_can_be_wrong_without_error, and report_fallback_as_kernel_speedup as booleans, and fallback_numerical_status as PASS, FAIL, or PENDING. Offline review only.",
+      "expected_output": "enable_kernel_at_requested_widths and report_fallback_as_kernel_speedup are false. unsupported_shape_can_be_wrong_without_error is true. fallback_numerical_status is PENDING because no GPU is available. Matching math does not imply a supported shape. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/kernels"
+      ],
+      "assertions": [
+        "The agent enables the kernel only for widths its shape table supports.",
+        "The agent warns that an unsupported shape can return wrong values without an error.",
+        "The agent marks the fallback's numerical comparison pending and does not report that path as a kernel speedup."
+      ],
+      "domain_checks": [
+        {
+          "label": "enable kernel",
+          "artifact": "answer.json",
+          "path": [
+            "enable_kernel_at_requested_widths"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "silent wrong shape",
+          "artifact": "answer.json",
+          "path": [
+            "unsupported_shape_can_be_wrong_without_error"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "fallback speedup",
+          "artifact": "answer.json",
+          "path": [
+            "report_fallback_as_kernel_speedup"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "fallback numerical",
+          "artifact": "answer.json",
+          "path": [
+            "fallback_numerical_status"
+          ],
+          "op": "equals",
+          "expected": "PENDING"
+        }
+      ],
+      "input_sha256": {
+        "kernels/request.json": "3f9b343625d37467d014e427cfc5b14426d2760cf90cea398ea696f240ba08b2"
+      }
+    },
+    {
+      "id": "model-onboard-006-hub-registration",
+      "prompt": "Read /workspace/input/hub/request.json. Construction of a compute-only port fails with that exception. Say what is missing and what pipeline support may be claimed. Write /workspace/output/answer.json with add_local_checkpoints, add_support_matrix_name, load_weights_only, and claim_build_processor as booleans. Offline review only.",
+      "expected_output": "add_local_checkpoints, add_support_matrix_name, and load_weights_only are true. claim_build_processor is false. The hub lookup still needs the support-matrix name and a LOCAL_CHECKPOINTS entry that loads with weights_only=True. A compute-only port does not claim build_processor support. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/hub"
+      ],
+      "assertions": [
+        "The agent adds the model name to the support matrix and a LOCAL_CHECKPOINTS entry that loads with weights_only=True.",
+        "The agent does not claim build_processor support for a compute-only port.",
+        "The agent identifies the hub lookup as the source of the KeyError."
+      ],
+      "domain_checks": [
+        {
+          "label": "local checkpoints",
+          "artifact": "answer.json",
+          "path": [
+            "add_local_checkpoints"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "support matrix",
+          "artifact": "answer.json",
+          "path": [
+            "add_support_matrix_name"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "weights only",
+          "artifact": "answer.json",
+          "path": [
+            "load_weights_only"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "claim processor",
+          "artifact": "answer.json",
+          "path": [
+            "claim_build_processor"
+          ],
+          "op": "equals",
+          "expected": false
+        }
+      ],
+      "input_sha256": {
+        "hub/request.json": "754d005a206f5cc6c7069e519eaa93629dc7b23ee866374c17c95ea043c11501"
+      }
+    },
+    {
+      "id": "model-onboard-007-module-swap-negative",
+      "prompt": "Read /workspace/input/swap/request.json and answer that request. Write /workspace/output/answer.json with native_model_port as a boolean, task as module_swap or native_port, and guide as accelerate-custom-model or port-model. Do not create a model package.",
+      "expected_output": "native_model_port is false, task is module_swap, and guide is accelerate-custom-model. Swapping one module into the user's model is not a native BioIR port. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/swap"
+      ],
+      "assertions": [
+        "The agent treats the request as a single-module swap and points to the Accelerate a Custom Model guide.",
+        "The agent does not create a native model, checkpoint converter, or data pipeline."
+      ],
+      "domain_checks": [
+        {
+          "label": "native port",
+          "artifact": "answer.json",
+          "path": [
+            "native_model_port"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "task",
+          "artifact": "answer.json",
+          "path": [
+            "task"
+          ],
+          "op": "equals",
+          "expected": "module_swap"
+        },
+        {
+          "label": "guide",
+          "artifact": "answer.json",
+          "path": [
+            "guide"
+          ],
+          "op": "equals",
+          "expected": "accelerate-custom-model"
+        }
+      ],
+      "expected_skill": null,
+      "input_sha256": {
+        "swap/request.json": "a24dad4ac5a276c4a4952df52a61c9b2f58e79b5a815e5eb6a3e20930058a132"
+      }
+    },
+    {
+      "id": "model-onboard-008-benchmark-order",
+      "prompt": "Read /workspace/input/benchmark/request.json. Correctness checks have not been run. Decide whether to publish the speedup now. Write /workspace/output/answer.json with run_benchmark_now and correctness_first as booleans and benchmark_skill as bench-perf-oss or none. Do not launch a benchmark.",
+      "expected_output": "run_benchmark_now is false, correctness_first is true, and benchmark_skill is bench-perf-oss. Folding speed is measured only after correctness, and a supported folding model uses bench-perf-oss. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/benchmark"
+      ],
+      "assertions": [
+        "The agent refuses to publish a speedup before correctness checks pass.",
+        "The agent names the folding benchmark skill for the later measurement and does not start it now."
+      ],
+      "domain_checks": [
+        {
+          "label": "benchmark now",
+          "artifact": "answer.json",
+          "path": [
+            "run_benchmark_now"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "correctness first",
+          "artifact": "answer.json",
+          "path": [
+            "correctness_first"
+          ],
+          "op": "equals",
+          "expected": true
+        },
+        {
+          "label": "benchmark skill",
+          "artifact": "answer.json",
+          "path": [
+            "benchmark_skill"
+          ],
+          "op": "equals",
+          "expected": "bench-perf-oss"
+        }
+      ],
+      "input_sha256": {
+        "benchmark/request.json": "9a51a5853c81b8b0b49b428731151e6d4f84f330f55e5daf8bd5324f697e5f11"
+      }
+    },
+    {
+      "id": "model-onboard-009-pipeline-only-negative",
+      "prompt": "Read /workspace/input/pipeline/request.json and answer that request. Write /workspace/output/answer.json with native_model_port as a boolean and task as data_pipeline or native_port. Do not modify the network.",
+      "expected_output": "native_model_port is false and task is data_pipeline. The network and checkpoint already exist; only the data pipeline is in scope. Inspect /workspace/output/answer.json.",
+      "files": [
+        "evals/files/pipeline"
+      ],
+      "assertions": [
+        "The agent treats the request as a data-pipeline port of an existing native model.",
+        "The agent does not start a native model implementation or a checkpoint converter."
+      ],
+      "domain_checks": [
+        {
+          "label": "native port",
+          "artifact": "answer.json",
+          "path": [
+            "native_model_port"
+          ],
+          "op": "equals",
+          "expected": false
+        },
+        {
+          "label": "task",
+          "artifact": "answer.json",
+          "path": [
+            "task"
+          ],
+          "op": "equals",
+          "expected": "data_pipeline"
+        }
+      ],
+      "expected_skill": null,
+      "input_sha256": {
+        "pipeline/request.json": "0015e6075b14275fed628ee24dd12d168379f3a31db030c6e141168a3d21a1be"
+      }
+    }
+  ]
+}
