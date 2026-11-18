@@ -319,7 +319,7 @@ jobs:
           dropped=/tmp/plugins-dropped.txt
           touch "$dropped"
           gh label create "$TRACKER_LABEL" --color FFA500 \
-            --description "Catalog plugins held or dropped by the plugin sync — missing artifacts, signature drift, or version not bumped" \
+            --description "Plugins held or dropped by the plugin sync (missing artifacts, sig drift, version)" \
             --force >/dev/null
           existing=$(gh issue list --label "$TRACKER_LABEL" --state open --json number --jq '.[0].number // empty' --limit 1)
           if [ ! -s "$dropped" ]; then
