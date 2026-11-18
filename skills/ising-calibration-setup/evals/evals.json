@@ -1,0 +1,120 @@
+{
+  "skill_name": "ising-calibration-setup",
+  "evals": [
+    {
+      "id": "hosted-api-connect",
+      "prompt": "How do I connect to the Ising Calibration model through the hosted build.nvidia.com API?",
+      "expected_output": "Loads ising-calibration-setup and walks the hosted API setup: sign in at build.nvidia.com, generate an nvapi- key at build.nvidia.com/settings/api-keys, store it as NVIDIA_API_KEY, and call https://integrate.api.nvidia.com/v1/chat/completions with an Authorization: Bearer header.",
+      "expected_skill": "ising-calibration-setup",
+      "assertions": [
+        "Loads ising-calibration-setup and routes to the hosted API, not the self-hosted NIM.",
+        "Refers to the setup by name (the hosted API at build.nvidia.com) and describes each step by what it does.",
+        "Tells the user to generate a personal nvapi- key at build.nvidia.com and store it as NVIDIA_API_KEY, rather than asking the user to paste the key into chat.",
+        "Does not print or echo back any API key value.",
+        "References the correct endpoint (https://integrate.api.nvidia.com/v1/chat/completions) and Bearer auth header."
+      ]
+    },
+    {
+      "id": "hosted-api-hello-world",
+      "prompt": "I've got my NVIDIA_API_KEY set and the hosted Ising Calibration API is returning 200 on a ping. Now what -- how do I actually try it out?",
+      "expected_output": "Loads ising-calibration-setup and walks the hello-world example in references/hosted-api-quickstart.md: fetch a real sample calibration-plot image URL from the public QCalEval dataset via the HF datasets-server API, then send it as an image_url content block (not base64) alongside a text prompt to the chat completions endpoint.",
+      "expected_skill": "ising-calibration-setup",
+      "assertions": [
+        "Offers an image-based (multimodal) request as a next step rather than only the text-only ping.",
+        "Uses the image_url content-block shape with a plain HTTPS url (not base64 data-URI) for the sample image.",
+        "Fetches a fresh image URL via the dataset API rather than reusing/hardcoding a URL from a prior example, since QCalEval's asset URLs are signed and expire.",
+        "Does not fabricate a model response; if asked what the model will say, defers to actually running the request rather than inventing example output.",
+        "Does not tell the user to try the build.nvidia.com interactive code tab as the source of the image request shape, since that tab's example ships with the request body blanked out."
+      ]
+    },
+    {
+      "id": "self-hosted-nim-setup",
+      "prompt": "I want to self-host the Ising Calibration NIM. What do I need?",
+      "expected_output": "Loads ising-calibration-setup and routes to the self-hosted NIM: generate a separate NGC personal key (not the build.nvidia.com nvapi- key), docker login to nvcr.io, then docker pull/run nvcr.io/nim/nvidia/ising-calibration-1-5-31b:1.5.0 with --gpus all and a weight-cache volume mounted at /opt/nim/.cache, and flags the GPU memory requirement against whatever GPU (local machine or cloud GPU instance) the user is targeting.",
+      "expected_skill": "ising-calibration-setup",
+      "assertions": [
+        "Loads ising-calibration-setup and routes to the self-hosted NIM, not the hosted API.",
+        "Refers to the setup by name (a self-hosted NIM container) and describes each step by what it does.",
+        "Does not assume 'self-hosted' means the user's local machine; asks or otherwise accounts for the possibility of a cloud GPU instance.",
+        "Explicitly distinguishes the NGC personal key from the build.nvidia.com nvapi- key rather than treating them as interchangeable.",
+        "Actually walks the user through generating the NGC personal key step by step (sign in, org, Generate Personal Key, name/expiration/service scopes, one-time display, read -rs into the shell) rather than handing over the personal-keys URL and telling them to come back with a key.",
+        "Surfaces the NGC Catalog service scope as a requirement at key-creation time, not only after a docker login failure.",
+        "Treats docker login as the verification step for the key and its scopes, before starting the multi-gigabyte pull.",
+        "Surfaces the GPU memory requirement (effectively ~96GB, e.g. 2x L40S or a single H200) before or alongside the docker run command, rather than only after a failure.",
+        "Does not print or echo back any API key value.",
+        "Points to /v1/health/ready as the readiness check rather than inferring readiness from log output alone.",
+        "Mounts the weight cache with the container side of -v set to /opt/nim/.cache (the image's NIM_CACHE_PATH), not /root/.cache/nim or another path -- a wrong container path leaves the mount inert, so --rm discards the weights and every run re-downloads them.",
+        "Explains that the docker pull and the startup weight download are two separate large downloads, rather than implying the image contains the weights."
+      ]
+    },
+    {
+      "id": "self-hosted-hello-world",
+      "prompt": "My self-hosted Ising Calibration NIM container is up and a ping to localhost:8000 returns 200. Am I done?",
+      "expected_output": "Loads ising-calibration-setup and confirms the connection is working, then offers the optional hello-world request in references/self-hosted-nim-quickstart.md as a next step: fetching a real QCalEval sample plot and sending it as an image_url content block to the container, using the self-hosted model ID (nvidia/NVIDIA-Ising-Calibration-1.5-31B, readable from /v1/models) rather than the hosted API's model string.",
+      "expected_skill": "ising-calibration-setup",
+      "assertions": [
+        "Offers the multimodal hello-world request for the self-hosted container, not treating it as available only for the hosted API.",
+        "Follows the hello-world walkthrough in references/self-hosted-nim-quickstart.md rather than improvising a request shape.",
+        "Uses the self-hosted model ID or omits the model field; does not copy the hosted API's 'nvidia/ising-calibration-1.5-31b' string into a self-hosted request.",
+        "Does not fabricate the model's response; runs the request or has the user run it.",
+        "If first-request latency comes up, attributes it to warmup rather than a network or auth problem."
+      ]
+    },
+    {
+      "id": "connectivity-checklist-auth-failure",
+      "prompt": "My Ising Calibration API calls are failing with a 401. What's wrong?",
+      "expected_output": "Loads ising-calibration-setup, runs through the connectivity checklist, and first establishes which setup the user is on, because a 401 means different things. Hosted API: an auth failure (missing/expired/wrong NVIDIA_API_KEY, or the NGC key exported by mistake), fixed by checking the env var and regenerating the nvapi- key. Self-hosted NIM: the container does not authenticate requests, so the 401 comes from a proxy, gateway, or load balancer in front of it; check that layer, not the NGC key. In both cases distinct from a network or model-not-ready failure.",
+      "expected_skill": "ising-calibration-setup",
+      "assertions": [
+        "Asks or determines whether the user is on the hosted API or a self-hosted NIM before diagnosing, rather than giving one generic answer.",
+        "Hosted API: classifies the 401/403 as an auth problem, checks whether NVIDIA_API_KEY is set before assuming the key is invalid, and points to regenerating the nvapi- key at build.nvidia.com.",
+        "Self-hosted NIM: does not blame NGC_API_KEY or tell the user to regenerate it; explains that the container itself does not return 401 and directs the user to the proxy/gateway/load balancer in front of it (and to curl the container directly to confirm).",
+        "Does not print or echo back any API key value, including when asking the user to check whether it is set.",
+        "Does not treat the 401 as a network or GPU/readiness problem."
+      ]
+    },
+    {
+      "id": "connectivity-checklist-not-auth",
+      "prompt": "I set up the self-hosted Ising Calibration NIM on a cloud GPU instance, but curl to its endpoint just hangs or times out.",
+      "expected_output": "Loads ising-calibration-setup and, per the connectivity checklist, identifies a timeout/connection-refused symptom as a network or container-readiness issue rather than an auth issue, and directs the user to check docker ps / docker logs (and, for a remote/cloud host, that the port is actually reachable from where curl is being run -- e.g. security group / firewall rules) before regenerating any key.",
+      "expected_skill": "ising-calibration-setup",
+      "assertions": [
+        "Does not tell the user to regenerate an API key in response to a timeout/connection-refused symptom.",
+        "Directs the user to check container status (docker ps) and logs (docker logs) before assuming an auth failure.",
+        "For a remote/cloud host, also considers network reachability (firewall, security group, port not exposed) rather than only local container state.",
+        "Does not fabricate a specific log message or health-check response the container is expected to show."
+      ]
+    },
+    {
+      "id": "negative-generic-docker-gpu",
+      "prompt": "My docker run --gpus all command says 'could not select device driver'. How do I fix the NVIDIA Container Toolkit on Ubuntu?",
+      "expected_output": "Answers the general NVIDIA Container Toolkit installation and configuration question directly, without loading ising-calibration-setup; the request is not about connecting to the Ising Calibration model.",
+      "expected_skill": null,
+      "assertions": [
+        "Does not load or cite ising-calibration-setup.",
+        "Does not steer the user toward Ising Calibration keys, endpoints, or the Ising NIM container.",
+        "Addresses the Container Toolkit problem on its own terms."
+      ]
+    },
+    {
+      "id": "negative-other-nim-model",
+      "prompt": "How do I get an API key for the Llama NIM on build.nvidia.com and call it with curl?",
+      "expected_output": "Helps with build.nvidia.com key generation and a chat completions call for the requested model, without loading ising-calibration-setup; the shared build.nvidia.com mechanics do not make this an Ising Calibration setup request.",
+      "expected_skill": null,
+      "assertions": [
+        "Does not load or cite ising-calibration-setup.",
+        "Does not substitute the Ising Calibration model or its container for the model the user asked about."
+      ]
+    },
+    {
+      "id": "negative-model-usage",
+      "prompt": "I'm already connected to Ising Calibration and getting 200s. Can you write a prompt that asks it to classify this Rabi oscillation plot as good or bad?",
+      "expected_output": "Treats this as model usage, which is outside ising-calibration-setup's scope, and either answers directly or points to the Quantum Calibration Agent Blueprint; it does not re-run the connectivity setup.",
+      "expected_skill": null,
+      "assertions": [
+        "Does not load or cite ising-calibration-setup.",
+        "Does not re-walk key generation or connectivity verification for an already-working connection."
+      ]
+    }
+  ]
+}
