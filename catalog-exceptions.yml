@@ -11,3 +11,14 @@ exceptions:
     reason: Catalog infrastructure router skill; maintained via direct PR (no components.d upstream)
     owner: jdudash
     component: NVIDIA Skills
+
+# Plugin exceptions — plugins/ dirs allowed to exist WITHOUT a
+# components.d `plugins:` registration. Everything else in plugins/ must
+# be declared by a components.d/<slug>.yml plugins: entry or listed here —
+# otherwise the hourly plugin sync prunes it
+# (see .github/scripts/prune-orphan-plugins.sh).
+plugin_exceptions:
+  - dir: nvidia-skills
+    reason: Catalog-owned discovery plugin with no product repo; built in this repo from plugins.d/nvidia-skills.yml
+    owner: jdudash
+    component: NVIDIA Skills
