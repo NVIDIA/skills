@@ -420,6 +420,13 @@ jobs:
           fi
 
       - name: Resolve skill contacts
+        # Disabled 2026-11-18: the onboarder lookup tags the wrong person
+        # (shallow checkout credits the newest commit on main; with full
+        # history most products resolve to the components.d migration
+        # author, and most emails do not resolve to a login). Downstream
+        # steps already omit the cc trailer when no contacts file exists.
+        # Re-enable once contacts are resolved from the drifted files.
+        if: ${{ false }}
         # For each dropped/reverted skill, resolve the original onboarder
         # via git blame on the owning components.d/<slug>.yml and emit a
         # mapping (catalog_dir → @github-login) into /tmp/skill-contacts.txt.
