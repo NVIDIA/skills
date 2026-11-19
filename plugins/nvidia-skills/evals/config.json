@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "execution": {
+    "variants": ["skill", "baseline"],
+    "openshell": {
+      "allowed_origins": [
+        "https://api.github.com",
+        "https://build.nvidia.com",
+        "https://github.com",
+        "https://raw.githubusercontent.com",
+        "https://registry.npmjs.org"
+      ]
+    }
+  },
+  "grading": {
+    "security_policy": {
+      "schema_version": 1,
+      "managed_policy": "nvcarps-managed-security-v8",
+      "allowed_origins": [
+        "https://api.github.com",
+        "https://build.nvidia.com",
+        "https://github.com",
+        "https://raw.githubusercontent.com",
+        "https://registry.npmjs.org"
+      ]
+    }
+  }
+}
