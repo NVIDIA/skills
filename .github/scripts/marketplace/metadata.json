@@ -3625,6 +3625,18 @@
       }
     },
     {
+      "path": "skills/nixl-docs",
+      "name": "nixl-docs",
+      "description": "Find and read NIXL documentation for APIs, architecture, backends, installation and builds, environment variables, telemetry, troubleshooting, examples, benchmarks, and contribution.",
+      "metadata": {
+        "product.primary": "Inference Xfer Library (NIXL)",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "inference-ai",
+        "audience": "developer,application_developer,platform_engineer,devops_engineer,ai_engineer",
+        "discovery.activity_tags": "get_started,troubleshoot,configure,benchmark,contribute"
+      }
+    },
+    {
       "path": "skills/nsight-port-cpu-to-gpu",
       "name": "nsight-port-cpu-to-gpu",
       "description": "Guide an agent through GPU-accelerating a codebase: setup interview, flavor-specific translation (Fortran OpenACC, Fortran OpenMP, C++ CUDA, C++ Kokkos), and NVIDIA Nsight Systems (nsys) profile-guided orchestration. Use when porting HPC applications to GPU. Do not use for porting or optimizing  individual standalone kernels.",

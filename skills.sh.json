@@ -403,6 +403,7 @@
         "molmim-nim",
         "msa-search-nim",
         "msa-structure-prediction-pipeline",
+        "nixl-docs",
         "nv-reason-ct",
         "openfold2-nim",
         "openfold3-nim",

@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 471,
-  "result_row_count": 4444,
+  "skill_count": 472,
+  "result_row_count": 4454,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -6324,6 +6324,27 @@
       "component": "Newton",
       "has_results": true,
       "average_uplift_pct": 15.5
+    },
+    {
+      "skill": "nixl-docs",
+      "evaluation_date": "2026-11-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:0fac1cee47214d06c42d07dec03ba91af781c867621b04639baf1ee27bffc8c4",
+      "validation_status": "passed",
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "has_results": true,
+      "average_uplift_pct": 11.67
     },
     {
       "skill": "nsight-port-cpu-to-gpu",
@@ -35284,6 +35305,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 68.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 28.0
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 20.0
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": 10.0
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 69.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nixl-docs",
+      "component": "NIXL",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 78.7,
       "uplift_pct": null
     },
     {
