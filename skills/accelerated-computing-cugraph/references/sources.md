@@ -21,6 +21,6 @@ The nx-cuGraph / Dask / cuGraph-PyG roadmap direction comes from the commissioni
 
 ## Attribution
 
-This skill's organization and migration topics are adapted from NVIDIA's `accelerated-computing-cugraph` skill in RAPIDS/rapids-agent-skills at commit `4672643da793932d4c8351f0bea35c724f4c1710` (2026-11-06 inspection), licensed CC-BY-4.0 for documentation/skills and Apache-2.0 for code. Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. The original repository is currently at https://gitlab-master.nvidia.com/RAPIDS/rapids-agent-skills/ and may require NVIDIA access.
+Adapted from NVIDIA-authored cuGraph skill guidance. Documentation/skills retain CC-BY-4.0 attribution and code retains Apache-2.0 licensing. Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
-Changes: replaced nx-cuGraph acceleration guidance with explicit cuGraph/pylibcugraph migration; redirected GNN recommendations; added version-scoped distributed walkthroughs, executable examples, and new evaluation cases. Original benchmark claims and signatures are not reused. The public API references above are sufficient to use the skill without access to the internal source.
+Changes: replaced nx-cuGraph acceleration guidance with explicit cuGraph/pylibcugraph migration; redirected GNN recommendations; added version-scoped distributed walkthroughs, executable examples, and new evaluation cases. Original benchmark claims and signatures are not reused. The public API references above document the APIs used by this skill.

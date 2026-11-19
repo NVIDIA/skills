@@ -5,7 +5,6 @@
 
 Base NVIDIA/skills commit: `c663e5799366d945a70a40b1ab18cedfc817495c`.
 API source: cuGraph v26.10.00, `8ff922fabf4521cf540a7ac3cfae857f7edc6f10`.
-Internal reference: RAPIDS/rapids-agent-skills `4672643da793932d4c8351f0bea35c724f4c1710`.
 
 Passed locally on macOS (CPU only):
 
