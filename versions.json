@@ -2116,6 +2116,13 @@
       "last_modified": "2026-11-12"
     },
     {
+      "name": "nixl-docs",
+      "path": "skills/nixl-docs",
+      "content_digest": "sha256:dbf7b8cb83a75647c199829b630ff5050f47ec9e20f229df16c941fc3c8e99b5",
+      "last_commit": "741fc4f83899c432421fcedb0f072cd27e36ef0e",
+      "last_modified": "2026-11-19"
+    },
+    {
       "name": "nsight-port-cpu-to-gpu",
       "path": "skills/nsight-port-cpu-to-gpu",
       "content_digest": "sha256:b24c80cdb437080ac1b356866a774d80773eaedb4ac9da2ede611ca621be31b0",
