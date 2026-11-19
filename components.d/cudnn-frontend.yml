@@ -1,0 +1,12 @@
+name: cuDNN Frontend
+product_primary: cuDNN
+repo: NVIDIA/cudnn-frontend
+ref: develop
+description: Install cuDNN and compile, serialize, and reload C++ execution plans.
+links:
+  security: false
+skills:
+  - path: skills/cudnn-compile-and-serialize/
+    catalog_dir: cudnn-compile-and-serialize
+  - path: skills/cudnn-install/
+    catalog_dir: cudnn-install
