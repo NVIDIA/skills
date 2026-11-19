@@ -2301,8 +2301,8 @@
       "name": "nvidia-skill-finder",
       "path": "skills/nvidia-skill-finder",
       "content_digest": "sha256:63a07ba8ba0d12c9cb85c8a5dc4dabd52ec4fc56c7cb933a340aee85cb5724a2",
-      "last_commit": "7c3ee2281bfe47e12e31536355c1234060721e44",
-      "last_modified": "2026-11-10"
+      "last_commit": "75ddb4bfbffefb1f5eae1b4a479be765ad9c72fb",
+      "last_modified": "2026-11-19"
     },
     {
       "name": "nvshmem-collect-performance-data",
