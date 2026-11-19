@@ -7,9 +7,9 @@ repo: NVIDIA-Omniverse/ovannotators
 description: Turn ovrtx render output or your own arrays into labeled ML datasets (COCO, KITTI, YOLO, BOP, LeRobot, Cosmos) on disk, S3, ovstorage, or WebDataset shards.
 ref: main
 skills:
-  - path: skills/dataset-quickstart/
+  - path: skills/ovannotators-dataset-quickstart/
     catalog_dir: ovannotators-dataset-quickstart
-  - path: skills/dataset-capture/
+  - path: skills/ovannotators-dataset-capture/
     catalog_dir: ovannotators-dataset-capture
 links:
   discussions: false
