@@ -3,7 +3,8 @@
   "execution": {
     "runtime": {
       "system_packages": [
-        "curl"
+        "curl",
+        "git"
       ]
     }
   }
