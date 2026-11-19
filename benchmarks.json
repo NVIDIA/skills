@@ -6831,12 +6831,12 @@
     },
     {
       "skill": "nvidia-ontology-management",
-      "evaluation_date": "2026-11-16",
+      "evaluation_date": "2026-11-19",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.9",
-      "dataset_digest": "sha256:4c8455d88fc45fd16ded90344c740ea7149fe29edbca7f112b346c21177d23fa",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:2a7e02bc91822e5415a1671f8a353b25b4cc6fe394c0a319553f56aff937e157",
       "validation_status": "passed",
-      "tasks": 13,
+      "tasks": 14,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -6848,16 +6848,16 @@
       "catalog_dir": "nvidia-ontology-management",
       "component": "Auto Ontology",
       "has_results": true,
-      "average_uplift_pct": 24.12
+      "average_uplift_pct": 26.08
     },
     {
       "skill": "nvidia-ontology-query",
-      "evaluation_date": "2026-11-16",
+      "evaluation_date": "2026-11-19",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.9",
-      "dataset_digest": "sha256:314823168b2eada85a48a450189c9d2cc1d374eed343c106147bd2b63080bf72",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:9ebf688eb0f22bd40dbdb3d21e5ecc3404a2c9abcd0177e05700ab3fe9fa3ed7",
       "validation_status": "passed",
-      "tasks": 13,
+      "tasks": 15,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -6869,13 +6869,13 @@
       "catalog_dir": "nvidia-ontology-query",
       "component": "Auto Ontology",
       "has_results": true,
-      "average_uplift_pct": 19.85
+      "average_uplift_pct": 25.0
     },
     {
       "skill": "nvidia-ontology-setup",
-      "evaluation_date": "2026-11-16",
+      "evaluation_date": "2026-11-19",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.9",
+      "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:dcbcf0848aefb19cd5b010e9a0d69ed8920e61dc3fdba560ca0f88cd48a8da96",
       "validation_status": "passed",
       "tasks": 10,
@@ -6890,7 +6890,7 @@
       "catalog_dir": "nvidia-ontology-setup",
       "component": "Auto Ontology",
       "has_results": true,
-      "average_uplift_pct": 32.47
+      "average_uplift_pct": 32.23
     },
     {
       "skill": "nvidia-skill-finder",
@@ -37338,8 +37338,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 96.4,
+      "uplift_pct": -3.6
     },
     {
       "catalog_dir": "nvidia-ontology-management",
@@ -37347,8 +37347,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 84.6,
-      "uplift_pct": -11.6
+      "score_pct": 92.9,
+      "uplift_pct": -7.1
     },
     {
       "catalog_dir": "nvidia-ontology-management",
@@ -37356,8 +37356,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.4,
-      "uplift_pct": 55.4
+      "score_pct": 97.1,
+      "uplift_pct": 57.1
     },
     {
       "catalog_dir": "nvidia-ontology-management",
@@ -37365,8 +37365,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 84.6,
-      "uplift_pct": 40.0
+      "score_pct": 84.3,
+      "uplift_pct": 38.6
     },
     {
       "catalog_dir": "nvidia-ontology-management",
@@ -37374,7 +37374,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.8,
+      "score_pct": 91.4,
       "uplift_pct": null
     },
     {
@@ -37383,7 +37383,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 94.6,
+      "score_pct": 94.3,
       "uplift_pct": null
     },
     {
@@ -37392,8 +37392,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 70.5,
-      "uplift_pct": 46.8
+      "score_pct": 81.0,
+      "uplift_pct": 52.4
     },
     {
       "catalog_dir": "nvidia-ontology-management",
@@ -37401,8 +37401,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 61.5,
-      "uplift_pct": 14.1
+      "score_pct": 67.9,
+      "uplift_pct": 19.1
     },
     {
       "catalog_dir": "nvidia-ontology-management",
@@ -37410,7 +37410,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.2,
+      "score_pct": 86.7,
       "uplift_pct": null
     },
     {
@@ -37419,7 +37419,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.9,
+      "score_pct": 87.9,
       "uplift_pct": null
     },
     {
@@ -37429,7 +37429,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 3.3
     },
     {
       "catalog_dir": "nvidia-ontology-query",
@@ -37437,8 +37437,8 @@
       "dimension": "Security",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "score_pct": 96.7,
+      "uplift_pct": -3.3
     },
     {
       "catalog_dir": "nvidia-ontology-query",
@@ -37446,8 +37446,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.5,
-      "uplift_pct": 46.2
+      "score_pct": 98.7,
+      "uplift_pct": 45.4
     },
     {
       "catalog_dir": "nvidia-ontology-query",
@@ -37455,8 +37455,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 78.5,
-      "uplift_pct": 24.6
+      "score_pct": 94.7,
+      "uplift_pct": 36.0
     },
     {
       "catalog_dir": "nvidia-ontology-query",
@@ -37464,7 +37464,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 82.3,
+      "score_pct": 96.0,
       "uplift_pct": null
     },
     {
@@ -37473,7 +37473,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 77.2,
+      "score_pct": 90.9,
       "uplift_pct": null
     },
     {
@@ -37482,8 +37482,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 81.4,
-      "uplift_pct": 27.2
+      "score_pct": 91.1,
+      "uplift_pct": 37.8
     },
     {
       "catalog_dir": "nvidia-ontology-query",
@@ -37491,8 +37491,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 80.1,
-      "uplift_pct": 21.1
+      "score_pct": 88.3,
+      "uplift_pct": 30.8
     },
     {
       "catalog_dir": "nvidia-ontology-query",
@@ -37500,7 +37500,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 90.0,
+      "score_pct": 92.2,
       "uplift_pct": null
     },
     {
@@ -37509,7 +37509,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 91.6,
+      "score_pct": 87.8,
       "uplift_pct": null
     },
     {
@@ -37518,26 +37518,26 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 10.0
-    },
-    {
-      "catalog_dir": "nvidia-ontology-setup",
-      "component": "Auto Ontology",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
       "score_pct": 100.0,
       "uplift_pct": 20.0
     },
     {
       "catalog_dir": "nvidia-ontology-setup",
       "component": "Auto Ontology",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": 15.0
+    },
+    {
+      "catalog_dir": "nvidia-ontology-setup",
+      "component": "Auto Ontology",
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 50.0
+      "uplift_pct": 52.0
     },
     {
       "catalog_dir": "nvidia-ontology-setup",
@@ -37546,7 +37546,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 98.0,
-      "uplift_pct": 38.0
+      "uplift_pct": 40.0
     },
     {
       "catalog_dir": "nvidia-ontology-setup",
@@ -37554,7 +37554,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 88.0,
+      "score_pct": 93.5,
       "uplift_pct": null
     },
     {
@@ -37563,7 +37563,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.5,
+      "score_pct": 91.5,
       "uplift_pct": null
     },
     {
@@ -37572,8 +37572,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 56.9
+      "score_pct": 90.0,
+      "uplift_pct": 43.6
     },
     {
       "catalog_dir": "nvidia-ontology-setup",
@@ -37581,8 +37581,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 77.1,
-      "uplift_pct": 19.9
+      "score_pct": 78.3,
+      "uplift_pct": 22.8
     },
     {
       "catalog_dir": "nvidia-ontology-setup",
@@ -37590,7 +37590,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 85.8,
+      "score_pct": 86.8,
       "uplift_pct": null
     },
     {

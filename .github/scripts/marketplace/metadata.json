@@ -3915,7 +3915,7 @@
     {
       "path": "skills/nvidia-ontology-management",
       "name": "nvidia-ontology-management",
-      "description": "Model and publish semantic definitions in Auto Ontology. Use for terms, relationships, measures, imports, and governed results—not deployment or querying.",
+      "description": "Model and publish Auto Ontology semantics. Use for terms, relationships, measures, imports, MCP write requests, and governed results; not deployment or querying.",
       "metadata": {
         "product.primary": "Auto Ontology",
         "classification.category.primary": "developer_tools",
@@ -3927,7 +3927,7 @@
     {
       "path": "skills/nvidia-ontology-query",
       "name": "nvidia-ontology-query",
-      "description": "Query Auto Ontology and validate generated SQL, rows, and answers. Use for MCP or REST access, readiness, authentication, conversations, and grounded questions.",
+      "description": "Query Auto Ontology and validate what it returns. Use for MCP or REST access, readiness, auth, conversations, empty or unanswered ask_question results, and checking generated SQL and rows for wrong measures, units, populations, lineage, joins, source columns, or truncation.",
       "metadata": {
         "product.primary": "Auto Ontology",
         "classification.category.primary": "developer_tools",
