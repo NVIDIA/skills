@@ -1,0 +1,64 @@
+{
+  "skill_name": "nixl-docs",
+  "evals": [
+    {
+      "id": "d01",
+      "name": "install-cuda13",
+      "track": "end-user",
+      "prompt": "My machine has CUDA 13. Which pip command installs NIXL?",
+      "expected_output": "`pip install nixl`. The package ships both the CUDA 12 and CUDA 13 backends and selects one at runtime from the CUDA version PyTorch reports.",
+      "assertions": [
+        "Recommends `pip install nixl`",
+        "Says the CUDA backend is selected automatically at runtime",
+        "Does not claim the `nixl[cu13]` extra or a separate `nixl-cu13` package is required"
+      ]
+    },
+    {
+      "id": "d02",
+      "name": "python-transfer-state",
+      "track": "end-user",
+      "prompt": "In Python, how do I know my NIXL transfer finished?",
+      "expected_output": "Poll `check_xfer_state` with the transfer handle. It returns the string \"DONE\" when finished, \"PROC\" while running, and \"ERR\" on failure.",
+      "assertions": [
+        "Uses `check_xfer_state`",
+        "States the strings \"DONE\", \"PROC\", and \"ERR\"",
+        "Does not use C++ enums such as `NIXL_SUCCESS` as the Python result"
+      ]
+    },
+    {
+      "id": "d03",
+      "name": "gpu-to-nvme-backend",
+      "track": "end-user",
+      "prompt": "Which NIXL backend should I use to move data from GPU memory to a local NVMe file?",
+      "expected_output": "GDS, with `mode=mt` for multi-threaded I/O (`GDS_MT` is an older name for the same engine). GPUDirect Storage moves VRAM to File without a CPU bounce buffer.",
+      "assertions": [
+        "Recommends GDS or GDS_MT",
+        "Explains that GPUDirect Storage avoids a CPU bounce buffer",
+        "Does not recommend POSIX, which handles DRAM to File"
+      ]
+    },
+    {
+      "id": "d04",
+      "name": "etcd-default-prefix",
+      "track": "end-user",
+      "prompt": "Where in etcd do NIXL agents store their metadata by default?",
+      "expected_output": "Under the key prefix `/nixl/agents/`, for example `/nixl/agents/<agent>/metadata`. `NIXL_ETCD_NAMESPACE` changes the prefix.",
+      "assertions": [
+        "States the default prefix `/nixl/agents/`",
+        "Names `NIXL_ETCD_NAMESPACE` as the way to change the prefix"
+      ]
+    },
+    {
+      "id": "d05",
+      "name": "prometheus-default-port",
+      "track": "end-user",
+      "prompt": "I turned on NIXL Prometheus metrics. Which port do I scrape?",
+      "expected_output": "Port 9090 by default, at the `/metrics` endpoint. `NIXL_TELEMETRY_PROMETHEUS_PORT` changes the port.",
+      "assertions": [
+        "States the default port is 9090",
+        "Names `NIXL_TELEMETRY_PROMETHEUS_PORT` as the way to change the port",
+        "Does not claim the default port is 9100"
+      ]
+    }
+  ]
+}
