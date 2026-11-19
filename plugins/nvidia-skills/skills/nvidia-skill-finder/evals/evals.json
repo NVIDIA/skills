@@ -137,62 +137,67 @@
   },
   {
     "id": "nvidia-skill-finder-neg-express-route",
-    "question": "Add an Express route for POST /api/orders.",
+    "question": "Given this Express app, show the code to add POST /api/orders. Do not edit files or start a server. The JSON body must contain a nonempty string item and a positive integer quantity; return HTTP 400 for invalid input, or HTTP 201 with {id: \"order-1\", item, quantity} for valid input. Use an in-memory example without a database.\n\n```javascript\nconst express = require(\"express\");\nconst app = express();\napp.use(express.json());\nmodule.exports = app;\n```",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The agent treats 'route' as a web framework route, not a vehicle routing or NVIDIA skill discovery request.",
+    "ground_truth": "The agent treats 'route' as an HTTP route and supplies the requested Express handler using the provided app and response contract, without routing to NVIDIA skill discovery.",
     "expected_behavior": [
       "Does not invoke the NVIDIA skill finder",
       "Does not recommend cuOpt or any NVIDIA skill",
-      "Answers or implements the Express route task normally"
+      "Provides an Express POST /api/orders handler that validates item and quantity and uses the requested 400 and 201 response statuses",
+      "Does not claim unperformed file edits, server execution, or validation"
     ]
   },
   {
     "id": "nvidia-skill-finder-neg-react-optimize",
-    "question": "Optimize my React page load performance and reduce bundle size.",
+    "question": "Suggest a minimal patch to improve the initial bundle of this React app. Do not edit files, install packages, or claim measured performance gains. Reports is a large component used only on the reports page; the app already depends on React. Keep the home page usable and show a loading state when Reports first loads.\n\n```jsx\nimport { useState } from \"react\";\nimport Reports from \"./Reports\";\nexport default function App() {\n  const [page, setPage] = useState(\"home\");\n  return <main>\n    <button onClick={() => setPage(\"home\")}>Home</button>\n    <button onClick={() => setPage(\"reports\")}>Reports</button>\n    {page === \"reports\" ? <Reports /> : <h1>Home</h1>}\n  </main>;\n}\n```",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The agent treats this as ordinary frontend performance work, not NVIDIA skill discovery.",
+    "ground_truth": "The agent treats this as ordinary frontend performance work and proposes a lazy-loaded Reports component with a loading state, using the supplied code without inventing benchmark results.",
     "expected_behavior": [
       "Does not invoke the NVIDIA skill finder",
       "Does not recommend Omniverse, GPU, or any NVIDIA skill",
-      "Handles the frontend performance request normally"
+      "Uses a dynamic import with React lazy and Suspense, preserving navigation and the home page",
+      "Distinguishes the expected bundle benefit from unmeasured performance"
     ]
   },
   {
     "id": "nvidia-skill-finder-neg-generic-kubernetes",
-    "question": "Deploy my web API to Kubernetes.",
+    "question": "Write Kubernetes YAML for my stateless HTTP web API using image ghcr.io/example/orders-api:1.0, container port 8080, and two replicas. Include a ClusterIP Service exposing port 80 and routing to port 8080. Use matching labels and selectors. This is a manifest example only: do not access a cluster or apply anything.",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The agent treats this as generic deployment work because no NVIDIA, GPU, or accelerated infrastructure signal is present.",
+    "ground_truth": "The agent provides a generic Kubernetes Deployment and Service from the supplied image, ports, and replica count without invoking NVIDIA skill discovery or claiming a live deployment.",
     "expected_behavior": [
       "Does not invoke the NVIDIA skill finder",
       "Does not recommend Dynamo, NIM, Holoscan, or any NVIDIA skill",
-      "Handles the Kubernetes deployment request normally"
+      "Provides a Deployment with two replicas and the supplied image and container port, plus a Service with matching selectors and the requested ports",
+      "Does not run kubectl or claim that a deployment was applied"
     ]
   },
   {
     "id": "nvidia-skill-finder-neg-python-refactor",
-    "question": "Refactor this Python module to make the code easier to read.",
+    "question": "Refactor the Python function below for readability and explain the change. Return the revised code in your answer; do not edit files. Preserve input order and behavior: return the names of active records, or \"unknown\" when an active record has no name.\n\n```python\ndef pick(xs):\n    r = []\n    for x in xs:\n        if x.get(\"active\", False):\n            if \"name\" in x:\n                r.append(x[\"name\"])\n            else:\n                r.append(\"unknown\")\n    return r\n```",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The agent treats this as ordinary code refactoring because no NVIDIA, GPU, or acceleration signal is present.",
+    "ground_truth": "The agent performs ordinary Python refactoring on the supplied function, preserving order, filtering, and name fallback behavior without recommending an NVIDIA skill.",
     "expected_behavior": [
       "Does not invoke the NVIDIA skill finder",
       "Does not recommend any NVIDIA skill",
-      "Handles the refactor normally"
+      "Returns a readable equivalent function preserving order and the default for a missing name",
+      "Does not claim unperformed file edits or validation"
     ]
   },
   {
     "id": "nvidia-skill-finder-neg-video-editing",
-    "question": "Trim this video, add captions, and export it for social media.",
+    "question": "I want to trim a video, add captions, and export it for social media, but I have not attached the video or provided edit details yet. What do you need from me before you can do the edit?",
     "expected_skill": null,
     "expected_script": null,
-    "ground_truth": "The agent treats this as ordinary video editing work, not NVIDIA Vision AI or VSS.",
+    "ground_truth": "The agent treats this as ordinary video editing intake. It requests the missing source video and essential editing requirements instead of attempting an edit or claiming an export.",
     "expected_behavior": [
       "Does not invoke the NVIDIA skill finder",
       "Does not recommend VSS or any Vision AI skill",
-      "Handles the video editing request normally"
+      "Asks for the video, desired trim range, caption text or transcription preference, and target platform or output format",
+      "Does not claim that an edit or export has been completed"
     ]
   },
   {
@@ -213,11 +218,11 @@
     "question": "I want to do deep research on a technical topic and synthesize what's known. Any NVIDIA skill for that?",
     "expected_skill": "nvidia-skill-finder",
     "expected_script": null,
-    "ground_truth": "The agent routes 'deep research and synthesize' to the AI-Q research skill rather than to RAG or retrieval skills.",
+    "ground_truth": "The agent checks the live catalog and routes deep research and technical synthesis to a current AI-Q research skill if one is available, rather than treating retrieval or RAG as the primary fit. It reports no strong match or an unavailable catalog honestly.",
     "expected_behavior": [
       "Invokes the NVIDIA skill finder",
       "Checks the live NVIDIA catalog before naming a specific skill",
-      "Recommends an AI-Q research skill (e.g. aiq-research) for technical synthesis",
+      "Recommends an AI-Q research skill (e.g. aiq-research) for technical synthesis only if present in the checked catalog; otherwise reports no strong match or that the catalog could not be checked without inventing a slug",
       "Does not recommend rag-blueprint, nemo-retriever, or nemo-rl-auto-research as the primary fit"
     ]
   },
@@ -232,6 +237,44 @@
       "Asks a clarifying question about the user's task, or offers domain browse as a path",
       "Does not dump every skill at once",
       "Does not install a skill without consent"
+    ]
+  },
+  {
+    "id": "nvidia-skill-finder-diff-offline-catalog",
+    "question": "I am working offline and cannot access the NVIDIA skills catalog. Do not use network tools or run network or installation commands; local read-only inspection is allowed. I need help accelerating pandas ETL on GPUs; can you confirm a current NVIDIA skill to install?",
+    "expected_skill": "nvidia-skill-finder",
+    "expected_script": null,
+    "ground_truth": "The agent recognizes NVIDIA relevance but cannot verify live catalog availability under the explicit offline restriction. It explains that limitation, avoids inventing a current install target, and offers a useful next step.",
+    "expected_behavior": [
+      "Recognizes GPU pandas acceleration as NVIDIA-relevant",
+      "Respects the explicit restriction on network tools and network or installation commands",
+      "Says that a current catalog entry cannot be confirmed and does not give a concrete skill slug or an install command",
+      "Offers a catalog URL to check later, a later retry, or general help"
+    ]
+  },
+  {
+    "id": "nvidia-skill-finder-diff-recommend-without-install",
+    "question": "Find an NVIDIA skill for GPU pandas ETL. I only want recommendations for my Codex client; do not install anything or change its configuration.",
+    "expected_skill": "nvidia-skill-finder",
+    "expected_script": null,
+    "ground_truth": "The agent checks the live catalog and gives at most three relevant recommendations when available, with commands shown for Codex and a useful first prompt, while respecting the request not to install or modify configuration.",
+    "expected_behavior": [
+      "Checks the live NVIDIA catalog before naming a specific install target",
+      "For available matches, recommends at most three skills and includes why each fits, a displayed install command targeting codex, and a useful first prompt",
+      "Does not execute an installation or modify agent configuration; a read-only catalog listing is allowed",
+      "If the catalog cannot be checked, explains the limitation without guessing a slug or install command"
+    ]
+  },
+  {
+    "id": "nvidia-skill-finder-neg-ambiguous-routing",
+    "question": "Help me optimize routing in my application. I have not yet described what is being routed or the technology I use.",
+    "expected_skill": null,
+    "expected_script": null,
+    "ground_truth": "The agent recognizes that routing could mean several unrelated tasks and asks a concise question about the application and routing problem before assuming an NVIDIA workflow.",
+    "expected_behavior": [
+      "Asks a concise clarifying question about what is being routed and the technology or constraints",
+      "Does not assume vehicle routing, GPU use, or another NVIDIA-specific workflow",
+      "Does not invoke the NVIDIA skill finder or recommend an NVIDIA skill based only on the ambiguous word routing"
     ]
   }
 ]
