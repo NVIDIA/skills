@@ -2286,23 +2286,23 @@
     {
       "name": "nvidia-ontology-management",
       "path": "skills/nvidia-ontology-management",
-      "content_digest": "sha256:ee6c981a2756eeb053f2d80441464228dab7ed19cfaea6413cb447f732d396ee",
-      "last_commit": "71bb80be8cc7dbd05767f037980b817c405c7a97",
-      "last_modified": "2026-11-17"
+      "content_digest": "sha256:c7100dc6d7eef774dbfcd6d1be7982c80bb94d5812d7a10088fa4dd88d7268db",
+      "last_commit": "eeaf2daa3134155f2b3d702f5b3d5ddccfd5b4f5",
+      "last_modified": "2026-11-19"
     },
     {
       "name": "nvidia-ontology-query",
       "path": "skills/nvidia-ontology-query",
-      "content_digest": "sha256:e303e4d5f08c68761d1143e1f9e4de93bf691c1c5a51bda2ac1d0f330ce5c7a7",
-      "last_commit": "71bb80be8cc7dbd05767f037980b817c405c7a97",
-      "last_modified": "2026-11-17"
+      "content_digest": "sha256:13bb7691ce602626715e2fc18ead7e51ee32901101caae9a308b88fd40f1a2df",
+      "last_commit": "eeaf2daa3134155f2b3d702f5b3d5ddccfd5b4f5",
+      "last_modified": "2026-11-19"
     },
     {
       "name": "nvidia-ontology-setup",
       "path": "skills/nvidia-ontology-setup",
-      "content_digest": "sha256:bf67f26361442aaeee8b2f5c5aa5da704310f744fc25b574954ddf7f73c134eb",
-      "last_commit": "fd6e3160bd0ecb69d300b75275fd9fc4c36df836",
-      "last_modified": "2026-11-16"
+      "content_digest": "sha256:f5210849fcd35b1a404d32d6b70eeab79de9e3297f33dfe17b37825416a8c052",
+      "last_commit": "eeaf2daa3134155f2b3d702f5b3d5ddccfd5b4f5",
+      "last_modified": "2026-11-19"
     },
     {
       "name": "nvidia-skill-finder",
