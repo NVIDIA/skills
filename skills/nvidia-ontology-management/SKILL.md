@@ -1,11 +1,12 @@
 ---
 name: nvidia-ontology-management
 description: >-
-  Model and publish semantic definitions in Auto Ontology. Use for terms, relationships,
-  measures, imports, and governed results—not deployment or querying.
+  Model and publish Auto Ontology semantics. Use for terms, relationships,
+  measures, imports, MCP write requests, and governed results; not deployment
+  or querying.
 license: Apache-2.0
 metadata:
-  version: "0.2.1"
+  version: "0.2.2"
   author: "NVIDIA <opensource@nvidia.com>"
   tags:
     - nvidia-ontology
@@ -55,6 +56,8 @@ the deployment or semantic layer is not ready.
 MCP is read-only, Auto Ontology has no generic result-row writeback endpoint, and current
 model import and certification APIs do not prove atomic promotion. Follow the
 publication gates below and fail closed when exact readback is unavailable.
+When asked to write through MCP, say that MCP is read-only and use the REST
+write path below.
 
 ## Auth
 
@@ -63,8 +66,9 @@ the UI (user menu → API Tokens). A token **acts as its owner** — a viewer's
 token cannot do admin things. Creating and revoking tokens requires a signed-in
 session; a token cannot mint another token.
 
-Writes below need `catalog:edit` unless noted. `403` means the owner's role
-lacks that permission, not that the path is wrong.
+Writes below need `catalog:edit` unless noted. A term, or a node other than a
+column, can also be edited by members of its owner group. `403` means neither the owner's role nor
+the row's owner group permits the write, not that the path is wrong.
 
 ## Instructions
 

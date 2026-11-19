@@ -60,7 +60,9 @@ memberships when downstream joins require the full set.
 5. Re-export the same scope and compare exact IDs, structure, properties,
    relationships, and counts.
 6. Run positive and negative readiness, answerability, SQL, row, and answer
-   probes.
+   probes. A negative probe passes when `ask_question` returns no SQL, with the
+   agent's unanswered message or a "not in this data" answer. It fails when it
+   returns SQL over the removed meaning, or an answer that still states it.
 7. Promote only the reviewed artifact; on mismatch, quarantine it and restore
    and verify the prior state where supported.
 

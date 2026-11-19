@@ -59,6 +59,9 @@ separate from presentation rounding.
 
 ## Check the answer
 
+An answer without SQL cites definitions, not rows: validate it against the
+terms it names, and never present it as a query result.
+
 Lead with findings from the returned rows, not a description of what the SQL
 would do. Require the prose to match the validated values, units, scope, and
 status. Preserve identifiers and literal recommendation state when requested.
@@ -76,7 +79,8 @@ evaluation questions. Do not use expected or evaluator-gold answers as model
 context.
 
 Retain a concise receipt containing question identity, ontology/source identity,
-SQL, rows, row count, truncation, answer, attempts, and observed gaps. Never
+SQL, rows, row count, truncation, answer, the agent's steps (`reasoning`), and
+observed gaps. Never
 record credentials. On missing evidence, wrong population, invalid state, or
 unverifiable truncation, fail closed instead of silently trimming or choosing
 the latest available row.
