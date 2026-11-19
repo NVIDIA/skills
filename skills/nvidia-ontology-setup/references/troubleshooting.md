@@ -86,6 +86,9 @@ There is no server-side token to paste; do not try to configure one.
 
 ## `ask_question` returned an empty answer, with no SQL and no error
 
+An answer with text and empty SQL is a different case, covered under *Answers
+without SQL* in `nvidia-ontology-query`.
+
 Call `check_readiness` first. Most often no database connection is
 configured. A non-empty `databases` list is not proof SQL can run: the
 catalog outlives the connection it was ingested from. Viewing connections is

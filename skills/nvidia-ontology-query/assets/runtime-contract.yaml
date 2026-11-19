@@ -42,7 +42,7 @@ required_fields:
     - rows
     - row_count
     - truncated
-    - attempts
+    - agent_steps
     - validation_gaps
   ValidatedAnswer:
     - findings

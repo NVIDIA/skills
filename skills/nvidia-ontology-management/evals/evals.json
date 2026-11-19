@@ -40,10 +40,10 @@
     {
       "id": "management-eval-004-token-acts-as-owner",
       "prompt": "I minted an API token as a viewer. Can I PATCH /api/terms/{id} with it?",
-      "expected_output": "A token acts as its owner and carries no extra permissions. A viewer's token cannot perform catalog:edit. 403 means the owner's role lacks the permission.",
+      "expected_output": "A token acts as its owner and carries no extra permissions. A viewer's token can PATCH a term only when the viewer belongs to that term's owner group; otherwise the write needs catalog:edit and returns 403.",
       "assertions": [
         "States that a token acts as its owner",
-        "States catalog:edit is required for PATCH /api/terms/{term_id}",
+        "States the write needs catalog:edit or membership in the term's owner group",
         "Does not claim the token elevates the viewer"
       ],
       "expected_skill": "nvidia-ontology-management",
@@ -154,6 +154,17 @@
         "Sequences modeling, backup, staged application, exact readback, and query validation",
         "Produces publication and rollback receipts after a write, or a blocked receipt when prerequisites fail",
         "Fails closed at any mismatched lifecycle stage"
+      ],
+      "expected_skill": "nvidia-ontology-management",
+      "expected_script": null
+    },
+    {
+      "id": "management-eval-014-negative-probe-without-sql",
+      "prompt": "I removed the Late Order measure and ran a negative probe: ask_question(\"How many late orders last week?\") returned no SQL and the answer \"I couldn't write a query that answers this question from the data I could find.\" Did the probe fail?",
+      "expected_output": "No. The probe passed: the agent found no query for the removed meaning and said so, without stating a late-order value. A negative probe fails when it returns SQL over the removed measure, or an answer that still states it.",
+      "assertions": [
+        "Treats the no-SQL unanswered message as a passing negative probe",
+        "States that SQL over the removed meaning, or an answer still stating it, would be the failure"
       ],
       "expected_skill": "nvidia-ontology-management",
       "expected_script": null

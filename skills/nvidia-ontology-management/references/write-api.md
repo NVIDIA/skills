@@ -17,7 +17,7 @@ Call the **Next.js** origin (`APP_URL`, local `:3000`), not FastAPI `:3001`.
 | --- | --- | --- | --- |
 | GET | `/api/terms` | `catalog:read` | Query `query`, `skip`, `limit` |
 | GET | `/api/terms/{term_id}` | `catalog:read` | |
-| PATCH | `/api/terms/{term_id}` | `catalog:edit` | `TermUpdate`: `name`, `description`, `name_certified`, `description_certified`. Renaming invalidates cached SQL-attribute description suggestions. |
+| PATCH | `/api/terms/{term_id}` | `catalog:edit`, or the term's owner group (gateway admits `catalog:read`) | `TermUpdate`: `name`, `description`, `name_certified`, `description_certified`. Renaming invalidates cached SQL-attribute description suggestions. |
 
 There is no public "create empty term" POST on `/api/terms`. New terms arrive
 through compilation, ingest, or model import.
@@ -33,7 +33,7 @@ through compilation, ingest, or model import.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| POST | `/api/sql-attributes/validate` | `catalog:edit` | Body: `expression`, optional `term_id`, optional `attribute_id`. Parse failure is **422**, not `valid: false`. |
+| POST | `/api/sql-attributes/validate` | `catalog:read` | Body: `expression`, optional `term_id`, optional `attribute_id`. Parse failure is **422**, not `valid: false`. |
 | POST | `/api/sql-attributes` | `catalog:edit` | `SqlAttributeCreate`: required `name`, `description`, `expression`, `term_id`; optional `source` (default `manual`). `expression` is a full query over catalog tables: `SELECT <expression> FROM <tables>` for a calculation, or `SELECT * FROM <tables> WHERE <condition>` for a filter. A bare expression is rejected with 422. 201. |
 | GET | `/api/sql-attributes/{attr_id}` | `catalog:read` | Also MCP `get_sql_attribute` |
 | PATCH | `/api/sql-attributes/{attr_id}` | `catalog:edit` | Metadata only (name/description). Does **not** change the SQL expression. |
@@ -46,7 +46,7 @@ through compilation, ingest, or model import.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| PATCH | `/api/nodes/{node_id}` | `catalog:edit` | Mutable properties of a Database, Schema, Table, or Column node |
+| PATCH | `/api/nodes/{node_id}` | `catalog:edit`, or the node's owner group; columns need the role (gateway admits `catalog:read`) | Mutable properties of a Database, Schema, Table, or Column node |
 
 ## Compilation
 

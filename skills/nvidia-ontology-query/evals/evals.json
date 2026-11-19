@@ -156,6 +156,30 @@
       ],
       "expected_skill": "nvidia-ontology-query",
       "expected_script": null
+    },
+    {
+      "id": "query-eval-014-information-answer",
+      "prompt": "I asked Auto Ontology \"Which tables describe suppliers?\" and ask_question returned a paragraph naming three tables, with empty sql and no rows. Is the deployment broken?",
+      "expected_output": "No. Questions about the data itself are answered from the catalog without SQL. Check the named tables and terms with search_terms or get_term, and do not present the answer as a computed result.",
+      "assertions": [
+        "States that an answer without SQL is expected for a question about the data itself",
+        "Validates the answer against the semantic layer rather than rows",
+        "Does not treat the response as a failure or call for readiness troubleshooting"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
+    },
+    {
+      "id": "query-eval-015-unanswered-message",
+      "prompt": "ask_question returned \"I couldn't write a query that answers this question from the data I could find. Try rephrasing it, or name the table or measure you mean.\" with empty sql. Should I just ask again?",
+      "expected_output": "Treat it as a gap, not a transient error. Run check_answerable and search_terms for the question's nouns, then ask again naming the measure or table they surface, or report that the semantic layer does not cover it.",
+      "assertions": [
+        "Treats the message as a coverage gap",
+        "Uses check_answerable or search_terms before asking again",
+        "Does not retry the same wording unchanged"
+      ],
+      "expected_skill": "nvidia-ontology-query",
+      "expected_script": null
     }
   ]
 }

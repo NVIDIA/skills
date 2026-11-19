@@ -1,12 +1,13 @@
 ---
 name: nvidia-ontology-query
 description: >-
-  Query Auto Ontology and validate generated SQL, rows, and
-  answers. Use for MCP or REST access, readiness, authentication, conversations,
-  and grounded questions.
+  Query Auto Ontology and validate what it returns. Use for MCP or REST access,
+  readiness, auth, conversations, empty or unanswered ask_question results, and
+  checking generated SQL and rows for wrong measures, units, populations,
+  lineage, joins, source columns, or truncation.
 license: Apache-2.0
 metadata:
-  version: "0.2.1"
+  version: "0.2.2"
   author: "NVIDIA <opensource@nvidia.com>"
   tags:
     - nvidia-ontology
@@ -74,15 +75,18 @@ Sequence (the server also advertises this so models do not jump straight to
 1. `check_readiness` — compiled semantic layer **and** a live DB connection.
 2. `search_terms` — what the nouns mean here.
 3. `check_answerable` — cheap coverage check.
-4. `ask_question` — full text-to-SQL; tens of seconds; answer + SQL + rows
-   (capped at 100 rows, with `row_count` / `truncated`).
+4. `ask_question` — the answering agent; tens of seconds. Returns `answer`,
+   `sql`, `rows` (capped at 100, with `row_count` / `truncated`), and
+   `reasoning`, one line per step the agent took.
 5. For a claim-bearing answer, validate material intent, generated SQL, returned
    rows, truncation, and prose using
    [query-validation.md](references/query-validation.md).
 
 Everything on MCP **reads**. There is no MCP tool for raw databases, schemas,
 or columns on purpose. `describe_table` is the legitimate table view: the
-terms a table carries and the stored queries that reference it.
+terms a table carries and the stored queries that reference it. Do not route
+around it through `information_schema` or a direct database connection; use
+`search_terms`, `describe_table`, and `ask_question`.
 
 Connect: `AUTO_ONTOLOGY_API_URL` is the **web app**. Run `auto-ontology-mcp`, point the client at
 `…/mcp`, user signs in. No token on the MCP server. Details:
@@ -92,9 +96,10 @@ repository `mcp/README.md` and `docs/mcp.md`.
 
 When MCP is unavailable, public clients call the authenticated **Next.js
 gateway**, not FastAPI
-`:3001`. FastAPI trusts `x-auto-ontology-user-id` and must not be exposed. A direct
-FastAPI request without `conversation_id` is stateless; with
-`conversation_id` it requires that internal header.
+`:3001`. FastAPI trusts the `x-auto-ontology-user-id` header without checking
+it, so a caller could act as any user. Never call `:3001` from a client or
+partner app, with or without that header; send every request through the
+gateway.
 
 Auth (any of these; resolved in one place):
 
@@ -163,9 +168,23 @@ measure, unit, grain, joins, lineage, status, validity, rows, truncation, and
 answer prose. If a material constraint cannot be verified, return the gap rather
 than a stronger claim.
 
+## Answers without SQL
+
+An `answer` with empty `sql` and no `rows` is not a failure. The agent returns
+one in two cases:
+
+- **Information answer:** a question about the data itself, such as which
+  tables exist or what a term means, is answered from the catalog. Check it
+  against `search_terms` and `get_term`, and never present it as a computed
+  value.
+- **Unanswered:** "I couldn't write a query that answers this question…" means
+  the agent found no query it could stand behind. Treat it as a gap: run
+  `check_answerable` and `search_terms` for the question's nouns instead of
+  retrying the same wording.
+
 ## Empty or failed answers
 
-`ask_question` / chat returned nothing useful → `check_readiness` (or
+An empty `answer` from `ask_question` or chat, with no SQL and no error → `check_readiness` (or
 `GET /api/semantic-compilation/status`) before rewriting the question. A
 named database is not proof SQL can execute. See `nvidia-ontology-setup`
 troubleshooting.
