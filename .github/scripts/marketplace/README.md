@@ -5,9 +5,13 @@ This repo generates two catalog-wide metadata files:
 - `.github/scripts/marketplace/metadata.json` — canonical inventory of every
   catalog skill plus its taxonomy assignments (`product.primary`,
   `classification.category.primary`, `catalog.subdomain`, `audience`,
-  `discovery.activity_tags`).
+  `discovery.activity_tags`), plus a `plugins` block carrying one entry per
+  plugin declared in `plugins.d/`. A plugin's taxonomy is rolled up from the
+  skills it bundles rather than authored per plugin; see
+  [`plugins.d/README.md`](../../../plugins.d/README.md).
 - `skills.sh.json` (repo root) — marketplace/index file derived from
-  `metadata.json`, grouping skills by `catalog.subdomain`.
+  `metadata.json`, grouping skills by `catalog.subdomain`. Skills only;
+  plugins have no `catalog.subdomain`.
 
 Both files are produced by
 [`generate-skill-metadata.py`](./generate-skill-metadata.py) (this directory).
