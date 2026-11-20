@@ -16,9 +16,94 @@
       "items": {
         "$ref": "#/$defs/skill"
       }
+    },
+    "plugins": {
+      "type": "array",
+      "description": "One entry per plugin declared in plugins.d/. Taxonomy is rolled up from the skills the plugin bundles, not authored per plugin.",
+      "$comment": "Intentionally NOT listed in the root `required`. existing_valid_metadata() validates a single carried-forward entry by wrapping it as {\"skills\": [entry]} and running it against this whole schema; requiring `plugins` would fail every one of those wrappers and silently disable carry-forward for the entire catalog.",
+      "items": {
+        "$ref": "#/$defs/plugin"
+      }
     }
   },
   "$defs": {
+    "plugin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "path",
+        "source",
+        "description",
+        "skills",
+        "metadata"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Plugin install name, matching the plugins.d/<name>.yml basename."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^plugins/.+",
+          "description": "Repo-relative path to the built plugin directory."
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^plugins\\.d/.+\\.yml$",
+          "description": "Repo-relative path of the plugins.d file declaring this plugin. Lets a published entry be recognised when its file can no longer be parsed and its name cannot be read."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Plugin description copied exactly from plugins.d/<name>.yml."
+        },
+        "skills": {
+          "type": "array",
+          "description": "Repo-relative paths of the catalog skills this plugin bundles, sorted. Empty when the plugin bundles no catalog skill, in which case every taxonomy field is hand-declared in plugins.d/<name>.yml.",
+          "items": {
+            "type": "string",
+            "pattern": "^skills/.+"
+          },
+          "uniqueItems": true
+        },
+        "metadata": {
+          "$ref": "#/$defs/pluginMetadata"
+        }
+      }
+    },
+    "pluginMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "$comment": "Each field reuses the controlled values defined for skills, so plugins and skills can never drift apart on vocabulary.",
+      "required": [
+        "classification.category.primary",
+        "product.primary",
+        "audience"
+      ],
+      "properties": {
+        "classification.category.primary": {
+          "$ref": "#/$defs/metadata/properties/classification.category.primary",
+          "description": "Domain. The single facet build.nvidia.com displays for plugins at launch."
+        },
+        "product.primary": {
+          "type": "array",
+          "description": "Library. Every distinct product among the bundled skills, sorted. Emitted but not displayed at launch.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/metadata/properties/product.primary"
+          }
+        },
+        "audience": {
+          "$ref": "#/$defs/metadata/properties/audience",
+          "description": "Audience values held by at least half the bundled skills. Emitted but not displayed at launch."
+        }
+      }
+    },
     "skill": {
       "type": "object",
       "additionalProperties": false,

@@ -10,6 +10,7 @@ Pipeline:
         -> classify against baseline metadata.json (added/removed/renamed/changed)
         -> carry forward valid existing metadata
         -> AI enrichment for missing fields (strict-JSON, taxonomy-bound)
+        -> roll plugins.d/*.yml up into plugin taxonomy from bundled skills
         -> validate against metadata.schema.json + skills-sh.schema.json
         -> emit byte-stable metadata.json and skills.sh.json
 
@@ -30,10 +31,12 @@ Environment:
 from __future__ import annotations
 
 import argparse
+import collections
 import dataclasses
 import difflib
 import json
 import os
+import posixpath
 import re
 import sys
 import textwrap
@@ -62,6 +65,7 @@ MARKETPLACE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = MARKETPLACE_DIR.parents[2]
 SKILLS_DIR = REPO_ROOT / "skills"
 COMPONENTS_DIR = REPO_ROOT / "components.d"
+PLUGINS_D_DIR = REPO_ROOT / "plugins.d"
 
 # All marketplace artifacts (generated outputs, schemas, the subdomain config,
 # the exclusions list, and this generator script) live under
@@ -82,6 +86,20 @@ MVP_FIELDS = (
     "catalog.subdomain",
     "audience",
     "discovery.activity_tags",
+)
+
+# Taxonomy fields rolled up from a plugin's bundled skills.
+#
+# Only three, and deliberately so. `classification.category.primary` (Domain)
+# is the one facet build.nvidia.com displays for plugins at launch;
+# `product.primary` (Library) and `audience` are emitted but not displayed, so
+# the frontend can switch either on later without a generator change or a
+# regeneration. `catalog.subdomain` and `discovery.activity_tags` are omitted
+# because neither has a defined meaning for a bundle.
+PLUGIN_FIELDS = (
+    "classification.category.primary",
+    "product.primary",
+    "audience",
 )
 
 
@@ -856,6 +874,663 @@ def build_skills_sh(metadata: dict, subdomains: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Plugins
+#
+# A plugin is a product-owned bundle declared by plugins.d/<name>.yml and built
+# into plugins/<name>/ by .github/scripts/build-plugins.py. Its taxonomy is
+# derived here rather than authored, because every skill it bundles already
+# carries enriched metadata: `include_skills` lists canonical `skills/...`
+# paths, which are exactly the keys of the entries built earlier in this run.
+# The join is therefore deterministic and needs no inference.
+#
+# Where a plugin bundles no catalog skill -- an MCP-only plugin, or one that
+# lands before its skills do -- there is nothing to roll up. That case is
+# reported as an error naming the plugin, and the remedy is a `taxonomy:` block
+# in plugins.d/<name>.yml. Inference is intentionally NOT wired in: it would
+# put a nondeterministic path into a generator whose output is gated on being
+# byte-stable. The hook for it is the empty-`resolved` branch below.
+
+
+def _audience_values(entry: dict) -> list[str]:
+    raw = entry["metadata"].get("audience", "")
+    return [v for v in raw.split(",") if v]
+
+
+PLUGIN_NAME_RE = re.compile(r"[a-z0-9][a-z0-9-]*")
+
+
+
+
+def load_plugin_specs(warnings: list[str], declared: set[str] | None = None) -> list[dict]:
+    """Read every plugins.d/<name>.yml that defines a plugin.
+
+    Discovery matches build-plugins.py on everything that decides which files
+    are plugins and what they contain: the same ``*.yml`` glob, the same
+    leading-underscore rule for include files, the same ``_defaults.yml``
+    shallow merge, the same lowercase-kebab-case name rule, and the same
+    policy of skipping a bad file rather than aborting.
+
+    One deliberate divergence: directory-form ``include_skills`` entries are
+    refused by build_plugin_entries rather than expanded. See the note in
+    plugins.d/README.md for why, and for what to implement if the catalog is
+    ever regrouped by product.
+
+    Any divergence shows up as a catalog that describes a different set of
+    plugins from the one actually published -- an entry for a plugin that is
+    never built, or a plugin on the marketplaces with no entry here.
+
+    `declared`, when given, is filled with the identity of every plugin this
+    directory declares, including ones skipped below. Recovery uses it to tell
+    "failed to build" from "deliberately deleted". It is populated HERE, by
+    the same parse that produces the specs, because resolving plugin identity
+    in a second place is how discovery and recovery came to disagree twice:
+    once over defaults, once over which names are legal. A name this function
+    refuses is deliberately NOT declared -- build-plugins.py refuses it too,
+    so the plugin is not published and the catalog should not keep describing
+    it. A file too broken to parse falls back to its filename, matching that
+    script leaving the previously built tree in place.
+    """
+    if declared is None:
+        declared = set()
+    if not PLUGINS_D_DIR.is_dir():
+        return []
+
+    # build-plugins.py merges _defaults.yml into every spec before reading any
+    # field from it, so a `description` or `include_skills` declared there is
+    # inherited by every plugin. Reading only the per-plugin file would make
+    # this script see a different plugin than the one actually published.
+    # The merge is shallow and the per-plugin file wins, matching that script.
+    defaults: dict = {}
+    defaults_path = PLUGINS_D_DIR / "_defaults.yml"
+    if defaults_path.is_file():
+        try:
+            loaded = load_yaml(defaults_path)
+        except Exception as exc:  # noqa: BLE001 - PyYAML raises builtins too
+            warnings.append(f"plugins.d/_defaults.yml: could not be parsed: {exc}")
+            loaded = None
+        if isinstance(loaded, dict):
+            defaults = loaded
+        elif loaded is not None:
+            warnings.append(
+                "plugins.d/_defaults.yml: expected a YAML mapping; defaults ignored."
+            )
+
+    specs: list[dict] = []
+    seen: dict[str, str] = {}
+    for path in sorted(PLUGINS_D_DIR.glob("*.yml")):
+        if path.name.startswith("_"):
+            continue
+        # Built from PLUGINS_D_DIR rather than relative_to(REPO_ROOT): the
+        # result is identical in production and does not depend on where the
+        # directory sits, so `source` stays a stable key that recovery can
+        # match on and the function can be exercised in isolation.
+        rel = f"{PLUGINS_D_DIR.name}/{path.name}"
+
+        # User-authored YAML must never raise out of this generator: its
+        # failures are reported into a GitHub issue body, where a traceback
+        # tells the maintainer nothing.
+        # Exception, not yaml.YAMLError. PyYAML's own constructors raise
+        # ordinary builtins: `release_date: 2026-02-30` matches the timestamp
+        # resolver and then raises ValueError out of datetime.date, and the
+        # field need not be one this generator reads. A YAMLError-only handler
+        # lets those through and stops the whole catalog.
+        try:
+            data = load_yaml(path)
+        except Exception as exc:  # noqa: BLE001 - see above
+            # The name is unknowable here, and it need not equal the filename.
+            # Declaring the stem would miss a published entry built under a
+            # different `name` and silently delist it, so the SOURCE PATH is
+            # declared instead and recovery matches entries on it. Still
+            # declared at all because build-plugins.py also fails to read this
+            # file and leaves the previously built tree in place.
+            declared.add(rel)
+            warnings.append(f"{rel}: could not be parsed, plugin skipped: {exc}")
+            continue
+
+        if not isinstance(data, dict):
+            declared.add(rel)
+            warnings.append(
+                f"{rel}: expected a YAML mapping at top level, got "
+                f"{type(data).__name__}; plugin skipped."
+            )
+            continue
+
+        data = {**defaults, **data}
+        name = data.get("name")
+        if not name or not isinstance(name, str):
+            warnings.append(f"{rel}: missing or non-string `name`; plugin skipped.")
+            continue
+        if not PLUGIN_NAME_RE.fullmatch(name):
+            warnings.append(
+                f"{rel}: plugin name `{name}` is not lowercase kebab-case; "
+                f"plugin skipped. build-plugins.py refuses to build it, so an "
+                f"entry here would describe a plugin that is never published."
+            )
+            continue
+        if name in seen:
+            warnings.append(
+                f"{rel}: duplicate plugin name `{name}`, already declared in "
+                f"{seen[name]}; plugin skipped."
+            )
+            continue
+        if name != path.stem:
+            # build-plugins.py builds plugins/<name>/ from the `name` field,
+            # so this still works; it just makes the tree hard to navigate.
+            warnings.append(
+                f"{rel}: `name: {name}` does not match the file basename "
+                f"`{path.stem}`. The plugin is built as `{name}`."
+            )
+
+        seen[name] = rel
+        declared.add(name)
+        data["__source"] = rel
+        specs.append(data)
+    return specs
+
+
+def derive_plugin_taxonomy(included: list[dict]) -> dict:
+    """Roll a plugin's taxonomy up from the skills it bundles.
+
+    Domain  -- the most common ``classification.category.primary``. A plugin
+               shows under one domain, so a single value has to be chosen even
+               when the bundle spans several. Ties break alphabetically, which
+               keeps the output byte-stable rather than dependent on input
+               order.
+    Library -- every distinct ``product.primary``, sorted. Usually one value;
+               more when a product's skills are registered under several names.
+    Audience -- values held by at least half the bundled skills. A union over
+               all bundled skills returns most of the vocabulary and separates
+               nothing; an intersection is frequently empty. The halfway rule
+               keeps the values that actually characterise the bundle. When it
+               selects nothing, the most common value(s) are used, so the field
+               is never empty for a plugin that bundles any skill at all.
+    """
+    # Every entry reaching here came from build_skill_entry, which emits
+    # nothing unless all of MVP_FIELDS is present, so these are populated in
+    # practice. Reading them defensively keeps a future change to MVP_FIELDS
+    # from turning into a KeyError in the plugin pass.
+    missing = [
+        e.get("path", "<unknown>")
+        for e in included
+        if not e.get("metadata", {}).get("classification.category.primary")
+        or not e.get("metadata", {}).get("product.primary")
+    ]
+    if missing:
+        raise GeneratorError(
+            "cannot roll up a plugin from skills with incomplete metadata: "
+            + ", ".join(sorted(missing))
+        )
+
+    cats = collections.Counter(
+        e["metadata"]["classification.category.primary"] for e in included
+    )
+    domain = sorted(cats.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+
+    libraries = sorted({e["metadata"]["product.primary"] for e in included})
+
+    # set() because the skill schema permits a repeated audience token, and
+    # counting tokens would let one skill vote twice and carry a value over
+    # the halfway line on its own.
+    aud: collections.Counter = collections.Counter()
+    for e in included:
+        for value in set(_audience_values(e)):
+            aud[value] += 1
+    audience = sorted(v for v, n in aud.items() if n * 2 >= len(included))
+    if not audience and aud:
+        top = max(aud.values())
+        audience = sorted(v for v, n in aud.items() if n == top)
+
+    return {
+        "classification.category.primary": domain,
+        "product.primary": libraries,
+        "audience": ",".join(audience),
+    }
+
+
+def plugin_taxonomy_help(taxonomy: dict, src: str) -> str:
+    """A ready-to-paste `taxonomy:` block for the error that asks for one.
+
+    The person reading this error is usually adding their first plugin. Naming
+    the three fields is not enough: they are dotted, unusual, and easy to
+    mistype, and the product and audience values live in enums far too long to
+    scan, in a schema file they have no reason to have opened. So the message
+    carries the shape, and inlines the one vocabulary short enough to print.
+    """
+    domains = taxonomy["classification.category.primary"]["values"]
+    return (
+        f"declare it by hand in {src}:\n"
+        f"\n"
+        f"    taxonomy:\n"
+        f"      classification.category.primary: {domains[0]}\n"
+        f"      product.primary:\n"
+        f"        - <product name, exactly as metadata.schema.json spells it>\n"
+        f"      audience: developer\n"
+        f"\n"
+        f"    classification.category.primary is one of: "
+        + ", ".join(domains)
+        + ".\n"
+        f"    product.primary and audience values come from "
+        f"{SCHEMA_PATH.relative_to(REPO_ROOT).as_posix()}.\n"
+        f"    All three are required when the plugin bundles no skill. When it\n"
+        f"    does bundle skills, any field may be declared on its own and the\n"
+        f"    rest still roll up.\n"
+        f"    See plugins.d/README.md."
+    )
+
+
+def _suggest(value: str, allowed: Iterable[str]) -> str:
+    """`Did you mean ...` for a mistyped controlled value.
+
+    Without this, a single-character typo sends the maintainer to search the
+    whole enum by eye. `product.primary` alone runs to several hundred values
+    and grows with every product onboarded.
+    """
+    close = difflib.get_close_matches(str(value), list(allowed), n=3, cutoff=0.6)
+    return f" Did you mean: {', '.join(close)}?" if close else ""
+
+
+def validate_plugin_taxonomy(
+    metadata: dict, taxonomy: dict, location: str, errors: list[str]
+) -> None:
+    """Check rolled-up or hand-declared values against the schema vocabulary.
+
+    The schema is the single source of truth for the controlled values, so an
+    override in plugins.d is held to exactly the same vocabulary as an enriched
+    skill. Without this a typo in a hand-written `taxonomy:` block would only
+    surface later, as a schema failure against the whole document.
+    """
+    domain = metadata.get("classification.category.primary")
+    allowed = taxonomy["classification.category.primary"]["values"]
+    if domain not in allowed:
+        errors.append(
+            f"{location}: classification.category.primary `{domain}` is not a "
+            f"value in metadata.schema.json. Valid values: "
+            + ", ".join(allowed)
+            + "."
+        )
+
+    allowed_products = taxonomy["product.primary"]["values"]
+    for value in metadata.get("product.primary", []):
+        if value not in set(allowed_products):
+            errors.append(
+                f"{location}: product.primary `{value}` is not a value in "
+                f"metadata.schema.json." + _suggest(value, allowed_products)
+            )
+
+    allowed_audience = taxonomy["audience"]["values"]
+    for value in str(metadata.get("audience", "")).split(","):
+        if value and value not in set(allowed_audience):
+            errors.append(
+                f"{location}: audience `{value}` is not a value in "
+                f"metadata.schema.json." + _suggest(value, allowed_audience)
+            )
+
+
+def apply_taxonomy_override(metadata: dict, override: dict, src: str) -> str | None:
+    """Apply a hand-declared `taxonomy:` block in place.
+
+    A declared value always wins over the rolled-up one, the same precedence
+    a components.d `product_primary` has over enrichment. Returns a message
+    describing the first type problem found, or None on success.
+    """
+    for field in PLUGIN_FIELDS:
+        if field not in override:
+            continue
+        value = override[field]
+        if field == "product.primary":
+            value = value if isinstance(value, list) else [value]
+            if not all(isinstance(v, str) for v in value):
+                return (
+                    f"{src}: `taxonomy.product.primary` must be a string or a "
+                    f"list of strings; plugin skipped."
+                )
+            value = sorted(value)
+        elif not isinstance(value, str):
+            return (
+                f"{src}: `taxonomy.{field}` must be a string, got "
+                f"{type(value).__name__}; plugin skipped."
+            )
+        metadata[field] = value
+    return None
+
+
+def build_plugin_entries(
+    skill_entries: list[dict],
+    taxonomy: dict,
+    warnings: list[str],
+    validator: Draft202012Validator,
+    declared: set[str] | None = None,
+) -> list[dict]:
+    """Build one metadata entry per plugin declared in plugins.d/.
+
+    Nothing here is fatal. A plugin problem degrades that plugin -- it is
+    warned about and left out of the catalog -- and never stops the skills
+    from being emitted.
+
+    That policy is not a preference, it is required for the repository to
+    function. build-plugins.py soft-fails curation drift on purpose, so that
+    "the daily sync PR is not blocked by curation drift in plugins.d", and
+    validate-plugins.yml is advisory for the same reason. Hard-failing here
+    would invert it: a skill renamed by an upstream sync, or dropped through
+    metadata-exclusions.yaml, would leave a stale path in some team's
+    include_skills and from that moment block regeneration of the entire
+    catalog and red-line every unrelated PR in the repository.
+    """
+    by_path = {e["path"]: e for e in skill_entries}
+    entries: list[dict] = []
+
+    for spec in load_plugin_specs(warnings, declared):
+        name = spec["name"]
+        src = spec["__source"]
+
+        description = spec.get("description")
+        if not description or not isinstance(description, str):
+            warnings.append(
+                f"{src}: missing or non-string `description`; plugin skipped."
+            )
+            continue
+        try:
+            # The schema accepts any string, but the output is written as
+            # UTF-8, and a lone surrogate from a YAML escape such as "\uD800"
+            # only fails at that point -- too late to degrade just this plugin.
+            description.encode("utf-8")
+        except UnicodeEncodeError:
+            warnings.append(
+                f"{src}: `description` contains characters that cannot be "
+                f"encoded as UTF-8; plugin skipped."
+            )
+            continue
+
+        raw_includes = spec.get("include_skills") or []
+        if not isinstance(raw_includes, list):
+            # A bare string would otherwise be iterated one character at a
+            # time, producing nonsense paths.
+            warnings.append(
+                f"{src}: `include_skills` must be a list, got "
+                f"{type(raw_includes).__name__}; plugin skipped."
+            )
+            continue
+
+        # build-plugins.py calls .rstrip() on each entry, so a non-string
+        # raises AttributeError there and the build fails. Emitting an entry
+        # for it would describe a plugin that is never published.
+        bad_types = [r for r in raw_includes if not isinstance(r, str)]
+        if bad_types:
+            warnings.append(
+                f"{src}: include_skills entries must be strings; found "
+                + ", ".join(f"{type(r).__name__}" for r in bad_types)
+                + ". build-plugins.py fails on these, so the plugin would not "
+                "be published. Plugin skipped."
+            )
+            continue
+
+        resolved: list[dict] = []
+        unresolved: list[str] = []
+        grouping: list[str] = []
+        escaping: list[str] = []
+        for raw in raw_includes:
+            # Normalisation follows build-plugins.py exactly: it does
+            # `(REPO_ROOT / entry.rstrip("/")).resolve()`, which collapses
+            # "./" and ".." but does NOT strip surrounding whitespace. Doing
+            # either differently makes the two scripts resolve different sets,
+            # so this script would describe a plugin the other does not ship.
+            path = posixpath.normpath(raw.rstrip("/"))
+            # metadata.json keys are repo-relative. An absolute path, or one
+            # climbing out of the repo, matches no key and so slipped past the
+            # directory check below while build-plugins.py resolved it against
+            # the filesystem and expanded it.
+            if path.startswith("/") or path == ".." or path.startswith("../"):
+                escaping.append(path)
+                continue
+            entry = by_path.get(path)
+            if entry is not None:
+                resolved.append(entry)
+                continue
+            # build-plugins.py also accepts a grouping directory, expanding it
+            # to the immediate children that hold a SKILL.md. That is NOT
+            # reimplemented here. The catalog is flat today -- 472 skills, all
+            # at skills/<name>, no grouping directories, and no plugins.d file
+            # using the form -- so the feature has no users, and approximating
+            # its semantics is how this code got them wrong twice. It is
+            # refused loudly rather than guessed at, so the divergence is
+            # visible instead of silent. See plugins.d/README.md.
+            if any(p.startswith(path + "/") for p in by_path):
+                grouping.append(path)
+            else:
+                unresolved.append(path)
+
+        if escaping:
+            warnings.append(
+                f"{src}: include_skills paths must be repo-relative, under "
+                f"skills/: "
+                + ", ".join(sorted(escaping))
+                + ". build-plugins.py resolves these against the filesystem, "
+                "so the published plugin and this catalog would disagree. "
+                "Plugin skipped."
+            )
+            continue
+
+        if grouping:
+            warnings.append(
+                f"{src}: directory-form include_skills entries are not "
+                f"supported by the metadata generator: "
+                + ", ".join(sorted(grouping))
+                + ". build-plugins.py WOULD expand these, so the published "
+                "plugin and this catalog would disagree. List each skill "
+                "path explicitly. Plugin skipped."
+            )
+            continue
+
+        # Held, not emitted. The plugin can still be skipped further down, and
+        # a warning claiming it was "BUILT WITHOUT" some skills would then be
+        # describing a plugin that is not in the output at all.
+        unresolved_notice = ""
+        if unresolved:
+            # Not an error, and deliberately not advice to delete the path.
+            # The usual causes are a skill that is legitimately absent from
+            # this run -- newly added and not yet enriched under --no-ai, or
+            # removed through metadata-exclusions.yaml -- where the path is
+            # correct and deleting it would be wrong.
+            unresolved_notice = (
+                f"{src}: BUILT WITHOUT {len(unresolved)} SKILL(S). These "
+                f"include_skills path(s) have no entry in metadata.json and "
+                f"were left out of the plugin's taxonomy: "
+                + ", ".join(sorted(unresolved))
+                + ". This is expected for a skill that is new, excluded, or "
+                "renamed upstream; check the path only if it should be there."
+            )
+
+        override = spec.get("taxonomy") or {}
+        if not isinstance(override, dict):
+            warnings.append(
+                f"{src}: `taxonomy:` must be a mapping, got "
+                f"{type(override).__name__}; plugin skipped."
+            )
+            continue
+
+        # key=str because YAML keys need not be strings: a mapping such as
+        # `{null: x, typo: y}` otherwise reaches sorted() with None beside a
+        # string and raises TypeError out of the generator.
+        unknown = sorted((set(override) - set(PLUGIN_FIELDS)), key=str)
+        if unknown:
+            # Silently ignoring these is how a dotted-name typo turns into a
+            # plugin that quietly keeps its rolled-up values.
+            warnings.append(
+                f"{src}: unknown `taxonomy:` field(s) "
+                + ", ".join(f"`{k}`" for k in unknown)
+                + ". Valid fields are "
+                + ", ".join(PLUGIN_FIELDS)
+                + "; plugin skipped."
+            )
+            continue
+
+        # De-duplicate before deriving, not at assembly. A path repeated in
+        # include_skills would otherwise vote twice in the domain plurality
+        # and the audience threshold while the emitted `skills` list stayed
+        # byte-identical, so the wrong taxonomy would be invisible in the
+        # output and in review.
+        resolved = list({e["path"]: e for e in resolved}.values())
+
+        if resolved:
+            try:
+                metadata = derive_plugin_taxonomy(resolved)
+            except GeneratorError as exc:
+                warnings.append(f"{src}: {exc}; plugin skipped.")
+                continue
+        else:
+            # Tier 2 hook. See the section comment above. With nothing to roll
+            # up there is no partial case: every field has to be declared, or
+            # the entry would be emitted incomplete and fail the schema with
+            # an error blaming a value the maintainer never wrote.
+            undeclared = [f for f in PLUGIN_FIELDS if f not in override]
+            if undeclared:
+                warnings.append(
+                    f"{src}: plugin `{name}` bundles no catalog skill, so its "
+                    f"taxonomy cannot be derived and every field has to be "
+                    f"declared. Missing: "
+                    + ", ".join(undeclared)
+                    + ".\nEither list catalog skills under `include_skills:`, "
+                    "or " + plugin_taxonomy_help(taxonomy, src)
+                )
+                continue
+            metadata = {}
+
+        problem = apply_taxonomy_override(metadata, override, src)
+        if problem:
+            warnings.append(problem)
+            continue
+
+        vocab_errors: list[str] = []
+        validate_plugin_taxonomy(metadata, taxonomy, src, vocab_errors)
+        if vocab_errors:
+            warnings.extend(f"{e} Plugin skipped." for e in vocab_errors)
+            continue
+
+        entry = {
+            "name": name,
+            "path": f"plugins/{name}",
+            # Carried so recovery can identify a published plugin whose file
+            # has since become unparseable, when its `name` cannot be read.
+            "source": src,
+            "description": description,
+            "skills": sorted({e["path"] for e in resolved}),
+            "metadata": {f: metadata[f] for f in PLUGIN_FIELDS},
+        }
+
+        # The assembled entry is checked against the published schema here,
+        # not left to the whole-document validation later in main().
+        #
+        # This is the difference between a bad plugin degrading itself and a
+        # bad plugin stopping the catalog. validate_plugin_taxonomy checks
+        # that values are in the vocabulary, but the schema enforces more than
+        # that -- minItems on product.primary, uniqueItems on skills, and an
+        # audience pattern that rejects "" and a trailing comma. Anything the
+        # vocabulary check does not cover used to pass this gate and fail the
+        # whole document instead, which writes no output at all.
+        schema_errors: list[str] = []
+        validate_against_schema(
+            {"skills": [], "plugins": [entry]}, validator, src, schema_errors
+        )
+        if schema_errors:
+            warnings.extend(f"{e} Plugin skipped." for e in schema_errors)
+            continue
+
+        # Only now is the plugin certain to be in the output.
+        if unresolved_notice:
+            warnings.append(unresolved_notice)
+        entries.append(entry)
+
+    entries.sort(key=lambda e: e["name"])
+    return entries
+
+
+def recover_plugin_entries(
+    entries: list[dict],
+    baseline: dict | None,
+    validator: Draft202012Validator,
+    warnings: list[str],
+    declared: set[str],
+) -> list[dict]:
+    """Keep a published plugin rather than delisting it when a rebuild fails.
+
+    This mirrors the rule the skills pass already applies: an entry already in
+    metadata.json must never regress, because a document missing it stays
+    schema-valid and internally consistent, so nothing downstream notices the
+    disappearance.
+
+    Plugins need it more than skills do, not less. A plugin's taxonomy is
+    derived from skills it does not own, so a skill being excluded for
+    compliance, renamed upstream, or simply added unenriched under --no-ai can
+    take a perfectly compliant plugin down with it. `nvidia-skills` bundles a
+    single skill, so exactly one absent skill would otherwise remove the
+    flagship plugin from build.nvidia.com.
+
+    The deliberate case still works: a plugin whose plugins.d file is deleted
+    is no longer declared, so it is not recovered and correctly disappears.
+
+    `declared` comes from load_plugin_specs, which is the only place plugin
+    identity is resolved. Recomputing it here is what previously let recovery
+    follow a name discovery had rejected, and miss one discovery had taken
+    from _defaults.yml.
+    """
+    built = {e["name"] for e in entries}
+
+    # The baseline is a file on disk and may predate this code, be hand-edited,
+    # or be truncated. It must never raise: a malformed `plugins` block there
+    # would otherwise stop the independent skills path from being written.
+    prior_plugins = (baseline or {}).get("plugins") or []
+    if not isinstance(prior_plugins, list):
+        prior_plugins = []
+    prior_by_name = {
+        e["name"]: e
+        for e in prior_plugins
+        if isinstance(e, dict) and isinstance(e.get("name"), str) and e["name"]
+    }
+
+    # `declared` holds plugin names, and -- for a file whose name could not be
+    # read -- its source path. An entry matches on either, so a published
+    # plugin whose file has become unparseable is still recognised as declared
+    # even though its name is no longer readable.
+    recovered: list[dict] = []
+    for prior in sorted(prior_by_name.values(), key=lambda e: e["name"]):
+        if prior["name"] in built:
+            continue
+        if prior["name"] not in declared and prior.get("source") not in declared:
+            # Deliberately deleted, or its name is one discovery now rejects.
+            continue
+        try:
+            # The validator covers the whole document, so a single entry is
+            # checked by wrapping it the way existing_valid_metadata does.
+            validator.validate({"skills": [], "plugins": [prior]})
+        except Exception:
+            continue
+        try:
+            # The schema accepts any string, but output is written as UTF-8.
+            # A baseline entry predates this check, so it is re-checked here
+            # rather than trusted; otherwise a surrogate already in the file
+            # would be carried forward and fail at write time, stopping the
+            # whole catalog.
+            json.dumps(prior, ensure_ascii=False).encode("utf-8")
+        except UnicodeEncodeError:
+            warnings.append(
+                f"plugin `{prior['name']}`: its previous entry cannot be "
+                f"encoded as UTF-8 and was not carried forward."
+            )
+            continue
+        recovered.append(prior)
+        name = prior["name"]
+        warnings.append(
+            f"plugin `{name}`: KEPT. Could not be rebuilt this run, so the "
+            f"entry from the previous metadata.json was retained and the "
+            f"plugin stays in the catalog. Its taxonomy may now be stale."
+        )
+
+    if not recovered:
+        return entries
+    return sorted(entries + recovered, key=lambda e: e["name"])
+
+
+# ---------------------------------------------------------------------------
 # Validation helpers
 
 
@@ -941,8 +1616,13 @@ def write_if_changed(path: Path, content: str) -> bool:
     existing = path.read_text(encoding="utf-8") if path.exists() else None
     if existing == content:
         return False
+    # Encode before opening. `dumps_canonical` uses ensure_ascii=False, so a
+    # lone surrogate reaching it survives into the string and only fails when
+    # the file is written -- by which point write_text has already truncated
+    # the file, destroying a good catalog to emit a bad one.
+    encoded = content.encode("utf-8")
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
+    path.write_bytes(encoded)
     return True
 
 
@@ -1083,7 +1763,19 @@ def main(argv: list[str] | None = None) -> int:
             "drop it deliberately."
         )
 
-    metadata_obj = {"skills": entries}
+    # Plugins roll up from the entries built above, so this runs after the
+    # recovery pass: a plugin that bundles a recovered skill still resolves.
+    # Problems here are warnings, never errors -- see build_plugin_entries.
+    plugin_warnings: list[str] = []
+    declared_plugins: set[str] = set()
+    plugin_entries = build_plugin_entries(
+        entries, taxonomy, plugin_warnings, metadata_validator, declared_plugins
+    )
+    plugin_entries = recover_plugin_entries(
+        plugin_entries, baseline, metadata_validator, plugin_warnings, declared_plugins
+    )
+
+    metadata_obj = {"skills": entries, "plugins": plugin_entries}
 
     # Validate metadata.json against the schema (all entries in one pass).
     if not errors:
@@ -1117,11 +1809,16 @@ def main(argv: list[str] | None = None) -> int:
     # entry -- never which field failed enrichment or why. The recovered case
     # (a published skill kept from the baseline) does not set `errors` and so
     # always reported correctly, which is why the gap stayed hidden.
-    if skill_warnings:
+    if skill_warnings or plugin_warnings:
         # Structured warnings file for CI to surface in issue bodies.
         warnings_path = Path("/tmp/skill-warnings.json")
+        payload: dict[str, list[str]] = {}
+        if skill_warnings:
+            payload["stale_skills"] = skill_warnings
+        if plugin_warnings:
+            payload["plugins"] = plugin_warnings
         warnings_path.write_text(
-            json.dumps({"stale_skills": skill_warnings}, indent=2) + "\n",
+            json.dumps(payload, indent=2) + "\n",
             encoding="utf-8",
         )
 
@@ -1155,6 +1852,21 @@ def main(argv: list[str] | None = None) -> int:
         )
         for w in skill_warnings:
             print(f"  - {w}", file=sys.stderr)
+    if plugin_warnings:
+        # Deliberately does not claim an outcome for the set as a whole. These
+        # cover three different results -- a plugin skipped, a plugin kept from
+        # the baseline, and a plugin built from a partial skill list -- and a
+        # blanket "left out of metadata.json" header made a retained plugin
+        # read as a lost one.
+        print(
+            f"\nPLUGIN WARNINGS: {len(plugin_warnings)} issue(s). Each line "
+            f"states its own outcome. The skills catalog is unaffected in "
+            f"every case:",
+            file=sys.stderr,
+        )
+        for w in plugin_warnings:
+            print(f"  - {w}", file=sys.stderr)
+
     # A skill that could not be built has to fail the run, in both --check and
     # write mode, so CI cannot read a partial success as a pass. Outputs are
     # still rendered first, so the catalog does not lose a skill either way.
@@ -1164,6 +1876,12 @@ def main(argv: list[str] | None = None) -> int:
     # filling them is the regenerate job's work, not the PR's. Failing here
     # would red-line every open PR from the moment a sync adds a skill until
     # regeneration runs. The warnings are still printed either way.
+    #
+    # plugin_warnings deliberately does NOT feed this. A nonzero exit skips the
+    # "Create regeneration PR" step in generate-skill-metadata.yml, so letting a
+    # plugin problem set it would block regeneration of the whole catalog --
+    # the exact failure this pass exists to prevent, reintroduced through the
+    # exit code. Plugin problems surface in the log and in the warnings file.
     exit_code = 1 if skill_warnings and not args.no_ai else 0
 
     metadata_text = dumps_canonical(metadata_obj)
@@ -1198,7 +1916,7 @@ def main(argv: list[str] | None = None) -> int:
     _print_classification(cls)
     print(
         f"metadata.json: {'updated' if md_changed else 'unchanged'} "
-        f"({len(entries)} skills)"
+        f"({len(entries)} skills, {len(plugin_entries)} plugins)"
     )
     print(
         f"skills.sh.json: {'updated' if sh_changed else 'unchanged'} "
