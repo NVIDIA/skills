@@ -23,6 +23,11 @@ on:
       - ".github/scripts/tests/**"
       - ".github/workflows/generate-skill-metadata.yml"
       - "components.d/**"
+      # A plugin's taxonomy is rolled up from the skills it bundles, so a
+      # change to `include_skills` changes metadata.json without touching any
+      # skill. Without this path the drift check would not run on exactly the
+      # edit that causes the drift.
+      - "plugins.d/**"
       - "skills.sh.json"
       # versions.json tracks every file in a skill directory: the content
       # digest follows skill.oms.sig, and last_commit/last_modified follow any
@@ -231,6 +236,36 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # Plugin problems never fail the generator, because a nonzero exit would
+      # skip the PR step below and block regeneration of the whole catalog for
+      # one team's stale include_skills entry. They would therefore be visible
+      # only in the run log, so they are lifted into the PR body instead.
+      - name: Summarize plugin warnings
+        id: pluginwarn
+        if: steps.generate.outputs.exit_code == '0' && steps.changes.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let section = '';
+            try {
+              const warnings = JSON.parse(fs.readFileSync('/tmp/skill-warnings.json', 'utf8'));
+              const items = warnings.plugins || [];
+              if (items.length > 0) {
+                section = [
+                  '',
+                  `### Plugin warnings (${items.length})`,
+                  '',
+                  'Each line states its own outcome: a plugin skipped, a plugin kept from the previous `metadata.json`, or a plugin built from a partial skill list. The skills catalog is unaffected in every case.',
+                  '',
+                  items.map(w => `- \`${w}\``).join('\n'),
+                ].join('\n');
+              }
+            } catch (e) {
+              // No warnings file is the normal case.
+            }
+            core.setOutput('section', section);
+
       - name: Create regeneration PR
         if: steps.generate.outputs.exit_code == '0' && steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
@@ -248,6 +283,7 @@ jobs:
 
             - Trigger: `${{ github.event_name }}`
             - Generator log: see workflow run.
+            ${{ steps.pluginwarn.outputs.section }}
 
             cc @jim-NVIDIA @jasonNVIDIA
           labels: |

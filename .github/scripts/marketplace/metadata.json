@@ -5808,5 +5808,23 @@
         "discovery.activity_tags": "evaluate,benchmark,profile,optimize,assess"
       }
     }
+  ],
+  "plugins": [
+    {
+      "name": "nvidia-skills",
+      "path": "plugins/nvidia-skills",
+      "source": "plugins.d/nvidia-skills.yml",
+      "description": "Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows.",
+      "skills": [
+        "skills/nvidia-skill-finder"
+      ],
+      "metadata": {
+        "classification.category.primary": "developer_tools",
+        "product.primary": [
+          "Learning"
+        ],
+        "audience": "ai_engineer,application_developer,developer,platform_engineer,solutions_architect"
+      }
+    }
   ]
 }
