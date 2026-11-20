@@ -1733,9 +1733,9 @@
     {
       "name": "kumo-data-science",
       "path": "skills/kumo-data-science",
-      "content_digest": "sha256:dd6d4c83d89f9d6fdf6123dccee61d176553a7efeed52c75fbc2eda2c15d7b60",
-      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
-      "last_modified": "2026-11-19"
+      "content_digest": "sha256:dc3fc7255b4c971ba12c33d8a624f185c9db6b6ca3b21f841bb43ce37de2ba58",
+      "last_commit": "7059d0f946f1ca521e04e812debf8899907e1898",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "kumo-graph-visualization",
@@ -1747,9 +1747,9 @@
     {
       "name": "kumo-model-explanations",
       "path": "skills/kumo-model-explanations",
-      "content_digest": "sha256:0583ff661dd607e6dea4dd4a25e365b0b407ca2f7a95ed99cc6d6133139e43c4",
-      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
-      "last_modified": "2026-11-19"
+      "content_digest": "sha256:79dedc64b13109c87d72fbd813c7a17efcd4e26d750c8d41bfe0d85567c9e67f",
+      "last_commit": "7059d0f946f1ca521e04e812debf8899907e1898",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "kumo-model-persistence",
