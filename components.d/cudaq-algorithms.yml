@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: CUDA-Q Algorithms
+repo: NVIDIA/cudaq-algorithms
+description: Use CUDA-Q Algorithms contracts for state-preparation injection, QSP/QSVT, chemistry, dynamics, and primitives; excludes CUDA-Q setup and standalone kernels.
+skills:
+  - path: skills/cudaq-algorithms/
+    catalog_dir: cudaq-algorithms
+links:
+  discussions: false
