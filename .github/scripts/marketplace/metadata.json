@@ -805,6 +805,30 @@
       }
     },
     {
+      "path": "skills/cudnn-compile-and-serialize",
+      "name": "cudnn-compile-and-serialize",
+      "description": "Explain or implement cuDNN Frontend C++ parallel plan compilation, graph serialization, cached plan loading, and deviceless ahead-of-time compilation. Adapt the C++ samples into application code with explicit plan selection, tensor bindings, and error handling.",
+      "metadata": {
+        "product.primary": "cuDNN",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "application_developer,hpc_developer,developer,ml_engineer",
+        "discovery.activity_tags": "integrate,optimize,configure,deploy,debug"
+      }
+    },
+    {
+      "path": "skills/cudnn-install",
+      "name": "cudnn-install",
+      "description": "Install, verify, or upgrade the cuDNN backend and Python or C++ frontend. Check existing PyTorch, JAX, and NVIDIA NGC installations, select package extras, and diagnose cuDNN library conflicts.",
+      "metadata": {
+        "product.primary": "cuDNN",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "gpu-development",
+        "audience": "developer,application_developer,ml_engineer,ai_engineer,platform_engineer",
+        "discovery.activity_tags": "configure,validate,troubleshoot,get_started,select"
+      }
+    },
+    {
       "path": "skills/cuml",
       "name": "cuml",
       "description": "Use when writing, running, debugging or upgrading Python code that uses NVIDIA cuML (GPU machine learning), cuml.accel (zero-code-change GPU acceleration of scikit-learn, umap-learn and hdbscan), or GPU UMAP/HDBSCAN/RandomForest/KMeans/SVC, including through libraries that wrap cuML (BERTopic, rapids-singlecell). Covers APIs removed or renamed in 2025-2026 releases, verifying code really ran on the GPU, large-data UMAP/HDBSCAN memory recipes, and exporting trained models. Not for cuDF-only dataframe work, PyTorch or XGBoost.",
