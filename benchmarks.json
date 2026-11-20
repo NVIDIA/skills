@@ -5187,7 +5187,7 @@
     },
     {
       "skill": "kumo-data-science",
-      "evaluation_date": "2026-11-19",
+      "evaluation_date": "2026-11-20",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:f72dc6983fe9c6ff4f46b5d40bebd4ceb50356c04e83ebc88dc2cd383486d627",
@@ -5204,7 +5204,7 @@
       "catalog_dir": "kumo-data-science",
       "component": "Kumo Engine",
       "has_results": true,
-      "average_uplift_pct": 37.42
+      "average_uplift_pct": 34.6
     },
     {
       "skill": "kumo-graph-visualization",
@@ -5229,7 +5229,7 @@
     },
     {
       "skill": "kumo-model-explanations",
-      "evaluation_date": "2026-11-19",
+      "evaluation_date": "2026-11-20",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:e389a4317a270919c8e56c8d8f40c51460e1ecc5bef453075887cea72bad3559",
@@ -5246,7 +5246,7 @@
       "catalog_dir": "kumo-model-explanations",
       "component": "Kumo Engine",
       "has_results": true,
-      "average_uplift_pct": 25.08
+      "average_uplift_pct": 23.85
     },
     {
       "skill": "kumo-model-persistence",
@@ -31168,7 +31168,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 25.0
+      "uplift_pct": 18.7
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31176,7 +31176,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 97.5,
+      "score_pct": 100.0,
       "uplift_pct": 45.0
     },
     {
@@ -31186,7 +31186,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 95.0,
-      "uplift_pct": 45.0
+      "uplift_pct": 47.5
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31203,7 +31203,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 92.9,
+      "score_pct": 92.1,
       "uplift_pct": null
     },
     {
@@ -31212,8 +31212,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 60.7
+      "score_pct": 93.8,
+      "uplift_pct": 50.2
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31221,8 +31221,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 86.6,
-      "uplift_pct": 48.8
+      "score_pct": 85.9,
+      "uplift_pct": 46.2
     },
     {
       "catalog_dir": "kumo-data-science",
@@ -31230,7 +31230,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 96.1,
+      "score_pct": 94.0,
       "uplift_pct": null
     },
     {
@@ -31239,7 +31239,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.3,
+      "score_pct": 95.2,
       "uplift_pct": null
     },
     {
@@ -31357,7 +31357,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 53.3
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "kumo-model-explanations",
@@ -31365,8 +31365,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 33.3
+      "score_pct": 96.7,
+      "uplift_pct": 23.4
     },
     {
       "catalog_dir": "kumo-model-explanations",
@@ -31392,8 +31392,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 64.6,
-      "uplift_pct": 39.6
+      "score_pct": 60.4,
+      "uplift_pct": 35.4
     },
     {
       "catalog_dir": "kumo-model-explanations",
@@ -31401,7 +31401,7 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 66.0,
+      "score_pct": 57.6,
       "uplift_pct": 24.3
     },
     {
@@ -31410,7 +31410,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.0,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
@@ -31419,7 +31419,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 93.8,
+      "score_pct": 96.0,
       "uplift_pct": null
     },
     {
