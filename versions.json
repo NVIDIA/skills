@@ -1710,6 +1710,62 @@
       "last_modified": "2026-09-24"
     },
     {
+      "name": "kumo-custom-populations",
+      "path": "skills/kumo-custom-populations",
+      "content_digest": "sha256:cd0d5f6b1966c5e0f42e90501e294f5eed5beed3f32052ab2a67c61413a5d45c",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
+      "name": "kumo-data-science",
+      "path": "skills/kumo-data-science",
+      "content_digest": "sha256:dd6d4c83d89f9d6fdf6123dccee61d176553a7efeed52c75fbc2eda2c15d7b60",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
+      "name": "kumo-graph-visualization",
+      "path": "skills/kumo-graph-visualization",
+      "content_digest": "sha256:12e3cf68c6631ce9f3f5b3524c4f2fca4378bd1bdec00dd0e357bef9ce48f924",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
+      "name": "kumo-model-explanations",
+      "path": "skills/kumo-model-explanations",
+      "content_digest": "sha256:0583ff661dd607e6dea4dd4a25e365b0b407ca2f7a95ed99cc6d6133139e43c4",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
+      "name": "kumo-model-persistence",
+      "path": "skills/kumo-model-persistence",
+      "content_digest": "sha256:e8308e7903136a39f3b4a84d22f1695330ecb9bbeecd64c6612ca71fdecd7c3f",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
+      "name": "kumo-model-tuning",
+      "path": "skills/kumo-model-tuning",
+      "content_digest": "sha256:b379b759836d18d7adc3ccb331fd8dea477aa78db7cccc6986543c4ba77ececf",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
+      "name": "kumo-training-diagnostics",
+      "path": "skills/kumo-training-diagnostics",
+      "content_digest": "sha256:edea7393a6ce5607be34d2837eef76d012184da864bfb4c75b134e51e8659b5f",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
+      "name": "kumoai-reference",
+      "path": "skills/kumoai-reference",
+      "content_digest": "sha256:83d4524ff6f18c025fd57d662e6344b47e63b688d7fb2896da72c2be672b55b4",
+      "last_commit": "6b75e9e3c9737a4985ab87462d2ecb02d5b2ada7",
+      "last_modified": "2026-11-19"
+    },
+    {
       "name": "launch-nemo-rl",
       "path": "skills/launch-nemo-rl",
       "content_digest": "sha256:3dbe5dd1adaaae42882251d603a04d368d0ac14c07c30f2bd32dcdabca3d13f6",
