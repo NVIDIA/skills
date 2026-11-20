@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: SkillEvaluator
+repo: NVIDIA/SkillEvaluator
+description: Run and interpret SkillEvaluator to validate, benchmark, and CI-gate agent skills.
+skills:
+  - path: skills/skillevaluator/
+    catalog_dir: skillevaluator
