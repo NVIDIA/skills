@@ -1,7 +1,7 @@
 [
   {
     "id": "finetune-vae-from-datalist",
-    "question": "Fine-tune the NV-Generate VAE using CT and MRI images listed in /data/ctmr/vae_datalist.json.",
+    "question": "Fine-tune the NV-Generate VAE using CT and MRI images listed in /tmp/ctmr-input/vae_datalist.json. The synthetic images are relative to /tmp/ctmr-input. If that input has not been materialized, the supplied recipe /workspace/input/prepare_volumes.py takes that directory as its argument.",
     "expected_skill": "nv-generate-vae-finetune",
     "ground_truth": "The agent uses scripts/run_vae_finetune.py with --data-base-dir, --output-dir, and the datalist path.",
     "expected_behavior": [
@@ -9,17 +9,23 @@
       "the command includes --data-base-dir",
       "the command includes an explicit --output-dir",
       "the agent states the output checkpoint is experimental and not clinically validated"
+    ],
+    "files": [
+      "files/prepare_volumes.py"
     ]
   },
   {
     "id": "preflight-before-gpu-run",
-    "question": "Check whether my VAE finetune datalist is runnable before launching the GPU job.",
+    "question": "Check whether my VAE finetune datalist at /tmp/ctmr-input/vae_datalist.json is runnable before launching the GPU job. The synthetic images are relative to /tmp/ctmr-input. If that input has not been materialized, the supplied recipe /workspace/input/prepare_volumes.py takes that directory as its argument.",
     "expected_skill": "nv-generate-vae-finetune",
     "ground_truth": "The agent runs the wrapper with --preflight and does not start training.",
     "expected_behavior": [
       "the command includes --preflight",
       "the command does not execute train_vae_tutorial.ipynb",
       "the agent explains that real training still requires NIfTI images, CUDA, and model weights"
+    ],
+    "files": [
+      "files/prepare_volumes.py"
     ]
   }
 ]

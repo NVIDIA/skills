@@ -450,6 +450,8 @@
         "compileiq-validate-result",
         "compute-sanitizer-diagnose-cuda-bugs",
         "cudf-query-engine-builder",
+        "cudnn-compile-and-serialize",
+        "cudnn-install",
         "cuequivariance-jax",
         "cuequivariance-torch",
         "genomics-workflow-acceleration",

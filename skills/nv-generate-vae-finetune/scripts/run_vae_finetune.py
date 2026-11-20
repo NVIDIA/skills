@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -429,7 +429,9 @@ def _run_training(
     ).to(device)
 
     if cfg.finetune:
-        checkpoint_autoencoder = torch.load(cfg.trained_autoencoder_path, map_location=device)
+        checkpoint_autoencoder = torch.load(
+            cfg.trained_autoencoder_path, map_location=device, weights_only=True
+        )
         if "unet_state_dict" in checkpoint_autoencoder:
             checkpoint_autoencoder = checkpoint_autoencoder["unet_state_dict"]
         autoencoder.load_state_dict(checkpoint_autoencoder)
