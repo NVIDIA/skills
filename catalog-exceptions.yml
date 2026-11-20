@@ -7,10 +7,6 @@
 #
 # Add an entry only with a documented reason and an owner.
 exceptions:
-  - dir: cuopt-developer
-    reason: Contributor-facing skill, intentionally uncataloged (per cuOpt team, 2026-06-01)
-    owner: rgsl888prabhu
-    component: cuOpt
   - dir: nvidia-skill-finder
     reason: Catalog infrastructure router skill; maintained via direct PR (no components.d upstream)
     owner: jdudash
