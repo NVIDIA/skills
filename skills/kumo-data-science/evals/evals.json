@@ -1,0 +1,116 @@
+{
+  "skill_name": "kumo-data-science",
+  "evals": [
+    {
+      "id": "kds-01",
+      "prompt": "Use my sales data to figure out which customers are risky. Build me a Kumo model for it.",
+      "expected_output": "Treats this as a `train` request with required fields missing. In one ask-back it asks for where the data lives (for example a database and schema, or a folder of files), the observable outcome that makes a customer 'risky' (the positive-label condition), and the prediction window. It does not ask for columns, keys, joins or an output table, does not guess an outcome, and generates no code.",
+      "assertions": [
+        "Asks where the data lives, as a location such as a database and schema, a dataset, a bucket prefix or a folder of files",
+        "Asks for a concrete, observable outcome that defines 'risky' (the positive-label condition) instead of inventing one",
+        "Asks for the prediction window (for example 'in the next 30 days')",
+        "Asks for all missing fields together in a single reply",
+        "Does not ask for column names, primary keys, joins or an output table",
+        "Does not write a notebook, Kumo SDK code or a predictive query"
+      ],
+      "expected_skill": "kumo-data-science",
+      "expected_script": null
+    },
+    {
+      "id": "kds-02",
+      "prompt": "Create a notebook that trains a Kumo model for our fraud use case. The data is in Snowflake, USER_DATA.E_COMMERCE. Entity: each customer. Outcome: at least one fraud event. Window: next 30 days. You can't reach our Snowflake account from here, so this is the structure; no keys are declared:\n\nCUSTOMERS(CUSTOMER_ID NUMBER, COUNTRY VARCHAR, SIGNUP_AT TIMESTAMP_NTZ)\nFRAUD_EVENTS(EVENT_ID NUMBER, CUSTOMER_ID NUMBER, EVENT_AT TIMESTAMP_NTZ, AMOUNT NUMBER, RESOLVED_AT TIMESTAMP_NTZ, DAYS_TO_RESOLVE NUMBER)\nTRANSACTIONS(TRANSACTION_ID NUMBER, CUSTOMER_ID NUMBER, CREATED_AT TIMESTAMP_NTZ, AMOUNT NUMBER)",
+      "expected_output": "All required fields are present, so it builds the graph proposal from the pasted structure and stops for confirmation. The Source scope line says the structure came from the user. Keys CUSTOMERS.CUSTOMER_ID, FRAUD_EVENTS.EVENT_ID and TRANSACTIONS.TRANSACTION_ID are proposed by name and, since no probe can run, tagged as unverified; time columns are EVENT_AT and CREATED_AT; FRAUD_EVENTS.CUSTOMER_ID and TRANSACTIONS.CUSTOMER_ID link to CUSTOMERS.CUSTOMER_ID; table mode all-connected [default]. An Excluded columns section removes FRAUD_EVENTS.RESOLVED_AT and DAYS_TO_RESOLVE as not knowable at the row's EVENT_AT. It ends by asking the user to confirm or correct any line, with no Kumo code.",
+      "assertions": [
+        "Presents a graph proposal (metadata, links, table mode) built from the pasted structure rather than asking for the structure again",
+        "Tags proposal values with provenance tags such as [supplied], [inferred], [inferred, unverified] or [default]",
+        "Says the structure came from the user rather than from a read of the source",
+        "Proposes links from FRAUD_EVENTS.CUSTOMER_ID and TRANSACTIONS.CUSTOMER_ID to CUSTOMERS.CUSTOMER_ID",
+        "Lists FRAUD_EVENTS.RESOLVED_AT and FRAUD_EVENTS.DAYS_TO_RESOLVE as excluded columns because their values are not known at the event time",
+        "Asks the user to confirm or correct the proposal and stops there",
+        "Does not emit Kumo SDK code or a predictive query in this reply"
+      ],
+      "expected_skill": "kumo-data-science",
+      "expected_script": null
+    },
+    {
+      "id": "kds-03",
+      "prompt": "Build a Kumo notebook that predicts, for each account in our BigQuery dataset acme-prod:billing, whether the account will have at least one failed payment in the next 14 days.",
+      "expected_output": "The request has every required field. Before preflight it checks whether it can read the dataset's columns in this session (a BigQuery tool, an authenticated `bq` on the PATH, or Python with Kumo and ambient credentials). It cannot, so it sends one ask-back saying what it checked and what happened, and offers two ways forward: the user makes a read tool available, or pastes the structure (tables, columns, types, declared keys). It never asks for a credential value, does not sign in or change tool configuration, does not invent tables, and writes no code.",
+      "assertions": [
+        "Says what it checked to read the dataset and what the result was",
+        "Offers the user a way to grant read access (an authenticated tool or a connected tool for BigQuery)",
+        "Offers the alternative of pasting the structure: tables, columns with types and any declared keys",
+        "Does not ask for a password, key, token or other credential value in the chat",
+        "Does not invent tables, columns or a graph proposal for acme-prod:billing",
+        "Does not re-ask for the entity, outcome or window, which the user already gave",
+        "Does not generate the notebook in this reply"
+      ],
+      "expected_skill": "kumo-data-science",
+      "expected_script": null
+    },
+    {
+      "id": "kds-04",
+      "prompt": "Earlier in this session you proposed this graph for our fraud request (Snowflake USER_DATA.E_COMMERCE; entity: each customer; outcome: at least one fraud event; window: next 30 days):\n\nMetadata\n- CUSTOMERS: primary key CUSTOMER_ID [inferred]\n- FRAUD_EVENTS: primary key EVENT_ID [inferred]; time column EVENT_AT [inferred]\nLinks\n- FRAUD_EVENTS.CUSTOMER_ID -> CUSTOMERS.CUSTOMER_ID [inferred]\nExcluded columns\n- FRAUD_EVENTS.RESOLVED_AT [inferred]\n\nI confirm the graph. Please write the predictions to ANALYTICS.ML.fraud_scores.",
+      "expected_output": "With the graph confirmed it moves to the task interpretation gate and restates the task in the documented shape: one prediction per CUSTOMERS.CUSTOMER_ID; outcome at least one fraud event; window 0 to 30 days after the prediction anchor; temporal binary classification; predictions written to ANALYTICS.ML.fraud_scores, verbatim, in the same notebook; threshold 0.5 [default]. It says whether the destination already exists and would be replaced, or that it could not check. It then asks for explicit confirmation and emits no Kumo code.",
+      "assertions": [
+        "Restates the entity as one prediction per customer (CUSTOMERS.CUSTOMER_ID)",
+        "Restates the outcome as at least one fraud event and the window as the next 30 days",
+        "Names the task type as temporal binary classification",
+        "Carries the destination ANALYTICS.ML.fraud_scores verbatim, without changing its case or adding a suffix",
+        "States a classification threshold of 0.5 as the default",
+        "Says whether the destination table already exists and would be replaced on every run, or that it could not check",
+        "Asks for explicit confirmation and does not emit Kumo SDK code or a notebook yet"
+      ],
+      "expected_skill": "kumo-data-science",
+      "expected_script": null
+    },
+    {
+      "id": "kds-05",
+      "prompt": "I trained a Kumo model in my notebook an hour ago and `training_result` is still in memory. Which columns influenced its predictions the most?",
+      "expected_output": "This is an attribution question about an existing run, not a new training request. It routes to the kumo-model-explanations skill (or says that skill is not available here), keeps the existing run, and does not run new-training intake or start another fit.",
+      "assertions": [
+        "Treats the request as an explanation question about the existing run, handled by the kumo-model-explanations skill (or reports that skill is unavailable rather than improvising its workflow)",
+        "Does not ask for the data location, entity, outcome or prediction window",
+        "Does not start, propose or generate a new training run"
+      ],
+      "expected_skill": "kumo-data-science",
+      "expected_script": null
+    },
+    {
+      "id": "kds-06",
+      "prompt": "Schedule the Kumo churn notebook you generated to run every night at 2am as a job on our cluster, and tell me when the first run finishes.",
+      "expected_output": "In this generic coding-agent host there is no job file: the skill does not submit, schedule or monitor jobs. It says so and offers the notebook or script to run themselves. It does not create a scheduler entry or submit anything.",
+      "assertions": [
+        "Says that in this environment the skill does not submit, schedule or monitor jobs",
+        "Offers the notebook or a script as what it can provide instead",
+        "Does not create a cron entry, scheduler configuration or job submission",
+        "Does not claim to watch or report on a run"
+      ],
+      "expected_skill": "kumo-data-science",
+      "expected_script": null
+    },
+    {
+      "id": "kds-07",
+      "prompt": "Set up kumo.init with my KUMO_API_KEY and train a churn model on Kumo's hosted service.",
+      "expected_output": "Hosted Kumo (kumo.init, API keys, KUMO_API_KEY / KUMO_API_ENDPOINT, Kumo Studio) is not the SDK this skill targets. It says so and stops, and does not blend hosted setup into generated code.",
+      "assertions": [
+        "Says that hosted Kumo (kumo.init with an API key) is not the SDK this skill works with",
+        "Does not write code that calls kumo.init or reads KUMO_API_KEY",
+        "Does not ask the user to paste an API key"
+      ],
+      "expected_skill": "kumo-data-science",
+      "expected_script": null
+    },
+    {
+      "id": "kds-08",
+      "prompt": "Write a pandas function that removes duplicate rows from a DataFrame, keeping the most recent row per order_id by updated_at.",
+      "expected_output": "A plain pandas task with no Kumo or predictive-model element. The agent answers directly, for example with sort_values plus drop_duplicates, without loading the Kumo skill or starting its intake.",
+      "assertions": [
+        "Does not load or follow the kumo-data-science skill or ask Kumo intake questions",
+        "Provides pandas code that keeps the latest row per order_id by updated_at"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

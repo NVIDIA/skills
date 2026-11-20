@@ -1,0 +1,83 @@
+{
+  "skill_name": "kumo-model-persistence",
+  "evals": [
+    {
+      "id": "kpersist-01",
+      "prompt": "Write the cell for my Snowflake notebook that trains the confirmed Kumo churn model and publishes it to the model registry in ML.REGISTRY as CHURN_MODEL version V3. `model_plan`, `training_table` and `snapshot` are already defined in the notebook. I will run the cell myself.",
+      "expected_output": "Writes code that publishes during the fit: `trainer.fit(training_table, snapshot=snapshot, export_config=kumo.ModelOutputConfig(connector=registry_connector, location=kumo.ModelRegistryLocation(model_name='CHURN_MODEL', version='V3')))` with a connector scoped to ML.REGISTRY, then checks `training_result.published_model` and raises if it is None. Uses `location`, not `path`, for Snowflake. Checks that V3 does not already exist first and does not overwrite an existing version.",
+      "assertions": [
+        "The code passes a kumo.ModelOutputConfig as export_config to trainer.fit",
+        "The code uses kumo.ModelRegistryLocation with model_name CHURN_MODEL and version V3",
+        "The code uses location= rather than path= for the Snowflake registry",
+        "The code checks training_result.published_model and treats None as a failure",
+        "The code checks that version V3 does not already exist and does not overwrite an existing version"
+      ],
+      "expected_skill": "kumo-model-persistence",
+      "expected_script": null
+    },
+    {
+      "id": "kpersist-02",
+      "prompt": "Load CHURN_MODEL from our Snowflake model registry in ML.REGISTRY and score new customers. SHOW VERSIONS lists V1, V2 and V3.",
+      "expected_output": "Several versions exist and the user named none, so it asks which version to load rather than choosing one. It explains that `version=None` loads the registry default, which is not necessarily the newest, and that 'latest' would mean the newest created_on, passed explicitly. It does not retrain.",
+      "assertions": [
+        "Asks which version to load instead of picking one",
+        "Explains that loading without a version uses the registry default, not necessarily the newest",
+        "Does not train a new model"
+      ],
+      "expected_skill": "kumo-model-persistence",
+      "expected_script": null
+    },
+    {
+      "id": "kpersist-03",
+      "prompt": "Write the notebook cells that load version V2 of CHURN_MODEL from the Snowflake registry ML.REGISTRY and score our customers as of 2026-12-01. The V2 training record's graph-building code is in `build_graph_v2()`, already defined in the notebook. I will run the cells myself.",
+      "expected_output": "Writes code that restores with `kumo.Trainer.load_from_connector(registry_connector, location=kumo.ModelRegistryLocation(model_name='CHURN_MODEL', version='V2'))`, rebuilds the graph with the V2 training record's `build_graph_v2()` (not the live schema), creates a fresh `graph.snapshot()`, generates the prediction table with a naive `prediction_time` and `plan=loaded.training_table_generation_plan`, and predicts with `snapshot=` and an explicit binary threshold. No retraining.",
+      "assertions": [
+        "The code loads with kumo.Trainer.load_from_connector and an explicit ModelRegistryLocation for version V2",
+        "The code rebuilds the graph from the V2 training record (build_graph_v2) rather than from the live schema or another version",
+        "The code builds a new graph.snapshot() for scoring",
+        "The code passes plan=loaded.training_table_generation_plan to generate_prediction_table",
+        "The code passes snapshot= to predict and an explicit binary classification threshold",
+        "The code does not call fit"
+      ],
+      "expected_skill": "kumo-model-persistence",
+      "expected_script": null
+    },
+    {
+      "id": "kpersist-04",
+      "prompt": "Write the cell for my Snowflake notebook that keeps my Kumo run's aggregate metrics and the per-trial validation results on the internal stage @ML.ARTIFACTS before the notebook shuts down, so I can look at them next week. The run's directory is `run_dir`, already defined. I will run the cell myself.",
+      "expected_output": "Writes code that selects explicit files from `run_dir` (not the whole scratch tree, which can hold source data and credentials), writes aggregate metrics to a new JSON file with allow_nan=False, builds an archive with the packaged `create_archive` helper from an explicit list of relative paths, uploads with `session.file.put(..., auto_compress=False, overwrite=False)` to a new run-specific prefix and checks exactly one `UPLOADED` result, and records the stage path and archive SHA256 digest.",
+      "assertions": [
+        "The code selects explicit files from one run instead of uploading the whole scratch directory",
+        "The code uses the packaged create_archive helper with a list of explicit relative file paths",
+        "The code uploads with session.file.put and overwrite=False",
+        "The code checks that the upload status is UPLOADED and treats anything else, including SKIPPED, as not retained",
+        "The code records the stage object path and the archive digest"
+      ],
+      "expected_skill": "kumo-model-persistence",
+      "expected_script": null
+    },
+    {
+      "id": "kpersist-05",
+      "prompt": "Look up my Kumo model by its hosted job ID job-8841 and redeploy it.",
+      "expected_output": "The local Kumo API has no hosted model or job ID lookup. It says so and asks for the registry model name and version, or a retained bundle, instead of inventing a lookup.",
+      "assertions": [
+        "Says there is no hosted model or job ID lookup in this local API",
+        "Asks for a registry model and explicit version, or a retained bundle",
+        "Does not invent an API call that fetches a model by job ID"
+      ],
+      "expected_skill": "kumo-model-persistence",
+      "expected_script": null
+    },
+    {
+      "id": "kpersist-06",
+      "prompt": "Save my trained scikit-learn model with joblib and upload it to s3://ml-models/fraud/.",
+      "expected_output": "A scikit-learn persistence task unrelated to Kumo. The agent answers with joblib and an S3 upload, without loading the Kumo persistence skill.",
+      "assertions": [
+        "Does not load or follow the kumo-model-persistence skill",
+        "Uses joblib to save the model and uploads it to the S3 path"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

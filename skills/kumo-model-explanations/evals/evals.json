@@ -1,0 +1,81 @@
+{
+  "skill_name": "kumo-model-explanations",
+  "evals": [
+    {
+      "id": "kexpl-01",
+      "prompt": "Which columns influenced my Kumo model the most? I fit it in this notebook and `training_result` is still in memory.",
+      "expected_output": "Uses `training_result.explanations`, checks `availability['gradient']`, and reads `gradient_scores().to_pandas()` (optionally `plot_gradient`). Names the result Kumo gradient attribution over the processed TEST subset, normalized across the graph, and not drivers, probabilities, percentages or causal effects. Reports the run, stage and file paths, and notes the files are local scratch excluded from the published model bundle. Does not retrain.",
+      "assertions": [
+        "Uses training_result.explanations and checks availability before reading",
+        "Reads gradient scores with gradient_scores() or plot_gradient()",
+        "Calls the scores Kumo gradient attribution over the processed test subset",
+        "Says the scores are not causal effects, probabilities or percentages",
+        "Reports the run and the TEST stage the scores come from",
+        "Does not start another fit"
+      ],
+      "expected_skill": "kumo-model-explanations",
+      "expected_script": null
+    },
+    {
+      "id": "kexpl-02",
+      "prompt": "For my Kumo model, compare predictions with actual outcomes across age cohorts. `training_result` is in memory.",
+      "expected_output": "Uses column analysis: `explanations.column_analysis()`, `cohort_keys()` to find the (table, hop, column) key, then `cohort(key)` / `plot_cohort(key)`. Reports each cohort's population share beside its mean prediction and, when recorded, mean target. A cohort mismatch is a lead to investigate, not proof of leakage or causation; prediction_score and target_score are not AUROC or error metrics.",
+      "assertions": [
+        "Uses column analysis with cohort_keys() and cohort() or plot_cohort()",
+        "Reports population share alongside mean prediction and mean target per cohort",
+        "Says a prediction-versus-target mismatch is a lead, not proof of leakage or a cause",
+        "Does not treat prediction_score or target_score as AUROC or an error metric"
+      ],
+      "expected_skill": "kumo-model-explanations",
+      "expected_script": null
+    },
+    {
+      "id": "kexpl-03",
+      "prompt": "I reloaded my Kumo model with `Trainer.load(bundle_dir)` and there are no explanations. Just call `trainer.explain()` to regenerate them.",
+      "expected_output": "There is no public `Trainer.explain()` or regeneration API. Published bundles exclude explanation files, so a loaded bundle reports them unavailable (`model_only`). The retained training run can be reopened with `kumo.TrainingExplanations.load(run_dir)`. It says no fit was started and asks whether the user wants one.",
+      "assertions": [
+        "Says there is no public Trainer.explain() to regenerate explanations",
+        "Says the model bundle does not contain explanation files",
+        "Suggests reopening the retained run with kumo.TrainingExplanations.load(run_dir)",
+        "Does not start a fit, and asks before proposing one"
+      ],
+      "expected_skill": "kumo-model-explanations",
+      "expected_script": null
+    },
+    {
+      "id": "kexpl-04",
+      "prompt": "Run column analysis and radiant attribution on my Kumo link-prediction model.",
+      "expected_output": "Kumo calls the method gradient attribution, not Radiant. Column analysis is restricted to supported node-level tasks and is not available for link prediction. Gradient scoring may exist, but TWO_TOWER link models are skipped, so availability must be checked.",
+      "assertions": [
+        "Says Kumo calls the method gradient attribution",
+        "Says column analysis is not available for link prediction",
+        "Says gradient attribution availability must be checked for this link model (TWO_TOWER models are skipped)"
+      ],
+      "expected_skill": "kumo-model-explanations",
+      "expected_script": null
+    },
+    {
+      "id": "kexpl-05",
+      "prompt": "There are three Kumo training runs under /scratch/kumo/runs. Show me the gradient attribution.",
+      "expected_output": "Lists the candidate runs with their paths and asks which one the user means before showing any score. It never picks the newest directory or combines runs.",
+      "assertions": [
+        "Lists the candidate runs with their paths",
+        "Asks which run the user means before showing scores",
+        "Does not pick the newest run or combine runs"
+      ],
+      "expected_skill": "kumo-model-explanations",
+      "expected_script": null
+    },
+    {
+      "id": "kexpl-06",
+      "prompt": "Compute SHAP values for my XGBoost classifier and show a beeswarm plot.",
+      "expected_output": "A SHAP task on an XGBoost model, unrelated to Kumo. The agent uses the shap library without loading the Kumo model-explanations skill.",
+      "assertions": [
+        "Does not load or follow the kumo-model-explanations skill",
+        "Uses the shap library to compute values and draw a beeswarm plot"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "skill_name": "kumo-training-diagnostics",
+  "evals": [
+    {
+      "id": "kdiag-01",
+      "prompt": "My Kumo churn model just finished training in this notebook and `training_result` is in memory. How did it do?",
+      "expected_output": "Reads `training_result.metrics` as an attribute and lists the metric keys and finite values that are actually present, treating missing values as unavailable, not zero. For binary classification it explains that AUROC measures ranking and AP/AUPRC depends on prevalence. It does not assume metrics that were not computed and does not retrain or tune.",
+      "assertions": [
+        "Reads training_result.metrics as an attribute, not a method call",
+        "Reports only the metric keys actually present, treating missing values as unavailable rather than zero",
+        "Explains that AUROC measures ranking quality and AP/AUPRC depends on class prevalence",
+        "Does not start a new fit or tuning run"
+      ],
+      "expected_skill": "kumo-training-diagnostics",
+      "expected_script": null
+    },
+    {
+      "id": "kdiag-02",
+      "prompt": "Is my Kumo model overfitting? `training_result` from the fit is still in memory; look at the learning curves.",
+      "expected_output": "Locates the run from `training_result.bundle_dir`, finds `auto_train_progress.json` under it, and reads each trial's epoch records from `trial_progress`, keeping trials and refits separate. A widening train/validation gap can suggest overfitting, but distribution shift, split design and sampling can also explain it. It does not join unrelated trials into one curve and does not retrain.",
+      "assertions": [
+        "Finds the run directory from training_result.bundle_dir and reads auto_train_progress.json",
+        "Reads per-trial epoch metrics and keeps trial and refit histories separate",
+        "Says a widening train/validation gap can suggest overfitting but has other possible explanations",
+        "Does not plot unrelated trials as one continuous curve",
+        "Does not start a new fit"
+      ],
+      "expected_skill": "kumo-training-diagnostics",
+      "expected_script": null
+    },
+    {
+      "id": "kdiag-03",
+      "prompt": "Pick the Kumo trial with the best test AUROC from my last run and use that one instead of the one Kumo selected.",
+      "expected_output": "Declines to select by test-set performance. Trial selection uses the configured validation tuning metric and its direction, recorded in `best_trainer.json`; the agent should not replace the SDK's selection with its own ranking. Test results are held for final evaluation.",
+      "assertions": [
+        "Says a model should not be chosen using test-set performance",
+        "Points to best_trainer.json and the validation tuning metric as the selection evidence",
+        "Does not override Kumo's selected trial with its own ranking"
+      ],
+      "expected_skill": "kumo-training-diagnostics",
+      "expected_script": null
+    },
+    {
+      "id": "kdiag-04",
+      "prompt": "What's the job ID of my Kumo training run, and can you poll its status until it's done?",
+      "expected_output": "Kumo trains synchronously in the notebook process: there is no hosted job ID, status API or polling. A progress file can show recorded elapsed and estimated time, but a stale file is not proof the process is running or dead.",
+      "assertions": [
+        "Says Kumo runs synchronously in the notebook process, with no job ID or status API",
+        "Does not invent a job ID, status call or polling loop"
+      ],
+      "expected_skill": "kumo-training-diagnostics",
+      "expected_script": null
+    },
+    {
+      "id": "kdiag-05",
+      "prompt": "Plot the ROC curve and confusion matrix for my scikit-learn LogisticRegression on X_test, y_test.",
+      "expected_output": "A scikit-learn evaluation task unrelated to Kumo. The agent answers with sklearn.metrics, without loading the Kumo training-diagnostics skill.",
+      "assertions": [
+        "Does not load or follow the kumo-training-diagnostics skill",
+        "Uses scikit-learn metrics to plot the ROC curve and confusion matrix"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "skill_name": "kumoai-reference",
+  "evals": [
+    {
+      "id": "kref-01",
+      "prompt": "This request has passed kumo-data-science intake and both gates. Confirmed: entity is each account (accounts.account_id); outcome is at least one transaction with transactions.is_fraud = 1; window is the next 30 days; transactions links to accounts by account_id. Write the Kumo predictive query (PQL) for it.",
+      "expected_output": "`PREDICT COUNT(transactions.* WHERE transactions.is_fraud = 1, 0, 30, days) > 0 FOR EACH accounts.account_id`. The fraud condition is inline in the aggregation because it describes the future event; a trailing WHERE would instead filter which accounts are eligible and predict any transaction. The window is in the aggregation arguments with the plural unit `days`.",
+      "assertions": [
+        "Writes PREDICT ... FOR EACH accounts.account_id",
+        "Puts the is_fraud = 1 condition inside the aggregation (inline WHERE), not as a trailing entity WHERE",
+        "Expresses the horizon as aggregation arguments 0, 30, days",
+        "Uses a comparison such as > 0 so the target is binary classification",
+        "Does not use keywords such as WITHIN or a singular unit such as day"
+      ],
+      "expected_skill": "kumoai-reference",
+      "expected_script": null
+    },
+    {
+      "id": "kref-02",
+      "prompt": "Validated and confirmed by kumo-data-science: Parquet files in /data/shop (customers, orders). customers: primary key customer_id. orders: primary key order_id, time column ordered_at, link orders.customer_id -> customers.customer_id. Query: PREDICT COUNT(orders.*, 0, 30, days) = 0 FOR EACH customers.customer_id. Prediction time 2026-11-01. Threshold 0.5 [default]. Destination: the empty directory /data/scores/. Generate the Python script with the Kumo SDK.",
+      "expected_output": "A script that imports `kumo.engine`, connects with `FileConnector(root_dir='/data/shop')`, builds Tables with `Table.from_source_table`, links them with an `Edge`, validates the graph and the query (and checks `get_task_type()`), calls `graph.snapshot()`, generates the training and prediction tables (prediction_time a naive datetime), fits exactly once with `trainer.fit(training_table, snapshot=snapshot)`, and predicts with `trainer.predict(prediction_table, snapshot=snapshot, binary_classification_threshold=0.5, output_config=...)` writing to /data/scores/. No credentials, no environment setup, no superseded API.",
+      "assertions": [
+        "Imports kumo.engine (not kumoai)",
+        "Connects with FileConnector rooted at /data/shop",
+        "Declares the orders -> customers relationship with an Edge object, not a dict",
+        "Calls graph.snapshot() and passes snapshot= to both fit and predict",
+        "Calls fit exactly once, on a training table generated from the predictive query",
+        "Passes binary_classification_threshold=0.5 to predict, not to PredictionOutputConfig",
+        "Uses a naive datetime (no timezone) for the 2026-11-01 prediction time",
+        "Writes predictions to /data/scores/ through a PredictionOutputConfig",
+        "Does not call set_backend, LocalBackend, kumo.init or OutputConfig"
+      ],
+      "expected_skill": "kumoai-reference",
+      "expected_script": null
+    },
+    {
+      "id": "kref-03",
+      "prompt": "My old Kumo notebook fails with `AttributeError: module 'kumo' has no attribute 'set_backend'`. It does:\n\n```python\nkumo.set_backend(kumo.LocalBackend())\ngraph = kumo.Graph(tables=tables, edges=[{'src_table': 'orders', 'fkey': 'customer_id', 'dst_table': 'customers'}])\ntrainer.fit(graph, pquery=pq)\nout = OutputConfig(table_name='churn')\n```\n\nCan you patch it so it runs on the current Kumo SDK?",
+      "expected_output": "It says the notebook targets a superseded build of the Kumo SDK and must be rewritten, not patched line by line: there is no backend to set; edges are `Edge` objects; training is `fit(training_table, snapshot=snapshot)` after `graph.snapshot()` and table generation; the output config is `kumo.PredictionOutputConfig`. It does not keep `set_backend`, dict edges or `OutputConfig`.",
+      "assertions": [
+        "Says the code targets a superseded (old) Kumo SDK build",
+        "Removes set_backend / LocalBackend rather than finding a replacement call for it",
+        "Rewrites the edge as an Edge object",
+        "Rewrites training as fit(training_table, snapshot=snapshot) with an explicit graph.snapshot()",
+        "Replaces OutputConfig with kumo.PredictionOutputConfig"
+      ],
+      "expected_skill": "kumoai-reference",
+      "expected_script": null
+    },
+    {
+      "id": "kref-04",
+      "prompt": "Validated request: forecast weekly sales amount for each store for the next 4 weeks, from sales(store_id, sold_at, amount) linked to stores(store_id). Write the PQL and the Kumo SDK steps for the training and prediction tables.",
+      "expected_output": "Forecasting is a temporal regression query plus a generation plan: `PREDICT SUM(sales.amount, 0, 7, days) FOR EACH stores.store_id`, with `TrainingTableGenerationPlan(forecast_length=4)` passed to `generate_training_table(snapshot, plan=...)`, and the fitted `trainer.training_table_generation_plan` passed to `generate_prediction_table`. `forecast_length` is not a model-plan setting, and `weeks` is not a valid unit.",
+      "assertions": [
+        "Writes a SUM aggregation over a 7-day window, e.g. PREDICT SUM(sales.amount, 0, 7, days) FOR EACH stores.store_id",
+        "Does not use weeks as the unit",
+        "Sets forecast_length=4 on a TrainingTableGenerationPlan passed to generate_training_table",
+        "Does not put forecast_length on the model plan",
+        "Reuses trainer.training_table_generation_plan when generating the prediction table"
+      ],
+      "expected_skill": "kumoai-reference",
+      "expected_script": null
+    },
+    {
+      "id": "kref-05",
+      "prompt": "Write a PyTorch Geometric GCN from scratch for node classification on the Cora dataset.",
+      "expected_output": "A generic graph neural network task, unrelated to the Kumo SDK. The agent writes PyTorch Geometric code without loading the Kumo reference skill.",
+      "assertions": [
+        "Does not load or follow the kumoai-reference skill",
+        "Writes PyTorch Geometric code for a GCN on Cora",
+        "Does not use kumo.engine"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "skill_name": "kumo-graph-visualization",
+  "evals": [
+    {
+      "id": "kviz-01",
+      "prompt": "Add a graph diagram step to my Kumo training script churn_30d_train.py.",
+      "expected_output": "Adds, after `graph.validate()` and before snapshot and training, a step that saves the diagram next to the script as `churn_30d_train.graph.svg` via `Path(__file__).with_suffix('.graph.svg')`, guarded by `hasattr(graph, 'visualize')` and a try/except that prints the error and lets training continue, and prints the saved path.",
+      "assertions": [
+        "Saves the diagram with graph.visualize to a path derived from the script name, churn_30d_train.graph.svg",
+        "Places the step after graph validation and before snapshot creation or training",
+        "Guards with hasattr(graph, 'visualize') and a try/except that lets the script continue",
+        "Prints or reports the saved diagram path"
+      ],
+      "expected_skill": "kumo-graph-visualization",
+      "expected_script": null
+    },
+    {
+      "id": "kviz-02",
+      "prompt": "Export my Kumo graph to reports/graph.pdf. That file already exists from last week.",
+      "expected_output": "A view/export request needs no training intake. `.pdf` gives a diagram plus a complete schema index. Because the named file exists, it says so and asks for confirmation before replacing it, then uses `graph.visualize('reports/graph.pdf')`. Samples stay off.",
+      "assertions": [
+        "Does not ask model-training intake questions",
+        "Uses graph.visualize with the .pdf path",
+        "Says the file already exists and asks before replacing it",
+        "Does not turn on show_samples"
+      ],
+      "expected_skill": "kumo-graph-visualization",
+      "expected_script": null
+    },
+    {
+      "id": "kviz-03",
+      "prompt": "I'm deciding which table to add to my Kumo graph next. Give me a text view of all its columns, keys and relationships that you can read.",
+      "expected_output": "Exports the graph to Markdown in a new temporary directory (`graph.visualize(schema_path)` with a `.md` path), reads that file for columns, key and time roles and relationships, and notes the schema does not measure predictive usefulness.",
+      "assertions": [
+        "Exports the graph to a .md file with graph.visualize",
+        "Writes it to a new temporary directory so nothing is replaced",
+        "Reads the exported file to inspect columns, keys and relationships",
+        "Says the schema view does not measure how useful a table would be for prediction"
+      ],
+      "expected_skill": "kumo-graph-visualization",
+      "expected_script": null
+    },
+    {
+      "id": "kviz-04",
+      "prompt": "Show my Kumo graph in the notebook. It has 45 tables, and employees.manager_id links back to employees.employee_id.",
+      "expected_output": "The viewer supports up to 30 tables and does not support self-relations, so this graph cannot be fully shown. It reports that and lets modeling continue with the original graph, without changing the graph to make it render.",
+      "assertions": [
+        "Says the viewer supports at most 30 tables",
+        "Says self-relations such as employees.manager_id -> employees are not supported",
+        "Does not remove tables or relationships from the model's graph to make it render"
+      ],
+      "expected_skill": "kumo-graph-visualization",
+      "expected_script": null
+    },
+    {
+      "id": "kviz-05",
+      "prompt": "Draw my social network from edges.csv (source, target) with networkx and matplotlib.",
+      "expected_output": "A networkx plotting task unrelated to Kumo. The agent answers with networkx code without loading the Kumo graph-visualization skill.",
+      "assertions": [
+        "Does not load or follow the kumo-graph-visualization skill",
+        "Uses networkx to read edges.csv and matplotlib to draw it"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}
