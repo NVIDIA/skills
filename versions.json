@@ -471,6 +471,20 @@
       "last_modified": "2026-11-04"
     },
     {
+      "name": "cudnn-compile-and-serialize",
+      "path": "skills/cudnn-compile-and-serialize",
+      "content_digest": "sha256:d73d17fc4f7517db36dd6d742451e7baca0c81cc4f3d66ce4c8fdb64160fdea6",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
+    },
+    {
+      "name": "cudnn-install",
+      "path": "skills/cudnn-install",
+      "content_digest": "sha256:58aa86946333611d7dbeabb6e819f0a4e650daf1c7b1822b226bd54ac1692327",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
+    },
+    {
       "name": "cuml",
       "path": "skills/cuml",
       "content_digest": "sha256:50d4cca14b1b00bc97a8b8877401c52663ec8102bbe5369a0fefbb181d82ff4f",
@@ -592,23 +606,23 @@
     {
       "name": "dicom-metadata-extract",
       "path": "skills/dicom-metadata-extract",
-      "content_digest": "sha256:ac05b7f648c31f2bb3426e01bed81f4d8a5c8b7947273513f9ad00cfbc8bad92",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:8e1dd16c08be81979b12dad90bfb515d2b0e593123b7ff3e5d4f1215dc56d361",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "dicom-series-preflight",
       "path": "skills/dicom-series-preflight",
-      "content_digest": "sha256:adbe8f799f3fb15f83035cda0ee03101adc4fd974ac0347ab0c3c0847b4073df",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:ec3bcddf094ff8f343f3d585541d14964fd0455c3ca3aa5e81a1fc32e9ec0065",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "dicom-series-to-volume",
       "path": "skills/dicom-series-to-volume",
-      "content_digest": "sha256:a63a39aae2b9a6589a7ff39b20ec577ae900a4d2412fc520bee68906c610043c",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:d85f6a17c03982d4f0e2f2eafa101ca75121c184a79b83acc307c18e6410a56c",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "digital-health-clinical-asr-build",
@@ -1810,9 +1824,9 @@
     {
       "name": "medtech-model-evidence-export",
       "path": "skills/medtech-model-evidence-export",
-      "content_digest": "sha256:4e47f893327ea3cea6aad4889c25dea5db49b810725f3917c0845b2390f12ef7",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:0ba7f547adb27b603e55213784f33c245e6a74632191026b4eb191cc35705737",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nemo-automodel-distributed-training",
@@ -2188,72 +2202,72 @@
     {
       "name": "nv-generate-ct-rflow",
       "path": "skills/nv-generate-ct-rflow",
-      "content_digest": "sha256:a91579e7f4643eeb7fe6230d214a2d5d37c514687a3f1f9ca164a01be90305a5",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:f5ffea56c811ff301c00d26041928a3bb34993291919c09d6c1b91fabc010b83",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-generate-mr",
       "path": "skills/nv-generate-mr",
-      "content_digest": "sha256:a09025df5bc7d03677a9f561290935604e30fc3539c409f2c7037ee0351e2849",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:945430d88a4685f58bf332f64e5c45abf792828b40f0a572c7af18af6a7b5f1b",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-generate-mr-brain",
       "path": "skills/nv-generate-mr-brain",
-      "content_digest": "sha256:48c8efaa8609232389e58a10606d76676168b3c07da4ee76390ffc390bd3128a",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:ca29f093e1495ddf8e03c3dda4f03314b0671a0c864560d61a1d0bc323ffade6",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-generate-mr-brain-finetune",
       "path": "skills/nv-generate-mr-brain-finetune",
-      "content_digest": "sha256:6075d9d579124650d221075a68e4c5da0c1c4c6e584a04ab17df28817d68cfd8",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:f77d2c58d5e95f36facd55df1a76fa41227ec5be1b8b74d3930ecb7dabafe964",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-generate-vae-finetune",
       "path": "skills/nv-generate-vae-finetune",
-      "content_digest": "sha256:437e6a4d234d45687ad9898228f671de2c4115eec204186003a7b73780c9fbfe",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:77edfbd79ed6e357a4236fcff3976cdebe492bbe57227389d224078e46f8ffd3",
+      "last_commit": "4fb25bc7003f5e5fb4f539ddbd68ff54828409e8",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-reason-ct",
       "path": "skills/nv-reason-ct",
-      "content_digest": "sha256:e89cd4d3a7c600ee2cc8108b578c7c9cd915d7b0f99f14904417c5df52d9f1e2",
-      "last_commit": "74d4e064fc56ed6a5271fda7d184a1e6e0ded0b6",
-      "last_modified": "2026-09-29"
+      "content_digest": "sha256:ef5f11474304785cac2e097fb31bc8596cb2a57c1e25761eff93f47851c21a13",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-reason-cxr",
       "path": "skills/nv-reason-cxr",
-      "content_digest": "sha256:27ddb44fe12a516fd9bc6eff284e143dbc206be870dca0f45c98f2a6c37c2914",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:e4ae5054318326b87fbf4ae368043d775b9ff14c44651ad295fea3845a9fd427",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-segment-ct",
       "path": "skills/nv-segment-ct",
-      "content_digest": "sha256:1d2bcdce3fe45c3015a4e2f3b5add25deb1e201c6e3d447dc317e41d6f5d31fc",
-      "last_commit": "e8ac07fb15a93920460145426c1443d7be1593a5",
-      "last_modified": "2026-07-08"
+      "content_digest": "sha256:994659f1f473a6befc01368a82784c8d1be747eb52dca169c6e77fb685b9653f",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-segment-ct-finetune",
       "path": "skills/nv-segment-ct-finetune",
-      "content_digest": "sha256:1d2971649d78d1d233b9efc770d61eb3a5acd5d600fd259e6b9fc7b9d8b2a67f",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:b1db159c64037fa171e3ff4f5b9f927aa9b82a78c86df84946f8a428a974d6a2",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nv-segment-ctmr",
       "path": "skills/nv-segment-ctmr",
-      "content_digest": "sha256:299426367dc8ac392b3d35e5aab31fb536b78fb1605b2372da8acdbb8e581016",
-      "last_commit": "2cd3507404ddb4c833e26fde979f1b0c20c4980d",
-      "last_modified": "2026-09-15"
+      "content_digest": "sha256:9ea244ec0704e79fadf33e110576d5ddbcb15fd150af7ce5657ad2933ed6ab93",
+      "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
+      "last_modified": "2026-11-20"
     },
     {
       "name": "nvalchemi-toolkit",
