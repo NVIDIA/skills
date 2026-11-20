@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,7 +119,12 @@ def _load_config_override(fixture_arg: str) -> tuple[dict[str, Any], str | None]
     fixture_path = Path(fixture_arg).expanduser().resolve()
     if not fixture_path.is_file():
         raise typer.BadParameter(f"config_infer override not found: {fixture_arg}")
-    raw = json.loads(fixture_path.read_text())
+    try:
+        raw = json.loads(fixture_path.read_text())
+    except json.JSONDecodeError as exc:
+        raise typer.BadParameter(f"Invalid JSON in {fixture_path}: {exc.msg}") from exc
+    if not isinstance(raw, dict):
+        raise typer.BadParameter("config_infer override must be a JSON object")
     # Drop comment / metadata keys (leading underscore).
     cleaned = {k: v for k, v in raw.items() if not k.startswith("_")}
     unknown = sorted(k for k in cleaned if k not in OVERRIDE_KEYS)
@@ -715,27 +720,30 @@ def main(
         raise typer.BadParameter(f"--version must be one of {SUPPORTED_VERSIONS}")
 
     upstream_root_env = os.environ.get("NV_GENERATE_ROOT", "").strip()
-    if not upstream_root_env:
-        emit(
-            {
-                "skill": "nv_generate_ct_rflow",
-                "error": "NV_GENERATE_ROOT is unset",
-                "detail": "Clone https://github.com/NVIDIA-Medtech/NV-Generate-CTMR and "
-                "export NV_GENERATE_ROOT to its path.",
-            }
-        )
-        raise typer.Exit(2)
-    upstream_root = Path(upstream_root_env).expanduser().resolve()
+    upstream_root = Path(upstream_root_env).expanduser().resolve() if upstream_root_env else None
     network = NETWORK_FOR_VERSION[version]
     network_config = UPSTREAM_NETWORK_CONFIG_FMT.format(network=network)
-    if not (upstream_root / network_config).is_file():
-        emit(
-            {
-                "skill": "nv_generate_ct_rflow",
-                "error": "NV_GENERATE_ROOT layout invalid",
-                "detail": f"{upstream_root}/{network_config} not found",
-            }
-        )
+    if upstream_root is None or not (upstream_root / network_config).is_file():
+        if upstream_root is None:
+            error = "NV_GENERATE_ROOT is unset"
+            detail = "Set NV_GENERATE_ROOT to a local NV-Generate-CTMR checkout."
+        else:
+            error = "NV_GENERATE_ROOT layout invalid"
+            detail = f"{upstream_root / network_config} not found"
+        result: dict[str, Any] = {"skill": "nv_generate_ct_rflow", "error": error, "detail": detail}
+        if preflight_only:
+            override, _ = _load_config_override(config_infer)
+            issues = _validate_override_bounds(override)
+            result.update(
+                preflight="incomplete",
+                preflight_errors=[error, *issues],
+                unchecked=["upstream defaults", "anatomy dictionary", "mask-candidate dataset"],
+                cuda=_detect_cuda(),
+            )
+            cost_keys = ("output_size", "num_output_samples", "num_inference_steps")
+            if not issues and all(override.get(key) is not None for key in cost_keys):
+                result["estimated_cost"] = _estimate_cost(override, version)
+        emit(result)
         raise typer.Exit(2)
     if output_dir is None:
         output_dir = upstream_root / "output"

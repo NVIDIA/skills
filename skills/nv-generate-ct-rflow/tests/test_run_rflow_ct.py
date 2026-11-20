@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -331,3 +331,34 @@ def test_failure_reasons_report_upstream_failure_and_zero_samples():
         "upstream scripts.inference exited 7",
         "upstream scripts.inference produced zero image/label samples",
     ]
+
+
+@pytest.mark.parametrize(
+    "request_config,has_cost",
+    [
+        (
+            {"output_size": [256, 256, 256], "num_output_samples": 1, "num_inference_steps": 30},
+            True,
+        ),
+        ({"num_output_samples": 1}, False),
+        ({"output_size": [], "num_output_samples": 1, "num_inference_steps": 30}, False),
+    ],
+)
+def test_preflight_without_upstream_reports_partial_result(
+    tmp_path, monkeypatch, request_config, has_cost
+):
+    from typer.testing import CliRunner
+
+    monkeypatch.delenv("NV_GENERATE_ROOT", raising=False)
+    monkeypatch.setattr(mod, "_detect_cuda", lambda: {"available": False})
+    path = tmp_path / "request.json"
+    path.write_text(json.dumps(request_config))
+    result = CliRunner().invoke(
+        mod.app, [str(path), "--preflight-only", "--output-dir", str(tmp_path / "out")]
+    )
+    assert result.exit_code == 2
+    payload = json.loads(result.stdout)
+    assert payload["preflight"] == "incomplete"
+    assert "anatomy dictionary" in payload["unchecked"]
+    assert ("estimated_cost" in payload) == has_cost
+    assert not (tmp_path / "out").exists()

@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nv-generate-mr-brain-finetune`
-- Evaluation date: 2026-09-14
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 2 evaluation tasks (2 positive)
 - Dataset digest: `sha256:b454dd144a46b515c2d9de6de25fc7fb92c1ed1c66479f52678fa03cb000bc64` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| nv-generate-mr-brain-finetune | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain-finetune | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain-finetune | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain-finetune | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain-finetune | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `nv-generate-mr-brain-finetune`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,27 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 96.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 90.0% → 100.0% (+10.0 points) |
+| Overall | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 95.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 75.0% → 100.0% (+25.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 40.0% → 100.0% (+60.0 points) | 100.0% → 100.0% (±0.0 points) |
 | Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 20.0% → 90.0% (+70.0 points) | 60.0% → 90.0% (+30.0 points) |
-| Efficiency | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 97.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 5.0% → 90.0% (+85.0 points) | 85.0% → 90.0% (+5.0 points) |
+| Efficiency | 97.7% — baseline ran, but no comparable score was available; uplift unavailable | 95.7% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 89.7% → 95.5% (+5.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 88.2% → 91.3% (+3.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -52,22 +78,22 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 135,326 | 1,362,815 | N/A | N/A | skill 2/2; base 4/4 |
-| claude-code | finetune-mr-brain-from-datalist | 67,793 | 1,202,352 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | preflight-before-gpu-run | 67,533 | 160,463 | -92,930 | -57.91% | skill 1/1; base 1/1 |
-| codex | All cases | 80,382 | 145,101 | -64,719 | -44.60% | skill 2/2; base 2/2 |
-| codex | finetune-mr-brain-from-datalist | 49,758 | 53,505 | -3,747 | -7.00% | skill 1/1; base 1/1 |
-| codex | preflight-before-gpu-run | 30,624 | 91,596 | -60,972 | -66.57% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 215,708 | 1,507,916 | N/A | N/A | skill 4/4; base 6/6 |
+| claude-code | All cases | 198,248 | 925,679 | -727,431 | -78.58% | skill 2/2; base 2/2 |
+| claude-code | finetune-mr-brain-from-datalist | 120,504 | 778,169 | -657,665 | -84.51% | skill 1/1; base 1/1 |
+| claude-code | preflight-before-gpu-run | 77,744 | 147,510 | -69,766 | -47.30% | skill 1/1; base 1/1 |
+| codex | All cases | 97,522 | 134,358 | -36,836 | -27.42% | skill 2/2; base 2/2 |
+| codex | finetune-mr-brain-from-datalist | 48,871 | 71,539 | -22,668 | -31.69% | skill 1/1; base 1/1 |
+| codex | preflight-before-gpu-run | 48,651 | 62,819 | -14,168 | -22.55% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 295,770 | 1,060,037 | -764,267 | -72.10% | skill 4/4; base 4/4 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 18 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 2 task(s) |
 
 ## Findings and Observations
@@ -75,30 +101,27 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** SECURITY/Skill Enumeration (AS3): Agent Snooping: skills/nv-generate-mr-brain-finetune/SKILL.md (`BENCHMARK.md:75`)
-- **MEDIUM** SECURITY/Session Persistence (RA2): Rogue Agent: write model caches under the upstream checkout and `~/.cache (`SKILL.md:79`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
+- **HIGH** DUPLICATE/duplicate: Duplicate content found within SKILL.md:
+  "## Instructions" in SKILL.md (lines 10-23)
+  vs "## Examples" in SKILL.md (lines 24-50)
+  vs "## Available Scripts" in SKILL.md (lines 51-55)
+  vs "## 2. Usage (one-line training)" in SKILL.md (lines 155-194) (`SKILL.md:10`)
+- **MEDIUM** SECURITY/Session Persistence (RA2): Rogue Agent: write model caches under the upstream checkout and `~/.cache (`BENCHMARK.md:79`)
+- **MEDIUM** SECURITY/Session Persistence (RA2): Rogue Agent: write model caches under the upstream checkout and `~/.cache (`SKILL.md:80`)
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
             ["git", "rev-parse", "HEAD"],
             cwd=str(root),
             env=_child_process_env(),
             check=False,
             capture_output=True,
-     (`scripts/run_mr_brain_finetune.py:250`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
+            text=Tr (`scripts/run_mr_brain_finetune.py:250`)
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
             ["git", "status", "--porcelain", "--untracked-files=no"],
             cwd=str(root),
             env=_child_process_env(),
             check=False,
-          (`scripts/run_mr_brain_finetune.py:266`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:     return subprocess.run(
-        command,
-        cwd=str(upstream_root),
-        env=env,
-        capture_output=True,
-        text=True,
-        check=False,
-    ) (`scripts/run_mr_brain_finetune.py:517`)
-- 13 additional finding(s) are available in the full evaluation artifacts.
+            capture_outp (`scripts/run_mr_brain_finetune.py:266`)
+- 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

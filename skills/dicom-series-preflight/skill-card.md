@@ -7,9 +7,9 @@ This skill is for research and development only. <br>
 NVIDIA <br>
 
 ### License/Terms of Use: <br>
-Apache 2.0 <br>
+Apache-2.0 <br>
 ## Use Case: <br>
-Developers and engineers use this skill to run a header-only preflight scan of a DICOM series directory, checking orientation, spacing consistency, and PHI-tag presence before conversion or model inference. <br>
+Developers and engineers use this skill to run an engineering-time, header-only scan of a single DICOM series directory, checking corruption, orientation axcodes, standard-tag PHI presence, and consistency, and returning a pass/warn/fail preflight verdict before conversion or model inference. It is not for clinical deployment, regulatory de-identification, autonomous diagnosis, or production ingestion without a vetted converter. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,53 +25,85 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Skill Manifest](skill_manifest.yaml) <br>
-- [Skill Benchmark](BENCHMARK.md) <br>
+- [skill_manifest.yaml](skill_manifest.yaml) <br>
+- [Output schema (validators/output_schema.json)](validators/output_schema.json) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Files] <br>
 **Output Format:** [JSON] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Emits structured preflight JSON with inventory, orientation axcodes, PHI flags, findings, and a verdict of pass, warn, or fail] <br>
+**Other Properties Related to Output:** [Emits inventory, orientation axcodes, PHI flags, findings, and preflight.verdict (pass, warn, or fail); header-only, pixel data is not decoded.] <br>
 
 ## Evaluation Agents Used: <br>
-- Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`) <br>
-- Codex (`openai/openai/gpt-5.5`) <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-3 evaluation tasks across DICOM preflight scenarios (3 positive cases), each with 3 attempts per agent in isolated sandbox pods. <br>
+3 evaluation tasks (3 positive): preflight-clean-axial-flags-phi, preflight-clean-no-phi-greenlights, and preflight-flipped-lr-blocks-segmentation. 1 attempt per task, each task attempt in its own isolated sandbox pod (`k8s-sandbox` environment); evaluator version `1.6.10`, evaluation date 2026-11-20. Baseline is the same task attempted without the target skill. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Whether the skill is safe to use: checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- Correctness: Whether the final answer is correct against the reference answer. <br>
-- Discoverability: Whether the right skill was loaded and activated when needed. <br>
-- Effectiveness: Whether the skill helped complete the user's goal, combining goal completion (50%) and expected workflow adherence (50%). <br>
-- Efficiency: Whether the skill avoided wasted tool calls and token usage, combining tool-call productivity (50%) and token efficiency (50%). <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
-- `accuracy`: Final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Whether the user's goal was achieved. <br>
-- `behavior_check`: Whether the expected workflow behavior was followed. <br>
-- `skill_efficiency`: Tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
-- `token_efficiency`: Actual uncached prompt plus completion usage. <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
+> ✅ **Overall verdict: PASS — Recommended for publication**
+
+### Publication Recommendation
+
+Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 75.3% | 71.6% |
-| Security | 100.0% → 66.7% (-33.3 pts) | 100.0% → 66.7% (-33.3 pts) |
-| Correctness | 2.9% → 80.0% (+77.1 pts) | 2.5% → 80.0% (+77.5 pts) |
-| Discoverability | 88.3% | 81.7% |
-| Effectiveness | 13.6% → 56.1% (+42.5 pts) | 17.5% → 49.7% (+32.2 pts) |
-| Efficiency | 85.2% | 79.8% |
+| Overall | 87.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 66.7% (-33.3 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 73.3% → 100.0% (+26.7 points) | 46.7% → 100.0% (+53.3 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 81.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 77.8% → 94.5% (+16.7 points) | 36.1% → 83.3% (+47.2 points) |
+| Efficiency | 73.8% — baseline ran, but no comparable score was available; uplift unavailable | 79.0% — baseline ran, but no comparable score was available; uplift unavailable |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 95.5% → 94.4% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 87.6% → 88.3% (+0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 12 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
 ## Skill Version(s): <br>
 0.1.0 (source: skill_manifest.yaml) <br>

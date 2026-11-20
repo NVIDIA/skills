@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `medtech-model-evidence-export`
-- Evaluation date: 2026-09-14
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 4 evaluation tasks (2 positive, 2 negative)
 - Dataset digest: `sha256:20dc012111b0aa3dc1ff37d9ba71d5f505c9fccdf540783bcb0acf6764f3c4b7` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| medtech-model-evidence-export | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| medtech-model-evidence-export | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| medtech-model-evidence-export | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| medtech-model-evidence-export | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| medtech-model-evidence-export | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `medtech-model-evidence-export`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 92.0% — baseline ran, but no comparable score was available; uplift unavailable | 90.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
-| Correctness | 40.0% → 100.0% (+60.0 points) | 37.8% → 100.0% (+62.2 points) |
-| Discoverability | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 80.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 31.3% → 78.1% (+46.8 points) | 38.9% → 78.1% (+39.2 points) |
-| Efficiency | 86.8% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | Not available | 91.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | Not available | 100.0% → 100.0% (±0.0 points) |
+| Correctness | Not available | 40.0% → 100.0% (+60.0 points) |
+| Discoverability | Not available | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | Not available | 33.3% → 78.1% (+44.8 points) |
+| Efficiency | Not available | 85.6% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,31 +63,40 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 92.8% → 91.2% (-1.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 866,006 | 1,606,045 | N/A | N/A | skill 4/4; base 8/8 |
-| claude-code | export-approved-slice-previews | 439,480 | 734,185 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | preview-inference-export | 366,021 | 751,181 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | reject-live-training-tracking | 29,918 | 90,793 | -60,875 | -67.05% | skill 1/1; base 1/1 |
-| claude-code | reject-unapproved-raw-upload | 30,587 | 29,886 | +701 | +2.35% | skill 1/1; base 1/1 |
-| codex | All cases | 425,426 | 2,199,946 | N/A | N/A | skill 4/4; base 9/9 |
-| codex | export-approved-slice-previews | 216,112 | 1,424,108 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | preview-inference-export | 152,355 | 404,396 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | reject-live-training-tracking | 28,371 | 357,991 | N/A | N/A | skill 1/1; base 2/2 |
-| codex | reject-unapproved-raw-upload | 28,588 | 13,451 | +15,137 | +112.53% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,291,432 | 3,805,991 | N/A | N/A | skill 8/8; base 17/17 |
+| claude-code | All cases | 540,019 | 470,064 | +69,955 | +14.88% | skill 4/4; base 4/4 |
+| claude-code | export-approved-slice-previews | 232,256 | 143,875 | +88,381 | +61.43% | skill 1/1; base 1/1 |
+| claude-code | preview-inference-export | 272,130 | 183,097 | +89,033 | +48.63% | skill 1/1; base 1/1 |
+| claude-code | reject-live-training-tracking | 35,633 | 107,465 | -71,832 | -66.84% | skill 1/1; base 1/1 |
+| claude-code | reject-unapproved-raw-upload | 0 | 35,627 | -35,627 | -100.00% | skill 1/1; base 1/1 |
+| codex | All cases | 299,447 | 170,151 | +129,296 | +75.99% | skill 4/4; base 4/4 |
+| codex | export-approved-slice-previews | 105,964 | 56,698 | +49,266 | +86.89% | skill 1/1; base 1/1 |
+| codex | preview-inference-export | 137,614 | 54,868 | +82,746 | +150.81% | skill 1/1; base 1/1 |
+| codex | reject-live-training-tracking | 27,898 | 45,261 | -17,363 | -38.36% | skill 1/1; base 1/1 |
+| codex | reject-unapproved-raw-upload | 27,971 | 13,324 | +14,647 | +109.93% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 839,466 | 640,215 | +199,251 | +31.12% | skill 8/8; base 8/8 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 13 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 4 task(s) |
 
@@ -83,10 +107,10 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **MEDIUM** QUALITY/quality_correctness: SKILL_SPEC recommended field missing: 'metadata.tags' (`skills/medtech-model-evidence-export/SKILL.md`)
 - **MEDIUM** SCRIPT_LINT/deep_nesting: export_evidence_pack.py has deeply nested code (depth 7, max 6) (`skills/medtech-model-evidence-export/scripts/export_evidence_pack.py`)
-- **MEDIUM** SECURITY/Unknown (SQP-2): The skill card explicitly states it exports metadata, parameters, reproducibility details, and quality metrics from Medi (`skill-card.md:2`)
 - **LOW** QUALITY/quality_discoverability: Description very long (289 chars, recommend 50-150) (`skills/medtech-model-evidence-export/SKILL.md`)
 - **LOW** QUALITY/quality_reliability: Inputs are used but no dedicated Inputs section is documented (`skills/medtech-model-evidence-export/SKILL.md`)
-- 10 additional finding(s) are available in the full evaluation artifacts.
+- **LOW** QUALITY/quality_reliability: Structured output is used but no dedicated Output Format section is documented (`skills/medtech-model-evidence-export/SKILL.md`)
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

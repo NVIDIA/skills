@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,11 +64,20 @@ def _human(n: int) -> str:
     return f"{n:.1f} TB"
 
 
-def _download(url: str, dest: Path) -> None:
+def _download(dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_suffix(dest.suffix + ".partial")
-    sys.stderr.write(f"[fetch] downloading {url}\n[fetch]   -> {dest} (~1.5 GB)\n")
-    with urllib.request.urlopen(url) as r:
+    sys.stderr.write(f"[fetch] downloading {TASK09_URL}\n[fetch]   -> {dest} (~1.5 GB)\n")
+    # Use only the canonical HTTPS object. Proxy support is needed on managed networks.
+    opener = urllib.request.OpenerDirector()
+    for handler in (
+        urllib.request.ProxyHandler(),
+        urllib.request.HTTPSHandler(),
+        urllib.request.HTTPDefaultErrorHandler(),
+        urllib.request.HTTPErrorProcessor(),
+    ):
+        opener.add_handler(handler)
+    with opener.open(TASK09_URL, timeout=120) as r:
         total = int(r.headers.get("Content-Length", "0"))
         with tmp.open("wb") as f:
             n = 0
@@ -82,7 +91,9 @@ def _download(url: str, dest: Path) -> None:
                 if n - last_report > (50 << 20):  # every 50 MB
                     sys.stderr.write(f"[fetch]   {_human(n)}/{_human(total) if total else '?'}\n")
                     last_report = n
-    tmp.rename(dest)
+    if total and n != total:
+        raise OSError(f"Incomplete fixture download: expected {total} bytes, received {n}")
+    tmp.replace(dest)
     sys.stderr.write(
         f"[fetch] saved {_human(dest.stat().st_size)} to {dest.relative_to(REPO_ROOT)}\n"
     )
@@ -118,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if not TASK09_TAR.is_file():
-        _download(TASK09_URL, TASK09_TAR)
+        _download(TASK09_TAR)
     else:
         sys.stderr.write(f"[fetch] tar already cached: {TASK09_TAR.relative_to(REPO_ROOT)}\n")
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,35 +20,78 @@
   clean_axial/   — warn demo (same geometry, PHI tags populated)
   flipped_lr/    — fail demo (LR-flipped IOP)
 
-Reuses the same volume geometry as dicom_series_to_volume fixtures.
+Each series has 32 slices of a 64 by 64 synthetic CT phantom.
 """
 
-import sys
+import argparse
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-REPO = ROOT.parents[2]
-sys.path.insert(0, str(REPO / "skills" / "dicom-series-to-volume" / "fixtures"))
+import numpy as np
+from pydicom.dataset import FileDataset, FileMetaDataset
+from pydicom.uid import CTImageStorage, ExplicitVRLittleEndian, generate_uid
 
-from generate_fixtures import write_series  # noqa: E402
+
+def _phantom() -> np.ndarray:
+    z, y, x = np.ogrid[:32, :64, :64]
+    volume = np.full((32, 64, 64), -1000, dtype="<i2")
+    body = (x - 32) ** 2 + (y - 32) ** 2 < (64 * 0.45) ** 2
+    volume[(z >= 2) & (z < 30) & body] = 40
+    volume[(z - 16) ** 2 + (y - 35) ** 2 + (x - 41) ** 2 < 25] = 60
+    return volume
+
+
+def write_series(folder: Path, volume: np.ndarray, x_axis: int, synthetic_tags: bool) -> None:
+    folder.mkdir(parents=True, exist_ok=True)
+    study_uid, series_uid = generate_uid(), generate_uid()
+    for index, pixels in enumerate(volume):
+        meta = FileMetaDataset()
+        meta.MediaStorageSOPClassUID = CTImageStorage
+        meta.MediaStorageSOPInstanceUID = generate_uid()
+        meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        path = folder / f"slice_{index:03d}.dcm"
+        ds = FileDataset(str(path), {}, file_meta=meta, preamble=bytes(128))
+        ds.SOPClassUID = CTImageStorage
+        ds.SOPInstanceUID = meta.MediaStorageSOPInstanceUID
+        ds.StudyInstanceUID = study_uid
+        ds.SeriesInstanceUID = series_uid
+        ds.StudyDate = "20260509"
+        ds.StudyDescription = "Synthetic CT fixture for orientation gate demo"
+        ds.AccessionNumber = "ACC-FIX-001"
+        ds.SeriesDescription = "Synthetic axial CT"
+        ds.SeriesNumber = 1
+        ds.Modality = "CT"
+        ds.BodyPartExamined = "ABDOMEN"
+        if synthetic_tags:
+            ds.PatientName = "SYNTHETIC^FIXTURE"
+            ds.PatientID = "SYNTH-001"
+            ds.PatientBirthDate = "19000101"
+            ds.PatientSex = "O"
+        ds.InstanceNumber = index + 1
+        ds.ImageOrientationPatient = [x_axis, 0, 0, 0, 1, 0]
+        ds.ImagePositionPatient = [0, 0, index * 2 * x_axis]
+        ds.PixelSpacing = [1, 1]
+        ds.SliceThickness = 2
+        ds.Rows, ds.Columns = pixels.shape
+        ds.SamplesPerPixel = 1
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.BitsAllocated = ds.BitsStored = 16
+        ds.HighBit = 15
+        ds.PixelRepresentation = 1
+        ds.RescaleSlope, ds.RescaleIntercept = 1, 0
+        ds.PixelData = pixels.tobytes()
+        ds.save_as(path, enforce_file_format=True)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out-dir", type=Path, default=Path(__file__).resolve().parent)
+    root = parser.parse_args().out_dir
+    phantom = _phantom()
+    write_series(root / "clean_axial", phantom, 1, True)
+    write_series(root / "flipped_lr", phantom, -1, True)
+    write_series(root / "clean_no_phi", phantom, 1, False)
+    print(f"Wrote three synthetic series under {root}")
+
 
 if __name__ == "__main__":
-    write_series(ROOT / "clean_axial", iop=[1, 0, 0, 0, 1, 0], series_label="clean_phi")
-    write_series(ROOT / "flipped_lr", iop=[-1, 0, 0, 0, 1, 0], series_label="flipped_lr")
-    write_series(ROOT / "clean_no_phi", iop=[1, 0, 0, 0, 1, 0], series_label="clean_no_phi")
-    # Strip PHI tags from pass fixture
-    import pydicom
-
-    for p in (ROOT / "clean_no_phi").glob("*.dcm"):
-        ds = pydicom.dcmread(str(p))
-        for tag in (
-            "PatientName",
-            "PatientID",
-            "PatientBirthDate",
-            "PatientSex",
-            "InstitutionName",
-        ):
-            if hasattr(ds, tag):
-                delattr(ds, tag)
-        ds.save_as(str(p), enforce_file_format=True)
-    print("wrote clean_no_phi, clean_axial, flipped_lr under", ROOT)
+    main()

@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `dicom-series-preflight`
-- Evaluation date: 2026-09-14
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 3 evaluation tasks (3 positive)
-- Dataset digest: `sha256:62a39511ef1fe2d4954937d2a8a22b8e447484afd22c4b0ef6cf8e2f26b337ff` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Dataset digest: `sha256:6a9c1991fda1f2a40a2bc2257509ff06567cbde7ceb769c0946856326899f30f` (skill-evaluator-dataset-snapshot/1)
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| dicom-series-preflight | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-series-preflight | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-series-preflight | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-series-preflight | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-series-preflight | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `dicom-series-preflight`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,27 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 75.3% — baseline ran, but no comparable score was available; uplift unavailable | 71.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 66.7% (-33.3 points) | 100.0% → 66.7% (-33.3 points) |
-| Correctness | 2.9% → 80.0% (+77.1 points) | 2.5% → 80.0% (+77.5 points) |
-| Discoverability | 88.3% — baseline ran, but no comparable score was available; uplift unavailable | 81.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 13.6% → 56.1% (+42.5 points) | 17.5% → 49.7% (+32.2 points) |
-| Efficiency | 85.2% — baseline ran, but no comparable score was available; uplift unavailable | 79.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 87.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 66.7% (-33.3 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 73.3% → 100.0% (+26.7 points) | 46.7% → 100.0% (+53.3 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 81.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 77.8% → 94.5% (+16.7 points) | 36.1% → 83.3% (+47.2 points) |
+| Efficiency | 73.8% — baseline ran, but no comparable score was available; uplift unavailable | 79.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 95.5% → 94.4% (-1.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 87.6% → 88.3% (+0.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -52,17 +78,17 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,398,058 | 1,184,793 | N/A | N/A | skill 3/3; base 7/7 |
-| claude-code | preflight-clean-axial-flags-phi | 634,914 | 510,580 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | preflight-clean-no-phi-greenlights | 458,381 | 483,512 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | preflight-flipped-lr-blocks-segmentation | 304,763 | 190,701 | +114,062 | +59.81% | skill 1/1; base 1/1 |
-| codex | All cases | 1,156,112 | 813,778 | N/A | N/A | skill 3/3; base 8/8 |
-| codex | preflight-clean-axial-flags-phi | 389,303 | 264,463 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | preflight-clean-no-phi-greenlights | 319,585 | 341,802 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | preflight-flipped-lr-blocks-segmentation | 447,224 | 207,513 | N/A | N/A | skill 1/1; base 2/2 |
-| ALL AGENTS | Dataset aggregate | 2,554,170 | 1,998,571 | N/A | N/A | skill 6/6; base 15/15 |
+| claude-code | All cases | 888,744 | 500,046 | +388,698 | +77.73% | skill 3/3; base 3/3 |
+| claude-code | preflight-clean-axial-flags-phi | 282,154 | 113,318 | +168,836 | +148.99% | skill 1/1; base 1/1 |
+| claude-code | preflight-clean-no-phi-greenlights | 324,488 | 153,215 | +171,273 | +111.79% | skill 1/1; base 1/1 |
+| claude-code | preflight-flipped-lr-blocks-segmentation | 282,102 | 233,513 | +48,589 | +20.81% | skill 1/1; base 1/1 |
+| codex | All cases | 745,033 | 395,784 | +349,249 | +88.24% | skill 3/3; base 3/3 |
+| codex | preflight-clean-axial-flags-phi | 219,290 | 105,709 | +113,581 | +107.45% | skill 1/1; base 1/1 |
+| codex | preflight-clean-no-phi-greenlights | 274,884 | 195,514 | +79,370 | +40.60% | skill 1/1; base 1/1 |
+| codex | preflight-flipped-lr-blocks-segmentation | 250,859 | 94,561 | +156,298 | +165.29% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 1,633,777 | 895,830 | +737,947 | +82.38% | skill 6/6; base 6/6 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
@@ -78,14 +104,16 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <summary>Show detailed findings and successful checks</summary>
 
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/dicom-series-preflight/SKILL.md`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         subprocess.run(
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
             [sys.executable, str(FIXTURES / "generate_fixtures.py")],
             check=True,
             cwd=REPO,
-        ) (`tests/test_preflight_series.py:37`)
+        ) (`tests/test_preflight_series.py:36`)
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
+        [sys.executable, str(script), "--out-dir", str(destination)], cwd=tmp_path, check=True
+    ) (`tests/test_preflight_series.py:69`)
 - **LOW** QUALITY/quality_reliability: Inputs are used but no dedicated Inputs section is documented (`skills/dicom-series-preflight/SKILL.md`)
 - **LOW** QUALITY/quality_reliability: Structured output is used but no dedicated Output Format section is documented (`skills/dicom-series-preflight/SKILL.md`)
-- **LOW** SCHEMA/unexpected_file: Unexpected 'fixtures' in skill root (`skills/dicom-series-preflight/fixtures`)
 - 7 additional finding(s) are available in the full evaluation artifacts.
 
 </details>

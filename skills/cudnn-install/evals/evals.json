@@ -1,0 +1,120 @@
+{
+  "skill_name": "cudnn-install",
+  "evals": [
+    {
+      "id": "cudnn-install-reuse-framework-backend",
+      "prompt": "I use Python in /envs/train on Linux x86_64. Do not upgrade anything. CUDA PyTorch works, torch.backends.cudnn.version() returns a version, and /proc/self/maps shows cuDNN from /envs/train/lib/python3.12/site-packages/nvidia/cudnn/lib. I only need the cuDNN Python frontend. Another environment has a different cuDNN wheel. Give the inspection and installation plan without running commands.",
+      "expected_output": "Use /envs/train's interpreter, inspect its package/framework constraints and backend path, reuse its compatible working backend, and install only the needed frontend. Verify dependency consistency and GPU execution without changing the other environment.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Uses the selected environment's interpreter and does not infer dependencies from another environment.",
+        "Identifies the frontend distribution as nvidia-cudnn-frontend, imported as cudnn.",
+        "Reuses the compatible working backend instead of installing a second CUDA flavor or upgrading PyTorch.",
+        "Includes pip check, fresh-process backend loading, and a small GPU execution check."
+      ]
+    },
+    {
+      "id": "cudnn-install-cuda12-wheel-no-checkout",
+      "prompt": "I want Python wheels, not a source build, in my existing Linux virtual environment. Its selected toolkit/runtime and framework constraints require CUDA 12, and no cuDNN backend is installed. I have no cuDNN Frontend checkout. Give a command plan for the frontend and backend, with compatibility checks first. Do not execute or upgrade other packages.",
+      "expected_output": "Inspect release metadata and framework/driver compatibility, then use the target interpreter to install nvidia-cudnn-cu12 and nvidia-cudnn-frontend. A checkout is not required for a wheel install; verify loaded versions, dependency consistency, and GPU execution.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Selects the CUDA 12 backend flavor and does not also install the CUDA 13 flavor.",
+        "Uses release/package metadata rather than assuming develop dependencies apply to the wheel.",
+        "Does not require cloning the source repository for the wheel install.",
+        "Includes verification beyond a successful import and preserves unrelated package constraints."
+      ]
+    },
+    {
+      "id": "cudnn-install-metadata-extras-and-groups",
+      "prompt": "Plan commands for an editable cuDNN Frontend install in an already selected Linux virtual environment. The selected checkout's metadata says: base dependencies nvidia-cutlass-dsl[cu13] and apache-tvm-ffi; optional-dependencies cutedsl=[cuda-python], comm=[nvshmem4py-cu13], cutile=[cuda-tile]; dependency-groups torch=[torch,torch-c-dlpack-ext], dev=[pytest,pre-commit]. I need PyTorch integration and a cuTile engine, not communication. The backend/toolkit are already compatible. Do not execute commands. Explain external compiler requirements too.",
+      "expected_output": "Use the cutile editable extra plus the torch dependency group if the selected pip supports groups, respecting framework constraints. Do not install every extra or treat torch/dev as extras. The cuTile engine needs a compatible tileiras compiler separately; the extra does not provide it.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Distinguishes project dependencies, optional extras, and dependency groups.",
+        "Uses the cutile extra and the torch group rather than nonexistent torch/dev extras.",
+        "Does not install the communication extra or redundant groups without a need.",
+        "Checks the external tileiras compiler and preserves existing framework constraints."
+      ]
+    },
+    {
+      "id": "cudnn-install-cpp-only-build",
+      "prompt": "I need the cuDNN C++ frontend only on Linux. The selected checkout and compatible toolkit/backend development files are present at /src/cudnn-frontend, /opt/cuda, and /opt/cudnn. Give the native build/integration and verification plan. Do not install Python, PyTorch, or JAX.",
+      "expected_output": "Use the header-only frontend include directory or cudnn_frontend CMake target. Configure the source build with CUDNN_PATH and CUDAToolkit_ROOT, inspect resolved headers/libraries and toolchain requirements, then compile/run a GPU sample. Python package installation is unnecessary.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Describes header-only C++ integration and the cudnn_frontend target or include directory.",
+        "Uses CUDNN_PATH=/opt/cudnn and CUDAToolkit_ROOT=/opt/cuda with the selected source checkout.",
+        "Checks development headers/libraries and toolchain requirements.",
+        "Distinguishes compilation from running an actual GPU sample without adding Python dependencies."
+      ]
+    },
+    {
+      "id": "cudnn-install-ngc-no-pip-record",
+      "prompt": "In an NVIDIA NGC PyTorch container, a GPU convolution works and cuDNN is loaded from a system library directory, but python -m pip show nvidia-cudnn-cu12 reports no package. Should I install another backend? I want to preserve the container's tested stack. Give diagnostic steps only.",
+      "expected_output": "Do not infer absence from a missing pip record. Inspect image tag/release information, package-manager records and the actual loaded library path/version, then reuse a compatible backend and prefer an appropriate container tag over replacing its stack.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Does not treat the missing pip record as proof that cuDNN is absent.",
+        "Checks NGC image/release metadata, system package records, and actual loaded libraries.",
+        "Preserves the working framework-managed stack while checking frontend compatibility."
+      ]
+    },
+    {
+      "id": "cudnn-install-pytorch-version-override",
+      "prompt": "PyTorch reports a cuDNN compatibility error after LD_LIBRARY_PATH was changed. A teammate proposes exporting PYTORCH_SKIP_CUDNN_COMPATIBILITY_CHECK=1 in our shell startup file and using pip --no-deps to force a new backend. Explain a safe diagnostic and repair plan; do not change files or install anything.",
+      "expected_output": "Inspect PyTorch compile/runtime versions and the actual loaded backend path, then remove the conflicting search path or restore its compatible backend. Do not use --no-deps or a persistent compatibility bypass to conceal a mismatch. A user-authorized override is limited to one controlled process and cannot establish compatibility.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Checks loaded paths and compile/runtime versions before selecting a repair.",
+        "Rejects a persistent compatibility override and dependency-conflict concealment with --no-deps.",
+        "Explains that the override does not install, select, or make a backend compatible.",
+        "Requires normal validation without the override before claiming compatibility."
+      ]
+    },
+    {
+      "id": "cudnn-install-cpu-only-verification",
+      "prompt": "I installed nvidia-cudnn-frontend in a Linux CI worker. import cudnn succeeds, pip check passes, and there is no NVIDIA GPU accessible. What can I report as verified, and what must run on another host? Do not install anything or invent a GPU result.",
+      "expected_output": "Report package/import and dependency checks as completed only as supplied. Check loaded backend/version/handle availability separately, and mark GPU execution unverified. Run an actual frontend or framework GPU operation on a compatible GPU host before claiming a working GPU installation.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Separates import/package checks from backend loading and GPU execution.",
+        "Reports GPU execution as unverified on this worker.",
+        "Names a real GPU operation and loaded-library/version checks to perform on another host.",
+        "Does not interpret a CPU-only environment as proof that the product's GPU path is unsupported."
+      ]
+    },
+    {
+      "id": "cudnn-install-upgrade-frontend-only",
+      "prompt": "My existing virtual environment has a working PyTorch installation with a pinned cuDNN backend and a lockfile. Upgrade only nvidia-cudnn-frontend to the latest compatible stable release. Give the plan without executing it. If the newest frontend needs incompatible dependencies, preserve this environment and explain my options.",
+      "expected_output": "Inspect release metadata and selected-interpreter constraints, compare installed/proposed versions and dry-run changes, update only the compatible frontend within the lockfile policy, or propose a compatible release/separate environment. Do not silently change backend/framework pins.",
+      "expected_skill": "cudnn-install",
+      "assertions": [
+        "Finds compatible stable release metadata rather than blindly choosing an unbounded newest package.",
+        "Previews dependency changes and respects the lockfile.",
+        "Preserves the selected frontend-only upgrade scope and backend/PyTorch pins.",
+        "Offers a compatible release or separate environment if the newest release conflicts."
+      ]
+    },
+    {
+      "id": "cudnn-install-negative-executable-plan-cache",
+      "prompt": "My cuDNN Frontend C++ graph already builds and runs. Explain how to serialize its selected execution plan and reload it in another process with new tensor buffers. Installation is working; do not propose package changes.",
+      "expected_output": "Explain executable-plan serialization and restoration with stable tensor UIDs, fresh buffer bindings, workspace, and compatibility constraints.",
+      "expected_skill": null,
+      "assertions": [
+        "Focuses on plan serialization and execution bindings.",
+        "Does not introduce an installation or upgrade workflow when the environment is already working."
+      ]
+    },
+    {
+      "id": "cudnn-install-negative-python-list",
+      "prompt": "Write a Python list comprehension that squares each even number in [1, 2, 3, 4, 5, 6]. Use only Python built-ins.",
+      "expected_output": "Return [x * x for x in [1, 2, 3, 4, 5, 6] if x % 2 == 0], or an equivalent comprehension producing [4, 16, 36].",
+      "expected_skill": null,
+      "assertions": [
+        "Uses a Python list comprehension and produces [4, 16, 36].",
+        "Does not propose CUDA, cuDNN, or package installation for a built-in Python operation."
+      ]
+    }
+  ]
+}

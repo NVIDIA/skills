@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
 
 """Unit tests for dicom_series_preflight."""
 
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -31,9 +33,6 @@ from preflight_series import preflight  # noqa: E402
 @pytest.fixture(scope="module")
 def _ensure_fixtures():
     if not (FIXTURES / "clean_no_phi").is_dir():
-        import subprocess
-        import sys
-
         subprocess.run(
             [sys.executable, str(FIXTURES / "generate_fixtures.py")],
             check=True,
@@ -59,3 +58,27 @@ def test_clean_axial_warns_phi(_ensure_fixtures):
     result = preflight(FIXTURES / "clean_axial")
     assert result["preflight"]["verdict"] == "warn"
     assert result["phi"]["phi_present"] is True
+
+
+def test_standalone_generator_preserves_series_geometry_and_pixels(tmp_path):
+    import pydicom
+
+    script = tmp_path / "generate_fixtures.py"
+    shutil.copyfile(FIXTURES / script.name, script)
+    destination = tmp_path / "data"
+    subprocess.run(
+        [sys.executable, str(script), "--out-dir", str(destination)], cwd=tmp_path, check=True
+    )
+    for name, verdict in (
+        ("flipped_lr", "fail"),
+        ("clean_axial", "warn"),
+        ("clean_no_phi", "pass"),
+    ):
+        folder = destination / name
+        assert preflight(folder)["preflight"]["verdict"] == verdict
+        slices = sorted(folder.glob("*.dcm"))
+        assert len(slices) == 32
+        center = pydicom.dcmread(slices[16])
+        assert center.pixel_array.shape == (64, 64)
+        assert int(center.pixel_array[35, 41]) == 60
+        assert float(center.ImagePositionPatient[2]) == (-32 if name == "flipped_lr" else 32)

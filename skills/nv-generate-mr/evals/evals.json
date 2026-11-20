@@ -1,7 +1,7 @@
 [
   {
     "id": "generate-body-mr-t1",
-    "question": "Generate a synthetic T1 MRI volume from /data/mr_request.json using the rflow-mr skill.",
+    "question": "Generate a synthetic T1 MRI volume from /workspace/input/mr_request.json using the rflow-mr skill.",
     "expected_skill": "nv-generate-mr",
     "ground_truth": "The agent runs scripts/run_mr.py with the config path, --modality mri_t1, --output-dir, and --random-seed.",
     "expected_behavior": [
@@ -9,6 +9,9 @@
       "the command includes --modality mri_t1",
       "the command includes the user config path as first positional argument",
       "the agent states the synthetic-output and non-clinical limitations"
+    ],
+    "files": [
+      "files/mr_request.json"
     ]
   },
   {
@@ -20,6 +23,7 @@
       "the agent mentions skills/nv-generate-mr-brain for brain images",
       "the agent does NOT silently run generic rflow-mr for a brain-specific request",
       "the agent preserves engineering-only scope"
-    ]
+    ],
+    "files": []
   }
 ]

@@ -3,6 +3,7 @@ name: nv-reason-cxr
 description: Used for command-shape or live NV-Reason-CXR chest X-ray reasoning smoke tests. Not for diagnosis or clinical reporting.
 license: Apache-2.0
 allowed-tools: Bash
+permissions: [env, file_read, file_write, network, shell]
 metadata:
   author: NVIDIA MedTech Team
   tags:
@@ -10,6 +11,7 @@ metadata:
     - CXR
     - reasoning
 ---
+
 
 # NV-Reason-CXR
 
@@ -80,7 +82,7 @@ python skills/nv-reason-cxr/scripts/run_nv_reason_cxr.py PATH_TO_CXR_OR_FIXTURE 
   --backend local
 ```
 
-For public API inference without local model packages, use:
+For a public image and prompt, select the hosted backend explicitly. It requires Pillow 10 or newer.
 
 ```bash
 python skills/nv-reason-cxr/scripts/run_nv_reason_cxr.py PATH_TO_CXR_OR_FIXTURE \
@@ -110,9 +112,10 @@ weights are already cached.
 CUDA is expected for practical inference. CPU execution may work for small
 tests but is slow and must be requested explicitly.
 
-For `--backend hf-space-api`, no local PyTorch, Transformers, CUDA, model
-cache, or Hugging Face token is required. The backend sends the image and
-prompt to the public `nvidia/nv-reason-cxr` Hugging Face Space.
+With `--backend hf-space-api`, Pillow re-encodes the image as a PNG with a
+generic filename. The public Hugging Face Space receives the prompt and image
+pixels, including visible text. Use this backend only for inputs cleared for
+public sharing. For private inputs, use the default local backend.
 
 Check the local environment before downloading weights or running inference:
 
@@ -281,7 +284,7 @@ python skills/nv-reason-cxr/scripts/run_nv_reason_cxr.py PATH_TO_CXR.jpg \
 Flags:
 
 - `--backend local|hf-space-api` — inference backend, default `local`.
-- `--model-id` — Hugging Face model id, default `nvidia/NV-Reason-CXR-3B`.
+- `--model-id` — Hugging Face model ID or local directory, default `nvidia/NV-Reason-CXR-3B`. Model and processor load the same pinned revision. The result records that revision for Hub models.
 - `--device auto|cuda|cpu` — default `auto`, using CUDA when available.
 - `--allow-cpu` — required for live CPU inference; CPU runs can be very slow.
 - `--torch-dtype auto|float16|bfloat16|float32` — default `auto`, using
