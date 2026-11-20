@@ -2929,6 +2929,102 @@
       }
     },
     {
+      "path": "skills/kumo-custom-populations",
+      "name": "kumo-custom-populations",
+      "description": "Train with caller-supplied labels, weights and splits or score exact entity/anchor rows through Snowflake source tables using the local Kumo API. Use when generated populations do not represent the requested rows.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "data_scientist,ml_engineer,data_engineer,developer",
+        "discovery.activity_tags": "train,inference,configure,integrate,validate"
+      }
+    },
+    {
+      "path": "skills/kumo-data-science",
+      "name": "kumo-data-science",
+      "description": "Use for KumoAI graphs and predictive models on relational data in a warehouse, an object store or local files: inspect, visualize or export a graph's schema and relationships; train a model, score data with a trained one, explain its predictions, diagnose its training, publish, reload or retain it, train or score on custom labels or rows, or tune it. Covers churn, propensity, fraud, recommendation, forecasting and link prediction. For a new model it checks that the request names the data, outcome and time window, confirms the inferred tables and task, then generates one notebook or script; it runs it only when asked, in the notebook or as a host job. Also use it, before any general jobs or workspace skill, for a job, schedule, run or cluster that runs a Kumo notebook or scores a model published from one: creating, scheduling, pausing, submitting or debugging it.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "data_scientist,ml_engineer,data_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "train,inference,inspect,deploy,debug"
+      }
+    },
+    {
+      "path": "skills/kumo-graph-visualization",
+      "name": "kumo-graph-visualization",
+      "description": "Provide graph visuals in Kumo notebooks and SDK scripts, display or export relationships on request, and inspect Markdown schemas during model iteration.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "data-science",
+        "audience": "data_scientist,developer,ml_engineer,application_developer",
+        "discovery.activity_tags": "inspect,generate,convert,integrate"
+      }
+    },
+    {
+      "path": "skills/kumo-model-explanations",
+      "name": "kumo-model-explanations",
+      "description": "Inspect and interpret gradient attribution (including requests called radiant attribution), column analysis and sampled explanation subgraphs from a Kumo model trained in a Python notebook. Locate the correct run's explanation artifacts, explain feature scores and cohorts, and identify missing or unsupported explanations without automatically retraining.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "data_scientist,ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "inspect,evaluate,assess,summarize,validate"
+      }
+    },
+    {
+      "path": "skills/kumo-model-persistence",
+      "name": "kumo-model-persistence",
+      "description": "Publish and reload Kumo models through the Snowflake registry, reconstruct compatible scoring inputs, and retain or retrieve run diagnostics and output files through a Snowflake stage. Use for saved-model scoring and artifact retention without retraining by default.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "data_scientist,ml_engineer,data_engineer,developer",
+        "discovery.activity_tags": "deploy,inference,package,recover,integrate"
+      }
+    },
+    {
+      "path": "skills/kumo-model-tuning",
+      "name": "kumo-model-tuning",
+      "description": "Configure a Kumo model plan for a user-defined task, including encoders, run mode, bounded experiments, sampling, optimization, architecture, metrics and refits. Preserve target and evaluation constraints and use existing diagnostics for comparisons.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "data_scientist,ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "configure,optimize,train,evaluate,compare"
+      }
+    },
+    {
+      "path": "skills/kumo-training-diagnostics",
+      "name": "kumo-training-diagnostics",
+      "description": "Evaluate an existing Kumo training run in a Python notebook using aggregate metrics, trial results, learning curves, refit evidence, and training progress. Use for model-quality questions or training diagnostics; inspect existing results without automatically tuning, rerunning, or deploying a model.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "training-ai",
+        "audience": "data_scientist,ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "evaluate,inspect,measure,validate,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/kumoai-reference",
+      "name": "kumoai-reference",
+      "description": "Reference for translating a validated ML request into KumoAI graph configuration, PQL (predictive query language), and Kumo Predict SDK code. Normally loaded by the kumo-data-science skill after its intake checks pass, rather than invoked directly. Triggers: kumo graph, PQL, predictive query, kumo.Table, kumo.Graph, kumo.Trainer, kumo sdk.",
+      "metadata": {
+        "product.primary": "Kumo Engine",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "data-science",
+        "audience": "data_scientist,ml_engineer,data_engineer,developer",
+        "discovery.activity_tags": "generate,configure,train,inference,integrate"
+      }
+    },
+    {
       "path": "skills/launch-nemo-rl",
       "name": "launch-nemo-rl",
       "description": "Playbook for launching, monitoring, stopping, and debugging NeMo-RL recipes on a Kubernetes cluster via the nrl-k8s CLI. Covers ephemeral vs long-lived RayCluster modes, iterating on runs, and debugging hung or failed training jobs.",
