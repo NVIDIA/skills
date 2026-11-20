@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: DAQIRI
+repo: NVIDIA/daqiri
+description: Guide DAQIRI setup, configuration, troubleshooting, and first benchmarks.
+skills:
+  - path: skills/daqiri-onboarding/
+    catalog_dir: daqiri-onboarding
