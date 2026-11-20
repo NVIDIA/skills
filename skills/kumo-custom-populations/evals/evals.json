@@ -1,0 +1,72 @@
+{
+  "skill_name": "kumo-custom-populations",
+  "evals": [
+    {
+      "id": "kpop-01",
+      "prompt": "Train my confirmed Kumo churn query on our own labels instead of generated ones. The Snowflake table ML.LABELS.CURATED_LABELS has ENTITY1, TARGET1, TIMESTAMP, WEIGHT and SPLIT (0 train, 1 validation, 2 test). `pq` and `snapshot` are already built in the notebook.",
+      "expected_output": "Before any code it replies with the plan and stops for confirmation: the table and its fields, WEIGHT and SPLIT as the weight and split columns, what it validated, and the constructor `kumo.TrainingTable.from_source_table(population_connector['CURATED_LABELS'], TrainingTableSpec(weight_col='WEIGHT', split_col='SPLIT'), pq=pq, snapshot=snapshot)`, reusing the confirmed pq and snapshot, with `suggest_model_plan(..., train_table_spec=spec)`.",
+      "assertions": [
+        "Names kumo.TrainingTable.from_source_table as the constructor",
+        "Uses TrainingTableSpec with weight_col='WEIGHT' and split_col='SPLIT'",
+        "Reuses the existing pq and snapshot",
+        "Passes the same spec to suggest_model_plan as train_table_spec",
+        "Presents the plan and stops for the user's confirmation before training"
+      ],
+      "expected_skill": "kumo-custom-populations",
+      "expected_script": null
+    },
+    {
+      "id": "kpop-02",
+      "prompt": "Our Kumo labels table ML.LABELS.CURATED_LABELS has a SPLIT_LABEL column with the values 'train', 'val' and 'test'. Use it as the split column and train.",
+      "expected_output": "Reports SPLIT_LABEL as the offending field: the split column reads only 0, 1 and 2, so string labels match no split and their rows are skipped (the build fails with 'custom-TT source kept no rows' if none remain). It shows the labels and their counts from a read-only query and asks for either a prepared table with 0/1/2 or explicit approval of a shown mapping, which would then be applied in a read-only connector.sql(...) source. It writes nothing back.",
+      "assertions": [
+        "Says the split column must hold 0, 1 or 2 and that 'train'/'val'/'test' will not match",
+        "Explains that unmatched rows are skipped, so training could keep no rows",
+        "Asks for a prepared 0/1/2 table or explicit approval of a mapping it shows",
+        "Proposes the mapping only as a read-only connector.sql(...) source, after approval",
+        "Does not UPDATE the table, CREATE TABLE AS, or write a derived table"
+      ],
+      "expected_skill": "kumo-custom-populations",
+      "expected_script": null
+    },
+    {
+      "id": "kpop-03",
+      "prompt": "For my Kumo custom training table, just normalize the WEIGHT column to mean 1 and multiply positives by 10. You have my approval, go ahead.",
+      "expected_output": "An approval given before the formula and distribution are shown is not approval. It states the exact formula and the columns it reads, shows the resulting weight distribution (min, mean, max, counts per label) from a read-only query, and stops for explicit approval. Only then would it apply the formula in a read-only connector.sql(...) source; it never writes to the source table.",
+      "assertions": [
+        "Does not apply the weight change straight away despite the up-front approval",
+        "Shows the exact weight formula and the columns it reads",
+        "Shows or proposes a read-only query for the resulting weight distribution",
+        "Stops for explicit approval after showing them",
+        "Does not UPDATE the source table or write a derived table"
+      ],
+      "expected_skill": "kumo-custom-populations",
+      "expected_script": null
+    },
+    {
+      "id": "kpop-04",
+      "prompt": "Score exactly the accounts in ML.EVAL.EVAL_ACCOUNTS (ACCOUNT_ID, ANCHOR_TS, CHURNED) with my fitted Kumo trainer, so I can compare against CHURNED afterwards.",
+      "expected_output": "The scoring population must not carry the target, so the table cannot be passed as is. Evaluation labels (CHURNED) stay separate and are joined to the scores afterwards. It proposes, for approval, a read-only connector.sql(...) source keeping only the entity and TIMESTAMP columns under their contract names, or asks for a table without the target, and scores with `kumo.PredictionTable.from_source_table(..., pq=pq, snapshot=snapshot, plan=trainer.training_table_generation_plan)` then `trainer.predict(population, snapshot=snapshot, ...)`, comparing output entity and anchor coverage with the population.",
+      "assertions": [
+        "Says the scoring population must not contain the target column CHURNED",
+        "Keeps CHURNED separate for joining to the scores afterwards",
+        "Proposes a read-only connector.sql(...) source with the entity and timestamp columns, or asks for a table without the target",
+        "Uses kumo.PredictionTable.from_source_table with pq and snapshot",
+        "Says output rows or coverage will be compared with the population rather than assumed equal"
+      ],
+      "expected_skill": "kumo-custom-populations",
+      "expected_script": null
+    },
+    {
+      "id": "kpop-05",
+      "prompt": "Split my pandas DataFrame into stratified train, validation and test sets (70/15/15) with scikit-learn.",
+      "expected_output": "A scikit-learn data-splitting task unrelated to Kumo. The agent answers with train_test_split, without loading the Kumo custom-populations skill.",
+      "assertions": [
+        "Does not load or follow the kumo-custom-populations skill",
+        "Uses scikit-learn train_test_split with stratification to produce 70/15/15 splits"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}

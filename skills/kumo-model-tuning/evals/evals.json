@@ -1,0 +1,68 @@
+{
+  "skill_name": "kumo-model-tuning",
+  "evals": [
+    {
+      "id": "ktune-01",
+      "prompt": "My Kumo `trainer` is already fitted in this notebook with the plan I tuned last week. Before a long run on new data I want a quick smoke test: one experiment, three epochs, no refits. Show me the plan changes.",
+      "expected_output": "Starts from the existing plan (`trainer.model_plan`), not a fresh `suggest_model_plan`, which would reset settings the user did not mention. Applies only the requested changes: `training_job.num_experiments = 1`, `training_job.refit_trainval = False`, `training_job.refit_full = False`, `optimization.max_epochs = 3`. Says this is a limited functional check, not a production-quality setting, and presents the resolved plan without running the fit.",
+      "assertions": [
+        "Starts from the existing plan (trainer.model_plan) rather than a new suggest_model_plan",
+        "Sets plan.training_job.num_experiments = 1",
+        "Sets plan.training_job.refit_trainval = False and plan.training_job.refit_full = False",
+        "Sets plan.optimization.max_epochs = 3",
+        "Says the smoke test is a limited functional check, not a production-quality configuration",
+        "Does not run fit as part of presenting the plan"
+      ],
+      "expected_skill": "kumo-model-tuning",
+      "expected_script": null
+    },
+    {
+      "id": "ktune-02",
+      "prompt": "In my existing Kumo model plan, use a numerical encoder for customers.account_balance. The plan already has encoder overrides for two other columns.",
+      "expected_output": "Imports `Numerical` from `kumoapi.encoder` and adds `'customers.account_balance': Numerical()` to `plan.column_processing.encoder_overrides`, merging into the existing overrides rather than replacing them. Notes that the key must match the graph's actual table.column and semantic type.",
+      "assertions": [
+        "Uses Numerical from kumoapi.encoder",
+        "Sets the override under plan.column_processing.encoder_overrides with the key 'customers.account_balance'",
+        "Merges into the existing overrides instead of replacing the whole mapping",
+        "Notes the key must match the graph's table and column (and its semantic type)"
+      ],
+      "expected_skill": "kumo-model-tuning",
+      "expected_script": null
+    },
+    {
+      "id": "ktune-03",
+      "prompt": "Set forecast_length = 4 in my Kumo model plan so the model forecasts four periods ahead.",
+      "expected_output": "Explains that `forecast_length` belongs to `TrainingTableGenerationPlan`, not `ModelPlan`, together with generation, split and lag settings, so it cannot be set on the model plan. Does not invent a model-plan field for it.",
+      "assertions": [
+        "Says forecast_length is not a ModelPlan setting",
+        "Says it belongs to TrainingTableGenerationPlan",
+        "Does not set a forecast_length field on the model plan"
+      ],
+      "expected_skill": "kumo-model-tuning",
+      "expected_script": null
+    },
+    {
+      "id": "ktune-04",
+      "prompt": "I want my Kumo model tuned on a custom Python metric I wrote, `def profit_at_k(y, p): ...`. Plug it into the model plan.",
+      "expected_output": "Says that arbitrary Python metric callables are not supported: metric names go in `plan.training_job.metrics` and `tune_metric`, chosen from those the task supports, with the tuning direction kept explicit. It may suggest a supported metric but does not wire the function in.",
+      "assertions": [
+        "Says a custom Python metric function cannot be used by the model plan",
+        "Says metrics are chosen by name in plan.training_job.metrics and tune_metric",
+        "Does not write code that passes the Python function to the plan"
+      ],
+      "expected_skill": "kumo-model-tuning",
+      "expected_script": null
+    },
+    {
+      "id": "ktune-05",
+      "prompt": "Tune the hyperparameters of my scikit-learn RandomForestClassifier with GridSearchCV over n_estimators and max_depth.",
+      "expected_output": "A scikit-learn task unrelated to Kumo. The agent writes GridSearchCV code without loading the Kumo model-tuning skill.",
+      "assertions": [
+        "Does not load or follow the kumo-model-tuning skill",
+        "Provides GridSearchCV code over n_estimators and max_depth"
+      ],
+      "expected_skill": null,
+      "expected_script": null
+    }
+  ]
+}
