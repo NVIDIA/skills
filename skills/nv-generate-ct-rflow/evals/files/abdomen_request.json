@@ -1,0 +1,22 @@
+{
+  "num_output_samples": 1,
+  "body_region": [
+    "abdomen"
+  ],
+  "anatomy_list": [
+    "liver",
+    "spleen"
+  ],
+  "controllable_anatomy_size": [],
+  "output_size": [
+    256,
+    256,
+    256
+  ],
+  "spacing": [
+    1.5,
+    1.5,
+    2.0
+  ],
+  "num_inference_steps": 30
+}

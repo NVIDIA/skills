@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `dicom-metadata-extract`
-- Evaluation date: 2026-09-14
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 2 evaluation tasks (2 positive)
 - Dataset digest: `sha256:1c4acd30852c7efd65d9d439bca3bcb67f590e7024f3e1cdfbbfc3f6660f1771` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| dicom-metadata-extract | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-metadata-extract | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-metadata-extract | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-metadata-extract | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| dicom-metadata-extract | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `dicom-metadata-extract`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,27 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 72.3% — baseline ran, but no comparable score was available; uplift unavailable | 77.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 50.0% (-50.0 points) | 100.0% → 50.0% (-50.0 points) |
-| Correctness | 25.0% → 80.0% (+55.0 points) | 15.0% → 100.0% (+85.0 points) |
-| Discoverability | 91.5% — baseline ran, but no comparable score was available; uplift unavailable | 75.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 28.3% → 55.0% (+26.7 points) | 28.3% → 85.0% (+56.7 points) |
-| Efficiency | 84.8% — baseline ran, but no comparable score was available; uplift unavailable | 74.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 80.9% — baseline ran, but no comparable score was available; uplift unavailable | 80.6% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 50.0% → 70.0% (+20.0 points) | 40.0% → 60.0% (+20.0 points) |
+| Discoverability | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 92.5% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 21.7% → 55.0% (+33.3 points) | 38.3% → 60.0% (+21.7 points) |
+| Efficiency | 82.1% — baseline ran, but no comparable score was available; uplift unavailable | 90.3% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.6% → 95.4% (-3.2 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 93.1% → 90.5% (-2.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -52,21 +78,21 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 647,052 | 605,045 | N/A | N/A | skill 2/2; base 4/4 |
-| claude-code | extract-modality-and-phi-flag | 212,638 | 482,358 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | no-anonymization-claim | 434,414 | 122,687 | +311,727 | +254.08% | skill 1/1; base 1/1 |
-| codex | All cases | 642,885 | 382,685 | N/A | N/A | skill 2/2; base 4/4 |
-| codex | extract-modality-and-phi-flag | 391,281 | 265,946 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | no-anonymization-claim | 251,604 | 116,739 | +134,865 | +115.53% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,289,937 | 987,730 | N/A | N/A | skill 4/4; base 8/8 |
+| claude-code | All cases | 553,635 | 213,466 | +340,169 | +159.36% | skill 2/2; base 2/2 |
+| claude-code | extract-modality-and-phi-flag | 188,926 | 106,494 | +82,432 | +77.41% | skill 1/1; base 1/1 |
+| claude-code | no-anonymization-claim | 364,709 | 106,972 | +257,737 | +240.94% | skill 1/1; base 1/1 |
+| codex | All cases | 166,339 | 124,377 | +41,962 | +33.74% | skill 2/2; base 2/2 |
+| codex | extract-modality-and-phi-flag | 79,833 | 54,674 | +25,159 | +46.02% | skill 1/1; base 1/1 |
+| codex | no-anonymization-claim | 86,506 | 69,703 | +16,803 | +24.11% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 719,974 | 337,843 | +382,131 | +113.11% | skill 4/4; base 4/4 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 14 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 2 task(s) |
 
@@ -79,8 +105,13 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 - **MEDIUM** PII/ip_addresses: Public IP address (`fixtures/generate_sample.py:49`)
 - **MEDIUM** PII/ip_addresses: Public IP address (`fixtures/generate_sample.py:51`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/dicom-metadata-extract/SKILL.md`)
-- **MEDIUM** SECURITY/Unknown (SQP-2): The skill reads DICOM files, extracts PHI-containing metadata (e.g., patient name, DOB, MRN — standard DICOM tags), and  (`SKILL.md:51`)
-- 11 additional finding(s) are available in the full evaluation artifacts.
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
+        [sys.executable, str(SCRIPT), *args],
+        capture_output=True,
+        text=True,
+        check=True,
+    ) (`tests/test_basic.py:40`)
+- 9 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

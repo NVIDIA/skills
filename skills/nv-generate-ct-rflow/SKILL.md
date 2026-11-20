@@ -3,6 +3,7 @@ name: nv-generate-ct-rflow
 description: Used for generating synthetic CT volumes and masks with NV-Generate-CTMR rflow-ct. Not for production training data without review.
 license: Apache-2.0
 allowed-tools: Bash
+permissions: [env, file_read, file_write, network, shell]
 metadata:
   author: NVIDIA MedTech Team
   tags:
@@ -10,6 +11,7 @@ metadata:
     - CT
     - generation
 ---
+
 
 # NV-Generate-CT (rflow-ct)
 
@@ -23,7 +25,7 @@ metadata:
 - Read `skill_manifest.yaml` before changing arguments, side effects, or validation gates.
 - Run `scripts/run_rflow_ct.py` through the documented command below; keep outputs under a caller-provided run directory.
 - If a host agent exposes `run_script`, use `run_script("scripts/run_rflow_ct.py", args=[...])`; otherwise run the Bash/Python command shown below.
-- Emit a single bash code block, and keep the `python -m pip install -r "$NV_GENERATE_ROOT/requirements.txt"` step in that same command — the runtime may be a fresh environment without `nibabel`/MONAI, so dropping the install fails with `ModuleNotFoundError`.
+- For generation, use the upstream runtime requirements. For a preflight, the wrapper needs only NumPy, NiBabel, and Typer to start. Pass the caller’s config, output directory, and seed to the same entrypoint.
 - Do not add `rm`, `mkdir`, or any cleanup of `--output-dir`; the wrapper creates it. Use a fresh `--output-dir` instead of deleting one.
 - Check the emitted JSON and paired verifier guidance before treating the run as evidence.
 
@@ -172,6 +174,19 @@ python skills/nv-generate-ct-rflow/scripts/run_ct_image.py \
   skills/nv-generate-ct-rflow/fixtures/ct_image_only_default.json \
   --output-dir runs/ct_image_only_demo --version rflow-ct
 ```
+
+For a preflight, run this from the installed skill directory. The upstream source
+checkout supplies the anatomy dictionary and default configs. A preflight
+checks for CUDA and model data without downloading weights.
+
+```bash
+python scripts/run_rflow_ct.py PATH_TO_CONFIG_INFER.json \
+  --output-dir OUT_DIR --random-seed 0 --preflight-only
+```
+
+Report the emitted JSON, including prerequisite failures. For a missing
+checkout, only the request fields supplied by the caller can be checked.
+Confirm runtime and VRAM estimates on the target GPU before generation.
 
 The wrapper runs preflight on every invocation (regardless of
 `--preflight-only`): config-schema bounds, anatomy names matched

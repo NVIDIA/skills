@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,10 +27,11 @@ import argparse
 import binascii
 import hashlib
 import importlib.metadata
+import io
 import json
 import math
-import mimetypes
 import os
+import re
 import struct
 import sys
 import time
@@ -40,8 +41,15 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.parse import urlencode, urlsplit
+from urllib.request import (
+    HTTPDefaultErrorHandler,
+    HTTPErrorProcessor,
+    HTTPSHandler,
+    OpenerDirector,
+    ProxyHandler,
+    Request,
+)
 
 DEFAULT_MODEL = "nvidia/NV-Reason-CXR-3B"
 DEFAULT_MODEL_REVISION = "056bd0383b35226554da9dc5866e095df174ae19"
@@ -474,6 +482,27 @@ def _select_torch_dtype(torch_module: Any, dtype_name: str, device: str) -> Any:
     }[dtype_name]
 
 
+def _model_revision(model_id: str, local_files_only: bool, token: str | None) -> str | None:
+    """Pin model and processor to the same revision, including cache-only runs."""
+    if Path(model_id).is_dir():
+        return None
+    if model_id == DEFAULT_MODEL:
+        return DEFAULT_MODEL_REVISION
+
+    from huggingface_hub import HfApi, try_to_load_from_cache
+
+    if local_files_only:
+        cached = try_to_load_from_cache(model_id, "config.json")
+        if not isinstance(cached, str):
+            raise SkillError(f"No cached config.json for {model_id} in local-files-only mode.")
+        revision = Path(cached).parent.name
+    else:
+        revision = HfApi().model_info(model_id, token=token).sha
+    if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise SkillError(f"Could not resolve an immutable model revision for {model_id}.")
+    return revision
+
+
 def _run_transformers_inference(
     *,
     image_path: Path,
@@ -500,13 +529,16 @@ def _run_transformers_inference(
     device = _select_device(device_request, allow_cpu=allow_cpu)
     dtype = _select_torch_dtype(torch, torch_dtype_name, device)
     token = os.environ.get("HF_TOKEN") or None
-    revision = DEFAULT_MODEL_REVISION if model_id == DEFAULT_MODEL else None
+    try:
+        revision = _model_revision(model_id, local_files_only, token)
+    except SkillError:
+        raise
+    except Exception as exc:
+        raise SkillError(f"Could not resolve the model revision for {model_id}: {exc}") from exc
     load_kwargs: dict[str, Any] = {
-        "local_files_only": local_files_only,
+        "local_files_only": local_files_only or revision is None,
         "token": token,
     }
-    if revision is not None:
-        load_kwargs["revision"] = revision
 
     try:
         image = Image.open(image_path).convert("RGB")
@@ -518,6 +550,7 @@ def _run_transformers_inference(
             model = AutoModelForImageTextToText.from_pretrained(
                 model_id,
                 dtype=dtype,
+                revision=revision,
                 **load_kwargs,
             ).eval()
         except TypeError as e:
@@ -526,12 +559,14 @@ def _run_transformers_inference(
             model = AutoModelForImageTextToText.from_pretrained(
                 model_id,
                 torch_dtype=dtype,
+                revision=revision,
                 **load_kwargs,
             ).eval()
         model = model.to(device)
         processor = AutoProcessor.from_pretrained(
             model_id,
             use_fast=True,
+            revision=revision,
             **load_kwargs,
         )
         messages = [
@@ -572,6 +607,22 @@ def _run_transformers_inference(
     return generated_text, runtime
 
 
+def _open_space(request: Request, timeout: int):
+    """Send only to the fixed HTTPS origin and reject redirects."""
+    origin = urlsplit(request.full_url)
+    if origin.scheme != "https" or origin.netloc != urlsplit(HF_SPACE_URL).netloc:
+        raise SkillError("The hosted backend accepts only the configured HTTPS Space.")
+    opener = OpenerDirector()
+    for handler in (
+        ProxyHandler(),
+        HTTPSHandler(),
+        HTTPDefaultErrorHandler(),
+        HTTPErrorProcessor(),
+    ):
+        opener.add_handler(handler)
+    return opener.open(request, timeout=timeout)
+
+
 # Normalize HTTP and network errors from Gradio API calls.
 def _http_fetch(
     url: str,
@@ -581,7 +632,7 @@ def _http_fetch(
     timeout: int,
 ) -> bytes:
     try:
-        with urlopen(Request(url, data=data, headers=headers or {}), timeout=timeout) as response:
+        with _open_space(Request(url, data=data, headers=headers or {}), timeout) as response:
             return response.read()
     except HTTPError as e:
         detail = e.read().decode("utf-8", "replace")
@@ -590,18 +641,36 @@ def _http_fetch(
         raise SkillError(f"network error: {e.reason}") from e
 
 
-# Upload the local image and shape the response as Gradio FileData.
+def _hosted_png(image_path: Path) -> bytes:
+    """Encode only the displayed pixels for the public Space."""
+    try:
+        from PIL import Image, ImageOps
+    except ImportError as exc:
+        raise SkillError("The hf-space-api backend requires Pillow>=10.") from exc
+
+    try:
+        with Image.open(image_path, formats=("JPEG", "PNG")) as source:
+            pixels = ImageOps.exif_transpose(source)
+            if pixels.mode == "P" or pixels.mode == "CMYK" or "transparency" in pixels.info:
+                pixels = pixels.convert("RGBA")
+            pixels.info.clear()
+            with io.BytesIO() as encoded:
+                pixels.save(encoded, format="PNG")
+                return encoded.getvalue()
+    except (OSError, ValueError, Image.DecompressionBombError) as exc:
+        raise SkillError(f"Could not prepare the PNG/JPEG for the public Space: {exc}") from exc
+
+
 def _hf_space_image_payload(base_url: str, image_path: Path, *, timeout: int) -> dict[str, Any]:
+    png = _hosted_png(image_path)
     boundary = f"----gradio-upload-{uuid.uuid4().hex}"
-    mime = mimetypes.guess_type(image_path.name)[0] or "application/octet-stream"
-    filename = image_path.name.replace('"', "%22")
     body = (
         (
             f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="files"; filename="{filename}"\r\n'
-            f"Content-Type: {mime}\r\n\r\n"
+            'Content-Disposition: form-data; name="files"; filename="image.png"\r\n'
+            "Content-Type: image/png\r\n\r\n"
         ).encode()
-        + image_path.read_bytes()
+        + png
         + f"\r\n--{boundary}--\r\n".encode()
     )
     headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
@@ -613,9 +682,9 @@ def _hf_space_image_payload(base_url: str, image_path: Path, *, timeout: int) ->
 
     item = uploaded[0] if isinstance(uploaded, list) and uploaded else uploaded
     payload = dict(item) if isinstance(item, dict) else {"path": item}
-    payload.setdefault("orig_name", image_path.name)
-    payload.setdefault("size", image_path.stat().st_size)
-    payload.setdefault("mime_type", mime)
+    payload["orig_name"] = "image.png"
+    payload["size"] = len(png)
+    payload["mime_type"] = "image/png"
     payload.setdefault("is_stream", False)
     payload.setdefault("meta", {"_type": "gradio.FileData"})
     return payload
@@ -716,7 +785,7 @@ def _call_hf_space_endpoint(
 
     stream_url = f"{base_url}/gradio_api/queue/data?{urlencode({'session_hash': session_hash})}"
     try:
-        with urlopen(Request(stream_url), timeout=timeout) as response:
+        with _open_space(Request(stream_url), timeout) as response:
             return _stream_hf_space_response(response)
     except HTTPError as e:
         detail = e.read().decode("utf-8", "replace")
@@ -780,7 +849,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--backend",
         choices=["local", "hf-space-api"],
         default="local",
-        help="Inference backend. Defaults to local Hugging Face Transformers.",
+        help="Defaults to local. hf-space-api sends the prompt and image pixels to a public Space.",
     )
     parser.add_argument(
         "--out-dir",

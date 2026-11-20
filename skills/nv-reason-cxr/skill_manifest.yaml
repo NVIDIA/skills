@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -138,9 +138,10 @@ runtime:
         Runtime setup commands may install packages into the active Python
         environment. That is acceptable only when the caller chooses that
         environment; benchmark and evidence runs should use a fresh per-run
-        environment. The hf-space-api backend is public and uses only the
-        Python standard library, with no local PyTorch, Transformers, CUDA,
-        model cache, or Hugging Face token required.
+        environment. The hf-space-api backend uses Pillow to send re-encoded image
+        pixels and the prompt to a public Space. Use only inputs cleared for
+        public sharing. Local model packages, a GPU, and a token are optional
+        for this backend.
     env_required: []
     env_optional:
       - MOCK_NV_REASON_CXR

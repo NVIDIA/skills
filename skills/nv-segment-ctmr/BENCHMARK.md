@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nv-segment-ctmr`
-- Evaluation date: 2026-09-14
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 2 evaluation tasks (2 positive)
 - Dataset digest: `sha256:d9381987f6fd5c438605f95aa26c4d59861ee8ddca4c7510f334009092399308` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| nv-segment-ctmr | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-segment-ctmr | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-segment-ctmr | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-segment-ctmr | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-segment-ctmr | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `nv-segment-ctmr`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,27 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 88.7% — baseline ran, but no comparable score was available; uplift unavailable | 79.7% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 50.0% (-50.0 points) |
-| Correctness | 30.0% → 100.0% (+70.0 points) | 80.0% → 100.0% (+20.0 points) |
-| Discoverability | 95.0% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 26.0% → 66.7% (+40.7 points) | 27.1% → 95.0% (+67.9 points) |
-| Efficiency | 81.6% — baseline ran, but no comparable score was available; uplift unavailable | 68.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 94.2% — baseline ran, but no comparable score was available; uplift unavailable | 83.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 40.0% → 100.0% (+60.0 points) | 50.0% → 80.0% (+30.0 points) |
+| Discoverability | 97.5% — baseline ran, but no comparable score was available; uplift unavailable | 95.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 22.9% → 75.0% (+52.1 points) | 56.3% → 56.3% (±0.0 points) |
+| Efficiency | 98.2% — baseline ran, but no comparable score was available; uplift unavailable | 87.0% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.4% → 96.5% (-1.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 90.5% → 90.6% (+0.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -52,22 +78,22 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 453,658 | 1,073,166 | N/A | N/A | skill 2/2; base 4/4 |
-| claude-code | mri-brain-preprocessing-caveat | 186,926 | 253,730 | -66,804 | -26.33% | skill 1/1; base 1/1 |
-| claude-code | run-ct-body-segmentation | 266,732 | 819,436 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 726,469 | 556,735 | +169,734 | +30.49% | skill 2/2; base 2/2 |
-| codex | mri-brain-preprocessing-caveat | 98,028 | 88,299 | +9,729 | +11.02% | skill 1/1; base 1/1 |
-| codex | run-ct-body-segmentation | 628,441 | 468,436 | +160,005 | +34.16% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 1,180,127 | 1,629,901 | N/A | N/A | skill 4/4; base 6/6 |
+| claude-code | All cases | 309,629 | 215,011 | +94,618 | +44.01% | skill 2/2; base 2/2 |
+| claude-code | mri-brain-preprocessing-caveat | 154,645 | 107,669 | +46,976 | +43.63% | skill 1/1; base 1/1 |
+| claude-code | run-ct-body-segmentation | 154,984 | 107,342 | +47,642 | +44.38% | skill 1/1; base 1/1 |
+| codex | All cases | 117,273 | 96,430 | +20,843 | +21.61% | skill 2/2; base 2/2 |
+| codex | mri-brain-preprocessing-caveat | 51,582 | 35,475 | +16,107 | +45.40% | skill 1/1; base 1/1 |
+| codex | run-ct-body-segmentation | 65,691 | 60,955 | +4,736 | +7.77% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 426,902 | 311,441 | +115,461 | +37.07% | skill 4/4; base 4/4 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 11 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 13 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 2 task(s) |
 
 ## Findings and Observations
@@ -75,30 +101,29 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and scripts/run_ctmr.py:
+  "## Purpose" in SKILL.md (lines 3-7)
+  vs "## Available Scripts" in SKILL.md (lines 14-18)
+  vs "## Exact Runnable Surface" in SKILL.md (lines 46-62)
+  vs "## Usage" in SKILL.md (lines 114-152)
+  vs "(module docstring)" in scripts/run_ctmr.py (lines 1-9) (`SKILL.md:3`)
 - **MEDIUM** SCHEMA/body_recommended_section: Missing recommended section: '## Examples' (`skills/nv-segment-ctmr/SKILL.md`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
+- **MEDIUM** SECURITY/skillspector_execution_failure: skillspector scan did not execute reliably (agent-control analysis limitation): SKILL.md [static; static_parse_limit; analyzers=static_patterns_tool_misuse]: A security-relevant expression could not be fully resolved by the bounded static parser. SkillSpector could not determine this command or code fragment's boundaries. Check: command argument boundary; location: reported source range; unchecked scope: command arguments. Relevant parser input fully checked. (`.`)
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
             ["git", "rev-parse", "HEAD"],
             cwd=str(root),
             env=_child_process_env(),
             capture_output=True,
             text=True,
-       (`scripts/run_ctmr.py:111`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
-            cmd,
-            cwd=str(resolved_root),
-            env=run_env,
+            timeout=i (`scripts/run_ctmr.py:111`)
+- **MEDIUM** SECURITY/Tainted flow: 'root' from os.environ.get (line 635, credential/environment) → subprocess.run (code execution) (TT2): Data Flow: subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(root),
+            env=_child_process_env(),
             capture_output=True,
             text=True,
-            timeout=timeout_seconds (`scripts/run_ctmr.py:590`)
-- **MEDIUM** SECURITY/Tainted flow: 'resolved_root' from os.environ.get (line 539, credential/environment) → subprocess.run (code execution) (TT2): Data Flow:         proc = subprocess.run(
-            cmd,
-            cwd=str(resolved_root),
-            env=run_env,
-            capture_output=True,
-            text=True,
-            timeout=timeout_seconds (`scripts/run_ctmr.py:590`)
-- **LOW** QUALITY/quality_reliability: Inputs are used but no dedicated Inputs section is documented (`skills/nv-segment-ctmr/SKILL.md`)
-- 6 additional finding(s) are available in the full evaluation artifacts.
+            timeout=i (`scripts/run_ctmr.py:111`)
+- 9 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

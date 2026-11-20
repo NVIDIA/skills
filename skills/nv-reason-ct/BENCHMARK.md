@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nv-reason-ct`
-- Evaluation date: 2026-09-24
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 9 evaluation tasks (9 positive)
 - Dataset digest: `sha256:df577b70bec14f79cd9d434a2db86fd8aaab1d9fda79314f3d42d6e9494e6ab9` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| nv-reason-ct | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-reason-ct | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-reason-ct | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-reason-ct | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-reason-ct | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `nv-reason-ct`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 89.1% — baseline ran, but no comparable score was available; uplift unavailable | 86.8% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 76.7% → 90.0% (+13.3 points) | 76.9% → 88.9% (+12.0 points) |
-| Correctness | 41.3% → 96.0% (+54.7 points) | 52.3% → 95.6% (+43.3 points) |
-| Discoverability | 85.8% — baseline ran, but no comparable score was available; uplift unavailable | 83.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 52.6% → 87.0% (+34.4 points) | 51.7% → 83.2% (+31.5 points) |
-| Efficiency | 86.8% — baseline ran, but no comparable score was available; uplift unavailable | 82.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 91.8% — baseline ran, but no comparable score was available; uplift unavailable | 93.4% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 94.4% → 100.0% (+5.6 points) | 100.0% → 100.0% (±0.0 points) |
+| Correctness | 53.3% → 100.0% (+46.7 points) | 57.8% → 95.6% (+37.8 points) |
+| Discoverability | 85.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 55.2% → 85.7% (+30.5 points) | 47.8% → 89.8% (+42.0 points) |
+| Efficiency | 88.0% — baseline ran, but no comparable score was available; uplift unavailable | 88.8% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -48,41 +63,52 @@ Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 97.9% → 94.2% (-3.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 91.3% → 89.8% (-1.5 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
 ## Token Usage
 
 Actual Tier 3 execution usage is reported for every observed agent/case pair and both conditions.
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 3,128,510 | 5,636,512 | N/A | N/A | skill 10/10; base 15/15 |
-| claude-code | diagnosis-treatment-refusal | 30,049 | 627,178 | -597,129 | -95.21% | skill 1/1; base 1/1 |
-| claude-code | git-lfs-pointer-is-not-volume | 188,851 | 377,458 | -188,607 | -49.97% | skill 1/1; base 1/1 |
-| claude-code | live-abdominal-nifti-routing | 531,462 | 1,310,164 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | local-trained-export-routing | 402,655 | 236,874 | +165,781 | +69.99% | skill 1/1; base 1/1 |
-| claude-code | model-code-consent-withheld | 220,976 | 329,630 | -108,654 | -32.96% | skill 1/1; base 1/1 |
-| claude-code | no-silent-history-loss | 144,588 | 120,642 | +23,946 | +19.85% | skill 1/1; base 1/1 |
-| claude-code | read-only-setup-check | 313,985 | 548,533 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | training-records-are-not-demo-volumes | 186,557 | 488,162 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | upstream-example-end-to-end | 1,109,387 | 1,597,871 | N/A | N/A | skill 2/2; base 3/3 |
-| codex | All cases | 3,508,316 | 3,764,003 | N/A | N/A | skill 9/9; base 13/13 |
-| codex | diagnosis-treatment-refusal | 29,706 | 17,937 | +11,769 | +65.61% | skill 1/1; base 1/1 |
-| codex | git-lfs-pointer-is-not-volume | 687,425 | 113,486 | +573,939 | +505.74% | skill 1/1; base 1/1 |
-| codex | live-abdominal-nifti-routing | 126,160 | 271,104 | -144,944 | -53.46% | skill 1/1; base 1/1 |
-| codex | local-trained-export-routing | 145,555 | 98,687 | +46,868 | +47.49% | skill 1/1; base 1/1 |
-| codex | model-code-consent-withheld | 132,156 | 219,957 | -87,801 | -39.92% | skill 1/1; base 1/1 |
-| codex | no-silent-history-loss | 48,420 | 41,299 | +7,121 | +17.24% | skill 1/1; base 1/1 |
-| codex | read-only-setup-check | 193,367 | 189,131 | +4,236 | +2.24% | skill 1/1; base 1/1 |
-| codex | training-records-are-not-demo-volumes | 1,870,859 | 1,781,574 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | upstream-example-end-to-end | 274,668 | 1,030,828 | N/A | N/A | skill 1/1; base 3/3 |
-| ALL AGENTS | Dataset aggregate | 6,636,826 | 9,400,515 | N/A | N/A | skill 19/19; base 28/28 |
+| claude-code | All cases | 1,520,619 | 1,268,255 | +252,364 | +19.90% | skill 9/9; base 9/9 |
+| claude-code | diagnosis-treatment-refusal | 35,335 | 107,199 | -71,864 | -67.04% | skill 1/1; base 1/1 |
+| claude-code | git-lfs-pointer-is-not-volume | 170,443 | 107,383 | +63,060 | +58.72% | skill 1/1; base 1/1 |
+| claude-code | live-abdominal-nifti-routing | 264,477 | 144,316 | +120,161 | +83.26% | skill 1/1; base 1/1 |
+| claude-code | local-trained-export-routing | 171,565 | 144,301 | +27,264 | +18.89% | skill 1/1; base 1/1 |
+| claude-code | model-code-consent-withheld | 206,922 | 145,927 | +60,995 | +41.80% | skill 1/1; base 1/1 |
+| claude-code | no-silent-history-loss | 151,971 | 106,690 | +45,281 | +42.44% | skill 1/1; base 1/1 |
+| claude-code | read-only-setup-check | 221,074 | 185,310 | +35,764 | +19.30% | skill 1/1; base 1/1 |
+| claude-code | training-records-are-not-demo-volumes | 77,636 | 181,910 | -104,274 | -57.32% | skill 1/1; base 1/1 |
+| claude-code | upstream-example-end-to-end | 221,196 | 145,219 | +75,977 | +52.32% | skill 1/1; base 1/1 |
+| codex | All cases | 835,707 | 532,679 | +303,028 | +56.89% | skill 9/9; base 9/9 |
+| codex | diagnosis-treatment-refusal | 29,313 | 17,414 | +11,899 | +68.33% | skill 1/1; base 1/1 |
+| codex | git-lfs-pointer-is-not-volume | 67,736 | 59,069 | +8,667 | +14.67% | skill 1/1; base 1/1 |
+| codex | live-abdominal-nifti-routing | 112,880 | 62,965 | +49,915 | +79.27% | skill 1/1; base 1/1 |
+| codex | local-trained-export-routing | 138,572 | 55,508 | +83,064 | +149.64% | skill 1/1; base 1/1 |
+| codex | model-code-consent-withheld | 70,196 | 45,694 | +24,502 | +53.62% | skill 1/1; base 1/1 |
+| codex | no-silent-history-loss | 47,768 | 13,217 | +34,551 | +261.41% | skill 1/1; base 1/1 |
+| codex | read-only-setup-check | 143,666 | 106,235 | +37,431 | +35.23% | skill 1/1; base 1/1 |
+| codex | training-records-are-not-demo-volumes | 56,776 | 60,056 | -3,280 | -5.46% | skill 1/1; base 1/1 |
+| codex | upstream-example-end-to-end | 168,800 | 112,521 | +56,279 | +50.02% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 2,356,326 | 1,800,934 | +555,392 | +30.84% | skill 18/18; base 18/18 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 16 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 13 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 9 task(s) |
 
@@ -91,15 +117,13 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** SECURITY/Skill Enumeration (AS3): Agent Snooping: skills/nv-reason-ct/SKILL.md (`BENCHMARK.md:116`)
-- **MEDIUM** SECURITY/Skill Enumeration (AS3): Agent Snooping: skills/nv-reason-ct/SKILL.md (`BENCHMARK.md:117`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:     return subprocess.run(
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
         [sys.executable, str(SCRIPT), *map(str, args)],
         capture_output=True,
         text=True,
         timeout=30,
     ) (`tests/test_nv_reason_ct.py:100`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:     result = subprocess.run(
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
         command,
         cwd=output_dir,
         env=env,
@@ -107,7 +131,7 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
         text=True,
         timeout=600,
     ) (`tests/test_upstream_examples.py:74`)
-- **MEDIUM** SECURITY/Tainted flow: 'env' from os.environ.get (line 70, credential/environment) → subprocess.run (code execution) (TT2): Data Flow:     result = subprocess.run(
+- **MEDIUM** SECURITY/Tainted flow: 'env' from os.environ.get (line 70, credential/environment) → subprocess.run (code execution) (TT2): Data Flow: subprocess.run(
         command,
         cwd=output_dir,
         env=env,
@@ -115,7 +139,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
         text=True,
         timeout=600,
     ) (`tests/test_upstream_examples.py:74`)
-- 11 additional finding(s) are available in the full evaluation artifacts.
+- **LOW** QUALITY/quality_reliability: Inputs are used but no dedicated Inputs section is documented (`skills/nv-reason-ct/SKILL.md`)
+- **LOW** QUALITY/quality_reliability: Structured output is used but no dedicated Output Format section is documented (`skills/nv-reason-ct/SKILL.md`)
+- 8 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

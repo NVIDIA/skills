@@ -1,0 +1,120 @@
+{
+  "skill_name": "cudnn-compile-and-serialize",
+  "evals": [
+    {
+      "id": "cudnn-compile-and-serialize-binary-round-trip",
+      "prompt": "Review this cuDNN Frontend C++ cache code: `std::string payload; graph.serialize(payload); fe::graph::Graph restored; restored.deserialize(handle, payload);`. I need a built executable plan that can run after reload, not only the graph definition. Explain the correct serialization type and the required preparation, reload, and binding steps. Do not run GPU code.",
+      "expected_output": "Use the executable-plan binary serialization path with std::vector<uint8_t>, after building and selecting a supported plan. Restore it, query workspace, and bind fresh buffers by stable tensor UID. Structural JSON alone does not establish a built executable plan.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Distinguishes structural graph JSON from binary executable-plan serialization.",
+        "Builds and selects a supported candidate before serialization and propagates failed statuses.",
+        "Queries restored workspace and rebuilds UID-to-pointer bindings instead of reusing saved addresses."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-parallel-build-race",
+      "prompt": "Our selected cuDNN Frontend revision writes a plain shared `plans.candidate` field in build_plan_at_index(i), and its do_multithreaded_builds=true path returns an error. We currently launch eight threads that call build_plan_at_index on the same Graph and serialize whichever thread finishes last. Propose a safe bounded parallel design without adding a scheduler library.",
+      "expected_output": "Use separate fully constructed Graph state per worker, with worker-owned handle/device context where needed. Match engine/configuration identity rather than assuming candidate indices agree across graph queries. Join workers, collect errors, select a successful result explicitly, and serialize its associated graph.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Removes concurrent mutation of the same Graph and does not enable the unsupported multithreaded flag.",
+        "Uses bounded workers with independent graph state and handles when handle-based builds are used.",
+        "Keeps each plan result attached to its graph and selects it explicitly after collecting worker outcomes.",
+        "Does not claim that a lock around every build provides compilation speedup."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-deviceless-deployment",
+      "prompt": "We want cuDNN Frontend AOT builds on a CPU-only build farm. Someone proposed capturing target DeviceProperties on the CPU node, shipping the plan to any GPU, then executing without a cuDNN handle. Explain what must change and what the CPU workers still need. Do not execute anything.",
+      "expected_output": "Capture target device properties on a compatible GPU, compile on a CPU node with those properties plus supported cuDNN/compiler dependencies, then load and execute on a compatible GPU with a handle, fresh buffers, and workspace. Artifacts are not universally portable.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Separates GPU property capture, CPU compilation, and GPU execution into three stages.",
+        "States that CPU compilation still needs supported cuDNN libraries and compilation dependencies.",
+        "Requires a compatible execution GPU and a cuDNN handle for execution.",
+        "Rejects unrestricted portability across GPUs and software versions."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-heuristics-versus-tuning",
+      "prompt": "In cuDNN Frontend C++, I used BuildPlanPolicy_t::ALL and assumed the active candidate must be the fastest plan. I also copied the sample's RUNTIME_COMPILATION-only filter. I need lowest measured GPU latency, including precompiled engines, under a workspace cap. Describe the corrected plan selection and timing procedure.",
+      "expected_output": "ALL builds candidates but does not measure their latency. Apply the workspace/numerical constraints, retain eligible precompiled engines, benchmark successful plans with valid bindings and synchronized GPU timing, then select the measured winner explicitly.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Does not equate ALL or HEURISTICS_CHOICE with measured autotuning.",
+        "Removes the sample-specific runtime-compilation filter when it would exclude eligible plans.",
+        "Preserves workspace and numerical requirements while ranking only successful candidates.",
+        "Separates host compilation timing from synchronized GPU execution timing."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-cross-process-bindings",
+      "prompt": "Process A serialized cuDNN Frontend candidate 7. Process B deserializes it, calls execute_plan_at_index with 7, and reuses a saved map of tensor object addresses to GPU pointers from A. Explain how to fix the cross-process contract. Include scalar and workspace lifetimes.",
+      "expected_output": "Persist stable nonvirtual tensor UIDs and a tensor contract rather than addresses. The restored selected plan uses index zero in the described API behavior. Allocate fresh buffers and queried workspace, recreate UID bindings, and retain buffers and pass-by-value host scalars until GPU work completes.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Does not reuse source-process object addresses or device pointers as the cross-process interface.",
+        "Does not carry source candidate index 7 into the restored graph.",
+        "Uses stable explicit tensor UIDs and records dimensions, strides, datatypes, and pass-by-value needs.",
+        "Queries restored workspace and preserves scalar, buffer, and workspace lifetimes through execution."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-cache-failure-policy",
+      "prompt": "Our cuDNN C++ service loads a plan file at startup. A cache miss may rebuild, but malformed or incompatible files must return an error unless the caller opts into rebuilding. Files may be read during another process's write. Propose the cache I/O and compatibility policy, without implementing a cache server.",
+      "expected_output": "Use binary I/O, validate read/write results, and publish completed files atomically. Record graph/tensor contract, target properties, software/compiler environment, and plan filters. Distinguish a permitted miss from malformed/incompatible data, preserve the caller's fallback policy, and measure cache hits without hidden compilation.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Uses a temporary file and atomic publication after successful serialization.",
+        "Checks I/O and identifies malformed, truncated, or incompatible artifacts.",
+        "Preserves the different caller policies for cache misses and invalid files.",
+        "Includes graph, device, version, and plan-filter compatibility metadata without promising universal portability."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-version-and-skip-evidence",
+      "prompt": "Assess this cuDNN Frontend validation report: 'Our headers expose handle-less deserialize starting at cuDNN 9.8, so full deviceless AOT is verified on backend 9.8. We ran all stages on a GPU host. Parallel build printed SKIP, so parallel compilation passed.' The selected sample gates device-property serialization at 9.11. State what can be claimed and which measurements are missing.",
+      "expected_output": "The report does not establish full AOT support on 9.8, CPU-only middle-stage execution, or parallel-build correctness/performance. Verify headers and loaded backend, exercise the policy-supported runtime, run compilation with no GPU accessible, and use an enabled opt-in parallel harness. A skip is not a pass.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Distinguishes the 9.8 API floor from the sample's 9.11 runtime policy.",
+        "Requires execution of the middle stage with no GPU accessible before claiming a CPU-only deployment.",
+        "Reports the skipped parallel sample as unavailable coverage rather than a pass.",
+        "Names loaded backend/header versions and actual commands as evidence to record."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-status-preserving-fragment",
+      "prompt": "Write a corrected cuDNN Frontend C++ fragment for this API contract: build_plan_at_index(int64_t), serialize(std::vector<uint8_t>&), deserialize(cudnnHandle_t, std::vector<uint8_t> const&), and get_workspace_size(int64_t&) return error_t with is_bad(); assume these are the selected revision's signatures. Inputs are a prepared graph, a valid handle, and selected_index. The broken sketch ignores all errors, serializes to std::vector<char>, and executes with old tensor pointers. Return each failed status to the caller, restore into a new graph, and query its workspace. There are no headers or GPU in this exercise; label the result accordingly.",
+      "expected_output": "A C++ integration fragment checks and returns every failed status, builds the requested candidate, serializes into std::vector<uint8_t>, deserializes into a fresh Graph, and queries int64_t workspace size. It does not execute with old bindings and identifies the fragment as uncompiled/GPU-unverified.",
+      "expected_skill": "cudnn-compile-and-serialize",
+      "assertions": [
+        "Checks the result of build_plan_at_index, serialize, deserialize, and get_workspace_size.",
+        "Uses std::vector<uint8_t> for binary plan bytes.",
+        "Restores a distinct Graph and queries its workspace before any execution.",
+        "Does not claim compilation or GPU execution passed in this exercise."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-negative-python-install",
+      "prompt": "Give a short plan to install the cuDNN Python frontend and a compatible backend into an existing virtual environment. Do not discuss C++ graph serialization or ahead-of-time compilation.",
+      "expected_output": "Identify the target interpreter/environment and compatibility constraints, use the matching frontend/backend distributions, and propose verification without unrelated plan-cache or compilation instructions.",
+      "expected_skill": null,
+      "assertions": [
+        "Keeps the answer on Python package installation and compatibility.",
+        "Does not expand the request into C++ graph compilation or serialization."
+      ]
+    },
+    {
+      "id": "cudnn-compile-and-serialize-negative-dataloader-workers",
+      "prompt": "My PyTorch DataLoader is slow while reading JPEG files from disk. Explain how to assess num_workers, pinned memory, and input I/O. I am not building cuDNN graphs or changing model kernels.",
+      "expected_output": "Give focused input-pipeline profiling guidance on worker count, host memory transfer, and disk/decoding bottlenecks.",
+      "expected_skill": null,
+      "assertions": [
+        "Addresses data loading and I/O measurement.",
+        "Does not propose cuDNN execution-plan serialization or parallel plan compilation as the DataLoader fix."
+      ]
+    }
+  ]
+}

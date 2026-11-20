@@ -9,17 +9,32 @@ Recommended for publication based on the completed evaluation evidence in this r
 ## Evaluation Metadata
 
 - Skill: `nv-generate-mr-brain`
-- Evaluation date: 2026-09-14
-- Evaluator version: `1.5.6`
-- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-4-8`), Codex (`openai/openai/gpt-5.5`)
+- Validation status: `passed`
+- Evaluation date: 2026-11-20
+- Evaluator version: `1.6.10`
+- Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
 - Tasks: 3 evaluation tasks (3 positive)
 - Dataset digest: `sha256:cd7314cae4d2269a61962e6b3e8e7cc821983453218701162a4526ceecd5ee28` (skill-evaluator-dataset-snapshot/1)
-- Attempts per task: 3
+- Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
 - Tier 3 evidence: required for publication
 
 Each task attempt ran in its own isolated sandbox pod.
+
+## Tier 1 LLM Provenance
+
+SkillSpector provider, model, analyzer revision, and determinism evidence retained for this scan.
+
+| Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
+| --- | --- | --- | --- | --- | --- | --- |
+| nv-generate-mr-brain | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| nv-generate-mr-brain | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+
+- Controls for `nv-generate-mr-brain`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
 ## What This Report Answers
 
@@ -35,16 +50,27 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 97.3% — baseline ran, but no comparable score was available; uplift unavailable | 97.6% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 20.0% → 100.0% (+80.0 points) | 36.0% → 100.0% (+64.0 points) |
-| Discoverability | 91.7% — baseline ran, but no comparable score was available; uplift unavailable | 93.3% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 18.4% → 96.7% (+78.3 points) | 38.0% → 96.7% (+58.7 points) |
-| Efficiency | 98.0% — baseline ran, but no comparable score was available; uplift unavailable | 98.2% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 99.7% — baseline ran, but no comparable score was available; uplift unavailable | 91.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 66.7% → 100.0% (+33.3 points) |
+| Correctness | 6.7% → 100.0% (+93.3 points) | 73.3% → 93.3% (+20.0 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 91.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 9.7% → 100.0% (+90.3 points) | 68.9% → 74.5% (+5.6 points) |
+| Efficiency | 98.3% — baseline ran, but no comparable score was available; uplift unavailable | 95.9% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
 Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| claude-code | Efficiency | Token-only comparison | 98.5% → 96.7% (-1.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 88.6% → 91.7% (+3.1 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -52,24 +78,24 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 430,102 | 1,920,822 | N/A | N/A | skill 3/3; base 8/8 |
-| claude-code | generate-brain-mra-v1 | 205,531 | 658,031 | N/A | N/A | skill 1/1; base 3/3 |
-| claude-code | generate-brain-mri-t1 | 99,119 | 869,013 | N/A | N/A | skill 1/1; base 2/2 |
-| claude-code | skull-stripped-modality-supported | 125,452 | 393,778 | N/A | N/A | skill 1/1; base 3/3 |
-| codex | All cases | 124,659 | 244,322 | N/A | N/A | skill 3/3; base 5/5 |
-| codex | generate-brain-mra-v1 | 48,632 | 102,435 | -53,803 | -52.52% | skill 1/1; base 1/1 |
-| codex | generate-brain-mri-t1 | 46,409 | 52,860 | -6,451 | -12.20% | skill 1/1; base 1/1 |
-| codex | skull-stripped-modality-supported | 29,618 | 89,027 | N/A | N/A | skill 1/1; base 3/3 |
-| ALL AGENTS | Dataset aggregate | 554,761 | 2,165,144 | N/A | N/A | skill 6/6; base 13/13 |
+| claude-code | All cases | 305,602 | 321,903 | -16,301 | -5.06% | skill 3/3; base 3/3 |
+| claude-code | generate-brain-mra-v1 | 114,878 | 106,806 | +8,072 | +7.56% | skill 1/1; base 1/1 |
+| claude-code | generate-brain-mri-t1 | 115,349 | 108,040 | +7,309 | +6.77% | skill 1/1; base 1/1 |
+| claude-code | skull-stripped-modality-supported | 75,375 | 107,057 | -31,682 | -29.59% | skill 1/1; base 1/1 |
+| codex | All cases | 157,629 | 144,357 | +13,272 | +9.19% | skill 3/3; base 3/3 |
+| codex | generate-brain-mra-v1 | 47,743 | 68,273 | -20,530 | -30.07% | skill 1/1; base 1/1 |
+| codex | generate-brain-mri-t1 | 47,863 | 38,243 | +9,620 | +25.15% | skill 1/1; base 1/1 |
+| codex | skull-stripped-modality-supported | 62,023 | 37,841 | +24,182 | +63.90% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 463,231 | 466,260 | -3,029 | -0.65% | skill 6/6; base 6/6 |
 
-Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. N/A means the relevant trajectory counters were not available; coverage is never estimated.
+Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
 ## Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
 | Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 15 finding(s) |
-| Tier 2 | Semantic deduplication | **PASSED** | 2 validator(s); 0 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 3 task(s) |
 
 ## Findings and Observations
@@ -77,35 +103,44 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 <details>
 <summary>Show detailed findings and successful checks</summary>
 
-- **MEDIUM** SECURITY/Skill Enumeration (AS3): Agent Snooping: skills/nv-generate-mr-brain/SKILL.md (`BENCHMARK.md:75`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and fixtures/README.md and scripts/run_mr_brain.py:
+  "## Purpose" in SKILL.md (lines 3-8)
+  vs "## Instructions" in SKILL.md (lines 9-25)
+  vs "## Examples" in SKILL.md (lines 26-40)
+  vs "## Available Scripts" in SKILL.md (lines 41-45)
+  vs "## Limitations" in SKILL.md (lines 51-56)
+  vs "## Exact Runnable Surface" in SKILL.md (lines 72-83)
+  vs "## Usage" in SKILL.md (lines 140-185)
+  vs "# Curated Fixture Catalog - `nv_generate_mr_brain`" in fixtures/README.md (lines 1-27)
+  vs "(module docstring)" in scripts/run_mr_brain.py (lines 1-10)
+  vs "main()" in scripts/run_mr_brain.py (lines 557-815) (`SKILL.md:3`)
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
             ["git", "rev-parse", "HEAD"],
             cwd=str(root),
             env=_child_process_env(),
             check=False,
             capture_output=True,
-     (`scripts/run_mr_brain.py:160`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
+            text=Tr (`scripts/run_mr_brain.py:160`)
+- **MEDIUM** SECURITY/Tainted flow: 'root' from os.environ.get (line 193, credential/environment) → subprocess.run (code execution) (TT2): Data Flow: subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(root),
+            env=_child_process_env(),
+            check=False,
+            capture_output=True,
+            text=Tr (`scripts/run_mr_brain.py:160`)
+- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution: subprocess.run(
             ["git", "status", "--porcelain", "--untracked-files=no"],
             cwd=str(root),
             env=_child_process_env(),
             check=False,
-          (`scripts/run_mr_brain.py:178`)
-- **MEDIUM** SECURITY/subprocess module call (AST4): Dangerous Code Execution:         proc = subprocess.run(
-            cmd,
-            cwd=str(upstream_root),
-            env=run_env,
-            capture_output=True,
-            text=True,
-            timeout=timeout_seconds (`scripts/run_mr_brain.py:734`)
-- **MEDIUM** SECURITY/Tainted flow: 'cmd' from os.environ.get (line 718, credential/environment) → subprocess.run (code execution) (TT2): Data Flow:         proc = subprocess.run(
-            cmd,
-            cwd=str(upstream_root),
-            env=run_env,
-            capture_output=True,
-            text=True,
-            timeout=timeout_seconds (`scripts/run_mr_brain.py:734`)
-- 10 additional finding(s) are available in the full evaluation artifacts.
+            capture_outp (`scripts/run_mr_brain.py:178`)
+- **MEDIUM** SECURITY/Tainted flow: 'root' from os.environ.get (line 194, credential/environment) → subprocess.run (code execution) (TT2): Data Flow: subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=str(root),
+            env=_child_process_env(),
+            check=False,
+            capture_outp (`scripts/run_mr_brain.py:178`)
+- 11 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 
