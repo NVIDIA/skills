@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: NeMo Gym
+repo: NVIDIA-NeMo/Gym
+description: Build RL training environments, evaluate models and agents in them, and profile per-task rewards to choose RL training tasks.
+links:
+  discussions: false
+skills:
+  - path: skills/nemo-gym-reward-profiling/
+    catalog_dir: nemo-gym-reward-profiling
