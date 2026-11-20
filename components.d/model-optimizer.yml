@@ -1,0 +1,8 @@
+name: Model Optimizer
+repo: NVIDIA/Model-Optimizer
+description: Search quantization recipes and coordinate Day-0 model release validation with NVIDIA Model Optimizer.
+skills:
+  - path: skills/modelopt-quant-recipe-search/
+    catalog_dir: modelopt-quant-recipe-search
+  - path: skills/modelopt-day0-release/
+    catalog_dir: modelopt-day0-release
