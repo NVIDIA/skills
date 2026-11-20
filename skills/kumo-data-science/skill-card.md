@@ -1,5 +1,5 @@
 ## Description: <br>
-Routes KumoAI requests on relational data in a warehouse, object store, or local files: it gates a new model through multi-turn intake (data, outcome, time window, then inferred graph and task confirmation) and generates one notebook or script that trains then predicts, runs it only on explicit request, and routes graph inspection, explanations, diagnostics, persistence, custom populations, tuning, and Kumo job requests to their workflows. <br>
+Use for KumoAI graphs and predictive models on relational data in a warehouse, an object store or local files: inspect, visualize or export a graph's schema and relationships; train a model, score data with a trained one, explain its predictions, diagnose its training, publish, reload or retain it, train or score on custom labels or rows, or tune it. <br>
 
 This skill is ready for commercial/non-commercial use. <br>
 
@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers, data scientists, and ML engineers use this skill to have an agent turn a plain-language predictive request (churn, propensity, fraud, recommendation, forecasting, link prediction) into a confirmed KumoAI task and graph and a runnable training or batch-inference notebook or script, and to route follow-up model and job requests. <br>
+Developers and data scientists use this skill to turn a plain-language predictive request (churn, propensity, fraud, recommendation, forecasting, link prediction) on relational data into a confirmed task and graph, then generate one runnable KumoAI notebook or script, running it only on explicit request. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -25,23 +25,22 @@ Risk: Review before execution as proposals could introduce incorrect or misleadi
 Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
-- [Kumo Engine documentation](https://docs.nvidia.com/sdgm/kumo-engine/get-started-with-kumo-engine/overview) <br>
-- [kumo-engine on PyPI](https://pypi.org/project/kumo-engine/) <br>
-- [NVIDIA/kumo-engine#134 (graph visualization)](https://github.com/NVIDIA/kumo-engine/pull/134) <br>
 - [accept/intake_contract.md](accept/intake_contract.md) <br>
 - [accept/preflight.md](accept/preflight.md) <br>
-- [accept/semantic_view.md](accept/semantic_view.md) <br>
 - [accept/batch_inference.md](accept/batch_inference.md) <br>
+- [accept/semantic_view.md](accept/semantic_view.md) <br>
 - [validate/atomic_question_check.md](validate/atomic_question_check.md) <br>
 - [hosts/generic/adapter.md](hosts/generic/adapter.md) <br>
 - [hosts/generic/runtime.md](hosts/generic/runtime.md) <br>
+- [NVIDIA/kumo-engine#134 (graph visualization)](https://github.com/NVIDIA/kumo-engine/pull/134) <br>
+- [Kumo Engine documentation](https://docs.nvidia.com/sdgm/kumo-engine/get-started-with-kumo-engine/overview) <br>
 
 
 ## Skill Output: <br>
 **Output Type(s):** [Analysis, Code, Files] <br>
-**Output Format:** [Markdown intake replies (ask-back, graph proposal, task restatement) and one generated Jupyter notebook or Python script] <br>
+**Output Format:** [Markdown (intake proposals and confirmations) and a Python notebook or script] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Generates no Kumo SDK code before the task is confirmed; generated artifacts run only on explicit user request] <br>
+**Other Properties Related to Output:** [Generates exactly one artifact; executes it only on explicit user request] <br>
 
 ## Evaluation Agents Used: <br>
 - Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
@@ -50,7 +49,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-8 evaluation tasks (7 positive, 1 negative), 1 attempt per task, each attempt in an isolated sandbox pod (`k8s-sandbox`), compared against a no-skill baseline. Evaluator version `1.6.10`, evaluation date 2026-11-19; dataset digest `sha256:f72dc6983fe9c6ff4f46b5d40bebd4ceb50356c04e83ebc88dc2cd383486d627` (skill-evaluator-dataset-snapshot/1). <br>
+8 evaluation tasks (7 positive, 1 negative); 1 attempt per task, each in its own isolated sandbox pod (`k8s-sandbox`), compared against a no-skill baseline. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -82,14 +81,16 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 98.7% — baseline ran, but no comparable score was available; uplift unavailable | 94.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 75.0% → 100.0% (+25.0 points) |
-| Correctness | 52.5% → 97.5% (+45.0 points) | 50.0% → 95.0% (+45.0 points) |
-| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.9% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 39.3% → 100.0% (+60.7 points) | 37.8% → 86.6% (+48.8 points) |
-| Efficiency | 96.1% — baseline ran, but no comparable score was available; uplift unavailable | 95.3% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 97.6% — baseline ran, but no comparable score was available; uplift unavailable | 93.7% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 100.0% → 100.0% (±0.0 points) | 81.3% → 100.0% (+18.7 points) |
+| Correctness | 55.0% → 100.0% (+45.0 points) | 47.5% → 95.0% (+47.5 points) |
+| Discoverability | 100.0% — baseline ran, but no comparable score was available; uplift unavailable | 92.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 43.6% → 93.8% (+50.2 points) | 39.7% → 85.9% (+46.2 points) |
+| Efficiency | 94.0% — baseline ran, but no comparable score was available; uplift unavailable | 95.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+Example: `47.0% → 92.0% (+45.0 points)` means the skill-assisted run scored 92.0%, 45.0 percentage points above its 47.0% no-skill baseline.
 
 A partial dimension was calculated from only the available configured signals; review the detailed report before relying on it.
 
@@ -100,9 +101,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 97.0% → 92.3% (-4.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 96.3% → 91.5% (-4.8 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 82.0% → 90.7% (+8.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 84.8% → 90.5% (+5.7 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
@@ -113,7 +114,7 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 8 task(s) |
 
 ## Skill Version(s): <br>
-0.1.0 (source: pyproject.toml); SKILL.md build marker 2026-11-19-bef5ab4e-dirty, repo commit 2bbedbe6 (committed 2026-11-18) <br>
+0.1.0 (source: pyproject.toml); build marker SKILL-BUILD 2026-11-19-b58c6c2d (source: SKILL.md) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>
