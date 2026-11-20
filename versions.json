@@ -492,6 +492,13 @@
       "last_modified": "2026-11-05"
     },
     {
+      "name": "cuopt-developer",
+      "path": "skills/cuopt-developer",
+      "content_digest": "sha256:2146d5b9c801f3298e75179f6bd898c42a2c0ca26531fb2313b39449b99cf281",
+      "last_commit": "e37c0a0aa49eea95122d3ec27bbeaa001f40b773",
+      "last_modified": "2026-06-29"
+    },
+    {
       "name": "cuopt-install",
       "path": "skills/cuopt-install",
       "content_digest": "sha256:af62fdd9987981b11afc08a863a6dd2388c25ed07437d4f97d2bf21748b349f5",

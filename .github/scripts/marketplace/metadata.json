@@ -841,6 +841,18 @@
       }
     },
     {
+      "path": "skills/cuopt-developer",
+      "name": "cuopt-developer",
+      "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
+      "metadata": {
+        "product.primary": "cuOpt",
+        "classification.category.primary": "developer_tools",
+        "catalog.subdomain": "decision-optimization",
+        "audience": "developer,hpc_developer",
+        "discovery.activity_tags": "contribute,test,debug,extend"
+      }
+    },
+    {
       "path": "skills/cuopt-install",
       "name": "cuopt-install",
       "description": "Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. For building cuOpt from source, see cuopt-developer.",
