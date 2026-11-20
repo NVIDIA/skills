@@ -3,6 +3,7 @@ name: nv-generate-vae-finetune
 description: Used for finetuning the NV-Generate-CTMR MAISI VAE from CT/MRI NIfTI datalists. Not for clinical or production data approval.
 license: Apache-2.0
 allowed-tools: Bash
+permissions: [env, file_read, file_write, shell]
 metadata:
   author: NVIDIA MedTech Team
   tags:
@@ -12,6 +13,7 @@ metadata:
     - VAE
     - finetune
 ---
+
 
 # NV-Generate-VAE-Finetune
 
@@ -42,6 +44,20 @@ python skills/nv-generate-vae-finetune/scripts/run_vae_finetune.py \
   --modality mri \
   --preflight
 ```
+
+To try the shipped path-validation example, run from the installed skill
+directory. The preflight uses the Python standard library. It checks the
+datalist and paths even when the upstream checkout is missing.
+
+```bash
+python scripts/run_vae_finetune.py fixtures/preflight_datalist.json \
+  --data-base-dir fixtures/preflight_dataset --output-dir OUT_DIR --preflight
+```
+
+Read `input.training_cases`, `input.validation_cases`, `invocation.exit_code`,
+and `logs.stderr_tail`. The example contains text placeholders. For training,
+use the caller’s NIfTI volumes and data root. If a prerequisite is missing,
+report it with the invocation needed on the training machine.
 
 For real GPU finetuning and other variations, see [Usage](#2-usage-one-line-training) below.
 
