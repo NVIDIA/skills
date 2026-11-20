@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers and engineers finetuning the NV-Generate-CTMR MAISI VAE/autoencoder on custom CT or MRI NIfTI training volumes for medical image synthesis research. <br>
+Developers and medical imaging researchers use this skill to preflight-check MONAI-style CT/MRI NIfTI datalists and finetune the NV-Generate-CTMR MAISI VAE/autoencoder on their own data, producing autoencoder and discriminator checkpoints plus a JSON run summary. Not for clinical interpretation, regulatory use, or approving synthetic data for production training. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -26,54 +26,81 @@ Mitigation: Review and scan skill before deployment. <br>
 
 ## Reference(s): <br>
 - [NV-Generate-CTMR (upstream repository)](https://github.com/NVIDIA-Medtech/NV-Generate-CTMR) <br>
-- [MONAI Bundle Notes](docs/references/monai-bundle.md) <br>
+- [skill_manifest.yaml](skill_manifest.yaml) <br>
+- [BENCHMARK.md](BENCHMARK.md) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Files, Shell commands, Configuration instructions] <br>
-**Output Format:** [JSON result summary with checkpoint file paths] <br>
+**Output Type(s):** [Files, Shell commands, Analysis] <br>
+**Output Format:** [JSON run summary (stdout and workflow_summary.json) plus model checkpoint files, staged config JSON, and TensorBoard logs] <br>
 **Output Parameters:** [1D] <br>
-**Other Properties Related to Output:** [Produces autoencoder and discriminator checkpoint files, TensorBoard logs, and a workflow summary JSON under the caller-provided output directory] <br>
+**Other Properties Related to Output:** [Writes under the caller-provided output directory; preflight mode validates the datalist and paths without GPU training.] <br>
 
 ## Evaluation Agents Used: <br>
-- claude-code <br>
-- codex <br>
+- Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`) <br>
+- Codex (`openai/openai/gpt-6.1-sol`) <br>
 
 
 
 ## Evaluation Tasks: <br>
-Evaluated against 2 internal evaluation tasks via NVSkills-Eval external profile in astra-sandbox environment. <br>
+2 evaluation tasks (2 positive), 1 attempt per task, each attempt in its own isolated sandbox pod (`k8s-sandbox`); dataset digest `sha256:1a2909b018143dc21ade7709cd49693ed1d59d232eea4816759d87b8fa6e5a21` (skill-evaluator-dataset-snapshot/1). Cases: finetune-vae-from-datalist, preflight-before-gpu-run. Evaluator version `1.6.10`, evaluated 2026-11-20. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
-- Security: Checks whether skill-assisted execution avoids unsafe behavior such as secret leakage, destructive commands, or unauthorized access. <br>
-- Correctness: Checks whether the agent follows the expected workflow and produces the correct final output. <br>
-- Discoverability: Checks whether the agent loads the skill when relevant and avoids using it when irrelevant. <br>
-- Effectiveness: Checks whether the agent performs measurably better with the skill than without it. <br>
-- Efficiency: Checks whether the agent uses fewer tokens and avoids redundant work. <br>
+- Security: Is it safe to use? Scored from `security` (100%). <br>
+- Correctness: Is the answer correct? Scored from `accuracy` (100%). <br>
+- Discoverability: Was the right skill loaded when needed? Scored from `skill_execution` (100%). <br>
+- Effectiveness: Did the skill help complete the task? Scored from `goal_accuracy` (50%) + `behavior_check` (50%). <br>
+- Efficiency: Did it avoid wasted tool calls and token usage? Scored from `skill_efficiency` (50%) + `token_efficiency` (50%). <br>
 
 Underlying evaluation signals used in this run: <br>
-- `security`: Checks for unsafe operations, secret leakage, and unauthorized access. <br>
-- `skill_execution`: Verifies that the agent loaded the expected skill and workflow. <br>
-- `skill_efficiency`: Checks routing quality, decoy avoidance, and redundant tool usage. <br>
-- `accuracy`: Grades final-answer correctness against the reference answer. <br>
-- `goal_accuracy`: Checks whether the overall user task completed successfully. <br>
-- `behavior_check`: Verifies expected behavior steps, including safety expectations. <br>
-- `token_efficiency`: Compares token usage with and without the skill. <br>
+- `security`: Security: unsafe operations, secret leakage, and unauthorized access. <br>
+- `skill_execution`: Skill Execution: whether the expected skill was selected, decoys were avoided, and the workflow executed. <br>
+- `skill_efficiency`: Tool Productivity: tool-call productivity (legacy wire id; routing is scored under Discoverability). <br>
+- `accuracy`: Accuracy: final-answer correctness against the reference answer. <br>
+- `goal_accuracy`: Goal Accuracy: whether the user's goal was achieved. <br>
+- `behavior_check`: Behavior Check: whether the expected workflow behavior was followed. <br>
+- `token_efficiency`: Token Efficiency: actual uncached prompt plus completion usage (50% of Efficiency). <br>
 
 
 
 ## Evaluation Results: <br>
-| Dimension | Num | `claude-code` | `codex` |
-|---|---:|---:|---:|
-| Security | 2 | 100% (+0%) | 100% (+0%) |
-| Correctness | 2 | 85% (+62%) | 76% (+56%) |
-| Discoverability | 2 | 89% (+57%) | 61% (+25%) |
-| Effectiveness | 2 | 60% (+55%) | 61% (+56%) |
-| Efficiency | 2 | 69% (+37%) | 58% (+17%) |
+**Overall verdict:** ✅ PASS — Recommended for publication
+
+**Publication Recommendation:** Recommended for publication based on the completed evaluation evidence in this report.
+
+### Results at a Glance
+
+| Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
+|---|---:|---:|
+| Overall | Not available | 85.8% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | Not available | 25.0% → 75.0% (+50.0 points) |
+| Correctness | Not available | 70.0% → 100.0% (+30.0 points) |
+| Discoverability | Not available | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | Not available | 27.1% → 93.8% (+66.7 points) |
+| Efficiency | Not available | 75.5% — baseline ran, but no comparable score was available; uplift unavailable |
+
+**How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
+
+### Comparison details
+
+Shared-source comparisons use the same signals and weights on both conditions. They do not replace the full dimension scores above or change the publication verdict.
+
+| Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
+| --- | --- | --- | --- | --- |
+| codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
+| codex | Efficiency | Token-only comparison | 82.4% → 86.3% (+3.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+
+### Tier Status
+
+| Tier | Purpose | Status | Evidence |
+|---|---|---|---|
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 10 finding(s) |
+| Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 1 finding(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 2 task(s) |
 
 ## Skill Version(s): <br>
-7c392e3 (source: git SHA, committed 2026-07-08) <br>
+093591f (source: git SHA, committed 2026-11-20) <br>
 
 ## Ethical Considerations: <br>
 NVIDIA believes Trustworthy AI is a shared responsibility and we have established policies and practices to enable development for a wide array of AI applications. When downloaded or used in accordance with our terms of service, developers should work with their internal team to ensure this skill meets requirements for the relevant industry and use case and addresses unforeseen product misuse. <br>

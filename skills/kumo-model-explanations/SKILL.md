@@ -1,6 +1,6 @@
 ---
 name: kumo-model-explanations
-description: Inspect and interpret gradient attribution (including requests called radiant attribution), column analysis and sampled explanation subgraphs from a Kumo model trained in a Python notebook. Locate the correct run's explanation artifacts, explain feature scores and cohorts, and identify missing or unsupported explanations without automatically retraining.
+description: Inspect and interpret gradient attribution (including requests called radiant attribution), column analysis and sampled explanation subgraphs from Kumo training and batch prediction runs in Python. Locate the correct run's explanation artifacts, explain feature scores and cohorts, and identify missing or unsupported explanations without automatically rerunning work.
 ---
 
 # Kumo model explanations
@@ -16,6 +16,10 @@ with its in-process `kumo.engine` runtime and retained local run files.
 - For a fresh `training_result`, use `training_result.explanations`. Otherwise reopen the
   explicit retained run with `kumo.TrainingExplanations.load(run_dir)`. A downloaded model
   bundle is not the original training run.
+- For a prediction result, use `prediction.explanations`, or reopen its retained
+  `run_root` with `kumo.PredictionExplanations.load(run_dir)`. Retain the complete run,
+  including its compact explanation status and saved sample mappings; an arbitrary artifact
+  directory is invalid. Use the recorded `explanations.run_id`, not the directory name.
 - If several runs or trainer/refit directories exist, list candidates with their paths and ask
   which one the user means, before showing any score. Never silently select the newest
   directory or combine different runs.
@@ -34,6 +38,24 @@ gradient scoring, column analysis and sampled subgraphs after successful trainin
 artifacts. A failure in this post-training step can leave a usable model with missing or
 partial explanations.
 
+`Trainer.predict(..., explanations=True)` opts into prediction cohorts and sampled graphs
+for that call. The default skips generation. Replay uses the prediction inputs and selected
+published checkpoint, including after `Trainer.load()`. It adds inference work without
+training. Prediction explanations have PRED stage and no gradient attribution or observed
+targets. Report observed counts and the selected checkpoint from the public
+`prediction.explanations.coverage` value.
+For an authorized prediction with explicit coverage limits, pass
+`explanations=kumo.PredictionExplanationOptions(cohort_rows=500, sample_rows=100)`.
+The limits are independent positive row counts. By default, sampled graphs cover up to the
+first 1,000 prediction rows. Cohorts process up to `max(50 * B, 1000)` rows rounded up to whole
+batches, where `B = max(eval_batch_size // 4, 1)`. A smaller population processes fewer rows.
+
+Prediction producer outcomes are independent: a failed producer's partial files are unavailable
+through the API, while another completed producer remains readable. Reopening the retained run
+preserves disabled, unsupported and failed states and their recorded errors. Coverage records
+generation work, so it does not shrink when files are removed or only partly copied; check
+availability separately. Sample membership comes from the saved mappings.
+
 The shared explainer can limit the number of test batches. Describe coverage as the processed
 test subset unless the run proves it covered the full test population.
 
@@ -48,7 +70,8 @@ from the existence of `disable_explain`.
   The runtime's explainer task list can narrow support further.
 - `training_result.explanations` retrieves retained TEST-stage artifacts and provides gradient
   and cohort plots. There is no public `kumo.Trainer.explain()` or standalone regeneration API.
-  Do not call private trainers or enable prediction-time XAI through invented options.
+  Use only the documented per-call prediction option; do not call private trainers or invent
+  standalone regeneration methods.
 - An inspection request does not authorize another fit. If required files are absent, diagnose
   the reason first. Generate an additional fit only when the user has requested that run.
 
@@ -82,11 +105,12 @@ Every answer, however short, carries:
 - for cohorts, each cohort's population share beside its mean prediction and, when the file
   records one, mean target, read from column analysis;
 - for a plot, the plotting code in the reply, reading the selected run's files, titled with the
-  table, column, run and test stage;
-- when evidence is missing, that no fit was started, and whether the user wants one.
+  table, column, run and actual TEST or PRED stage;
+- when evidence is missing, the recorded availability reason and whether any new computation
+  was requested; do not start another fit or predict during inspection.
 
 Distinguish observations, hypotheses, and missing evidence. Do not promise individual prediction
-explanations from aggregate files; sampled subgraphs cover only the sampled test entities (see the
+explanations from aggregate files; sampled subgraphs cover only the selected run's sampled rows (see the
 reference's *Sampled subgraphs*). If only one explanation family is present, analyze that family
 and state why the other could not be assessed.
 
