@@ -142,6 +142,41 @@
       "last_modified": "2026-11-04"
     },
     {
+      "name": "bionemo-cupotential-benchmark",
+      "path": "skills/bionemo-cupotential-benchmark",
+      "content_digest": "sha256:f525ba92472444d88131e473921805c41d09ca61f6d381a9c6fe1de51a87ebe2",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
+    },
+    {
+      "name": "bionemo-cupotential-custom-potentials",
+      "path": "skills/bionemo-cupotential-custom-potentials",
+      "content_digest": "sha256:589fdc9d5d0a4313523cc6f2b568cf8a7d4f2dd21df4bf1da38e32205699bd29",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
+    },
+    {
+      "name": "bionemo-cupotential-install",
+      "path": "skills/bionemo-cupotential-install",
+      "content_digest": "sha256:f5a26555acdec58a72b8057bc518fca6c35ce71047a549ecb1c0bfa210bd1902",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
+    },
+    {
+      "name": "bionemo-cupotential-openmm",
+      "path": "skills/bionemo-cupotential-openmm",
+      "content_digest": "sha256:86628efc2023a2ddb871a711e883f0921d7503fd43c7f7b80c19f9648d8e9b2e",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
+    },
+    {
+      "name": "bionemo-cupotential-validate",
+      "path": "skills/bionemo-cupotential-validate",
+      "content_digest": "sha256:20b8072dc5178944a8385588d311e43bd896d207d862b79f71d354a09924f253",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
+    },
+    {
       "name": "bionemo-diffdock-nim",
       "path": "skills/bionemo-diffdock-nim",
       "content_digest": "sha256:d4825b6a0a116a4affd7feb00d9fbdf54dcee32a77b0b60e6b349075983dedcb",
@@ -452,9 +487,9 @@
     {
       "name": "cudaq-guide",
       "path": "skills/cudaq-guide",
-      "content_digest": "sha256:c2a9f99670f2218f34e20d972625ce371df7fb4909a0573554f15d03ddd15bcc",
-      "last_commit": "15886223ed6cebd69f2970f2a16da03fd0cd5a35",
-      "last_modified": "2026-11-17"
+      "content_digest": "sha256:9922e87f68d954bdbbbea65821350634fb4f98004bb5364e3d0ee93ce8c215da",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
     },
     {
       "name": "cudaq-importing",
@@ -492,53 +527,11 @@
       "last_modified": "2026-11-05"
     },
     {
-      "name": "cuopt-developer",
-      "path": "skills/cuopt-developer",
-      "content_digest": "sha256:2146d5b9c801f3298e75179f6bd898c42a2c0ca26531fb2313b39449b99cf281",
-      "last_commit": "e37c0a0aa49eea95122d3ec27bbeaa001f40b773",
-      "last_modified": "2026-06-29"
-    },
-    {
-      "name": "cuopt-install",
-      "path": "skills/cuopt-install",
-      "content_digest": "sha256:af62fdd9987981b11afc08a863a6dd2388c25ed07437d4f97d2bf21748b349f5",
-      "last_commit": "ca9a15eb625a71a20d6996fe65d50cd9a88d846d",
-      "last_modified": "2026-08-25"
-    },
-    {
       "name": "cuopt-multi-objective-exploration",
       "path": "skills/cuopt-multi-objective-exploration",
       "content_digest": "sha256:defe0e1fabf9c408825a52b2d87cee3f70e0c9b225b47e95e981fd2311a28b80",
       "last_commit": "3aecfe9ba84e4df15fa7b224987f2803c2ba70e7",
       "last_modified": "2026-10-25"
-    },
-    {
-      "name": "cuopt-numerical-optimization-api",
-      "path": "skills/cuopt-numerical-optimization-api",
-      "content_digest": "sha256:fe2da3b0c9aa036daf9d0ede478dcc14ce764c5eccd417fa3a4de73a8f7b330f",
-      "last_commit": "47d179c3e5dfc677974650533be734c71ef9115e",
-      "last_modified": "2026-11-10"
-    },
-    {
-      "name": "cuopt-numerical-optimization-formulation",
-      "path": "skills/cuopt-numerical-optimization-formulation",
-      "content_digest": "sha256:4b98a111168f56b91b1f7378f0671122c6401184b3c76910fe147db52b38f7d9",
-      "last_commit": "e0cd22d572493dd3061708406a9ba53fddaa7087",
-      "last_modified": "2026-08-07"
-    },
-    {
-      "name": "cuopt-routing-api-python",
-      "path": "skills/cuopt-routing-api-python",
-      "content_digest": "sha256:27d199ace2c3add140367a961f7c21f4e372ea646c3a29c36999a180cd7649d3",
-      "last_commit": "77580296021eb309cfb372787409660ae35e6b2e",
-      "last_modified": "2026-08-13"
-    },
-    {
-      "name": "cuopt-server-api-python",
-      "path": "skills/cuopt-server-api-python",
-      "content_digest": "sha256:ff7ced7078cb937b10f0350b36974f84234026aab8cbfdc842355f4d4d00e5a8",
-      "last_commit": "38b6f0dc04e97ad42788b96c258cb3f6e7bb040c",
-      "last_modified": "2026-10-16"
     },
     {
       "name": "dali-dynamic-mode",
@@ -1827,6 +1820,20 @@
       "content_digest": "sha256:0ba7f547adb27b603e55213784f33c245e6a74632191026b4eb191cc35705737",
       "last_commit": "8df252007802af6b51520881281d8c48c8103e2f",
       "last_modified": "2026-11-20"
+    },
+    {
+      "name": "modelopt-day0-release",
+      "path": "skills/modelopt-day0-release",
+      "content_digest": "sha256:325116d2fedf307a5bf1db630bbc6346798f5b79c3a3a01b0beb3261b617b8c3",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
+    },
+    {
+      "name": "modelopt-quant-recipe-search",
+      "path": "skills/modelopt-quant-recipe-search",
+      "content_digest": "sha256:c3ab3ee48dc8aa26337db8120ca70023419309f2df1dc2c58dc3eed2b6949644",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
     },
     {
       "name": "nemo-automodel-distributed-training",
@@ -3304,6 +3311,13 @@
       "content_digest": "sha256:c5c9d3dbabc23820ae609c4543e37cf9d2d9ed1f0254ee17ca3777f83eb4bbbd",
       "last_commit": "15886223ed6cebd69f2970f2a16da03fd0cd5a35",
       "last_modified": "2026-11-17"
+    },
+    {
+      "name": "trtllm-serve-config-guide",
+      "path": "skills/trtllm-serve-config-guide",
+      "content_digest": "sha256:87da7ff0d6c44090af505a799fc1fbd7e75d3dc1dd17ea407ac01a653fdf1809",
+      "last_commit": "5528fb0dd3a5bc6f2a389b387b10af502e045032",
+      "last_modified": "2026-11-23"
     },
     {
       "name": "vss-ask-video",

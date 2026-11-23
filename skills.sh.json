@@ -230,6 +230,11 @@
       "title": "Simulation and Modeling",
       "description": "Create, run, validate, and analyze simulation and modeling workflows for systems, environments, processes, and physical phenomena.",
       "skills": [
+        "cupotential-benchmark",
+        "cupotential-custom-potentials",
+        "cupotential-install",
+        "cupotential-openmm",
+        "cupotential-validate",
         "earth2studio-create-datasource",
         "earth2studio-create-diagnostic",
         "earth2studio-create-prognostic",
@@ -408,6 +413,8 @@
         "make-data-pipeline",
         "medtech-model-evidence-export",
         "model-onboard",
+        "modelopt-day0-release",
+        "modelopt-quant-recipe-search",
         "molmim-nim",
         "msa-search-nim",
         "msa-structure-prediction-pipeline",
@@ -420,20 +427,15 @@
         "rfdiffusion-nim",
         "tao-run-inference-service",
         "triton-onnx-model-repository",
-        "triton-pytorch-model-repository"
+        "triton-pytorch-model-repository",
+        "trtllm-serve-config-guide"
       ]
     },
     {
       "title": "Decision Optimization",
       "description": "Formulate and solve routing, scheduling, and numerical optimization problems using optimization solvers, APIs, services, and deployment workflows.",
       "skills": [
-        "cuopt-developer",
-        "cuopt-install",
         "cuopt-multi-objective-exploration",
-        "cuopt-numerical-optimization-api",
-        "cuopt-numerical-optimization-formulation",
-        "cuopt-routing-api-python",
-        "cuopt-server-api-python",
         "portfolio-optimization"
       ]
     },
