@@ -241,6 +241,66 @@
       }
     },
     {
+      "path": "skills/bionemo-cupotential-benchmark",
+      "name": "cupotential-benchmark",
+      "description": "Benchmark cuPotential against stock OpenMM on a user's molecular system while checking accuracy and matching simulation settings. Use for speedup measurements, startup overhead, performance regressions, or diagnosing unexpectedly slow cuPotential simulations.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "computational_biologist,simulation_engineer,hpc_developer,research_academic,developer",
+        "discovery.activity_tags": "benchmark,compare,measure,validate,profile"
+      }
+    },
+    {
+      "path": "skills/bionemo-cupotential-custom-potentials",
+      "name": "cupotential-custom-potentials",
+      "description": "Build and validate cuPotential custom pair potentials through its OpenMM expression API, including WCA, LJ fusion, soft-core interactions and live globals. Review path-specific support for alchemical estimators and analytic energy-parameter derivatives.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "computational_biologist,simulation_engineer,research_academic,hpc_developer,application_developer",
+        "discovery.activity_tags": "validate,generate,test,integrate,assess"
+      }
+    },
+    {
+      "path": "skills/bionemo-cupotential-install",
+      "name": "cupotential-install",
+      "description": "Install cuPotential's OpenMM plugin in a selected Python environment, verify CUDA execution, and diagnose driver, package, or shared-library loading problems. Use for installation, upgrade planning, missing nv_openmm_plugin, or a plugin that imports but cannot run.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "computational_biologist,simulation_engineer,research_academic,hpc_developer,application_developer",
+        "discovery.activity_tags": "configure,troubleshoot,validate,debug,get_started"
+      }
+    },
+    {
+      "path": "skills/bionemo-cupotential-openmm",
+      "name": "cupotential-openmm",
+      "description": "Adapt an OpenMM simulation to cuPotential, run NVT or NPT, and save or resume checkpoints while preserving the supplied force field and simulation settings. Use for nv_openmm_plugin force replacement, simulation setup, parameter changes, and restart problems.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "computational_biologist,simulation_engineer,research_academic,hpc_developer,application_developer",
+        "discovery.activity_tags": "integrate,configure,convert,operate,recover"
+      }
+    },
+    {
+      "path": "skills/bionemo-cupotential-validate",
+      "name": "cupotential-validate",
+      "description": "Investigate cuPotential energy or force differences, validate a converted simulation, and assess numerical or physical simulation failures. Use for comparison with OpenMM, custom-force finite differences, cutoff artifacts, energy drift, or questionable simulation results.",
+      "metadata": {
+        "product.primary": "BioNeMo Libraries",
+        "classification.category.primary": "accelerated_computing",
+        "catalog.subdomain": "simulation-modeling",
+        "audience": "computational_biologist,simulation_engineer,research_academic,hpc_developer,application_developer",
+        "discovery.activity_tags": "validate,compare,troubleshoot,debug,measure"
+      }
+    },
+    {
       "path": "skills/bionemo-diffdock-nim",
       "name": "diffdock-nim",
       "description": "Run DiffDock molecular docking via NVIDIA NIM to predict small-molecule binding poses against protein targets. Use for DiffDock, molecular docking, ligand docking, blind docking, SMILES or SDF ligands, ranked poses, confidence scores, hosted NVIDIA API, or local Docker deployment.\n",
@@ -841,30 +901,6 @@
       }
     },
     {
-      "path": "skills/cuopt-developer",
-      "name": "cuopt-developer",
-      "description": "Modify, build, test, debug, and contribute to NVIDIA cuOpt (C++/CUDA, Python, server, CI). Use for solver internals, PRs, DCO, and code conventions.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "developer_tools",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,hpc_developer",
-        "discovery.activity_tags": "contribute,test,debug,extend"
-      }
-    },
-    {
-      "path": "skills/cuopt-install",
-      "name": "cuopt-install",
-      "description": "Install cuOpt for Python, C, or server via pip, conda, or Docker; verify the install. For building cuOpt from source, see cuopt-developer.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer,devops_engineer",
-        "discovery.activity_tags": "get_started,configure,validate,deploy"
-      }
-    },
-    {
       "path": "skills/cuopt-multi-objective-exploration",
       "name": "cuopt-multi-objective-exploration",
       "description": "Trace, complete, and interpret the Pareto frontier across competing objectives using repeated single-objective cuOpt solves (weighted-sum and ε-constraint).",
@@ -874,54 +910,6 @@
         "catalog.subdomain": "decision-optimization",
         "audience": "application_developer,data_scientist,solutions_architect,developer",
         "discovery.activity_tags": "optimize,compare,evaluate,configure"
-      }
-    },
-    {
-      "path": "skills/cuopt-numerical-optimization-api",
-      "name": "cuopt-numerical-optimization-api",
-      "description": "LP, MILP, and QP (beta) with cuOpt — Python, C, and CLI. Use when the user is solving LP, MILP, or QP with any cuOpt interface.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "ai_and_machine_learning",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "application_developer,data_scientist,hpc_developer,solutions_architect,developer",
-        "discovery.activity_tags": "optimize,integrate,configure,get_started,benchmark"
-      }
-    },
-    {
-      "path": "skills/cuopt-numerical-optimization-formulation",
-      "name": "cuopt-numerical-optimization-formulation",
-      "description": "LP, MILP, QP — concepts, problem-text parsing, and formulation patterns (parameters, constraints, decisions, objective). Concepts only; no API.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer,data_scientist",
-        "discovery.activity_tags": "assess,select,optimize,validate"
-      }
-    },
-    {
-      "path": "skills/cuopt-routing-api-python",
-      "name": "cuopt-routing-api-python",
-      "description": "Vehicle routing (VRP, TSP, PDP) with cuOpt — Python API only. Use when the user is building or solving routing in Python.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer",
-        "discovery.activity_tags": "configure,optimize,validate,debug"
-      }
-    },
-    {
-      "path": "skills/cuopt-server-api-python",
-      "name": "cuopt-server-api-python",
-      "description": "cuOpt REST server — start server, endpoints, Python/curl client examples. Use when the user is deploying or calling the REST API.",
-      "metadata": {
-        "product.primary": "cuOpt",
-        "classification.category.primary": "accelerated_computing",
-        "catalog.subdomain": "decision-optimization",
-        "audience": "developer,application_developer,devops_engineer",
-        "discovery.activity_tags": "deploy,configure,integrate,validate,debug"
       }
     },
     {
@@ -3130,6 +3118,30 @@
         "catalog.subdomain": "inference-ai",
         "audience": "ml_engineer,ai_engineer,application_developer,data_scientist,developer",
         "discovery.activity_tags": "extract,integrate,inference,validate,measure"
+      }
+    },
+    {
+      "path": "skills/modelopt-day0-release",
+      "name": "modelopt-day0-release",
+      "description": "Deterministic end-to-end driver for day-0 quantized-checkpoint releases — chains PTQ → evaluation → comparison with enforced gates between stages (the evaluation stage deploys the checkpoint itself), and returns a publish decision (ACCEPT / REGRESSION / INDETERMINATE / ANOMALOUS / INFEASIBLE). Use when the user asks to \"release a model at day-0\", \"quantize and validate model X is within N% of baseline and tell me if it's publishable\", or \"run the full day-0 workflow\". Do NOT use for single-stage requests — quantizing only (use modelopt-ptq), serving only (use modelopt-deployment), evaluating only (use modelopt-evaluation), or comparing two existing runs (use modelopt-compare-results).",
+      "metadata": {
+        "product.primary": "Model Optimizer",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,developer,devops_engineer,platform_engineer",
+        "discovery.activity_tags": "orchestrate,validate,optimize,evaluate,compare"
+      }
+    },
+    {
+      "path": "skills/modelopt-quant-recipe-search",
+      "name": "modelopt-quant-recipe-search",
+      "description": "Use when the user asks to find, search for, or optimize the best quantization recipe for a model, including direct requests like \"find the best quantization recipe and generate a PTQ checkpoint.\" Guides the multi-candidate loop: choose compute-vs-memory success metrics, select ModelOpt recipe baselines, design AutoQuant/manual recipe deltas, interpret sensitivity, and decide next candidates. Do NOT use for a single known PTQ recipe run (use modelopt-ptq), serving (use modelopt-deployment), creating/running evals (use modelopt-evaluation or modelopt-launching-evals), monitoring jobs (use modelopt-monitor), MLflow browsing (use modelopt-accessing-mlflow), or comparing completed baseline-vs-candidate scores only (use modelopt-compare-results).",
+      "metadata": {
+        "product.primary": "Model Optimizer",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,developer",
+        "discovery.activity_tags": "optimize,select,evaluate,benchmark,configure"
       }
     },
     {
@@ -5662,6 +5674,18 @@
         "catalog.subdomain": "inference-ai",
         "audience": "ml_engineer,ai_engineer,application_developer,devops_engineer,platform_engineer",
         "discovery.activity_tags": "deploy,configure,inference,debug,troubleshoot"
+      }
+    },
+    {
+      "path": "skills/trtllm-serve-config-guide",
+      "name": "trtllm-serve-config-guide",
+      "description": "Generate a source-backed starting `trtllm-serve --config` YAML for basic aggregate single-node PyTorch serving, aligned with checked-in TensorRT-LLM configs and deployment docs. Preserves explicit latency / balanced / throughput objectives. Excludes disaggregated, multi-node, and non-MTP speculative configs.",
+      "metadata": {
+        "product.primary": "TensorRT-LLM",
+        "classification.category.primary": "ai_and_machine_learning",
+        "catalog.subdomain": "inference-ai",
+        "audience": "ml_engineer,ai_engineer,platform_engineer,devops_engineer,developer",
+        "discovery.activity_tags": "configure,deploy,inference,optimize,generate"
       }
     },
     {

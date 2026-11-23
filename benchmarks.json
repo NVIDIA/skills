@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 482,
-  "result_row_count": 4539,
+  "skill_count": 484,
+  "result_row_count": 4559,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -444,6 +444,111 @@
       "component": "BioNeMo Libraries",
       "has_results": true,
       "average_uplift_pct": 1.93
+    },
+    {
+      "skill": "cupotential-benchmark",
+      "evaluation_date": "2026-11-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:be1b0378a08187c503b19c07f00d9a9df87c149685b61701c5a52ff6d31f7f2f",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": -0.48
+    },
+    {
+      "skill": "cupotential-custom-potentials",
+      "evaluation_date": "2026-11-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:90327961b6859a76206db1436143b70aed177305a82b415478b113ed1369a8f1",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 11.57
+    },
+    {
+      "skill": "cupotential-install",
+      "evaluation_date": "2026-11-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:5adee186a6f369716433c4ec5aef26ae2e8f8ddb38dea855deb357eee51a864a",
+      "validation_status": "passed",
+      "tasks": 2,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 0.0
+    },
+    {
+      "skill": "cupotential-openmm",
+      "evaluation_date": "2026-11-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:a0d05291c3203b24150e54f253d919eba61ed96edaae46b75714b7371329d3c6",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 13.5
+    },
+    {
+      "skill": "cupotential-validate",
+      "evaluation_date": "2026-11-21",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:46ffaa790e420d0412546b3d00ca6f3e44de6ab33248a4cdde85681ccc9b1474",
+      "validation_status": "passed",
+      "tasks": 3,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "has_results": true,
+      "average_uplift_pct": 12.12
     },
     {
       "skill": "diffdock-nim",
@@ -1371,12 +1476,12 @@
     },
     {
       "skill": "cudaq-guide",
-      "evaluation_date": "2026-11-17",
+      "evaluation_date": "2026-11-23",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.9",
-      "dataset_digest": "sha256:7884d2878ed008a3969a7668a02fb2f9fda8e70495368a69ca8bf4ce1f6071dd",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:e587d102c08982b984d330ae5fd7786631b7c327cf05f97b946576160ba2e91b",
       "validation_status": "passed",
-      "tasks": 13,
+      "tasks": 14,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
@@ -1388,7 +1493,7 @@
       "catalog_dir": "cudaq-guide",
       "component": "CUDA-Q",
       "has_results": true,
-      "average_uplift_pct": 12.28
+      "average_uplift_pct": 13.72
     },
     {
       "skill": "cudaq-importing",
@@ -1496,48 +1601,6 @@
       "average_uplift_pct": 7.9
     },
     {
-      "skill": "cuopt-developer",
-      "evaluation_date": "2026-06-26",
-      "environment": "astra-sandbox",
-      "evaluator_version": null,
-      "dataset_digest": null,
-      "validation_status": null,
-      "tasks": 3,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": 50.0,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "evaluation_source": null,
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "has_results": true,
-      "average_uplift_pct": 23.7
-    },
-    {
-      "skill": "cuopt-install",
-      "evaluation_date": "2026-08-12",
-      "environment": "k8s-sandbox",
-      "evaluator_version": "1.2.4",
-      "dataset_digest": "sha256:69515ef8677f7773d6ae7ac097b3a02767971b308d79ba74759f647dd33794c5",
-      "validation_status": null,
-      "tasks": 7,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": null,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "evaluation_source": null,
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "has_results": true,
-      "average_uplift_pct": 30.7
-    },
-    {
       "skill": "cuopt-multi-objective-exploration",
       "evaluation_date": "2026-10-23",
       "environment": "k8s-sandbox",
@@ -1557,90 +1620,6 @@
       "component": "cuOpt",
       "has_results": true,
       "average_uplift_pct": 4.35
-    },
-    {
-      "skill": "cuopt-numerical-optimization-api",
-      "evaluation_date": "2026-11-10",
-      "environment": "k8s-sandbox",
-      "evaluator_version": "1.6.9",
-      "dataset_digest": "sha256:f385c69ce235035e8e5cbfd91a8d3245b75473f0bf0d694451e988e439f6e9e1",
-      "validation_status": "passed",
-      "tasks": 9,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": null,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "evaluation_source": null,
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "has_results": true,
-      "average_uplift_pct": 10.33
-    },
-    {
-      "skill": "cuopt-numerical-optimization-formulation",
-      "evaluation_date": "2026-08-05",
-      "environment": "k8s-sandbox",
-      "evaluator_version": "1.0.0",
-      "dataset_digest": "sha256:7f39d48b2b7e50bd2a24f83c7f6172f1f16b1895a59e237bb4c345cf690cb71e",
-      "validation_status": null,
-      "tasks": 3,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": null,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "evaluation_source": null,
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "has_results": true,
-      "average_uplift_pct": 39.6
-    },
-    {
-      "skill": "cuopt-routing-api-python",
-      "evaluation_date": "2026-08-12",
-      "environment": "k8s-sandbox",
-      "evaluator_version": "1.2.4",
-      "dataset_digest": "sha256:e13146ac43d578682f0a3d799837f67335d277ef722feb1d28fc526709b6ba4e",
-      "validation_status": null,
-      "tasks": 7,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": null,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "evaluation_source": null,
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "has_results": true,
-      "average_uplift_pct": 31.2
-    },
-    {
-      "skill": "cuopt-server-api-python",
-      "evaluation_date": "2026-10-16",
-      "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
-      "dataset_digest": "sha256:c54a53a22db535b2e2101bfcd2c43a8cdfef342f5c166ba343b8fdba517c741d",
-      "validation_status": null,
-      "tasks": 8,
-      "attempts_per_task": 1,
-      "pass_threshold_pct": null,
-      "verdict": "PASS",
-      "agents": [
-        "claude-code",
-        "codex"
-      ],
-      "evaluation_source": null,
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "has_results": true,
-      "average_uplift_pct": 17.1
     },
     {
       "skill": "dali-dynamic-mode",
@@ -5463,6 +5442,48 @@
       "component": "Medical AI Skills",
       "has_results": true,
       "average_uplift_pct": 34.93
+    },
+    {
+      "skill": "modelopt-day0-release",
+      "evaluation_date": "2026-11-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:de5befa070b07ebde59acd26a41d4369f15d99b63c0d8cd672f39261d1593040",
+      "validation_status": "passed",
+      "tasks": 9,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "has_results": true,
+      "average_uplift_pct": 23.45
+    },
+    {
+      "skill": "modelopt-quant-recipe-search",
+      "evaluation_date": "2026-11-18",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:964e367df033c49d035170f7088fb0571faaa64aafd97b993806832d305c1f1a",
+      "validation_status": "passed",
+      "tasks": 1,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "has_results": true,
+      "average_uplift_pct": 9.72
     },
     {
       "skill": "nemo-automodel-distributed-training",
@@ -9881,6 +9902,27 @@
       "average_uplift_pct": 8.37
     },
     {
+      "skill": "trtllm-serve-config-guide",
+      "evaluation_date": "2026-11-20",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:607e57130afdc7b02c203d5cbed9abecc6a98d4e3c16102630e2479a65845261",
+      "validation_status": "passed",
+      "tasks": 5,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "has_results": true,
+      "average_uplift_pct": 9.32
+    },
+    {
       "skill": "vss-ask-video",
       "evaluation_date": "2026-11-16",
       "environment": "k8s-sandbox",
@@ -11845,6 +11887,456 @@
       "num": null,
       "agent": "codex",
       "score_pct": 69.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 66.7,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 16.6
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": -19.5
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 78.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-benchmark",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 33.3
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 33.3
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 80.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 94.5,
+      "uplift_pct": -5.5
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.8,
+      "uplift_pct": 8.3
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 69.9,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-custom-potentials",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 65.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 50.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 90.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 77.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 79.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-install",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 57.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 66.7
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 33.3,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 86.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 75.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.2,
+      "uplift_pct": 2.3
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 69.5,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 63.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-openmm",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 63.4,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 33.3
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 6.7
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 13.3
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 93.3,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 86.7,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 19.4
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "bionemo-cupotential-validate",
+      "component": "BioNeMo Libraries",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 68.5,
       "uplift_pct": null
     },
     {
@@ -15768,7 +16260,7 @@
       "dimension": "Security",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 100.0,
+      "score_pct": 92.9,
       "uplift_pct": 0.0
     },
     {
@@ -15778,7 +16270,7 @@
       "num": null,
       "agent": "codex",
       "score_pct": 100.0,
-      "uplift_pct": 0.0
+      "uplift_pct": 3.6
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -15786,8 +16278,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 98.5,
-      "uplift_pct": 12.3
+      "score_pct": 98.6,
+      "uplift_pct": 15.7
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -15795,35 +16287,35 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
+      "score_pct": 91.4,
+      "uplift_pct": 7.1
+    },
+    {
+      "catalog_dir": "cudaq-guide",
+      "component": "CUDA-Q",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 95.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cudaq-guide",
+      "component": "CUDA-Q",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 94.1,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "cudaq-guide",
+      "component": "CUDA-Q",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
       "score_pct": 92.3,
-      "uplift_pct": 3.1
-    },
-    {
-      "catalog_dir": "cudaq-guide",
-      "component": "CUDA-Q",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cudaq-guide",
-      "component": "CUDA-Q",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 94.5,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cudaq-guide",
-      "component": "CUDA-Q",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 87.8,
-      "uplift_pct": 36.5
+      "uplift_pct": 38.4
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -15831,8 +16323,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 76.3,
-      "uplift_pct": 21.8
+      "score_pct": 72.0,
+      "uplift_pct": 17.5
     },
     {
       "catalog_dir": "cudaq-guide",
@@ -15840,7 +16332,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 83.4,
+      "score_pct": 82.5,
       "uplift_pct": null
     },
     {
@@ -15849,7 +16341,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 66.9,
+      "score_pct": 67.2,
       "uplift_pct": null
     },
     {
@@ -16303,186 +16795,6 @@
       "uplift_pct": null
     },
     {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 75.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 89.0,
-      "uplift_pct": 26.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 42.0,
-      "uplift_pct": 25.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 72.0,
-      "uplift_pct": 41.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 95.0,
-      "uplift_pct": 40.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": 29.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "claude-code",
-      "score_pct": 48.0,
-      "uplift_pct": 22.0
-    },
-    {
-      "catalog_dir": "cuopt-developer",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": 3,
-      "agent": "codex",
-      "score_pct": 69.0,
-      "uplift_pct": 34.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": -7.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 94.0,
-      "uplift_pct": 9.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 11.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 96.0,
-      "uplift_pct": 69.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 46.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 81.0,
-      "uplift_pct": 18.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 93.0,
-      "uplift_pct": 17.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 81.0
-    },
-    {
-      "catalog_dir": "cuopt-install",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 67.0,
-      "uplift_pct": 63.0
-    },
-    {
       "catalog_dir": "cuopt-multi-objective-exploration",
       "component": "cuOpt",
       "dimension": "Security",
@@ -16570,366 +16882,6 @@
       "num": null,
       "agent": "codex",
       "score_pct": 69.1,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 13.3
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.6,
-      "uplift_pct": 4.5
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 92.8,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 91.4,
-      "uplift_pct": 26.3
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 74.1,
-      "uplift_pct": 17.9
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 84.6,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-api",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 70.7,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 94.0,
-      "uplift_pct": 94.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 3.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 90.0,
-      "uplift_pct": -1.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "cuopt-numerical-optimization-formulation",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 100.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 91.0,
-      "uplift_pct": 14.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 20.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 93.0,
-      "uplift_pct": 71.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 88.0,
-      "uplift_pct": 38.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 87.0,
-      "uplift_pct": 21.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 86.0,
-      "uplift_pct": 21.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 86.0,
-      "uplift_pct": 78.0
-    },
-    {
-      "catalog_dir": "cuopt-routing-api-python",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 56.0,
-      "uplift_pct": 49.0
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Security",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 0.0
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": 22.5
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Correctness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 17.5
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 100.0,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Discoverability",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 93.8,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 94.3,
-      "uplift_pct": 36.2
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Effectiveness",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 90.5,
-      "uplift_pct": 26.4
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "claude-code",
-      "score_pct": 97.1,
-      "uplift_pct": null
-    },
-    {
-      "catalog_dir": "cuopt-server-api-python",
-      "component": "cuOpt",
-      "dimension": "Efficiency",
-      "num": null,
-      "agent": "codex",
-      "score_pct": 95.1,
       "uplift_pct": null
     },
     {
@@ -31915,6 +31867,186 @@
       "num": null,
       "agent": "codex",
       "score_pct": 85.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.3,
+      "uplift_pct": 16.6
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.8,
+      "uplift_pct": 35.6
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 91.1,
+      "uplift_pct": 31.1
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 85.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 93.6,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 84.0,
+      "uplift_pct": 21.3
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 89.1,
+      "uplift_pct": 36.1
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 92.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-day0-release",
+      "component": "Model Optimizer",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 95.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 83.3,
+      "uplift_pct": 66.6
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 66.7,
+      "uplift_pct": -8.3
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 96.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "modelopt-quant-recipe-search",
+      "component": "Model Optimizer",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 78.0,
       "uplift_pct": null
     },
     {
@@ -50086,6 +50218,96 @@
       "num": null,
       "agent": "codex",
       "score_pct": 71.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.0,
+      "uplift_pct": -10.0
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 100.0,
+      "uplift_pct": 8.0
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 12.0
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 97.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 83.8,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 77.3,
+      "uplift_pct": 3.3
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 88.3,
+      "uplift_pct": 42.6
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "claude-code",
+      "score_pct": 88.0,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "trtllm-serve-config-guide",
+      "component": "TensorRT-LLM",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 87.1,
       "uplift_pct": null
     },
     {
