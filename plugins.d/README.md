@@ -108,6 +108,19 @@ A plugin that fails any of these checks is left out of `metadata.json` with a
 warning. It never fails the generator: one team's stale `include_skills` entry
 must not block regeneration of the whole catalog.
 
+### Plugins this directory does not define
+
+A product team's plugin lives in that team's own repo, is registered under
+`plugins:` in `components.d/<product>.yml`, and is mirrored into
+`plugins/<catalog_dir>/` by the plugin sync. It has no file here. Its catalog
+metadata is derived from the skills bundled in the mirrored tree instead; see
+[`components.d/README.md`](../components.d/README.md).
+
+The two kinds never overlap. A `plugins/<name>/` that has a
+`plugins.d/<name>.yml` is built by the catalog, and the sync never mirrors,
+prunes or lists it. The metadata generator applies the same rule, so one
+plugin is never described twice from two sources.
+
 ### Known limitation: directory-form includes
 
 `build-plugins.sh` accepts a grouping directory in `include_skills` and

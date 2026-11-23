@@ -66,6 +66,10 @@ REPO_ROOT = MARKETPLACE_DIR.parents[2]
 SKILLS_DIR = REPO_ROOT / "skills"
 COMPONENTS_DIR = REPO_ROOT / "components.d"
 PLUGINS_D_DIR = REPO_ROOT / "plugins.d"
+# The built and mirrored plugin trees both live here. A module constant
+# rather than REPO_ROOT / "plugins" at the call site, so tests can point the
+# mirrored-plugin pass at a fixture without a repository on disk.
+PLUGINS_DIR = REPO_ROOT / "plugins"
 
 # All marketplace artifacts (generated outputs, schemas, the subdomain config,
 # the exclusions list, and this generator script) live under
@@ -1342,105 +1346,443 @@ def build_plugin_entries(
                 "renamed upstream; check the path only if it should be there."
             )
 
-        override = spec.get("taxonomy") or {}
-        if not isinstance(override, dict):
+        entry = assemble_plugin_entry(
+            name=name,
+            description=description,
+            src=src,
+            resolved=resolved,
+            override=spec.get("taxonomy") or {},
+            unresolved_notice=unresolved_notice,
+            taxonomy=taxonomy,
+            warnings=warnings,
+            validator=validator,
+            no_skills_remedy="list catalog skills under `include_skills:`",
+        )
+        if entry is not None:
+            entries.append(entry)
+
+    entries.sort(key=lambda e: e["name"])
+    return entries
+
+
+def assemble_plugin_entry(
+    name: str,
+    description: str,
+    src: str,
+    resolved: list[dict],
+    override: Any,
+    unresolved_notice: str,
+    taxonomy: dict,
+    warnings: list[str],
+    validator: Draft202012Validator,
+    no_skills_remedy: str,
+) -> dict | None:
+    """Turn a plugin's resolved skills into a validated entry, or warn and skip.
+
+    Shared by both discovery paths. A plugin declared in plugins.d/ and a
+    plugin mirrored from a product repo differ only in how their bundled
+    skills are found; everything after that -- the roll-up, the `taxonomy:`
+    override, the vocabulary check, the schema check, and the rule that a
+    problem degrades one plugin and never the catalog -- must be identical,
+    or the two kinds of plugin would be held to different standards in the
+    same output file.
+
+    Returns None when the plugin is skipped. Warnings are appended in place.
+    """
+    if not isinstance(override, dict):
+        warnings.append(
+            f"{src}: `taxonomy:` must be a mapping, got "
+            f"{type(override).__name__}; plugin skipped."
+        )
+        return None
+
+    # key=str because YAML keys need not be strings: a mapping such as
+    # `{null: x, typo: y}` otherwise reaches sorted() with None beside a
+    # string and raises TypeError out of the generator.
+    unknown = sorted((set(override) - set(PLUGIN_FIELDS)), key=str)
+    if unknown:
+        # Silently ignoring these is how a dotted-name typo turns into a
+        # plugin that quietly keeps its rolled-up values.
+        warnings.append(
+            f"{src}: unknown `taxonomy:` field(s) "
+            + ", ".join(f"`{k}`" for k in unknown)
+            + ". Valid fields are "
+            + ", ".join(PLUGIN_FIELDS)
+            + "; plugin skipped."
+        )
+        return None
+
+    # De-duplicate before deriving, not at assembly. A skill counted twice
+    # would otherwise vote twice in the domain plurality and the audience
+    # threshold while the emitted `skills` list stayed byte-identical, so the
+    # wrong taxonomy would be invisible in the output and in review. Both
+    # discovery paths can produce a repeat: plugins.d through a path listed
+    # twice in include_skills, a mirrored plugin through two bundled
+    # directories resolving to the same catalog skill.
+    resolved = list({e["path"]: e for e in resolved}.values())
+
+    if resolved:
+        try:
+            metadata = derive_plugin_taxonomy(resolved)
+        except GeneratorError as exc:
+            warnings.append(f"{src}: {exc}; plugin skipped.")
+            return None
+    else:
+        # Tier 2 hook. See the section comment above. With nothing to roll
+        # up there is no partial case: every field has to be declared, or
+        # the entry would be emitted incomplete and fail the schema with
+        # an error blaming a value the maintainer never wrote.
+        undeclared = [f for f in PLUGIN_FIELDS if f not in override]
+        if undeclared:
             warnings.append(
-                f"{src}: `taxonomy:` must be a mapping, got "
-                f"{type(override).__name__}; plugin skipped."
+                f"{src}: plugin `{name}` bundles no catalog skill, so its "
+                f"taxonomy cannot be derived and every field has to be "
+                f"declared. Missing: "
+                + ", ".join(undeclared)
+                + f".\nEither {no_skills_remedy}, or "
+                + plugin_taxonomy_help(taxonomy, src)
+            )
+            return None
+        metadata = {}
+
+    problem = apply_taxonomy_override(metadata, override, src)
+    if problem:
+        warnings.append(problem)
+        return None
+
+    vocab_errors: list[str] = []
+    validate_plugin_taxonomy(metadata, taxonomy, src, vocab_errors)
+    if vocab_errors:
+        warnings.extend(f"{e} Plugin skipped." for e in vocab_errors)
+        return None
+
+    entry = {
+        "name": name,
+        "path": f"plugins/{name}",
+        # Carried so recovery can identify a published plugin whose source
+        # declaration has since become unreadable, when its `name` cannot be
+        # read. For a mirrored plugin this is its components.d registry file.
+        "source": src,
+        "description": description,
+        "skills": sorted({e["path"] for e in resolved}),
+        "metadata": {f: metadata[f] for f in PLUGIN_FIELDS},
+    }
+
+    # The assembled entry is checked against the published schema here,
+    # not left to the whole-document validation later in main().
+    #
+    # This is the difference between a bad plugin degrading itself and a
+    # bad plugin stopping the catalog. validate_plugin_taxonomy checks
+    # that values are in the vocabulary, but the schema enforces more than
+    # that -- minItems on product.primary, uniqueItems on skills, and an
+    # audience pattern that rejects "" and a trailing comma. Anything the
+    # vocabulary check does not cover used to pass this gate and fail the
+    # whole document instead, which writes no output at all.
+    schema_errors: list[str] = []
+    validate_against_schema(
+        {"skills": [], "plugins": [entry]}, validator, src, schema_errors
+    )
+    if schema_errors:
+        warnings.extend(f"{e} Plugin skipped." for e in schema_errors)
+        return None
+
+    # Only now is the plugin certain to be in the output.
+    if unresolved_notice:
+        warnings.append(unresolved_notice)
+    return entry
+
+
+def load_mirrored_plugin_specs(
+    warnings: list[str], declared: set[str] | None = None
+) -> list[dict]:
+    """Read every `plugins:` entry declared in components.d/<product>.yml.
+
+    These are the plugins a product team owns in its own repo. sync-plugins.yml
+    mirrors the declared directory byte-for-byte into plugins/<catalog_dir>/.
+    There is no plugins.d file for them, which is why they were invisible to
+    this generator until now.
+
+    Precedence follows sync-plugins.yml exactly: a plugins/<name>/ that has a
+    plugins.d/<name>.yml is the catalog's own built plugin. The sync never
+    mirrors, prunes or lists it, so this function must not claim it either, or
+    one plugin would be described twice from two different sources.
+
+    Each returned spec carries `__source_skills`: the product's declared
+    skills as a source-path -> catalog-path map. That is one of the two keys
+    used to identify a bundled skill, and it is read here because it lives in
+    the same registry file as the plugin declaration.
+
+    `declared`, when given, is filled with the identity of every plugin this
+    registry declares, including ones skipped below, so recovery can tell
+    "failed to build" from "no longer registered". A plugin registered but not
+    yet mirrored is still declared: the sync may simply not have run yet, and
+    delisting it on that basis would drop a live plugin from the catalog.
+    """
+    if declared is None:
+        declared = set()
+    if not COMPONENTS_DIR.is_dir():
+        return []
+
+    specs: list[dict] = []
+    seen: dict[str, str] = {}
+    for ymlf in sorted(COMPONENTS_DIR.glob("*.yml")):
+        src = f"{COMPONENTS_DIR.name}/{ymlf.name}"
+        try:
+            data = load_yaml(ymlf)
+        except Exception as exc:  # noqa: BLE001 - PyYAML raises builtins too
+            # The skills pass reads this file too and reports its own errors.
+            # Say nothing more than that no plugin could be read from it.
+            warnings.append(
+                f"{src}: could not be parsed, so any `plugins:` entry in it "
+                f"was not read: {exc}"
+            )
+            continue
+        if not isinstance(data, dict):
+            continue
+
+        raw_plugins = data.get("plugins")
+        if raw_plugins is None:
+            continue
+        if not isinstance(raw_plugins, list):
+            warnings.append(
+                f"{src}: `plugins:` must be a list, got "
+                f"{type(raw_plugins).__name__}; no plugin read from this file."
             )
             continue
 
-        # key=str because YAML keys need not be strings: a mapping such as
-        # `{null: x, typo: y}` otherwise reaches sorted() with None beside a
-        # string and raises TypeError out of the generator.
-        unknown = sorted((set(override) - set(PLUGIN_FIELDS)), key=str)
-        if unknown:
-            # Silently ignoring these is how a dotted-name typo turns into a
-            # plugin that quietly keeps its rolled-up values.
-            warnings.append(
-                f"{src}: unknown `taxonomy:` field(s) "
-                + ", ".join(f"`{k}`" for k in unknown)
-                + ". Valid fields are "
-                + ", ".join(PLUGIN_FIELDS)
-                + "; plugin skipped."
-            )
-            continue
-
-        # De-duplicate before deriving, not at assembly. A path repeated in
-        # include_skills would otherwise vote twice in the domain plurality
-        # and the audience threshold while the emitted `skills` list stayed
-        # byte-identical, so the wrong taxonomy would be invisible in the
-        # output and in review.
-        resolved = list({e["path"]: e for e in resolved}.values())
-
-        if resolved:
-            try:
-                metadata = derive_plugin_taxonomy(resolved)
-            except GeneratorError as exc:
-                warnings.append(f"{src}: {exc}; plugin skipped.")
+        # Source path -> catalog path for this product's standalone skills.
+        # `catalog_dir` is the rename the catalog applies on the way in, so
+        # the two sides genuinely differ: BioIR ships skills/bench-perf-oss/
+        # and the catalog publishes it as skills/bioir-bench-perf-oss.
+        source_skills: dict[str, str] = {}
+        for entry in data.get("skills") or []:
+            if not isinstance(entry, dict):
                 continue
-        else:
-            # Tier 2 hook. See the section comment above. With nothing to roll
-            # up there is no partial case: every field has to be declared, or
-            # the entry would be emitted incomplete and fail the schema with
-            # an error blaming a value the maintainer never wrote.
-            undeclared = [f for f in PLUGIN_FIELDS if f not in override]
-            if undeclared:
+            spath = entry.get("path")
+            cdir = entry.get("catalog_dir")
+            if not isinstance(spath, str) or not spath.strip():
+                continue
+            if not isinstance(cdir, str) or not cdir.strip():
+                continue
+            source_skills[spath.strip().rstrip("/")] = (
+                f"skills/{cdir.strip().rstrip('/')}"
+            )
+
+        for raw in raw_plugins:
+            if not isinstance(raw, dict):
                 warnings.append(
-                    f"{src}: plugin `{name}` bundles no catalog skill, so its "
-                    f"taxonomy cannot be derived and every field has to be "
-                    f"declared. Missing: "
-                    + ", ".join(undeclared)
-                    + ".\nEither list catalog skills under `include_skills:`, "
-                    "or " + plugin_taxonomy_help(taxonomy, src)
+                    f"{src}: each `plugins:` entry must be a mapping, got "
+                    f"{type(raw).__name__}; entry skipped."
                 )
                 continue
-            metadata = {}
+            name = raw.get("catalog_dir")
+            if not isinstance(name, str) or not name.strip():
+                warnings.append(
+                    f"{src}: a `plugins:` entry has no `catalog_dir`; it names "
+                    f"the directory under plugins/ and the install name, so "
+                    f"the entry cannot be placed. Entry skipped."
+                )
+                continue
+            name = name.strip().rstrip("/")
 
-        problem = apply_taxonomy_override(metadata, override, src)
-        if problem:
-            warnings.append(problem)
+            # sync-plugins.yml refuses a catalog_dir that is not lowercase
+            # kebab-case, so one is never mirrored and must not be described.
+            # This also refuses a path separator, which would otherwise let an
+            # entry name ../ or another plugin's directory.
+            if not PLUGIN_NAME_RE.fullmatch(name):
+                warnings.append(
+                    f"{src}: `catalog_dir` `{name}` is not lowercase "
+                    f"kebab-case. The plugin sync refuses it, so it is never "
+                    f"mirrored. Entry skipped."
+                )
+                continue
+
+            if name in seen and seen[name] != src:
+                warnings.append(
+                    f"{src}: plugin `{name}` is already declared by "
+                    f"{seen[name]}. Two registries cannot own one plugin "
+                    f"directory. Entry skipped."
+                )
+                continue
+            seen[name] = src
+
+            # Precedence: the catalog's own built plugins stay with plugins.d.
+            if (PLUGINS_D_DIR / f"{name}.yml").is_file():
+                continue
+
+            declared.add(name)
+            declared.add(src)
+            specs.append(
+                {
+                    "name": name,
+                    "__source": src,
+                    "__source_skills": source_skills,
+                }
+            )
+
+    return specs
+
+
+def resolve_bundled_skills(
+    plugin_dir: Path,
+    by_name: dict[str, dict],
+    by_path: dict[str, dict],
+    source_skills: dict[str, str],
+) -> tuple[list[dict], list[str]]:
+    """Identify which catalog skills a mirrored plugin bundles.
+
+    A mirrored plugin carries copies of the skills, not references to them, so
+    there is no declared list to read: `plugin.json`'s `skills` field is the
+    container path "./skills/", not an inventory. The copies have to be
+    identified from what they contain.
+
+    Two keys are used, in order, and neither is the directory name:
+
+    1. The `name` in the bundled SKILL.md frontmatter. Catalog `name` values
+       are unique and are copied verbatim from that same frontmatter, so this
+       is an identity match.
+    2. The bundled directory's path within the plugin, resolved through the
+       product's own `skills:` declarations to the catalog path.
+
+    Matching on the directory name instead would be wrong for 43 of the 484
+    skills in the catalog today, because `catalog_dir` renames a skill on the
+    way in. BioIR publishes skills/bench-perf-oss/ as skills/bioir-bench-perf-oss,
+    so the bundled directory and the catalog directory do not share a name.
+    Both keys above survive that rename; the directory name does not.
+
+    Returns (resolved entries, unidentified directory names).
+    """
+    skills_dir = plugin_dir / "skills"
+    if not skills_dir.is_dir():
+        return [], []
+
+    resolved: list[dict] = []
+    unresolved: list[str] = []
+    for child in sorted(p for p in skills_dir.iterdir() if p.is_dir()):
+        skill_md = child / "SKILL.md"
+        if not skill_md.is_file():
+            # Not a skill directory. The sync mirrors the product's tree
+            # byte-for-byte, so anything may sit here.
             continue
 
-        vocab_errors: list[str] = []
-        validate_plugin_taxonomy(metadata, taxonomy, src, vocab_errors)
-        if vocab_errors:
-            warnings.extend(f"{e} Plugin skipped." for e in vocab_errors)
+        entry = None
+        try:
+            front = parse_frontmatter(skill_md.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001 - unreadable or undecodable file
+            front = {}
+        declared_name = front.get("name")
+        if isinstance(declared_name, str) and declared_name.strip():
+            entry = by_name.get(declared_name.strip())
+
+        if entry is None:
+            catalog_path = source_skills.get(f"skills/{child.name}")
+            if catalog_path:
+                entry = by_path.get(catalog_path)
+
+        if entry is None:
+            unresolved.append(child.name)
+        else:
+            resolved.append(entry)
+
+    return resolved, unresolved
+
+
+def build_mirrored_plugin_entries(
+    skill_entries: list[dict],
+    taxonomy: dict,
+    warnings: list[str],
+    validator: Draft202012Validator,
+    declared: set[str] | None = None,
+) -> list[dict]:
+    """Build one metadata entry per plugin mirrored from a product repo.
+
+    Same contract as build_plugin_entries: nothing here is fatal, a plugin
+    problem degrades that plugin and never the skills catalog.
+    """
+    by_path = {e["path"]: e for e in skill_entries}
+    by_name = {e["name"]: e for e in skill_entries}
+    entries: list[dict] = []
+
+    for spec in load_mirrored_plugin_specs(warnings, declared):
+        name = spec["name"]
+        src = spec["__source"]
+        plugin_dir = PLUGINS_DIR / name
+
+        if not plugin_dir.is_dir():
+            # Registered but not mirrored yet, or held by the sync for drift
+            # or missing compliance. Both are normal and transient. The plugin
+            # stays declared, so a previously published entry is recovered
+            # rather than delisted.
+            warnings.append(
+                f"{src}: plugin `{name}` is registered but plugins/{name}/ is "
+                f"not in the repository yet, so it has no entry this run. This "
+                f"is expected between registration and the first successful "
+                f"plugin sync."
+            )
             continue
 
-        entry = {
-            "name": name,
-            "path": f"plugins/{name}",
-            # Carried so recovery can identify a published plugin whose file
-            # has since become unparseable, when its `name` cannot be read.
-            "source": src,
-            "description": description,
-            "skills": sorted({e["path"] for e in resolved}),
-            "metadata": {f: metadata[f] for f in PLUGIN_FIELDS},
-        }
+        description = None
+        manifest = plugin_dir / "plugin.json"
+        if manifest.is_file():
+            try:
+                loaded = json.loads(manifest.read_text(encoding="utf-8"))
+                if isinstance(loaded, dict):
+                    description = loaded.get("description")
+            except Exception:  # noqa: BLE001 - malformed or undecodable JSON
+                description = None
+        if not isinstance(description, str) or not description.strip():
+            warnings.append(
+                f"{src}: plugin `{name}` has no usable `description` in "
+                f"plugins/{name}/plugin.json, which is the manifest the "
+                f"marketplaces are built from. Plugin skipped."
+            )
+            continue
+        try:
+            # Matches build_plugin_entries: the schema accepts any string but
+            # the output is written as UTF-8, and a lone surrogate only fails
+            # at write time, too late to degrade just this plugin.
+            description.encode("utf-8")
+        except UnicodeEncodeError:
+            warnings.append(
+                f"{src}: plugin `{name}` has a `description` that cannot be "
+                f"encoded as UTF-8; plugin skipped."
+            )
+            continue
 
-        # The assembled entry is checked against the published schema here,
-        # not left to the whole-document validation later in main().
-        #
-        # This is the difference between a bad plugin degrading itself and a
-        # bad plugin stopping the catalog. validate_plugin_taxonomy checks
-        # that values are in the vocabulary, but the schema enforces more than
-        # that -- minItems on product.primary, uniqueItems on skills, and an
-        # audience pattern that rejects "" and a trailing comma. Anything the
-        # vocabulary check does not cover used to pass this gate and fail the
-        # whole document instead, which writes no output at all.
-        schema_errors: list[str] = []
-        validate_against_schema(
-            {"skills": [], "plugins": [entry]}, validator, src, schema_errors
+        resolved, unidentified = resolve_bundled_skills(
+            plugin_dir, by_name, by_path, spec["__source_skills"]
         )
-        if schema_errors:
-            warnings.extend(f"{e} Plugin skipped." for e in schema_errors)
-            continue
 
-        # Only now is the plugin certain to be in the output.
-        if unresolved_notice:
-            warnings.append(unresolved_notice)
-        entries.append(entry)
+        unresolved_notice = ""
+        if unidentified:
+            unresolved_notice = (
+                f"{src}: plugin `{name}` BUILT WITHOUT "
+                f"{len(unidentified)} BUNDLED SKILL(S). These directories "
+                f"under plugins/{name}/skills/ match no catalog skill by "
+                f"SKILL.md name or by this registry's `skills:` paths, and "
+                f"were left out of the plugin's taxonomy: "
+                + ", ".join(sorted(unidentified))
+                + ". This is expected for a skill that is new, excluded, or "
+                "not published standalone; check it only if it should be there."
+            )
+
+        entry = assemble_plugin_entry(
+            name=name,
+            description=description.strip(),
+            src=src,
+            resolved=resolved,
+            override={},
+            unresolved_notice=unresolved_notice,
+            taxonomy=taxonomy,
+            warnings=warnings,
+            validator=validator,
+            no_skills_remedy=(
+                f"check that plugins/{name}/skills/ holds skills that are "
+                f"published in the catalog"
+            ),
+        )
+        if entry is not None:
+            entries.append(entry)
 
     entries.sort(key=lambda e: e["name"])
     return entries
@@ -1785,9 +2127,19 @@ def main(argv: list[str] | None = None) -> int:
     # Problems here are warnings, never errors -- see build_plugin_entries.
     plugin_warnings: list[str] = []
     declared_plugins: set[str] = set()
+    # Two kinds of plugin, one output. plugins.d holds the ones the catalog
+    # builds itself; components.d `plugins:` holds the ones product teams own
+    # and the sync mirrors in. Both fill the same `declared` set, because
+    # recovery has to recognise a published plugin of either kind -- without
+    # that, a mirrored plugin whose skills fail to resolve for one run would
+    # be delisted instead of kept.
     plugin_entries = build_plugin_entries(
         entries, taxonomy, plugin_warnings, metadata_validator, declared_plugins
     )
+    plugin_entries += build_mirrored_plugin_entries(
+        entries, taxonomy, plugin_warnings, metadata_validator, declared_plugins
+    )
+    plugin_entries.sort(key=lambda e: e["name"])
     plugin_entries = recover_plugin_entries(
         plugin_entries, baseline, metadata_validator, plugin_warnings, declared_plugins
     )
