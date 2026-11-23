@@ -14,7 +14,7 @@
 # Gates, same shape as skills:
 #   - signature drift / missing / mismatch on plugin.oms.sig → revert to
 #     the last signed tree on main (drop if the plugin is new)
-#   - compliance: plugin.json, plugin-card.md, plugin.oms.sig, evals/,
+#   - compliance: plugin.json, plugin-card.md, plugin.oms.sig,
 #     BENCHMARK.md, and every bundled skill must itself be compliant
 #   - version: content changed since main ⇒ plugin.json version must be
 #     higher, else hold
@@ -226,15 +226,16 @@ jobs:
               fi
             fi
 
-            # Compliance: required plugin-level artifacts.
+            # Compliance: required plugin-level artifacts. Plugin-level eval
+            # data is NOT required here: NVCARPS accepts a root evals.json,
+            # an evals/ dir, or skills-only evals, and the signed BENCHMARK.md
+            # (its output) plus the per-skill eval check below already prove
+            # the evals ran. Holding on eval layout would block validly
+            # signed plugins.
             missing=""
             for f in plugin.json plugin-card.md BENCHMARK.md; do
               [ -f "$dir/$f" ] || missing="$missing $f"
             done
-            if [ ! -f "$dir/evals/evals.json" ] && \
-               [ -z "$(find "$dir/evals" -maxdepth 1 -type f -name '*.json' -print -quit 2>/dev/null)" ]; then
-              missing="$missing evals/"
-            fi
             if [ -n "$missing" ]; then
               hold "$dir" "missing artifacts:$(echo "$missing" | xargs)"
               continue
