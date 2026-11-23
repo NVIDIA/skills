@@ -14,7 +14,8 @@
 #                                 and link to this repo
 #   plugins.d/<name>.yml        — presence means the plugin is BUILT by
 #                                 build-plugins.py from catalog skills, not
-#                                 mirrored; the plugin sync ignores it entirely
+#                                 mirrored. The sync never touches it, but it
+#                                 is still listed here with Source = this repo
 #                                 (e.g. nvidia-skills)
 #
 # Writes:
@@ -61,8 +62,7 @@ for pdir in sorted(Path("plugins").glob("*/")):
     manifest = pdir / "plugin.json"
     if not manifest.is_file():
         continue
-    if (Path("plugins.d") / f"{pdir.name}.yml").is_file():
-        continue  # catalog-built plugin, outside the plugin sync
+    catalog_built = (Path("plugins.d") / f"{pdir.name}.yml").is_file()
     try:
         m = json.loads(manifest.read_text())
     except Exception:
@@ -72,7 +72,9 @@ for pdir in sorted(Path("plugins").glob("*/")):
     desc = str(m.get("description", "")).replace("|", "\\|").replace("\n", " ").strip()
     skills = sorted(p.parent.name for p in (pdir / "skills").glob("*/SKILL.md"))
     product, repo = mapping.get(pdir.name, ("", ""))
-    if repo:
+    if catalog_built:
+        source = "This repo (built from `plugins.d/`)"
+    elif repo:
         source = f"[{product}](https://github.com/{repo})"
     elif product:
         source = f"{product} (this repo)"
