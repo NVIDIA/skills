@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 NVIDIA Corporation. All rights reserved.
+name: TensorRT-LLM
+repo: NVIDIA/TensorRT-LLM
+description: TensorRT LLM provides users with an easy-to-use Python API to define Large Language Models (LLMs) and supports state-of-the-art optimizations to perform inference efficiently on NVIDIA GPUs. TensorRT LLM also contains components to create Python and C++ runtimes that orchestrate the inference execution in a performant way.
+skills:
+  - path: skills/trtllm-serve-config-guide/
+    catalog_dir: trtllm-serve-config-guide
