@@ -196,7 +196,7 @@ Plugins bundle a product's skills together with their evals, MCP servers, hooks 
 <!-- plugins-table-start -->
 | Plugin | Description | Version | Skills | Source |
 |--------|-------------|---------|--------|--------|
-| _No plugins published yet_ | | | | |
+| `nvidia-skills` | Find the right NVIDIA skill for GPU acceleration, CUDA, AI agents, data loading, training, inference, robotics, Physical AI, Omniverse, simulation, and other NVIDIA-powered workflows. | `1.5.0` | 1 | This repo (built from `plugins.d/`) |
 <!-- plugins-table-end -->
 
 ---
