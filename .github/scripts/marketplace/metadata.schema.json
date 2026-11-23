@@ -42,7 +42,7 @@
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Plugin install name, matching the plugins.d/<name>.yml basename."
+          "description": "Plugin install name, taken from the `name` field of plugins.d/<name>.yml. It should match the file basename and the generator warns when it does not, but a mismatch is not rejected: build-plugins.py builds the plugin from `name` regardless, so refusing it here would delist a plugin that is live on build.nvidia.com."
         },
         "path": {
           "type": "string",

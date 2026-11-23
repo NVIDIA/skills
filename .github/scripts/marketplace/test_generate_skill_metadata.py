@@ -95,6 +95,47 @@ def pick_reference_entry(gen, baseline: dict, validator: Draft202012Validator) -
     )
 
 
+def _expected_metadata(gen):
+    """Return the metadata.json a healthy run produces, as written text.
+
+    Tests that drive main() in --check mode need a baseline that already
+    agrees with the current tree, or the run fails on drift before it reaches
+    the behaviour under test. Reading the checked-in file supplied one only
+    while that file happened to carry a `plugins` block, which made the tests
+    pass or fail on repo state. Generating it keeps them self-contained.
+
+    The skills come from the repo, because --no-ai can only carry a skill
+    forward from a baseline that already holds it. The `plugins` block does
+    not: it is seeded empty and rebuilt by the run.
+    """
+    import tempfile
+    from unittest.mock import patch
+
+    catalog = json.loads(gen.METADATA_PATH.read_text(encoding="utf-8"))
+    captured = {}
+
+    def capture(path, content):
+        captured[path] = content
+        return False
+
+    with tempfile.TemporaryDirectory() as tmp:
+        seed = Path(tmp) / "metadata.json"
+        seed.write_text(
+            gen.dumps_canonical(dict(catalog, plugins=[])), encoding="utf-8"
+        )
+        buf = io.StringIO()
+        with patch.object(gen, "METADATA_PATH", seed), \
+             patch.object(gen, "write_if_changed", capture), \
+             contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+            rc = gen.main(["--no-ai"])
+        if rc != 0 or seed not in captured:
+            raise AssertionError(
+                "could not build a baseline for the --check tests: "
+                f"rc={rc}; {buf.getvalue()[-300:]}"
+            )
+        return captured[seed]
+
+
 def check_plugin_never_blocks_main(gen, r):
     """Drive main() with a hostile plugins.d and prove output still happens.
 
@@ -148,19 +189,27 @@ def check_plugin_never_blocks_main(gen, r):
             f"name: p\ndescription: d\ninclude_skills:\n  - skills/\ntaxonomy:\n{full_taxonomy}",
     }
 
+    # --check fails on any drift, so it needs a baseline that already matches a
+    # healthy run. Taking the checked-in metadata.json made every case below
+    # depend on repo state: on a tree whose metadata.json has no `plugins`
+    # block yet -- main before this change -- all of them failed on drift
+    # rather than on the defect they name. Build the baseline here instead.
+    expected = _expected_metadata(gen)
+
     for label, body in hostile.items():
         with tempfile.TemporaryDirectory() as tmp:
             # The real plugins.d is copied in first so the genuine plugins
-            # still build. Without them the run would report drift against the
-            # checked-in metadata.json and fail for a reason unrelated to the
-            # hostile file. None of the hostile inputs below produce an entry,
-            # so a healthy run stays byte-identical.
+            # still build. None of the hostile inputs below produce an entry,
+            # so a healthy run stays byte-identical to the baseline above.
             directory = Path(tmp) / "plugins.d"
             shutil.copytree(real_plugins_d, directory)
             (directory / "p.yml").write_text(body, encoding="utf-8")
+            meta = Path(tmp) / "metadata.json"
+            meta.write_text(expected, encoding="utf-8")
             buf = io.StringIO()
             try:
                 with patch.object(gen, "PLUGINS_D_DIR", directory), \
+                     patch.object(gen, "METADATA_PATH", meta), \
                      contextlib.redirect_stdout(buf), \
                      contextlib.redirect_stderr(buf):
                     rc = gen.main(["--check", "--no-ai"])
@@ -187,8 +236,11 @@ def check_plugin_never_blocks_main(gen, r):
         directory = Path(tmp) / "plugins.d"
         shutil.copytree(real_plugins_d, directory)
         (directory / "p.yml").write_text("- not a mapping\n", encoding="utf-8")
+        meta = Path(tmp) / "metadata.json"
+        meta.write_text(expected, encoding="utf-8")
         buf = io.StringIO()
         with patch.object(gen, "PLUGINS_D_DIR", directory), \
+             patch.object(gen, "METADATA_PATH", meta), \
              patch.object(gen, "build_plugin_entries", lambda *a, **k: []), \
              contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
             gen.main(["--check", "--no-ai"])
@@ -218,14 +270,13 @@ def check_recovery_through_main(gen, r):
     from unittest.mock import patch
 
     real_plugins_d = gen.PLUGINS_D_DIR
-    baseline = json.loads(gen.METADATA_PATH.read_text(encoding="utf-8"))
-    published = [p["name"] for p in baseline.get("plugins", [])]
-    if not published:
-        r.check("recovery through main(): a published plugin exists to test", False,
-                "metadata.json has no plugins block to recover from")
-        return
-
-    target = published[0]
+    # The catalog's skills come from the repo because --no-ai can only carry a
+    # skill forward from a baseline that already holds it. The `plugins` block
+    # deliberately does not: this suite has to pass on a tree that has no such
+    # block yet, which is main before this change. A healthy run below supplies
+    # it instead, so the test depends on the generator, not on repo state.
+    catalog = json.loads(gen.METADATA_PATH.read_text(encoding="utf-8"))
+    seed = dict(catalog, plugins=[])
 
     def run(mutate_plugins_d, baseline_doc):
         """Run main() against a temp plugins.d and a temp baseline copy."""
@@ -253,10 +304,16 @@ def check_recovery_through_main(gen, r):
     def names(doc):
         return [p["name"] for p in (doc or {}).get("plugins", [])]
 
-    # Baseline: an untouched run still emits the plugin.
-    rc, out, log = run(lambda d: None, baseline)
-    r.check("recovery through main(): healthy run emits the plugin",
-            rc == 0 and target in names(out), f"rc={rc}; {names(out)}")
+    # A healthy run proves the happy path and supplies the baseline that the
+    # recovery scenarios below fall back on.
+    rc, generated, log = run(lambda d: None, seed)
+    r.check("recovery through main(): healthy run emits a plugin",
+            rc == 0 and bool(names(generated)), f"rc={rc}; {names(generated)}")
+    if not names(generated):
+        return
+
+    target = names(generated)[0]
+    baseline = dict(catalog, plugins=generated["plugins"])
 
     # The plugin's file becomes unparseable. build-plugins.py leaves the built
     # tree in place, so the catalog must keep the entry too.
