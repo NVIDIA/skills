@@ -10,11 +10,11 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 - Skill: `cudaq-guide`
 - Validation status: `passed`
-- Evaluation date: 2026-11-17
-- Evaluator version: `1.6.9`
+- Evaluation date: 2026-11-23
+- Evaluator version: `1.6.10`
 - Agents: Claude Code (`aws/anthropic/bedrock-claude-opus-5-5`), Codex (`openai/openai/gpt-6.1-sol`)
-- Tasks: 13 evaluation tasks (10 positive, 3 negative)
-- Dataset digest: `sha256:7884d2878ed008a3969a7668a02fb2f9fda8e70495368a69ca8bf4ce1f6071dd` (skill-evaluator-dataset-snapshot/1)
+- Tasks: 14 evaluation tasks (11 positive, 3 negative)
+- Dataset digest: `sha256:e587d102c08982b984d330ae5fd7786631b7c327cf05f97b946576160ba2e91b` (skill-evaluator-dataset-snapshot/1)
 - Attempts per task: 1
 - Environment: `k8s-sandbox`
 - Tier 2 evidence: required for publication
@@ -28,11 +28,11 @@ SkillSpector provider, model, analyzer revision, and determinism evidence retain
 
 | Skill | Provider | Adapter | Analyzer | Model | Revision | Determinism |
 | --- | --- | --- | --- | --- | --- | --- |
-| cudaq-guide | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
-| cudaq-guide | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
-| cudaq-guide | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
-| cudaq-guide | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
-| cudaq-guide | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.4` | nondeterministic / provider_defaults |
+| cudaq-guide | nv_inference | openai | mcp_tool_poisoning | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| cudaq-guide | nv_inference | openai | semantic_developer_intent | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| cudaq-guide | nv_inference | openai | semantic_quality_policy | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| cudaq-guide | nv_inference | openai | semantic_security_discovery | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
+| cudaq-guide | nv_inference | openai | meta_analyzer | `aws/anthropic/bedrock-claude-opus-5-5` | `2.13.5` | nondeterministic / provider_defaults |
 
 - Controls for `cudaq-guide`: temperature=not set (source=provider_default, forwarded=no); seed=not set (source=unset, forwarded=no); reasoning_effort=not set (source=provider_default, forwarded=no)
 
@@ -50,12 +50,12 @@ The three-tier evaluation checks whether the skill:
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.1% — baseline ran, but no comparable score was available; uplift unavailable | 86.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 86.2% → 98.5% (+12.3 points) | 89.2% → 92.3% (+3.1 points) |
-| Discoverability | 96.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 51.3% → 87.8% (+36.5 points) | 54.5% → 76.3% (+21.8 points) |
-| Efficiency | 83.4% — baseline ran, but no comparable score was available; uplift unavailable | 66.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 92.3% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 92.9% → 92.9% (±0.0 points) | 96.4% → 100.0% (+3.6 points) |
+| Correctness | 82.9% → 98.6% (+15.7 points) | 84.3% → 91.4% (+7.1 points) |
+| Discoverability | 95.5% — baseline ran, but no comparable score was available; uplift unavailable | 94.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 53.9% → 92.3% (+38.4 points) | 54.5% → 72.0% (+17.5 points) |
+| Efficiency | 82.5% — baseline ran, but no comparable score was available; uplift unavailable | 67.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -70,9 +70,9 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.7% → 96.8% (-1.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.3% → 96.7% (-1.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 87.2% → 87.8% (+0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 88.2% → 87.8% (-0.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ## Token Usage
 
@@ -80,35 +80,37 @@ Actual Tier 3 execution usage is reported for every observed agent/case pair and
 
 | Agent | Dataset case | With skill | Without skill | Delta | Change | Coverage |
 |---|---|---:|---:|---:|---:|---|
-| claude-code | All cases | 1,481,300 | 789,012 | +692,288 | +87.74% | skill 13/13; base 13/13 |
-| claude-code | cudaq-guide-applications-001 | 114,052 | 35,921 | +78,131 | +217.51% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-author-adjoint-001 | 156,496 | 71,436 | +85,060 | +119.07% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-author-api-001 | 119,297 | 35,531 | +83,766 | +235.75% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-author-constraint-001 | 110,692 | 108,076 | +2,616 | +2.42% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-gpu-sim-001 | 110,531 | 36,318 | +74,213 | +204.34% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-install-001 | 114,060 | 36,596 | +77,464 | +211.67% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-neg-001 | 35,033 | 35,019 | +14 | +0.04% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-neg-002 | 35,378 | 35,462 | -84 | -0.24% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-neg-003 | 107,075 | 106,823 | +252 | +0.24% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-parallelize-001 | 112,905 | 36,427 | +76,478 | +209.95% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-qpu-001 | 150,348 | 36,633 | +113,715 | +310.42% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-route-qiskit-001 | 74,529 | 72,392 | +2,137 | +2.95% | skill 1/1; base 1/1 |
-| claude-code | cudaq-guide-test-program-001 | 240,904 | 142,378 | +98,526 | +69.20% | skill 1/1; base 1/1 |
-| codex | All cases | 968,418 | 744,788 | +223,630 | +30.03% | skill 13/13; base 13/13 |
-| codex | cudaq-guide-applications-001 | 65,741 | 28,006 | +37,735 | +134.74% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-author-adjoint-001 | 54,199 | 38,662 | +15,537 | +40.19% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-author-api-001 | 49,848 | 17,572 | +32,276 | +183.68% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-author-constraint-001 | 62,648 | 46,925 | +15,723 | +33.51% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-gpu-sim-001 | 66,773 | 21,785 | +44,988 | +206.51% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-install-001 | 66,144 | 47,291 | +18,853 | +39.87% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-neg-001 | 13,227 | 13,176 | +51 | +0.39% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-neg-002 | 13,371 | 13,279 | +92 | +0.69% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-neg-003 | 45,286 | 49,995 | -4,709 | -9.42% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-parallelize-001 | 79,206 | 31,002 | +48,204 | +155.49% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-qpu-001 | 87,100 | 35,199 | +51,901 | +147.45% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-route-qiskit-001 | 49,199 | 31,016 | +18,183 | +58.62% | skill 1/1; base 1/1 |
-| codex | cudaq-guide-test-program-001 | 315,676 | 370,880 | -55,204 | -14.88% | skill 1/1; base 1/1 |
-| ALL AGENTS | Dataset aggregate | 2,449,718 | 1,533,800 | +915,918 | +59.72% | skill 26/26; base 26/26 |
+| claude-code | All cases | 1,781,721 | 980,867 | +800,854 | +81.65% | skill 14/14; base 14/14 |
+| claude-code | cudaq-guide-applications-001 | 114,678 | 35,800 | +78,878 | +220.33% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-author-adjoint-001 | 152,084 | 71,490 | +80,594 | +112.73% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-author-api-001 | 119,393 | 35,805 | +83,588 | +233.45% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-author-constraint-001 | 110,618 | 36,052 | +74,566 | +206.83% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-gpu-sim-001 | 110,858 | 36,165 | +74,693 | +206.53% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-install-001 | 114,888 | 71,534 | +43,354 | +60.61% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-neg-001 | 35,059 | 35,010 | +49 | +0.14% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-neg-002 | 35,365 | 35,672 | -307 | -0.86% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-neg-003 | 107,244 | 143,565 | -36,321 | -25.30% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-parallelize-001 | 112,517 | 36,815 | +75,702 | +205.63% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-parallelize-002 | 155,115 | 154,285 | +830 | +0.54% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-qpu-001 | 150,336 | 36,482 | +113,854 | +312.08% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-route-qiskit-001 | 112,073 | 72,524 | +39,549 | +54.53% | skill 1/1; base 1/1 |
+| claude-code | cudaq-guide-test-program-001 | 351,493 | 179,668 | +171,825 | +95.63% | skill 1/1; base 1/1 |
+| codex | All cases | 1,015,279 | 678,173 | +337,106 | +49.71% | skill 14/14; base 14/14 |
+| codex | cudaq-guide-applications-001 | 69,484 | 28,791 | +40,693 | +141.34% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-author-adjoint-001 | 51,410 | 26,025 | +25,385 | +97.54% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-author-api-001 | 49,534 | 21,657 | +27,877 | +128.72% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-author-constraint-001 | 62,553 | 34,462 | +28,091 | +81.51% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-gpu-sim-001 | 66,706 | 17,572 | +49,134 | +279.62% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-install-001 | 62,366 | 38,657 | +23,709 | +61.33% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-neg-001 | 13,223 | 13,176 | +47 | +0.36% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-neg-002 | 13,330 | 13,287 | +43 | +0.32% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-neg-003 | 50,293 | 44,874 | +5,419 | +12.08% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-parallelize-001 | 61,029 | 30,410 | +30,619 | +100.69% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-parallelize-002 | 80,299 | 49,673 | +30,626 | +61.66% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-qpu-001 | 86,889 | 33,622 | +53,267 | +158.43% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-route-qiskit-001 | 45,307 | 30,429 | +14,878 | +48.89% | skill 1/1; base 1/1 |
+| codex | cudaq-guide-test-program-001 | 302,856 | 295,538 | +7,318 | +2.48% | skill 1/1; base 1/1 |
+| ALL AGENTS | Dataset aggregate | 2,797,000 | 1,659,040 | +1,137,960 | +68.59% | skill 28/28; base 28/28 |
 
 Prompt tokens include cached reads, so total tokens are `prompt + completion` (cached is not added twice). The Efficiency score uses `(prompt - cached) + completion`. Change is `100 * (with - without) / without`; negative means fewer tokens. N/A comparisons include their reason in the coverage column; coverage is never estimated.
 
@@ -116,9 +118,9 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 8 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 9 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 13 task(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 14 task(s) |
 
 ## Findings and Observations
 
@@ -127,18 +129,18 @@ Prompt tokens include cached reads, so total tokens are `prompt + completion` (c
 
 - **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/onboarding.md:
   "## Troubleshooting" in SKILL.md (lines 78-92)
-  vs "## Platform Troubleshooting" in references/onboarding.md (lines 207-215) (`SKILL.md:78`)
-- **MEDIUM** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/onboarding.md:
+  vs "## Platform Troubleshooting" in references/onboarding.md (lines 242-250) (`SKILL.md:78`)
+- **HIGH** DUPLICATE/duplicate: Duplicate content found across SKILL.md and references/onboarding.md:
   "## Purpose" in SKILL.md (lines 3-9)
   vs "## Instructions" in SKILL.md (lines 18-28)
   vs "## Routing by Argument" in SKILL.md (lines 29-41)
   vs "## Menu" in SKILL.md (lines 42-59)
   vs "# CUDA-Q Onboarding Reference" in references/onboarding.md (lines 1-5)
-  vs "## Invocation Examples" in references/onboarding.md (lines 191-206) (`SKILL.md:3`)
+  vs "## Invocation Examples" in references/onboarding.md (lines 226-241) (`SKILL.md:3`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'author' is ignored; use 'metadata.author' (`skills/cudaq-guide/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'tags' is ignored; use 'metadata.tags' (`skills/cudaq-guide/SKILL.md`)
 - **MEDIUM** SCHEMA/frontmatter_field_placement: Root field 'version' is ignored; use 'metadata.version' (`skills/cudaq-guide/SKILL.md`)
-- 5 additional finding(s) are available in the full evaluation artifacts.
+- 6 additional finding(s) are available in the full evaluation artifacts.
 
 </details>
 

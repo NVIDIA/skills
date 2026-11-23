@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "cuPotential numerical validation"
+  short_description: "Check energies, forces, and simulation validity"
+  default_prompt: "Use $cupotential-validate to investigate my cuPotential results with an appropriate independent reference."

@@ -1,0 +1,53 @@
+{
+  "skill_name": "cupotential-benchmark",
+  "evals": [
+    {
+      "id": "benchmark-force-versus-integrated",
+      "prompt": "Build the synthetic workload in /workspace/input/benchmark-system.json. Inspect runtime first. With compatible cuPotential/CUDA, measure stock force plus stock integrator, cuPotential force plus that stock integrator, and cuPotential force plus native integrator. Preserve model/settings and COM policy. Declare and justify accuracy references and budgets before performance recommendations. Record setup cost separately, warm each available arm, synchronize equal timed work and retain at least three repetitions. CPU fallback is explicitly permitted if cuPotential/CUDA is absent: actually run and time the stock OpenMM CPU or Reference control, including finite energy/forces, supplied physical settings, actual steps, setup/warm separation and three repetitions; prepare the two cuPotential arms but mark their CUDA accuracy, timing and speedup NOT_RUN. You may install stock OpenMM in a new isolated CPU environment without changing the base environment. Save code, input/runtime/platform identity, raw times and variation under /workspace/output/benchmark-arms. CPU timing is a stock control only, not evidence of GPU speedup. If no branch executes, report the benchmark incomplete rather than substitute blog numbers.",
+      "files": [
+        "files/benchmark-system.json"
+      ],
+      "expected_output": "A measured, accuracy-qualified three-arm cuPotential CUDA comparison when available, or a real stock OpenMM CPU control with setup/warm timing and three repetitions, plus prepared cuPotential arms and explicit NOT_RUN native metrics. CPU timing establishes no cuPotential/GPU speedup.",
+      "assertions": [
+        "The prepared three arms isolate force replacement and native integration with COM frequency 37 applied once; CPU fallback executes only the labeled stock control.",
+        "All prepared/executed arms preserve particle model, geometry, timestep, constraints, cutoff, precision policy and ensemble; a CPU platform/precision difference is disclosed rather than hidden.",
+        "Accuracy references and budgets are declared, fixed-configuration checks use an independent reference, and native comparisons not executed stay NOT_RUN.",
+        "Available-arm timing separates setup and warm work, records actual steps, and uses equal 500-step work for at least three repetitions; native CUDA uses synchronized paired arm trials.",
+        "Raw times, throughput and variation are saved with actual platform/device identity. In CPU mode no cuPotential timing, speedup or GPU performance conclusion is produced.",
+        "No native execution/backend behavior or published speedup is invented. CPU control completion is explicitly distinguished from the unexecuted cuPotential GPU benchmark."
+      ]
+    },
+    {
+      "id": "benchmark-short-lived-startup",
+      "prompt": "My application starts a fresh process for only 100 MD steps. A colleague recommends cuPotential based on the warm-loop timings in /workspace/input/startup-timings.json. Analyze these synthetic timings without running a new benchmark. Compute median warm throughput, total modeled time for 100 and 10000 steps, and the crossover step count under the stated linear model. Explain which measurement answers my application question and what the data cannot establish. Save the calculations and recommendation under /workspace/output/startup-analysis; label supplied timings as synthetic rather than local GPU measurements.",
+      "files": [
+        "files/startup-timings.json"
+      ],
+      "expected_output": "The supplied medians imply 3x warm speedup but about 0.75 s stock versus 8.05 s cuPotential for a fresh 100-step process. The modeled crossover is 7400 steps; at 10000 steps totals are about 15.6 s and 13.0 s. A recommendation distinguishes warm throughput from end-to-end latency and does not invent accuracy evidence.",
+      "assertions": [
+        "Median warm times are 1.5 s and 0.5 s per 1000 steps, giving 3x warm speedup and approximately 115.2 versus 345.6 ns/day at the supplied timestep.",
+        "Fresh-process setup is included once per application: 100-step totals are approximately 0.75 s stock and 8.05 s cuPotential.",
+        "The linear-model crossover is 7400 steps, and 10000-step totals are approximately 15.6 s stock and 13.0 s cuPotential.",
+        "The recommendation addresses the requested 100-step process lifetime instead of presenting warm throughput as the application's end-to-end speedup.",
+        "The report preserves the supplied matched-work assumptions, discusses uncertainty or omitted real application costs, and does not infer physical accuracy from timing data.",
+        "The timings are identified as supplied synthetic data; no new GPU benchmark, universal break-even point or unsupported backend attribution is claimed."
+      ]
+    },
+    {
+      "id": "benchmark-unlocked-no-golden",
+      "prompt": "Review /workspace/input/benchmark-attempts.json, which contains synthetic source-runner records. Which attempts contain usable current timing evidence, and which can establish a historical performance regression? Explain how to rerun the intended apoa1 source benchmark with a nonempty selection when GPU clocks cannot be locked. Do not run builds or contact a GPU here. Write /workspace/output/benchmark-review.md, preserving the empty-selection failure and distinguishing synthetic log analysis from newly measured performance.",
+      "files": [
+        "files/benchmark-attempts.json"
+      ],
+      "expected_output": "The empty selection is rejected despite exit status zero. The nonempty unlocked attempt supports a current measurement of the supplied workload, labeled synthetic input analysis, with medians 1.2 s stock and 0.6 s cuPotential. Neither attempt establishes a historical regression without golden data; a proposed rerun collects a nonempty selection and uses the documented unlocked-clock mode.",
+      "assertions": [
+        "The zero-selection attempt is explicitly rejected as executed benchmark coverage even though its wrapper exit status is zero.",
+        "The nonempty attempt's raw repetitions are retained and yield approximately 2x matched-work timing ratio, with unlocked clocks disclosed.",
+        "Absent historical golden data prevents a historical regression verdict but does not by itself invalidate a nonempty current timing measurement.",
+        "The proposed source workflow checks available stages and collection count before running the apoa1 benchmark, and uses CUPO_ALLOW_UNLOCKED_CLOCKS=1 where required.",
+        "The agent does not invent privileged clock locking, a passing golden comparison, a newly executed GPU benchmark or an accuracy result missing from the records.",
+        "The report labels conclusions as analysis of supplied synthetic records and retains the failed empty-selection attempt."
+      ]
+    }
+  ]
+}

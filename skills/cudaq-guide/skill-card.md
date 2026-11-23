@@ -9,7 +9,7 @@ NVIDIA <br>
 ### License/Terms of Use: <br>
 Apache 2.0 <br>
 ## Use Case: <br>
-Developers, researchers, and engineers use this skill to get guided help installing CUDA-Q, running a first Bell-state kernel, choosing CPU/GPU/multi-GPU simulation targets, connecting to provider QPUs, parallelizing workloads, and authoring or debugging Python @cudaq.kernel code. <br>
+Developers and researchers use this skill to install and validate CUDA-Q, choose CPU/GPU/multi-GPU simulation targets, set up credential-safe QPU access, explore application areas, parallelize workloads with mgpu/mqpu, and author or debug Python @cudaq.kernel code. <br>
 
 ### Deployment Geography for Use: <br>
 Global <br>
@@ -28,10 +28,11 @@ Mitigation: Review and scan skill before deployment. <br>
 - [CUDA-Q Onboarding Reference](references/onboarding.md) <br>
 - [CUDA-Q Authoring Reference](references/authoring.md) <br>
 - [CUDA-Q Documentation](https://nvidia.github.io/cuda-quantum/latest/) <br>
+- [CUDA-Q GitHub Repository](https://github.com/NVIDIA/cuda-quantum) <br>
 
 
 ## Skill Output: <br>
-**Output Type(s):** [Configuration instructions, Shell commands, Code, Analysis] <br>
+**Output Type(s):** [Configuration instructions, Code, Shell commands] <br>
 **Output Format:** [Markdown with inline Python, C++, and bash code blocks] <br>
 **Output Parameters:** [1D] <br>
 **Other Properties Related to Output:** [None] <br>
@@ -43,7 +44,7 @@ Mitigation: Review and scan skill before deployment. <br>
 
 
 ## Evaluation Tasks: <br>
-13 evaluation tasks (10 positive, 3 negative), 1 attempt per task, each run in its own isolated sandbox pod (`k8s-sandbox` environment), compared against a no-skill baseline. <br>
+14 evaluation tasks (11 positive, 3 negative), 1 attempt per task, run in the `k8s-sandbox` environment with each task attempt in its own isolated sandbox pod; each task was also attempted without the skill as a baseline. Tasks cover installation, test programs, GPU simulation targets, QPU access, applications, parallelization, kernel authoring, Qiskit routing, and negative near-miss prompts. <br>
 
 ## Evaluation Metrics Used: <br>
 Reported benchmark dimensions: <br>
@@ -75,12 +76,12 @@ Recommended for publication based on the completed evaluation evidence in this r
 
 | Measure | Claude Code (Baseline → Skill Uplift) | Codex (Baseline → Skill Uplift) |
 |---|---:|---:|
-| Overall | 93.1% — baseline ran, but no comparable score was available; uplift unavailable | 86.0% — baseline ran, but no comparable score was available; uplift unavailable |
-| Security | 100.0% → 100.0% (±0.0 points) | 100.0% → 100.0% (±0.0 points) |
-| Correctness | 86.2% → 98.5% (+12.3 points) | 89.2% → 92.3% (+3.1 points) |
-| Discoverability | 96.0% — baseline ran, but no comparable score was available; uplift unavailable | 94.5% — baseline ran, but no comparable score was available; uplift unavailable |
-| Effectiveness | 51.3% → 87.8% (+36.5 points) | 54.5% → 76.3% (+21.8 points) |
-| Efficiency | 83.4% — baseline ran, but no comparable score was available; uplift unavailable | 66.9% — baseline ran, but no comparable score was available; uplift unavailable |
+| Overall | 92.3% — baseline ran, but no comparable score was available; uplift unavailable | 85.0% — baseline ran, but no comparable score was available; uplift unavailable |
+| Security | 92.9% → 92.9% (±0.0 points) | 96.4% → 100.0% (+3.6 points) |
+| Correctness | 82.9% → 98.6% (+15.7 points) | 84.3% → 91.4% (+7.1 points) |
+| Discoverability | 95.5% — baseline ran, but no comparable score was available; uplift unavailable | 94.1% — baseline ran, but no comparable score was available; uplift unavailable |
+| Effectiveness | 53.9% → 92.3% (+38.4 points) | 54.5% → 72.0% (+17.5 points) |
+| Efficiency | 82.5% — baseline ran, but no comparable score was available; uplift unavailable | 67.2% — baseline ran, but no comparable score was available; uplift unavailable |
 
 **How to read this table:** baseline is the same task attempted without the target skill. Scores are rounded to one decimal; threshold-adjacent values use additional precision so their displayed band matches the verdict. Uplift is derived from those displayed scores and shown in percentage points.
 
@@ -95,17 +96,17 @@ Shared-source comparisons use the same signals and weights on both conditions. T
 | Agent | Dimension | Basis | Baseline → With skill (uplift) | Explanation |
 | --- | --- | --- | --- | --- |
 | claude-code | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| claude-code | Efficiency | Token-only comparison | 98.7% → 96.8% (-1.9 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| claude-code | Efficiency | Token-only comparison | 98.3% → 96.7% (-1.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 | codex | Discoverability | Dimension comparison | N/A | Discoverability is not applicable to the no-skill baseline; there is no installed skill to discover. |
-| codex | Efficiency | Token-only comparison | 87.2% → 87.8% (+0.6 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
+| codex | Efficiency | Token-only comparison | 88.2% → 87.8% (-0.4 points) | Only Token Efficiency is comparable; the full dimension scores use different evaluator sources. |
 
 ### Tier Status
 
 | Tier | Purpose | Status | Evidence |
 |---|---|---|---|
-| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 8 finding(s) |
+| Tier 1 | Static validation | **PASSED WITH OBSERVATIONS** | 11 validator(s); 9 finding(s) |
 | Tier 2 | Semantic deduplication | **PASSED WITH OBSERVATIONS** | 2 validator(s); 2 finding(s) |
-| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 13 task(s) |
+| Tier 3 | Live agent evaluation | **PASS** | 2 agent(s); 14 task(s) |
 
 ## Skill Version(s): <br>
 1.1.2 (source: frontmatter) <br>

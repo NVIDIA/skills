@@ -1,0 +1,53 @@
+{
+  "skill_name": "cupotential-custom-potentials",
+  "evals": [
+    {
+      "id": "custom-binary-wca",
+      "prompt": "Implement the binary-mixture WCA model in /workspace/input/wca-model.json using cuPotential's OpenMM expression interface. Inspect runtime first and use compatible cuPotential/CUDA when available. Build an independently coded analytic pair-energy/force reference and declare finite-difference steps and numerical budgets before candidate observations. Test supplied separations, the excluded-pair control and reversible strength sequence at fixed coordinates. If CUDA/cuPotential is unavailable, CPU fallback is permitted: actually execute the analytic reference and finite-difference sweep, with nonzero interior values, outside-support/excluded controls and strength 1.0, 0.4, 1.0. When stock OpenMM CPU/Reference is available, also compare its expression with that independent reference and use live Context changes. You may install stock OpenMM in a new isolated CPU environment; do not replace the cuPotential runtime. Save executable candidate/reference code, commands, hashes, budgets, raw results and comparisons under /workspace/output/wca. In CPU mode label the prepared native candidate and its live updates NOT_RUN, and cuPotential numerical validation incomplete; analytic or stock CPU success is not a GPU result. Preserve input and every failed check. No cache cleanup is needed.",
+      "files": [
+        "files/wca-model.json"
+      ],
+      "expected_output": "A correct unequal-particle cuPotential WCA definition plus executed independent analytic and finite-difference controls. Exercise native CUDA when available; otherwise deliver explicitly labeled CPU reference results and a prepared native harness whose CUDA execution/accuracy remain untested.",
+      "assertions": [
+        "The expression uses arithmetic sigma and geometric epsilon mixing, WCA shift and the pair-specific radius 2^(1/6) times sigma.",
+        "The periodic cutoff covers pair-specific support, units are consistent, and no electrostatic or homogeneous tail contribution is invented.",
+        "Executed controls include a nonzero interior interaction and zero outside-support/excluded values, from native CUDA when available or explicitly labeled CPU references otherwise.",
+        "An independent analytic reference and a declared finite-difference step sweep check force sign, magnitude and equal/opposite pair components away from boundaries.",
+        "Strength 1.0, 0.4, 1.0 is actually exercised at fixed coordinates in the available reference/Context, with observed scaling and restoration. Unexecuted native live Context updates remain NOT_RUN.",
+        "Budgets precede observations, failures/input are preserved, and CPU controls are never reported as successful cuPotential CUDA execution or candidate agreement."
+      ]
+    },
+    {
+      "id": "custom-fusion-retains-lj",
+      "prompt": "The model in /workspace/input/fusion-model.json contains ordinary periodic Coulomb/LJ plus an additional Gaussian pair term. Prepare independent stock OpenMM and cuPotential setCutoffInteraction definitions. Preserve ordinary LJ exactly once, electrostatics, exceptions, exclusions, cutoff, switching and tail conventions. Inspect the installed interface when available and state the complete replacement expression. Execute fixed-configuration stock-versus-cuPotential energy/force comparisons with declared budgets when compatible CUDA is available. If not, CPU fallback is permitted: execute the independent stock definition on OpenMM CPU or Reference, with finite raw energies/forces and independent nonzero LJ-only/Gaussian-only analytic controls away from cutoffs. Stock OpenMM may be installed in a new isolated CPU environment; do not replace the cuPotential stack. Keep the native construction runnable but NOT_RUN, distinguish its planned inventory from observed stock inventory, and leave the native comparison incomplete. Save code, inventories, versions, input hashes, commands, results and retained failures under /workspace/output/fusion. Do not alter the model or claim prepared code/CPU controls prove cuPotential execution. If stock CPU execution is also unavailable, report it incomplete.",
+      "files": [
+        "files/fusion-model.json"
+      ],
+      "expected_output": "A full LJ-plus-Gaussian replacement preserving electrostatics/exceptions, an independent stock definition and observed numerical controls. Compare both on native CUDA when available; otherwise exercise the stock CPU reference and analytic controls while explicitly leaving cuPotential execution/comparison NOT_RUN.",
+      "assertions": [
+        "The replacement includes full ordinary LJ exactly once plus Gaussian; setCutoffInteraction is not treated as adding to native LJ.",
+        "Standard electrostatics is retained once and no reciprocal Gaussian contribution is fabricated.",
+        "Pair 0-1 exception/exclusion, particle count, cutoff and disabled switching/tail settings are preserved.",
+        "Both definitions use identical model/coordinates/box/units; observed stock inventory is distinguished from a prepared native inventory if cuPotential cannot execute.",
+        "Actual finite stock energy/forces and independent nonzero analytic LJ/Gaussian controls are saved on the CPU branch; native comparisons are additionally required when compatible CUDA is available.",
+        "The input, original failures and declared budgets are retained. Stock CPU results do not certify native cuPotential execution or numerical agreement; unavailable comparisons remain NOT_RUN."
+      ]
+    },
+    {
+      "id": "custom-unavailable-derivatives",
+      "prompt": "Review the synthetic installed-API contract in /workspace/input/derivative-contract.txt. My estimator requires analytic dU/dlambda at every sampled configuration. I can change lambda live and restart a short trajectory, so can I declare this runtime's offset path ready for thermodynamic integration and report an RBFE result? Give a concrete implementation/protocol decision in /workspace/output/derivative-assessment.md. Use only the supplied contract and explain remaining evidence needs. Do not install software, invent derivative APIs or claim to have run the estimator.",
+      "files": [
+        "files/derivative-contract.txt"
+      ],
+      "expected_output": "A justified incompatibility finding for the requested analytic-derivative estimator on this specified path, with a supported alternative or explicit protocol change and the sampling/analysis requirements needed before any free-energy claim.",
+      "assertions": [
+        "The answer separates live global-parameter updates, coordinate forces, checkpoint restoration and analytic derivatives with respect to lambda.",
+        "It uses the supplied path-specific absence of analytic energy-parameter derivatives and does not generalize that finding to every future cuPotential build or interface.",
+        "It does not invent an API or silently present finite-difference energy estimates as the required analytic derivative.",
+        "Any proposed fallback identifies a runtime/path supporting the required observable or an explicit estimator/protocol change that still needs validation.",
+        "A short single-window run or successful restart is not reported as an RBFE result; thermodynamic cycle, endpoint/intermediate sampling, convergence or overlap, estimator and applicable corrections remain necessary.",
+        "The artifact reports an assessment, with no fabricated software execution or scientific result."
+      ]
+    }
+  ]
+}

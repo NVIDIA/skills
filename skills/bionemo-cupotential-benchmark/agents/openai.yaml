@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "cuPotential benchmarking"
+  short_description: "Measure cuPotential speed and accuracy on your workload"
+  default_prompt: "Use $cupotential-benchmark to compare cuPotential and stock OpenMM fairly on my system."

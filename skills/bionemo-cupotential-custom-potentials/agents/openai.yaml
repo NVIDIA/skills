@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "cuPotential custom potentials"
+  short_description: "Build and check custom pair potentials with live parameters"
+  default_prompt: "Use $cupotential-custom-potentials to implement my pair potential and verify its forces and parameter updates."

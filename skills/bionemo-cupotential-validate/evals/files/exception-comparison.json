@@ -1,0 +1,18 @@
+{
+  "provenance": "Original synthetic isolated exception-contribution fixture, computed as k*qprod/r with k=138.935456 kJ nm/(mol e^2); not full-system or GPU output.",
+  "reference_model": {"particle_charges_e": [0.1, -0.1], "exception": {"particles": [0, 1], "charge_product_e2": -0.01, "epsilon_kj_mol": 0}, "exceptions_use_periodic_boundary_conditions": false},
+  "candidate_model": {"particle_charges_e": [0.1, -0.1], "exception": {"particles": [0, 1], "charge_product_e2": -0.005, "epsilon_kj_mol": 0}, "exceptions_use_periodic_boundary_conditions": false},
+  "budgets": {"energy_atol": 0.000001, "force_max_atol": 0.000001},
+  "reference_snapshot": {
+    "positions_nm": [[0.5, 1, 1], [1, 1, 1]],
+    "box_vectors_nm": [[4, 0, 0], [0, 4, 0], [0, 0, 4]],
+    "potential_energy_kj_mol": -2.77870912,
+    "forces_kj_mol_nm": [[5.55741824, 0, 0], [-5.55741824, 0, 0]]
+  },
+  "candidate_snapshot": {
+    "positions_nm": [[0.5, 1, 1], [1, 1, 1]],
+    "box_vectors_nm": [[4, 0, 0], [0, 4, 0], [0, 0, 4]],
+    "potential_energy_kj_mol": -1.38935456,
+    "forces_kj_mol_nm": [[2.77870912, 0, 0], [-2.77870912, 0, 0]]
+  }
+}

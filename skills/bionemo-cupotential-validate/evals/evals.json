@@ -1,0 +1,47 @@
+{
+  "skill_name": "cupotential-validate",
+  "evals": [
+    {
+      "id": "validate-changed-exception",
+      "prompt": "Diagnose /workspace/input/exception-comparison.json. It contains synthetic fixed-coordinate results for an isolated exception contribution, plus the two model definitions and predeclared budgets. Compute the original numerical verdict and identify any model mismatch before attributing it to cuPotential's numerical method. Preserve the input, extract working snapshots under /workspace/output/exception-check, and save the computed metrics and diagnosis there. You may explain or separately demonstrate a correction, but must retain the original verdict. No OpenMM installation or GPU is needed; do not claim these synthetic arrays are a GPU reproduction or silently change the acceptance criteria.",
+      "files": ["files/exception-comparison.json"],
+      "expected_output": "The original comparison fails its supplied energy and force budgets. The candidate exception charge product is half the reference value, so the models differ before any engine-accuracy conclusion. The original failure is retained and any correction is a separately identified comparison.",
+      "assertions": [
+        "The agent computes energy and force differences from the supplied arrays using the supplied budgets and retains failed original energy and force checks.",
+        "It identifies the exception charge-product change from -0.01 to -0.005 e^2 while the supplied particle charges, geometry and other declared conventions are unchanged.",
+        "It does not diagnose a cuPotential force ceiling or approximation defect from this model-mismatched isolated-contribution fixture.",
+        "The supplied input remains unchanged, and any corrected or aligned-model result is kept separate from the original failed comparison.",
+        "Numerical limits are not loosened after seeing the candidate, and a running trajectory or restored checkpoint is not offered as a replacement for the failed checks.",
+        "The report identifies the data as synthetic CPU-analyzed inputs and makes no claim of actual GPU execution or full-system validation."
+      ]
+    },
+    {
+      "id": "validate-common-refined-reference",
+      "prompt": "Analyze the synthetic common-reference sweep in /workspace/input/reference-refinement.json. Use the predeclared reference and candidate budgets, quantify reference refinement, then assess stock OpenMM and cuPotential separately against the finest supplied reference. A colleague proposes dividing energy errors by the finest reference energy and increasing the LJ cutoff to make agreement easier. Evaluate those proposals without changing the input or budgets. Write numerical results and a short methodology assessment under /workspace/output/common-reference. This is CPU analysis of supplied data; no new simulation is requested.",
+      "files": ["files/reference-refinement.json"],
+      "expected_output": "A common-reference comparison showing that the final refinement changes energy by about 1e-8 kJ/mol and force components by about 1e-6 kJ/mol/nm, below the reference budgets; both supplied candidate methods meet the separate absolute candidate budgets. Relative energy error at zero reference energy is undefined, and changing the truncated-LJ cutoff changes the model.",
+      "assertions": [
+        "The report computes the last refinement differences and checks them against the separate reference budgets before interpreting candidate accuracy.",
+        "Stock and cuPotential are each compared with the same finest reference, rather than treating stock's default result as an exact oracle.",
+        "It reports approximately 3e-6 and 2e-6 kJ/mol absolute energy errors and 2e-4 and 3e-4 kJ/mol/nm maximum component errors for stock and cuPotential respectively, within the supplied candidate limits.",
+        "It does not divide by zero reference energy or silently replace the requested absolute energy criterion with a misleading relative metric.",
+        "It explains why increasing the physical truncated-LJ cutoff would change the model, and preserves the supplied geometry, cutoff, switching and tail conventions.",
+        "It labels the sweep synthetic and the refinement as evidence for this supplied protocol, without claiming newly executed GPU measurements or a universal scientific tolerance."
+      ]
+    },
+    {
+      "id": "validate-invalid-and-undefined-inputs",
+      "prompt": "Exercise snapshot comparison on the supplied files. Compare nonfinite.json and different-box.json separately against reference.json with a maximum-force-component tolerance of 0.001 kJ/mol/nm. Compare zero-reference.json against itself with a relative-force-L2 tolerance of 0.01, then separately with a maximum-component tolerance of zero. Finally compare reference.json with itself without any thresholds. Save commands, process exit codes and machine-readable results under /workspace/output/snapshot-input-checks. Explain which outcomes establish a pass and which do not. Preserve all supplied files; do not repair invalid inputs or omit a failing/undefined check to obtain an overall pass.",
+      "files": ["files/nonfinite.json", "files/different-box.json", "files/reference.json", "files/zero-reference.json"],
+      "expected_output": "Observed CPU comparisons classify the nonfinite and changed-box inputs as invalid, the zero-reference relative check as inconclusive, the separate zero absolute-force check as passed, and the threshold-free comparison as diagnostic. Commands, exit codes and coverage are retained without a blanket numerical or GPU pass claim.",
+      "assertions": [
+        "The comparisons actually execute on the supplied snapshots, and commands, machine-readable reports and nonzero process exit codes are retained.",
+        "The 1e999 force component is rejected as nonfinite and the changed box is rejected as incompatible geometry; neither input is silently repaired.",
+        "A requested relative-force-L2 check with zero reference norm is inconclusive or explicitly unevaluable, not passed by treating 0/0 as zero.",
+        "The separate zero absolute-force check can pass its stated narrow criterion without converting the undefined relative check into a pass.",
+        "An identical-array comparison without thresholds is diagnostic and does not claim an acceptance test passed.",
+        "Using the bundled comparator, invalid and inconclusive runs exit 2 while the separate absolute pass and diagnostic runs exit 0; no result claims model equivalence, reference convergence or GPU execution."
+      ]
+    }
+  ]
+}

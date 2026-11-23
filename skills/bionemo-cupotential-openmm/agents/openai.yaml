@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "cuPotential OpenMM simulations"
+  short_description: "Adapt OpenMM simulations and verify checkpoint restarts"
+  default_prompt: "Use $cupotential-openmm to adapt my simulation to cuPotential while preserving its physical settings."

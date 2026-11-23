@@ -1,0 +1,20 @@
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+
+SYNTHETIC SUPPORT INPUT: these observations describe a hypothetical application
+environment. They were constructed for this task and are not a GPU run result.
+
+Selected interpreter: /opt/application-env/bin/python
+Python: 3.12, Linux x86-64
+importlib.metadata.version("nv-openmm-plugin"): PackageNotFoundError
+find_spec("nv_openmm_plugin").origin:
+  /opt/application-sdk/python/nv_openmm_plugin/__init__.py
+OpenMM import: succeeds, version 8.4
+Plugin import: fails with
+  ImportError: libnvJitLink.so.13: cannot open shared object file: No such file or directory
+nvidia-smi: a GPU is listed and the header displays "CUDA Version: 13.4"
+nvcc: not found on PATH
+
+Not supplied: exact driver build, GPU architecture, plugin/runtime build identity,
+the application's dynamic-library search paths, the native extension dependency
+listing, or evidence of a CUDA Context or energy/force evaluation.

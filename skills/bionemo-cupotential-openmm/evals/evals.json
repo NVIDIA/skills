@@ -1,0 +1,55 @@
+{
+  "skill_name": "cupotential-openmm",
+  "evals": [
+    {
+      "id": "openmm-preserve-stock-integrator",
+      "prompt": "Use the original synthetic model in /workspace/input/system.json to build an independent stock OpenMM System and prepare adaptation of only its standard nonbonded force to cuPotential. Preserve the stock LangevinMiddleIntegrator and all supplied model/settings, including COM frequency 37. Inspect available runtime first. If compatible cuPotential/CUDA is available, run the 100-step adapted NVT simulation on CUDA. Otherwise a CPU fallback is explicitly permitted: run the stock System for 100 steps on OpenMM CPU or Reference, with actual finite initial energy/forces, step count and output state. You may install stock OpenMM in a new isolated CPU-reference environment if needed; do not alter the base environment or replace the cuPotential runtime. Save code, input hashes, inventories, runtime/platform identity and raw results under /workspace/output/stock-integrator. In CPU mode, preserve the cuPotential adaptation as runnable code and distinguish its planned inventory from the observed stock CPU inventory. Label CPU control results separately and cuPotential CUDA execution NOT_RUN; it remains incomplete. If neither runtime can execute, retain the blocker and do not claim either run succeeded. Preserve inputs and failed attempts; no cache cleanup is needed.",
+      "files": [
+        "files/system.json"
+      ],
+      "expected_output": "Either an observed model-preserving 100-step cuPotential CUDA run, or an explicitly labeled 100-step stock OpenMM CPU reference with finite raw energies/forces and a separately prepared cuPotential conversion. CPU reference success leaves cuPotential CUDA execution and numerical agreement untested.",
+      "assertions": [
+        "The supplied file is preserved, and masses, particle ordering, constraint, exception, coordinates, box, cutoff, switching and tail settings match the input contract in either branch.",
+        "The cuPotential construction replaces the intended nonbonded force exactly once; observed inventories are distinguished from a planned, unexecuted candidate inventory in CPU mode.",
+        "The stock LangevinMiddleIntegrator retains the requested temperature, friction, timestep and seed policy, and the stock CMMotionRemover retains frequency 37.",
+        "Replacements are constructed or source properties extracted before removal; no deleted OpenMM-owned force is accessed.",
+        "The selected available branch actually records finite energy/forces and 100 steps: cuPotential CUDA when available, or stock OpenMM CPU/Reference as the permitted fallback.",
+        "CPU fallback retains runnable cuPotential conversion code and marks native CUDA execution and agreement NOT_RUN; neither syntax checks nor stock CPU results are claimed as cuPotential validation.",
+        "Any installation stays in a new isolated CPU reference environment; original inputs and failures are retained. If both runtimes are unavailable, neither run is reported complete."
+      ]
+    },
+    {
+      "id": "openmm-com-checkpoint-restart",
+      "prompt": "Starting from /workspace/input/system.json, prepare cuPotential nonbonded force and native LangevinMiddleIntegrator with the supplied NVT settings and COM-removal frequency 37 transferred exactly once. Inspect runtime first. With compatible cuPotential/CUDA, run 100 steps, save compatible System/integrator XML and a binary checkpoint, restore in a separate Python process and run 40 additional steps. If that runtime is absent, CPU fallback is permitted: execute the same physical model with stock OpenMM on CPU or Reference, keeping the stock integrator and COM remover, and perform the actual 100-step checkpoint plus fresh-process 40-step continuation. Stock OpenMM may be installed in a new isolated CPU environment; do not modify the base environment or cuPotential stack. Save hashes, code, runtime identity, parent/child process evidence, definitions and before-save/immediately-restored/continued states under /workspace/output/nvt-restart. Compare physical state and Context parameters before continuation, with criteria declared before observing results. A stock CPU checkpoint does not verify cuPotential checkpoint compatibility or native COM transfer: keep that code prepared and those native checks NOT_RUN. Preserve input and failures. If both runtimes are unavailable, report incomplete rather than invent a checkpoint.",
+      "files": [
+        "files/system.json"
+      ],
+      "expected_output": "An actual 100-step plus fresh-process 40-step checkpoint workflow on compatible cuPotential CUDA or explicitly labeled stock OpenMM CPU/Reference, with physical-state comparisons before continuation. CPU artifacts do not certify native cuPotential serialization or CUDA execution.",
+      "assertions": [
+        "The prepared native integrator transfers COM frequency 37 exactly once; a stock CPU control instead retains the stock integrator and its single frequency-37 remover.",
+        "Masses, constraints, exceptions, force settings, temperature, friction, 0.001 ps timestep, seeds and input file are preserved.",
+        "The executed branch saves a real binary checkpoint and compatible System/integrator definitions, with actual runtime/platform identity.",
+        "A separately launched process reconstructs a compatible Context for the selected branch and loads its checkpoint; rereading the original Context does not count.",
+        "Saved versus immediately restored positions, velocities, box, time, step count and Context parameters are checked before continuation; mismatches remain failures.",
+        "Observed results establish 100 initial and 40 resumed steps. A CPU result is labeled stock OpenMM and leaves cuPotential CUDA/native checkpoint checks NOT_RUN.",
+        "The stock CPU checkpoint is not presented as portable to a cuPotential Context; if neither branch can run, execution remains incomplete without fabricated results."
+      ]
+    },
+    {
+      "id": "openmm-npt-restoration-limits",
+      "prompt": "Use /workspace/input/system.json and its npt section to prepare a cuPotential run with the native integrator and native isotropic barostat. Inspect runtime first. With compatible cuPotential/CUDA, run 100 steps, create a checkpoint, restore in a fresh process and run 50 more steps. If unavailable, CPU fallback is permitted: actually perform that checkpoint workflow using stock OpenMM CPU or Reference, stock LangevinMiddleIntegrator, the existing COM remover and one stock isotropic MonteCarloBarostat with the supplied pressure, temperature, frequency and seed policy. You may install stock OpenMM in a new isolated CPU environment, without changing the base environment or cuPotential stack. A teammate asks you to certify future positions and volume changes will be bitwise identical to uninterrupted continuation. Assess that separately from physical-state restoration. Save model/input hashes, code, runtime identity, seeds, before/after/continued physical states and separate-process evidence under /workspace/output/npt-restart. Keep the native conversion prepared but NOT_RUN in CPU mode; a stock CPU checkpoint does not validate cuPotential serialization or barostat bookkeeping. Preserve failed checks. Do not manufacture a checkpoint or claim any execution absent its prerequisites.",
+      "files": [
+        "files/system.json"
+      ],
+      "expected_output": "A real NPT checkpoint/restore and 100+50 integrated steps on the available cuPotential CUDA branch or explicitly labeled stock OpenMM CPU reference, plus a justified refusal to infer bitwise future-trajectory replay from restored physical state. CPU success leaves native cuPotential execution untested.",
+      "assertions": [
+        "Exactly one intended barostat preserves pressure, temperature, frequency and seed policy. Native code transfers COM frequency 37; a stock CPU control retains its single frequency-37 remover.",
+        "The model, box, timestep and input are preserved; the selected runtime actually creates its own checkpoint rather than receiving fabricated binary data.",
+        "A fresh compatible process restores the selected branch's checkpoint and compares physical state before further integration.",
+        "Actual results record 100 initial and 50 resumed steps, with box vectors and time. CPU and cuPotential CUDA results are labeled separately.",
+        "No bitwise future NPT trajectory guarantee is inferred solely from seeds or checkpoint-state equality; version-specific internal barostat-state evidence remains necessary.",
+        "CPU fallback does not certify cuPotential serialization, native barostat state, CUDA execution, numerical agreement or ensemble accuracy. Unavailable native checks stay NOT_RUN; no available branch means incomplete execution."
+      ]
+    }
+  ]
+}

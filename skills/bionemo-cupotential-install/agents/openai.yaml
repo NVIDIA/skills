@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+interface:
+  display_name: "cuPotential installation"
+  short_description: "Install cuPotential and diagnose GPU runtime loading"
+  default_prompt: "Use $cupotential-install to set up cuPotential in my selected Python environment and verify CUDA execution."
