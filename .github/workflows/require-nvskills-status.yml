@@ -139,7 +139,8 @@ jobs:
               def watched:
                 (. // "") |
                 startswith("skills/") or
-                startswith("team-skills/");
+                startswith("team-skills/") or
+                startswith("plugins/");
               [
                 .files[]? |
                 select((.filename | watched) or (.previous_filename? | watched)) |
@@ -162,8 +163,13 @@ jobs:
                   "plugins/[^/]+|plugins/[^/]+/skills/[^/]+)/" +
                   "(BENCHMARK\\.md|skill-card\\.md|skill\\.oms\\.sig|" +
                   "skill-card-review-needed\\.md|[^/]+-review-needed\\.md)$"
+                ) or
+                test(
+                  "^plugins/[^/]+/(plugin-card\\.md|plugin\\.oms\\.sig)$"
                 );
-              any(.files[]?; .filename | endswith("/skill.oms.sig")) and
+              any(.files[]?;
+                .filename | (endswith("/skill.oms.sig") or endswith("/plugin.oms.sig"))
+              ) and
               all(.files[]?;
                 ((.previous_filename? // "") | length) == 0 and
                 (.filename | generated_artifact)
@@ -215,7 +221,7 @@ jobs:
 
           if [ "${head_repo_full_name}" = "${REPO,,}" ]; then
             case "${HEAD_REF}" in
-              automated/sync-skills|bot/regenerate-skill-metadata)
+              automated/sync-skills|automated/sync-plugins|bot/regenerate-skill-metadata)
                 append_summary \
                   "## NVSkills CI required status" \
                   "" \
@@ -233,7 +239,8 @@ jobs:
               def watched:
                 (. // "") |
                 startswith("skills/") or
-                startswith("team-skills/");
+                startswith("team-skills/") or
+                startswith("plugins/");
               any(.[]; (.filename | watched) or (.previous_filename? | watched))
             ' >/dev/null; then
               has_watched_change=true
@@ -403,7 +410,7 @@ jobs:
             "Latest watched-path change: \`${latest_watched_path}\`." \
             "" \
             "Comment \`/nvskills-ci\` on this PR after every commit that changes" \
-            "\`skills/\` or \`team-skills/\`."
+            "\`skills/\`, \`team-skills/\`, or \`plugins/\`."
           if [ "${is_fork_pull_request}" = "true" ]; then
             append_summary \
               "" \
