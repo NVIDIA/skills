@@ -1150,16 +1150,18 @@ def validate_plugin_taxonomy(
         )
 
     allowed_products = taxonomy["product.primary"]["values"]
+    allowed_product_set = set(allowed_products)
     for value in metadata.get("product.primary", []):
-        if value not in set(allowed_products):
+        if value not in allowed_product_set:
             errors.append(
                 f"{location}: product.primary `{value}` is not a value in "
                 f"metadata.schema.json." + _suggest(value, allowed_products)
             )
 
     allowed_audience = taxonomy["audience"]["values"]
+    allowed_audience_set = set(allowed_audience)
     for value in str(metadata.get("audience", "")).split(","):
-        if value and value not in set(allowed_audience):
+        if value and value not in allowed_audience_set:
             errors.append(
                 f"{location}: audience `{value}` is not a value in "
                 f"metadata.schema.json." + _suggest(value, allowed_audience)
@@ -1502,7 +1504,22 @@ def recover_plugin_entries(
             # The validator covers the whole document, so a single entry is
             # checked by wrapping it the way existing_valid_metadata does.
             validator.validate({"skills": [], "plugins": [prior]})
-        except Exception:
+        except Exception as exc:
+            # Never drop it silently. This is the last path by which a
+            # published plugin can still leave the catalog without a word, and
+            # a baseline written by an older generator or edited by hand is
+            # exactly what reaches it. Flatten the reason: these warnings are
+            # rendered as single markdown bullets in the regeneration PR body.
+            reason = " ".join(
+                (getattr(exc, "message", None) or str(exc)).split()
+            )
+            warnings.append(
+                f"plugin `{prior['name']}`: DROPPED. It could not be rebuilt "
+                f"this run, and its entry in the previous metadata.json is not "
+                f"valid, so it could not be carried forward either. The plugin "
+                f"has left the catalog. Repair its plugins.d file to restore "
+                f"it. Reason: {reason}"
+            )
             continue
         try:
             # The schema accepts any string, but output is written as UTF-8.

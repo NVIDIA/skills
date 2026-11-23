@@ -144,6 +144,47 @@ jobs:
           echo "exit_code=${rc}" >> "$GITHUB_OUTPUT"
           exit ${rc}
 
+      # Plugin problems never fail the generator, because a nonzero exit would
+      # skip the PR step below and block regeneration of the whole catalog for
+      # one team's stale include_skills entry. They would therefore be visible
+      # only in the run log, so they are lifted out here.
+      #
+      # This runs unconditionally, and must. A plugin that is skipped and then
+      # recovered from the previous metadata.json produces no diff at all, so
+      # gating on `changed` hid exactly the warning that says a plugin's
+      # taxonomy has gone stale. The job summary always receives them; the PR
+      # body and the validation issue add them when they exist.
+      - name: Summarize plugin warnings
+        id: pluginwarn
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let section = '';
+            try {
+              const warnings = JSON.parse(fs.readFileSync('/tmp/skill-warnings.json', 'utf8'));
+              const items = warnings.plugins || [];
+              if (items.length > 0) {
+                section = [
+                  '',
+                  `### Plugin warnings (${items.length})`,
+                  '',
+                  'Each line states its own outcome: a plugin skipped, a plugin kept from the previous `metadata.json`, a plugin dropped because neither a rebuild nor its previous entry was usable, or a plugin built from a partial skill list. The skills catalog is unaffected in every case.',
+                  '',
+                  // Warnings carry their own backticks and can span several
+                  // lines, so they are emitted as plain bullets with internal
+                  // whitespace collapsed. Wrapping them in backticks broke the
+                  // rendering and hid the multi-line ones entirely.
+                  items.map(w => `- ${String(w).split(/\s+/).join(' ').trim()}`).join('\n'),
+                ].join('\n');
+                await core.summary.addRaw(section).write();
+              }
+            } catch (e) {
+              // No warnings file is the normal case.
+            }
+            core.setOutput('section', section);
+
       # ---- Failure path: open or update a tracking issue --------------
       - name: Open or update validation issue
         if: steps.generate.outputs.exit_code != '0'
@@ -176,6 +217,27 @@ jobs:
               }
             } catch (_) {}
 
+            // Plugin warnings do not set the exit code, so a run that fails
+            // for a skills reason can still be carrying them. Without this
+            // they appear only in the log, because the regeneration PR that
+            // normally reports them is never opened on this path. Read from
+            // the file rather than interpolating the pluginwarn output: the
+            // warnings contain backticks, which would end the template
+            // literal they were pasted into.
+            let pluginSection = '';
+            try {
+              const warnings = JSON.parse(fs.readFileSync('/tmp/skill-warnings.json', 'utf8'));
+              const items = warnings.plugins || [];
+              if (items.length > 0) {
+                pluginSection = [
+                  `### Plugin warnings (${items.length})`,
+                  ``,
+                  items.map(w => `- ${String(w).split(/\s+/).join(' ').trim()}`).join('\n'),
+                  ``,
+                ].join('\n');
+              }
+            } catch (_) {}
+
             const body = [
               `Validation failed in workflow run: ${runUrl}`,
               ``,
@@ -184,6 +246,7 @@ jobs:
               `cc @jim-NVIDIA @jasonNVIDIA`,
               ``,
               omittedSection,
+              pluginSection,
               `<details><summary>Full generator log</summary>`,
               ``,
               '```',
@@ -235,36 +298,6 @@ jobs:
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
-
-      # Plugin problems never fail the generator, because a nonzero exit would
-      # skip the PR step below and block regeneration of the whole catalog for
-      # one team's stale include_skills entry. They would therefore be visible
-      # only in the run log, so they are lifted into the PR body instead.
-      - name: Summarize plugin warnings
-        id: pluginwarn
-        if: steps.generate.outputs.exit_code == '0' && steps.changes.outputs.changed == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            let section = '';
-            try {
-              const warnings = JSON.parse(fs.readFileSync('/tmp/skill-warnings.json', 'utf8'));
-              const items = warnings.plugins || [];
-              if (items.length > 0) {
-                section = [
-                  '',
-                  `### Plugin warnings (${items.length})`,
-                  '',
-                  'Each line states its own outcome: a plugin skipped, a plugin kept from the previous `metadata.json`, or a plugin built from a partial skill list. The skills catalog is unaffected in every case.',
-                  '',
-                  items.map(w => `- \`${w}\``).join('\n'),
-                ].join('\n');
-              }
-            } catch (e) {
-              // No warnings file is the normal case.
-            }
-            core.setOutput('section', section);
 
       - name: Create regeneration PR
         if: steps.generate.outputs.exit_code == '0' && steps.changes.outputs.changed == 'true'
