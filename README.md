@@ -1,12 +1,14 @@
 <!-- SPDX-License-Identifier: Apache-2.0 AND CC-BY-4.0 -->
 <!-- Copyright (c) 2026 NVIDIA Corporation. All rights reserved. -->
 
-# NVIDIA Agent Skills
+# NVIDIA Agent Skills and Plugins
 
-**Official, NVIDIA-verified Agent Skills for Claude Code, Codex, and other coding agents.**
+**Official, NVIDIA-verified Agent Skills & Plugins for Claude Code, Codex, and other coding agents.**
 
 [![NVIDIA](https://img.shields.io/badge/NVIDIA-Verified-76B900?style=flat&logo=nvidia&logoColor=white)](https://nvidia.com)
 [![Agent Skills Spec](https://img.shields.io/badge/Agent%20Skills-Specification-blue)](https://agentskills.io)
+[![Agent Plugins Spec](https://img.shields.io/badge/Agent%20Plugins-Specification-blue)](https://agent-plugins.org)
+[![Claude Code Plugins](https://img.shields.io/badge/Claude%20Code-Plugins-D97757)](https://code.claude.com/docs/en/plugins-reference)
 [![License](https://img.shields.io/badge/License-Apache%202.0%20%2B%20CC--BY--4.0-green.svg)](#license)
 
 > 📖 **Docs:** [docs.nvidia.com/skills](https://docs.nvidia.com/skills) &nbsp;·&nbsp;
@@ -15,23 +17,34 @@
 
 ---
 
-Skills are portable instruction sets that teach AI agents how to use NVIDIA software optimally: Physical AI and robotics workflows, simulation, CUDA-X libraries, RAG and AI Blueprints, and platform tools. This repository is a catalog: skills are maintained in their respective product repos, and mirrored here daily via an automated sync pipeline. Skills are being added continuously, so check back for updates. We are building this infrastructure in the open, and contributions are welcome. See the [Roadmap](#roadmap) for what is planned next.
+Skills are portable instruction sets that teach AI agents how to use NVIDIA software optimally: Physical AI and robotics workflows, simulation, CUDA-X libraries, RAG and AI Blueprints, and platform tools. Plugins bundle a product's skills, plus a local MCP server where the product needs one, into a single install for Claude Code, Codex, Cursor, and other agents.
+
+This repository is a catalog of both. Skills are maintained in their respective product repos and mirrored here daily through an automated sync pipeline. Plugins are maintained by product teams in their own repos, mirrored here through a matching plugin sync, and published to the major agent marketplaces. Every skill and every NVIDIA Verified Plugin is signed, scanned, and evaluated before it ships. New skills and plugins are added continuously, so check back for updates. We are building this infrastructure in the open, and contributions are welcome. See the [Roadmap](#roadmap) for what is planned next.
 
 ---
 
 ## Quickstart
 
-Install NVIDIA skills with the default [`skills` CLI](https://github.com/vercel-labs/skills) flow. The NVIDIA Skill Finder skill will search this catalog and help you discover the right skill for your use case.
+Install individual **skills** with the [`skills` CLI](https://github.com/vercel-labs/skills), or install a whole product toolset as an NVIDIA Verified **plugin**:
 
-```bash
-npx skills add nvidia/skills --skill nvidia-skill-finder --yes
-```
+<!-- TODO: run a real install test of every plugin command, and confirm the OpenClaw and Hermes skill paths, before merge. -->
 
-This installs the skill finder, which can then find and install other skills for you. To browse the full catalog instead, run `npx skills add nvidia/skills`. You do not need to clone this repo or copy skill folders by hand.
+| Agent | Skills | Plugins |
+|-------|--------|---------|
+| **Claude Code** | `npx skills add nvidia/skills --agent claude-code` | `/plugin marketplace add NVIDIA/skills`<br>`/plugin install <plugin>@nvidia-official` |
+| **Codex** | `npx skills add nvidia/skills --agent codex` | `codex plugin marketplace add NVIDIA/skills`<br>`codex plugin add <plugin>@nvidia-official` |
+| **Cursor** | `npx skills add nvidia/skills --agent cursor` | [Cursor Marketplace](https://cursor.com/marketplace), or add the `NVIDIA/skills` marketplace |
+| **OpenClaw** | [ClawHub](https://clawhub.ai) | [ClawHub](https://clawhub.ai) |
+| **Hermes** | Hermes Hub | [Hermes plugin marketplace](https://hermes-agent.nousresearch.com/docs/plugins) |
+| **Other agents** (Kiro, Snowflake CoCo, …) | `npx skills add nvidia/skills --agent <agent>` | — |
+
+- **Skills:** the CLI prompts you to choose skills and an install destination; you do not need to clone this repo. Browse the [Skill Catalog](#skill-catalog).
+- **Plugins:** replace `<plugin>` with a name from the **Plugin** column of the [Plugin Catalog](#plugin-catalog). Verified Plugins are also listed in the Anthropic, Codex, and Cursor plugin directories.
+- **Not sure what you need?** Start with the NVIDIA Skill Finder skill, which searches this catalog and installs the right skills for your use case: `npx skills add nvidia/skills --skill nvidia-skill-finder --yes`. As a plugin, install `nvidia-skills`, which also recommends Verified Plugins first.
 
 > **Requires a current `skills` CLI (v1.5.16 or newer).** Installing via `npx skills@latest add nvidia/skills` always uses the latest. On older CLIs (v1.5.15 and earlier), skills may install but not appear in Claude Code — see [Troubleshooting](docs/advanced-install.mdx#troubleshooting).
 
-The skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API. In Claude Code, run `/reload-skills` to load newly installed skills in your current session.
+A skill is available the next time your agent loads skills and encounters a relevant task. For example, ask your agent to "solve a linear programming problem with cuOpt" and the skill guides it through the cuOpt Python API. In Claude Code, run `/reload-skills` to load newly installed skills in your current session.
 
 ### Install One Skill Without Prompts
 
@@ -196,7 +209,9 @@ For non-interactive installs, global installs, agent-specific installs, updates,
 
 ## Plugin Catalog
 
-Plugins bundle a product's skills together with their evals, MCP servers, hooks and assets, mirrored from the product repo and signed there. Install from the `nvidia-official` marketplace (see [plugins/README.md](plugins/README.md)).
+Plugins bundle a product's skills, plus a local MCP server where the product needs one, into a single install. Each plugin is maintained in its product team's repo, signed there, and mirrored here, and each one meets the bar described in [Verifying Plugins](#verifying-plugins). Install any of them with the commands in the [Quickstart](#quickstart); the **Plugin** column is the install name. This table is regenerated automatically whenever a plugin is added or updated.
+
+The `nvidia-skills` discovery plugin is the one exception: it is built in this repo from [`plugins.d/`](plugins.d/) rather than mirrored. See [`plugins/README.md`](plugins/README.md).
 
 <!-- plugins-table-start -->
 | Plugin | Description | Version | Skills | Source |
@@ -211,11 +226,12 @@ Plugins bundle a product's skills together with their evals, MCP servers, hooks 
 **Where to file an issue depends on what's broken:**
 
 - **Skill content issues** (a specific skill has a bug, missing functionality, or incorrect content) — file in the **source repo** for that product, using the per-product table below.
-- **Catalog issues** (catalog README errors, sync workflow problems, distribution channels, signing/verification flow, docs in this repo) — file [here](../../issues/new/choose) using the catalog issue templates: **Bug Report**, **Feature Request**, or **Documentation Request or Correction**.
+- **Plugin issues** (a Verified Plugin misbehaves, is missing a skill, or its bundled MCP server fails) — file with the **owning product team**. The plugin's **Source** link in the [Plugin Catalog](#plugin-catalog) points to that team's repo, and its row in the table below has the team's issue and security links.
+- **Catalog issues** (catalog README errors, sync workflow problems, plugin packaging and marketplace listings, distribution channels, signing/verification flow, docs in this repo) — file [here](../../issues/new/choose) using the catalog issue templates: **Bug Report**, **Feature Request**, or **Documentation Request or Correction**.
 - **Questions or general discussion** — use [Discussions](../../discussions). The issue tracker is reserved for bug reports, feature proposals with a design, and documentation issues.
 - **Security vulnerabilities** — follow the disclosure process in [SECURITY.md](SECURITY.md); do not open a public issue.
 
-Per-product source repo links:
+Per-product source repo links for skills:
 
 <!-- help-table-start -->
 | Product | Issues | Discussions | Contributing | Security |
@@ -297,7 +313,7 @@ Per-product source repo links:
 | **Warp** | [Issues](https://github.com/NVIDIA/warp/issues) | [Discussions](https://github.com/NVIDIA/warp/discussions) | [Contributing](https://github.com/NVIDIA/warp/blob/main/CONTRIBUTING.md) | [Security](https://github.com/NVIDIA/warp/blob/main/SECURITY.md) |
 <!-- help-table-end -->
 
-For issues with **this catalog repo itself** (README, structure, listing a new product): [open an issue here](../../issues).
+For issues with **this catalog repo itself** (README, structure, listing a new product or plugin): [open an issue here](../../issues).
 
 ---
 
@@ -327,6 +343,43 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 
 ---
 
+## Verifying Plugins
+
+NVIDIA Verified Plugins carry the catalog's trust guarantees at the bundle level:
+
+| Guarantee | What it means |
+|-----------|---------------|
+| **Signed** | The plugin and every skill inside it carry an NVIDIA signature. |
+| **Verified** | Automated verifiers check every skill and the plugin bundle (instruction safety, supply chain, structure) before publishing. |
+| **Evaluated** | Each plugin publishes its evaluation results in a signed `BENCHMARK.md`, generated from its eval data. |
+| **Plugin Card** | A machine-readable card covers identity, provenance, contents, evaluation results, and behavioral boundaries. |
+| **Owned** | A named NVIDIA product team maintains the plugin, and issues route to that team's repo. |
+
+<!-- TODO(plugin signing): confirm artifact file names and the verify command once plugin signing ships. -->
+Every Verified Plugin under `plugins/<plugin>/` ships with:
+
+- Per-agent manifests (`.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`) and a portable `plugin.json`
+- `skills/` — the bundled skills, each with its own `skill.oms.sig`, skill card, and evaluation data
+- `plugin-card.md` — plugin identity and governance card
+- `plugin.oms.sig` — detached signature over the whole plugin bundle
+- `BENCHMARK.md` — evaluation results, generated by NVSkills CI from the eval data (`evals.json`) and covered by `plugin.oms.sig`
+
+Verify a plugin against the same NVIDIA trust anchor:
+
+```bash
+pip install model-signing
+model_signing verify certificate plugins/<plugin> \
+  --signature plugins/<plugin>/plugin.oms.sig \
+  --certificate_chain nv-agent-root-cert.pem \
+  --ignore_unsigned_files
+```
+
+A successful verification confirms that no file in the plugin, including its bundled skills and any local MCP server, has been modified since NVIDIA signed it. Every bundled skill can also be verified on its own, as described in [Verifying Skills](#verifying-skills).
+
+**What "Verified" requires.** A plugin earns the Verified mark only when every included skill is in the catalog and passes all sync gates, the bundle passes the verifiers and is signed, evaluation results are published in a signed `BENCHMARK.md`, the Plugin Card is complete, a named engineering and product owner is listed with issue and security links, and any bundled MCP server runs locally (stdio) and is scanned.
+
+---
+
 ## Roadmap
 
 - ✅ Public skills catalog with NVIDIA-verified skills across multiple products
@@ -337,6 +390,7 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 - ✅ Skill Card with machine-readable metadata for identity, provenance, quality, and behavioral boundaries
 - ✅ Sync-time compliance gates — signature drift detection and missing-artifact enforcement
 - ✅ Syndication to external marketplaces — Skills.sh, Codex plugin, Claude Code plugin, ClawHub, Hermes Hub
+- ✅ NVIDIA Verified Plugins — signed, evaluated, product-owned plugin bundles with Plugin Cards for Claude Code, Codex, Cursor, OpenClaw, and Hermes
 - 🔲 Syndication to additional MCP hubs and partner channels
 
 ---
@@ -345,55 +399,61 @@ See [Verify Signed Agent Skills](docs/signing-agent-skills.mdx) for signature la
 
 ```
 NVIDIA/skills/
-├── skills/                      # NVIDIA-verified skills (count grows continuously),
-│   │                              synced from upstream product repos
+├── skills/                      # NVIDIA-verified skills, synced daily from product repos
 │   ├── README.md                 # Browser-facing install guidance
-│   ├── <product-prefix>-*/       # Flat layout — one dir per skill, product-prefixed
-│   │                               # e.g. cuopt-*, cupynumeric-*,
-│   │                               # dali-*, deepstream-*, dicom-*, digital-health-*,
-│   │                               # dynamo-*, earth2studio-*, holoscan-*, hsb-*,
-│   │                               # jetson-*, launch-nemo-rl, mcore-*,
-│   │                               # nemo-automodel-*, nemo-data-designer-plugin,
-│   │                               # nemo-evaluator-plugin, nemo-mbridge-* (20 skills),
-│   │                               # nemo-retriever, nemo-rl-* (4 skills),
-│   │                               # nemoclaw-user-guide, nemotron-*, nemotron-speech,
-│   │                               # nv-* (medical AI), physicsnemo-*, rag-*,
-│   │                               # skill-card-generator, tao-*, tilegym-*,
-│   │                               # vss-* (15 skills), accelerated-computing-cudf,
-│   │                               # cudaq-guide, portfolio-optimization
+│   ├── <product-prefix>-*/       # Flat layout: one dir per skill, product-prefixed
+│   │                             # (e.g. tao-*, doca-*, bionemo-*, nvflare-*, cuopt-*)
 │   ├── omniverse-*/              # Physical AI — manually staged (see manual-components.yml)
 │   └── physical-ai-*/            # Physical AI — manually staged
-├── components.d/                # Product registry — one file per component, teams onboard here
+├── components.d/                # Skill registry: one YAML per product; teams onboard here
 │   ├── README.md                 # Schema and onboarding instructions
-│   └── <product>.yml             # one file per registered product
-├── plugins/                     # Packaged plugin distributions
-│   └── nvidia-skills/            # Curated NVIDIA skills bundle (Claude Code, Codex)
-├── plugins.d/                   # Plugin build registry — config for `build-plugins.py`
+│   └── <product>.yml
+├── plugins/                     # Plugin bundles: mirrored from product repos, or built from plugins.d/ (do not edit)
 │   ├── README.md
-│   ├── _defaults.yml
-│   └── nvidia-skills.yml
-├── .claude-plugin/              # Claude Code marketplace metadata
+│   ├── nvidia-skills/            # Discovery plugin, built from plugins.d/: finds skills, recommends Verified Plugins
+│   └── <plugin>/                 # One folder per Verified Plugin, mirrored from its product repo
+│       ├── .claude-plugin/        # Claude Code manifest
+│       ├── .codex-plugin/         # Codex manifest
+│       ├── .cursor-plugin/        # Cursor manifest
+│       ├── plugin.json            # Portable Agent Plugins manifest (Hermes and others)
+│       ├── skills/                # Bundled skills, signed in the product repo
+│       ├── plugin-card.md         # Plugin identity and governance card
+│       ├── plugin.oms.sig         # Detached signature over the whole bundle
+│       └── assets/                # Logo and marketplace images
+├── plugins.d/                   # Catalog-built plugins (nvidia-skills), read by build-plugins.py
+│   ├── README.md                 # Authoring workflow
+│   ├── _defaults.yml             # Shared defaults for every plugin
+│   └── <plugin>.yml
+├── .claude-plugin/              # Claude Code marketplace (lists every plugin)
 │   └── marketplace.json
-├── .agents/plugins/             # Agent marketplace metadata (other clients)
+├── .agents/plugins/             # Codex marketplace (lists every plugin)
+│   └── marketplace.json
+├── .cursor-plugin/              # Cursor marketplace (lists every plugin)
 │   └── marketplace.json
 ├── docs/                        # Long-form documentation (published via Fern)
 │   ├── README.md                 # How to build the docs locally
 │   ├── index.mdx
 │   ├── advanced-install.mdx
 │   ├── agent-skill-trust-pipeline.mdx
-│   ├── release-checklist.mdx
+│   ├── evaluating-agent-skills.mdx
 │   ├── scanning-agent-skills.mdx
 │   ├── signing-agent-skills.mdx
-│   └── skill-cards.mdx
+│   ├── skill-cards.mdx
+│   └── release-checklist.mdx
 ├── fern/                        # Fern docs site configuration
 ├── .github/
-│   ├── workflows/                # Sync pipeline, plugin validation, DCO check, author verify
-│   └── scripts/                  # regenerate-readme.sh, build-plugins.py,
-│                                 # manual-components.yml (temp Physical AI catalog
-│                                 # exception, removed after Computex 2026),
-│                                 # marketplace/metadata.json (skill metadata sidecar)
-├── nv-agent-root-cert.pem       # Trust anchor for OMS signature verification
+│   ├── workflows/                # Skill and plugin syncs, plugin validation, content integrity,
+│   │                             # ClawHub publishing, DCO and author checks
+│   └── scripts/                  # regenerate-readme.sh (skill tables),
+│                                 # regenerate-plugins-readme.sh (plugin table),
+│                                 # build-plugins.py, version-plugins.py,
+│                                 # verify_content_integrity.py, prune-orphans.sh,
+│                                 # manual-components.yml (manually staged skills)
+├── benchmarks.json              # Aggregated evaluation results for catalog skills
+├── versions.json                # Skill and plugin versions
 ├── skills.sh.json               # Skills.sh marketplace grouping config
+├── catalog-exceptions.yml       # skills/ dirs allowed without a components.d entry
+├── nv-agent-root-cert.pem       # Trust anchor for skill and plugin signature verification
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md              # Contribution guidelines
 ├── SECURITY.md                  # Security reporting policy
@@ -402,13 +462,15 @@ NVIDIA/skills/
 └── LICENSE-CC-BY-4.0            # CC BY 4.0 (documentation/skills)
 ```
 
-Skills are maintained in their respective product repos (see the **Source** column in the [Skill Catalog](#skill-catalog)) and synced to this repo daily. Products only appear under `skills/` after the sync pipeline confirms each skill carries:
+**Skills** are maintained in their respective product repos (see the [Skill Catalog](#skill-catalog)) and synced to this repo daily. Products only appear under `skills/` after the sync pipeline confirms each skill carries:
 
 - `skill.oms.sig` — detached OMS-format signature (verifiable against `nv-agent-root-cert.pem`)
 - `skill-card.md` — skill identity and governance card
 - A Tier-3 evaluation dataset — accepted at `evals/evals.json`, `evals/*.json`, `eval/*.json`, or `benchmark/evals.json`
 
 When evaluation runs produce a `BENCHMARK.md`, it ships alongside the skill so consumers can see verifiable benchmark uplift data.
+
+**Plugins** are maintained in their product teams' repos and registered under `plugins:` in that product's `components.d/<product>.yml`. An hourly plugin sync mirrors each one into `plugins/<name>/`, applies the same signature and compliance gates as the skills sync, and regenerates the marketplace registries and the [Plugin Catalog](#plugin-catalog). Catalog-built plugins such as `nvidia-skills` are defined in `plugins.d/` instead. See [`components.d/README.md`](components.d/README.md) for registering a plugin, [`plugins.d/README.md`](plugins.d/README.md) for catalog-built plugins, and [Verifying Plugins](#verifying-plugins) for what each plugin must carry before it is published.
 
 ---
 
@@ -420,6 +482,12 @@ This repository adheres to the [Agent Skills specification](https://agentskills.
 - Metadata uses YAML frontmatter with required `name` and `description` fields.
 - Skills follow a progressive disclosure model — lightweight metadata loads at startup, full instructions load on activation.
 - Validate your skill using the [`skills-ref`](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference library.
+
+Plugins follow the [Agent Plugins specification](https://agent-plugins.org) and each agent's native plugin format, such as the [Claude Code plugins reference](https://code.claude.com/docs/en/plugins-reference), so they install the same way as any other plugin for that agent:
+
+- Each plugin ships a Claude Code manifest (`.claude-plugin/plugin.json`), a Codex manifest (`.codex-plugin/plugin.json`), and a Cursor manifest (`.cursor-plugin/plugin.json`), plus a portable [Agent Plugins](https://agent-plugins.org/schemas/1.0.0/plugin.schema.json) manifest (`plugin.json`) for compatible clients such as Hermes.
+- Self-hosted marketplace registries for Claude Code, Codex, and Cursor live at the repo root and list every plugin.
+- Skills inside a plugin are copies of catalog skills and follow the same Agent Skills specification, so every bundled skill can also be installed on its own.
 
 ---
 
