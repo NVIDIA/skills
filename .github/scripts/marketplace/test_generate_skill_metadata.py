@@ -248,6 +248,244 @@ def check_plugin_never_blocks_main(gen, r):
                 "p.yml" not in buf.getvalue())
 
 
+def check_mirrored_plugins_through_main(gen, r):
+    """Drive main() against a mirrored plugin that does not exist in the repo.
+
+    There is no mirrored plugin in NVIDIA/skills yet -- sync-plugins.yml has
+    not landed -- so every scenario here is built as a fixture: a components.d
+    registry with a `plugins:` entry, and a plugins/<name>/ tree holding a
+    plugin.json and copies of catalog skills.
+
+    The copies are deliberately given directory names that do NOT match the
+    catalog, because that is the real shape: `catalog_dir` renames a skill on
+    the way into the catalog, so a product's own directory name and the
+    catalog's differ for 43 of the 484 skills today. A resolver that matched
+    on directory name would pass a test built from well-behaved names and fail
+    in production, so the fixture never offers it that option.
+    """
+    import shutil
+    import tempfile
+    from unittest.mock import patch
+
+    catalog = json.loads(gen.METADATA_PATH.read_text(encoding="utf-8"))
+    # Two real catalog skills that share a domain, so the roll-up has a
+    # dominant value to find rather than a tie to break.
+    pool = [s for s in catalog["skills"]
+            if s["metadata"].get("classification.category.primary")]
+    by_domain = {}
+    for s in pool:
+        by_domain.setdefault(
+            s["metadata"]["classification.category.primary"], []).append(s)
+    sample = max(by_domain.values(), key=len)[:2]
+    if len(sample) < 2:
+        r.check("mirrored: two catalog skills available to bundle", False)
+        return
+
+    def build(tmp, *, dir_names, registry_skills, plugin_json=None,
+              catalog_dir="nvidia-tao", extra_registry=""):
+        """Lay out a fixture components.d + plugins/ tree."""
+        comp = Path(tmp) / "components.d"
+        comp.mkdir()
+        skills_yaml = "".join(
+            f"  - path: {p}\n    catalog_dir: {c}\n"
+            for p, c in registry_skills
+        )
+        comp.joinpath("tao.yml").write_text(
+            "name: TAO Toolkit\n"
+            "repo: NVIDIA-TAO/tao-skill-bank\n"
+            "description: d\n"
+            + ("skills:\n" + skills_yaml if skills_yaml else "")
+            + "plugins:\n"
+            + f"  - path: plugins/{catalog_dir}/\n"
+            + f"    catalog_dir: {catalog_dir}\n"
+            + extra_registry,
+            encoding="utf-8",
+        )
+        plugins = Path(tmp) / "plugins"
+        pdir = plugins / catalog_dir
+        (pdir / "skills").mkdir(parents=True)
+        manifest = {"name": catalog_dir, "version": "1.0.0",
+                    "description": "Mirrored TAO plugin.",
+                    "skills": ["./skills/"]}
+        if plugin_json is not None:
+            manifest = plugin_json
+        if manifest is not False:
+            pdir.joinpath("plugin.json").write_text(
+                json.dumps(manifest), encoding="utf-8")
+        for dirname, skill in zip(dir_names, sample):
+            d = pdir / "skills" / dirname
+            d.mkdir()
+            d.joinpath("SKILL.md").write_text(
+                f"---\nname: {skill['name']}\n"
+                f"description: {skill['description']}\n---\n\nBody.\n",
+                encoding="utf-8",
+            )
+        return comp, plugins
+
+    def run(tmp, comp, plugins, baseline=None):
+        meta = Path(tmp) / "metadata.json"
+        meta.write_text(
+            gen.dumps_canonical(baseline if baseline is not None
+                                else dict(catalog, plugins=[])),
+            encoding="utf-8")
+        captured = {}
+
+        def capture(path, content):
+            if path == meta:
+                captured["out"] = json.loads(content)
+            return False
+
+        buf = io.StringIO()
+        with patch.object(gen, "COMPONENTS_DIR", comp), \
+             patch.object(gen, "PLUGINS_DIR", plugins), \
+             patch.object(gen, "METADATA_PATH", meta), \
+             patch.object(gen, "write_if_changed", capture), \
+             contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+            rc = gen.main(["--no-ai"])
+        return rc, captured.get("out"), buf.getvalue()
+
+    def plugins_of(doc):
+        return {p["name"]: p for p in (doc or {}).get("plugins", [])}
+
+    # --- The main case: bundled dirs named as the PRODUCT names them. -------
+    # The catalog publishes these two skills under different directory names,
+    # so only SKILL.md-name matching can resolve them.
+    product_dirs = ["bundled-one", "bundled-two"]
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[])
+        rc, out, log = run(tmp, comp, plugins)
+        got = plugins_of(out)
+        entry = got.get("nvidia-tao")
+        r.check("mirrored: a mirrored plugin gets an entry",
+                rc == 0 and entry is not None, f"rc={rc}; {list(got)}")
+        r.check("mirrored: bundled skills resolve by SKILL.md name, not folder",
+                entry is not None
+                and entry["skills"] == sorted(s["path"] for s in sample),
+                f"{entry and entry['skills']}")
+        r.check("mirrored: taxonomy is rolled up from them",
+                entry is not None
+                and entry["metadata"]["classification.category.primary"]
+                == sample[0]["metadata"]["classification.category.primary"],
+                f"{entry and entry['metadata']}")
+        r.check("mirrored: source points at the registry, not plugins.d",
+                entry is not None
+                and entry["source"] == "components.d/tao.yml",
+                f"{entry and entry.get('source')}")
+        r.check("mirrored: description comes from plugin.json",
+                entry is not None
+                and entry["description"] == "Mirrored TAO plugin.",
+                f"{entry and entry.get('description')}")
+
+    # --- The second key: SKILL.md unreadable, registry path resolves it. ----
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(
+            tmp, dir_names=product_dirs,
+            registry_skills=[(f"skills/{d}", s["path"].split("/")[-1])
+                             for d, s in zip(product_dirs, sample)])
+        # Blank the frontmatter name so key 1 cannot fire.
+        for d in product_dirs:
+            p = plugins / "nvidia-tao" / "skills" / d / "SKILL.md"
+            p.write_text("---\ndescription: d\n---\n\nBody.\n", encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins)
+        entry = plugins_of(out).get("nvidia-tao")
+        r.check("mirrored: falls back to the registry source path",
+                entry is not None
+                and entry["skills"] == sorted(s["path"] for s in sample),
+                f"rc={rc}; {entry and entry.get('skills')}")
+
+    # --- Precedence: plugins.d wins, the registry entry is ignored. ---------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[],
+                              catalog_dir="nvidia-skills")
+        rc, out, log = run(tmp, comp, plugins)
+        entry = plugins_of(out).get("nvidia-skills")
+        r.check("mirrored: a plugins.d plugin is never claimed as mirrored",
+                entry is not None and entry["source"].startswith("plugins.d/"),
+                f"rc={rc}; {entry and entry.get('source')}")
+
+    # --- Registered but not mirrored yet: warned, not an entry, not fatal. --
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[])
+        shutil.rmtree(plugins / "nvidia-tao")
+        rc, out, log = run(tmp, comp, plugins)
+        r.check("mirrored: registered but unmirrored is reported, not fatal",
+                rc == 0 and "nvidia-tao" not in plugins_of(out)
+                and "not in the repository yet" in log, f"rc={rc}")
+
+    # --- Recovery: a registered plugin that fails to build is KEPT. ---------
+    # This is Moshe's point. Without the registry entry counting as declared,
+    # a mirrored plugin whose skills stop resolving for one run is delisted.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[])
+        rc, out, _ = run(tmp, comp, plugins)
+        published = dict(catalog, plugins=(out or {}).get("plugins", []))
+        # Now break it: remove the manifest so it cannot be rebuilt.
+        (plugins / "nvidia-tao" / "plugin.json").unlink()
+        rc, out, log = run(tmp, comp, plugins, baseline=published)
+        r.check("mirrored: a registered plugin that fails to build is KEPT",
+                rc == 0 and "nvidia-tao" in plugins_of(out) and "KEPT." in log,
+                f"rc={rc}; {list(plugins_of(out))}")
+
+    # --- Deregistered: removed from the registry, correctly delisted. -------
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[])
+        rc, out, _ = run(tmp, comp, plugins)
+        published = dict(catalog, plugins=(out or {}).get("plugins", []))
+        comp.joinpath("tao.yml").write_text(
+            "name: TAO Toolkit\nrepo: r\ndescription: d\n", encoding="utf-8")
+        rc, out, log = run(tmp, comp, plugins, baseline=published)
+        r.check("mirrored: a deregistered plugin is delisted",
+                rc == 0 and "nvidia-tao" not in plugins_of(out),
+                f"rc={rc}; {list(plugins_of(out))}")
+
+    # --- Hostile registries must never stop the catalog. --------------------
+    hostile = {
+        "catalog_dir escaping the tree": "plugins:\n  - catalog_dir: ../evil\n",
+        "catalog_dir not kebab-case": "plugins:\n  - catalog_dir: Not_Kebab\n",
+        "catalog_dir missing": "plugins:\n  - path: plugins/x/\n",
+        "plugins: not a list": "plugins: nope\n",
+        "plugins entry not a mapping": "plugins:\n  - just-a-string\n",
+    }
+    for label, body in hostile.items():
+        with tempfile.TemporaryDirectory() as tmp:
+            comp, plugins = build(tmp, dir_names=product_dirs,
+                                  registry_skills=[])
+            comp.joinpath("hostile.yml").write_text(body, encoding="utf-8")
+            rc, out, log = run(tmp, comp, plugins)
+            r.check(f"mirrored: catalog survives {label}",
+                    rc == 0 and out is not None
+                    and len(out.get("skills", [])) == len(catalog["skills"]),
+                    f"rc={rc}; {log[-200:]}")
+
+    # An unparseable components.d file is deliberately NOT in the list above.
+    # The skills pass reads the same directory and treats a malformed registry
+    # as fatal by existing design -- "invalid declarations fail before any
+    # output is written" -- and it runs first, so the generator stops there.
+    # Asserted so nobody later reads the plugin pass's own guard as a promise
+    # that a broken registry degrades gracefully. It does not, and changing
+    # that is a decision about the skills pass, not this one.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[])
+        comp.joinpath("hostile.yml").write_text(
+            "name: x\n  bad indent:\n", encoding="utf-8")
+        try:
+            rc, out, log = run(tmp, comp, plugins)
+            raised = None
+        except Exception as exc:  # noqa: BLE001
+            raised = exc
+        r.check("mirrored: an unparseable registry still fails loudly",
+                raised is not None, f"raised={raised!r}")
+
+    # Teeth: the guard above must notice if the mirrored pass stops working.
+    with tempfile.TemporaryDirectory() as tmp:
+        comp, plugins = build(tmp, dir_names=product_dirs, registry_skills=[])
+        with patch.object(gen, "build_mirrored_plugin_entries",
+                          lambda *a, **k: []):
+            rc, out, log = run(tmp, comp, plugins)
+        r.check("mirrored: the fixture detects a disabled mirrored pass",
+                "nvidia-tao" not in plugins_of(out), f"{list(plugins_of(out))}")
+
+
 def check_recovery_through_main(gen, r):
     """Prove through main() that a published plugin survives a failed rebuild.
 
@@ -1212,6 +1450,7 @@ def main() -> int:
     check_plugin_discovery(gen, taxonomy, validator, r)
     check_plugin_never_blocks_main(gen, r)
     check_recovery_through_main(gen, r)
+    check_mirrored_plugins_through_main(gen, r)
 
     return r.report()
 

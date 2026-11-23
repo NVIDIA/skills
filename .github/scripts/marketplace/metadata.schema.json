@@ -53,8 +53,8 @@
         "source": {
           "type": "string",
           "minLength": 1,
-          "pattern": "^plugins\\.d/.+\\.yml$",
-          "description": "Repo-relative path of the plugins.d file declaring this plugin. Lets a published entry be recognised when its file can no longer be parsed and its name cannot be read."
+          "pattern": "^(plugins|components)\\.d/.+\\.yml$",
+          "description": "Repo-relative path of the file declaring this plugin: plugins.d/<name>.yml for a plugin the catalog builds, or components.d/<product>.yml for one mirrored from a product repo. Lets a published entry be recognised when its declaration can no longer be read and its name cannot be recovered from it."
         },
         "description": {
           "type": "string",

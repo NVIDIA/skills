@@ -28,6 +28,13 @@ on:
       # skill. Without this path the drift check would not run on exactly the
       # edit that causes the drift.
       - "plugins.d/**"
+      # A mirrored plugin's taxonomy is rolled up from the skills bundled
+      # inside plugins/<name>/skills/, identified by their SKILL.md `name`.
+      # Editing or re-syncing that tree changes metadata.json without touching
+      # any catalog skill, so without this path the drift check would not run
+      # on exactly the change that causes the drift. components.d/** is
+      # already listed above and covers the `plugins:` registry entries.
+      - "plugins/**"
       - "skills.sh.json"
       # versions.json tracks every file in a skill directory: the content
       # digest follows skill.oms.sig, and last_commit/last_modified follow any

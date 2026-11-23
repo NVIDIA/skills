@@ -110,6 +110,19 @@ This produced nested paths like `skills/your-product/<skill-name>/` for every sk
 - The `catalog_dir` per skill makes the catalog naming explicit at onboarding time rather than relying on whatever subdirectory names happened to ship in the source `skills/` tree.
 - Source skills can be added, removed, or renamed without changing the catalog's top-level shape silently.
 
+## Catalog metadata for a registered plugin
+
+A `plugins:` entry gives the plugin its taxonomy on build.nvidia.com, the same way a `skills:` entry does for a skill. `.github/scripts/marketplace/generate-skill-metadata.py` reads this file, finds the mirrored tree at `plugins/<catalog_dir>/`, identifies the skills bundled inside it, and rolls them up into a `plugins` entry in `metadata.json`: one Domain, the set of Libraries, and the Audience values held by at least half of them. Nothing is authored per plugin and no inference runs.
+
+A bundled skill is identified by the `name` in its `SKILL.md` frontmatter, or failing that by its path resolved through this file's own `skills:` entries. **It is not identified by its directory name**, because `catalog_dir` renames a skill on the way into the catalog and the two names often differ — BioIR ships `skills/bench-perf-oss/` and the catalog publishes it as `skills/bioir-bench-perf-oss`.
+
+Two consequences worth knowing:
+
+- Changing what a plugin bundles changes `metadata.json`. The sync regenerates it, but a hand-edited PR that touches `plugins/` must re-run the generator and commit the result, or CI's byte-stability check fails.
+- A plugin registered here but not yet present at `plugins/<catalog_dir>/` is reported and left out, not treated as an error. That is the normal state between registration and the first successful sync, and a plugin already published keeps its previous entry rather than disappearing.
+
+A plugin whose `catalog_dir` has a `plugins.d/<name>.yml` is built by the catalog rather than mirrored, and is read from there instead. This matches the plugin sync, which never mirrors, prunes or lists such a directory.
+
 ## How aggregation works
 
 The sync workflow runs:
