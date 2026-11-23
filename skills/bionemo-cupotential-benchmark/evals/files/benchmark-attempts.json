@@ -1,0 +1,19 @@
+{
+  "provenance": "Original synthetic source-runner records; no benchmark was executed to produce this file.",
+  "attempts": [
+    {"id": "empty-filter", "command": "./run_test openmm_bench -k apoa1_missing_variant", "wrapper_exit_code": 0, "selected_tests": 0, "historical_golden": null, "timings": []},
+    {
+      "id": "unlocked-current",
+      "command": "CUPO_ALLOW_UNLOCKED_CLOCKS=1 ./run_test openmm_bench -k apoa1",
+      "wrapper_exit_code": 0,
+      "selected_tests": 1,
+      "clock_lock": "unavailable; unlocked mode explicitly enabled",
+      "historical_golden": null,
+      "warmup_steps_per_trial": 500,
+      "timed_steps_per_trial": 3000,
+      "timings_seconds": {"stock": [1.21, 1.2, 1.19], "cupotential": [0.61, 0.6, 0.59]},
+      "physical_settings": "matched across stock and cuPotential timing arms",
+      "accuracy_evidence": "not included in this record"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+
+SYNTHETIC TASK CONTRACT: assume these capabilities for the selected runtime's
+standard nonbonded parameter-offset path. This is not a new runtime measurement
+or a claim about another release.
+
+- lambda is a declared global parameter; Context.setParameter changes its value.
+- Coordinate energies and forces can be evaluated after the change.
+- Compatible binary checkpoints restore the Context's physical state.
+- This path does not compute analytic energy derivatives with respect to lambda.
+- The requested TI estimator explicitly requires analytic dU/dlambda samples.
+- The available demonstration is one prepared alchemical window and a short NVT
+  run. No endpoint ensembles, overlap/convergence study, estimator analysis,
+  thermodynamic cycle or correction calculation has been supplied.

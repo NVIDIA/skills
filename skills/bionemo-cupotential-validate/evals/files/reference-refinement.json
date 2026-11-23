@@ -1,0 +1,12 @@
+{
+  "provenance": "Original synthetic common-reference sweep for arithmetic and methodology evaluation; no runtime measured these values.",
+  "common_geometry": {"positions_nm": [[0.7, 0.8, 0.9], [1.1, 0.8, 0.9]], "box_vectors_nm": [[4, 0, 0], [0, 4, 0], [0, 0, 4]]},
+  "model_policy": {"particle_order": "identical", "exceptions": "identical", "coulomb_boundary": "same periodic convention", "lj_cutoff_nm": 0.9, "lj_switching": false, "lj_tail": false, "reference_refinement": "refine the independent electrostatic reference while holding the physical LJ model, coordinates and box fixed"},
+  "reference_budgets": {"energy_atol": 0.000001, "force_max_atol": 0.00001},
+  "candidate_budgets": {"energy_atol": 0.0001, "force_max_atol": 0.001},
+  "coarse_reference": {"potential_energy_kj_mol": 0.01, "forces_kj_mol_nm": [[1.01, 0, 0], [-1.01, 0, 0]]},
+  "fine_reference": {"potential_energy_kj_mol": 0.00000001, "forces_kj_mol_nm": [[1.000001, 0, 0], [-1.000001, 0, 0]]},
+  "finest_reference": {"potential_energy_kj_mol": 0, "forces_kj_mol_nm": [[1, 0, 0], [-1, 0, 0]]},
+  "stock": {"potential_energy_kj_mol": -0.000003, "forces_kj_mol_nm": [[1.0002, 0, 0], [-1.0002, 0, 0]]},
+  "cupotential": {"potential_energy_kj_mol": 0.000002, "forces_kj_mol_nm": [[1.0003, 0, 0], [-1.0003, 0, 0]]}
+}

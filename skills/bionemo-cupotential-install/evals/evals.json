@@ -1,0 +1,34 @@
+{
+  "skill_name": "cupotential-install",
+  "evals": [
+    {
+      "id": "install-isolated-cuda",
+      "prompt": "Assess the available interpreter/runtime and install the published cuPotential 0.3.5 OpenMM plugin in a new Python 3.12 environment under /workspace/output/install-env when that compatible interpreter and package route are available. Preserve base packages and record actual resolved versions/import paths. When CUDA is available, actually execute a neutral periodic energy/force probe and save finite nonzero results and commands under /workspace/output/install-check. CPU fallback is explicitly permitted when the required interpreter, plugin or GPU is absent: retain the exact cuPotential installation/CUDA blocker, create a separate isolated stock OpenMM CPU-reference environment using an available supported interpreter, and actually run a small neutral periodic stock CPU or Reference energy/force control. Record the selected CPU interpreter and its differences from the requested cuPotential environment. CPU installation/control success is a separate result; do not substitute another cuPotential release or mark its installation/CUDA probe verified. Retain failures, hashes, commands and observed versions. If neither branch executes, report incomplete rather than invent a successful probe.",
+      "expected_output": "Observed isolated cuPotential installation and CUDA energy/forces when prerequisites exist, or a documented cuPotential blocker plus an actually executed isolated stock OpenMM CPU control. CPU environment/control success is separate from unverified cuPotential installation/CUDA verification.",
+      "assertions": [
+        "Package changes stay in newly isolated environments and use their recorded interpreters; base packages remain untouched.",
+        "The native target remains nv-openmm-plugin 0.3.5 with import nv_openmm_plugin. Missing compatible release/interpreter is recorded rather than silently substituted.",
+        "An actual energy/force probe executes on CUDA when available, or on stock OpenMM CPU/Reference as the expressly permitted control.",
+        "The executed probe's energy/force components are finite with a nonzero force component, and its actual platform is recorded.",
+        "Interpreter/version/module paths, commands and failures are retained; CPU fallback records its separate interpreter/environment and never claims CUDA verification.",
+        "Native installation and CUDA verification remain unverified/incomplete if blocked, even when the separate stock CPU control passes. If both branches lack execution, neither is reported complete."
+      ]
+    },
+    {
+      "id": "install-loader-assessment",
+      "prompt": "Assess the cuPotential loading problem described in /workspace/input/loader-report.txt. This is a supplied synthetic support report, not the environment running this evaluation. Explain what the evidence establishes, what remains unknown and which read-only checks the application owner should run with the selected interpreter. Do not install packages, alter library paths or change either environment. Write /workspace/output/loader-assessment.md. Do missing wheel metadata or the CUDA number in nvidia-smi alone explain this failure?",
+      "files": [
+        "files/loader-report.txt"
+      ],
+      "expected_output": "An evidence-based loader assessment identifying the reported unresolved libnvJitLink dependency, distinguishing module discovery, distribution metadata and execution, and proposing interpreter-specific read-only checks without claiming the exact repair is already known.",
+      "assertions": [
+        "The assessment uses the supplied report rather than treating the evaluation host as the affected application environment.",
+        "It identifies the explicit libnvJitLink.so.13 loader error and does not diagnose a missing Python module merely because distribution metadata is absent.",
+        "It distinguishes nvidia-smi's driver capability from an installed CUDA toolkit and from the shared libraries loaded by the selected Python process.",
+        "Suggested checks target the selected interpreter and actual module/library locations, including dependency and OpenMM plugin-load evidence where available.",
+        "No package, driver, symlink or library-path change is performed, and no successful import or CUDA execution is invented.",
+        "The report keeps the exact compatible dependency repair unresolved until the missing version/path evidence is obtained."
+      ]
+    }
+  ]
+}

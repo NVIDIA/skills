@@ -60,6 +60,19 @@
     ]
   },
   {
+    "id": "cudaq-guide-parallelize-002",
+    "question": "I'm doing ADAPT-QAOA in CUDA-Q. Each iteration I compute the gradient for every operator in the pool against the current ansatz state. Parallelize that gradient across my 4 GPUs.",
+    "expected_skill": "cudaq-guide",
+    "expected_script": null,
+    "ground_truth": "The agent uses the `nvidia` target with `mqpu` and `observe_async` over `qpu_id`, and keeps the ansatz state on each GPU: each dispatched kernel either rebuilds the ansatz from its parameters or uses a state prepared on that same GPU via `get_state_async(..., qpu_id=k)`. It does not prepare one `cudaq.State` on GPU 0 and pass it to kernels running on other GPUs.",
+    "expected_behavior": [
+      "The agent read skills/cudaq-guide/SKILL.md before answering",
+      "The agent dispatched pool-operator gradient evaluations across GPUs with `observe_async` and `qpu_id`",
+      "The agent did not pass a single state prepared on GPU 0 to kernels running on other GPUs",
+      "The agent prepared the ansatz state on each GPU, either inside each kernel or once per `qpu_id`"
+    ]
+  },
+  {
     "id": "cudaq-guide-applications-001",
     "question": "What kinds of quantum applications can I build with CUDA-Q?",
     "expected_skill": "cudaq-guide",

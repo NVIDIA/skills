@@ -1,0 +1,16 @@
+{
+  "provenance": "Original synthetic analytic-control specification; not measured output.",
+  "box_vectors_nm": [[3.6, 0, 0], [0, 3.6, 0], [0, 0, 3.6]],
+  "masses_dalton": [40, 45],
+  "particles": [{"sigma_nm": 0.3, "epsilon_kj_mol": 0.5}, {"sigma_nm": 0.35, "epsilon_kj_mol": 0.8}],
+  "mixing": {"sigma": "arithmetic mean", "epsilon": "geometric mean"},
+  "pair_energy": "strength * (4*epsilon*((sigma/r)^12-(sigma/r)^6)+epsilon) for 0<r<2^(1/6)*sigma; zero otherwise",
+  "separations_nm": [0.32, 0.35, 0.4],
+  "separation_axis": "x",
+  "cutoff_nm": 0.9,
+  "switching": false,
+  "long_range_correction": false,
+  "strength_sequence": [1, 0.4, 1],
+  "excluded_pair_control": [0, 1],
+  "precision": "mixed"
+}

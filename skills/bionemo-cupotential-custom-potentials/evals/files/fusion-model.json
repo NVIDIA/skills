@@ -1,0 +1,24 @@
+{
+  "provenance": "Original synthetic four-particle fusion specification; not measured output.",
+  "positions_nm": [[0.4, 0.4, 0.4], [0.9, 0.4, 0.4], [0.4, 1.0, 0.4], [0.9, 1.0, 0.4]],
+  "box_vectors_nm": [[3.6, 0, 0], [0, 3.6, 0], [0, 0, 3.6]],
+  "masses_dalton": [40, 40, 40, 40],
+  "particles": [
+    {"charge_e": 0.1, "sigma_nm": 0.3, "epsilon_kj_mol": 0.2},
+    {"charge_e": -0.1, "sigma_nm": 0.35, "epsilon_kj_mol": 0.3},
+    {"charge_e": 0.1, "sigma_nm": 0.32, "epsilon_kj_mol": 0.25},
+    {"charge_e": -0.1, "sigma_nm": 0.34, "epsilon_kj_mol": 0.22}
+  ],
+  "ordinary_lj_mixing": "Lorentz-Berthelot",
+  "electrostatics": {"method": "PME", "ewald_error_tolerance": 0.0005},
+  "exceptions": [{"particles": [0, 1], "charge_product_e2": 0, "sigma_nm": 0.325, "epsilon_kj_mol": 0}],
+  "exceptions_use_periodic_boundary_conditions": false,
+  "additional_pair_energy": "amplitude*exp(-r^2/(2*width^2))",
+  "amplitude_kj_mol": 0.08,
+  "width_nm": 0.25,
+  "custom_exclusions": [[0, 1]],
+  "cutoff_nm": 0.9,
+  "switching": false,
+  "tails": false,
+  "precision": "mixed"
+}

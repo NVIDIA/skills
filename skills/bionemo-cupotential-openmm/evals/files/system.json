@@ -1,0 +1,32 @@
+{
+  "provenance": "Original synthetic four-particle test contract; not a recorded simulation.",
+  "positions_nm": [[0.4, 0.4, 0.4], [0.9, 0.4, 0.4], [0.4, 1.0, 0.4], [0.9, 1.0, 0.4]],
+  "box_vectors_nm": [[3.6, 0, 0], [0, 3.6, 0], [0, 0, 3.6]],
+  "masses_dalton": [39.9, 39.9, 39.9, 39.9],
+  "constraints": [{"particles": [0, 1], "distance_nm": 0.5}],
+  "virtual_sites": [],
+  "nonbonded": {
+    "method": "PME",
+    "cutoff_nm": 0.9,
+    "ewald_error_tolerance": 0.0005,
+    "switching": false,
+    "dispersion_correction": false,
+    "exceptions_use_periodic_boundary_conditions": false,
+    "particles": [
+      {"charge_e": 0.1, "sigma_nm": 0.3, "epsilon_kj_mol": 0.2},
+      {"charge_e": -0.1, "sigma_nm": 0.3, "epsilon_kj_mol": 0.2},
+      {"charge_e": 0.1, "sigma_nm": 0.3, "epsilon_kj_mol": 0.2},
+      {"charge_e": -0.1, "sigma_nm": 0.3, "epsilon_kj_mol": 0.2}
+    ],
+    "exceptions": [{"particles": [0, 1], "charge_product_e2": 0, "sigma_nm": 0.3, "epsilon_kj_mol": 0}]
+  },
+  "com_frequency": 37,
+  "temperature_kelvin": 300,
+  "friction_per_ps": 1,
+  "timestep_ps": 0.001,
+  "integrator_seed": 731,
+  "initial_velocities": {"method": "setVelocitiesToTemperature", "seed": 911, "apply_velocity_constraints": true},
+  "precision": "mixed",
+  "nvt_steps": 100,
+  "npt": {"pressure_bar": 1, "temperature_kelvin": 300, "frequency": 25, "seed": 277}
+}

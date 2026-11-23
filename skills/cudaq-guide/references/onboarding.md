@@ -133,7 +133,7 @@ After walking through the provider steps, always close with:
 CUDA-Q ships with ready-to-run application notebooks.
 
 | Category | Examples |
-|---|---|
+| --- | --- |
 | Optimization | QAOA, ADAPT-QAOA, MaxCut |
 | Chemistry | VQE, UCCSD, ADAPT-VQE |
 | Error Correction | Surface codes, QEC memory |
@@ -148,7 +148,7 @@ CUDA-Q supports two distinct multi-GPU parallelization strategies. Pick based on
 what the user is trying to scale.
 
 | Goal | Strategy | Target option |
-|---|---|---|
+| --- | --- | --- |
 | Single circuit too large for one GPU | Pool GPU memory | `nvidia --target-option mgpu` |
 | Many independent circuits at once | Run circuits in parallel | `nvidia --target-option mqpu` |
 | Large Hamiltonian expectation value | Distribute terms across GPUs | `mqpu` plus `execution=cudaq.parallel.thread` |
@@ -169,6 +169,41 @@ futures = [
     for i, params in enumerate(param_sets)
 ]
 results = [f.get().expectation() for f in futures]
+```
+
+Keep each GPU's input state local. Do not prepare a `cudaq.State` once
+(for example with `cudaq.get_state` on QPU 0) and pass it to kernels dispatched
+to other `qpu_id`s: every such call copies the full statevector off GPU 0,
+which costs more than the parallel work saves. Instead, either pass the ansatz
+parameters and let each kernel rebuild the state on its own GPU, or build the
+state once per GPU with `cudaq.get_state_async(prep, *args, qpu_id=k)` and reuse
+it only for the jobs sent to that same `qpu_id=k`. This matters for gradient
+loops such as ADAPT-VQE/ADAPT-QAOA, where every pool operator is evaluated
+against the same current state.
+
+```python
+# ADAPT gradient: dE/dθ of exp(iθA) at θ=0 is <ψ| i[H, A] |ψ>.
+grad_ops = [1j * (H * A - A * H) for A in pool]
+
+# Option 1: each job rebuilds the ansatz on the GPU that runs it.
+futures = [cudaq.observe_async(ansatz, op, *ansatz_args, qpu_id=j % n_qpus)
+           for j, op in enumerate(grad_ops)]
+
+# Option 2: prepare the state once per GPU and reuse it only on that GPU.
+@cudaq.kernel
+def from_state(s: cudaq.State):
+    q = cudaq.qvector(s)
+
+states = [cudaq.get_state_async(ansatz, *ansatz_args, qpu_id=k)
+          for k in range(n_qpus)]
+states = [s.get() for s in states]
+futures = [cudaq.observe_async(from_state, op, states[j % n_qpus],
+                               qpu_id=j % n_qpus)
+           for j, op in enumerate(grad_ops)]
+gradients = [f.get().expectation() for f in futures]
+
+# Avoid: state = cudaq.get_state(ansatz, ...) once, then
+# observe_async(from_state, op, state, qpu_id=j % n_qpus) for every j.
 ```
 
 ### Hamiltonian batching
