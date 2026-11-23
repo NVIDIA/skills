@@ -50,8 +50,8 @@ A component may also publish one or more **plugins** — a directory in the prod
 
 ```yaml
 plugins:
-  - path: plugin/
-    catalog_dir: your-product
+  - path: plugins/your-product/   # recommended layout in the product repo
+    catalog_dir: your-product      # must equal `name` in plugin.json; not a plugins.d name
 ```
 
 Skills bundled inside a plugin are independent copies of the standalone `skills/` entries; the sync does not deduplicate them.

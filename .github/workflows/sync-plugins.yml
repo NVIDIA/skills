@@ -110,6 +110,26 @@ jobs:
             for j in $(seq 0 $((plugin_count - 1))); do
               path=$(yq -r ".components[$i].plugins[$j].path" "$CONFIG")
               catalog_dir=$(yq -r ".components[$i].plugins[$j].catalog_dir" "$CONFIG")
+
+              # Validate the registry entry before touching the tree:
+              #   - catalog_dir is lowercase kebab-case (also the install name)
+              #   - catalog_dir is not a plugins.d-built plugin (would overwrite it)
+              #   - path stays inside the source checkout (no .., no absolute)
+              if ! [[ "$catalog_dir" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+                echo "  ✗ catalog_dir '$catalog_dir' is not lowercase kebab-case — skipping"
+                echo "- **$name** ($repo): invalid catalog_dir \`$catalog_dir\`" >> /tmp/plugins-failed-components.txt
+                continue
+              fi
+              if [ -f "plugins.d/$catalog_dir.yml" ]; then
+                echo "  ✗ catalog_dir '$catalog_dir' is built from plugins.d/ and cannot be mirrored — skipping"
+                echo "- **$name** ($repo): catalog_dir \`$catalog_dir\` collides with plugins.d/$catalog_dir.yml" >> /tmp/plugins-failed-components.txt
+                continue
+              fi
+              if [[ "$path" == /* || "$path" == *..* ]]; then
+                echo "  ✗ path '$path' must be relative to the repo root with no '..' — skipping"
+                echo "- **$name** ($repo): invalid plugin path \`$path\`" >> /tmp/plugins-failed-components.txt
+                continue
+              fi
               src="$tmp_dir/$path"
               if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ]; then
                 mkdir -p "plugins/$catalog_dir"
