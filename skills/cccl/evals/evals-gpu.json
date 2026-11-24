@@ -1,0 +1,211 @@
+{
+  "skill_name": "cccl",
+  "evals": [
+    {
+      "id": "cccl-port-2x-to-3x",
+      "prompt": "code/stats.cu built fine with CUDA 12.2. After upgrading to CUDA 13 it no longer compiles. Make it build and run with the CUDA 13 toolkit installed here, with the same output, and keep using Thrust/CUB.",
+      "files": [
+        "files/cccl-port-2x-to-3x/code/stats.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Explains that CUDA 13 ships CCCL 3.x, which removed APIs deprecated in CCCL 2.x. Replaces cub::Sum/cub::Max/cub::Min with cuda::std::plus<>/cuda::maximum<>/cuda::minimum<> (or equivalent standard function objects), removes the thrust::unary_function base classes, replaces thrust::identity<float> with cuda::std::identity (or a plain copy), drops the trailing debug_synchronous argument from the cub::DeviceReduce calls, and replaces CUB_MAX / CUB_QUOTIENT_CEILING with cuda::std::max and cuda::ceil_div. It does not pin an old CCCL, re-implement the removed names in namespace cub/thrust, or add a compatibility shim. The program builds with the CUDA 13 nvcc and prints mean=8.9900 max=18.9800 min=-1.0000 pages=4096 archived=1048576.",
+      "assertions": [
+        "Replaces cub::Sum, cub::Max and cub::Min with libcu++ function objects (cuda::std::plus, cuda::maximum, cuda::minimum or equivalents)",
+        "Removes the thrust::unary_function base classes instead of re-defining them",
+        "Replaces thrust::identity with cuda::std::identity or an equivalent copy",
+        "Removes the trailing debug_synchronous argument from the cub::DeviceReduce calls",
+        "Replaces CUB_MAX and CUB_QUOTIENT_CEILING with cuda::std::max / cuda::ceil_div or plain C++ equivalents",
+        "Does not reintroduce the removed names via its own shims in namespace cub or thrust and does not switch to an older CCCL",
+        "Builds and runs the program and reports output matching mean=8.99, max=18.98, min=-1, pages=4096"
+      ]
+    },
+    {
+      "id": "cccl-host-compiler-include",
+      "prompt": "This project in code/ built fine with CUDA 12.6. With CUDA 13 the .cpp files fail with 'thrust/host_vector.h: No such file or directory'. Fix the build properly (don't hardcode paths), run it, and tell me what changed in CUDA 13 that broke it.",
+      "files": [
+        "files/cccl-host-compiler-include/code/CMakeLists.txt",
+        "files/cccl-host-compiler-include/code/src/main.cpp",
+        "files/cccl-host-compiler-include/code/src/report.cpp",
+        "files/cccl-host-compiler-include/code/src/gpu_stats.h",
+        "files/cccl-host-compiler-include/code/src/gpu_stats.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Explains that CUDA 13 moved the bundled CCCL headers (Thrust, CUB, libcu++) from <ctk>/include to <ctk>/include/cccl, which nvcc adds automatically but the host C++ compiler does not, so .cpp files that include Thrust or cuda/std headers fail. Fixes CMake by linking a target that carries the include path: find_package(CUDAToolkit) + CUDA::cudart (or CUDA::toolkit), or find_package(CCCL) + CCCL::CCCL together with CUDA::cudart; propagated PUBLIC from fleet_gpu or added to fleet_report. Does not hardcode /usr/local/cuda paths and does not change includes to <cccl/thrust/...>. Builds with CMake and runs, printing fleet mean=49.950 max=99.9.",
+      "assertions": [
+        "Explains that CUDA 13 moved the CCCL headers into include/cccl, which only nvcc adds automatically",
+        "Fixes the build with an imported CMake target (CUDA::cudart / CUDA::toolkit, or CCCL::CCCL plus the CUDA runtime) rather than hardcoded paths",
+        "Does not rewrite includes as <cccl/thrust/...>",
+        "Builds and runs the project and reports fleet mean=49.950 max=99.9"
+      ]
+    },
+    {
+      "id": "cccl-sort-perf",
+      "prompt": "Binning in code/bin_particles.cu (sorting particles by grid cell every step) is the bottleneck of our simulation. Make the sort as fast as you can on this GPU while keeping particles ordered by cell. Report before/after sort time per step and explain what made the original slow.",
+      "files": [
+        "files/cccl-sort-perf/code/bin_particles.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Explains that thrust::sort with a custom lambda comparator over 28-byte structs cannot use radix sort and falls back to a comparison (merge) sort that moves the whole struct. Instead extracts the cell ids into a key array and sorts (key, index) pairs with radix sort (thrust::sort_by_key with default less, or cub::DeviceRadixSort::SortPairs), then gathers/permutes the particles once; since cell ids are below 65536, restricts the radix sort to bits [0,16) with begin_bit/end_bit to halve the passes. Reuses buffers/temp storage across steps. Measured sort time drops several times (about 9 ms to under 2 ms on an RTX 4090), and the result is still ordered by cell.",
+      "assertions": [
+        "Explains that sorting the structs with a custom comparator cannot use radix sort and falls back to a slower comparison (merge) sort",
+        "Sorts integer cell keys with radix sort (sort_by_key / cub::DeviceRadixSort) and permutes the particles with an index gather (or equivalent key-value sort)",
+        "Restricts the radix sort to the 16 significant key bits (begin_bit/end_bit), or explains why it chose not to",
+        "Verifies the particles are still ordered by cell",
+        "Reports measured before and after sort times, with the new sort several times faster"
+      ]
+    },
+    {
+      "id": "cccl-stream-pipeline",
+      "prompt": "code/pipeline.cu processes 8 independent channels, each on its own stream, but nsys shows no overlap between the streams at all. Make the channels actually run concurrently and the whole thing faster. Keep the printed checksum the same, and tell me why the streams didn't overlap.",
+      "files": [
+        "files/cccl-stream-pipeline/code/pipeline.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Explains that Thrust algorithms with thrust::cuda::par.on(stream) synchronize the stream before returning, and that thrust::transform_reduce returns its value to the host, which blocks too (plus per-call temp allocation with cudaMalloc/cudaFree, which synchronizes the device). Switches to thrust::cuda::par_nosync.on(stream) for the transform and writes the reduction results into device memory without blocking (thrust::reduce_into with a transform_iterator, or cub::DeviceReduce::TransformReduce/Reduce on the stream with preallocated temp storage), synchronizing only once at the end and copying the energies back in bulk. The checksum stays 26754811.958 and the measured runtime drops (about 2x or more).",
+      "assertions": [
+        "Explains that Thrust with thrust::cuda::par.on(stream) (or thrust::device) waits for the stream after each algorithm call",
+        "Explains that transform_reduce returns its result to the host, which blocks on every call",
+        "Uses thrust::cuda::par_nosync.on(stream) or CUB calls on the stream so the host does not block per step",
+        "Writes reduction results to device memory (e.g. thrust::reduce_into or CUB) and copies them back once at the end",
+        "Keeps the checksum unchanged and reports a measured speedup"
+      ]
+    },
+    {
+      "id": "cccl-review-ingest",
+      "prompt": "Please review code/ingest.cu for correctness bugs before we ship it. Fix everything you find, run it, and tell me what was wrong.",
+      "files": [
+        "files/cccl-review-ingest/code/ingest.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Finds and fixes five silent bugs: (1) thrust::reduce over device_vector<bool> accumulates in bool and returns 1 instead of the count; use thrust::count or reduce with an int init. (2) thrust::exclusive_scan over the uint8_t per-sensor counts without an init accumulates in uint8_t and wraps at 256; pass an int init 0 (or widen the input). (3) The radix sort restricts the bit range to 11 bits, but the drift keys are signed and negative values need the sign bit; sort all bits (or offset the keys to be non-negative before using a reduced bit range). (4) After sorting with a cub::DoubleBuffer the sorted keys are in keys.Current(), which may be drift_alt, but the median is read from drift. (5) cub::DeviceSegmentedReduce::Min uses numeric_limits<float>::max() as its identity, so all-+inf (offline) sensors come out as FLT_MAX and are not counted as offline; use DeviceSegmentedReduce::Reduce with cuda::minimum and a +infinity init. After the fixes the program prints valid readings 2879077 of 3200000, last sensor offset 2879020, median drift 0, offline sensors 516.",
+      "assertions": [
+        "Fixes the bool-mask thrust::reduce count (bool accumulator returns 1)",
+        "Fixes the uint8_t exclusive_scan accumulator overflow with an int init or wider input",
+        "Fixes the radix sort of signed drift keys restricted to 11 bits (sorts all bits or offsets keys to non-negative)",
+        "Reads the sorted keys from the DoubleBuffer's Current() buffer instead of the original drift array",
+        "Fixes the per-sensor minimum so offline (all +inf) sensors stay +inf (explicit +inf init instead of DeviceSegmentedReduce::Min)",
+        "Runs the fixed program and reports valid 2879077, last offset 2879020, median drift 0 and offline sensors 516"
+      ]
+    },
+    {
+      "id": "cccl-bykey-reproducible",
+      "prompt": "code/ledger.cu totals trade amounts per account. Our audit reruns it and compares the totals bit for bit, and it flags differences even though the input is identical and it's the same GPU (the program prints how many of 20 reruns differ). Make the per-account totals bitwise reproducible from run to run. They have to stay float sums (no double or fixed-point accumulation) and it must not get much slower. Run it and tell me what caused the differences.",
+      "files": [
+        "files/cccl-bykey-reproducible/code/ledger.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Explains that thrust::reduce_by_key combines the partial sums of a long key run (one that spans several tiles) in an order that depends on timing between thread blocks, so float totals differ in the last bits from run to run; it is not a bug in the input or a data race in the user's code, and reduce_by_key has no determinism option. Replaces it with a reduction that has a fixed combination order: cub::DeviceSegmentedReduce::Sum over per-account begin/end offsets (run_to_run deterministic by default), with the offsets derived from the sorted account ids (vectorized lower_bound/upper_bound, run-length encode, or unique + counts; integer work is deterministic). Accumulation stays in float. After the change the program prints accounts: 160, reruns that differ bitwise: 0 of 20, a max relative error vs the double reference that is still around 1e-7, and a time per call in the same range as before (about 0.2-0.4 ms vs 0.16 ms on an RTX 4090).",
+      "assertions": [
+        "Explains that reduce_by_key combines partial sums of long key runs in an order that varies between runs",
+        "Replaces reduce_by_key with a reduction that has a fixed combination order (cub::DeviceSegmentedReduce over per-account offsets, or an equivalent)",
+        "Keeps the totals as float sums (no double or fixed-point accumulation)",
+        "Runs the program and shows 0 of 20 reruns differ, with the max relative error still below 1e-5",
+        "Reports the time per call, which stays within a few times the original"
+      ]
+    },
+    {
+      "id": "cccl-compose-events",
+      "prompt": "code/replay.cu computes the net effect of an event log on the GPU, but the register value doesn't match the CPU replay (it prints MISMATCH). Find out why and fix it. The composition has to stay on the GPU (no host loop over the events). Run it and explain the cause.",
+      "files": [
+        "files/cccl-compose-events/code/replay.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Explains that thrust::reduce (like cub::DeviceReduce) requires the binary operator to be commutative as well as associative: the GPU reduction combines partial results out of order, and composing updates (Then) is associative but not commutative, so the result is silently wrong even though nothing errors. Fixes it with an algorithm that preserves operand order for associative operators: thrust::inclusive_scan(log.begin(), log.end(), out.begin(), Then{}) (or cub::DeviceScan::InclusiveScan) and taking the last element, optionally writing through a discarding/last-element output to avoid the extra array, or an equivalent order-preserving reduction on the GPU. The Then operator keeps its meaning. After the fix the program prints register after replay: gpu=3279595927 cpu=3279595927 -> MATCH.",
+      "assertions": [
+        "Explains that thrust::reduce needs a commutative operator and reorders operands, and that composing the updates is associative but not commutative",
+        "Fixes it on the GPU with an order-preserving algorithm (thrust::inclusive_scan / cub::DeviceScan and taking the last element, or an equivalent), without a host loop over the events",
+        "Runs the program and reports MATCH with register value 3279595927"
+      ]
+    },
+    {
+      "id": "cccl-fuse-passes",
+      "prompt": "diagnose() in code/hot_particles.cu runs every simulation step and shows up in our profile. It also allocates three full-size temporaries, which we can't afford at the production particle count. Make it as fast as you can and get rid of the full-size temporaries. The three printed results must stay the same. Report the time per step before and after.",
+      "files": [
+        "files/cccl-fuse-passes/code/hot_particles.cu"
+      ],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Fuses the five passes (two transforms for speed squared, a transform for the kinetic energy, copy_if, then reduce and max_element) into a single pass that never materializes speed2, energy or hot: a thrust::transform_reduce (or reduce over a transform iterator, or cub::DeviceReduce::TransformReduce) over a zip iterator of vx, vy, vz and mass, whose transform computes the energy and returns a small struct/tuple {count, energy sum as double, max} for particles above the threshold (identity otherwise) and whose reduction adds counts and energies and takes the max. No device_vector of size n is allocated inside diagnose(). The printed results stay hot particles: 1429673, hot energy: 5.043568e+08, hottest: 597.2832, and the measured time per step drops by roughly an order of magnitude (about 8.6 ms to under 1 ms on an RTX 4090).",
+      "assertions": [
+        "Computes the energies on the fly with fancy iterators or transform_reduce (zip/transform iterators) instead of materializing the speed2, energy and hot arrays",
+        "No full-size temporary device arrays remain in diagnose()",
+        "Keeps the printed results: hot particles 1429673, hot energy 5.043568e+08, hottest 597.2832",
+        "Reports measured time per step before and after, with the new version several times faster"
+      ]
+    },
+    {
+      "id": "cccl-kernel-argmax",
+      "prompt": "I need a CUDA kernel that finds the largest value in a device array of floats and where it is (the first position if the maximum occurs more than once). n can be up to 500 million and it runs once per frame, so it has to be fast. Write peak.cu with `void find_peak(const float* d_x, size_t n, float* peak, size_t* index)` plus a test main, build it and run it. We're on CUDA 13.4.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Implements find_peak with a CCCL algorithm instead of a hand-written reduction kernel: thrust::max_element(thrust::device, d_x, d_x + n) (returns the first maximum; index = it - d_x), or cub::DeviceReduce::ArgMax(d_x, d_max_out, d_index_out, n) (CCCL 3.4+, writes the value and a 64-bit index of the first maximum), and tells the user that this replaces a custom kernel because the library reduction is already tuned and tested. Uses an execution policy (thrust::device) or device_pointer_cast because d_x is a raw device pointer. The test main checks the result against a CPU reference, includes a case with a duplicated maximum to show the first position is returned and a size that is not a multiple of the block size, and the program builds with nvcc -std=c++17 and passes.",
+      "assertions": [
+        "Implements find_peak with a CCCL algorithm (thrust::max_element, cub::DeviceReduce::ArgMax, or a Thrust/CUB reduction over value-index pairs) rather than a hand-written reduction kernel",
+        "Returns the first position when the maximum is duplicated and tests that case",
+        "Builds and runs the test, which passes against a CPU reference"
+      ]
+    },
+    {
+      "id": "cccl-kernel-histogram",
+      "prompt": "Write a CUDA kernel that computes the 256-bin histogram of an 8-bit grayscale image that is already on the GPU (16384 x 16384, one byte per pixel). It's part of an auto-exposure loop, so it should be fast. Put it in hist.cu as `void histogram256(const unsigned char* d_img, size_t n_pixels, unsigned int* d_hist)` with a test main, build it and run it. We're on CUDA 13.4.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Implements histogram256 with cub::DeviceHistogram::HistogramEven instead of a hand-written atomics kernel: HistogramEven(d_img, d_hist, 257, 0, 256, n_pixels) (num_levels is bins + 1 = 257; levels are [0, 256) so every byte value gets its own bin), using either the two-phase temp-storage form or the single-call form, and checking the returned cudaError_t. Tells the user that CUB already provides a tuned histogram so no custom kernel is needed. The test main fills an image on the GPU or host, compares all 256 bins against a CPU histogram, checks that the counts sum to n_pixels, and the program builds with nvcc -std=c++17 and passes.",
+      "assertions": [
+        "Implements histogram256 with cub::DeviceHistogram (HistogramEven or HistogramRange) or another CCCL algorithm rather than a hand-written histogram kernel",
+        "Passes 257 levels over [0, 256) (or equivalent) so that all 256 byte values are counted",
+        "Builds and runs the test, which matches a CPU histogram"
+      ]
+    },
+    {
+      "id": "cccl-kernel-bbox",
+      "prompt": "I need a CUDA kernel that computes the axis-aligned bounding box of a point cloud that is already on the GPU: 100M points stored as `struct Point { float x, y, z; }`. It runs every frame, so it has to be fast. Write bbox.cu with `void bounding_box(const Point* d_pts, size_t n, Point* lo, Point* hi)` plus a test main, build it and run it. We're on CUDA 13.4.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Implements bounding_box as a single library reduction instead of a hand-written reduction kernel: thrust::transform_reduce(thrust::device, d_pts, d_pts + n, to_box, identity_box, merge_boxes) or thrust::reduce / cub::DeviceReduce::Reduce / TransformReduce with a small Box {lo, hi} struct, where the identity is {+FLT_MAX or +inf, -FLT_MAX or -inf} per component and the operator takes component-wise min and max (it is associative and commutative). All six values come out of one pass; it does not run six separate reductions or copy the points to the host. Tells the user the library reduction replaces a custom kernel. Passes an execution policy (thrust::device) since d_pts is a raw device pointer. The test compares against a CPU loop, including a size that is not a multiple of the block size, builds with nvcc -std=c++17 and passes.",
+      "assertions": [
+        "Implements bounding_box with a CCCL reduction (thrust::transform_reduce / reduce, or cub::DeviceReduce) rather than a hand-written reduction kernel",
+        "Computes all six bounds in a single pass over the points (one reduction over a box struct or tuple, not six separate reductions)",
+        "Builds and runs the test, which passes against a CPU reference"
+      ]
+    },
+    {
+      "id": "cccl-kernel-first-diff",
+      "prompt": "I need a CUDA kernel that compares two byte buffers that are already on the GPU (up to 4 GB each) and returns the index of the first byte where they differ, or n if they are identical. Write firstdiff.cu with `size_t first_difference(const unsigned char* d_a, const unsigned char* d_b, size_t n)` plus a test main, build it and run it. We're on CUDA 13.4.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "Implements first_difference with a CCCL search instead of a hand-written kernel: thrust::mismatch(thrust::device, d_a, d_a + n, d_b).first - d_a, or thrust::find_if / cub::DeviceFind::FindIf over a counting or zip iterator with a predicate comparing d_a[i] and d_b[i], or cuda::std::mismatch with the cuda::execution::gpu policy; all return the first differing position and n when the buffers are equal. Uses 64-bit indices so buffers larger than 2^32 bytes work. Tells the user the library call replaces a custom kernel. The test covers identical buffers (returns n), a difference at index 0, at the last byte, and several differences (the lowest index wins), builds with nvcc -std=c++17 and passes.",
+      "assertions": [
+        "Implements first_difference with a CCCL algorithm (thrust::mismatch, thrust::find_if, cub::DeviceFind, or cuda::std::mismatch) rather than a hand-written search kernel",
+        "Returns n for identical buffers and the lowest index when several bytes differ, and tests both",
+        "Builds and runs the test, which passes"
+      ]
+    },
+    {
+      "id": "cccl-runtime-launch",
+      "prompt": "Write saxpy.cu using libcu++'s runtime API from the CUDA 13.4 toolkit instead of the raw CUDA C API: no cudaMalloc/cudaFree, no cudaStreamCreate, no <<<...>>> launch. Create a stream on device 0, allocate device buffers for x and y (n = 1 << 24 floats) from the device's default memory pool, fill them on the GPU, launch a kernel that computes y = a * x + y, copy y back to the host and check it against the expected values. Build it and run it.",
+      "files": [],
+      "expected_skill": "cccl",
+      "expected_script": null,
+      "expected_output": "A saxpy.cu that uses the libcu++ runtime API shipped with CCCL 3.5: cuda::device_ref dev = cuda::devices[0] (<cuda/devices>); cuda::stream stream{dev} (<cuda/stream>); buffers from the default pool, e.g. auto x = cuda::make_buffer<float>(stream, cuda::device_default_memory_pool(dev), n, cuda::no_init) (<cuda/buffer>, <cuda/memory_pool>); kernels written as functors or lambdas with a __device__ operator() and launched with cuda::launch(stream, cuda::make_config(cuda::grid_dims(...), cuda::block_dims<256>()), kernel, args...) (<cuda/launch>), passing the buffers as cuda::std::span<float>; the result is copied back with cuda::copy_bytes(stream, buffer, host_vector) (<cuda/algorithm>) or an equivalent libcu++ copy, followed by stream.sync(). No cudaMalloc, cudaStreamCreate or <<<>>> remain. It builds with nvcc -std=c++17 (or c++20), runs, and the check against the expected y values passes.",
+      "assertions": [
+        "Creates the stream with cuda::stream on cuda::devices[0] (no cudaStreamCreate)",
+        "Allocates the device buffers with cuda::make_buffer / cuda::buffer from cuda::device_default_memory_pool (no cudaMalloc)",
+        "Launches the kernels with cuda::launch and a cuda::make_config configuration (no <<<...>>>)",
+        "Copies the result back with a libcu++ facility (cuda::copy_bytes or equivalent) and synchronizes the stream",
+        "Builds and runs the program and reports that the check against the expected values passes"
+      ]
+    }
+  ]
+}

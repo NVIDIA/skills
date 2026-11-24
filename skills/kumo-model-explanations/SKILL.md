@@ -23,7 +23,8 @@ with its in-process `kumo.engine` runtime and retained local run files.
 - If several runs or trainer/refit directories exist, list candidates with their paths and ask
   which one the user means, before showing any score. Never silently select the newest
   directory or combine different runs.
-- Identify the task type, target/positive class, explanation stage, and fit/refit used.
+- Identify the task type, target/positive class, explanation stage, and the fit/refit used
+  (training) or the recorded run ID and checkpoint (prediction).
   Record unknowns explicitly. These determine what the scores can mean.
 
 Read [the artifact workflow](references/artifacts.md) for discovery, executable readers,
@@ -52,7 +53,10 @@ batches, where `B = max(eval_batch_size // 4, 1)`. A smaller population processe
 
 Prediction producer outcomes are independent: a failed producer's partial files are unavailable
 through the API, while another completed producer remains readable. Reopening the retained run
-preserves disabled, unsupported and failed states and their recorded errors. Coverage records
+preserves disabled, unsupported and failed states and their recorded errors when the status file
+was written. Status writes are best effort: if no status file was retained,
+`PredictionExplanations.load` raises `kumo.InvalidRunError`; if an earlier write succeeded but the
+final one failed, the reopened run reports `failed` even for producers that completed. Check the prediction logs before calling either a cause. Coverage records
 generation work, so it does not shrink when files are removed or only partly copied; check
 availability separately. Sample membership comes from the saved mappings.
 
@@ -98,10 +102,12 @@ is a lead to investigate, not proof of leakage or a causal mechanism.
 
 Every answer, however short, carries:
 
-- the run, task, stage, selected trainer/refit and the exact file paths read;
-- gradient scores named as Kumo gradient attribution over the processed test subset, normalized
-  across the graph as observed (the default producer, when the total is positive), and never
-  called drivers, probabilities or percentages;
+- the run, task, stage and the exact file paths read; for training, the selected trainer/refit;
+  for prediction, the recorded `run_id` and `coverage.checkpoint_path` (prediction runs have no
+  trainer/refit selection; `None` means the checkpoint was not resolved, e.g. a disabled run);
+- for training only, gradient scores named as Kumo gradient attribution over the processed test
+  subset, normalized across the graph as observed (the default producer, when the total is
+  positive), and never called drivers, probabilities or percentages; prediction runs record none;
 - for cohorts, each cohort's population share beside its mean prediction and, when the file
   records one, mean target, read from column analysis;
 - for a plot, the plotting code in the reply, reading the selected run's files, titled with the
