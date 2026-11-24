@@ -4,9 +4,10 @@
 # Verify every commit in a pull request carries a Signed-off-by
 # trailer per the project's DCO requirement (see CONTRIBUTING.md).
 #
-# The automated/sync-skills and bot/regenerate-skill-metadata branches
-# are exempt — they're bot-managed (the daily mirror bot and the skill
-# metadata regenerator), not contributors. The legal anchor for synced
+# The automated/sync-skills, automated/sync-plugins and
+# bot/regenerate-skill-metadata branches are exempt — they're bot-managed
+# (the skill and plugin mirror bots and the skill metadata regenerator),
+# not contributors. The legal anchor for synced
 # content lives on the human onboarding PR that registered the component
 # in components.d; the daily sync and metadata regen are downstream
 # plumbing.
@@ -40,7 +41,7 @@ jobs:
 
           # Bot-managed branches are exempt — see header comment.
           case "$HEAD_REF" in
-            automated/sync-skills|bot/regenerate-skill-metadata)
+            automated/sync-skills|automated/sync-plugins|bot/regenerate-skill-metadata)
               echo "DCO check exempt for bot-managed branch '$HEAD_REF'."
               exit 0
               ;;
