@@ -40,7 +40,7 @@ Each entry under `skills:` requires:
 
 ## Plugins (optional)
 
-A component may also publish one or more **plugins** — a directory in the product repo that bundles skills with their evals, MCP servers, hooks and assets, plus a `plugin.json`, `plugin-card.md`, `plugin.oms.sig` and `BENCHMARK.md` (plugin-level eval data is optional; the bundled skills carry their own). Plugins are mirrored byte-for-byte into `plugins/<catalog_dir>/` by a separate hourly workflow (`sync-plugins.yml`, PR branch `automated/sync-plugins`) with the same signature-drift and compliance gates as skills. The catalog never generates or edits anything inside a mirrored plugin; `version` in `plugin.json` is owned by the product repo and must increase whenever the plugin's content changes.
+A component may also publish one or more **plugins** — a directory in the product repo that bundles skills with their evals, MCP servers, hooks and assets, plus a `plugin.json`, `plugin-card.md`, `plugin.oms.sig` and `BENCHMARK.md` whose verdict is PASS or PASS WITH WARNINGS (plugin-level eval data is optional; the bundled skills carry their own). Plugins are mirrored byte-for-byte into `plugins/<catalog_dir>/` by a separate hourly workflow (`sync-plugins.yml`, PR branch `automated/sync-plugins`) with the same signature-drift and compliance gates as skills. The catalog never generates or edits anything inside a mirrored plugin; `version` in `plugin.json` is owned by the product repo and must increase whenever the plugin's content changes.
 
 | Field         | Type   | Description                                                                                     |
 |---------------|--------|-------------------------------------------------------------------------------------------------|
