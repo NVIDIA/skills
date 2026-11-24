@@ -1878,6 +1878,13 @@
       "last_modified": "2026-11-18"
     },
     {
+      "name": "nemo-gym-reward-profiling",
+      "path": "skills/nemo-gym-reward-profiling",
+      "content_digest": "sha256:e6ed7f0326980cb0f799126b9bb2151074e1bdec5874ca98fdae6eb6c0d45772",
+      "last_commit": "aa348b0cc26c375522cd2582d2860a8737154410",
+      "last_modified": "2026-11-24"
+    },
+    {
       "name": "nemo-mbridge-mlm-bridge-training",
       "path": "skills/nemo-mbridge-mlm-bridge-training",
       "content_digest": "sha256:1e0f0b52fccc215ef95426fb1912fb299940a1e279dd12077cdf10eea5358423",
@@ -2685,9 +2692,9 @@
     {
       "name": "tao-analyze-changenet-rca",
       "path": "skills/tao-analyze-changenet-rca",
-      "content_digest": "sha256:70f5d20765a475b89d0e4040293838c11bfb61e9d931bd264bf392df558d7b69",
-      "last_commit": "da7046cfa5130affbf300132c8ce53fd46b4dfac",
-      "last_modified": "2026-09-22"
+      "content_digest": "sha256:02842a943366a51f2039558c069d5103cd157c0bd8a1128f3b0ee80a60ee560d",
+      "last_commit": "fe018b7a8f32b1a366aab85f00792380ea5b8377",
+      "last_modified": "2026-11-24"
     },
     {
       "name": "tao-analyze-detection-kpi",
@@ -2706,9 +2713,9 @@
     {
       "name": "tao-analyze-gaps-visual-changenet",
       "path": "skills/tao-analyze-gaps-visual-changenet",
-      "content_digest": "sha256:bddd44975f33a89c32144c115117bc0c461ccfbdd54204eb79ebd2ad3be66f5a",
-      "last_commit": "252ba53487b73eaafbfcccf3e750c7b350b93db9",
-      "last_modified": "2026-11-23"
+      "content_digest": "sha256:981287a4a97cf6d9373ca5f15eed671da369aa9870705034397168032706a3d3",
+      "last_commit": "fe018b7a8f32b1a366aab85f00792380ea5b8377",
+      "last_modified": "2026-11-24"
     },
     {
       "name": "tao-analyze-gaps-vlm-bcq",
@@ -2853,9 +2860,9 @@
     {
       "name": "tao-mine-aoi-images",
       "path": "skills/tao-mine-aoi-images",
-      "content_digest": "sha256:e6586d3a1c35fbbce87b2bbe708edca8fedd47ededa861265dd181efd399a2b5",
-      "last_commit": "12a4695275bbb8e57e401f54a91bed6176c047df",
-      "last_modified": "2026-10-16"
+      "content_digest": "sha256:f1ec6de13091c8c1cde73c7ae8f88058663e2b3c72fc9ee379225fe25e2d0e50",
+      "last_commit": "fe018b7a8f32b1a366aab85f00792380ea5b8377",
+      "last_modified": "2026-11-24"
     },
     {
       "name": "tao-mine-nearest-neighbors",

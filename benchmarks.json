@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": "skills/*/BENCHMARK.md",
-  "skill_count": 484,
-  "result_row_count": 4559,
+  "skill_count": 485,
+  "result_row_count": 4564,
   "skills_without_results": [
     "deepstream-generate-pipeline",
     "digital-health-clinical-asr-setup",
@@ -5612,6 +5612,27 @@
       "average_uplift_pct": 28.25
     },
     {
+      "skill": "nemo-gym-reward-profiling",
+      "evaluation_date": "2026-11-20",
+      "environment": "k8s-sandbox",
+      "evaluator_version": "1.6.10",
+      "dataset_digest": "sha256:4786da0fd072041d60b9f858457929a19d08378369a7c9c8928b967b0942b9fc",
+      "validation_status": "passed",
+      "tasks": 17,
+      "attempts_per_task": 1,
+      "pass_threshold_pct": null,
+      "verdict": "PASS",
+      "agents": [
+        "claude-code",
+        "codex"
+      ],
+      "evaluation_source": null,
+      "catalog_dir": "nemo-gym-reward-profiling",
+      "component": "NeMo Gym",
+      "has_results": true,
+      "average_uplift_pct": 15.0
+    },
+    {
       "skill": "nemo-mbridge-mlm-bridge-training",
       "evaluation_date": "2026-07-15",
       "environment": "astra-sandbox",
@@ -8016,13 +8037,13 @@
     },
     {
       "skill": "tao-analyze-changenet-rca",
-      "evaluation_date": "2026-09-21",
+      "evaluation_date": "2026-11-24",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
+      "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:0f59e0d0e9480172b2f30333f8d1e5c4879d9904763edbe80d78be71db557687",
-      "validation_status": null,
+      "validation_status": "passed",
       "tasks": 1,
-      "attempts_per_task": 3,
+      "attempts_per_task": 1,
       "pass_threshold_pct": null,
       "verdict": "PASS",
       "agents": [
@@ -8033,7 +8054,7 @@
       "catalog_dir": "tao-analyze-changenet-rca",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 47.5
+      "average_uplift_pct": 23.8
     },
     {
       "skill": "tao-analyze-detection-kpi",
@@ -8079,7 +8100,7 @@
     },
     {
       "skill": "tao-analyze-gaps-visual-changenet",
-      "evaluation_date": "2026-11-20",
+      "evaluation_date": "2026-11-24",
       "environment": "k8s-sandbox",
       "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:ae84a6a3fa64e143c6bed275bc0db66b4be02dc112bc310fce577d286399c2d4",
@@ -8096,7 +8117,7 @@
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 31.89
+      "average_uplift_pct": 34.74
     },
     {
       "skill": "tao-analyze-gaps-vlm-bcq",
@@ -8520,11 +8541,11 @@
     },
     {
       "skill": "tao-mine-aoi-images",
-      "evaluation_date": "2026-10-16",
+      "evaluation_date": "2026-11-24",
       "environment": "k8s-sandbox",
-      "evaluator_version": "1.5.6",
+      "evaluator_version": "1.6.10",
       "dataset_digest": "sha256:2f6b99a4a594874f43e0be6c3915392736c3f9b703a55e95ada6d1a02662b36a",
-      "validation_status": null,
+      "validation_status": "passed",
       "tasks": 1,
       "attempts_per_task": 1,
       "pass_threshold_pct": null,
@@ -8537,7 +8558,7 @@
       "catalog_dir": "tao-mine-aoi-images",
       "component": "TAO Toolkit",
       "has_results": true,
-      "average_uplift_pct": 46.76
+      "average_uplift_pct": 34.27
     },
     {
       "skill": "tao-mine-nearest-neighbors",
@@ -32545,6 +32566,51 @@
       "uplift_pct": null
     },
     {
+      "catalog_dir": "nemo-gym-reward-profiling",
+      "component": "NeMo Gym",
+      "dimension": "Security",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 100.0,
+      "uplift_pct": 0.0
+    },
+    {
+      "catalog_dir": "nemo-gym-reward-profiling",
+      "component": "NeMo Gym",
+      "dimension": "Correctness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 97.7,
+      "uplift_pct": 15.3
+    },
+    {
+      "catalog_dir": "nemo-gym-reward-profiling",
+      "component": "NeMo Gym",
+      "dimension": "Discoverability",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 81.5,
+      "uplift_pct": null
+    },
+    {
+      "catalog_dir": "nemo-gym-reward-profiling",
+      "component": "NeMo Gym",
+      "dimension": "Effectiveness",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 90.4,
+      "uplift_pct": 29.7
+    },
+    {
+      "catalog_dir": "nemo-gym-reward-profiling",
+      "component": "NeMo Gym",
+      "dimension": "Efficiency",
+      "num": null,
+      "agent": "codex",
+      "score_pct": 84.2,
+      "uplift_pct": null
+    },
+    {
       "catalog_dir": "nemo-mbridge-mlm-bridge-training",
       "component": "NeMo MBridge",
       "dimension": "Security",
@@ -42154,7 +42220,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 86.7
+      "uplift_pct": 100.0
     },
     {
       "catalog_dir": "tao-analyze-changenet-rca",
@@ -42162,8 +42228,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
-      "uplift_pct": 80.0
+      "score_pct": 20.0,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-analyze-changenet-rca",
@@ -42180,7 +42246,7 @@
       "dimension": "Discoverability",
       "num": null,
       "agent": "codex",
-      "score_pct": 95.0,
+      "score_pct": 0.0,
       "uplift_pct": null
     },
     {
@@ -42190,7 +42256,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 83.3
+      "uplift_pct": 66.7
     },
     {
       "catalog_dir": "tao-analyze-changenet-rca",
@@ -42198,8 +42264,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 83.3,
-      "uplift_pct": 35.0
+      "score_pct": 33.3,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-analyze-changenet-rca",
@@ -42207,7 +42273,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.6,
+      "score_pct": 98.6,
       "uplift_pct": null
     },
     {
@@ -42216,8 +42282,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.4,
-      "uplift_pct": null
+      "score_pct": 93.7,
+      "uplift_pct": -0.1
     },
     {
       "catalog_dir": "tao-analyze-detection-kpi",
@@ -42432,8 +42498,8 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 60.0,
-      "uplift_pct": 40.0
+      "score_pct": 80.0,
+      "uplift_pct": 60.0
     },
     {
       "catalog_dir": "tao-analyze-gaps-visual-changenet",
@@ -44305,7 +44371,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 80.0
     },
     {
       "catalog_dir": "tao-mine-aoi-images",
@@ -44313,7 +44379,7 @@
       "dimension": "Correctness",
       "num": null,
       "agent": "codex",
-      "score_pct": 100.0,
+      "score_pct": 60.0,
       "uplift_pct": 60.0
     },
     {
@@ -44341,7 +44407,7 @@
       "num": null,
       "agent": "claude-code",
       "score_pct": 100.0,
-      "uplift_pct": 100.0
+      "uplift_pct": 83.3
     },
     {
       "catalog_dir": "tao-mine-aoi-images",
@@ -44349,8 +44415,8 @@
       "dimension": "Effectiveness",
       "num": null,
       "agent": "codex",
-      "score_pct": 85.0,
-      "uplift_pct": 68.3
+      "score_pct": 33.3,
+      "uplift_pct": 16.6
     },
     {
       "catalog_dir": "tao-mine-aoi-images",
@@ -44358,7 +44424,7 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "claude-code",
-      "score_pct": 72.3,
+      "score_pct": 97.8,
       "uplift_pct": null
     },
     {
@@ -44367,8 +44433,8 @@
       "dimension": "Efficiency",
       "num": null,
       "agent": "codex",
-      "score_pct": 98.5,
-      "uplift_pct": -1.0
+      "score_pct": 93.6,
+      "uplift_pct": 0.0
     },
     {
       "catalog_dir": "tao-mine-nearest-neighbors",
